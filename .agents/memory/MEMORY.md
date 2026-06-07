@@ -1,0 +1,1 @@
+- [Program health merge pattern](program-health-merge.md) — HEALTH data in ProgramMap.tsx merges into program data at setSelectedItem; ContextPanel gets all fields.

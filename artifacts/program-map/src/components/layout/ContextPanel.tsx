@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers } from 'lucide-react';
+import { Layers, Calendar } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -311,6 +311,175 @@ export function ContextPanel() {
       );
     }
 
+    if (type === 'program') {
+      const opStatus = data.operationalStatus;
+      const statusDot = opStatus === 'active' ? 'bg-emerald-500' : opStatus === 'in-discovery' ? 'bg-sky-400' : 'bg-muted-foreground/50';
+      const statusLabel = opStatus === 'active' ? 'Active' : opStatus === 'in-discovery' ? 'In Discovery' : 'Draft';
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            {/* Header */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Program</Badge>
+                <ConfidenceBadge status={data.confidence || 'needs-review'} />
+                {opStatus && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
+                    <span className={`w-1.5 h-1.5 rounded-full ${statusDot}`} />
+                    <span className="text-muted-foreground">{statusLabel}</span>
+                  </span>
+                )}
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground">{data.name}</h2>
+              <p className="text-xs text-muted-foreground italic leading-snug">{data.strategicRole}</p>
+            </div>
+
+            {/* Health snapshot */}
+            {opStatus && (
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { val: data.activeCohorts ?? 0, lbl: 'cohorts' },
+                  { val: data.learnerCount > 0 ? data.learnerCount : '—', lbl: data.learnerLabel || 'learners' },
+                  { val: data.applicants ?? data.waitlist ?? '—', lbl: data.applicants ? 'applied' : data.waitlist ? 'waitlist' : 'pipeline' },
+                ].map(s => (
+                  <div key={s.lbl} className="rounded-lg bg-muted/40 border border-border p-2 text-center">
+                    <p className="text-base font-bold text-foreground">{String(s.val)}</p>
+                    <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{s.lbl}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Next event */}
+            {data.nextDate && (
+              <div className="flex items-start gap-2 bg-primary/5 border border-primary/15 rounded-md p-3">
+                <Calendar className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[10px] font-bold text-primary uppercase mb-0.5">Next · {data.nextDate}</p>
+                  <p className="text-xs text-foreground leading-snug">{data.nextEvent}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Executive summary */}
+            {data.executiveSummary && (
+              <p className="text-sm text-muted-foreground italic leading-relaxed">{data.executiveSummary}</p>
+            )}
+
+            {/* Why it matters */}
+            {data.whyItMatters && (
+              <div className="bg-primary/5 border border-primary/15 rounded-md p-3">
+                <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+                <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
+              </div>
+            )}
+
+            {/* Key facts */}
+            {data.keyFacts?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Key Facts</span>
+                <ul className="space-y-1">
+                  {data.keyFacts.map((f: string, i: number) => (
+                    <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                      <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0 mt-2" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* RESOLVE phases */}
+            {data.resolvePhases?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">RESOLVE Phases</span>
+                <div className="flex flex-wrap gap-1">
+                  {data.resolvePhases.map((p: string) => (
+                    <Badge key={p} variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 text-[10px]">{p}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Penny capabilities */}
+            {data.pennyFeatures?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Penny Capabilities</span>
+                <div className="flex flex-wrap gap-1">
+                  {data.pennyFeatures.map((f: string) => (
+                    <Badge key={f} variant="secondary" className="text-[10px]">{f}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Trail OS capabilities */}
+            {data.trailOsCapabilities?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Trail OS Capabilities</span>
+                <div className="flex flex-wrap gap-1">
+                  {data.trailOsCapabilities.map((c: string) => (
+                    <Badge key={c} variant="outline" className="bg-sky-50 text-sky-700 border-sky-200 text-[10px]">{c}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Slack channels */}
+            {data.commChannels?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
+                  Slack Channels <span className="text-muted-foreground/50 normal-case font-normal">(Planned Q3 2025)</span>
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {data.commChannels.map((c: string) => (
+                    <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">{c}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Source documents */}
+            {data.docs?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Source Documents</span>
+                <div className="flex flex-wrap gap-1">
+                  {data.docs.map((d: string) => (
+                    <Badge key={d} variant="outline" className="bg-muted text-muted-foreground text-[10px]">{d}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* What breaks if missing */}
+            {data.whatBreaksIfMissing && (
+              <div className="bg-amber-50 border border-amber-100 rounded-md p-3">
+                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">What Breaks If Missing</span>
+                <p className="text-sm text-amber-900 leading-tight">{data.whatBreaksIfMissing}</p>
+              </div>
+            )}
+
+            {/* Health note */}
+            {data.healthNote && (
+              <div className="bg-amber-100/50 border border-amber-200 rounded-md p-3">
+                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">⚠ Health Flag</span>
+                <p className="text-xs text-amber-900">{data.healthNote}</p>
+              </div>
+            )}
+
+            {/* Source + confidence */}
+            <div className="text-[11px] text-muted-foreground border-t border-border/40 pt-3">
+              <p><span className="font-semibold text-foreground">Source: </span>{data.sourceDoc}</p>
+              {data.confidence === 'needs-review' && (
+                <p className="mt-1 text-amber-700">⚠ Some details require source document review before treating as authoritative.</p>
+              )}
+              <p className="mt-1 text-muted-foreground/60">Future: Salesforce MCP · Knowledge links</p>
+            </div>
+          </div>
+        </ScrollArea>
+      );
+    }
+
     // Default rich panel for Program, Penny, Trail OS, Resolve, Demand
     return (
       <ScrollArea className="h-full">
@@ -318,7 +487,6 @@ export function ContextPanel() {
           <div className="space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
-                {type === 'program' && 'Program'}
                 {type === 'penny' && 'Penny AI Capability'}
                 {type === 'trailOs' && 'Trail OS Capability'}
                 {type === 'resolve' && 'RESOLVE Phase'}
@@ -352,7 +520,7 @@ export function ContextPanel() {
               </div>
             )}
 
-            {(type !== 'program') && data.programs && data.programs.length > 0 && (
+            {data.programs && data.programs.length > 0 && (
               <div className="space-y-2">
                 <span className="block text-xs font-semibold text-foreground uppercase">Programs Impacted</span>
                 <div className="flex flex-wrap gap-1">
@@ -374,28 +542,6 @@ export function ContextPanel() {
               </div>
             )}
 
-            {type === 'program' && (
-              <>
-                {data.pricing && (
-                  <div>
-                    <span className="block text-xs font-semibold text-foreground uppercase mb-1">Pricing Model</span>
-                    <p className="text-sm text-muted-foreground">{data.pricing}</p>
-                  </div>
-                )}
-                {data.docs && data.docs.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="block text-xs font-semibold text-foreground uppercase">Source Documents</span>
-                    <div className="flex flex-wrap gap-1">
-                      {data.docs.map((d: string) => (
-                        <Badge key={d} variant="outline" className="bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80" onClick={() => handleChipClick('document', d, '/source-docs')}>
-                          {d}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
 
             {data.whatBreaksIfMissing && (
               <div className="bg-amber-50 border border-amber-100 rounded-md p-3">
