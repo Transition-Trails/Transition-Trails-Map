@@ -42,6 +42,11 @@ import PennyIntegrations from "@/pages/penny/PennyIntegrations";
 
 import LibraryDocuments from "@/pages/library/LibraryDocuments";
 import Templates        from "@/pages/library/Templates";
+
+import CommunicationChannels    from "@/pages/admin/CommunicationChannels";
+import CommunicationRouting     from "@/pages/admin/CommunicationRouting";
+import CommMessageTemplates     from "@/pages/admin/MessageTemplates";
+import OperationsCommunications from "@/pages/operations/Communications";
 import SalesforceKB     from "@/pages/library/SalesforceKB";
 import SourceMapping    from "@/pages/library/SourceMapping";
 import LibrarySearch    from "@/pages/library/LibrarySearch";
@@ -75,6 +80,7 @@ function Router() {
       <Route path="/operations/website-marketing" component={WebsiteMarketing} />
       <Route path="/operations/penny-health"      component={PennyHealth} />
       <Route path="/operations/trail-os-health"   component={TrailOsHealth} />
+      <Route path="/operations/communications"    component={OperationsCommunications} />
 
       <Route path="/demand/intake"         component={Intake} />
       <Route path="/demand/cases"          component={DemandCases} />
@@ -100,6 +106,9 @@ function Router() {
       <Route path="/library/source-mapping" component={SourceMapping} />
       <Route path="/library/search"        component={LibrarySearch} />
 
+      <Route path="/admin/comm-channels"  component={CommunicationChannels} />
+      <Route path="/admin/comm-routing"   component={CommunicationRouting} />
+      <Route path="/admin/comm-templates" component={CommMessageTemplates} />
       <Route path="/admin/:section" component={Admin} />
       <Route path="/admin"          component={Admin} />
 

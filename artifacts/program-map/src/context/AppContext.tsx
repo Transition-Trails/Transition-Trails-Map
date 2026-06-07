@@ -4,8 +4,13 @@ import { sourceDocuments as staticDocs, type SourceDocument } from '@/data/sourc
 import { resolvePhases as staticResolvePhases, type ResolvePhase } from '@/data/resolvePhases';
 import { pennyCapabilities as staticPenny, type PennyCapability } from '@/data/pennyCapabilities';
 import { trailOsCapabilities as staticTrailOs, type TrailOsCapability } from '@/data/trailOsCapabilities';
+import { commProviders as staticCommProviders, type CommProvider } from '@/data/commProviders';
+import { commRoutes as staticCommRoutes, type CommRoute } from '@/data/commRouting';
+import { messageTemplates as staticTemplates, type MessageTemplate } from '@/data/messageTemplates';
 
-type SelectedItemType = 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'document';
+export type SelectedItemType =
+  | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'document'
+  | 'commProvider' | 'commRoute' | 'commTemplate';
 
 interface AppState {
   activePage: string;
@@ -17,6 +22,9 @@ interface AppState {
   resolvePhases: ResolvePhase[];
   pennyCapabilities: PennyCapability[];
   trailOsCapabilities: TrailOsCapability[];
+  commProviders: CommProvider[];
+  commRoutes: CommRoute[];
+  messageTemplates: MessageTemplate[];
   setActivePage: (page: string) => void;
   setActiveLens: (lens: string) => void;
   setSelectedItem: (item: { type: SelectedItemType; id: string; data: any } | null) => void;
@@ -31,15 +39,19 @@ interface AppState {
 const AppContext = createContext<AppState | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [activePage, setActivePage] = useState('program-map');
-  const [activeLens, setActiveLens] = useState('executive');
+  const [activePage, setActivePage]     = useState('program-map');
+  const [activeLens, setActiveLens]     = useState('executive');
   const [selectedItem, setSelectedItem] = useState<AppState['selectedItem']>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [programs, setPrograms] = useState<Program[]>(staticPrograms);
-  const [sourceDocuments, setSourceDocuments] = useState<SourceDocument[]>(staticDocs);
-  const [resolvePhases, setResolvePhases] = useState<ResolvePhase[]>(staticResolvePhases);
-  const [pennyCapabilities, setPennyCapabilities] = useState<PennyCapability[]>(staticPenny);
+  const [searchOpen, setSearchOpen]     = useState(false);
+
+  const [programs, setPrograms]                       = useState<Program[]>(staticPrograms);
+  const [sourceDocuments, setSourceDocuments]         = useState<SourceDocument[]>(staticDocs);
+  const [resolvePhases, setResolvePhases]             = useState<ResolvePhase[]>(staticResolvePhases);
+  const [pennyCapabilities, setPennyCapabilities]     = useState<PennyCapability[]>(staticPenny);
   const [trailOsCapabilities, setTrailOsCapabilities] = useState<TrailOsCapability[]>(staticTrailOs);
+  const [commProviders]     = useState<CommProvider[]>(staticCommProviders);
+  const [commRoutes]        = useState<CommRoute[]>(staticCommRoutes);
+  const [messageTemplates]  = useState<MessageTemplate[]>(staticTemplates);
 
   function syncSelected(type: SelectedItemType, id: string, updates: Record<string, any>) {
     setSelectedItem(prev => {
@@ -79,6 +91,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider value={{
       activePage, activeLens, selectedItem, searchOpen,
       programs, sourceDocuments, resolvePhases, pennyCapabilities, trailOsCapabilities,
+      commProviders, commRoutes, messageTemplates,
       setActivePage, setActiveLens, setSelectedItem, setSearchOpen,
       updateProgram, updateDocument, updateResolvePhase,
       updatePennyCapability, updateTrailOsCapability,

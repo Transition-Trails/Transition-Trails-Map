@@ -114,6 +114,203 @@ export function ContextPanel() {
       );
     }
 
+    if (type === 'commProvider') {
+      const statusBg = data.status === 'prototype'
+        ? 'bg-amber-50 border-amber-200 text-amber-700'
+        : 'bg-muted border-border text-muted-foreground';
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Comm Provider</Badge>
+                <span className={`inline-flex items-center text-[10px] font-semibold border px-2 py-0.5 rounded-full ${statusBg}`}>
+                  {data.status === 'prototype' ? 'Prototype-Ready' : 'Future'}
+                </span>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground">{data.name}</h2>
+              <p className="text-xs text-muted-foreground">{data.tagline}</p>
+            </div>
+            <div>
+              <span className="block text-xs font-semibold text-foreground uppercase mb-1">Connection Status</span>
+              <p className="text-sm text-muted-foreground">{data.connectionStatus} — {data.futureSetup}</p>
+            </div>
+            <div>
+              <span className="block text-xs font-semibold text-foreground uppercase mb-1">Purpose</span>
+              <p className="text-sm text-muted-foreground leading-relaxed">{data.purpose}</p>
+            </div>
+            <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
+              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+              <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
+            </div>
+            {data.useCases?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Use Cases</span>
+                <ul className="space-y-1">
+                  {data.useCases.map((uc: string, i: number) => (
+                    <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                      <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0 mt-2" />
+                      {uc}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {data.relatedPennyCaps?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Penny Capabilities</span>
+                <div className="flex flex-wrap gap-1">
+                  {data.relatedPennyCaps.map((c: string) => <Badge key={c} variant="secondary">{c}</Badge>)}
+                </div>
+              </div>
+            )}
+            {data.relatedDemandEvents?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Events</span>
+                <div className="flex flex-wrap gap-1">
+                  {data.relatedDemandEvents.map((e: string) => <Badge key={e} variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">{e}</Badge>)}
+                </div>
+              </div>
+            )}
+            {data.requiredSetup?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Required Setup</span>
+                <ol className="space-y-1">
+                  {data.requiredSetup.map((step: string, i: number) => (
+                    <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
+                      <span className="text-[10px] font-bold text-muted-foreground/60 mt-0.5 w-3 flex-shrink-0">{i + 1}.</span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+            <div className="text-[11px] text-muted-foreground">
+              <span className="font-semibold text-foreground">Source / Owner: </span>{data.sourceOwner}
+            </div>
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    if (type === 'commRoute') {
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Comm Route</Badge>
+                <Badge variant="outline" className="bg-amber-50 border-amber-200 text-amber-700 text-[10px]">Planned</Badge>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground">{data.eventType}</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">{data.description}</p>
+            </div>
+            <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
+              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+              <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: 'Trigger',   value: data.trigger },
+                { label: 'Audience', value: data.audience },
+                { label: 'Owner',    value: data.owner },
+              ].map(f => (
+                <div key={f.label}>
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-0.5">{f.label}</span>
+                  <p className="text-sm text-muted-foreground">{f.value}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Slack Channel (Now)</span>
+              <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-md px-3 py-2">
+                <span className="font-mono text-sm text-foreground">{data.slackChannel}</span>
+                <span className="text-[10px] text-amber-700 ml-auto">{data.slackStatus}</span>
+              </div>
+            </div>
+            {data.googleChatSpace && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Google Chat (Future)</span>
+                <div className="flex items-center gap-2 bg-muted/30 border border-border/50 rounded-md px-3 py-2">
+                  <span className="text-sm text-muted-foreground">{data.googleChatSpace}</span>
+                  <span className="text-[10px] text-muted-foreground ml-auto">{data.googleChatStatus}</span>
+                </div>
+              </div>
+            )}
+            {data.relatedPennyCap && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Penny Capability</span>
+                <Badge variant="secondary">{data.relatedPennyCap}</Badge>
+              </div>
+            )}
+            {data.relatedDemandEvent && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Event</span>
+                <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">{data.relatedDemandEvent}</Badge>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    if (type === 'commTemplate') {
+      const statusColor = data.status === 'active' ? 'text-emerald-700' : data.status === 'draft' ? 'text-amber-700' : 'text-muted-foreground';
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Message Template</Badge>
+                <Badge variant="outline" className={`text-[10px] ${statusColor} bg-white`}>
+                  {data.status?.charAt(0).toUpperCase() + data.status?.slice(1)}
+                </Badge>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground">{data.name}</h2>
+            </div>
+            <div className="bg-muted/60 border border-border rounded-md p-3">
+              <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5">Message Preview</span>
+              <p className="text-sm text-foreground leading-relaxed font-mono text-[12px]">{data.messageSummary}</p>
+            </div>
+            <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
+              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+              <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: 'Provider',     value: data.provider },
+                { label: 'Destination', value: data.destination },
+                { label: 'Audience',    value: data.audience },
+                { label: 'Owner',       value: data.owner },
+                { label: 'Reviewed',    value: data.lastReviewed },
+              ].map(f => (
+                <div key={f.label}>
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-0.5">{f.label}</span>
+                  <p className="text-sm text-muted-foreground font-mono text-[12px]">{f.value}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <span className="block text-xs font-semibold text-foreground uppercase mb-1">Trigger Event</span>
+              <p className="text-sm text-muted-foreground">{data.triggerEvent}</p>
+            </div>
+            {data.relatedPennyCap && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Penny Capability</span>
+                <Badge variant="secondary">{data.relatedPennyCap}</Badge>
+              </div>
+            )}
+            {data.relatedDemandEvent && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Event</span>
+                <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">{data.relatedDemandEvent}</Badge>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      );
+    }
+
     // Default rich panel for Program, Penny, Trail OS, Resolve, Demand
     return (
       <ScrollArea className="h-full">
