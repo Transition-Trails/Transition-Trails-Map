@@ -18,7 +18,7 @@ export function Topbar() {
   const tabs = [
     { id: '/', label: 'Program Map', icon: Map },
     { id: '/trail-os-penny', label: 'Trail OS + Penny', icon: Database },
-    { id: '/resolve-demand', label: 'RESOLVE + Demand', icon: Compass },
+    { id: '/resolve-demand', label: 'RESOLVE Framework', icon: Compass },
     { id: '/source-docs', label: 'Source Documents', icon: BookOpen },
     { id: '/admin', label: 'Admin', icon: Settings },
   ];
