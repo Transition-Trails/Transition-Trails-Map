@@ -1,87 +1,216 @@
-export const programs = [
+export type ConfidenceStatus = 'confirmed' | 'needs-review' | 'draft' | 'deprecated';
+
+export interface Program {
+  id: string;
+  entityType: 'program';
+  name: string;
+  color: string;
+  pricingStatus: 'subsidized' | 'paid' | 'grant-subsidized';
+  confidence: ConfidenceStatus;
+  sourceDoc: string; // primary source of truth document name
+  strategicRole: string;
+  audience: string;
+  prerequisite: string;
+  format: string;
+  duration: string;
+  pricing: string; // kept for sidebar only, not shown on map cards
+  coreOutcome: string;
+  executiveSummary: string;
+  whyItMatters: string;
+  keyFacts: string[];
+  outcomes: string[];
+  whatBreaksIfMissing: string;
+  dependencies: string;
+  pennyFeatures: string[];
+  trailOsCapabilities: string[];
+  resolvePhases: string[];
+  docs: string[];
+  relatedConcepts: Array<{ label: string; type: string; id: string }>;
+}
+
+export const programs: Program[] = [
   {
     id: "explorers-trail",
+    entityType: "program",
     name: "Explorer's Trail",
-    audience: "Job seekers with no prior tech background, career changers",
-    prerequisite: "None",
-    format: "4-week cohort, 2 sessions/week, online synchronous",
-    duration: "4 weeks",
-    pricing: "$0 (subsidized, grant-funded)",
-    outcomes: ["Digital literacy", "Resume basics", "LinkedIn optimization", "Intro to career tools"],
-    dependencies: "None (entry point)",
-    pennyFeatures: ["Trail Guide", "Learning Coach", "Career Translator"],
-    trailOsCapabilities: ["Intake coordination", "Learner-client matching", "Org readiness"],
-    resolvePhases: ["Recognize", "Evaluate"],
-    docs: ["Brand Book", "Explorer's Trail Blueprint", "Facilitator Guide"],
     color: "sky-blue",
-    status: "Subsidized",
+    pricingStatus: "subsidized",
+    confidence: "confirmed",
+    sourceDoc: "Explorer's Trail Blueprint",
+    strategicRole: "Entry point — removes access barriers and builds foundational digital literacy",
+    audience: "Job seekers with no prior tech background; career changers",
+    prerequisite: "None",
+    format: "Cohort-based, online synchronous",
+    duration: "4 weeks",
+    pricing: "$0 — subsidized, grant-funded",
+    coreOutcome: "Learners gain foundational digital literacy and career readiness tools",
+    executiveSummary: "Explorer's Trail is the no-barrier entry program designed for adults new to digital work environments. It removes cost and prerequisite obstacles so that underserved job seekers can access the Transition Trails ecosystem. Success here feeds the entire program pipeline.",
+    whyItMatters: "Without Explorer's Trail, there is no accessible entry point for non-technical learners. The entire cohort pipeline depends on this program functioning as a reliable, high-quality on-ramp.",
+    keyFacts: [
+      "No cost to the learner (grant-funded)",
+      "No prior tech experience required",
+      "Online synchronous — maximizes access",
+      "Direct feeder into Foundations Trail",
+      "Facilitator Guide governs delivery"
+    ],
+    outcomes: ["Digital literacy", "Resume basics", "LinkedIn optimization", "Introduction to career tools"],
+    whatBreaksIfMissing: "Pipeline to all downstream programs collapses. Without Explorer's Trail, only learners with existing digital skills can access Transition Trails — defeating the equity mission.",
+    dependencies: "None — this is the entry point",
+    pennyFeatures: ["Trail Guide", "Learning Coach", "Career Translator"],
+    trailOsCapabilities: ["Intake Coordination", "Learner-Client Matching", "Org Readiness"],
+    resolvePhases: ["Recognize", "Evaluate"],
+    docs: ["Explorer's Trail Blueprint", "Facilitator Guide", "Brand Book"],
+    relatedConcepts: [
+      { label: "Foundations Trail", type: "program", id: "foundations-trail" },
+      { label: "Trail Guide", type: "penny", id: "trail-guide" },
+      { label: "Intake Coordination", type: "trailOs", id: "intake" }
+    ]
   },
   {
     id: "foundations-trail",
+    entityType: "program",
     name: "Foundations Trail",
-    audience: "Explorer's Trail graduates, early-career adults",
-    prerequisite: "Explorer's Trail or assessment",
-    format: "6-week cohort, 3 sessions/week, hybrid",
+    color: "deep-teal",
+    pricingStatus: "paid",
+    confidence: "confirmed",
+    sourceDoc: "Foundations Trail Blueprint",
+    strategicRole: "Core skill-building — develops employable technical and professional competencies",
+    audience: "Explorer's Trail graduates; early-career adults with basic digital literacy",
+    prerequisite: "Explorer's Trail or equivalent assessment",
+    format: "Cohort-based, hybrid delivery",
     duration: "6 weeks",
-    pricing: "$250 (sliding scale available)",
-    outcomes: ["Salesforce basics", "Productivity tools", "Professional presence", "Strategic analysis intro"],
+    pricing: "Needs Review — pricing not confirmed in source materials",
+    coreOutcome: "Learners develop foundational Salesforce, productivity, and professional skills",
+    executiveSummary: "Foundations Trail bridges digital literacy into employable technical skills. It is the core competency-building layer of the program sequence, preparing learners for advanced project-based work in Guided Trail.",
+    whyItMatters: "This program represents the highest-volume, highest-impact stage for most learners. It is where career transformation becomes concrete and measurable.",
+    keyFacts: [
+      "Prerequisite: Explorer's Trail or assessment",
+      "Hybrid delivery format",
+      "6-week cohort structure",
+      "Covers Salesforce basics, productivity, professional presence",
+      "Governed by Foundations Trail Blueprint"
+    ],
+    outcomes: ["Salesforce basics", "Productivity tools", "Professional presence", "Strategic analysis introduction"],
+    whatBreaksIfMissing: "Learners cannot progress to Guided Trail without foundational technical competencies. The program sequence breaks and advanced cohorts cannot be filled.",
     dependencies: "Explorer's Trail",
     pennyFeatures: ["Trail Guide", "Learning Coach", "Exam Coach", "Build Companion"],
-    trailOsCapabilities: ["Project delivery coordination", "Documentation", "Coach visibility"],
+    trailOsCapabilities: ["Project Delivery", "Documentation", "Coach Visibility"],
     resolvePhases: ["Recognize", "Evaluate", "Solve"],
     docs: ["Foundations Trail Blueprint", "Program Comparison Sheet", "Facilitator Guide"],
-    color: "deep-teal",
-    status: "Paid",
+    relatedConcepts: [
+      { label: "Explorer's Trail", type: "program", id: "explorers-trail" },
+      { label: "Guided Trail", type: "program", id: "guided-trail" },
+      { label: "Exam Coach", type: "penny", id: "exam-coach" }
+    ]
   },
   {
     id: "guided-trail",
+    entityType: "program",
     name: "Guided Trail",
-    audience: "Foundations Trail graduates, career advancers seeking specialization",
+    color: "trail-green",
+    pricingStatus: "paid",
+    confidence: "confirmed",
+    sourceDoc: "Guided Trail Blueprint",
+    strategicRole: "Advanced specialization — develops real-world portfolio and professional identity",
+    audience: "Foundations Trail graduates; career advancers seeking specialization",
     prerequisite: "Foundations Trail or equivalent experience",
-    format: "12-week cohort, intensive project-based, hybrid",
+    format: "Intensive project-based, hybrid, sprint cadence",
     duration: "12 weeks (4 sprints × 3 weeks)",
-    pricing: "$750 (scholarship options available)",
+    pricing: "Needs Review — pricing not confirmed in source materials",
+    coreOutcome: "Learners build a portfolio of real-world projects and achieve advanced tool mastery",
+    executiveSummary: "Guided Trail is the flagship program — the most intensive, most structured, and most differentiated offering in the Transition Trails ecosystem. Sprint-based delivery mirrors professional work environments. Outcomes here directly drive employer placement.",
+    whyItMatters: "Guided Trail is the primary driver of employer placement outcomes and organizational reputation. Its sprint cadence and project portfolio are the core differentiators of the Transition Trails model.",
+    keyFacts: [
+      "12 weeks across 4 structured sprints",
+      "Sprint cadence governed by Guided Trail Sprint Cadence document",
+      "RESOLVE framework applied as a course module",
+      "Intern Workbook structures learner engagement",
+      "Most Trail OS and Penny capabilities active here"
+    ],
     outcomes: ["Real-world tool mastery", "Salesforce advanced", "Strategic analysis", "Professional portfolio"],
+    whatBreaksIfMissing: "The pathway to employment outcomes collapses. Without Guided Trail, learners plateau at foundational skills and the organization loses its primary value proposition to employers.",
     dependencies: "Foundations Trail",
     pennyFeatures: ["Trail Guide", "Exam Coach", "Build Companion", "Quest Master", "Career Translator"],
-    trailOsCapabilities: ["Full delivery loop", "Sprint cadence coordination", "Outcomes tracking"],
+    trailOsCapabilities: ["Project Delivery", "Coach Visibility", "Outcomes Tracking"],
     resolvePhases: ["Solve", "Organize", "Leverage", "Verify"],
     docs: ["Guided Trail Blueprint", "Guided Trail Sprint Cadence", "RESOLVE Course Canvas", "Intern Workbook"],
-    color: "trail-green",
-    status: "Paid",
+    relatedConcepts: [
+      { label: "Foundations Trail", type: "program", id: "foundations-trail" },
+      { label: "Trail of Mastery", type: "program", id: "trail-of-mastery" },
+      { label: "Quest Master", type: "penny", id: "quest-master" },
+      { label: "Project Delivery", type: "trailOs", id: "delivery" }
+    ]
   },
   {
     id: "trail-of-mastery",
+    entityType: "program",
     name: "Trail of Mastery",
-    audience: "Guided Trail graduates, advanced practitioners",
+    color: "charcoal",
+    pricingStatus: "paid",
+    confidence: "draft",
+    sourceDoc: "Trail of Mastery Proposal",
+    strategicRole: "Leadership development — prepares advanced practitioners for mentorship and consulting roles",
+    audience: "Guided Trail graduates; advanced practitioners seeking leadership readiness",
     prerequisite: "Guided Trail + portfolio review",
-    format: "Ongoing cohort/project-based, 16 weeks",
-    duration: "16 weeks",
-    pricing: "$1,500 (employer-sponsored options available)",
-    outcomes: ["Leadership readiness", "Systems thinking", "Mentorship capability", "Org consulting"],
+    format: "Needs Review — format not confirmed in source materials",
+    duration: "Needs Review — duration not confirmed in source materials",
+    pricing: "Needs Review — pricing not confirmed in source materials",
+    coreOutcome: "Needs Review — outcomes not confirmed beyond proposal stage",
+    executiveSummary: "Trail of Mastery is currently in proposal stage. It represents the intended advanced tier of the ecosystem — a leadership and consulting readiness program for Guided Trail graduates. Details should be confirmed against the Trail of Mastery Proposal before being treated as authoritative.",
+    whyItMatters: "This program would close the loop on the ecosystem by giving the most advanced learners a path toward becoming practitioners, coaches, or organizational consultants — expanding Transition Trails' alumni-to-contributor pipeline.",
+    keyFacts: [
+      "Status: Proposal — not yet active",
+      "Primary source: Trail of Mastery Proposal document",
+      "Intended audience: Guided Trail graduates",
+      "Full details require source document review"
+    ],
+    outcomes: ["Needs Review"],
+    whatBreaksIfMissing: "Advanced practitioners have no pathway within the ecosystem — they exit after Guided Trail with no continuation option.",
     dependencies: "Guided Trail",
     pennyFeatures: ["Coach Intelligence Layer"],
-    trailOsCapabilities: ["Analytics layer"],
-    resolvePhases: ["Leverage", "Verify", "Execute", "Evolve"],
+    trailOsCapabilities: ["Outcomes Tracking", "Coach Visibility"],
+    resolvePhases: ["Leverage", "Verify"],
     docs: ["Trail of Mastery Proposal", "Pricing Analysis", "Program Comparison Sheet"],
-    color: "charcoal",
-    status: "Paid",
+    relatedConcepts: [
+      { label: "Guided Trail", type: "program", id: "guided-trail" },
+      { label: "Coach Intelligence Layer", type: "penny", id: "coach-intelligence" }
+    ]
   },
   {
     id: "digital-compass",
+    entityType: "program",
     name: "Digital Compass",
+    color: "sun-amber",
+    pricingStatus: "grant-subsidized",
+    confidence: "confirmed",
+    sourceDoc: "Digital Compass Blueprint",
+    strategicRole: "Nonprofit client track — distinct parallel program for organizational digital transformation",
     audience: "Nonprofit staff and leadership seeking digital transformation skills",
-    prerequisite: "None (separate track)",
-    format: "8-week hybrid cohort for nonprofit clients",
+    prerequisite: "None — separate track from the main trail sequence",
+    format: "Hybrid cohort, client-organization focused",
     duration: "8 weeks",
-    pricing: "Grant-subsidized, custom nonprofit pricing",
+    pricing: "Grant-subsidized; custom nonprofit pricing applies",
+    coreOutcome: "Nonprofit clients gain digital strategy capability and Salesforce for nonprofits skills",
+    executiveSummary: "Digital Compass is a parallel program track serving nonprofit organizations as clients rather than individual learners. It shares the Transition Trails pedagogical model but is designed for organizational change management. It connects to the main trail at the Guided Trail level for advanced participants.",
+    whyItMatters: "Digital Compass diversifies Transition Trails' revenue and impact model by serving organizations, not just individuals. It also opens partnership opportunities with the nonprofit sector.",
+    keyFacts: [
+      "Completely separate entry track — no individual-learner prerequisites",
+      "Nonprofit organizations are the clients",
+      "Grant-subsidized pricing model",
+      "Connects to Guided Trail level for advanced participants",
+      "Digital Compass Blueprint is the source of truth"
+    ],
     outcomes: ["Digital strategy", "Salesforce for nonprofits", "Data literacy", "Change management"],
-    dependencies: "Independent (parallel track, connects at Guided Trail level)",
+    whatBreaksIfMissing: "Transition Trails loses its nonprofit client revenue stream and organizational partnership pipeline. The ecosystem becomes individual-learner-only.",
+    dependencies: "Independent — connects laterally at Guided Trail level",
     pennyFeatures: ["Trail Guide", "Learning Coach", "Career Translator", "Build Companion"],
-    trailOsCapabilities: ["Intake coordination", "Org readiness", "Outcomes tracking"],
+    trailOsCapabilities: ["Intake Coordination", "Org Readiness", "Outcomes Tracking"],
     resolvePhases: ["Recognize", "Evaluate", "Solve", "Organize"],
     docs: ["Digital Compass Blueprint", "RESOLVE Course Canvas", "Brand Book"],
-    color: "sun-amber",
-    status: "Subsidized",
+    relatedConcepts: [
+      { label: "Guided Trail", type: "program", id: "guided-trail" },
+      { label: "Org Readiness", type: "trailOs", id: "readiness" },
+      { label: "Trail Guide", type: "penny", id: "trail-guide" }
+    ]
   }
 ];

@@ -8,6 +8,7 @@ import ProgramMap from "@/pages/ProgramMap";
 import TrailOSPenny from "@/pages/TrailOSPenny";
 import ResolveDemand from "@/pages/ResolveDemand";
 import SourceDocs from "@/pages/SourceDocs";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/trail-os-penny" component={TrailOSPenny} />
       <Route path="/resolve-demand" component={ResolveDemand} />
       <Route path="/source-docs" component={SourceDocs} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );

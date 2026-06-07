@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { programs } from '@/data/programs';
-import { Badge } from '@/components/ui/badge';
+import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 
 export default function ProgramMap() {
   const { activeLens, setSelectedItem, selectedItem } = useAppContext();
@@ -27,7 +26,7 @@ export default function ProgramMap() {
         <p className="text-muted-foreground">Navigate the learning trails and their interconnected dependencies.</p>
       </div>
 
-      <div className="flex-1 min-h-[400px] relative rounded-xl border border-border/50 bg-white/50 shadow-sm p-8 overflow-hidden">
+      <div className="flex-1 min-h-[500px] relative rounded-xl border border-border/50 bg-white/50 shadow-sm p-8 overflow-hidden">
         {/* Connection Lines (SVG) */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
           <defs>
@@ -36,39 +35,39 @@ export default function ProgramMap() {
             </marker>
           </defs>
           {/* Main Trail Path */}
-          <path d="M 150 200 L 350 200 L 550 200 L 750 200" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" opacity="0.4" markerEnd="url(#arrowhead)" />
-          <path d="M 350 200 L 550 200" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" opacity="0.4" markerEnd="url(#arrowhead)" />
-          <path d="M 550 200 L 750 200" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" opacity="0.4" markerEnd="url(#arrowhead)" />
+          <path d="M 220 220 L 380 220 L 640 220 L 900 220" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" opacity="0.4" markerEnd="url(#arrowhead)" />
+          <path d="M 380 220 L 640 220" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" opacity="0.4" markerEnd="url(#arrowhead)" />
+          <path d="M 640 220 L 900 220" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" opacity="0.4" markerEnd="url(#arrowhead)" />
           
           {/* Compass to Guided connection */}
-          <path d="M 550 350 L 550 260" stroke="hsl(var(--accent))" strokeWidth="2" strokeDasharray="6,6" fill="none" opacity="0.6" markerEnd="url(#arrowhead)" />
+          <path d="M 640 400 L 640 300" stroke="hsl(var(--accent))" strokeWidth="2" strokeDasharray="6,6" fill="none" opacity="0.6" markerEnd="url(#arrowhead)" />
         </svg>
 
         {/* Nodes */}
         <div className="relative w-full h-full z-10">
           
           {/* Explorer's */}
-          <div className="absolute top-[160px] left-[50px]">
+          <div className="absolute top-[140px] left-[20px]">
             <ProgramNode program={explorers} isSelected={isSelected(explorers?.id || '')} onClick={() => handleProgramClick(explorers)} lens={activeLens} />
           </div>
 
           {/* Foundations */}
-          <div className="absolute top-[160px] left-[250px]">
+          <div className="absolute top-[140px] left-[280px]">
             <ProgramNode program={foundations} isSelected={isSelected(foundations?.id || '')} onClick={() => handleProgramClick(foundations)} lens={activeLens} />
           </div>
 
           {/* Guided */}
-          <div className="absolute top-[160px] left-[450px]">
+          <div className="absolute top-[140px] left-[540px]">
             <ProgramNode program={guided} isSelected={isSelected(guided?.id || '')} onClick={() => handleProgramClick(guided)} lens={activeLens} />
           </div>
 
           {/* Mastery */}
-          <div className="absolute top-[160px] left-[650px]">
+          <div className="absolute top-[140px] left-[800px]">
             <ProgramNode program={mastery} isSelected={isSelected(mastery?.id || '')} onClick={() => handleProgramClick(mastery)} lens={activeLens} />
           </div>
 
           {/* Digital Compass */}
-          <div className="absolute top-[350px] left-[450px]">
+          <div className="absolute top-[400px] left-[540px]">
             <ProgramNode program={compass} isSelected={isSelected(compass?.id || '')} onClick={() => handleProgramClick(compass)} lens={activeLens} />
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground whitespace-nowrap bg-white/80 px-2 rounded-full border border-border/50">
               Nonprofit Client Program
@@ -81,7 +80,7 @@ export default function ProgramMap() {
         <div className="absolute bottom-6 left-6 p-4 rounded-lg border border-border bg-white/90 backdrop-blur shadow-sm max-w-sm">
           <h4 className="text-xs font-semibold uppercase tracking-wider mb-2 text-foreground">Active Lens Insights</h4>
           <p className="text-sm text-muted-foreground">
-            {activeLens === 'executive' && "Highlighting pricing models and subsidized vs paid status for portfolio balancing."}
+            {activeLens === 'executive' && "Highlighting strategic roles and outcomes for portfolio balancing."}
             {activeLens === 'program' && "Emphasizing audience targets and expected learning outcomes."}
             {activeLens === 'operations' && "Surfacing delivery format and duration metrics."}
             {activeLens === 'architect' && "Mapping cross-program dependencies and technology requirements."}
@@ -108,29 +107,34 @@ function ProgramNode({ program, isSelected, onClick, lens }: { program: any; isS
   return (
     <button
       onClick={onClick}
-      className={`group relative flex flex-col w-[160px] rounded-xl border-2 transition-all duration-200 text-left ${
-        isSelected ? 'scale-105 shadow-md border-primary ring-2 ring-primary/20 ring-offset-2 ring-offset-background' : 'hover:scale-105 hover:shadow-sm border-transparent'
+      className={`group relative flex flex-col w-[220px] rounded-xl border-2 transition-all duration-200 text-left ${
+        isSelected ? 'scale-105 shadow-md border-primary ring-2 ring-primary/20 ring-offset-2 ring-offset-background' : 'hover:scale-[1.02] hover:shadow-sm border-transparent'
       }`}
     >
-      <div className={`p-4 rounded-t-lg ${bgClass}`}>
-        <h3 className="font-semibold text-sm leading-tight">{program.name}</h3>
+      <div className={`p-4 rounded-t-lg ${bgClass} relative`}>
+        <h3 className="font-serif font-bold text-lg leading-tight mb-1">{program.name}</h3>
+        <p className="text-xs opacity-90 italic leading-snug line-clamp-2">{program.strategicRole}</p>
+        {program.confidence === 'draft' && (
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-white/20 uppercase tracking-wider backdrop-blur-sm">
+            Draft
+          </div>
+        )}
       </div>
       
-      <div className="p-3 bg-white rounded-b-lg border-t-0 border-x border-b border-border/50 h-[80px] flex flex-col justify-between">
+      <div className="p-4 bg-white rounded-b-lg border-t-0 border-x border-b border-border/50 min-h-[120px] flex flex-col gap-3">
         
-        {/* Dynamic content based on lens */}
-        <div className="text-xs text-muted-foreground line-clamp-2">
-          {lens === 'executive' && <span className="font-medium text-foreground">{program.pricing}</span>}
-          {lens === 'program' && <span>{program.audience}</span>}
-          {lens === 'operations' && <span>{program.format}</span>}
-          {lens === 'architect' && <span>Deps: {program.dependencies}</span>}
+        <div className="text-sm font-medium text-foreground leading-tight line-clamp-2">
+          {program.coreOutcome}
         </div>
 
-        <div className="mt-2 flex items-center justify-between">
-          <Badge variant={program.status === 'Paid' ? 'secondary' : 'outline'} className="text-[9px] px-1.5 py-0 h-4">
-            {program.status}
-          </Badge>
-          <span className="text-[10px] text-muted-foreground">{program.duration}</span>
+        <div className="text-xs text-muted-foreground mt-auto">
+          <span className="font-semibold text-foreground mr-1">For:</span>
+          <span className="line-clamp-1">{program.audience.split(';')[0]}</span>
+        </div>
+
+        <div className="flex items-center gap-2 mt-2 pt-3 border-t border-border/50">
+          <ConfidenceBadge status={program.confidence || 'needs-review'} />
+          <span className="text-[10px] text-muted-foreground ml-auto">{program.duration} • {program.format.split(',')[0]}</span>
         </div>
       </div>
     </button>

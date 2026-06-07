@@ -1,4 +1,4 @@
-import { Search, Map, Database, Compass, BookOpen, Search as SearchIcon, Eye } from 'lucide-react';
+import { Search, Map, Database, Compass, BookOpen, Search as SearchIcon, Eye, Settings } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ export function Topbar() {
     { id: '/trail-os-penny', label: 'Trail OS + Penny', icon: Database },
     { id: '/resolve-demand', label: 'RESOLVE + Demand', icon: Compass },
     { id: '/source-docs', label: 'Source Documents', icon: BookOpen },
+    { id: '/admin', label: 'Admin', icon: Settings },
   ];
 
   return (

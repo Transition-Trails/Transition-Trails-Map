@@ -1,17 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { MapPin, Box, Database, Compass, BookOpen, Layers } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
+import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 
 export function ContextPanel() {
   const { selectedItem, setSelectedItem } = useAppContext();
   const [, setLocation] = useLocation();
 
   const handleChipClick = (type: string, id: string, route?: string) => {
-    // In a real app, we'd lookup the actual data here based on type/id
-    // For now we just clear it, or we could set it to mock data
     if (route) {
       setLocation(route);
     }
@@ -22,247 +21,207 @@ export function ContextPanel() {
       return (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center text-muted-foreground">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <MapPin className="w-8 h-8 text-primary/40" />
+            <Layers className="w-8 h-8 text-primary/40" />
           </div>
-          <p className="text-sm">Select any program, phase, capability, or document to explore its context.</p>
+          <p className="text-sm">Select any program, capability, phase, or document to open its decision brief.</p>
         </div>
       );
     }
 
     const { type, data } = selectedItem;
 
+    if (type === 'document') {
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
+                  Document
+                </Badge>
+                <ConfidenceBadge status={data.confidence || 'needs-review'} />
+                <Badge variant={data.status === 'Active' ? 'default' : 'secondary'} className="text-[10px]">
+                  {data.status}
+                </Badge>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground">
+                {data.name}
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground italic leading-relaxed">{data.summary}</p>
+              
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Purpose</span>
+                <p className="text-sm text-muted-foreground">{data.purpose}</p>
+              </div>
+
+              {data.quickTake && (
+                <div className="bg-emerald-50 border border-emerald-100 rounded-md p-3">
+                  <span className="block text-[10px] font-bold text-emerald-800 uppercase mb-1">Quick Take</span>
+                  <p className="text-sm text-emerald-900 leading-tight">{data.quickTake}</p>
+                </div>
+              )}
+
+              {data.sourceOfTruthFor && data.sourceOfTruthFor.length > 0 && (
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-1">Source of Truth For</span>
+                  <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
+                    {data.sourceOfTruthFor.map((item: string, i: number) => <li key={i}>{item}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {data.notSourceOfTruthFor && data.notSourceOfTruthFor.length > 0 && (
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-1">Not Source of Truth For</span>
+                  <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
+                    {data.notSourceOfTruthFor.map((item: string, i: number) => <li key={i}>{item}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {data.keyDecisionsInfluenced && data.keyDecisionsInfluenced.length > 0 && (
+                <div className="space-y-1">
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-1">Key Decisions Influenced</span>
+                  <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
+                    {data.keyDecisionsInfluenced.map((item: string, i: number) => <li key={i}>{item}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {data.programs && data.programs.length > 0 && (
+                <div className="space-y-2">
+                  <span className="block text-xs font-semibold text-foreground uppercase">Programs Affected</span>
+                  <div className="flex flex-wrap gap-1">
+                    {data.programs.map((p: string) => <Badge key={p} variant="secondary">{p}</Badge>)}
+                  </div>
+                </div>
+              )}
+
+              {data.relatedDocuments && data.relatedDocuments.length > 0 && (
+                <div className="space-y-2">
+                  <span className="block text-xs font-semibold text-foreground uppercase">Related Documents</span>
+                  <div className="flex flex-wrap gap-1">
+                    {data.relatedDocuments.map((d: string) => <Badge key={d} variant="outline" className="bg-muted text-muted-foreground">{d}</Badge>)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // Default rich panel for Program, Penny, Trail OS, Resolve, Demand
     return (
       <ScrollArea className="h-full">
         <div className="p-5 space-y-6">
-          <div className="space-y-2">
-            <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
-              {type === 'program' && 'Program'}
-              {type === 'penny' && 'Penny AI'}
-              {type === 'trailOs' && 'Trail OS'}
-              {type === 'resolve' && 'RESOLVE Phase'}
-              {type === 'demand' && 'Demand Stage'}
-              {type === 'document' && 'Document'}
-            </Badge>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
+                {type === 'program' && 'Program'}
+                {type === 'penny' && 'Penny AI Capability'}
+                {type === 'trailOs' && 'Trail OS Capability'}
+                {type === 'resolve' && 'RESOLVE Phase'}
+                {type === 'demand' && 'Demand Stage'}
+              </Badge>
+              <ConfidenceBadge status={data.confidence || 'needs-review'} />
+            </div>
             <h2 className="text-xl font-serif font-bold text-foreground">
               {type === 'resolve' ? `${data.letter} — ${data.name}` : data.name}
             </h2>
           </div>
 
-          {type === 'program' && (
-            <>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="block text-muted-foreground mb-1 text-xs">Format</span>
-                    <span className="font-medium">{data.format}</span>
-                  </div>
-                  <div>
-                    <span className="block text-muted-foreground mb-1 text-xs">Duration</span>
-                    <span className="font-medium">{data.duration}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="block text-muted-foreground mb-1 text-xs">Audience</span>
-                    <span className="font-medium">{data.audience}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="block text-muted-foreground mb-1 text-xs">Pricing</span>
-                    <span className="font-medium text-primary">{data.pricing}</span>
-                  </div>
-                </div>
+          <div className="space-y-6">
+            {data.executiveSummary && (
+              <p className="text-sm text-muted-foreground italic leading-relaxed">{data.executiveSummary}</p>
+            )}
 
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase">Top Outcomes</span>
-                  <ul className="list-disc pl-4 space-y-1 text-sm">
-                    {data.outcomes?.slice(0, 3).map((out: string, i: number) => (
-                      <li key={i}>{out}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
-                    <Box className="w-3 h-3" /> Related Penny AI
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {data.pennyFeatures?.map((p: string) => (
-                      <Badge key={p} variant="secondary" className="cursor-pointer hover:bg-secondary/80" onClick={() => handleChipClick('penny', p, '/trail-os-penny')}>
-                        {p}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
-                    <Compass className="w-3 h-3" /> RESOLVE Phases
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {data.resolvePhases?.map((r: string) => (
-                      <Badge key={r} variant="outline" className="bg-white border-primary/20 cursor-pointer hover:bg-primary/5" onClick={() => handleChipClick('resolve', r, '/resolve-demand')}>
-                        {r}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
-                    <BookOpen className="w-3 h-3" /> Source Documents
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {data.docs?.map((d: string) => (
-                      <Badge key={d} variant="outline" className="bg-muted cursor-pointer hover:bg-muted/80" onClick={() => handleChipClick('document', d, '/source-docs')}>
-                        {d}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+            {data.whyItMatters && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Why It Matters</span>
+                <p className="text-sm text-foreground">{data.whyItMatters}</p>
               </div>
-            </>
-          )}
+            )}
 
-          {type === 'penny' && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{data.purpose}</p>
-              
+            {data.keyFacts && data.keyFacts.length > 0 && (
+              <div className="space-y-1">
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Key Facts</span>
+                <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
+                  {data.keyFacts.map((fact: string, i: number) => <li key={i}>{fact}</li>)}
+                </ul>
+              </div>
+            )}
+
+            {(type !== 'program') && data.programs && data.programs.length > 0 && (
               <div className="space-y-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Supported Programs</span>
+                <span className="block text-xs font-semibold text-foreground uppercase">Programs Impacted</span>
                 <div className="flex flex-wrap gap-1">
-                  {data.programs?.map((p: string) => (
-                    <Badge key={p} variant="secondary">{p}</Badge>
-                  ))}
+                  {data.programs.map((p: string) => <Badge key={p} variant="secondary">{p}</Badge>)}
                 </div>
               </div>
+            )}
 
+            {data.relatedConcepts && data.relatedConcepts.length > 0 && (
               <div className="space-y-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Trail OS Connections</span>
+                <span className="block text-xs font-semibold text-foreground uppercase">Related Concepts</span>
                 <div className="flex flex-wrap gap-1">
-                  {data.trailOsCapabilities?.map((t: string) => (
-                    <Badge key={t} variant="outline" className="bg-white border-primary/20">{t}</Badge>
+                  {data.relatedConcepts.map((c: any, i: number) => (
+                    <Badge key={i} variant="outline" className="bg-white border-primary/20 text-xs">
+                      {c.label}
+                    </Badge>
                   ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {type === 'trailOs' && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">{data.description}</p>
-              
-              <div className="space-y-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Active in Programs</span>
-                <div className="flex flex-wrap gap-1">
-                  {data.programs?.map((p: string) => (
-                    <Badge key={p} variant="secondary">{p}</Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-xs font-semibold text-muted-foreground uppercase">Penny Integrations</span>
-                <div className="flex flex-wrap gap-1">
-                  {data.penny?.map((p: string) => (
-                    <Badge key={p} variant="outline" className="bg-white border-primary/20">{p}</Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {type === 'resolve' && (
-            <div className="space-y-4">
-              <p className="text-sm text-foreground">{data.purpose}</p>
-              
-              <div className="space-y-3 mt-4 border-t pt-4">
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Inputs</span>
-                  <span className="text-sm">{data.inputs}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Outputs</span>
-                  <span className="text-sm">{data.outputs}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Owner</span>
-                  <span className="text-sm font-medium">{data.owner}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Implications</span>
-                  <span className="text-sm text-muted-foreground">{data.implications}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {type === 'demand' && (
-            <div className="space-y-4">
-              <p className="text-sm text-foreground">{data.purpose}</p>
-              
-              <div className="space-y-3 mt-4 border-t pt-4">
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Current Items</span>
-                  <ul className="list-disc pl-4 space-y-1 text-sm">
-                    {data.items?.map((item: string, i: number) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
+            {type === 'program' && (
+              <>
+                {data.pricing && (
                   <div>
-                    <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Inputs</span>
-                    <span className="text-sm">{data.inputs}</span>
+                    <span className="block text-xs font-semibold text-foreground uppercase mb-1">Pricing Model</span>
+                    <p className="text-sm text-muted-foreground">{data.pricing}</p>
                   </div>
-                  <div>
-                    <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Outputs</span>
-                    <span className="text-sm">{data.outputs}</span>
+                )}
+                {data.docs && data.docs.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="block text-xs font-semibold text-foreground uppercase">Source Documents</span>
+                    <div className="flex flex-wrap gap-1">
+                      {data.docs.map((d: string) => (
+                        <Badge key={d} variant="outline" className="bg-muted text-muted-foreground cursor-pointer hover:bg-muted/80" onClick={() => handleChipClick('document', d, '/source-docs')}>
+                          {d}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Owner</span>
-                  <span className="text-sm font-medium">{data.owner}</span>
-                </div>
-              </div>
-            </div>
-          )}
+                )}
+              </>
+            )}
 
-          {type === 'document' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Category</span>
-                  <Badge variant="outline">{data.category}</Badge>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Status</span>
-                  <Badge variant={data.status === 'Active' ? 'default' : 'secondary'}>{data.status}</Badge>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Owner</span>
-                  <span className="text-sm font-medium">{data.owner}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Last Updated</span>
-                  <span className="text-sm">{data.lastUpdated}</span>
-                </div>
+            {data.whatBreaksIfMissing && (
+              <div className="bg-amber-50 border border-amber-100 rounded-md p-3">
+                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">What Breaks If Missing</span>
+                <p className="text-sm text-amber-900 leading-tight">{data.whatBreaksIfMissing}</p>
               </div>
+            )}
 
-              <div className="space-y-2 mt-4 border-t pt-4">
-                <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Programs Affected</span>
-                <div className="flex flex-wrap gap-1">
-                  {data.programs?.map((p: string) => (
-                    <Badge key={p} variant="secondary">{p}</Badge>
-                  ))}
-                </div>
+            {data.confidence === 'needs-review' && (
+              <div className="bg-amber-100/50 border border-amber-200 rounded-md p-3">
+                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">Source Mapping Note</span>
+                <p className="text-xs text-amber-900 leading-tight">Some details in this brief require source mapping. Treat operational specifics as preliminary.</p>
               </div>
-            </div>
-          )}
+            )}
+
+          </div>
         </div>
       </ScrollArea>
     );
   };
 
   return (
-    <div className="w-[280px] h-full bg-card border-l border-border flex flex-col">
+    <div className="w-[300px] h-full bg-card border-l border-border flex flex-col shrink-0">
       <div className="px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2">
         <Layers className="w-4 h-4 text-primary" />
         <h3 className="font-semibold text-sm">Follow the Trail</h3>
