@@ -14,17 +14,18 @@ export function Sidebar() {
   ];
 
   const lenses = [
-    { id: 'executive', label: 'Executive View', icon: Activity },
-    { id: 'program', label: 'Program View', icon: BookOpen },
-    { id: 'operations', label: 'Operations View', icon: Settings },
-    { id: 'architect', label: 'Architect View', icon: Box },
+    { id: 'executive', label: 'Executive', icon: Activity },
+    { id: 'program', label: 'Program', icon: Eye },
+    { id: 'operations', label: 'Operations', icon: Box },
+    { id: 'architect', label: 'Architect', icon: Settings },
   ];
 
   return (
-    <div className="w-[200px] flex flex-col h-full bg-sidebar border-r border-sidebar-border overflow-y-auto">
-      <div className="flex-1 py-4 px-3 space-y-6">
-        
-        <div className="space-y-1">
+    <div className="w-[188px] flex-shrink-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border">
+
+      <div className="flex-1 flex flex-col py-3 overflow-y-auto">
+
+        <nav className="px-2 space-y-0.5">
           {navItems.map((item) => {
             const isActive = location === item.id;
             const Icon = item.icon;
@@ -32,24 +33,27 @@ export function Sidebar() {
               <button
                 key={item.id}
                 onClick={() => setLocation(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                data-testid={`nav-${item.id.replace('/', '') || 'home'}`}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-colors text-left ${
                   isActive
                     ? 'bg-primary text-primary-foreground'
                     : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                {item.label}
+                <Icon className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">{item.label}</span>
               </button>
             );
           })}
-        </div>
+        </nav>
 
-        <div>
-          <div className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Active Lens
-          </div>
-          <div className="space-y-1">
+        <div className="mx-2 my-3 border-t border-sidebar-border" />
+
+        <div className="px-2">
+          <p className="px-2.5 mb-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+            Lens
+          </p>
+          <div className="space-y-0.5">
             {lenses.map((lens) => {
               const isActive = activeLens === lens.id;
               const Icon = lens.icon;
@@ -57,37 +61,36 @@ export function Sidebar() {
                 <button
                   key={lens.id}
                   onClick={() => setActiveLens(lens.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                  data-testid={`lens-${lens.id}`}
+                  className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs transition-colors text-left ${
                     isActive
-                      ? 'bg-primary/20 text-primary font-medium border border-primary/30'
-                      : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground border border-transparent'
+                      ? 'bg-primary/15 text-primary font-semibold'
+                      : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  {lens.label}
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="truncate">{lens.label} View</span>
                 </button>
               );
             })}
           </div>
         </div>
-
       </div>
 
-      <div className="p-4 border-t border-sidebar-border space-y-4">
+      <div className="px-2 pb-3 border-t border-sidebar-border pt-3 space-y-0.5">
         <button
           onClick={() => setLocation('/admin')}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+          data-testid="nav-admin"
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-colors text-left ${
             location === '/admin'
               ? 'bg-primary/10 text-primary'
               : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground'
           }`}
         >
-          <Settings className="w-4 h-4" />
-          Admin
+          <Settings className="w-4 h-4 flex-shrink-0" />
+          <span className="truncate">Admin</span>
         </button>
-        <div className="text-xs text-muted-foreground text-center">
-          v1.0 — Internal
-        </div>
+        <p className="text-[10px] text-muted-foreground text-center pt-1">v1.0 — Internal</p>
       </div>
     </div>
   );

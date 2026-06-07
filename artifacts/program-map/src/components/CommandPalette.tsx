@@ -9,16 +9,14 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { useAppContext } from '@/context/AppContext';
-import { programs } from '@/data/programs';
 import { pennyCapabilities } from '@/data/pennyCapabilities';
 import { trailOsCapabilities } from '@/data/trailOsCapabilities';
 import { resolvePhases } from '@/data/resolvePhases';
 import { demandStages } from '@/data/demandStages';
-import { sourceDocuments } from '@/data/sourceDocuments';
 import { Map, Database, Compass, BookOpen, Layers } from 'lucide-react';
 
 export function CommandPalette() {
-  const { searchOpen, setSearchOpen, setSelectedItem } = useAppContext();
+  const { searchOpen, setSearchOpen, setSelectedItem, programs, sourceDocuments } = useAppContext();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
@@ -40,10 +38,10 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={searchOpen} onOpenChange={setSearchOpen}>
-      <CommandInput placeholder="Type a command or search..." />
+      <CommandInput placeholder="Search programs, capabilities, phases, documents…" />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        
+
         <CommandGroup heading="Programs">
           {programs.map((p) => (
             <CommandItem key={p.id} onSelect={() => handleSelect(p, 'program', '/')}>
@@ -80,15 +78,23 @@ export function CommandPalette() {
           ))}
         </CommandGroup>
 
+        <CommandGroup heading="Demand Stages">
+          {demandStages.map((d) => (
+            <CommandItem key={d.id} onSelect={() => handleSelect(d, 'demand', '/resolve-demand')}>
+              <Layers className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>{d.name}</span>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+
         <CommandGroup heading="Source Documents">
-          {sourceDocuments.slice(0, 5).map((d) => (
+          {sourceDocuments.map((d) => (
             <CommandItem key={d.id} onSelect={() => handleSelect(d, 'document', '/source-docs')}>
               <BookOpen className="mr-2 h-4 w-4 text-muted-foreground" />
               <span>{d.name}</span>
             </CommandItem>
           ))}
         </CommandGroup>
-
       </CommandList>
     </CommandDialog>
   );
