@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import {
   Layers, FileText, Compass, Brain, Monitor, Plug,
   Search, ArrowLeft, ChevronRight, Save, X, AlertTriangle,
-  ExternalLink, CheckCircle2,
+  ExternalLink, CheckCircle2, Users, Copy, User, Shield, Sliders, Building2,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
@@ -17,14 +18,32 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-type AdminView = 'home' | 'programs' | 'documents' | 'resolve' | 'penny' | 'trailOs' | 'integrations';
+type AdminView = 'home' | 'programs' | 'documents' | 'resolve' | 'penny' | 'trailOs' | 'integrations'
+  | 'roles' | 'templates' | 'users' | 'permissions' | 'settings';
+
+const URL_SECTION_MAP: Partial<Record<string, AdminView>> = {
+  programs: 'programs', documents: 'documents', resolve: 'resolve',
+  'trail-os': 'trailOs', penny: 'penny', roles: 'roles',
+  templates: 'templates', integrations: 'integrations',
+  users: 'users', permissions: 'permissions', settings: 'settings',
+};
 
 // ─── Main ──────────────────────────────────────────────────────────────────────
 
 export default function Admin() {
-  const [view, setView]         = useState<AdminView>('home');
+  const [location] = useLocation();
+  const urlSection = location.split('/admin/')[1]?.split('/')[0] ?? '';
+
+  const [view, setView]         = useState<AdminView>(() => URL_SECTION_MAP[urlSection] ?? 'home');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [search, setSearch]     = useState('');
+
+  useEffect(() => {
+    const sect = location.split('/admin/')[1]?.split('/')[0] ?? '';
+    setView(URL_SECTION_MAP[sect] ?? 'home');
+    setSelectedId(null);
+    setSearch('');
+  }, [location]);
 
   function navigate(v: AdminView) {
     setView(v);
@@ -116,6 +135,51 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
       iconBg: 'bg-muted text-muted-foreground',
       description: 'Configure external integrations — Salesforce Cases Kanban and future data connections. Currently future-state only.',
     },
+    {
+      id: 'roles' as AdminView,
+      icon: <Users className="w-5 h-5" />,
+      label: 'Roles',
+      count: 0,
+      borderColor: 'border-violet-200 hover:border-violet-400',
+      iconBg: 'bg-violet-50 text-violet-700',
+      description: 'Define organizational roles across programs, RESOLVE methodology, Penny, and Trail OS operations.',
+    },
+    {
+      id: 'templates' as AdminView,
+      icon: <Copy className="w-5 h-5" />,
+      label: 'Templates',
+      count: 0,
+      borderColor: 'border-emerald-200 hover:border-emerald-400',
+      iconBg: 'bg-emerald-50 text-emerald-700',
+      description: 'Manage document and deliverable templates — future sync from Google Drive.',
+    },
+    {
+      id: 'users' as AdminView,
+      icon: <User className="w-5 h-5" />,
+      label: 'Users',
+      count: 0,
+      borderColor: 'border-border hover:border-border/60',
+      iconBg: 'bg-muted text-muted-foreground',
+      description: 'Manage Trail OS platform users, access levels, and account provisioning.',
+    },
+    {
+      id: 'permissions' as AdminView,
+      icon: <Shield className="w-5 h-5" />,
+      label: 'Permissions',
+      count: 0,
+      borderColor: 'border-border hover:border-border/60',
+      iconBg: 'bg-muted text-muted-foreground',
+      description: 'Configure role-based access permissions for all Trail OS platform sections.',
+    },
+    {
+      id: 'settings' as AdminView,
+      icon: <Sliders className="w-5 h-5" />,
+      label: 'Settings',
+      count: 0,
+      borderColor: 'border-border hover:border-border/60',
+      iconBg: 'bg-muted text-muted-foreground',
+      description: 'Global platform settings — branding, environment configuration, and system preferences.',
+    },
   ];
 
   return (
@@ -194,7 +258,38 @@ function AreaEditor({
     penny: 'Penny AI Capabilities',
     trailOs: 'Trail OS Capabilities',
     integrations: 'Integrations',
+    roles: 'Roles',
+    templates: 'Templates',
+    users: 'Users',
+    permissions: 'Permissions',
+    settings: 'Settings',
   };
+
+  const STUB_VIEWS = new Set<AdminView>(['roles', 'templates', 'users', 'permissions', 'settings']);
+
+  if (STUB_VIEWS.has(view)) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden">
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-card flex-shrink-0">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Knowledge Base
+          </button>
+          <span className="text-muted-foreground/40">/</span>
+          <span className="text-xs font-medium text-foreground">{areaLabels[view]}</span>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-10 text-center">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+            <Building2 className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <p className="text-sm font-medium text-foreground mb-1.5">{areaLabels[view]}</p>
+          <p className="text-xs text-muted-foreground max-w-[280px] leading-relaxed">
+            This administration section is being built. Configuration and management tools will be added in a future sprint.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   type ListRecord = { id: string; name: string; confidence?: string; category?: string };
 

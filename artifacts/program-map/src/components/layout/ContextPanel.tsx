@@ -23,7 +23,7 @@ export function ContextPanel() {
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
             <Layers className="w-8 h-8 text-primary/40" />
           </div>
-          <p className="text-sm">Select any program, capability, phase, or document to open its decision brief.</p>
+          <p className="text-sm">Select any item to open its knowledge brief.</p>
         </div>
       );
     }
@@ -224,7 +224,7 @@ export function ContextPanel() {
     <div className="w-[300px] h-full bg-card border-l border-border flex flex-col shrink-0">
       <div className="px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2">
         <Layers className="w-4 h-4 text-primary" />
-        <h3 className="font-semibold text-sm">Follow the Trail</h3>
+        <h3 className="font-semibold text-sm">Knowledge Brief</h3>
       </div>
       <div className="flex-1 relative overflow-hidden bg-white/50">
         <AnimatePresence mode="wait">
