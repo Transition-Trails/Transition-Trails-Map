@@ -18,6 +18,7 @@ export interface SourceDocument {
   notSourceOfTruthFor: string[];
   keySections: string[];
   relatedDocuments: string[];
+  driveUrl?: string;
 }
 
 export const sourceDocuments: SourceDocument[] = [

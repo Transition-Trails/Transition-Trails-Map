@@ -1,4 +1,20 @@
-export const pennyCapabilities = [
+export type ConfidenceStatus = 'confirmed' | 'needs-review' | 'draft' | 'deprecated';
+
+export interface PennyCapability {
+  id: string;
+  entityType: 'penny-capability';
+  confidence: ConfidenceStatus;
+  name: string;
+  purpose: string;
+  executiveSummary: string;
+  whyItMatters: string;
+  keyFacts: string[];
+  programs: string[];
+  trailOsCapabilities: string[];
+  docs: string[];
+}
+
+export const pennyCapabilities: PennyCapability[] = [
   {
     id: "trail-guide",
     entityType: "penny-capability",

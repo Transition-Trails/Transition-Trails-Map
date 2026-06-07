@@ -1,4 +1,20 @@
-export const trailOsCapabilities = [
+export type ConfidenceStatus = 'confirmed' | 'needs-review' | 'draft' | 'deprecated';
+
+export interface TrailOsCapability {
+  id: string;
+  entityType: 'trail-os-capability';
+  confidence: ConfidenceStatus;
+  name: string;
+  description: string;
+  executiveSummary: string;
+  whyItMatters: string;
+  keyFacts: string[];
+  programs: string[];
+  penny: string[];
+  resolve: string[];
+}
+
+export const trailOsCapabilities: TrailOsCapability[] = [
   {
     id: "intake",
     entityType: "trail-os-capability",

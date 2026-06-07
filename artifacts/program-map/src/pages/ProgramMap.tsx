@@ -26,22 +26,24 @@ export default function ProgramMap() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col p-5 overflow-hidden">
-      <div className="mb-4 flex-shrink-0">
+    <div className="h-full w-full flex flex-col p-4 overflow-hidden">
+      <div className="mb-3 flex-shrink-0">
         <h1 className="text-2xl font-serif font-bold text-foreground leading-tight">Program Ecosystem</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Navigate the learning trails and their interconnected dependencies.
         </p>
       </div>
 
-      <div className="flex-1 min-h-0 rounded-xl border border-border/60 bg-white/60 shadow-sm flex flex-col p-5 gap-0 overflow-hidden">
+      <div className="flex-1 min-h-0 rounded-xl border border-border/60 bg-white/60 shadow-sm flex flex-col p-4 overflow-hidden">
 
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground text-center mb-5 flex-shrink-0">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground text-center mb-4 flex-shrink-0">
           — The Transition Trail —
         </p>
 
-        <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-hidden">
+        {/* ── Two-row map area ── */}
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden" style={{ gap: '36px' }}>
 
+          {/* Row 1: The four main trail programs */}
           <div className="flex items-start gap-0 flex-shrink-0">
             <div className="flex-1 min-w-0">
               <ProgramNode
@@ -65,6 +67,7 @@ export default function ProgramMap() {
 
             <TrailConnector />
 
+            {/* Guided Trail with dashed connector below */}
             <div className="flex-1 min-w-0 relative">
               <ProgramNode
                 program={guided}
@@ -73,11 +76,11 @@ export default function ProgramMap() {
                 lens={activeLens}
               />
               <div className="absolute left-1/2 -translate-x-1/2 top-full flex flex-col items-center" style={{ zIndex: 10 }}>
-                <div className="w-px h-5 border-l-2 border-dashed border-amber-400/80 mt-1" />
-                <span className="text-[9px] text-muted-foreground bg-white/90 px-1.5 py-0.5 rounded-full border border-border/50 whitespace-nowrap my-1">
+                <div className="w-px h-3 border-l-2 border-dashed border-amber-400/80 mt-1" />
+                <span className="text-[9px] text-muted-foreground bg-white/90 px-1.5 py-0.5 rounded-full border border-border/50 whitespace-nowrap my-0.5">
                   Nonprofit Client Program
                 </span>
-                <div className="w-px h-4 border-l-2 border-dashed border-amber-400/80" />
+                <div className="w-px h-2 border-l-2 border-dashed border-amber-400/80" />
               </div>
             </div>
 
@@ -93,11 +96,12 @@ export default function ProgramMap() {
             </div>
           </div>
 
-          <div className="flex items-start gap-0 flex-shrink-0" style={{ marginTop: '2.25rem' }}>
+          {/* Row 2: Digital Compass aligned under Guided Trail */}
+          <div className="flex items-start gap-0 flex-shrink-0">
             <div className="flex-1 min-w-0" />
-            <div className="w-8 flex-shrink-0" />
+            <div className="w-7 flex-shrink-0" />
             <div className="flex-1 min-w-0" />
-            <div className="w-8 flex-shrink-0" />
+            <div className="w-7 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <ProgramNode
                 program={compass}
@@ -106,15 +110,16 @@ export default function ProgramMap() {
                 lens={activeLens}
               />
             </div>
-            <div className="w-8 flex-shrink-0" />
+            <div className="w-7 flex-shrink-0" />
             <div className="flex-1 min-w-0" />
           </div>
 
         </div>
 
-        <div className="flex-shrink-0 mt-4 pt-3 border-t border-border/40">
-          <div className="inline-flex items-start gap-2 p-3 rounded-lg bg-muted/50 border border-border/40 max-w-sm">
-            <div className="w-1 h-full bg-primary/30 rounded-full flex-shrink-0 self-stretch" />
+        {/* ── Lens note ── */}
+        <div className="flex-shrink-0 mt-3 pt-3 border-t border-border/40">
+          <div className="inline-flex items-start gap-2 p-2.5 rounded-lg bg-muted/50 border border-border/40 max-w-sm">
+            <div className="w-1 rounded-full flex-shrink-0 self-stretch bg-primary/30" />
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
                 {activeLens.charAt(0).toUpperCase() + activeLens.slice(1)} Lens
@@ -123,6 +128,7 @@ export default function ProgramMap() {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
@@ -130,8 +136,8 @@ export default function ProgramMap() {
 
 function TrailConnector() {
   return (
-    <div className="w-8 flex-shrink-0 flex items-center justify-center pt-8">
-      <ArrowRight className="w-5 h-5 text-primary/40" strokeWidth={1.5} />
+    <div className="w-7 flex-shrink-0 flex items-center justify-center pt-6">
+      <ArrowRight className="w-4 h-4 text-primary/40" strokeWidth={1.5} />
     </div>
   );
 }
@@ -166,8 +172,8 @@ function ProgramNode({
   const bgClass     = colorMap[program.color] ?? 'bg-primary text-primary-foreground';
   const borderClass = borderMap[program.color] ?? 'border-primary';
 
-  const showDuration   = lens === 'operations' || lens === 'executive';
-  const showAudience   = lens === 'program' || lens === 'executive';
+  const showDuration     = lens === 'operations' || lens === 'executive';
+  const showAudience     = lens === 'program'    || lens === 'executive';
   const showDependencies = lens === 'architect';
 
   return (
@@ -176,47 +182,65 @@ function ProgramNode({
       data-testid={`program-card-${program.id}`}
       className={`w-full flex flex-col rounded-xl border-2 transition-all duration-200 text-left overflow-hidden ${
         isSelected
-          ? `scale-[1.03] shadow-lg ${borderClass} ring-2 ring-offset-2 ring-offset-background ring-primary/25`
+          ? `scale-[1.02] shadow-lg ${borderClass} ring-2 ring-offset-1 ring-offset-background ring-primary/25`
           : `border-transparent hover:border-border hover:shadow-md`
       }`}
     >
-      <div className={`${bgClass} px-3 pt-3 pb-2.5 relative`}>
-        {program.confidence === 'draft' && (
-          <span className="absolute top-2 right-2 text-[8px] font-bold uppercase tracking-wider bg-white/25 px-1.5 py-0.5 rounded backdrop-blur-sm">
-            Draft
-          </span>
-        )}
-        <p className="font-serif font-bold text-base leading-tight mb-0.5">{program.name}</p>
-        <p className="text-[11px] opacity-80 italic leading-snug line-clamp-2">{program.strategicRole}</p>
+      {/* ── Colored header ── */}
+      <div className={`${bgClass} px-3 pt-2 pb-2 flex-shrink-0`}>
+        <div className="flex items-start gap-1.5 min-w-0">
+          <div className="flex-1 min-w-0">
+            {/* 2-line clamp so "Trail of Mastery" wraps instead of truncating mid-word */}
+            <p className="font-serif font-bold text-[15px] leading-tight line-clamp-2">
+              {program.name}
+            </p>
+            {/* 1-line for role — keeps header height predictable across all cards */}
+            <p className="text-[11px] opacity-80 italic leading-none line-clamp-1 mt-0.5">
+              {program.strategicRole}
+            </p>
+          </div>
+          {program.confidence === 'draft' && (
+            <span className="flex-shrink-0 mt-0.5 text-[8px] font-bold uppercase tracking-wider bg-white/25 px-1.5 py-0.5 rounded whitespace-nowrap">
+              Draft
+            </span>
+          )}
+        </div>
       </div>
 
-      <div className="px-3 py-2.5 bg-white flex flex-col gap-2 border-x border-b border-border/40 rounded-b-xl">
-        <p className="text-xs font-medium text-foreground leading-snug line-clamp-2">
+      {/* ── White body ── */}
+      <div className="px-3 py-1.5 bg-white flex flex-col gap-1.5 border-x border-b border-border/40 rounded-b-xl overflow-hidden min-w-0">
+
+        <p className="text-xs font-medium text-foreground leading-snug line-clamp-2 min-w-0">
           {program.coreOutcome}
         </p>
 
         {showAudience && (
-          <p className="text-[11px] text-muted-foreground leading-snug line-clamp-1">
-            <span className="font-semibold text-foreground">For: </span>
+          <p className="text-[11px] text-muted-foreground leading-snug truncate min-w-0">
+            <span className="font-semibold text-foreground/80">For: </span>
             {program.audience.split(';')[0].trim()}
           </p>
         )}
 
         {showDependencies && (
-          <p className="text-[11px] text-muted-foreground leading-snug line-clamp-1">
-            <span className="font-semibold text-foreground">Requires: </span>
+          <p className="text-[11px] text-muted-foreground leading-snug truncate min-w-0">
+            <span className="font-semibold text-foreground/80">Requires: </span>
             {program.dependencies}
           </p>
         )}
 
-        <div className="flex items-center gap-1.5 pt-1.5 border-t border-border/40">
-          <ConfidenceBadge status={program.confidence ?? 'needs-review'} />
-          {showDuration && (
-            <span className="text-[10px] text-muted-foreground ml-auto whitespace-nowrap">
-              {program.duration} · {program.format.split(',')[0]}
-            </span>
+        {/* ── Footer: badge on its own, duration below ── */}
+        <div className="pt-1.5 border-t border-border/40 space-y-0.5 min-w-0 overflow-hidden">
+          <div className="flex-shrink-0">
+            <ConfidenceBadge status={program.confidence ?? 'needs-review'} />
+          </div>
+          {showDuration && program.duration && (
+            <p className="text-[10px] text-muted-foreground truncate">
+              {program.duration}
+              {program.format ? ` · ${program.format.split(',')[0].trim()}` : ''}
+            </p>
           )}
         </div>
+
       </div>
     </button>
   );
