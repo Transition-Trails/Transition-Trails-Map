@@ -6,12 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Database, Sparkles, Activity, Workflow } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 export default function TrailOSPenny() {
   const [activeLayer, setActiveLayer] = useState('trailOs');
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedDrawerItem, setSelectedDrawerItem] = useState<any>(null);
   const { setSelectedItem } = useAppContext();
 
   const layers = [
@@ -23,8 +20,6 @@ export default function TrailOSPenny() {
 
   const handleCardClick = (type: 'trailOs' | 'penny', item: any) => {
     setSelectedItem({ type, id: item.id, data: item });
-    setSelectedDrawerItem({ type, ...item });
-    setDrawerOpen(true);
   };
 
   return (
@@ -166,83 +161,6 @@ export default function TrailOSPenny() {
         )}
 
       </div>
-
-      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <SheetContent className="w-[400px] sm:w-[500px] overflow-y-auto">
-          {selectedDrawerItem && (
-            <div className="space-y-6 mt-6">
-              <SheetHeader>
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className="uppercase tracking-wider text-[10px]">
-                    {selectedDrawerItem.type === 'trailOs' ? 'Trail OS Capability' : 'Penny AI Feature'}
-                  </Badge>
-                </div>
-                <SheetTitle className="text-2xl font-serif text-foreground flex items-center gap-2">
-                  {selectedDrawerItem.type === 'trailOs'
-                    ? <Database className="w-5 h-5 text-primary" />
-                    : <Sparkles className="w-5 h-5 text-secondary" />}
-                  {selectedDrawerItem.name}
-                </SheetTitle>
-              </SheetHeader>
-
-              <div className="space-y-2">
-                <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Purpose</span>
-                <p className="text-sm text-foreground leading-relaxed">
-                  {selectedDrawerItem.description || selectedDrawerItem.purpose}
-                </p>
-              </div>
-
-              {selectedDrawerItem.type === 'penny' && (
-                <div className="space-y-2">
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">How it works</span>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Operates actively within the learner's context to provide real-time translation and guidance, bridging the gap between programmatic objectives and user comprehension.
-                  </p>
-                </div>
-              )}
-
-              {selectedDrawerItem.type === 'trailOs' && (
-                <div className="space-y-2">
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Owner Role</span>
-                  <span className="text-sm font-medium">Operations Lead</span>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Active in Programs</span>
-                <div className="flex flex-wrap gap-1">
-                  {selectedDrawerItem.programs?.map((p: string) => (
-                    <Badge key={p} variant="secondary">{p}</Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">
-                  {selectedDrawerItem.type === 'trailOs' ? 'Related Penny Integrations' : 'Related Trail OS Capabilities'}
-                </span>
-                <div className="flex flex-wrap gap-1">
-                  {(selectedDrawerItem.type === 'trailOs' ? selectedDrawerItem.penny : selectedDrawerItem.trailOsCapabilities)?.map((p: string) => (
-                    <Badge key={p} variant="outline" className="bg-white">{p}</Badge>
-                  ))}
-                </div>
-              </div>
-
-              {selectedDrawerItem.type === 'trailOs' && (
-                <div className="space-y-2">
-                  <span className="block text-xs font-semibold text-muted-foreground uppercase mb-1">Related RESOLVE Phases</span>
-                  <div className="flex flex-wrap gap-1">
-                    {selectedDrawerItem.resolve?.map((r: string) => (
-                      <Badge key={r} variant="outline" className="bg-white">{r}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
