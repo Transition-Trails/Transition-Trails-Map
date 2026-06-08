@@ -82,7 +82,8 @@ const navGroups: NavGroup[] = [
     items: [
       { path: '/communications/overview',          label: 'Overview' },
       { path: '/communications/providers',         label: 'Providers' },
-      { path: '/communications/channels',          label: 'Channels' },
+      { path: '/communications/channels',          label: 'Channels & Spaces' },
+      { path: '/communications/calendar',          label: 'Calendar' },
       { path: '/communications/penny-broadcasts',  label: 'Penny Broadcasts' },
       { path: '/communications/weekly-briefs',     label: 'Weekly Briefs' },
       { path: '/communications/notifications',     label: 'Notifications' },

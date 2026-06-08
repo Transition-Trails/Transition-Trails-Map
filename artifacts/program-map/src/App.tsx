@@ -46,6 +46,7 @@ import CommProviders       from "@/pages/communications/CommProviders";
 import CommChannels        from "@/pages/communications/CommChannels";
 import PennyBroadcasts     from "@/pages/communications/PennyBroadcasts";
 import WeeklyBriefs        from "@/pages/communications/WeeklyBriefs";
+import CommCalendar         from "@/pages/communications/CommCalendar";
 import CommNotifications   from "@/pages/communications/CommNotifications";
 import CommMessageTemplates from "@/pages/communications/MessageTemplates";
 
@@ -112,6 +113,7 @@ function Router() {
       <Route path="/communications/overview"          component={CommOverview} />
       <Route path="/communications/providers"         component={CommProviders} />
       <Route path="/communications/channels"          component={CommChannels} />
+      <Route path="/communications/calendar"          component={CommCalendar} />
       <Route path="/communications/penny-broadcasts"  component={PennyBroadcasts} />
       <Route path="/communications/weekly-briefs"     component={WeeklyBriefs} />
       <Route path="/communications/notifications"     component={CommNotifications} />

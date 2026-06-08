@@ -794,13 +794,14 @@ export function ContextPanel() {
     if (
       type === 'commChannel' ||
       type === 'commBroadcast' || type === 'commWeeklyBrief' ||
-      type === 'commNotification'
+      type === 'commNotification' || type === 'commCalendar'
     ) {
       const TYPE_META: Record<string, { label: string; icon: React.ReactNode }> = {
-        commChannel:      { label: 'Communication Channel', icon: <MessageSquare className="w-4 h-4 text-primary" /> },
-        commBroadcast:    { label: 'Penny Broadcast',       icon: <Radio className="w-4 h-4 text-secondary" /> },
-        commWeeklyBrief:  { label: 'Weekly Brief',          icon: <CalendarDays className="w-4 h-4 text-primary" /> },
-        commNotification: { label: 'Notification Rule',     icon: <Bell className="w-4 h-4 text-primary" /> },
+        commChannel:      { label: 'Channel / Space',    icon: <MessageSquare className="w-4 h-4 text-primary" /> },
+        commBroadcast:    { label: 'Penny Broadcast',    icon: <Radio className="w-4 h-4 text-secondary" /> },
+        commWeeklyBrief:  { label: 'Weekly Brief',       icon: <CalendarDays className="w-4 h-4 text-primary" /> },
+        commNotification: { label: 'Notification Rule',  icon: <Bell className="w-4 h-4 text-primary" /> },
+        commCalendar:     { label: 'Calendar Category',  icon: <CalendarDays className="w-4 h-4 text-emerald-700" /> },
       };
       const meta = TYPE_META[type] || { label: 'Communications', icon: <MessageSquare className="w-4 h-4 text-primary" /> };
 
@@ -1201,12 +1202,20 @@ function CommsBriefGuide() {
   const [, setLocation] = useLocation();
 
   const PAGES = [
-    { icon: MessageSquare, label: 'Providers',        path: '/communications/providers',         desc: 'Slack first — Google Chat, Teams, Email to follow.' },
-    { icon: MessageSquare, label: 'Channels',          path: '/communications/channels',          desc: 'Destination channels for broadcasts and briefs.' },
-    { icon: Radio,         label: 'Penny Broadcasts',  path: '/communications/penny-broadcasts',  desc: 'Automated learner nudges, reminders, and celebrations.' },
-    { icon: CalendarDays,  label: 'Weekly Briefs',     path: '/communications/weekly-briefs',     desc: 'Auto-generated executive and coach digests.' },
-    { icon: Bell,          label: 'Notifications',     path: '/communications/notifications',     desc: 'Event routing rules: demand → ops, risk → coach.' },
-    { icon: FileText,      label: 'Templates',         path: '/communications/message-templates', desc: 'Reusable message templates for all providers.' },
+    { icon: MessageSquare, label: 'Providers',         path: '/communications/providers',         desc: 'Slack (community), Google Chat (client), Google Calendar (timing).' },
+    { icon: MessageSquare, label: 'Channels & Spaces', path: '/communications/channels',          desc: 'Slack channels for learners/coaches/ops. Chat Spaces for clients.' },
+    { icon: CalendarDays,  label: 'Calendar',          path: '/communications/calendar',          desc: 'Operational timing: cohort starts, UAT sessions, sprint reviews.' },
+    { icon: Radio,         label: 'Penny Broadcasts',  path: '/communications/penny-broadcasts',  desc: 'Calendar-aware learner nudges, Trail Wins, Trail Quests, celebrations.' },
+    { icon: CalendarDays,  label: 'Weekly Briefs',     path: '/communications/weekly-briefs',     desc: 'Executive and coach digests — Slack + Google Chat, Calendar-triggered.' },
+    { icon: Bell,          label: 'Notifications',     path: '/communications/notifications',     desc: 'Audience + timing rules: Slack, Google Chat, and Calendar combined.' },
+    { icon: FileText,      label: 'Templates',         path: '/communications/message-templates', desc: 'Reusable templates for Slack, Google Chat, and Calendar reminders.' },
+  ];
+
+  const MODEL = [
+    { role: 'what',  label: 'Knowledge Library', color: 'text-secondary' },
+    { role: 'work',  label: 'Salesforce / Demand', color: 'text-amber-700' },
+    { role: 'who',   label: 'Communications', color: 'text-primary' },
+    { role: 'when',  label: 'Calendar', color: 'text-emerald-700' },
   ];
 
   return (
@@ -1215,21 +1224,24 @@ function CommsBriefGuide() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
-            Communications Hub
+            Communications & Collaboration
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Trail OS and Penny's messaging layer. Select any item on the page to open its brief here.
+            Trail OS and Penny's messaging and timing layer. Select any item on the page to open its brief here.
           </p>
         </div>
 
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-1">
-          <div className="flex items-center gap-1.5">
-            <MessageSquare className="w-3.5 h-3.5 text-primary shrink-0" />
-            <p className="text-[11px] font-bold text-primary">Provider-agnostic design</p>
+        {/* Operating model */}
+        <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">The Operating Model</p>
+          <div className="space-y-1">
+            {MODEL.map(m => (
+              <div key={m.role} className="flex items-baseline gap-1.5">
+                <span className={`text-[9px] font-bold uppercase tracking-wider w-8 shrink-0 ${m.color}`}>{m.role}</span>
+                <span className="text-[10px] text-muted-foreground">{m.label}</span>
+              </div>
+            ))}
           </div>
-          <p className="text-[10px] text-primary/70 leading-relaxed">
-            Slack is the first adapter. Channels, broadcasts, templates, and routing rules stay the same when Google Chat, Teams, or Email are added.
-          </p>
         </div>
 
         <div className="space-y-1">
@@ -1253,7 +1265,7 @@ function CommsBriefGuide() {
 
         <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            <strong>Prototype mode —</strong> No live provider connections. Slack adapter planned Q3 2025.
+            <strong>Prototype mode —</strong> No live connections. Slack adapter planned Q3 2025. Google Chat and Calendar to follow.
           </p>
         </div>
 

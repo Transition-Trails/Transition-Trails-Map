@@ -1,38 +1,83 @@
-import { Database, Sparkles, MessageSquare, ArrowRight, Bell, FileText, Radio, CalendarDays } from 'lucide-react';
+import { Database, Sparkles, MessageSquare, ArrowRight, Bell, FileText, Radio, CalendarDays, Hash, Users } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 const WHAT_IT_DOES = [
   {
+    icon: Users,
+    label: 'Providers',
+    desc: 'Slack (community), Google Chat (client), Google Calendar (timing) — three focused tools, not a general-purpose adapter.',
+    path: '/communications/providers',
+  },
+  {
+    icon: Hash,
+    label: 'Channels & Spaces',
+    desc: 'Slack channels for learners, coaches, and ops. Google Chat Spaces for clients, Digital Compass, and executive sponsors.',
+    path: '/communications/channels',
+  },
+  {
+    icon: CalendarDays,
+    label: 'Calendar',
+    desc: 'Google Calendar as the operational timing layer — cohort starts, UAT sessions, sprint reviews, and brief schedules.',
+    path: '/communications/calendar',
+  },
+  {
     icon: Radio,
     label: 'Penny Broadcasts',
-    desc: 'Automated messages Penny sends to learners and coaches — reminders, nudges, celebrations, and prompts.',
+    desc: 'Calendar-aware learner nudges, Trail Quest prompts, Trail Wins, reminders, and celebrations via Slack.',
     path: '/communications/penny-broadcasts',
   },
   {
     icon: CalendarDays,
     label: 'Weekly Briefs',
-    desc: 'Auto-generated executive and coach digests covering program health, learner insights, and Penny recommendations.',
+    desc: 'Auto-generated executive and coach digests delivered to Slack and Google Chat, triggered by the Operations Calendar.',
     path: '/communications/weekly-briefs',
   },
   {
     icon: Bell,
     label: 'Notifications',
-    desc: 'Event-driven routing rules that send Trail OS and Penny signals to the right channel at the right time.',
+    desc: 'Routing rules combining audience, timing, and provider — Slack for community, Google Chat for clients, Calendar for timing.',
     path: '/communications/notifications',
   },
   {
     icon: FileText,
     label: 'Message Templates',
-    desc: 'Reusable, reviewable message templates for broadcasts, briefs, and notifications across all providers.',
+    desc: 'Reusable templates for Slack, Google Chat, and Calendar-triggered reminders.',
     path: '/communications/message-templates',
   },
 ];
 
 const PROVIDERS = [
-  { label: 'Slack', note: 'Planned · Primary Prototype', color: 'border-primary/30 bg-primary/5 text-primary' },
-  { label: 'Google Chat', note: 'Future', color: 'border-border bg-muted/40 text-muted-foreground' },
-  { label: 'Microsoft Teams', note: 'Future', color: 'border-border bg-muted/40 text-muted-foreground' },
-  { label: 'Email', note: 'Future', color: 'border-border bg-muted/40 text-muted-foreground' },
+  {
+    label: 'Slack',
+    role: 'Community & Program',
+    note: 'Planned · Primary Prototype',
+    desc: 'Learners, coaches, cohorts, ops alerts, Trail Wins, Trail Quests, Penny nudges',
+    color: 'border-primary/30 bg-primary/5 text-primary',
+    noteCls: 'text-primary/70',
+  },
+  {
+    label: 'Google Chat',
+    role: 'Client & Project',
+    note: 'Future Supported',
+    desc: 'Nonprofit clients, Digital Compass, executive sponsors, steering committees',
+    color: 'border-border bg-white text-foreground',
+    noteCls: 'text-muted-foreground',
+  },
+  {
+    label: 'Google Calendar',
+    role: 'Operational Timing',
+    note: 'Future · Collaboration Source',
+    desc: 'Cohort starts, sprint reviews, UAT sessions, brief schedules, office hours',
+    color: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+    noteCls: 'text-emerald-700/70',
+  },
+];
+
+const MENTAL_MODEL = [
+  { label: 'Knowledge Library', role: 'what', note: 'The content — docs, templates, Penny context', color: 'border-secondary/30 bg-secondary/5 text-secondary' },
+  { label: 'Salesforce / Demand', role: 'work', note: 'The cases — intake, epics, features, changes', color: 'border-amber-200 bg-amber-50 text-amber-800' },
+  { label: 'Communications', role: 'who', note: 'The message — who gets what, through which channel', color: 'border-primary/30 bg-primary/5 text-primary' },
+  { label: 'Calendar', role: 'when', note: 'The timing — when communications fire based on events', color: 'border-emerald-200 bg-emerald-50 text-emerald-800' },
 ];
 
 export default function CommOverview() {
@@ -44,66 +89,57 @@ export default function CommOverview() {
 
         {/* Header */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Communications Hub</h1>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
+          <h1 className="text-3xl font-serif font-bold text-foreground">Overview</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            The operational messaging layer for Trail OS and Penny — routing program signals, learner nudges, and weekly briefs to the right people through the right channels.
+            The messaging and timing layer for Trail OS and Penny — routing program signals, learner nudges, and weekly briefs to the right people, through the right channel, at the right moment.
           </p>
         </div>
 
-        {/* What it is */}
+        {/* Operating model */}
         <section className="rounded-xl border border-border bg-white shadow-sm p-6 space-y-4">
-          <div className="flex items-start gap-3">
-            <MessageSquare className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-            <div>
-              <h2 className="font-bold text-foreground text-lg">What is the Communications Hub?</h2>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-                Communications is the layer that connects Trail OS and Penny to your team's existing messaging tools. It is not itself a chat product — it is an adapter system. Slack is the first planned adapter. Google Chat, Microsoft Teams, and Email can be plugged in later without redesigning how broadcasts, briefs, or notifications are configured.
-              </p>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                Every message that Trail OS or Penny sends — a learner nudge, a coach alert, a weekly brief — is configured as a template routed through a provider to a destination channel. The provider can change; the template and routing logic stay the same.
-              </p>
-            </div>
+          <h2 className="font-bold text-foreground">The Operating Model</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {MENTAL_MODEL.map(m => (
+              <div key={m.role} className={`rounded-lg border px-3 py-3 ${m.color}`}>
+                <p className="text-[11px] font-bold uppercase tracking-wider opacity-70">{m.role}</p>
+                <p className="text-[12px] font-bold mt-0.5">{m.label}</p>
+                <p className="text-[10px] mt-1 opacity-70 leading-relaxed">{m.note}</p>
+              </div>
+            ))}
           </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Communications is the <strong>who</strong> layer. It is not a chat product — it is an adapter and routing system that connects Trail OS events to the right people through Slack, Google Chat, and Google Calendar. The provider can change; the routing logic stays the same.
+          </p>
         </section>
 
         {/* Architecture */}
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Architecture</h2>
+          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Message Flow</h2>
           <div className="flex items-center gap-2 flex-wrap text-sm">
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-white px-4 py-2.5 shadow-sm">
-              <Database className="w-4 h-4 text-primary" />
-              <span className="font-semibold text-foreground">Trail OS</span>
-              <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider ml-1">events</span>
-            </div>
-            <ArrowRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-white px-4 py-2.5 shadow-sm">
-              <Sparkles className="w-4 h-4 text-secondary" />
-              <span className="font-semibold text-foreground">Penny</span>
-              <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider ml-1">composes</span>
-            </div>
-            <ArrowRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-white px-4 py-2.5 shadow-sm">
-              <FileText className="w-4 h-4 text-foreground/60" />
-              <span className="font-semibold text-foreground">Templates</span>
-              <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider ml-1">formatted by</span>
-            </div>
-            <ArrowRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-white px-4 py-2.5 shadow-sm">
-              <MessageSquare className="w-4 h-4 text-foreground/60" />
-              <span className="font-semibold text-foreground">Provider</span>
-              <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider ml-1">delivered via</span>
-            </div>
-            <ArrowRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-white px-4 py-2.5 shadow-sm">
-              <Bell className="w-4 h-4 text-foreground/60" />
-              <span className="font-semibold text-foreground">Channel</span>
-              <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider ml-1">to destination</span>
-            </div>
+            {[
+              { icon: Database, label: 'Trail OS', sub: 'events', color: 'text-primary' },
+              { icon: Sparkles, label: 'Penny', sub: 'composes', color: 'text-secondary' },
+              { icon: FileText, label: 'Templates', sub: 'formats', color: 'text-foreground/60' },
+              { icon: MessageSquare, label: 'Provider', sub: 'delivers', color: 'text-foreground/60' },
+              { icon: Bell, label: 'Channel', sub: 'receives', color: 'text-foreground/60' },
+            ].map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <div key={step.label} className="flex items-center gap-2">
+                  {i > 0 && <ArrowRight className="w-4 h-4 text-muted-foreground/30 shrink-0" />}
+                  <div className="flex items-center gap-1.5 rounded-lg border border-border/60 bg-white px-3 py-2 shadow-sm">
+                    <Icon className={`w-3.5 h-3.5 ${step.color}`} />
+                    <span className="text-[11px] font-semibold text-foreground">{step.label}</span>
+                    <span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider">{step.sub}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 
-        {/* Provider status */}
+        {/* Provider summary */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Providers</h2>
@@ -114,47 +150,47 @@ export default function CommOverview() {
               View all providers <ArrowRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid md:grid-cols-3 gap-3">
             {PROVIDERS.map(p => (
               <div key={p.label} className={`rounded-lg border px-4 py-3 ${p.color}`}>
-                <p className="font-bold text-sm">{p.label}</p>
-                <p className="text-[10px] mt-0.5 opacity-80">{p.note}</p>
+                <div className="flex items-baseline justify-between gap-1 mb-1">
+                  <p className="font-bold text-sm">{p.label}</p>
+                  <span className={`text-[9px] font-semibold uppercase tracking-wider shrink-0 ${p.noteCls}`}>{p.role}</span>
+                </div>
+                <p className={`text-[9px] font-medium uppercase tracking-wider mb-1.5 ${p.noteCls}`}>{p.note}</p>
+                <p className="text-[10px] opacity-80 leading-relaxed">{p.desc}</p>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-muted-foreground/60 mt-2">
-            Slack is the first planned adapter. The hub is designed provider-agnostic — Google Chat, Teams, and Email can be added without redesigning templates, routing, or broadcasts.
-          </p>
         </section>
 
-        {/* What it does */}
+        {/* What lives here */}
         <section>
           <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">What Lives Here</h2>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-3">
             {WHAT_IT_DOES.map(item => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.label}
                   onClick={() => setLocation(item.path)}
-                  className="rounded-xl border border-border bg-white shadow-sm p-5 text-left hover:border-primary/30 hover:shadow-md transition-all group"
+                  className="rounded-xl border border-border bg-white shadow-sm p-4 text-left hover:border-primary/30 hover:shadow-md transition-all group"
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Icon className="w-4 h-4 text-primary" />
-                    <span className="font-bold text-sm text-foreground">{item.label}</span>
-                    <ArrowRight className="w-3 h-3 text-muted-foreground/40 ml-auto group-hover:text-primary transition-colors" />
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Icon className="w-3.5 h-3.5 text-primary" />
+                    <span className="font-bold text-[12px] text-foreground">{item.label}</span>
+                    <ArrowRight className="w-3 h-3 text-muted-foreground/30 ml-auto group-hover:text-primary transition-colors" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">{item.desc}</p>
                 </button>
               );
             })}
           </div>
         </section>
 
-        {/* Setup status */}
         <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            <strong>Prototype mode —</strong> No live API connections are active. All providers, channels, broadcasts, and templates shown are planned configuration. Slack adapter development planned Q3 2025. Additional providers follow.
+            <strong>Prototype mode —</strong> No live API connections. Slack adapter planned Q3 2025. Google Chat and Google Calendar to follow. Configuration managed in Administration → Integrations when ready.
           </p>
         </div>
 

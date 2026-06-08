@@ -20,6 +20,7 @@ const TYPE_LABELS: Record<CommChannel['type'], string> = {
   digest: 'Digest',
   ops: 'Ops',
   space: 'Space',
+  'client-space': 'Client Space',
 };
 
 export default function CommChannels() {
@@ -65,17 +66,17 @@ export default function CommChannels() {
       <div className="max-w-4xl mx-auto space-y-8">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Channels</h1>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
+          <h1 className="text-3xl font-serif font-bold text-foreground">Channels & Spaces</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            Destination channels where Trail OS and Penny deliver broadcasts, briefs, and notifications. Click any channel to open its brief.
+            Slack channels for the learning community. Google Chat Spaces for client and project collaboration. Click any channel to open its Knowledge Brief.
           </p>
         </div>
 
         {/* Slack channels */}
         <section>
           <div className="flex items-center gap-2 mb-3">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Slack — Planned Channels</h2>
+            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Slack — Community & Program</h2>
             <Badge className="text-[10px] bg-primary/10 text-primary border-primary/20 border">Primary Prototype</Badge>
           </div>
           <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
@@ -83,9 +84,12 @@ export default function CommChannels() {
           </div>
         </section>
 
-        {/* Future channels */}
+        {/* Google Chat spaces */}
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">Future Provider Channels</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Google Chat — Client & Project Spaces</h2>
+            <Badge variant="secondary" className="text-[10px]">Future Supported</Badge>
+          </div>
           <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
             {futureChannels.map(ch => <ChannelRow key={ch.id} ch={ch} />)}
           </div>
@@ -93,7 +97,7 @@ export default function CommChannels() {
 
         <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            <strong>Channels are configured per provider.</strong> When a new provider is added, the same channel purposes are replicated — only the destination changes. No broadcasts or templates need to be rewritten.
+            <strong>Two channel types, two audiences.</strong> Slack is the community and program layer — for learners, coaches, and internal ops. Google Chat Spaces are the client-facing layer — for nonprofit partners, Digital Compass, and executive sponsors who work in Google Workspace.
           </p>
         </div>
 
