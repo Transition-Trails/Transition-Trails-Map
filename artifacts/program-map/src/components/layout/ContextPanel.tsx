@@ -4,6 +4,8 @@ import { useAppContext } from '@/context/AppContext';
 import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2 } from 'lucide-react';
 import { ACTION_CATEGORY_CONFIG, type PennyContentAction } from '@/data/pennyContentActions';
 import { type TrailOsSfMapping, SF_STATUS_CONFIG, type SfMappingStatus, SF_PRODUCT_CONFIG } from '@/data/salesforceArchitectureData';
+import { type ContentStandard, STANDARD_STATUS_CONFIG, STANDARD_CONFIDENCE_CONFIG, STANDARD_CATEGORY_CONFIG } from '@/data/standardsData';
+import { type PennyCapability, CAPABILITY_READINESS_CONFIG, CAPABILITY_DOMAIN_CONFIG, POC_STATUS_CONFIG } from '@/data/pennyCapabilityData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -1063,6 +1065,186 @@ export function ContextPanel() {
               <div><span className="text-muted-foreground">Owner:</span> <span className="font-medium">{res.owner}</span></div>
               <div><span className="text-muted-foreground">Permissions:</span> <span className="font-medium capitalize">{(res.permissionsModel || '').replace(/-/g, ' ')}</span></div>
               <div><span className="text-muted-foreground">Sync:</span> <span className="font-medium capitalize">{(res.syncStatus || '').replace(/-/g, ' ')}</span></div>
+            </div>
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // ── Penny Capability ───────────────────────────────────────────────────
+    if (type === 'pennyCapability') {
+      const cap     = data as PennyCapability;
+      const matCfg  = CAPABILITY_READINESS_CONFIG[cap.maturity];
+      const domCfg  = CAPABILITY_DOMAIN_CONFIG[cap.domain];
+      const pocCfg  = POC_STATUS_CONFIG[cap.pocStatus];
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Penny Capability</p>
+              <p className="text-xl font-serif font-bold text-foreground leading-snug">{cap.name}</p>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${domCfg.cls}`}>{cap.domain}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${matCfg.cls}`}>{cap.maturity}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${pocCfg.cls}`}>{pocCfg.label}</span>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-3">
+              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">Purpose</p>
+              <p className="text-[12px] text-foreground leading-relaxed">{cap.purpose}</p>
+            </div>
+
+            {cap.dependencies.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Dependencies</p>
+                <div className="flex flex-wrap gap-1">
+                  {cap.dependencies.map(depId => (
+                    <span key={depId} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{depId.replace('cap-', '').replace(/-/g, ' ')}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {cap.relatedPrograms.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Programs</p>
+                <div className="flex flex-wrap gap-1">
+                  {cap.relatedPrograms.map(p => <span key={p} className="text-[10px] font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 text-primary">{p}</span>)}
+                </div>
+              </div>
+            )}
+
+            {cap.relatedSfObjects.length > 0 && (
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1.5">Salesforce Objects</p>
+                <div className="flex flex-wrap gap-1">
+                  {cap.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-blue-900 bg-white/70 border border-blue-100 rounded-full px-2 py-0.5">{o}</span>)}
+                </div>
+              </div>
+            )}
+
+            {cap.relatedStandards.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Standards</p>
+                <div className="flex flex-wrap gap-1">
+                  {cap.relatedStandards.map(s => <span key={s} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{s.replace('std-', '').replace(/-/g, ' ')}</span>)}
+                </div>
+              </div>
+            )}
+
+            <div className="rounded-lg border border-secondary/10 bg-secondary/5 p-3">
+              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">POC Mapping</p>
+              <p className="text-[11px] text-foreground/80 leading-relaxed">{cap.pocMapping}</p>
+            </div>
+
+            {cap.nextSteps.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Next Steps</p>
+                <div className="space-y-1.5">
+                  {cap.nextSteps.map((step, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="w-4 h-4 rounded-full bg-foreground text-background text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                      <p className="text-[11px] text-foreground leading-snug">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {cap.foundationsTrailExample && (
+              <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
+                <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">★ Foundations Trail Example</p>
+                <p className="text-[11px] text-foreground italic leading-relaxed">{cap.foundationsTrailExample}</p>
+              </div>
+            )}
+
+            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
+              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Future Integration</p>
+              <p className="text-[11px] text-amber-900 leading-relaxed">{cap.futureIntegrationStatus}</p>
+            </div>
+
+            <div className="rounded-lg border border-border bg-muted/20 p-3 text-[11px] space-y-1">
+              <div><span className="text-muted-foreground">Owner</span><span className="font-semibold text-foreground ml-2">{cap.owner}</span></div>
+              <div><span className="text-muted-foreground">Audience</span><span className="font-semibold text-foreground ml-2">{cap.audience.join(', ')}</span></div>
+            </div>
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // ── Content Standard ───────────────────────────────────────────────────
+    if (type === 'contentStandard') {
+      const std = data as ContentStandard;
+      const statusCfg     = STANDARD_STATUS_CONFIG[std.status];
+      const confidenceCfg = STANDARD_CONFIDENCE_CONFIG[std.confidence];
+      const catCfg        = STANDARD_CATEGORY_CONFIG[std.category];
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Content Standard</p>
+              <p className="text-xl font-serif font-bold text-foreground leading-snug">{std.name}</p>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg.cls}`}>{std.category}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${confidenceCfg.cls}`}>{confidenceCfg.label}</span>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
+              <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Purpose</p>
+              <p className="text-[12px] text-foreground leading-relaxed">{std.purpose}</p>
+            </div>
+
+            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
+              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Why It Matters</p>
+              <p className="text-[11px] text-amber-900 leading-relaxed">{std.whyItMatters}</p>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Required Fields ({std.requiredFields.filter(f => f.required).length} required)</p>
+              <div className="space-y-1">
+                {std.requiredFields.map(f => (
+                  <div key={f.field} className="flex items-start gap-1.5">
+                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{f.required ? 'Req' : 'Opt'}</span>
+                    <div><p className="text-[11px] font-semibold text-foreground leading-tight">{f.field}</p><p className="text-[10px] text-muted-foreground leading-tight">{f.description}</p></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {std.relatedContentObjects.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Content Objects</p>
+                <div className="flex flex-wrap gap-1">
+                  {std.relatedContentObjects.map(o => (
+                    <span key={o} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{o}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-2.5">
+                <p className="text-[9px] font-bold text-blue-700 uppercase tracking-wider mb-0.5">Salesforce</p>
+                <p className="text-[11px] text-blue-900">{std.sfMapping}</p>
+              </div>
+              <div className="rounded-lg border border-violet-200 bg-violet-50 p-2.5">
+                <p className="text-[9px] font-bold text-violet-700 uppercase tracking-wider mb-0.5">LMS</p>
+                <p className="text-[11px] text-violet-900">{std.lmsMapping}</p>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-secondary/15 bg-secondary/5 p-3">
+              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">How Penny Uses This</p>
+              <p className="text-[11px] text-foreground/80 leading-relaxed">{std.howPennyUsesIt}</p>
+            </div>
+
+            <div className="rounded-lg border border-border bg-muted/20 p-3 text-[11px] space-y-1.5">
+              <div><span className="text-muted-foreground">Owner</span><span className="font-semibold text-foreground ml-2">{std.owner}</span></div>
+              <div><span className="text-muted-foreground">Review cycle</span><span className="font-semibold text-foreground ml-2">{std.reviewCycle}</span></div>
+              <div><span className="text-muted-foreground">Penny checks</span><span className="font-semibold text-foreground ml-2">{std.pennyChecks.length} ({std.pennyChecks.filter(c => c.required).length} required)</span></div>
             </div>
           </div>
         </ScrollArea>

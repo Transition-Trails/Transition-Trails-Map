@@ -63,7 +63,8 @@ const navGroups: NavGroup[] = [
     icon: Brain,
     pathPrefix: '/penny',
     items: [
-      { path: '/penny/learners',         label: 'Learners' },
+      { path: '/penny/capability-registry', label: 'Capability Registry' },
+      { path: '/penny/learners',           label: 'Learners' },
       { path: '/penny/logs',             label: 'Logs' },
       { path: '/penny/trail-quests',     label: 'Trail Quests' },
       { path: '/penny/assessments',      label: 'Assessments' },
@@ -136,6 +137,8 @@ const navGroups: NavGroup[] = [
       { path: '/curriculum/calendar-events',     label: 'Calendar Events' },
       { path: '/curriculum/office-hours',        label: 'Office Hours' },
       { path: '/curriculum/content-health',      label: 'Content Health' },
+      { label: 'Standards & Quality', isLabel: true },
+      { path: '/curriculum/standards',           label: 'Standards Studio' },
       { label: 'Blueprints & Architecture', isLabel: true },
       { path: '/curriculum/blueprint',           label: 'Program Blueprint' },
       { path: '/curriculum/salesforce-mapping',  label: 'Salesforce Architecture' },

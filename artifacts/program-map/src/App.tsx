@@ -74,6 +74,8 @@ import DeliveryOfficeHours    from "@/pages/curriculum/DeliveryOfficeHours";
 import ContentHealth          from "@/pages/curriculum/ContentHealth";
 import ProgramBlueprint       from "@/pages/curriculum/ProgramBlueprint";
 import SalesforceMapping      from "@/pages/curriculum/SalesforceMapping";
+import StandardsStudio        from "@/pages/curriculum/StandardsStudio";
+import ProgramCapabilityRegistry from "@/pages/penny/PennyCapabilityRegistry";
 import ProgramResources       from "@/pages/admin/ProgramResources";
 
 import LibraryDocuments from "@/pages/library/LibraryDocuments";
@@ -126,7 +128,8 @@ function Router() {
       <Route path="/demand/roadmap"        component={Roadmap} />
       <Route path="/demand/change-request" component={ChangeRequest} />
 
-      <Route path="/penny/learners"         component={Learners} />
+      <Route path="/penny/capability-registry" component={ProgramCapabilityRegistry} />
+      <Route path="/penny/learners"           component={Learners} />
       <Route path="/penny/logs"             component={PennyLogs} />
       <Route path="/penny/trail-quests"     component={TrailQuests} />
       <Route path="/penny/assessments"      component={Assessments} />
@@ -169,6 +172,7 @@ function Router() {
       <Route path="/curriculum/content-health"      component={ContentHealth} />
       <Route path="/curriculum/blueprint"           component={ProgramBlueprint} />
       <Route path="/curriculum/salesforce-mapping"  component={SalesforceMapping} />
+      <Route path="/curriculum/standards"           component={StandardsStudio} />
 
       <Route path="/library/documents"     component={LibraryDocuments} />
       <Route path="/library/templates"     component={Templates} />
