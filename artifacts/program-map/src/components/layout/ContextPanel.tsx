@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -31,6 +31,7 @@ export function ContextPanel() {
   const renderContent = () => {
     if (!selectedItem) {
       if (location === '/') return <HomeWelcomeGuide />;
+      if (location === '/navigator/trail-os-map') return <TrailOSCapabilityGuide />;
       return (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center text-muted-foreground">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -1066,6 +1067,80 @@ function HomeWelcomeGuide() {
           <p className="text-[10px] text-muted-foreground leading-relaxed">
             <strong>Prototype Mode —</strong> Salesforce, Agentforce, and GA4 connections planned Q3–Q4 2025.
           </p>
+        </div>
+
+      </div>
+    </ScrollArea>
+  );
+}
+
+// ── Trail OS Capability Map — Knowledge Brief guide ───────────────────────────
+// Shown when the user lands on /navigator/trail-os-map with no card selected.
+// Replaces the removed Overview tab: definitions + architecture live here.
+
+function TrailOSCapabilityGuide() {
+  const [, setLocation] = useLocation();
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-4 space-y-4">
+
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+            Trail OS Capability Map
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Select any capability card to open its brief here.
+          </p>
+        </div>
+
+        {/* Trail OS definition */}
+        <div className="rounded-lg border border-border/60 bg-white/70 p-3 space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Database className="w-3.5 h-3.5 text-primary shrink-0" />
+            <p className="text-[11px] font-bold text-foreground">Trail OS</p>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Infrastructure Layer</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            The operational technology foundation coordinating intake, project delivery, documentation, learner-client matching, org readiness, coach visibility, and outcomes measurement across all programs.
+          </p>
+        </div>
+
+        {/* Penny AI definition */}
+        <div className="rounded-lg border border-border/60 bg-white/70 p-3 space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-secondary shrink-0" />
+            <p className="text-[11px] font-bold text-foreground">Penny AI</p>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Intelligence Layer</span>
+          </div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            The AI learning and guidance layer embedded across all programs, providing personalised coaching, skill translation, and learning intelligence at every stage of the learner journey.
+          </p>
+        </div>
+
+        {/* Architecture flow */}
+        <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
+          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">Ecosystem Architecture</p>
+          <div className="flex items-center gap-1.5 text-[10px] font-medium flex-wrap">
+            <span className="flex items-center gap-1 text-primary"><Database className="w-3 h-3" />Trail OS</span>
+            <span className="text-muted-foreground/40 italic text-[9px]">powers</span>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
+            <span className="flex items-center gap-1 text-secondary"><Sparkles className="w-3 h-3" />Penny AI</span>
+            <span className="text-muted-foreground/40 italic text-[9px]">guides</span>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
+            <span className="flex items-center gap-1 text-foreground/70"><Layers className="w-3 h-3" />Programs</span>
+          </div>
+        </div>
+
+        {/* Links */}
+        <div className="space-y-1.5">
+          <button
+            onClick={() => setLocation('/navigator/knowledge-relationships')}
+            className="flex items-center gap-1 text-[10px] font-medium text-primary hover:underline w-full text-left"
+          >
+            View full Knowledge Relationships map
+            <ArrowRight className="w-2.5 h-2.5" />
+          </button>
         </div>
 
       </div>
