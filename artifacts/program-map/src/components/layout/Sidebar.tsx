@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown,
+  Home, Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown,
 } from 'lucide-react';
 
 type NavItem  = { path: string; label: string };
@@ -114,18 +114,17 @@ const navGroups: NavGroup[] = [
 export function Sidebar() {
   const [location, setLocation] = useLocation();
 
-  const activeGroupId = navGroups.find(g => location.startsWith(g.pathPrefix))?.id ?? 'navigator';
+  const activeGroupId = navGroups.find(g => location.startsWith(g.pathPrefix))?.id;
 
   const [openGroups, setOpenGroups] = useState<Set<string>>(
-    () => new Set([activeGroupId])
+    () => new Set([activeGroupId ?? 'navigator'])
   );
 
   useEffect(() => {
-    const gid = navGroups.find(g => location.startsWith(g.pathPrefix))?.id;
-    if (gid) {
-      setOpenGroups(prev => prev.has(gid) ? prev : new Set([...prev, gid]));
+    if (activeGroupId) {
+      setOpenGroups(prev => prev.has(activeGroupId) ? prev : new Set([...prev, activeGroupId]));
     }
-  }, [location]);
+  }, [activeGroupId]);
 
   function toggleGroup(id: string) {
     setOpenGroups(prev => {
@@ -138,6 +137,20 @@ export function Sidebar() {
   return (
     <div className="w-[220px] flex-shrink-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border">
       <div className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
+
+        {/* Home — top-level link, above all groups */}
+        <button
+          onClick={() => setLocation('/')}
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
+            location === '/'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+          }`}
+        >
+          <Home className={`w-4 h-4 flex-shrink-0 ${location === '/' ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+          <span>Home</span>
+        </button>
+
         {navGroups.map(group => {
           const isOpen        = openGroups.has(group.id);
           const isGroupActive = location.startsWith(group.pathPrefix);

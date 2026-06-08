@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar } from 'lucide-react';
+import { Layers, Calendar, ArrowRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -8,7 +9,7 @@ import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 
 export function ContextPanel() {
   const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities } = useAppContext();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   const handleChipClick = (type: string, id: string, route?: string) => {
     if (route) {
@@ -18,6 +19,7 @@ export function ContextPanel() {
 
   const renderContent = () => {
     if (!selectedItem) {
+      if (location === '/') return <HomeWelcomeGuide />;
       return (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center text-muted-foreground">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -860,12 +862,14 @@ export function ContextPanel() {
     <div className="w-[300px] h-full bg-card border-l border-border flex flex-col shrink-0">
       <div className="px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2">
         <Layers className="w-4 h-4 text-primary" />
-        <h3 className="font-semibold text-sm">Knowledge Brief</h3>
+        <h3 className="font-semibold text-sm">
+          {!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief'}
+        </h3>
       </div>
       <div className="flex-1 relative overflow-hidden bg-white/50">
         <AnimatePresence mode="wait">
           <motion.div
-            key={selectedItem ? `${selectedItem.type}-${selectedItem.id}` : 'empty'}
+            key={selectedItem ? `${selectedItem.type}-${selectedItem.id}` : `empty-${location}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -877,5 +881,117 @@ export function ContextPanel() {
         </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+// ── Home welcome guide rendered in the Knowledge Brief on the home route ──────
+const WELCOME_TABS = ['Overview', 'Navigator', 'Operations', 'Demand', 'Penny', 'Library', 'Admin'] as const;
+type WelcomeTab = typeof WELCOME_TABS[number];
+
+const WELCOME_CONTENT: Record<WelcomeTab, { title: string; body: string; path?: string; pathLabel?: string }> = {
+  Overview: {
+    title: 'Welcome to Trail OS',
+    body: "Trail OS is Transition Trails' unified operating platform. Use the left navigation to move between sections. Use this page to get a snapshot of what's happening, what needs attention, and where to go next.",
+  },
+  Navigator: {
+    title: 'Navigator',
+    body: "The ecosystem map for Transition Trails programs. Program Map shows how Explorer's Trail, Foundations Trail, Guided Trail, Trail of Mastery, and Digital Compass connect. RESOLVE shows the delivery lifecycle. Trail OS Capability Map links Penny AI and capabilities to programs.",
+    path: '/navigator/program-map',
+    pathLabel: 'Open Program Map',
+  },
+  Operations: {
+    title: 'Operations Center',
+    body: 'Real-time health for programs, Salesforce, automation, Penny, and the website. Use Program Health to monitor cohort status and capacity. Salesforce Health shows integration and sync status.',
+    path: '/operations/program-health',
+    pathLabel: 'Open Program Health',
+  },
+  Demand: {
+    title: 'Demand Management',
+    body: 'Where new program requests, change requests, and delivery work lives. Start with Intake to create a new request, or review Salesforce Cases for active items. Epics, Features, and Stories organize the delivery backlog.',
+    path: '/demand/intake',
+    pathLabel: 'Open Intake',
+  },
+  Penny: {
+    title: 'Penny Command Center',
+    body: 'Penny is the AI coaching and operations layer. Use Learners for cohort learner data, Logs for session history, Trail Quests for guided learning flows, and Test Penny to run prototype interactions.',
+    path: '/penny/test-penny',
+    pathLabel: 'Open Penny Test',
+  },
+  Library: {
+    title: 'Knowledge Library',
+    body: 'The source of truth for Transition Trails documentation. Documents holds all source blueprints and reference materials. Source Mapping tracks how each document connects to programs, phases, and Penny capabilities.',
+    path: '/library/documents',
+    pathLabel: 'Open Documents',
+  },
+  Admin: {
+    title: 'Administration',
+    body: 'Configure programs, RESOLVE phases, Trail OS capabilities, Penny settings, communication channels, templates, users, and permissions. Changes here affect the entire platform.',
+    path: '/admin',
+    pathLabel: 'Open Admin',
+  },
+};
+
+function HomeWelcomeGuide() {
+  const [activeTab, setActiveTab] = useState<WelcomeTab>('Overview');
+  const [, setLocation] = useLocation();
+  const c = WELCOME_CONTENT[activeTab];
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-5 space-y-4">
+
+        <div>
+          <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px] mb-2">
+            How to use Trail OS
+          </Badge>
+          <h2 className="text-xl font-serif font-bold text-foreground">
+            Mission Control
+          </h2>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+            Select a section below to learn where things live, or click any item on the Home page to open its brief here.
+          </p>
+        </div>
+
+        {/* Section tabs */}
+        <div className="flex flex-wrap gap-1">
+          {WELCOME_TABS.map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`text-[10px] font-medium px-2 py-1 rounded-md transition-colors ${
+                activeTab === tab
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-bold text-foreground">{c.title}</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">{c.body}</p>
+          {c.path && (
+            <button
+              onClick={() => setLocation(c.path!)}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+            >
+              {c.pathLabel}
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+
+        {/* Prototype mode note */}
+        <div className="rounded-md bg-muted/40 border border-border p-3">
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            <strong>Prototype Mode —</strong> Data throughout Trail OS is representative. Salesforce, Agentforce, and GA4 connections are planned for Q3–Q4 2025.
+          </p>
+        </div>
+
+      </div>
+    </ScrollArea>
   );
 }

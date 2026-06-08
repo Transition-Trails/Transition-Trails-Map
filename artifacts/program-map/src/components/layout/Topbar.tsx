@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const PAGE_INFO: Array<[string, string, string]> = [
+  ['/',                                  'Trail OS',               'Mission Control'],
   ['/navigator/program-map',             'Navigator',              'Program Map'],
   ['/navigator/resolve',                 'Navigator',              'Delivery Operating System'],
   ['/navigator/roles',                   'Navigator',              'Roles'],

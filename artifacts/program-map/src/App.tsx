@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
 
+import Home          from "@/pages/Home";
 import ProgramMap    from "@/pages/ProgramMap";
 import ResolveDemand from "@/pages/ResolveDemand";
 import TrailOSPenny  from "@/pages/TrailOSPenny";
@@ -62,7 +63,7 @@ function Redirect({ to }: { to: string }) {
 function Router() {
   return (
     <Switch>
-      <Route path="/"><Redirect to="/navigator/program-map" /></Route>
+      <Route path="/" component={Home} />
 
       <Route path="/trail-os-penny"><Redirect to="/navigator/trail-os-map" /></Route>
       <Route path="/resolve-demand"><Redirect to="/navigator/resolve" /></Route>
