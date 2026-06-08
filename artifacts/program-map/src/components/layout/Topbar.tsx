@@ -9,7 +9,7 @@ import {
 
 const PAGE_INFO: Array<[string, string, string]> = [
   ['/navigator/program-map',             'Navigator',              'Program Map'],
-  ['/navigator/resolve',                 'Navigator',              'RESOLVE Framework'],
+  ['/navigator/resolve',                 'Navigator',              'Delivery Operating System'],
   ['/navigator/roles',                   'Navigator',              'Roles'],
   ['/navigator/trail-os-map',            'Navigator',              'Trail OS Capability Map'],
   ['/navigator/knowledge-relationships', 'Navigator',              'Knowledge Relationships'],

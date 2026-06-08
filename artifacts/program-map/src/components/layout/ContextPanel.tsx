@@ -7,7 +7,7 @@ import { useLocation } from 'wouter';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 
 export function ContextPanel() {
-  const { selectedItem, setSelectedItem } = useAppContext();
+  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities } = useAppContext();
   const [, setLocation] = useLocation();
 
   const handleChipClick = (type: string, id: string, route?: string) => {
@@ -480,7 +480,301 @@ export function ContextPanel() {
       );
     }
 
-    // Default rich panel for Program, Penny, Trail OS, Resolve, Demand
+    // ── Dedicated RESOLVE renderer (phases, mappings, work items, metrics) ──
+    if (type === 'resolve') {
+      const kind: string = data.kind || 'phase';
+
+      // ── Operational Mapping ──
+      if (kind === 'mapping') {
+        return (
+          <ScrollArea className="h-full">
+            <div className="p-5 space-y-5">
+              <div className="space-y-2">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Operational Mapping</Badge>
+                <h2 className="text-xl font-serif font-bold text-foreground">{data.phase}</h2>
+                <p className="text-xs text-muted-foreground italic leading-snug">{data.description}</p>
+              </div>
+
+              <div className="space-y-2">
+                {([
+                  { label: 'RESOLVE Phase',     value: data.phase,    cls: 'bg-primary/10 border-primary/20 text-primary' },
+                  { label: 'Trail OS Capability', value: data.trailOs,  cls: 'bg-sky-50 border-sky-200 text-sky-800' },
+                  { label: 'Penny AI Function',  value: `⚡ ${data.penny as string}`, cls: 'bg-violet-50 border-violet-200 text-violet-800' },
+                  { label: 'Program Artifact',   value: data.artifact, cls: 'bg-muted border-border text-foreground' },
+                ] as Array<{ label: string; value: string; cls: string }>).map((row) => (
+                  <div key={row.label}>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">{row.label}</p>
+                    <span className={`inline-flex text-xs font-medium border px-2 py-1 rounded-md ${row.cls}`}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {(data.commChannels as string[])?.length > 0 && (
+                <div>
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
+                    Slack Channels{' '}
+                    <span className="normal-case text-muted-foreground/50 font-normal">(Planned Q3 2025)</span>
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {(data.commChannels as string[]).map((c) => (
+                      <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">{c}</Badge>
+                    ))}
+                  </div>
+                  <p className="mt-1.5 text-[10px] text-muted-foreground">Google Chat: Q4 2025+ · Same routing model, channel-agnostic</p>
+                </div>
+              )}
+
+              {(data.sources as string[])?.length > 0 && (
+                <div>
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Sources</span>
+                  <div className="flex flex-wrap gap-1">
+                    {(data.sources as string[]).map((s) => (
+                      <Badge key={s} variant="outline" className="bg-muted text-muted-foreground text-[10px]">{s}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <p className="text-[11px] text-muted-foreground/50">Prototype · Future: Salesforce MCP · Knowledge links</p>
+            </div>
+          </ScrollArea>
+        );
+      }
+
+      // ── Active Work Item ──
+      if (kind === 'work') {
+        const statusDot: Record<string, string> = {
+          'active': 'bg-emerald-500', 'in-discovery': 'bg-sky-400',
+          'planning': 'bg-amber-400', 'in-progress': 'bg-primary',
+        };
+        const statusLabel: Record<string, string> = {
+          'active': 'Active', 'in-discovery': 'In Discovery',
+          'planning': 'Planning', 'in-progress': 'In Progress',
+        };
+        const dot = statusDot[data.status as string] ?? 'bg-muted-foreground/40';
+        const lbl = statusLabel[data.status as string] ?? String(data.status);
+        return (
+          <ScrollArea className="h-full">
+            <div className="p-5 space-y-5">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Active Work</Badge>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
+                    <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+                    <span className="text-muted-foreground">{lbl}</span>
+                  </span>
+                </div>
+                <h2 className="text-xl font-serif font-bold text-foreground">{data.name as string}</h2>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {([
+                  { label: 'RESOLVE Phase', value: data.phase as string },
+                  { label: 'Program',       value: data.program as string },
+                  { label: 'Owner',         value: data.owner as string },
+                  { label: 'Next Date',     value: data.nextDate as string },
+                ] as Array<{ label: string; value: string }>).map((r) => (
+                  <div key={r.label}>
+                    <p className="text-[9px] font-bold uppercase text-muted-foreground mb-0.5">{r.label}</p>
+                    <p className="text-sm text-foreground font-medium">{r.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {(data.commChannels as string[])?.length > 0 && (
+                <div>
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
+                    Slack Channels{' '}
+                    <span className="normal-case text-muted-foreground/50 font-normal">(Planned)</span>
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {(data.commChannels as string[]).map((c) => (
+                      <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">{c}</Badge>
+                    ))}
+                  </div>
+                  <p className="mt-1.5 text-[10px] text-muted-foreground">Google Chat: Q4 2025+ · Reminders, alerts, digests</p>
+                </div>
+              )}
+
+              <p className="text-[11px] text-muted-foreground/50">Prototype data · Future: Salesforce Cases live sync</p>
+            </div>
+          </ScrollArea>
+        );
+      }
+
+      // ── Demand Metric ──
+      if (kind === 'metric') {
+        return (
+          <ScrollArea className="h-full">
+            <div className="p-5 space-y-5">
+              <div className="space-y-2">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Demand Signal</Badge>
+                <div className="flex items-baseline gap-3">
+                  <p className="text-5xl font-bold text-foreground leading-none">{data.count as number}</p>
+                  <h2 className="text-xl font-serif font-bold text-foreground">{data.label as string}</h2>
+                </div>
+                <p className="text-xs text-muted-foreground">{data.note as string}</p>
+              </div>
+
+              <p className="text-sm text-muted-foreground leading-relaxed">{data.description as string}</p>
+
+              <div className="bg-muted/40 border border-border rounded-md p-3">
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Pipeline Stage</span>
+                <p className="text-sm text-foreground font-medium">{data.label as string}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{data.note as string}</p>
+              </div>
+
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Sources</span>
+                <p className="text-[11px] text-muted-foreground/60">Prototype data · Future: Salesforce Cases live sync</p>
+                <p className="text-[11px] text-muted-foreground/60">Knowledge Articles: not yet mapped · Owner: Program Lead</p>
+                <p className="text-[11px] text-muted-foreground/60">Confidence: Prototype only — do not treat as authoritative</p>
+              </div>
+            </div>
+          </ScrollArea>
+        );
+      }
+
+      // ── RESOLVE Phase (default kind) ──
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-4">
+            {/* Header */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">RESOLVE Phase</Badge>
+                <ConfidenceBadge status={data.confidence || 'needs-review'} />
+                {data.status && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
+                    <span className={`w-1.5 h-1.5 rounded-full ${data.status === 'active' ? 'bg-emerald-500' : data.status === 'needs-review' ? 'bg-amber-400' : 'bg-sky-400'}`} />
+                    <span className="text-muted-foreground">{data.status === 'active' ? 'Active' : data.status === 'needs-review' ? 'Needs Review' : 'Planning'}</span>
+                  </span>
+                )}
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground">{data.letter} — {data.name}</h2>
+              <p className="text-xs text-muted-foreground italic leading-snug">{data.purpose as string}</p>
+            </div>
+
+            {/* Stats row */}
+            {data.initiatives !== undefined && (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-lg bg-muted/40 border border-border p-2 text-center">
+                  <p className="text-lg font-bold text-foreground leading-none">{data.initiatives as number}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">active initiatives</p>
+                </div>
+                <div className="rounded-lg bg-muted/40 border border-border p-2 text-center">
+                  <p className="text-lg font-bold text-foreground leading-none">{(data.activePrograms as string[])?.length ?? 0}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">programs using</p>
+                </div>
+              </div>
+            )}
+
+            {/* Overview */}
+            {data.executiveSummary && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Overview</span>
+                <p className="text-sm text-muted-foreground italic leading-relaxed">{data.executiveSummary as string}</p>
+              </div>
+            )}
+
+            {data.owner && data.owner !== 'Source mapping needed' && (
+              <div className="bg-muted/30 border border-border rounded-md p-2.5">
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-0.5">Owner</span>
+                <p className="text-sm font-medium text-foreground">{data.owner as string}</p>
+              </div>
+            )}
+
+            {data.whyItMatters && data.whyItMatters !== 'Source mapping needed' && (
+              <div className="bg-primary/5 border border-primary/15 rounded-md p-3">
+                <span className="block text-[10px] font-bold text-primary/80 uppercase mb-1">Why It Matters</span>
+                <p className="text-sm text-foreground leading-snug">{data.whyItMatters as string}</p>
+              </div>
+            )}
+
+            {/* Trail OS section */}
+            {(data.trailOs as string[])?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Trail OS Capabilities</span>
+                <div className="space-y-1.5">
+                  {(data.trailOs as string[]).map((c) => {
+                    const cap = trailOsCapabilities.find(t => t.name === c);
+                    return (
+                      <div key={c} className="bg-sky-50 border border-sky-100 rounded-md p-2">
+                        <p className="text-[11px] font-semibold text-sky-800">{c}</p>
+                        {cap && <p className="text-[10px] text-sky-600 mt-0.5 leading-snug">{cap.description}</p>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Penny section */}
+            {(data.penny as string[])?.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Penny AI Capabilities</span>
+                <div className="space-y-1.5">
+                  {(data.penny as string[]).map((p) => {
+                    const cap = (pennyCapabilities as Array<{ name: string; description?: string }>)?.find(c => c.name === p);
+                    return (
+                      <div key={p} className="bg-violet-50 border border-violet-100 rounded-md p-2">
+                        <p className="text-[11px] font-semibold text-violet-800">⚡ {p}</p>
+                        {cap?.description && <p className="text-[10px] text-violet-600 mt-0.5 leading-snug">{cap.description}</p>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Communications section */}
+            <div>
+              <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Communications</span>
+              {(data.commChannels as string[])?.length > 0 ? (
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 mb-1">Slack (Planned Q3 2025)</p>
+                    <div className="flex flex-wrap gap-1">
+                      {(data.commChannels as string[]).map((c) => (
+                        <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">#{c.replace(/^#/, '')}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">Google Chat: Q4 2025+ · Reminders, alerts, digests · channel-agnostic model</p>
+                </div>
+              ) : (
+                <p className="text-[11px] text-muted-foreground/60">No channels configured · Future: Slack Q3 2025 · Google Chat Q4 2025+</p>
+              )}
+            </div>
+
+            {/* Sources section */}
+            <div className="space-y-1.5">
+              <span className="block text-xs font-semibold text-foreground uppercase">Sources</span>
+              {(data.docs as string[])?.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {(data.docs as string[]).map((d) => (
+                    <Badge key={d} variant="outline" className="bg-muted text-muted-foreground text-[10px]">{d}</Badge>
+                  ))}
+                </div>
+              )}
+              <p className="text-[11px] text-muted-foreground/60">Salesforce Cases: future · Knowledge Articles: future</p>
+              {data.owner === 'Source mapping needed' && (
+                <div className="bg-amber-50 border border-amber-100 rounded-md p-2.5 mt-1">
+                  <p className="text-[11px] text-amber-800">⚠ Owner and operational details require source document review before treating as authoritative.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Source note footer */}
+            {data.sourceNote && (
+              <p className="text-[11px] text-muted-foreground/50 border-t border-border/40 pt-3 leading-snug">{data.sourceNote as string}</p>
+            )}
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // Default rich panel for Program, Penny, Trail OS, Demand
     return (
       <ScrollArea className="h-full">
         <div className="p-5 space-y-6">
@@ -489,13 +783,12 @@ export function ContextPanel() {
               <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
                 {type === 'penny' && 'Penny AI Capability'}
                 {type === 'trailOs' && 'Trail OS Capability'}
-                {type === 'resolve' && 'RESOLVE Phase'}
                 {type === 'demand' && 'Demand Stage'}
               </Badge>
               <ConfidenceBadge status={data.confidence || 'needs-review'} />
             </div>
             <h2 className="text-xl font-serif font-bold text-foreground">
-              {type === 'resolve' ? `${data.letter} — ${data.name}` : data.name}
+              {data.name}
             </h2>
           </div>
 
