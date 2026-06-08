@@ -10,7 +10,8 @@ import { messageTemplates as staticTemplates, type MessageTemplate } from '@/dat
 
 export type SelectedItemType =
   | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'document'
-  | 'commProvider' | 'commRoute' | 'commTemplate';
+  | 'commProvider' | 'commRoute' | 'commTemplate'
+  | 'commChannel' | 'commBroadcast' | 'commWeeklyBrief' | 'commNotification';
 
 interface AppState {
   activePage: string;

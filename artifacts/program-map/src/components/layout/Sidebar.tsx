@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Home, Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown,
+  Home, Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown, MessageSquare,
 } from 'lucide-react';
 
 type NavItem  = { path: string; label: string };
@@ -72,6 +72,21 @@ const navGroups: NavGroup[] = [
       { path: '/penny/response-quality', label: 'Response Quality' },
       { path: '/penny/prompt-library',   label: 'Prompt Library' },
       { path: '/penny/integrations',     label: 'Integrations' },
+    ],
+  },
+  {
+    id: 'communications',
+    label: 'Communications',
+    icon: MessageSquare,
+    pathPrefix: '/communications',
+    items: [
+      { path: '/communications/overview',          label: 'Overview' },
+      { path: '/communications/providers',         label: 'Providers' },
+      { path: '/communications/channels',          label: 'Channels' },
+      { path: '/communications/penny-broadcasts',  label: 'Penny Broadcasts' },
+      { path: '/communications/weekly-briefs',     label: 'Weekly Briefs' },
+      { path: '/communications/notifications',     label: 'Notifications' },
+      { path: '/communications/message-templates', label: 'Message Templates' },
     ],
   },
   {

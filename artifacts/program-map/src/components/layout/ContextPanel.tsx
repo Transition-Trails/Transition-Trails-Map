@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -32,6 +32,7 @@ export function ContextPanel() {
     if (!selectedItem) {
       if (location === '/') return <HomeWelcomeGuide />;
       if (location === '/navigator/trail-os-map') return <TrailOSCapabilityGuide />;
+      if (location.startsWith('/communications')) return <CommsBriefGuide />;
       return (
         <div className="flex flex-col items-center justify-center h-full p-6 text-center text-muted-foreground">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -788,6 +789,125 @@ export function ContextPanel() {
       );
     }
 
+    // ── Communications Hub — new item types (commChannel/Broadcast/WeeklyBrief/Notification)
+    // Note: commProvider, commTemplate, commRoute are handled by existing blocks above.
+    if (
+      type === 'commChannel' ||
+      type === 'commBroadcast' || type === 'commWeeklyBrief' ||
+      type === 'commNotification'
+    ) {
+      const TYPE_META: Record<string, { label: string; icon: React.ReactNode }> = {
+        commChannel:      { label: 'Communication Channel', icon: <MessageSquare className="w-4 h-4 text-primary" /> },
+        commBroadcast:    { label: 'Penny Broadcast',       icon: <Radio className="w-4 h-4 text-secondary" /> },
+        commWeeklyBrief:  { label: 'Weekly Brief',          icon: <CalendarDays className="w-4 h-4 text-primary" /> },
+        commNotification: { label: 'Notification Rule',     icon: <Bell className="w-4 h-4 text-primary" /> },
+      };
+      const meta = TYPE_META[type] || { label: 'Communications', icon: <MessageSquare className="w-4 h-4 text-primary" /> };
+
+      const title  = data.name || data.event || 'Untitled';
+      const status = data.status || data.statusLabel || '—';
+
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px] flex items-center gap-1">
+                  {meta.icon}
+                  {meta.label}
+                </Badge>
+                <Badge variant="secondary" className="text-[10px]">{status}</Badge>
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground leading-snug">{title}</h2>
+            </div>
+
+            {data.purpose && (
+              <div>
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Purpose</span>
+                <p className="text-sm text-foreground leading-relaxed">{data.purpose}</p>
+              </div>
+            )}
+
+            {data.whyItMatters && (
+              <div>
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Why It Matters</span>
+                <p className="text-sm text-muted-foreground leading-relaxed">{data.whyItMatters}</p>
+              </div>
+            )}
+
+            {data.pennyCapability && (
+              <div className="rounded-md bg-secondary/5 border border-secondary/20 px-3 py-2">
+                <span className="block text-[10px] font-bold text-secondary/80 uppercase tracking-wider mb-1 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" /> Penny Capability
+                </span>
+                <p className="text-sm font-medium text-foreground">{data.pennyCapability}</p>
+              </div>
+            )}
+
+            {(data.relatedDemandEvent || data.demandEvent) && (
+              <div>
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Related Demand Event</span>
+                <p className="text-sm text-foreground">{data.relatedDemandEvent || data.demandEvent}</p>
+              </div>
+            )}
+
+            {(data.relatedProgram || data.audience) && (
+              <div>
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                  {data.relatedProgram ? 'Related Program' : 'Audience'}
+                </span>
+                <p className="text-sm text-foreground">{data.relatedProgram || data.audience}</p>
+              </div>
+            )}
+
+            {data.owner && (
+              <div>
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Owner</span>
+                <p className="text-sm text-foreground">{data.owner}</p>
+              </div>
+            )}
+
+            {data.capabilities && data.capabilities.length > 0 && (
+              <div>
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Capabilities</span>
+                <div className="flex flex-wrap gap-1">
+                  {data.capabilities.map((c: string) => <Badge key={c} variant="secondary" className="text-[10px]">{c}</Badge>)}
+                </div>
+              </div>
+            )}
+
+            {data.sections && data.sections.length > 0 && (
+              <div>
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Brief Sections</span>
+                <ul className="list-disc pl-4 space-y-1">
+                  {data.sections.map((s: string) => {
+                    const [title] = s.split(' — ');
+                    return <li key={s} className="text-[11px] text-muted-foreground">{title}</li>;
+                  })}
+                </ul>
+              </div>
+            )}
+
+            {data.example && (
+              <div className="bg-muted/50 rounded-md px-3 py-2 border border-border/40">
+                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Example Message</span>
+                <p className="text-[11px] text-muted-foreground leading-relaxed italic">{data.example}</p>
+              </div>
+            )}
+
+            {data.setupNotes && (
+              <div className="bg-amber-50 border border-amber-100 rounded-md px-3 py-2">
+                <span className="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Future Setup</span>
+                <p className="text-[11px] text-amber-900 leading-relaxed">{data.setupNotes}</p>
+              </div>
+            )}
+
+          </div>
+        </ScrollArea>
+      );
+    }
+
     // Default rich panel for Program, Penny, Trail OS, Demand
     return (
       <ScrollArea className="h-full">
@@ -1066,6 +1186,74 @@ function HomeWelcomeGuide() {
         <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
           <p className="text-[10px] text-muted-foreground leading-relaxed">
             <strong>Prototype Mode —</strong> Salesforce, Agentforce, and GA4 connections planned Q3–Q4 2025.
+          </p>
+        </div>
+
+      </div>
+    </ScrollArea>
+  );
+}
+
+// ── Communications Hub — Knowledge Brief guide ────────────────────────────────
+// Shown when user is on any /communications/* route with no item selected.
+
+function CommsBriefGuide() {
+  const [, setLocation] = useLocation();
+
+  const PAGES = [
+    { icon: MessageSquare, label: 'Providers',        path: '/communications/providers',         desc: 'Slack first — Google Chat, Teams, Email to follow.' },
+    { icon: MessageSquare, label: 'Channels',          path: '/communications/channels',          desc: 'Destination channels for broadcasts and briefs.' },
+    { icon: Radio,         label: 'Penny Broadcasts',  path: '/communications/penny-broadcasts',  desc: 'Automated learner nudges, reminders, and celebrations.' },
+    { icon: CalendarDays,  label: 'Weekly Briefs',     path: '/communications/weekly-briefs',     desc: 'Auto-generated executive and coach digests.' },
+    { icon: Bell,          label: 'Notifications',     path: '/communications/notifications',     desc: 'Event routing rules: demand → ops, risk → coach.' },
+    { icon: FileText,      label: 'Templates',         path: '/communications/message-templates', desc: 'Reusable message templates for all providers.' },
+  ];
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-4 space-y-4">
+
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+            Communications Hub
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Trail OS and Penny's messaging layer. Select any item on the page to open its brief here.
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-1">
+          <div className="flex items-center gap-1.5">
+            <MessageSquare className="w-3.5 h-3.5 text-primary shrink-0" />
+            <p className="text-[11px] font-bold text-primary">Provider-agnostic design</p>
+          </div>
+          <p className="text-[10px] text-primary/70 leading-relaxed">
+            Slack is the first adapter. Channels, broadcasts, templates, and routing rules stay the same when Google Chat, Teams, or Email are added.
+          </p>
+        </div>
+
+        <div className="space-y-1">
+          {PAGES.map(p => {
+            const Icon = p.icon;
+            return (
+              <button
+                key={p.path}
+                onClick={() => setLocation(p.path)}
+                className="w-full flex items-start gap-2 rounded-md px-2.5 py-2 hover:bg-muted/50 transition-colors text-left group"
+              >
+                <Icon className="w-3.5 h-3.5 text-muted-foreground/60 mt-0.5 shrink-0 group-hover:text-primary transition-colors" />
+                <div>
+                  <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors">{p.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{p.desc}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            <strong>Prototype mode —</strong> No live provider connections. Slack adapter planned Q3 2025.
           </p>
         </div>
 

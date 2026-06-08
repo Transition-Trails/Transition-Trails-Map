@@ -1,0 +1,103 @@
+import { useAppContext } from '@/context/AppContext';
+import { commChannels, type CommChannel } from '@/data/commData';
+import { Badge } from '@/components/ui/badge';
+import { Hash, Globe } from 'lucide-react';
+
+function statusBadge(status: CommChannel['status']) {
+  if (status === 'active')  return <Badge className="text-[10px] bg-green-50 text-green-800 border-green-200 border">Active</Badge>;
+  if (status === 'planned') return <Badge className="text-[10px] bg-primary/10 text-primary border-primary/20 border">Planned</Badge>;
+  return <Badge variant="secondary" className="text-[10px]">Future</Badge>;
+}
+
+function providerBadge(provider: string, ps: CommChannel['providerStatus']) {
+  const cls = ps === 'planned' ? 'text-primary border-primary/20 bg-primary/5' : 'text-muted-foreground border-border bg-muted/40';
+  return <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${cls}`}>{provider}</span>;
+}
+
+const TYPE_LABELS: Record<CommChannel['type'], string> = {
+  team: 'Cohort',
+  alert: 'Alert',
+  digest: 'Digest',
+  ops: 'Ops',
+  space: 'Space',
+};
+
+export default function CommChannels() {
+  const { setSelectedItem } = useAppContext();
+
+  function select(ch: CommChannel) {
+    setSelectedItem({ type: 'commChannel', id: ch.id, data: ch });
+  }
+
+  const slackChannels  = commChannels.filter(c => c.provider === 'Slack');
+  const futureChannels = commChannels.filter(c => c.provider !== 'Slack');
+
+  function ChannelRow({ ch }: { ch: CommChannel }) {
+    return (
+      <button
+        onClick={() => select(ch)}
+        className="w-full flex items-start gap-4 px-4 py-3 hover:bg-muted/30 transition-colors text-left group border-b border-border/30 last:border-0"
+      >
+        <div className="mt-0.5 shrink-0">
+          {ch.type === 'space'
+            ? <Globe className="w-4 h-4 text-muted-foreground/60" />
+            : <Hash className="w-4 h-4 text-muted-foreground/60" />
+          }
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-mono text-[12px] font-semibold text-foreground">{ch.name}</span>
+            {providerBadge(ch.provider, ch.providerStatus)}
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/50 border border-border/60 rounded px-1.5 py-0.5">{TYPE_LABELS[ch.type]}</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{ch.purpose}</p>
+          <p className="text-[10px] text-muted-foreground/60 mt-0.5">{ch.audience} · Owner: {ch.owner}</p>
+        </div>
+        <div className="shrink-0">
+          {statusBadge(ch.status)}
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <div className="h-full overflow-y-auto p-6 bg-muted/20">
+      <div className="max-w-4xl mx-auto space-y-8">
+
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
+          <h1 className="text-3xl font-serif font-bold text-foreground">Channels</h1>
+          <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
+            Destination channels where Trail OS and Penny deliver broadcasts, briefs, and notifications. Click any channel to open its brief.
+          </p>
+        </div>
+
+        {/* Slack channels */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Slack — Planned Channels</h2>
+            <Badge className="text-[10px] bg-primary/10 text-primary border-primary/20 border">Primary Prototype</Badge>
+          </div>
+          <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+            {slackChannels.map(ch => <ChannelRow key={ch.id} ch={ch} />)}
+          </div>
+        </section>
+
+        {/* Future channels */}
+        <section>
+          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">Future Provider Channels</h2>
+          <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+            {futureChannels.map(ch => <ChannelRow key={ch.id} ch={ch} />)}
+          </div>
+        </section>
+
+        <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <strong>Channels are configured per provider.</strong> When a new provider is added, the same channel purposes are replicated — only the destination changes. No broadcasts or templates need to be rewritten.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  );
+}

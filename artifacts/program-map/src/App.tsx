@@ -41,12 +41,20 @@ import ResponseQuality from "@/pages/penny/ResponseQuality";
 import PromptLibrary   from "@/pages/penny/PromptLibrary";
 import PennyIntegrations from "@/pages/penny/PennyIntegrations";
 
+import CommOverview        from "@/pages/communications/CommOverview";
+import CommProviders       from "@/pages/communications/CommProviders";
+import CommChannels        from "@/pages/communications/CommChannels";
+import PennyBroadcasts     from "@/pages/communications/PennyBroadcasts";
+import WeeklyBriefs        from "@/pages/communications/WeeklyBriefs";
+import CommNotifications   from "@/pages/communications/CommNotifications";
+import CommMessageTemplates from "@/pages/communications/MessageTemplates";
+
 import LibraryDocuments from "@/pages/library/LibraryDocuments";
 import Templates        from "@/pages/library/Templates";
 
-import CommunicationChannels    from "@/pages/admin/CommunicationChannels";
-import CommunicationRouting     from "@/pages/admin/CommunicationRouting";
-import CommMessageTemplates     from "@/pages/admin/MessageTemplates";
+import CommunicationChannels     from "@/pages/admin/CommunicationChannels";
+import CommunicationRouting      from "@/pages/admin/CommunicationRouting";
+import AdminMessageTemplates     from "@/pages/admin/MessageTemplates";
 import OperationsCommunications from "@/pages/operations/Communications";
 import SalesforceKB     from "@/pages/library/SalesforceKB";
 import SourceMapping    from "@/pages/library/SourceMapping";
@@ -101,6 +109,14 @@ function Router() {
       <Route path="/penny/prompt-library"   component={PromptLibrary} />
       <Route path="/penny/integrations"     component={PennyIntegrations} />
 
+      <Route path="/communications/overview"          component={CommOverview} />
+      <Route path="/communications/providers"         component={CommProviders} />
+      <Route path="/communications/channels"          component={CommChannels} />
+      <Route path="/communications/penny-broadcasts"  component={PennyBroadcasts} />
+      <Route path="/communications/weekly-briefs"     component={WeeklyBriefs} />
+      <Route path="/communications/notifications"     component={CommNotifications} />
+      <Route path="/communications/message-templates" component={CommMessageTemplates} />
+
       <Route path="/library/documents"     component={LibraryDocuments} />
       <Route path="/library/templates"     component={Templates} />
       <Route path="/library/salesforce-kb" component={SalesforceKB} />
@@ -109,7 +125,7 @@ function Router() {
 
       <Route path="/admin/comm-channels"  component={CommunicationChannels} />
       <Route path="/admin/comm-routing"   component={CommunicationRouting} />
-      <Route path="/admin/comm-templates" component={CommMessageTemplates} />
+      <Route path="/admin/comm-templates" component={AdminMessageTemplates} />
       <Route path="/admin/:section" component={Admin} />
       <Route path="/admin"          component={Admin} />
 
