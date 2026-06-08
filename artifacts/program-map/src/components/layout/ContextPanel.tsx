@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar, ArrowRight } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -10,6 +10,17 @@ import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 export function ContextPanel() {
   const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities } = useAppContext();
   const [location, setLocation] = useLocation();
+
+  // ── Focus / Brief mode ────────────────────────────────────────────────────
+  // Default: collapsed on Home, open elsewhere. Auto-expands when an item is
+  // selected from any page. Manual toggle is remembered for the session
+  // (ContextPanel is never unmounted, so useState persists across routes).
+  const [collapsed, setCollapsed] = useState(location === '/');
+
+  useEffect(() => {
+    // Selecting any item always opens the panel so the brief is readable
+    if (selectedItem) setCollapsed(false);
+  }, [selectedItem]);
 
   const handleChipClick = (type: string, id: string, route?: string) => {
     if (route) {
@@ -859,135 +870,177 @@ export function ContextPanel() {
   };
 
   return (
-    <div className="w-[300px] h-full bg-card border-l border-border flex flex-col shrink-0">
-      <div className="px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2">
-        <Layers className="w-4 h-4 text-primary" />
-        <h3 className="font-semibold text-sm">
-          {!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief'}
-        </h3>
-      </div>
-      <div className="flex-1 relative overflow-hidden bg-white/50">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedItem ? `${selectedItem.type}-${selectedItem.id}` : `empty-${location}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0"
+    <div
+      className={`flex-shrink-0 h-full bg-card border-l border-border flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out ${
+        collapsed ? 'w-9' : 'w-[300px]'
+      }`}
+    >
+      {collapsed ? (
+        /* ── Focus Mode: slim vertical tab ── */
+        <button
+          onClick={() => setCollapsed(false)}
+          aria-label="Expand Knowledge Brief"
+          title="Expand Knowledge Brief"
+          className="flex-1 w-full flex flex-col items-center justify-center gap-3 hover:bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+        >
+          <Layers className="w-3.5 h-3.5 text-muted-foreground/50" />
+          <span
+            className="text-[9px] font-semibold text-muted-foreground/40 tracking-widest uppercase select-none"
+            style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
-            {renderContent()}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+            Knowledge Brief
+          </span>
+        </button>
+      ) : (
+        /* ── Brief Mode: full panel ── */
+        <>
+          <div className="px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2 shrink-0">
+            <Layers className="w-4 h-4 text-primary shrink-0" />
+            <h3 className="font-semibold text-sm truncate flex-1">
+              {!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief'}
+            </h3>
+            <button
+              onClick={() => setCollapsed(true)}
+              aria-label="Collapse Knowledge Brief (Focus Mode)"
+              title="Focus Mode — collapse panel"
+              className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/60 transition-colors shrink-0"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="flex-1 relative overflow-hidden bg-white/50">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedItem ? `${selectedItem.type}-${selectedItem.id}` : `empty-${location}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0"
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-// ── Home welcome guide rendered in the Knowledge Brief on the home route ──────
-const WELCOME_TABS = ['Overview', 'Navigator', 'Operations', 'Demand', 'Penny', 'Library', 'Admin'] as const;
-type WelcomeTab = typeof WELCOME_TABS[number];
+// ── Home welcome guide ────────────────────────────────────────────────────────
+// Six accordion chips — tap a section to reveal a short description + nav link.
+// No tabs, no long paragraphs. Details appear only on demand.
 
-const WELCOME_CONTENT: Record<WelcomeTab, { title: string; body: string; path?: string; pathLabel?: string }> = {
-  Overview: {
-    title: 'Welcome to Trail OS',
-    body: "Trail OS is Transition Trails' unified operating platform. Use the left navigation to move between sections. Use this page to get a snapshot of what's happening, what needs attention, and where to go next.",
-  },
-  Navigator: {
-    title: 'Navigator',
-    body: "The ecosystem map for Transition Trails programs. Program Map shows how Explorer's Trail, Foundations Trail, Guided Trail, Trail of Mastery, and Digital Compass connect. RESOLVE shows the delivery lifecycle. Trail OS Capability Map links Penny AI and capabilities to programs.",
+type NavSection = {
+  label: string;
+  body: string;
+  path: string;
+  pathLabel: string;
+};
+
+const NAV_SECTIONS: NavSection[] = [
+  {
+    label: 'Navigator',
+    body: "Ecosystem map for all programs. Program Map shows how Explorer's Trail, Foundations Trail, Guided Trail, Trail of Mastery, and Digital Compass connect. RESOLVE shows the delivery lifecycle.",
     path: '/navigator/program-map',
     pathLabel: 'Open Program Map',
   },
-  Operations: {
-    title: 'Operations Center',
-    body: 'Real-time health for programs, Salesforce, automation, Penny, and the website. Use Program Health to monitor cohort status and capacity. Salesforce Health shows integration and sync status.',
+  {
+    label: 'Operations',
+    body: 'Real-time health for programs, Salesforce, automation, Penny, and the website. Start with Program Health for cohort and capacity status.',
     path: '/operations/program-health',
     pathLabel: 'Open Program Health',
   },
-  Demand: {
-    title: 'Demand Management',
-    body: 'Where new program requests, change requests, and delivery work lives. Start with Intake to create a new request, or review Salesforce Cases for active items. Epics, Features, and Stories organize the delivery backlog.',
+  {
+    label: 'Demand',
+    body: 'New requests, change requests, and delivery work. Use Intake to submit, Cases to review active items, and Roadmap for the delivery backlog.',
     path: '/demand/intake',
     pathLabel: 'Open Intake',
   },
-  Penny: {
-    title: 'Penny Command Center',
-    body: 'Penny is the AI coaching and operations layer. Use Learners for cohort learner data, Logs for session history, Trail Quests for guided learning flows, and Test Penny to run prototype interactions.',
+  {
+    label: 'Penny',
+    body: 'AI coaching and operations layer. Learners shows cohort data, Logs shows session history, Trail Quests holds guided flows, Test Penny lets you run live interactions.',
     path: '/penny/test-penny',
-    pathLabel: 'Open Penny Test',
+    pathLabel: 'Open Test Penny',
   },
-  Library: {
-    title: 'Knowledge Library',
-    body: 'The source of truth for Transition Trails documentation. Documents holds all source blueprints and reference materials. Source Mapping tracks how each document connects to programs, phases, and Penny capabilities.',
+  {
+    label: 'Library',
+    body: 'Source of truth for all documentation. Documents holds source blueprints. Source Mapping tracks how each document connects to programs, phases, and Penny capabilities.',
     path: '/library/documents',
     pathLabel: 'Open Documents',
   },
-  Admin: {
-    title: 'Administration',
-    body: 'Configure programs, RESOLVE phases, Trail OS capabilities, Penny settings, communication channels, templates, users, and permissions. Changes here affect the entire platform.',
+  {
+    label: 'Admin',
+    body: 'Configure programs, RESOLVE phases, Trail OS capabilities, Penny settings, users, and permissions. Changes here affect the entire platform.',
     path: '/admin',
     pathLabel: 'Open Admin',
   },
-};
+];
 
 function HomeWelcomeGuide() {
-  const [activeTab, setActiveTab] = useState<WelcomeTab>('Overview');
+  const [open, setOpen] = useState<string | null>(null);
   const [, setLocation] = useLocation();
-  const c = WELCOME_CONTENT[activeTab];
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4">
+      <div className="p-4 space-y-3">
 
         <div>
-          <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px] mb-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
             How to use Trail OS
-          </Badge>
-          <h2 className="text-xl font-serif font-bold text-foreground">
-            Mission Control
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            Select a section below to learn where things live, or click any item on the Home page to open its brief here.
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Select a section to see what lives there.
           </p>
         </div>
 
-        {/* Section tabs */}
-        <div className="flex flex-wrap gap-1">
-          {WELCOME_TABS.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`text-[10px] font-medium px-2 py-1 rounded-md transition-colors ${
-                activeTab === tab
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+        {/* Accordion chips */}
+        <div className="space-y-1.5">
+          {NAV_SECTIONS.map(s => {
+            const isOpen = open === s.label;
+            return (
+              <div
+                key={s.label}
+                className={`rounded-lg border transition-colors overflow-hidden ${
+                  isOpen
+                    ? 'border-primary/30 bg-primary/5'
+                    : 'border-border/60 bg-white/70 hover:bg-muted/30'
+                }`}
+              >
+                <button
+                  onClick={() => setOpen(isOpen ? null : s.label)}
+                  className="w-full flex items-center justify-between px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+                >
+                  <span className={`text-[11px] font-semibold ${isOpen ? 'text-primary' : 'text-foreground'}`}>
+                    {s.label}
+                  </span>
+                  <ChevronRight
+                    className={`w-3 h-3 shrink-0 transition-transform ${
+                      isOpen ? 'rotate-90 text-primary' : 'text-muted-foreground/40'
+                    }`}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="px-3 pb-2.5 space-y-2">
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">{s.body}</p>
+                    <button
+                      onClick={() => setLocation(s.path)}
+                      className="flex items-center gap-1 text-[10px] font-medium text-primary hover:underline"
+                    >
+                      {s.pathLabel}
+                      <ArrowRight className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Tab content */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-bold text-foreground">{c.title}</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">{c.body}</p>
-          {c.path && (
-            <button
-              onClick={() => setLocation(c.path!)}
-              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-            >
-              {c.pathLabel}
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          )}
-        </div>
-
-        {/* Prototype mode note */}
-        <div className="rounded-md bg-muted/40 border border-border p-3">
+        <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            <strong>Prototype Mode —</strong> Data throughout Trail OS is representative. Salesforce, Agentforce, and GA4 connections are planned for Q3–Q4 2025.
+            <strong>Prototype Mode —</strong> Salesforce, Agentforce, and GA4 connections planned Q3–Q4 2025.
           </p>
         </div>
 
