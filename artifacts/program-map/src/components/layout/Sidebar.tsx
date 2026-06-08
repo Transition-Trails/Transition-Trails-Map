@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Home, Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown, MessageSquare,
+  Home, Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown, MessageSquare, GraduationCap,
 } from 'lucide-react';
 
 type NavItem  = { path: string; label: string };
@@ -101,6 +101,25 @@ const navGroups: NavGroup[] = [
       { path: '/library/salesforce-kb', label: 'Salesforce Knowledge' },
       { path: '/library/source-mapping', label: 'Source Mapping' },
       { path: '/library/search',       label: 'Search' },
+    ],
+  },
+  {
+    id: 'curriculum',
+    label: 'Curriculum Studio',
+    icon: GraduationCap,
+    pathPrefix: '/curriculum',
+    items: [
+      { path: '/curriculum/overview',           label: 'Overview' },
+      { path: '/curriculum/programs',           label: 'Programs' },
+      { path: '/curriculum/sprints',            label: 'Sprints' },
+      { path: '/curriculum/modules',            label: 'Modules' },
+      { path: '/curriculum/lessons',            label: 'Lessons' },
+      { path: '/curriculum/assignments',        label: 'Assignments' },
+      { path: '/curriculum/assessments',        label: 'Assessments' },
+      { path: '/curriculum/knowledge-articles', label: 'Knowledge Articles' },
+      { path: '/curriculum/penny-templates',    label: 'Penny Templates' },
+      { path: '/curriculum/content-requests',   label: 'Content Requests' },
+      { path: '/curriculum/content-health',     label: 'Content Health' },
     ],
   },
   {

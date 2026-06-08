@@ -50,6 +50,18 @@ import CommCalendar         from "@/pages/communications/CommCalendar";
 import CommNotifications   from "@/pages/communications/CommNotifications";
 import CommMessageTemplates from "@/pages/communications/MessageTemplates";
 
+import CurriculumOverview     from "@/pages/curriculum/CurriculumOverview";
+import CurriculumPrograms     from "@/pages/curriculum/CurriculumPrograms";
+import CurriculumSprints      from "@/pages/curriculum/CurriculumSprints";
+import CurriculumModules      from "@/pages/curriculum/CurriculumModules";
+import CurriculumLessons      from "@/pages/curriculum/CurriculumLessons";
+import CurriculumAssignments  from "@/pages/curriculum/CurriculumAssignments";
+import CurriculumAssessments  from "@/pages/curriculum/CurriculumAssessments";
+import KnowledgeArticles      from "@/pages/curriculum/KnowledgeArticles";
+import PennyTemplatesCurr     from "@/pages/curriculum/PennyTemplates";
+import ContentRequests        from "@/pages/curriculum/ContentRequests";
+import ContentHealth          from "@/pages/curriculum/ContentHealth";
+
 import LibraryDocuments from "@/pages/library/LibraryDocuments";
 import Templates        from "@/pages/library/Templates";
 
@@ -118,6 +130,18 @@ function Router() {
       <Route path="/communications/weekly-briefs"     component={WeeklyBriefs} />
       <Route path="/communications/notifications"     component={CommNotifications} />
       <Route path="/communications/message-templates" component={CommMessageTemplates} />
+
+      <Route path="/curriculum/overview"           component={CurriculumOverview} />
+      <Route path="/curriculum/programs"           component={CurriculumPrograms} />
+      <Route path="/curriculum/sprints"            component={CurriculumSprints} />
+      <Route path="/curriculum/modules"            component={CurriculumModules} />
+      <Route path="/curriculum/lessons"            component={CurriculumLessons} />
+      <Route path="/curriculum/assignments"        component={CurriculumAssignments} />
+      <Route path="/curriculum/assessments"        component={CurriculumAssessments} />
+      <Route path="/curriculum/knowledge-articles" component={KnowledgeArticles} />
+      <Route path="/curriculum/penny-templates"    component={PennyTemplatesCurr} />
+      <Route path="/curriculum/content-requests"   component={ContentRequests} />
+      <Route path="/curriculum/content-health"     component={ContentHealth} />
 
       <Route path="/library/documents"     component={LibraryDocuments} />
       <Route path="/library/templates"     component={Templates} />

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -901,6 +901,311 @@ export function ContextPanel() {
               <div className="bg-amber-50 border border-amber-100 rounded-md px-3 py-2">
                 <span className="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Future Setup</span>
                 <p className="text-[11px] text-amber-900 leading-relaxed">{data.setupNotes}</p>
+              </div>
+            )}
+
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // ── Curriculum Studio item ─────────────────────────────────────────────
+    if (type === 'curriculumItem') {
+      const d           = data as any;
+      const objType     = d.objectType as string;
+      const status      = d.status as string;
+      const statusCls: Record<string, string> = {
+        published:      'text-green-700 bg-green-50 border-green-200',
+        draft:          'text-amber-700 bg-amber-50 border-amber-200',
+        'needs-review': 'text-orange-700 bg-orange-50 border-orange-200',
+        missing:        'text-red-700 bg-red-50 border-red-200',
+        prototype:      'text-violet-700 bg-violet-50 border-violet-200',
+      };
+      const objChip: Record<string, string> = {
+        program:          'bg-primary/10 text-primary border-primary/20',
+        sprint:           'bg-violet-50 text-violet-800 border-violet-200',
+        module:           'bg-sky-50 text-sky-800 border-sky-200',
+        lesson:           'bg-amber-50 text-amber-800 border-amber-200',
+        assignment:       'bg-orange-50 text-orange-800 border-orange-200',
+        assessment:       'bg-rose-50 text-rose-800 border-rose-200',
+        knowledgeArticle: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+        pennyTemplate:    'bg-secondary/10 text-secondary border-secondary/20',
+        healthIssue:      'bg-red-50 text-red-700 border-red-200',
+      };
+      const objLabel: Record<string, string> = {
+        program: 'Program', sprint: 'Sprint', module: 'Module', lesson: 'Lesson',
+        assignment: 'Assignment', assessment: 'Assessment', knowledgeArticle: 'Knowledge Article',
+        pennyTemplate: 'Penny Template', healthIssue: 'Content Health Issue',
+      };
+      const ObjIcon = objType === 'pennyTemplate' ? Sparkles
+        : objType === 'knowledgeArticle' ? BookOpen
+        : objType === 'healthIssue' ? AlertTriangle
+        : GraduationCap;
+
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+
+            {/* Header */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`inline-flex items-center text-[10px] font-bold uppercase tracking-wider border rounded-full px-2 py-0.5 ${objChip[objType] ?? 'bg-muted text-muted-foreground border-border'}`}>
+                  <ObjIcon className="w-3 h-3 mr-1" />
+                  {objLabel[objType] ?? objType}
+                </span>
+                <span className={`inline-flex text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCls[status] ?? 'bg-muted text-muted-foreground border-border'}`}>
+                  {status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                </span>
+                {d.confidence && (
+                  <span className="inline-flex text-[10px] font-semibold border border-border bg-muted/40 text-muted-foreground rounded-full px-2 py-0.5">
+                    {d.confidence}
+                  </span>
+                )}
+              </div>
+              <h2 className="text-xl font-serif font-bold text-foreground leading-tight">{d.name}</h2>
+            </div>
+
+            {/* Purpose */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Purpose</p>
+              <p className="text-[12px] text-foreground leading-relaxed">{d.purpose}</p>
+            </div>
+
+            {/* Context — program / sprint / module chain */}
+            {(d.program || d.sprint || d.module) && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Context</p>
+                <div className="space-y-1">
+                  {d.program && (
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="text-[11px] text-foreground">{d.program}</span>
+                    </div>
+                  )}
+                  {d.sprint && (
+                    <div className="flex items-center gap-2">
+                      <ArrowRight className="w-3 h-3 text-violet-600 flex-shrink-0" />
+                      <span className="text-[11px] text-foreground">{d.sprint}</span>
+                    </div>
+                  )}
+                  {d.module && (
+                    <div className="flex items-center gap-2">
+                      <ArrowRight className="w-3 h-3 text-sky-600 flex-shrink-0" />
+                      <span className="text-[11px] text-foreground">{d.module}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Ownership */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Owner</p>
+              {d.owner
+                ? <p className="text-[12px] text-foreground font-medium">{d.owner}</p>
+                : <p className="text-[12px] text-red-600 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> No owner assigned</p>}
+            </div>
+
+            {/* Type-specific fields */}
+
+            {objType === 'sprint' && d.resolvePhase && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">RESOLVE Phase</p>
+                <span className="inline-flex text-[11px] font-semibold border border-violet-200 bg-violet-50 text-violet-800 rounded-full px-2.5 py-0.5">{d.resolvePhase}</span>
+              </div>
+            )}
+
+            {objType === 'sprint' && d.theme && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Theme</p>
+                <p className="text-[12px] text-foreground">{d.theme}</p>
+              </div>
+            )}
+
+            {objType === 'module' && Array.isArray(d.learningObjectives) && d.learningObjectives.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Learning Objectives</p>
+                <ul className="space-y-1.5">
+                  {(d.learningObjectives as string[]).map((obj, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-[11px] text-foreground leading-snug">{obj}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {objType === 'lesson' && d.learningObjective && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Learning Objective</p>
+                <p className="text-[12px] text-foreground leading-relaxed">{d.learningObjective}</p>
+              </div>
+            )}
+
+            {objType === 'lesson' && (
+              <div className="grid grid-cols-2 gap-3">
+                {d.lessonType && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Type</p>
+                    <p className="text-[12px] text-foreground">{d.lessonType}</p>
+                  </div>
+                )}
+                {d.duration && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Duration</p>
+                    <p className="text-[12px] text-foreground">{d.duration}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {objType === 'assessment' && (
+              <div className="grid grid-cols-2 gap-3">
+                {d.questionCount !== undefined && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Questions</p>
+                    <p className="text-[12px] text-foreground font-semibold">{d.questionCount}</p>
+                  </div>
+                )}
+                {d.passingScore !== undefined && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Passing Score</p>
+                    <p className="text-[12px] text-foreground font-semibold">{d.passingScore}%</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {objType === 'knowledgeArticle' && (
+              <div className="grid grid-cols-2 gap-3">
+                {d.articleType && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Article Type</p>
+                    <p className="text-[12px] text-foreground">{d.articleType}</p>
+                  </div>
+                )}
+                {d.wordCount && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Word Count</p>
+                    <p className="text-[12px] text-foreground">{d.wordCount}</p>
+                  </div>
+                )}
+                {d.lastReviewed && (
+                  <div className="col-span-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Last Reviewed</p>
+                    <p className="text-[12px] text-foreground">{d.lastReviewed}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {objType === 'pennyTemplate' && d.triggerContext && (
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Trigger Context</p>
+                  <p className="text-[12px] text-foreground">{d.triggerContext}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {d.targetAudience && (
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Audience</p>
+                      <p className="text-[12px] text-foreground">{d.targetAudience}</p>
+                    </div>
+                  )}
+                  {d.tone && (
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Tone</p>
+                      <p className="text-[12px] text-foreground italic">{d.tone}</p>
+                    </div>
+                  )}
+                </div>
+                {d.sampleOutput && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Sample Output</p>
+                    <div className="rounded-lg border border-secondary/20 bg-secondary/5 px-3 py-2">
+                      <p className="text-[11px] text-foreground leading-relaxed italic">{d.sampleOutput}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {objType === 'healthIssue' && (
+              <div className="space-y-3">
+                {Array.isArray(d.affectedItems) && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Affected Items</p>
+                    <ul className="space-y-1">
+                      {(d.affectedItems as string[]).map((item, i) => (
+                        <li key={i} className="text-[11px] text-foreground flex items-start gap-1.5">
+                          <AlertTriangle className="w-3 h-3 text-orange-500 mt-0.5 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {d.actionRequired && (
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Action Required</p>
+                    <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2">
+                      <p className="text-[11px] text-green-800 leading-relaxed">{d.actionRequired}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Salesforce / LMS mapping */}
+            <div className="space-y-2 pt-1 border-t border-border/40">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Object Mapping</p>
+              <div className="space-y-1.5">
+                {d.relatedSalesforceObject && (
+                  <div className="flex items-center gap-2">
+                    <Database className="w-3 h-3 text-primary flex-shrink-0" />
+                    <span className="text-[11px] text-foreground">{d.relatedSalesforceObject}</span>
+                  </div>
+                )}
+                {d.relatedLmsObject && (
+                  <div className="flex items-center gap-2">
+                    <Layers className="w-3 h-3 text-sky-600 flex-shrink-0" />
+                    <span className="text-[11px] text-foreground">{d.relatedLmsObject}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Penny generation actions */}
+            {Array.isArray(d.pennyActions) && d.pennyActions.length > 0 && (
+              <div className="space-y-2 pt-1 border-t border-border/40">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Penny Generation</p>
+                <div className="flex flex-wrap gap-1">
+                  {(d.pennyActions as string[]).map(action => (
+                    <span key={action} className="inline-flex items-center gap-1 text-[10px] font-medium text-secondary border border-secondary/20 bg-secondary/5 rounded-full px-2 py-0.5">
+                      <Zap className="w-2.5 h-2.5" />
+                      {action}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground/60">Future state — requires Penny Content Assistant integration</p>
+              </div>
+            )}
+
+            {/* Future demand link */}
+            {d.futureDemandLink && (
+              <div className="pt-1 border-t border-border/40">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5">Demand Management</p>
+                <p className="text-[11px] text-muted-foreground">{d.futureDemandLink}</p>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5">Governance workflows planned for Q3–Q4 2025</p>
+              </div>
+            )}
+
+            {/* Notes */}
+            {d.notes && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+                <p className="text-[10px] font-bold text-amber-900 mb-1">Note</p>
+                <p className="text-[11px] text-amber-800 leading-relaxed">{d.notes}</p>
               </div>
             )}
 
