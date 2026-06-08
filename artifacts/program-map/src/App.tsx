@@ -52,15 +52,29 @@ import CommMessageTemplates from "@/pages/communications/MessageTemplates";
 
 import CurriculumOverview     from "@/pages/curriculum/CurriculumOverview";
 import CurriculumPrograms     from "@/pages/curriculum/CurriculumPrograms";
+import CurriculumCohorts      from "@/pages/curriculum/CurriculumCohorts";
 import CurriculumSprints      from "@/pages/curriculum/CurriculumSprints";
 import CurriculumModules      from "@/pages/curriculum/CurriculumModules";
-import CurriculumLessons      from "@/pages/curriculum/CurriculumLessons";
-import CurriculumAssignments  from "@/pages/curriculum/CurriculumAssignments";
-import CurriculumAssessments  from "@/pages/curriculum/CurriculumAssessments";
+import LearningLessons        from "@/pages/curriculum/LearningLessons";
+import LearningAssessments    from "@/pages/curriculum/LearningAssessments";
+import LearningResources      from "@/pages/curriculum/LearningResources";
 import KnowledgeArticles      from "@/pages/curriculum/KnowledgeArticles";
-import PennyTemplatesCurr     from "@/pages/curriculum/PennyTemplates";
-import ContentRequests        from "@/pages/curriculum/ContentRequests";
+import PennyCoachingPrompts   from "@/pages/curriculum/PennyCoachingPrompts";
+import PennyReflectionPrompts from "@/pages/curriculum/PennyReflectionPrompts";
+import PennyTrailQuestsCurr   from "@/pages/curriculum/PennyTrailQuests";
+import PennyWeeklyReviews     from "@/pages/curriculum/PennyWeeklyReviews";
+import PennyContentAssistant  from "@/pages/curriculum/PennyContentAssistant";
+import PennyActionLibrary     from "@/pages/curriculum/PennyActionLibrary";
+import ConsistencyReview      from "@/pages/curriculum/ConsistencyReview";
+import PennyGeneratedOutputs  from "@/pages/curriculum/PennyGeneratedOutputs";
+import DeliverySlackActivities from "@/pages/curriculum/DeliverySlackActivities";
+import DeliveryGoogleChat     from "@/pages/curriculum/DeliveryGoogleChat";
+import DeliveryCalendarEvents from "@/pages/curriculum/DeliveryCalendarEvents";
+import DeliveryOfficeHours    from "@/pages/curriculum/DeliveryOfficeHours";
 import ContentHealth          from "@/pages/curriculum/ContentHealth";
+import ProgramBlueprint       from "@/pages/curriculum/ProgramBlueprint";
+import SalesforceMapping      from "@/pages/curriculum/SalesforceMapping";
+import ProgramResources       from "@/pages/admin/ProgramResources";
 
 import LibraryDocuments from "@/pages/library/LibraryDocuments";
 import Templates        from "@/pages/library/Templates";
@@ -131,17 +145,30 @@ function Router() {
       <Route path="/communications/notifications"     component={CommNotifications} />
       <Route path="/communications/message-templates" component={CommMessageTemplates} />
 
-      <Route path="/curriculum/overview"           component={CurriculumOverview} />
-      <Route path="/curriculum/programs"           component={CurriculumPrograms} />
-      <Route path="/curriculum/sprints"            component={CurriculumSprints} />
-      <Route path="/curriculum/modules"            component={CurriculumModules} />
-      <Route path="/curriculum/lessons"            component={CurriculumLessons} />
-      <Route path="/curriculum/assignments"        component={CurriculumAssignments} />
-      <Route path="/curriculum/assessments"        component={CurriculumAssessments} />
-      <Route path="/curriculum/knowledge-articles" component={KnowledgeArticles} />
-      <Route path="/curriculum/penny-templates"    component={PennyTemplatesCurr} />
-      <Route path="/curriculum/content-requests"   component={ContentRequests} />
-      <Route path="/curriculum/content-health"     component={ContentHealth} />
+      <Route path="/curriculum/overview"            component={CurriculumOverview} />
+      <Route path="/curriculum/programs"            component={CurriculumPrograms} />
+      <Route path="/curriculum/cohorts"             component={CurriculumCohorts} />
+      <Route path="/curriculum/sprints"             component={CurriculumSprints} />
+      <Route path="/curriculum/modules"             component={CurriculumModules} />
+      <Route path="/curriculum/lessons"             component={LearningLessons} />
+      <Route path="/curriculum/assessments"         component={LearningAssessments} />
+      <Route path="/curriculum/resources"           component={LearningResources} />
+      <Route path="/curriculum/knowledge-articles"  component={KnowledgeArticles} />
+      <Route path="/curriculum/coaching-prompts"    component={PennyCoachingPrompts} />
+      <Route path="/curriculum/reflection-prompts"  component={PennyReflectionPrompts} />
+      <Route path="/curriculum/trail-quests"        component={PennyTrailQuestsCurr} />
+      <Route path="/curriculum/weekly-reviews"      component={PennyWeeklyReviews} />
+      <Route path="/curriculum/penny-assistant"     component={PennyContentAssistant} />
+      <Route path="/curriculum/penny-actions"       component={PennyActionLibrary} />
+      <Route path="/curriculum/consistency-review"  component={ConsistencyReview} />
+      <Route path="/curriculum/generated-outputs"   component={PennyGeneratedOutputs} />
+      <Route path="/curriculum/slack-activities"    component={DeliverySlackActivities} />
+      <Route path="/curriculum/google-chat"         component={DeliveryGoogleChat} />
+      <Route path="/curriculum/calendar-events"     component={DeliveryCalendarEvents} />
+      <Route path="/curriculum/office-hours"        component={DeliveryOfficeHours} />
+      <Route path="/curriculum/content-health"      component={ContentHealth} />
+      <Route path="/curriculum/blueprint"           component={ProgramBlueprint} />
+      <Route path="/curriculum/salesforce-mapping"  component={SalesforceMapping} />
 
       <Route path="/library/documents"     component={LibraryDocuments} />
       <Route path="/library/templates"     component={Templates} />
@@ -149,6 +176,7 @@ function Router() {
       <Route path="/library/source-mapping" component={SourceMapping} />
       <Route path="/library/search"        component={LibrarySearch} />
 
+      <Route path="/admin/program-resources" component={ProgramResources} />
       <Route path="/admin/comm-channels"  component={CommunicationChannels} />
       <Route path="/admin/comm-routing"   component={CommunicationRouting} />
       <Route path="/admin/comm-templates" component={AdminMessageTemplates} />

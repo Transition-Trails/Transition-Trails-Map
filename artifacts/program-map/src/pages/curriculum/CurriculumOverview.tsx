@@ -1,183 +1,161 @@
 import { useLocation } from 'wouter';
-import { GraduationCap, Layers, Sparkles, CheckCircle2, ArrowRight, AlertTriangle, BookOpen } from 'lucide-react';
-import { curriculumPrograms } from '@/data/curriculumData';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { GraduationCap, BookOpen, Sparkles, Radio, AlertTriangle, ArrowRight, CheckCircle2, Zap, Layers } from 'lucide-react';
+import { curriculumModules, curriculumPrograms, curriculumHealthIssues } from '@/data/curriculumData';
 
-const HIERARCHY = [
-  { label: 'Program',          color: 'bg-primary/10 text-primary border-primary/20' },
-  { label: 'Sprint',           color: 'bg-violet-50 text-violet-800 border-violet-200' },
-  { label: 'Module',           color: 'bg-sky-50 text-sky-800 border-sky-200' },
-  { label: 'Lesson',           color: 'bg-amber-50 text-amber-800 border-amber-200' },
-  { label: 'Assignment',       color: 'bg-orange-50 text-orange-800 border-orange-200' },
-  { label: 'Assessment',       color: 'bg-rose-50 text-rose-800 border-rose-200' },
-  { label: 'Knowledge Article',color: 'bg-indigo-50 text-indigo-800 border-indigo-200' },
-  { label: 'Penny Template',   color: 'bg-secondary/10 text-secondary border-secondary/20' },
-  { label: 'Outcome',          color: 'bg-green-50 text-green-800 border-green-200' },
+const ARCHITECTURE_LAYERS = [
+  { id: 'structure', label: 'Program Structure', color: 'border-primary/30 bg-primary/5 text-primary', chipColor: 'bg-primary/10 text-primary border-primary/20', icon: GraduationCap, items: ['Programs', 'Cohorts', 'Sprints', 'Modules'], path: '/curriculum/modules' },
+  { id: 'learning', label: 'Learning Assets', color: 'border-amber-300 bg-amber-50/50 text-amber-800', chipColor: 'bg-amber-50 text-amber-800 border-amber-200', icon: BookOpen, items: ['Lessons', 'Assessments', 'Knowledge Articles', 'Resources'], path: '/curriculum/lessons' },
+  { id: 'penny', label: 'Penny Assets', color: 'border-secondary/30 bg-secondary/5 text-secondary', chipColor: 'bg-secondary/10 text-secondary border-secondary/20', icon: Sparkles, items: ['Coaching Prompts', 'Reflection Prompts', 'Trail Quests', 'Weekly Reviews'], path: '/curriculum/coaching-prompts' },
+  { id: 'delivery', label: 'Delivery Assets', color: 'border-green-300 bg-green-50/50 text-green-800', chipColor: 'bg-green-50 text-green-800 border-green-200', icon: Radio, items: ['Slack Activities', 'Google Chat', 'Calendar Events', 'Office Hours'], path: '/curriculum/slack-activities' },
 ];
-
-const PILLARS = [
-  {
-    icon: Layers,
-    iconCls: 'text-primary',
-    bg: 'bg-primary/5 border-primary/20',
-    title: 'Program Architecture',
-    desc: 'Model the complete content object hierarchy — from Program to Outcome — in a structured, reviewable format. Plan Salesforce and LMS object mappings before build.',
-  },
-  {
-    icon: Sparkles,
-    iconCls: 'text-secondary',
-    bg: 'bg-secondary/5 border-secondary/20',
-    title: 'Penny Content Assistant',
-    desc: 'Use Penny to generate modules, lessons, assessments, coach notes, reflection prompts, Slack messages, and knowledge articles — ensuring uniform quality across all programs.',
-  },
-  {
-    icon: CheckCircle2,
-    iconCls: 'text-green-700',
-    bg: 'bg-green-50 border-green-200',
-    title: 'Content Standards',
-    desc: 'Enforce standards across all programs: every lesson has an objective, every module has an assessment, every article has an owner. Content Health surfaces gaps automatically.',
-  },
-];
-
-const ft = curriculumPrograms.find(p => p.id === 'prog-foundations')!;
 
 export default function CurriculumOverview() {
   const [, setLocation] = useLocation();
+  const mod21 = curriculumModules.find(m => m.id === 'mod-2-1')!;
+  const highIssues = curriculumHealthIssues.filter(h => h.severity === 'high');
+  const published = curriculumModules.filter(m => m.status === 'published').length;
+  const fullyConnected = curriculumModules.filter(m =>
+    (m.lessonIds as string[]).length > 0 && (m.assessmentIds as string[]).length > 0 &&
+    (m.knowledgeArticleIds as string[]).length > 0 && (m.coachingPromptIds as string[]).length > 0
+  ).length;
 
   return (
-    <div className="h-full w-full overflow-y-auto p-6 bg-muted/20">
-      <div className="max-w-5xl mx-auto space-y-8">
-
-        {/* Header */}
+    <ScrollArea className="h-full">
+      <div className="p-6 max-w-5xl space-y-7">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Curriculum Studio</h1>
-          <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            The curriculum factory for Trail OS — where programs are designed, content is standardized, and Penny responses are generated. Build before governance, create before change management.
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
+          <h1 className="text-3xl font-serif font-bold text-foreground">Learning Architecture Workspace</h1>
+          <p className="text-[13px] text-muted-foreground mt-2 max-w-2xl">
+            Model relationships between Program Structure, Learning Assets, Penny Assets, and Delivery Assets so staff can build
+            consistent, standards-based curriculum. Consistency comes from <strong>relationships</strong>, not templates.
           </p>
         </div>
 
-        {/* Prototype notice */}
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 flex items-start gap-3">
-          <AlertTriangle className="w-4 h-4 text-amber-700 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-[12px] font-semibold text-amber-900 mb-1">Prototype — Content Architecture Layer</p>
-            <p className="text-[11px] text-amber-800 leading-relaxed">
-              Curriculum Studio is the pre-governance workspace for designing, building, and standardizing program content.
-              Demand Management will later govern new program and change requests — but this prototype focuses on <strong>structure, creation, and content standards first</strong>.
-              All data shown is prototype mapping based on Foundations Trail as the primary example.
-            </p>
-          </div>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+          <p className="text-[12px] text-amber-800">
+            <strong>Prototype — Content Architecture Layer.</strong> Foundations Trail is the primary fully-connected example.
+            All 12 modules model the four-layer relationship architecture. Module 2.1 is the standards reference.
+          </p>
         </div>
 
-        {/* Three pillars */}
-        <section>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Three Pillars</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {PILLARS.map(p => {
-              const Icon = p.icon;
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: 'Programs', value: String(curriculumPrograms.length), sub: `${curriculumPrograms.filter(p => p.status === 'published').length} published` },
+            { label: 'Modules', value: String(curriculumModules.length), sub: `${published} published` },
+            { label: 'Fully Connected', value: String(fullyConnected), sub: 'of ' + curriculumModules.length + ' modules' },
+            { label: 'Health Issues', value: String(curriculumHealthIssues.length), sub: `${highIssues.length} high priority` },
+          ].map(s => (
+            <div key={s.label} className="rounded-lg border border-border bg-white px-4 py-3">
+              <p className="text-2xl font-bold text-foreground">{s.value}</p>
+              <p className="text-[11px] font-semibold text-foreground/70">{s.label}</p>
+              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Four-Layer Architecture</p>
+          <p className="text-[12px] text-muted-foreground">Module is the central connective node — it links all four asset layers into a complete learning experience.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {ARCHITECTURE_LAYERS.map(layer => {
+              const Icon = layer.icon;
               return (
-                <div key={p.title} className={`rounded-xl border p-5 ${p.bg}`}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Icon className={`w-4 h-4 ${p.iconCls}`} />
-                    <p className="text-[13px] font-bold text-foreground">{p.title}</p>
+                <button key={layer.id} onClick={() => setLocation(layer.path)} className={`rounded-lg border-2 p-4 text-left transition-all hover:shadow-sm ${layer.color}`}>
+                  <div className="flex items-center gap-2 mb-2"><Icon className="w-4 h-4" /><span className="text-[13px] font-bold">{layer.label}</span></div>
+                  <div className="flex flex-wrap gap-1">
+                    {layer.items.map(item => (
+                      <span key={item} className={`text-[10px] font-medium border rounded-full px-2 py-0.5 ${layer.chipColor}`}>{item}</span>
+                    ))}
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">{p.desc}</p>
-                </div>
+                </button>
               );
             })}
           </div>
-        </section>
+        </div>
 
-        {/* Object hierarchy */}
-        <section>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Object Hierarchy</h2>
-          <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
-            <p className="text-[11px] text-muted-foreground mb-4">Every content object in Curriculum Studio maps to a future Salesforce and LMS object — establishing the data architecture before integration.</p>
-            <div className="flex items-center gap-1 flex-wrap">
-              {HIERARCHY.map((h, i) => (
-                <div key={h.label} className="flex items-center gap-1">
-                  <span className={`inline-flex items-center text-[11px] font-semibold border rounded-full px-2.5 py-1 ${h.color}`}>{h.label}</span>
-                  {i < HIERARCHY.length - 1 && <ArrowRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Foundations Trail stats — prototype example */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Foundations Trail — Prototype Example</h2>
-            <button
-              onClick={() => setLocation('/curriculum/programs')}
-              className="text-[11px] text-primary font-medium hover:underline flex items-center gap-1"
-            >
-              View all programs <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <GraduationCap className="w-4 h-4 text-primary" />
-              <p className="text-[13px] font-bold text-foreground">Foundations Trail</p>
-              <span className="inline-flex text-[10px] font-semibold border border-green-200 bg-green-50 text-green-700 rounded-full px-2 py-0.5">Published</span>
-              <span className="inline-flex text-[10px] font-semibold border border-primary/20 bg-primary/10 text-primary rounded-full px-2 py-0.5">Primary Prototype</span>
-            </div>
-            <div className="grid grid-cols-4 gap-3 sm:grid-cols-8">
-              {[
-                { label: 'Sprints',   value: ft.sprintCount },
-                { label: 'Modules',   value: ft.moduleCount },
-                { label: 'Lessons',   value: ft.lessonCount },
-                { label: 'Assignments', value: ft.assignmentCount },
-                { label: 'Assessments', value: ft.assessmentCount },
-                { label: 'Articles',  value: ft.knowledgeArticleCount },
-                { label: 'Templates', value: ft.pennyTemplateCount },
-                { label: 'Cohorts',   value: ft.cohortCount },
-              ].map(s => (
-                <div key={s.label} className="text-center">
-                  <p className="text-2xl font-bold font-serif text-primary">{s.value as number}</p>
-                  <p className="text-[10px] text-muted-foreground">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Quick links */}
-        <section>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Studio Areas</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {[
-              { path: '/curriculum/programs',          label: 'Programs',           desc: '5 programs, Foundations Trail primary example' },
-              { path: '/curriculum/sprints',           label: 'Sprints',            desc: '4 sprints mapped to RESOLVE phases' },
-              { path: '/curriculum/modules',           label: 'Modules',            desc: '12 modules with learning objectives' },
-              { path: '/curriculum/lessons',           label: 'Lessons',            desc: '36 lessons with types and durations' },
-              { path: '/curriculum/knowledge-articles', label: 'Knowledge Articles', desc: '10 articles mapped to Salesforce Knowledge' },
-              { path: '/curriculum/penny-templates',   label: 'Penny Templates',    desc: '8 templates + Penny Content Assistant' },
-              { path: '/curriculum/assessments',       label: 'Assessments',        desc: '11 assessments with passing scores' },
-              { path: '/curriculum/content-health',    label: 'Content Health',     desc: '7 issues found — 1 high severity' },
-              { path: '/curriculum/content-requests',  label: 'Content Requests',   desc: 'Future: governed by Demand Management' },
-            ].map(link => (
-              <button
-                key={link.path}
-                onClick={() => setLocation(link.path)}
-                className="text-left rounded-xl border border-border bg-white hover:border-primary/30 hover:bg-primary/5 transition-all p-4 group"
-              >
-                <p className="text-[13px] font-semibold text-foreground group-hover:text-primary">{link.label}</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">{link.desc}</p>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Future state — Demand Management */}
-        <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4 flex items-start gap-3">
-          <BookOpen className="w-4 h-4 text-muted-foreground/60 flex-shrink-0 mt-0.5" />
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            <strong>Future state —</strong> New program requests and program change requests will be governed through Demand Management (Intake → Case → Epic → Feature → Story) once governance workflows are in place. Curriculum Studio is the pre-governance content workspace. Content Requests will connect to the Demand Management pipeline in a future release.
+        <div className="rounded-lg border-2 border-primary/20 bg-primary/5 px-5 py-4">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-primary/60 mb-1">The Relationship Principle</p>
+          <p className="text-[13px] font-semibold text-foreground mb-1">
+            A fully-connected module has: lessons → assessment → knowledge articles → coaching prompts → reflection prompts → delivery activities → outcomes.
+          </p>
+          <p className="text-[12px] text-muted-foreground">
+            When staff select any object, the Knowledge Brief rail shows all related objects across all four layers — not just the object's properties.
           </p>
         </div>
 
+        {mod21 && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Fully-Connected Example</p>
+              <span className="text-[10px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5">★ Module 2.1 — Foundations Trail</span>
+            </div>
+            <div className="rounded-lg border-2 border-sky-200 bg-sky-50/30 p-4">
+              <p className="text-[13px] font-bold text-sky-900 mb-3">{mod21.name as string} · {mod21.sprint as string}</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {[
+                  { label: 'Lessons', count: (mod21.lessonIds as string[]).length, path: '/curriculum/lessons' },
+                  { label: 'Assessment', count: (mod21.assessmentIds as string[]).length, path: '/curriculum/assessments' },
+                  { label: 'KB Articles', count: (mod21.knowledgeArticleIds as string[]).length, path: '/curriculum/knowledge-articles' },
+                  { label: 'Coaching Prompts', count: (mod21.coachingPromptIds as string[]).length, path: '/curriculum/coaching-prompts' },
+                  { label: 'Reflection Prompts', count: (mod21.reflectionPromptIds as string[]).length, path: '/curriculum/reflection-prompts' },
+                  { label: 'Delivery Assets', count: (mod21.slackActivityIds as string[]).length + (mod21.calendarEventIds as string[]).length, path: '/curriculum/slack-activities' },
+                ].map(rel => (
+                  <button key={rel.label} onClick={() => setLocation(rel.path)} className="flex items-center gap-2 rounded-md border border-sky-200 bg-white px-3 py-2 text-left hover:border-sky-400 transition-colors">
+                    <CheckCircle2 className="w-3 h-3 text-green-600 shrink-0" />
+                    <span className="text-[11px] font-medium text-sky-800">{rel.count} {rel.label}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-sky-700 mt-2 italic">Use Module 2.1 as the content architecture standard — all future modules should reach this level of completeness.</p>
+            </div>
+          </div>
+        )}
+
+        <div className="rounded-lg border border-secondary/30 bg-secondary/5 px-5 py-4 flex items-start gap-3">
+          <Sparkles className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+          <div className="flex-1">
+            <p className="text-[13px] font-bold text-foreground">Penny Content Assistant</p>
+            <p className="text-[12px] text-muted-foreground mt-0.5">Select any learning object and use Penny to generate outlines, draft lessons, create assessments, write prompts, and more. Penny works as curriculum architect and content co-author.</p>
+          </div>
+          <button onClick={() => setLocation('/curriculum/penny-assistant')} className="flex items-center gap-1.5 text-[12px] font-semibold text-secondary border border-secondary/30 rounded-full px-3 py-1.5 hover:bg-secondary/10 transition-colors whitespace-nowrap">
+            Open <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        {highIssues.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">High-Priority Health Issues</p>
+            {highIssues.map(issue => (
+              <div key={issue.id} className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50/50 px-4 py-3">
+                <AlertTriangle className="w-3.5 h-3.5 text-red-600 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-[12px] font-semibold text-red-900">{issue.name as string}</p>
+                  <p className="text-[11px] text-red-700">{issue.actionRequired as string}</p>
+                </div>
+              </div>
+            ))}
+            <button onClick={() => setLocation('/curriculum/content-health')} className="text-[12px] text-primary font-medium flex items-center gap-1 hover:underline">View all health issues <ArrowRight className="w-3 h-3" /></button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pb-4">
+          {[
+            { label: 'Modules', path: '/curriculum/modules', desc: 'Relationship health map' },
+            { label: 'Penny Content Assistant', path: '/curriculum/penny-assistant', desc: 'Generate curriculum content' },
+            { label: 'Consistency Review', path: '/curriculum/consistency-review', desc: 'Gap analysis by program' },
+            { label: 'Content Health', path: '/curriculum/content-health', desc: 'All health issues' },
+            { label: 'Generated Outputs', path: '/curriculum/generated-outputs', desc: 'Module 2.1 sample output' },
+            { label: 'Action Library', path: '/curriculum/penny-actions', desc: '11 prototype actions' },
+          ].map(link => (
+            <button key={link.path} onClick={() => setLocation(link.path)} className="rounded-lg border border-border bg-white px-4 py-3 text-left hover:border-primary/30 hover:bg-primary/5 transition-colors">
+              <div className="flex items-center gap-1.5 mb-0.5"><Zap className="w-3 h-3 text-primary" /><span className="text-[12px] font-semibold text-foreground">{link.label}</span></div>
+              <p className="text-[10px] text-muted-foreground">{link.desc}</p>
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 }

@@ -12,7 +12,7 @@ export type SelectedItemType =
   | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'document'
   | 'commProvider' | 'commRoute' | 'commTemplate'
   | 'commChannel' | 'commBroadcast' | 'commWeeklyBrief' | 'commNotification' | 'commCalendar'
-  | 'curriculumItem';
+  | 'curriculumItem' | 'pennyAction' | 'sfMapping' | 'programResource';
 
 interface AppState {
   activePage: string;

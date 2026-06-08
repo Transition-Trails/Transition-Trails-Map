@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2 } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2 } from 'lucide-react';
+import { ACTION_CATEGORY_CONFIG, type PennyContentAction } from '@/data/pennyContentActions';
+import { type TrailOsSfMapping, SF_STATUS_CONFIG, type SfMappingStatus, SF_PRODUCT_CONFIG } from '@/data/salesforceArchitectureData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -904,6 +906,164 @@ export function ContextPanel() {
               </div>
             )}
 
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // ── Penny Content Action ───────────────────────────────────────────────
+    if (type === 'pennyAction') {
+      const action = data as PennyContentAction;
+      const catCfg = ACTION_CATEGORY_CONFIG[action.category];
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Penny Action</p>
+              <p className="text-xl font-serif font-bold text-foreground leading-snug">{action.name}</p>
+              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                <span className={`inline-block text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg?.chip ?? ''}`}>{action.category}</span>
+                <span className="text-[10px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{action.estimatedTime}</span>
+                <span className={`text-[10px] font-medium border rounded-full px-2 py-0.5 ${action.status === 'prototype' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{action.status}</span>
+              </div>
+            </div>
+            <p className="text-[12px] text-muted-foreground leading-relaxed">{action.purpose}</p>
+            <div className="rounded-lg border border-secondary/10 bg-secondary/5 p-3">
+              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">Context</p>
+              <p className="text-[11px] text-foreground/80 italic leading-relaxed">{action.contextSentence}</p>
+            </div>
+            {action.inputs.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Inputs Required</p>
+                <div className="space-y-1.5">
+                  {action.inputs.map(inp => (
+                    <div key={inp.label} className="flex items-start gap-2">
+                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${inp.required ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{inp.required ? 'Required' : 'Optional'}</span>
+                      <div><p className="text-[11px] font-semibold text-foreground">{inp.label}</p><p className="text-[10px] text-muted-foreground">{inp.description}</p></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {action.generates.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Generates</p>
+                <div className="space-y-1">
+                  {action.generates.map(g => (
+                    <div key={g.label} className="flex items-start gap-2">
+                      <Sparkles className="w-3 h-3 text-secondary shrink-0 mt-0.5" />
+                      <div><p className="text-[11px] font-semibold text-foreground">{g.label}</p><p className="text-[10px] text-muted-foreground">{g.description}</p></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {action.applicableTo.length > 0 && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Applies To</p>
+                <div className="flex flex-wrap gap-1">
+                  {action.applicableTo.map(obj => (
+                    <span key={obj} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{obj}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {action.salesforceMapping && (
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                <p className="text-[10px] font-bold text-blue-800 uppercase tracking-wider mb-1">Salesforce Mapping</p>
+                <p className="text-[11px] font-semibold text-blue-900">{action.salesforceMapping}</p>
+              </div>
+            )}
+            {action.notes && (
+              <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
+                <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Note</p>
+                <p className="text-[11px] text-amber-900">{action.notes}</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // ── Salesforce Architecture Mapping ────────────────────────────────────
+    if (type === 'sfMapping') {
+      const mapping = data as TrailOsSfMapping;
+      const statusCfg = SF_STATUS_CONFIG[mapping.status];
+      const productCfg = SF_PRODUCT_CONFIG[mapping.sfProduct];
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — SF Architecture</p>
+              <p className="text-xl font-serif font-bold text-foreground leading-snug">{mapping.trailOsObject}</p>
+              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${productCfg.cls}`}>{productCfg.label}</span>
+              </div>
+            </div>
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-1">
+              <p className="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Maps To</p>
+              <p className="text-[14px] font-bold text-blue-900">{mapping.sfLabel}</p>
+              <p className="text-[11px] font-mono text-blue-700">{mapping.sfApiName}</p>
+              <p className="text-[11px] text-blue-800">{mapping.sfPackageSource}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Purpose</p>
+              <p className="text-[12px] text-foreground leading-relaxed">{mapping.purpose}</p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/20 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Current Implementation</p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">{mapping.currentImplementation}</p>
+            </div>
+            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
+              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Future Recommendation</p>
+              <p className="text-[11px] text-amber-900 leading-relaxed">{mapping.futureRecommendation}</p>
+            </div>
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">★ Foundations Trail Example</p>
+              <p className="text-[11px] text-foreground leading-relaxed italic">{mapping.foundationsTrailExample}</p>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+              <Link2 className="w-3 h-3" />
+              <span className="capitalize">{mapping.relationshipType} relationship</span>
+              <span>·</span>
+              <span>Owner: {mapping.owner}</span>
+            </div>
+            {mapping.notes && (
+              <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider mb-1">Note</p>
+                <p className="text-[11px] text-orange-900">{mapping.notes}</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // ── Program Resource (Google Drive) ────────────────────────────────────
+    if (type === 'programResource') {
+      const res = data as any;
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Program Resource</p>
+              <p className="text-xl font-serif font-bold text-foreground">{res.programName}</p>
+              <p className="text-[12px] text-muted-foreground">{res.folderName || 'No folder configured'}</p>
+            </div>
+            <p className="text-[12px] text-muted-foreground leading-relaxed">{res.description}</p>
+            {res.folderUrl && (
+              <a href={res.folderUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-[12px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-lg px-3 py-2 hover:bg-primary/10 transition-colors">
+                Open Google Drive folder
+                <Shield className="w-3.5 h-3.5" />
+              </a>
+            )}
+            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
+              <div><span className="text-muted-foreground">Owner:</span> <span className="font-medium">{res.owner}</span></div>
+              <div><span className="text-muted-foreground">Permissions:</span> <span className="font-medium capitalize">{(res.permissionsModel || '').replace(/-/g, ' ')}</span></div>
+              <div><span className="text-muted-foreground">Sync:</span> <span className="font-medium capitalize">{(res.syncStatus || '').replace(/-/g, ' ')}</span></div>
+            </div>
           </div>
         </ScrollArea>
       );

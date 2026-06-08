@@ -4,7 +4,7 @@ import {
   Home, Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown, MessageSquare, GraduationCap,
 } from 'lucide-react';
 
-type NavItem  = { path: string; label: string };
+type NavItem  = { path: string; label: string; isLabel?: false } | { label: string; isLabel: true };
 type NavGroup = {
   id: string;
   label: string;
@@ -96,11 +96,11 @@ const navGroups: NavGroup[] = [
     icon: BookOpen,
     pathPrefix: '/library',
     items: [
-      { path: '/library/documents',    label: 'Documents' },
-      { path: '/library/templates',    label: 'Templates' },
+      { path: '/library/documents',     label: 'Documents' },
+      { path: '/library/templates',     label: 'Templates' },
       { path: '/library/salesforce-kb', label: 'Salesforce Knowledge' },
       { path: '/library/source-mapping', label: 'Source Mapping' },
-      { path: '/library/search',       label: 'Search' },
+      { path: '/library/search',        label: 'Search' },
     ],
   },
   {
@@ -109,17 +109,36 @@ const navGroups: NavGroup[] = [
     icon: GraduationCap,
     pathPrefix: '/curriculum',
     items: [
-      { path: '/curriculum/overview',           label: 'Overview' },
-      { path: '/curriculum/programs',           label: 'Programs' },
-      { path: '/curriculum/sprints',            label: 'Sprints' },
-      { path: '/curriculum/modules',            label: 'Modules' },
-      { path: '/curriculum/lessons',            label: 'Lessons' },
-      { path: '/curriculum/assignments',        label: 'Assignments' },
-      { path: '/curriculum/assessments',        label: 'Assessments' },
-      { path: '/curriculum/knowledge-articles', label: 'Knowledge Articles' },
-      { path: '/curriculum/penny-templates',    label: 'Penny Templates' },
-      { path: '/curriculum/content-requests',   label: 'Content Requests' },
-      { path: '/curriculum/content-health',     label: 'Content Health' },
+      { path: '/curriculum/overview',            label: 'Overview' },
+      { label: 'Program Structure', isLabel: true },
+      { path: '/curriculum/programs',            label: 'Programs' },
+      { path: '/curriculum/cohorts',             label: 'Cohorts' },
+      { path: '/curriculum/sprints',             label: 'Sprints' },
+      { path: '/curriculum/modules',             label: 'Modules' },
+      { label: 'Learning Assets', isLabel: true },
+      { path: '/curriculum/lessons',             label: 'Lessons' },
+      { path: '/curriculum/assessments',         label: 'Assessments' },
+      { path: '/curriculum/knowledge-articles',  label: 'Knowledge Articles' },
+      { path: '/curriculum/resources',           label: 'Resources' },
+      { label: 'Penny Assets', isLabel: true },
+      { path: '/curriculum/coaching-prompts',    label: 'Coaching Prompts' },
+      { path: '/curriculum/reflection-prompts',  label: 'Reflection Prompts' },
+      { path: '/curriculum/trail-quests',        label: 'Trail Quests' },
+      { path: '/curriculum/weekly-reviews',      label: 'Weekly Reviews' },
+      { label: 'Penny Content Assistant', isLabel: true },
+      { path: '/curriculum/penny-assistant',     label: 'Content Workshop' },
+      { path: '/curriculum/penny-actions',       label: 'Action Library' },
+      { path: '/curriculum/consistency-review',  label: 'Consistency Review' },
+      { path: '/curriculum/generated-outputs',   label: 'Generated Outputs' },
+      { label: 'Delivery Assets', isLabel: true },
+      { path: '/curriculum/slack-activities',    label: 'Slack Activities' },
+      { path: '/curriculum/google-chat',         label: 'Google Chat' },
+      { path: '/curriculum/calendar-events',     label: 'Calendar Events' },
+      { path: '/curriculum/office-hours',        label: 'Office Hours' },
+      { path: '/curriculum/content-health',      label: 'Content Health' },
+      { label: 'Blueprints & Architecture', isLabel: true },
+      { path: '/curriculum/blueprint',           label: 'Program Blueprint' },
+      { path: '/curriculum/salesforce-mapping',  label: 'Salesforce Architecture' },
     ],
   },
   {
@@ -128,23 +147,28 @@ const navGroups: NavGroup[] = [
     icon: Settings,
     pathPrefix: '/admin',
     items: [
-      { path: '/admin/programs',     label: 'Programs' },
-      { path: '/admin/documents',    label: 'Documents' },
-      { path: '/admin/resolve',      label: 'RESOLVE' },
-      { path: '/admin/trail-os',     label: 'Trail OS' },
-      { path: '/admin/penny',        label: 'Penny' },
-      { path: '/admin/roles',        label: 'Roles' },
-      { path: '/admin/templates',    label: 'Templates' },
-      { path: '/admin/integrations',   label: 'Integrations' },
-      { path: '/admin/comm-channels', label: 'Comm Channels' },
-      { path: '/admin/comm-routing',  label: 'Comm Routing' },
-      { path: '/admin/comm-templates', label: 'Message Templates' },
-      { path: '/admin/users',          label: 'Users' },
-      { path: '/admin/permissions',  label: 'Permissions' },
-      { path: '/admin/settings',     label: 'Settings' },
+      { path: '/admin/programs',          label: 'Programs' },
+      { path: '/admin/program-resources', label: 'Program Resources' },
+      { path: '/admin/documents',         label: 'Documents' },
+      { path: '/admin/resolve',         label: 'RESOLVE' },
+      { path: '/admin/trail-os',        label: 'Trail OS' },
+      { path: '/admin/penny',           label: 'Penny' },
+      { path: '/admin/roles',           label: 'Roles' },
+      { path: '/admin/templates',       label: 'Templates' },
+      { path: '/admin/integrations',    label: 'Integrations' },
+      { path: '/admin/comm-channels',   label: 'Comm Channels' },
+      { path: '/admin/comm-routing',    label: 'Comm Routing' },
+      { path: '/admin/comm-templates',  label: 'Message Templates' },
+      { path: '/admin/users',           label: 'Users' },
+      { path: '/admin/permissions',     label: 'Permissions' },
+      { path: '/admin/settings',        label: 'Settings' },
     ],
   },
 ];
+
+function calcMaxHeight(items: NavItem[]): number {
+  return items.reduce((sum, item) => sum + (item.isLabel ? 28 : 36), 0);
+}
 
 export function Sidebar() {
   const [location, setLocation] = useLocation();
@@ -173,7 +197,7 @@ export function Sidebar() {
     <div className="w-[220px] flex-shrink-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border">
       <div className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
 
-        {/* Home — top-level link, above all groups */}
+        {/* Home */}
         <button
           onClick={() => setLocation('/')}
           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
@@ -193,7 +217,6 @@ export function Sidebar() {
 
           return (
             <div key={group.id}>
-              {/* Section header */}
               <button
                 onClick={() => toggleGroup(group.id)}
                 className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
@@ -211,13 +234,21 @@ export function Sidebar() {
                 />
               </button>
 
-              {/* Sub-items with smooth height transition */}
               <div
                 className="overflow-hidden transition-all duration-200 ease-in-out"
-                style={{ maxHeight: isOpen ? `${group.items.length * 36}px` : '0px' }}
+                style={{ maxHeight: isOpen ? `${calcMaxHeight(group.items)}px` : '0px' }}
               >
                 <div className="ml-4 border-l border-sidebar-border/60 mt-0.5 mb-1 space-y-0.5">
-                  {group.items.map(item => {
+                  {group.items.map((item, idx) => {
+                    if (item.isLabel) {
+                      return (
+                        <div key={`label-${idx}`} className="px-3 pt-2 pb-0.5">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                            {item.label}
+                          </p>
+                        </div>
+                      );
+                    }
                     const isActive = location === item.path;
                     return (
                       <button

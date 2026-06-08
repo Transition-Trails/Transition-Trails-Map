@@ -1,18 +1,29 @@
-// ── Curriculum Studio Data — Prototype ────────────────────────────────────────
-// Models the Trail OS curriculum object hierarchy:
-// Program → Sprint → Module → Lesson → Assignment → Assessment →
-//   Knowledge Article → Penny Template → Outcome
+// ── Curriculum Studio Data — Learning Architecture Workspace ─────────────────
+// Models the full Trail OS learning architecture:
+// Program → Cohort → Sprint → Module
+//   └── Lessons, Assessments, Knowledge Articles, Resources
+//   └── Penny Assets: Coaching Prompts, Reflection Prompts, Trail Quests, Weekly Reviews
+//   └── Delivery Assets: Slack Activities, Google Chat Updates, Calendar Events, Office Hours
 //
-// Foundations Trail is the primary prototype example with full data.
-// All data is prototype — structure and content standards, not live records.
+// Relationship-first design: Module is the central connective node.
+// Foundations Trail (Module 2.1) is the primary fully-connected example.
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 export type CurriculumObjectType =
-  | 'program' | 'sprint' | 'module' | 'lesson'
-  | 'assignment' | 'assessment' | 'knowledgeArticle' | 'pennyTemplate' | 'healthIssue';
+  | 'program' | 'cohort' | 'sprint' | 'module'
+  | 'lesson' | 'assessment' | 'knowledgeArticle' | 'resource'
+  | 'coachingPrompt' | 'reflectionPrompt' | 'trailQuest' | 'weeklyReview'
+  | 'slackActivity' | 'googleChatUpdate' | 'calendarEvent' | 'officeHours'
+  | 'healthIssue';
 
-export type ContentStatus      = 'published' | 'draft' | 'needs-review' | 'missing';
-export type ContentConfidence  = 'confirmed' | 'prototype' | 'draft' | 'planned';
-export type HealthSeverity     = 'high' | 'medium' | 'low';
+export type ContentStatus     = 'published' | 'draft' | 'needs-review' | 'missing';
+export type ContentConfidence = 'confirmed' | 'prototype' | 'draft' | 'planned';
+export type HealthSeverity    = 'high' | 'medium' | 'low';
+export type HealthCheckType   =
+  | 'missing-objectives' | 'missing-assessment' | 'missing-knowledge-link'
+  | 'missing-penny-prompts' | 'duplicate-concept' | 'missing-delivery'
+  | 'no-owner' | 'needs-review';
 
 export interface CurriculumItem {
   id: string;
@@ -22,33 +33,37 @@ export interface CurriculumItem {
   confidence: ContentConfidence;
   owner: string;
   program: string;
-  purpose: string;
+  purpose?: string;
   relatedSalesforceObject: string;
   relatedLmsObject: string;
   pennyActions: string[];
   futureDemandLink: string;
   notes?: string;
-  // typed extension fields
   [key: string]: unknown;
 }
 
 // ── Display Config ────────────────────────────────────────────────────────────
 
 export const CURRICULUM_OBJECT_CONFIG: Record<CurriculumObjectType, {
-  label: string;
-  pluralLabel: string;
-  chip: string;
-  border: string;
+  label: string; pluralLabel: string; chip: string; border: string; group: string;
 }> = {
-  program:          { label: 'Program',           pluralLabel: 'Programs',           chip: 'bg-primary/10 text-primary border-primary/20',          border: 'border-primary/20 hover:border-primary/40' },
-  sprint:           { label: 'Sprint',            pluralLabel: 'Sprints',            chip: 'bg-violet-50 text-violet-800 border-violet-200',         border: 'border-violet-100 hover:border-violet-300' },
-  module:           { label: 'Module',            pluralLabel: 'Modules',            chip: 'bg-sky-50 text-sky-800 border-sky-200',                  border: 'border-sky-100 hover:border-sky-300' },
-  lesson:           { label: 'Lesson',            pluralLabel: 'Lessons',            chip: 'bg-amber-50 text-amber-800 border-amber-200',            border: 'border-amber-100 hover:border-amber-300' },
-  assignment:       { label: 'Assignment',        pluralLabel: 'Assignments',        chip: 'bg-orange-50 text-orange-800 border-orange-200',         border: 'border-orange-100 hover:border-orange-300' },
-  assessment:       { label: 'Assessment',        pluralLabel: 'Assessments',        chip: 'bg-rose-50 text-rose-800 border-rose-200',               border: 'border-rose-100 hover:border-rose-300' },
-  knowledgeArticle: { label: 'Knowledge Article', pluralLabel: 'Knowledge Articles', chip: 'bg-indigo-50 text-indigo-800 border-indigo-200',         border: 'border-indigo-100 hover:border-indigo-300' },
-  pennyTemplate:    { label: 'Penny Template',    pluralLabel: 'Penny Templates',    chip: 'bg-secondary/10 text-secondary border-secondary/20',     border: 'border-secondary/20 hover:border-secondary/40' },
-  healthIssue:      { label: 'Health Issue',      pluralLabel: 'Health Issues',      chip: 'bg-red-50 text-red-700 border-red-200',                  border: 'border-red-100 hover:border-red-300' },
+  program:          { label: 'Program',            pluralLabel: 'Programs',            chip: 'bg-primary/10 text-primary border-primary/20',          border: 'border-primary/20 hover:border-primary/40',         group: 'Program Structure' },
+  cohort:           { label: 'Cohort',             pluralLabel: 'Cohorts',             chip: 'bg-teal-50 text-teal-800 border-teal-200',              border: 'border-teal-100 hover:border-teal-300',             group: 'Program Structure' },
+  sprint:           { label: 'Sprint',             pluralLabel: 'Sprints',             chip: 'bg-violet-50 text-violet-800 border-violet-200',        border: 'border-violet-100 hover:border-violet-300',         group: 'Program Structure' },
+  module:           { label: 'Module',             pluralLabel: 'Modules',             chip: 'bg-sky-50 text-sky-800 border-sky-200',                 border: 'border-sky-100 hover:border-sky-300',               group: 'Program Structure' },
+  lesson:           { label: 'Lesson',             pluralLabel: 'Lessons',             chip: 'bg-amber-50 text-amber-800 border-amber-200',           border: 'border-amber-100 hover:border-amber-300',           group: 'Learning Assets' },
+  assessment:       { label: 'Assessment',         pluralLabel: 'Assessments',         chip: 'bg-rose-50 text-rose-800 border-rose-200',              border: 'border-rose-100 hover:border-rose-300',             group: 'Learning Assets' },
+  knowledgeArticle: { label: 'Knowledge Article',  pluralLabel: 'Knowledge Articles',  chip: 'bg-indigo-50 text-indigo-800 border-indigo-200',        border: 'border-indigo-100 hover:border-indigo-300',         group: 'Learning Assets' },
+  resource:         { label: 'Resource',           pluralLabel: 'Resources',           chip: 'bg-slate-50 text-slate-800 border-slate-200',           border: 'border-slate-100 hover:border-slate-300',           group: 'Learning Assets' },
+  coachingPrompt:   { label: 'Coaching Prompt',    pluralLabel: 'Coaching Prompts',    chip: 'bg-secondary/10 text-secondary border-secondary/20',    border: 'border-secondary/20 hover:border-secondary/40',     group: 'Penny Assets' },
+  reflectionPrompt: { label: 'Reflection Prompt',  pluralLabel: 'Reflection Prompts',  chip: 'bg-purple-50 text-purple-800 border-purple-200',        border: 'border-purple-100 hover:border-purple-300',         group: 'Penny Assets' },
+  trailQuest:       { label: 'Trail Quest',        pluralLabel: 'Trail Quests',        chip: 'bg-emerald-50 text-emerald-800 border-emerald-200',     border: 'border-emerald-100 hover:border-emerald-300',       group: 'Penny Assets' },
+  weeklyReview:     { label: 'Weekly Review',      pluralLabel: 'Weekly Reviews',      chip: 'bg-cyan-50 text-cyan-800 border-cyan-200',              border: 'border-cyan-100 hover:border-cyan-300',             group: 'Penny Assets' },
+  slackActivity:    { label: 'Slack Activity',     pluralLabel: 'Slack Activities',    chip: 'bg-green-50 text-green-800 border-green-200',           border: 'border-green-100 hover:border-green-300',           group: 'Delivery Assets' },
+  googleChatUpdate: { label: 'Google Chat Update', pluralLabel: 'Google Chat Updates', chip: 'bg-blue-50 text-blue-800 border-blue-200',              border: 'border-blue-100 hover:border-blue-300',             group: 'Delivery Assets' },
+  calendarEvent:    { label: 'Calendar Event',     pluralLabel: 'Calendar Events',     chip: 'bg-orange-50 text-orange-800 border-orange-200',        border: 'border-orange-100 hover:border-orange-300',         group: 'Delivery Assets' },
+  officeHours:      { label: 'Office Hours',       pluralLabel: 'Office Hours',        chip: 'bg-pink-50 text-pink-800 border-pink-200',              border: 'border-pink-100 hover:border-pink-300',             group: 'Delivery Assets' },
+  healthIssue:      { label: 'Health Issue',       pluralLabel: 'Health Issues',       chip: 'bg-red-50 text-red-700 border-red-200',                 border: 'border-red-100 hover:border-red-300',               group: 'Content Health' },
 };
 
 export const CONTENT_STATUS_CONFIG: Record<ContentStatus, { label: string; cls: string }> = {
@@ -64,6 +79,17 @@ export const SEVERITY_CONFIG: Record<HealthSeverity, { label: string; cls: strin
   low:    { label: 'Low',    cls: 'text-amber-700 bg-amber-50 border-amber-200' },
 };
 
+export const HEALTH_CHECK_CONFIG: Record<HealthCheckType, { label: string; description: string }> = {
+  'missing-objectives':    { label: 'Missing Learning Objectives', description: 'Module has no defined learning objectives.' },
+  'missing-assessment':    { label: 'Missing Assessment',          description: 'Module has no linked assessment.' },
+  'missing-knowledge-link':{ label: 'Missing Knowledge Articles',  description: 'Module has no linked knowledge articles.' },
+  'missing-penny-prompts': { label: 'Missing Penny Prompts',       description: 'Module has no coaching or reflection prompts.' },
+  'duplicate-concept':     { label: 'Duplicate Concept',           description: 'Content concept overlaps with another module.' },
+  'missing-delivery':      { label: 'Missing Delivery Activities', description: 'Module has no Slack, Calendar, or Office Hours assets.' },
+  'no-owner':              { label: 'No Owner Assigned',           description: 'No owner assigned to this content object.' },
+  'needs-review':          { label: 'Needs Content Review',        description: 'Content flagged for review before publishing.' },
+};
+
 // ── Programs ──────────────────────────────────────────────────────────────────
 
 export const curriculumPrograms: CurriculumItem[] = [
@@ -75,22 +101,18 @@ export const curriculumPrograms: CurriculumItem[] = [
     confidence: 'confirmed',
     owner: 'Program Manager',
     program: 'Foundations Trail',
-    purpose: 'Salesforce skills training and certification preparation — prepares learners for Admin and Associate certifications in a structured 12-week cohort format with 4 sprints, 12 modules, and Penny-assisted content throughout.',
-    relatedSalesforceObject: 'Program__c (Custom Object)',
+    purpose: 'Salesforce skills training and certification preparation — prepares learners for Admin and Associate certifications in a 12-week cohort format with 4 sprints, 12 modules, and Penny-assisted content throughout.',
+    relatedSalesforceObject: 'Program__c',
     relatedLmsObject: 'Course (Salesforce LMS)',
     pennyActions: ['Generate Sprint Outline', 'Create Module', 'Create Assessment', 'Create Coach Notes'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
+    futureDemandLink: 'Submit Change Request',
+    sprintCount: 4, moduleCount: 12, lessonCount: 36, assessmentCount: 12,
+    knowledgeArticleCount: 10, cohortCount: 2,
     duration: '12 weeks',
     audience: 'Career changers seeking Salesforce Admin or Associate certification',
-    sprintCount: 4,
-    moduleCount: 12,
-    lessonCount: 36,
-    assignmentCount: 24,
-    assessmentCount: 11,
-    knowledgeArticleCount: 10,
-    pennyTemplateCount: 8,
-    cohortCount: 2,
-    notes: 'Primary prototype example — full data modeled here.',
+    cohortIds: ['coh-ft-01', 'coh-ft-02'],
+    sprintIds: ['spr-ft-1', 'spr-ft-2', 'spr-ft-3', 'spr-ft-4'],
+    notes: 'Primary prototype example — full relationship data modeled here.',
   },
   {
     id: 'prog-guided',
@@ -101,21 +123,13 @@ export const curriculumPrograms: CurriculumItem[] = [
     owner: 'Program Manager',
     program: 'Guided Trail',
     purpose: 'Multi-sprint career transition program with cohort coaching, Trail Quests, and Penny AI guidance — 12–16 weeks for adult career changers.',
-    relatedSalesforceObject: 'Program__c (Custom Object)',
+    relatedSalesforceObject: 'Program__c',
     relatedLmsObject: 'Course (Salesforce LMS)',
-    pennyActions: ['Generate Sprint Outline', 'Create Lesson', 'Create Reflection Prompt', 'Create Slack Prompt'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
+    pennyActions: ['Generate Sprint Outline', 'Create Lesson', 'Create Reflection Prompt'],
+    futureDemandLink: 'Submit Change Request',
+    sprintCount: 4, moduleCount: 8, lessonCount: 24, assessmentCount: 8,
     duration: '12–16 weeks',
-    audience: 'Adult career changers in cohort-based job placement programs',
-    sprintCount: 4,
-    moduleCount: 8,
-    lessonCount: 24,
-    assignmentCount: 16,
-    assessmentCount: 8,
-    knowledgeArticleCount: 6,
-    pennyTemplateCount: 6,
-    cohortCount: 1,
-    notes: 'Curriculum structure prototype — content creation underway.',
+    cohortIds: ['coh-gt-01'],
   },
   {
     id: 'prog-explorers',
@@ -126,20 +140,12 @@ export const curriculumPrograms: CurriculumItem[] = [
     owner: 'Program Manager',
     program: "Explorer's Trail",
     purpose: 'No-barrier entry program for adults new to digital environments — 4-week subsidized cohort with foundational digital literacy focus.',
-    relatedSalesforceObject: 'Program__c (Custom Object)',
+    relatedSalesforceObject: 'Program__c',
     relatedLmsObject: 'Course (Salesforce LMS)',
     pennyActions: ['Create Lesson', 'Create Knowledge Article', 'Create Reflection Prompt'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
+    futureDemandLink: 'Submit Change Request',
+    sprintCount: 1, moduleCount: 4, lessonCount: 12, assessmentCount: 4,
     duration: '4 weeks',
-    audience: 'Job seekers new to digital and professional environments',
-    sprintCount: 1,
-    moduleCount: 4,
-    lessonCount: 12,
-    assignmentCount: 8,
-    assessmentCount: 4,
-    knowledgeArticleCount: 4,
-    pennyTemplateCount: 3,
-    cohortCount: 2,
     notes: 'Content review needed for sprint 1 materials.',
   },
   {
@@ -150,21 +156,13 @@ export const curriculumPrograms: CurriculumItem[] = [
     confidence: 'prototype',
     owner: 'Program Manager',
     program: 'Digital Compass',
-    purpose: 'Employer partnership program placing learners on real nonprofit workplace projects — structured around client deliverables, sprint cycles, and employer presentations.',
-    relatedSalesforceObject: 'Program__c (Custom Object)',
+    purpose: 'Employer partnership program placing learners on real nonprofit workplace projects — sprint cycles and employer presentations.',
+    relatedSalesforceObject: 'Program__c',
     relatedLmsObject: 'Course (Salesforce LMS)',
     pennyActions: ['Create Module', 'Create Google Chat Update', 'Create Coach Notes'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
+    futureDemandLink: 'Submit Change Request',
+    sprintCount: 2, moduleCount: 6, lessonCount: 16, assessmentCount: 4,
     duration: '8 weeks',
-    audience: 'Learners with foundational skills ready for workplace projects',
-    sprintCount: 2,
-    moduleCount: 6,
-    lessonCount: 16,
-    assignmentCount: 10,
-    assessmentCount: 4,
-    knowledgeArticleCount: 5,
-    pennyTemplateCount: 4,
-    cohortCount: 1,
     notes: 'Client-facing content drafts in progress.',
   },
   {
@@ -175,553 +173,546 @@ export const curriculumPrograms: CurriculumItem[] = [
     confidence: 'planned',
     owner: 'Program Manager',
     program: 'Trail of Mastery',
-    purpose: 'Advanced credential and specialization path for Foundations Trail alumni — deepens Salesforce expertise with specialty certifications and career positioning.',
-    relatedSalesforceObject: 'Program__c (Custom Object)',
+    purpose: 'Advanced credential path for Foundations Trail alumni — specialty certifications and career positioning.',
+    relatedSalesforceObject: 'Program__c',
     relatedLmsObject: 'Course (Salesforce LMS)',
     pennyActions: ['Generate Sprint Outline', 'Create Assessment'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    duration: '8–12 weeks',
-    audience: 'Foundations Trail alumni seeking advanced Salesforce credentials',
-    sprintCount: 0,
-    moduleCount: 0,
-    lessonCount: 0,
-    assignmentCount: 0,
-    assessmentCount: 0,
-    knowledgeArticleCount: 0,
-    pennyTemplateCount: 0,
-    cohortCount: 0,
+    futureDemandLink: 'Submit Change Request',
+    sprintCount: 0, moduleCount: 0, lessonCount: 0, assessmentCount: 0,
     notes: 'Planned — no content created yet.',
   },
 ];
 
-// ── Sprints (Foundations Trail) ───────────────────────────────────────────────
+// ── Cohorts ───────────────────────────────────────────────────────────────────
+
+export const curriculumCohorts: CurriculumItem[] = [
+  {
+    id: 'coh-ft-01',
+    objectType: 'cohort',
+    name: 'Foundations Trail — Cohort 1 (Jan 2025)',
+    status: 'published',
+    confidence: 'confirmed',
+    owner: 'Program Manager',
+    program: 'Foundations Trail',
+    purpose: 'First delivery of the Foundations Trail program — 14 learners across 12 weeks. Used to validate curriculum, delivery pace, and Penny prompt effectiveness.',
+    relatedSalesforceObject: 'Cohort__c',
+    relatedLmsObject: 'TrailGroup__c (Salesforce LMS)',
+    pennyActions: ['Generate Weekly Review', 'Create Coach Notes'],
+    futureDemandLink: 'Submit Change Request',
+    startDate: 'Jan 13, 2025',
+    endDate: 'Apr 4, 2025',
+    learnerCount: 14,
+    activeLearners: 12,
+    atRiskLearners: 2,
+    completionRate: '86%',
+    programId: 'prog-foundations',
+    currentSprint: 'Sprint 3 — Automation & Flows',
+    notes: 'Active cohort. Week 7 progress review completed.',
+  },
+  {
+    id: 'coh-ft-02',
+    objectType: 'cohort',
+    name: 'Foundations Trail — Cohort 2 (Mar 2025)',
+    status: 'published',
+    confidence: 'confirmed',
+    owner: 'Program Manager',
+    program: 'Foundations Trail',
+    purpose: 'Second delivery of Foundations Trail — 12 learners. Incorporates improvements from Cohort 1 feedback.',
+    relatedSalesforceObject: 'Cohort__c',
+    relatedLmsObject: 'TrailGroup__c (Salesforce LMS)',
+    pennyActions: ['Generate Weekly Review', 'Create Coach Notes'],
+    futureDemandLink: 'Submit Change Request',
+    startDate: 'Mar 10, 2025',
+    endDate: 'May 30, 2025',
+    learnerCount: 12,
+    activeLearners: 12,
+    atRiskLearners: 0,
+    completionRate: 'In progress',
+    programId: 'prog-foundations',
+    currentSprint: 'Sprint 1 — Salesforce Foundations',
+  },
+  {
+    id: 'coh-gt-01',
+    objectType: 'cohort',
+    name: 'Guided Trail — Cohort 1 (Feb 2025)',
+    status: 'published',
+    confidence: 'prototype',
+    owner: 'Program Manager',
+    program: 'Guided Trail',
+    purpose: 'First Guided Trail delivery — 10 learners in a coaching-intensive format.',
+    relatedSalesforceObject: 'Cohort__c',
+    relatedLmsObject: 'TrailGroup__c (Salesforce LMS)',
+    pennyActions: ['Generate Weekly Review'],
+    futureDemandLink: 'Submit Change Request',
+    startDate: 'Feb 3, 2025',
+    learnerCount: 10,
+    activeLearners: 9,
+    programId: 'prog-guided',
+  },
+];
+
+// ── Sprints ────────────────────────────────────────────────────────────────────
 
 export const curriculumSprints: CurriculumItem[] = [
   {
     id: 'spr-ft-1',
     objectType: 'sprint',
-    name: 'Salesforce Ecosystem Foundations',
+    name: 'Sprint 1 — Salesforce Ecosystem Foundations',
     status: 'published',
     confidence: 'confirmed',
     owner: 'Curriculum Lead',
     program: 'Foundations Trail',
     purpose: 'Establish foundational understanding of the Salesforce ecosystem, CRM concepts, and the Admin role — with career context for the learner\'s transition journey.',
-    relatedSalesforceObject: 'Sprint__c (Custom Object)',
+    relatedSalesforceObject: 'Sprint__c',
     relatedLmsObject: 'Unit (Salesforce LMS)',
     pennyActions: ['Generate Sprint Outline', 'Create Coach Notes', 'Create Slack Prompt'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprintNumber: 1,
-    duration: 'Weeks 1–3',
-    moduleCount: 3,
-    lessonCount: 9,
+    futureDemandLink: 'Submit Change Request',
+    sprintNumber: 1, duration: 'Weeks 1–3', moduleCount: 3,
     theme: 'Ecosystem, CRM, Navigation',
     resolvePhase: 'Recognize',
+    moduleIds: ['mod-1-1', 'mod-1-2', 'mod-1-3'],
+    programId: 'prog-foundations',
   },
   {
     id: 'spr-ft-2',
     objectType: 'sprint',
-    name: 'Data Modeling & Admin Fundamentals',
+    name: 'Sprint 2 — Data Modeling & Admin Fundamentals',
     status: 'published',
     confidence: 'confirmed',
     owner: 'Curriculum Lead',
     program: 'Foundations Trail',
     purpose: 'Build core Salesforce admin competency in data modeling, user management, security settings, reports, and dashboards — the foundation of the Admin certification.',
-    relatedSalesforceObject: 'Sprint__c (Custom Object)',
+    relatedSalesforceObject: 'Sprint__c',
     relatedLmsObject: 'Unit (Salesforce LMS)',
     pennyActions: ['Generate Sprint Outline', 'Create Assessment', 'Create Coach Notes'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprintNumber: 2,
-    duration: 'Weeks 4–6',
-    moduleCount: 3,
-    lessonCount: 9,
+    futureDemandLink: 'Submit Change Request',
+    sprintNumber: 2, duration: 'Weeks 4–6', moduleCount: 3,
     theme: 'Data Modeling, Security, Reporting',
     resolvePhase: 'Evaluate',
+    moduleIds: ['mod-2-1', 'mod-2-2', 'mod-2-3'],
+    programId: 'prog-foundations',
   },
   {
     id: 'spr-ft-3',
     objectType: 'sprint',
-    name: 'Automation & Flows',
+    name: 'Sprint 3 — Automation & Flows',
     status: 'published',
     confidence: 'confirmed',
     owner: 'Curriculum Lead',
     program: 'Foundations Trail',
     purpose: 'Introduce process automation, Flow Builder, and basic integration concepts — enabling learners to build and manage automated workflows in Salesforce.',
-    relatedSalesforceObject: 'Sprint__c (Custom Object)',
+    relatedSalesforceObject: 'Sprint__c',
     relatedLmsObject: 'Unit (Salesforce LMS)',
     pennyActions: ['Generate Sprint Outline', 'Create Lesson', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprintNumber: 3,
-    duration: 'Weeks 7–9',
-    moduleCount: 3,
-    lessonCount: 9,
+    futureDemandLink: 'Submit Change Request',
+    sprintNumber: 3, duration: 'Weeks 7–9', moduleCount: 3,
     theme: 'Automation, Flow Builder, Integrations',
     resolvePhase: 'Solve',
+    moduleIds: ['mod-3-1', 'mod-3-2', 'mod-3-3'],
+    programId: 'prog-foundations',
   },
   {
     id: 'spr-ft-4',
     objectType: 'sprint',
-    name: 'Certification Prep & Career Launch',
+    name: 'Sprint 4 — Certification Prep & Career Launch',
     status: 'needs-review',
     confidence: 'prototype',
     owner: 'Curriculum Lead',
     program: 'Foundations Trail',
-    purpose: 'Prepare learners for the Salesforce Admin or Associate certification exam and transition into the job market — including exam strategy, mock exams, portfolio work, and career positioning.',
-    relatedSalesforceObject: 'Sprint__c (Custom Object)',
+    purpose: 'Prepare learners for Salesforce Admin or Associate certification and the job market — exam strategy, mock exams, portfolio work, career positioning.',
+    relatedSalesforceObject: 'Sprint__c',
     relatedLmsObject: 'Unit (Salesforce LMS)',
-    pennyActions: ['Generate Sprint Outline', 'Create Assessment', 'Create Coach Notes', 'Create Reflection Prompt'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprintNumber: 4,
-    duration: 'Weeks 10–12',
-    moduleCount: 3,
-    lessonCount: 9,
+    pennyActions: ['Generate Sprint Outline', 'Create Assessment', 'Create Reflection Prompt'],
+    futureDemandLink: 'Submit Change Request',
+    sprintNumber: 4, duration: 'Weeks 10–12', moduleCount: 3,
     theme: 'Certification, Portfolio, Career',
     resolvePhase: 'Verify',
+    moduleIds: ['mod-4-1', 'mod-4-2', 'mod-4-3'],
+    programId: 'prog-foundations',
     notes: 'Career Launch module content needs review — portfolio content updated Q1.',
   },
 ];
 
-// ── Modules (Foundations Trail — 12 modules, 3 per sprint) ───────────────────
+// ── Modules ────────────────────────────────────────────────────────────────────
+// Module 2.1 is the fully-connected sample — all relationship arrays populated.
+// Other modules have partial relationship data showing realistic coverage gaps.
 
 export const curriculumModules: CurriculumItem[] = [
-  // Sprint 1 ──
+  // Sprint 1
   {
-    id: 'mod-ft-1-1',
-    objectType: 'module',
-    name: 'Introduction to Salesforce',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Orient learners to the Salesforce platform: its history, ecosystem, key products, and why it matters for their career transition.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Knowledge Article', 'Create Reflection Prompt'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 1: Salesforce Ecosystem Foundations',
-    sprintId: 'spr-ft-1',
-    moduleNumber: '1.1',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-1-1',
-    learningObjectives: [
-      'Explain what Salesforce is and why it is the leading CRM platform',
-      'Identify the key Salesforce product families and their purposes',
-      'Describe the Admin role and its career value',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    id: 'mod-1-1', objectType: 'module', name: 'Salesforce Basics & the CRM Landscape',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-1', sprint: 'Sprint 1 — Salesforce Ecosystem Foundations', moduleNumber: '1.1',
+    purpose: 'Orient learners to the Salesforce ecosystem, the role of CRM, and where Salesforce fits in a nonprofit or business context.',
+    learningObjectives: ['Explain what Salesforce is and why organizations use it', 'Describe the main cloud products and their purposes', 'Navigate a Salesforce org for the first time'],
+    outcomes: ['Can describe the Salesforce ecosystem to a client', 'Passes Module 1.1 Assessment with 75%+'],
+    lessonIds: ['les-1-1a', 'les-1-1b'], assessmentIds: ['asmnt-1-1'],
+    knowledgeArticleIds: ['ka-sf-basics'], coachingPromptIds: ['cp-1-1-intro'],
+    reflectionPromptIds: ['rp-1-1a'], slackActivityIds: ['sa-sprint-1-launch'],
+    calendarEventIds: [], relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Reflection Prompt', 'Create Assessment'], futureDemandLink: 'Submit Change Request',
   },
   {
-    id: 'mod-ft-1-2',
-    objectType: 'module',
-    name: 'CRM Concepts & Career Context',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Build conceptual understanding of CRM principles and connect those concepts to the learner\'s career story — bridging prior experience to the Salesforce Admin path.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Reflection Prompt', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 1: Salesforce Ecosystem Foundations',
-    sprintId: 'spr-ft-1',
-    moduleNumber: '1.2',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-1-2',
-    learningObjectives: [
-      'Define CRM and explain how Salesforce implements CRM principles',
-      'Connect learner\'s prior work experience to CRM concepts',
-      'Articulate the career value of Salesforce Admin skills to an employer',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    id: 'mod-1-2', objectType: 'module', name: 'Navigation, AppBuilder & Customization Basics',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-1', sprint: 'Sprint 1 — Salesforce Ecosystem Foundations', moduleNumber: '1.2',
+    purpose: 'Introduce learners to the Salesforce UI, navigation patterns, and basic App Builder customization.',
+    learningObjectives: ['Navigate the Lightning interface confidently', 'Customize an App using App Builder', 'Understand tabs, views, and object layouts'],
+    outcomes: ['Can configure a basic Salesforce app for a client', 'Passes Module 1.2 Assessment with 75%+'],
+    lessonIds: ['les-1-2a', 'les-1-2b'], assessmentIds: ['asmnt-1-2'],
+    knowledgeArticleIds: [], coachingPromptIds: ['cp-general-checkin'],
+    reflectionPromptIds: ['rp-1-2a'], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Assessment'], futureDemandLink: 'Submit Change Request',
+    notes: 'Knowledge articles not yet linked — hi-kb-1-2 flagged.',
   },
   {
-    id: 'mod-ft-1-3',
-    objectType: 'module',
-    name: 'Navigation & Core Objects',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Develop hands-on familiarity with the Salesforce UI, core standard objects (Accounts, Contacts, Leads, Opportunities), and basic record navigation.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Assessment', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 1: Salesforce Ecosystem Foundations',
-    sprintId: 'spr-ft-1',
-    moduleNumber: '1.3',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-1-3',
-    learningObjectives: [
-      'Navigate the Salesforce UI confidently: App Launcher, tabs, list views',
-      'Identify and describe the purpose of Accounts, Contacts, Leads, and Opportunities',
-      'Create and edit records in a Salesforce sandbox environment',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    id: 'mod-1-3', objectType: 'module', name: 'User Management & Security Basics',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-1', sprint: 'Sprint 1 — Salesforce Ecosystem Foundations', moduleNumber: '1.3',
+    purpose: 'Cover user management, profiles, roles, permission sets, and basic security model in Salesforce.',
+    learningObjectives: ['Create and manage Salesforce users', 'Configure profiles and permission sets', 'Understand the Salesforce security model'],
+    outcomes: ['Can set up a user org structure', 'Passes Module 1.3 Assessment with 75%+'],
+    lessonIds: ['les-1-3a', 'les-1-3b'], assessmentIds: ['asmnt-1-3'],
+    knowledgeArticleIds: ['ka-security'], coachingPromptIds: [],
+    reflectionPromptIds: ['rp-module-complete'], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Assessment'], futureDemandLink: 'Submit Change Request',
+    notes: 'No coaching prompts linked — flagged in Content Health.',
   },
-  // Sprint 2 ──
+
+  // Sprint 2 — The fully-connected showcase module is 2.1
   {
-    id: 'mod-ft-2-1',
-    objectType: 'module',
-    name: 'Data Modeling & Schema',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Teach the principles of Salesforce data modeling — objects, fields, relationships, and schema design — forming the foundation for all admin configuration work.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Assessment', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 2: Data Modeling & Admin Fundamentals',
-    sprintId: 'spr-ft-2',
-    moduleNumber: '2.1',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-2-1',
+    id: 'mod-2-1', objectType: 'module', name: 'Data Modeling & Schema Design',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-2', sprint: 'Sprint 2 — Data Modeling & Admin Fundamentals', moduleNumber: '2.1',
+    purpose: 'Build learner competency in Salesforce data modeling — custom objects, fields, relationships, and Schema Builder — as the foundation for all admin work.',
     learningObjectives: [
-      'Explain the difference between standard and custom objects',
-      'Design a simple data schema for a business use case',
-      'Create custom fields with appropriate field types',
+      'Define custom objects and explain their role in a Salesforce data model',
+      'Select the correct field type for a given data requirement',
+      'Create a multi-object schema using Schema Builder',
+      'Explain the difference between Lookup and Master-Detail relationships',
     ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    outcomes: [
+      'Can design a custom object schema for a simple business use case',
+      'Can use Schema Builder to build and review a data model',
+      'Passes Module 2.1 Data Modeling Assessment with 75%+',
+      'Can explain their data model decisions to a coach or client',
+    ],
+    lessonIds: ['les-2-1a', 'les-2-1b', 'les-2-1c'],
+    assessmentIds: ['asmnt-2-1'],
+    knowledgeArticleIds: ['ka-dm-1', 'ka-dm-2'],
+    coachingPromptIds: ['cp-2-1-intro', 'cp-2-1-stuck'],
+    reflectionPromptIds: ['rp-2-1a', 'rp-2-1b'],
+    slackActivityIds: ['sa-2-1-kickoff', 'sa-2-1-lab'],
+    calendarEventIds: ['ce-2-1-oh'],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Reflection Prompt', 'Create Assessment', 'Generate Weekly Review'],
+    futureDemandLink: 'Submit Change Request',
+    isFeatured: true,
+    notes: 'Fully connected example — all asset types linked. Use as the content architecture standard.',
   },
   {
-    id: 'mod-ft-2-2',
-    objectType: 'module',
-    name: 'User Management & Security',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Cover Salesforce security architecture — profiles, permission sets, roles, and sharing rules — enabling learners to manage access control for real org configurations.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Assessment', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 2: Data Modeling & Admin Fundamentals',
-    sprintId: 'spr-ft-2',
-    moduleNumber: '2.2',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-2-2',
-    learningObjectives: [
-      'Distinguish between profiles, permission sets, and roles',
-      'Configure user access using appropriate sharing mechanisms',
-      'Troubleshoot a common permission issue in a sandbox',
-    ],
-    hasPennyTemplate: false,
-    hasKnowledgeArticle: true,
-    notes: 'Missing Penny template — flagged in Content Health.',
+    id: 'mod-2-2', objectType: 'module', name: 'Relationships, Lookups & Junction Objects',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-2', sprint: 'Sprint 2 — Data Modeling & Admin Fundamentals', moduleNumber: '2.2',
+    purpose: 'Deep-dive into Salesforce relationships — Lookup, Master-Detail, Many-to-Many, and self-relationships — with junction object patterns.',
+    learningObjectives: ['Build Master-Detail and Lookup relationships', 'Design a Many-to-Many relationship using a junction object', 'Understand roll-up summary fields'],
+    outcomes: ['Can model complex data relationships', 'Passes Module 2.2 Assessment with 75%+'],
+    lessonIds: ['les-2-2a', 'les-2-2b'], assessmentIds: ['asmnt-2-2'],
+    knowledgeArticleIds: [], coachingPromptIds: ['cp-general-checkin'],
+    reflectionPromptIds: [], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Reflection Prompt'], futureDemandLink: 'Submit Change Request',
+    notes: 'Missing delivery activities and reflection prompts — flagged in Content Health.',
   },
   {
-    id: 'mod-ft-2-3',
-    objectType: 'module',
-    name: 'Reports & Dashboards',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Build practical skill in Salesforce reporting — creating tabular, summary, and matrix reports, building dashboards, and interpreting data for stakeholder communication.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Assessment', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 2: Data Modeling & Admin Fundamentals',
-    sprintId: 'spr-ft-2',
-    moduleNumber: '2.3',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-2-3',
-    learningObjectives: [
-      'Build a tabular, summary, and matrix report in Salesforce',
-      'Create a dashboard with at least 3 components',
-      'Explain the business value of a report to a non-technical stakeholder',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: false,
-    notes: 'Knowledge article for dashboards needed — flagged in Content Health.',
+    id: 'mod-2-3', objectType: 'module', name: 'Data Quality & Validation Rules',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-2', sprint: 'Sprint 2 — Data Modeling & Admin Fundamentals', moduleNumber: '2.3',
+    purpose: 'Introduce data quality controls — validation rules, required fields, duplicate management, and data governance principles.',
+    learningObjectives: ['Create validation rules with error messages', 'Configure required fields and default values', 'Use duplicate management rules'],
+    outcomes: ['Can build a data quality ruleset for a Salesforce org'],
+    lessonIds: ['les-2-3a'], assessmentIds: ['asmnt-2-3'],
+    knowledgeArticleIds: ['ka-data-quality'], coachingPromptIds: ['cp-general-checkin'],
+    reflectionPromptIds: ['rp-module-complete'], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Assessment'], futureDemandLink: 'Submit Change Request',
   },
-  // Sprint 3 ──
+
+  // Sprint 3 — some incomplete to show health issues
   {
-    id: 'mod-ft-3-1',
-    objectType: 'module',
-    name: 'Validation Rules & Workflow',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Introduce Salesforce process automation through validation rules, workflow rules, and process builder — the foundational automation layer before Flow Builder.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Assessment', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 3: Automation & Flows',
-    sprintId: 'spr-ft-3',
-    moduleNumber: '3.1',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-3-1',
-    learningObjectives: [
-      'Write a validation rule using formula syntax',
-      'Build a workflow rule with field update and email alert actions',
-      'Explain when to use validation rules vs. automation',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    id: 'mod-3-1', objectType: 'module', name: 'Screen Flows & Record-Triggered Flows',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-3', sprint: 'Sprint 3 — Automation & Flows', moduleNumber: '3.1',
+    purpose: 'Build learner competency in Salesforce Flow Builder — screen flows for user-facing wizards and record-triggered flows for automation.',
+    learningObjectives: ['Build a screen flow with multiple screens', 'Create a record-triggered flow for automation', 'Debug flows using the Flow debugger'],
+    outcomes: ['Can build a basic screen flow', 'Can create a record-triggered update flow'],
+    lessonIds: ['les-3-1a', 'les-3-1b'], assessmentIds: [],
+    knowledgeArticleIds: ['ka-automation'], coachingPromptIds: ['cp-general-checkin'],
+    reflectionPromptIds: ['rp-3-1a'], slackActivityIds: ['sa-3-1-lab'], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Assessment', 'Create Coaching Prompt'], futureDemandLink: 'Submit Change Request',
+    notes: 'No assessment linked — flagged in Content Health.',
   },
   {
-    id: 'mod-ft-3-2',
-    objectType: 'module',
-    name: 'Flow Builder Fundamentals',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Teach Flow Builder as the primary Salesforce automation tool — covering screen flows, record-triggered flows, and scheduled flows with practical lab exercises.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Assessment', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 3: Automation & Flows',
-    sprintId: 'spr-ft-3',
-    moduleNumber: '3.2',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-3-2',
-    learningObjectives: [
-      'Build a screen flow with at least 3 screens and decision logic',
-      'Create a record-triggered flow for a common admin use case',
-      'Debug a broken flow using the Debug feature',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    id: 'mod-3-2', objectType: 'module', name: 'Subflows, Loops & Advanced Automation',
+    status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-3', sprint: 'Sprint 3 — Automation & Flows', moduleNumber: '3.2',
+    purpose: 'Extend Flow knowledge with subflows, loop elements, collection variables, and scheduled automation patterns.',
+    learningObjectives: [],
+    outcomes: [],
+    lessonIds: ['les-3-2a'], assessmentIds: ['asmnt-3-2'],
+    knowledgeArticleIds: [], coachingPromptIds: [],
+    reflectionPromptIds: [], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Assessment'], futureDemandLink: 'Submit Change Request',
+    notes: 'Multiple health issues — no objectives, no knowledge articles, no prompts. Needs full content pass before publishing.',
   },
   {
-    id: 'mod-ft-3-3',
-    objectType: 'module',
-    name: 'Integration Concepts',
-    status: 'needs-review',
-    confidence: 'prototype',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Introduce integration concepts at a conceptual level — APIs, connected apps, AppExchange, and data import/export tools — without requiring learners to build integrations.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Knowledge Article'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 3: Automation & Flows',
-    sprintId: 'spr-ft-3',
-    moduleNumber: '3.3',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-3-3',
-    learningObjectives: [
-      'Describe Salesforce APIs and when they are used',
-      'Explain the purpose of AppExchange and evaluate an AppExchange listing',
-      'Import data using the Data Import Wizard',
-    ],
-    hasPennyTemplate: false,
-    hasKnowledgeArticle: false,
-    notes: 'Both Penny template and knowledge article missing — flagged. Last reviewed >6 months ago.',
+    id: 'mod-3-3', objectType: 'module', name: 'Approval Processes & Email Alerts',
+    status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-3', sprint: 'Sprint 3 — Automation & Flows', moduleNumber: '3.3',
+    purpose: 'Configure Salesforce approval processes and email alert automation for workflow-style business rules.',
+    learningObjectives: ['Build an approval process with multiple steps', 'Configure email alerts and outbound messages'],
+    outcomes: ['Can design an approval workflow for a business scenario'],
+    lessonIds: ['les-3-3a'], assessmentIds: ['asmnt-3-3'],
+    knowledgeArticleIds: [], coachingPromptIds: ['cp-general-checkin'],
+    reflectionPromptIds: ['rp-module-complete'], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt'], futureDemandLink: 'Submit Change Request',
   },
-  // Sprint 4 ──
+
+  // Sprint 4 — draft/planned
   {
-    id: 'mod-ft-4-1',
-    objectType: 'module',
-    name: 'Exam Strategy & Mindset',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Prepare learners for the cognitive and strategic dimensions of the Salesforce certification exam — test-taking strategy, time management, anxiety reduction, and study planning.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Assessment', 'Create Reflection Prompt'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 4: Certification Prep & Career Launch',
-    sprintId: 'spr-ft-4',
-    moduleNumber: '4.1',
-    lessonCount: 3,
-    assignmentCount: 2,
-    assessmentId: 'asmnt-ft-4-1',
-    learningObjectives: [
-      'Create a personalized 2-week exam study plan',
-      'Apply active recall and spaced repetition to Salesforce content',
-      'Manage exam anxiety using evidence-based strategies',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    id: 'mod-4-1', objectType: 'module', name: 'Exam Strategy & Study Planning',
+    status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-4', sprint: 'Sprint 4 — Certification Prep & Career Launch', moduleNumber: '4.1',
+    purpose: 'Build a personal exam strategy — study schedule, priority topics, Trailhead mix-ins, and mindset coaching.',
+    learningObjectives: ['Build a personalized 2-week study plan', 'Identify priority exam topics based on personal gaps'],
+    outcomes: ['Has a study plan before entering exam prep week'],
+    lessonIds: ['les-4-1a'], assessmentIds: ['asmnt-4-1'],
+    knowledgeArticleIds: [], coachingPromptIds: ['cp-at-risk'],
+    reflectionPromptIds: ['rp-sprint-complete'], slackActivityIds: [], calendarEventIds: ['ce-exam-prep-oh'],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Assessment', 'Create Reflection Prompt'], futureDemandLink: 'Submit Change Request',
+    notes: 'Needs content review — Q1 curriculum refresh in progress.',
   },
   {
-    id: 'mod-ft-4-2',
-    objectType: 'module',
-    name: 'Practice Exam Sessions',
-    status: 'published',
-    confidence: 'confirmed',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Run 3 timed practice exams with debrief — simulating real exam conditions, identifying knowledge gaps, and using Penny Exam Coach for targeted review.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Assessment', 'Create Coach Notes'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 4: Certification Prep & Career Launch',
-    sprintId: 'spr-ft-4',
-    moduleNumber: '4.2',
-    lessonCount: 3,
-    assignmentCount: 1,
-    assessmentId: 'asmnt-ft-4-2',
-    learningObjectives: [
-      'Complete 3 timed practice exams at 60-question length',
-      'Identify the top 3 topic areas needing additional review',
-      'Score ≥70% on the final practice exam before the real exam',
-    ],
-    hasPennyTemplate: true,
-    hasKnowledgeArticle: true,
+    id: 'mod-4-2', objectType: 'module', name: 'Practice Exams & Knowledge Verification',
+    status: 'draft', confidence: 'prototype', owner: 'Curriculum Lead',
+    program: 'Foundations Trail', sprintId: 'spr-ft-4', sprint: 'Sprint 4 — Certification Prep & Career Launch', moduleNumber: '4.2',
+    purpose: 'Structured practice exam sessions with Penny-assisted feedback — builds test-taking confidence and identifies remaining knowledge gaps.',
+    learningObjectives: ['Complete 2 full practice exams under timed conditions', 'Score 80%+ on a practice exam'],
+    outcomes: ['Ready for Salesforce Admin or Associate certification exam'],
+    lessonIds: [], assessmentIds: ['asmnt-4-2'],
+    knowledgeArticleIds: [], coachingPromptIds: [],
+    reflectionPromptIds: [], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Coaching Prompt', 'Create Reflection Prompt'], futureDemandLink: 'Submit Change Request',
+    notes: 'No lessons yet — practice exam content in development.',
   },
   {
-    id: 'mod-ft-4-3',
-    objectType: 'module',
-    name: 'Portfolio & Career Launch',
-    status: 'needs-review',
-    confidence: 'prototype',
-    owner: 'Curriculum Lead',
-    program: 'Foundations Trail',
-    purpose: 'Guide learners through building a portfolio showcasing their Salesforce work and preparing for job applications — resume, LinkedIn, interview preparation, and job search strategy.',
-    relatedSalesforceObject: 'Module__c (Custom Object)',
-    relatedLmsObject: 'Module (Salesforce LMS)',
-    pennyActions: ['Create Lesson', 'Create Reflection Prompt', 'Create Coach Notes'],
-    futureDemandLink: 'Submit Change Request → /demand/change-request',
-    sprint: 'Sprint 4: Certification Prep & Career Launch',
-    sprintId: 'spr-ft-4',
-    moduleNumber: '4.3',
-    lessonCount: 3,
-    assignmentCount: 3,
-    assessmentId: null,
-    learningObjectives: [
-      'Build a portfolio with at least 2 Salesforce project examples',
-      'Update LinkedIn profile with Salesforce skills and certification',
-      'Complete at least 2 mock interviews with coach feedback',
-    ],
-    hasPennyTemplate: false,
-    hasKnowledgeArticle: false,
-    notes: 'Assessment missing — flagged in Content Health. Portfolio content needs Q1 update.',
+    id: 'mod-4-3', objectType: 'module', name: 'Career Launch & Portfolio Presentation',
+    status: 'draft', confidence: 'prototype', owner: 'Program Manager',
+    program: 'Foundations Trail', sprintId: 'spr-ft-4', sprint: 'Sprint 4 — Certification Prep & Career Launch', moduleNumber: '4.3',
+    purpose: 'Prepare learners for job search — resume polish, LinkedIn optimization, portfolio presentation, and employer pitch.',
+    learningObjectives: ['Complete a Salesforce portfolio project', 'Present their work to a coach panel'],
+    outcomes: ['Has a job-ready Salesforce portfolio'],
+    lessonIds: ['les-4-3a'], assessmentIds: [],
+    knowledgeArticleIds: [], coachingPromptIds: [],
+    reflectionPromptIds: ['rp-sprint-complete'], slackActivityIds: [], calendarEventIds: [],
+    relatedSalesforceObject: 'TrailModule__c', relatedLmsObject: 'Unit (Salesforce LMS)',
+    pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request',
+    notes: 'Career coaching content update needed.',
   },
 ];
 
-// ── Lessons (sample — 18 representative lessons) ──────────────────────────────
+// ── Lessons ───────────────────────────────────────────────────────────────────
 
 export const curriculumLessons: CurriculumItem[] = [
-  // Module 1.1 ──
-  { id: 'les-ft-1-1-1', objectType: 'lesson', name: 'What Is Salesforce?', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Introduce the Salesforce platform — its origin, market position, and why it is the #1 CRM.', relatedSalesforceObject: 'Lesson__c (Custom Object)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt', 'Create Knowledge Article'], futureDemandLink: 'Submit Change Request', module: 'Introduction to Salesforce', moduleId: 'mod-ft-1-1', moduleNumber: '1.1', lessonNumber: '1.1.1', lessonType: 'Video + Discussion', duration: '45 min', learningObjective: 'Explain what Salesforce is and why it leads the CRM market', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-1-1-2', objectType: 'lesson', name: 'The Salesforce Ecosystem', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Overview of Salesforce Clouds, AppExchange, Trailhead, and the broader ecosystem.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', module: 'Introduction to Salesforce', moduleId: 'mod-ft-1-1', moduleNumber: '1.1', lessonNumber: '1.1.2', lessonType: 'Reading + Lab', duration: '60 min', learningObjective: 'Identify the key Salesforce product families and their purposes', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-1-1-3', objectType: 'lesson', name: 'The Admin Role', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Profile the Salesforce Admin role — responsibilities, career paths, and day-in-the-life.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', module: 'Introduction to Salesforce', moduleId: 'mod-ft-1-1', moduleNumber: '1.1', lessonNumber: '1.1.3', lessonType: 'Video + Workshop', duration: '45 min', learningObjective: 'Describe the Admin role and its career value', hasPennyPrompt: false, hasAssessment: true },
-  // Module 1.2 ──
-  { id: 'les-ft-1-2-1', objectType: 'lesson', name: 'CRM Fundamentals', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Explain the core principles of Customer Relationship Management and how Salesforce implements them.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article', 'Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', module: 'CRM Concepts & Career Context', moduleId: 'mod-ft-1-2', moduleNumber: '1.2', lessonNumber: '1.2.1', lessonType: 'Reading + Discussion', duration: '45 min', learningObjective: 'Define CRM and explain how Salesforce implements it', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-1-2-2', objectType: 'lesson', name: 'Translating Your Experience', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Help learners identify transferable skills from prior careers and connect them to CRM and Admin concepts.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt', 'Create Coach Notes'], futureDemandLink: 'Submit Change Request', module: 'CRM Concepts & Career Context', moduleId: 'mod-ft-1-2', moduleNumber: '1.2', lessonNumber: '1.2.2', lessonType: 'Workshop', duration: '60 min', learningObjective: 'Connect prior work experience to CRM concepts', hasPennyPrompt: false, hasAssessment: false },
-  { id: 'les-ft-1-2-3', objectType: 'lesson', name: 'Your Career Story', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Guide learners in articulating a clear career narrative that positions their Salesforce training as intentional and valuable.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt', 'Create Coach Notes'], futureDemandLink: 'Submit Change Request', module: 'CRM Concepts & Career Context', moduleId: 'mod-ft-1-2', moduleNumber: '1.2', lessonNumber: '1.2.3', lessonType: 'Workshop + Live Session', duration: '75 min', learningObjective: 'Articulate career value of Salesforce Admin skills to an employer', hasPennyPrompt: true, hasAssessment: true },
-  // Module 2.1 ──
-  { id: 'les-ft-2-1-1', objectType: 'lesson', name: 'Objects, Fields & Relationships', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Introduce standard and custom objects, field types, and relationship types (Lookup, Master-Detail).', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article', 'Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Data Modeling & Schema', moduleId: 'mod-ft-2-1', moduleNumber: '2.1', lessonNumber: '2.1.1', lessonType: 'Video + Lab', duration: '60 min', learningObjective: 'Explain the difference between standard and custom objects', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-2-1-2', objectType: 'lesson', name: 'Schema Builder Lab', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Hands-on lab using Schema Builder to design and build a custom data model for a business scenario.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', module: 'Data Modeling & Schema', moduleId: 'mod-ft-2-1', moduleNumber: '2.1', lessonNumber: '2.1.2', lessonType: 'Hands-On Lab', duration: '90 min', learningObjective: 'Design a simple data schema for a business use case', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-2-1-3', objectType: 'lesson', name: 'Custom Fields Workshop', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Create custom fields with correct field types, required settings, and field-level security — a core admin task.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', module: 'Data Modeling & Schema', moduleId: 'mod-ft-2-1', moduleNumber: '2.1', lessonNumber: '2.1.3', lessonType: 'Workshop', duration: '60 min', learningObjective: 'Create custom fields with appropriate field types', hasPennyPrompt: false, hasAssessment: true },
-  // Module 3.2 ──
-  { id: 'les-ft-3-2-1', objectType: 'lesson', name: 'Flow Builder Introduction', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Tour the Flow Builder interface, element types, and flow variables — orienting learners before they build.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article', 'Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', module: 'Flow Builder Fundamentals', moduleId: 'mod-ft-3-2', moduleNumber: '3.2', lessonNumber: '3.2.1', lessonType: 'Video + Lab', duration: '60 min', learningObjective: 'Navigate the Flow Builder interface and identify element types', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-3-2-2', objectType: 'lesson', name: 'Screen Flow Lab', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Build a 3-screen screen flow with decision logic for a common admin use case — e.g. a new client intake form.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Flow Builder Fundamentals', moduleId: 'mod-ft-3-2', moduleNumber: '3.2', lessonNumber: '3.2.2', lessonType: 'Hands-On Lab', duration: '90 min', learningObjective: 'Build a screen flow with at least 3 screens and decision logic', hasPennyPrompt: false, hasAssessment: false },
-  { id: 'les-ft-3-2-3', objectType: 'lesson', name: 'Record-Triggered Flows', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Build and debug a record-triggered flow that automates a common Salesforce admin task.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', module: 'Flow Builder Fundamentals', moduleId: 'mod-ft-3-2', moduleNumber: '3.2', lessonNumber: '3.2.3', lessonType: 'Workshop + Lab', duration: '90 min', learningObjective: 'Create a record-triggered flow for a common admin use case', hasPennyPrompt: true, hasAssessment: true },
-  // Module 4.1 ──
-  { id: 'les-ft-4-1-1', objectType: 'lesson', name: 'Know the Exam Blueprint', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Map the official Salesforce Admin certification exam blueprint — topics, weights, and recommended focus areas.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', module: 'Exam Strategy & Mindset', moduleId: 'mod-ft-4-1', moduleNumber: '4.1', lessonNumber: '4.1.1', lessonType: 'Reading + Discussion', duration: '45 min', learningObjective: 'Identify exam topic weights and align study time accordingly', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-4-1-2', objectType: 'lesson', name: 'Active Recall Techniques', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Teach evidence-based study techniques (active recall, spaced repetition) applied to Salesforce certification content.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt', 'Create Coach Notes'], futureDemandLink: 'Submit Change Request', module: 'Exam Strategy & Mindset', moduleId: 'mod-ft-4-1', moduleNumber: '4.1', lessonNumber: '4.1.2', lessonType: 'Workshop', duration: '60 min', learningObjective: 'Apply active recall and spaced repetition to Salesforce content', hasPennyPrompt: true, hasAssessment: false },
-  { id: 'les-ft-4-1-3', objectType: 'lesson', name: 'Managing Exam Anxiety', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Address test anxiety with practical strategies — reframing, breathing techniques, and confidence-building through prior success.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', module: 'Exam Strategy & Mindset', moduleId: 'mod-ft-4-1', moduleNumber: '4.1', lessonNumber: '4.1.3', lessonType: 'Live Session', duration: '45 min', learningObjective: 'Manage exam anxiety using evidence-based strategies', hasPennyPrompt: false, hasAssessment: false },
-  // Module 4.3 ──
-  { id: 'les-ft-4-3-1', objectType: 'lesson', name: 'Building Your Portfolio', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Guide learners in selecting, documenting, and presenting 2+ Salesforce projects for a portfolio site or PDF.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Lesson', 'Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', module: 'Portfolio & Career Launch', moduleId: 'mod-ft-4-3', moduleNumber: '4.3', lessonNumber: '4.3.1', lessonType: 'Workshop', duration: '90 min', learningObjective: 'Build a portfolio with at least 2 Salesforce project examples', hasPennyPrompt: false, hasAssessment: false },
-  { id: 'les-ft-4-3-2', objectType: 'lesson', name: 'LinkedIn for Salesforce Professionals', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Optimize the LinkedIn profile for Salesforce job seekers — headline, summary, skills, and certification badges.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Lesson', 'Create Knowledge Article'], futureDemandLink: 'Submit Change Request', module: 'Portfolio & Career Launch', moduleId: 'mod-ft-4-3', moduleNumber: '4.3', lessonNumber: '4.3.2', lessonType: 'Workshop + Live Session', duration: '75 min', learningObjective: 'Update LinkedIn profile with Salesforce skills and certification', hasPennyPrompt: false, hasAssessment: false },
-  { id: 'les-ft-4-3-3', objectType: 'lesson', name: 'Mock Interview Prep', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Run 2 mock interviews with coach feedback — practicing technical and behavioral questions for Salesforce Admin roles.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt', 'Create Coach Notes'], futureDemandLink: 'Submit Change Request', module: 'Portfolio & Career Launch', moduleId: 'mod-ft-4-3', moduleNumber: '4.3', lessonNumber: '4.3.3', lessonType: 'Live Session', duration: '60 min', learningObjective: 'Complete at least 2 mock interviews with coach feedback', hasPennyPrompt: false, hasAssessment: false },
+  // Module 2.1 — fully detailed
+  { id: 'les-2-1a', objectType: 'lesson', name: 'Custom Objects & Fields', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', moduleName: 'Data Modeling & Schema Design', sprint: 'Sprint 2', lessonNumber: '2.1a', lessonType: 'Instruction', duration: '45 min', learningObjective: 'Create a custom object with appropriate fields and understand its role in the data model.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt', 'Create Coaching Prompt'], futureDemandLink: 'Submit Change Request', coachingPromptIds: ['cp-2-1-intro'], reflectionPromptIds: ['rp-2-1a'] },
+  { id: 'les-2-1b', objectType: 'lesson', name: 'Field Types & Formula Fields', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', moduleName: 'Data Modeling & Schema Design', sprint: 'Sprint 2', lessonNumber: '2.1b', lessonType: 'Instruction', duration: '50 min', learningObjective: 'Select the correct field type for a given requirement and build a basic formula field.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', reflectionPromptIds: ['rp-2-1b'] },
+  { id: 'les-2-1c', objectType: 'lesson', name: 'Schema Builder Lab', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', moduleName: 'Data Modeling & Schema Design', sprint: 'Sprint 2', lessonNumber: '2.1c', lessonType: 'Lab', duration: '60 min', learningObjective: 'Use Schema Builder to design a multi-object data model and present it to a peer.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request', coachingPromptIds: ['cp-2-1-stuck'] },
+  // Sprint 1
+  { id: 'les-1-1a', objectType: 'lesson', name: 'What is Salesforce?', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-1', moduleName: 'Salesforce Basics & the CRM Landscape', sprint: 'Sprint 1', lessonNumber: '1.1a', lessonType: 'Instruction', duration: '30 min', learningObjective: 'Explain what Salesforce is and why organizations use CRM.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-1-1b', objectType: 'lesson', name: 'The Salesforce Ecosystem & Clouds', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-1', moduleName: 'Salesforce Basics & the CRM Landscape', sprint: 'Sprint 1', lessonNumber: '1.1b', lessonType: 'Instruction', duration: '35 min', learningObjective: 'Describe the main Salesforce cloud products and their use cases.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-1-2a', objectType: 'lesson', name: 'Lightning Navigation & UI', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-2', moduleName: 'Navigation, AppBuilder & Customization Basics', sprint: 'Sprint 1', lessonNumber: '1.2a', lessonType: 'Instruction', duration: '40 min', learningObjective: 'Navigate the Lightning Experience interface and describe key UI components.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-1-2b', objectType: 'lesson', name: 'App Builder Customization Lab', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-2', moduleName: 'Navigation, AppBuilder & Customization Basics', sprint: 'Sprint 1', lessonNumber: '1.2b', lessonType: 'Lab', duration: '45 min', learningObjective: 'Use App Builder to customize tabs, home page layout, and app configuration.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-1-3a', objectType: 'lesson', name: 'Users, Profiles & Permission Sets', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-3', moduleName: 'User Management & Security Basics', sprint: 'Sprint 1', lessonNumber: '1.3a', lessonType: 'Instruction', duration: '50 min', learningObjective: 'Create users and configure profiles and permission sets.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-1-3b', objectType: 'lesson', name: 'Salesforce Security Model Lab', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-3', moduleName: 'User Management & Security Basics', sprint: 'Sprint 1', lessonNumber: '1.3b', lessonType: 'Lab', duration: '45 min', learningObjective: 'Implement a multi-tier security model using org-wide defaults and role hierarchy.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request' },
+  // Sprint 2 remaining
+  { id: 'les-2-2a', objectType: 'lesson', name: 'Lookup vs Master-Detail Relationships', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-2', moduleName: 'Relationships, Lookups & Junction Objects', sprint: 'Sprint 2', lessonNumber: '2.2a', lessonType: 'Instruction', duration: '45 min', learningObjective: 'Choose the correct relationship type for a given data architecture requirement.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-2-2b', objectType: 'lesson', name: 'Junction Objects & Many-to-Many Patterns', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-2', moduleName: 'Relationships, Lookups & Junction Objects', sprint: 'Sprint 2', lessonNumber: '2.2b', lessonType: 'Lab', duration: '60 min', learningObjective: 'Design a junction object pattern and build roll-up summary fields.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-2-3a', objectType: 'lesson', name: 'Validation Rules & Data Integrity', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-3', moduleName: 'Data Quality & Validation Rules', sprint: 'Sprint 2', lessonNumber: '2.3a', lessonType: 'Instruction', duration: '50 min', learningObjective: 'Write validation rules with error messages and formula conditions.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  // Sprint 3
+  { id: 'les-3-1a', objectType: 'lesson', name: 'Screen Flows — Building Wizards', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-3-1', moduleName: 'Screen Flows & Record-Triggered Flows', sprint: 'Sprint 3', lessonNumber: '3.1a', lessonType: 'Instruction', duration: '55 min', learningObjective: 'Build a multi-screen wizard using Salesforce Screen Flow.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-3-1b', objectType: 'lesson', name: 'Record-Triggered Flows Lab', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-3-1', moduleName: 'Screen Flows & Record-Triggered Flows', sprint: 'Sprint 3', lessonNumber: '3.1b', lessonType: 'Lab', duration: '60 min', learningObjective: 'Create a record-triggered flow that automates a field update on record save.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-3-2a', objectType: 'lesson', name: 'Subflows & Loop Elements', status: 'draft', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-3-2', moduleName: 'Subflows, Loops & Advanced Automation', sprint: 'Sprint 3', lessonNumber: '3.2a', lessonType: 'Instruction', duration: '50 min', learningObjective: 'Use subflows and loop elements to process collections in a flow.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-3-3a', objectType: 'lesson', name: 'Approval Processes & Steps', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-3-3', moduleName: 'Approval Processes & Email Alerts', sprint: 'Sprint 3', lessonNumber: '3.3a', lessonType: 'Instruction', duration: '45 min', learningObjective: 'Build a multi-step approval process with email alerts.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request' },
+  // Sprint 4
+  { id: 'les-4-1a', objectType: 'lesson', name: 'Exam Strategy & Study Plan Workshop', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-4-1', moduleName: 'Exam Strategy & Study Planning', sprint: 'Sprint 4', lessonNumber: '4.1a', lessonType: 'Workshop', duration: '90 min', learningObjective: 'Complete a personalized 2-week exam study plan.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Coaching Prompt'], futureDemandLink: 'Submit Change Request' },
+  { id: 'les-4-3a', objectType: 'lesson', name: 'Portfolio Presentation Workshop', status: 'draft', confidence: 'prototype', owner: 'Program Manager', program: 'Foundations Trail', moduleId: 'mod-4-3', moduleName: 'Career Launch & Portfolio Presentation', sprint: 'Sprint 4', lessonNumber: '4.3a', lessonType: 'Workshop', duration: '120 min', learningObjective: 'Present a portfolio project to a panel of coaches and peers.', relatedSalesforceObject: 'TrailLesson__c', relatedLmsObject: 'Lesson (Salesforce LMS)', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request' },
 ];
 
-// ── Assessments (12 — one per module) ────────────────────────────────────────
+// ── Assessments ────────────────────────────────────────────────────────────────
 
 export const curriculumAssessments: CurriculumItem[] = [
-  { id: 'asmnt-ft-1-1', objectType: 'assessment', name: 'Salesforce Intro Knowledge Check', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Verify learner understanding of the Salesforce platform, product families, and the Admin role after Module 1.1.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Introduction to Salesforce', moduleId: 'mod-ft-1-1', assessmentType: 'Knowledge Check', questionCount: 10, passingScore: 80, hasPennyCoach: true },
-  { id: 'asmnt-ft-1-2', objectType: 'assessment', name: 'CRM Concepts Quiz', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Assess understanding of CRM fundamentals and ability to connect prior experience to Salesforce context.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'CRM Concepts & Career Context', moduleId: 'mod-ft-1-2', assessmentType: 'Knowledge Check', questionCount: 10, passingScore: 75, hasPennyCoach: true },
-  { id: 'asmnt-ft-1-3', objectType: 'assessment', name: 'Navigation & Objects Skill Check', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Practical skill check: navigate the Salesforce UI and demonstrate correct use of core standard objects.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Navigation & Core Objects', moduleId: 'mod-ft-1-3', assessmentType: 'Skill Assessment', questionCount: 12, passingScore: 80, hasPennyCoach: true },
-  { id: 'asmnt-ft-2-1', objectType: 'assessment', name: 'Data Modeling Quiz', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Assess understanding of Salesforce data modeling: objects, fields, relationships, and schema design principles.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Data Modeling & Schema', moduleId: 'mod-ft-2-1', assessmentType: 'Knowledge Check', questionCount: 15, passingScore: 80, hasPennyCoach: true },
-  { id: 'asmnt-ft-2-2', objectType: 'assessment', name: 'Security Configuration Check', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Verify ability to configure user access correctly using profiles, permission sets, and sharing rules.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'User Management & Security', moduleId: 'mod-ft-2-2', assessmentType: 'Skill Assessment', questionCount: 12, passingScore: 80, hasPennyCoach: false },
-  { id: 'asmnt-ft-2-3', objectType: 'assessment', name: 'Reports & Dashboards Lab Check', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Practical check: learner builds a report and dashboard that meets defined specifications.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Reports & Dashboards', moduleId: 'mod-ft-2-3', assessmentType: 'Skill Assessment', questionCount: 8, passingScore: 75, hasPennyCoach: true },
-  { id: 'asmnt-ft-3-1', objectType: 'assessment', name: 'Validation & Workflow Quiz', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Test understanding of validation rule syntax and workflow rule configuration.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Validation Rules & Workflow', moduleId: 'mod-ft-3-1', assessmentType: 'Knowledge Check', questionCount: 12, passingScore: 80, hasPennyCoach: true },
-  { id: 'asmnt-ft-3-2', objectType: 'assessment', name: 'Flow Builder Lab Check', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Learner submits a completed screen flow and record-triggered flow for review — practical flow-building skill check.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Flow Builder Fundamentals', moduleId: 'mod-ft-3-2', assessmentType: 'Skill Assessment', questionCount: 6, passingScore: 80, hasPennyCoach: true },
-  { id: 'asmnt-ft-3-3', objectType: 'assessment', name: 'Integration Concepts Check', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Conceptual assessment of integration types, API use cases, and AppExchange evaluation skills.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Integration Concepts', moduleId: 'mod-ft-3-3', assessmentType: 'Knowledge Check', questionCount: 10, passingScore: 75, hasPennyCoach: false, notes: 'Needs Penny Coach prompt — flagged.' },
-  { id: 'asmnt-ft-4-1', objectType: 'assessment', name: 'Study Plan Review', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Learner submits personalized 2-week study plan and coach reviews against exam blueprint requirements.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Assignment (Salesforce LMS)', pennyActions: ['Create Assessment', 'Create Coach Notes'], futureDemandLink: 'Submit Change Request', module: 'Exam Strategy & Mindset', moduleId: 'mod-ft-4-1', assessmentType: 'Portfolio Review', questionCount: 1, passingScore: 100, hasPennyCoach: true },
-  { id: 'asmnt-ft-4-2', objectType: 'assessment', name: 'Practice Exam 3 (Final Gate)', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Final timed practice exam — 60 questions, 90-minute limit — learner must score ≥70% to proceed to real certification.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', module: 'Practice Exam Sessions', moduleId: 'mod-ft-4-2', assessmentType: 'Practice Exam', questionCount: 60, passingScore: 70, hasPennyCoach: true },
+  { id: 'asmnt-2-1', objectType: 'assessment', name: 'Data Modeling Assessment', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', moduleName: 'Data Modeling & Schema Design', sprint: 'Sprint 2', assessmentType: 'Knowledge Check', questionCount: 20, passingScore: 75, duration: '30 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment', 'Create Coach Notes'], futureDemandLink: 'Submit Change Request', avgScore: '82%', attempts: 26 },
+  { id: 'asmnt-1-1', objectType: 'assessment', name: 'Salesforce Basics Assessment', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-1', moduleName: 'Salesforce Basics & the CRM Landscape', sprint: 'Sprint 1', assessmentType: 'Knowledge Check', questionCount: 15, passingScore: 75, duration: '20 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', avgScore: '88%', attempts: 28 },
+  { id: 'asmnt-1-2', objectType: 'assessment', name: 'Navigation & AppBuilder Assessment', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-2', moduleName: 'Navigation & AppBuilder', sprint: 'Sprint 1', assessmentType: 'Knowledge Check', questionCount: 12, passingScore: 75, duration: '20 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', avgScore: '84%', attempts: 28 },
+  { id: 'asmnt-1-3', objectType: 'assessment', name: 'User Management Assessment', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-1-3', moduleName: 'User Management & Security', sprint: 'Sprint 1', assessmentType: 'Knowledge Check', questionCount: 18, passingScore: 75, duration: '25 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', avgScore: '79%', attempts: 28 },
+  { id: 'asmnt-2-2', objectType: 'assessment', name: 'Relationships Assessment', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-2', moduleName: 'Relationships & Junction Objects', sprint: 'Sprint 2', assessmentType: 'Knowledge Check', questionCount: 16, passingScore: 75, duration: '25 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', avgScore: '76%', attempts: 26 },
+  { id: 'asmnt-2-3', objectType: 'assessment', name: 'Data Quality Assessment', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-2-3', moduleName: 'Data Quality & Validation Rules', sprint: 'Sprint 2', assessmentType: 'Knowledge Check', questionCount: 14, passingScore: 75, duration: '20 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', avgScore: '80%', attempts: 26 },
+  { id: 'asmnt-3-2', objectType: 'assessment', name: 'Advanced Flows Assessment', status: 'draft', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-3-2', moduleName: 'Subflows & Advanced Automation', sprint: 'Sprint 3', assessmentType: 'Knowledge Check', questionCount: 18, passingScore: 75, duration: '30 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request' },
+  { id: 'asmnt-3-3', objectType: 'assessment', name: 'Approval Processes Assessment', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-3-3', moduleName: 'Approval Processes', sprint: 'Sprint 3', assessmentType: 'Knowledge Check', questionCount: 12, passingScore: 75, duration: '20 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request' },
+  { id: 'asmnt-4-1', objectType: 'assessment', name: 'Exam Readiness Self-Assessment', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-4-1', moduleName: 'Exam Strategy', sprint: 'Sprint 4', assessmentType: 'Self-Assessment', questionCount: 25, passingScore: 80, duration: '40 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request' },
+  { id: 'asmnt-4-2', objectType: 'assessment', name: 'Practice Certification Exam — Set A', status: 'draft', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleId: 'mod-4-2', moduleName: 'Practice Exams', sprint: 'Sprint 4', assessmentType: 'Practice Exam', questionCount: 60, passingScore: 80, duration: '90 min', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment', 'Create Coach Notes'], futureDemandLink: 'Submit Change Request' },
 ];
 
-// ── Knowledge Articles ────────────────────────────────────────────────────────
+// ── Knowledge Articles ─────────────────────────────────────────────────────────
 
 export const curriculumKnowledgeArticles: CurriculumItem[] = [
-  { id: 'ka-01', objectType: 'knowledgeArticle', name: 'What Is Salesforce? — Learner Reference', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Introductory reference article explaining Salesforce, its products, and why it matters for career changers.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Salesforce Overview', articleType: 'Reference', wordCount: 850, lastReviewed: 'Dec 2024', hasPennyMapping: true, relatedModules: ['Introduction to Salesforce'] },
-  { id: 'ka-02', objectType: 'knowledgeArticle', name: 'CRM Concepts: A Career Changer\'s Guide', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Explains CRM concepts in plain language with career-context framing — written for learners without a business background.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'CRM & Career', articleType: 'Career', wordCount: 1100, lastReviewed: 'Dec 2024', hasPennyMapping: true, relatedModules: ['CRM Concepts & Career Context'] },
-  { id: 'ka-03', objectType: 'knowledgeArticle', name: 'Salesforce Objects & Fields — Quick Reference', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Reference guide for standard and custom objects, field types, and relationships — used by Learning Coach to answer field-type questions.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Data Modeling', articleType: 'Reference', wordCount: 1400, lastReviewed: 'Nov 2024', hasPennyMapping: false, relatedModules: ['Data Modeling & Schema'], notes: 'No Salesforce/LMS mapping — flagged in Content Health.' },
-  { id: 'ka-04', objectType: 'knowledgeArticle', name: 'Understanding Salesforce Security Model', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Explains profiles, permission sets, roles, and sharing rules with visual diagrams — key reference for the security module.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Security & Access', articleType: 'Reference', wordCount: 1600, lastReviewed: 'Dec 2024', hasPennyMapping: true, relatedModules: ['User Management & Security'] },
-  { id: 'ka-05', objectType: 'knowledgeArticle', name: 'Flow Builder: Getting Started', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Step-by-step how-to guide for building a first Flow in Salesforce — written to support Build Companion responses.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Automation', articleType: 'How-To', wordCount: 1800, lastReviewed: 'Jan 2025', hasPennyMapping: true, relatedModules: ['Flow Builder Fundamentals'] },
-  { id: 'ka-06', objectType: 'knowledgeArticle', name: 'Salesforce Admin Certification: Exam Blueprint', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Exam blueprint breakdown with topic weights, study time recommendations, and recommended Trailhead trails.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Certification', articleType: 'Certification', wordCount: 1200, lastReviewed: 'Oct 2024', hasPennyMapping: false, relatedModules: ['Exam Strategy & Mindset'], notes: 'No Salesforce/LMS mapping — flagged in Content Health.' },
-  { id: 'ka-07', objectType: 'knowledgeArticle', name: 'Resume Writing for Salesforce Roles', status: 'draft', confidence: 'prototype', owner: '', program: 'Foundations Trail', purpose: 'Career article covering resume structure, Salesforce skill keywords, and how to present certification and project experience.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Career', articleType: 'Career', wordCount: 900, lastReviewed: 'Never', hasPennyMapping: false, relatedModules: ['Portfolio & Career Launch'], notes: 'No owner assigned — flagged in Content Health.' },
-  { id: 'ka-08', objectType: 'knowledgeArticle', name: 'LinkedIn Profile Optimization Guide', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Step-by-step guide to optimizing a LinkedIn profile for Salesforce job searching — headline, summary, skills, certifications.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article', 'Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', topic: 'Career', articleType: 'Career', wordCount: 750, lastReviewed: 'Sep 2024', hasPennyMapping: true, relatedModules: ['Portfolio & Career Launch'] },
-  { id: 'ka-09', objectType: 'knowledgeArticle', name: 'Introduction to Validation Rules', status: 'published', confidence: 'confirmed', owner: '', program: 'Foundations Trail', purpose: 'Explains validation rule syntax, formula logic, and common use cases — supports Learning Coach questions on automation.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Automation', articleType: 'Reference', wordCount: 1100, lastReviewed: 'Nov 2024', hasPennyMapping: true, relatedModules: ['Validation Rules & Workflow'], notes: 'No owner assigned — flagged in Content Health.' },
-  { id: 'ka-10', objectType: 'knowledgeArticle', name: 'AppExchange: Evaluating Solutions', status: 'draft', confidence: 'draft', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Guide for evaluating AppExchange solutions — security review, pricing, user reviews, and implementation considerations.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', topic: 'Integration', articleType: 'How-To', wordCount: 600, lastReviewed: 'Never', hasPennyMapping: false, relatedModules: ['Integration Concepts'], notes: 'Draft — not yet reviewed. No Salesforce/LMS mapping.' },
+  { id: 'ka-dm-1', objectType: 'knowledgeArticle', name: 'Objects vs. Fields vs. Records — A Visual Guide', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-2-1'], articleType: 'Concept Guide', wordCount: 850, lastReviewed: 'Jan 2025', relatedSalesforceObject: 'Knowledge__kav', relatedLmsObject: 'Knowledge Article (Salesforce LMS)', pennyActions: ['Generate Summary'], futureDemandLink: 'Submit Change Request', purpose: 'Visual explainer for the core Salesforce data model — Objects, Fields, Records, and Relationships — for learners new to CRM concepts.' },
+  { id: 'ka-dm-2', objectType: 'knowledgeArticle', name: 'Schema Design Patterns for Salesforce Admins', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-2-1'], articleType: 'Reference Guide', wordCount: 1200, lastReviewed: 'Jan 2025', relatedSalesforceObject: 'Knowledge__kav', relatedLmsObject: 'Knowledge Article (Salesforce LMS)', pennyActions: ['Generate Summary'], futureDemandLink: 'Submit Change Request', purpose: 'Reference guide covering common schema design patterns — junction objects, lookup chains, and self-relationships — with use case examples.' },
+  { id: 'ka-sf-basics', objectType: 'knowledgeArticle', name: 'Salesforce Navigation Quick Reference', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-1-1'], articleType: 'Quick Reference', wordCount: 400, lastReviewed: 'Dec 2024', relatedSalesforceObject: 'Knowledge__kav', relatedLmsObject: 'Knowledge Article (Salesforce LMS)', pennyActions: ['Generate Summary'], futureDemandLink: 'Submit Change Request', purpose: 'One-page visual quick reference for the Salesforce Lightning navigation — app launcher, global search, utility bar, and tabs.' },
+  { id: 'ka-security', objectType: 'knowledgeArticle', name: 'Salesforce Security Model — Layers Explained', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-1-3'], articleType: 'Concept Guide', wordCount: 950, lastReviewed: 'Nov 2024', relatedSalesforceObject: 'Knowledge__kav', relatedLmsObject: 'Knowledge Article (Salesforce LMS)', pennyActions: ['Generate Summary'], futureDemandLink: 'Submit Change Request', purpose: 'Explains the four layers of Salesforce security — org, object, record, and field — with diagrams and real-world examples.' },
+  { id: 'ka-automation', objectType: 'knowledgeArticle', name: 'When to Use Flow vs. Workflow vs. Process Builder', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-3-1'], articleType: 'Decision Guide', wordCount: 700, lastReviewed: 'Nov 2024', relatedSalesforceObject: 'Knowledge__kav', relatedLmsObject: 'Knowledge Article (Salesforce LMS)', pennyActions: ['Generate Summary'], futureDemandLink: 'Submit Change Request', purpose: 'Decision framework for choosing the right automation tool — updated for the Flow-first Salesforce direction.' },
+  { id: 'ka-data-quality', objectType: 'knowledgeArticle', name: 'Data Quality Checklist for Salesforce Admins', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-2-3'], articleType: 'Checklist', wordCount: 600, lastReviewed: 'Jan 2025', relatedSalesforceObject: 'Knowledge__kav', relatedLmsObject: 'Knowledge Article (Salesforce LMS)', pennyActions: ['Generate Summary'], futureDemandLink: 'Submit Change Request', purpose: 'Practical checklist for assessing and improving data quality in a Salesforce org — validation rules, duplicates, required fields.' },
 ];
 
-// ── Penny Templates ───────────────────────────────────────────────────────────
+// ── Resources ─────────────────────────────────────────────────────────────────
 
-export const curriculumPennyTemplates: CurriculumItem[] = [
-  { id: 'pt-01', objectType: 'pennyTemplate', name: 'Sprint Welcome Message', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Opening message delivered by Penny at the start of each new sprint — sets context, previews modules, and encourages the learner.', relatedSalesforceObject: 'PennyTemplate__c (Custom Object)', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Slack Prompt', 'Generate Sprint Outline'], futureDemandLink: 'Submit Change Request', templateType: 'Welcome', triggerContext: 'Sprint start (automated or manual trigger)', targetAudience: 'Learner', tone: 'Encouraging, clear', sampleOutput: '"Welcome to Sprint 2: Data Modeling & Admin Fundamentals! This sprint covers Objects, Security, and Reports — three core areas of the Salesforce Admin exam. Your coach has set up your first module. Let\'s go!"' },
-  { id: 'pt-02', objectType: 'pennyTemplate', name: 'Module Introduction', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Short intro message from Penny when a learner opens a new module — previews learning objectives and estimated time.', relatedSalesforceObject: 'PennyTemplate__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Module'], futureDemandLink: 'Submit Change Request', templateType: 'Introduction', triggerContext: 'Module entry (first open)', targetAudience: 'Learner', tone: 'Helpful, concise', sampleOutput: '"You\'re starting Data Modeling & Schema — one of the most important modules in Foundations Trail. After this module, you\'ll be able to design your first custom Salesforce data model. Estimated time: 3 hours across 3 lessons."' },
-  { id: 'pt-03', objectType: 'pennyTemplate', name: 'Lesson Reflection Prompt', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'End-of-lesson reflection question generated by Penny — connects lesson content to the learner\'s career story or prior experience.', relatedSalesforceObject: 'PennyTemplate__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', templateType: 'Reflection', triggerContext: 'Lesson completion', targetAudience: 'Learner', tone: 'Thoughtful, personal', sampleOutput: '"Now that you\'ve built your first validation rule — think about a past job where inconsistent data caused problems. How would a validation rule have helped in that situation? Share your thoughts in your Trail Journal."' },
-  { id: 'pt-04', objectType: 'pennyTemplate', name: 'Assignment Feedback Guide', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Coach-facing guide generated by Penny for giving structured, consistent feedback on a specific assignment type.', relatedSalesforceObject: 'PennyTemplate__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request', templateType: 'Feedback', triggerContext: 'Assignment submission review', targetAudience: 'Coach', tone: 'Instructional, structured', sampleOutput: '"When reviewing the Schema Builder Lab: Check that the learner has at least 2 custom objects with a Lookup relationship. Look for correct field types (Text vs. Picklist). Provide specific improvement notes before marking complete."' },
-  { id: 'pt-05', objectType: 'pennyTemplate', name: 'Assessment Coach Prompt', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Pre-assessment encouragement message from Penny — reduces anxiety, reminds learner of their preparation, and sets a calm mindset.', relatedSalesforceObject: 'PennyTemplate__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', templateType: 'Coaching', triggerContext: 'Before assessment (automated)', targetAudience: 'Learner', tone: 'Calm, confidence-building', sampleOutput: '"You\'ve completed all 3 lessons in Module 2.1 and your lab scores are solid. Remember: this assessment checks your understanding, not your worth. Take a breath, read each question carefully, and trust your preparation."' },
-  { id: 'pt-06', objectType: 'pennyTemplate', name: 'At-Risk Learner Nudge', status: 'draft', confidence: 'prototype', owner: 'Penny Lead', program: 'All Programs', purpose: 'Confidence-triggered outreach from Penny when a learner\'s engagement or progress signals dropout risk — sent via Slack or direct message.', relatedSalesforceObject: 'PennyTemplate__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Slack Prompt'], futureDemandLink: 'Submit Change Request', templateType: 'Alert', triggerContext: 'Confidence score drops below threshold (automated)', targetAudience: 'Learner', tone: 'Caring, low-pressure', sampleOutput: '"Hey — I noticed you haven\'t opened Module 3.1 yet this week. That\'s okay! Life happens. Your coach is available for a quick check-in if you\'d like. Want me to schedule 15 minutes?"' },
-  { id: 'pt-07', objectType: 'pennyTemplate', name: 'Weekly Progress Summary', status: 'draft', confidence: 'prototype', owner: 'Penny Lead', program: 'All Programs', purpose: 'Cohort health digest for coaches — summarizes learner progress, confidence flags, and upcoming milestones for the week ahead.', relatedSalesforceObject: 'PennyTemplate__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Coach Notes', 'Create Slack Prompt'], futureDemandLink: 'Submit Change Request', templateType: 'Summary', triggerContext: 'Weekly (every Monday, automated)', targetAudience: 'Coach', tone: 'Professional, data-forward', sampleOutput: '"Foundations Trail Cohort 2 — Week 7 Summary: 12/14 learners on track. 2 at-risk (flagged for review). Module 3.1 average score: 84%. Upcoming: Module 3.2 opens Wednesday."' },
-  { id: 'pt-08', objectType: 'pennyTemplate', name: 'Coach Notes Template', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', purpose: 'Structured coach guidance generated by Penny for each module — covers facilitation tips, common learner confusion points, and recommended support actions.', relatedSalesforceObject: 'PennyTemplate__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Create Coach Notes'], futureDemandLink: 'Submit Change Request', templateType: 'Notes', triggerContext: 'Module activation (coach dashboard)', targetAudience: 'Coach', tone: 'Collegial, practical', sampleOutput: '"Module 3.2 Coach Notes — Flow Builder: Most learners struggle with decision element logic. Encourage them to draw the flow before building. Common mistake: using Assignment element when a Decision should branch first."' },
+export const curriculumResources: CurriculumItem[] = [
+  { id: 'res-trailhead-admin', objectType: 'resource', name: 'Salesforce Trailhead — Admin Beginner Trail', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'All Programs', moduleIds: ['mod-1-1', 'mod-1-2', 'mod-1-3'], resourceType: 'External Platform', url: 'https://trailhead.salesforce.com', relatedSalesforceObject: 'N/A — External', relatedLmsObject: 'Resource Link', pennyActions: [], futureDemandLink: 'Submit Change Request', purpose: 'Official Salesforce Trailhead beginner admin trail — supplementary self-paced learning for all Sprint 1 modules.' },
+  { id: 'res-schema-builder', objectType: 'resource', name: 'Salesforce Help — Schema Builder Guide', status: 'published', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-2-1'], resourceType: 'Documentation', url: 'https://help.salesforce.com', relatedSalesforceObject: 'N/A — External', relatedLmsObject: 'Resource Link', pennyActions: [], futureDemandLink: 'Submit Change Request', purpose: 'Official Salesforce documentation for Schema Builder — referenced in Module 2.1 Schema Builder Lab.' },
+  { id: 'res-assessment-rubric', objectType: 'resource', name: 'Transition Trails Assessment Rubric v2', status: 'published', confidence: 'confirmed', owner: 'Program Manager', program: 'All Programs', moduleIds: [], resourceType: 'Internal Document', relatedSalesforceObject: 'Document__c', relatedLmsObject: 'Resource Link', pennyActions: [], futureDemandLink: 'Submit Change Request', purpose: 'Shared rubric for evaluating learner labs and assignments — used by coaches across all programs.' },
+  { id: 'res-exam-prep-guide', objectType: 'resource', name: 'Salesforce Admin Exam Preparation Guide', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', moduleIds: ['mod-4-1', 'mod-4-2'], resourceType: 'Internal Document', relatedSalesforceObject: 'Document__c', relatedLmsObject: 'Resource Link', pennyActions: [], futureDemandLink: 'Submit Change Request', purpose: 'Transition Trails exam prep guide — study schedule, topic priority list, and practice exam strategy.' },
 ];
 
-// ── Content Health Issues ─────────────────────────────────────────────────────
+// ── Coaching Prompts (Penny Assets) ───────────────────────────────────────────
 
-export const contentHealthIssues: CurriculumItem[] = [
-  { id: 'health-01', objectType: 'healthIssue', name: 'Module 4.3: Assessment Missing', status: 'missing', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Module 4.3 (Portfolio & Career Launch) has no associated assessment. All modules require a completion check.', relatedSalesforceObject: 'Assessment__c', relatedLmsObject: 'Quiz (Salesforce LMS)', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', severity: 'high', issueType: 'Missing Assessment', affectedItems: ['Portfolio & Career Launch (Module 4.3)'], actionRequired: 'Create an assessment for Module 4.3 using Penny — assign to Curriculum Lead.', module: 'Portfolio & Career Launch', moduleId: 'mod-ft-4-3' },
-  { id: 'health-02', objectType: 'healthIssue', name: '3 Lessons Without Learning Objectives', status: 'needs-review', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Lessons L1.1.3, L4.1.3, and L4.3.2 are missing documented learning objectives — making them unverifiable for quality and Penny unmappable.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Lesson'], futureDemandLink: 'Submit Change Request', severity: 'medium', issueType: 'Missing Learning Objectives', affectedItems: ['The Admin Role (L1.1.3)', 'Managing Exam Anxiety (L4.1.3)', 'LinkedIn for Salesforce Professionals (L4.3.2)'], actionRequired: 'Add one learning objective per lesson — use Penny Create Lesson to generate aligned objectives.' },
-  { id: 'health-03', objectType: 'healthIssue', name: '2 Knowledge Articles Without Owners', status: 'needs-review', confidence: 'confirmed', owner: '', program: 'Foundations Trail', purpose: 'KA-07 (Resume Writing for Salesforce Roles) and KA-09 (Introduction to Validation Rules) have no assigned owner — creating governance and review risk.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', severity: 'medium', issueType: 'Unowned Content', affectedItems: ['Resume Writing for Salesforce Roles (KA-07)', 'Introduction to Validation Rules (KA-09)'], actionRequired: 'Assign an owner to each article in Administration → Knowledge Articles.' },
-  { id: 'health-04', objectType: 'healthIssue', name: 'Module 3.3: Needs Review — 7+ Months Old', status: 'needs-review', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Module 3.3 (Integration Concepts) was last reviewed July 2024 — over 7 months ago — and AppExchange landscape changes may have made content stale.', relatedSalesforceObject: 'Module__c', relatedLmsObject: 'Module (Salesforce LMS)', pennyActions: ['Create Knowledge Article', 'Create Lesson'], futureDemandLink: 'Submit Change Request', severity: 'medium', issueType: 'Stale Content', affectedItems: ['Integration Concepts (Module 3.3)'], actionRequired: 'Review Module 3.3 against current Salesforce documentation — update lesson content and knowledge article.' },
-  { id: 'health-05', objectType: 'healthIssue', name: '5 Lessons Missing Penny Prompts', status: 'needs-review', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'Lessons 1.1.3, 1.2.2, 2.1.3, 3.2.2, and 4.1.3 have no Penny reflection or engagement prompts — reducing learner engagement during those lessons.', relatedSalesforceObject: 'Lesson__c', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Reflection Prompt'], futureDemandLink: 'Submit Change Request', severity: 'medium', issueType: 'Missing Penny Prompts', affectedItems: ['The Admin Role (1.1.3)', 'Translating Your Experience (1.2.2)', 'Custom Fields Workshop (2.1.3)', 'Screen Flow Lab (3.2.2)', 'Managing Exam Anxiety (4.1.3)'], actionRequired: 'Use Penny Content Assistant → Create Reflection Prompt for each flagged lesson.' },
-  { id: 'health-06', objectType: 'healthIssue', name: '3 Knowledge Articles Without Salesforce/LMS Mapping', status: 'needs-review', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'KA-03, KA-06, and KA-10 have no Salesforce Knowledge or LMS object mapping — preventing Penny from retrieving them correctly in future API integration.', relatedSalesforceObject: 'Knowledge (Salesforce Knowledge)', relatedLmsObject: 'Content (Salesforce LMS)', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', severity: 'medium', issueType: 'Missing LMS/Salesforce Mapping', affectedItems: ['Salesforce Objects & Fields — Quick Reference (KA-03)', 'Salesforce Admin Certification: Exam Blueprint (KA-06)', 'AppExchange: Evaluating Solutions (KA-10)'], actionRequired: 'Complete the Salesforce/LMS mapping fields in the Knowledge Articles admin area.' },
-  { id: 'health-07', objectType: 'healthIssue', name: 'Duplicate Concept: Data Modeling in M2.1 & M3.3', status: 'needs-review', confidence: 'prototype', owner: 'Curriculum Lead', program: 'Foundations Trail', purpose: 'The concept "Salesforce data model basics" appears in both Module 2.1 (Data Modeling & Schema) and Module 3.3 (Integration Concepts) — learners may encounter redundant content without clear progression.', relatedSalesforceObject: 'Module__c', relatedLmsObject: 'Module (Salesforce LMS)', pennyActions: ['Create Lesson', 'Create Knowledge Article'], futureDemandLink: 'Submit Change Request', severity: 'low', issueType: 'Duplicate Concept', affectedItems: ['Data Modeling & Schema (Module 2.1)', 'Integration Concepts (Module 3.3)'], actionRequired: 'Review both modules — M3.3 should reference M2.1 rather than re-teach data modeling basics.' },
+export const curriculumCoachingPrompts: CurriculumItem[] = [
+  { id: 'cp-2-1-intro', objectType: 'coachingPrompt', name: 'Module 2.1 — Welcome & Orientation', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', lessonId: 'les-2-1a', triggerContext: 'Module open (first access)', targetAudience: 'Learner', tone: 'Encouraging, clear', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Coaching Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Welcome message from Penny when a learner opens Module 2.1 for the first time — previews the learning objectives, estimated time, and what they\'ll be able to do by the end.', sampleOutput: '"Welcome to Data Modeling — one of the most important modules in Foundations Trail. By the end, you\'ll be able to design a custom Salesforce schema. Here\'s what we\'re covering: Custom Objects → Field Types → Schema Builder Lab. Estimated time: 2.5 hours."' },
+  { id: 'cp-2-1-stuck', objectType: 'coachingPrompt', name: 'Module 2.1 — Learner Support (Schema Builder)', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', lessonId: 'les-2-1c', triggerContext: 'Learner paused > 15 min on Schema Builder Lab', targetAudience: 'Learner', tone: 'Calm, supportive', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Coaching Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Intervention prompt from Penny when a learner appears stuck on the Schema Builder lab — offers a hint, points to the knowledge article, and suggests a coach check-in.', sampleOutput: '"Still working on the schema? That\'s normal — this lab is conceptual. Tip: Start by listing your objects (think nouns: Project, Contact, Assignment). Need help? Open \'Schema Design Patterns\' in Knowledge or ping your coach."' },
+  { id: 'cp-1-1-intro', objectType: 'coachingPrompt', name: 'Module 1.1 — Welcome to Salesforce', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-1-1', triggerContext: 'Module open (first access)', targetAudience: 'Learner', tone: 'Warm, career-focused', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Coaching Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'First Penny message a learner receives in Foundations Trail — sets the tone, introduces the program journey, and connects learning to career transition.' },
+  { id: 'cp-general-checkin', objectType: 'coachingPrompt', name: 'General Progress Check-In', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'All Programs', moduleId: null, triggerContext: 'Used across multiple modules when specific prompt not available', targetAudience: 'Learner', tone: 'Warm, conversational', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Coaching Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'General-purpose Penny check-in for modules that don\'t yet have a specific coaching prompt. Used as a placeholder while dedicated prompts are being created.', notes: 'Replace with module-specific prompts as they are created.' },
+  { id: 'cp-at-risk', objectType: 'coachingPrompt', name: 'At-Risk Learner Intervention', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'All Programs', moduleId: null, triggerContext: 'Confidence score drops below threshold or learner inactive > 3 days', targetAudience: 'Learner', tone: 'Caring, low-pressure', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Coaching Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Penny intervention for at-risk learners — triggered when engagement or progress signals dropout risk. Sent via Slack or direct message.', sampleOutput: '"Hey — I noticed you haven\'t opened your latest module this week. Life happens! Your coach is available for a check-in if you\'d like. Want me to schedule 15 minutes?"' },
 ];
 
-// ── Penny Content Assistant Actions ──────────────────────────────────────────
+// ── Reflection Prompts (Penny Assets) ─────────────────────────────────────────
 
-export interface PennyAssistantAction {
-  id: string;
-  label: string;
-  description: string;
-  outputType: CurriculumObjectType;
-  targetAudience: 'Learner' | 'Coach' | 'Staff';
-  estimatedTime: string;
-  notes: string;
+export const curriculumReflectionPrompts: CurriculumItem[] = [
+  { id: 'rp-2-1a', objectType: 'reflectionPrompt', name: 'After Lesson 2.1a — Objects & Fields', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', lessonId: 'les-2-1a', triggerContext: 'Lesson 2.1a completion', targetAudience: 'Learner', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Reflection Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Post-lesson reflection prompt connecting Custom Objects to a real-world scenario from the learner\'s work history.', sampleOutput: '"Think about a past role — what data did your team track manually (spreadsheets, notebooks, sticky notes)? How could a custom Salesforce object have helped? Jot your answer in your Trail Journal."' },
+  { id: 'rp-2-1b', objectType: 'reflectionPrompt', name: 'After Lesson 2.1b — Field Types', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', lessonId: 'les-2-1b', triggerContext: 'Lesson 2.1b completion', targetAudience: 'Learner', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Reflection Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Reflection on field type decisions — builds judgment for real schema design choices.', sampleOutput: '"You\'ve seen 12 Salesforce field types today. Which one surprised you most? When would you choose a Picklist over a Text field? Think of a real example and write it down."' },
+  { id: 'rp-1-1a', objectType: 'reflectionPrompt', name: 'After Lesson 1.1a — What is Salesforce?', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-1-1', lessonId: 'les-1-1a', triggerContext: 'Lesson 1.1a completion', targetAudience: 'Learner', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Reflection Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Career-connection reflection — helps learners articulate why they are pursuing Salesforce skills.' },
+  { id: 'rp-1-2a', objectType: 'reflectionPrompt', name: 'After Lesson 1.2a — Lightning Navigation', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-1-2', lessonId: 'les-1-2a', triggerContext: 'Lesson 1.2a completion', targetAudience: 'Learner', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Reflection Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Reflection on UI customization — connects AppBuilder to the learner\'s mental model of how Salesforce serves users.' },
+  { id: 'rp-module-complete', objectType: 'reflectionPrompt', name: 'End-of-Module Reflection (General)', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'All Programs', moduleId: null, triggerContext: 'Module completion', targetAudience: 'Learner', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Reflection Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'General end-of-module reflection — what was most surprising, what still feels uncertain, what would you do differently.', notes: 'Used for modules without a specific reflection prompt.' },
+  { id: 'rp-3-1a', objectType: 'reflectionPrompt', name: 'After Flow Builder Intro', status: 'needs-review', confidence: 'prototype', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-3-1', lessonId: 'les-3-1a', triggerContext: 'Lesson 3.1a completion', targetAudience: 'Learner', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Reflection Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Reflection connecting automation concepts to a real process the learner has experienced.' },
+  { id: 'rp-sprint-complete', objectType: 'reflectionPrompt', name: 'End-of-Sprint Reflection', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'All Programs', moduleId: null, triggerContext: 'Sprint completion', targetAudience: 'Learner', relatedSalesforceObject: 'PennyPrompt__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Reflection Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Structured sprint-end reflection — competency self-assessment, highlights, and goals for the next sprint.' },
+];
+
+// ── Trail Quests (Penny Assets) ────────────────────────────────────────────────
+
+export const curriculumTrailQuests: CurriculumItem[] = [
+  { id: 'tq-schema-designer', objectType: 'trailQuest', name: 'Schema Designer Badge', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-2-1', questType: 'Badge', difficulty: 'Intermediate', estimatedTime: '2–3 hours', relatedSalesforceObject: 'TrailQuest__c', relatedLmsObject: 'Badge (Salesforce LMS)', pennyActions: ['Generate Trail Quest'], futureDemandLink: 'Submit Change Request', purpose: 'Earnable badge for learners who complete the Schema Builder Lab and pass the Data Modeling Assessment with 80%+.', criteria: ['Complete Schema Builder Lab (les-2-1c)', 'Pass Data Modeling Assessment with 80%+', 'Submit schema to coach for review'] },
+  { id: 'tq-admin-challenge', objectType: 'trailQuest', name: 'Admin Challenge — Sprint 2', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: null, questType: 'Challenge', difficulty: 'Intermediate', estimatedTime: '4–5 hours', relatedSalesforceObject: 'TrailQuest__c', relatedLmsObject: 'Badge (Salesforce LMS)', pennyActions: ['Generate Trail Quest'], futureDemandLink: 'Submit Change Request', purpose: 'Sprint 2 capstone challenge — learner builds a complete data model for a mock nonprofit client scenario.', criteria: ['Complete all Sprint 2 modules', 'Design a 5-object schema with all relationship types', 'Peer review by another learner'] },
+  { id: 'tq-flow-builder', objectType: 'trailQuest', name: 'Flow Builder Badge', status: 'draft', confidence: 'prototype', owner: 'Penny Lead', program: 'Foundations Trail', moduleId: 'mod-3-1', questType: 'Badge', difficulty: 'Advanced', estimatedTime: '3–4 hours', relatedSalesforceObject: 'TrailQuest__c', relatedLmsObject: 'Badge (Salesforce LMS)', pennyActions: ['Generate Trail Quest'], futureDemandLink: 'Submit Change Request', purpose: 'Sprint 3 badge for completing both Flow lessons and the automation lab.', criteria: ['Build a working screen flow', 'Create a record-triggered flow'] },
+];
+
+// ── Weekly Reviews (Penny Assets) ─────────────────────────────────────────────
+
+export const curriculumWeeklyReviews: CurriculumItem[] = [
+  { id: 'wr-ft-week-7', objectType: 'weeklyReview', name: 'Foundations Trail — Week 7 Cohort Summary', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', cohortId: 'coh-ft-01', weekNumber: 7, relatedSalesforceObject: 'WeeklyReview__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Weekly Review'], futureDemandLink: 'Submit Change Request', purpose: 'Coach-facing weekly cohort digest — learner progress, confidence flags, and upcoming module milestones.', sampleOutput: '"Week 7 Summary — Cohort 1: 12/14 learners on track. 2 at-risk (flagged for check-in). Module 3.1 average: 78%. Upcoming: Module 3.2 opens Monday."', deliveredVia: 'Slack + Coach Dashboard' },
+  { id: 'wr-ft-week-4', objectType: 'weeklyReview', name: 'Foundations Trail — Week 4 Sprint Wrap', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'Foundations Trail', cohortId: 'coh-ft-01', weekNumber: 4, relatedSalesforceObject: 'WeeklyReview__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Weekly Review'], futureDemandLink: 'Submit Change Request', purpose: 'End-of-Sprint 1 summary — celebrates completion, previews Sprint 2, highlights top learners.', deliveredVia: 'Slack + Email' },
+  { id: 'wr-general', objectType: 'weeklyReview', name: 'Standard Weekly Review Template', status: 'published', confidence: 'confirmed', owner: 'Penny Lead', program: 'All Programs', cohortId: null, relatedSalesforceObject: 'WeeklyReview__c', relatedLmsObject: 'N/A — Penny-native', pennyActions: ['Generate Weekly Review'], futureDemandLink: 'Submit Change Request', purpose: 'Reusable template for generating weekly cohort summaries — parameterized by program, cohort, and week.', deliveredVia: 'Coach Dashboard + Slack' },
+];
+
+// ── Slack Activities (Delivery Assets) ────────────────────────────────────────
+
+export const curriculumSlackActivities: CurriculumItem[] = [
+  { id: 'sa-2-1-kickoff', objectType: 'slackActivity', name: 'Module 2.1 Kickoff Thread', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', moduleId: 'mod-2-1', channel: '#ft-cohort-1', timing: 'Monday, Module 2.1 start', activityType: 'Kickoff Thread', relatedSalesforceObject: 'SlackActivity__c', relatedLmsObject: 'N/A — Slack', pennyActions: ['Create Slack Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Penny-generated thread introducing Module 2.1 to the cohort — sets expectations, shares the week\'s goals, and invites learners to share prior experience with data.', sampleOutput: '"Week 4 starts today! 🗃️ We\'re diving into Data Modeling — one of the most important skills in the Salesforce Admin toolkit. Share in this thread: have you ever built a spreadsheet to track work? That instinct = a data model."' },
+  { id: 'sa-2-1-lab', objectType: 'slackActivity', name: 'Schema Builder Lab Share', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', moduleId: 'mod-2-1', channel: '#ft-cohort-1', timing: 'After les-2-1c (lab completion)', activityType: 'Lab Share', relatedSalesforceObject: 'SlackActivity__c', relatedLmsObject: 'N/A — Slack', pennyActions: ['Create Slack Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Peer-share activity where learners post a screenshot of their completed Schema Builder diagram for cohort review and coach feedback.', sampleOutput: '"📸 Schema Builder Lab Share: Upload your schema screenshot and answer: What business scenario did you model? What relationship type did you use, and why?"' },
+  { id: 'sa-sprint-1-launch', objectType: 'slackActivity', name: 'Sprint 1 Launch Announcement', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', moduleId: null, channel: '#ft-cohort-1', timing: 'Program day 1', activityType: 'Announcement', relatedSalesforceObject: 'SlackActivity__c', relatedLmsObject: 'N/A — Slack', pennyActions: ['Create Slack Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Welcome announcement at program start — introduces Penny, sets expectations, shares the 12-week journey overview.' },
+  { id: 'sa-3-1-lab', objectType: 'slackActivity', name: 'Flow Builder Lab Check-In', status: 'needs-review', confidence: 'prototype', owner: 'Coach', program: 'Foundations Trail', moduleId: 'mod-3-1', channel: '#ft-cohort-1', timing: 'After les-3-1b', activityType: 'Lab Check-In', relatedSalesforceObject: 'SlackActivity__c', relatedLmsObject: 'N/A — Slack', pennyActions: ['Create Slack Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Post-lab Slack thread for Flow Builder lab — asks learners to share what they built and what was most confusing.' },
+];
+
+// ── Google Chat Updates (Delivery Assets) ─────────────────────────────────────
+
+export const curriculumGoogleChatUpdates: CurriculumItem[] = [
+  { id: 'gc-sprint-2-start', objectType: 'googleChatUpdate', name: 'Sprint 2 Start Update', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', cohortId: 'coh-ft-01', timing: 'Sprint 2 day 1', channel: 'Foundations Trail Cohort 1 Space', relatedSalesforceObject: 'N/A — Google Chat', relatedLmsObject: 'N/A', pennyActions: ['Create Google Chat Update'], futureDemandLink: 'Submit Change Request', purpose: 'Sprint 2 kickoff message sent to the cohort Google Chat space — introduces data modeling focus and links to the sprint overview.' },
+  { id: 'gc-assessment-reminder', objectType: 'googleChatUpdate', name: 'Assessment Week Reminder', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', cohortId: 'coh-ft-01', timing: 'Day before assessment week', channel: 'Foundations Trail Cohort 1 Space', relatedSalesforceObject: 'N/A — Google Chat', relatedLmsObject: 'N/A', pennyActions: ['Create Google Chat Update'], futureDemandLink: 'Submit Change Request', purpose: 'Reminder and encouragement message the day before a module assessment — shares links, tips, and coach availability.' },
+  { id: 'gc-program-update', objectType: 'googleChatUpdate', name: 'Program Progress Update (Coach)', status: 'draft', confidence: 'prototype', owner: 'Coach', program: 'All Programs', cohortId: null, timing: 'Weekly (Fridays)', channel: 'Coaching Team Space', relatedSalesforceObject: 'N/A — Google Chat', relatedLmsObject: 'N/A', pennyActions: ['Create Google Chat Update'], futureDemandLink: 'Submit Change Request', purpose: 'Weekly update to the coaching team Google Chat space — cohort progress, at-risk flags, and action items.' },
+];
+
+// ── Calendar Events (Delivery Assets) ─────────────────────────────────────────
+
+export const curriculumCalendarEvents: CurriculumItem[] = [
+  { id: 'ce-2-1-oh', objectType: 'calendarEvent', name: 'Module 2.1 Office Hours (Week 5)', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', moduleId: 'mod-2-1', cohortId: 'coh-ft-01', timing: 'Week 5 — Wednesday 6–7 PM ET', eventType: 'Office Hours', attendees: 'Learners (open)', relatedSalesforceObject: 'CalendarEvent__c', relatedLmsObject: 'N/A', pennyActions: ['Generate Calendar Event'], futureDemandLink: 'Submit Change Request', purpose: 'Open office hours for Module 2.1 content — Schema Builder lab support and data modeling Q&A.' },
+  { id: 'ce-sprint-2-kickoff', objectType: 'calendarEvent', name: 'Sprint 2 Kickoff Session', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', moduleId: null, cohortId: 'coh-ft-01', timing: 'Week 4 — Monday 6–7 PM ET', eventType: 'Kickoff', attendees: 'All Cohort Learners', relatedSalesforceObject: 'CalendarEvent__c', relatedLmsObject: 'N/A', pennyActions: ['Generate Calendar Event'], futureDemandLink: 'Submit Change Request', purpose: 'Live kickoff session for Sprint 2 — introduces data modeling, reviews Sprint 1 achievements, and sets Sprint 2 goals.' },
+  { id: 'ce-cohort-progress', objectType: 'calendarEvent', name: 'Cohort 1 Mid-Program Progress Review', status: 'published', confidence: 'confirmed', owner: 'Program Manager', program: 'Foundations Trail', moduleId: null, cohortId: 'coh-ft-01', timing: 'Week 6 — Friday 4–5 PM ET', eventType: 'Review', attendees: 'Program Manager + Coaches', relatedSalesforceObject: 'CalendarEvent__c', relatedLmsObject: 'N/A', pennyActions: ['Generate Calendar Event'], futureDemandLink: 'Submit Change Request', purpose: 'Internal team review of Cohort 1 progress at the midpoint — data review, at-risk learner plans, curriculum feedback.' },
+  { id: 'ce-exam-prep-oh', objectType: 'calendarEvent', name: 'Certification Exam Prep Office Hours', status: 'needs-review', confidence: 'prototype', owner: 'Coach', program: 'Foundations Trail', moduleId: 'mod-4-1', cohortId: 'coh-ft-01', timing: 'Week 10–11 — Daily 12–1 PM ET', eventType: 'Office Hours', attendees: 'Learners (open)', relatedSalesforceObject: 'CalendarEvent__c', relatedLmsObject: 'N/A', pennyActions: ['Generate Calendar Event'], futureDemandLink: 'Submit Change Request', purpose: 'Daily exam prep office hours during certification week — Q&A, practice exam review, and mindset coaching.' },
+];
+
+// ── Office Hours (Delivery Assets) ────────────────────────────────────────────
+
+export const curriculumOfficeHours: CurriculumItem[] = [
+  { id: 'oh-weekly-ft', objectType: 'officeHours', name: 'Foundations Trail — Weekly Office Hours', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', schedule: 'Every Wednesday 6–7 PM ET', format: 'Zoom', relatedSalesforceObject: 'OfficeHours__c', relatedLmsObject: 'N/A', pennyActions: ['Generate Reminder'], futureDemandLink: 'Submit Change Request', purpose: 'Standing weekly office hours for all Foundations Trail learners — open Q&A on any module content, labs, or career questions.' },
+  { id: 'oh-schema-lab', objectType: 'officeHours', name: 'Schema Builder Lab Office Hours', status: 'published', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', schedule: 'Week 5 — dedicated session', format: 'Zoom', relatedSalesforceObject: 'OfficeHours__c', relatedLmsObject: 'N/A', pennyActions: ['Generate Reminder'], futureDemandLink: 'Submit Change Request', purpose: 'Dedicated office hours for the Schema Builder Lab — focused on data modeling questions and peer schema review.' },
+  { id: 'oh-exam-prep', objectType: 'officeHours', name: 'Certification Exam Prep Sessions', status: 'needs-review', confidence: 'prototype', owner: 'Coach', program: 'Foundations Trail', schedule: 'Week 10–11 — daily sessions', format: 'Zoom + Recording', relatedSalesforceObject: 'OfficeHours__c', relatedLmsObject: 'N/A', pennyActions: ['Generate Reminder'], futureDemandLink: 'Submit Change Request', purpose: 'Intensive exam prep sessions in the final two weeks — mock exam Q&A, topic deep-dives, confidence coaching.' },
+];
+
+// ── Health Issues ──────────────────────────────────────────────────────────────
+
+export const curriculumHealthIssues: CurriculumItem[] = [
+  { id: 'hi-mod-3-1-assessment', objectType: 'healthIssue', name: 'Module 3.1 — No Assessment Linked', status: 'missing', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', severity: 'high', checkType: 'missing-assessment' as HealthCheckType, affectedObjectType: 'module', affectedObjectId: 'mod-3-1', affectedObjectName: 'Screen Flows & Record-Triggered Flows', affectedItems: ['Module 3.1 has no linked assessment — learners complete lessons with no knowledge check'], actionRequired: 'Create and link an assessment for Module 3.1 before Sprint 3 delivery', relatedSalesforceObject: 'ContentHealthIssue__c', relatedLmsObject: 'N/A', pennyActions: ['Create Assessment'], futureDemandLink: 'Submit Change Request', purpose: 'Content health flag: Module 3.1 is missing a linked assessment, creating a gap in learner knowledge verification.' },
+  { id: 'hi-mod-3-2-multi', objectType: 'healthIssue', name: 'Module 3.2 — Multiple Content Gaps', status: 'missing', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', severity: 'high', checkType: 'missing-objectives' as HealthCheckType, affectedObjectType: 'module', affectedObjectId: 'mod-3-2', affectedObjectName: 'Subflows, Loops & Advanced Automation', affectedItems: ['No learning objectives defined', 'No knowledge articles linked', 'No coaching prompts', 'No reflection prompts'], actionRequired: 'Full content pass needed before Module 3.2 can be delivered — add objectives, articles, and prompts', relatedSalesforceObject: 'ContentHealthIssue__c', relatedLmsObject: 'N/A', pennyActions: ['Create Coaching Prompt', 'Create Reflection Prompt', 'Create Knowledge Article'], futureDemandLink: 'Submit Change Request', purpose: 'Module 3.2 has 4 simultaneous health issues — not ready for delivery.' },
+  { id: 'hi-mod-1-3-prompts', objectType: 'healthIssue', name: 'Module 1.3 — No Coaching Prompts', status: 'missing', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', severity: 'medium', checkType: 'missing-penny-prompts' as HealthCheckType, affectedObjectType: 'module', affectedObjectId: 'mod-1-3', affectedObjectName: 'User Management & Security Basics', affectedItems: ['Module 1.3 has no linked coaching prompts — learners get generic fallback prompt'], actionRequired: 'Create a module-specific coaching prompt for Module 1.3 — prioritized for Cohort 2 start', relatedSalesforceObject: 'ContentHealthIssue__c', relatedLmsObject: 'N/A', pennyActions: ['Create Coaching Prompt'], futureDemandLink: 'Submit Change Request', purpose: 'Module 1.3 learners are receiving a generic Penny prompt instead of a module-specific one. Impacts experience quality.' },
+  { id: 'hi-mod-2-2-delivery', objectType: 'healthIssue', name: 'Module 2.2 — No Delivery Activities', status: 'missing', confidence: 'confirmed', owner: 'Coach', program: 'Foundations Trail', severity: 'medium', checkType: 'missing-delivery' as HealthCheckType, affectedObjectType: 'module', affectedObjectId: 'mod-2-2', affectedObjectName: 'Relationships, Lookups & Junction Objects', affectedItems: ['No Slack activity linked', 'No calendar event linked'], actionRequired: 'Add at least one Slack activity and one calendar event for Module 2.2', relatedSalesforceObject: 'ContentHealthIssue__c', relatedLmsObject: 'N/A', pennyActions: ['Create Slack Prompt', 'Generate Calendar Event'], futureDemandLink: 'Submit Change Request', purpose: 'Module 2.2 has no delivery assets — no social learning moment or live touchpoint planned.' },
+  { id: 'hi-duplicate-flows', objectType: 'healthIssue', name: 'Modules 3.1 & 3.2 — Duplicate Flow Concept', status: 'needs-review', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', severity: 'medium', checkType: 'duplicate-concept' as HealthCheckType, affectedObjectType: 'module', affectedObjectId: 'mod-3-1', affectedObjectName: 'Screen Flows & Record-Triggered Flows', affectedItems: ['Module 3.1 covers "screen flows for wizard navigation"', 'Module 3.2 also introduces screen flow subflows — concept overlap'], actionRequired: 'Review Module 3.1 and 3.2 lesson outlines and clarify scope boundaries', relatedSalesforceObject: 'ContentHealthIssue__c', relatedLmsObject: 'N/A', pennyActions: [], futureDemandLink: 'Submit Change Request', purpose: 'Potential duplicate concept coverage between Sprint 3 modules — may confuse learners about scope boundaries.' },
+  { id: 'hi-mod-1-2-articles', objectType: 'healthIssue', name: 'Module 1.2 — No Knowledge Articles', status: 'missing', confidence: 'confirmed', owner: 'Curriculum Lead', program: 'Foundations Trail', severity: 'low', checkType: 'missing-knowledge-link' as HealthCheckType, affectedObjectType: 'module', affectedObjectId: 'mod-1-2', affectedObjectName: 'Navigation, AppBuilder & Customization Basics', affectedItems: ['Module 1.2 has no linked knowledge articles — learners have no reference material'], actionRequired: 'Create or link an App Builder quick reference article for Module 1.2', relatedSalesforceObject: 'ContentHealthIssue__c', relatedLmsObject: 'N/A', pennyActions: ['Create Knowledge Article'], futureDemandLink: 'Submit Change Request', purpose: 'Module 1.2 learners have no knowledge article to reference during or after lessons.' },
+];
+
+// ── Combined Lookup ────────────────────────────────────────────────────────────
+
+export const ALL_CURRICULUM_ITEMS: CurriculumItem[] = [
+  ...curriculumPrograms,
+  ...curriculumCohorts,
+  ...curriculumSprints,
+  ...curriculumModules,
+  ...curriculumLessons,
+  ...curriculumAssessments,
+  ...curriculumKnowledgeArticles,
+  ...curriculumResources,
+  ...curriculumCoachingPrompts,
+  ...curriculumReflectionPrompts,
+  ...curriculumTrailQuests,
+  ...curriculumWeeklyReviews,
+  ...curriculumSlackActivities,
+  ...curriculumGoogleChatUpdates,
+  ...curriculumCalendarEvents,
+  ...curriculumOfficeHours,
+  ...curriculumHealthIssues,
+];
+
+const _itemMap = new Map<string, CurriculumItem>(
+  ALL_CURRICULUM_ITEMS.map(item => [item.id, item])
+);
+
+export function getCurriculumItemById(id: string): CurriculumItem | undefined {
+  return _itemMap.get(id);
 }
 
-export const pennyAssistantActions: PennyAssistantAction[] = [
-  { id: 'action-create-module',      label: 'Create Module',             description: 'Generate a module structure with name, learning objectives, lesson outline, estimated duration, and suggested Penny template.', outputType: 'module',           targetAudience: 'Staff',   estimatedTime: '~30 seconds', notes: 'Penny generates from program + sprint context and learning objective inputs.' },
-  { id: 'action-create-lesson',      label: 'Create Lesson',             description: 'Generate a lesson plan with objective, content outline, activity type, duration estimate, and reflection prompt.', outputType: 'lesson',           targetAudience: 'Staff',   estimatedTime: '~30 seconds', notes: 'Input: module name + lesson topic. Output: structured lesson plan for review.' },
-  { id: 'action-create-assessment',  label: 'Create Assessment',         description: 'Generate assessment questions aligned to a module\'s learning objectives — multiple choice, scenario-based, or practical check.', outputType: 'assessment',       targetAudience: 'Staff',   estimatedTime: '~45 seconds', notes: 'Penny generates from learning objectives. Staff reviews before publishing.' },
-  { id: 'action-create-article',     label: 'Create Knowledge Article',  description: 'Draft a knowledge article from provided source topics — structured for Salesforce Knowledge taxonomy and Penny retrieval.', outputType: 'knowledgeArticle', targetAudience: 'Staff',   estimatedTime: '~60 seconds', notes: 'Requires topic and source reference inputs. Output is a draft — must be reviewed and owned before publishing.' },
-  { id: 'action-sprint-outline',     label: 'Generate Sprint Outline',   description: 'Build a full sprint plan — theme, modules, lesson sequence, assignments, and assessment strategy — from program and RESOLVE phase context.', outputType: 'sprint',           targetAudience: 'Staff',   estimatedTime: '~60 seconds', notes: 'Input: program name + sprint number + RESOLVE phase. Output: structured sprint outline for Curriculum Lead review.' },
-  { id: 'action-coach-notes',        label: 'Create Coach Notes',        description: 'Generate facilitation guidance for a module or sprint — covering common learner confusion points, recommended support actions, and coaching tips.', outputType: 'module',           targetAudience: 'Coach',   estimatedTime: '~30 seconds', notes: 'Context: module content + prior cohort performance signals (when available).' },
-  { id: 'action-slack-prompt',       label: 'Create Slack Prompt',       description: 'Generate a cohort-facing Slack message for a specific trigger — sprint start, Trail Quest launch, milestone celebration, or learner nudge.', outputType: 'pennyTemplate',    targetAudience: 'Learner', estimatedTime: '~20 seconds', notes: 'Output is a Slack-formatted message draft. Future: auto-route to #guided-trail-cohort via Slack API.' },
-  { id: 'action-gchat-update',       label: 'Create Google Chat Update', description: 'Generate a client-facing project update message for Digital Compass employer partners — sprint milestone, UAT prep, or learner progress summary.', outputType: 'pennyTemplate',    targetAudience: 'Learner', estimatedTime: '~20 seconds', notes: 'Output formatted for Google Chat Space. Future: auto-route to Digital Compass Space via Google Chat API.' },
-  { id: 'action-reflection-prompt',  label: 'Create Reflection Prompt',  description: 'Generate a learner reflection question for a lesson — connecting content to personal experience, career goals, or prior work history.', outputType: 'pennyTemplate',    targetAudience: 'Learner', estimatedTime: '~15 seconds', notes: 'Generated from lesson topic and module learning objective. Output added to lesson record as Penny prompt field.' },
-];
+export function getRelatedItems(ids: string[]): CurriculumItem[] {
+  return ids.flatMap(id => {
+    const item = _itemMap.get(id);
+    return item ? [item] : [];
+  });
+}
+
+export function getItemsByModule(moduleId: string, objectType: CurriculumObjectType): CurriculumItem[] {
+  return ALL_CURRICULUM_ITEMS.filter(
+    item => item.objectType === objectType && item.moduleId === moduleId
+  );
+}
