@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar, ArrowRight, ChevronRight } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -871,41 +871,65 @@ export function ContextPanel() {
 
   return (
     <div
-      className={`flex-shrink-0 h-full bg-card border-l border-border flex flex-col overflow-hidden transition-[width] duration-200 ease-in-out ${
-        collapsed ? 'w-9' : 'w-[300px]'
+      className={`flex-shrink-0 h-full bg-card flex flex-col overflow-hidden transition-[width] duration-[250ms] ease-in-out ${
+        collapsed
+          ? 'w-9 border-l-2 border-primary/30'
+          : 'w-[300px] border-l border-border'
       }`}
     >
       {collapsed ? (
-        /* ── Focus Mode: slim vertical tab ── */
+        /* ── Focus Mode ──────────────────────────────────────────────────────
+           Full-height button. ChevronLeft at top signals "click to expand left".
+           Colored left border + group-hover primary tint make it clearly
+           interactive rather than decorative.
+        ──────────────────────────────────────────────────────────────────── */
         <button
           onClick={() => setCollapsed(false)}
           aria-label="Expand Knowledge Brief"
           title="Expand Knowledge Brief"
-          className="flex-1 w-full flex flex-col items-center justify-center gap-3 hover:bg-muted/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+          className="flex-1 w-full flex flex-col items-center justify-center gap-3 py-6
+            hover:bg-primary/5 hover:border-primary transition-all duration-200
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary
+            group"
         >
-          <Layers className="w-3.5 h-3.5 text-muted-foreground/50" />
+          {/* Chevron pointing left — expand affordance */}
+          <ChevronLeft className="w-4 h-4 text-primary/50 group-hover:text-primary transition-colors duration-200" />
+
+          {/* Icon + label */}
+          <Layers className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary/70 transition-colors duration-200" />
           <span
-            className="text-[9px] font-semibold text-muted-foreground/40 tracking-widest uppercase select-none"
+            className="text-[9px] font-bold tracking-widest uppercase select-none transition-colors duration-200
+              text-muted-foreground/40 group-hover:text-primary/70"
             style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
             Knowledge Brief
           </span>
         </button>
       ) : (
-        /* ── Brief Mode: full panel ── */
+        /* ── Brief Mode ──────────────────────────────────────────────────────
+           Labeled "Focus ›" collapse button — clearly shows the action and
+           its effect. Left-edge primary accent border serves as the divider
+           handle so users understand the panel boundary is interactive.
+        ──────────────────────────────────────────────────────────────────── */
         <>
-          <div className="px-4 py-3 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2 shrink-0">
+          <div className="px-3 py-2.5 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2 shrink-0">
             <Layers className="w-4 h-4 text-primary shrink-0" />
             <h3 className="font-semibold text-sm truncate flex-1">
               {!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief'}
             </h3>
+            {/* Labeled collapse button — obvious, not a bare icon */}
             <button
               onClick={() => setCollapsed(true)}
-              aria-label="Collapse Knowledge Brief (Focus Mode)"
-              title="Focus Mode — collapse panel"
-              className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/60 transition-colors shrink-0"
+              aria-label="Collapse Knowledge Brief"
+              title="Collapse to Focus Mode"
+              className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
+                text-muted-foreground bg-muted/50 border border-border/60
+                hover:bg-muted hover:text-foreground hover:border-border
+                transition-all duration-150
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              Focus
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
           <div className="flex-1 relative overflow-hidden bg-white/50">
