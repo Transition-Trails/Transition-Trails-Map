@@ -3,73 +3,75 @@ import type { ResolvePhase } from '@/data/resolvePhases';
 import { ArrowRight } from 'lucide-react';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 
-// ── Prototype phase health data · future: Salesforce MCP ─────────────────────
+// ── Prototype phase operational status · owner/count details require source mapping ──
+// Status and channel values are prototype placeholders — owners and initiative counts
+// are NOT sourced and are intentionally omitted until source mapping is complete.
 const PHASE_HEALTH: Record<string, {
   status: 'active' | 'needs-review' | 'planning';
-  owner: string;
-  activePrograms: string[];
-  initiatives: number;
   commChannels: string[];
   demandNote?: string;
 }> = {
-  recognize: { status: 'active',       owner: 'Program Lead',          activePrograms: ["Explorer's Trail", 'Foundations Trail', 'Digital Compass'], initiatives: 2, commChannels: ['#case-intake'] },
-  evaluate:  { status: 'active',       owner: 'Program Lead',          activePrograms: ["Explorer's Trail", 'Foundations Trail', 'Digital Compass'], initiatives: 1, commChannels: ['#org-assessment'] },
-  solve:     { status: 'active',       owner: 'Curriculum Lead',       activePrograms: ['Foundations Trail', 'Guided Trail', 'Digital Compass'],     initiatives: 2, commChannels: ['#program-design'], demandNote: 'Trail of Mastery design active' },
-  organize:  { status: 'active',       owner: 'Operations',            activePrograms: ['Guided Trail', 'Digital Compass'],                          initiatives: 3, commChannels: ['#project-delivery'] },
-  leverage:  { status: 'active',       owner: 'Facilitation',          activePrograms: ['Guided Trail', 'Digital Compass'],                          initiatives: 4, commChannels: ['#trail-talks-cohort-{N}', '#coach-alerts'], demandNote: '2 cohorts active' },
-  verify:    { status: 'active',       owner: 'Outcomes Lead',         activePrograms: ['Guided Trail', 'Trail of Mastery'],                         initiatives: 1, commChannels: ['#outcomes-reports', '#trail-wins'] },
-  execute:   { status: 'needs-review', owner: 'Source mapping needed', activePrograms: ['Trail of Mastery'],                                         initiatives: 0, commChannels: [], demandNote: 'Phase distinction needs source review' },
-  evolve:    { status: 'active',       owner: 'Program Lead',          activePrograms: ['Guided Trail', 'Trail of Mastery'],                         initiatives: 1, commChannels: ['#program-updates'] },
+  recognize: { status: 'active',       commChannels: ['#case-intake'],                                    },
+  evaluate:  { status: 'active',       commChannels: ['#org-assessment'],                                 },
+  solve:     { status: 'active',       commChannels: ['#program-design'],  demandNote: 'Trail of Mastery design in progress' },
+  organize:  { status: 'active',       commChannels: ['#project-delivery'],                               },
+  leverage:  { status: 'active',       commChannels: ['#trail-talks-cohort-{N}', '#coach-alerts'],        },
+  verify:    { status: 'active',       commChannels: ['#outcomes-reports', '#trail-wins'],                },
+  execute:   { status: 'needs-review', commChannels: [],                   demandNote: 'Phase distinction from Leverage requires source review' },
+  evolve:    { status: 'active',       commChannels: ['#program-updates'],                                },
 };
 
 // ── Operational mappings ──────────────────────────────────────────────────────
+// Penny AI Function and Trail OS Capability names are drawn from confirmed
+// pennyCapabilities.ts and trailOsCapabilities.ts data only.
+// "Source mapping needed" marks cells where no confirmed capability is recorded.
 const OP_MAPPINGS = [
   {
     id: 'map-1', phase: 'Recognize', phaseLetter: 'R',
-    trailOs:  'Intake Coordination · Learner Assessment',
-    penny:    'Discovery Assistant',
+    trailOs:  'Intake Coordination',
+    penny:    'Trail Guide',
     artifact: 'Intake Record · Discovery Brief',
-    description: 'New program needs and learner requests surface through Intake Coordination. Trail Guide operates in discovery mode to structure incoming signals into briefs. Output is an Intake Record and Discovery Brief that gates entry to the Evaluate phase.',
+    description: 'New program needs and learner requests surface through Intake Coordination. Trail Guide structures incoming signals into a Discovery Brief. Output is an Intake Record and Discovery Brief that gates entry to the Evaluate phase. Source: RESOLVE Course Canvas · Explorer\'s Trail Blueprint.',
     commChannels: ['#case-intake (planned)'],
     sources: ["Explorer's Trail Blueprint", 'RESOLVE Course Canvas'],
   },
   {
     id: 'map-2', phase: 'Evaluate', phaseLetter: 'E',
-    trailOs:  'Org Readiness · Strategic Analysis',
-    penny:    'Insight Summary',
+    trailOs:  'Org Readiness',
+    penny:    'Source mapping needed',
     artifact: 'Evaluation Brief',
-    description: 'Intake records and discovery briefs are evaluated against org capacity, strategic fit, and learner readiness. Penny surfaces structured insight summaries from existing data patterns. Output is an Evaluation Brief that gates the Solve phase.',
+    description: 'Intake records and discovery briefs are assessed against org capacity, strategic fit, and learner readiness using Org Readiness. No confirmed Penny AI capability is mapped to this phase yet — pending source document review. Output is an Evaluation Brief that gates the Solve phase.',
     commChannels: ['#org-assessment (planned)'],
     sources: ['RESOLVE Course Canvas', 'Program Comparison Sheet'],
   },
   {
     id: 'map-3', phase: 'Organize', phaseLetter: 'O',
-    trailOs:  'Project Delivery · Documentation',
-    penny:    'Build Companion',
+    trailOs:  'Project Delivery · Org Readiness',
+    penny:    'Quest Master',
     artifact: 'Sprint Plan · Backlog',
-    description: 'Approved designs are structured into executable delivery plans. Build Companion assists with sprint backlog creation and documentation scaffolding. Output is a Sprint Plan and Backlog ready for facilitation handoff.',
-    commChannels: ['#project-delivery (planned)', '#cohort-setup (planned)'],
+    description: 'Approved designs are structured into executable delivery plans. Quest Master coordinates sprint cadences and milestone tracking. Output is a Sprint Plan and Backlog ready for facilitation. Source: Guided Trail Sprint Cadence · RESOLVE Course Canvas.',
+    commChannels: ['#project-delivery (planned)'],
     sources: ['Guided Trail Sprint Cadence', 'RESOLVE Course Canvas'],
   },
   {
     id: 'map-4', phase: 'Verify', phaseLetter: 'V',
-    trailOs:  'Outcomes Tracking',
-    penny:    'Coach Intelligence',
-    artifact: 'UAT · Feedback Summary',
-    description: 'Delivery outcomes are assessed against intended results. Coach Intelligence surfaces learner progress signals, risk flags, and feedback patterns. Output is a UAT summary and Feedback Report that feeds the Evolve phase.',
+    trailOs:  'Outcomes Tracking · Coach Visibility',
+    penny:    'Coach Intelligence Layer',
+    artifact: 'Outcomes Assessment · Feedback Summary',
+    description: 'Delivery outcomes are assessed against intended results using Outcomes Tracking. Coach Intelligence Layer surfaces learner progress signals and feedback patterns. Output is an Outcomes Assessment and Feedback Summary that feeds the Evolve phase. Source: RESOLVE Course Canvas.',
     commChannels: ['#outcomes-reports (planned)', '#trail-wins (planned)'],
     sources: ['RESOLVE Course Canvas', 'Pricing Analysis'],
   },
 ];
 
-// ── Active work items ─────────────────────────────────────────────────────────
+// ── Active work items · owners and dates are prototype placeholders ───────────
 const ACTIVE_WORK = [
-  { id: 'work-1', name: 'Guided Trail Cohort 1',      phase: 'Leverage',  program: 'Guided Trail',      status: 'active',       owner: 'Facilitation Team', nextDate: 'Nov 2025', commChannels: ['#cohort-guided-1', '#penny-alerts'] },
-  { id: 'work-2', name: 'Foundations Trail Cohort 2', phase: 'Organize',  program: 'Foundations Trail', status: 'active',       owner: 'Operations',        nextDate: 'Oct 2025', commChannels: ['#cohort-foundations-2'] },
-  { id: 'work-3', name: 'Trail of Mastery Design',    phase: 'Solve',     program: 'Trail of Mastery',  status: 'in-discovery', owner: 'Curriculum Lead',   nextDate: 'Q3 2025',  commChannels: ['#program-design'] },
-  { id: 'work-4', name: 'Digital Compass Org Cohort', phase: 'Leverage',  program: 'Digital Compass',   status: 'active',       owner: 'Client Services',   nextDate: 'Q4 2025',  commChannels: ['#cohort-compass-1'] },
-  { id: 'work-5', name: 'Salesforce Case Intake',     phase: 'Recognize', program: 'Operations',        status: 'planning',     owner: 'Operations',        nextDate: 'Q3 2025',  commChannels: ['#case-intake'] },
-  { id: 'work-6', name: 'Knowledge Base Build',       phase: 'Evolve',    program: 'Platform',          status: 'in-progress',  owner: 'Documentation',     nextDate: 'Ongoing',  commChannels: ['#program-updates'] },
+  { id: 'work-1', name: 'Guided Trail Cohort 1',      phase: 'Leverage',  program: 'Guided Trail',      status: 'active',       owner: 'Source mapping needed', nextDate: 'Prototype', commChannels: ['#cohort-guided-1', '#penny-alerts'] },
+  { id: 'work-2', name: 'Foundations Trail Cohort 2', phase: 'Organize',  program: 'Foundations Trail', status: 'active',       owner: 'Source mapping needed', nextDate: 'Prototype', commChannels: ['#cohort-foundations-2'] },
+  { id: 'work-3', name: 'Trail of Mastery Design',    phase: 'Solve',     program: 'Trail of Mastery',  status: 'in-discovery', owner: 'Source mapping needed', nextDate: 'Prototype', commChannels: ['#program-design'] },
+  { id: 'work-4', name: 'Digital Compass Org Cohort', phase: 'Leverage',  program: 'Digital Compass',   status: 'active',       owner: 'Source mapping needed', nextDate: 'Prototype', commChannels: ['#cohort-compass-1'] },
+  { id: 'work-5', name: 'Salesforce Case Intake',     phase: 'Recognize', program: 'Operations',        status: 'planning',     owner: 'Source mapping needed', nextDate: 'Prototype', commChannels: ['#case-intake'] },
+  { id: 'work-6', name: 'Knowledge Base Build',       phase: 'Evolve',    program: 'Platform',          status: 'in-progress',  owner: 'Source mapping needed', nextDate: 'Prototype', commChannels: ['#program-updates'] },
 ];
 
 // ── Demand signal metrics ─────────────────────────────────────────────────────
@@ -110,7 +112,19 @@ export default function ResolveDemand() {
 
   const selectPhase = (phase: ResolvePhase) => {
     const h = PHASE_HEALTH[phase.id] ?? {};
-    setSelectedItem({ type: 'resolve', id: phase.id, data: { ...phase, kind: 'phase', ...h } });
+    // relatedPrograms, penny, trailOs, owner etc. all come from the canonical phase data spread.
+    // Only prototype status and comm channels are merged from PHASE_HEALTH.
+    setSelectedItem({
+      type: 'resolve',
+      id: phase.id,
+      data: {
+        ...phase,
+        kind: 'phase',
+        status: h.status,
+        commChannels: h.commChannels ?? [],
+        demandNote: h.demandNote,
+      },
+    });
   };
 
   const selectMapping = (m: typeof OP_MAPPINGS[number]) =>
@@ -146,7 +160,7 @@ export default function ResolveDemand() {
         {/* ── Section 1: RESOLVE Lifecycle ── */}
         <SectionHead
           title="RESOLVE Lifecycle"
-          note="8 phases · Framework confirmed via RESOLVE Course Canvas · Prototype operational data"
+          note="Phases sourced from RESOLVE Method course canvas and Guided Trail workbook materials · Operational details pending source mapping"
         />
         <div className="grid grid-cols-4 gap-2">
           {resolvePhases.map((phase, idx) => (
@@ -278,16 +292,7 @@ function PhaseCard({
           <div className="flex items-center gap-1 flex-wrap">
             <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${statusDot}`} />
             <span className="text-[9px] font-semibold text-muted-foreground">{statusLbl}</span>
-            {health.initiatives > 0 && (
-              <span className="text-[9px] text-muted-foreground">· {health.initiatives} active</span>
-            )}
           </div>
-        )}
-
-        {health?.owner && health.owner !== 'Source mapping needed' && (
-          <p className="text-[9px] text-muted-foreground leading-none truncate">
-            <span className="font-semibold text-foreground/70">Owner: </span>{health.owner}
-          </p>
         )}
 
         {/* Trail OS + Penny capability chips */}
@@ -304,9 +309,9 @@ function PhaseCard({
           ))}
         </div>
 
-        {health?.activePrograms && (
+        {phase.relatedPrograms.length > 0 && (
           <p className="text-[9px] text-muted-foreground/55 leading-none">
-            {health.activePrograms.length} program{health.activePrograms.length !== 1 ? 's' : ''}
+            {phase.relatedPrograms.length} program{phase.relatedPrograms.length !== 1 ? 's' : ''}
           </p>
         )}
       </div>

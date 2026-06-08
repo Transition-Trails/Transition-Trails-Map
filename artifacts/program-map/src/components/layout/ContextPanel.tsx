@@ -655,16 +655,16 @@ export function ContextPanel() {
               <p className="text-xs text-muted-foreground italic leading-snug">{data.purpose as string}</p>
             </div>
 
-            {/* Stats row */}
-            {data.initiatives !== undefined && (
-              <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-lg bg-muted/40 border border-border p-2 text-center">
-                  <p className="text-lg font-bold text-foreground leading-none">{data.initiatives as number}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">active initiatives</p>
-                </div>
-                <div className="rounded-lg bg-muted/40 border border-border p-2 text-center">
-                  <p className="text-lg font-bold text-foreground leading-none">{(data.activePrograms as string[])?.length ?? 0}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">programs using</p>
+            {/* Programs using this phase — drawn from canonical relatedPrograms field */}
+            {(data.relatedPrograms as string[])?.length > 0 && (
+              <div>
+                <span className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">
+                  Programs Using This Phase
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {(data.relatedPrograms as string[]).map((p: string) => (
+                    <Badge key={p} variant="secondary" className="text-[10px]">{p}</Badge>
+                  ))}
                 </div>
               </div>
             )}
