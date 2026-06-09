@@ -20,13 +20,16 @@ interface CheckResult {
 interface ChannelResult {
   envVar: string;
   channelId: string;
+  normalizedId: string;
   resolvedRole: "penny" | "admin" | "default" | "unknown";
-  status: "pass" | "fail" | "skip";
+  status: "pass" | "warning" | "fail" | "skip";
   name?: string;
   isPrivate?: boolean;
   isMember?: boolean;
   memberCount?: number;
   error?: string;
+  scopeIssue?: boolean;
+  fix?: string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -42,6 +45,15 @@ async function slackGet(
     headers: { Authorization: `Bearer ${token}` },
   });
   return (await res.json()) as Record<string, unknown>;
+}
+
+/**
+ * Strip a workspace-prefixed channel ID like "T02JWAZ2A20/C099671TY6M"
+ * down to just the channel part "C099671TY6M".
+ */
+function normalizeChannelId(raw: string): string {
+  const slash = raw.lastIndexOf("/");
+  return slash !== -1 ? raw.slice(slash + 1) : raw;
 }
 
 /** Guess a channel's functional role from its name when not explicit. */
@@ -272,24 +284,32 @@ router.get("/slack/validate", async (req, res) => {
 
     // conversations.info for SLACK_CHANNEL_ID ---------------------------------
     if (authOk && channelId) {
+      const normalizedChannelId = normalizeChannelId(channelId);
+      const hadPrefix = normalizedChannelId !== channelId;
       try {
-        const r = await slackGet(botToken, "conversations.info", { channel: channelId });
+        const r = await slackGet(botToken, "conversations.info", { channel: normalizedChannelId });
         if (r["ok"] === true) {
           const ch = r["channel"] as Record<string, unknown>;
-          checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "pass", detail: `Channel found: #${ch["name"]} (${ch["is_private"] ? "private" : "public"}). ${ch["num_members"] ?? "?"} members.`, impact: "None.", meta: { channelName: String(ch["name"] ?? ""), isPrivate: Boolean(ch["is_private"]), members: Number(ch["num_members"] ?? 0) } });
+          const note = hadPrefix ? ` (workspace prefix stripped from "${channelId}")` : "";
+          checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "pass", detail: `Channel found: #${ch["name"]} (${ch["is_private"] ? "private" : "public"}). ${ch["num_members"] ?? "?"} members.${note}`, impact: "None.", meta: { channelName: String(ch["name"] ?? ""), isPrivate: Boolean(ch["is_private"]), members: Number(ch["num_members"] ?? 0) } });
           const isMember = ch["is_member"] === true;
           checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: isMember ? "pass" : "warning", detail: isMember ? `Bot${botUserId ? ` (${botUserId})` : ""} is confirmed as a member of #${ch["name"]}.` : `Bot is NOT a member of #${ch["name"]}.`, impact: isMember ? "None." : "Bot cannot read history or access private channels without membership.", fix: isMember ? undefined : `Invite the bot: /invite @trail-os-bot in #${ch["name"]}.` });
         } else {
           const errCode = String(r["error"] ?? "unknown");
-          const errMap: Record<string, { detail: string; fix: string }> = {
-            channel_not_found: { detail: `Channel ID "${channelId}" not found. Check if this is the Penny AI channel ID from the POC.`, fix: "Verify SLACK_CHANNEL_ID. Set SLACK_PENNY_CHANNEL_ID explicitly if this is the Penny AI channel." },
+          const errMap: Record<string, { detail: string; fix: string; status?: CheckStatus }> = {
+            channel_not_found: { detail: hadPrefix ? `Channel ID "${normalizedChannelId}" (stripped from "${channelId}") not found. The stripped ID may still be wrong.` : `Channel ID "${channelId}" not found. Check if this is the Penny AI channel ID from the POC.`, fix: "Verify SLACK_CHANNEL_ID. Set SLACK_PENNY_CHANNEL_ID explicitly if this is the Penny AI channel." },
             not_in_channel:    { detail: "Bot is not a member of this private channel.",      fix: "Invite the bot: /invite @trail-os-bot." },
             is_archived:       { detail: "The channel has been archived.",                    fix: "Choose an active channel." },
-            missing_scope:     { detail: "Bot token is missing channels:read scope.",         fix: "Add channels:read scope and reinstall the app." },
+            missing_scope:     { detail: "Bot token missing channels:read / groups:read scope. Token is valid — add the scope in Slack App → OAuth & Permissions and reinstall.", fix: "In Slack App dashboard → OAuth & Permissions → Scopes → Bot Token Scopes: add channels:read (public) and groups:read (private). Then reinstall the app to the workspace.", status: "warning" },
           };
           const mapped = errMap[errCode];
-          checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "fail", detail: mapped?.detail ?? `conversations.info returned: ${errCode}.`, impact: "Penny cannot post to the default channel.", fix: mapped?.fix ?? `Error: ${errCode}.` });
-          checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped — channel access check failed.", impact: "Cannot verify bot membership." });
+          const status: CheckStatus = (mapped?.status as CheckStatus) ?? "fail";
+          checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status, detail: mapped?.detail ?? `conversations.info returned: ${errCode}.`, impact: status === "warning" ? "Channel metadata unavailable until scope is added — bot can still post if chat:write is present." : "Penny cannot post to the default channel.", fix: mapped?.fix ?? `Error: ${errCode}.` });
+          if (errCode === "missing_scope") {
+            checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: "warning", detail: "Cannot verify membership — missing channels:read / groups:read scope. See Default Channel Access fix.", impact: "Minor — add scope to resolve.", fix: "Add channels:read and groups:read scopes in Slack App → OAuth & Permissions, then reinstall." });
+          } else {
+            checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped — channel access check failed.", impact: "Cannot verify bot membership." });
+          }
         }
       } catch {
         checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "fail", detail: "Network error checking channel.", impact: "Cannot verify channel.", fix: "Check network." });
@@ -321,37 +341,51 @@ router.get("/slack/validate", async (req, res) => {
         { envVar: "SLACK_ADMIN_CHANNEL_ID", explicitRole: "admin" },
       ];
 
-      // Deduplicate by channel ID to avoid calling the same channel twice
+      // Deduplicate by normalized channel ID to avoid calling the same channel twice
       const seen = new Set<string>();
 
       for (const target of channelTargets) {
-        const chId = process.env[target.envVar];
-        if (!chId || seen.has(chId)) continue;
-        seen.add(chId);
+        const rawId = process.env[target.envVar];
+        if (!rawId) continue;
+        const normId = normalizeChannelId(rawId);
+        if (seen.has(normId)) continue;
+        seen.add(normId);
 
         try {
-          const r = await slackGet(botToken, "conversations.info", { channel: chId });
+          const r = await slackGet(botToken, "conversations.info", { channel: normId });
           if (r["ok"] === true) {
             const ch = r["channel"] as Record<string, unknown>;
             const name = String(ch["name"] ?? "");
             const resolvedRole = target.explicitRole ?? detectChannelRole(name);
+            const isMember = ch["is_member"] === true;
             channels.push({
-              envVar: target.envVar, channelId: chId, resolvedRole,
+              envVar: target.envVar, channelId: rawId, normalizedId: normId, resolvedRole,
               status: "pass", name,
               isPrivate: Boolean(ch["is_private"]),
-              isMember: ch["is_member"] === true,
+              isMember,
               memberCount: Number(ch["num_members"] ?? 0),
+              fix: isMember ? undefined : `Run /invite @coachconnectbot in #${name} to add the bot.`,
             });
           } else {
+            const errCode = String(r["error"] ?? "unknown");
+            const isScopeIssue = errCode === "missing_scope";
+            const fixMap: Record<string, string> = {
+              missing_scope:     "Add channels:read (public) and groups:read (private) scopes in Slack App → OAuth & Permissions → Bot Token Scopes, then reinstall the app to the workspace.",
+              channel_not_found: "Verify the channel ID in Replit Secrets. Right-click the channel in Slack → View channel details → copy the ID at the bottom.",
+              not_in_channel:    "Invite the bot to this channel: run /invite @coachconnectbot inside the channel.",
+              is_archived:       "Un-archive the channel or use a different active channel.",
+            };
             channels.push({
-              envVar: target.envVar, channelId: chId,
+              envVar: target.envVar, channelId: rawId, normalizedId: normId,
               resolvedRole: target.explicitRole ?? "unknown",
-              status: "fail",
-              error: String(r["error"] ?? "unknown"),
+              status: isScopeIssue ? "warning" : "fail",
+              error: errCode,
+              scopeIssue: isScopeIssue,
+              fix: fixMap[errCode] ?? `Slack error: ${errCode}.`,
             });
           }
         } catch {
-          channels.push({ envVar: target.envVar, channelId: chId, resolvedRole: target.explicitRole ?? "unknown", status: "fail", error: "network_error" });
+          channels.push({ envVar: target.envVar, channelId: rawId, normalizedId: normId, resolvedRole: target.explicitRole ?? "unknown", status: "fail", error: "network_error", fix: "Check network connectivity." });
         }
       }
     }
@@ -361,15 +395,38 @@ router.get("/slack/validate", async (req, res) => {
 });
 
 // ─── POST /slack/validate/test-message ───────────────────────────────────────
+// Body: { target?: "penny" | "admin" | "default" }
+// Resolves the channel ID from env based on target, normalises it, then posts.
 
 router.post("/slack/validate/test-message", async (req, res) => {
-  const botToken  = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
-  const channelId = process.env["SLACK_PENNY_CHANNEL_ID"] ?? process.env["SLACK_CHANNEL_ID"];
-
-  if (!botToken || !channelId) {
-    res.status(400).json({ ok: false, error: "SLACK_BOT_TOKEN and at least one channel ID (SLACK_PENNY_CHANNEL_ID or SLACK_CHANNEL_ID) must be set." });
+  const botToken = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
+  if (!botToken) {
+    res.status(400).json({ ok: false, error: "no_token", detail: "SLACK_BOT_TOKEN is not set." });
     return;
   }
+
+  const target = (req.body as { target?: string })?.target ?? "penny";
+
+  let rawChannelId: string | undefined;
+  let targetLabel: string;
+  if (target === "admin") {
+    rawChannelId = process.env["SLACK_ADMIN_CHANNEL_ID"];
+    targetLabel  = "Admin Channel";
+  } else if (target === "default") {
+    rawChannelId = process.env["SLACK_CHANNEL_ID"];
+    targetLabel  = "Default Channel";
+  } else {
+    rawChannelId = process.env["SLACK_PENNY_CHANNEL_ID"] ?? process.env["SLACK_CHANNEL_ID"];
+    targetLabel  = "Penny AI Channel";
+  }
+
+  if (!rawChannelId) {
+    const envVar = target === "admin" ? "SLACK_ADMIN_CHANNEL_ID" : target === "default" ? "SLACK_CHANNEL_ID" : "SLACK_PENNY_CHANNEL_ID";
+    res.status(400).json({ ok: false, error: "no_channel", detail: `${envVar} is not set. Configure this secret first.` });
+    return;
+  }
+
+  const channelId = normalizeChannelId(rawChannelId);
 
   try {
     const response = await fetch("https://slack.com/api/chat.postMessage", {
@@ -377,7 +434,7 @@ router.post("/slack/validate/test-message", async (req, res) => {
       headers: { Authorization: `Bearer ${botToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         channel: channelId,
-        text: `🤖 *Trail OS — Slack Integration Validation Test* (${new Date().toISOString()})\nThis is a test message from the Trail OS Slack Integration Center. You can safely delete this message.`,
+        text: `🤖 *Trail OS — Slack Integration Validation Test* (${new Date().toISOString()})\nSent to: *${targetLabel}*. This is a test message from the Trail OS Slack Integration Center. You can safely delete this message.`,
         unfurl_links: false,
         unfurl_media: false,
       }),
@@ -386,17 +443,17 @@ router.post("/slack/validate/test-message", async (req, res) => {
     const result = (await response.json()) as { ok: boolean; error?: string; ts?: string; channel?: string };
 
     if (result.ok) {
-      res.json({ ok: true, messageTs: result.ts, channel: result.channel });
+      res.json({ ok: true, messageTs: result.ts, channel: result.channel, targetLabel });
       return;
     }
 
     const errMap: Record<string, string> = {
-      not_in_channel:    "Bot is not a member of the channel. Invite the bot with /invite @trail-os-bot.",
-      channel_not_found: "Channel ID is invalid or does not exist in this workspace.",
-      missing_scope:     "Bot token is missing the chat:write scope. Add it and reinstall the app.",
+      not_in_channel:    `Bot is not a member of the ${targetLabel}. Run /invite @coachconnectbot in that channel.`,
+      channel_not_found: "Channel ID is invalid or was not found in this workspace.",
+      missing_scope:     "Bot token is missing chat:write scope. Add it in Slack App → OAuth & Permissions and reinstall.",
       invalid_auth:      "Bot token is invalid or revoked.",
-      is_archived:       "Channel is archived.",
-      rate_limited:      "Rate limited — try again in a moment.",
+      is_archived:       "Channel is archived — choose an active channel.",
+      rate_limited:      "Rate limited — wait a moment and try again.",
     };
 
     res.status(400).json({ ok: false, error: result.error ?? "unknown", detail: errMap[result.error ?? ""] ?? `Slack error: ${result.error}` });

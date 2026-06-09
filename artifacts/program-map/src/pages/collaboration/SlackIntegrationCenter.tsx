@@ -41,13 +41,16 @@ interface SlackApiCheck {
 interface SlackChannelResult {
   envVar: string;
   channelId: string;
+  normalizedId?: string;
   resolvedRole: 'penny' | 'admin' | 'default' | 'unknown';
-  status: 'pass' | 'fail' | 'skip';
+  status: 'pass' | 'warning' | 'fail' | 'skip';
   name?: string;
   isPrivate?: boolean;
   isMember?: boolean;
   memberCount?: number;
   error?: string;
+  scopeIssue?: boolean;
+  fix?: string;
 }
 
 interface SlackValidationResponse {
@@ -316,25 +319,41 @@ function WorkspaceValidationTab() {
   const skip       = checks.filter(c => c.status === 'skip').length;
   const categories = [...new Set(checks.map(c => c.category))];
 
-  const tokenValid   = checks.some(c => c.id === 'api-auth-test'    && c.status === 'pass');
-  const hasChannelId = checks.some(c => c.id === 'secret-channel-id' && c.status === 'pass');
+  const tokenValid    = checks.some(c => c.id === 'api-auth-test'         && c.status === 'pass');
+  const hasPennyCh    = checks.some(c => c.id === 'secret-penny-channel'   && c.status === 'pass');
+  const hasAdminCh    = checks.some(c => c.id === 'secret-admin-channel'   && c.status === 'pass');
+  const hasChannelId  = checks.some(c => c.id === 'secret-channel-id'      && c.status === 'pass');
 
-  function sendTestMessage() {
-    setTestMsgState('sending');
-    setTestMsgDetail('');
-    fetch('/api/slack/validate/test-message', { method: 'POST' })
-      .then(r => r.json() as Promise<{ ok: boolean; error?: string; detail?: string; messageTs?: string }>)
+  type TestTarget = 'penny' | 'admin';
+  const [testMsgTargets, setTestMsgTargets] = useState<Record<TestTarget, 'idle' | 'sending' | 'sent' | 'error'>>({ penny: 'idle', admin: 'idle' });
+  const [testMsgDetails, setTestMsgDetails] = useState<Record<TestTarget, string>>({ penny: '', admin: '' });
+
+  function sendTestMessage(target: TestTarget) {
+    setTestMsgTargets(p => ({ ...p, [target]: 'sending' }));
+    setTestMsgDetails(p => ({ ...p, [target]: '' }));
+    fetch('/api/slack/validate/test-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target }),
+    })
+      .then(r => r.json() as Promise<{ ok: boolean; error?: string; detail?: string; messageTs?: string; targetLabel?: string }>)
       .then(data => {
         if (data.ok) {
-          setTestMsgState('sent');
-          setTestMsgDetail(`Sent (ts: ${data.messageTs ?? '?'}).`);
+          setTestMsgTargets(p => ({ ...p, [target]: 'sent' }));
+          setTestMsgDetails(p => ({ ...p, [target]: `Sent to ${data.targetLabel ?? target} (ts: ${data.messageTs ?? '?'}).` }));
         } else {
-          setTestMsgState('error');
-          setTestMsgDetail(data.detail ?? data.error ?? 'Unknown error.');
+          setTestMsgTargets(p => ({ ...p, [target]: 'error' }));
+          setTestMsgDetails(p => ({ ...p, [target]: data.detail ?? data.error ?? 'Unknown error.' }));
         }
       })
-      .catch(() => { setTestMsgState('error'); setTestMsgDetail('Network error — could not reach API.'); });
+      .catch(() => {
+        setTestMsgTargets(p => ({ ...p, [target]: 'error' }));
+        setTestMsgDetails(p => ({ ...p, [target]: 'Network error — could not reach API.' }));
+      });
   }
+
+  const canSendPenny = tokenValid && (hasPennyCh || hasChannelId);
+  const canSendAdmin = tokenValid && hasAdminCh;
 
   return (
     <div className="flex flex-col h-full">
@@ -351,27 +370,45 @@ function WorkspaceValidationTab() {
           }
         </button>
 
-        {tokenValid && hasChannelId && (
+        {canSendPenny && (
           <button
-            onClick={sendTestMessage}
-            disabled={testMsgState === 'sending'}
+            onClick={() => sendTestMessage('penny')}
+            disabled={testMsgTargets.penny === 'sending'}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-50 ${
-              testMsgState === 'sent'  ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
-              testMsgState === 'error' ? 'border-rose-300 bg-rose-50 text-rose-700' :
-              'border-border bg-white text-foreground hover:bg-muted/40'
+              testMsgTargets.penny === 'sent'  ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
+              testMsgTargets.penny === 'error' ? 'border-rose-300 bg-rose-50 text-rose-700' :
+              'border-pink-200 bg-pink-50 text-pink-700 hover:bg-pink-100'
             }`}
           >
-            {testMsgState === 'sending' ? '⌛ Sending…' :
-             testMsgState === 'sent'    ? '✓ Message Sent' :
-             testMsgState === 'error'   ? '✕ Send Failed' :
-             '✉ Send Test Message'}
+            {testMsgTargets.penny === 'sending' ? '⌛ Sending…' :
+             testMsgTargets.penny === 'sent'    ? '✓ Penny Sent' :
+             testMsgTargets.penny === 'error'   ? '✕ Penny Failed' :
+             '✉ Test → Penny AI'}
           </button>
         )}
 
-        {testMsgDetail && (
-          <span className={`text-[11px] ${testMsgState === 'sent' ? 'text-emerald-600' : 'text-rose-600'}`}>
-            {testMsgDetail}
-          </span>
+        {canSendAdmin && (
+          <button
+            onClick={() => sendTestMessage('admin')}
+            disabled={testMsgTargets.admin === 'sending'}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-50 ${
+              testMsgTargets.admin === 'sent'  ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
+              testMsgTargets.admin === 'error' ? 'border-rose-300 bg-rose-50 text-rose-700' :
+              'border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100'
+            }`}
+          >
+            {testMsgTargets.admin === 'sending' ? '⌛ Sending…' :
+             testMsgTargets.admin === 'sent'    ? '✓ Admin Sent' :
+             testMsgTargets.admin === 'error'   ? '✕ Admin Failed' :
+             '✉ Test → Admin'}
+          </button>
+        )}
+
+        {(testMsgDetails.penny || testMsgDetails.admin) && (
+          <div className="flex flex-col gap-0.5">
+            {testMsgDetails.penny && <span className={`text-[11px] ${testMsgTargets.penny === 'sent' ? 'text-emerald-600' : 'text-rose-600'}`}>{testMsgDetails.penny}</span>}
+            {testMsgDetails.admin && <span className={`text-[11px] ${testMsgTargets.admin === 'sent' ? 'text-emerald-600' : 'text-rose-600'}`}>{testMsgDetails.admin}</span>}
+          </div>
         )}
 
         {lastRun && <span className="ml-auto text-[11px] text-muted-foreground">Last run {lastRun}</span>}
@@ -440,22 +477,35 @@ function WorkspaceValidationTab() {
                     <div>
                       <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">Channel Map</p>
                       {channels.map(ch => (
-                        <div key={ch.envVar} className="flex items-center gap-2.5 px-4 py-2.5 border-b border-border/20">
-                          <ValidationIcon status={ch.status} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[12px] font-medium text-foreground truncate">
-                              {ch.name ? `#${ch.name}` : `${ch.channelId.substring(0, 10)}…`}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground truncate">{ch.envVar}</p>
+                        <div key={ch.envVar} className={`px-4 py-2.5 border-b border-border/20 ${ch.scopeIssue ? 'bg-amber-50/60' : ''}`}>
+                          <div className="flex items-center gap-2.5">
+                            <ValidationIcon status={ch.status} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[12px] font-medium text-foreground truncate">
+                                {ch.name ? `#${ch.name}` : ch.normalizedId ?? ch.channelId.slice(0, 12)}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground truncate">{ch.envVar}</p>
+                              {ch.isMember === true  && <p className="text-[10px] text-emerald-600">✓ Bot is member · {ch.memberCount ?? '?'} members{ch.isPrivate ? ' · private' : ' · public'}</p>}
+                              {ch.isMember === false && <p className="text-[10px] text-amber-600">⚠ Bot not a member — {ch.fix}</p>}
+                            </div>
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border shrink-0 ${
+                              ch.resolvedRole === 'penny'   ? 'bg-pink-50 text-pink-700 border-pink-200' :
+                              ch.resolvedRole === 'admin'   ? 'bg-violet-50 text-violet-700 border-violet-200' :
+                              ch.resolvedRole === 'default' ? 'bg-teal-50 text-teal-700 border-teal-200' :
+                              'bg-muted text-muted-foreground border-border'
+                            }`}>
+                              {ch.resolvedRole === 'penny' ? 'Penny AI' : ch.resolvedRole === 'admin' ? 'Admin' : ch.resolvedRole === 'default' ? 'Default' : 'Unknown'}
+                            </span>
                           </div>
-                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border shrink-0 ${
-                            ch.resolvedRole === 'penny'   ? 'bg-pink-50 text-pink-700 border-pink-200' :
-                            ch.resolvedRole === 'admin'   ? 'bg-violet-50 text-violet-700 border-violet-200' :
-                            ch.resolvedRole === 'default' ? 'bg-teal-50 text-teal-700 border-teal-200' :
-                            'bg-muted text-muted-foreground border-border'
-                          }`}>
-                            {ch.resolvedRole === 'penny' ? 'Penny AI' : ch.resolvedRole === 'admin' ? 'Admin' : ch.resolvedRole === 'default' ? 'Default' : 'Unknown'}
-                          </span>
+                          {ch.scopeIssue && (
+                            <div className="mt-1.5 ml-6 rounded border border-amber-200 bg-amber-50 px-2.5 py-1.5">
+                              <p className="text-[10px] font-bold text-amber-800 mb-0.5">Scope required: channels:read + groups:read</p>
+                              <p className="text-[10px] text-amber-700 leading-snug">{ch.fix}</p>
+                            </div>
+                          )}
+                          {ch.error && !ch.scopeIssue && (
+                            <p className="mt-1 ml-6 text-[10px] text-rose-600 leading-snug">{ch.fix ?? ch.error}</p>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1547,29 +1597,54 @@ function PocReadinessTab() {
   const liveChecks  = valState.kind === 'done' ? valState.data.checks   : null;
   const liveChannels = valState.kind === 'done' ? valState.data.channels : null;
 
-  const tokenValid   = liveChecks?.some(c => c.id === 'api-auth-test'     && c.status === 'pass') ?? false;
-  const hasPennyCh   = liveChecks?.some(c => c.id === 'secret-penny-channel' && c.status === 'pass') ?? false;
-  const hasAdminCh   = liveChecks?.some(c => c.id === 'secret-admin-channel'  && c.status === 'pass') ?? false;
-  const pennyChPass  = liveChannels?.find(c => c.resolvedRole === 'penny')?.status === 'pass';
-  const pennyMember  = liveChannels?.find(c => c.resolvedRole === 'penny')?.isMember === true;
-  const adminChPass  = liveChannels?.find(c => c.resolvedRole === 'admin')?.status === 'pass';
+  const tokenValid   = liveChecks?.some(c => c.id === 'api-auth-test'          && c.status === 'pass') ?? false;
+  const hasPennyCh   = liveChecks?.some(c => c.id === 'secret-penny-channel'   && c.status === 'pass') ?? false;
+  const hasAdminCh   = liveChecks?.some(c => c.id === 'secret-admin-channel'   && c.status === 'pass') ?? false;
+  const pennyCh      = liveChannels?.find(c => c.resolvedRole === 'penny');
+  const adminCh      = liveChannels?.find(c => c.resolvedRole === 'admin');
+  const pennyChPass  = pennyCh?.status === 'pass';
+  const pennyScopeIssue = pennyCh?.scopeIssue === true;
+  const pennyMember  = pennyCh?.isMember === true;
+  const adminChPass  = adminCh?.status === 'pass';
+  const adminScopeIssue = adminCh?.scopeIssue === true;
+  const adminMember  = adminCh?.isMember === true;
+
+  const pennyChDetail = () => {
+    if (!liveChannels) return 'Run Workspace Validation to check.';
+    if (pennyChPass)       return `Channel accessible${pennyMember ? ' — bot is a member ✓' : ' — bot not yet a member. Run /invite @coachconnectbot.'}`;
+    if (pennyScopeIssue)   return 'channels:read scope missing. Token is valid — add scope in Slack App → OAuth & Permissions → Bot Token Scopes, then reinstall.';
+    return `Channel access failed: ${pennyCh?.error ?? 'unknown error'}. ${pennyCh?.fix ?? ''}`;
+  };
+  const adminChDetail = () => {
+    if (!liveChannels) return 'Run Workspace Validation to check.';
+    if (adminChPass)       return `Channel accessible${adminMember ? ' — bot is a member ✓' : ' — bot not yet a member. Run /invite @coachconnectbot.'}`;
+    if (adminScopeIssue)   return 'channels:read scope missing. Token is valid — add scope in Slack App → OAuth & Permissions → Bot Token Scopes, then reinstall.';
+    return `Channel access failed: ${adminCh?.error ?? 'unknown error'}. ${adminCh?.fix ?? ''}`;
+  };
 
   const liveItems = [
-    { id:'token',        label:'Bot Token Valid',                   status: liveChecks ? (tokenValid ? 'pass' : 'fail')    : 'pending', detail: liveChecks ? (tokenValid ? 'auth.test confirmed — bot token is valid.' : 'auth.test failed. Regenerate the Bot User OAuth Token.')   : 'Run Workspace Validation to check.' },
-    { id:'penny-ch-id',  label:'Penny Channel ID (SLACK_PENNY_CHANNEL_ID)',  status: liveChecks ? (hasPennyCh  ? 'pass' : 'warning') : 'pending', detail: hasPennyCh  ? 'SLACK_PENNY_CHANNEL_ID is set — Penny AI channel explicitly configured.'  : 'Set SLACK_PENNY_CHANNEL_ID with the Penny AI channel ID from the POC.' },
-    { id:'penny-access', label:'Penny AI Channel Accessible',       status: liveChannels ? (pennyChPass ? 'pass' : 'fail') : 'pending', detail: pennyChPass ? 'Bot can read the Penny AI channel via conversations.info.' : 'Channel access failed. Invite the bot: /invite @trail-os-bot.' },
-    { id:'penny-member', label:'Bot is Member of Penny AI Channel', status: liveChannels ? (pennyMember ? 'pass' : 'warning') : 'pending', detail: pennyMember ? 'Bot confirmed as channel member — can receive events and post.' : 'Bot is not yet a member. Run /invite @trail-os-bot in the Penny AI channel.' },
-    { id:'admin-ch-id',  label:'Admin Channel ID (SLACK_ADMIN_CHANNEL_ID)', status: liveChecks ? (hasAdminCh  ? 'pass' : 'warning') : 'pending', detail: hasAdminCh  ? 'SLACK_ADMIN_CHANNEL_ID is set — admin channel explicitly configured.'    : 'Set SLACK_ADMIN_CHANNEL_ID with the admin channel ID from the POC.' },
-    { id:'admin-access', label:'Admin Channel Accessible',          status: liveChannels ? (adminChPass ? 'pass' : 'warning') : 'pending', detail: adminChPass ? 'Bot can access the admin channel.'                                     : 'Admin channel not yet configured or bot not invited.' },
+    { id:'token',        label:'Bot Token Valid',                    status: liveChecks ? (tokenValid ? 'pass' : 'fail')      : 'pending', detail: liveChecks ? (tokenValid ? 'auth.test confirmed — @coachconnectbot is valid.' : 'auth.test failed. Regenerate the Bot User OAuth Token.') : 'Run Workspace Validation to check.' },
+    { id:'penny-ch-id',  label:'Penny Channel ID configured',        status: liveChecks ? (hasPennyCh  ? 'pass' : 'warning')  : 'pending', detail: hasPennyCh  ? 'SLACK_PENNY_CHANNEL_ID is set — Penny AI channel explicitly configured.'   : 'Set SLACK_PENNY_CHANNEL_ID with the Penny AI channel ID from the POC.' },
+    { id:'admin-ch-id',  label:'Admin Channel ID configured',        status: liveChecks ? (hasAdminCh  ? 'pass' : 'warning')  : 'pending', detail: hasAdminCh  ? 'SLACK_ADMIN_CHANNEL_ID is set — admin/ops channel explicitly configured.'  : 'Set SLACK_ADMIN_CHANNEL_ID with the admin channel ID from the POC.' },
+    { id:'penny-access', label:'Penny AI Channel — Slack API',       status: liveChannels ? (pennyChPass ? 'pass' : pennyScopeIssue ? 'warning' : 'fail') : 'pending', detail: pennyChDetail() },
+    { id:'penny-member', label:'Bot Member of Penny AI Channel',     status: liveChannels ? (pennyMember ? 'pass' : pennyChPass ? 'warning' : pennyScopeIssue ? 'warning' : 'skip') : 'pending', detail: pennyMember ? 'Bot confirmed as member — can receive events and post.' : pennyChPass ? 'Channel accessible but bot is not yet a member. Run /invite @coachconnectbot in the Penny AI channel.' : pennyScopeIssue ? 'Cannot verify until scope is added.' : 'Blocked until channel access is resolved.' },
+    { id:'admin-access', label:'Admin Channel — Slack API',          status: liveChannels ? (adminChPass ? 'pass' : adminScopeIssue ? 'warning' : 'fail') : 'pending', detail: adminChDetail() },
+    { id:'admin-member', label:'Bot Member of Admin Channel',        status: liveChannels ? (adminMember ? 'pass' : adminChPass ? 'warning' : adminScopeIssue ? 'warning' : 'skip') : 'pending', detail: adminMember ? 'Bot confirmed as member of admin channel.' : adminChPass ? 'Channel accessible but bot not yet a member.' : adminScopeIssue ? 'Cannot verify until scope is added.' : 'Blocked until admin channel access is resolved.' },
   ];
 
+  const scopeActionNeeded = pennyScopeIssue || adminScopeIssue;
+
   const nextSteps = [
-    { step:'Set SLACK_PENNY_CHANNEL_ID',              done: hasPennyCh,   detail:'Add the Penny AI channel ID to Replit Secrets.' },
-    { step:'Set SLACK_ADMIN_CHANNEL_ID',               done: hasAdminCh,   detail:'Add the admin channel ID to Replit Secrets.' },
-    { step:'Invite Trail OS Bot to Penny AI channel',  done: pennyMember,  detail:'Run /invite @trail-os-bot in the Penny AI Slack channel.' },
-    { step:'Confirm Penny → Prompt Studio routing',    done: false,        detail:'Verify prompt templates are wired to the restored Penny AI channel.' },
-    { step:'Re-confirm Agentforce integration path',   done: false,        detail:'Confirm Agentforce (Penny–Transition Trails Assistant) targets the correct channel.' },
-    { step:'Run POC Restoration test suite end-to-end',done: false,        detail:'User mention → Penny responds → Agentforce also responds → assessment starts → Trail OS records.' },
+    { step:'Bot token valid (auth.test)',                         done: tokenValid,                  detail:'@coachconnectbot is active and authenticated.' },
+    { step:'SLACK_PENNY_CHANNEL_ID configured',                   done: hasPennyCh,                  detail:'Penny AI channel ID set in Replit Secrets.' },
+    { step:'SLACK_ADMIN_CHANNEL_ID configured',                   done: hasAdminCh,                  detail:'Admin channel ID set in Replit Secrets.' },
+    { step:'Add channels:read + groups:read scopes',              done: !scopeActionNeeded && liveChannels !== null, detail:'Required for conversations.info channel discovery. Slack App → OAuth & Permissions → Bot Token Scopes → add channels:read + groups:read → reinstall app.' },
+    { step:'Invite bot to Penny AI channel',                      done: pennyMember,                 detail:'Run /invite @coachconnectbot in the Penny AI Slack channel.' },
+    { step:'Invite bot to Admin channel',                         done: adminMember,                 detail:'Run /invite @coachconnectbot in the admin Slack channel.' },
+    { step:'Send test message to Penny AI channel',               done: false,                       detail:'Use "Test → Penny AI" button in Workspace Validation to confirm chat:write works.' },
+    { step:'Confirm Penny → Prompt Studio routing',               done: false,                       detail:'Verify assessment quiz templates are wired to the restored Penny AI channel.' },
+    { step:'Re-confirm Agentforce integration path',              done: false,                       detail:'Confirm Agentforce (Penny–Transition Trails Assistant) targets the Penny AI channel.' },
+    { step:'End-to-end: user mention → Penny + Agentforce respond', done: false,                    detail:'User @mentions Penny → Penny responds → Agentforce also responds → assessment starts → Trail OS records.' },
   ];
 
   return (
