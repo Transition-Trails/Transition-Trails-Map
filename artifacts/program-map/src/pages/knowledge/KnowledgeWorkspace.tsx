@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Brain, Network, GraduationCap } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
 import { knowledgeSources, SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, HEALTH_CONFIG, type KnowledgeSource } from '@/data/knowledgeSourceData';
+import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -132,6 +133,34 @@ function RelatedProgramsTab({ src }: { src: KnowledgeSource }) {
   );
 }
 
+function RelationshipsTabKS({ src }: { src: KnowledgeSource }) {
+  const programItems: RelatedItem[] = [
+    { id:'exp',    label:"Explorer's Trail",  statusColor:'bg-emerald-400', href:'/program' },
+    { id:'found',  label:'Foundations Trail', statusColor:'bg-emerald-400', href:'/program' },
+    { id:'guided', label:'Guided Trail',      statusColor:'bg-amber-400',   href:'/program' },
+  ];
+  const capMap: Record<string, RelatedItem[]> = {
+    'salesforce-kb':  [{ id:'rr', label:'Resume Review',  statusColor:'bg-emerald-400', href:'/penny' }, { id:'lc', label:'Learning Coach', statusColor:'bg-emerald-400', href:'/penny' }, { id:'cs', label:'Coach Support', statusColor:'bg-blue-400', href:'/penny' }],
+    'resume-guide':   [{ id:'rr', label:'Resume Review',  statusColor:'bg-emerald-400', href:'/penny' }],
+    'linkedin-guide': [{ id:'rr', label:'Resume Review',  statusColor:'bg-blue-400',   href:'/penny' }],
+  };
+  const dtItems: RelatedItem[] = [
+    { id:'dt-rel', label:'Relationship Graph',  statusColor:'bg-violet-400', href:'/knowledge/relationships' },
+    { id:'dt-kn',  label:'Knowledge Network',   statusColor:'bg-blue-400',   href:'/digital-twin/knowledge'  },
+  ];
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-5 space-y-3 max-w-3xl">
+        <p className="text-[12px] text-muted-foreground">Digital Twin relationships — programs, Penny capabilities, and graph connections for this source.</p>
+        <RelationshipCard title="Programs"          icon={GraduationCap} items={programItems}                   viewAllHref="/program"          emptyMessage="No programs linked" />
+        <RelationshipCard title="Penny Capabilities" icon={Brain}         items={capMap[(src as any).id] ?? []}  viewAllHref="/penny"            emptyMessage="No capabilities depend on this source" />
+        <RelationshipCard title="Digital Twin"       icon={Network}       items={dtItems}                        viewAllHref="/digital-twin/knowledge" />
+      </div>
+    </ScrollArea>
+  );
+}
+
 function HealthTabKS({ src }: { src: KnowledgeSource }) {
   const isActive = (src as any).syncStatus === 'Live' || (src as any).syncStatus === 'Manual';
   const rawHealth = String((src as any).health ?? 'Healthy');
@@ -194,7 +223,8 @@ export default function KnowledgeWorkspace() {
     { id:'governance', label:'Governance',   render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <GovernanceTab src={s} /> : null; } },
     { id:'programs',   label:'Programs',     render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelatedProgramsTab src={s} /> : null; } },
     { id:'penny',      label:'Penny Assets', render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <PennyAssetsTab src={s} /> : null; } },
-    { id:'health',     label:'Health',       render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <HealthTabKS src={s} /> : null; } },
+    { id:'health',         label:'Health',        render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <HealthTabKS src={s} /> : null; } },
+    { id:'relationships',  label:'Relationships', render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelationshipsTabKS src={s} /> : null; } },
   ], []);
 
   return (

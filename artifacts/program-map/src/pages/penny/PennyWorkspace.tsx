@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { Brain } from 'lucide-react';
+import { Brain, GraduationCap, BookOpen, Puzzle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
 import { pennyCapabilities as STATIC_CAPS, type PennyCapability, CAPABILITY_READINESS_CONFIG, CAPABILITY_DOMAIN_CONFIG } from '@/data/pennyCapabilityData';
+import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -217,6 +218,40 @@ function HealthTab({ cap }: { cap: PennyCapability }) {
   );
 }
 
+function RelationshipsTab({ cap }: { cap: PennyCapability }) {
+  const programMap: Record<string, RelatedItem[]> = {
+    'resume-review':     [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }],
+    'learning-coach':    [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }, { id:'guided', label:'Guided Trail', statusColor:'bg-amber-400' }],
+    'trail-quest-runner':[{ id:'guided',label:'Guided Trail',      statusColor:'bg-amber-400'   }, { id:'mastery', label:'Trail of Mastery', statusColor:'bg-amber-400' }],
+    'weekly-brief':      [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }, { id:'guided', label:'Guided Trail', statusColor:'bg-amber-400' }, { id:'mastery', label:'Trail of Mastery', statusColor:'bg-amber-400' }],
+    'intake-triage':     [{ id:'all',   label:'All Programs',      statusColor:'bg-blue-400'    }],
+    'cohort-health':     [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }],
+    'sf-intelligence':   [{ id:'all',   label:'All Programs',      statusColor:'bg-blue-400'    }],
+  };
+  const knowledgeMap: Record<string, RelatedItem[]> = {
+    'resume-review':     [{ id:'rg',  label:'Resume Writing Guide',    statusColor:'bg-emerald-400' }, { id:'ats', label:'ATS Guide', statusColor:'bg-emerald-400' }, { id:'sf-kb', label:'Salesforce KB', statusColor:'bg-blue-400' }],
+    'learning-coach':    [{ id:'sf-kb', label:'Salesforce KB',         statusColor:'bg-blue-400'   }, { id:'slo', label:'Sprint Learning Outcomes', statusColor:'bg-blue-400' }],
+    'trail-quest-runner':[{ id:'tql',   label:'Trail Quest Library',   statusColor:'bg-emerald-400' }],
+    'weekly-brief':      [{ id:'scd',   label:'Salesforce Cohort Data',statusColor:'bg-blue-400'   }, { id:'cal', label:'Sprint Calendar', statusColor:'bg-amber-400' }],
+  };
+  const integrationItems: RelatedItem[] = [
+    { id:'prompt-studio', label:'Prompt Studio',       statusColor:'bg-emerald-400', href:'/penny/prompts' },
+    { id:'cap-reg',       label:'Capability Registry', statusColor:'bg-emerald-400', href:'/penny' },
+    ...((cap.id === 'weekly-brief' || cap.id === 'learning-coach') ? [{ id:'slack', label:'Slack', statusColor:'bg-amber-400' as string }] : []),
+  ];
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-5 space-y-3 max-w-3xl">
+        <p className="text-[12px] text-muted-foreground">Digital Twin relationships — programs, knowledge sources, and integrations connected to this capability.</p>
+        <RelationshipCard title="Programs"          icon={GraduationCap} items={programMap[cap.id]  ?? []} viewAllHref="/digital-twin/penny-network" emptyMessage="No programs linked" />
+        <RelationshipCard title="Knowledge Sources" icon={BookOpen}      items={knowledgeMap[cap.id] ?? []} viewAllHref="/knowledge"                 emptyMessage="No knowledge sources linked" />
+        <RelationshipCard title="Integrations"      icon={Puzzle}        items={integrationItems}            viewAllHref="/penny/integration-layer"   emptyMessage="No integrations linked" />
+      </div>
+    </ScrollArea>
+  );
+}
+
 function InfoRowLocal({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
@@ -258,7 +293,8 @@ export default function PennyWorkspace() {
     { id:'prompts',   label:'Prompts',           render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <PromptsTab cap={cap} /> : null; } },
     { id:'sources',   label:'Knowledge Sources', render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <SourcesTab cap={cap} /> : null; } },
     { id:'quality',   label:'Quality',           render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <QualityTab cap={cap} /> : null; } },
-    { id:'health',    label:'Health',            render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <HealthTab cap={cap} /> : null; } },
+    { id:'health',         label:'Health',        render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <HealthTab cap={cap} /> : null; } },
+    { id:'relationships',  label:'Relationships', render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <RelationshipsTab cap={cap} /> : null; } },
   ], []);
 
   return (

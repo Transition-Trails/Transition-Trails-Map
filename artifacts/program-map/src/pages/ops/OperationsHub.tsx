@@ -1,4 +1,5 @@
-import { Activity, BarChart2, Puzzle, GitBranch, TrendingUp, ChevronRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Activity, BarChart2, Puzzle, GitBranch, TrendingUp, ChevronRight, AlertTriangle, CheckCircle2, Target, RefreshCw } from 'lucide-react';
+import type { ActionItem } from '@/components/workspace/ActionBar';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -247,12 +248,20 @@ function AllRecommendations() {
   );
 }
 
+const OPS_ACTIONS: ActionItem[] = [
+  { id: 'phase1',       label: 'Phase 1 Readiness',  icon: Target,     href: '/admin/phase1-readiness',  variant: 'primary'   },
+  { id: 'integrations', label: 'Integrations',        icon: Puzzle,     href: '/operations/integrations', variant: 'secondary' },
+  { id: 'recs',         label: 'Recommendations',     icon: ChevronRight, href: '/operations/recommendations', variant: 'secondary' },
+  { id: 'trends',       label: 'Trends & Insights',   icon: TrendingUp, href: '/operations/trends',       variant: 'secondary' },
+];
+
 export default function OperationsHub() {
   return (
     <HubShell
       title="Operations"
       icon={Activity}
       description="Executive health, domain indicators, integration readiness, demand pipeline, readiness scorecards, and strategic trends."
+      actions={OPS_ACTIONS}
       tabs={[
         { id: 'overview',    label: 'Executive Overview', path: '/operations',              icon: BarChart2,   content: <ExecutiveOverview /> },
         { id: 'health',      label: 'Health Indicators',  path: '/operations/health',       icon: Activity,    content: <HealthIndicators /> },

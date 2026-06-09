@@ -9,6 +9,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import Home    from "@/pages/Home";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
+import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
 
 import DigitalTwin      from "@/pages/twin/DigitalTwin";
 import OperationsHub    from "@/pages/ops/OperationsHub";
@@ -150,8 +151,9 @@ function Router() {
       <Route path="/context"              component={ContextHub} />
 
       {/* Administration */}
-      <Route path="/admin/people"         component={PeopleWorkspace} />
-      <Route path="/admin/:section"       component={Admin} />
+      <Route path="/admin/people"            component={PeopleWorkspace} />
+      <Route path="/admin/phase1-readiness"  component={Phase1ReadinessDashboard} />
+      <Route path="/admin/:section"          component={Admin} />
       <Route path="/admin"                component={Admin} />
 
       <Route component={NotFound} />

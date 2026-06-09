@@ -1,11 +1,12 @@
-import { GraduationCap, LayoutGrid, Star, Database, FolderOpen, Activity, GitBranch, Network } from 'lucide-react';
+import { GraduationCap, LayoutGrid, Star, Database, FolderOpen, Activity, GitBranch, Network, CheckSquare } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
-import ProgramWorkspace  from '@/pages/program/ProgramWorkspace';
-import StandardsStudio   from '@/pages/curriculum/StandardsStudio';
-import ProgramBlueprint  from '@/pages/curriculum/ProgramBlueprint';
-import SalesforceMapping from '@/pages/curriculum/SalesforceMapping';
-import ProgramResources  from '@/pages/admin/ProgramResources';
+import ProgramWorkspace         from '@/pages/program/ProgramWorkspace';
+import StandardsStudio          from '@/pages/curriculum/StandardsStudio';
+import ProgramBlueprint         from '@/pages/curriculum/ProgramBlueprint';
+import SalesforceMapping        from '@/pages/curriculum/SalesforceMapping';
+import SalesforceValidationCenter from '@/pages/curriculum/SalesforceValidationCenter';
+import ProgramResources         from '@/pages/admin/ProgramResources';
 
 const HUB_ACTIONS: ActionItem[] = [
   { id: 'health',        label: 'Run Health Check',   icon: Activity,  href: '/operations/health',            variant: 'secondary' },
@@ -26,7 +27,8 @@ export default function ProgramHub() {
         { id: 'standards',  label: 'Standards',       path: '/program/standards',  icon: Star,       content: <StandardsStudio /> },
         { id: 'blueprint',  label: 'Blueprint',       path: '/program/blueprint',  icon: LayoutGrid, content: <ProgramBlueprint /> },
         { id: 'salesforce', label: 'Salesforce Arch', path: '/program/salesforce', icon: Database,   content: <SalesforceMapping /> },
-        { id: 'resources',  label: 'Resources',       path: '/program/resources',  icon: FolderOpen, content: <ProgramResources /> },
+        { id: 'sf-validation',label: 'SF Validation',  path: '/program/sf-validation',icon: CheckSquare, content: <SalesforceValidationCenter /> },
+        { id: 'resources',    label: 'Resources',      path: '/program/resources',    icon: FolderOpen,  content: <ProgramResources /> },
       ]}
     />
   );

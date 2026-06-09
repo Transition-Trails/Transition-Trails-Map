@@ -3,3 +3,5 @@
 - [Sidebar nav structure](sidebar-nav.md) — 7 groups + Home/Search/Context; UOM+Governance merged into Digital Twin via extraPrefixes[]; no separate UOM/Governance nav groups.
 - [Lens system](lens-system.md) — 2 lenses only: executive (amber) + builder (sky); always-visible pill toggle in Topbar; activeLens in AppContext as string default 'executive'.
 - [ContextBar always-visible](contextbar.md) — ContextBar is always mounted (32px no-context state + 40px active state); never returns null; uses EXAMPLE_CONTEXTS for switcher fallback.
+- [Phase 1 readiness pages](phase1-readiness.md) — Phase1ReadinessDashboard at /admin/phase1-readiness; SalesforceValidationCenter as tab in ProgramHub (/program/sf-validation); PennyIntegrationLayer as tab in PennyHub (/penny/integration-layer). All standalone components, no separate data files.
+- [RelationshipCard in workspaces](relationship-cards.md) — RelationshipCard embedded as "Relationships" tab in PennyWorkspace and KnowledgeWorkspace per-object detail views; shows programs, knowledge sources, and integrations with statusColor dots.

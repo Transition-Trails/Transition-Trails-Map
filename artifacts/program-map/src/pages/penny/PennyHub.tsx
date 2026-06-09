@@ -1,13 +1,14 @@
-import { Brain, Layers, MessageSquare, Users, BarChart2, Activity, Map, FlaskConical, GitBranch, Target } from 'lucide-react';
+import { Brain, Layers, MessageSquare, Users, BarChart2, Activity, Map, FlaskConical, GitBranch, Puzzle } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
-import PennyWorkspace    from '@/pages/penny/PennyWorkspace';
-import PennyPromptStudio from '@/pages/penny/PennyPromptStudio';
-import Learners          from '@/pages/penny/Learners';
-import Intelligence      from '@/pages/penny/Intelligence';
-import TrailOSPenny      from '@/pages/TrailOSPenny';
-import PennyHealth       from '@/pages/operations/PennyHealth';
-import TestPenny         from '@/pages/penny/TestPenny';
+import PennyWorkspace        from '@/pages/penny/PennyWorkspace';
+import PennyPromptStudio     from '@/pages/penny/PennyPromptStudio';
+import Learners              from '@/pages/penny/Learners';
+import Intelligence          from '@/pages/penny/Intelligence';
+import TrailOSPenny          from '@/pages/TrailOSPenny';
+import PennyHealth           from '@/pages/operations/PennyHealth';
+import TestPenny             from '@/pages/penny/TestPenny';
+import PennyIntegrationLayer from '@/pages/penny/PennyIntegrationLayer';
 
 const HUB_ACTIONS: ActionItem[] = [
   { id: 'test',          label: 'Test Penny',         icon: FlaskConical, href: '/penny/test',          variant: 'primary'   },
@@ -31,7 +32,8 @@ export default function PennyHub() {
         { id: 'intelligence', label: 'Intelligence',  path: '/penny/intelligence',  icon: BarChart2,     content: <Intelligence /> },
         { id: 'trail-os-map', label: 'Trail OS Map',  path: '/penny/trail-os-map',  icon: Map,           content: <TrailOSPenny /> },
         { id: 'health',       label: 'Health',        path: '/penny/health',        icon: Activity,      content: <PennyHealth /> },
-        { id: 'test',         label: 'Test Penny',    path: '/penny/test',          icon: FlaskConical,  content: <TestPenny /> },
+        { id: 'test',             label: 'Test Penny',       path: '/penny/test',             icon: FlaskConical,  content: <TestPenny /> },
+        { id: 'integration-layer',label: 'POC Integrations', path: '/penny/integration-layer',icon: Puzzle,        content: <PennyIntegrationLayer /> },
       ]}
     />
   );
