@@ -3,8 +3,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Key, RefreshCw, CheckCircle, XCircle, AlertTriangle, Shield,
   ChevronDown, ChevronRight, ExternalLink, Zap, Brain, Globe,
-  Lock, Wifi, WifiOff,
+  Lock, Wifi, WifiOff, ArrowRight,
 } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 // ── Types — Audit ─────────────────────────────────────────────────────────────
 
@@ -385,6 +386,7 @@ function IntegrationGroup({ summary, entries }: { summary: IntegrationSummary; e
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function IntegrationSecretsAudit() {
+  const [, navigate] = useLocation();
   const [auditData, setAuditData]   = useState<AuditResponse | null>(null);
   const [auditLoading, setAuditLoading] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
@@ -566,28 +568,49 @@ export default function IntegrationSecretsAudit() {
                 </div>
               )}
 
-              {/* Google refresh token note */}
-              {auditData.entries.some(e => (e.id === 'google-drive-refresh' || e.id === 'google-cal-refresh') && e.status === 'missing') && (
-                <div className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-3">
-                  <div className="flex items-start gap-2">
-                    <Key className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-[11px] font-bold text-sky-800 mb-1">Google OAuth — Complete the Authorization Flow</p>
-                      <p className="text-[12px] text-sky-900 leading-relaxed mb-2">
-                        <strong>GOOGLE_CLIENT_ID</strong> and <strong>GOOGLE_CLIENT_SECRET</strong> are both configured and verified.
-                        The remaining step is running the OAuth authorization flow to obtain refresh tokens for Drive and Calendar.
+              {/* Google OAuth action card */}
+              {auditData.entries.some(e => e.integration.startsWith('Google') && e.status === 'missing') && (
+                <div className="rounded-lg border border-sky-300 bg-sky-50 px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <Globe className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 flex-wrap mb-2">
+                        <p className="text-[12px] font-bold text-sky-800">Google OAuth — Authorization Flow Available</p>
+                        {auditData.entries.filter(e => e.integration === 'Google' && e.status !== 'missing').length >= 2 && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold border border-emerald-300 bg-emerald-50 text-emerald-700">
+                            <CheckCircle className="w-3 h-3" /> Client credentials ready
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[12px] text-sky-900 leading-relaxed mb-3">
+                        GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are configured. The built-in OAuth flow will authorize Drive and Calendar together,
+                        display the refresh token once for copying into Replit Secrets, and guide you through every step.
                       </p>
-                      <ul className="text-[11px] text-sky-800 space-y-0.5 ml-3 list-disc mb-2">
-                        <li>Use the Google OAuth Playground or your app's OAuth flow to authorize with <code className="font-mono">drive.readonly drive.file calendar.readonly calendar.events</code> scopes</li>
-                        <li>Store the resulting refresh token as <code className="font-mono">GOOGLE_DRIVE_REFRESH_TOKEN</code> and <code className="font-mono">GOOGLE_CALENDAR_REFRESH_TOKEN</code></li>
-                        <li>Restart the API server after adding the new secrets</li>
-                      </ul>
-                      <a href="https://developers.google.com/oauthplayground" target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 hover:text-sky-900">
-                        Google OAuth Playground <ExternalLink className="w-3 h-3" />
-                      </a>
+                      <button
+                        onClick={() => navigate('/admin/google-oauth')}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-bold bg-sky-600 text-white hover:bg-sky-700 transition-colors"
+                      >
+                        <Lock className="w-3.5 h-3.5" />
+                        Open Google Authorization Flow
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Already authorized confirmation */}
+              {auditData.entries.filter(e => (e.id === 'google-drive-refresh' || e.id === 'google-cal-refresh') && e.status !== 'missing').length === 2 && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-[12px] font-bold text-emerald-800">Google Drive + Calendar: Refresh tokens configured</p>
+                    <p className="text-[11px] text-emerald-700 mt-0.5">Run Live Checks above to confirm the tokens are valid and API-ready.</p>
+                  </div>
+                  <button onClick={() => navigate('/admin/google-oauth')}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-emerald-300 bg-white text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50">
+                    Re-authorize <ArrowRight className="w-3 h-3" />
+                  </button>
                 </div>
               )}
             </>

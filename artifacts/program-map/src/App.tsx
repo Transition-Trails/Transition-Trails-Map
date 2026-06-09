@@ -11,6 +11,7 @@ import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
 import IntegrationSecretsAudit  from "@/pages/admin/IntegrationSecretsAudit";
+import GoogleOAuthFlow           from "@/pages/admin/GoogleOAuthFlow";
 
 import DigitalTwin      from "@/pages/twin/DigitalTwin";
 import OperationsHub    from "@/pages/ops/OperationsHub";
@@ -155,6 +156,7 @@ function Router() {
       <Route path="/admin/people"            component={PeopleWorkspace} />
       <Route path="/admin/phase1-readiness"  component={Phase1ReadinessDashboard} />
       <Route path="/admin/secrets-audit"     component={IntegrationSecretsAudit} />
+      <Route path="/admin/google-oauth"      component={GoogleOAuthFlow} />
       <Route path="/admin/:section"          component={Admin} />
       <Route path="/admin"                component={Admin} />
 
