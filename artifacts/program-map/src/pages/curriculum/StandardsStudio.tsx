@@ -272,8 +272,9 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
                 quality criteria, and how Penny uses it.
               </p>
               <p className="text-[12px] text-foreground/80 leading-relaxed">
-                The <strong>Foundations Trail</strong> is the canonical implementation of all standards. When building new programs,
-                these standards ensure Penny can serve every learner with the same quality of coaching, regardless of which program they're in.
+                The <strong>Program Blueprint</strong> is the design standard — it defines what every program <em>should</em> contain.
+                <strong> Foundations Trail</strong> is the reference implementation — the first program fully built to this standard, showing what <em>does</em> exist.
+                These standards ensure Penny can serve every learner with consistent coaching quality across all programs.
               </p>
             </div>
           </div>
@@ -302,7 +303,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
             {[
               { step: '1', title: 'Author creates content', desc: 'Curriculum authors use the required fields list as a checklist while writing modules, lessons, prompts, or delivery assets.' },
               { step: '2', title: 'Penny audits with checklist', desc: 'Before publishing, Penny runs the Standards Checklist against each content object — flagging missing fields and quality issues.' },
-              { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps across Foundations Trail, sorted by severity, so teams can prioritize fixes.' },
+              { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps in the reference implementation and all programs, sorted by severity, so teams can prioritise fixes before the next cohort.' },
             ].map(s => (
               <div key={s.step} className="rounded-lg border border-border bg-white p-3">
                 <div className="w-6 h-6 rounded-full bg-foreground text-background text-[11px] font-bold flex items-center justify-center mb-2">{s.step}</div>
@@ -365,7 +366,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           >
             <AlertTriangle className="w-5 h-5 text-rose-600 mb-2" />
             <p className="text-[12px] font-bold text-foreground mb-1">Gap Report</p>
-            <p className="text-[11px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps in Foundations Trail require attention.</p>
+            <p className="text-[11px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps across all programs require attention before the next cohort.</p>
           </button>
         </div>
 

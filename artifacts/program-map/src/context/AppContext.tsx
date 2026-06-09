@@ -12,7 +12,10 @@ export type SelectedItemType =
   | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'document'
   | 'commProvider' | 'commRoute' | 'commTemplate'
   | 'commChannel' | 'commBroadcast' | 'commWeeklyBrief' | 'commNotification' | 'commCalendar'
-  | 'curriculumItem' | 'pennyAction' | 'sfMapping' | 'programResource' | 'contentStandard' | 'pennyCapability';
+  | 'curriculumItem' | 'pennyAction' | 'sfMapping' | 'programResource' | 'contentStandard' | 'pennyCapability' | 'knowledgeSource'
+  | 'promptTemplate' | 'integration'
+  | 'persona' | 'role' | 'roleBlueprint' | 'roleParticipation'
+  | 'healthIndicator' | 'oicRecommendation' | 'trendInsight' | 'twinNode';
 
 interface AppState {
   activePage: string;

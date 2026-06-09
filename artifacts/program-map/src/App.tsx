@@ -6,94 +6,24 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
 
-import Home          from "@/pages/Home";
-import ProgramMap    from "@/pages/ProgramMap";
-import ResolveDemand from "@/pages/ResolveDemand";
-import TrailOSPenny  from "@/pages/TrailOSPenny";
-import Admin         from "@/pages/Admin";
-import NotFound      from "@/pages/not-found";
+import Home    from "@/pages/Home";
+import Admin   from "@/pages/Admin";
+import NotFound from "@/pages/not-found";
 
-import Roles                   from "@/pages/navigator/Roles";
-import KnowledgeRelationships  from "@/pages/navigator/KnowledgeRelationships";
-
-import ProgramHealth    from "@/pages/operations/ProgramHealth";
-import SalesforceHealth from "@/pages/operations/SalesforceHealth";
-import AutomationHealth from "@/pages/operations/AutomationHealth";
-import WebsiteMarketing from "@/pages/operations/WebsiteMarketing";
-import PennyHealth      from "@/pages/operations/PennyHealth";
-import TrailOsHealth    from "@/pages/operations/TrailOsHealth";
-
-import Intake         from "@/pages/demand/Intake";
-import DemandCases    from "@/pages/demand/Cases";
-import Epics          from "@/pages/demand/Epics";
-import Features       from "@/pages/demand/Features";
-import Stories        from "@/pages/demand/Stories";
-import Roadmap        from "@/pages/demand/Roadmap";
-import ChangeRequest  from "@/pages/demand/ChangeRequest";
-
-import Learners        from "@/pages/penny/Learners";
-import PennyLogs       from "@/pages/penny/PennyLogs";
-import TrailQuests     from "@/pages/penny/TrailQuests";
-import Assessments     from "@/pages/penny/Assessments";
-import Intelligence    from "@/pages/penny/Intelligence";
-import TestPenny       from "@/pages/penny/TestPenny";
-import ResponseQuality from "@/pages/penny/ResponseQuality";
-import PromptLibrary   from "@/pages/penny/PromptLibrary";
-import PennyIntegrations from "@/pages/penny/PennyIntegrations";
-
-import CommOverview        from "@/pages/communications/CommOverview";
-import CommProviders       from "@/pages/communications/CommProviders";
-import CommChannels        from "@/pages/communications/CommChannels";
-import PennyBroadcasts     from "@/pages/communications/PennyBroadcasts";
-import WeeklyBriefs        from "@/pages/communications/WeeklyBriefs";
-import CommCalendar         from "@/pages/communications/CommCalendar";
-import CommNotifications   from "@/pages/communications/CommNotifications";
-import CommMessageTemplates from "@/pages/communications/MessageTemplates";
-
-import CurriculumOverview     from "@/pages/curriculum/CurriculumOverview";
-import CurriculumPrograms     from "@/pages/curriculum/CurriculumPrograms";
-import CurriculumCohorts      from "@/pages/curriculum/CurriculumCohorts";
-import CurriculumSprints      from "@/pages/curriculum/CurriculumSprints";
-import CurriculumModules      from "@/pages/curriculum/CurriculumModules";
-import LearningLessons        from "@/pages/curriculum/LearningLessons";
-import LearningAssessments    from "@/pages/curriculum/LearningAssessments";
-import LearningResources      from "@/pages/curriculum/LearningResources";
-import KnowledgeArticles      from "@/pages/curriculum/KnowledgeArticles";
-import PennyCoachingPrompts   from "@/pages/curriculum/PennyCoachingPrompts";
-import PennyReflectionPrompts from "@/pages/curriculum/PennyReflectionPrompts";
-import PennyTrailQuestsCurr   from "@/pages/curriculum/PennyTrailQuests";
-import PennyWeeklyReviews     from "@/pages/curriculum/PennyWeeklyReviews";
-import PennyContentAssistant  from "@/pages/curriculum/PennyContentAssistant";
-import PennyActionLibrary     from "@/pages/curriculum/PennyActionLibrary";
-import ConsistencyReview      from "@/pages/curriculum/ConsistencyReview";
-import PennyGeneratedOutputs  from "@/pages/curriculum/PennyGeneratedOutputs";
-import DeliverySlackActivities from "@/pages/curriculum/DeliverySlackActivities";
-import DeliveryGoogleChat     from "@/pages/curriculum/DeliveryGoogleChat";
-import DeliveryCalendarEvents from "@/pages/curriculum/DeliveryCalendarEvents";
-import DeliveryOfficeHours    from "@/pages/curriculum/DeliveryOfficeHours";
-import ContentHealth          from "@/pages/curriculum/ContentHealth";
-import ProgramBlueprint       from "@/pages/curriculum/ProgramBlueprint";
-import SalesforceMapping      from "@/pages/curriculum/SalesforceMapping";
-import StandardsStudio        from "@/pages/curriculum/StandardsStudio";
-import ProgramCapabilityRegistry from "@/pages/penny/PennyCapabilityRegistry";
-import ProgramResources       from "@/pages/admin/ProgramResources";
-
-import LibraryDocuments from "@/pages/library/LibraryDocuments";
-import Templates        from "@/pages/library/Templates";
-
-import CommunicationChannels     from "@/pages/admin/CommunicationChannels";
-import CommunicationRouting      from "@/pages/admin/CommunicationRouting";
-import AdminMessageTemplates     from "@/pages/admin/MessageTemplates";
-import OperationsCommunications from "@/pages/operations/Communications";
-import SalesforceKB     from "@/pages/library/SalesforceKB";
-import SourceMapping    from "@/pages/library/SourceMapping";
-import LibrarySearch    from "@/pages/library/LibrarySearch";
+import DigitalTwin      from "@/pages/twin/DigitalTwin";
+import OperationsHub    from "@/pages/ops/OperationsHub";
+import ProgramHub       from "@/pages/program/ProgramHub";
+import PennyHub         from "@/pages/penny/PennyHub";
+import KnowledgeHub     from "@/pages/knowledge/KnowledgeHub";
+import CollaborationHub from "@/pages/collaboration/CollaborationHub";
+import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
+import UnifiedObjectModel from "@/pages/uom/UnifiedObjectModel";
 
 const queryClient = new QueryClient();
 
 function Redirect({ to }: { to: string }) {
   const [, setLocation] = useLocation();
-  useEffect(() => { setLocation(to); }, []);
+  useEffect(() => { setLocation(to); }, [to]);
   return null;
 }
 
@@ -102,90 +32,113 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
 
-      <Route path="/trail-os-penny"><Redirect to="/navigator/trail-os-map" /></Route>
-      <Route path="/resolve-demand"><Redirect to="/navigator/resolve" /></Route>
-      <Route path="/source-docs"><Redirect to="/library/documents" /></Route>
+      {/* ── Redirects (must precede hub wildcard routes) ── */}
 
-      <Route path="/navigator/program-map"            component={ProgramMap} />
-      <Route path="/navigator/resolve"                component={ResolveDemand} />
-      <Route path="/navigator/roles"                  component={Roles} />
-      <Route path="/navigator/trail-os-map"           component={TrailOSPenny} />
-      <Route path="/navigator/knowledge-relationships" component={KnowledgeRelationships} />
+      {/* Navigator → workspaces */}
+      <Route path="/navigator/program-map">              <Redirect to="/program" /></Route>
+      <Route path="/navigator/resolve">                  <Redirect to="/operations/demand" /></Route>
+      <Route path="/navigator/roles">                    <Redirect to="/digital-twin/people" /></Route>
+      <Route path="/navigator/trail-os-map">             <Redirect to="/penny/trail-os-map" /></Route>
+      <Route path="/navigator/knowledge-relationships">  <Redirect to="/knowledge/relationships" /></Route>
 
-      <Route path="/operations/program-health"    component={ProgramHealth} />
-      <Route path="/operations/salesforce-health" component={SalesforceHealth} />
-      <Route path="/operations/automation-health" component={AutomationHealth} />
-      <Route path="/operations/website-marketing" component={WebsiteMarketing} />
-      <Route path="/operations/penny-health"      component={PennyHealth} />
-      <Route path="/operations/trail-os-health"   component={TrailOsHealth} />
-      <Route path="/operations/communications"    component={OperationsCommunications} />
+      {/* Old operations sub-pages */}
+      <Route path="/operations/program-health">    <Redirect to="/operations/health" /></Route>
+      <Route path="/operations/salesforce-health"> <Redirect to="/operations/health" /></Route>
+      <Route path="/operations/automation-health"> <Redirect to="/operations/health" /></Route>
+      <Route path="/operations/website-marketing"> <Redirect to="/operations/health" /></Route>
+      <Route path="/operations/penny-health">      <Redirect to="/penny/health" /></Route>
+      <Route path="/operations/trail-os-health">   <Redirect to="/operations/health" /></Route>
+      <Route path="/operations/communications">    <Redirect to="/collaboration" /></Route>
 
-      <Route path="/demand/intake"         component={Intake} />
-      <Route path="/demand/cases"          component={DemandCases} />
-      <Route path="/demand/epics"          component={Epics} />
-      <Route path="/demand/features"       component={Features} />
-      <Route path="/demand/stories"        component={Stories} />
-      <Route path="/demand/roadmap"        component={Roadmap} />
-      <Route path="/demand/change-request" component={ChangeRequest} />
+      {/* Demand → operations demand tab */}
+      <Route path="/demand/intake">          <Redirect to="/operations/demand" /></Route>
+      <Route path="/demand/cases">           <Redirect to="/operations/demand" /></Route>
+      <Route path="/demand/epics">           <Redirect to="/operations/demand" /></Route>
+      <Route path="/demand/features">        <Redirect to="/operations/demand" /></Route>
+      <Route path="/demand/stories">         <Redirect to="/operations/demand" /></Route>
+      <Route path="/demand/roadmap">         <Redirect to="/operations/demand" /></Route>
+      <Route path="/demand/change-request">  <Redirect to="/operations/demand" /></Route>
+      <Route path="/demand">                 <Redirect to="/operations/demand" /></Route>
 
-      <Route path="/penny/capability-registry" component={ProgramCapabilityRegistry} />
-      <Route path="/penny/learners"           component={Learners} />
-      <Route path="/penny/logs"             component={PennyLogs} />
-      <Route path="/penny/trail-quests"     component={TrailQuests} />
-      <Route path="/penny/assessments"      component={Assessments} />
-      <Route path="/penny/intelligence"     component={Intelligence} />
-      <Route path="/penny/test-penny"       component={TestPenny} />
-      <Route path="/penny/response-quality" component={ResponseQuality} />
-      <Route path="/penny/prompt-library"   component={PromptLibrary} />
-      <Route path="/penny/integrations"     component={PennyIntegrations} />
+      {/* Old Penny paths → penny hub tabs */}
+      <Route path="/penny/capability-registry"> <Redirect to="/penny" /></Route>
+      <Route path="/penny/prompt-studio">       <Redirect to="/penny/prompts" /></Route>
+      <Route path="/penny/test-penny">          <Redirect to="/penny/test" /></Route>
+      <Route path="/penny/prompt-library">      <Redirect to="/penny/prompts" /></Route>
+      <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
+      <Route path="/penny/integrations">        <Redirect to="/operations/integrations" /></Route>
+      <Route path="/penny/trail-quests">        <Redirect to="/penny" /></Route>
+      <Route path="/penny/assessments">         <Redirect to="/penny/learners" /></Route>
+      <Route path="/penny/logs">                <Redirect to="/penny/learners" /></Route>
 
-      <Route path="/communications/overview"          component={CommOverview} />
-      <Route path="/communications/providers"         component={CommProviders} />
-      <Route path="/communications/channels"          component={CommChannels} />
-      <Route path="/communications/calendar"          component={CommCalendar} />
-      <Route path="/communications/penny-broadcasts"  component={PennyBroadcasts} />
-      <Route path="/communications/weekly-briefs"     component={WeeklyBriefs} />
-      <Route path="/communications/notifications"     component={CommNotifications} />
-      <Route path="/communications/message-templates" component={CommMessageTemplates} />
+      {/* Communications → collaboration */}
+      <Route path="/communications/overview">          <Redirect to="/collaboration" /></Route>
+      <Route path="/communications/providers">         <Redirect to="/collaboration" /></Route>
+      <Route path="/communications/channels">          <Redirect to="/collaboration/channels" /></Route>
+      <Route path="/communications/calendar">          <Redirect to="/collaboration/calendar" /></Route>
+      <Route path="/communications/penny-broadcasts">  <Redirect to="/collaboration/channels" /></Route>
+      <Route path="/communications/weekly-briefs">     <Redirect to="/collaboration/briefs" /></Route>
+      <Route path="/communications/notifications">     <Redirect to="/collaboration/notifications" /></Route>
+      <Route path="/communications/message-templates"> <Redirect to="/collaboration/templates" /></Route>
+      <Route path="/communications">                   <Redirect to="/collaboration" /></Route>
 
-      <Route path="/curriculum/overview"            component={CurriculumOverview} />
-      <Route path="/curriculum/programs"            component={CurriculumPrograms} />
-      <Route path="/curriculum/cohorts"             component={CurriculumCohorts} />
-      <Route path="/curriculum/sprints"             component={CurriculumSprints} />
-      <Route path="/curriculum/modules"             component={CurriculumModules} />
-      <Route path="/curriculum/lessons"             component={LearningLessons} />
-      <Route path="/curriculum/assessments"         component={LearningAssessments} />
-      <Route path="/curriculum/resources"           component={LearningResources} />
-      <Route path="/curriculum/knowledge-articles"  component={KnowledgeArticles} />
-      <Route path="/curriculum/coaching-prompts"    component={PennyCoachingPrompts} />
-      <Route path="/curriculum/reflection-prompts"  component={PennyReflectionPrompts} />
-      <Route path="/curriculum/trail-quests"        component={PennyTrailQuestsCurr} />
-      <Route path="/curriculum/weekly-reviews"      component={PennyWeeklyReviews} />
-      <Route path="/curriculum/penny-assistant"     component={PennyContentAssistant} />
-      <Route path="/curriculum/penny-actions"       component={PennyActionLibrary} />
-      <Route path="/curriculum/consistency-review"  component={ConsistencyReview} />
-      <Route path="/curriculum/generated-outputs"   component={PennyGeneratedOutputs} />
-      <Route path="/curriculum/slack-activities"    component={DeliverySlackActivities} />
-      <Route path="/curriculum/google-chat"         component={DeliveryGoogleChat} />
-      <Route path="/curriculum/calendar-events"     component={DeliveryCalendarEvents} />
-      <Route path="/curriculum/office-hours"        component={DeliveryOfficeHours} />
-      <Route path="/curriculum/content-health"      component={ContentHealth} />
-      <Route path="/curriculum/blueprint"           component={ProgramBlueprint} />
-      <Route path="/curriculum/salesforce-mapping"  component={SalesforceMapping} />
-      <Route path="/curriculum/standards"           component={StandardsStudio} />
+      {/* Curriculum → program hub */}
+      <Route path="/curriculum/blueprint">           <Redirect to="/program/blueprint" /></Route>
+      <Route path="/curriculum/standards">           <Redirect to="/program/standards" /></Route>
+      <Route path="/curriculum/salesforce-mapping">  <Redirect to="/program/salesforce" /></Route>
+      <Route path="/curriculum/overview">            <Redirect to="/program/curriculum" /></Route>
+      <Route path="/curriculum/programs">            <Redirect to="/program/programs" /></Route>
+      <Route path="/curriculum/:sub">                <Redirect to="/program/curriculum" /></Route>
+      <Route path="/curriculum">                     <Redirect to="/program/curriculum" /></Route>
 
-      <Route path="/library/documents"     component={LibraryDocuments} />
-      <Route path="/library/templates"     component={Templates} />
-      <Route path="/library/salesforce-kb" component={SalesforceKB} />
-      <Route path="/library/source-mapping" component={SourceMapping} />
-      <Route path="/library/search"        component={LibrarySearch} />
+      {/* Library → knowledge hub */}
+      <Route path="/library/knowledge-sources"> <Redirect to="/knowledge" /></Route>
+      <Route path="/library/documents">         <Redirect to="/knowledge/library" /></Route>
+      <Route path="/library/templates">         <Redirect to="/knowledge/library" /></Route>
+      <Route path="/library/salesforce-kb">     <Redirect to="/knowledge/library" /></Route>
+      <Route path="/library/source-mapping">    <Redirect to="/knowledge/relationships" /></Route>
+      <Route path="/library/search">            <Redirect to="/knowledge/search" /></Route>
+      <Route path="/library/:sub">              <Redirect to="/knowledge/library" /></Route>
+      <Route path="/library">                   <Redirect to="/knowledge" /></Route>
 
-      <Route path="/admin/program-resources" component={ProgramResources} />
-      <Route path="/admin/comm-channels"  component={CommunicationChannels} />
-      <Route path="/admin/comm-routing"   component={CommunicationRouting} />
-      <Route path="/admin/comm-templates" component={AdminMessageTemplates} />
-      <Route path="/admin/:section" component={Admin} />
-      <Route path="/admin"          component={Admin} />
+      {/* Old admin sub-pages */}
+      <Route path="/admin/integration-readiness"> <Redirect to="/operations/integrations" /></Route>
+      <Route path="/admin/comm-channels">         <Redirect to="/collaboration/channels" /></Route>
+      <Route path="/admin/comm-routing">          <Redirect to="/collaboration/channels" /></Route>
+      <Route path="/admin/comm-templates">        <Redirect to="/collaboration/templates" /></Route>
+      <Route path="/admin/program-resources">     <Redirect to="/program/resources" /></Route>
+
+      {/* Root-level legacy aliases */}
+      <Route path="/trail-os-penny">  <Redirect to="/penny/trail-os-map" /></Route>
+      <Route path="/resolve-demand">  <Redirect to="/operations/demand" /></Route>
+      <Route path="/source-docs">     <Redirect to="/knowledge/library" /></Route>
+
+      {/* ── Hub routes ── */}
+      <Route path="/uom/:tab"             component={UnifiedObjectModel} />
+      <Route path="/uom"                  component={UnifiedObjectModel} />
+
+      <Route path="/digital-twin/:tab"    component={DigitalTwin} />
+      <Route path="/digital-twin"         component={DigitalTwin} />
+
+      <Route path="/operations/:tab"      component={OperationsHub} />
+      <Route path="/operations"           component={OperationsHub} />
+
+      <Route path="/program/:tab"         component={ProgramHub} />
+      <Route path="/program"              component={ProgramHub} />
+
+      <Route path="/penny/:tab"           component={PennyHub} />
+      <Route path="/penny"                component={PennyHub} />
+
+      <Route path="/knowledge/:tab"       component={KnowledgeHub} />
+      <Route path="/knowledge"            component={KnowledgeHub} />
+
+      <Route path="/collaboration/:tab"   component={CollaborationHub} />
+      <Route path="/collaboration"        component={CollaborationHub} />
+
+      {/* Administration */}
+      <Route path="/admin/people"         component={PeopleRolesStudio} />
+      <Route path="/admin/:section"       component={Admin} />
+      <Route path="/admin"                component={Admin} />
 
       <Route component={NotFound} />
     </Switch>

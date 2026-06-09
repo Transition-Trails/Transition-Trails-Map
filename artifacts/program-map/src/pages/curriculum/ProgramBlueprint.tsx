@@ -126,11 +126,11 @@ export default function ProgramBlueprint() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Program Blueprint</p>
-            <h1 className="text-3xl font-serif font-bold text-foreground">Program Blueprint</h1>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Program Canvas</p>
+            <h1 className="text-3xl font-serif font-bold text-foreground">Program Canvas</h1>
             <p className="text-[13px] text-muted-foreground mt-1">
-              The complete relationship chain for a program — from structure to delivery assets to Salesforce records.
-              {isFoundations && <span className="ml-1 text-primary font-medium">Foundations Trail is the canonical reference example.</span>}
+              What actually exists in each program — structure, assets, Salesforce records, and delivery content.
+              {isFoundations && <span className="ml-1 text-primary font-medium">Foundations Trail is the reference implementation of the Program Blueprint standard.</span>}
             </p>
           </div>
 
@@ -149,6 +149,16 @@ export default function ProgramBlueprint() {
           </div>
         </div>
 
+        {/* Blueprint vs program helper */}
+        <div className="rounded-lg border border-border bg-muted/30 px-4 py-2.5 flex items-start gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 mt-1.5 shrink-0" />
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <span className="font-semibold text-foreground">This is what exists.</span>{' '}
+            The <span className="font-semibold text-foreground">Program Blueprint</span> standard in Standards Studio defines what every program should contain.
+            This canvas shows what has actually been built for the selected program.
+          </p>
+        </div>
+
         {/* Program header card */}
         <button
           onClick={() => selectItem(program)}
@@ -157,7 +167,7 @@ export default function ProgramBlueprint() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                {isFoundations && <span className="text-[10px] font-bold text-primary border border-primary/20 bg-white rounded-full px-2 py-0.5">★ Canonical Example</span>}
+                {isFoundations && <span className="text-[10px] font-bold text-primary border border-primary/20 bg-white rounded-full px-2 py-0.5">★ Reference Implementation</span>}
                 <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${CONTENT_STATUS_CONFIG[program.status].cls}`}>
                   {CONTENT_STATUS_CONFIG[program.status].label}
                 </span>

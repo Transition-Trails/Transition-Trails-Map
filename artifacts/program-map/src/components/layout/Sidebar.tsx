@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Home, Map, Activity, Inbox, Brain, BookOpen, Settings, ChevronDown, MessageSquare, GraduationCap,
+  Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings, ChevronDown, Layers,
 } from 'lucide-react';
 
 type NavItem  = { path: string; label: string; isLabel?: false } | { label: string; isLabel: true };
@@ -15,133 +15,104 @@ type NavGroup = {
 
 const navGroups: NavGroup[] = [
   {
-    id: 'navigator',
-    label: 'Navigator',
-    icon: Map,
-    pathPrefix: '/navigator',
+    id: 'digital-twin',
+    label: 'Digital Twin',
+    icon: Network,
+    pathPrefix: '/digital-twin',
     items: [
-      { path: '/navigator/program-map',             label: 'Program Map' },
-      { path: '/navigator/resolve',                  label: 'RESOLVE' },
-      { path: '/navigator/roles',                    label: 'Roles' },
-      { path: '/navigator/trail-os-map',             label: 'Trail OS Capability Map' },
-      { path: '/navigator/knowledge-relationships',  label: 'Knowledge Relationships' },
+      { path: '/digital-twin',               label: 'Overview' },
+      { path: '/digital-twin/org-graph',     label: 'Org Graph' },
+      { path: '/digital-twin/programs',      label: 'Program Network' },
+      { path: '/digital-twin/knowledge',     label: 'Knowledge Network' },
+      { path: '/digital-twin/people',        label: 'People & Roles' },
+      { path: '/digital-twin/relationships', label: 'Relationships' },
+      { path: '/digital-twin/impact',        label: 'Impact Analysis' },
+    ],
+  },
+  {
+    id: 'uom',
+    label: 'Unified Object Model',
+    icon: Layers,
+    pathPrefix: '/uom',
+    items: [
+      { path: '/uom',             label: 'Architecture' },
+      { path: '/uom/catalog',     label: 'Object Catalog' },
+      { path: '/uom/matrix',      label: 'Relationship Matrix' },
+      { path: '/uom/sources',     label: 'Source of Truth' },
+      { path: '/uom/governance',  label: 'Governance' },
+      { path: '/uom/explorer',    label: 'Object Explorer' },
     ],
   },
   {
     id: 'operations',
-    label: 'Operations Center',
+    label: 'Operations',
     icon: Activity,
     pathPrefix: '/operations',
     items: [
-      { path: '/operations/program-health',    label: 'Program Health' },
-      { path: '/operations/salesforce-health', label: 'Salesforce Health' },
-      { path: '/operations/automation-health', label: 'Automation Health' },
-      { path: '/operations/website-marketing', label: 'Website & Marketing' },
-      { path: '/operations/penny-health',      label: 'Penny Health' },
-      { path: '/operations/trail-os-health',   label: 'Trail OS Health' },
-      { path: '/operations/communications',    label: 'Communications' },
+      { path: '/operations',               label: 'Executive Overview' },
+      { path: '/operations/health',        label: 'Health Indicators' },
+      { path: '/operations/integrations',  label: 'Integration Readiness' },
+      { path: '/operations/demand',        label: 'Demand' },
+      { path: '/operations/scorecards',    label: 'Scorecards' },
+      { path: '/operations/trends',        label: 'Trends & Insights' },
+      { path: '/operations/recommendations', label: 'Recommendations' },
     ],
   },
   {
-    id: 'demand',
-    label: 'Demand Management',
-    icon: Inbox,
-    pathPrefix: '/demand',
+    id: 'program',
+    label: 'Program & Curriculum',
+    icon: GraduationCap,
+    pathPrefix: '/program',
     items: [
-      { path: '/demand/intake',          label: 'Intake' },
-      { path: '/demand/cases',           label: 'Salesforce Cases' },
-      { path: '/demand/epics',           label: 'Epics' },
-      { path: '/demand/features',        label: 'Features' },
-      { path: '/demand/stories',         label: 'Stories' },
-      { path: '/demand/roadmap',         label: 'Roadmap' },
-      { path: '/demand/change-request',  label: 'Submit Change Request' },
+      { path: '/program',            label: 'Program Map' },
+      { path: '/program/programs',   label: 'Programs' },
+      { path: '/program/curriculum', label: 'Curriculum' },
+      { path: '/program/standards',  label: 'Standards' },
+      { path: '/program/blueprint',  label: 'Program Blueprint' },
+      { path: '/program/salesforce', label: 'Salesforce Architecture' },
+      { path: '/program/resources',  label: 'Resources' },
     ],
   },
   {
     id: 'penny',
-    label: 'Penny Command Center',
+    label: 'Penny',
     icon: Brain,
     pathPrefix: '/penny',
     items: [
-      { path: '/penny/capability-registry', label: 'Capability Registry' },
-      { path: '/penny/learners',           label: 'Learners' },
-      { path: '/penny/logs',             label: 'Logs' },
-      { path: '/penny/trail-quests',     label: 'Trail Quests' },
-      { path: '/penny/assessments',      label: 'Assessments' },
-      { path: '/penny/intelligence',     label: 'Intelligence' },
-      { path: '/penny/test-penny',       label: 'Test Penny' },
-      { path: '/penny/response-quality', label: 'Response Quality' },
-      { path: '/penny/prompt-library',   label: 'Prompt Library' },
-      { path: '/penny/integrations',     label: 'Integrations' },
+      { path: '/penny',              label: 'Capabilities' },
+      { path: '/penny/prompts',      label: 'Prompt Studio' },
+      { path: '/penny/learners',     label: 'Learners' },
+      { path: '/penny/intelligence', label: 'Intelligence' },
+      { path: '/penny/trail-os-map', label: 'Trail OS Map' },
+      { path: '/penny/health',       label: 'Health' },
+      { path: '/penny/test',         label: 'Test Penny' },
     ],
   },
   {
-    id: 'communications',
-    label: 'Communications',
-    icon: MessageSquare,
-    pathPrefix: '/communications',
-    items: [
-      { path: '/communications/overview',          label: 'Overview' },
-      { path: '/communications/providers',         label: 'Providers' },
-      { path: '/communications/channels',          label: 'Channels & Spaces' },
-      { path: '/communications/calendar',          label: 'Calendar' },
-      { path: '/communications/penny-broadcasts',  label: 'Penny Broadcasts' },
-      { path: '/communications/weekly-briefs',     label: 'Weekly Briefs' },
-      { path: '/communications/notifications',     label: 'Notifications' },
-      { path: '/communications/message-templates', label: 'Message Templates' },
-    ],
-  },
-  {
-    id: 'library',
-    label: 'Knowledge Library',
+    id: 'knowledge',
+    label: 'Knowledge',
     icon: BookOpen,
-    pathPrefix: '/library',
+    pathPrefix: '/knowledge',
     items: [
-      { path: '/library/documents',     label: 'Documents' },
-      { path: '/library/templates',     label: 'Templates' },
-      { path: '/library/salesforce-kb', label: 'Salesforce Knowledge' },
-      { path: '/library/source-mapping', label: 'Source Mapping' },
-      { path: '/library/search',        label: 'Search' },
+      { path: '/knowledge',               label: 'Sources' },
+      { path: '/knowledge/relationships', label: 'Relationships' },
+      { path: '/knowledge/library',       label: 'Library' },
+      { path: '/knowledge/memory',        label: 'Org Memory' },
+      { path: '/knowledge/search',        label: 'Search' },
     ],
   },
   {
-    id: 'curriculum',
-    label: 'Curriculum Studio',
-    icon: GraduationCap,
-    pathPrefix: '/curriculum',
+    id: 'collaboration',
+    label: 'Collaboration',
+    icon: MessageSquare,
+    pathPrefix: '/collaboration',
     items: [
-      { path: '/curriculum/overview',            label: 'Overview' },
-      { label: 'Program Structure', isLabel: true },
-      { path: '/curriculum/programs',            label: 'Programs' },
-      { path: '/curriculum/cohorts',             label: 'Cohorts' },
-      { path: '/curriculum/sprints',             label: 'Sprints' },
-      { path: '/curriculum/modules',             label: 'Modules' },
-      { label: 'Learning Assets', isLabel: true },
-      { path: '/curriculum/lessons',             label: 'Lessons' },
-      { path: '/curriculum/assessments',         label: 'Assessments' },
-      { path: '/curriculum/knowledge-articles',  label: 'Knowledge Articles' },
-      { path: '/curriculum/resources',           label: 'Resources' },
-      { label: 'Penny Assets', isLabel: true },
-      { path: '/curriculum/coaching-prompts',    label: 'Coaching Prompts' },
-      { path: '/curriculum/reflection-prompts',  label: 'Reflection Prompts' },
-      { path: '/curriculum/trail-quests',        label: 'Trail Quests' },
-      { path: '/curriculum/weekly-reviews',      label: 'Weekly Reviews' },
-      { label: 'Penny Content Assistant', isLabel: true },
-      { path: '/curriculum/penny-assistant',     label: 'Content Workshop' },
-      { path: '/curriculum/penny-actions',       label: 'Action Library' },
-      { path: '/curriculum/consistency-review',  label: 'Consistency Review' },
-      { path: '/curriculum/generated-outputs',   label: 'Generated Outputs' },
-      { label: 'Delivery Assets', isLabel: true },
-      { path: '/curriculum/slack-activities',    label: 'Slack Activities' },
-      { path: '/curriculum/google-chat',         label: 'Google Chat' },
-      { path: '/curriculum/calendar-events',     label: 'Calendar Events' },
-      { path: '/curriculum/office-hours',        label: 'Office Hours' },
-      { path: '/curriculum/content-health',      label: 'Content Health' },
-      { label: 'Standards & Quality', isLabel: true },
-      { path: '/curriculum/standards',           label: 'Standards Studio' },
-      { label: 'Blueprints & Architecture', isLabel: true },
-      { path: '/curriculum/blueprint',           label: 'Program Blueprint' },
-      { path: '/curriculum/salesforce-mapping',  label: 'Salesforce Architecture' },
+      { path: '/collaboration',               label: 'Overview' },
+      { path: '/collaboration/channels',      label: 'Channels' },
+      { path: '/collaboration/calendar',      label: 'Calendar' },
+      { path: '/collaboration/templates',     label: 'Templates' },
+      { path: '/collaboration/briefs',        label: 'Weekly Briefs' },
+      { path: '/collaboration/notifications', label: 'Notifications' },
     ],
   },
   {
@@ -150,21 +121,15 @@ const navGroups: NavGroup[] = [
     icon: Settings,
     pathPrefix: '/admin',
     items: [
-      { path: '/admin/programs',          label: 'Programs' },
-      { path: '/admin/program-resources', label: 'Program Resources' },
-      { path: '/admin/documents',         label: 'Documents' },
-      { path: '/admin/resolve',         label: 'RESOLVE' },
-      { path: '/admin/trail-os',        label: 'Trail OS' },
-      { path: '/admin/penny',           label: 'Penny' },
-      { path: '/admin/roles',           label: 'Roles' },
-      { path: '/admin/templates',       label: 'Templates' },
-      { path: '/admin/integrations',    label: 'Integrations' },
-      { path: '/admin/comm-channels',   label: 'Comm Channels' },
-      { path: '/admin/comm-routing',    label: 'Comm Routing' },
-      { path: '/admin/comm-templates',  label: 'Message Templates' },
-      { path: '/admin/users',           label: 'Users' },
-      { path: '/admin/permissions',     label: 'Permissions' },
-      { path: '/admin/settings',        label: 'Settings' },
+      { path: '/admin',            label: 'Setup' },
+      { path: '/admin/programs',   label: 'Programs' },
+      { path: '/admin/people',     label: 'People & Roles' },
+      { path: '/admin/roles',      label: 'Roles' },
+      { path: '/admin/resolve',    label: 'RESOLVE' },
+      { path: '/admin/trail-os',   label: 'Trail OS' },
+      { path: '/admin/penny',      label: 'Penny' },
+      { path: '/admin/users',      label: 'Users' },
+      { path: '/admin/settings',   label: 'Settings' },
     ],
   },
 ];
@@ -179,7 +144,7 @@ export function Sidebar() {
   const activeGroupId = navGroups.find(g => location.startsWith(g.pathPrefix))?.id;
 
   const [openGroups, setOpenGroups] = useState<Set<string>>(
-    () => new Set([activeGroupId ?? 'navigator'])
+    () => new Set([activeGroupId ?? 'digital-twin'])
   );
 
   useEffect(() => {
@@ -252,7 +217,8 @@ export function Sidebar() {
                         </div>
                       );
                     }
-                    const isActive = location === item.path;
+                    const isActive = location === item.path ||
+                      (item.path !== group.pathPrefix && location.startsWith(item.path + '/'));
                     return (
                       <button
                         key={item.path}
@@ -275,7 +241,8 @@ export function Sidebar() {
       </div>
 
       <div className="px-4 py-3 border-t border-sidebar-border flex-shrink-0">
-        <p className="text-[10px] text-muted-foreground text-center">v1.0 — Internal</p>
+        <p className="text-[9px] font-bold text-amber-600 uppercase tracking-wider text-center">Phase 1 Architecture Consolidation</p>
+        <p className="text-[10px] text-muted-foreground text-center mt-0.5">v1.0 — Internal Prototype</p>
       </div>
     </div>
   );

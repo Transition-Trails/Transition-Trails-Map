@@ -32,12 +32,12 @@ const ATTENTION = [
 ];
 
 const QUICK_ACTIONS = [
-  { icon: Plus,      label: 'Create Demand Request', path: '/demand/intake',             primary: true  },
-  { icon: Inbox,     label: 'Review Cases',          path: '/demand/cases',              primary: false },
-  { icon: BarChart3, label: 'Program Health',        path: '/operations/program-health', primary: false },
-  { icon: Bot,       label: 'Test Penny',            path: '/penny/test-penny',          primary: false },
-  { icon: FileText,  label: 'Add Knowledge Article', path: '/library/documents',         primary: false },
-  { icon: Map,       label: 'Program Map',           path: '/navigator/program-map',     primary: false },
+  { icon: Plus,      label: 'Create Demand Request', path: '/operations/demand',   primary: true  },
+  { icon: Inbox,     label: 'Review Cases',          path: '/operations/demand',   primary: false },
+  { icon: BarChart3, label: 'Program Health',        path: '/operations/health',   primary: false },
+  { icon: Bot,       label: 'Test Penny',            path: '/penny/test',          primary: false },
+  { icon: FileText,  label: 'Knowledge Library',     path: '/knowledge/library',   primary: false },
+  { icon: Map,       label: 'Program Map',           path: '/program',             primary: false },
 ];
 
 const PROGRAM_COLORS: Record<string, string> = {
@@ -71,7 +71,7 @@ export default function Home() {
           const Icon = a.icon;
           return (
             <button
-              key={a.path}
+              key={a.label}
               onClick={() => setLocation(a.path)}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors whitespace-nowrap ${
                 a.primary
@@ -136,7 +136,7 @@ export default function Home() {
               })}
               <div className="border-t border-border/30 px-3 py-2">
                 <button
-                  onClick={() => setLocation('/operations/program-health')}
+                  onClick={() => setLocation('/operations/health')}
                   className="flex items-center gap-1 text-[10px] text-primary hover:underline font-medium"
                 >
                   View All Activity <ArrowRight className="w-3 h-3" />
@@ -203,7 +203,7 @@ export default function Home() {
               return (
                 <button
                   key={p.id}
-                  onClick={() => setLocation('/navigator/program-map')}
+                  onClick={() => setLocation('/program')}
                   className={`w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-muted/30 transition-colors ${
                     i < programs.length - 1 ? 'border-b border-border/30' : ''
                   }`}

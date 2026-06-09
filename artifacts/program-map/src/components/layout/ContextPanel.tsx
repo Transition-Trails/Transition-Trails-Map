@@ -6,6 +6,7 @@ import { ACTION_CATEGORY_CONFIG, type PennyContentAction } from '@/data/pennyCon
 import { type TrailOsSfMapping, SF_STATUS_CONFIG, type SfMappingStatus, SF_PRODUCT_CONFIG } from '@/data/salesforceArchitectureData';
 import { type ContentStandard, STANDARD_STATUS_CONFIG, STANDARD_CONFIDENCE_CONFIG, STANDARD_CATEGORY_CONFIG } from '@/data/standardsData';
 import { type PennyCapability, CAPABILITY_READINESS_CONFIG, CAPABILITY_DOMAIN_CONFIG, POC_STATUS_CONFIG } from '@/data/pennyCapabilityData';
+import { type KnowledgeSource, SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, SYNC_STATUS_CONFIG, HEALTH_CONFIG } from '@/data/knowledgeSourceData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
@@ -1022,7 +1023,7 @@ export function ContextPanel() {
               <p className="text-[11px] text-amber-900 leading-relaxed">{mapping.futureRecommendation}</p>
             </div>
             <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-              <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">★ Foundations Trail Example</p>
+              <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">★ Reference Implementation: Foundations Trail</p>
               <p className="text-[11px] text-foreground leading-relaxed italic">{mapping.foundationsTrailExample}</p>
             </div>
             <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
@@ -1154,7 +1155,7 @@ export function ContextPanel() {
 
             {cap.foundationsTrailExample && (
               <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-                <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">★ Foundations Trail Example</p>
+                <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">★ Reference Implementation: Foundations Trail</p>
                 <p className="text-[11px] text-foreground italic leading-relaxed">{cap.foundationsTrailExample}</p>
               </div>
             )}
