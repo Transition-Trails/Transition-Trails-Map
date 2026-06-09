@@ -6,44 +6,54 @@ import { HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
 import {
   Hash, Settings, Users, Brain, FileText, Activity, Shield, BarChart2, FlaskConical,
-  CheckCircle, XCircle, AlertTriangle,
+  CheckCircle, XCircle, AlertTriangle, ChevronRight, Key, GitMerge, Layers,
+  Play, Map, Workflow,
 } from 'lucide-react';
 import {
   SLACK_WORKSPACE, SLACK_CHANNELS, SLACK_USER_MAPPINGS, PENNY_SLACK_CAPABILITIES,
-  SLACK_TEMPLATES, SLACK_ACTIVITY, SLACK_GOVERNANCE, SLACK_HEALTH_SCORES, SLACK_TESTS,
-  getTestCategories, getOverallTestCoverage, getPennyEnabledChannels,
-  type SlackChannel, type SlackUserMapping, type SlackHealthScore,
+  SLACK_TEMPLATES, SLACK_ACTIVITY, SLACK_HEALTH_SCORES,
+  getPennyEnabledChannels,
+  type SlackChannel, type SlackUserMapping,
 } from '@/data/slackIntegrationData';
+import {
+  VALIDATION_CHECKS, PROGRAM_CHANNEL_MAPS, ROLE_GROUPS, PENNY_DELIVERY_MAPS,
+  COMM_FLOWS, SLACK_OBJECT_PROFILES, OPERATIONAL_SCENARIOS, GOVERNANCE_ISSUES, TEST_SUITES,
+  getValidationSummary, getGovernanceSummary, getTestSuiteSummary, getOverallTestSummary,
+  getScenarioSummary,
+  type ValidationCheck, type RoleGroup, type CommFlow, type FlowNode,
+  type OperationalScenario, type GovernanceIssue, type TestSuite,
+} from '@/data/slackPhase2Data';
 
 // ── Shared utilities ──────────────────────────────────────────────────────────
+
 function ReadinessBadge({ status }: { status: string }) {
   const cls =
-    status === 'ready'     || status === 'operational' || status === 'passing' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-    status === 'partial'   || status === 'in-development'                      ? 'bg-amber-50   text-amber-700   border-amber-200'  :
-    status === 'not-ready' || status === 'pending' || status === 'failing'     ? 'bg-rose-50    text-rose-700    border-rose-200'   :
-    status === 'planned'                                                        ? 'bg-sky-50     text-sky-700     border-sky-200'    :
-                                                                                  'bg-muted       text-muted-foreground border-border';
-  const label =
-    status === 'ready'          ? 'Ready'         :
-    status === 'partial'        ? 'Partial'       :
-    status === 'not-ready'      ? 'Not Ready'     :
-    status === 'planned'        ? 'Planned'       :
-    status === 'operational'    ? 'Operational'   :
-    status === 'in-development' ? 'In Dev'        :
-    status === 'passing'        ? 'Passing'       :
-    status === 'failing'        ? 'Failing'       :
-    status === 'pending'        ? 'Pending'       : status;
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>{label}</span>;
+    status === 'ready' || status === 'operational' || status === 'passing' || status === 'pass' || status === 'Active' || status === 'Complete' || status === 'Mapped' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+    status === 'partial' || status === 'in-development' || status === 'warning' || status === 'Partial' || status === 'Configured' || status === 'Partially Ready' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+    status === 'not-ready' || status === 'pending' || status === 'fail' || status === 'Pending' || status === 'Missing' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+    status === 'blocked' || status === 'Blocked' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+    status === 'planned' || status === 'Planned' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+    'bg-muted text-muted-foreground border-border';
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>{status}</span>;
 }
 
-function ScoreGauge({ score, max, status }: { score: number; max: number; status: string }) {
+function SeverityBadge({ sev }: { sev: string }) {
+  const cls =
+    sev === 'Critical' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+    sev === 'High'     ? 'bg-orange-50 text-orange-700 border-orange-200' :
+    sev === 'Medium'   ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                          'bg-muted text-muted-foreground border-border';
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>{sev}</span>;
+}
+
+function ScoreBar({ score, max = 100 }: { score: number; max?: number }) {
   const pct = Math.round((score / max) * 100);
-  const barCls = status === 'ready' ? 'bg-emerald-400' : status === 'partial' ? 'bg-amber-400' : 'bg-rose-400';
-  const textCls = status === 'ready' ? 'text-emerald-600' : status === 'partial' ? 'text-amber-600' : 'text-rose-600';
+  const barCls = pct >= 70 ? 'bg-emerald-400' : pct >= 40 ? 'bg-amber-400' : 'bg-rose-400';
+  const textCls = pct >= 70 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600';
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${barCls}`} style={{ width: `${pct}%` }} />
+      <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className={`h-full rounded-full ${barCls}`} style={{ width:`${pct}%` }} />
       </div>
       <span className={`text-[11px] font-bold tabular-nums shrink-0 ${textCls}`}>{pct}%</span>
     </div>
@@ -59,178 +69,126 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+function ValidationIcon({ status }: { status: string }) {
+  if (status === 'pass')    return <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
+  if (status === 'fail')    return <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
+  if (status === 'warning') return <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />;
+  return <span className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 shrink-0 inline-block" />;
+}
+
+const FLOW_NODE_COLORS: Record<FlowNode['type'], string> = {
+  Program:  'bg-emerald-50 border-emerald-200 text-emerald-800',
+  Channel:  'bg-teal-50 border-teal-200 text-teal-800',
+  Penny:    'bg-pink-50 border-pink-200 text-pink-800',
+  Template: 'bg-violet-50 border-violet-200 text-violet-800',
+  Message:  'bg-blue-50 border-blue-200 text-blue-800',
+  Activity: 'bg-amber-50 border-amber-200 text-amber-800',
+  Signal:   'bg-orange-50 border-orange-200 text-orange-800',
+};
+
+function FlowNodeBox({ node }: { node: FlowNode }) {
+  const cls = FLOW_NODE_COLORS[node.type];
+  const dotCls = node.status === 'active' ? 'bg-emerald-400' : node.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400';
+  return (
+    <div className={`rounded-lg border px-3 py-2 min-w-[130px] max-w-[160px] shrink-0 ${cls}`}>
+      <div className="flex items-center gap-1.5 mb-1">
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />
+        <span className="text-[8px] font-bold uppercase tracking-wide opacity-60">{node.type}</span>
+      </div>
+      <p className="text-[11px] font-semibold leading-tight mb-0.5">{node.label}</p>
+      <p className="text-[10px] opacity-60 leading-tight">{node.detail}</p>
+    </div>
+  );
+}
+
 // ── Tab 1: Overview ───────────────────────────────────────────────────────────
+
 function OverviewTab() {
-  const productionScore = SLACK_HEALTH_SCORES.find(s => s.dimension === 'production');
-  const pennyScore      = SLACK_HEALTH_SCORES.find(s => s.dimension === 'penny');
-  const channelScore    = SLACK_HEALTH_SCORES.find(s => s.dimension === 'channels');
-  const userScore       = SLACK_HEALTH_SCORES.find(s => s.dimension === 'users');
-  const wsScore         = SLACK_HEALTH_SCORES.find(s => s.dimension === 'workspace');
+  const valSummary      = getValidationSummary();
+  const govSummary      = getGovernanceSummary();
+  const testSummary     = getOverallTestSummary();
+  const scenSummary     = getScenarioSummary();
   const pennyEnabled    = getPennyEnabledChannels();
+  const productionScore = SLACK_HEALTH_SCORES.find(s => s.dimension === 'production');
 
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5 max-w-4xl">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-          <p className="text-[11px] font-bold text-primary uppercase mb-1">Slack Integration Center — Phase 1</p>
+          <p className="text-[11px] font-bold text-primary uppercase mb-1">Slack Integration Center — Phase 2: Operational Workflow Validation</p>
           <p className="text-[12px] text-foreground leading-relaxed">
-            The Slack Integration Center is the first production-focused integration module for Trail OS and the operational
-            communications layer for Penny AI delivery. It connects Slack channels, users, and workspaces to the Unified Object Model,
-            Context Engine, Digital Twin, and Global Search — enabling Penny to deliver coaching, briefs, quests, and alerts
-            directly into the learner and coach communication flow.
+            Phase 2 advances from architecture and readiness into real object flows. Program-to-channel mapping, role-to-user
+            routing, Penny delivery mapping, and end-to-end flow validation are all configured and awaiting bot token activation.
+            All 5 mock operational scenarios are defined and partially ready. Two critical blockers remain: bot token and app installation.
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {/* Phase 2 stat grid */}
+        <div className="grid grid-cols-4 gap-3">
           {[
-            { label:'Channels', value:String(SLACK_WORKSPACE.channelCount), sub:`${SLACK_WORKSPACE.activeChannels} active`, cls:'border-primary/20 bg-primary/5' },
-            { label:'Members',  value:String(SLACK_WORKSPACE.memberCount),  sub:'Mapped to personas',                       cls:'border-blue-200 bg-blue-50' },
-            { label:'Penny Enabled', value:String(pennyEnabled.length),    sub:'Active channels',                           cls:'border-pink-200 bg-pink-50' },
-            { label:'Production', value:`${Math.round((productionScore?.score ?? 0) / (productionScore?.maxScore ?? 100) * 100)}%`, sub:'Readiness score', cls: wsScore?.status === 'ready' ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50' },
+            { label:'Validation Checks', value:`${valSummary.pass}/${valSummary.total}`, sub:'passing', cls: valSummary.fail > 0 ? 'border-rose-200 bg-rose-50' : 'border-emerald-200 bg-emerald-50' },
+            { label:'Governance Issues', value:String(govSummary.critical + govSummary.high), sub:`${govSummary.critical} critical`, cls: govSummary.critical > 0 ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50' },
+            { label:'Scenarios Ready',   value:`${scenSummary.ready}/${scenSummary.total}`, sub:`avg ${scenSummary.avgScore}% ready`, cls:'border-amber-200 bg-amber-50' },
+            { label:'Tests Passing',     value:`${testSummary.pass}/${testSummary.total}`, sub:`${testSummary.pct}% overall`, cls:'border-amber-200 bg-amber-50' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
-              <p className="text-2xl font-bold font-serif text-foreground">{s.value}</p>
-              <p className="text-[11px] font-semibold text-foreground mt-0.5">{s.label}</p>
-              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wide mb-1">{s.label}</p>
+              <p className="text-[22px] font-bold text-foreground leading-none">{s.value}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">{s.sub}</p>
             </div>
           ))}
         </div>
 
-        {/* Workspace status */}
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-            <p className="text-[12px] font-bold text-amber-700">OAuth Pending — Production Blockers</p>
-          </div>
-          <p className="text-[12px] text-amber-800 leading-relaxed">
-            Slack workspace architecture, channel registry, user-role mappings, and Penny integration configuration are
-            all complete. <strong>Bot token, signing secret, and OAuth connection</strong> are required before live Penny delivery.
-            All capabilities can be validated against mock data today.
-          </p>
-          <div className="flex gap-3 flex-wrap text-[10px] text-amber-700 font-semibold">
-            <span>✗ Bot token not configured</span>
-            <span>✗ Signing secret missing</span>
-            <span>✗ OAuth pending admin approval</span>
-          </div>
-        </div>
-
-        {/* Readiness overview */}
+        {/* Critical blockers */}
         <div>
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-3">Integration Readiness by Dimension</p>
-          <div className="space-y-2.5">
-            {SLACK_HEALTH_SCORES.map(s => (
-              <div key={s.dimension} className="flex items-center gap-3">
-                <span className="text-[11px] font-medium text-foreground w-40 shrink-0">{s.label}</span>
-                <div className="flex-1">
-                  <ScoreGauge score={s.score} max={s.maxScore} status={s.status} />
-                </div>
-                <ReadinessBadge status={s.status} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Penny delivery summary */}
-        <div>
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Active Penny Delivery</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Critical Blockers to Go Live</p>
           <div className="space-y-2">
-            {PENNY_SLACK_CAPABILITIES.filter(c => c.readiness === 'operational').map(cap => (
-              <div key={cap.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-emerald-200 bg-emerald-50/60">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <span className="text-[12px] font-semibold text-foreground flex-1">{cap.capabilityName}</span>
-                <span className="text-[10px] text-muted-foreground">{cap.enabledChannels.join(', ')}</span>
-                {cap.qualityScore && <span className="text-[10px] font-bold text-emerald-600">{cap.qualityScore}%</span>}
+            {GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical').map(issue => (
+              <div key={issue.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-rose-200 bg-rose-50">
+                <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-semibold text-foreground">{issue.title}</p>
+                  <p className="text-[11px] text-muted-foreground">{issue.resolution}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </ScrollArea>
-  );
-}
 
-// ── Tab 2: Workspace Config ───────────────────────────────────────────────────
-function WorkspaceConfigTab() {
-  const ws = SLACK_WORKSPACE;
-  const statusCls = ws.oauthStatus === 'connected' ? 'border-emerald-200 bg-emerald-50' :
-                    ws.oauthStatus === 'pending'    ? 'border-amber-200 bg-amber-50'    :
-                                                      'border-rose-200 bg-rose-50';
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
-        {/* Connection status */}
-        <div className={`rounded-lg border p-4 ${statusCls}`}>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[12px] font-bold text-foreground">Slack OAuth Status</p>
-            <ReadinessBadge status={ws.oauthStatus} />
-          </div>
-          <p className="text-[11px] text-muted-foreground">{ws.validationNotes}</p>
-        </div>
-
-        {/* Workspace metadata */}
+        {/* Phase 2 readiness by area */}
         <div>
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Workspace Metadata</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Phase 2 Readiness by Area</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-            <InfoRow label="Display Name"   value={ws.displayName} />
-            <InfoRow label="Domain"         value={`slack.com/T-${ws.domain}`} />
-            <InfoRow label="Plan"           value={ws.plan} />
-            <InfoRow label="Members"        value={`${ws.memberCount} members`} />
-            <InfoRow label="Channels"       value={`${ws.channelCount} total, ${ws.activeChannels} active`} />
-            <InfoRow label="Environment"    value={<ReadinessBadge status={ws.environment} />} />
-            <InfoRow label="Bot User"       value={ws.botUser} />
-            <InfoRow label="Last Synced"    value={ws.lastSynced} />
-          </div>
-        </div>
-
-        {/* Credentials */}
-        <div>
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Credentials & Security</p>
-          <div className="space-y-2">
             {[
-              { label:'Bot Token',      status: ws.botToken,      description:'Required for Penny to post messages to channels' },
-              { label:'Signing Secret', status: ws.signingSecret, description:'Required for webhook signature validation' },
-              { label:'User Token',     status: ws.userToken,     description:'Required for admin operations and channel management' },
-            ].map(cred => (
-              <div key={cred.label} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border ${cred.status === 'configured' ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
-                {cred.status === 'configured' ? (
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                ) : (
-                  <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                )}
-                <div className="flex-1">
-                  <p className="text-[12px] font-bold text-foreground">{cred.label}</p>
-                  <p className="text-[11px] text-muted-foreground">{cred.description}</p>
+              { area:'Program-to-Channel Mapping', pct:72, note:'5 programs mapped · 8 channels · 3 missing bot access' },
+              { area:'Role-to-User Mapping',        pct:60, note:'5 of 7 role groups have at least one mapped user' },
+              { area:'Penny Delivery Mapping',      pct:55, note:'6 capabilities mapped · 4 with configured routes' },
+              { area:'Communication Flows',          pct:65, note:'5 flows defined · 2 configured · 3 planned/blocked' },
+              { area:'Operational Scenarios',        pct:scenSummary.avgScore, note:`${scenSummary.partial} partially ready · ${scenSummary.blocked} blocked` },
+              { area:'Governance Compliance',        pct:45, note:`${govSummary.critical + govSummary.high} critical/high issues open` },
+              { area:'Production Testing',           pct:testSummary.pct, note:`${testSummary.pass} of ${testSummary.total} tests passing` },
+            ].map(r => (
+              <div key={r.area} className="px-4 py-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[12px] font-medium text-foreground">{r.area}</span>
+                  <span className="text-[11px] text-muted-foreground">{r.note}</span>
                 </div>
-                <ReadinessBadge status={cred.status === 'configured' ? 'ready' : 'not-ready'} />
+                <ScoreBar score={r.pct} />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Permissions */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <p className="text-[10px] font-bold uppercase text-emerald-600 mb-2">Granted Permissions ({ws.permissionsGranted.length})</p>
-            <div className="space-y-1">
-              {ws.permissionsGranted.map(perm => (
-                <div key={perm} className="flex items-center gap-2 text-[11px] text-foreground">
-                  <span className="text-emerald-500 shrink-0">✓</span>
-                  <code className="font-mono">{perm}</code>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase text-amber-600 mb-2">Missing Permissions ({ws.permissionsMissing.length})</p>
-            <div className="space-y-1">
-              {ws.permissionsMissing.map(perm => (
-                <div key={perm} className="flex items-center gap-2 text-[11px] text-foreground">
-                  <span className="text-amber-500 shrink-0">—</span>
-                  <code className="font-mono">{perm}</code>
-                </div>
-              ))}
-            </div>
+        {/* Workspace connection status */}
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Workspace</p>
+          <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+            <InfoRow label="Workspace"       value={SLACK_WORKSPACE.displayName} />
+            <InfoRow label="Domain"          value={SLACK_WORKSPACE.domain} />
+            <InfoRow label="Bot User"        value={SLACK_WORKSPACE.botUser} />
+            <InfoRow label="Connection"      value={<ReadinessBadge status={SLACK_WORKSPACE.oauthStatus} />} />
+            <InfoRow label="Channels"        value={`${SLACK_CHANNELS.length} mapped · ${pennyEnabled.length} Penny-enabled`} />
+            <InfoRow label="Production Score" value={productionScore ? `${productionScore.score}/${productionScore.maxScore}` : '—'} />
           </div>
         </div>
       </div>
@@ -238,103 +196,446 @@ function WorkspaceConfigTab() {
   );
 }
 
-// ── Tab 3: Channel Registry (ObjectWorkspace) ─────────────────────────────────
+// ── Tab 2: Workspace Validation ───────────────────────────────────────────────
+
+function WorkspaceValidationTab() {
+  const [selected, setSelected] = useState<ValidationCheck | null>(null);
+  const summary = getValidationSummary();
+  const categories = ['Secret','Permission','Channel Access','OAuth','Bot'] as const;
+
+  return (
+    <div className="flex h-full">
+      {/* Left: check list */}
+      <div className="w-80 shrink-0 border-r border-border flex flex-col">
+        {/* Summary header */}
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Validation Summary</p>
+          <div className="grid grid-cols-4 gap-1.5">
+            {[
+              { label:'Pass',    value:summary.pass,    cls:'text-emerald-600 bg-emerald-50 border-emerald-200' },
+              { label:'Fail',    value:summary.fail,    cls:'text-rose-600 bg-rose-50 border-rose-200' },
+              { label:'Warn',    value:summary.warning, cls:'text-amber-600 bg-amber-50 border-amber-200' },
+              { label:'Pending', value:summary.pending, cls:'text-sky-600 bg-sky-50 border-sky-200' },
+            ].map(s => (
+              <div key={s.label} className={`rounded border text-center py-1.5 ${s.cls}`}>
+                <p className="text-[16px] font-bold leading-none">{s.value}</p>
+                <p className="text-[9px] font-bold uppercase mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <ScrollArea className="flex-1">
+          {categories.map(cat => {
+            const checks = VALIDATION_CHECKS.filter(c => c.category === cat);
+            return (
+              <div key={cat}>
+                <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">{cat}</p>
+                {checks.map(check => (
+                  <button
+                    key={check.id}
+                    onClick={() => setSelected(check)}
+                    className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/40 border-b border-border/20 transition-colors ${selected?.id === check.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+                  >
+                    <ValidationIcon status={check.status} />
+                    <span className="text-[12px] text-foreground font-medium flex-1 leading-tight">{check.label}</span>
+                  </button>
+                ))}
+              </div>
+            );
+          })}
+        </ScrollArea>
+      </div>
+      {/* Right: detail */}
+      <div className="flex-1 min-w-0">
+        {selected ? (
+          <ScrollArea className="h-full">
+            <div className="p-5 space-y-4 max-w-2xl">
+              <div className="flex items-start gap-3">
+                <ValidationIcon status={selected.status} />
+                <div>
+                  <h3 className="text-[14px] font-bold text-foreground">{selected.label}</h3>
+                  <p className="text-[11px] text-muted-foreground">{selected.category} · <ReadinessBadge status={selected.status} /></p>
+                </div>
+              </div>
+              <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+                <InfoRow label="Detail"  value={selected.detail} />
+                <InfoRow label="Impact"  value={selected.impact} />
+                {selected.fix && <InfoRow label="Resolution" value={<span className="text-emerald-700">{selected.fix}</span>} />}
+              </div>
+            </div>
+          </ScrollArea>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center px-8">
+            <Key className="w-8 h-8 text-muted-foreground/30 mb-3" />
+            <p className="text-[13px] font-semibold text-foreground mb-1">Select a validation check</p>
+            <p className="text-[12px] text-muted-foreground">View the detail, impact, and resolution for each check.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Tab 3: Program → Channel Mapping ─────────────────────────────────────────
+
+function ProgramChannelTab() {
+  const [selectedProgramId, setSelectedProgramId] = useState<string>(PROGRAM_CHANNEL_MAPS[0].programId);
+  const selected = PROGRAM_CHANNEL_MAPS.find(p => p.programId === selectedProgramId) ?? PROGRAM_CHANNEL_MAPS[0];
+
+  const botCls = (s: string) => s === 'Granted' ? 'text-emerald-600' : s === 'Pending' ? 'text-amber-600' : 'text-rose-600';
+  const mapCls = (s: string) => s === 'Mapped' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : s === 'Partial' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+  const purpCls: Record<string, string> = {
+    'Cohort':'bg-teal-50 text-teal-700 border-teal-200','Coaches':'bg-violet-50 text-violet-700 border-violet-200',
+    'Announcements':'bg-blue-50 text-blue-700 border-blue-200','Admin':'bg-muted text-muted-foreground border-border',
+    'Penny Delivery':'bg-pink-50 text-pink-700 border-pink-200','Executive':'bg-orange-50 text-orange-700 border-orange-200',
+  };
+
+  return (
+    <div className="flex h-full">
+      {/* Left: program list */}
+      <div className="w-56 shrink-0 border-r border-border flex flex-col">
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Programs</p>
+          <p className="text-[10px] text-muted-foreground">{PROGRAM_CHANNEL_MAPS.length} programs mapped</p>
+        </div>
+        <ScrollArea className="flex-1">
+          {PROGRAM_CHANNEL_MAPS.map(p => {
+            const allMapped = p.channels.every(c => c.mappingStatus === 'Mapped');
+            const hasMissing = p.channels.some(c => c.mappingStatus === 'Missing');
+            const dotCls = allMapped ? 'bg-emerald-400' : hasMissing ? 'bg-rose-400' : 'bg-amber-400';
+            return (
+              <button
+                key={p.programId}
+                onClick={() => setSelectedProgramId(p.programId)}
+                className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedProgramId === p.programId ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+              >
+                <span className={`w-2 h-2 rounded-full mt-1 shrink-0 ${dotCls}`} />
+                <div>
+                  <p className="text-[12px] font-semibold text-foreground leading-tight">{p.programName}</p>
+                  <p className="text-[10px] text-muted-foreground">{p.channels.length} channels</p>
+                  {p.cohort && <p className="text-[10px] text-muted-foreground">{p.cohort}</p>}
+                </div>
+              </button>
+            );
+          })}
+        </ScrollArea>
+      </div>
+      {/* Right: channel detail */}
+      <div className="flex-1 min-w-0">
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-4 max-w-3xl">
+            <div className="flex items-center gap-3">
+              <div>
+                <h3 className="text-[14px] font-bold text-foreground">{selected.programName}</h3>
+                <p className="text-[11px] text-muted-foreground">{selected.cohort ?? 'Planning phase'} · <ReadinessBadge status={selected.status} /></p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {selected.channels.map(ch => (
+                <div key={ch.channelId} className="rounded-lg border border-border bg-white px-4 py-3">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Hash className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                    <span className="text-[13px] font-bold text-foreground font-mono">{ch.channelName}</span>
+                    <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${mapCls(ch.mappingStatus)}`}>{ch.mappingStatus}</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${purpCls[ch.purpose] ?? 'bg-muted border-border text-muted-foreground'}`}>{ch.purpose}</span>
+                    <span>Bot Access: <span className={`font-semibold ${botCls(ch.botAccess)}`}>{ch.botAccess}</span></span>
+                    {ch.memberCount !== undefined && <span>{ch.memberCount} members</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-[11px] font-bold text-amber-700 mb-1">Bot Access Required</p>
+              <p className="text-[11px] text-amber-700">After app installation, invite <code className="font-mono bg-amber-100 px-1 rounded">@trail-os-bot</code> to each channel above. Bot access is required before Penny can deliver messages.</p>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// ── Tab 4: Role → User Mapping ────────────────────────────────────────────────
+
+function RoleUserTab() {
+  const [selectedRoleId, setSelectedRoleId] = useState<string>('coach');
+  const selected = ROLE_GROUPS.find(r => r.roleId === selectedRoleId) ?? ROLE_GROUPS[0];
+
+  const mapCls = (s: string) => s === 'Complete' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : s === 'Partial' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+  const roleColors: Record<string, string> = {
+    'Coach':'bg-violet-100 text-violet-700','Learner':'bg-teal-100 text-teal-700',
+    'Program Lead':'bg-emerald-100 text-emerald-700','Curriculum Designer':'bg-blue-100 text-blue-700',
+    'Volunteer':'bg-amber-100 text-amber-700','Executive':'bg-orange-100 text-orange-700','Admin':'bg-muted text-muted-foreground',
+  };
+
+  return (
+    <div className="flex h-full">
+      <div className="w-56 shrink-0 border-r border-border flex flex-col">
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Role Groups</p>
+          <p className="text-[10px] text-muted-foreground">{ROLE_GROUPS.length} roles · {ROLE_GROUPS.reduce((s,r)=>s+r.count,0)} total people</p>
+        </div>
+        <ScrollArea className="flex-1">
+          {ROLE_GROUPS.map(r => (
+            <button
+              key={r.roleId}
+              onClick={() => setSelectedRoleId(r.roleId)}
+              className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedRoleId === r.roleId ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <p className="text-[12px] font-semibold text-foreground">{r.roleName}</p>
+                  <span className={`inline-flex px-1 rounded text-[9px] font-bold ${mapCls(r.mappingStatus)}`}>{r.mappingStatus}</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground">{r.count} {r.count === 1 ? 'person' : 'people'}</p>
+              </div>
+            </button>
+          ))}
+        </ScrollArea>
+      </div>
+      <div className="flex-1 min-w-0">
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-4 max-w-2xl">
+            <div className="flex items-center gap-3">
+              <span className={`inline-flex items-center px-2 py-1 rounded text-[11px] font-bold ${roleColors[selected.roleType] ?? 'bg-muted'}`}>{selected.roleType}</span>
+              <h3 className="text-[14px] font-bold text-foreground">{selected.roleName}</h3>
+              <ReadinessBadge status={selected.mappingStatus} />
+            </div>
+            <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+              <InfoRow label="People Count"    value={String(selected.count)} />
+              <InfoRow label="Penny Persona"   value={selected.pennyPersona} />
+              <InfoRow label="Programs"        value={selected.programs.join(', ')} />
+              <InfoRow label="Delivery Channels" value={selected.deliveryChannels.length > 0 ? selected.deliveryChannels.join(', ') : '—'} />
+              <InfoRow label="User Groups"     value={selected.slackUserGroups.length > 0 ? selected.slackUserGroups.join(', ') : '—'} />
+            </div>
+            {selected.slackUsers.length > 0 ? (
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Mapped Slack Users</p>
+                <div className="space-y-2">
+                  {selected.slackUsers.map(u => (
+                    <div key={u.slackHandle} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
+                      <span className="w-7 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center shrink-0">
+                        {u.displayName[0]}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-semibold text-foreground">{u.displayName}</p>
+                        <p className="text-[10px] text-muted-foreground font-mono">{u.slackHandle} · {u.role}</p>
+                      </div>
+                      <ReadinessBadge status={u.pennyEnabled ? 'Active' : 'Pending'} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
+                <p className="text-[12px] text-muted-foreground">No individual users mapped — using user group <code className="font-mono">{selected.slackUserGroups[0] ?? '@group-pending'}</code> for delivery routing.</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// ── Tab 5: Penny → Channel Delivery Mapping ───────────────────────────────────
+
+function PennyDeliveryTab() {
+  const [selectedId, setSelectedId] = useState<string>('learning-coach');
+  const selected = PENNY_DELIVERY_MAPS.find(p => p.capabilityId === selectedId) ?? PENNY_DELIVERY_MAPS[0];
+
+  const trigCls: Record<string, string> = {
+    'Scheduled':'bg-blue-50 text-blue-700 border-blue-200',
+    'Event-Driven':'bg-teal-50 text-teal-700 border-teal-200',
+    'On-Demand':'bg-violet-50 text-violet-700 border-violet-200',
+    'Escalation':'bg-rose-50 text-rose-700 border-rose-200',
+  };
+
+  return (
+    <div className="flex h-full">
+      <div className="w-56 shrink-0 border-r border-border flex flex-col">
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Penny Capabilities</p>
+          <p className="text-[10px] text-muted-foreground">{PENNY_DELIVERY_MAPS.length} capabilities mapped</p>
+        </div>
+        <ScrollArea className="flex-1">
+          {PENNY_DELIVERY_MAPS.map(p => (
+            <button
+              key={p.capabilityId}
+              onClick={() => setSelectedId(p.capabilityId)}
+              className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedId === p.capabilityId ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+            >
+              <div className="flex-1">
+                <p className="text-[12px] font-semibold text-foreground leading-tight">{p.capabilityName}</p>
+                <p className="text-[10px] text-muted-foreground">{p.domain} · {p.deliveries.length} routes</p>
+                <ReadinessBadge status={p.overallStatus} />
+              </div>
+            </button>
+          ))}
+        </ScrollArea>
+      </div>
+      <div className="flex-1 min-w-0">
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-4 max-w-2xl">
+            <div>
+              <h3 className="text-[14px] font-bold text-foreground">{selected.capabilityName}</h3>
+              <p className="text-[11px] text-muted-foreground mb-1">{selected.domain} domain · <ReadinessBadge status={selected.maturity} /> <ReadinessBadge status={selected.overallStatus} /></p>
+              <p className="text-[12px] text-muted-foreground leading-relaxed">{selected.description}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Delivery Routes</p>
+              <div className="space-y-3">
+                {selected.deliveries.map((d, i) => (
+                  <div key={i} className="rounded-lg border border-border bg-white px-4 py-3">
+                    <div className="flex items-start gap-3">
+                      <Hash className="w-3.5 h-3.5 text-teal-600 mt-0.5 shrink-0" />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[13px] font-bold font-mono text-foreground">{d.channelName}</span>
+                          <ReadinessBadge status={d.deliveryStatus} />
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                          <span>Template: <span className="font-medium text-foreground">{d.templateName}</span></span>
+                          <span>Audience: <span className="font-medium text-foreground">{d.audience}</span></span>
+                          {d.frequency && <span>Frequency: <span className="font-medium text-foreground">{d.frequency}</span></span>}
+                        </div>
+                        <div className="mt-1.5">
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${trigCls[d.triggerType] ?? 'bg-muted border-border'}`}>{d.triggerType}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// ── Tab 6: Flow Explorer ──────────────────────────────────────────────────────
+
+function FlowExplorerTab() {
+  const [selectedId, setSelectedId] = useState<string>('weekly-reflection');
+  const selected = COMM_FLOWS.find(f => f.id === selectedId) ?? COMM_FLOWS[0];
+
+  const statusCls = (s: CommFlow['status']) =>
+    s === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+    s === 'Configured' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+    s === 'Planned' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+    'bg-rose-50 text-rose-700 border-rose-200';
+
+  return (
+    <div className="flex h-full">
+      {/* Left: flow list */}
+      <div className="w-52 shrink-0 border-r border-border flex flex-col">
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Communication Flows</p>
+        </div>
+        <ScrollArea className="flex-1">
+          {COMM_FLOWS.map(f => (
+            <button
+              key={f.id}
+              onClick={() => setSelectedId(f.id)}
+              className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedId === f.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+            >
+              <div className="flex-1">
+                <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">{f.name}</p>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${statusCls(f.status)}`}>{f.status}</span>
+              </div>
+            </button>
+          ))}
+        </ScrollArea>
+      </div>
+      {/* Right: flow detail */}
+      <div className="flex-1 min-w-0">
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            <div>
+              <h3 className="text-[14px] font-bold text-foreground mb-1">{selected.name}</h3>
+              <p className="text-[12px] text-muted-foreground leading-relaxed mb-3">{selected.description}</p>
+              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                <span>Trigger: <span className="font-medium text-foreground">{selected.trigger}</span></span>
+                <span>·</span>
+                <span>Cadence: <span className="font-medium text-foreground">{selected.cadence}</span></span>
+                <span>·</span>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${statusCls(selected.status)}`}>{selected.status}</span>
+              </div>
+            </div>
+
+            {/* Flow diagram */}
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-3">End-to-End Flow</p>
+              <div className="overflow-x-auto pb-2">
+                <div className="flex items-start gap-2 min-w-max">
+                  {selected.nodes.map((node, i) => (
+                    <div key={node.id} className="flex items-center gap-2">
+                      <FlowNodeBox node={node} />
+                      {i < selected.nodes.length - 1 && (
+                        <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Node detail table */}
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Node Detail</p>
+              <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+                {selected.nodes.map(node => {
+                  const dotCls = node.status === 'active' ? 'bg-emerald-400' : node.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400';
+                  const lblCls = node.status === 'active' ? 'text-emerald-700' : node.status === 'pending' ? 'text-amber-700' : 'text-rose-700';
+                  return (
+                    <div key={node.id} className="flex items-center gap-3 px-4 py-2.5">
+                      <span className="text-[9px] font-bold uppercase w-20 shrink-0 text-muted-foreground/60">{node.type}</span>
+                      <span className="text-[12px] font-medium text-foreground flex-1">{node.label}</span>
+                      <span className="text-[11px] text-muted-foreground flex-1">{node.detail}</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className={`w-1.5 h-1.5 rounded-full ${dotCls}`} />
+                        <span className={`text-[10px] font-semibold ${lblCls}`}>{node.status}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="text-[11px] text-muted-foreground italic px-1">
+              Programs: {selected.programs.join(', ')}
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// ── Tab 7: Channel Registry (ObjectWorkspace) ─────────────────────────────────
+
 function ChannelOverview({ ch }: { ch: SlackChannel }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-2xl">
-        <div className="flex items-center gap-2 flex-wrap">
-          <ReadinessBadge status={ch.lifecycle} />
-          <ReadinessBadge status={ch.governanceStatus} />
-          {ch.pennyEnabled && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-pink-50 text-pink-700 border border-pink-200">Penny Enabled</span>}
-        </div>
-        <p className="text-[12px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-3">{ch.description}</p>
         <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-          <InfoRow label="Purpose"       value={ch.purpose} />
-          <InfoRow label="Topic"         value={ch.topic} />
-          <InfoRow label="Members"       value={`${ch.memberCount} members`} />
-          <InfoRow label="Owner"         value={ch.owner} />
-          <InfoRow label="Created"       value={ch.createdAt} />
-          <InfoRow label="Archive Policy" value={ch.archivePolicy} />
-          <InfoRow label="Message Rate"  value={ch.messageFrequency} />
-          {ch.relatedProgram && <InfoRow label="Program" value={ch.relatedProgram} />}
-          {ch.relatedCohort  && <InfoRow label="Cohort"  value={ch.relatedCohort} />}
-          {ch.relatedRole    && <InfoRow label="Role"    value={ch.relatedRole} />}
+          <InfoRow label="Purpose"      value={ch.purpose} />
+          <InfoRow label="Lifecycle"    value={<ReadinessBadge status={ch.lifecycle} />} />
+          <InfoRow label="Penny"        value={ch.pennyEnabled ? `Enabled · ${ch.pennyCapabilities.length} capabilities` : 'Not enabled'} />
+          <InfoRow label="UOM Object"   value={ch.uomObjectId ?? '—'} />
+          <InfoRow label="Governance"   value={ch.governanceStatus} />
         </div>
-        <div className="flex items-center gap-2">
-          <HealthDot health={ch.health} />
-          <span className="text-[12px] text-muted-foreground">{ch.healthNote}</span>
-        </div>
-      </div>
-    </ScrollArea>
-  );
-}
-
-function ChannelPenny({ ch }: { ch: SlackChannel }) {
-  const caps = PENNY_SLACK_CAPABILITIES.filter(cap => cap.enabledChannels.includes(ch.name));
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-2xl">
-        {ch.pennyEnabled && caps.length > 0 ? (
-          caps.map(cap => (
-            <div key={cap.id} className="rounded-lg border border-pink-200 bg-pink-50/40 p-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-[12px] font-bold text-foreground">{cap.capabilityName}</p>
-                <ReadinessBadge status={cap.readiness} />
-              </div>
-              <div className="rounded-lg border border-border bg-white divide-y divide-border/40 text-[11px]">
-                <InfoRow label="Trigger"     value={cap.deliveryTrigger} />
-                <InfoRow label="Condition"   value={cap.triggerCondition} />
-                <InfoRow label="Format"      value={cap.outputFormat} />
-                {cap.escalationChannel && <InfoRow label="Escalation" value={cap.escalationChannel} />}
-                {cap.qualityScore !== undefined && <InfoRow label="Quality" value={`${cap.qualityScore}%`} />}
-              </div>
+        <p className="text-[12px] text-muted-foreground leading-relaxed">{ch.description}</p>
+        {ch.pennyCapabilities.length > 0 && (
+          <div>
+            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Penny Capabilities</p>
+            <div className="flex flex-wrap gap-1.5">
+              {ch.pennyCapabilities.map(c => <span key={c} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-pink-50 border border-pink-200 text-pink-700">{c}</span>)}
             </div>
-          ))
-        ) : !ch.pennyEnabled ? (
-          <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">Penny is not enabled for <strong>{ch.name}</strong>.</p>
-            {ch.lifecycle === 'active' && <p className="text-[11px] text-muted-foreground mt-1">To enable, assign Penny capabilities in the Penny Integration tab and ensure the bot is a channel member.</p>}
-          </div>
-        ) : (
-          <p className="text-[12px] text-muted-foreground">No Penny capabilities configured for this channel.</p>
-        )}
-      </div>
-    </ScrollArea>
-  );
-}
-
-function ChannelGovernance({ ch }: { ch: SlackChannel }) {
-  const record = SLACK_GOVERNANCE.find(g => g.name === ch.name || g.name.includes(ch.name.replace('#','')));
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-2xl">
-        {record ? (
-          <>
-            <div className={`rounded-lg border p-3 ${record.complianceStatus === 'compliant' ? 'border-emerald-200 bg-emerald-50' : record.complianceStatus === 'partial' ? 'border-amber-200 bg-amber-50' : 'border-rose-200 bg-rose-50'}`}>
-              <p className="text-[11px] font-bold uppercase text-foreground/70 mb-0.5">Compliance Status</p>
-              <p className="text-[12px] font-bold text-foreground capitalize">{record.complianceStatus}</p>
-            </div>
-            <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-              <InfoRow label="Owner"         value={record.owner} />
-              <InfoRow label="Review Cadence" value={record.reviewCadence} />
-              <InfoRow label="Last Review"   value={record.lastReview ?? '—'} />
-              <InfoRow label="Next Review"   value={record.nextReview ?? '—'} />
-              <InfoRow label="Archive Policy" value={ch.archivePolicy} />
-            </div>
-            {record.issues.length > 0 && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-1">
-                <p className="text-[10px] font-bold uppercase text-amber-700 mb-1.5">Open Issues</p>
-                {record.issues.map((issue, i) => (
-                  <p key={i} className="text-[11px] text-amber-800 flex items-start gap-1.5"><span className="mt-0.5">⚠</span>{issue}</p>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 p-4">
-            <p className="text-[12px] font-bold text-rose-700 mb-1">Missing Governance Record</p>
-            <p className="text-[11px] text-rose-700">No governance record found for {ch.name}. Owner, review cadence, and archive policy must be documented.</p>
           </div>
         )}
       </div>
@@ -344,96 +645,462 @@ function ChannelGovernance({ ch }: { ch: SlackChannel }) {
 
 function ChannelRegistry() {
   const items = useMemo<WorkspaceItem[]>(() => SLACK_CHANNELS.map(ch => ({
-    id: ch.id,
-    name: ch.name,
-    typeName: ch.purpose,
-    typeColor: ch.purpose === 'cohort' ? 'text-emerald-700' : ch.purpose === 'coach' ? 'text-blue-700' : ch.purpose === 'penny' ? 'text-pink-700' : 'text-teal-700',
-    typeBg:    ch.purpose === 'cohort' ? 'bg-emerald-50'    : ch.purpose === 'coach' ? 'bg-blue-50'    : ch.purpose === 'penny' ? 'bg-pink-50'    : 'bg-teal-50',
-    status: ch.lifecycle,
-    statusVariant: (ch.lifecycle === 'active' ? 'active' : ch.lifecycle === 'archived' ? 'inactive' : 'planning') as any,
+    id: ch.id, name: ch.name,
+    typeName: ch.purpose, typeColor:'text-teal-700', typeBg:'bg-teal-50',
+    status: ch.lifecycle, statusVariant: ch.lifecycle === 'active' ? 'active' as const : 'planning' as const,
     health: ch.health,
-    secondary: `${ch.memberCount} members · ${ch.governanceStatus}`,
+    secondary: ch.description,
     owner: ch.owner,
   })), []);
 
   const tabs = useMemo<WorkspaceTab[]>(() => [
-    { id:'overview',    label:'Overview',    render:(item) => { const ch = SLACK_CHANNELS.find(c => c.id === item.id); return ch ? <ChannelOverview ch={ch} /> : null; } },
-    { id:'penny',       label:'Penny',       render:(item) => { const ch = SLACK_CHANNELS.find(c => c.id === item.id); return ch ? <ChannelPenny ch={ch} /> : null; } },
-    { id:'governance',  label:'Governance',  render:(item) => { const ch = SLACK_CHANNELS.find(c => c.id === item.id); return ch ? <ChannelGovernance ch={ch} /> : null; } },
-    { id:'health',      label:'Health',      render:(item) => {
-      const ch = SLACK_CHANNELS.find(c => c.id === item.id);
-      if (!ch) return null;
-      return (
-        <ScrollArea className="h-full">
-          <div className="p-5 space-y-3 max-w-2xl">
+    { id:'overview', label:'Overview', render:(item) => { const ch = SLACK_CHANNELS.find(c => c.id === item.id); return ch ? <ChannelOverview ch={ch} /> : null; } },
+    { id:'health', label:'Health', render:(item) => {
+        const ch = SLACK_CHANNELS.find(c => c.id === item.id);
+        if (!ch) return null;
+        return (
+          <ScrollArea className="h-full"><div className="p-5 space-y-2 max-w-xl">
             {[
-              { label:'Channel Lifecycle', health:ch.health, note:ch.healthNote },
-              { label:'Governance',        health: (ch.governanceStatus === 'compliant' ? 'healthy' : ch.governanceStatus === 'needs-review' || ch.governanceStatus === 'missing-metadata' ? 'needs-attention' : 'incomplete') as any, note:ch.governanceStatus },
-              { label:'Penny Integration', health: (ch.pennyEnabled ? 'healthy' : 'incomplete') as any, note: ch.pennyEnabled ? `${ch.pennyCapabilities.length} capabilities` : 'Not enabled' },
-              { label:'UOM Mapping',       health: (ch.uomObjectId ? 'healthy' : 'needs-attention') as any, note: ch.uomObjectId ?? 'No UOM object ID' },
+              { label:'Channel Lifecycle',  health:ch.health,                                                                                                                                                                              note:ch.healthNote },
+              { label:'Governance',         health:(ch.governanceStatus === 'compliant' ? 'healthy' : ch.governanceStatus === 'needs-review' ? 'needs-attention' : 'incomplete') as any, note:ch.governanceStatus },
+              { label:'Penny Integration',  health:(ch.pennyEnabled ? 'healthy' : 'incomplete') as any,                                                                                                                                    note:ch.pennyEnabled ? `${ch.pennyCapabilities.length} capabilities` : 'Not enabled' },
+              { label:'UOM Mapping',        health:(ch.uomObjectId ? 'healthy' : 'needs-attention') as any,                                                                                                                                 note:ch.uomObjectId ?? 'No UOM object ID' },
             ].map(ind => (
               <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                <div className="flex items-center gap-2.5">
-                  <HealthDot health={ind.health} />
-                  <span className="text-[12px] font-medium text-foreground">{ind.label}</span>
-                </div>
+                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[12px] font-medium">{ind.label}</span></div>
                 <span className="text-[11px] text-muted-foreground">{ind.note}</span>
               </div>
             ))}
-          </div>
-        </ScrollArea>
-      );
-    }},
+          </div></ScrollArea>
+        );
+      },
+    },
   ], []);
 
-  return <ObjectWorkspace icon={Hash} items={items} tabs={tabs} emptyTitle="Select a channel" emptyBody="Choose a Slack channel to view its configuration, Penny integration, governance, and health." />;
+  return <ObjectWorkspace icon={Hash} items={items} tabs={tabs} emptyTitle="Select a channel" emptyBody="Choose a Slack channel to view its configuration, Penny integration, and health." />;
 }
 
-// ── Tab 4: User & Role Mapping (ObjectWorkspace) ──────────────────────────────
-function UserMappingDetail({ mapping }: { mapping: SlackUserMapping }) {
-  const roleColor = mapping.roleType === 'learner' ? 'text-emerald-700' : mapping.roleType === 'coach' ? 'text-blue-700' : mapping.roleType === 'executive-director' ? 'text-violet-700' : mapping.roleType === 'admin' ? 'text-orange-700' : 'text-muted-foreground';
-  const roleBg    = mapping.roleType === 'learner' ? 'bg-emerald-50' : mapping.roleType === 'coach' ? 'bg-blue-50' : mapping.roleType === 'executive-director' ? 'bg-violet-50' : mapping.roleType === 'admin' ? 'bg-orange-50' : 'bg-muted';
+// ── Tab 8: Object Profiles ────────────────────────────────────────────────────
+
+function ProfileDetail({ profile }: { profile: typeof SLACK_OBJECT_PROFILES[0] }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-2xl">
-        <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${roleBg} ${roleColor} border-border`}>{mapping.roleLabel}</span>
-          <ReadinessBadge status={mapping.mappingStatus} />
-        </div>
         <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-          <InfoRow label="Slack Display"   value={mapping.slackDisplayName} />
-          <InfoRow label="Slack User ID"   value={<code className="font-mono text-[11px]">{mapping.slackUserId}</code>} />
-          <InfoRow label="Trail OS Persona" value={mapping.trailOsPersonaName} />
-          <InfoRow label="Role Type"       value={mapping.roleLabel} />
-          <InfoRow label="Mapping Status"  value={<ReadinessBadge status={mapping.mappingStatus} />} />
-          <InfoRow label="Penny Enabled"   value={mapping.pennyEnabled ? <span className="text-emerald-600 font-semibold">Yes</span> : <span className="text-rose-600 font-semibold">No</span>} />
+          <InfoRow label="Object Type"   value={profile.objectType} />
+          <InfoRow label="Status"        value={<ReadinessBadge status={profile.status} />} />
+          <InfoRow label="Owner"         value={profile.owner} />
+          <InfoRow label="Governance"    value={profile.governanceStatus} />
+          {profile.memberCount !== undefined && <InfoRow label="Members" value={String(profile.memberCount)} />}
+          {profile.botAccess !== undefined && <InfoRow label="Bot Access" value={profile.botAccess ? 'Granted' : 'Not granted'} />}
+          {profile.pennyEnabled !== undefined && <InfoRow label="Penny Enabled" value={profile.pennyEnabled ? 'Yes' : 'No'} />}
+          {profile.lastActivity && <InfoRow label="Last Activity" value={profile.lastActivity} />}
         </div>
-        {mapping.relatedPrograms.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Purpose</p>
+          <p className="text-[12px] text-muted-foreground leading-relaxed">{profile.purpose}</p>
+        </div>
+        {profile.programs.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Related Programs</p>
-            <div className="flex flex-wrap gap-1">
-              {mapping.relatedPrograms.map(p => <span key={p} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-foreground">{p}</span>)}
+            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Programs</p>
+            <div className="flex flex-wrap gap-1.5">
+              {profile.programs.map(p => <span key={p} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-700">{p}</span>)}
             </div>
           </div>
         )}
-        {mapping.relatedCohorts.length > 0 && (
-          <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Related Cohorts</p>
-            <div className="flex flex-wrap gap-1">
-              {mapping.relatedCohorts.map(c => <span key={c} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-foreground">{c}</span>)}
-            </div>
+        {profile.notes && (
+          <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
+            <p className="text-[11px] text-muted-foreground italic">{profile.notes}</p>
           </div>
         )}
-        {mapping.mappingStatus !== 'mapped' && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-            <p className="text-[11px] font-bold text-amber-700 mb-1">Mapping Issues</p>
-            {mapping.mappingStatus === 'unmapped' ? (
-              <p className="text-[11px] text-amber-800">This Slack user has no Trail OS persona assigned. Penny cannot deliver messages to unmapped users.</p>
-            ) : (
-              <p className="text-[11px] text-amber-800">Partial mapping — some fields are missing. Check Penny enablement and related programs.</p>
+      </div>
+    </ScrollArea>
+  );
+}
+
+function ObjectProfilesTab() {
+  const items = useMemo<WorkspaceItem[]>(() => SLACK_OBJECT_PROFILES.map(p => ({
+    id: p.id, name: p.name,
+    typeName: p.objectType, typeColor: p.objectType === 'channel' ? 'text-teal-700' : p.objectType === 'usergroup' ? 'text-violet-700' : 'text-blue-700',
+    typeBg: p.objectType === 'channel' ? 'bg-teal-50' : p.objectType === 'usergroup' ? 'bg-violet-50' : 'bg-blue-50',
+    status: p.status, statusVariant: p.health === 'healthy' ? 'active' as const : 'planning' as const,
+    health: p.health, secondary: p.secondary, owner: p.owner,
+  })), []);
+
+  const tabs = useMemo<WorkspaceTab[]>(() => [
+    { id:'detail', label:'Profile', render:(item) => { const p = SLACK_OBJECT_PROFILES.find(x => x.id === item.id); return p ? <ProfileDetail profile={p} /> : null; } },
+    { id:'health', label:'Health', render:(item) => {
+        const p = SLACK_OBJECT_PROFILES.find(x => x.id === item.id);
+        if (!p) return null;
+        return (
+          <ScrollArea className="h-full"><div className="p-5 space-y-2 max-w-xl">
+            {[
+              { label:'Object Health',    health:p.health,                                                                                                                          note:p.status },
+              { label:'Governance',       health:(p.governanceStatus === 'compliant' ? 'healthy' : p.governanceStatus === 'needs-review' ? 'needs-attention' : 'incomplete') as any, note:p.governanceStatus },
+              { label:'Owner Assigned',   health:(p.owner && p.owner !== 'Unassigned' ? 'healthy' : 'needs-attention') as any,                                                      note:p.owner },
+              { label:'Program Mapped',   health:(p.programs.length > 0 ? 'healthy' : 'needs-attention') as any,                                                                   note:p.programs.length > 0 ? p.programs.join(', ') : 'No program mapping' },
+            ].map(ind => (
+              <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
+                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[12px] font-medium">{ind.label}</span></div>
+                <span className="text-[11px] text-muted-foreground">{ind.note}</span>
+              </div>
+            ))}
+          </div></ScrollArea>
+        );
+      },
+    },
+  ], []);
+
+  return <ObjectWorkspace icon={Layers} items={items} tabs={tabs} emptyTitle="Select an object" emptyBody="Choose a channel, user group, or template to view its Universal Object Profile." />;
+}
+
+// ── Tab 9: Operational Scenarios ──────────────────────────────────────────────
+
+function ScenariosTab() {
+  const [selectedId, setSelectedId] = useState<string>('scenario-weekly-reflection');
+  const selected = OPERATIONAL_SCENARIOS.find(s => s.id === selectedId) ?? OPERATIONAL_SCENARIOS[0];
+  const summary = getScenarioSummary();
+
+  const catCls: Record<string, string> = {
+    'Coaching':'bg-violet-50 text-violet-700 border-violet-200',
+    'Briefing':'bg-blue-50 text-blue-700 border-blue-200',
+    'Escalation':'bg-rose-50 text-rose-700 border-rose-200',
+    'Announcement':'bg-emerald-50 text-emerald-700 border-emerald-200',
+  };
+
+  const stepTypeCls: Record<string, string> = {
+    trigger:'bg-amber-100 text-amber-800',program:'bg-emerald-100 text-emerald-800',
+    channel:'bg-teal-100 text-teal-800',penny:'bg-pink-100 text-pink-800',
+    template:'bg-violet-100 text-violet-800',delivery:'bg-blue-100 text-blue-800',signal:'bg-orange-100 text-orange-800',
+  };
+
+  return (
+    <div className="flex h-full">
+      <div className="w-56 shrink-0 border-r border-border flex flex-col">
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Mock Scenarios</p>
+          <p className="text-[10px] text-muted-foreground">{summary.partial} partial · {summary.blocked} blocked · avg {summary.avgScore}%</p>
+        </div>
+        <ScrollArea className="flex-1">
+          {OPERATIONAL_SCENARIOS.map(s => (
+            <button
+              key={s.id}
+              onClick={() => setSelectedId(s.id)}
+              className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedId === s.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+            >
+              <div className="flex-1">
+                <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">{s.name}</p>
+                <ReadinessBadge status={s.status} />
+              </div>
+            </button>
+          ))}
+        </ScrollArea>
+      </div>
+      <div className="flex-1 min-w-0">
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-4 max-w-2xl">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${catCls[selected.category] ?? 'bg-muted border-border'}`}>{selected.category}</span>
+                <h3 className="text-[14px] font-bold text-foreground">{selected.name}</h3>
+              </div>
+              <p className="text-[12px] text-muted-foreground leading-relaxed">{selected.description}</p>
+            </div>
+
+            <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+              <InfoRow label="Trigger"         value={selected.trigger} />
+              <InfoRow label="Programs"        value={selected.programs.join(', ')} />
+              <InfoRow label="Penny"           value={selected.pennyCapability} />
+              <InfoRow label="Destination"     value={<code className="font-mono text-[11px]">{selected.destination}</code>} />
+              <InfoRow label="Status"          value={<ReadinessBadge status={selected.status} />} />
+              <InfoRow label="Readiness"       value={<ScoreBar score={selected.readinessScore} />} />
+            </div>
+
+            {/* Step flow */}
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Scenario Flow</p>
+              <div className="space-y-1.5">
+                {selected.flow.map(step => {
+                  const dotCls = step.status === 'ready' ? 'bg-emerald-400' : step.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400';
+                  const rowBg = step.status === 'blocked' ? 'bg-rose-50 border-rose-200' : step.status === 'pending' ? 'bg-amber-50/50 border-amber-200/60' : 'bg-white border-border';
+                  return (
+                    <div key={step.step} className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${rowBg}`}>
+                      <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0">{step.step}</span>
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold shrink-0 mt-0.5 ${stepTypeCls[step.type] ?? 'bg-muted'}`}>{step.type}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-semibold text-foreground">{step.label}</p>
+                        <p className="text-[11px] text-muted-foreground">{step.detail}</p>
+                      </div>
+                      <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${dotCls}`} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {selected.blockers.length > 0 && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
+                <p className="text-[11px] font-bold text-rose-700 mb-1.5">Blockers ({selected.blockers.length})</p>
+                <ul className="space-y-0.5">
+                  {selected.blockers.map((b, i) => (
+                    <li key={i} className="flex items-center gap-2 text-[11px] text-rose-700">
+                      <XCircle className="w-3 h-3 shrink-0" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
-        )}
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// ── Tab 10: Governance ────────────────────────────────────────────────────────
+
+function GovernanceTab() {
+  const [filter, setFilter] = useState<string>('All');
+  const summary = getGovernanceSummary();
+  const severities = ['All','Critical','High','Medium','Low'];
+  const filtered = filter === 'All' ? GOVERNANCE_ISSUES : GOVERNANCE_ISSUES.filter(i => i.severity === filter);
+
+  const catCls: Record<string, string> = {
+    'Ownership':'bg-violet-50 text-violet-700 border-violet-200',
+    'Missing Mapping':'bg-amber-50 text-amber-700 border-amber-200',
+    'Permission':'bg-rose-50 text-rose-700 border-rose-200',
+    'Orphaned':'bg-muted text-muted-foreground border-border',
+    'Inactive':'bg-sky-50 text-sky-700 border-sky-200',
+    'Configuration':'bg-rose-50 text-rose-700 border-rose-200',
+  };
+
+  const statusIcon = (s: GovernanceIssue['status']) =>
+    s === 'Resolved' ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> :
+    s === 'In Progress' ? <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" /> :
+    <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-6 space-y-4 max-w-3xl">
+        {/* Summary */}
+        <div className="grid grid-cols-4 gap-3">
+          {[
+            { label:'Critical', value:summary.critical, cls:'border-rose-200 bg-rose-50 text-rose-700' },
+            { label:'High',     value:summary.high,     cls:'border-orange-200 bg-orange-50 text-orange-700' },
+            { label:'Medium',   value:summary.medium,   cls:'border-amber-200 bg-amber-50 text-amber-700' },
+            { label:'Low',      value:summary.low,      cls:'border-border bg-muted/30 text-muted-foreground' },
+          ].map(s => (
+            <div key={s.label} className={`rounded-lg border text-center py-2.5 ${s.cls}`}>
+              <p className="text-[22px] font-bold leading-none">{s.value}</p>
+              <p className="text-[10px] font-bold uppercase mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Severity filter */}
+        <div className="flex items-center gap-1">
+          {severities.map(s => (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`px-3 py-1 rounded text-[11px] font-semibold border transition-colors ${filter === s ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-foreground border-border hover:bg-muted/40'}`}
+            >{s}</button>
+          ))}
+        </div>
+
+        {/* Issues list */}
+        <div className="space-y-2">
+          {filtered.map(issue => (
+            <div key={issue.id} className="rounded-lg border border-border bg-white px-4 py-3">
+              <div className="flex items-start gap-3">
+                {statusIcon(issue.status)}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <SeverityBadge sev={issue.severity} />
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${catCls[issue.category] ?? 'bg-muted border-border'}`}>{issue.category}</span>
+                    <span className="text-[12px] font-semibold text-foreground">{issue.title}</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">{issue.detail}</p>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground/60 shrink-0 mt-0.5">Resolution:</span>
+                    <span className="text-[11px] text-emerald-700">{issue.resolution}</span>
+                  </div>
+                  {issue.affectedObjects.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {issue.affectedObjects.map(o => <span key={o} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-muted border border-border text-muted-foreground font-mono">{o}</span>)}
+                    </div>
+                  )}
+                </div>
+                <ReadinessBadge status={issue.status} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
+
+// ── Tab 11: Test Suite ────────────────────────────────────────────────────────
+
+function TestSuiteTab() {
+  const [selectedSuiteId, setSelectedSuiteId] = useState<string>('suite-secrets');
+  const selectedSuite = TEST_SUITES.find(s => s.id === selectedSuiteId) ?? TEST_SUITES[0];
+  const overall = getOverallTestSummary();
+
+  const statusIcon = (s: string) => {
+    if (s === 'pass')    return <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
+    if (s === 'fail')    return <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
+    if (s === 'warning') return <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />;
+    if (s === 'blocked') return <span className="w-3.5 h-3.5 rounded bg-rose-200 flex items-center justify-center shrink-0"><span className="text-[8px] text-rose-700 font-bold">B</span></span>;
+    return <span className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 shrink-0 inline-block" />;
+  };
+
+  return (
+    <div className="flex h-full">
+      {/* Left: suite list */}
+      <div className="w-52 shrink-0 border-r border-border flex flex-col">
+        <div className="px-4 py-3 border-b border-border bg-muted/30">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Test Suites</p>
+          <p className="text-[10px] text-muted-foreground">{overall.pass}/{overall.total} passing · {overall.pct}%</p>
+        </div>
+        <ScrollArea className="flex-1">
+          {TEST_SUITES.map(suite => {
+            const sum = getTestSuiteSummary(suite);
+            return (
+              <button
+                key={suite.id}
+                onClick={() => setSelectedSuiteId(suite.id)}
+                className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedSuiteId === suite.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+              >
+                <div className="flex-1">
+                  <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">{suite.name}</p>
+                  <div className="flex items-center gap-2">
+                    <ScoreBar score={sum.pct} />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{sum.pass}/{sum.total} passing</p>
+                </div>
+              </button>
+            );
+          })}
+        </ScrollArea>
+      </div>
+      {/* Right: test cases */}
+      <div className="flex-1 min-w-0">
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-4 max-w-2xl">
+            <div>
+              <h3 className="text-[14px] font-bold text-foreground mb-1">{selectedSuite.name}</h3>
+              <p className="text-[12px] text-muted-foreground leading-relaxed">{selectedSuite.description}</p>
+            </div>
+            {/* Suite stats */}
+            {(() => {
+              const sum = getTestSuiteSummary(selectedSuite);
+              return (
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { label:'Pass',    value:sum.pass,    cls:'text-emerald-600 bg-emerald-50 border-emerald-200' },
+                    { label:'Fail',    value:sum.fail,    cls:'text-rose-600 bg-rose-50 border-rose-200' },
+                    { label:'Blocked', value:sum.blocked, cls:'text-rose-600 bg-rose-50 border-rose-200' },
+                    { label:'Warning', value:sum.warning, cls:'text-amber-600 bg-amber-50 border-amber-200' },
+                  ].map(s => (
+                    <div key={s.label} className={`rounded border text-center py-2 ${s.cls}`}>
+                      <p className="text-[18px] font-bold leading-none">{s.value}</p>
+                      <p className="text-[9px] font-bold uppercase mt-0.5">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+            {/* Test cases */}
+            <div className="space-y-2">
+              {selectedSuite.tests.map(test => (
+                <div key={test.id} className="rounded-lg border border-border bg-white px-4 py-3">
+                  <div className="flex items-start gap-2.5 mb-1.5">
+                    {statusIcon(test.status)}
+                    <div className="flex-1">
+                      <p className="text-[12px] font-semibold text-foreground">{test.name}</p>
+                      <p className="text-[11px] text-muted-foreground">{test.description}</p>
+                    </div>
+                    <ReadinessBadge status={test.status} />
+                  </div>
+                  <div className="ml-6">
+                    <p className="text-[11px] text-muted-foreground italic">{test.result}</p>
+                    {test.blockedBy && (
+                      <p className="text-[10px] text-rose-600 mt-0.5">Blocked by: {test.blockedBy}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// ── Tab 12: Integration Health ────────────────────────────────────────────────
+
+function IntegrationHealthTab() {
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-6 space-y-4 max-w-3xl">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Health Scorecard</p>
+        <div className="space-y-3">
+          {SLACK_HEALTH_SCORES.map(s => (
+            <div key={s.dimension} className="rounded-lg border border-border bg-white px-4 py-3">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-[12px] font-bold text-foreground capitalize">{s.dimension}</span>
+                <span className="ml-auto text-[11px] font-bold tabular-nums">{s.score}/{s.maxScore}</span>
+                <ReadinessBadge status={s.status} />
+              </div>
+              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${s.status === 'ready' ? 'bg-emerald-400' : s.status === 'partial' ? 'bg-amber-400' : 'bg-rose-400'}`}
+                  style={{ width:`${Math.round((s.score / s.maxScore)*100)}%` }}
+                />
+              </div>
+              {s.items.filter(it => it.status === 'fail').length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {s.items.filter(it => it.status === 'fail').map(it => <span key={it.label} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-rose-50 border border-rose-200 text-rose-600">{it.label}</span>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Dimension Detail</p>
+          <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+            {SLACK_HEALTH_SCORES.flatMap(s => s.items.filter(it => it.status !== 'pass')).map((it, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 py-2.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span className="text-[12px] text-foreground">{it.label}</span>
+                <span className="ml-auto text-[11px] text-muted-foreground">{it.note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
+
+// ── Tab: User & Role Map (legacy enhanced) ────────────────────────────────────
+
+function UserMappingDetail({ mapping }: { mapping: SlackUserMapping }) {
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-5 space-y-4 max-w-2xl">
+        <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+          <InfoRow label="Slack Handle"   value={<code className="font-mono text-[11px]">{mapping.slackUserId}</code>} />
+          <InfoRow label="Mapping Status" value={<ReadinessBadge status={mapping.mappingStatus} />} />
+          <InfoRow label="Trail OS Persona" value={mapping.trailOsPersonaName ?? '—'} />
+          <InfoRow label="Programs"       value={mapping.relatedPrograms.join(', ') || '—'} />
+          <InfoRow label="Penny Enabled"  value={mapping.pennyEnabled ? 'Yes' : 'No'} />
+        </div>
       </div>
     </ScrollArea>
   );
@@ -441,182 +1108,64 @@ function UserMappingDetail({ mapping }: { mapping: SlackUserMapping }) {
 
 function UserRoleMapping() {
   const items = useMemo<WorkspaceItem[]>(() => SLACK_USER_MAPPINGS.map(m => ({
-    id: m.id,
-    name: m.slackDisplayName,
-    typeName: m.roleLabel,
-    typeColor: m.roleType === 'learner' ? 'text-emerald-700' : m.roleType === 'coach' ? 'text-blue-700' : 'text-muted-foreground',
-    typeBg:    m.roleType === 'learner' ? 'bg-emerald-50'    : m.roleType === 'coach' ? 'bg-blue-50'    : 'bg-muted',
-    status: m.mappingStatus,
-    statusVariant: (m.mappingStatus === 'mapped' ? 'active' : m.mappingStatus === 'partial' ? 'planning' : 'draft') as any,
+    id: m.id, name: m.slackDisplayName,
+    typeName: m.roleType, typeColor:'text-violet-700', typeBg:'bg-violet-50',
+    status: m.mappingStatus, statusVariant: m.healthStatus === 'healthy' ? 'active' as const : 'planning' as const,
     health: m.healthStatus,
-    secondary: m.trailOsPersonaName,
-    owner: m.roleLabel,
+    secondary: `${m.slackUserId} · ${m.trailOsPersonaName ?? 'No persona'}`,
+    owner: 'Admin',
   })), []);
 
   const tabs = useMemo<WorkspaceTab[]>(() => [
     { id:'detail', label:'Detail', render:(item) => { const m = SLACK_USER_MAPPINGS.find(x => x.id === item.id); return m ? <UserMappingDetail mapping={m} /> : null; } },
     { id:'health', label:'Health', render:(item) => {
-      const m = SLACK_USER_MAPPINGS.find(x => x.id === item.id);
-      if (!m) return null;
-      return (
-        <ScrollArea className="h-full">
-          <div className="p-5 space-y-3 max-w-2xl">
+        const m = SLACK_USER_MAPPINGS.find(x => x.id === item.id);
+        if (!m) return null;
+        return (
+          <ScrollArea className="h-full"><div className="p-5 space-y-2 max-w-xl">
             {[
-              { label:'Mapping Status',    health:m.healthStatus, note:m.mappingStatus },
-              { label:'Persona Assigned',  health: (m.trailOsPersonaId ? 'healthy' : 'incomplete') as any, note: m.trailOsPersonaName || '—' },
-              { label:'Penny Enablement',  health: (m.pennyEnabled ? 'healthy' : 'incomplete') as any, note: m.pennyEnabled ? 'Enabled' : 'Not enabled' },
-              { label:'Program Coverage',  health: (m.relatedPrograms.length > 0 ? 'healthy' : 'needs-attention') as any, note: m.relatedPrograms.join(', ') || 'No programs assigned' },
+              { label:'Mapping Status',   health:m.healthStatus,                                                 note:m.mappingStatus },
+              { label:'Persona Assigned', health:(m.trailOsPersonaId ? 'healthy' : 'incomplete') as any,        note:m.trailOsPersonaName || '—' },
+              { label:'Penny Enabled',    health:(m.pennyEnabled ? 'healthy' : 'incomplete') as any,            note:m.pennyEnabled ? 'Enabled' : 'Not enabled' },
+              { label:'Program Coverage', health:(m.relatedPrograms.length > 0 ? 'healthy' : 'needs-attention') as any, note:m.relatedPrograms.join(', ') || 'No programs' },
             ].map(ind => (
               <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                <div className="flex items-center gap-2.5">
-                  <HealthDot health={ind.health} />
-                  <span className="text-[12px] font-medium text-foreground">{ind.label}</span>
-                </div>
+                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[12px] font-medium">{ind.label}</span></div>
                 <span className="text-[11px] text-muted-foreground">{ind.note}</span>
               </div>
             ))}
-          </div>
-        </ScrollArea>
-      );
-    }},
+          </div></ScrollArea>
+        );
+      },
+    },
   ], []);
 
-  return <ObjectWorkspace icon={Users} items={items} tabs={tabs} emptyTitle="Select a user" emptyBody="Choose a user mapping to view their persona assignment, Penny enablement, and program connections." />;
+  return <ObjectWorkspace icon={Users} items={items} tabs={tabs} emptyTitle="Select a user mapping" emptyBody="Choose a user mapping to view its detail and health." />;
 }
 
-// ── Tab 5: Penny Integration ──────────────────────────────────────────────────
-function PennyIntegrationTab() {
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">All Penny AI capabilities configured for Slack delivery. Operational capabilities require a connected bot token.</p>
-        {PENNY_SLACK_CAPABILITIES.map(cap => (
-          <div key={cap.id} className="rounded-lg border border-border bg-white p-4 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="text-[13px] font-bold text-foreground">{cap.capabilityName}</p>
-                <p className="text-[11px] text-muted-foreground">{cap.triggerCondition}</p>
-              </div>
-              <ReadinessBadge status={cap.readiness} />
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-[11px]">
-              <div>
-                <p className="text-[9px] font-bold uppercase text-muted-foreground/60 mb-1">Enabled Channels</p>
-                {cap.enabledChannels.length > 0 ? (
-                  cap.enabledChannels.map(ch => <p key={ch} className="text-foreground font-mono">{ch}</p>)
-                ) : (
-                  <p className="text-muted-foreground">Not yet configured</p>
-                )}
-              </div>
-              <div>
-                <p className="text-[9px] font-bold uppercase text-muted-foreground/60 mb-1">Output Format</p>
-                <p className="text-foreground">{cap.outputFormat}</p>
-              </div>
-              {cap.escalationChannel && (
-                <div>
-                  <p className="text-[9px] font-bold uppercase text-muted-foreground/60 mb-1">Escalation</p>
-                  <p className="text-foreground font-mono">{cap.escalationChannel}</p>
-                </div>
-              )}
-              {cap.qualityScore !== undefined && (
-                <div>
-                  <p className="text-[9px] font-bold uppercase text-muted-foreground/60 mb-1">Quality Score</p>
-                  <p className={`font-bold ${cap.qualityScore >= 85 ? 'text-emerald-600' : cap.qualityScore >= 75 ? 'text-amber-600' : 'text-rose-600'}`}>{cap.qualityScore}%</p>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
-  );
-}
+// ── Tab: Templates ────────────────────────────────────────────────────────────
 
-// ── Tab 6: Templates ──────────────────────────────────────────────────────────
 function TemplatesTab() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Message templates for Penny-generated and manual Slack communications. Penny-generated templates link to Prompt Studio.</p>
-        {SLACK_TEMPLATES.map(tpl => (
-          <div key={tpl.id} className="rounded-lg border border-border bg-white p-4 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div>
+      <div className="p-6 space-y-3 max-w-3xl">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-1">Message Templates</p>
+        {SLACK_TEMPLATES.map(tmpl => (
+          <div key={tmpl.id} className="rounded-lg border border-border bg-white px-4 py-3">
+            <div className="flex items-start gap-3 mb-2">
+              <div className="flex-1">
                 <div className="flex items-center gap-2 mb-0.5">
-                  {tpl.pennyGenerated && <span className="text-[8px] font-bold px-1.5 py-0.5 rounded border bg-pink-50 text-pink-700 border-pink-200">Penny</span>}
-                  <p className="text-[12px] font-bold text-foreground">{tpl.name}</p>
+                  <span className="text-[13px] font-bold text-foreground">{tmpl.name}</span>
+                  <ReadinessBadge status={tmpl.readiness} />
                 </div>
-                <p className="text-[10px] text-muted-foreground">{tpl.audience} · Trigger: {tpl.trigger}</p>
+                <p className="text-[11px] text-muted-foreground">{tmpl.purpose} · {tmpl.audience}</p>
               </div>
-              <ReadinessBadge status={tpl.readiness} />
             </div>
-            <p className="text-[11px] text-muted-foreground font-mono border-l-2 border-primary/20 pl-2 italic">{tpl.previewText}</p>
-            <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-              <span>Channel: <code className="font-mono">{tpl.channel}</code></span>
-              <span>Updated: {tpl.lastUpdated}</span>
-              {tpl.promptTemplateId && <span className="text-primary font-medium">→ {tpl.promptTemplateId}</span>}
-            </div>
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
-  );
-}
-
-// ── Tab 7: Activity Feed ──────────────────────────────────────────────────────
-function ActivityFeedTab() {
-  const typeColors: Record<string, string> = {
-    penny:'bg-pink-400', communication:'bg-blue-400', governance:'bg-orange-400',
-    channel:'bg-teal-400', user:'bg-violet-400', system:'bg-primary',
-  };
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-2 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">{SLACK_ACTIVITY.length} recent events across Penny delivery, governance, channel activity, and system updates.</p>
-        {SLACK_ACTIVITY.map(ev => (
-          <div key={ev.id} className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${ev.severity === 'warning' ? 'border-amber-200 bg-amber-50/30' : ev.severity === 'success' ? 'border-emerald-200 bg-emerald-50/20' : 'border-border bg-white'}`}>
-            <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${typeColors[ev.type] ?? 'bg-gray-300'}`} />
-            <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-semibold text-foreground">{ev.summary}</p>
-              {ev.channel && <p className="text-[10px] font-mono text-muted-foreground">{ev.channel}</p>}
-              {ev.detail && <p className="text-[10px] text-muted-foreground">{ev.detail}</p>}
-              <p className="text-[10px] text-muted-foreground/60 mt-0.5">{ev.actor} · {ev.type}</p>
-            </div>
-            <span className="text-[9px] text-muted-foreground/50 shrink-0 whitespace-nowrap">{ev.timestamp}</span>
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
-  );
-}
-
-// ── Tab 8: Governance ─────────────────────────────────────────────────────────
-function GovernanceTab() {
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Governance records for all Slack objects — workspace, channels, user mappings, and templates.</p>
-        {SLACK_GOVERNANCE.map((rec, i) => (
-          <div key={i} className={`rounded-lg border p-4 space-y-2 ${rec.complianceStatus === 'compliant' ? 'border-emerald-200 bg-white' : rec.complianceStatus === 'partial' ? 'border-amber-200 bg-amber-50/30' : 'border-rose-200 bg-rose-50/30'}`}>
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <span className="text-[9px] font-bold uppercase text-muted-foreground/60 mr-2">{rec.objectType}</span>
-                <p className="text-[12px] font-bold text-foreground">{rec.name}</p>
+            {tmpl.promptTemplateId && <p className="text-[11px] text-muted-foreground">Template ID: <span className="font-medium text-foreground font-mono">{tmpl.promptTemplateId}</span></p>}
+            {tmpl.channel && (
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono bg-teal-50 border border-teal-200 text-teal-700">{tmpl.channel}</span>
               </div>
-              <ReadinessBadge status={rec.complianceStatus === 'compliant' ? 'ready' : rec.complianceStatus === 'partial' ? 'partial' : 'not-ready'} />
-            </div>
-            <div className="flex gap-4 text-[10px] text-muted-foreground flex-wrap">
-              <span>Owner: <strong className="text-foreground">{rec.owner}</strong></span>
-              <span>Cadence: {rec.reviewCadence}</span>
-              {rec.lastReview && <span>Last: {rec.lastReview}</span>}
-              {rec.nextReview && <span>Next: {rec.nextReview}</span>}
-            </div>
-            {rec.issues.length > 0 && (
-              <ul className="space-y-0.5">
-                {rec.issues.map((issue, j) => (
-                  <li key={j} className="text-[11px] text-amber-700 flex items-start gap-1.5"><span className="mt-0.5 shrink-0">⚠</span>{issue}</li>
-                ))}
-              </ul>
             )}
           </div>
         ))}
@@ -625,162 +1174,61 @@ function GovernanceTab() {
   );
 }
 
-// ── Tab 9: Integration Health ─────────────────────────────────────────────────
-function IntegrationHealthTab() {
-  const [selected, setSelected] = useState<SlackHealthScore | null>(null);
+// ── Tab: Activity Feed ────────────────────────────────────────────────────────
+
+function ActivityFeedTab() {
+  const eventCls: Record<string, string> = {
+    message:'bg-teal-50 text-teal-700','user-joined':'bg-emerald-50 text-emerald-700',
+    'bot-action':'bg-pink-50 text-pink-700','config-change':'bg-amber-50 text-amber-700',
+    'health-check':'bg-violet-50 text-violet-700',
+  };
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {SLACK_HEALTH_SCORES.map(s => (
-            <button
-              key={s.dimension}
-              onClick={() => setSelected(selected?.dimension === s.dimension ? null : s)}
-              className={`text-left rounded-lg border p-4 transition-all ${selected?.dimension === s.dimension ? 'border-primary/30 bg-primary/5 ring-1 ring-primary/20' : 'border-border bg-white hover:bg-muted/20'}`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[12px] font-bold text-foreground">{s.label}</p>
-                <ReadinessBadge status={s.status} />
-              </div>
-              <ScoreGauge score={s.score} max={s.maxScore} status={s.status} />
-              <p className="text-[10px] text-muted-foreground mt-2">{s.note}</p>
-            </button>
-          ))}
-        </div>
-
-        {selected && (
-          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
-            <p className="text-[11px] font-bold text-foreground">{selected.label} — Detail</p>
-            {selected.items.map((item, i) => (
-              <div key={i} className="flex items-center justify-between py-1.5 border-b border-primary/10 last:border-0">
-                <div className="flex items-center gap-2">
-                  {item.status === 'pass' ? (
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  ) : item.status === 'partial' ? (
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                  ) : (
-                    <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                  )}
-                  <span className="text-[11px] font-medium text-foreground">{item.label}</span>
-                </div>
-                <span className="text-[10px] text-muted-foreground text-right max-w-xs">{item.note}</span>
-              </div>
-            ))}
+      <div className="p-6 space-y-2 max-w-3xl">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-1">Recent Activity</p>
+        {SLACK_ACTIVITY.map(ev => (
+          <div key={ev.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
+            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 ${eventCls[ev.type] ?? 'bg-muted text-muted-foreground'}`}>{ev.type}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] text-foreground font-medium">{ev.summary}</p>
+              <p className="text-[10px] text-muted-foreground">{ev.channel} · {ev.timestamp} · {ev.actor}</p>
+            </div>
           </div>
-        )}
+        ))}
       </div>
     </ScrollArea>
   );
 }
 
-// ── Tab 10: Testing Readiness ─────────────────────────────────────────────────
-function TestingReadinessTab() {
-  const [catFilter, setCatFilter] = useState('All');
-  const categories  = ['All', ...getTestCategories()];
-  const filtered    = catFilter === 'All' ? SLACK_TESTS : SLACK_TESTS.filter(t => t.category === catFilter);
-  const overall     = getOverallTestCoverage();
-  const passing     = SLACK_TESTS.filter(t => t.status === 'passing').length;
-  const partial     = SLACK_TESTS.filter(t => t.status === 'partial').length;
-  const pending     = SLACK_TESTS.filter(t => t.status === 'pending').length;
-  const critical    = SLACK_TESTS.filter(t => t.priority === 'critical').length;
-  const critPassing = SLACK_TESTS.filter(t => t.priority === 'critical' && t.status === 'passing').length;
+// ── Default export ────────────────────────────────────────────────────────────
 
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-4xl">
-        {/* Summary */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label:'Total Scenarios',   value:String(SLACK_TESTS.length),   cls:'border-primary/20 bg-primary/5' },
-            { label:'Passing',           value:String(passing),               cls:'border-emerald-200 bg-emerald-50' },
-            { label:'Partial / Pending', value:`${partial}/${pending}`,       cls:'border-amber-200 bg-amber-50' },
-            { label:'Avg Coverage',      value:`${overall}%`,                 cls:'border-border bg-muted/30' },
-          ].map(s => (
-            <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
-              <p className="text-xl font-bold font-serif text-foreground">{s.value}</p>
-              <p className="text-[10px] font-semibold text-foreground/70">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className={`rounded-lg border px-4 py-3 ${critPassing === critical ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
-          <p className={`text-[11px] font-bold uppercase mb-1 ${critPassing === critical ? 'text-emerald-700' : 'text-rose-700'}`}>
-            Critical Tests: {critPassing}/{critical} Passing
-          </p>
-          <p className={`text-[12px] leading-relaxed ${critPassing === critical ? 'text-emerald-800' : 'text-rose-800'}`}>
-            {critPassing < critical
-              ? `${critical - critPassing} critical test scenarios are not yet passing. OAuth connectivity and Penny delivery tests are the primary blockers.`
-              : 'All critical test scenarios are passing.'}
-          </p>
-        </div>
-
-        {/* Category filter */}
-        <div className="flex flex-wrap gap-1.5">
-          {categories.map(c => (
-            <button key={c} onClick={() => setCatFilter(c)}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-colors ${catFilter === c ? 'bg-foreground text-background border-foreground' : 'bg-white border-border text-muted-foreground hover:border-foreground/30'}`}
-            >{c}</button>
-          ))}
-        </div>
-
-        {/* Test scenarios */}
-        <div className="space-y-2">
-          {filtered.map(test => (
-            <div key={test.id} className={`rounded-lg border p-3 space-y-1 ${test.status === 'passing' ? 'border-emerald-200 bg-emerald-50/30' : test.status === 'partial' ? 'border-amber-200 bg-amber-50/30' : 'border-border bg-white'}`}>
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-start gap-2 min-w-0">
-                  {test.status === 'passing' ? (
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
-                  ) : test.status === 'partial' ? (
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
-                  ) : (
-                    <XCircle className="w-3.5 h-3.5 text-rose-400 mt-0.5 shrink-0" />
-                  )}
-                  <div>
-                    <p className="text-[11px] font-bold text-foreground">{test.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{test.description}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {test.priority === 'critical' && (
-                    <span className="text-[8px] font-bold bg-rose-100 text-rose-700 border border-rose-200 rounded px-1">CRITICAL</span>
-                  )}
-                  <ReadinessBadge status={test.status} />
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-[10px] text-muted-foreground pl-5.5">
-                <span>{test.type}</span>
-                <span>{test.coverage}% coverage</span>
-                {test.mockable && <span className="text-sky-600">Mockable</span>}
-                {test.automatable && <span className="text-violet-600">Auto</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </ScrollArea>
-  );
-}
-
-// ── SlackIntegrationCenter ────────────────────────────────────────────────────
 export default function SlackIntegrationCenter() {
+  const valSummary = getValidationSummary();
+  const govSummary = getGovernanceSummary();
+
+  const criticalBadge = govSummary.critical > 0
+    ? `${govSummary.critical} critical issue${govSummary.critical > 1 ? 's' : ''}`
+    : undefined;
+
   return (
     <HubShell
       title="Slack Integration Center"
       icon={Hash}
-      description="Production-focused Slack integration for Trail OS. Connects Slack workspace, channels, and users to Penny AI delivery, the Unified Object Model, Context Engine, and Operational Intelligence."
-      badge="Phase 1 — OAuth Pending"
+      description={`Phase 2: Operational workflow validation. ${valSummary.fail} secrets missing · ${govSummary.critical + govSummary.high} critical/high governance issues · all scenarios defined and partially ready.`}
+      badge={criticalBadge ?? 'Phase 2 — Workflow Validation'}
       tabs={[
-        { id:'overview',   label:'Overview',          path:'/collaboration/slack',             icon:Hash,          content:<OverviewTab /> },
-        { id:'workspace',  label:'Workspace Config',  path:'/collaboration/slack/workspace',   icon:Settings,      content:<WorkspaceConfigTab /> },
-        { id:'channels',   label:'Channel Registry',  path:'/collaboration/slack/channels',    icon:Hash,          content:<ChannelRegistry /> },
-        { id:'users',      label:'User & Role Map',   path:'/collaboration/slack/users',       icon:Users,         content:<UserRoleMapping /> },
-        { id:'penny',      label:'Penny Integration', path:'/collaboration/slack/penny',       icon:Brain,         content:<PennyIntegrationTab /> },
-        { id:'templates',  label:'Templates',         path:'/collaboration/slack/templates',   icon:FileText,      content:<TemplatesTab /> },
-        { id:'activity',   label:'Activity Feed',     path:'/collaboration/slack/activity',    icon:Activity,      content:<ActivityFeedTab /> },
-        { id:'governance', label:'Governance',        path:'/collaboration/slack/governance',  icon:Shield,        content:<GovernanceTab /> },
-        { id:'health',     label:'Integration Health',path:'/collaboration/slack/health',      icon:BarChart2,     content:<IntegrationHealthTab /> },
-        { id:'testing',    label:'Testing Readiness', path:'/collaboration/slack/testing',     icon:FlaskConical,  content:<TestingReadinessTab /> },
+        { id:'overview',    label:'Overview',            path:'/collaboration/slack',                   icon:Hash,          content:<OverviewTab /> },
+        { id:'validation',  label:'Workspace Validation',path:'/collaboration/slack/validation',        icon:Key,           content:<WorkspaceValidationTab /> },
+        { id:'prog-channel',label:'Program → Channel',   path:'/collaboration/slack/prog-channel',      icon:Map,           content:<ProgramChannelTab /> },
+        { id:'role-user',   label:'Role → User',         path:'/collaboration/slack/role-user',         icon:Users,         content:<RoleUserTab /> },
+        { id:'penny-ch',    label:'Penny → Channel',     path:'/collaboration/slack/penny-channel',     icon:Brain,         content:<PennyDeliveryTab /> },
+        { id:'flows',       label:'Flow Explorer',        path:'/collaboration/slack/flows',             icon:Workflow,      content:<FlowExplorerTab /> },
+        { id:'channels',    label:'Channel Registry',    path:'/collaboration/slack/channels',          icon:Hash,          content:<ChannelRegistry /> },
+        { id:'profiles',    label:'Object Profiles',     path:'/collaboration/slack/profiles',          icon:Layers,        content:<ObjectProfilesTab /> },
+        { id:'scenarios',   label:'Scenarios',           path:'/collaboration/slack/scenarios',         icon:Play,          content:<ScenariosTab /> },
+        { id:'governance',  label:'Governance',          path:'/collaboration/slack/governance',        icon:Shield,        content:<GovernanceTab /> },
+        { id:'testing',     label:'Test Suite',          path:'/collaboration/slack/testing',           icon:FlaskConical,  content:<TestSuiteTab /> },
+        { id:'health',      label:'Health',              path:'/collaboration/slack/health',            icon:BarChart2,     content:<IntegrationHealthTab /> },
       ]}
     />
   );
