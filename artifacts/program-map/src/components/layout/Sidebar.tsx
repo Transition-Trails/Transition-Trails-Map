@@ -123,8 +123,9 @@ const navGroups: NavGroup[] = [
     items: [
       { path: '/collaboration',               label: 'Systems Overview' },
       { path: '/collaboration/slack',         label: '⚡ Slack Integration' },
+      { path: '/collaboration/drive',         label: '📁 Google Drive' },
+      { path: '/collaboration/calendar',      label: '📅 Google Calendar' },
       { path: '/collaboration/channels',      label: 'Channels' },
-      { path: '/collaboration/calendar',      label: 'Calendar' },
       { path: '/collaboration/templates',     label: 'Templates' },
       { path: '/collaboration/briefs',        label: 'Weekly Briefs' },
       { path: '/collaboration/notifications', label: 'Notifications' },

@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Layers, LayoutGrid, GitBranch, Database, Shield, Search,
+  Layers, LayoutGrid, GitBranch, Database, Shield, Search, User,
   ArrowRight, ExternalLink, ChevronRight,
 } from 'lucide-react';
 import {
@@ -600,6 +600,62 @@ function ObjectExplorer() {
   );
 }
 
+// ── Object Profiles Tab ───────────────────────────────────────────────────────
+function ObjectProfilesTab() {
+  const [, setLocation] = useLocation();
+  const [query, setQuery] = useState('');
+  const filtered = query.trim()
+    ? OBJECT_TYPES.filter(o =>
+        o.name.toLowerCase().includes(query.toLowerCase()) ||
+        o.category.toLowerCase().includes(query.toLowerCase()) ||
+        o.purpose.toLowerCase().includes(query.toLowerCase())
+      )
+    : OBJECT_TYPES;
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-4 space-y-4">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Filter profiles…"
+            className="flex-1 h-8 rounded-md border border-border bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{filtered.length} of {OBJECT_TYPES.length}</span>
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          {filtered.map(obj => {
+            const catConfig = OBJECT_CATEGORIES.find(c => c.id === obj.category);
+            return (
+              <button
+                key={obj.id}
+                onClick={() => setLocation('/uom/explorer')}
+                className="group flex items-center gap-3 rounded-lg border border-border bg-card hover:bg-muted/40 hover:border-primary/30 transition-colors p-3 text-left w-full"
+              >
+                <div className="w-8 h-8 rounded-md bg-primary/8 flex items-center justify-center flex-shrink-0">
+                  <User className="w-4 h-4 text-primary/60" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-foreground">{obj.name}</span>
+                    {catConfig && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">{catConfig.label}</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">{obj.purpose}</p>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary/60 flex-shrink-0 transition-colors" />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
+
 // ── HubShell wiring ──────────────────────────────────────────────────────────
 function ArchTab()         { return <ArchitectureOverview />; }
 function CatalogTab()      { return <ObjectCatalog onSelectObject={() => {}} />; }
@@ -607,6 +663,7 @@ function MatrixTab()       { return <RelationshipMatrix />; }
 function SoTTab()          { return <SourceOfTruth />; }
 function GovernanceTab()   { return <Governance />; }
 function ExplorerTab()     { return <ObjectExplorer />; }
+function ProfilesTab()     { return <ObjectProfilesTab />; }
 
 export default function UnifiedObjectModel() {
   return (
@@ -621,6 +678,7 @@ export default function UnifiedObjectModel() {
         { id: 'sources',      label: 'Source of Truth',    path: '/uom/sources',     icon: Database,  content: <SoTTab /> },
         { id: 'governance',   label: 'Governance',         path: '/uom/governance',  icon: Shield,    content: <GovernanceTab /> },
         { id: 'explorer',     label: 'Object Explorer',    path: '/uom/explorer',    icon: Search,    content: <ExplorerTab /> },
+        { id: 'profiles',     label: 'Object Profiles',    path: '/uom/profiles',    icon: User,      content: <ProfilesTab /> },
       ]}
     />
   );

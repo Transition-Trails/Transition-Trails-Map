@@ -136,9 +136,11 @@ function Router() {
       <Route path="/knowledge/:tab"       component={KnowledgeHub} />
       <Route path="/knowledge"            component={KnowledgeHub} />
 
-      <Route path="/collaboration/slack/:subtab" component={CollaborationHub} />
-      <Route path="/collaboration/:tab"        component={CollaborationHub} />
-      <Route path="/collaboration"             component={CollaborationHub} />
+      <Route path="/collaboration/slack/:subtab"     component={CollaborationHub} />
+      <Route path="/collaboration/drive/:subtab"     component={CollaborationHub} />
+      <Route path="/collaboration/calendar/:subtab"  component={CollaborationHub} />
+      <Route path="/collaboration/:tab"              component={CollaborationHub} />
+      <Route path="/collaboration"                   component={CollaborationHub} />
 
       {/* Governance + Search + Context Engine */}
       <Route path="/governance/:tab"      component={GovernanceHub} />
