@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback, createContext, useContext } from 'react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace } from '@/components/workspace/ObjectWorkspace';
@@ -23,6 +23,63 @@ import {
   type ValidationCheck, type RoleGroup, type CommFlow, type FlowNode,
   type OperationalScenario, type GovernanceIssue, type TestSuite,
 } from '@/data/slackPhase2Data';
+
+// ── Slack Validation Context (live API) ───────────────────────────────────────
+
+interface SlackApiCheck {
+  id: string;
+  category: string;
+  label: string;
+  status: 'pass' | 'fail' | 'warning' | 'skip';
+  detail: string;
+  impact: string;
+  fix?: string;
+  meta?: Record<string, string | boolean | number>;
+}
+
+interface SlackValidationResponse {
+  checks: SlackApiCheck[];
+  timestamp: string;
+}
+
+type ValidationState =
+  | { kind: 'idle' }
+  | { kind: 'loading' }
+  | { kind: 'done'; data: SlackValidationResponse }
+  | { kind: 'error'; message: string };
+
+interface SlackValidationCtxValue {
+  state: ValidationState;
+  runValidation: () => void;
+}
+
+const SlackValidationCtx = createContext<SlackValidationCtxValue | null>(null);
+
+function useSlackValidation(): SlackValidationCtxValue {
+  const ctx = useContext(SlackValidationCtx);
+  if (!ctx) throw new Error('SlackValidationCtx not mounted');
+  return ctx;
+}
+
+function SlackValidationProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<ValidationState>({ kind: 'idle' });
+
+  const runValidation = useCallback(() => {
+    setState({ kind: 'loading' });
+    fetch('/api/slack/validate')
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() as Promise<SlackValidationResponse>; })
+      .then(data => setState({ kind: 'done', data }))
+      .catch((err: unknown) => setState({ kind: 'error', message: err instanceof Error ? err.message : 'Unknown error' }));
+  }, []);
+
+  useEffect(() => { runValidation(); }, [runValidation]);
+
+  return (
+    <SlackValidationCtx.Provider value={{ state, runValidation }}>
+      {children}
+    </SlackValidationCtx.Provider>
+  );
+}
 
 // ── Shared utilities ──────────────────────────────────────────────────────────
 
@@ -104,12 +161,17 @@ function FlowNodeBox({ node }: { node: FlowNode }) {
 // ── Tab 1: Overview ───────────────────────────────────────────────────────────
 
 function OverviewTab() {
-  const valSummary      = getValidationSummary();
+  const { state: valState }  = useSlackValidation();
   const govSummary      = getGovernanceSummary();
   const testSummary     = getOverallTestSummary();
   const scenSummary     = getScenarioSummary();
   const pennyEnabled    = getPennyEnabledChannels();
   const productionScore = SLACK_HEALTH_SCORES.find(s => s.dimension === 'production');
+
+  const liveChecks = valState.kind === 'done' ? valState.data.checks : null;
+  const livePass   = liveChecks ? liveChecks.filter(c => c.status === 'pass').length : null;
+  const liveFail   = liveChecks ? liveChecks.filter(c => c.status === 'fail').length : null;
+  const liveTotal  = liveChecks ? liveChecks.length : null;
 
   return (
     <ScrollArea className="h-full">
@@ -118,18 +180,23 @@ function OverviewTab() {
           <p className="text-[11px] font-bold text-primary uppercase mb-1">Slack Integration Center — Phase 2: Operational Workflow Validation</p>
           <p className="text-[12px] text-foreground leading-relaxed">
             Phase 2 advances from architecture and readiness into real object flows. Program-to-channel mapping, role-to-user
-            routing, Penny delivery mapping, and end-to-end flow validation are all configured and awaiting bot token activation.
-            All 5 mock operational scenarios are defined and partially ready. Two critical blockers remain: bot token and app installation.
+            routing, Penny delivery mapping, and end-to-end flow validation are all configured. Workspace Validation now runs
+            live against your Replit secrets — see the Workspace Validation tab for real-time results.
           </p>
         </div>
 
         {/* Phase 2 stat grid */}
         <div className="grid grid-cols-4 gap-3">
           {[
-            { label:'Validation Checks', value:`${valSummary.pass}/${valSummary.total}`, sub:'passing', cls: valSummary.fail > 0 ? 'border-rose-200 bg-rose-50' : 'border-emerald-200 bg-emerald-50' },
+            {
+              label: 'Validation Checks',
+              value: valState.kind === 'loading' ? '…' : liveChecks ? `${livePass}/${liveTotal}` : '—',
+              sub:   valState.kind === 'loading' ? 'checking…' : liveChecks ? `passing · live` : 'run validation',
+              cls:   (liveChecks && (liveFail ?? 0) > 0) ? 'border-rose-200 bg-rose-50' : liveChecks ? 'border-emerald-200 bg-emerald-50' : 'border-border bg-muted/30',
+            },
             { label:'Governance Issues', value:String(govSummary.critical + govSummary.high), sub:`${govSummary.critical} critical`, cls: govSummary.critical > 0 ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50' },
-            { label:'Scenarios Ready',   value:`${scenSummary.ready}/${scenSummary.total}`, sub:`avg ${scenSummary.avgScore}% ready`, cls:'border-amber-200 bg-amber-50' },
-            { label:'Tests Passing',     value:`${testSummary.pass}/${testSummary.total}`, sub:`${testSummary.pct}% overall`, cls:'border-amber-200 bg-amber-50' },
+            { label:'Scenarios Ready',   value:`${scenSummary.ready}/${scenSummary.total}`,   sub:`avg ${scenSummary.avgScore}% ready`,  cls:'border-amber-200 bg-amber-50' },
+            { label:'Tests Passing',     value:`${testSummary.pass}/${testSummary.total}`,    sub:`${testSummary.pct}% overall`,         cls:'border-amber-200 bg-amber-50' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
               <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wide mb-1">{s.label}</p>
@@ -139,19 +206,40 @@ function OverviewTab() {
           ))}
         </div>
 
-        {/* Critical blockers */}
+        {/* Critical blockers — live failures when available, else static governance */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Critical Blockers to Go Live</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">
+            {liveChecks ? 'Live Validation Failures' : 'Critical Blockers to Go Live'}
+          </p>
           <div className="space-y-2">
-            {GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical').map(issue => (
-              <div key={issue.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-rose-200 bg-rose-50">
-                <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-semibold text-foreground">{issue.title}</p>
-                  <p className="text-[11px] text-muted-foreground">{issue.resolution}</p>
+            {liveChecks ? (
+              liveChecks.filter(c => c.status === 'fail').length === 0 ? (
+                <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-emerald-200 bg-emerald-50">
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <p className="text-[12px] font-medium text-emerald-700">No live failures — all required secrets and API checks passed.</p>
                 </div>
-              </div>
-            ))}
+              ) : (
+                liveChecks.filter(c => c.status === 'fail').map(c => (
+                  <div key={c.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-rose-200 bg-rose-50">
+                    <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-semibold text-foreground">{c.label}</p>
+                      <p className="text-[11px] text-muted-foreground">{c.fix ?? c.detail}</p>
+                    </div>
+                  </div>
+                ))
+              )
+            ) : (
+              GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical').map(issue => (
+                <div key={issue.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-rose-200 bg-rose-50">
+                  <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] font-semibold text-foreground">{issue.title}</p>
+                    <p className="text-[11px] text-muted-foreground">{issue.resolution}</p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -196,82 +284,187 @@ function OverviewTab() {
   );
 }
 
-// ── Tab 2: Workspace Validation ───────────────────────────────────────────────
+// ── Tab 2: Workspace Validation (live) ────────────────────────────────────────
 
 function WorkspaceValidationTab() {
-  const [selected, setSelected] = useState<ValidationCheck | null>(null);
-  const summary = getValidationSummary();
-  const categories = ['Secret','Permission','Channel Access','OAuth','Bot'] as const;
+  const { state, runValidation } = useSlackValidation();
+  const [selected, setSelected] = useState<SlackApiCheck | null>(null);
+  const [testMsgState, setTestMsgState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [testMsgDetail, setTestMsgDetail] = useState('');
+
+  const checks     = state.kind === 'done' ? state.data.checks : [];
+  const isLoading  = state.kind === 'loading';
+  const lastRun    = state.kind === 'done' ? new Date(state.data.timestamp).toLocaleTimeString() : null;
+  const pass       = checks.filter(c => c.status === 'pass').length;
+  const fail       = checks.filter(c => c.status === 'fail').length;
+  const warning    = checks.filter(c => c.status === 'warning').length;
+  const skip       = checks.filter(c => c.status === 'skip').length;
+  const categories = [...new Set(checks.map(c => c.category))];
+
+  const tokenValid   = checks.some(c => c.id === 'api-auth-test'    && c.status === 'pass');
+  const hasChannelId = checks.some(c => c.id === 'secret-channel-id' && c.status === 'pass');
+
+  function sendTestMessage() {
+    setTestMsgState('sending');
+    setTestMsgDetail('');
+    fetch('/api/slack/validate/test-message', { method: 'POST' })
+      .then(r => r.json() as Promise<{ ok: boolean; error?: string; detail?: string; messageTs?: string }>)
+      .then(data => {
+        if (data.ok) {
+          setTestMsgState('sent');
+          setTestMsgDetail(`Sent (ts: ${data.messageTs ?? '?'}).`);
+        } else {
+          setTestMsgState('error');
+          setTestMsgDetail(data.detail ?? data.error ?? 'Unknown error.');
+        }
+      })
+      .catch(() => { setTestMsgState('error'); setTestMsgDetail('Network error — could not reach API.'); });
+  }
 
   return (
-    <div className="flex h-full">
-      {/* Left: check list */}
-      <div className="w-80 shrink-0 border-r border-border flex flex-col">
-        {/* Summary header */}
-        <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Validation Summary</p>
-          <div className="grid grid-cols-4 gap-1.5">
-            {[
-              { label:'Pass',    value:summary.pass,    cls:'text-emerald-600 bg-emerald-50 border-emerald-200' },
-              { label:'Fail',    value:summary.fail,    cls:'text-rose-600 bg-rose-50 border-rose-200' },
-              { label:'Warn',    value:summary.warning, cls:'text-amber-600 bg-amber-50 border-amber-200' },
-              { label:'Pending', value:summary.pending, cls:'text-sky-600 bg-sky-50 border-sky-200' },
-            ].map(s => (
-              <div key={s.label} className={`rounded border text-center py-1.5 ${s.cls}`}>
-                <p className="text-[16px] font-bold leading-none">{s.value}</p>
-                <p className="text-[9px] font-bold uppercase mt-0.5">{s.label}</p>
-              </div>
-            ))}
-          </div>
+    <div className="flex flex-col h-full">
+      {/* Toolbar */}
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20 shrink-0 flex-wrap">
+        <button
+          onClick={runValidation}
+          disabled={isLoading}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          {isLoading
+            ? <><span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin inline-block" /> Running…</>
+            : <>↻ Run Validation</>
+          }
+        </button>
+
+        {tokenValid && hasChannelId && (
+          <button
+            onClick={sendTestMessage}
+            disabled={testMsgState === 'sending'}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-50 ${
+              testMsgState === 'sent'  ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
+              testMsgState === 'error' ? 'border-rose-300 bg-rose-50 text-rose-700' :
+              'border-border bg-white text-foreground hover:bg-muted/40'
+            }`}
+          >
+            {testMsgState === 'sending' ? '⌛ Sending…' :
+             testMsgState === 'sent'    ? '✓ Message Sent' :
+             testMsgState === 'error'   ? '✕ Send Failed' :
+             '✉ Send Test Message'}
+          </button>
+        )}
+
+        {testMsgDetail && (
+          <span className={`text-[11px] ${testMsgState === 'sent' ? 'text-emerald-600' : 'text-rose-600'}`}>
+            {testMsgDetail}
+          </span>
+        )}
+
+        {lastRun && <span className="ml-auto text-[11px] text-muted-foreground">Last run {lastRun}</span>}
+      </div>
+
+      {/* Idle state */}
+      {state.kind === 'idle' && (
+        <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
+          <Key className="w-8 h-8 text-muted-foreground/30 mb-3" />
+          <p className="text-[13px] font-semibold text-foreground mb-1">Ready to validate</p>
+          <p className="text-[12px] text-muted-foreground">Click Run Validation to test your Slack secrets against the live API.</p>
         </div>
-        <ScrollArea className="flex-1">
-          {categories.map(cat => {
-            const checks = VALIDATION_CHECKS.filter(c => c.category === cat);
-            return (
-              <div key={cat}>
-                <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">{cat}</p>
-                {checks.map(check => (
-                  <button
-                    key={check.id}
-                    onClick={() => setSelected(check)}
-                    className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/40 border-b border-border/20 transition-colors ${selected?.id === check.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
-                  >
-                    <ValidationIcon status={check.status} />
-                    <span className="text-[12px] text-foreground font-medium flex-1 leading-tight">{check.label}</span>
-                  </button>
+      )}
+
+      {/* Error state */}
+      {state.kind === 'error' && (
+        <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
+          <XCircle className="w-8 h-8 text-rose-400 mb-3" />
+          <p className="text-[13px] font-semibold text-foreground mb-1">Could not reach validation endpoint</p>
+          <p className="text-[12px] text-muted-foreground">{state.message}</p>
+        </div>
+      )}
+
+      {/* Results (loading or done) */}
+      {(state.kind === 'loading' || state.kind === 'done') && (
+        <div className="flex flex-1 min-h-0">
+          {/* Left: check list */}
+          <div className="w-80 shrink-0 border-r border-border flex flex-col">
+            <div className="px-4 py-3 border-b border-border bg-muted/30">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Validation Summary</p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {[
+                  { label:'Pass', value:pass,    cls:'text-emerald-600 bg-emerald-50 border-emerald-200' },
+                  { label:'Fail', value:fail,    cls:'text-rose-600 bg-rose-50 border-rose-200' },
+                  { label:'Warn', value:warning, cls:'text-amber-600 bg-amber-50 border-amber-200' },
+                  { label:'Skip', value:skip,    cls:'text-sky-600 bg-sky-50 border-sky-200' },
+                ].map(s => (
+                  <div key={s.label} className={`rounded border text-center py-1.5 ${s.cls}`}>
+                    <p className="text-[16px] font-bold leading-none">{isLoading ? '…' : s.value}</p>
+                    <p className="text-[9px] font-bold uppercase mt-0.5">{s.label}</p>
+                  </div>
                 ))}
               </div>
-            );
-          })}
-        </ScrollArea>
-      </div>
-      {/* Right: detail */}
-      <div className="flex-1 min-w-0">
-        {selected ? (
-          <ScrollArea className="h-full">
-            <div className="p-5 space-y-4 max-w-2xl">
-              <div className="flex items-start gap-3">
-                <ValidationIcon status={selected.status} />
-                <div>
-                  <h3 className="text-[14px] font-bold text-foreground">{selected.label}</h3>
-                  <p className="text-[11px] text-muted-foreground">{selected.category} · <ReadinessBadge status={selected.status} /></p>
-                </div>
-              </div>
-              <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-                <InfoRow label="Detail"  value={selected.detail} />
-                <InfoRow label="Impact"  value={selected.impact} />
-                {selected.fix && <InfoRow label="Resolution" value={<span className="text-emerald-700">{selected.fix}</span>} />}
-              </div>
             </div>
-          </ScrollArea>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <Key className="w-8 h-8 text-muted-foreground/30 mb-3" />
-            <p className="text-[13px] font-semibold text-foreground mb-1">Select a validation check</p>
-            <p className="text-[12px] text-muted-foreground">View the detail, impact, and resolution for each check.</p>
+            <ScrollArea className="flex-1">
+              {isLoading ? (
+                <div className="px-4 py-6 text-center text-[12px] text-muted-foreground">Checking secrets and calling Slack API…</div>
+              ) : (
+                categories.map(cat => (
+                  <div key={cat}>
+                    <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">{cat}</p>
+                    {checks.filter(c => c.category === cat).map(check => (
+                      <button
+                        key={check.id}
+                        onClick={() => setSelected(check)}
+                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/40 border-b border-border/20 transition-colors ${selected?.id === check.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+                      >
+                        <ValidationIcon status={check.status} />
+                        <span className="text-[12px] text-foreground font-medium flex-1 leading-tight">{check.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                ))
+              )}
+            </ScrollArea>
           </div>
-        )}
-      </div>
+
+          {/* Right: detail */}
+          <div className="flex-1 min-w-0">
+            {selected && !isLoading ? (
+              <ScrollArea className="h-full">
+                <div className="p-5 space-y-4 max-w-2xl">
+                  <div className="flex items-start gap-3">
+                    <ValidationIcon status={selected.status} />
+                    <div>
+                      <h3 className="text-[14px] font-bold text-foreground">{selected.label}</h3>
+                      <p className="text-[11px] text-muted-foreground">{selected.category} · <ReadinessBadge status={selected.status} /></p>
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+                    <InfoRow label="Detail"     value={selected.detail} />
+                    <InfoRow label="Impact"     value={selected.impact} />
+                    {selected.fix && <InfoRow label="Resolution" value={<span className="text-emerald-700">{selected.fix}</span>} />}
+                    {selected.meta && Object.keys(selected.meta).length > 0 && (
+                      <InfoRow label="Metadata" value={
+                        <div className="flex flex-wrap gap-1.5">
+                          {Object.entries(selected.meta).map(([k, v]) => (
+                            <span key={k} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-muted border border-border">
+                              <span className="text-muted-foreground">{k}:</span>
+                              <span className="font-medium text-foreground">{String(v)}</span>
+                            </span>
+                          ))}
+                        </div>
+                      } />
+                    )}
+                  </div>
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center px-8">
+                <Key className="w-8 h-8 text-muted-foreground/30 mb-3" />
+                <p className="text-[13px] font-semibold text-foreground mb-1">Select a validation check</p>
+                <p className="text-[12px] text-muted-foreground">View the live detail, impact, and resolution for each check.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1202,19 +1395,28 @@ function ActivityFeedTab() {
 
 // ── Default export ────────────────────────────────────────────────────────────
 
-export default function SlackIntegrationCenter() {
-  const valSummary = getValidationSummary();
+function SlackIntegrationCenterInner() {
+  const { state: valState } = useSlackValidation();
   const govSummary = getGovernanceSummary();
+
+  const liveChecks = valState.kind === 'done' ? valState.data.checks : null;
+  const liveFail   = liveChecks ? liveChecks.filter(c => c.status === 'fail').length : null;
 
   const criticalBadge = govSummary.critical > 0
     ? `${govSummary.critical} critical issue${govSummary.critical > 1 ? 's' : ''}`
     : undefined;
 
+  const descParts: string[] = [];
+  if (valState.kind === 'loading') descParts.push('Checking secrets…');
+  else if (liveChecks) descParts.push(liveFail === 0 ? 'All secrets validated ✓' : `${liveFail} secret/API check${liveFail !== 1 ? 's' : ''} failing`);
+  descParts.push(`${govSummary.critical + govSummary.high} critical/high governance issues`);
+  descParts.push('all scenarios defined and partially ready');
+
   return (
     <HubShell
       title="Slack Integration Center"
       icon={Hash}
-      description={`Phase 2: Operational workflow validation. ${valSummary.fail} secrets missing · ${govSummary.critical + govSummary.high} critical/high governance issues · all scenarios defined and partially ready.`}
+      description={`Phase 2: Operational workflow validation. ${descParts.join(' · ')}.`}
       badge={criticalBadge ?? 'Phase 2 — Workflow Validation'}
       tabs={[
         { id:'overview',    label:'Overview',            path:'/collaboration/slack',                   icon:Hash,          content:<OverviewTab /> },
@@ -1231,5 +1433,13 @@ export default function SlackIntegrationCenter() {
         { id:'health',      label:'Health',              path:'/collaboration/slack/health',            icon:BarChart2,     content:<IntegrationHealthTab /> },
       ]}
     />
+  );
+}
+
+export default function SlackIntegrationCenter() {
+  return (
+    <SlackValidationProvider>
+      <SlackIntegrationCenterInner />
+    </SlackValidationProvider>
   );
 }
