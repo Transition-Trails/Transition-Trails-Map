@@ -58,7 +58,7 @@ function getPageInfo(location: string) {
 }
 
 export function Topbar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { activeLens, setActiveLens, setSearchOpen } = useAppContext();
 
   const { section, title } = getPageInfo(location);
@@ -105,7 +105,7 @@ export function Topbar() {
         <Button
           variant="ghost" size="icon"
           className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground"
-          onClick={() => setSearchOpen(true)}
+          onClick={() => setLocation('/search')}
           title="Search (Ctrl K)"
         >
           <SearchIcon className="w-3.5 h-3.5" />

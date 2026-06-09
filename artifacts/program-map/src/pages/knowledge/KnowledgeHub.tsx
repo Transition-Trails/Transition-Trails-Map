@@ -1,7 +1,7 @@
 import { BookOpen, Database, GitBranch, Archive, Search, BookMarked } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import KnowledgeSourceRegistry from '@/pages/library/KnowledgeSourceRegistry';
+import KnowledgeWorkspace      from '@/pages/knowledge/KnowledgeWorkspace';
 import KnowledgeRelationships  from '@/pages/navigator/KnowledgeRelationships';
 import LibraryDocuments        from '@/pages/library/LibraryDocuments';
 import LibrarySearch           from '@/pages/library/LibrarySearch';
@@ -66,7 +66,7 @@ export default function KnowledgeHub() {
       icon={BookOpen}
       description="Knowledge source registry, relationship graph, document library, organizational memory, and full-text search."
       tabs={[
-        { id: 'sources',       label: 'Sources',         path: '/knowledge',               icon: Database,    content: <KnowledgeSourceRegistry /> },
+        { id: 'sources',       label: 'Sources',         path: '/knowledge',               icon: Database,    content: <KnowledgeWorkspace /> },
         { id: 'relationships', label: 'Relationships',   path: '/knowledge/relationships', icon: GitBranch,   content: <KnowledgeRelationships /> },
         { id: 'library',       label: 'Library',         path: '/knowledge/library',       icon: BookMarked,  content: <LibraryDocuments /> },
         { id: 'memory',        label: 'Org Memory',      path: '/knowledge/memory',        icon: Archive,     content: <OrgMemoryPlaceholder /> },

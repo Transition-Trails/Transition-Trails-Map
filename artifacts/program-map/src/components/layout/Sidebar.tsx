@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings, ChevronDown, Layers,
+  Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
+  ChevronDown, Layers, Shield, Search, Target,
 } from 'lucide-react';
 
 type NavItem  = { path: string; label: string; isLabel?: false } | { label: string; isLabel: true };
@@ -39,8 +40,23 @@ const navGroups: NavGroup[] = [
       { path: '/uom/catalog',     label: 'Object Catalog' },
       { path: '/uom/matrix',      label: 'Relationship Matrix' },
       { path: '/uom/sources',     label: 'Source of Truth' },
-      { path: '/uom/governance',  label: 'Governance' },
       { path: '/uom/explorer',    label: 'Object Explorer' },
+    ],
+  },
+  {
+    id: 'governance',
+    label: 'Governance',
+    icon: Shield,
+    pathPrefix: '/governance',
+    items: [
+      { path: '/governance',             label: 'Overview' },
+      { path: '/governance/lifecycle',   label: 'Lifecycle Models' },
+      { path: '/governance/ownership',   label: 'Ownership Matrix' },
+      { path: '/governance/approvals',   label: 'Approval Workflows' },
+      { path: '/governance/reviews',     label: 'Review Cycles' },
+      { path: '/governance/compliance',  label: 'Compliance' },
+      { path: '/governance/health',      label: 'Governance Health' },
+      { path: '/governance/policies',    label: 'Policies' },
     ],
   },
   {
@@ -64,12 +80,10 @@ const navGroups: NavGroup[] = [
     icon: GraduationCap,
     pathPrefix: '/program',
     items: [
-      { path: '/program',            label: 'Program Map' },
-      { path: '/program/programs',   label: 'Programs' },
-      { path: '/program/curriculum', label: 'Curriculum' },
+      { path: '/program',            label: 'Programs' },
       { path: '/program/standards',  label: 'Standards' },
-      { path: '/program/blueprint',  label: 'Program Blueprint' },
-      { path: '/program/salesforce', label: 'Salesforce Architecture' },
+      { path: '/program/blueprint',  label: 'Blueprint' },
+      { path: '/program/salesforce', label: 'Salesforce Arch' },
       { path: '/program/resources',  label: 'Resources' },
     ],
   },
@@ -107,7 +121,8 @@ const navGroups: NavGroup[] = [
     icon: MessageSquare,
     pathPrefix: '/collaboration',
     items: [
-      { path: '/collaboration',               label: 'Overview' },
+      { path: '/collaboration',               label: 'Systems Overview' },
+      { path: '/collaboration/slack',         label: '⚡ Slack Integration' },
       { path: '/collaboration/channels',      label: 'Channels' },
       { path: '/collaboration/calendar',      label: 'Calendar' },
       { path: '/collaboration/templates',     label: 'Templates' },
@@ -161,6 +176,9 @@ export function Sidebar() {
     });
   }
 
+  const isSearch  = location === '/search';
+  const isContext = location === '/context' || location.startsWith('/context/');
+
   return (
     <div className="w-[220px] flex-shrink-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border">
       <div className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
@@ -178,6 +196,33 @@ export function Sidebar() {
           <span>Home</span>
         </button>
 
+        {/* Search */}
+        <button
+          onClick={() => setLocation('/search')}
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
+            isSearch
+              ? 'bg-primary text-primary-foreground'
+              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+          }`}
+        >
+          <Search className={`w-4 h-4 flex-shrink-0 ${isSearch ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+          <span>Global Search</span>
+        </button>
+
+        {/* Context Engine */}
+        <button
+          onClick={() => setLocation('/context')}
+          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
+            isContext
+              ? 'bg-primary text-primary-foreground'
+              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+          }`}
+        >
+          <Target className={`w-4 h-4 flex-shrink-0 ${isContext ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+          <span>Context Engine</span>
+        </button>
+
+        {/* Nav groups */}
         {navGroups.map(group => {
           const isOpen        = openGroups.has(group.id);
           const isGroupActive = location.startsWith(group.pathPrefix);

@@ -17,11 +17,31 @@ export type SelectedItemType =
   | 'persona' | 'role' | 'roleBlueprint' | 'roleParticipation'
   | 'healthIndicator' | 'oicRecommendation' | 'trendInsight' | 'twinNode';
 
+// ── Workspace Context Engine — Active Context type ─────────────────────────
+export interface ActiveContext {
+  id: string;
+  objectTypeId: string;
+  objectTypeName: string;
+  category: string;
+  categoryColor: string;
+  categoryBg: string;
+  name: string;
+  status?: string;
+  statusVariant?: 'active' | 'inactive' | 'draft' | 'planning';
+  health?: 'healthy' | 'needs-attention' | 'incomplete' | 'unknown';
+  owner?: string;
+  workspaceLink: string;
+  profileId?: string;
+  setAt: string; // ISO timestamp
+}
+
 interface AppState {
   activePage: string;
   activeLens: string;
   selectedItem: { type: SelectedItemType; id: string; data: any } | null;
   searchOpen: boolean;
+  activeContext: ActiveContext | null;
+  recentContexts: ActiveContext[];
   programs: Program[];
   sourceDocuments: SourceDocument[];
   resolvePhases: ResolvePhase[];
@@ -34,6 +54,7 @@ interface AppState {
   setActiveLens: (lens: string) => void;
   setSelectedItem: (item: { type: SelectedItemType; id: string; data: any } | null) => void;
   setSearchOpen: (open: boolean) => void;
+  setActiveContext: (ctx: ActiveContext | null) => void;
   updateProgram: (id: string, updates: Partial<Program>) => void;
   updateDocument: (id: string, updates: Partial<SourceDocument>) => void;
   updateResolvePhase: (id: string, updates: Partial<ResolvePhase>) => void;
@@ -43,11 +64,16 @@ interface AppState {
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
+const MAX_RECENT = 5;
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activePage, setActivePage]     = useState('program-map');
   const [activeLens, setActiveLens]     = useState('executive');
   const [selectedItem, setSelectedItem] = useState<AppState['selectedItem']>(null);
   const [searchOpen, setSearchOpen]     = useState(false);
+
+  const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
+  const [recentContexts, setRecentContexts]   = useState<ActiveContext[]>([]);
 
   const [programs, setPrograms]                       = useState<Program[]>(staticPrograms);
   const [sourceDocuments, setSourceDocuments]         = useState<SourceDocument[]>(staticDocs);
@@ -57,6 +83,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [commProviders]     = useState<CommProvider[]>(staticCommProviders);
   const [commRoutes]        = useState<CommRoute[]>(staticCommRoutes);
   const [messageTemplates]  = useState<MessageTemplate[]>(staticTemplates);
+
+  function setActiveContext(ctx: ActiveContext | null) {
+    setActiveContextRaw(ctx);
+    if (ctx) {
+      setRecentContexts(prev => {
+        const filtered = prev.filter(r => r.id !== ctx.id);
+        return [ctx, ...filtered].slice(0, MAX_RECENT);
+      });
+    }
+  }
 
   function syncSelected(type: SelectedItemType, id: string, updates: Record<string, any>) {
     setSelectedItem(prev => {
@@ -95,9 +131,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider value={{
       activePage, activeLens, selectedItem, searchOpen,
+      activeContext, recentContexts,
       programs, sourceDocuments, resolvePhases, pennyCapabilities, trailOsCapabilities,
       commProviders, commRoutes, messageTemplates,
       setActivePage, setActiveLens, setSelectedItem, setSearchOpen,
+      setActiveContext,
       updateProgram, updateDocument, updateResolvePhase,
       updatePennyCapability, updateTrailOsCapability,
     }}>

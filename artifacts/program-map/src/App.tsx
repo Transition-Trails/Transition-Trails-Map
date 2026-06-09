@@ -17,7 +17,11 @@ import PennyHub         from "@/pages/penny/PennyHub";
 import KnowledgeHub     from "@/pages/knowledge/KnowledgeHub";
 import CollaborationHub from "@/pages/collaboration/CollaborationHub";
 import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
+import PeopleWorkspace    from "@/pages/people/PeopleWorkspace";
 import UnifiedObjectModel from "@/pages/uom/UnifiedObjectModel";
+import GovernanceHub      from "@/pages/governance/GovernanceHub";
+import GlobalSearch       from "@/pages/search/GlobalSearch";
+import ContextHub         from "@/pages/context/ContextHub";
 
 const queryClient = new QueryClient();
 
@@ -132,11 +136,19 @@ function Router() {
       <Route path="/knowledge/:tab"       component={KnowledgeHub} />
       <Route path="/knowledge"            component={KnowledgeHub} />
 
-      <Route path="/collaboration/:tab"   component={CollaborationHub} />
-      <Route path="/collaboration"        component={CollaborationHub} />
+      <Route path="/collaboration/slack/:subtab" component={CollaborationHub} />
+      <Route path="/collaboration/:tab"        component={CollaborationHub} />
+      <Route path="/collaboration"             component={CollaborationHub} />
+
+      {/* Governance + Search + Context Engine */}
+      <Route path="/governance/:tab"      component={GovernanceHub} />
+      <Route path="/governance"           component={GovernanceHub} />
+      <Route path="/search"               component={GlobalSearch} />
+      <Route path="/context/:tab"         component={ContextHub} />
+      <Route path="/context"              component={ContextHub} />
 
       {/* Administration */}
-      <Route path="/admin/people"         component={PeopleRolesStudio} />
+      <Route path="/admin/people"         component={PeopleWorkspace} />
       <Route path="/admin/:section"       component={Admin} />
       <Route path="/admin"                component={Admin} />
 
