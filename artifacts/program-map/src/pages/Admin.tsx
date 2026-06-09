@@ -4,6 +4,7 @@ import {
   Layers, FileText, Compass, Brain, Monitor, Plug,
   Search, ArrowLeft, ChevronRight, Save, X, AlertTriangle,
   ExternalLink, CheckCircle2, Users, Copy, User, Shield, Sliders, Building2,
+  Key, Lock,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
@@ -70,6 +71,7 @@ export default function Admin() {
 // ─── Admin home ────────────────────────────────────────────────────────────────
 
 function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
+  const [, setLocation] = useLocation();
   const { programs, sourceDocuments, resolvePhases, pennyCapabilities, trailOsCapabilities } = useAppContext();
 
   const areas: {
@@ -222,6 +224,72 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 </div>
               </button>
             ))}
+          </div>
+
+          {/* Integration & Readiness tools */}
+          <div className="mt-8">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Integration &amp; Readiness</p>
+            <div className="grid grid-cols-3 gap-4">
+              <button
+                onClick={() => setLocation('/admin/secrets-audit')}
+                className="text-left p-5 rounded-xl border-2 bg-card border-sky-200 hover:border-sky-400 transition-all duration-150 hover:shadow-md group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-sky-50 text-sky-700">
+                    <Key className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Live</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Secrets Audit</p>
+                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
+                  Two-layer audit of all integration secrets — presence &amp; format check plus live API validation for Gemini and Google.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => setLocation('/admin/google-oauth')}
+                className="text-left p-5 rounded-xl border-2 bg-card border-emerald-200 hover:border-emerald-400 transition-all duration-150 hover:shadow-md group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-700">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">OAuth</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Google Auth Setup</p>
+                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
+                  Step-by-step Google OAuth wizard — displays the exact redirect URI, runs the authorization flow, and reveals the refresh token once for Replit Secrets.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => setLocation('/admin/phase1-readiness')}
+                className="text-left p-5 rounded-xl border-2 bg-card border-amber-200 hover:border-amber-400 transition-all duration-150 hover:shadow-md group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-700">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Phase 1</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Phase 1 Readiness</p>
+                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
+                  Architecture consolidation readiness dashboard — integration scores, capability progress, and blockers across all Phase 1 workstreams.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+            </div>
           </div>
 
           {/* Prototype notice */}

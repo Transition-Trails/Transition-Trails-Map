@@ -119,6 +119,11 @@ const navGroups: NavGroup[] = [
       { path: '/admin/roles',    label: 'Roles' },
       { path: '/admin/penny',    label: 'Penny' },
       { path: '/admin/settings', label: 'Settings' },
+      { label: 'Integrations', isLabel: true },
+      { path: '/admin/secrets-audit',  label: 'Secrets Audit' },
+      { path: '/admin/google-oauth',   label: 'Google Auth Setup' },
+      { label: 'Readiness', isLabel: true },
+      { path: '/admin/phase1-readiness', label: 'Phase 1 Readiness' },
     ],
   },
 ];
