@@ -164,7 +164,7 @@ export interface TestCase {
 export interface TestSuite {
   id: string;
   name: string;
-  category: 'Secret Validation' | 'Permission Validation' | 'Channel Access' | 'Message Delivery' | 'Mapping Integrity' | 'Governance' | 'End-to-End Flow';
+  category: 'Secret Validation' | 'Permission Validation' | 'Channel Access' | 'Message Delivery' | 'Mapping Integrity' | 'Governance' | 'End-to-End Flow' | 'POC Restoration';
   icon: string;
   description: string;
   tests: TestCase[];
@@ -791,6 +791,25 @@ export const TEST_SUITES: TestSuite[] = [
       { id:'e2e-05', name:'Activity event round-trip',       description:'Message delivery → Activity event logged → Ops Intelligence update.', status:'pending', result:'Activity event structure is defined. Cannot validate until delivery works.', blockedBy:'Delivery blocked upstream' },
     ],
   },
+  {
+    id: 'suite-poc',
+    name: 'POC Restoration',
+    category: 'POC Restoration',
+    icon: 'FlaskConical',
+    description: 'Validates restoration of the known-working POC state: Penny AI channel, Agentforce coexistence, assessment quiz flow, bot membership, and Trail OS event recording.',
+    tests: [
+      { id:'poc-01', name:'Multi-channel bot membership confirmed',    description:'Trail OS Bot is a confirmed member of both Penny AI channel and admin channel.',                    status:'pending', result:'Pending — bot needs to be invited to the Penny AI channel. Set SLACK_PENNY_CHANNEL_ID and run /invite @trail-os-bot.', blockedBy:'Bot invite to Penny AI channel' },
+      { id:'poc-02', name:'User mention → Penny response',             description:'User @mentions Penny in Penny AI channel; Penny (Gemini) responds within expected latency.',        status:'pending', result:'Pending — bot channel access not yet confirmed. Restore channel access first.', blockedBy:'Bot not in Penny AI channel' },
+      { id:'poc-03', name:'Agentforce response in same channel',       description:'Agentforce (Penny–Transition Trails Assistant) responds in same channel as Penny/Gemini.',          status:'pending', result:'Pending — Agentforce integration layer needs re-confirmation after channel access restored.', blockedBy:'Channel access + Agentforce integration layer' },
+      { id:'poc-04', name:'Bot coexistence — no conflict',             description:'Penny (Gemini) and Agentforce both respond without duplicating or conflicting messages.',           status:'pending', result:'Was confirmed working in POC screenshot. Pending re-validation once channel access restored.', blockedBy:'Channel access restoration' },
+      { id:'poc-05', name:'Assessment quiz flow — initiation',         description:'User requests assessment; Penny routes to assessment template and delivers quiz in Slack.',        status:'pending', result:'Pending — assessment routing not yet wired to Penny delivery route.', blockedBy:'Assessment routing + channel access' },
+      { id:'poc-06', name:'Assessment quiz flow — completion + record',description:'User completes quiz; Trail OS records result as an operational event in Operations Center.',       status:'pending', result:'Pending — Trail OS event recording bridge not yet connected to Slack interactions.', blockedBy:'Assessment flow + Trail OS events bridge' },
+      { id:'poc-07', name:'Penny prompt routing via Prompt Studio',    description:'Penny responses are routed through Prompt Studio templates for coaching and assessment flows.',    status:'pending', result:'Pending — prompt template routing not yet confirmed for the restored Slack channel.', blockedBy:'Prompt Studio wiring' },
+      { id:'poc-08', name:'Trail OS records Slack interaction event',  description:'A Slack message interaction triggers an operational event visible in the Operations Center.',      status:'pending', result:'Pending — event recording bridge not yet implemented between Slack and Trail OS ops layer.', blockedBy:'Ops event recording bridge' },
+      { id:'poc-09', name:'Penny delivery graceful on missing channel',description:'Penny handles SLACK_CHANNEL_ID missing or invalid gracefully — returns structured error.',         status:'pass',    result:'Validation endpoint returns structured error with resolution guidance when channel is missing or inaccessible.', blockedBy:undefined },
+      { id:'poc-10', name:'Multiple channel IDs validated independently',description:'SLACK_CHANNEL_ID, SLACK_PENNY_CHANNEL_ID, SLACK_ADMIN_CHANNEL_ID each validated and role-detected.',status:'pass', result:'API /slack/validate returns per-channel ChannelResult array. Role auto-detected from channel name.', blockedBy:undefined },
+    ],
+  },
 ];
 
 // ── Helper functions ──────────────────────────────────────────────────────────
@@ -836,3 +855,112 @@ export function getScenarioSummary() {
   const avgScore = Math.round(OPERATIONAL_SCENARIOS.reduce((sum, s) => sum + s.readinessScore, 0) / OPERATIONAL_SCENARIOS.length);
   return { ready, partial, blocked, avgScore, total: OPERATIONAL_SCENARIOS.length };
 }
+
+// ── POC Restoration Data ──────────────────────────────────────────────────────
+
+export type PocStatus = 'confirmed-working' | 'tested' | 'designed' | 'planned';
+
+export interface PocWorkingItem {
+  id: string;
+  capability: string;
+  status: PocStatus;
+  channel: string;
+  note: string;
+  testedDate: string;
+  linkedTo: string[];
+}
+
+export interface PocChannelRecord {
+  role: 'penny' | 'admin';
+  channelName: string;
+  envVarHint: string;
+  recommendedEnvVar: string;
+  testedStatus: PocStatus;
+  botsPresent: string[];
+  featuresTested: string[];
+}
+
+export interface PocBot {
+  id: string;
+  name: string;
+  platform: string;
+  role: string;
+  colorCls: string;
+  status: 'confirmed' | 'planned';
+}
+
+export interface PocRestoreItem {
+  step: string;
+  note: string;
+  done: boolean;
+  status: string;
+}
+
+export interface PocIntegrationLink {
+  id: string;
+  label: string;
+  description: string;
+  route: string;
+  status: 'operational' | 'partial' | 'planned';
+  category: 'penny' | 'agentforce' | 'assessment' | 'slack' | 'trail-os';
+}
+
+export const POC_WORKING_ITEMS: PocWorkingItem[] = [
+  { id:'poc-1', capability:'Penny AI Channel — Penny (Gemini) Active',         status:'confirmed-working', channel:'Penny AI',      note:'Penny (Gemini) was responding to user messages in the Penny AI Slack channel during the POC.',                               testedDate:'Prior to June 2026', linkedTo:['Penny Integration Layer','Capability Registry'] },
+  { id:'poc-2', capability:'Agentforce Active in Penny AI Channel',            status:'confirmed-working', channel:'Penny AI',      note:'Agentforce (Penny–Transition Trails Assistant) was observed responding in the same Penny AI channel as Penny/Gemini.',        testedDate:'Prior to June 2026', linkedTo:['Agentforce Integration','Penny Integration Layer'] },
+  { id:'poc-3', capability:'Bot Coexistence — Penny + Agentforce',             status:'confirmed-working', channel:'Penny AI',      note:'Both bots responded in the same channel without conflict. Confirmed via screenshot showing both responding simultaneously.',   testedDate:'Prior to June 2026', linkedTo:['Slack Integration Center'] },
+  { id:'poc-4', capability:'Assessment Quiz Flow Tested',                      status:'confirmed-working', channel:'Penny AI',      note:'Assessment quiz functionality was tested in the POC. Quiz flow was initiated and completed in Slack.',                         testedDate:'Prior to June 2026', linkedTo:['Assessment','Penny Integration Layer'] },
+  { id:'poc-5', capability:'Admin Channel — Tested',                           status:'tested',            channel:'Admin Channel', note:'The admin/ops channel was tested for operational notifications and bot access during the POC.',                                testedDate:'Prior to June 2026', linkedTo:['Operations Center'] },
+  { id:'poc-6', capability:'Connected Agentforce (Salesforce-backed)',          status:'confirmed-working', channel:'Penny AI',      note:'Connected Agentforce (Salesforce-backed Penny–Transition Trails Assistant) was active and responding in the POC.',             testedDate:'Prior to June 2026', linkedTo:['Salesforce Integration','Agentforce'] },
+];
+
+export const POC_BOTS_CONFIRMED: PocBot[] = [
+  { id:'bot-penny-gemini', name:'Penny (Gemini)',                    platform:'Gemini / Trail OS',    role:'Learner coaching, assessments, weekly briefs, Trail Quests',                  colorCls:'border-pink-200 bg-pink-50 text-pink-700',       status:'confirmed' },
+  { id:'bot-agentforce',   name:'Penny–Transition Trails Assistant', platform:'Agentforce / Salesforce', role:'Connected agent, Salesforce-backed responses, escalation',               colorCls:'border-sky-200 bg-sky-50 text-sky-700',          status:'confirmed' },
+  { id:'bot-trail-os',     name:'Trail OS Bot',                      platform:'Trail OS / Slack API', role:'Delivery routing, event recording, system notifications, test messages',     colorCls:'border-emerald-200 bg-emerald-50 text-emerald-700', status:'confirmed' },
+];
+
+export const POC_CHANNELS_RECORD: PocChannelRecord[] = [
+  {
+    role: 'penny',
+    channelName: 'Penny AI',
+    envVarHint: 'Set SLACK_PENNY_CHANNEL_ID to this channel ID, or ensure SLACK_CHANNEL_ID points to the Penny AI channel.',
+    recommendedEnvVar: 'SLACK_PENNY_CHANNEL_ID',
+    testedStatus: 'confirmed-working',
+    botsPresent: ['Penny (Gemini)', 'Agentforce / Penny-Transition Trails Assistant', 'Trail OS Bot'],
+    featuresTested: ['Penny response to user mentions', 'Agentforce response in same channel', 'Assessment quiz flow', 'Bot coexistence confirmed', 'Connected Agentforce (Salesforce) active'],
+  },
+  {
+    role: 'admin',
+    channelName: 'Admin / Ops Channel',
+    envVarHint: 'Set SLACK_ADMIN_CHANNEL_ID to the admin/ops channel ID used in the POC.',
+    recommendedEnvVar: 'SLACK_ADMIN_CHANNEL_ID',
+    testedStatus: 'tested',
+    botsPresent: ['Trail OS Bot'],
+    featuresTested: ['Bot access confirmed', 'Admin notifications', 'Ops alerts'],
+  },
+];
+
+export const POC_RESTORE_CHECKLIST: PocRestoreItem[] = [
+  { step:'Bot Token (SLACK_BOT_TOKEN) configured',            note:'Required for all Slack API operations.',                                   done:true,  status:'Completed' },
+  { step:'Signing Secret (SLACK_SIGNING_SECRET) configured',  note:'Required for event payload verification.',                                 done:true,  status:'Completed' },
+  { step:'Bot token passes auth.test with Slack API',         note:'Confirms the token is valid and the bot user is active.',                  done:true,  status:'Completed' },
+  { step:'Identify Penny AI channel ID from POC',             note:'Find the exact channel ID for the Penny AI channel (right-click → View channel details → scroll to bottom).',  done:false, status:'Set SLACK_PENNY_CHANNEL_ID' },
+  { step:'Identify admin channel ID from POC',                note:'Find the channel ID for the admin/ops channel used in the POC.',           done:false, status:'Set SLACK_ADMIN_CHANNEL_ID' },
+  { step:'Invite Trail OS Bot to Penny AI channel',           note:'Run /invite @trail-os-bot inside the Penny AI Slack channel.',            done:false, status:'Pending — invite bot after setting channel ID' },
+  { step:'Verify bot membership in Penny AI channel',         note:'conversations.info should return is_member: true for the Penny AI channel.', done:false, status:'Pending invite' },
+  { step:'Confirm assessment flow routing in Prompt Studio',  note:'Assessment quiz templates wired to Penny delivery for the restored channel.', done:false, status:'In progress' },
+  { step:'Confirm Agentforce integration layer path',         note:'Agentforce integration configured to respond in the restored Penny AI channel.', done:false, status:'In progress' },
+  { step:'End-to-end: user mention → Penny response',         note:'Full flow validated: user @mentions Penny → Penny responds in Penny AI channel.', done:false, status:'Pending channel access fix' },
+];
+
+export const POC_INTEGRATION_LINKS: PocIntegrationLink[] = [
+  { id:'link-penny-layer',   label:'Penny Integration Layer',  description:'Penny/Gemini capability wiring, Agentforce handoff path, and delivery routing configuration.', route:'/penny/integration-layer', status:'partial',  category:'penny' },
+  { id:'link-prompt-studio', label:'Prompt Studio',            description:'Prompt templates for Penny responses, assessment quizzes, and coaching nudges.',                route:'/penny/prompt-studio',     status:'partial',  category:'penny' },
+  { id:'link-capabilities',  label:'Capability Registry',      description:'All registered Penny capabilities including assessment, Trail Quests, weekly briefs.',           route:'/penny/capabilities',      status:'partial',  category:'penny' },
+  { id:'link-assessments',   label:'Assessment Functionality', description:'Assessment quiz flow tested in POC. Template routing and Slack delivery configuration.',          route:'/penny/assessments',       status:'partial',  category:'assessment' },
+  { id:'link-agentforce',    label:'Agentforce Handoff',       description:'Connected Agentforce (Salesforce) bot configuration for Slack channel coexistence.',              route:'/admin/integrations',      status:'planned',  category:'agentforce' },
+  { id:'link-sf-valid',      label:'Salesforce Validation',    description:'Salesforce integration status and Agentforce (Penny–Transition Trails) configuration.',           route:'/program/sf-validation',   status:'partial',  category:'agentforce' },
+  { id:'link-ops-center',    label:'Operations Center',        description:'Trail OS operational event recording from Slack interactions — program health intelligence.',     route:'/operations/program-health',status:'planned', category:'trail-os' },
+  { id:'link-slack-valid',   label:'Workspace Validation',     description:'Live Slack token, channel access, and bot membership validation against real Slack API.',        route:'/collaboration/slack/validation', status:'operational', category:'slack' },
+];

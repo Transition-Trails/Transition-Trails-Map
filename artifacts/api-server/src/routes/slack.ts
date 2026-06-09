@@ -17,7 +17,19 @@ interface CheckResult {
   meta?: Record<string, string | boolean | number>;
 }
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
+interface ChannelResult {
+  envVar: string;
+  channelId: string;
+  resolvedRole: "penny" | "admin" | "default" | "unknown";
+  status: "pass" | "fail" | "skip";
+  name?: string;
+  isPrivate?: boolean;
+  isMember?: boolean;
+  memberCount?: number;
+  error?: string;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function slackGet(
   token: string,
@@ -32,15 +44,24 @@ async function slackGet(
   return (await res.json()) as Record<string, unknown>;
 }
 
+/** Guess a channel's functional role from its name when not explicit. */
+function detectChannelRole(name: string): "penny" | "admin" | "default" {
+  const l = name.toLowerCase();
+  if (l.includes("penny") || l.includes("poc") || l.includes("gemini") || l.includes("ai")) return "penny";
+  if (l.includes("admin") || l.includes("ops") || l.includes("leadership") || l.includes("operations")) return "admin";
+  return "default";
+}
+
 // ─── GET /slack/validate ──────────────────────────────────────────────────────
 
 router.get("/slack/validate", async (req, res) => {
-  const checks: CheckResult[] = [];
+  const checks: CheckResult[]  = [];
+  const channels: ChannelResult[] = [];
 
-  const botToken     = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
-  const appToken     = process.env["SLACK_APP_TOKEN"];
+  const botToken      = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
+  const appToken      = process.env["SLACK_APP_TOKEN"];
   const signingSecret = process.env["SLACK_SIGNING_SECRET"];
-  const channelId    = process.env["SLACK_CHANNEL_ID"];
+  const channelId     = process.env["SLACK_CHANNEL_ID"];
 
   // ── Secret presence ───────────────────────────────────────────────────────
 
@@ -92,12 +113,39 @@ router.get("/slack/validate", async (req, res) => {
     label: "Default Channel ID (SLACK_CHANNEL_ID)",
     status: channelId ? "pass" : "warning",
     detail: channelId
-      ? `SLACK_CHANNEL_ID is present (${channelId.length}-character ID).`
+      ? `SLACK_CHANNEL_ID is present (${channelId.length}-character ID). See Channel Map for role discovery.`
       : "SLACK_CHANNEL_ID is not set. Penny will not have a default delivery channel.",
     impact: "Default channel ID is required for Penny message delivery routing.",
     fix: channelId
       ? undefined
       : "Add SLACK_CHANNEL_ID in Replit Secrets. Right-click a channel in Slack → View channel details → scroll to bottom for the ID (starts with C or G).",
+  });
+
+  const pennyChannelId = process.env["SLACK_PENNY_CHANNEL_ID"];
+  const adminChannelId = process.env["SLACK_ADMIN_CHANNEL_ID"];
+
+  checks.push({
+    id: "secret-penny-channel",
+    category: "Secret",
+    label: "Penny Channel ID (SLACK_PENNY_CHANNEL_ID)",
+    status: pennyChannelId ? "pass" : "warning",
+    detail: pennyChannelId
+      ? "SLACK_PENNY_CHANNEL_ID is set — the Penny AI channel is explicitly configured."
+      : "SLACK_PENNY_CHANNEL_ID is not set. Trail OS will fall back to SLACK_CHANNEL_ID for Penny delivery. Set this to explicitly target the Penny AI channel from the POC.",
+    impact: pennyChannelId ? "None." : "Penny delivery will use the default channel. If SLACK_CHANNEL_ID is not the Penny AI channel, delivery routing will be incorrect.",
+    fix: pennyChannelId ? undefined : "Add SLACK_PENNY_CHANNEL_ID with the channel ID of the Penny AI Slack channel used in the POC.",
+  });
+
+  checks.push({
+    id: "secret-admin-channel",
+    category: "Secret",
+    label: "Admin Channel ID (SLACK_ADMIN_CHANNEL_ID)",
+    status: adminChannelId ? "pass" : "warning",
+    detail: adminChannelId
+      ? "SLACK_ADMIN_CHANNEL_ID is set — the admin/ops channel is explicitly configured."
+      : "SLACK_ADMIN_CHANNEL_ID is not set. Admin notifications and ops alerts will have no dedicated channel.",
+    impact: adminChannelId ? "None." : "Admin/ops notifications will have no dedicated delivery channel.",
+    fix: adminChannelId ? undefined : "Add SLACK_ADMIN_CHANNEL_ID with the channel ID of the admin/ops Slack channel used in the POC.",
   });
 
   // ── Token format validation ────────────────────────────────────────────────
@@ -113,9 +161,7 @@ router.get("/slack/validate", async (req, res) => {
         ? 'Bot token has the correct "xoxb-" prefix for a Bot User OAuth Token.'
         : 'Bot token does not start with "xoxb-". This may indicate the wrong token type.',
       impact: ok ? "None." : "Non-standard prefix may cause API authentication failures.",
-      fix: ok
-        ? undefined
-        : "Use the Bot User OAuth Token (xoxb-...) from OAuth & Permissions — not a user token or legacy token.",
+      fix: ok ? undefined : "Use the Bot User OAuth Token (xoxb-...) from OAuth & Permissions.",
     });
   }
 
@@ -126,13 +172,9 @@ router.get("/slack/validate", async (req, res) => {
       category: "Token Format",
       label: "App Token Format (xapp- prefix)",
       status: ok ? "pass" : "warning",
-      detail: ok
-        ? 'App token has the correct "xapp-" prefix.'
-        : 'App token does not start with "xapp-".',
+      detail: ok ? 'App token has the correct "xapp-" prefix.' : 'App token does not start with "xapp-".',
       impact: ok ? "None." : "Wrong token type — xapp- prefix is required for app-level tokens.",
-      fix: ok
-        ? undefined
-        : "Use the App-Level Token from Basic Information → App-Level Tokens in the Slack App dashboard.",
+      fix: ok ? undefined : "Use the App-Level Token from Basic Information → App-Level Tokens.",
     });
   }
 
@@ -147,9 +189,7 @@ router.get("/slack/validate", async (req, res) => {
         ? "Signing secret matches the expected 32-character lowercase hex format."
         : "Signing secret is present but does not match the typical 32-character hex format.",
       impact: ok ? "None." : "Signing secret format is unexpected — verify it was copied correctly.",
-      fix: ok
-        ? undefined
-        : "Copy the Signing Secret exactly from Slack App dashboard → Basic Information → App Credentials.",
+      fix: ok ? undefined : "Copy the Signing Secret exactly from Slack App dashboard → Basic Information.",
     });
   }
 
@@ -158,15 +198,13 @@ router.get("/slack/validate", async (req, res) => {
     checks.push({
       id: "format-channel-id",
       category: "Token Format",
-      label: "Channel ID Format (C.../G...)",
+      label: "Default Channel ID Format (C.../G...)",
       status: ok ? "pass" : "warning",
       detail: ok
-        ? "Channel ID has the correct format (starts with C or G, uppercase alphanumeric, 9–11 characters)."
-        : "Channel ID does not match expected format and may not be a valid Slack channel ID.",
+        ? "Default channel ID has the correct format (starts with C or G, uppercase alphanumeric, 9–11 characters)."
+        : "Default channel ID does not match expected format.",
       impact: ok ? "None." : "Invalid channel ID format will cause conversations.info and message delivery to fail.",
-      fix: ok
-        ? undefined
-        : "Get the channel ID from Slack: right-click channel → View channel details → scroll to bottom.",
+      fix: ok ? undefined : "Get the channel ID from Slack: right-click channel → View channel details → scroll to bottom.",
     });
   }
 
@@ -180,14 +218,7 @@ router.get("/slack/validate", async (req, res) => {
       ["api-bot-member",   "Bot Channel Membership"],
       ["api-post-ready",   "Message Post Readiness"],
     ] as [string, string][]) {
-      checks.push({
-        id,
-        category: "API",
-        label,
-        status: "skip",
-        detail: "Skipped — SLACK_BOT_TOKEN is not set.",
-        impact: "Cannot perform live API validation without bot token.",
-      });
+      checks.push({ id, category: "API", label, status: "skip", detail: "Skipped — SLACK_BOT_TOKEN is not set.", impact: "Cannot perform live API validation without bot token." });
     }
   } else {
     // auth.test ---------------------------------------------------------------
@@ -201,202 +232,158 @@ router.get("/slack/validate", async (req, res) => {
       if (authOk) {
         botUserId = r["user_id"] as string | undefined;
         checks.push({
-          id: "api-auth-test",
-          category: "API Auth",
-          label: "Slack auth.test",
-          status: "pass",
+          id: "api-auth-test", category: "API Auth", label: "Slack auth.test", status: "pass",
           detail: `Token validated. Bot user: @${r["user"]}, workspace: ${r["team"]} (${r["team_id"]}).`,
           impact: "None — token is valid and the bot is authorised.",
-          meta: {
-            botUser:   String(r["user"]    ?? ""),
-            workspace: String(r["team"]    ?? ""),
-            teamId:    String(r["team_id"] ?? ""),
-            userId:    String(r["user_id"] ?? ""),
-          },
+          meta: { botUser: String(r["user"] ?? ""), workspace: String(r["team"] ?? ""), teamId: String(r["team_id"] ?? ""), userId: String(r["user_id"] ?? "") },
         });
       } else {
         const errCode = String(r["error"] ?? "unknown");
         const errMap: Record<string, { detail: string; fix: string }> = {
-          invalid_auth:     { detail: "Token was rejected by Slack — it is invalid or has been revoked.",  fix: "Regenerate the Bot User OAuth Token in Slack App dashboard → OAuth & Permissions, and update SLACK_BOT_TOKEN." },
-          token_revoked:    { detail: "Token has been explicitly revoked.",                                fix: "Reinstall the Slack App to the workspace to generate a new token." },
-          not_authed:       { detail: "No token was recognised by the Slack API.",                        fix: "Check SLACK_BOT_TOKEN is set correctly with no extra whitespace." },
-          account_inactive: { detail: "The workspace account associated with this token is inactive.",    fix: "Check workspace status in Slack Admin." },
+          invalid_auth:     { detail: "Token was rejected by Slack — invalid or revoked.",      fix: "Regenerate the Bot User OAuth Token in Slack App dashboard → OAuth & Permissions." },
+          token_revoked:    { detail: "Token has been explicitly revoked.",                    fix: "Reinstall the Slack App to the workspace to generate a new token." },
+          not_authed:       { detail: "No token was recognised by the Slack API.",             fix: "Check SLACK_BOT_TOKEN is set correctly with no extra whitespace." },
+          account_inactive: { detail: "The workspace account for this token is inactive.",     fix: "Check workspace status in Slack Admin." },
         };
         const mapped = errMap[errCode];
-        checks.push({
-          id: "api-auth-test",
-          category: "API Auth",
-          label: "Slack auth.test",
-          status: "fail",
-          detail: mapped?.detail ?? `Slack API returned error: ${errCode}.`,
-          impact: "Cannot make any Slack API calls. All channel and message operations will fail.",
-          fix: mapped?.fix ?? `Slack error code: ${errCode}. Refer to api.slack.com/methods/auth.test.`,
-        });
+        checks.push({ id: "api-auth-test", category: "API Auth", label: "Slack auth.test", status: "fail", detail: mapped?.detail ?? `Slack API returned error: ${errCode}.`, impact: "Cannot make any Slack API calls.", fix: mapped?.fix ?? `Error: ${errCode}` });
       }
     } catch {
       req.log.warn("slack auth.test network error");
-      checks.push({
-        id: "api-auth-test",
-        category: "API Auth",
-        label: "Slack auth.test",
-        status: "fail",
-        detail: "Network error — could not reach api.slack.com.",
-        impact: "Slack API is unreachable from this environment.",
-        fix: "Check network connectivity. Outbound requests to api.slack.com may be restricted.",
-      });
+      checks.push({ id: "api-auth-test", category: "API Auth", label: "Slack auth.test", status: "fail", detail: "Network error — could not reach api.slack.com.", impact: "Slack API is unreachable.", fix: "Check network connectivity." });
     }
 
-    // team.info (workspace metadata) -----------------------------------------
+    // team.info ---------------------------------------------------------------
     if (authOk) {
       try {
         const r = await slackGet(botToken, "team.info");
         if (r["ok"] === true) {
           const team = r["team"] as Record<string, unknown> | undefined;
-          checks.push({
-            id: "api-workspace",
-            category: "Workspace",
-            label: "Workspace Metadata",
-            status: "pass",
-            detail: `Workspace: ${team?.["name"]} (${team?.["domain"]}.slack.com).`,
-            impact: "None — workspace metadata retrieved successfully.",
-            meta: {
-              name:   String(team?.["name"]   ?? ""),
-              domain: String(team?.["domain"] ?? ""),
-            },
-          });
+          checks.push({ id: "api-workspace", category: "Workspace", label: "Workspace Metadata", status: "pass", detail: `Workspace: ${team?.["name"]} (${team?.["domain"]}.slack.com).`, impact: "None.", meta: { name: String(team?.["name"] ?? ""), domain: String(team?.["domain"] ?? "") } });
         } else {
-          checks.push({
-            id: "api-workspace",
-            category: "Workspace",
-            label: "Workspace Metadata",
-            status: "warning",
-            detail: `team.info returned error: ${r["error"]}. Token is valid but workspace metadata is unavailable.`,
-            impact: "Minor — workspace display info will be unavailable.",
-            fix: `Ensure the bot has team:read scope. Slack error: ${r["error"]}.`,
-          });
+          checks.push({ id: "api-workspace", category: "Workspace", label: "Workspace Metadata", status: "warning", detail: `team.info returned: ${r["error"]}. Token valid but workspace metadata unavailable.`, impact: "Minor.", fix: `Add team:read scope. Error: ${r["error"]}.` });
         }
       } catch {
-        checks.push({ id: "api-workspace", category: "Workspace", label: "Workspace Metadata", status: "warning", detail: "Network error retrieving workspace metadata.", impact: "Minor.", fix: "Check network connectivity." });
+        checks.push({ id: "api-workspace", category: "Workspace", label: "Workspace Metadata", status: "warning", detail: "Network error retrieving workspace metadata.", impact: "Minor.", fix: "Check network." });
       }
     } else {
-      checks.push({ id: "api-workspace", category: "Workspace", label: "Workspace Metadata", status: "skip", detail: "Skipped — auth.test failed.", impact: "Cannot retrieve workspace info without valid token." });
+      checks.push({ id: "api-workspace", category: "Workspace", label: "Workspace Metadata", status: "skip", detail: "Skipped — auth.test failed.", impact: "Cannot retrieve workspace info." });
     }
 
-    // conversations.info (channel + bot membership) --------------------------
+    // conversations.info for SLACK_CHANNEL_ID ---------------------------------
     if (authOk && channelId) {
       try {
         const r = await slackGet(botToken, "conversations.info", { channel: channelId });
         if (r["ok"] === true) {
           const ch = r["channel"] as Record<string, unknown>;
-          checks.push({
-            id: "api-channel-info",
-            category: "Channel",
-            label: "Default Channel Access",
-            status: "pass",
-            detail: `Channel found: #${ch["name"]} (${ch["is_private"] ? "private" : "public"}). ${ch["num_members"] ?? "?"} members.`,
-            impact: "None — channel is accessible.",
-            meta: {
-              channelName: String(ch["name"]        ?? ""),
-              isPrivate:   Boolean(ch["is_private"]),
-              members:     Number(ch["num_members"] ?? 0),
-            },
-          });
-
+          checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "pass", detail: `Channel found: #${ch["name"]} (${ch["is_private"] ? "private" : "public"}). ${ch["num_members"] ?? "?"} members.`, impact: "None.", meta: { channelName: String(ch["name"] ?? ""), isPrivate: Boolean(ch["is_private"]), members: Number(ch["num_members"] ?? 0) } });
           const isMember = ch["is_member"] === true;
-          checks.push({
-            id: "api-bot-member",
-            category: "Bot Membership",
-            label: "Bot in Default Channel",
-            status: isMember ? "pass" : "warning",
-            detail: isMember
-              ? `Bot${botUserId ? ` (${botUserId})` : ""} is confirmed as a member of #${ch["name"]}.`
-              : `Bot is NOT a member of #${ch["name"]}. Posting to public channels may still work, but private channel access and history reads will fail.`,
-            impact: isMember ? "None." : "Bot cannot read message history or access private channels without explicit membership.",
-            fix: isMember ? undefined : `Invite the bot to the channel in Slack: type /invite @trail-os-bot in #${ch["name"]}.`,
-          });
+          checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: isMember ? "pass" : "warning", detail: isMember ? `Bot${botUserId ? ` (${botUserId})` : ""} is confirmed as a member of #${ch["name"]}.` : `Bot is NOT a member of #${ch["name"]}.`, impact: isMember ? "None." : "Bot cannot read history or access private channels without membership.", fix: isMember ? undefined : `Invite the bot: /invite @trail-os-bot in #${ch["name"]}.` });
         } else {
           const errCode = String(r["error"] ?? "unknown");
           const errMap: Record<string, { detail: string; fix: string }> = {
-            channel_not_found: { detail: `Channel ID "${channelId}" was not found. It may be invalid or belong to a different workspace.`, fix: "Verify SLACK_CHANNEL_ID. Get the ID from Slack channel settings." },
-            not_in_channel:    { detail: "Bot is not a member of this private channel.",                                                   fix: "Invite the bot to the channel using /invite @trail-os-bot." },
-            is_archived:       { detail: "The channel has been archived.",                                                                  fix: "Choose a different active channel for SLACK_CHANNEL_ID." },
-            missing_scope:     { detail: "Bot token is missing channels:read (or groups:read for private channels) scope.",                 fix: "Add channels:read scope to the Slack App manifest and reinstall the app." },
+            channel_not_found: { detail: `Channel ID "${channelId}" not found. Check if this is the Penny AI channel ID from the POC.`, fix: "Verify SLACK_CHANNEL_ID. Set SLACK_PENNY_CHANNEL_ID explicitly if this is the Penny AI channel." },
+            not_in_channel:    { detail: "Bot is not a member of this private channel.",      fix: "Invite the bot: /invite @trail-os-bot." },
+            is_archived:       { detail: "The channel has been archived.",                    fix: "Choose an active channel." },
+            missing_scope:     { detail: "Bot token is missing channels:read scope.",         fix: "Add channels:read scope and reinstall the app." },
           };
           const mapped = errMap[errCode];
-          checks.push({
-            id: "api-channel-info",
-            category: "Channel",
-            label: "Default Channel Access",
-            status: "fail",
-            detail: mapped?.detail ?? `conversations.info returned: ${errCode}.`,
-            impact: "Penny cannot post to the default channel.",
-            fix: mapped?.fix ?? `Slack error: ${errCode}.`,
-          });
+          checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "fail", detail: mapped?.detail ?? `conversations.info returned: ${errCode}.`, impact: "Penny cannot post to the default channel.", fix: mapped?.fix ?? `Error: ${errCode}.` });
           checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped — channel access check failed.", impact: "Cannot verify bot membership." });
         }
       } catch {
-        checks.push({ id: "api-channel-info", category: "Channel",       label: "Default Channel Access",   status: "fail",   detail: "Network error checking channel.",   impact: "Cannot verify channel access.", fix: "Check network." });
-        checks.push({ id: "api-bot-member",   category: "Bot Membership", label: "Bot in Default Channel",   status: "skip",   detail: "Skipped — channel check failed.",   impact: "Unknown." });
+        checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "fail", detail: "Network error checking channel.", impact: "Cannot verify channel.", fix: "Check network." });
+        checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped.", impact: "Unknown." });
       }
     } else if (!channelId) {
-      checks.push({ id: "api-channel-info", category: "Channel",       label: "Default Channel Access", status: "skip", detail: "Skipped — SLACK_CHANNEL_ID not set.", impact: "No default channel to validate." });
-      checks.push({ id: "api-bot-member",   category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped — no channel ID.",             impact: "Cannot check membership without channel ID." });
+      checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "skip", detail: "Skipped — SLACK_CHANNEL_ID not set.", impact: "No default channel." });
+      checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped — no channel ID.", impact: "Cannot check membership." });
     } else {
-      checks.push({ id: "api-channel-info", category: "Channel",       label: "Default Channel Access", status: "skip", detail: "Skipped — auth.test failed.", impact: "Cannot check channel without valid token." });
-      checks.push({ id: "api-bot-member",   category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped — auth.test failed.", impact: "Cannot check membership without valid token." });
+      checks.push({ id: "api-channel-info", category: "Channel", label: "Default Channel Access", status: "skip", detail: "Skipped — auth.test failed.", impact: "Cannot check channel." });
+      checks.push({ id: "api-bot-member", category: "Bot Membership", label: "Bot in Default Channel", status: "skip", detail: "Skipped — auth.test failed.", impact: "Cannot check membership." });
     }
 
-    // post permission readiness ----------------------------------------------
+    // post permission readiness -----------------------------------------------
     checks.push({
-      id: "api-post-ready",
-      category: "Post Permission",
-      label: "Message Post Readiness",
+      id: "api-post-ready", category: "Post Permission", label: "Message Post Readiness",
       status: authOk ? "pass" : "skip",
-      detail: authOk
-        ? "Bot token is valid. Use the Send Test Message button to confirm chat:write permission by sending a labelled test message to the default channel."
-        : "Skipped — auth.test failed.",
-      impact: authOk
-        ? "If chat:write scope is missing, all Penny message posting will fail at runtime."
-        : "Cannot verify post permission without valid token.",
-      fix: authOk ? undefined : "Ensure chat:write scope is in the app manifest and the app is reinstalled to the workspace.",
+      detail: authOk ? "Bot token is valid. Use Send Test Message to confirm chat:write permission." : "Skipped — auth.test failed.",
+      impact: authOk ? "If chat:write is missing, all Penny posting will fail at runtime." : "Cannot verify post permission.",
+      fix: authOk ? undefined : "Ensure chat:write scope is in the app manifest and the app is reinstalled.",
     });
+
+    // ── Multi-channel discovery (channels array) ──────────────────────────────
+
+    if (authOk) {
+      const channelTargets: { envVar: string; explicitRole?: "penny" | "admin" }[] = [
+        { envVar: "SLACK_CHANNEL_ID" },
+        { envVar: "SLACK_PENNY_CHANNEL_ID", explicitRole: "penny" },
+        { envVar: "SLACK_ADMIN_CHANNEL_ID", explicitRole: "admin" },
+      ];
+
+      // Deduplicate by channel ID to avoid calling the same channel twice
+      const seen = new Set<string>();
+
+      for (const target of channelTargets) {
+        const chId = process.env[target.envVar];
+        if (!chId || seen.has(chId)) continue;
+        seen.add(chId);
+
+        try {
+          const r = await slackGet(botToken, "conversations.info", { channel: chId });
+          if (r["ok"] === true) {
+            const ch = r["channel"] as Record<string, unknown>;
+            const name = String(ch["name"] ?? "");
+            const resolvedRole = target.explicitRole ?? detectChannelRole(name);
+            channels.push({
+              envVar: target.envVar, channelId: chId, resolvedRole,
+              status: "pass", name,
+              isPrivate: Boolean(ch["is_private"]),
+              isMember: ch["is_member"] === true,
+              memberCount: Number(ch["num_members"] ?? 0),
+            });
+          } else {
+            channels.push({
+              envVar: target.envVar, channelId: chId,
+              resolvedRole: target.explicitRole ?? "unknown",
+              status: "fail",
+              error: String(r["error"] ?? "unknown"),
+            });
+          }
+        } catch {
+          channels.push({ envVar: target.envVar, channelId: chId, resolvedRole: target.explicitRole ?? "unknown", status: "fail", error: "network_error" });
+        }
+      }
+    }
   }
 
-  res.json({ checks, timestamp: new Date().toISOString() });
+  res.json({ checks, channels, timestamp: new Date().toISOString() });
 });
 
 // ─── POST /slack/validate/test-message ───────────────────────────────────────
 
 router.post("/slack/validate/test-message", async (req, res) => {
   const botToken  = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
-  const channelId = process.env["SLACK_CHANNEL_ID"];
+  const channelId = process.env["SLACK_PENNY_CHANNEL_ID"] ?? process.env["SLACK_CHANNEL_ID"];
 
   if (!botToken || !channelId) {
-    res.status(400).json({ ok: false, error: "SLACK_BOT_TOKEN and SLACK_CHANNEL_ID must both be set to send a test message." });
+    res.status(400).json({ ok: false, error: "SLACK_BOT_TOKEN and at least one channel ID (SLACK_PENNY_CHANNEL_ID or SLACK_CHANNEL_ID) must be set." });
     return;
   }
 
   try {
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${botToken}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${botToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         channel: channelId,
-        text: `🤖 *Trail OS — Slack Integration Validation Test* (${new Date().toISOString()})\nThis is a test message sent from the Trail OS Slack Integration Center. You can safely delete this message.`,
+        text: `🤖 *Trail OS — Slack Integration Validation Test* (${new Date().toISOString()})\nThis is a test message from the Trail OS Slack Integration Center. You can safely delete this message.`,
         unfurl_links: false,
         unfurl_media: false,
       }),
     });
 
-    const result = (await response.json()) as {
-      ok: boolean;
-      error?: string;
-      ts?: string;
-      channel?: string;
-    };
+    const result = (await response.json()) as { ok: boolean; error?: string; ts?: string; channel?: string };
 
     if (result.ok) {
       res.json({ ok: true, messageTs: result.ts, channel: result.channel });
@@ -406,17 +393,13 @@ router.post("/slack/validate/test-message", async (req, res) => {
     const errMap: Record<string, string> = {
       not_in_channel:    "Bot is not a member of the channel. Invite the bot with /invite @trail-os-bot.",
       channel_not_found: "Channel ID is invalid or does not exist in this workspace.",
-      missing_scope:     "Bot token is missing the chat:write scope. Add it in the Slack App manifest and reinstall.",
+      missing_scope:     "Bot token is missing the chat:write scope. Add it and reinstall the app.",
       invalid_auth:      "Bot token is invalid or revoked.",
       is_archived:       "Channel is archived.",
       rate_limited:      "Rate limited — try again in a moment.",
     };
 
-    res.status(400).json({
-      ok: false,
-      error: result.error ?? "unknown",
-      detail: errMap[result.error ?? ""] ?? `Slack error: ${result.error}`,
-    });
+    res.status(400).json({ ok: false, error: result.error ?? "unknown", detail: errMap[result.error ?? ""] ?? `Slack error: ${result.error}` });
   } catch {
     req.log.error("slack test-message network error");
     res.status(500).json({ ok: false, error: "network_error", detail: "Could not reach Slack API." });

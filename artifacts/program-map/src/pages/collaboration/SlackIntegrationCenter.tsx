@@ -7,7 +7,7 @@ import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectW
 import {
   Hash, Settings, Users, Brain, FileText, Activity, Shield, BarChart2, FlaskConical,
   CheckCircle, XCircle, AlertTriangle, ChevronRight, Key, GitMerge, Layers,
-  Play, Map, Workflow,
+  Play, Map, Workflow, Zap,
 } from 'lucide-react';
 import {
   SLACK_WORKSPACE, SLACK_CHANNELS, SLACK_USER_MAPPINGS, PENNY_SLACK_CAPABILITIES,
@@ -18,6 +18,7 @@ import {
 import {
   VALIDATION_CHECKS, PROGRAM_CHANNEL_MAPS, ROLE_GROUPS, PENNY_DELIVERY_MAPS,
   COMM_FLOWS, SLACK_OBJECT_PROFILES, OPERATIONAL_SCENARIOS, GOVERNANCE_ISSUES, TEST_SUITES,
+  POC_WORKING_ITEMS, POC_BOTS_CONFIRMED, POC_CHANNELS_RECORD, POC_RESTORE_CHECKLIST, POC_INTEGRATION_LINKS,
   getValidationSummary, getGovernanceSummary, getTestSuiteSummary, getOverallTestSummary,
   getScenarioSummary,
   type ValidationCheck, type RoleGroup, type CommFlow, type FlowNode,
@@ -37,8 +38,21 @@ interface SlackApiCheck {
   meta?: Record<string, string | boolean | number>;
 }
 
+interface SlackChannelResult {
+  envVar: string;
+  channelId: string;
+  resolvedRole: 'penny' | 'admin' | 'default' | 'unknown';
+  status: 'pass' | 'fail' | 'skip';
+  name?: string;
+  isPrivate?: boolean;
+  isMember?: boolean;
+  memberCount?: number;
+  error?: string;
+}
+
 interface SlackValidationResponse {
   checks: SlackApiCheck[];
+  channels: SlackChannelResult[];
   timestamp: string;
 }
 
@@ -292,7 +306,8 @@ function WorkspaceValidationTab() {
   const [testMsgState, setTestMsgState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [testMsgDetail, setTestMsgDetail] = useState('');
 
-  const checks     = state.kind === 'done' ? state.data.checks : [];
+  const checks     = state.kind === 'done' ? state.data.checks   : [];
+  const channels   = state.kind === 'done' ? state.data.channels : [];
   const isLoading  = state.kind === 'loading';
   const lastRun    = state.kind === 'done' ? new Date(state.data.timestamp).toLocaleTimeString() : null;
   const pass       = checks.filter(c => c.status === 'pass').length;
@@ -405,21 +420,47 @@ function WorkspaceValidationTab() {
               {isLoading ? (
                 <div className="px-4 py-6 text-center text-[12px] text-muted-foreground">Checking secrets and calling Slack API…</div>
               ) : (
-                categories.map(cat => (
-                  <div key={cat}>
-                    <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">{cat}</p>
-                    {checks.filter(c => c.category === cat).map(check => (
-                      <button
-                        key={check.id}
-                        onClick={() => setSelected(check)}
-                        className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/40 border-b border-border/20 transition-colors ${selected?.id === check.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
-                      >
-                        <ValidationIcon status={check.status} />
-                        <span className="text-[12px] text-foreground font-medium flex-1 leading-tight">{check.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                ))
+                <>
+                  {categories.map(cat => (
+                    <div key={cat}>
+                      <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">{cat}</p>
+                      {checks.filter(c => c.category === cat).map(check => (
+                        <button
+                          key={check.id}
+                          onClick={() => setSelected(check)}
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/40 border-b border-border/20 transition-colors ${selected?.id === check.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
+                        >
+                          <ValidationIcon status={check.status} />
+                          <span className="text-[12px] text-foreground font-medium flex-1 leading-tight">{check.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                  {channels.length > 0 && (
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">Channel Map</p>
+                      {channels.map(ch => (
+                        <div key={ch.envVar} className="flex items-center gap-2.5 px-4 py-2.5 border-b border-border/20">
+                          <ValidationIcon status={ch.status} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[12px] font-medium text-foreground truncate">
+                              {ch.name ? `#${ch.name}` : `${ch.channelId.substring(0, 10)}…`}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground truncate">{ch.envVar}</p>
+                          </div>
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border shrink-0 ${
+                            ch.resolvedRole === 'penny'   ? 'bg-pink-50 text-pink-700 border-pink-200' :
+                            ch.resolvedRole === 'admin'   ? 'bg-violet-50 text-violet-700 border-violet-200' :
+                            ch.resolvedRole === 'default' ? 'bg-teal-50 text-teal-700 border-teal-200' :
+                            'bg-muted text-muted-foreground border-border'
+                          }`}>
+                            {ch.resolvedRole === 'penny' ? 'Penny AI' : ch.resolvedRole === 'admin' ? 'Admin' : ch.resolvedRole === 'default' ? 'Default' : 'Unknown'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </ScrollArea>
           </div>
@@ -1393,6 +1434,218 @@ function ActivityFeedTab() {
   );
 }
 
+// ── Tab 13: POC State ─────────────────────────────────────────────────────────
+
+function PocStateTab() {
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-6 space-y-5 max-w-4xl">
+        <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3">
+          <p className="text-[11px] font-bold text-teal-800 uppercase mb-1">POC Last Confirmed Working State — Restoration Reference</p>
+          <p className="text-[12px] text-teal-900 leading-relaxed">
+            The Penny AI Slack POC was confirmed working with both Penny (Gemini) and Agentforce (Penny–Transition Trails Assistant) responding in the same channel simultaneously. Assessment quiz flow, connected Agentforce, and both the Penny AI channel and admin channel were tested. This tab is the reference document for restoring and validating that state.
+          </p>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Confirmed Working — POC State</p>
+          <div className="space-y-2">
+            {POC_WORKING_ITEMS.map(item => (
+              <div key={item.id} className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${
+                item.status === 'confirmed-working' ? 'border-emerald-200 bg-emerald-50' : 'border-teal-200 bg-teal-50'
+              }`}>
+                <CheckCircle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${item.status === 'confirmed-working' ? 'text-emerald-500' : 'text-teal-500'}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <p className="text-[12px] font-semibold text-foreground">{item.capability}</p>
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${
+                      item.status === 'confirmed-working' ? 'border-emerald-200 bg-white text-emerald-700' : 'border-teal-200 bg-white text-teal-700'
+                    }`}>{item.status === 'confirmed-working' ? 'Confirmed' : 'Tested'}</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">{item.note}</p>
+                  <p className="text-[10px] text-muted-foreground/60 mt-0.5">Channel: {item.channel} · {item.testedDate}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Bots Confirmed Active — Penny AI Channel</p>
+          <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+            {POC_BOTS_CONFIRMED.map(bot => (
+              <div key={bot.id} className="flex items-center gap-3 px-4 py-2.5">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold border shrink-0 ${bot.colorCls}`}>{bot.platform}</span>
+                <div className="flex-1">
+                  <p className="text-[12px] font-semibold text-foreground">{bot.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{bot.role}</p>
+                </div>
+                <span className="text-[10px] font-medium text-emerald-600 shrink-0">✓ Confirmed in POC</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+            Both Penny (Gemini) and Agentforce were observed responding in the same Penny AI channel — confirmed via screenshot showing simultaneous active responses. The Trail OS Bot handled delivery routing, test messages, and event logging.
+          </p>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Channels Tested in POC</p>
+          <div className="grid grid-cols-2 gap-3">
+            {POC_CHANNELS_RECORD.map(ch => (
+              <div key={ch.role} className={`rounded-lg border p-4 ${ch.role === 'penny' ? 'border-teal-200 bg-teal-50' : 'border-violet-200 bg-violet-50'}`}>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <Hash className={`w-4 h-4 ${ch.role === 'penny' ? 'text-teal-600' : 'text-violet-600'}`} />
+                  <p className="text-[13px] font-bold text-foreground">{ch.channelName}</p>
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${
+                    ch.testedStatus === 'confirmed-working' ? 'border-emerald-200 bg-white text-emerald-700' : 'border-teal-200 bg-white text-teal-700'
+                  }`}>{ch.testedStatus === 'confirmed-working' ? 'Confirmed' : 'Tested'}</span>
+                </div>
+                <div className="space-y-1 mb-3">
+                  {ch.featuresTested.map(f => (
+                    <div key={f} className="flex items-center gap-1.5 text-[11px] text-foreground">
+                      <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0" /> {f}
+                    </div>
+                  ))}
+                </div>
+                <div className="pt-2 border-t border-border/30">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase mb-0.5">Recommended Env Var</p>
+                  <code className="text-[10px] font-mono text-muted-foreground">{ch.recommendedEnvVar}</code>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 italic leading-snug">{ch.envVarHint}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Restore Checklist</p>
+          <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+            {POC_RESTORE_CHECKLIST.map((item, i) => (
+              <div key={i} className="flex items-start gap-3 px-4 py-2.5">
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground'}`}>
+                  {item.done ? '✓' : String(i + 1)}
+                </span>
+                <div className="flex-1">
+                  <p className={`text-[12px] font-semibold ${item.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{item.step}</p>
+                  <p className="text-[11px] text-muted-foreground">{item.note}</p>
+                </div>
+                <span className={`text-[10px] font-medium shrink-0 ${item.done ? 'text-emerald-600' : 'text-muted-foreground'}`}>{item.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
+
+// ── Tab 14: POC Readiness ─────────────────────────────────────────────────────
+
+function PocReadinessTab() {
+  const { state: valState } = useSlackValidation();
+  const liveChecks  = valState.kind === 'done' ? valState.data.checks   : null;
+  const liveChannels = valState.kind === 'done' ? valState.data.channels : null;
+
+  const tokenValid   = liveChecks?.some(c => c.id === 'api-auth-test'     && c.status === 'pass') ?? false;
+  const hasPennyCh   = liveChecks?.some(c => c.id === 'secret-penny-channel' && c.status === 'pass') ?? false;
+  const hasAdminCh   = liveChecks?.some(c => c.id === 'secret-admin-channel'  && c.status === 'pass') ?? false;
+  const pennyChPass  = liveChannels?.find(c => c.resolvedRole === 'penny')?.status === 'pass';
+  const pennyMember  = liveChannels?.find(c => c.resolvedRole === 'penny')?.isMember === true;
+  const adminChPass  = liveChannels?.find(c => c.resolvedRole === 'admin')?.status === 'pass';
+
+  const liveItems = [
+    { id:'token',        label:'Bot Token Valid',                   status: liveChecks ? (tokenValid ? 'pass' : 'fail')    : 'pending', detail: liveChecks ? (tokenValid ? 'auth.test confirmed — bot token is valid.' : 'auth.test failed. Regenerate the Bot User OAuth Token.')   : 'Run Workspace Validation to check.' },
+    { id:'penny-ch-id',  label:'Penny Channel ID (SLACK_PENNY_CHANNEL_ID)',  status: liveChecks ? (hasPennyCh  ? 'pass' : 'warning') : 'pending', detail: hasPennyCh  ? 'SLACK_PENNY_CHANNEL_ID is set — Penny AI channel explicitly configured.'  : 'Set SLACK_PENNY_CHANNEL_ID with the Penny AI channel ID from the POC.' },
+    { id:'penny-access', label:'Penny AI Channel Accessible',       status: liveChannels ? (pennyChPass ? 'pass' : 'fail') : 'pending', detail: pennyChPass ? 'Bot can read the Penny AI channel via conversations.info.' : 'Channel access failed. Invite the bot: /invite @trail-os-bot.' },
+    { id:'penny-member', label:'Bot is Member of Penny AI Channel', status: liveChannels ? (pennyMember ? 'pass' : 'warning') : 'pending', detail: pennyMember ? 'Bot confirmed as channel member — can receive events and post.' : 'Bot is not yet a member. Run /invite @trail-os-bot in the Penny AI channel.' },
+    { id:'admin-ch-id',  label:'Admin Channel ID (SLACK_ADMIN_CHANNEL_ID)', status: liveChecks ? (hasAdminCh  ? 'pass' : 'warning') : 'pending', detail: hasAdminCh  ? 'SLACK_ADMIN_CHANNEL_ID is set — admin channel explicitly configured.'    : 'Set SLACK_ADMIN_CHANNEL_ID with the admin channel ID from the POC.' },
+    { id:'admin-access', label:'Admin Channel Accessible',          status: liveChannels ? (adminChPass ? 'pass' : 'warning') : 'pending', detail: adminChPass ? 'Bot can access the admin channel.'                                     : 'Admin channel not yet configured or bot not invited.' },
+  ];
+
+  const nextSteps = [
+    { step:'Set SLACK_PENNY_CHANNEL_ID',              done: hasPennyCh,   detail:'Add the Penny AI channel ID to Replit Secrets.' },
+    { step:'Set SLACK_ADMIN_CHANNEL_ID',               done: hasAdminCh,   detail:'Add the admin channel ID to Replit Secrets.' },
+    { step:'Invite Trail OS Bot to Penny AI channel',  done: pennyMember,  detail:'Run /invite @trail-os-bot in the Penny AI Slack channel.' },
+    { step:'Confirm Penny → Prompt Studio routing',    done: false,        detail:'Verify prompt templates are wired to the restored Penny AI channel.' },
+    { step:'Re-confirm Agentforce integration path',   done: false,        detail:'Confirm Agentforce (Penny–Transition Trails Assistant) targets the correct channel.' },
+    { step:'Run POC Restoration test suite end-to-end',done: false,        detail:'User mention → Penny responds → Agentforce also responds → assessment starts → Trail OS records.' },
+  ];
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-6 space-y-5 max-w-4xl">
+        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
+          <p className="text-[11px] font-bold text-primary uppercase mb-1">POC Integration Readiness</p>
+          <p className="text-[12px] text-foreground leading-relaxed">
+            Live readiness across all systems required to restore the confirmed-working POC state: Slack channels, Penny/Gemini, Agentforce, Assessment, Prompt Studio, and Trail OS event recording. Slack checks update automatically when Workspace Validation runs.
+          </p>
+        </div>
+
+        {/* Live Slack readiness */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Live Slack Readiness</p>
+            {liveChecks === null && <span className="text-[10px] text-muted-foreground italic">— run Workspace Validation to populate</span>}
+          </div>
+          <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+            {liveItems.map(item => (
+              <div key={item.id} className="flex items-start gap-3 px-4 py-2.5">
+                <ValidationIcon status={item.status} />
+                <div className="flex-1">
+                  <p className="text-[12px] font-semibold text-foreground">{item.label}</p>
+                  <p className="text-[11px] text-muted-foreground">{item.detail}</p>
+                </div>
+                <ReadinessBadge status={item.status} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Integration components */}
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Integration Components</p>
+          <div className="grid grid-cols-2 gap-2">
+            {POC_INTEGRATION_LINKS.map(link => (
+              <div key={link.id} className={`rounded-lg border p-3 ${
+                link.status === 'operational' ? 'border-emerald-200 bg-emerald-50' :
+                link.status === 'partial'     ? 'border-amber-200 bg-amber-50' :
+                                               'border-sky-200 bg-sky-50'
+              }`}>
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <p className="text-[12px] font-semibold text-foreground">{link.label}</p>
+                  <ReadinessBadge status={link.status} />
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug mb-2">{link.description}</p>
+                <code className="text-[10px] font-mono text-muted-foreground/60">{link.route}</code>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Next steps to restore POC */}
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Restore Path — What Needs to Happen Next</p>
+          <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+            {nextSteps.map((item, i) => (
+              <div key={i} className="flex items-start gap-3 px-4 py-2.5">
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground'}`}>
+                  {item.done ? '✓' : String(i + 1)}
+                </span>
+                <div className="flex-1">
+                  <p className={`text-[12px] font-semibold ${item.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{item.step}</p>
+                  <p className="text-[11px] text-muted-foreground">{item.detail}</p>
+                </div>
+                {item.done && <ReadinessBadge status="pass" />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
+
 // ── Default export ────────────────────────────────────────────────────────────
 
 function SlackIntegrationCenterInner() {
@@ -1431,6 +1684,8 @@ function SlackIntegrationCenterInner() {
         { id:'governance',  label:'Governance',          path:'/collaboration/slack/governance',        icon:Shield,        content:<GovernanceTab /> },
         { id:'testing',     label:'Test Suite',          path:'/collaboration/slack/testing',           icon:FlaskConical,  content:<TestSuiteTab /> },
         { id:'health',      label:'Health',              path:'/collaboration/slack/health',            icon:BarChart2,     content:<IntegrationHealthTab /> },
+        { id:'poc-state',   label:'POC State',           path:'/collaboration/slack/poc-state',         icon:CheckCircle,   content:<PocStateTab /> },
+        { id:'poc-ready',   label:'POC Readiness',       path:'/collaboration/slack/poc-readiness',     icon:Zap,           content:<PocReadinessTab /> },
       ]}
     />
   );
