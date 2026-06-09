@@ -1,22 +1,23 @@
-import { BookOpen, Database, GitBranch, Archive, Search, BookMarked } from 'lucide-react';
+import { BookOpen, Database, GitBranch, Archive, Search, BookMarked, Network, Target } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import KnowledgeWorkspace      from '@/pages/knowledge/KnowledgeWorkspace';
-import KnowledgeRelationships  from '@/pages/navigator/KnowledgeRelationships';
-import LibraryDocuments        from '@/pages/library/LibraryDocuments';
-import LibrarySearch           from '@/pages/library/LibrarySearch';
+import type { ActionItem } from '@/components/workspace/ActionBar';
+import KnowledgeWorkspace     from '@/pages/knowledge/KnowledgeWorkspace';
+import KnowledgeRelationships from '@/pages/navigator/KnowledgeRelationships';
+import LibraryDocuments       from '@/pages/library/LibraryDocuments';
+import LibrarySearch          from '@/pages/library/LibrarySearch';
 
 function OrgMemoryPlaceholder() {
   const sections = [
-    { title: 'Decisions',           desc: 'Key organizational decisions with rationale, owner, impact, and review dates.' },
-    { title: 'Program History',     desc: 'Major program evolution — launches, retirements, redesigns, and cohort milestones.' },
-    { title: 'Standards History',   desc: 'Changes to Program, Module, Lesson, Assessment, Knowledge, Penny, and Communication Blueprints.' },
-    { title: 'Architecture History',desc: 'Trail OS architecture decisions — platform choices, naming conventions, structural design.' },
-    { title: 'Penny History',       desc: 'Capability, prompt, and governance evolution — what Penny could do and when.' },
-    { title: 'Lessons Learned',     desc: 'Retrospective insights from programs, curriculum, operations, and integrations.' },
+    { title: 'Decisions',               desc: 'Key organizational decisions with rationale, owner, impact, and review dates.' },
+    { title: 'Program History',         desc: 'Major program evolution — launches, retirements, redesigns, and cohort milestones.' },
+    { title: 'Standards History',       desc: 'Changes to Program, Module, Lesson, Assessment, Knowledge, Penny, and Communication Blueprints.' },
+    { title: 'Architecture History',    desc: 'Trail OS architecture decisions — platform choices, naming conventions, structural design.' },
+    { title: 'Penny History',           desc: 'Capability, prompt, and governance evolution — what Penny could do and when.' },
+    { title: 'Lessons Learned',         desc: 'Retrospective insights from programs, curriculum, operations, and integrations.' },
     { title: 'Institutional Knowledge', desc: 'Curated repository of important organizational context and rationale for future staff.' },
-    { title: 'Governance Records',  desc: 'Policy, standards, ownership, and review history across all domains.' },
-    { title: 'Memory Health',       desc: 'Missing ownership, undocumented decisions, stale records, and knowledge gaps.' },
+    { title: 'Governance Records',      desc: 'Policy, standards, ownership, and review history across all domains.' },
+    { title: 'Memory Health',           desc: 'Missing ownership, undocumented decisions, stale records, and knowledge gaps.' },
   ];
 
   return (
@@ -59,18 +60,27 @@ function OrgMemoryPlaceholder() {
   );
 }
 
+const HUB_ACTIONS: ActionItem[] = [
+  { id: 'search',        label: 'Search Library',     icon: Search,    href: '/knowledge/search',        variant: 'primary'   },
+  { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/knowledge/relationships', variant: 'secondary' },
+  { id: 'digital-twin',  label: 'Open Digital Twin',  icon: Network,   href: '/digital-twin/knowledge',  variant: 'secondary' },
+  { id: 'memory',        label: 'Org Memory',         icon: Archive,   href: '/knowledge/memory',        variant: 'secondary' },
+  { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                  variant: 'secondary' },
+];
+
 export default function KnowledgeHub() {
   return (
     <HubShell
       title="Knowledge"
       icon={BookOpen}
       description="Knowledge source registry, relationship graph, document library, organizational memory, and full-text search."
+      actions={HUB_ACTIONS}
       tabs={[
-        { id: 'sources',       label: 'Sources',         path: '/knowledge',               icon: Database,    content: <KnowledgeWorkspace /> },
-        { id: 'relationships', label: 'Relationships',   path: '/knowledge/relationships', icon: GitBranch,   content: <KnowledgeRelationships /> },
-        { id: 'library',       label: 'Library',         path: '/knowledge/library',       icon: BookMarked,  content: <LibraryDocuments /> },
-        { id: 'memory',        label: 'Org Memory',      path: '/knowledge/memory',        icon: Archive,     content: <OrgMemoryPlaceholder /> },
-        { id: 'search',        label: 'Search',          path: '/knowledge/search',        icon: Search,      content: <LibrarySearch /> },
+        { id: 'sources',       label: 'Sources',       path: '/knowledge',               icon: Database,   content: <KnowledgeWorkspace /> },
+        { id: 'relationships', label: 'Relationships', path: '/knowledge/relationships', icon: GitBranch,  content: <KnowledgeRelationships /> },
+        { id: 'library',       label: 'Library',       path: '/knowledge/library',       icon: BookMarked, content: <LibraryDocuments /> },
+        { id: 'memory',        label: 'Org Memory',    path: '/knowledge/memory',        icon: Archive,    content: <OrgMemoryPlaceholder /> },
+        { id: 'search',        label: 'Search',        path: '/knowledge/search',        icon: Search,     content: <LibrarySearch /> },
       ]}
     />
   );

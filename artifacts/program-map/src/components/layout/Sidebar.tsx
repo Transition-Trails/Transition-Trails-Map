@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
   Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
-  ChevronDown, Layers, Shield, Search, Target,
+  ChevronDown, Search, Target,
 } from 'lucide-react';
 
 type NavItem  = { path: string; label: string; isLabel?: false } | { label: string; isLabel: true };
@@ -11,6 +11,7 @@ type NavGroup = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   pathPrefix: string;
+  extraPrefixes?: string[];
   items: NavItem[];
 };
 
@@ -20,6 +21,7 @@ const navGroups: NavGroup[] = [
     label: 'Digital Twin',
     icon: Network,
     pathPrefix: '/digital-twin',
+    extraPrefixes: ['/uom', '/governance'],
     items: [
       { path: '/digital-twin',               label: 'Overview' },
       { path: '/digital-twin/org-graph',     label: 'Org Graph' },
@@ -28,35 +30,14 @@ const navGroups: NavGroup[] = [
       { path: '/digital-twin/people',        label: 'People & Roles' },
       { path: '/digital-twin/relationships', label: 'Relationships' },
       { path: '/digital-twin/impact',        label: 'Impact Analysis' },
-    ],
-  },
-  {
-    id: 'uom',
-    label: 'Unified Object Model',
-    icon: Layers,
-    pathPrefix: '/uom',
-    items: [
-      { path: '/uom',             label: 'Architecture' },
-      { path: '/uom/catalog',     label: 'Object Catalog' },
-      { path: '/uom/matrix',      label: 'Relationship Matrix' },
-      { path: '/uom/sources',     label: 'Source of Truth' },
-      { path: '/uom/explorer',    label: 'Object Explorer' },
-    ],
-  },
-  {
-    id: 'governance',
-    label: 'Governance',
-    icon: Shield,
-    pathPrefix: '/governance',
-    items: [
-      { path: '/governance',             label: 'Overview' },
-      { path: '/governance/lifecycle',   label: 'Lifecycle Models' },
-      { path: '/governance/ownership',   label: 'Ownership Matrix' },
-      { path: '/governance/approvals',   label: 'Approval Workflows' },
-      { path: '/governance/reviews',     label: 'Review Cycles' },
-      { path: '/governance/compliance',  label: 'Compliance' },
-      { path: '/governance/health',      label: 'Governance Health' },
-      { path: '/governance/policies',    label: 'Policies' },
+      { label: 'Object Model', isLabel: true },
+      { path: '/uom',           label: 'Architecture' },
+      { path: '/uom/explorer',  label: 'Object Explorer' },
+      { path: '/uom/profiles',  label: 'Object Profiles' },
+      { label: 'Governance', isLabel: true },
+      { path: '/governance',            label: 'Overview' },
+      { path: '/governance/lifecycle',  label: 'Lifecycle Models' },
+      { path: '/governance/ownership',  label: 'Ownership Matrix' },
     ],
   },
   {
@@ -65,18 +46,16 @@ const navGroups: NavGroup[] = [
     icon: Activity,
     pathPrefix: '/operations',
     items: [
-      { path: '/operations',               label: 'Executive Overview' },
-      { path: '/operations/health',        label: 'Health Indicators' },
-      { path: '/operations/integrations',  label: 'Integration Readiness' },
-      { path: '/operations/demand',        label: 'Demand' },
-      { path: '/operations/scorecards',    label: 'Scorecards' },
-      { path: '/operations/trends',        label: 'Trends & Insights' },
-      { path: '/operations/recommendations', label: 'Recommendations' },
+      { path: '/operations',              label: 'Executive Overview' },
+      { path: '/operations/health',       label: 'Health Indicators' },
+      { path: '/operations/integrations', label: 'Integration Readiness' },
+      { path: '/operations/scorecards',   label: 'Scorecards' },
+      { path: '/operations/trends',       label: 'Trends & Insights' },
     ],
   },
   {
     id: 'program',
-    label: 'Program & Curriculum',
+    label: 'Programs',
     icon: GraduationCap,
     pathPrefix: '/program',
     items: [
@@ -98,7 +77,6 @@ const navGroups: NavGroup[] = [
       { path: '/penny/learners',     label: 'Learners' },
       { path: '/penny/intelligence', label: 'Intelligence' },
       { path: '/penny/trail-os-map', label: 'Trail OS Map' },
-      { path: '/penny/health',       label: 'Health' },
       { path: '/penny/test',         label: 'Test Penny' },
     ],
   },
@@ -109,8 +87,8 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/knowledge',
     items: [
       { path: '/knowledge',               label: 'Sources' },
-      { path: '/knowledge/relationships', label: 'Relationships' },
       { path: '/knowledge/library',       label: 'Library' },
+      { path: '/knowledge/relationships', label: 'Relationships' },
       { path: '/knowledge/memory',        label: 'Org Memory' },
       { path: '/knowledge/search',        label: 'Search' },
     ],
@@ -121,14 +99,12 @@ const navGroups: NavGroup[] = [
     icon: MessageSquare,
     pathPrefix: '/collaboration',
     items: [
-      { path: '/collaboration',               label: 'Systems Overview' },
-      { path: '/collaboration/slack',         label: '⚡ Slack Integration' },
-      { path: '/collaboration/drive',         label: '📁 Google Drive' },
-      { path: '/collaboration/calendar',      label: '📅 Google Calendar' },
+      { path: '/collaboration',               label: 'Overview' },
+      { path: '/collaboration/slack',         label: 'Slack' },
+      { path: '/collaboration/drive',         label: 'Google Drive' },
+      { path: '/collaboration/calendar',      label: 'Google Calendar' },
       { path: '/collaboration/channels',      label: 'Channels' },
       { path: '/collaboration/templates',     label: 'Templates' },
-      { path: '/collaboration/briefs',        label: 'Weekly Briefs' },
-      { path: '/collaboration/notifications', label: 'Notifications' },
     ],
   },
   {
@@ -137,18 +113,20 @@ const navGroups: NavGroup[] = [
     icon: Settings,
     pathPrefix: '/admin',
     items: [
-      { path: '/admin',            label: 'Setup' },
-      { path: '/admin/programs',   label: 'Programs' },
-      { path: '/admin/people',     label: 'People & Roles' },
-      { path: '/admin/roles',      label: 'Roles' },
-      { path: '/admin/resolve',    label: 'RESOLVE' },
-      { path: '/admin/trail-os',   label: 'Trail OS' },
-      { path: '/admin/penny',      label: 'Penny' },
-      { path: '/admin/users',      label: 'Users' },
-      { path: '/admin/settings',   label: 'Settings' },
+      { path: '/admin',          label: 'Setup' },
+      { path: '/admin/programs', label: 'Programs' },
+      { path: '/admin/people',   label: 'People & Roles' },
+      { path: '/admin/roles',    label: 'Roles' },
+      { path: '/admin/penny',    label: 'Penny' },
+      { path: '/admin/settings', label: 'Settings' },
     ],
   },
 ];
+
+function isGroupActive(group: NavGroup, location: string): boolean {
+  if (location.startsWith(group.pathPrefix)) return true;
+  return (group.extraPrefixes ?? []).some(p => location.startsWith(p));
+}
 
 function calcMaxHeight(items: NavItem[]): number {
   return items.reduce((sum, item) => sum + (item.isLabel ? 28 : 36), 0);
@@ -157,7 +135,7 @@ function calcMaxHeight(items: NavItem[]): number {
 export function Sidebar() {
   const [location, setLocation] = useLocation();
 
-  const activeGroupId = navGroups.find(g => location.startsWith(g.pathPrefix))?.id;
+  const activeGroupId = navGroups.find(g => isGroupActive(g, location))?.id;
 
   const [openGroups, setOpenGroups] = useState<Set<string>>(
     () => new Set([activeGroupId ?? 'digital-twin'])
@@ -197,7 +175,7 @@ export function Sidebar() {
           <span>Home</span>
         </button>
 
-        {/* Search */}
+        {/* Global Search */}
         <button
           onClick={() => setLocation('/search')}
           className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
@@ -223,10 +201,12 @@ export function Sidebar() {
           <span>Context Engine</span>
         </button>
 
+        <div className="h-px bg-sidebar-border/60 mx-1 my-1" />
+
         {/* Nav groups */}
         {navGroups.map(group => {
           const isOpen        = openGroups.has(group.id);
-          const isGroupActive = location.startsWith(group.pathPrefix);
+          const groupActive   = isGroupActive(group, location);
           const Icon          = group.icon;
 
           return (
@@ -234,12 +214,12 @@ export function Sidebar() {
               <button
                 onClick={() => toggleGroup(group.id)}
                 className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
-                  isGroupActive
+                  groupActive
                     ? 'text-primary'
                     : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                 }`}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${isGroupActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${groupActive ? 'text-primary' : 'text-muted-foreground'}`} />
                 <span className="flex-1 truncate">{group.label}</span>
                 <ChevronDown
                   className={`w-3.5 h-3.5 flex-shrink-0 text-muted-foreground/50 transition-transform duration-200 ${
@@ -256,8 +236,8 @@ export function Sidebar() {
                   {group.items.map((item, idx) => {
                     if (item.isLabel) {
                       return (
-                        <div key={`label-${idx}`} className="px-3 pt-2 pb-0.5">
-                          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                        <div key={`label-${idx}`} className="px-3 pt-2.5 pb-0.5">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">
                             {item.label}
                           </p>
                         </div>

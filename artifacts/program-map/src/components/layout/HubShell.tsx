@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { useLocation } from 'wouter';
+import { ActionBar, type ActionItem } from '@/components/workspace/ActionBar';
 
 export interface HubTab {
   id: string;
@@ -15,12 +16,14 @@ export function HubShell({
   description,
   badge,
   tabs,
+  actions,
 }: {
   title: string;
   icon: ComponentType<{ className?: string }>;
   description: string;
   badge?: string;
   tabs: HubTab[];
+  actions?: ActionItem[];
 }) {
   const [location, setLocation] = useLocation();
 
@@ -64,6 +67,11 @@ export function HubShell({
           })}
         </div>
       </div>
+
+      {/* Hub action bar */}
+      {actions && actions.length > 0 && (
+        <ActionBar actions={actions} />
+      )}
 
       {/* Active content */}
       <div className="flex-1 min-h-0 overflow-hidden">

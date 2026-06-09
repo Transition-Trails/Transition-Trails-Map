@@ -1,1 +1,5 @@
 - [Program health merge pattern](program-health-merge.md) — HEALTH data in ProgramMap.tsx merges into program data at setSelectedItem; ContextPanel gets all fields.
+- [UX shared components](ux-shared-components.md) — ActionBar, RelationshipCard, EmptyState live in src/components/workspace/; HubShell accepts optional `actions` prop to show ActionBar between tab bar and content.
+- [Sidebar nav structure](sidebar-nav.md) — 7 groups + Home/Search/Context; UOM+Governance merged into Digital Twin via extraPrefixes[]; no separate UOM/Governance nav groups.
+- [Lens system](lens-system.md) — 2 lenses only: executive (amber) + builder (sky); always-visible pill toggle in Topbar; activeLens in AppContext as string default 'executive'.
+- [ContextBar always-visible](contextbar.md) — ContextBar is always mounted (32px no-context state + 40px active state); never returns null; uses EXAMPLE_CONTEXTS for switcher fallback.
