@@ -55,7 +55,7 @@ export default function OperationsCommunications() {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2">{p.purpose}</p>
-                  <p className="text-[10px] text-primary font-medium mt-2 group-hover:underline">Open Knowledge Brief →</p>
+                  <p className="text-[10px] text-primary font-medium mt-2 group-hover:underline">Open Trail Insights →</p>
                 </button>
               ))}
             </div>

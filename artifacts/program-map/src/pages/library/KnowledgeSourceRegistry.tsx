@@ -139,7 +139,7 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
               </div>
             </div>
             <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">
-              Knowledge Brief
+              Trail Insights
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">

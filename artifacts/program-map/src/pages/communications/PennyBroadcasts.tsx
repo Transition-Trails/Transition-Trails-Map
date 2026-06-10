@@ -83,7 +83,7 @@ export default function PennyBroadcasts() {
 
               <div className="flex items-center gap-1 text-[10px] text-primary/60 group-hover:text-primary transition-colors mt-auto">
                 <ChevronRight className="w-3 h-3" />
-                <span>Open Knowledge Brief</span>
+                <span>Open Trail Insights</span>
               </div>
             </button>
           ))}

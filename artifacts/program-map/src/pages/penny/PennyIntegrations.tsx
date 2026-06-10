@@ -68,7 +68,7 @@ export default function PennyIntegrations() {
                     </div>
                   </div>
                 </div>
-                <p className="text-[10px] text-primary font-medium mt-2 group-hover:underline">Open Knowledge Brief →</p>
+                <p className="text-[10px] text-primary font-medium mt-2 group-hover:underline">Open Trail Insights →</p>
               </button>
             ))}
           </div>

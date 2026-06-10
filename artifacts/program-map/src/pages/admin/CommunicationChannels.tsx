@@ -87,7 +87,7 @@ export default function CommunicationChannels() {
                   )}
                 </ul>
               </div>
-              <p className="text-[10px] text-primary font-medium group-hover:underline">Click to open Knowledge Brief →</p>
+              <p className="text-[10px] text-primary font-medium group-hover:underline">Click to open Trail Insights →</p>
             </div>
           </button>
         ))}

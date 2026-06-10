@@ -26,7 +26,7 @@ export const TERMS = {
   trailSignals:   'Trail Signals',
 
   /** Object-knowledge reading mode inside the same panel */
-  knowledgeBrief: 'Knowledge Brief',
+  knowledgeBrief: 'Trail Insights',
 
   // ── Platform ───────────────────────────────────────────────────────────────
   platform:       'Trail OS',
