@@ -25,8 +25,8 @@ function SlackNotifyStub({ context }: { context: string }) {
   }
 
   return (
-    <div className="rounded-lg border border-border bg-muted/20 overflow-hidden">
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-muted/30">
+    <div className="rounded-lg border border-[#4A154B]/20 bg-[#4A154B]/[0.03] overflow-hidden">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-[#4A154B]/15 bg-[#4A154B]/[0.05]">
         <Hash className="w-3 h-3 text-[#4A154B]" />
         <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Notify via Slack</p>
         <span className="ml-auto text-[9px] text-muted-foreground/40 font-medium">Prototype</span>
@@ -110,7 +110,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
 
   if (saved) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3 px-4">
+      <div className="flex flex-col items-center justify-center h-full gap-3 px-4 bg-white">
         <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
           <CheckCircle2 className="w-5 h-5 text-emerald-600" />
         </div>
@@ -129,7 +129,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Header */}
-      <div className="px-4 pt-3 pb-2.5 border-b border-border flex-shrink-0 bg-card">
+      <div className="px-4 pt-3 pb-2.5 border-b border-primary/15 flex-shrink-0 bg-primary/[0.05]">
         <div className="flex items-start justify-between gap-2 mb-1">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
@@ -232,7 +232,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
           )}
 
           {/* Auto-assigned strip */}
-          <div className="rounded border border-border bg-muted/30 px-2.5 py-2">
+          <div className="rounded border border-border/50 bg-muted/20 px-2.5 py-2">
             <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">Auto-assigned</p>
             <div className="flex gap-3 text-[10px] text-foreground flex-wrap">
               <span>Status: <strong>Draft</strong></span>
@@ -250,7 +250,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-4 py-2.5 border-t border-border bg-card flex-shrink-0 space-y-2">
+      <div className="px-4 py-2.5 border-t border-border/60 bg-white flex-shrink-0 space-y-2">
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleClose}

@@ -169,7 +169,7 @@ function ChannelRow({ ch, showProgram }: { ch: SlackChannel; showProgram?: boole
       href={slackChannelUrl(ch.id)}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-start gap-2 px-2.5 py-2 rounded-lg hover:bg-muted/40 transition-colors group"
+      className="flex items-start gap-2 px-2.5 py-2 mx-2 mb-1 rounded-lg border border-transparent hover:border-[#4A154B]/15 hover:bg-[#4A154B]/[0.04] bg-white/60 transition-colors group"
     >
       <HealthDotSlack health={ch.health} />
       <div className="flex-1 min-w-0">
@@ -198,7 +198,7 @@ function ActivityRow({ ev }: { ev: SlackActivityEvent }) {
                   ev.severity === 'warning' ? 'text-amber-500' :
                   ev.severity === 'error'   ? 'text-rose-500'   : 'text-muted-foreground/40';
   return (
-    <div className="flex items-start gap-2 px-2.5 py-1.5">
+    <div className="flex items-start gap-2 px-2.5 py-1.5 border-b border-border/30 last:border-0">
       <Icon className={`w-3 h-3 shrink-0 mt-0.5 ${iconCls}`} />
       <div className="flex-1 min-w-0">
         <p className="text-[10px] text-foreground leading-snug">{ev.summary}</p>
@@ -226,7 +226,9 @@ function PendingItemRow({ item }: { item: PendingItem }) {
   const iconCls = item.urgent ? 'text-rose-500' :
                   item.kind === 'escalation' ? 'text-amber-500' :
                   item.kind === 'alert' ? 'text-amber-500' : 'text-muted-foreground/50';
-  const bgCls = item.urgent ? 'border-rose-100 bg-rose-50/50' : 'border-border bg-card';
+  const bgCls = item.urgent
+    ? 'border-rose-200 bg-rose-50 shadow-sm'
+    : 'border-border/50 bg-white shadow-sm';
 
   return (
     <div className={`rounded-lg border px-2.5 py-2 ${bgCls}`}>
@@ -310,7 +312,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
     <div className="flex flex-col h-full overflow-hidden">
 
       {/* Header */}
-      <div className="px-3 pt-3 pb-2.5 border-b border-border flex-shrink-0 bg-[#4A154B]/5">
+      <div className="px-3 pt-3 pb-2.5 border-b border-[#4A154B]/20 flex-shrink-0 bg-[#4A154B]/[0.07]">
         <div className="flex items-start justify-between gap-2 mb-1.5">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
@@ -348,7 +350,9 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
 
         {/* Status strip */}
         {(urgentCount > 0 || SLACK_WORKSPACE.oauthStatus !== 'connected') && (
-          <div className="mt-1.5 rounded border border-amber-200 bg-amber-50/60 px-2.5 py-1.5 flex items-center gap-1.5">
+          <div className={`mt-1.5 rounded-lg border px-2.5 py-1.5 flex items-center gap-1.5 ${
+            urgentCount > 0 ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50/70'
+          }`}>
             <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
             <p className="text-[10px] text-amber-900 leading-snug flex-1">
               {urgentCount > 0 ? `${urgentCount} urgent action${urgentCount > 1 ? 's' : ''} pending` : ''}
@@ -360,7 +364,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border flex-shrink-0 bg-card">
+      <div className="flex border-b border-[#4A154B]/10 flex-shrink-0 bg-white">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -402,8 +406,8 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               )}
 
               {/* Context-specific quick actions */}
-              <div className="pt-2 border-t border-border/50">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 px-0.5 mb-1.5">Quick Actions</p>
+              <div className="pt-2 border-t border-border/40">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 px-0.5 mb-1.5">Quick Actions</p>
                 <div className="space-y-1">
                   {(config.context === 'penny' || config.context === 'program' || config.context === 'cohort') && (
                     <a
@@ -411,7 +415,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                         ? slackChannelUrl('foundations-cohort-2') : WORKSPACE_WEB}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border hover:bg-muted/40 transition-colors text-[10px] font-semibold text-foreground"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#4A154B]/20 bg-white shadow-sm hover:bg-[#4A154B]/[0.05] transition-colors text-[10px] font-semibold text-foreground"
                     >
                       <Send className="w-3 h-3 text-[#4A154B]" />
                       Send Test Message via Penny
@@ -423,7 +427,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                       href={slackChannelUrl('trail-os-ops')}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border hover:bg-muted/40 transition-colors text-[10px] font-semibold text-foreground"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-amber-200/60 bg-white shadow-sm hover:bg-amber-50/50 transition-colors text-[10px] font-semibold text-foreground"
                     >
                       <Shield className="w-3 h-3 text-amber-600" />
                       Post Governance Alert to #trail-os-ops
@@ -435,7 +439,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                       href={slackChannelUrl('foundations-cohort-2')}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border hover:bg-muted/40 transition-colors text-[10px] font-semibold text-foreground"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-primary/20 bg-white shadow-sm hover:bg-primary/[0.04] transition-colors text-[10px] font-semibold text-foreground"
                     >
                       <Calendar className="w-3 h-3 text-primary" />
                       Send Calendar Reminder to Cohort
@@ -446,7 +450,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                     href={slackChannelUrl('trail-os-ops')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border hover:bg-muted/40 transition-colors text-[10px] font-semibold text-foreground"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-white shadow-sm hover:bg-muted/30 transition-colors text-[10px] font-semibold text-foreground"
                   >
                     <Radio className="w-3 h-3 text-muted-foreground/60" />
                     Open #trail-os-ops in Slack
@@ -457,9 +461,9 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
 
               {/* Penny / workspace status for Penny context */}
               {config.context === 'penny' && pennyReadiness && (
-                <div className="pt-2 border-t border-border/50">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 px-0.5 mb-1.5">Penny Slack Status</p>
-                  <div className="rounded-lg border border-border px-2.5 py-2 space-y-1">
+                <div className="pt-2 border-t border-border/40">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 px-0.5 mb-1.5">Penny Slack Status</p>
+                  <div className="rounded-lg border border-[#4A154B]/15 bg-white shadow-sm px-2.5 py-2 space-y-1">
                     {pennyReadiness.items.slice(0, 4).map((item, i) => (
                       <div key={i} className="flex items-center gap-2">
                         {item.status === 'pass'    ? <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" /> :
@@ -480,9 +484,9 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
 
               {/* Workspace readiness for slack context */}
               {(config.context === 'slack' || config.context === 'collaboration') && workspaceReadiness && (
-                <div className="pt-2 border-t border-border/50">
+                <div className="pt-2 border-t border-border/40">
                   <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 px-0.5 mb-1.5">Workspace Health</p>
-                  <div className="rounded-lg border border-border px-2.5 py-2">
+                  <div className="rounded-lg border border-border/50 bg-white shadow-sm px-2.5 py-2">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="flex-1 bg-muted/40 rounded-full h-1.5 overflow-hidden">
                         <div
@@ -515,13 +519,13 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                   <a href="/collaboration/slack" className="text-[10px] text-primary hover:underline">Open Slack Integration Center</a>
                 </div>
               ) : (
-                <div>
+                <div className="pt-1">
                   {relevantChannels.map(ch => (
                     <ChannelRow key={ch.id} ch={ch} showProgram={config.context !== 'program'} />
                   ))}
                 </div>
               )}
-              <div className="px-2.5 pt-2 pb-1 border-t border-border/50 mt-1">
+              <div className="px-2.5 pt-2 pb-1 border-t border-[#4A154B]/10 mt-1">
                 <a
                   href={WORKSPACE_WEB}
                   target="_blank"
@@ -547,7 +551,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
             <div>
               <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 px-4 py-1.5">Recent Slack Activity</p>
               {relevantActivity.map(ev => <ActivityRow key={ev.id} ev={ev} />)}
-              <div className="px-4 pt-2 pb-1 border-t border-border/50 mt-1">
+              <div className="px-4 pt-2 pb-1 border-t border-[#4A154B]/10 mt-1">
                 <a
                   href="/collaboration/slack"
                   className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors"
@@ -563,7 +567,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-3 py-2 border-t border-border flex-shrink-0 bg-card">
+      <div className="px-3 py-2 border-t border-[#4A154B]/15 flex-shrink-0 bg-white">
         <div className="flex items-center gap-2">
           <a
             href="/collaboration/slack"

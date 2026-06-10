@@ -1647,15 +1647,16 @@ export function ContextPanel() {
 
   return (
     <div
-      className={`flex-shrink-0 h-full bg-card flex flex-col overflow-hidden transition-[width] duration-[250ms] ease-in-out ${
+      className={`flex-shrink-0 h-full bg-white flex flex-col overflow-hidden transition-[width] duration-[250ms] ease-in-out ${
         collapsed
-          ? 'w-9 border-l-2 border-primary/30'
+          ? 'w-9 border-l-2 border-primary/25'
           : actionPanel
-          ? 'w-[420px] border-l-2 border-primary/40'
+          ? 'w-[420px] border-l-[3px] border-primary/45'
           : slackPanel
-          ? 'w-[380px] border-l-2 border-[#4A154B]/40'
-          : 'w-[300px] border-l border-border'
+          ? 'w-[400px] border-l-[3px] border-[#4A154B]/45'
+          : 'w-[300px] border-l-2 border-border/70'
       }`}
+      style={{ boxShadow: '-4px 0 18px rgba(0,0,0,0.08)' }}
     >
       {collapsed ? (
         /* ── Focus Mode ──────────────────────────────────────────────────────
@@ -1692,8 +1693,16 @@ export function ContextPanel() {
            handle so users understand the panel boundary is interactive.
         ──────────────────────────────────────────────────────────────────── */
         <>
-          <div className={`px-3 py-2.5 border-b border-border backdrop-blur-sm z-10 flex items-center gap-2 shrink-0 ${
-            actionPanel ? 'bg-primary/5' : slackPanel ? 'bg-[#4A154B]/5' : 'bg-card/50'
+          {/* Mode accent line — thin color bar at top gives immediate mode signal */}
+          <div className={`h-[3px] w-full flex-shrink-0 ${
+            actionPanel ? 'bg-primary/55' : slackPanel ? 'bg-[#4A154B]/55' : 'bg-border/60'
+          }`} />
+          <div className={`px-3 py-2.5 border-b z-10 flex items-center gap-2 shrink-0 ${
+            actionPanel
+              ? 'bg-primary/[0.06] border-primary/20'
+              : slackPanel
+              ? 'bg-[#4A154B]/[0.07] border-[#4A154B]/20'
+              : 'bg-white border-border/60'
           }`}>
             {actionPanel
               ? <Pencil className="w-4 h-4 text-primary shrink-0" />
@@ -1724,7 +1733,7 @@ export function ContextPanel() {
               <ChevronRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="flex-1 relative overflow-hidden bg-white/50">
+          <div className="flex-1 relative overflow-hidden bg-white">
             <AnimatePresence mode="wait">
               <motion.div
                 key={
