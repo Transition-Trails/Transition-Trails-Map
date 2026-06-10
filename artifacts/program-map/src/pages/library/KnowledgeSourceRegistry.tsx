@@ -8,7 +8,6 @@ import {
 } from '@/data/knowledgeSourceData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
 import {
   Database, FolderOpen, BookOpen, GraduationCap, ShieldCheck, Layers,
   Brain, MessageSquare, CalendarDays, Search, Filter, AlertTriangle,
@@ -878,9 +877,8 @@ function HealthView() {
 // ── Main Page ──────────────────────────────────────────────────────────────────
 
 export default function KnowledgeSourceRegistry() {
-  const { setSelectedItem } = useAppContext();
-  const [view,       setView]       = useState<RegistryView>('overview');
-  const [createMode, setCreateMode] = useState(false);
+  const { setSelectedItem, openActionPanel } = useAppContext();
+  const [view, setView] = useState<RegistryView>('overview');
 
   const totalIssues = knowledgeSources.reduce((acc, s) => acc + s.healthIssues.length, 0);
 
@@ -888,26 +886,20 @@ export default function KnowledgeSourceRegistry() {
     setSelectedItem({ type: 'knowledgeSource', id: src.id, data: src });
   }
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="Add Knowledge Source"
-        objectType="Knowledge Source"
-        subtitle="Register a new trusted knowledge source. It will appear in the Source Catalog with Draft/Unvalidated status until approved."
-        fields={[
-          { id: 'name',        label: 'Source Name',    type: 'text',     required: true, placeholder: 'e.g. Transition Trails Program Guide — Google Drive' },
-          { id: 'type',        label: 'Source Type',    type: 'select',   options: ['Salesforce Knowledge', 'Google Drive', 'LMS Content', 'Assessments', 'Standards Studio', 'Curriculum Studio', 'Penny Generated', 'Slack History', 'Google Chat History', 'Calendar Events'], required: true },
-          { id: 'trustLevel',  label: 'Trust Level',    type: 'select',   options: ['Authoritative', 'Reference', 'Supplementary', 'Unverified'] },
-          { id: 'description', label: 'Description',    type: 'textarea', placeholder: 'What does this source contain and how should Penny use it?', rows: 3 },
-          { id: 'sourceUrl',   label: 'Source URL / ID',type: 'text',     placeholder: 'e.g. Google Drive folder ID, Salesforce category name' },
-          { id: 'syncCadence', label: 'Sync Cadence',   type: 'select',   options: ['Real-time', 'Daily', 'Weekly', 'Manual', 'Not Synced'] },
-          { id: 'usedByPenny', label: 'Available to Penny', type: 'select', options: ['Yes — approved', 'Pending review', 'No — not approved'] },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-      />
-    );
+  function handleAddSource() {
+    openActionPanel({
+      title: 'Add Knowledge Source', objectType: 'Knowledge Source',
+      subtitle: 'Register a new trusted knowledge source. Appears in the Source Catalog with Draft/Unvalidated status.',
+      fields: [
+        { id: 'name',        label: 'Source Name',          type: 'text',     required: true, placeholder: 'e.g. Transition Trails Program Guide — Google Drive' },
+        { id: 'type',        label: 'Source Type',          type: 'select',   options: ['Salesforce Knowledge', 'Google Drive', 'LMS Content', 'Assessments', 'Standards Studio', 'Curriculum Studio', 'Penny Generated', 'Slack History', 'Google Chat History', 'Calendar Events'], required: true },
+        { id: 'trustLevel',  label: 'Trust Level',          type: 'select',   options: ['Authoritative', 'Reference', 'Supplementary', 'Unverified'] },
+        { id: 'description', label: 'Description',          type: 'textarea', placeholder: 'What does this source contain and how should Penny use it?', rows: 3 },
+        { id: 'sourceUrl',   label: 'Source URL / ID',      type: 'text',     placeholder: 'e.g. Google Drive folder ID, Salesforce category name' },
+        { id: 'syncCadence', label: 'Sync Cadence',         type: 'select',   options: ['Real-time', 'Daily', 'Weekly', 'Manual', 'Not Synced'] },
+        { id: 'usedByPenny', label: 'Available to Penny',   type: 'select',   options: ['Yes — approved', 'Pending review', 'No — not approved'] },
+      ],
+    });
   }
 
   return (
@@ -926,7 +918,7 @@ export default function KnowledgeSourceRegistry() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => setCreateMode(true)}
+              onClick={handleAddSource}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3.5 h-3.5" />

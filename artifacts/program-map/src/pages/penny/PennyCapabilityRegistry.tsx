@@ -9,11 +9,11 @@ import {
 import {
   Brain, Layers, Network, FlaskConical, ChevronDown, ChevronRight,
   CheckCircle2, ArrowRight, Search, Filter, Zap, BookOpen, MessageSquare,
-  CalendarDays, Database, ShieldCheck, Users, Star, Link2, Plus,
+  CalendarDays, Database, ShieldCheck, Users, Star, Link2, Plus, Hash,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+
 
 type RegistryView = 'architecture' | 'capabilities' | 'relationships' | 'poc-mapping';
 
@@ -686,10 +686,9 @@ function PocMappingView() {
 // ── Main Page ──────────────────────────────────────────────────────────────
 
 export default function PennyCapabilityRegistry() {
-  const { setSelectedItem } = useAppContext();
+  const { setSelectedItem, openActionPanel, openSlackPanel } = useAppContext();
   const [view,         setView]         = useState<RegistryView>('architecture');
   const [initialCapId, setInitialCapId] = useState<string | undefined>(undefined);
-  const [createMode,   setCreateMode]   = useState(false);
 
   function openBrief(cap: PennyCapability) {
     setSelectedItem({ type: 'pennyCapability', id: cap.id, data: cap });
@@ -700,26 +699,22 @@ export default function PennyCapabilityRegistry() {
     if (id) setInitialCapId(id);
   }
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="New Penny Capability"
-        objectType="Penny Capability"
-        subtitle="Register a new Penny AI capability. It will appear in the Capability Registry with Planned/Draft status until validated."
-        fields={[
-          { id: 'name',        label: 'Capability Name', type: 'text',     required: true, placeholder: 'e.g. Salary Negotiation Coach' },
-          { id: 'domain',      label: 'Domain',          type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
-          { id: 'description', label: 'Description',     type: 'textarea', placeholder: 'What does this capability do for learners?', rows: 3 },
-          { id: 'trigger',     label: 'When to Use',     type: 'textarea', placeholder: 'Describe the context where Penny should invoke this…', rows: 3 },
-          { id: 'maturity',    label: 'Maturity Level',  type: 'select',   options: ['Concept', 'Planned', 'In Development', 'POC Ready', 'Live'] },
-          { id: 'hallucinationRisk', label: 'Hallucination Risk', type: 'select', options: ['Low', 'Medium', 'High'] },
-          { id: 'knowledgeSources',  label: 'Key Knowledge Sources', type: 'textarea', placeholder: 'Which sources should Penny query for this capability?', rows: 2 },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => { setCreateMode(false); setView('capabilities'); }}
-      />
-    );
+  function handleNewCapability() {
+    openActionPanel({
+      title: 'New Penny Capability', objectType: 'Penny Capability',
+      subtitle: 'Register a new Penny AI capability. Appears with Planned/Draft status until validated.',
+      slackContext: 'penny',
+      fields: [
+        { id: 'name',             label: 'Capability Name',      type: 'text',     required: true, placeholder: 'e.g. Salary Negotiation Coach' },
+        { id: 'domain',           label: 'Domain',               type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
+        { id: 'description',      label: 'Description',          type: 'textarea', placeholder: 'What does this capability do for learners?', rows: 3 },
+        { id: 'trigger',          label: 'When to Use',          type: 'textarea', placeholder: 'Describe the context where Penny should invoke this…', rows: 3 },
+        { id: 'maturity',         label: 'Maturity Level',       type: 'select',   options: ['Concept', 'Planned', 'In Development', 'POC Ready', 'Live'] },
+        { id: 'hallucinationRisk',label: 'Hallucination Risk',   type: 'select',   options: ['Low', 'Medium', 'High'] },
+        { id: 'knowledgeSources', label: 'Key Knowledge Sources',type: 'textarea', placeholder: 'Which sources should Penny query?', rows: 2 },
+      ],
+      onSaveAndView: () => setView('capabilities'),
+    });
   }
 
   return (
@@ -738,7 +733,15 @@ export default function PennyCapabilityRegistry() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => setCreateMode(true)}
+              onClick={() => openSlackPanel({ context: 'penny', title: 'Penny Capabilities', subtitle: 'Slack channels and pending bot status for capability work.' })}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
+              title="Open Slack context"
+            >
+              <Hash className="w-3.5 h-3.5" />
+              Slack
+            </button>
+            <button
+              onClick={handleNewCapability}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3.5 h-3.5" />

@@ -106,7 +106,7 @@ export interface SlackActivityEvent {
   actor: string;
   summary: string;
   detail?: string;
-  severity: 'info' | 'warning' | 'success';
+  severity: 'info' | 'warning' | 'success' | 'error';
 }
 
 export interface SlackGovernanceRecord {

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
-import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2 } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2, Pencil, Hash } from 'lucide-react';
+import { RailActionPanel } from '@/components/workspace/RailActionPanel';
+import { SlackContextPanel } from '@/components/workspace/SlackContextPanel';
 import { ACTION_CATEGORY_CONFIG, type PennyContentAction } from '@/data/pennyContentActions';
 import { type TrailOsSfMapping, SF_STATUS_CONFIG, type SfMappingStatus, SF_PRODUCT_CONFIG } from '@/data/salesforceArchitectureData';
 import { type ContentStandard, STANDARD_STATUS_CONFIG, STANDARD_CONFIDENCE_CONFIG, STANDARD_CATEGORY_CONFIG } from '@/data/standardsData';
@@ -13,19 +15,23 @@ import { useLocation } from 'wouter';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 
 export function ContextPanel() {
-  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities } = useAppContext();
+  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel } = useAppContext();
   const [location, setLocation] = useLocation();
 
   // ── Focus / Brief mode ────────────────────────────────────────────────────
-  // Default: collapsed on Home, open elsewhere. Auto-expands when an item is
-  // selected from any page. Manual toggle is remembered for the session
-  // (ContextPanel is never unmounted, so useState persists across routes).
   const [collapsed, setCollapsed] = useState(location === '/');
 
   useEffect(() => {
-    // Selecting any item always opens the panel so the brief is readable
     if (selectedItem) setCollapsed(false);
   }, [selectedItem]);
+
+  useEffect(() => {
+    if (actionPanel) setCollapsed(false);
+  }, [actionPanel]);
+
+  useEffect(() => {
+    if (slackPanel) setCollapsed(false);
+  }, [slackPanel]);
 
   const handleChipClick = (type: string, id: string, route?: string) => {
     if (route) {
@@ -1644,6 +1650,10 @@ export function ContextPanel() {
       className={`flex-shrink-0 h-full bg-card flex flex-col overflow-hidden transition-[width] duration-[250ms] ease-in-out ${
         collapsed
           ? 'w-9 border-l-2 border-primary/30'
+          : actionPanel
+          ? 'w-[420px] border-l-2 border-primary/40'
+          : slackPanel
+          ? 'w-[380px] border-l-2 border-[#4A154B]/40'
           : 'w-[300px] border-l border-border'
       }`}
     >
@@ -1682,15 +1692,27 @@ export function ContextPanel() {
            handle so users understand the panel boundary is interactive.
         ──────────────────────────────────────────────────────────────────── */
         <>
-          <div className="px-3 py-2.5 border-b border-border bg-card/50 backdrop-blur-sm z-10 flex items-center gap-2 shrink-0">
-            <Layers className="w-4 h-4 text-primary shrink-0" />
+          <div className={`px-3 py-2.5 border-b border-border backdrop-blur-sm z-10 flex items-center gap-2 shrink-0 ${
+            actionPanel ? 'bg-primary/5' : slackPanel ? 'bg-[#4A154B]/5' : 'bg-card/50'
+          }`}>
+            {actionPanel
+              ? <Pencil className="w-4 h-4 text-primary shrink-0" />
+              : slackPanel
+              ? <Hash className="w-4 h-4 text-[#4A154B] shrink-0" />
+              : <Layers className="w-4 h-4 text-primary shrink-0" />
+            }
             <h3 className="font-semibold text-sm truncate flex-1">
-              {!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief'}
+              {actionPanel
+                ? 'Action Panel'
+                : slackPanel
+                ? 'Slack Context'
+                : (!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief')
+              }
             </h3>
             {/* Labeled collapse button — obvious, not a bare icon */}
             <button
               onClick={() => setCollapsed(true)}
-              aria-label="Collapse Knowledge Brief"
+              aria-label="Collapse panel"
               title="Collapse to Focus Mode"
               className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
                 text-muted-foreground bg-muted/50 border border-border/60
@@ -1705,14 +1727,24 @@ export function ContextPanel() {
           <div className="flex-1 relative overflow-hidden bg-white/50">
             <AnimatePresence mode="wait">
               <motion.div
-                key={selectedItem ? `${selectedItem.type}-${selectedItem.id}` : `empty-${location}`}
+                key={
+                  actionPanel ? `action-${actionPanel.title}`
+                  : slackPanel ? `slack-${slackPanel.context}`
+                  : selectedItem ? `${selectedItem.type}-${selectedItem.id}`
+                  : `empty-${location}`
+                }
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
                 className="absolute inset-0"
               >
-                {renderContent()}
+                {actionPanel
+                  ? <RailActionPanel config={actionPanel} onClose={closeActionPanel} />
+                  : slackPanel
+                  ? <SlackContextPanel config={slackPanel} onClose={closeSlackPanel} />
+                  : renderContent()
+                }
               </motion.div>
             </AnimatePresence>
           </div>

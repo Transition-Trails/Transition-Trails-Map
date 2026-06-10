@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { useAppContext } from '@/context/AppContext';
 import { Brain, MessageSquare, BookOpen, Hash, HardDrive, Calendar, Database, CheckCircle2, AlertTriangle, XCircle, Clock, ArrowRight, Zap, Plus } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -254,32 +254,27 @@ function ConnectionCard({ conn }: { conn: IntegrationConnection }) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 export default function PennyIntegrationLayer() {
-  const [createMode, setCreateMode] = useState(false);
+  const { openActionPanel, openSlackPanel } = useAppContext();
   const liveCount    = CONNECTIONS.filter(c => c.status === 'live').length;
   const readyCount   = CONNECTIONS.filter(c => c.status === 'ready').length;
   const blockedCount = CONNECTIONS.filter(c => c.status === 'blocked').length;
   const avgReadiness = Math.round(CONNECTIONS.reduce((s, c) => s + c.readiness, 0) / CONNECTIONS.length);
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="Add Integration Connection"
-        objectType="Integration Connection"
-        subtitle="Register a new integration pairing between Penny and an external platform. It will appear in the readiness tracker with Planned status."
-        fields={[
-          { id: 'from',        label: 'From (Penny System)', type: 'text',     required: true, placeholder: 'e.g. Penny Coaching Core' },
-          { id: 'to',          label: 'To (External System)',type: 'text',     required: true, placeholder: 'e.g. Salesforce' },
-          { id: 'description', label: 'Description',         type: 'textarea', placeholder: 'What data flows between these two systems?', rows: 3 },
-          { id: 'phase',       label: 'Integration Phase',   type: 'select',   options: ['Phase 1 — Core', 'Phase 2 — Extended'], required: true },
-          { id: 'status',      label: 'Current Status',      type: 'select',   options: ['Planned', 'In Development', 'POC Ready', 'Live', 'Blocked'] },
-          { id: 'readiness',   label: 'Readiness %',         type: 'text',     placeholder: 'e.g. 60' },
-          { id: 'blocker',     label: 'Current Blocker',     type: 'textarea', placeholder: 'What is preventing progress? (leave blank if none)', rows: 2 },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-      />
-    );
+  function handleAddIntegration() {
+    openActionPanel({
+      title: 'Add Integration Connection', objectType: 'Integration Connection',
+      subtitle: 'Register a new integration pairing between Penny and an external platform. Appears with Planned status.',
+      slackContext: 'penny',
+      fields: [
+        { id: 'from',        label: 'From (Penny System)',  type: 'text',     required: true, placeholder: 'e.g. Penny Coaching Core' },
+        { id: 'to',          label: 'To (External System)', type: 'text',     required: true, placeholder: 'e.g. Salesforce' },
+        { id: 'description', label: 'Description',          type: 'textarea', placeholder: 'What data flows between these two systems?', rows: 3 },
+        { id: 'phase',       label: 'Integration Phase',    type: 'select',   options: ['Phase 1 — Core', 'Phase 2 — Extended'], required: true },
+        { id: 'status',      label: 'Current Status',       type: 'select',   options: ['Planned', 'In Development', 'POC Ready', 'Live', 'Blocked'] },
+        { id: 'readiness',   label: 'Readiness %',          type: 'text',     placeholder: 'e.g. 60' },
+        { id: 'blocker',     label: 'Current Blocker',      type: 'textarea', placeholder: 'What is preventing progress? (leave blank if none)', rows: 2 },
+      ],
+    });
   }
 
   return (
@@ -295,13 +290,23 @@ export default function PennyIntegrationLayer() {
               Integration readiness tracking between Penny capabilities and all connected systems — internal registry and external platform integrations.
             </p>
           </div>
-          <button
-            onClick={() => setCreateMode(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0 mt-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Integration
-          </button>
+          <div className="flex items-center gap-2 shrink-0 mt-1">
+            <button
+              onClick={() => openSlackPanel({ context: 'penny', title: 'POC Integrations', subtitle: 'Slack bot status and pending actions for Penny integration work.' })}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
+              title="Open Slack context"
+            >
+              <Hash className="w-3.5 h-3.5" />
+              Slack
+            </button>
+            <button
+              onClick={handleAddIntegration}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Integration
+            </button>
+          </div>
         </div>
 
         {/* Summary strip */}

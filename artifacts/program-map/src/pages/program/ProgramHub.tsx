@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { GraduationCap, LayoutGrid, Star, Database, FolderOpen, Activity, GitBranch, Network, CheckSquare, Plus } from 'lucide-react';
+import { GraduationCap, LayoutGrid, Star, Database, FolderOpen, Activity, GitBranch, Network, CheckSquare, Plus, Hash } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { useAppContext } from '@/context/AppContext';
 import ProgramWorkspace         from '@/pages/program/ProgramWorkspace';
 import StandardsStudio          from '@/pages/curriculum/StandardsStudio';
 import ProgramBlueprint         from '@/pages/curriculum/ProgramBlueprint';
@@ -11,31 +10,24 @@ import SalesforceValidationCenter from '@/pages/curriculum/SalesforceValidationC
 import ProgramResources         from '@/pages/admin/ProgramResources';
 
 export default function ProgramHub() {
-  const [createMode, setCreateMode] = useState(false);
-
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="New Program"
-        objectType="Program"
-        subtitle="Create a new Transition Trails learning program. It will be assigned Draft status and appear in the Programs workspace."
-        fields={[
-          { id: 'name',        label: 'Program Name',    type: 'text',     required: true, placeholder: 'e.g. Digital Literacy Trail' },
-          { id: 'audience',    label: 'Target Audience', type: 'text',     required: true, placeholder: 'e.g. Adult job seekers, career changers' },
-          { id: 'format',      label: 'Format',          type: 'select',   options: ['Cohort-based', 'Self-paced', 'Hybrid', 'Workshop Series', 'Bootcamp'] },
-          { id: 'duration',    label: 'Duration',        type: 'text',     placeholder: 'e.g. 8 weeks, 3 months' },
-          { id: 'coreOutcome', label: 'Core Outcome',    type: 'textarea', placeholder: 'What will learners be able to do after completing this program?', rows: 3 },
-          { id: 'summary',     label: 'Executive Summary', type: 'textarea', placeholder: 'Brief description of the program purpose and strategic role...', rows: 3 },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-      />
-    );
-  }
+  const { openActionPanel, openSlackPanel } = useAppContext();
 
   const HUB_ACTIONS: ActionItem[] = [
-    { id: 'create-program', label: 'Create Program',    icon: Plus,      onClick: () => setCreateMode(true),         variant: 'primary'   },
+    { id: 'create-program', label: 'Create Program', icon: Plus, variant: 'primary', onClick: () => openActionPanel({
+        title: 'New Program', objectType: 'Program',
+        subtitle: 'Create a new Transition Trails learning program. Assigned Draft status.',
+        slackContext: 'program',
+        fields: [
+          { id: 'name',        label: 'Program Name',      type: 'text',     required: true, placeholder: 'e.g. Digital Literacy Trail' },
+          { id: 'audience',    label: 'Target Audience',   type: 'text',     required: true, placeholder: 'e.g. Adult job seekers, career changers' },
+          { id: 'format',      label: 'Format',            type: 'select',   options: ['Cohort-based', 'Self-paced', 'Hybrid', 'Workshop Series', 'Bootcamp'] },
+          { id: 'duration',    label: 'Duration',          type: 'text',     placeholder: 'e.g. 8 weeks, 3 months' },
+          { id: 'coreOutcome', label: 'Core Outcome',      type: 'textarea', placeholder: 'What will learners be able to do?', rows: 3 },
+          { id: 'summary',     label: 'Executive Summary', type: 'textarea', placeholder: 'Brief description of the program purpose…', rows: 3 },
+        ],
+      })
+    },
+    { id: 'slack-context',  label: 'Slack Context',     icon: Hash,      variant: 'secondary', onClick: () => openSlackPanel({ context: 'program', title: 'Program Channels', subtitle: 'Cohort channels, Trail Talk threads, and program Slack activity.' }) },
     { id: 'health',         label: 'Run Health Check',  icon: Activity,  href: '/operations/health',                 variant: 'secondary' },
     { id: 'digital-twin',   label: 'Open Digital Twin', icon: Network,   href: '/digital-twin/programs',             variant: 'secondary' },
     { id: 'relationships',  label: 'View Relationships',icon: GitBranch, href: '/digital-twin/relationships',        variant: 'secondary' },

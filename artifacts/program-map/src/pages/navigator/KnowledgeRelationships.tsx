@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { Database, Sparkles, Layers, ArrowRight, Plus } from 'lucide-react';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { Database, Sparkles, Layers, ArrowRight, Plus, Hash } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 
 // ── Architecture moved from Trail OS Capability Map > Overview (removed) ──────
 // Trail OS → Penny AI → Programs is the foundational relationship that no longer
@@ -45,27 +44,21 @@ const RELATIONSHIP_ROWS = [
 ];
 
 export default function KnowledgeRelationships() {
-  const [createMode, setCreateMode] = useState(false);
+  const { openActionPanel, openSlackPanel } = useAppContext();
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="Add Knowledge Relationship"
-        objectType="Knowledge Relationship"
-        subtitle="Document a new connection between two Trail OS objects. These relationships power the Digital Twin and Penny's contextual awareness."
-        fields={[
-          { id: 'fromObject',  label: 'From Object',    type: 'text',     required: true, placeholder: 'e.g. Program, Penny Capability, Role' },
-          { id: 'relationship',label: 'Relationship',   type: 'select',   options: ['powers', 'guides', 'uses', 'maps to', 'validates', 'references', 'owned by', 'part of', 'triggers', 'generates'], required: true },
-          { id: 'toObject',    label: 'To Object',      type: 'text',     required: true, placeholder: 'e.g. Knowledge Source, Penny Capability, Standard' },
-          { id: 'how',         label: 'How It Works',   type: 'textarea', placeholder: 'Describe the mechanism: how does this relationship operate?', rows: 3 },
-          { id: 'dataFlow',    label: 'Data / Signal Flow', type: 'textarea', placeholder: 'What data or signals flow between these objects?', rows: 2 },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-        ownerHint="Who is responsible for maintaining this relationship definition?"
-      />
-    );
+  function handleAddRelationship() {
+    openActionPanel({
+      title: 'Add Knowledge Relationship', objectType: 'Knowledge Relationship',
+      subtitle: "Document a new connection between two Trail OS objects. Powers the Digital Twin and Penny's contextual awareness.",
+      ownerHint: 'Who is responsible for maintaining this relationship definition?',
+      fields: [
+        { id: 'fromObject',   label: 'From Object',          type: 'text',     required: true, placeholder: 'e.g. Program, Penny Capability, Role' },
+        { id: 'relationship', label: 'Relationship',          type: 'select',   options: ['powers', 'guides', 'uses', 'maps to', 'validates', 'references', 'owned by', 'part of', 'triggers', 'generates'], required: true },
+        { id: 'toObject',     label: 'To Object',             type: 'text',     required: true, placeholder: 'e.g. Knowledge Source, Penny Capability, Standard' },
+        { id: 'how',          label: 'How It Works',          type: 'textarea', placeholder: 'Describe the mechanism: how does this relationship operate?', rows: 3 },
+        { id: 'dataFlow',     label: 'Data / Signal Flow',    type: 'textarea', placeholder: 'What data or signals flow between these objects?', rows: 2 },
+      ],
+    });
   }
 
   return (
@@ -81,13 +74,23 @@ export default function KnowledgeRelationships() {
               How Trail OS, Penny AI, and Programs connect — the foundational architecture of the Transition Trails technology ecosystem.
             </p>
           </div>
-          <button
-            onClick={() => setCreateMode(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0 mt-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Relationship
-          </button>
+          <div className="flex items-center gap-2 shrink-0 mt-1">
+            <button
+              onClick={() => openSlackPanel({ context: 'digital-twin', title: 'Knowledge Relationships', subtitle: 'Digital Twin and Knowledge Relationships context in Slack.' })}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
+              title="Open Slack context"
+            >
+              <Hash className="w-3.5 h-3.5" />
+              Slack
+            </button>
+            <button
+              onClick={handleAddRelationship}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Relationship
+            </button>
+          </div>
         </div>
 
         {/* Architecture strip */}

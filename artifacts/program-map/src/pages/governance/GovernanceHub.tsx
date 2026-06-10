@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { useAppContext } from '@/context/AppContext';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import {
   Shield, GitBranch, Users, CheckSquare, RotateCcw,
-  BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight, Plus,
+  BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight, Plus, Hash,
 } from 'lucide-react';
 import {
   LIFECYCLE_MODELS, OWNERSHIP_MATRIX, GOV_HEALTH_ISSUES,
@@ -653,31 +653,24 @@ function PoliciesTab() {
 
 // ── GovernanceHub ─────────────────────────────────────────────────────────────
 export default function GovernanceHub() {
-  const [createMode, setCreateMode] = useState(false);
+  const { openActionPanel, openSlackPanel } = useAppContext();
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="New Lifecycle Model"
-        objectType="Lifecycle Model"
-        subtitle="Define the lifecycle stages, transition rules, and review cadence for a Trail OS object type."
-        fields={[
+  const actions: ActionItem[] = [
+    { id: 'slack-context', label: 'Slack Context', icon: Hash, variant: 'secondary', onClick: () => openSlackPanel({ context: 'governance', title: 'Governance', subtitle: 'Governance review alerts and escalations in Slack.' }) },
+    { id: 'new-lifecycle', label: 'Add Lifecycle Model', icon: Plus, variant: 'primary', onClick: () => openActionPanel({
+        title: 'New Lifecycle Model', objectType: 'Lifecycle Model',
+        subtitle: 'Define the lifecycle stages, transition rules, and review cadence for a Trail OS object type.',
+        slackContext: 'governance',
+        fields: [
           { id: 'objectType',    label: 'Object Type',       type: 'select',   options: ['Program', 'Course', 'Penny Capability', 'Knowledge Source', 'Role', 'Integration', 'Content Standard', 'Cohort', 'Sprint', 'Module', 'Lesson', 'Assessment', 'Persona', 'Decision', 'Policy', 'Resource'], required: true },
           { id: 'modelName',     label: 'Model Name',        type: 'text',     required: true, placeholder: 'e.g. Program Lifecycle v2' },
           { id: 'stages',        label: 'Lifecycle Stages',  type: 'textarea', required: true, placeholder: 'e.g. Draft → Review → Approved → Active → Retired', rows: 3 },
           { id: 'approval',      label: 'Approval Required', type: 'select',   options: ['Yes — single approver', 'Yes — group review', 'No — self-service'] },
           { id: 'cadence',       label: 'Review Cadence',    type: 'select',   options: ['Monthly', 'Quarterly', 'Semi-Annual', 'Annual', 'On-Change'] },
           { id: 'retentionRule', label: 'Retention Rule',    type: 'textarea', placeholder: 'What triggers retirement or archival?', rows: 2 },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-      />
-    );
-  }
-
-  const actions: ActionItem[] = [
-    { id: 'new-lifecycle', label: 'Add Lifecycle Model', icon: Plus, onClick: () => setCreateMode(true), variant: 'primary' },
+        ],
+      })
+    },
   ];
 
   return (

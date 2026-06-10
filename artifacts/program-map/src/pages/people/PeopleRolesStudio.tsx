@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+
 import { Users, ChevronRight, Shield, MessageSquare, Sparkles, Database, Activity, BookOpen, Map, Target, CheckCircle2, AlertTriangle, XCircle, User, Plus } from 'lucide-react';
 import {
   personas, roles, responsibilities, roleBlueprints,
@@ -43,9 +43,8 @@ function StatBox({ label, value, sub, color = 'text-foreground' }: { label: stri
 }
 
 export default function PeopleRolesStudio() {
-  const [view,       setView]       = useState<View>('Overview');
-  const [createMode, setCreateMode] = useState<'persona' | 'role' | null>(null);
-  const { setSelectedItem } = useAppContext();
+  const [view, setView] = useState<View>('Overview');
+  const { setSelectedItem, openActionPanel } = useAppContext();
 
   const selectPersona  = (p: Persona) =>       setSelectedItem({ type: 'persona',      id: p.id, data: p });
   const selectRole     = (r: Role) =>           setSelectedItem({ type: 'role',         id: r.id, data: r });
@@ -57,46 +56,38 @@ export default function PeopleRolesStudio() {
   const incomplete = roleHealthRecords.filter(r => r.healthStatus === 'incomplete').length;
   const blueprintsDone = roleBlueprints.filter(b => b.status === 'complete').length;
 
-  if (createMode === 'persona') {
-    return (
-      <CreatePanel
-        title="New Persona"
-        objectType="Persona"
-        subtitle="Define a learner or stakeholder archetype for the Trail OS human layer."
-        fields={[
-          { id: 'name',        label: 'Persona Name',     type: 'text',     required: true, placeholder: 'e.g. Career Changer — Mid-level' },
-          { id: 'type',        label: 'Type',             type: 'select',   options: ['Learner', 'Coach', 'Admin', 'Employer', 'Partner', 'Funder'], required: true },
-          { id: 'background',  label: 'Background',       type: 'textarea', placeholder: 'Who is this person? Brief demographic and context…', rows: 3 },
-          { id: 'goals',       label: 'Goals',            type: 'textarea', placeholder: 'What does this persona want to achieve?', rows: 3 },
-          { id: 'frustrations',label: 'Frustrations',     type: 'textarea', placeholder: 'What blocks them from their goals?', rows: 3 },
-          { id: 'programs',    label: 'Typical Programs', type: 'text',     placeholder: 'e.g. Digital Literacy Trail, Foundations Trail' },
-        ]}
-        onClose={() => setCreateMode(null)}
-        onSaveDraft={() => setCreateMode(null)}
-        onSaveAndView={() => { setCreateMode(null); setView('Personas'); }}
-      />
-    );
+  function handleNewPersona() {
+    openActionPanel({
+      title: 'New Persona', objectType: 'Persona',
+      subtitle: 'Define a learner or stakeholder archetype for the Trail OS human layer.',
+      slackContext: 'people',
+      fields: [
+        { id: 'name',         label: 'Persona Name',     type: 'text',     required: true, placeholder: 'e.g. Career Changer — Mid-level' },
+        { id: 'type',         label: 'Type',             type: 'select',   options: ['Learner', 'Coach', 'Admin', 'Employer', 'Partner', 'Funder'], required: true },
+        { id: 'background',   label: 'Background',       type: 'textarea', placeholder: 'Who is this person? Brief demographic and context…', rows: 3 },
+        { id: 'goals',        label: 'Goals',            type: 'textarea', placeholder: 'What does this persona want to achieve?', rows: 3 },
+        { id: 'frustrations', label: 'Frustrations',     type: 'textarea', placeholder: 'What blocks them from their goals?', rows: 3 },
+        { id: 'programs',     label: 'Typical Programs', type: 'text',     placeholder: 'e.g. Digital Literacy Trail, Foundations Trail' },
+      ],
+      onSaveAndView: () => setView('Personas'),
+    });
   }
 
-  if (createMode === 'role') {
-    return (
-      <CreatePanel
-        title="New Role"
-        objectType="Role"
-        subtitle="Define a functional role in the Trail OS human operating layer. Roles are assigned responsibilities, blueprints, and Penny support mappings."
-        fields={[
-          { id: 'name',        label: 'Role Name',        type: 'text',     required: true, placeholder: 'e.g. Peer Mentor Lead' },
-          { id: 'category',    label: 'Category',         type: 'select',   options: ['Staff', 'Participant', 'Partner', 'Admin', 'Coach', 'Volunteer'] },
-          { id: 'description', label: 'Description',      type: 'textarea', placeholder: 'What is this role responsible for?', rows: 3 },
-          { id: 'programs',    label: 'Programs',         type: 'text',     placeholder: 'Which programs does this role operate in?' },
-          { id: 'pennySupport',label: 'Penny Support',    type: 'text',     placeholder: 'How does Penny support this role?' },
-          { id: 'sfObject',    label: 'Salesforce Object',type: 'text',     placeholder: 'e.g. Contact (role: Volunteer)' },
-        ]}
-        onClose={() => setCreateMode(null)}
-        onSaveDraft={() => setCreateMode(null)}
-        onSaveAndView={() => { setCreateMode(null); setView('Roles'); }}
-      />
-    );
+  function handleNewRole() {
+    openActionPanel({
+      title: 'New Role', objectType: 'Role',
+      subtitle: 'Define a functional role in the Trail OS human operating layer.',
+      slackContext: 'people',
+      fields: [
+        { id: 'name',        label: 'Role Name',         type: 'text',     required: true, placeholder: 'e.g. Peer Mentor Lead' },
+        { id: 'category',    label: 'Category',          type: 'select',   options: ['Staff', 'Participant', 'Partner', 'Admin', 'Coach', 'Volunteer'] },
+        { id: 'description', label: 'Description',       type: 'textarea', placeholder: 'What is this role responsible for?', rows: 3 },
+        { id: 'programs',    label: 'Programs',          type: 'text',     placeholder: 'Which programs does this role operate in?' },
+        { id: 'pennySupport',label: 'Penny Support',     type: 'text',     placeholder: 'How does Penny support this role?' },
+        { id: 'sfObject',    label: 'Salesforce Object', type: 'text',     placeholder: 'e.g. Contact (role: Volunteer)' },
+      ],
+      onSaveAndView: () => setView('Roles'),
+    });
   }
 
   return (
@@ -109,14 +100,14 @@ export default function PeopleRolesStudio() {
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Human Layer</span>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             <button
-              onClick={() => setCreateMode('persona')}
+              onClick={handleNewPersona}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[10px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3 h-3" />
               New Persona
             </button>
             <button
-              onClick={() => setCreateMode('role')}
+              onClick={handleNewRole}
               className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-full text-[10px] font-bold hover:bg-muted/40 transition-colors"
             >
               <Plus className="w-3 h-3" />

@@ -8,12 +8,12 @@ import {
 } from '@/data/pennyPromptStudioData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+
 import {
   Brain, BookOpen, Layers, ShieldCheck, Database, Search, Filter,
   ChevronDown, ChevronRight, ArrowRight, AlertTriangle, CheckCircle2,
   Zap, Clock, Star, GitBranch, FlaskConical, ClipboardCheck, BarChart3,
-  Play, RotateCcw, Users, FileText, Plus,
+  Play, RotateCcw, Users, FileText, Plus, Hash,
 } from 'lucide-react';
 
 type StudioView = 'library' | 'templates' | 'variables' | 'source-rules' | 'formats' | 'test-bench' | 'history' | 'quality' | 'create';
@@ -833,7 +833,7 @@ function QualityReviewView() {
 // ── Main Page ──────────────────────────────────────────────────────────────
 
 export default function PennyPromptStudio() {
-  const { setSelectedItem } = useAppContext();
+  const { setSelectedItem, openActionPanel, openSlackPanel } = useAppContext();
   const [view, setView] = useState<StudioView>('library');
   const [librarySelectedTemplate, setLibrarySelectedTemplate] = useState<PromptTemplate | null>(null);
 
@@ -844,6 +844,27 @@ export default function PennyPromptStudio() {
   function handleLibrarySelect(t: PromptTemplate) {
     setLibrarySelectedTemplate(t);
     setView('templates');
+  }
+
+  function handleNewTemplate() {
+    openActionPanel({
+      title: 'New Prompt Template', objectType: 'Prompt Template',
+      subtitle: 'Configure how Penny thinks, retrieves, and responds in a specific context.',
+      slackContext: 'penny',
+      fields: [
+        { id: 'name',       label: 'Template Name',   type: 'text',     required: true, placeholder: 'e.g. Goal-Setting Coaching Prompt' },
+        { id: 'domain',     label: 'Domain',           type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
+        { id: 'purpose',    label: 'Purpose',          type: 'textarea', placeholder: 'What does this prompt do and when should Penny use it?', rows: 3 },
+        { id: 'promptBody', label: 'Prompt Body',      type: 'textarea', placeholder: 'Write the prompt. Use {{variable_name}} for dynamic tokens.', rows: 5 },
+        { id: 'audience',   label: 'Audience',         type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'] },
+        { id: 'inputs',     label: 'Required Inputs',  type: 'textarea', placeholder: 'e.g. learnerName, programName, currentGoal…', rows: 2 },
+        { id: 'tone',       label: 'Tone & Style',     type: 'text',     placeholder: 'e.g. Empathetic and direct.' },
+        { id: 'guardrails', label: 'Guardrails',       type: 'textarea', placeholder: 'Constraints: never recommend specific employers…', rows: 3 },
+        { id: 'reviewStatus', label: 'Review Status',  type: 'select',   options: ['Draft', 'In Review', 'Approved', 'Needs Revision'] },
+        { id: 'testCase',   label: 'Test Case',        type: 'textarea', placeholder: 'Describe a test input and expected Penny response…', rows: 3 },
+      ],
+      onSaveAndView: () => setView('templates'),
+    });
   }
 
   return (
@@ -860,7 +881,15 @@ export default function PennyPromptStudio() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => setView('create')}
+              onClick={() => openSlackPanel({ context: 'penny', title: 'Penny Prompt Studio', subtitle: 'Slack channels, pending asks, and bot status for Penny prompt work.' })}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
+              title="Open Slack context"
+            >
+              <Hash className="w-3.5 h-3.5" />
+              Slack
+            </button>
+            <button
+              onClick={handleNewTemplate}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -889,23 +918,12 @@ export default function PennyPromptStudio() {
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {view === 'create' && (
-          <CreatePanel
-            title="New Prompt Template"
-            objectType="Prompt Template"
-            subtitle="Configure how Penny thinks, retrieves, and responds in a specific context."
-            fields={[
-              { id: 'name',       label: 'Template Name', type: 'text',     required: true, placeholder: 'e.g. Goal-Setting Coaching Prompt' },
-              { id: 'domain',     label: 'Domain',        type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
-              { id: 'purpose',    label: 'Purpose',       type: 'textarea', placeholder: 'Describe what this prompt does and when Penny should use it…', rows: 3 },
-              { id: 'promptBody', label: 'Prompt Body',   type: 'textarea', placeholder: 'Write the prompt. Use {{variable_name}} for dynamic tokens.', rows: 6 },
-              { id: 'audience',   label: 'Audience',      type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'] },
-              { id: 'tone',       label: 'Tone & Style',  type: 'text',     placeholder: 'e.g. Empathetic and direct. Focus on action.' },
-              { id: 'guardrails', label: 'Guardrails',    type: 'textarea', placeholder: 'Constraints: never recommend specific employers…', rows: 3 },
-            ]}
-            onClose={() => setView('library')}
-            onSaveDraft={() => setView('library')}
-            onSaveAndView={() => setView('templates')}
-          />
+          <div className="flex flex-col items-center justify-center h-full p-8 text-center text-muted-foreground">
+            <p className="text-sm font-semibold mb-1">Use the Action Panel →</p>
+            <p className="text-[12px] leading-relaxed max-w-xs">
+              Click <strong>New Template</strong> above. The creation form opens in the right panel so the library stays visible.
+            </p>
+          </div>
         )}
         {view === 'library'      && <LibraryView onSelectTemplate={handleLibrarySelect} />}
         {view === 'templates'    && <TemplatesView onOpenBrief={openBrief} />}

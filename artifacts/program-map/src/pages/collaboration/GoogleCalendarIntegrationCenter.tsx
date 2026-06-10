@@ -8,7 +8,7 @@ import {
   CheckCircle, XCircle, AlertTriangle, Clock, ChevronRight, Users, Brain,
   Hash, MessageSquare, Layers, HardDrive, RefreshCw, Plus,
 } from 'lucide-react';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { useAppContext } from '@/context/AppContext';
 import {
   CAL_VALIDATION_CHECKS, TRAIL_CALENDARS, CALENDAR_EVENTS,
   PROGRAM_EVENT_MAPPINGS, ROLE_PEOPLE_MAPPINGS, PENNY_SCHEDULING_CAPABILITIES,
@@ -899,34 +899,26 @@ function HealthTab() {
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
 export default function GoogleCalendarIntegrationCenter() {
-  const [createMode, setCreateMode] = useState(false);
+  const { openActionPanel } = useAppContext();
   const govSummary   = getCalGovernanceSummary();
   const criticalCount = govSummary.critical;
   const badge = criticalCount > 0 ? `${criticalCount} CRITICAL ISSUES` : 'Phase 1 — Calendar Integration';
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="Add Calendar Mapping"
-        objectType="Calendar Mapping"
-        subtitle="Connect a Google Calendar to a Trail OS program, cohort, or role. Sets up the timing layer for Penny scheduling."
-        fields={[
-          { id: 'calendarName', label: 'Calendar Name',      type: 'text',     required: true, placeholder: 'e.g. Digital Literacy Trail — Cohort 3 Sessions' },
-          { id: 'calendarId',   label: 'Google Calendar ID', type: 'text',     placeholder: 'Paste the Google Calendar ID' },
-          { id: 'mapTo',        label: 'Maps To',            type: 'select',   options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Scheduling', 'Comms Cadence'], required: true },
-          { id: 'trailObject',  label: 'Trail OS Object',    type: 'text',     placeholder: 'e.g. Digital Literacy Trail' },
-          { id: 'eventTypes',   label: 'Event Types',        type: 'textarea', placeholder: 'What kinds of events will be on this calendar?', rows: 2 },
-          { id: 'pennyCanRead', label: 'Penny Can Read',     type: 'select',   options: ['Yes — auto-sync', 'Yes — on request', 'No'] },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-      />
-    );
-  }
-
   const actions = [
-    { id: 'add-calendar', label: 'Add Calendar Mapping', icon: Plus, onClick: () => setCreateMode(true), variant: 'primary' as const },
+    { id: 'add-calendar', label: 'Add Calendar Mapping', icon: Plus, variant: 'primary' as const, onClick: () => openActionPanel({
+        title: 'Add Calendar Mapping', objectType: 'Calendar Mapping',
+        subtitle: 'Connect a Google Calendar to a Trail OS program, cohort, or role.',
+        slackContext: 'collaboration',
+        fields: [
+          { id: 'calendarName', label: 'Calendar Name',       type: 'text',     required: true, placeholder: 'e.g. Digital Literacy Trail — Cohort 3 Sessions' },
+          { id: 'calendarId',   label: 'Google Calendar ID',  type: 'text',     placeholder: 'Paste the Google Calendar ID' },
+          { id: 'mapTo',        label: 'Maps To',             type: 'select',   options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Scheduling', 'Comms Cadence'], required: true },
+          { id: 'trailObject',  label: 'Trail OS Object',     type: 'text',     placeholder: 'e.g. Digital Literacy Trail' },
+          { id: 'eventTypes',   label: 'Event Types',         type: 'textarea', placeholder: 'What kinds of events will be on this calendar?', rows: 2 },
+          { id: 'pennyCanRead', label: 'Penny Can Read',      type: 'select',   options: ['Yes — auto-sync', 'Yes — on request', 'No'] },
+        ],
+      })
+    },
   ];
 
   return (

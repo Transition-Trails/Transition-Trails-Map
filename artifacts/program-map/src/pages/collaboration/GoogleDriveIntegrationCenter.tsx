@@ -8,7 +8,7 @@ import {
   CheckCircle, XCircle, AlertTriangle, Clock, ChevronRight, Key,
   Layers, Brain, BookOpen, Database, RefreshCw, File, Folder, Plus,
 } from 'lucide-react';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { useAppContext } from '@/context/AppContext';
 import {
   DRIVE_VALIDATION_CHECKS, PROGRAM_FOLDERS, DRIVE_FILES,
   CONTENT_MAPPINGS, PENNY_SOURCE_MAPPINGS, KNOWLEDGE_SOURCE_MAPPINGS,
@@ -769,34 +769,26 @@ function HealthTab() {
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
 export default function GoogleDriveIntegrationCenter() {
-  const [createMode, setCreateMode] = useState(false);
+  const { openActionPanel } = useAppContext();
   const govSummary = getDriveGovernanceSummary();
   const criticalCount = govSummary.critical;
   const badge = criticalCount > 0 ? `${criticalCount} CRITICAL ISSUES` : 'Phase 1 — Drive Integration';
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="Add Folder Mapping"
-        objectType="Folder Mapping"
-        subtitle="Connect a Google Drive folder to a Trail OS program, cohort, or content type."
-        fields={[
-          { id: 'folderName',  label: 'Folder Name',        type: 'text',     required: true, placeholder: 'e.g. Digital Literacy Trail — Cohort 3' },
-          { id: 'folderId',    label: 'Google Drive Folder ID', type: 'text', placeholder: 'Paste the Drive folder ID or URL' },
-          { id: 'mapTo',       label: 'Maps To',            type: 'select',   options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Source', 'Knowledge Source'], required: true },
-          { id: 'trailObject', label: 'Trail OS Object',    type: 'text',     placeholder: 'e.g. Digital Literacy Trail' },
-          { id: 'contentType', label: 'Content Type',       type: 'select',   options: ['Program Materials', 'Assessments', 'Templates', 'Reference Docs', 'Media', 'Penny Knowledge'] },
-          { id: 'syncEnabled', label: 'Sync to Penny',      type: 'select',   options: ['Yes — auto-sync', 'Yes — manual sync', 'No'] },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-      />
-    );
-  }
-
   const actions = [
-    { id: 'add-folder', label: 'Add Folder Mapping', icon: Plus, onClick: () => setCreateMode(true), variant: 'primary' as const },
+    { id: 'add-folder', label: 'Add Folder Mapping', icon: Plus, variant: 'primary' as const, onClick: () => openActionPanel({
+        title: 'Add Folder Mapping', objectType: 'Folder Mapping',
+        subtitle: 'Connect a Google Drive folder to a Trail OS program, cohort, or content type.',
+        slackContext: 'collaboration',
+        fields: [
+          { id: 'folderName',  label: 'Folder Name',             type: 'text',   required: true, placeholder: 'e.g. Digital Literacy Trail — Cohort 3' },
+          { id: 'folderId',    label: 'Google Drive Folder ID',   type: 'text',   placeholder: 'Paste the Drive folder ID or URL' },
+          { id: 'mapTo',       label: 'Maps To',                  type: 'select', options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Source', 'Knowledge Source'], required: true },
+          { id: 'trailObject', label: 'Trail OS Object',          type: 'text',   placeholder: 'e.g. Digital Literacy Trail' },
+          { id: 'contentType', label: 'Content Type',             type: 'select', options: ['Program Materials', 'Assessments', 'Templates', 'Reference Docs', 'Media', 'Penny Knowledge'] },
+          { id: 'syncEnabled', label: 'Sync to Penny',            type: 'select', options: ['Yes — auto-sync', 'Yes — manual sync', 'No'] },
+        ],
+      })
+    },
   ];
 
   return (

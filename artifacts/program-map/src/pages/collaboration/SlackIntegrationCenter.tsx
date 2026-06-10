@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace } from '@/components/workspace/ObjectWorkspace';
 import { HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
-import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { useAppContext } from '@/context/AppContext';
 import {
   Hash, Settings, Users, Brain, FileText, Activity, Shield, BarChart2, FlaskConical,
   CheckCircle, XCircle, AlertTriangle, ChevronRight, Key, GitMerge, Layers,
@@ -1773,32 +1773,31 @@ function SlackIntegrationCenterInner({ onOpenCreate }: { onOpenCreate: () => voi
 }
 
 export default function SlackIntegrationCenter() {
-  const [createMode, setCreateMode] = useState(false);
+  const { openActionPanel, openSlackPanel } = useAppContext();
 
-  if (createMode) {
-    return (
-      <CreatePanel
-        title="Add Channel Mapping"
-        objectType="Channel Mapping"
-        subtitle="Connect a Slack channel to a Trail OS object — program, role, cohort, or Penny capability."
-        fields={[
-          { id: 'channelName', label: 'Slack Channel Name', type: 'text',     required: true, placeholder: 'e.g. #career-coaching-jan25' },
-          { id: 'mapType',     label: 'Mapping Type',       type: 'select',   options: ['Program → Channel', 'Role → User', 'Penny → Channel', 'Cohort → Channel'], required: true },
-          { id: 'trailObject', label: 'Trail OS Object',    type: 'text',     required: true, placeholder: 'e.g. Job Seekers — Digital Literacy Trail' },
-          { id: 'purpose',     label: 'Purpose',            type: 'textarea', placeholder: 'What is this channel used for in Trail OS?', rows: 2 },
-          { id: 'visibility',  label: 'Channel Visibility', type: 'select',   options: ['Public', 'Private'] },
-          { id: 'pennyAccess', label: 'Penny Can Post',     type: 'select',   options: ['Yes', 'No — humans only', 'Read-only'] },
-        ]}
-        onClose={() => setCreateMode(false)}
-        onSaveDraft={() => setCreateMode(false)}
-        onSaveAndView={() => setCreateMode(false)}
-      />
-    );
+  useEffect(() => {
+    openSlackPanel({ context: 'slack', title: 'Slack Integration', subtitle: 'Workspace health, channel status, and pending actions from your Slack integration.' });
+  }, []);
+
+  function handleAddChannelMapping() {
+    openActionPanel({
+      title: 'Add Channel Mapping', objectType: 'Channel Mapping',
+      subtitle: 'Connect a Slack channel to a Trail OS object — program, role, cohort, or Penny capability.',
+      slackContext: 'slack',
+      fields: [
+        { id: 'channelName', label: 'Slack Channel Name',  type: 'text',     required: true, placeholder: 'e.g. #career-coaching-jan25' },
+        { id: 'mapType',     label: 'Mapping Type',        type: 'select',   options: ['Program → Channel', 'Role → User', 'Penny → Channel', 'Cohort → Channel'], required: true },
+        { id: 'trailObject', label: 'Trail OS Object',     type: 'text',     required: true, placeholder: 'e.g. Job Seekers — Digital Literacy Trail' },
+        { id: 'purpose',     label: 'Purpose',             type: 'textarea', placeholder: 'What is this channel used for in Trail OS?', rows: 2 },
+        { id: 'visibility',  label: 'Channel Visibility',  type: 'select',   options: ['Public', 'Private'] },
+        { id: 'pennyAccess', label: 'Penny Can Post',      type: 'select',   options: ['Yes', 'No — humans only', 'Read-only'] },
+      ],
+    });
   }
 
   return (
     <SlackValidationProvider>
-      <SlackIntegrationCenterInner onOpenCreate={() => setCreateMode(true)} />
+      <SlackIntegrationCenterInner onOpenCreate={handleAddChannelMapping} />
     </SlackValidationProvider>
   );
 }

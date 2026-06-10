@@ -7,6 +7,7 @@ import { trailOsCapabilities as staticTrailOs, type TrailOsCapability } from '@/
 import { commProviders as staticCommProviders, type CommProvider } from '@/data/commProviders';
 import { commRoutes as staticCommRoutes, type CommRoute } from '@/data/commRouting';
 import { messageTemplates as staticTemplates, type MessageTemplate } from '@/data/messageTemplates';
+import type { ActionPanelConfig, SlackPanelConfig } from '@/types/actionPanel';
 
 export type SelectedItemType =
   | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'document'
@@ -35,6 +36,8 @@ export interface ActiveContext {
   setAt: string; // ISO timestamp
 }
 
+export type { ActionPanelConfig, SlackPanelConfig };
+
 interface AppState {
   activePage: string;
   activeLens: string;
@@ -50,11 +53,17 @@ interface AppState {
   commProviders: CommProvider[];
   commRoutes: CommRoute[];
   messageTemplates: MessageTemplate[];
+  actionPanel: ActionPanelConfig | null;
+  slackPanel: SlackPanelConfig | null;
   setActivePage: (page: string) => void;
   setActiveLens: (lens: string) => void;
   setSelectedItem: (item: { type: SelectedItemType; id: string; data: any } | null) => void;
   setSearchOpen: (open: boolean) => void;
   setActiveContext: (ctx: ActiveContext | null) => void;
+  openActionPanel: (config: ActionPanelConfig) => void;
+  closeActionPanel: () => void;
+  openSlackPanel: (config: SlackPanelConfig) => void;
+  closeSlackPanel: () => void;
   updateProgram: (id: string, updates: Partial<Program>) => void;
   updateDocument: (id: string, updates: Partial<SourceDocument>) => void;
   updateResolvePhase: (id: string, updates: Partial<ResolvePhase>) => void;
@@ -71,9 +80,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeLens, setActiveLens]     = useState('executive');
   const [selectedItem, setSelectedItem] = useState<AppState['selectedItem']>(null);
   const [searchOpen, setSearchOpen]     = useState(false);
+  const [actionPanel, setActionPanel]   = useState<ActionPanelConfig | null>(null);
+  const [slackPanel,  setSlackPanel]    = useState<SlackPanelConfig | null>(null);
 
   const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
   const [recentContexts, setRecentContexts]   = useState<ActiveContext[]>([]);
+
+  const openActionPanel  = (config: ActionPanelConfig) => { setActionPanel(config); setSlackPanel(null); };
+  const closeActionPanel = ()                          => setActionPanel(null);
+  const openSlackPanel   = (config: SlackPanelConfig)  => { setSlackPanel(config); setActionPanel(null); };
+  const closeSlackPanel  = ()                          => setSlackPanel(null);
 
   const [programs, setPrograms]                       = useState<Program[]>(staticPrograms);
   const [sourceDocuments, setSourceDocuments]         = useState<SourceDocument[]>(staticDocs);
@@ -134,6 +150,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       activeContext, recentContexts,
       programs, sourceDocuments, resolvePhases, pennyCapabilities, trailOsCapabilities,
       commProviders, commRoutes, messageTemplates,
+      actionPanel, openActionPanel, closeActionPanel,
+      slackPanel, openSlackPanel, closeSlackPanel,
       setActivePage, setActiveLens, setSelectedItem, setSearchOpen,
       setActiveContext,
       updateProgram, updateDocument, updateResolvePhase,
