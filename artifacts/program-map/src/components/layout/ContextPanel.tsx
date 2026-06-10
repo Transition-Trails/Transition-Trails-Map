@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
-import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2, Pencil, Hash } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2, Pencil, Hash, Bot } from 'lucide-react';
+import { PagePennyGuide } from './PagePennyGuide';
 import { RailActionPanel } from '@/components/workspace/RailActionPanel';
 import { SlackContextPanel } from '@/components/workspace/SlackContextPanel';
 import { ACTION_CATEGORY_CONFIG, type PennyContentAction } from '@/data/pennyContentActions';
@@ -21,7 +22,7 @@ export function ContextPanel() {
   const [location, setLocation] = useLocation();
 
   // ── Focus / Brief mode ────────────────────────────────────────────────────
-  const [collapsed, setCollapsed] = useState(location === '/');
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     if (selectedItem) setCollapsed(false);
@@ -43,17 +44,7 @@ export function ContextPanel() {
 
   const renderContent = () => {
     if (!selectedItem) {
-      if (location === '/') return <HomeWelcomeGuide />;
-      if (location === '/penny/trail-os-map') return <TrailOSCapabilityGuide />;
-      if (location.startsWith('/collaboration')) return <CommsBriefGuide />;
-      return (
-        <div className="flex flex-col items-center justify-center h-full p-6 text-center text-muted-foreground">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Layers className="w-8 h-8 text-primary/40" />
-          </div>
-          <p className="text-sm">Select any item to open its knowledge brief.</p>
-        </div>
-      );
+      return <PagePennyGuide />;
     }
 
     const { type, data } = selectedItem;
@@ -1701,19 +1692,26 @@ export function ContextPanel() {
         <>
           {/* Mode accent line — thin color bar at top gives immediate mode signal */}
           <div className={`h-[3px] w-full flex-shrink-0 ${
-            actionPanel ? 'bg-primary/55' : slackPanel ? 'bg-[#4A154B]/55' : 'bg-border/60'
+            actionPanel ? 'bg-primary/55'
+            : slackPanel ? 'bg-[#4A154B]/55'
+            : !selectedItem ? 'bg-violet-400/70'
+            : 'bg-border/60'
           }`} />
           <div className={`px-3 py-2.5 border-b z-10 flex items-center gap-2 shrink-0 ${
             actionPanel
               ? 'bg-primary/[0.06] border-primary/20'
               : slackPanel
               ? 'bg-[#4A154B]/[0.07] border-[#4A154B]/20'
+              : !selectedItem
+              ? 'bg-violet-50/60 border-violet-100/80'
               : 'bg-white border-border/60'
           }`}>
             {actionPanel
               ? <Pencil className="w-4 h-4 text-primary shrink-0" />
               : slackPanel
               ? <Hash className="w-4 h-4 text-[#4A154B] shrink-0" />
+              : !selectedItem
+              ? <Bot className="w-4 h-4 text-violet-600 shrink-0" />
               : <Layers className="w-4 h-4 text-primary shrink-0" />
             }
             <h3 className="font-semibold text-sm truncate flex-1">
@@ -1721,7 +1719,9 @@ export function ContextPanel() {
                 ? 'Action Panel'
                 : slackPanel
                 ? TERMS.trailSignals
-                : (!selectedItem && location === '/' ? 'How to Use Trail OS' : TERMS.knowledgeBrief)
+                : !selectedItem
+                ? 'Ask Penny'
+                : TERMS.knowledgeBrief
               }
             </h3>
             {/* Labeled collapse button — obvious, not a bare icon */}

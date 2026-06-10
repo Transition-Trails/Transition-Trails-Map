@@ -5,7 +5,7 @@ import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import {
   Activity, Users, Inbox, Brain,
-  ArrowRight, AlertTriangle, CheckCircle2, Lightbulb,
+  ArrowRight,
   Plus, BarChart3, FileText, Bot, Map, Layers, BookOpen,
 } from 'lucide-react';
 
@@ -17,33 +17,6 @@ const ALL_ACTIVITY = [
   { id: 'a4', icon: Activity, catCls: 'bg-emerald-100 text-emerald-700',cat: 'Programs', text: 'Foundations Trail cohort at 89% capacity',                       time: '2h',  minPower: false },
   { id: 'a5', icon: FileText, catCls: 'bg-indigo-100 text-indigo-700', cat: 'Knowledge',text: 'Sprint 3 Resume Writing materials updated',                       time: '3h',  minPower: false },
   { id: 'a6', icon: FileText, catCls: 'bg-indigo-100 text-indigo-700', cat: 'Knowledge',text: 'Source Mapping updated — RESOLVE Course Canvas',                  time: '3h',  minPower: true  },
-];
-
-const PENNY_BULLETS_EVERYDAY = [
-  "Guided Trail Cohort 1 · Week 3 of 8 — on track",
-  "Foundations Trail Cohort 2 approaching capacity (89%)",
-  "Your upcoming sessions: Sprint 3 Resume Workshop — Thursday",
-  "Penny is ready to help with your resume review",
-];
-
-const PENNY_BULLETS_POWER = [
-  "Guided Trail Cohort 1 · Week 3 of 8 — on track",
-  "Foundations Trail Cohort 2 approaching capacity (89%)",
-  "Trail of Mastery · Solve phase — sprint review needed before Q3",
-  "234 Penny interactions this week · 1 Learning Coach confidence flag",
-  "5 open demand items · 2 change requests pending triage",
-];
-
-const ATTENTION_EVERYDAY = [
-  { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200',  text: "Explorer's Trail Cohort 3 active · 12 of 15 enrolled",   icon_cls: 'text-emerald-500' },
-  { icon: Lightbulb,    bg: 'bg-sky-50 border-sky-200',          text: 'Sprint 3 Resume Workshop starts Thursday — materials ready', icon_cls: 'text-sky-500' },
-  { icon: AlertTriangle,bg: 'bg-amber-50 border-amber-200',      text: 'Foundations Trail Cohort 2 filling up — 89% capacity',    icon_cls: 'text-amber-500' },
-];
-
-const ATTENTION_POWER = [
-  { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',    text: 'Execute phase needs source documentation review',    icon_cls: 'text-amber-500' },
-  { icon: Lightbulb,     bg: 'bg-sky-50 border-sky-200',        text: 'Trail of Mastery — schedule Q3 sprint review',       icon_cls: 'text-sky-500' },
-  { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200',text: "Explorer's Trail Cohort 3 active · 12 of 15 enrolled", icon_cls: 'text-emerald-500' },
 ];
 
 const PROGRAM_COLORS: Record<string, string> = {
@@ -90,17 +63,13 @@ export default function Home() {
     ? ALL_ACTIVITY.filter(a => !a.minPower)
     : ALL_ACTIVITY;
 
-  // Tier-aware attention & penny bullets
-  const attention    = isEveryday ? ATTENTION_EVERYDAY : ATTENTION_POWER;
-  const pennyBullets = isEveryday ? PENNY_BULLETS_EVERYDAY : PENNY_BULLETS_POWER;
-
   // Status strip metrics (simplified for everyday)
   const metrics = isEveryday
     ? [
         { label: 'My Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
         { label: 'Cohort Learners',value: '47',  icon: Users,  cls: 'text-sky-600' },
         { label: 'Upcoming Tasks', value: '3',   icon: Inbox,  cls: 'text-amber-600' },
-        { label: 'Penny nudges',   value: '12',  icon: Brain,  cls: 'text-violet-600' },
+        { label: 'Penny Nudges',   value: '12',  icon: Brain,  cls: 'text-violet-600' },
       ]
     : [
         { label: 'Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
@@ -169,80 +138,29 @@ export default function Home() {
       {/* ── Scrollable body ── */}
       <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-0.5">
 
-        {/* ── 2-col layout ── */}
-        <div className="grid grid-cols-5 gap-3">
-
-          {/* Recent Activity */}
-          <div className="col-span-3 space-y-1.5">
-            <Label>Recent Activity</Label>
-            <div className="rounded-xl border border-border/60 bg-white/80 shadow-sm overflow-hidden">
-              {activityItems.map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.id} className={`flex items-start gap-2.5 px-3 py-2.5 ${i < activityItems.length - 1 ? 'border-b border-border/30' : ''}`}>
-                    <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 ${item.catCls}`}>
-                      <Icon className="w-3 h-3" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-foreground leading-snug">{item.text}</p>
-                      <p className="text-[9px] text-muted-foreground/60 mt-0.5">{item.cat} · {item.time} ago</p>
-                    </div>
+        {/* ── Recent Activity — full width ── */}
+        <div>
+          <Label>Recent Activity</Label>
+          <div className="rounded-xl border border-border/60 bg-white/80 shadow-sm overflow-hidden mt-1.5">
+            {activityItems.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.id} className={`flex items-start gap-2.5 px-3 py-2.5 ${i < activityItems.length - 1 ? 'border-b border-border/30' : ''}`}>
+                  <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 ${item.catCls}`}>
+                    <Icon className="w-3 h-3" />
                   </div>
-                );
-              })}
-              <div className="border-t border-border/30 px-3 py-2">
-                <button onClick={() => setLocation('/operations/health')} className="flex items-center gap-1 text-[10px] text-primary hover:underline font-medium">
-                  View All Activity <ArrowRight className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Penny + Attention */}
-          <div className="col-span-2 space-y-3">
-
-            {/* Penny */}
-            <div>
-              <Label>{isEveryday ? 'Penny — Your Learning Assistant' : 'Penny Briefing'}</Label>
-              <div className="rounded-xl border border-violet-200 bg-violet-50/60 shadow-sm px-3 py-2.5 mt-1.5">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-4 h-4 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-2.5 h-2.5 text-white" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] text-foreground leading-snug">{item.text}</p>
+                    <p className="text-[9px] text-muted-foreground/60 mt-0.5">{item.cat} · {item.time} ago</p>
                   </div>
-                  <span className="text-[9px] font-bold text-violet-700 uppercase tracking-wide">
-                    {isEveryday ? 'Penny · Your Coach' : 'Penny · Chief of Staff'}
-                  </span>
                 </div>
-                <ul className="space-y-1">
-                  {pennyBullets.map((b, i) => (
-                    <li key={i} className="flex items-start gap-1.5 text-[10px] text-violet-900 leading-snug">
-                      <span className="text-violet-400 flex-shrink-0 mt-px leading-none">•</span>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-                <button onClick={() => setLocation(isEveryday ? '/penny/test' : '/penny/intelligence')} className="flex items-center gap-1 text-[10px] text-violet-600 hover:underline font-medium mt-2">
-                  {isEveryday ? 'Ask Penny a question' : 'View Full Brief'} <ArrowRight className="w-2.5 h-2.5" />
-                </button>
-              </div>
+              );
+            })}
+            <div className="border-t border-border/30 px-3 py-2">
+              <button onClick={() => setLocation('/operations/health')} className="flex items-center gap-1 text-[10px] text-primary hover:underline font-medium">
+                View All Activity <ArrowRight className="w-3 h-3" />
+              </button>
             </div>
-
-            {/* Attention */}
-            <div>
-              <Label>Attention</Label>
-              <div className="space-y-1.5 mt-1.5">
-                {attention.map((a, i) => {
-                  const Icon = a.icon;
-                  return (
-                    <div key={i} className={`flex items-start gap-2 px-2.5 py-2 rounded-lg border text-[10px] ${a.bg}`}>
-                      <Icon className={`w-3 h-3 flex-shrink-0 mt-0.5 ${a.icon_cls}`} />
-                      <span className="text-foreground leading-snug">{a.text}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
           </div>
         </div>
 
