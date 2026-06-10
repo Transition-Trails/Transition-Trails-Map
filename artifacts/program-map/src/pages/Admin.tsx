@@ -72,7 +72,7 @@ export default function Admin() {
 
 function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
   const [, setLocation] = useLocation();
-  const { programs, sourceDocuments, resolvePhases, pennyCapabilities, trailOsCapabilities } = useAppContext();
+  const { programs, sourceDocuments, resolvePhases, pennyCapabilities, trailOsCapabilities, openSlackPanel } = useAppContext();
 
   const areas: {
     id: AdminView;
@@ -196,9 +196,18 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 Edit dashboard content — programs, documents, capabilities, and frameworks.
               </p>
             </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium px-3 py-1.5 rounded-full">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              Prototype — edits reset on refresh
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => openSlackPanel({ context: 'admin', title: 'Administration', subtitle: 'Slack, Drive, and workspace signals for Knowledge Management.' })}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors"
+              >
+                <Layers className="w-3 h-3" />
+                Workspace Signals
+              </button>
+              <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium px-3 py-1.5 rounded-full">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Prototype — edits reset on refresh
+              </div>
             </div>
           </div>
 

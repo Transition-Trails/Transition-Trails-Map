@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import {
   Activity, Users, Inbox, Brain,
   ArrowRight, AlertTriangle, CheckCircle2, Lightbulb,
-  Plus, BarChart3, FileText, Bot, Map,
+  Plus, BarChart3, FileText, Bot, Map, Layers,
 } from 'lucide-react';
 
 // ── Prototype data ────────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ const PROGRAM_COLORS: Record<string, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const { programs } = useAppContext();
+  const { programs, openSlackPanel } = useAppContext();
   const [, setLocation] = useLocation();
 
   return (
@@ -84,6 +84,13 @@ export default function Home() {
             </button>
           );
         })}
+        <button
+          onClick={() => openSlackPanel({ context: 'home', title: 'Mission Control', subtitle: 'Slack, Drive, and workspace signals for Mission Control.' })}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border border-[#4A154B]/20 text-[#4A154B] hover:bg-[#4A154B]/[0.04] transition-colors whitespace-nowrap ml-auto"
+        >
+          <Layers className="w-3 h-3" />
+          Workspace Signals
+        </button>
       </div>
 
       {/* ── Status strip — 4 primary signals ── */}

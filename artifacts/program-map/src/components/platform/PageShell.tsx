@@ -1,5 +1,6 @@
-import { Building2, Plug, Clock } from 'lucide-react';
+import { Building2, Plug, Clock, Layers } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAppContext } from '@/context/AppContext';
 
 /* ─── Shared atomic components used by Operations Center pages ─── */
 
@@ -33,6 +34,7 @@ export function OpsHeader({
 }: {
   title: string; subtitle?: string; integration?: string;
 }) {
+  const { openSlackPanel } = useAppContext();
   return (
     <div className="flex-shrink-0 px-6 pt-5 pb-4 border-b bg-card">
       <div className="flex items-start justify-between gap-4">
@@ -46,9 +48,18 @@ export function OpsHeader({
           <h1 className="text-2xl font-serif font-bold text-foreground">{title}</h1>
           {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
-        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground flex-shrink-0 pt-1">
-          <Clock className="w-3.5 h-3.5" />
-          Not live
+        <div className="flex items-center gap-2 flex-shrink-0 pt-1">
+          <button
+            onClick={() => openSlackPanel({ context: 'operations', title, subtitle: `Slack, Drive, and workspace signals for ${title}.` })}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors whitespace-nowrap"
+          >
+            <Layers className="w-3 h-3" />
+            Workspace Signals
+          </button>
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Clock className="w-3.5 h-3.5" />
+            Not live
+          </div>
         </div>
       </div>
       {integration && (

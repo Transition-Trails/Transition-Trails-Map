@@ -32,7 +32,12 @@ export type SlackPanelContext =
   | 'calendar'
   | 'collaboration'
   | 'people'
-  | 'digital-twin';
+  | 'digital-twin'
+  | 'home'
+  | 'operations'
+  | 'knowledge'
+  | 'admin'
+  | 'navigator';
 
 export interface SlackPanelConfig {
   context: SlackPanelContext;

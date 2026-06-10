@@ -1714,7 +1714,7 @@ export function ContextPanel() {
               {actionPanel
                 ? 'Action Panel'
                 : slackPanel
-                ? 'Slack Context'
+                ? 'Workspace Signals'
                 : (!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief')
               }
             </h3>

@@ -3,13 +3,13 @@ import { sourceDocuments } from '@/data/sourceDocuments';
 import { useAppContext } from '@/context/AppContext';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, FileText } from 'lucide-react';
+import { Search, FileText, Layers } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function SourceDocs() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const { setSelectedItem, selectedItem } = useAppContext();
+  const { setSelectedItem, selectedItem, openSlackPanel } = useAppContext();
 
   const statuses = ['All', 'Active', 'Draft', 'Deprecated', 'Archived'];
 
@@ -39,17 +39,26 @@ export default function SourceDocs() {
             />
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            {statuses.map(status => (
-              <Badge
-                key={status}
-                variant={statusFilter === status ? 'default' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => setStatusFilter(status)}
-              >
-                {status}
-              </Badge>
-            ))}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex flex-wrap gap-2">
+              {statuses.map(status => (
+                <Badge
+                  key={status}
+                  variant={statusFilter === status ? 'default' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() => setStatusFilter(status)}
+                >
+                  {status}
+                </Badge>
+              ))}
+            </div>
+            <button
+              onClick={() => openSlackPanel({ context: 'knowledge', title: 'Knowledge Library', subtitle: 'Slack, Drive, and workspace signals for the Knowledge Library.' })}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors whitespace-nowrap ml-auto"
+            >
+              <Layers className="w-3 h-3" />
+              Workspace Signals
+            </button>
           </div>
         </div>
       </div>

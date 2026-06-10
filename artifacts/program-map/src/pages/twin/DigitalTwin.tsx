@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
+import { useAppContext } from '@/context/AppContext';
 import {
   Network, Compass, Shield, GraduationCap, Brain, BookOpen,
   Users, Plug, X, ChevronRight, ArrowRight, ExternalLink,
@@ -978,6 +979,7 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function DigitalTwin() {
+  const { openSlackPanel } = useAppContext();
   const [, setLocation] = useLocation();
   const [selected, setSelected] = useState<SelectedObject | null>(null);
 
@@ -995,6 +997,9 @@ export default function DigitalTwin() {
       icon={Network}
       description="Pick a thing, see what it touches, understand what changes, take the next action."
       badge={selected ? selected.name : undefined}
+      actions={[
+        { id: 'signals', label: 'Workspace Signals', icon: Layers, variant: 'secondary' as const, onClick: () => openSlackPanel({ context: 'digital-twin', title: 'Digital Twin', subtitle: 'Slack, Drive, and workspace signals for the Digital Twin.' }) },
+      ]}
       tabs={[
         {
           id: 'explore',

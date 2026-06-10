@@ -3,6 +3,7 @@ import {
   Hash, ExternalLink, AlertTriangle, CheckCircle2, Clock, X,
   Zap, MessageSquare, Bell, ArrowRight, Radio, Settings,
   Users, Send, Shield, Calendar, ChevronRight,
+  Folder, Mail, FileText, Info, Lock,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -85,6 +86,36 @@ const CONTEXT_META: Record<SlackPanelContext, {
     purposeFilter: ['executive', 'admin', 'internal'],
     contextualChannelIds: ['exec-briefs', 'trail-os-ops'],
   },
+  home: {
+    color: '#145A32',
+    label: 'Mission Control',
+    purposeFilter: ['admin', 'internal', 'executive'],
+    contextualChannelIds: ['trail-os-ops', 'exec-briefs'],
+  },
+  operations: {
+    color: '#145A32',
+    label: 'Operations',
+    purposeFilter: ['admin', 'internal', 'cohort'],
+    contextualChannelIds: ['trail-os-ops', 'foundations-coaches', 'exec-briefs'],
+  },
+  knowledge: {
+    color: '#0F7B6C',
+    label: 'Knowledge Library',
+    purposeFilter: ['internal', 'executive', 'admin'],
+    contextualChannelIds: ['trail-os-ops', 'exec-briefs'],
+  },
+  admin: {
+    color: '#6B4F12',
+    label: 'Administration',
+    purposeFilter: ['admin', 'internal'],
+    contextualChannelIds: ['trail-os-ops'],
+  },
+  navigator: {
+    color: '#145A32',
+    label: 'Navigator',
+    purposeFilter: ['program', 'coach', 'admin'],
+    contextualChannelIds: ['foundations-coaches', 'trail-os-ops'],
+  },
 };
 
 // ── Pending action items per context ─────────────────────────────────────────
@@ -143,7 +174,328 @@ const CONTEXT_PENDING: Record<SlackPanelContext, PendingItem[]> = {
     { id:'p1', kind:'ask',       text:'Exec brief: "Digital Twin impact — which programs are affected by the new Standard?" Needs triage.', channel:'#exec-briefs', channelId:'exec-briefs', time:'Today', urgent:false },
     { id:'p2', kind:'reminder',  text:'Knowledge relationship change: notify program leads via #trail-os-ops.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'This week', urgent:false },
   ],
+  home: [
+    { id:'p1', kind:'alert',    text:'3 Slack channels missing governance records — review required.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:true },
+    { id:'p2', kind:'reminder', text:'Q2 platform report due — exec brief not yet published.', channel:'#exec-briefs', channelId:'exec-briefs', time:'This week', urgent:false },
+    { id:'p3', kind:'mention',  text:'Learning Coach flagged low confidence — Cohort 3 recap needs review.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'8m ago', urgent:false },
+  ],
+  operations: [
+    { id:'p1', kind:'alert',    text:'Below-target enrollment: Guided Trail (4/8). Outreach in #foundations-coaches recommended.', channel:'#foundations-coaches', channelId:'foundations-coaches', time:'Ongoing', urgent:true },
+    { id:'p2', kind:'escalation',text:'Trail of Mastery Q3 launch — no cohort scheduled. Planning thread in #trail-os-ops needed.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:false },
+    { id:'p3', kind:'reminder', text:'Foundations Trail at 89% capacity — post in #exec-briefs to open a new cohort.', channel:'#exec-briefs', channelId:'exec-briefs', time:'This week', urgent:false },
+  ],
+  knowledge: [
+    { id:'p1', kind:'reminder', text:'Source mapping update needed — RESOLVE Execute phase docs not yet mapped.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:true },
+    { id:'p2', kind:'ask',      text:'3 source docs in review queue — awaiting confidence confirmation from team.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'This week', urgent:false },
+    { id:'p3', kind:'mention',  text:'Digital Twin relationship update — coach notified in #trail-os-ops.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'3h ago', urgent:false },
+  ],
+  admin: [
+    { id:'p1', kind:'alert',    text:'OAuth integration pending — Slack workspace not yet connected. Requires admin action.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Ongoing', urgent:true },
+    { id:'p2', kind:'reminder', text:'Q3 role matrix not yet approved — permission review needed before Jul 1.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'This week', urgent:false },
+    { id:'p3', kind:'alert',    text:'1 unmapped Slack user (U10J) — no Trail OS persona assigned.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Ongoing', urgent:false },
+  ],
+  navigator: [
+    { id:'p1', kind:'reminder', text:'RESOLVE Execute phase — source mapping docs missing. Update needed before sprint review.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:false },
+    { id:'p2', kind:'ask',      text:'Trail of Mastery status unresolved — Q3 planning thread not yet started.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'This week', urgent:false },
+  ],
 };
+
+// ── Google Drive signals per context ─────────────────────────────────────────
+
+interface DriveItem {
+  id: string;
+  name: string;
+  kind: 'folder' | 'doc' | 'sheet' | 'slides';
+  status: 'ok' | 'needs-review' | 'missing' | 'updated';
+  note?: string;
+}
+
+const DRIVE_FOLDER_URL = 'https://drive.google.com/drive/u/0/my-drive';
+
+const CONTEXT_DRIVE: Partial<Record<SlackPanelContext, { folderName: string; items: DriveItem[] }>> = {
+  home: {
+    folderName: 'Trail OS Shared',
+    items: [
+      { id:'d1', name:'Platform Roadmap Q3 2025',      kind:'doc',    status:'updated',      note:'Updated 2 days ago' },
+      { id:'d2', name:'Q2 Program Summary Report',     kind:'sheet',  status:'needs-review', note:'Review requested by Dr. Simmons' },
+      { id:'d3', name:'Operating Procedures Guide',    kind:'doc',    status:'ok' },
+      { id:'d4', name:'Transition Trails Brand Deck',  kind:'slides', status:'ok' },
+    ],
+  },
+  operations: {
+    folderName: 'Operations Center',
+    items: [
+      { id:'d1', name:'Ops Runbook v2',                    kind:'doc',   status:'updated',      note:'Updated last week' },
+      { id:'d2', name:'Program Health Dashboard Notes',    kind:'sheet', status:'needs-review', note:'Q2 review pending' },
+      { id:'d3', name:'Cohort Capacity Tracker',           kind:'sheet', status:'ok' },
+      { id:'d4', name:'Q3 Planning Template',              kind:'doc',   status:'missing',      note:'Expected Jun 15' },
+    ],
+  },
+  penny: {
+    folderName: 'Penny AI Team',
+    items: [
+      { id:'d1', name:'Prompt Library Export (Jun)',    kind:'sheet', status:'updated' },
+      { id:'d2', name:'Capability Specs v1.3',          kind:'doc',   status:'needs-review', note:'Review before deploy' },
+      { id:'d3', name:'QA Test Results — Sprint 4',     kind:'sheet', status:'ok' },
+      { id:'d4', name:'Penny Integration Architecture', kind:'doc',   status:'ok' },
+    ],
+  },
+  program: {
+    folderName: 'Program Library',
+    items: [
+      { id:'d1', name:'Foundations Trail Curriculum',        kind:'folder', status:'ok' },
+      { id:'d2', name:"Explorer's Trail Learner Handbook",   kind:'doc',    status:'needs-review', note:'Sprint 4 update needed' },
+      { id:'d3', name:'Program Templates Library',           kind:'folder', status:'ok' },
+      { id:'d4', name:'Cohort 2 Completion Records',         kind:'sheet',  status:'missing',      note:'Due at cohort close' },
+    ],
+  },
+  knowledge: {
+    folderName: 'Knowledge Library',
+    items: [
+      { id:'d1', name:'Source Documents Master',          kind:'folder', status:'ok' },
+      { id:'d2', name:'RESOLVE Course Canvas — Phase 5',  kind:'doc',   status:'updated',      note:'Source mapping updated 3h ago' },
+      { id:'d3', name:'Knowledge Review Queue',           kind:'sheet', status:'needs-review', note:'3 docs need review' },
+      { id:'d4', name:'Digital Twin Relationship Map',    kind:'slides',status:'ok' },
+    ],
+  },
+  governance: {
+    folderName: 'Governance & Compliance',
+    items: [
+      { id:'d1', name:'Governance Policies v2',   kind:'doc',   status:'ok' },
+      { id:'d2', name:'Q2 Audit Log',             kind:'sheet', status:'needs-review', note:'Review overdue' },
+      { id:'d3', name:'Channel Registry Export',  kind:'sheet', status:'updated' },
+      { id:'d4', name:'Q3 Policy Templates',      kind:'doc',   status:'missing',      note:'Expected Jun 20' },
+    ],
+  },
+  'digital-twin': {
+    folderName: 'Digital Twin Assets',
+    items: [
+      { id:'d1', name:'Knowledge Graph Export',         kind:'slides', status:'updated' },
+      { id:'d2', name:'Digital Twin Architecture Spec', kind:'doc',   status:'needs-review', note:'Q3 update needed' },
+      { id:'d3', name:'Source Mapping Registry',        kind:'sheet', status:'ok' },
+    ],
+  },
+  admin: {
+    folderName: 'Administration',
+    items: [
+      { id:'d1', name:'Admin Configuration Guide', kind:'doc',   status:'ok' },
+      { id:'d2', name:'Permission Matrix',         kind:'sheet', status:'needs-review', note:'Review before Q3' },
+      { id:'d3', name:'Platform Config Tracker',   kind:'sheet', status:'updated' },
+    ],
+  },
+  navigator: {
+    folderName: 'Navigator Resources',
+    items: [
+      { id:'d1', name:'Program Map Reference',           kind:'doc',   status:'ok' },
+      { id:'d2', name:'RESOLVE Framework Guide',         kind:'doc',   status:'needs-review', note:'Cohort 3 update pending' },
+      { id:'d3', name:'Roles & Responsibilities Matrix', kind:'sheet', status:'ok' },
+    ],
+  },
+  slack: {
+    folderName: 'Collaboration Assets',
+    items: [
+      { id:'d1', name:'Channel Governance Policy',   kind:'doc',   status:'ok' },
+      { id:'d2', name:'Slack Setup Runbook',         kind:'doc',   status:'updated' },
+      { id:'d3', name:'Channel Registry (Master)',   kind:'sheet', status:'needs-review', note:'Q3 audit overdue' },
+    ],
+  },
+  collaboration: {
+    folderName: 'Collaboration Assets',
+    items: [
+      { id:'d1', name:'Channel Governance Policy',   kind:'doc',   status:'ok' },
+      { id:'d2', name:'Integration Setup Guide',     kind:'doc',   status:'updated' },
+      { id:'d3', name:'Channel Registry (Master)',   kind:'sheet', status:'needs-review', note:'Q3 audit overdue' },
+    ],
+  },
+};
+
+// ── Phase 2 signal data ────────────────────────────────────────────────────────
+
+interface Phase2Signal { text: string; urgency: 'high' | 'medium' | 'low'; }
+
+const EMAIL_SIGNALS: Phase2Signal[] = [
+  { text: 'Unanswered coach email — Jordan M. (3 days old)',      urgency: 'high' },
+  { text: "Draft follow-up ready: Explorer's Trail learner check-in", urgency: 'medium' },
+  { text: 'Escalation response needed: Cohort 2 capacity concern', urgency: 'high' },
+  { text: 'Sprint 4 schedule confirmation pending from facilitator', urgency: 'low' },
+  { text: 'New intake inquiry — no response yet (2 days)',         urgency: 'medium' },
+];
+
+const CALENDAR_SIGNALS: Phase2Signal[] = [
+  { text: 'Trail Talk: Program Strategy — Thu 2pm · 2 invites no response', urgency: 'medium' },
+  { text: 'Cohort 2 Sprint 4 Kickoff — Thu 10am · prep materials missing',  urgency: 'high' },
+  { text: 'Weekly team sync — Mon · no agenda prepared yet',                urgency: 'low' },
+  { text: 'Learner onboarding — Fri · handbooks not yet uploaded',          urgency: 'medium' },
+  { text: 'Executive review — needs prep brief from Knowledge Library',     urgency: 'low' },
+];
+
+// ── Drive + Phase 2 sub-components ───────────────────────────────────────────
+
+function DriveItemRow({ item }: { item: DriveItem }) {
+  const kindColor = item.kind === 'folder' ? 'text-amber-500' :
+                    item.kind === 'sheet'  ? 'text-emerald-600' :
+                    item.kind === 'slides' ? 'text-orange-500' : 'text-sky-500';
+  const statusBadge =
+    item.status === 'needs-review' ? <span className="text-[8px] font-bold bg-amber-50 border border-amber-200 text-amber-700 rounded px-1 py-0.5">Review</span> :
+    item.status === 'missing'      ? <span className="text-[8px] font-bold bg-rose-50 border border-rose-200 text-rose-700 rounded px-1 py-0.5">Missing</span> :
+    item.status === 'updated'      ? <span className="text-[8px] font-bold bg-sky-50 border border-sky-200 text-sky-700 rounded px-1 py-0.5">Updated</span> :
+    null;
+
+  return (
+    <a
+      href={DRIVE_FOLDER_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-start gap-2 px-2.5 py-2 mx-2 mb-1 rounded-lg border border-transparent hover:border-border/50 hover:bg-muted/20 transition-colors group"
+    >
+      <FileText className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${kindColor}`} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[10px] font-semibold text-foreground group-hover:text-primary truncate transition-colors">{item.name}</span>
+          {statusBadge}
+        </div>
+        {item.note && <p className="text-[9px] text-muted-foreground/60 mt-0.5">{item.note}</p>}
+      </div>
+      <ExternalLink className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary/50 shrink-0 mt-0.5 transition-colors" />
+    </a>
+  );
+}
+
+function DriveSection({ context }: { context: SlackPanelContext }) {
+  const data = CONTEXT_DRIVE[context];
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="px-3 py-2 border-b border-border/40 bg-muted/20 flex items-start gap-1.5 flex-shrink-0">
+        <Info className="w-3 h-3 text-muted-foreground/40 shrink-0 mt-0.5" />
+        <p className="text-[9px] text-muted-foreground/60 leading-snug">
+          No live Drive connection yet. Links open your Google Drive — items are contextual placeholders.
+        </p>
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="py-2">
+          {data ? (
+            <>
+              <a
+                href={DRIVE_FOLDER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2.5 mx-2 mb-2 rounded-lg bg-amber-50/70 border border-amber-200/60 hover:bg-amber-50 transition-colors"
+              >
+                <Folder className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span className="text-[10px] font-bold text-amber-900 flex-1 truncate">{data.folderName}</span>
+                <ExternalLink className="w-3 h-3 text-amber-500/60 shrink-0" />
+              </a>
+              {data.items.map(item => <DriveItemRow key={item.id} item={item} />)}
+              <div className="px-3 pt-3 pb-1 border-t border-border/30 mt-2 space-y-1.5">
+                <p className="text-[9px] text-muted-foreground/50 leading-snug">
+                  Connect Google Drive in Phase 2 for real-time doc signals, review queue sync, and change detection.
+                </p>
+                <a
+                  href="https://drive.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[9px] text-primary/70 hover:text-primary transition-colors"
+                >
+                  <ExternalLink className="w-2.5 h-2.5" />
+                  Open Google Drive
+                </a>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center py-8 gap-2 text-center px-4">
+              <Folder className="w-6 h-6 text-muted-foreground/30" />
+              <p className="text-[11px] text-muted-foreground">No Drive data mapped for this context.</p>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
+function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
+  const isEmail = tool === 'email';
+  const signals  = isEmail ? EMAIL_SIGNALS : CALENDAR_SIGNALS;
+  const Icon     = isEmail ? Mail : Calendar;
+  const accentCls  = isEmail ? 'text-sky-600'  : 'text-primary';
+  const headerBg   = isEmail ? 'bg-sky-50/60 border-sky-200/60' : 'bg-primary/[0.04] border-primary/15';
+  const headerText = isEmail ? 'text-sky-800'  : 'text-primary/80';
+  const phaseLabel = isEmail ? 'Email Signals' : 'Calendar Signals';
+  const phaseDesc  = isEmail
+    ? 'Unanswered messages, draft follow-ups, and escalation emails — surfaced from Gmail.'
+    : 'Upcoming meetings, no-response invites, prep reminders, and Trail Talk scheduling — from Google Calendar.';
+  const openUrl   = isEmail ? 'https://mail.google.com' : 'https://calendar.google.com';
+  const openLabel = isEmail ? 'Open Gmail' : 'Open Google Calendar';
+
+  const planned = isEmail
+    ? ['Unanswered email detection (3-day threshold)','Draft follow-up generator for at-risk learners','Escalation email triage and routing','Weekly brief email confirmation workflow','Coach → learner thread tracking']
+    : ['No-response invite detection and reminders','Meeting prep brief auto-generation','Trail Talk scheduling and prep reminders','Cohort session calendar sync with Slack','Google Meet link integration for 1:1s'];
+
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <ScrollArea className="flex-1">
+        <div className="p-3 space-y-3">
+          <div className={`rounded-lg border px-3 py-2.5 ${headerBg}`}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Icon className={`w-3.5 h-3.5 shrink-0 ${accentCls}`} />
+              <span className={`text-[10px] font-bold ${headerText}`}>{phaseLabel}</span>
+              <span className="ml-auto text-[7px] font-bold bg-muted border border-border rounded-full px-2 py-0.5 text-muted-foreground">Phase 2</span>
+            </div>
+            <p className={`text-[10px] leading-snug ${headerText} opacity-80`}>{phaseDesc}</p>
+          </div>
+
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5 px-0.5">
+              Preview — signals that will surface here
+            </p>
+            <div className="space-y-1">
+              {signals.map((sig, i) => (
+                <div key={i} className="flex items-start gap-2 px-2.5 py-1.5 rounded-lg bg-muted/20 border border-border/30 opacity-60">
+                  <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${
+                    sig.urgency === 'high' ? 'bg-rose-400' : sig.urgency === 'medium' ? 'bg-amber-400' : 'bg-muted-foreground/30'
+                  }`} />
+                  <p className="text-[10px] text-foreground leading-snug">{sig.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-border/40 bg-white px-3 py-2.5">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-2">Planned capabilities</p>
+            <ul className="space-y-1.5">
+              {planned.map((item, i) => (
+                <li key={i} className="flex items-start gap-1.5 text-[10px] text-muted-foreground">
+                  <CheckCircle2 className="w-3 h-3 text-muted-foreground/30 shrink-0 mt-0.5" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <a
+            href={openUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-semibold transition-colors ${
+              isEmail ? 'border-sky-200/60 bg-sky-50/40 text-sky-800 hover:bg-sky-50' : 'border-primary/20 bg-primary/[0.03] text-primary/80 hover:bg-primary/[0.06]'
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5 shrink-0" />
+            {openLabel}
+            <ExternalLink className="w-3 h-3 ml-auto" />
+          </a>
+
+          <div className="rounded border border-border/40 bg-muted/20 px-2.5 py-2 flex items-start gap-1.5">
+            <Lock className="w-3 h-3 text-muted-foreground/30 shrink-0 mt-0.5" />
+            <p className="text-[9px] text-muted-foreground/60 leading-snug">
+              <strong>Phase 2 — Google Auth</strong>: Sign-In with Google will connect Drive, Gmail, and Calendar without separate credentials.
+            </p>
+          </div>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
@@ -263,7 +615,8 @@ interface SlackContextPanelProps {
 }
 
 export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
-  const [activeTab, setActiveTab] = useState<'channels' | 'pending' | 'activity'>('pending');
+  const [activeTab, setActiveTab]   = useState<'channels' | 'pending' | 'activity'>('pending');
+  const [activeTool, setActiveTool] = useState<'slack' | 'drive' | 'email' | 'calendar'>('slack');
   const meta = CONTEXT_META[config.context];
   const pending = CONTEXT_PENDING[config.context] ?? [];
   const urgentCount = pending.filter(p => p.urgent).length;
@@ -308,6 +661,15 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
     { id: 'activity' as const, label: 'Activity', count: relevantActivity.length },
   ];
 
+  type WorkspaceTool = 'slack' | 'drive' | 'email' | 'calendar';
+  interface ToolDef { id: WorkspaceTool; label: string; Icon: React.ElementType; badge: number; urgent: boolean; phase2: boolean; }
+  const workspaceTools: ToolDef[] = [
+    { id: 'slack',    label: 'Slack',    Icon: Hash,     badge: urgentCount > 0 ? urgentCount : pending.length, urgent: urgentCount > 0, phase2: false },
+    { id: 'drive',    label: 'Drive',    Icon: Folder,   badge: CONTEXT_DRIVE[config.context]?.items.length ?? 0, urgent: false, phase2: false },
+    { id: 'email',    label: 'Email',    Icon: Mail,     badge: 0, urgent: false, phase2: true },
+    { id: 'calendar', label: 'Calendar', Icon: Calendar, badge: 0, urgent: false, phase2: true },
+  ];
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
 
@@ -316,7 +678,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
         <div className="flex items-start justify-between gap-2 mb-1.5">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#4A154B]/60">Slack Context</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-[#4A154B]/60">Workspace Signals</span>
               <span className="text-[9px] font-bold text-[#4A154B] border border-[#4A154B]/20 bg-[#4A154B]/5 rounded-full px-1.5 py-0.5">
                 {meta.label}
               </span>
@@ -363,6 +725,39 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
         )}
       </div>
 
+      {/* Workspace tool switcher */}
+      <div className="flex border-b border-border/40 flex-shrink-0 bg-white pt-1 px-1 gap-0.5">
+        {workspaceTools.map(tool => {
+          const ToolIcon = tool.Icon;
+          return (
+            <button
+              key={tool.id}
+              onClick={() => setActiveTool(tool.id)}
+              className={`flex-1 flex flex-col items-center gap-0.5 px-1 py-1.5 text-[9px] font-bold uppercase tracking-wide transition-colors border-b-2 rounded-t ${
+                activeTool === tool.id
+                  ? 'border-[#4A154B] text-[#4A154B]'
+                  : 'border-transparent text-muted-foreground/50 hover:text-foreground/70'
+              }`}
+            >
+              <div className="flex items-center gap-0.5">
+                <ToolIcon className="w-3 h-3" />
+                {tool.badge > 0 && !tool.phase2 && (
+                  <span className={`text-[7px] font-bold text-white rounded-full min-w-[13px] text-center leading-[13px] px-0.5 ${tool.urgent ? 'bg-rose-500' : 'bg-muted-foreground/40'}`}>
+                    {tool.badge}
+                  </span>
+                )}
+                {tool.phase2 && (
+                  <span className="text-[6px] font-bold bg-muted text-muted-foreground/50 rounded px-0.5">P2</span>
+                )}
+              </div>
+              {tool.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {activeTool === 'slack' && (
+      <>
       {/* Tabs */}
       <div className="flex border-b border-[#4A154B]/10 flex-shrink-0 bg-white">
         {tabs.map(tab => (
@@ -565,6 +960,13 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
 
         </div>
       </ScrollArea>
+
+      </>
+      )}
+
+      {activeTool === 'drive' && <DriveSection context={config.context} />}
+      {activeTool === 'email' && <Phase2Section tool="email" />}
+      {activeTool === 'calendar' && <Phase2Section tool="calendar" />}
 
       {/* Footer */}
       <div className="px-3 py-2 border-t border-[#4A154B]/15 flex-shrink-0 bg-white">
