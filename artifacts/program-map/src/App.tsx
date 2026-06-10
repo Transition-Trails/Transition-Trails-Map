@@ -44,9 +44,17 @@ function Router() {
       {/* Navigator → workspaces */}
       <Route path="/navigator/program-map">              <Redirect to="/program" /></Route>
       <Route path="/navigator/resolve">                  <Redirect to="/operations/demand" /></Route>
-      <Route path="/navigator/roles">                    <Redirect to="/digital-twin/people" /></Route>
+      <Route path="/navigator/roles">                    <Redirect to="/digital-twin" /></Route>
       <Route path="/navigator/trail-os-map">             <Redirect to="/penny/trail-os-map" /></Route>
       <Route path="/navigator/knowledge-relationships">  <Redirect to="/knowledge/relationships" /></Route>
+
+      {/* Old Digital Twin sub-routes → Explore */}
+      <Route path="/digital-twin/org-graph">     <Redirect to="/digital-twin" /></Route>
+      <Route path="/digital-twin/programs">      <Redirect to="/digital-twin/map" /></Route>
+      <Route path="/digital-twin/knowledge">     <Redirect to="/digital-twin/map" /></Route>
+      <Route path="/digital-twin/penny-network"> <Redirect to="/digital-twin/map" /></Route>
+      <Route path="/digital-twin/people">        <Redirect to="/digital-twin" /></Route>
+      <Route path="/digital-twin/relationships"> <Redirect to="/digital-twin" /></Route>
 
       {/* Old operations sub-pages */}
       <Route path="/operations/program-health">    <Redirect to="/operations/health" /></Route>
