@@ -12,10 +12,11 @@ import { type KnowledgeSource, SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, SYNC_STAT
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
+import { locationToContext, getSignalPanelConfig, SIGNAL_COUNTS } from '@/data/signalCounts';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 
 export function ContextPanel() {
-  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel } = useAppContext();
+  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel } = useAppContext();
   const [location, setLocation] = useLocation();
 
   // ── Focus / Brief mode ────────────────────────────────────────────────────
@@ -1645,6 +1646,10 @@ export function ContextPanel() {
     );
   };
 
+  const nudgeContext = locationToContext(location);
+  const nudgeCounts = SIGNAL_COUNTS[nudgeContext] ?? null;
+  const handleNudgeClick = () => openSlackPanel(getSignalPanelConfig(nudgeContext));
+
   return (
     <div
       className={`flex-shrink-0 h-full bg-white flex flex-col overflow-hidden transition-[width] duration-[250ms] ease-in-out ${
@@ -1733,6 +1738,33 @@ export function ContextPanel() {
               <ChevronRight className="w-3 h-3" />
             </button>
           </div>
+
+          {/* ── Signals nudge strip ─────────────────────────────────────────
+              Shown only in Knowledge Brief mode (not when workspace signals
+              or action panel is open) and only when the current page has
+              signals available. Clicking it opens the signals panel.
+          ──────────────────────────────────────────────────────────────── */}
+          {!actionPanel && !slackPanel && nudgeCounts && nudgeCounts.total > 0 && (
+            <button
+              onClick={handleNudgeClick}
+              className="group w-full flex items-center gap-2 px-3 py-1.5 border-b shrink-0
+                bg-amber-50/40 border-amber-100/80 hover:bg-amber-50
+                transition-colors duration-150"
+            >
+              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                nudgeCounts.urgent > 0 ? 'bg-amber-400 animate-pulse' : 'bg-primary/25'
+              }`} />
+              <span className="text-[10px] text-left leading-tight flex-1 min-w-0 text-muted-foreground/80 group-hover:text-foreground transition-colors">
+                {nudgeCounts.urgent > 0 ? (
+                  <><span className="font-semibold text-amber-700">{nudgeCounts.urgent} urgent</span>{' · '}{nudgeCounts.total} workspace signals</>
+                ) : (
+                  <><span className="font-semibold text-foreground/70">{nudgeCounts.total} workspace signals</span>{' available'}</>
+                )}
+              </span>
+              <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary shrink-0 transition-colors" />
+            </button>
+          )}
+
           <div className="flex-1 relative overflow-hidden bg-white">
             <AnimatePresence mode="wait">
               <motion.div

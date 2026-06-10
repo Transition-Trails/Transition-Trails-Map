@@ -2,6 +2,7 @@ import { Map, Search as SearchIcon } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
+import { locationToContext, getSignalPanelConfig, SIGNAL_COUNTS } from '@/data/signalCounts';
 
 const PAGE_INFO: Array<[string, string, string]> = [
   ['/',                                  'Trail OS',               'Mission Control'],
@@ -89,6 +90,63 @@ function LensPill({ activeLens, setActiveLens }: { activeLens: string; setActive
   );
 }
 
+// ── Signals indicator ──────────────────────────────────────────────────────
+function SignalsIndicator() {
+  const [location] = useLocation();
+  const { openSlackPanel, slackPanel } = useAppContext();
+
+  const context = locationToContext(location);
+  const counts = SIGNAL_COUNTS[context];
+  if (!counts || counts.total === 0) return null;
+
+  const panelOpen = slackPanel !== null;
+
+  const sourceDots: Array<{ key: string; color: string; count: number }> = [
+    { key: 'slack',      color: 'bg-[#4A154B]/60', count: counts.sources.slack },
+    { key: 'drive',      color: 'bg-emerald-500',  count: counts.sources.drive },
+    { key: 'salesforce', color: 'bg-sky-500',       count: counts.sources.salesforce },
+    { key: 'calendar',   color: 'bg-rose-400',      count: counts.sources.calendar },
+    { key: 'email',      color: 'bg-blue-400',      count: counts.sources.email },
+  ].filter(s => s.count > 0);
+
+  return (
+    <button
+      onClick={() => openSlackPanel(getSignalPanelConfig(context))}
+      title={`${counts.urgent > 0 ? `${counts.urgent} urgent · ` : ''}${counts.total} workspace signals available — click to open`}
+      className={`group flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-all duration-200 whitespace-nowrap ${
+        panelOpen
+          ? 'bg-[#4A154B]/10 border-[#4A154B]/25 text-[#4A154B]/80'
+          : counts.urgent > 0
+          ? 'bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100 hover:border-amber-300'
+          : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-muted hover:text-foreground'
+      }`}
+    >
+      {/* Status dot — pulses when urgent */}
+      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${
+        panelOpen
+          ? 'bg-[#4A154B]/50'
+          : counts.urgent > 0
+          ? 'bg-amber-400 animate-pulse'
+          : 'bg-muted-foreground/40'
+      }`} />
+
+      {/* Label */}
+      <span>
+        {counts.urgent > 0 && !panelOpen
+          ? `${counts.urgent} urgent`
+          : `${counts.total} signals`}
+      </span>
+
+      {/* Source dots — shown on hover via group */}
+      <span className="hidden group-hover:flex items-center gap-0.5 ml-0.5">
+        {sourceDots.map(s => (
+          <span key={s.key} className={`w-1 h-1 rounded-full ${s.color}`} title={s.key} />
+        ))}
+      </span>
+    </button>
+  );
+}
+
 export function Topbar() {
   const [location, setLocation] = useLocation();
   const { activeLens, setActiveLens } = useAppContext();
@@ -111,6 +169,7 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0">
+        <SignalsIndicator />
         <LensPill activeLens={activeLens} setActiveLens={setActiveLens} />
         <Button
           variant="ghost" size="icon"
