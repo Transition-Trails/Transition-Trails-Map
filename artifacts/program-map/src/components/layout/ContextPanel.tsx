@@ -1730,15 +1730,15 @@ export function ContextPanel() {
             {(!selectedItem && !actionPanel && !slackPanel) ? (
               <button
                 onClick={() => setPennyPanelTab('signals')}
-                aria-label="View Trail Insights"
-                title="View Trail Insights"
+                aria-label="View Trail Signals"
+                title="View Trail Signals"
                 className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
                   text-violet-700 bg-violet-50 border border-violet-200
                   hover:bg-violet-100 hover:text-violet-800 hover:border-violet-300
                   transition-all duration-150
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
               >
-                Trail Insights
+                Trail Signals
                 <ChevronRight className="w-3 h-3" />
               </button>
             ) : (

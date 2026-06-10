@@ -116,7 +116,7 @@ export default function Home() {
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border border-[#4A154B]/20 text-[#4A154B] hover:bg-[#4A154B]/[0.04] transition-colors whitespace-nowrap ml-auto"
         >
           <Layers className="w-3 h-3" />
-          {isEveryday ? 'Trail Insights' : TERMS.trailSignals}
+          {TERMS.trailSignals}
         </button>
       </div>
 

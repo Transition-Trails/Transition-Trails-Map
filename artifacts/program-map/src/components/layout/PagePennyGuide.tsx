@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import {
   Send, Sparkles, ArrowRight,
   CheckCircle2, AlertTriangle, Lightbulb,
-  Hash, Folder, Calendar, Mail, Database, ExternalLink,
+  Hash, Folder, Calendar, Mail, Database, ExternalLink, Info,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -18,12 +18,12 @@ type PageCtx =
 
 function deriveCtx(loc: string): PageCtx {
   if (loc === '/' || loc === '') return 'home';
-  if (loc.startsWith('/program'))      return 'programs';
-  if (loc.startsWith('/penny'))        return 'penny';
-  if (loc.startsWith('/operations'))   return 'operations';
-  if (loc.startsWith('/knowledge'))    return 'knowledge';
+  if (loc.startsWith('/program'))       return 'programs';
+  if (loc.startsWith('/penny'))         return 'penny';
+  if (loc.startsWith('/operations'))    return 'operations';
+  if (loc.startsWith('/knowledge'))     return 'knowledge';
   if (loc.startsWith('/collaboration')) return 'collaboration';
-  if (loc.startsWith('/admin'))        return 'admin';
+  if (loc.startsWith('/admin'))         return 'admin';
   if (loc.startsWith('/digital-twin') || loc.startsWith('/uom') || loc.startsWith('/governance'))
     return 'digital-twin';
   return 'default';
@@ -32,76 +32,94 @@ function deriveCtx(loc: string): PageCtx {
 // ── Signal source config ───────────────────────────────────────────────────────
 
 const SOURCE_ICO = {
-  slack:      { Icon: Hash,     cls: 'text-[#4A154B]', bg: 'bg-[#4A154B]/10', label: 'Slack' },
-  drive:      { Icon: Folder,   cls: 'text-blue-600',  bg: 'bg-blue-50',       label: 'Drive' },
-  calendar:   { Icon: Calendar, cls: 'text-emerald-600', bg: 'bg-emerald-50',  label: 'Calendar' },
-  email:      { Icon: Mail,     cls: 'text-amber-600', bg: 'bg-amber-50',      label: 'Email' },
-  salesforce: { Icon: Database, cls: 'text-sky-600',   bg: 'bg-sky-50',        label: 'Salesforce' },
+  slack:      { Icon: Hash,     cls: 'text-[#4A154B]',    bg: 'bg-[#4A154B]/10', label: 'Slack' },
+  drive:      { Icon: Folder,   cls: 'text-blue-600',     bg: 'bg-blue-50',      label: 'Google Drive' },
+  calendar:   { Icon: Calendar, cls: 'text-emerald-600',  bg: 'bg-emerald-50',   label: 'Google Calendar' },
+  email:      { Icon: Mail,     cls: 'text-amber-600',    bg: 'bg-amber-50',     label: 'Gmail' },
+  salesforce: { Icon: Database, cls: 'text-sky-600',      bg: 'bg-sky-50',       label: 'Salesforce' },
 } as const;
 type SigSource = keyof typeof SOURCE_ICO;
 
-type SigItem = { urgent: boolean; source: SigSource; text: string; meta: string };
+// Connection status per source — shown as trust cues in the Trail Signals tab
+const SOURCE_CONNECT: Record<SigSource, {
+  status: string; cls: string; dotCls: string; link?: string;
+}> = {
+  slack:      { status: 'Prototype-Ready', cls: 'text-amber-600',       dotCls: 'bg-amber-400',          link: 'https://transitiontrails.slack.com' },
+  drive:      { status: 'Connected',       cls: 'text-emerald-600',     dotCls: 'bg-emerald-500',         link: 'https://drive.google.com' },
+  calendar:   { status: 'Connected',       cls: 'text-emerald-600',     dotCls: 'bg-emerald-500',         link: 'https://calendar.google.com' },
+  email:      { status: 'Phase 2',         cls: 'text-muted-foreground', dotCls: 'bg-muted-foreground/30' },
+  salesforce: { status: 'Prototype',       cls: 'text-sky-600',         dotCls: 'bg-sky-400' },
+};
+
+type SigItem = {
+  urgent: boolean;
+  source: SigSource;
+  text: string;
+  meta: string;
+  /** Why Penny surfaced this — trains users to trust the data behind insights */
+  why: string;
+};
 
 const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   home: [
-    { urgent: true,  source: 'slack',      text: 'Learning Coach: low confidence on Cohort 3 recap scoring',     meta: '8m ago' },
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery source docs overdue — execute phase blocked', meta: '1h ago' },
-    { urgent: false, source: 'slack',      text: 'Foundations Trail Cohort 2: enrollment at 89% capacity',       meta: '2h ago' },
-    { urgent: false, source: 'drive',      text: 'Sprint 3 Resume Writing materials updated',                    meta: '3h ago' },
-    { urgent: false, source: 'calendar',   text: 'Sprint 3 session confirmed — Thursday 10am',                   meta: '5h ago' },
-    { urgent: false, source: 'email',      text: 'Weekly brief generated — 3 cohort updates',                    meta: '6h ago' },
-    { urgent: false, source: 'salesforce', text: "Explorer's Trail Cohort 3 — 3 enrollment slots open",          meta: '8h ago' },
+    { urgent: true,  source: 'slack',      text: 'Learning Coach: low confidence on Cohort 3 recap scoring',     meta: '8m ago',  why: 'Penny monitors coach confidence scores to flag when outputs may need human review before affecting learner feedback' },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery source docs overdue — execute phase blocked', meta: '1h ago',  why: 'This Salesforce phase record requires documentation before Penny can generate content or update program status' },
+    { urgent: false, source: 'slack',      text: 'Foundations Trail Cohort 2: enrollment at 89% capacity',       meta: '2h ago',  why: 'Penny watches enrollment channels to flag when a new cohort may need to open soon' },
+    { urgent: false, source: 'drive',      text: 'Sprint 3 Resume Writing materials updated',                    meta: '3h ago',  why: 'Penny reads Drive so learners and coaches always see the most current version of program materials' },
+    { urgent: false, source: 'calendar',   text: 'Sprint 3 session confirmed — Thursday 10am',                   meta: '5h ago',  why: 'Penny reads Calendar to surface upcoming milestones and session timing relevant to your programs' },
+    { urgent: false, source: 'email',      text: 'Weekly brief generated — 3 cohort updates',                    meta: '6h ago',  why: 'Penny monitors email digests to track program communication patterns (Phase 2 — read-only access)' },
+    { urgent: false, source: 'salesforce', text: "Explorer's Trail Cohort 3 — 3 enrollment slots open",          meta: '8h ago',  why: 'Penny tracks Salesforce enrollment records to surface open capacity for outreach or cohort planning' },
   ],
   programs: [
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before Q3',      meta: '1h ago' },
-    { urgent: false, source: 'slack',      text: "Explorer's Trail Cohort 3 — enrollment at 80%",                meta: '2h ago' },
-    { urgent: false, source: 'drive',      text: 'Content standards: 4 items pending review',                    meta: '4h ago' },
-    { urgent: false, source: 'calendar',   text: 'Sprint 3 review scheduled — Thursday',                         meta: '5h ago' },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before Q3',      meta: '1h ago',  why: 'Salesforce execution phases require documentation records — Penny flags these as blockers to Q3 delivery' },
+    { urgent: false, source: 'slack',      text: "Explorer's Trail Cohort 3 — enrollment at 80%",                meta: '2h ago',  why: 'Penny watches cohort enrollment channels to surface capacity trends across active programs' },
+    { urgent: false, source: 'drive',      text: 'Content standards: 4 items pending review',                    meta: '4h ago',  why: 'Penny reads Drive metadata to surface content quality review backlogs before they affect delivery' },
+    { urgent: false, source: 'calendar',   text: 'Sprint 3 review scheduled — Thursday',                         meta: '5h ago',  why: 'Penny reads Calendar to surface program milestone timing and flag missing reviews' },
   ],
   penny: [
-    { urgent: true,  source: 'slack',      text: 'Learning Coach: confidence flag on Cohort 3 recap',            meta: '8m ago' },
-    { urgent: false, source: 'salesforce', text: '14 capabilities pending Agentforce integration (Q3 2025)',      meta: '2h ago' },
-    { urgent: false, source: 'slack',      text: 'Test Penny: 12 prototype queries this week',                   meta: '3h ago' },
-    { urgent: false, source: 'drive',      text: 'Trail Quest capability spec updated',                          meta: '5h ago' },
-    { urgent: false, source: 'salesforce', text: 'Penny interaction log: 234 this week',                         meta: '8h ago' },
+    { urgent: true,  source: 'slack',      text: 'Learning Coach: confidence flag on Cohort 3 recap',            meta: '8m ago',  why: "Penny self-monitors its own Learning Coach output to flag when its recommendations may need human verification" },
+    { urgent: false, source: 'salesforce', text: '14 capabilities pending Agentforce integration (Q3 2025)',      meta: '2h ago',  why: 'Penny tracks Agentforce readiness in Salesforce to surface integration blockers before Q3 launch' },
+    { urgent: false, source: 'slack',      text: 'Test Penny: 12 prototype queries this week',                   meta: '3h ago',  why: 'Penny monitors its own usage in test channels to measure adoption and identify capability gaps' },
+    { urgent: false, source: 'drive',      text: 'Trail Quest capability spec updated',                          meta: '5h ago',  why: 'Penny watches Drive for spec updates to its own capability definitions so guidance stays current' },
+    { urgent: false, source: 'salesforce', text: 'Penny interaction log: 234 this week',                         meta: '8h ago',  why: 'Penny reads its interaction log from Salesforce to surface usage patterns for system improvement' },
   ],
   operations: [
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery execute phase: source docs required',         meta: '1h ago' },
-    { urgent: false, source: 'slack',      text: '2 demand change requests unassigned in queue',                 meta: '3h ago' },
-    { urgent: false, source: 'calendar',   text: 'Q3 sprint review not yet scheduled',                           meta: '4h ago' },
-    { urgent: false, source: 'drive',      text: 'Integration readiness: 5 checklist items open',                meta: '6h ago' },
-    { urgent: false, source: 'salesforce', text: 'Foundations Trail capacity alert: 89%',                        meta: '8h ago' },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery execute phase: source docs required',         meta: '1h ago',  why: 'Penny flags Salesforce phase blockers that prevent program delivery from moving forward' },
+    { urgent: false, source: 'slack',      text: '2 demand change requests unassigned in queue',                 meta: '3h ago',  why: 'Penny monitors demand channels to flag unassigned work that may accumulate into delivery delays' },
+    { urgent: false, source: 'calendar',   text: 'Q3 sprint review not yet scheduled',                           meta: '4h ago',  why: 'Penny reads Calendar to surface missing milestone events before they become launch blockers' },
+    { urgent: false, source: 'drive',      text: 'Integration readiness: 5 checklist items open',                meta: '6h ago',  why: 'Penny reads Drive checklists to surface open operational items affecting integration timelines' },
+    { urgent: false, source: 'salesforce', text: 'Foundations Trail capacity alert: 89%',                        meta: '8h ago',  why: 'Penny monitors Salesforce cohort records to flag when enrollment is approaching its limit' },
   ],
   knowledge: [
-    { urgent: false, source: 'drive',      text: "12 documents flagged 'needs-review'",                          meta: '2h ago' },
-    { urgent: false, source: 'drive',      text: 'Source Mapping updated — RESOLVE Course Canvas',               meta: '3h ago' },
-    { urgent: false, source: 'slack',      text: 'Sprint 3 materials question in #guided-trail',                 meta: '5h ago' },
-    { urgent: false, source: 'salesforce', text: 'Org Memory: 234 Penny interactions logged this week',          meta: '6h ago' },
+    { urgent: false, source: 'drive',      text: "12 documents flagged 'needs-review'",                          meta: '2h ago',  why: "Penny reads Drive metadata to surface documents that may be outdated — these affect what Penny can cite" },
+    { urgent: false, source: 'drive',      text: 'Source Mapping updated — RESOLVE Course Canvas',               meta: '3h ago',  why: 'Penny watches source mapping records to know when the knowledge graph changes and reindex accordingly' },
+    { urgent: false, source: 'slack',      text: 'Sprint 3 materials question in #guided-trail',                 meta: '5h ago',  why: 'Penny monitors program channels to surface learner questions that may indicate a materials gap' },
+    { urgent: false, source: 'salesforce', text: 'Org Memory: 234 Penny interactions logged this week',          meta: '6h ago',  why: "Penny reads its interaction log to identify knowledge gaps and improve future answers" },
   ],
   collaboration: [
-    { urgent: false, source: 'slack',      text: 'Slack activation ready — awaiting Q3 go-live',                 meta: '1h ago' },
-    { urgent: false, source: 'calendar',   text: 'Sprint 3 Resume Workshop — Thursday 10am',                     meta: '2h ago' },
-    { urgent: false, source: 'slack',      text: '#guided-trail-cohort-1: Week 3 message from coach',            meta: '4h ago' },
-    { urgent: false, source: 'drive',      text: '7 message templates ready for testing',                        meta: '6h ago' },
+    { urgent: false, source: 'slack',      text: 'Slack activation ready — awaiting Q3 go-live',                 meta: '1h ago',  why: 'Penny monitors Slack integration status — once live, Penny will send reminders and cohort updates through Slack' },
+    { urgent: false, source: 'calendar',   text: 'Sprint 3 Resume Workshop — Thursday 10am',                     meta: '2h ago',  why: 'Penny reads Calendar to surface upcoming collaborative sessions so you can prepare' },
+    { urgent: false, source: 'slack',      text: '#guided-trail-cohort-1: Week 3 message from coach',            meta: '4h ago',  why: 'Penny monitors cohort channels to surface coach communications that may need a follow-up' },
+    { urgent: false, source: 'drive',      text: '7 message templates ready for testing',                        meta: '6h ago',  why: 'Penny watches template folders to surface communication assets that are ready to use or review' },
   ],
   admin: [
-    { urgent: false, source: 'slack',      text: 'Phase 1 readiness: 3 of 8 integration checks complete',        meta: '2h ago' },
-    { urgent: false, source: 'calendar',   text: 'Q3 launch review not yet scheduled',                           meta: '4h ago' },
-    { urgent: false, source: 'drive',      text: 'Secrets audit: last run 3 days ago',                           meta: '6h ago' },
+    { urgent: false, source: 'slack',      text: 'Phase 1 readiness: 3 of 8 integration checks complete',        meta: '2h ago',  why: 'Penny tracks readiness checklist progress in admin channels to surface Phase 1 launch status' },
+    { urgent: false, source: 'calendar',   text: 'Q3 launch review not yet scheduled',                           meta: '4h ago',  why: 'Penny watches Calendar to flag missing launch milestone events before they become timeline risks' },
+    { urgent: false, source: 'drive',      text: 'Secrets audit: last run 3 days ago',                           meta: '6h ago',  why: 'Penny monitors Drive audit logs to surface security hygiene status for the admin team' },
   ],
   'digital-twin': [
-    { urgent: false, source: 'salesforce', text: 'Digital Compass: 6 object relationships unmapped',             meta: '3h ago' },
-    { urgent: false, source: 'drive',      text: 'Governance policy document updated',                           meta: '5h ago' },
-    { urgent: false, source: 'slack',      text: '#trail-os-ops: governance review thread active',               meta: '8h ago' },
+    { urgent: false, source: 'salesforce', text: 'Digital Compass: 6 object relationships unmapped',             meta: '3h ago',  why: 'Penny reads Salesforce object metadata to surface gaps in Digital Twin coverage' },
+    { urgent: false, source: 'drive',      text: 'Governance policy document updated',                           meta: '5h ago',  why: 'Penny watches governance docs in Drive to surface policy changes that affect object rules' },
+    { urgent: false, source: 'slack',      text: '#trail-os-ops: governance review thread active',               meta: '8h ago',  why: 'Penny monitors ops channels to surface active governance discussions needing attention' },
   ],
   default: [
-    { urgent: false, source: 'slack',      text: 'No context-specific signals for this page yet',                meta: '' },
+    { urgent: false, source: 'slack',      text: 'No context-specific signals for this page yet',                meta: '',        why: 'Penny will surface signals as you navigate to pages with active data connections' },
   ],
 };
 
 // ── Penny content definitions ──────────────────────────────────────────────────
 
-type AttItem = { icon: typeof CheckCircle2; bg: string; iconCls: string; text: string };
+type AttItem  = { icon: typeof CheckCircle2; bg: string; iconCls: string; text: string };
 type StepItem = { label: string; path: string };
 
 type PageContent = {
@@ -314,7 +332,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
   },
   default: {
     everydayInsights: ['Select any item on this page to see its details here'],
-    powerInsights:    ['Select any item to open its knowledge brief', 'Trail Insights shows context for this page'],
+    powerInsights:    ['Select any item to open its Trail Insights', 'Trail Signals shows context for this page'],
     attentionItems: [],
     everydaySteps: [],
     powerSteps: [],
@@ -345,6 +363,16 @@ export function PagePennyGuide() {
   const steps    = isEveryday ? content.everydaySteps    : content.powerSteps;
   const canned   = isEveryday ? content.everydayCanned   : content.powerCanned;
 
+  // Group signal items by source for the Trail Signals tab
+  const signalsBySource = signalItems.reduce<Partial<Record<SigSource, SigItem[]>>>((acc, item) => {
+    if (!acc[item.source]) acc[item.source] = [];
+    acc[item.source]!.push(item);
+    return acc;
+  }, {});
+  // Order: urgent sources first, then by source priority
+  const sourceOrder: SigSource[] = ['slack', 'salesforce', 'drive', 'calendar', 'email'];
+  const presentSources = sourceOrder.filter(s => signalsBySource[s]?.length);
+
   function handleAsk() {
     if (!query.trim() || !canned) return;
     setResponse(canned);
@@ -354,7 +382,7 @@ export function PagePennyGuide() {
   // ── Tab bar ──────────────────────────────────────────────────────────────
   const TABS = [
     { id: 'penny'   as const, label: 'Penny',          badge: null,       urgent: false },
-    { id: 'signals' as const, label: 'Trail Insights', badge: totalCount, urgent: urgentCount > 0 },
+    { id: 'signals' as const, label: 'Trail Signals',  badge: totalCount, urgent: urgentCount > 0 },
     { id: 'ask'     as const, label: 'Ask',             badge: null,       urgent: false },
   ];
 
@@ -387,7 +415,7 @@ export function PagePennyGuide() {
         ))}
       </div>
 
-      {/* ── Penny tab ─────────────────────────────────────────────────────── */}
+      {/* ── Penny Insights tab ────────────────────────────────────────────── */}
       {pennyPanelTab === 'penny' && (
         isEveryday && insights.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 text-center p-5 h-full">
@@ -405,11 +433,11 @@ export function PagePennyGuide() {
           <ScrollArea className="h-full">
             <div className="p-4 space-y-4">
 
-              {/* Insights */}
+              {/* Penny Insights header */}
               {insights.length > 0 && (
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-2">
-                    {isEveryday ? 'Penny · Your Learning Coach' : 'Penny · Chief of Staff'}
+                    {isEveryday ? 'Penny Insights · Your Learning Coach' : 'Penny Insights · Chief of Staff'}
                   </p>
                   <div className="rounded-lg border border-violet-100 bg-violet-50/50 p-3 space-y-1.5">
                     {insights.map((text, i) => (
@@ -419,6 +447,15 @@ export function PagePennyGuide() {
                       </div>
                     ))}
                   </div>
+                  {/* Trust bridge — directs users to verify via Trail Signals */}
+                  <button
+                    onClick={() => setPennyPanelTab('signals')}
+                    className="mt-1.5 w-full flex items-center gap-1 text-[9px] text-muted-foreground/50 hover:text-violet-600 transition-colors group"
+                  >
+                    <Info className="w-2.5 h-2.5 shrink-0 group-hover:text-violet-500" />
+                    See the Trail Signals behind these insights
+                    <ArrowRight className="w-2.5 h-2.5 ml-auto group-hover:text-violet-500" />
+                  </button>
                 </div>
               )}
 
@@ -462,7 +499,7 @@ export function PagePennyGuide() {
               {isPowerOrAbove && (
                 <div className="rounded-md bg-muted/30 border border-border/50 p-2.5">
                   <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
-                    <span className="font-semibold text-muted-foreground/70">Prototype mode</span> — Salesforce, Agentforce, and GA4 connections planned Q3–Q4 2025. Select any item to open its Knowledge Brief.
+                    <span className="font-semibold text-muted-foreground/70">Prototype mode</span> — Salesforce, Agentforce, and GA4 connections planned Q3–Q4 2025. Select any item to open its Trail Insights.
                   </p>
                 </div>
               )}
@@ -471,84 +508,101 @@ export function PagePennyGuide() {
         )
       )}
 
-      {/* ── Trail Insights tab ────────────────────────────────────────────── */}
+      {/* ── Trail Signals tab ─────────────────────────────────────────────── */}
       {pennyPanelTab === 'signals' && (
         <ScrollArea className="h-full">
-          <div className="p-4 space-y-3">
+          <div className="p-3 space-y-3">
 
-            {/* Count summary */}
+            {/* Header */}
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Trail Signals</p>
-              <div className="rounded-lg border border-[#4A154B]/15 bg-[#4A154B]/[0.03] p-3">
-                <div className="flex items-baseline gap-1.5 mb-2">
-                  <span className="text-2xl font-bold text-foreground">{totalCount}</span>
-                  <span className="text-[11px] text-muted-foreground">signals</span>
-                  {urgentCount > 0 && (
-                    <>
-                      <span className="text-muted-foreground/40 mx-0.5">·</span>
-                      <span className="text-[11px] font-semibold text-amber-600">{urgentCount} urgent</span>
-                    </>
-                  )}
-                </div>
-
-                {/* Source chips */}
-                {nudgeCounts && (
-                  <div className="flex flex-wrap gap-1">
-                    {(Object.entries(nudgeCounts.sources) as [SigSource, number][])
-                      .filter(([, n]) => n > 0)
-                      .map(([src, n]) => {
-                        const { Icon, cls, bg, label } = SOURCE_ICO[src];
-                        return (
-                          <span key={src} className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium ${bg}`}>
-                            <Icon className={`w-2.5 h-2.5 ${cls}`} />
-                            <span className={cls}>{label} {n}</span>
-                          </span>
-                        );
-                      })
-                    }
-                  </div>
-                )}
-              </div>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Trail Signals</p>
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                The data Penny is watching — {totalCount} signal{totalCount !== 1 ? 's' : ''} across {presentSources.length} source{presentSources.length !== 1 ? 's' : ''}
+                {urgentCount > 0 && <> · <span className="font-semibold text-amber-600">{urgentCount} urgent</span></>}
+              </p>
             </div>
 
-            {/* Signal item list */}
-            <div className="space-y-1">
-              {signalItems.map((item, i) => {
-                const { Icon, cls, bg } = SOURCE_ICO[item.source];
-                return (
-                  <div key={i} className={`flex items-start gap-2.5 px-2.5 py-2 rounded-lg border ${
-                    item.urgent ? 'border-amber-200 bg-amber-50/60' : 'border-border/50 bg-white/60'
-                  }`}>
-                    <span className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 ${bg}`}>
-                      <Icon className={`w-3 h-3 ${cls}`} />
+            {/* Source groups */}
+            {presentSources.map(src => {
+              const items  = signalsBySource[src]!;
+              const ico    = SOURCE_ICO[src];
+              const conn   = SOURCE_CONNECT[src];
+              const SrcIcon = ico.Icon;
+              const hasUrgent = items.some(i => i.urgent);
+
+              return (
+                <div key={src} className="rounded-lg border border-border/50 overflow-hidden">
+
+                  {/* Source header */}
+                  <div className={`flex items-center gap-2 px-3 py-2 ${ico.bg} border-b border-border/30`}>
+                    <span className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 bg-white/70`}>
+                      <SrcIcon className={`w-3 h-3 ${ico.cls}`} />
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-[11px] leading-snug ${item.urgent ? 'font-medium text-amber-900' : 'text-foreground'}`}>
-                        {item.urgent && <span className="text-amber-600 font-bold mr-1">!</span>}
-                        {item.text}
-                      </p>
-                      {item.meta && <p className="text-[9px] text-muted-foreground/60 mt-0.5">{item.meta}</p>}
+                      <div className="flex items-center gap-1.5">
+                        <span className={`text-[10px] font-bold ${ico.cls}`}>{ico.label}</span>
+                        {hasUrgent && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${conn.dotCls}`} />
+                        <span className={`text-[9px] font-medium ${conn.cls}`}>{conn.status}</span>
+                      </div>
                     </div>
+                    {conn.link && (
+                      <a
+                        href={conn.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-0.5 text-[9px] text-muted-foreground/50 hover:text-foreground transition-colors shrink-0"
+                        title={`Open ${ico.label}`}
+                      >
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    )}
                   </div>
-                );
-              })}
+
+                  {/* Signal items */}
+                  <div className="divide-y divide-border/30 bg-white">
+                    {items.map((item, i) => (
+                      <div key={i} className={`px-3 py-2.5 ${item.urgent ? 'bg-amber-50/40' : ''}`}>
+                        <div className="flex items-start gap-1.5">
+                          {item.urgent
+                            ? <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+                            : <span className="w-1 h-1 rounded-full bg-muted-foreground/25 flex-shrink-0 mt-1.5" />
+                          }
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[11px] leading-snug ${item.urgent ? 'font-medium text-amber-900' : 'text-foreground'}`}>
+                              {item.text}
+                            </p>
+                            {item.meta && (
+                              <p className="text-[9px] text-muted-foreground/50 mt-0.5">{item.meta}</p>
+                            )}
+                            {/* Why this matters — trust cue */}
+                            <p className="text-[9px] text-muted-foreground/55 italic leading-snug mt-1 border-l-2 border-border/50 pl-1.5">
+                              {item.why}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Trust footer */}
+            <div className="rounded-md bg-muted/20 border border-border/40 p-2.5">
+              <p className="text-[9px] text-muted-foreground/50 leading-relaxed">
+                <span className="font-semibold text-muted-foreground/70">Penny Insights</span> interpret these signals into plain-language recommendations.{' '}
+                <button onClick={() => setPennyPanelTab('penny')} className="text-violet-600 hover:underline font-medium">
+                  View Penny Insights ›
+                </button>
+              </p>
+              <p className="text-[9px] text-muted-foreground/40 mt-1">Phase 1 · Prototype data — Live connections Q3 2025</p>
             </div>
 
-            {/* Workspace link */}
-            <a
-              href="https://transitiontrails.slack.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-[#4A154B] text-white text-[10px] font-bold hover:bg-[#3D0F3E] transition-colors"
-            >
-              <Hash className="w-3.5 h-3.5" />
-              Open Transition Trails Workspace
-              <ExternalLink className="w-3 h-3 ml-auto" />
-            </a>
-
-            <p className="text-[9px] text-muted-foreground/40 text-center leading-snug">
-              Phase 1 · Prototype signal data — Live Slack/Drive/Salesforce Q3 2025
-            </p>
           </div>
         </ScrollArea>
       )}
@@ -562,8 +616,8 @@ export function PagePennyGuide() {
               <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-2">Ask Penny</p>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
                 {isEveryday
-                  ? 'Ask me about your programs, upcoming sessions, or anything in the Knowledge Library.'
-                  : 'Ask me about this page, system relationships, or operational context across Trail OS.'}
+                  ? 'Ask me about your programs, upcoming sessions, or anything in the Knowledge Library. I can also explain any Trail Signal.'
+                  : 'Ask me about this page, system relationships, or operational context. I can explain any Trail Signal or Penny Insight.'}
               </p>
             </div>
 
@@ -591,7 +645,7 @@ export function PagePennyGuide() {
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAsk()}
-                  placeholder={`Ask Penny about ${ctx === 'home' ? 'your dashboard' : ctx === 'default' ? 'this page' : ctx}…`}
+                  placeholder={`Ask about ${ctx === 'home' ? 'your dashboard' : ctx === 'default' ? 'this page' : ctx}…`}
                   className="flex-1 text-[11px] bg-white border border-border/70 rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-violet-300 focus:border-violet-300"
                 />
                 <button
@@ -607,14 +661,14 @@ export function PagePennyGuide() {
               </p>
             </div>
 
-            {/* Quick question suggestions */}
+            {/* Suggestions */}
             {!response && (
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Try asking</p>
                 <div className="space-y-1">
                   {(isEveryday
-                    ? ["What's happening with my programs?", "What do I need to do this week?", "Find Sprint 3 materials"]
-                    : ["What needs attention today?", "What's the status of Trail of Mastery?", "Show me Penny activity this week"]
+                    ? ["What's happening with my programs?", "Why did Penny flag the Learning Coach signal?", "Find Sprint 3 materials"]
+                    : ["What needs attention today?", "Why is Trail of Mastery blocked?", "Explain the Salesforce signals"]
                   ).map((suggestion, i) => (
                     <button
                       key={i}
