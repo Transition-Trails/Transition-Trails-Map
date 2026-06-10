@@ -9,10 +9,11 @@ import {
 import {
   Brain, Layers, Network, FlaskConical, ChevronDown, ChevronRight,
   CheckCircle2, ArrowRight, Search, Filter, Zap, BookOpen, MessageSquare,
-  CalendarDays, Database, ShieldCheck, Users, Star, Link2,
+  CalendarDays, Database, ShieldCheck, Users, Star, Link2, Plus,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 
 type RegistryView = 'architecture' | 'capabilities' | 'relationships' | 'poc-mapping';
 
@@ -686,8 +687,9 @@ function PocMappingView() {
 
 export default function PennyCapabilityRegistry() {
   const { setSelectedItem } = useAppContext();
-  const [view,        setView]        = useState<RegistryView>('architecture');
+  const [view,         setView]         = useState<RegistryView>('architecture');
   const [initialCapId, setInitialCapId] = useState<string | undefined>(undefined);
+  const [createMode,   setCreateMode]   = useState(false);
 
   function openBrief(cap: PennyCapability) {
     setSelectedItem({ type: 'pennyCapability', id: cap.id, data: cap });
@@ -696,6 +698,28 @@ export default function PennyCapabilityRegistry() {
   function goToCapabilities(id?: string) {
     setView('capabilities');
     if (id) setInitialCapId(id);
+  }
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="New Penny Capability"
+        objectType="Penny Capability"
+        subtitle="Register a new Penny AI capability. It will appear in the Capability Registry with Planned/Draft status until validated."
+        fields={[
+          { id: 'name',        label: 'Capability Name', type: 'text',     required: true, placeholder: 'e.g. Salary Negotiation Coach' },
+          { id: 'domain',      label: 'Domain',          type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
+          { id: 'description', label: 'Description',     type: 'textarea', placeholder: 'What does this capability do for learners?', rows: 3 },
+          { id: 'trigger',     label: 'When to Use',     type: 'textarea', placeholder: 'Describe the context where Penny should invoke this…', rows: 3 },
+          { id: 'maturity',    label: 'Maturity Level',  type: 'select',   options: ['Concept', 'Planned', 'In Development', 'POC Ready', 'Live'] },
+          { id: 'hallucinationRisk', label: 'Hallucination Risk', type: 'select', options: ['Low', 'Medium', 'High'] },
+          { id: 'knowledgeSources',  label: 'Key Knowledge Sources', type: 'textarea', placeholder: 'Which sources should Penny query for this capability?', rows: 2 },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => { setCreateMode(false); setView('capabilities'); }}
+      />
+    );
   }
 
   return (
@@ -713,6 +737,13 @@ export default function PennyCapabilityRegistry() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setCreateMode(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New Capability
+            </button>
             <span className="text-[11px] font-semibold text-secondary border border-secondary/20 bg-secondary/5 rounded-full px-3 py-1">
               {CAPABILITY_SUMMARY.total} capabilities
             </span>

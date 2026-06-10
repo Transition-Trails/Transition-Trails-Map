@@ -6,8 +6,9 @@ import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectW
 import {
   CalendarDays, CalendarCheck, CalendarClock, Settings, Shield, Activity, FlaskConical,
   CheckCircle, XCircle, AlertTriangle, Clock, ChevronRight, Users, Brain,
-  Hash, MessageSquare, Layers, HardDrive, RefreshCw,
+  Hash, MessageSquare, Layers, HardDrive, RefreshCw, Plus,
 } from 'lucide-react';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 import {
   CAL_VALIDATION_CHECKS, TRAIL_CALENDARS, CALENDAR_EVENTS,
   PROGRAM_EVENT_MAPPINGS, ROLE_PEOPLE_MAPPINGS, PENNY_SCHEDULING_CAPABILITIES,
@@ -898,9 +899,35 @@ function HealthTab() {
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
 export default function GoogleCalendarIntegrationCenter() {
+  const [createMode, setCreateMode] = useState(false);
   const govSummary   = getCalGovernanceSummary();
   const criticalCount = govSummary.critical;
   const badge = criticalCount > 0 ? `${criticalCount} CRITICAL ISSUES` : 'Phase 1 — Calendar Integration';
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="Add Calendar Mapping"
+        objectType="Calendar Mapping"
+        subtitle="Connect a Google Calendar to a Trail OS program, cohort, or role. Sets up the timing layer for Penny scheduling."
+        fields={[
+          { id: 'calendarName', label: 'Calendar Name',      type: 'text',     required: true, placeholder: 'e.g. Digital Literacy Trail — Cohort 3 Sessions' },
+          { id: 'calendarId',   label: 'Google Calendar ID', type: 'text',     placeholder: 'Paste the Google Calendar ID' },
+          { id: 'mapTo',        label: 'Maps To',            type: 'select',   options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Scheduling', 'Comms Cadence'], required: true },
+          { id: 'trailObject',  label: 'Trail OS Object',    type: 'text',     placeholder: 'e.g. Digital Literacy Trail' },
+          { id: 'eventTypes',   label: 'Event Types',        type: 'textarea', placeholder: 'What kinds of events will be on this calendar?', rows: 2 },
+          { id: 'pennyCanRead', label: 'Penny Can Read',     type: 'select',   options: ['Yes — auto-sync', 'Yes — on request', 'No'] },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => setCreateMode(false)}
+      />
+    );
+  }
+
+  const actions = [
+    { id: 'add-calendar', label: 'Add Calendar Mapping', icon: Plus, onClick: () => setCreateMode(true), variant: 'primary' as const },
+  ];
 
   return (
     <HubShell
@@ -908,6 +935,7 @@ export default function GoogleCalendarIntegrationCenter() {
       icon={CalendarDays}
       description="Calendars and events as first-class Trail OS objects — the timing layer. Calendar Registry, Event Catalog, Program Mapping, Penny Scheduling, and Governance in one place."
       badge={badge}
+      actions={actions}
       tabs={[
         { id:'overview',       label:'Overview',            path:'/collaboration/calendar',                    icon:Activity,      content:<OverviewTab /> },
         { id:'account',        label:'Account Config',      path:'/collaboration/calendar/account',            icon:Settings,      content:<AccountConfigTab /> },

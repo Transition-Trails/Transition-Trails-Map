@@ -8,14 +8,15 @@ import {
 } from '@/data/pennyPromptStudioData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 import {
   Brain, BookOpen, Layers, ShieldCheck, Database, Search, Filter,
   ChevronDown, ChevronRight, ArrowRight, AlertTriangle, CheckCircle2,
   Zap, Clock, Star, GitBranch, FlaskConical, ClipboardCheck, BarChart3,
-  Play, RotateCcw, Users, FileText,
+  Play, RotateCcw, Users, FileText, Plus,
 } from 'lucide-react';
 
-type StudioView = 'library' | 'templates' | 'variables' | 'source-rules' | 'formats' | 'test-bench' | 'history' | 'quality';
+type StudioView = 'library' | 'templates' | 'variables' | 'source-rules' | 'formats' | 'test-bench' | 'history' | 'quality' | 'create';
 
 // ── Tab ────────────────────────────────────────────────────────────────────
 
@@ -858,6 +859,13 @@ export default function PennyPromptStudio() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setView('create')}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New Template
+            </button>
             <span className="text-[11px] font-semibold text-green-700 border border-green-200 bg-green-50 rounded-full px-3 py-1">
               {PROMPT_STUDIO_SUMMARY.approved} Approved
             </span>
@@ -880,6 +888,25 @@ export default function PennyPromptStudio() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
+        {view === 'create' && (
+          <CreatePanel
+            title="New Prompt Template"
+            objectType="Prompt Template"
+            subtitle="Configure how Penny thinks, retrieves, and responds in a specific context."
+            fields={[
+              { id: 'name',       label: 'Template Name', type: 'text',     required: true, placeholder: 'e.g. Goal-Setting Coaching Prompt' },
+              { id: 'domain',     label: 'Domain',        type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
+              { id: 'purpose',    label: 'Purpose',       type: 'textarea', placeholder: 'Describe what this prompt does and when Penny should use it…', rows: 3 },
+              { id: 'promptBody', label: 'Prompt Body',   type: 'textarea', placeholder: 'Write the prompt. Use {{variable_name}} for dynamic tokens.', rows: 6 },
+              { id: 'audience',   label: 'Audience',      type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'] },
+              { id: 'tone',       label: 'Tone & Style',  type: 'text',     placeholder: 'e.g. Empathetic and direct. Focus on action.' },
+              { id: 'guardrails', label: 'Guardrails',    type: 'textarea', placeholder: 'Constraints: never recommend specific employers…', rows: 3 },
+            ]}
+            onClose={() => setView('library')}
+            onSaveDraft={() => setView('library')}
+            onSaveAndView={() => setView('templates')}
+          />
+        )}
         {view === 'library'      && <LibraryView onSelectTemplate={handleLibrarySelect} />}
         {view === 'templates'    && <TemplatesView onOpenBrief={openBrief} />}
         {view === 'variables'    && <VariablesView />}

@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Brain, MessageSquare, BookOpen, Hash, HardDrive, Calendar, Database, CheckCircle2, AlertTriangle, XCircle, Clock, ArrowRight, Zap } from 'lucide-react';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
+import { Brain, MessageSquare, BookOpen, Hash, HardDrive, Calendar, Database, CheckCircle2, AlertTriangle, XCircle, Clock, ArrowRight, Zap, Plus } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -252,22 +254,54 @@ function ConnectionCard({ conn }: { conn: IntegrationConnection }) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 export default function PennyIntegrationLayer() {
+  const [createMode, setCreateMode] = useState(false);
   const liveCount    = CONNECTIONS.filter(c => c.status === 'live').length;
   const readyCount   = CONNECTIONS.filter(c => c.status === 'ready').length;
   const blockedCount = CONNECTIONS.filter(c => c.status === 'blocked').length;
   const avgReadiness = Math.round(CONNECTIONS.reduce((s, c) => s + c.readiness, 0) / CONNECTIONS.length);
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="Add Integration Connection"
+        objectType="Integration Connection"
+        subtitle="Register a new integration pairing between Penny and an external platform. It will appear in the readiness tracker with Planned status."
+        fields={[
+          { id: 'from',        label: 'From (Penny System)', type: 'text',     required: true, placeholder: 'e.g. Penny Coaching Core' },
+          { id: 'to',          label: 'To (External System)',type: 'text',     required: true, placeholder: 'e.g. Salesforce' },
+          { id: 'description', label: 'Description',         type: 'textarea', placeholder: 'What data flows between these two systems?', rows: 3 },
+          { id: 'phase',       label: 'Integration Phase',   type: 'select',   options: ['Phase 1 — Core', 'Phase 2 — Extended'], required: true },
+          { id: 'status',      label: 'Current Status',      type: 'select',   options: ['Planned', 'In Development', 'POC Ready', 'Live', 'Blocked'] },
+          { id: 'readiness',   label: 'Readiness %',         type: 'text',     placeholder: 'e.g. 60' },
+          { id: 'blocker',     label: 'Current Blocker',     type: 'textarea', placeholder: 'What is preventing progress? (leave blank if none)', rows: 2 },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => setCreateMode(false)}
+      />
+    );
+  }
 
   return (
     <ScrollArea className="h-full">
       <div className="p-6 max-w-4xl space-y-5">
 
         {/* Header */}
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Penny — POC Integration Layer</p>
-          <h2 className="text-2xl font-serif font-bold text-foreground">Penny Integration Readiness</h2>
-          <p className="text-[12px] text-muted-foreground mt-1 max-w-2xl">
-            Integration readiness tracking between Penny capabilities and all connected systems — internal registry and external platform integrations.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Penny — POC Integration Layer</p>
+            <h2 className="text-2xl font-serif font-bold text-foreground">Penny Integration Readiness</h2>
+            <p className="text-[12px] text-muted-foreground mt-1 max-w-2xl">
+              Integration readiness tracking between Penny capabilities and all connected systems — internal registry and external platform integrations.
+            </p>
+          </div>
+          <button
+            onClick={() => setCreateMode(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0 mt-1"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Integration
+          </button>
         </div>
 
         {/* Summary strip */}
@@ -321,3 +355,4 @@ export default function PennyIntegrationLayer() {
     </ScrollArea>
   );
 }
+

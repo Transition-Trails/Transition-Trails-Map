@@ -8,11 +8,12 @@ import {
 } from '@/data/knowledgeSourceData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 import {
   Database, FolderOpen, BookOpen, GraduationCap, ShieldCheck, Layers,
   Brain, MessageSquare, CalendarDays, Search, Filter, AlertTriangle,
   CheckCircle2, ChevronDown, ChevronRight, ArrowRight, Users, Link2,
-  Network, Activity, GitBranch, ClipboardList, Zap, Clock, Star,
+  Network, Activity, GitBranch, ClipboardList, Zap, Clock, Star, Plus,
 } from 'lucide-react';
 
 type RegistryView = 'overview' | 'catalog' | 'relationships' | 'retrieval-map' | 'governance' | 'health';
@@ -878,12 +879,35 @@ function HealthView() {
 
 export default function KnowledgeSourceRegistry() {
   const { setSelectedItem } = useAppContext();
-  const [view, setView] = useState<RegistryView>('overview');
+  const [view,       setView]       = useState<RegistryView>('overview');
+  const [createMode, setCreateMode] = useState(false);
 
   const totalIssues = knowledgeSources.reduce((acc, s) => acc + s.healthIssues.length, 0);
 
   function openBrief(src: KnowledgeSource) {
     setSelectedItem({ type: 'knowledgeSource', id: src.id, data: src });
+  }
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="Add Knowledge Source"
+        objectType="Knowledge Source"
+        subtitle="Register a new trusted knowledge source. It will appear in the Source Catalog with Draft/Unvalidated status until approved."
+        fields={[
+          { id: 'name',        label: 'Source Name',    type: 'text',     required: true, placeholder: 'e.g. Transition Trails Program Guide — Google Drive' },
+          { id: 'type',        label: 'Source Type',    type: 'select',   options: ['Salesforce Knowledge', 'Google Drive', 'LMS Content', 'Assessments', 'Standards Studio', 'Curriculum Studio', 'Penny Generated', 'Slack History', 'Google Chat History', 'Calendar Events'], required: true },
+          { id: 'trustLevel',  label: 'Trust Level',    type: 'select',   options: ['Authoritative', 'Reference', 'Supplementary', 'Unverified'] },
+          { id: 'description', label: 'Description',    type: 'textarea', placeholder: 'What does this source contain and how should Penny use it?', rows: 3 },
+          { id: 'sourceUrl',   label: 'Source URL / ID',type: 'text',     placeholder: 'e.g. Google Drive folder ID, Salesforce category name' },
+          { id: 'syncCadence', label: 'Sync Cadence',   type: 'select',   options: ['Real-time', 'Daily', 'Weekly', 'Manual', 'Not Synced'] },
+          { id: 'usedByPenny', label: 'Available to Penny', type: 'select', options: ['Yes — approved', 'Pending review', 'No — not approved'] },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => setCreateMode(false)}
+      />
+    );
   }
 
   return (
@@ -901,6 +925,13 @@ export default function KnowledgeSourceRegistry() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setCreateMode(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Source
+            </button>
             {totalIssues > 0 && (
               <span className="text-[11px] font-semibold text-amber-700 border border-amber-200 bg-amber-50 rounded-full px-3 py-1">
                 {totalIssues} issues
@@ -913,12 +944,12 @@ export default function KnowledgeSourceRegistry() {
         </div>
         {/* Tabs */}
         <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <ViewTab label="Overview"      icon={Network}      active={view === 'overview'}      onClick={() => setView('overview')} />
-          <ViewTab label="Source Catalog" icon={Database}    active={view === 'catalog'}       count={SOURCE_SUMMARY.total} onClick={() => setView('catalog')} />
-          <ViewTab label="Relationships" icon={GitBranch}    active={view === 'relationships'} onClick={() => setView('relationships')} />
-          <ViewTab label="Penny Retrieval Map" icon={Brain}  active={view === 'retrieval-map'} count={pennyRetrievalMap.length} onClick={() => setView('retrieval-map')} />
-          <ViewTab label="Governance"    icon={ShieldCheck}  active={view === 'governance'}    onClick={() => setView('governance')} />
-          <ViewTab label="Source Health" icon={Activity}     active={view === 'health'}        count={totalIssues} onClick={() => setView('health')} />
+          <ViewTab label="Overview"           icon={Network}    active={view === 'overview'}      onClick={() => setView('overview')} />
+          <ViewTab label="Source Catalog"     icon={Database}   active={view === 'catalog'}       count={SOURCE_SUMMARY.total} onClick={() => setView('catalog')} />
+          <ViewTab label="Relationships"      icon={GitBranch}  active={view === 'relationships'} onClick={() => setView('relationships')} />
+          <ViewTab label="Penny Retrieval Map" icon={Brain}     active={view === 'retrieval-map'} count={pennyRetrievalMap.length} onClick={() => setView('retrieval-map')} />
+          <ViewTab label="Governance"         icon={ShieldCheck}active={view === 'governance'}    onClick={() => setView('governance')} />
+          <ViewTab label="Source Health"      icon={Activity}   active={view === 'health'}        count={totalIssues} onClick={() => setView('health')} />
         </div>
       </div>
 

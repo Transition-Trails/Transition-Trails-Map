@@ -6,8 +6,9 @@ import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectW
 import {
   HardDrive, FolderOpen, FileText, Settings, Shield, Activity, FlaskConical,
   CheckCircle, XCircle, AlertTriangle, Clock, ChevronRight, Key,
-  Layers, Brain, BookOpen, Database, RefreshCw, File, Folder,
+  Layers, Brain, BookOpen, Database, RefreshCw, File, Folder, Plus,
 } from 'lucide-react';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 import {
   DRIVE_VALIDATION_CHECKS, PROGRAM_FOLDERS, DRIVE_FILES,
   CONTENT_MAPPINGS, PENNY_SOURCE_MAPPINGS, KNOWLEDGE_SOURCE_MAPPINGS,
@@ -768,9 +769,35 @@ function HealthTab() {
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
 export default function GoogleDriveIntegrationCenter() {
+  const [createMode, setCreateMode] = useState(false);
   const govSummary = getDriveGovernanceSummary();
   const criticalCount = govSummary.critical;
   const badge = criticalCount > 0 ? `${criticalCount} CRITICAL ISSUES` : 'Phase 1 — Drive Integration';
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="Add Folder Mapping"
+        objectType="Folder Mapping"
+        subtitle="Connect a Google Drive folder to a Trail OS program, cohort, or content type."
+        fields={[
+          { id: 'folderName',  label: 'Folder Name',        type: 'text',     required: true, placeholder: 'e.g. Digital Literacy Trail — Cohort 3' },
+          { id: 'folderId',    label: 'Google Drive Folder ID', type: 'text', placeholder: 'Paste the Drive folder ID or URL' },
+          { id: 'mapTo',       label: 'Maps To',            type: 'select',   options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Source', 'Knowledge Source'], required: true },
+          { id: 'trailObject', label: 'Trail OS Object',    type: 'text',     placeholder: 'e.g. Digital Literacy Trail' },
+          { id: 'contentType', label: 'Content Type',       type: 'select',   options: ['Program Materials', 'Assessments', 'Templates', 'Reference Docs', 'Media', 'Penny Knowledge'] },
+          { id: 'syncEnabled', label: 'Sync to Penny',      type: 'select',   options: ['Yes — auto-sync', 'Yes — manual sync', 'No'] },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => setCreateMode(false)}
+      />
+    );
+  }
+
+  const actions = [
+    { id: 'add-folder', label: 'Add Folder Mapping', icon: Plus, onClick: () => setCreateMode(true), variant: 'primary' as const },
+  ];
 
   return (
     <HubShell
@@ -778,6 +805,7 @@ export default function GoogleDriveIntegrationCenter() {
       icon={HardDrive}
       description="Drive folders and files as first-class Trail OS objects. Program Folder Registry, File Catalog, Content Mapping, Penny Source Mapping, and Governance in one place."
       badge={badge}
+      actions={actions}
       tabs={[
         { id:'overview',       label:'Overview',               path:'/collaboration/drive',                  icon:Activity,    content:<OverviewTab /> },
         { id:'account',        label:'Account Config',         path:'/collaboration/drive/account',          icon:Settings,    content:<AccountConfigTab /> },

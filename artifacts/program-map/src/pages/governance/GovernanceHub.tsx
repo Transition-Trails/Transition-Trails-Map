@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
+import type { ActionItem } from '@/components/workspace/ActionBar';
 import {
   Shield, GitBranch, Users, CheckSquare, RotateCcw,
-  BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight,
+  BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight, Plus,
 } from 'lucide-react';
 import {
   LIFECYCLE_MODELS, OWNERSHIP_MATRIX, GOV_HEALTH_ISSUES,
@@ -651,12 +653,40 @@ function PoliciesTab() {
 
 // ── GovernanceHub ─────────────────────────────────────────────────────────────
 export default function GovernanceHub() {
+  const [createMode, setCreateMode] = useState(false);
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="New Lifecycle Model"
+        objectType="Lifecycle Model"
+        subtitle="Define the lifecycle stages, transition rules, and review cadence for a Trail OS object type."
+        fields={[
+          { id: 'objectType',    label: 'Object Type',       type: 'select',   options: ['Program', 'Course', 'Penny Capability', 'Knowledge Source', 'Role', 'Integration', 'Content Standard', 'Cohort', 'Sprint', 'Module', 'Lesson', 'Assessment', 'Persona', 'Decision', 'Policy', 'Resource'], required: true },
+          { id: 'modelName',     label: 'Model Name',        type: 'text',     required: true, placeholder: 'e.g. Program Lifecycle v2' },
+          { id: 'stages',        label: 'Lifecycle Stages',  type: 'textarea', required: true, placeholder: 'e.g. Draft → Review → Approved → Active → Retired', rows: 3 },
+          { id: 'approval',      label: 'Approval Required', type: 'select',   options: ['Yes — single approver', 'Yes — group review', 'No — self-service'] },
+          { id: 'cadence',       label: 'Review Cadence',    type: 'select',   options: ['Monthly', 'Quarterly', 'Semi-Annual', 'Annual', 'On-Change'] },
+          { id: 'retentionRule', label: 'Retention Rule',    type: 'textarea', placeholder: 'What triggers retirement or archival?', rows: 2 },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => setCreateMode(false)}
+      />
+    );
+  }
+
+  const actions: ActionItem[] = [
+    { id: 'new-lifecycle', label: 'Add Lifecycle Model', icon: Plus, onClick: () => setCreateMode(true), variant: 'primary' },
+  ];
+
   return (
     <HubShell
       title="Governance"
       icon={Shield}
       description="Object Lifecycle & Governance — the operational rulebook for all 20 UOM object types. Defines lifecycle, ownership, approvals, review cycles, compliance, and retirement for every core Trail OS object."
       badge="Phase 1"
+      actions={actions}
       tabs={[
         { id:'overview',    label:'Overview',            path:'/governance',             icon:Shield,      content:<OverviewTab />     },
         { id:'lifecycle',   label:'Lifecycle Models',    path:'/governance/lifecycle',   icon:GitBranch,   content:<LifecycleTab />    },

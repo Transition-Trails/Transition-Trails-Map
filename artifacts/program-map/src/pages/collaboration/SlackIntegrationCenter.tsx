@@ -4,10 +4,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace } from '@/components/workspace/ObjectWorkspace';
 import { HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 import {
   Hash, Settings, Users, Brain, FileText, Activity, Shield, BarChart2, FlaskConical,
   CheckCircle, XCircle, AlertTriangle, ChevronRight, Key, GitMerge, Layers,
-  Play, Map, Workflow, Zap,
+  Play, Map, Workflow, Zap, Plus,
 } from 'lucide-react';
 import {
   SLACK_WORKSPACE, SLACK_CHANNELS, SLACK_USER_MAPPINGS, PENNY_SLACK_CAPABILITIES,
@@ -1723,7 +1724,7 @@ function PocReadinessTab() {
 
 // ── Default export ────────────────────────────────────────────────────────────
 
-function SlackIntegrationCenterInner() {
+function SlackIntegrationCenterInner({ onOpenCreate }: { onOpenCreate: () => void }) {
   const { state: valState } = useSlackValidation();
   const govSummary = getGovernanceSummary();
 
@@ -1740,12 +1741,17 @@ function SlackIntegrationCenterInner() {
   descParts.push(`${govSummary.critical + govSummary.high} critical/high governance issues`);
   descParts.push('all scenarios defined and partially ready');
 
+  const actions = [
+    { id: 'add-channel', label: 'Add Channel Mapping', icon: Plus, onClick: onOpenCreate, variant: 'primary' as const },
+  ];
+
   return (
     <HubShell
       title="Slack Integration Center"
       icon={Hash}
       description={`Phase 2: Operational workflow validation. ${descParts.join(' · ')}.`}
       badge={criticalBadge ?? 'Phase 2 — Workflow Validation'}
+      actions={actions}
       tabs={[
         { id:'overview',    label:'Overview',            path:'/collaboration/slack',                   icon:Hash,          content:<OverviewTab /> },
         { id:'validation',  label:'Workspace Validation',path:'/collaboration/slack/validation',        icon:Key,           content:<WorkspaceValidationTab /> },
@@ -1767,9 +1773,32 @@ function SlackIntegrationCenterInner() {
 }
 
 export default function SlackIntegrationCenter() {
+  const [createMode, setCreateMode] = useState(false);
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="Add Channel Mapping"
+        objectType="Channel Mapping"
+        subtitle="Connect a Slack channel to a Trail OS object — program, role, cohort, or Penny capability."
+        fields={[
+          { id: 'channelName', label: 'Slack Channel Name', type: 'text',     required: true, placeholder: 'e.g. #career-coaching-jan25' },
+          { id: 'mapType',     label: 'Mapping Type',       type: 'select',   options: ['Program → Channel', 'Role → User', 'Penny → Channel', 'Cohort → Channel'], required: true },
+          { id: 'trailObject', label: 'Trail OS Object',    type: 'text',     required: true, placeholder: 'e.g. Job Seekers — Digital Literacy Trail' },
+          { id: 'purpose',     label: 'Purpose',            type: 'textarea', placeholder: 'What is this channel used for in Trail OS?', rows: 2 },
+          { id: 'visibility',  label: 'Channel Visibility', type: 'select',   options: ['Public', 'Private'] },
+          { id: 'pennyAccess', label: 'Penny Can Post',     type: 'select',   options: ['Yes', 'No — humans only', 'Read-only'] },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => setCreateMode(false)}
+      />
+    );
+  }
+
   return (
     <SlackValidationProvider>
-      <SlackIntegrationCenterInner />
+      <SlackIntegrationCenterInner onOpenCreate={() => setCreateMode(true)} />
     </SlackValidationProvider>
   );
 }

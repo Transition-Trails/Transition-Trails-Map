@@ -10,15 +10,16 @@ import {
 import {
   BookCheck, ShieldCheck, ClipboardList, AlertTriangle,
   ChevronDown, ChevronRight, CheckCircle2, XCircle,
-  Layers, BookOpen, Brain, Zap, Search, Filter,
+  Layers, BookOpen, Brain, Zap, Search, Filter, Plus,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-type StudioView = 'overview' | 'standards' | 'checklist' | 'gap-report';
+type StudioView = 'overview' | 'standards' | 'checklist' | 'gap-report' | 'create';
 
 const CATEGORY_ICONS: Record<StandardCategory, typeof BookOpen> = {
   'Program Architecture': Layers,
@@ -731,6 +732,13 @@ export default function StandardsStudio() {
               <span className="text-[11px] font-bold text-rose-700">{GAP_SUMMARY.bySeverity.high} high-severity gaps</span>
             </div>
           )}
+          <button
+            onClick={() => navigateTo('create')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            New Standard
+          </button>
         </div>
 
         {/* View tabs */}
@@ -744,10 +752,29 @@ export default function StandardsStudio() {
 
       {/* View content */}
       <div className="flex-1 overflow-hidden">
-        {view === 'overview' && <OverviewView onNavigate={navigateTo} />}
-        {view === 'standards' && <StandardsBrowserView initialStdId={initialStdId} onOpenBrief={openBrief} />}
-        {view === 'checklist' && <ChecklistView />}
-        {view === 'gap-report' && <GapReportView />}
+        {view === 'create' && (
+          <CreatePanel
+            title="New Content Standard"
+            objectType="Content Standard"
+            subtitle="Define a new quality rule or best practice that Penny will use to create, review, and improve curriculum content."
+            fields={[
+              { id: 'title',       label: 'Standard Title', type: 'text',     required: true, placeholder: 'e.g. Lesson Learning Objectives Format' },
+              { id: 'category',    label: 'Category',       type: 'select',   options: ['Program Architecture', 'Learning Content', 'Penny AI', 'Assessments', 'Delivery'], required: true },
+              { id: 'rule',        label: 'The Rule',       type: 'textarea', required: true, placeholder: 'State the standard as a clear, actionable rule…', rows: 4 },
+              { id: 'rationale',   label: 'Rationale',      type: 'textarea', placeholder: 'Why does this standard exist?', rows: 2 },
+              { id: 'goodExample', label: 'Good Example',   type: 'textarea', placeholder: 'A concrete example that meets this standard…', rows: 2 },
+              { id: 'badExample',  label: 'Counter-Example',type: 'textarea', placeholder: 'An example that violates this standard…', rows: 2 },
+              { id: 'applies',     label: 'Applies To',     type: 'select',   options: ['All Content', 'Lessons', 'Modules', 'Assessments', 'Penny Prompts', 'Program Overviews'] },
+            ]}
+            onClose={() => navigateTo('standards')}
+            onSaveDraft={() => navigateTo('standards')}
+            onSaveAndView={() => navigateTo('standards')}
+          />
+        )}
+        {view === 'overview'    && <OverviewView onNavigate={navigateTo} />}
+        {view === 'standards'   && <StandardsBrowserView initialStdId={initialStdId} onOpenBrief={openBrief} />}
+        {view === 'checklist'   && <ChecklistView />}
+        {view === 'gap-report'  && <GapReportView />}
       </div>
     </div>
   );

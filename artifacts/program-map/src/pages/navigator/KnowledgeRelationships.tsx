@@ -1,4 +1,6 @@
-import { Database, Sparkles, Layers, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { Database, Sparkles, Layers, ArrowRight, Plus } from 'lucide-react';
+import { CreatePanel } from '@/components/workspace/CreatePanel';
 
 // ── Architecture moved from Trail OS Capability Map > Overview (removed) ──────
 // Trail OS → Penny AI → Programs is the foundational relationship that no longer
@@ -43,17 +45,49 @@ const RELATIONSHIP_ROWS = [
 ];
 
 export default function KnowledgeRelationships() {
+  const [createMode, setCreateMode] = useState(false);
+
+  if (createMode) {
+    return (
+      <CreatePanel
+        title="Add Knowledge Relationship"
+        objectType="Knowledge Relationship"
+        subtitle="Document a new connection between two Trail OS objects. These relationships power the Digital Twin and Penny's contextual awareness."
+        fields={[
+          { id: 'fromObject',  label: 'From Object',    type: 'text',     required: true, placeholder: 'e.g. Program, Penny Capability, Role' },
+          { id: 'relationship',label: 'Relationship',   type: 'select',   options: ['powers', 'guides', 'uses', 'maps to', 'validates', 'references', 'owned by', 'part of', 'triggers', 'generates'], required: true },
+          { id: 'toObject',    label: 'To Object',      type: 'text',     required: true, placeholder: 'e.g. Knowledge Source, Penny Capability, Standard' },
+          { id: 'how',         label: 'How It Works',   type: 'textarea', placeholder: 'Describe the mechanism: how does this relationship operate?', rows: 3 },
+          { id: 'dataFlow',    label: 'Data / Signal Flow', type: 'textarea', placeholder: 'What data or signals flow between these objects?', rows: 2 },
+        ]}
+        onClose={() => setCreateMode(false)}
+        onSaveDraft={() => setCreateMode(false)}
+        onSaveAndView={() => setCreateMode(false)}
+        ownerHint="Who is responsible for maintaining this relationship definition?"
+      />
+    );
+  }
+
   return (
     <div className="h-full w-full overflow-y-auto p-6 bg-muted/20">
       <div className="max-w-4xl mx-auto space-y-10">
 
         {/* Header */}
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Navigator</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Knowledge Relationships</h1>
-          <p className="text-muted-foreground mt-2 leading-relaxed">
-            How Trail OS, Penny AI, and Programs connect — the foundational architecture of the Transition Trails technology ecosystem.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Navigator</p>
+            <h1 className="text-3xl font-serif font-bold text-foreground">Knowledge Relationships</h1>
+            <p className="text-muted-foreground mt-2 leading-relaxed">
+              How Trail OS, Penny AI, and Programs connect — the foundational architecture of the Transition Trails technology ecosystem.
+            </p>
+          </div>
+          <button
+            onClick={() => setCreateMode(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0 mt-1"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Relationship
+          </button>
         </div>
 
         {/* Architecture strip */}
