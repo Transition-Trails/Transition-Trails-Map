@@ -6,6 +6,7 @@ import {
   Folder, Mail, FileText, Info, Lock,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TERMS } from '@/config/terminology';
 import {
   SLACK_WORKSPACE,
   SLACK_CHANNELS,
@@ -678,7 +679,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
         <div className="flex items-start justify-between gap-2 mb-1.5">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#4A154B]/60">Workspace Signals</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-[#4A154B]/60">{TERMS.trailSignals}</span>
               <span className="text-[9px] font-bold text-[#4A154B] border border-[#4A154B]/20 bg-[#4A154B]/5 rounded-full px-1.5 py-0.5">
                 {meta.label}
               </span>

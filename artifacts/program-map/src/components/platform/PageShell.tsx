@@ -1,6 +1,7 @@
 import { Building2, Plug, Clock, Layers } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 
 /* ─── Shared atomic components used by Operations Center pages ─── */
 
@@ -50,11 +51,11 @@ export function OpsHeader({
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 pt-1">
           <button
-            onClick={() => openSlackPanel({ context: 'operations', title, subtitle: `Slack, Drive, and workspace signals for ${title}.` })}
+            onClick={() => openSlackPanel({ context: 'operations', title, subtitle: TERMS.signalSubtitle(title) })}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors whitespace-nowrap"
           >
             <Layers className="w-3 h-3" />
-            Workspace Signals
+            {TERMS.trailSignals}
           </button>
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <Clock className="w-3.5 h-3.5" />

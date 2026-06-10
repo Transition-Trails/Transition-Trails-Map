@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2, Pencil, Hash } from 'lucide-react';
 import { RailActionPanel } from '@/components/workspace/RailActionPanel';
 import { SlackContextPanel } from '@/components/workspace/SlackContextPanel';
@@ -1719,8 +1720,8 @@ export function ContextPanel() {
               {actionPanel
                 ? 'Action Panel'
                 : slackPanel
-                ? 'Workspace Signals'
-                : (!selectedItem && location === '/' ? 'How to Use Trail OS' : 'Knowledge Brief')
+                ? TERMS.trailSignals
+                : (!selectedItem && location === '/' ? 'How to Use Trail OS' : TERMS.knowledgeBrief)
               }
             </h3>
             {/* Labeled collapse button — obvious, not a bare icon */}
@@ -1739,10 +1740,10 @@ export function ContextPanel() {
             </button>
           </div>
 
-          {/* ── Signals nudge strip ─────────────────────────────────────────
-              Shown only in Knowledge Brief mode (not when workspace signals
+          {/* ── Trail Signals nudge strip ───────────────────────────────────
+              Shown only in Knowledge Brief mode (not when Trail Signals
               or action panel is open) and only when the current page has
-              signals available. Clicking it opens the signals panel.
+              signals available. Clicking it opens the Trail Signals panel.
           ──────────────────────────────────────────────────────────────── */}
           {!actionPanel && !slackPanel && nudgeCounts && nudgeCounts.total > 0 && (
             <button
@@ -1756,9 +1757,9 @@ export function ContextPanel() {
               }`} />
               <span className="text-[10px] text-left leading-tight flex-1 min-w-0 text-muted-foreground/80 group-hover:text-foreground transition-colors">
                 {nudgeCounts.urgent > 0 ? (
-                  <><span className="font-semibold text-amber-700">{nudgeCounts.urgent} urgent</span>{' · '}{nudgeCounts.total} workspace signals</>
+                  <><span className="font-semibold text-amber-700">{nudgeCounts.urgent} urgent</span>{' · '}{nudgeCounts.total} {TERMS.trailSignals}</>
                 ) : (
-                  <><span className="font-semibold text-foreground/70">{nudgeCounts.total} workspace signals</span>{' available'}</>
+                  <><span className="font-semibold text-foreground/70">{nudgeCounts.total} {TERMS.trailSignals}</span>{' available'}</>
                 )}
               </span>
               <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary shrink-0 transition-colors" />

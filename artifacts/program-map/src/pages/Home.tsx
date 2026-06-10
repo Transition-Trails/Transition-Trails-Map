@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import {
   Activity, Users, Inbox, Brain,
@@ -85,11 +86,11 @@ export default function Home() {
           );
         })}
         <button
-          onClick={() => openSlackPanel({ context: 'home', title: 'Mission Control', subtitle: 'Slack, Drive, and workspace signals for Mission Control.' })}
+          onClick={() => openSlackPanel({ context: 'home', title: TERMS.missionControl, subtitle: TERMS.signalSubtitle(TERMS.missionControl) })}
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border border-[#4A154B]/20 text-[#4A154B] hover:bg-[#4A154B]/[0.04] transition-colors whitespace-nowrap ml-auto"
         >
           <Layers className="w-3 h-3" />
-          Workspace Signals
+          {TERMS.trailSignals}
         </button>
       </div>
 

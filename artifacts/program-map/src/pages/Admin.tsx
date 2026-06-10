@@ -7,6 +7,7 @@ import {
   Key, Lock,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 import type { Program } from '@/data/programs';
 import type { SourceDocument } from '@/data/sourceDocuments';
@@ -198,11 +199,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
-                onClick={() => openSlackPanel({ context: 'admin', title: 'Administration', subtitle: 'Slack, Drive, and workspace signals for Knowledge Management.' })}
+                onClick={() => openSlackPanel({ context: 'admin', title: 'Administration', subtitle: TERMS.signalSubtitle('Administration') })}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors"
               >
                 <Layers className="w-3 h-3" />
-                Workspace Signals
+                {TERMS.trailSignals}
               </button>
               <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium px-3 py-1.5 rounded-full">
                 <AlertTriangle className="w-3.5 h-3.5" />

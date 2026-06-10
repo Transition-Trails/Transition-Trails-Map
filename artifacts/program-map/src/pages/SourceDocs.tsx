@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { sourceDocuments } from '@/data/sourceDocuments';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Search, FileText, Layers } from 'lucide-react';
@@ -53,11 +54,11 @@ export default function SourceDocs() {
               ))}
             </div>
             <button
-              onClick={() => openSlackPanel({ context: 'knowledge', title: 'Knowledge Library', subtitle: 'Slack, Drive, and workspace signals for the Knowledge Library.' })}
+              onClick={() => openSlackPanel({ context: 'knowledge', title: 'Knowledge Library', subtitle: TERMS.signalSubtitle('Knowledge Library') })}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors whitespace-nowrap ml-auto"
             >
               <Layers className="w-3 h-3" />
-              Workspace Signals
+              {TERMS.trailSignals}
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { locationToContext, getSignalPanelConfig, SIGNAL_COUNTS } from '@/data/signalCounts';
+import { TERMS } from '@/config/terminology';
 
 const PAGE_INFO: Array<[string, string, string]> = [
   ['/',                                  'Trail OS',               'Mission Control'],
@@ -49,17 +50,17 @@ function getPageInfo(location: string) {
     if (location === path) return { section, title };
   }
   if (location.startsWith('/admin'))         return { section: 'Administration', title: 'Knowledge Management' };
-  if (location.startsWith('/digital-twin'))  return { section: 'Digital Twin',   title: 'Overview' };
-  if (location.startsWith('/uom'))           return { section: 'Digital Twin',   title: 'Object Model' };
-  if (location.startsWith('/governance'))    return { section: 'Digital Twin',   title: 'Governance' };
-  if (location.startsWith('/operations'))    return { section: 'Operations',     title: 'Dashboard' };
-  if (location.startsWith('/program'))       return { section: 'Programs',       title: 'Dashboard' };
-  if (location.startsWith('/penny'))         return { section: 'Penny',          title: 'Dashboard' };
-  if (location.startsWith('/knowledge'))     return { section: 'Knowledge',      title: 'Dashboard' };
-  if (location.startsWith('/collaboration')) return { section: 'Collaboration',  title: 'Dashboard' };
-  if (location.startsWith('/search'))        return { section: 'Trail OS',       title: 'Global Search' };
-  if (location.startsWith('/context'))       return { section: 'Trail OS',       title: 'Context Engine' };
-  return { section: 'Trail OS', title: 'Dashboard' };
+  if (location.startsWith('/digital-twin'))  return { section: TERMS.digitalTwin, title: 'Overview' };
+  if (location.startsWith('/uom'))           return { section: TERMS.digitalTwin, title: 'Object Model' };
+  if (location.startsWith('/governance'))    return { section: TERMS.digitalTwin, title: 'Governance' };
+  if (location.startsWith('/operations'))    return { section: 'Operations',      title: 'Dashboard' };
+  if (location.startsWith('/program'))       return { section: 'Programs',        title: 'Dashboard' };
+  if (location.startsWith('/penny'))         return { section: TERMS.aiAssistant, title: 'Dashboard' };
+  if (location.startsWith('/knowledge'))     return { section: 'Knowledge',       title: 'Dashboard' };
+  if (location.startsWith('/collaboration')) return { section: 'Collaboration',   title: 'Dashboard' };
+  if (location.startsWith('/search'))        return { section: TERMS.platform,    title: 'Global Search' };
+  if (location.startsWith('/context'))       return { section: TERMS.platform,    title: 'Context Engine' };
+  return { section: TERMS.platform, title: 'Dashboard' };
 }
 
 // ── Lens toggle ────────────────────────────────────────────────────────────
@@ -90,7 +91,7 @@ function LensPill({ activeLens, setActiveLens }: { activeLens: string; setActive
   );
 }
 
-// ── Signals indicator ──────────────────────────────────────────────────────
+// ── Trail Signals indicator ────────────────────────────────────────────────
 function SignalsIndicator() {
   const [location] = useLocation();
   const { openSlackPanel, slackPanel } = useAppContext();
@@ -112,7 +113,7 @@ function SignalsIndicator() {
   return (
     <button
       onClick={() => openSlackPanel(getSignalPanelConfig(context))}
-      title={`${counts.urgent > 0 ? `${counts.urgent} urgent · ` : ''}${counts.total} workspace signals available — click to open`}
+      title={TERMS.signalTooltip(counts.total, counts.urgent)}
       className={`group flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-all duration-200 whitespace-nowrap ${
         panelOpen
           ? 'bg-[#4A154B]/10 border-[#4A154B]/25 text-[#4A154B]/80'
@@ -132,12 +133,14 @@ function SignalsIndicator() {
 
       {/* Label */}
       <span>
-        {counts.urgent > 0 && !panelOpen
+        {panelOpen
+          ? TERMS.trailSignals
+          : counts.urgent > 0
           ? `${counts.urgent} urgent`
-          : `${counts.total} signals`}
+          : `${counts.total} ${TERMS.trailSignals}`}
       </span>
 
-      {/* Source dots — shown on hover via group */}
+      {/* Source dots — revealed on hover */}
       <span className="hidden group-hover:flex items-center gap-0.5 ml-0.5">
         {sourceDots.map(s => (
           <span key={s.key} className={`w-1 h-1 rounded-full ${s.color}`} title={s.key} />
@@ -160,7 +163,7 @@ export function Topbar() {
           <Map className="w-4 h-4" />
         </div>
         <span className="text-base font-semibold font-serif text-foreground leading-none flex-shrink-0">
-          Transition Trails
+          {TERMS.brand}
         </span>
         <span className="text-muted-foreground/30 select-none mx-0.5 flex-shrink-0">·</span>
         <span className="text-xs text-muted-foreground font-medium flex-shrink-0 hidden sm:block">{section}</span>

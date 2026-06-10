@@ -1,4 +1,5 @@
 import type { SlackPanelContext, SlackPanelConfig } from '@/types/actionPanel';
+import { TERMS } from '@/config/terminology';
 
 export interface SignalCounts {
   total: number;
@@ -72,62 +73,20 @@ export const SIGNAL_COUNTS: Record<SlackPanelContext, SignalCounts> = {
 };
 
 const CONTEXT_PANEL_META: Record<SlackPanelContext, { title: string; subtitle: string }> = {
-  home: {
-    title: 'Mission Control',
-    subtitle: 'Workspace signals across all active areas — flags, Drive updates, and Slack activity.',
-  },
-  operations: {
-    title: 'Operations',
-    subtitle: 'Operations signals — integration status, health flags, and demand pipeline activity.',
-  },
-  program: {
-    title: 'Programs',
-    subtitle: 'Program channels, cohort threads, and program workspace activity.',
-  },
-  governance: {
-    title: 'Governance',
-    subtitle: 'Governance signals — review cycles, doc updates, and approval threads.',
-  },
-  'digital-twin': {
-    title: 'Digital Twin',
-    subtitle: 'Workspace signals for the Digital Twin — object model and relationship updates.',
-  },
-  penny: {
-    title: 'Penny Command',
-    subtitle: 'Penny AI signals — capability flags, prompt reviews, and learner activity.',
-  },
-  knowledge: {
-    title: 'Knowledge Library',
-    subtitle: 'Workspace signals for the Knowledge Library — source doc updates and Drive activity.',
-  },
-  admin: {
-    title: 'Administration',
-    subtitle: 'Workspace signals for Knowledge Management — setup tasks and configuration updates.',
-  },
-  navigator: {
-    title: 'Navigator',
-    subtitle: 'Workspace signals for the Navigator — map updates and capability changes.',
-  },
-  slack: {
-    title: 'Collaboration',
-    subtitle: 'Workspace signals — channel activity, routing updates, and communication signals.',
-  },
-  cohort: {
-    title: 'Cohort',
-    subtitle: 'Cohort workspace signals — learner activity and program progress.',
-  },
-  collaboration: {
-    title: 'Collaboration',
-    subtitle: 'Workspace signals for Collaboration — comm routing and channel activity.',
-  },
-  calendar: {
-    title: 'Calendar',
-    subtitle: 'Calendar and scheduling workspace signals.',
-  },
-  people: {
-    title: 'People',
-    subtitle: 'People and roles workspace signals.',
-  },
+  home:            { title: TERMS.missionControl,  subtitle: TERMS.signalSubtitle(TERMS.missionControl) },
+  operations:      { title: 'Operations',          subtitle: TERMS.signalSubtitle('Operations') },
+  program:         { title: 'Programs',            subtitle: TERMS.signalSubtitle('Programs') },
+  governance:      { title: 'Governance',          subtitle: TERMS.signalSubtitle('Governance') },
+  'digital-twin':  { title: TERMS.digitalTwin,     subtitle: TERMS.signalSubtitle(TERMS.digitalTwin) },
+  penny:           { title: TERMS.aiAssistant,     subtitle: TERMS.signalSubtitle(TERMS.aiAssistant) },
+  knowledge:       { title: 'Knowledge Library',   subtitle: TERMS.signalSubtitle('Knowledge Library') },
+  admin:           { title: 'Administration',      subtitle: TERMS.signalSubtitle('Administration') },
+  navigator:       { title: 'Navigator',           subtitle: TERMS.signalSubtitle('Navigator') },
+  slack:           { title: 'Collaboration',       subtitle: TERMS.signalSubtitle('Collaboration') },
+  cohort:          { title: 'Cohort',              subtitle: TERMS.signalSubtitle('Cohort') },
+  collaboration:   { title: 'Collaboration',       subtitle: TERMS.signalSubtitle('Collaboration') },
+  calendar:        { title: 'Calendar',            subtitle: TERMS.signalSubtitle('Calendar') },
+  people:          { title: 'People',              subtitle: TERMS.signalSubtitle('People') },
 };
 
 export function locationToContext(location: string): SlackPanelContext {
