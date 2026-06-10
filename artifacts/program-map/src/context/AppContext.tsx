@@ -56,6 +56,8 @@ interface AppState {
   messageTemplates: MessageTemplate[];
   actionPanel: ActionPanelConfig | null;
   slackPanel: SlackPanelConfig | null;
+  pennyPanelTab: 'penny' | 'signals' | 'ask';
+  setPennyPanelTab: (tab: 'penny' | 'signals' | 'ask') => void;
   setActivePage: (page: string) => void;
   setActiveLens: (lens: string) => void;
   setUserTier: (tier: AccessTier) => void;
@@ -87,6 +89,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [searchOpen, setSearchOpen]     = useState(false);
   const [actionPanel, setActionPanel]   = useState<ActionPanelConfig | null>(null);
   const [slackPanel,  setSlackPanel]    = useState<SlackPanelConfig | null>(null);
+  const [pennyPanelTab, setPennyPanelTab] = useState<'penny' | 'signals' | 'ask'>('penny');
 
   const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
   const [recentContexts, setRecentContexts]   = useState<ActiveContext[]>([]);
@@ -158,6 +161,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       commProviders, commRoutes, messageTemplates,
       actionPanel, openActionPanel, closeActionPanel,
       slackPanel, openSlackPanel, closeSlackPanel,
+      pennyPanelTab, setPennyPanelTab,
       setActivePage, setActiveLens, setUserTier, setSelectedItem, setSearchOpen,
       setActiveContext,
       updateProgram, updateDocument, updateResolvePhase,

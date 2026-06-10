@@ -30,7 +30,7 @@ const PROGRAM_COLORS: Record<string, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const { programs, openSlackPanel } = useAppContext();
+  const { programs, openSlackPanel, setPennyPanelTab } = useAppContext();
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, setLocation] = useLocation();
 
@@ -38,7 +38,6 @@ export default function Home() {
   const quickActions = isEveryday
     ? [
         { icon: Map,      label: 'My Programs',      path: '/program',           primary: true  },
-        { icon: Bot,      label: 'Ask Penny',         path: '/penny/test',        primary: false },
         { icon: BookOpen, label: 'Knowledge Library', path: '/knowledge/library', primary: false },
         { icon: Users,    label: 'My Cohort',         path: '/program',           primary: false },
       ]
@@ -111,11 +110,13 @@ export default function Home() {
           );
         })}
         <button
-          onClick={() => openSlackPanel({ context: 'home', title: isEveryday ? 'My Trail Signals' : TERMS.missionControl, subtitle: TERMS.signalSubtitle(isEveryday ? 'My Dashboard' : TERMS.missionControl) })}
+          onClick={() => isEveryday
+            ? setPennyPanelTab('signals')
+            : openSlackPanel({ context: 'home', title: TERMS.missionControl, subtitle: TERMS.signalSubtitle(TERMS.missionControl) })}
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border border-[#4A154B]/20 text-[#4A154B] hover:bg-[#4A154B]/[0.04] transition-colors whitespace-nowrap ml-auto"
         >
           <Layers className="w-3 h-3" />
-          {TERMS.trailSignals}
+          {isEveryday ? 'Trail Insights' : TERMS.trailSignals}
         </button>
       </div>
 

@@ -16,10 +16,12 @@ import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
 import { locationToContext, getSignalPanelConfig, SIGNAL_COUNTS } from '@/data/signalCounts';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
+import { useTierFlags } from '@/hooks/useTierFlags';
 
 export function ContextPanel() {
-  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel } = useAppContext();
+  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel, setPennyPanelTab } = useAppContext();
   const [location, setLocation] = useLocation();
+  const { isEveryday } = useTierFlags();
 
   // ── Focus / Brief mode ────────────────────────────────────────────────────
   const [collapsed, setCollapsed] = useState(false);
@@ -1663,8 +1665,8 @@ export function ContextPanel() {
         ──────────────────────────────────────────────────────────────────── */
         <button
           onClick={() => setCollapsed(false)}
-          aria-label="Expand Knowledge Brief"
-          title="Expand Knowledge Brief"
+          aria-label="Open Trail Insights"
+          title="Open Trail Insights"
           className="flex-1 w-full flex flex-col items-center justify-center gap-3 py-6
             hover:bg-primary/5 hover:border-primary transition-all duration-200
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary
@@ -1680,7 +1682,7 @@ export function ContextPanel() {
               text-muted-foreground/40 group-hover:text-primary/70"
             style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
-            Knowledge Brief
+            Trail Insights
           </span>
         </button>
       ) : (
@@ -1724,20 +1726,36 @@ export function ContextPanel() {
                 : TERMS.knowledgeBrief
               }
             </h3>
-            {/* Labeled collapse button — obvious, not a bare icon */}
-            <button
-              onClick={() => setCollapsed(true)}
-              aria-label="Collapse panel"
-              title="Collapse to Focus Mode"
-              className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
-                text-muted-foreground bg-muted/50 border border-border/60
-                hover:bg-muted hover:text-foreground hover:border-border
-                transition-all duration-150
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              Focus
-              <ChevronRight className="w-3 h-3" />
-            </button>
+            {/* Header action button — Trail Insights in Penny mode, Focus collapse in Brief mode */}
+            {(!selectedItem && !actionPanel && !slackPanel) ? (
+              <button
+                onClick={() => setPennyPanelTab('signals')}
+                aria-label="View Trail Insights"
+                title="View Trail Insights"
+                className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
+                  text-violet-700 bg-violet-50 border border-violet-200
+                  hover:bg-violet-100 hover:text-violet-800 hover:border-violet-300
+                  transition-all duration-150
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
+              >
+                Trail Insights
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setCollapsed(true)}
+                aria-label="Collapse panel"
+                title="Collapse panel"
+                className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
+                  text-muted-foreground bg-muted/50 border border-border/60
+                  hover:bg-muted hover:text-foreground hover:border-border
+                  transition-all duration-150
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                Focus
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
           {/* ── Trail Signals nudge strip ───────────────────────────────────
@@ -1747,7 +1765,7 @@ export function ContextPanel() {
           ──────────────────────────────────────────────────────────────── */}
           {!actionPanel && !slackPanel && nudgeCounts && nudgeCounts.total > 0 && (
             <button
-              onClick={handleNudgeClick}
+              onClick={isEveryday ? () => setPennyPanelTab('signals') : handleNudgeClick}
               className="group w-full flex items-center gap-2 px-3 py-1.5 border-b shrink-0
                 bg-amber-50/40 border-amber-100/80 hover:bg-amber-50
                 transition-colors duration-150"
@@ -1783,7 +1801,7 @@ export function ContextPanel() {
               >
                 {actionPanel
                   ? <RailActionPanel config={actionPanel} onClose={closeActionPanel} />
-                  : slackPanel
+                  : (!isEveryday && slackPanel)
                   ? <SlackContextPanel config={slackPanel} onClose={closeSlackPanel} />
                   : renderContent()
                 }
