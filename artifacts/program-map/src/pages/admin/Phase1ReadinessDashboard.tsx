@@ -421,6 +421,104 @@ export default function Phase1ReadinessDashboard() {
           </div>
         </div>
 
+        {/* ── Trail Signals Roadmap ─────────────────────────────────── */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-3">
+            Trail Signals Roadmap
+          </p>
+          <div className="space-y-3">
+
+            {/* Phase 1 — active model */}
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">
+                  Phase 1 · Active
+                </span>
+                <span className="text-[12px] font-bold text-foreground">System-Driven Trail Signals</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+                In Phase 1, Trail Signals are assigned automatically by the platform — not configured by users.
+                The system selects signals based on four factors:
+              </p>
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                {[
+                  { label: 'Access tier',              detail: 'Everyday / Power User / Admin determines signal depth and source visibility' },
+                  { label: 'Org role / responsibility', detail: 'Your functional role determines which Required Signals always appear' },
+                  { label: 'Page context',              detail: 'Signals surface relevant to the hub or object currently in view' },
+                  { label: 'Digital Twin relationships',detail: 'Object connections in the Twin route related signals to the right people' },
+                ].map(f => (
+                  <div key={f.label} className="bg-white/70 border border-emerald-100 rounded-lg px-3 py-2">
+                    <p className="text-[11px] font-semibold text-foreground">{f.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{f.detail}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Role-based signal model */}
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+                Phase 1 signal model by role
+              </p>
+              <div className="space-y-1.5">
+                {[
+                  { tier: 'Everyday User',      dot: 'bg-emerald-500', signals: 'Simplified counts + visual health indicators + guided next actions — no source detail required' },
+                  { tier: 'Penny Power User',   dot: 'bg-violet-500',  signals: 'Penny quality metrics, source trust scores, usage analytics, learner/cohort intelligence, and deeper analytics' },
+                  { tier: 'Admin / Super Admin', dot: 'bg-amber-500',  signals: 'Integration health, governance flags, secrets status, full Digital Twin alerts, and system-level ops signals' },
+                ].map(r => (
+                  <div key={r.tier} className="flex items-start gap-2 bg-white/60 border border-emerald-100 rounded-lg px-3 py-2">
+                    <span className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${r.dot}`} />
+                    <div>
+                      <span className="text-[11px] font-semibold text-foreground">{r.tier}  </span>
+                      <span className="text-[11px] text-muted-foreground">{r.signals}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Required vs Optional note */}
+              <div className="mt-3 bg-emerald-100/60 border border-emerald-200 rounded-lg px-3 py-2">
+                <p className="text-[10px] font-bold text-emerald-800 mb-0.5">Required vs Optional Signals</p>
+                <p className="text-[11px] text-emerald-900 leading-snug">
+                  <span className="font-semibold">Required signals</span> come from your role and responsibility — they cannot be hidden because ignoring them would create a blind spot in your accountability area.
+                  <span className="font-semibold"> Optional signals</span> are contextual and informational — in Phase 2 users will control these. Phase 1 shows both without distinction.
+                </p>
+              </div>
+            </div>
+
+            {/* Phase 2 — deferred parking lot */}
+            <div className="rounded-xl border border-dashed border-border bg-muted/10 p-4">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 bg-muted border border-border px-2 py-0.5 rounded-full">
+                    Phase 2 · Deferred
+                  </span>
+                  <span className="text-[12px] font-bold text-foreground">My Trail Signals Control Center</span>
+                </div>
+                <span className="text-[9px] text-muted-foreground/50 flex-shrink-0">Requires Phase 1 live data first</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+                Once Phase 1 data connections are live, users will be able to customize what enters their Trail Signals feed.
+                Required signals (role + responsibility) remain always-on; optional signals become user-controlled.
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: 'Personal watch rules',       detail: 'Add custom triggers — "notify me when program capacity exceeds 85%"' },
+                  { label: 'Custom urgency thresholds',  detail: 'Define what counts as urgent for your context and role' },
+                  { label: 'Urgency descriptions',       detail: 'Label urgency in terms that match your team\'s language' },
+                  { label: 'Digest vs alert mode',       detail: 'Choose real-time alerts or a daily digest per signal category' },
+                  { label: 'Mute optional signals',      detail: 'Silence signals that aren\'t relevant to your work this sprint' },
+                  { label: 'Required signals always on', detail: 'Role/responsibility signals stay visible — no blind spots created' },
+                ].map(item => (
+                  <div key={item.label} className="bg-white/50 border border-border/60 rounded-lg px-3 py-2 opacity-70">
+                    <p className="text-[11px] font-semibold text-foreground">{item.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         {/* Footer note */}
         <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">About These Scores</p>

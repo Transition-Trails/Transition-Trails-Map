@@ -970,7 +970,23 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
       {activeTool === 'calendar' && <Phase2Section tool="calendar" />}
 
       {/* Footer */}
-      <div className="px-3 py-2 border-t border-[#4A154B]/15 flex-shrink-0 bg-white">
+      <div className="px-3 pt-2 pb-2.5 border-t border-[#4A154B]/15 flex-shrink-0 bg-white space-y-1.5">
+        {/* Phase 1 system-driven notice */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-[8px] font-bold uppercase tracking-wider text-[#4A154B]/40 bg-[#4A154B]/5 border border-[#4A154B]/10 px-1.5 py-0.5 rounded-full">
+            Phase 1
+          </span>
+          <span className="text-[9px] text-muted-foreground/50">
+            Signals are system-driven — assigned by tier, role &amp; page context.
+          </span>
+          <a
+            href="/admin/phase1-readiness"
+            className="text-[9px] text-[#4A154B]/50 hover:text-[#4A154B] transition-colors ml-auto flex-shrink-0 underline underline-offset-2"
+          >
+            Phase 2 roadmap →
+          </a>
+        </div>
+        {/* Integration links */}
         <div className="flex items-center gap-2">
           <a
             href="/collaboration/slack"
