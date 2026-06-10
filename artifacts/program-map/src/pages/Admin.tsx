@@ -19,15 +19,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import AccessRolesMatrix from '@/pages/admin/AccessRolesMatrix';
 
 type AdminView = 'home' | 'programs' | 'documents' | 'resolve' | 'penny' | 'trailOs' | 'integrations'
-  | 'roles' | 'templates' | 'users' | 'permissions' | 'settings';
+  | 'roles' | 'templates' | 'users' | 'permissions' | 'settings' | 'access';
 
 const URL_SECTION_MAP: Partial<Record<string, AdminView>> = {
   programs: 'programs', documents: 'documents', resolve: 'resolve',
   'trail-os': 'trailOs', penny: 'penny', roles: 'roles',
   templates: 'templates', integrations: 'integrations',
   users: 'users', permissions: 'permissions', settings: 'settings',
+  'access-roles': 'access',
 };
 
 // ─── Main ──────────────────────────────────────────────────────────────────────
@@ -53,9 +55,8 @@ export default function Admin() {
     setSearch('');
   }
 
-  if (view === 'home') {
-    return <AdminHome onNavigate={navigate} />;
-  }
+  if (view === 'home')   return <AdminHome onNavigate={navigate} />;
+  if (view === 'access') return <AccessRolesMatrix onBack={() => navigate('home')} />;
 
   return (
     <AreaEditor
@@ -182,6 +183,15 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
       borderColor: 'border-border hover:border-border/60',
       iconBg: 'bg-muted text-muted-foreground',
       description: 'Global platform settings — branding, environment configuration, and system preferences.',
+    },
+    {
+      id: 'access' as AdminView,
+      icon: <Shield className="w-5 h-5" />,
+      label: 'Access & Roles',
+      count: 4,
+      borderColor: 'border-indigo-200 hover:border-indigo-400',
+      iconBg: 'bg-indigo-50 text-indigo-700',
+      description: 'Google Groups → Trail OS role mapping, navigation visibility matrix, feature capabilities, and Google Sign-In setup.',
     },
   ];
 
@@ -361,6 +371,7 @@ function AreaEditor({
     users: 'Users',
     permissions: 'Permissions',
     settings: 'Settings',
+    access: 'Access & Roles',
   };
 
   const STUB_VIEWS = new Set<AdminView>(['roles', 'templates', 'users', 'permissions', 'settings']);

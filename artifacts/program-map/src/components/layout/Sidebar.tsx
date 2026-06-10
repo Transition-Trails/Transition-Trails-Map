@@ -4,8 +4,13 @@ import {
   Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
   ChevronDown, Search, Target,
 } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
+import { type AccessTier, canAccess, TIER_CONFIG } from '@/config/accessTiers';
 
-type NavItem  = { path: string; label: string; isLabel?: false } | { label: string; isLabel: true };
+type NavItem =
+  | { id: string; path: string; label: string; isLabel?: false; minTier?: AccessTier }
+  | { id: string; label: string; isLabel: true };
+
 type NavGroup = {
   id: string;
   label: string;
@@ -13,20 +18,22 @@ type NavGroup = {
   pathPrefix: string;
   extraPrefixes?: string[];
   items: NavItem[];
+  minTier?: AccessTier;
 };
 
 const navGroups: NavGroup[] = [
   {
     id: 'digital-twin',
+    minTier: 'power',
     label: 'Digital Twin',
     icon: Network,
     pathPrefix: '/digital-twin',
     extraPrefixes: ['/uom', '/governance'],
     items: [
-      { path: '/digital-twin',              label: 'Explore' },
-      { path: '/digital-twin/map',          label: 'Map' },
-      { path: '/digital-twin/impact',       label: 'Impact' },
-      { path: '/digital-twin/governance',   label: 'Governance' },
+      { id: 'dt-explore',    path: '/digital-twin',              label: 'Explore' },
+      { id: 'dt-map',        path: '/digital-twin/map',          label: 'Map',        minTier: 'admin' },
+      { id: 'dt-impact',     path: '/digital-twin/impact',       label: 'Impact',     minTier: 'admin' },
+      { id: 'dt-governance', path: '/digital-twin/governance',   label: 'Governance', minTier: 'admin' },
     ],
   },
   {
@@ -35,11 +42,12 @@ const navGroups: NavGroup[] = [
     icon: Activity,
     pathPrefix: '/operations',
     items: [
-      { path: '/operations',              label: 'Executive Overview' },
-      { path: '/operations/health',       label: 'Health Indicators' },
-      { path: '/operations/integrations', label: 'Integration Readiness' },
-      { path: '/operations/scorecards',   label: 'Scorecards' },
-      { path: '/operations/trends',       label: 'Trends & Insights' },
+      { id: 'ops-overview',      path: '/operations',              label: 'Executive Overview' },
+      { id: 'ops-health',        path: '/operations/health',       label: 'Health Indicators' },
+      { id: 'ops-integrations',  path: '/operations/integrations', label: 'Integration Readiness', minTier: 'power' },
+      { id: 'ops-scorecards',    path: '/operations/scorecards',   label: 'Scorecards',            minTier: 'power' },
+      { id: 'ops-trends',        path: '/operations/trends',       label: 'Trends & Insights',     minTier: 'power' },
+      { id: 'ops-demand',        path: '/operations/demand',       label: 'Demand',                minTier: 'power' },
     ],
   },
   {
@@ -48,11 +56,11 @@ const navGroups: NavGroup[] = [
     icon: GraduationCap,
     pathPrefix: '/program',
     items: [
-      { path: '/program',            label: 'Programs' },
-      { path: '/program/standards',  label: 'Standards' },
-      { path: '/program/blueprint',  label: 'Blueprint' },
-      { path: '/program/salesforce', label: 'Salesforce Arch' },
-      { path: '/program/resources',  label: 'Resources' },
+      { id: 'prog-programs',   path: '/program',            label: 'Programs' },
+      { id: 'prog-standards',  path: '/program/standards',  label: 'Standards',       minTier: 'power' },
+      { id: 'prog-blueprint',  path: '/program/blueprint',  label: 'Blueprint' },
+      { id: 'prog-salesforce', path: '/program/salesforce', label: 'Salesforce Arch', minTier: 'power' },
+      { id: 'prog-resources',  path: '/program/resources',  label: 'Resources',       minTier: 'power' },
     ],
   },
   {
@@ -61,12 +69,12 @@ const navGroups: NavGroup[] = [
     icon: Brain,
     pathPrefix: '/penny',
     items: [
-      { path: '/penny',              label: 'Capabilities' },
-      { path: '/penny/prompts',      label: 'Prompt Studio' },
-      { path: '/penny/learners',     label: 'Learners' },
-      { path: '/penny/intelligence', label: 'Intelligence' },
-      { path: '/penny/trail-os-map', label: 'Trail OS Map' },
-      { path: '/penny/test',         label: 'Test Penny' },
+      { id: 'penny-capabilities',  path: '/penny',              label: 'Capabilities',  minTier: 'power' },
+      { id: 'penny-prompts',       path: '/penny/prompts',      label: 'Prompt Studio', minTier: 'power' },
+      { id: 'penny-learners',      path: '/penny/learners',     label: 'Learners' },
+      { id: 'penny-intelligence',  path: '/penny/intelligence', label: 'Intelligence',  minTier: 'power' },
+      { id: 'penny-trail-os-map',  path: '/penny/trail-os-map', label: 'Trail OS Map',  minTier: 'power' },
+      { id: 'penny-test',          path: '/penny/test',         label: 'Test Penny',    minTier: 'power' },
     ],
   },
   {
@@ -75,11 +83,11 @@ const navGroups: NavGroup[] = [
     icon: BookOpen,
     pathPrefix: '/knowledge',
     items: [
-      { path: '/knowledge',               label: 'Sources' },
-      { path: '/knowledge/library',       label: 'Library' },
-      { path: '/knowledge/relationships', label: 'Relationships' },
-      { path: '/knowledge/memory',        label: 'Org Memory' },
-      { path: '/knowledge/search',        label: 'Search' },
+      { id: 'know-sources',       path: '/knowledge',               label: 'Sources',        minTier: 'power' },
+      { id: 'know-library',       path: '/knowledge/library',       label: 'Library' },
+      { id: 'know-relationships', path: '/knowledge/relationships', label: 'Relationships',  minTier: 'power' },
+      { id: 'know-memory',        path: '/knowledge/memory',        label: 'Org Memory',     minTier: 'power' },
+      { id: 'know-search',        path: '/knowledge/search',        label: 'Search' },
     ],
   },
   {
@@ -88,31 +96,33 @@ const navGroups: NavGroup[] = [
     icon: MessageSquare,
     pathPrefix: '/collaboration',
     items: [
-      { path: '/collaboration',               label: 'Overview' },
-      { path: '/collaboration/slack',         label: 'Slack' },
-      { path: '/collaboration/drive',         label: 'Google Drive' },
-      { path: '/collaboration/calendar',      label: 'Google Calendar' },
-      { path: '/collaboration/channels',      label: 'Channels' },
-      { path: '/collaboration/templates',     label: 'Templates' },
+      { id: 'collab-overview',   path: '/collaboration',               label: 'Overview' },
+      { id: 'collab-slack',      path: '/collaboration/slack',         label: 'Slack',            minTier: 'power' },
+      { id: 'collab-drive',      path: '/collaboration/drive',         label: 'Google Drive',     minTier: 'power' },
+      { id: 'collab-calendar',   path: '/collaboration/calendar',      label: 'Google Calendar' },
+      { id: 'collab-channels',   path: '/collaboration/channels',      label: 'Channels',         minTier: 'power' },
+      { id: 'collab-templates',  path: '/collaboration/templates',     label: 'Templates',        minTier: 'power' },
     ],
   },
   {
     id: 'admin',
+    minTier: 'admin',
     label: 'Administration',
     icon: Settings,
     pathPrefix: '/admin',
     items: [
-      { path: '/admin',          label: 'Setup' },
-      { path: '/admin/programs', label: 'Programs' },
-      { path: '/admin/people',   label: 'People & Roles' },
-      { path: '/admin/roles',    label: 'Roles' },
-      { path: '/admin/penny',    label: 'Penny' },
-      { path: '/admin/settings', label: 'Settings' },
-      { label: 'Integrations', isLabel: true },
-      { path: '/admin/secrets-audit',  label: 'Secrets Audit' },
-      { path: '/admin/google-oauth',   label: 'Google Auth Setup' },
-      { label: 'Readiness', isLabel: true },
-      { path: '/admin/phase1-readiness', label: 'Phase 1 Readiness' },
+      { id: 'admin-setup',     path: '/admin',               label: 'Setup' },
+      { id: 'admin-programs',  path: '/admin/programs',      label: 'Programs' },
+      { id: 'admin-people',    path: '/admin/people',        label: 'People & Roles' },
+      { id: 'admin-roles',     path: '/admin/roles',         label: 'Roles' },
+      { id: 'admin-penny',     path: '/admin/penny',         label: 'Penny' },
+      { id: 'admin-settings',  path: '/admin/settings',      label: 'Settings' },
+      { id: 'admin-access',    path: '/admin/access-roles',  label: 'Access & Roles' },
+      { id: 'lbl-integrations', label: 'Integrations', isLabel: true },
+      { id: 'admin-secrets',   path: '/admin/secrets-audit', label: 'Secrets Audit' },
+      { id: 'admin-gauth',     path: '/admin/google-oauth',  label: 'Google Auth Setup' },
+      { id: 'lbl-readiness',   label: 'Readiness', isLabel: true },
+      { id: 'admin-readiness', path: '/admin/phase1-readiness', label: 'Phase 1 Readiness' },
     ],
   },
 ];
@@ -128,11 +138,23 @@ function calcMaxHeight(items: NavItem[]): number {
 
 export function Sidebar() {
   const [location, setLocation] = useLocation();
+  const { userTier } = useAppContext();
 
-  const activeGroupId = navGroups.find(g => isGroupActive(g, location))?.id;
+  // Filter groups and items by access tier
+  const visibleGroups = navGroups
+    .filter(g => canAccess(g.minTier, userTier))
+    .map(g => ({
+      ...g,
+      items: g.items.filter(item => {
+        if (item.isLabel) return true;
+        return canAccess(item.minTier, userTier);
+      }),
+    }));
+
+  const activeGroupId = visibleGroups.find(g => isGroupActive(g, location))?.id;
 
   const [openGroups, setOpenGroups] = useState<Set<string>>(
-    () => new Set([activeGroupId ?? 'digital-twin'])
+    () => new Set([activeGroupId ?? 'operations'])
   );
 
   useEffect(() => {
@@ -151,6 +173,8 @@ export function Sidebar() {
 
   const isSearch  = location === '/search';
   const isContext = location === '/context' || location.startsWith('/context/');
+
+  const tier = TIER_CONFIG[userTier];
 
   return (
     <div className="w-[220px] flex-shrink-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border">
@@ -197,11 +221,12 @@ export function Sidebar() {
 
         <div className="h-px bg-sidebar-border/60 mx-1 my-1" />
 
-        {/* Nav groups */}
-        {navGroups.map(group => {
+        {/* Nav groups — filtered by tier */}
+        {visibleGroups.map(group => {
           const isOpen        = openGroups.has(group.id);
           const groupActive   = isGroupActive(group, location);
           const Icon          = group.icon;
+          const visibleItems  = group.items;
 
           return (
             <div key={group.id}>
@@ -224,10 +249,10 @@ export function Sidebar() {
 
               <div
                 className="overflow-hidden transition-all duration-200 ease-in-out"
-                style={{ maxHeight: isOpen ? `${calcMaxHeight(group.items)}px` : '0px' }}
+                style={{ maxHeight: isOpen ? `${calcMaxHeight(visibleItems)}px` : '0px' }}
               >
                 <div className="ml-4 border-l border-sidebar-border/60 mt-0.5 mb-1 space-y-0.5">
-                  {group.items.map((item, idx) => {
+                  {visibleItems.map((item, idx) => {
                     if (item.isLabel) {
                       return (
                         <div key={`label-${idx}`} className="px-3 pt-2.5 pb-0.5">
@@ -241,7 +266,7 @@ export function Sidebar() {
                       (item.path !== group.pathPrefix && location.startsWith(item.path + '/'));
                     return (
                       <button
-                        key={item.path}
+                        key={item.id}
                         onClick={() => setLocation(item.path)}
                         className={`w-full text-left pl-3 pr-2 py-1.5 text-[12px] rounded-r-md transition-colors ${
                           isActive
@@ -260,9 +285,17 @@ export function Sidebar() {
         })}
       </div>
 
-      <div className="px-4 py-3 border-t border-sidebar-border flex-shrink-0">
-        <p className="text-[9px] font-bold text-amber-600 uppercase tracking-wider text-center">Phase 1 Architecture Consolidation</p>
-        <p className="text-[10px] text-muted-foreground text-center mt-0.5">v1.0 — Internal Prototype</p>
+      {/* Footer — tier badge + prototype note */}
+      <div className="px-3 py-2.5 border-t border-sidebar-border flex-shrink-0">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tier.dotClass}`} />
+          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${tier.badgeClass}`}>
+            {tier.shortLabel}
+          </span>
+          <span className="text-[9px] text-muted-foreground/50 font-medium uppercase tracking-wider">Prototype</span>
+        </div>
+        <p className="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Phase 1 Architecture</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">v1.0 — Internal Prototype</p>
       </div>
     </div>
   );
