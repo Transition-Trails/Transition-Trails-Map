@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Map, Search as SearchIcon, ChevronDown } from 'lucide-react';
+import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -114,7 +114,7 @@ function SignalsIndicator() {
   );
 }
 
-// ── Tier switcher — replaces Executive/Builder lens toggle ────────────────────
+// ── Tier segment config ───────────────────────────────────────────────────────
 
 const TIER_SEGMENTS: { tier: AccessTier; label: string; icon?: string }[] = [
   { tier: 'everyday',   label: 'Everyday' },
@@ -123,12 +123,54 @@ const TIER_SEGMENTS: { tier: AccessTier; label: string; icon?: string }[] = [
   { tier: 'superadmin', label: 'Super', icon: '★' },
 ];
 
-function TierSwitcher() {
-  const { userTier, setUserTier } = useAppContext();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+// Placeholder prototype user (replaced with real Google data post-auth)
+const PROTOTYPE_USER = {
+  name:     'Trail OS User',
+  email:    'prototype@transitiontrails.org',
+  initials: 'TT',
+  photoUrl: null as string | null,
+};
 
-  // Close dropdown when clicking outside
+// ── Section row used in the preferences list ──────────────────────────────────
+function PrefRow({ icon: Icon, label, hint, badge, onClick }: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  hint: string;
+  badge?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors text-left group"
+    >
+      <Icon className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] font-medium text-foreground leading-none">{label}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{hint}</p>
+      </div>
+      {badge ? (
+        <span className="text-[8px] font-bold uppercase tracking-wide bg-muted border border-border text-muted-foreground/60 px-1.5 py-0.5 rounded flex-shrink-0">
+          {badge}
+        </span>
+      ) : (
+        <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors flex-shrink-0" />
+      )}
+    </button>
+  );
+}
+
+// ── User profile button + panel ───────────────────────────────────────────────
+function UserProfileButton() {
+  const { userTier, setUserTier } = useAppContext();
+  const [open, setOpen]           = useState(false);
+  const ref                       = useRef<HTMLDivElement>(null);
+
+  const current      = TIER_CONFIG[userTier];
+  const isPreviewing = userTier !== 'superadmin';
+  const user         = PROTOTYPE_USER;
+
+  // Close panel on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -137,88 +179,168 @@ function TierSwitcher() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  const current = TIER_CONFIG[userTier];
-  const isPreviewing = userTier !== 'superadmin';
+  // Tier dot color overlay on avatar
+  const tierDot: Record<AccessTier, string> = {
+    everyday:   'bg-emerald-500',
+    power:      'bg-violet-500',
+    admin:      'bg-amber-500',
+    superadmin: 'bg-primary',
+  };
 
   return (
     <div className="relative" ref={ref}>
-      {/* Compact pill — shows current tier, click to open dropdown */}
+
+      {/* ── Avatar button ── */}
       <button
         onClick={() => setOpen(o => !o)}
-        className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-all duration-150 whitespace-nowrap ${
-          isPreviewing
-            ? `${current.colorClass} hover:opacity-90`
-            : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/15'
+        title={`Signed in as ${user.name} · ${current.label} view`}
+        className={`relative flex items-center justify-center w-7 h-7 rounded-full ring-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-primary/50 ${
+          open
+            ? `ring-primary/40 ring-offset-1 ring-offset-background`
+            : isPreviewing
+            ? `ring-${current.dotClass.replace('bg-', '')}/30 ring-offset-1 ring-offset-background hover:ring-primary/30`
+            : 'ring-border/60 hover:ring-primary/30 ring-offset-1 ring-offset-background'
         }`}
-        title={`Viewing as: ${current.label}. Click to switch tier.`}
       >
-        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${current.dotClass}`} />
-        {TIER_SEGMENTS.find(s => s.tier === userTier)?.icon && (
-          <span className="text-[9px] leading-none">{TIER_SEGMENTS.find(s => s.tier === userTier)?.icon}</span>
+        {user.photoUrl ? (
+          <img src={user.photoUrl} alt={user.name} className="w-full h-full rounded-full object-cover" />
+        ) : (
+          <div className="w-full h-full rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold select-none">
+            {user.initials}
+          </div>
         )}
-        <span>{current.shortLabel}</span>
-        {isPreviewing && (
-          <span className="text-[8px] opacity-60 font-normal ml-0.5">preview</span>
-        )}
-        <ChevronDown className={`w-3 h-3 opacity-50 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
+        {/* Tier dot — bottom-right overlay */}
+        <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-[1.5px] border-background ${tierDot[userTier]}`} />
       </button>
 
-      {/* Dropdown */}
+      {/* ── Profile panel dropdown ── */}
       {open && (
-        <div className="absolute right-0 top-[30px] z-50 w-[260px] bg-card border border-border rounded-xl shadow-lg overflow-hidden">
-          {/* Header */}
-          <div className="px-3 pt-2.5 pb-2 border-b border-border/60">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">View as tier</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Switch to preview what each access level sees.
-            </p>
-          </div>
+        <div className="absolute right-0 top-[36px] z-50 w-[310px] bg-card border border-border rounded-xl shadow-xl overflow-hidden">
 
-          {/* Tier options */}
-          {TIER_ORDER.map(tier => {
-            const cfg    = TIER_CONFIG[tier];
-            const seg    = TIER_SEGMENTS.find(s => s.tier === tier)!;
-            const active = userTier === tier;
-            return (
-              <button
-                key={tier}
-                onClick={() => { setUserTier(tier); setOpen(false); }}
-                className={`w-full flex items-start gap-2.5 px-3 py-2.5 text-left transition-colors ${
-                  active ? 'bg-muted/60' : 'hover:bg-muted/40'
-                }`}
-              >
-                <span className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${cfg.badgeClass} border`}>
-                  {seg.icon
-                    ? <span className="text-[9px]">{seg.icon}</span>
-                    : <span className={`w-2 h-2 rounded-full ${cfg.dotClass}`} />}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[12px] font-semibold text-foreground">{cfg.label}</span>
-                    {active && (
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                        Active
-                      </span>
-                    )}
-                    {tier !== 'superadmin' && (
-                      <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded border ${cfg.badgeClass}`}>
-                        {cfg.groupLabel}
-                      </span>
-                    )}
+          {/* ── Identity header ── */}
+          <div className="px-4 py-3.5 border-b border-border bg-muted/20">
+            <div className="flex items-center gap-3">
+              {/* Large avatar */}
+              <div className="relative w-10 h-10 flex-shrink-0">
+                {user.photoUrl ? (
+                  <img src={user.photoUrl} alt={user.name} className="w-full h-full rounded-full object-cover ring-2 ring-border" />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold ring-2 ring-border select-none">
+                    {user.initials}
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{cfg.description}</p>
-                </div>
-              </button>
-            );
-          })}
+                )}
+                <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${tierDot[userTier]}`} />
+              </div>
 
-          {/* Footer */}
-          <div className="px-3 py-2 border-t border-border/60 bg-muted/20">
-            <p className="text-[9px] text-muted-foreground/60 leading-snug">
-              <span className="font-semibold text-muted-foreground/80">Prototype mode</span> — tier controls navigation visibility only.
-              Future: Google Workspace SSO assigns tiers automatically via group membership.
+              {/* Name + email */}
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-foreground truncate">{user.name}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+              </div>
+
+              {/* Prototype badge */}
+              <span className="text-[8px] font-bold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700 px-1.5 py-0.5 rounded flex-shrink-0">
+                Prototype
+              </span>
+            </div>
+
+            {/* Current tier pill */}
+            <div className={`mt-2.5 inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full border ${current.badgeClass}`}>
+              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tierDot[userTier]}`} />
+              {current.label}
+              {isPreviewing && <span className="font-normal opacity-60 ml-0.5">· previewing</span>}
+            </div>
+          </div>
+
+          {/* ── View as / Tier switcher ── */}
+          <div className="px-4 py-3 border-b border-border">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">View As</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {TIER_ORDER.map(tier => {
+                const cfg    = TIER_CONFIG[tier];
+                const seg    = TIER_SEGMENTS.find(s => s.tier === tier)!;
+                const active = userTier === tier;
+                return (
+                  <button
+                    key={tier}
+                    onClick={() => setUserTier(tier)}
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-colors border text-[11px] font-medium ${
+                      active
+                        ? `${cfg.badgeClass} shadow-sm`
+                        : 'border-border/60 text-muted-foreground hover:bg-muted/50 hover:text-foreground bg-transparent'
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tierDot[tier]}`} />
+                    {seg.icon && <span className="text-[9px] leading-none mr-[-2px]">{seg.icon}</span>}
+                    <span className="flex-1 truncate">{cfg.shortLabel}</span>
+                    {active && <span className="text-[8px] opacity-50 font-normal">active</span>}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[9px] text-muted-foreground/50 mt-2 leading-snug">
+              Super Admin can preview any tier. Future: assigned automatically via Google Groups.
             </p>
           </div>
+
+          {/* ── Preferences ── */}
+          <div className="py-1">
+            <div className="px-4 pt-2 pb-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">Preferences</p>
+            </div>
+            <PrefRow
+              icon={Layers}
+              label="Trail Signals"
+              hint="Configure signal channels and alert thresholds"
+              badge="Soon"
+            />
+            <PrefRow
+              icon={Bell}
+              label="Notifications"
+              hint="Email, Slack, and in-app notification rules"
+              badge="Soon"
+            />
+            <PrefRow
+              icon={Monitor}
+              label="Display & Accessibility"
+              hint="Theme, density, font size, and contrast"
+              badge="Soon"
+            />
+            <PrefRow
+              icon={User}
+              label="Profile Preferences"
+              hint="Name, timezone, language, and defaults"
+              badge="Soon"
+            />
+          </div>
+
+          {/* ── Google account section ── */}
+          <div className="px-4 py-3 border-t border-border bg-muted/10">
+            <div className="flex items-start gap-2.5">
+              <Chrome className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-[11px] font-semibold text-foreground">Google Account</p>
+                  <span className="text-[8px] font-bold bg-sky-50 border border-sky-200 text-sky-700 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                    Q3 Planned
+                  </span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                  Sign-in, profile photo, and tier assignment via Google Workspace SSO + Groups.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Sign out stub ── */}
+          <div className="px-4 py-2 border-t border-border">
+            <button className="w-full flex items-center gap-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors py-1 group">
+              <LogOut className="w-3.5 h-3.5 flex-shrink-0 group-hover:text-rose-500 transition-colors" />
+              <span className="group-hover:text-rose-600 transition-colors">Sign out</span>
+              <span className="ml-auto text-[8px] opacity-40 font-medium">prototype only</span>
+            </button>
+          </div>
+
         </div>
       )}
     </div>
@@ -247,10 +369,9 @@ export function Topbar() {
         <span className="text-sm text-foreground font-medium truncate">{title}</span>
       </div>
 
-      {/* Right — signals + tier switcher + search */}
+      {/* Right — signals + search + user profile */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <SignalsIndicator />
-        <TierSwitcher />
         <Button
           variant="ghost" size="icon"
           className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground"
@@ -259,6 +380,7 @@ export function Topbar() {
         >
           <SearchIcon className="w-3.5 h-3.5" />
         </Button>
+        <UserProfileButton />
       </div>
     </div>
   );

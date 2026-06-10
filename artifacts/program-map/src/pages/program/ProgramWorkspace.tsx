@@ -2,11 +2,12 @@ import { useMemo } from 'react';
 import { GraduationCap } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
+import { useTierFlags } from '@/hooks/useTierFlags';
 import { ObjectWorkspace, HealthDot, StatusBadge } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
 import type { Program } from '@/data/programs';
 
-// ── Tab content components ─────────────────────────────────────────────────────
+// ── Shared utilities ───────────────────────────────────────────────────────────
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
@@ -38,10 +39,9 @@ function ChipList({ items }: { items: string[] }) {
   );
 }
 
+// ── Tab components ─────────────────────────────────────────────────────────────
 function OverviewTab({ p }: { p: Program }) {
-  const healthMap: Record<string, 'healthy' | 'needs-attention' | 'incomplete'> = {
-    'confirmed': 'healthy', 'needs-review': 'needs-attention', 'draft': 'incomplete', 'deprecated': 'incomplete',
-  };
+  const { isEveryday } = useTierFlags();
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-3xl">
@@ -49,12 +49,12 @@ function OverviewTab({ p }: { p: Program }) {
           <p className="text-[13px] text-muted-foreground italic leading-relaxed border-l-4 border-primary/20 pl-4">{p.executiveSummary}</p>
         )}
         <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-          <InfoRow label="Audience"      value={p.audience} />
-          <InfoRow label="Format"        value={p.format} />
-          <InfoRow label="Duration"      value={p.duration} />
-          <InfoRow label="Prerequisite"  value={p.prerequisite || '—'} />
-          <InfoRow label="Core Outcome"  value={p.coreOutcome} />
-          <InfoRow label="Source of Truth" value={p.sourceDoc} />
+          <InfoRow label="Audience"     value={p.audience} />
+          <InfoRow label="Format"       value={p.format} />
+          <InfoRow label="Duration"     value={p.duration} />
+          <InfoRow label="Prerequisite" value={p.prerequisite || '—'} />
+          <InfoRow label="Core Outcome" value={p.coreOutcome} />
+          {!isEveryday && <InfoRow label="Source of Truth" value={p.sourceDoc} />}
           <InfoRow label="Strategic Role" value={p.strategicRole} />
         </div>
         {p.whyItMatters && (
@@ -76,7 +76,7 @@ function OverviewTab({ p }: { p: Program }) {
             </ul>
           </Section>
         )}
-        {p.whatBreaksIfMissing && (
+        {!isEveryday && p.whatBreaksIfMissing && (
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
             <p className="text-[10px] font-bold text-rose-700 uppercase mb-1">What Breaks if Missing</p>
             <p className="text-[12px] text-rose-800 leading-relaxed">{p.whatBreaksIfMissing}</p>
@@ -125,11 +125,16 @@ function BlueprintTab({ p }: { p: Program }) {
 }
 
 function PennyTab({ p }: { p: Program }) {
+  const { isEveryday } = useTierFlags();
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Penny AI capabilities that are activated or planned for this program.</p>
-        <Section title="Active Penny Features">
+        <p className="text-[12px] text-muted-foreground">
+          {isEveryday
+            ? 'Penny features available in this program to help you with coaching, feedback, and learning activities.'
+            : 'Penny AI capabilities that are activated or planned for this program.'}
+        </p>
+        <Section title={isEveryday ? 'Available Penny Features' : 'Active Penny Features'}>
           {p.pennyFeatures?.length > 0 ? (
             <div className="space-y-2">
               {p.pennyFeatures.map(f => (
@@ -144,20 +149,22 @@ function PennyTab({ p }: { p: Program }) {
             <p className="text-[12px] text-muted-foreground">No Penny features mapped yet.</p>
           )}
         </Section>
-        <Section title="Related Concepts">
-          {p.relatedConcepts?.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5">
-              {p.relatedConcepts.map((rc, i) => (
-                <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-foreground">
-                  {rc.label}
-                  <span className="ml-1 text-muted-foreground/60">{rc.type}</span>
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="text-[12px] text-muted-foreground">No related concepts mapped.</p>
-          )}
-        </Section>
+        {!isEveryday && (
+          <Section title="Related Concepts">
+            {p.relatedConcepts?.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {p.relatedConcepts.map((rc, i) => (
+                  <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-foreground">
+                    {rc.label}
+                    <span className="ml-1 text-muted-foreground/60">{rc.type}</span>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[12px] text-muted-foreground">No related concepts mapped.</p>
+            )}
+          </Section>
+        )}
       </div>
     </ScrollArea>
   );
@@ -193,7 +200,7 @@ function SystemsTab({ p }: { p: Program }) {
 function HealthTab({ p }: { p: Program }) {
   const isHealthy = p.confidence === 'confirmed';
   const indicators = [
-    { label:'Blueprint Compliance',  status: p.confidence === 'confirmed' ? 'healthy' : 'needs-attention', note: p.confidence === 'confirmed' ? 'Fully compliant with Program Blueprint v2' : 'Review required' },
+    { label:'Blueprint Compliance',   status: p.confidence === 'confirmed' ? 'healthy' : 'needs-attention', note: p.confidence === 'confirmed' ? 'Fully compliant with Program Blueprint v2' : 'Review required' },
     { label:'Salesforce Data Quality',status:'healthy',         note:'94% field completion across program records' },
     { label:'Penny Integration',      status: (p.pennyFeatures?.length ?? 0) > 0 ? 'healthy' : 'needs-attention', note: (p.pennyFeatures?.length ?? 0) > 0 ? `${p.pennyFeatures.length} features active` : 'No Penny features activated' },
     { label:'Knowledge Sources',      status:'healthy',         note:'Knowledge registry linkage confirmed' },
@@ -225,6 +232,7 @@ function HealthTab({ p }: { p: Program }) {
 // ── ProgramWorkspace ──────────────────────────────────────────────────────────
 export default function ProgramWorkspace() {
   const { programs } = useAppContext();
+  const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
 
   const items = useMemo<WorkspaceItem[]>(() => programs.map(p => ({
     id: p.id,
@@ -236,13 +244,15 @@ export default function ProgramWorkspace() {
     statusVariant: p.confidence === 'confirmed' ? ('active' as const) : ('planning' as const),
     health: p.confidence === 'confirmed' ? ('healthy' as const) : ('needs-attention' as const),
     secondary: `${p.format} · ${p.duration}`,
-    owner: 'Program Director',
-    confidence: p.confidence === 'confirmed' ? 91 : 72,
-  })), [programs]);
+    owner: !isEveryday ? 'Program Director' : undefined,
+    confidence: !isEveryday ? (p.confidence === 'confirmed' ? 91 : 72) : undefined,
+  })), [programs, isEveryday]);
 
   const tabs = useMemo<WorkspaceTab[]>(() => [
     { id:'overview',   label:'Overview',    render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <OverviewTab p={p} /> : null; } },
-    { id:'blueprint',  label:'Blueprint',   render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <BlueprintTab p={p} /> : null; } },
+    ...(isPowerOrAbove ? [
+      { id:'blueprint',  label:'Blueprint',   render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <BlueprintTab p={p} /> : null; } },
+    ] : []),
     { id:'curriculum', label:'Curriculum',  render:() => (
       <ScrollArea className="h-full">
         <div className="p-5 max-w-2xl">
@@ -259,10 +269,14 @@ export default function ProgramWorkspace() {
         </div>
       </ScrollArea>
     )},
-    { id:'penny',      label:'Penny',       render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <PennyTab p={p} /> : null; } },
-    { id:'systems',    label:'Systems',     render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <SystemsTab p={p} /> : null; } },
-    { id:'health',     label:'Health',      render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <HealthTab p={p} /> : null; } },
-  ], [programs]);
+    { id:'penny', label: isEveryday ? 'Penny Help' : 'Penny', render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <PennyTab p={p} /> : null; } },
+    ...(isPowerOrAbove ? [
+      { id:'systems', label:'Systems', render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <SystemsTab p={p} /> : null; } },
+    ] : []),
+    ...(isAdminOrAbove ? [
+      { id:'health', label:'Health', render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <HealthTab p={p} /> : null; } },
+    ] : []),
+  ], [programs, isEveryday, isPowerOrAbove, isAdminOrAbove]);
 
   return (
     <ObjectWorkspace
@@ -270,7 +284,11 @@ export default function ProgramWorkspace() {
       items={items}
       tabs={tabs}
       emptyTitle="Select a program"
-      emptyBody="Choose a program from the list to explore its blueprint alignment, curriculum, Penny features, systems, and health."
+      emptyBody={
+        isEveryday
+          ? 'Choose a program to see its schedule, your cohort, upcoming sessions, and Penny support.'
+          : 'Choose a program from the list to explore its blueprint alignment, curriculum, Penny features, systems, and health.'
+      }
     />
   );
 }

@@ -1,44 +1,49 @@
 import type { ReactNode } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { useTierFlags } from '@/hooks/useTierFlags';
 import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import {
   Activity, Users, Inbox, Brain,
   ArrowRight, AlertTriangle, CheckCircle2, Lightbulb,
-  Plus, BarChart3, FileText, Bot, Map, Layers,
+  Plus, BarChart3, FileText, Bot, Map, Layers, BookOpen,
 } from 'lucide-react';
 
-// ── Prototype data ────────────────────────────────────────────────────────────
-
-const ACTIVITY_ITEMS = [
-  { id: 'a1', icon: Bot,      catCls: 'bg-violet-100 text-violet-700', cat: 'Penny',    text: "Learning Coach flagged low confidence on Cohort 3 recap", time: '8m' },
-  { id: 'a2', icon: Inbox,    catCls: 'bg-amber-100 text-amber-700',   cat: 'Demand',   text: "New intake case — Explorer's Trail expansion", time: '23m' },
-  { id: 'a3', icon: Users,    catCls: 'bg-sky-100 text-sky-700',       cat: 'Cohort',   text: 'Guided Trail Cohort 1 · Week 3 materials uploaded', time: '1h' },
-  { id: 'a4', icon: Activity, catCls: 'bg-emerald-100 text-emerald-700',cat: 'Health',  text: 'Foundations Trail capacity at 89%', time: '2h' },
-  { id: 'a5', icon: FileText, catCls: 'bg-indigo-100 text-indigo-700', cat: 'Knowledge',text: 'Source Mapping updated — RESOLVE Course Canvas', time: '3h' },
+// ── Activity items — tagged by minimum tier to show ───────────────────────────
+const ALL_ACTIVITY = [
+  { id: 'a1', icon: Bot,      catCls: 'bg-violet-100 text-violet-700', cat: 'Penny',    text: "Learning Coach flagged low confidence on Cohort 3 recap",         time: '8m',  minPower: false },
+  { id: 'a2', icon: Inbox,    catCls: 'bg-amber-100 text-amber-700',   cat: 'Demand',   text: "New intake case — Explorer's Trail expansion",                    time: '23m', minPower: true  },
+  { id: 'a3', icon: Users,    catCls: 'bg-sky-100 text-sky-700',       cat: 'Cohort',   text: 'Guided Trail Cohort 1 · Week 3 materials uploaded',               time: '1h',  minPower: false },
+  { id: 'a4', icon: Activity, catCls: 'bg-emerald-100 text-emerald-700',cat: 'Programs', text: 'Foundations Trail cohort at 89% capacity',                       time: '2h',  minPower: false },
+  { id: 'a5', icon: FileText, catCls: 'bg-indigo-100 text-indigo-700', cat: 'Knowledge',text: 'Sprint 3 Resume Writing materials updated',                       time: '3h',  minPower: false },
+  { id: 'a6', icon: FileText, catCls: 'bg-indigo-100 text-indigo-700', cat: 'Knowledge',text: 'Source Mapping updated — RESOLVE Course Canvas',                  time: '3h',  minPower: true  },
 ];
 
-const PENNY_BULLETS = [
+const PENNY_BULLETS_EVERYDAY = [
+  "Guided Trail Cohort 1 · Week 3 of 8 — on track",
+  "Foundations Trail Cohort 2 approaching capacity (89%)",
+  "Your upcoming sessions: Sprint 3 Resume Workshop — Thursday",
+  "Penny is ready to help with your resume review",
+];
+
+const PENNY_BULLETS_POWER = [
   "Guided Trail Cohort 1 · Week 3 of 8 — on track",
   "Foundations Trail Cohort 2 approaching capacity (89%)",
   "Trail of Mastery · Solve phase — sprint review needed before Q3",
+  "234 Penny interactions this week · 1 Learning Coach confidence flag",
   "5 open demand items · 2 change requests pending triage",
-  "234 Penny interactions · 1 Learning Coach confidence flag",
 ];
 
-const ATTENTION = [
-  { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',   text: 'Execute phase needs source documentation review',    icon_cls: 'text-amber-500' },
-  { icon: Lightbulb,     bg: 'bg-sky-50 border-sky-200',       text: 'Trail of Mastery — schedule Q3 sprint review',       icon_cls: 'text-sky-500' },
+const ATTENTION_EVERYDAY = [
+  { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200',  text: "Explorer's Trail Cohort 3 active · 12 of 15 enrolled",   icon_cls: 'text-emerald-500' },
+  { icon: Lightbulb,    bg: 'bg-sky-50 border-sky-200',          text: 'Sprint 3 Resume Workshop starts Thursday — materials ready', icon_cls: 'text-sky-500' },
+  { icon: AlertTriangle,bg: 'bg-amber-50 border-amber-200',      text: 'Foundations Trail Cohort 2 filling up — 89% capacity',    icon_cls: 'text-amber-500' },
+];
+
+const ATTENTION_POWER = [
+  { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',    text: 'Execute phase needs source documentation review',    icon_cls: 'text-amber-500' },
+  { icon: Lightbulb,     bg: 'bg-sky-50 border-sky-200',        text: 'Trail of Mastery — schedule Q3 sprint review',       icon_cls: 'text-sky-500' },
   { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200',text: "Explorer's Trail Cohort 3 active · 12 of 15 enrolled", icon_cls: 'text-emerald-500' },
-];
-
-const QUICK_ACTIONS = [
-  { icon: Plus,      label: 'Create Demand Request', path: '/operations/demand',   primary: true  },
-  { icon: Inbox,     label: 'Review Cases',          path: '/operations/demand',   primary: false },
-  { icon: BarChart3, label: 'Program Health',        path: '/operations/health',   primary: false },
-  { icon: Bot,       label: 'Test Penny',            path: '/penny/test',          primary: false },
-  { icon: FileText,  label: 'Knowledge Library',     path: '/knowledge/library',   primary: false },
-  { icon: Map,       label: 'Program Map',           path: '/program',             primary: false },
 ];
 
 const PROGRAM_COLORS: Record<string, string> = {
@@ -53,22 +58,73 @@ const PROGRAM_COLORS: Record<string, string> = {
 
 export default function Home() {
   const { programs, openSlackPanel } = useAppContext();
+  const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, setLocation] = useLocation();
+
+  // Tier-aware quick actions
+  const quickActions = isEveryday
+    ? [
+        { icon: Map,      label: 'My Programs',      path: '/program',           primary: true  },
+        { icon: Bot,      label: 'Ask Penny',         path: '/penny/test',        primary: false },
+        { icon: BookOpen, label: 'Knowledge Library', path: '/knowledge/library', primary: false },
+        { icon: Users,    label: 'My Cohort',         path: '/program',           primary: false },
+      ]
+    : isPowerOrAbove && !isAdminOrAbove
+    ? [
+        { icon: Map,      label: 'Program Map',       path: '/program',           primary: false },
+        { icon: Bot,      label: 'Test Penny',        path: '/penny/test',        primary: false },
+        { icon: BarChart3,label: 'Program Health',    path: '/operations/health', primary: false },
+        { icon: FileText, label: 'Knowledge Library', path: '/knowledge/library', primary: false },
+      ]
+    : [
+        { icon: Plus,      label: 'Create Demand Request', path: '/operations/demand',   primary: true  },
+        { icon: Inbox,     label: 'Review Cases',          path: '/operations/demand',   primary: false },
+        { icon: BarChart3, label: 'Program Health',        path: '/operations/health',   primary: false },
+        { icon: Bot,       label: 'Test Penny',            path: '/penny/test',          primary: false },
+        { icon: FileText,  label: 'Knowledge Library',     path: '/knowledge/library',   primary: false },
+        { icon: Map,       label: 'Program Map',           path: '/program',             primary: false },
+      ];
+
+  // Tier-aware activity feed
+  const activityItems = isEveryday
+    ? ALL_ACTIVITY.filter(a => !a.minPower)
+    : ALL_ACTIVITY;
+
+  // Tier-aware attention & penny bullets
+  const attention    = isEveryday ? ATTENTION_EVERYDAY : ATTENTION_POWER;
+  const pennyBullets = isEveryday ? PENNY_BULLETS_EVERYDAY : PENNY_BULLETS_POWER;
+
+  // Status strip metrics (simplified for everyday)
+  const metrics = isEveryday
+    ? [
+        { label: 'My Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
+        { label: 'Cohort Learners',value: '47',  icon: Users,  cls: 'text-sky-600' },
+        { label: 'Upcoming Tasks', value: '3',   icon: Inbox,  cls: 'text-amber-600' },
+        { label: 'Penny nudges',   value: '12',  icon: Brain,  cls: 'text-violet-600' },
+      ]
+    : [
+        { label: 'Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
+        { label: 'Learners',    value: '47',  icon: Users,  cls: 'text-sky-600' },
+        { label: 'Open Demand', value: '5',   icon: Inbox,  cls: 'text-amber-600' },
+        { label: 'Penny / wk', value: '234', icon: Brain,  cls: 'text-violet-600' },
+      ];
 
   return (
     <div className="h-full w-full flex flex-col p-4 gap-3 overflow-hidden">
 
       {/* ── Header ── */}
       <div className="flex-shrink-0 flex items-baseline gap-2">
-        <h1 className="text-2xl font-serif font-bold text-foreground leading-none">Mission Control</h1>
+        <h1 className="text-2xl font-serif font-bold text-foreground leading-none">
+          {isEveryday ? 'My Dashboard' : 'Mission Control'}
+        </h1>
         <span className="text-[10px] font-medium text-muted-foreground/50 bg-muted/50 border border-border/60 px-1.5 py-0.5 rounded leading-none">
           Prototype Data
         </span>
       </div>
 
-      {/* ── Quick Actions — command toolbar ── */}
-      <div className="flex-shrink-0 flex items-center gap-1.5">
-        {QUICK_ACTIONS.map(a => {
+      {/* ── Quick Actions ── */}
+      <div className="flex-shrink-0 flex items-center gap-1.5 flex-wrap">
+        {quickActions.map(a => {
           const Icon = a.icon;
           return (
             <button
@@ -86,7 +142,7 @@ export default function Home() {
           );
         })}
         <button
-          onClick={() => openSlackPanel({ context: 'home', title: TERMS.missionControl, subtitle: TERMS.signalSubtitle(TERMS.missionControl) })}
+          onClick={() => openSlackPanel({ context: 'home', title: isEveryday ? 'My Trail Signals' : TERMS.missionControl, subtitle: TERMS.signalSubtitle(isEveryday ? 'My Dashboard' : TERMS.missionControl) })}
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border border-[#4A154B]/20 text-[#4A154B] hover:bg-[#4A154B]/[0.04] transition-colors whitespace-nowrap ml-auto"
         >
           <Layers className="w-3 h-3" />
@@ -94,14 +150,9 @@ export default function Home() {
         </button>
       </div>
 
-      {/* ── Status strip — 4 primary signals ── */}
+      {/* ── Status strip ── */}
       <div className="flex-shrink-0 flex items-stretch rounded-xl border border-border/60 bg-white/80 shadow-sm overflow-hidden">
-        {[
-          { label: 'Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
-          { label: 'Learners',    value: '47',  icon: Users,  cls: 'text-sky-600' },
-          { label: 'Open Demand', value: '5',   icon: Inbox,  cls: 'text-amber-600' },
-          { label: 'Penny / wk', value: '234', icon: Brain,  cls: 'text-violet-600' },
-        ].map((m, i) => {
+        {metrics.map((m, i) => {
           const Icon = m.icon;
           return (
             <div key={m.label} className={`flex-1 flex items-center gap-2.5 px-4 py-3 ${i > 0 ? 'border-l border-border/40' : ''}`}>
@@ -118,20 +169,17 @@ export default function Home() {
       {/* ── Scrollable body ── */}
       <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-0.5">
 
-        {/* ── 2-col: Activity + Penny/Attention ── */}
+        {/* ── 2-col layout ── */}
         <div className="grid grid-cols-5 gap-3">
 
           {/* Recent Activity */}
           <div className="col-span-3 space-y-1.5">
             <Label>Recent Activity</Label>
             <div className="rounded-xl border border-border/60 bg-white/80 shadow-sm overflow-hidden">
-              {ACTIVITY_ITEMS.map((item, i) => {
+              {activityItems.map((item, i) => {
                 const Icon = item.icon;
                 return (
-                  <div
-                    key={item.id}
-                    className={`flex items-start gap-2.5 px-3 py-2.5 ${i < ACTIVITY_ITEMS.length - 1 ? 'border-b border-border/30' : ''}`}
-                  >
+                  <div key={item.id} className={`flex items-start gap-2.5 px-3 py-2.5 ${i < activityItems.length - 1 ? 'border-b border-border/30' : ''}`}>
                     <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 ${item.catCls}`}>
                       <Icon className="w-3 h-3" />
                     </div>
@@ -143,51 +191,47 @@ export default function Home() {
                 );
               })}
               <div className="border-t border-border/30 px-3 py-2">
-                <button
-                  onClick={() => setLocation('/operations/health')}
-                  className="flex items-center gap-1 text-[10px] text-primary hover:underline font-medium"
-                >
+                <button onClick={() => setLocation('/operations/health')} className="flex items-center gap-1 text-[10px] text-primary hover:underline font-medium">
                   View All Activity <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Right: Penny Briefing + Attention */}
+          {/* Right: Penny + Attention */}
           <div className="col-span-2 space-y-3">
 
-            {/* Penny Briefing */}
+            {/* Penny */}
             <div>
-              <Label>Penny Briefing</Label>
+              <Label>{isEveryday ? 'Penny — Your Learning Assistant' : 'Penny Briefing'}</Label>
               <div className="rounded-xl border border-violet-200 bg-violet-50/60 shadow-sm px-3 py-2.5 mt-1.5">
                 <div className="flex items-center gap-1.5 mb-2">
                   <div className="w-4 h-4 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0">
                     <Bot className="w-2.5 h-2.5 text-white" />
                   </div>
-                  <span className="text-[9px] font-bold text-violet-700 uppercase tracking-wide">Penny · Chief of Staff</span>
+                  <span className="text-[9px] font-bold text-violet-700 uppercase tracking-wide">
+                    {isEveryday ? 'Penny · Your Coach' : 'Penny · Chief of Staff'}
+                  </span>
                 </div>
                 <ul className="space-y-1">
-                  {PENNY_BULLETS.map((b, i) => (
+                  {pennyBullets.map((b, i) => (
                     <li key={i} className="flex items-start gap-1.5 text-[10px] text-violet-900 leading-snug">
                       <span className="text-violet-400 flex-shrink-0 mt-px leading-none">•</span>
                       {b}
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => setLocation('/penny/intelligence')}
-                  className="flex items-center gap-1 text-[10px] text-violet-600 hover:underline font-medium mt-2"
-                >
-                  View Full Brief <ArrowRight className="w-2.5 h-2.5" />
+                <button onClick={() => setLocation(isEveryday ? '/penny/test' : '/penny/intelligence')} className="flex items-center gap-1 text-[10px] text-violet-600 hover:underline font-medium mt-2">
+                  {isEveryday ? 'Ask Penny a question' : 'View Full Brief'} <ArrowRight className="w-2.5 h-2.5" />
                 </button>
               </div>
             </div>
 
-            {/* Executive Attention */}
+            {/* Attention */}
             <div>
               <Label>Attention</Label>
               <div className="space-y-1.5 mt-1.5">
-                {ATTENTION.map((a, i) => {
+                {attention.map((a, i) => {
                   const Icon = a.icon;
                   return (
                     <div key={i} className={`flex items-start gap-2 px-2.5 py-2 rounded-lg border text-[10px] ${a.bg}`}>
@@ -204,7 +248,7 @@ export default function Home() {
 
         {/* ── Program Portfolio ── */}
         <div className="pb-4">
-          <Label>Program Portfolio</Label>
+          <Label>{isEveryday ? 'My Programs' : 'Program Portfolio'}</Label>
           <div className="rounded-xl border border-border/60 bg-white/80 shadow-sm overflow-hidden mt-1.5">
             {programs.map((p, i) => {
               const dot = PROGRAM_COLORS[p.id] ?? 'bg-muted';

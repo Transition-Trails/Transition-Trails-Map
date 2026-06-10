@@ -174,8 +174,6 @@ export function Sidebar() {
   const isSearch  = location === '/search';
   const isContext = location === '/context' || location.startsWith('/context/');
 
-  const tier = TIER_CONFIG[userTier];
-
   return (
     <div className="w-[220px] flex-shrink-0 flex flex-col h-full bg-sidebar border-r border-sidebar-border">
       <div className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
@@ -285,17 +283,10 @@ export function Sidebar() {
         })}
       </div>
 
-      {/* Footer — tier badge + prototype note */}
-      <div className="px-3 py-2.5 border-t border-sidebar-border flex-shrink-0">
-        <div className="flex items-center gap-1.5 mb-1">
-          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tier.dotClass}`} />
-          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${tier.badgeClass}`}>
-            {tier.shortLabel}
-          </span>
-          <span className="text-[9px] text-muted-foreground/50 font-medium uppercase tracking-wider">Prototype</span>
-        </div>
-        <p className="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Phase 1 Architecture</p>
-        <p className="text-[10px] text-muted-foreground mt-0.5">v1.0 — Internal Prototype</p>
+      {/* Footer — build info only */}
+      <div className="px-3 py-2 border-t border-sidebar-border flex-shrink-0">
+        <p className="text-[9px] font-bold text-amber-600/70 uppercase tracking-wider">Phase 1 Architecture</p>
+        <p className="text-[9px] text-muted-foreground/40 mt-0.5">Trail OS v1.0 · Internal Prototype</p>
       </div>
     </div>
   );
