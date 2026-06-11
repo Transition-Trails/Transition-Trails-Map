@@ -81,7 +81,13 @@ function slackChannelIdFormat(v: string) {
   return { plausible: ok, hint: ok ? `${norm} — C/G prefix ✓` : `Value "${norm.slice(0, 4)}…" does not match Slack channel ID format (C.../G...).` };
 }
 function geminiKeyFormat(v: string) {
-  return { plausible: v.startsWith("AIza") && v.length >= 35, hint: v.startsWith("AIza") ? "AIza prefix ✓" : "Expected AIza prefix for Google API key." };
+  const legacy = v.startsWith("AIza") && v.length >= 35;
+  const newFmt  = v.startsWith("AQ.")  && v.length >= 35;
+  const plausible = legacy || newFmt;
+  const hint = legacy  ? "AIza prefix ✓ (legacy format)"
+             : newFmt  ? "AQ. prefix ✓ (new secure auth key format)"
+             : "Expected AIza… (legacy) or AQ.… (new Google AI Studio secure auth key).";
+  return { plausible, hint };
 }
 function githubPatFormat(v: string) {
   const ok = v.startsWith("ghp_") || v.startsWith("github_pat_") || v.startsWith("gho_");
@@ -141,7 +147,7 @@ function buildCatalog(): SecretEntry[] {
     { id: "google-cal-refresh",   primary: "GOOGLE_CALENDAR_REFRESH_TOKEN", alts: ["GCAL_REFRESH_TOKEN", "GOOGLE_CAL_REFRESH_TOKEN"], integration: "Google Calendar", category: "OAuth Token", required: true,  purpose: "Persistent access token for Google Calendar API — cohort sessions, coaching events, Penny reminders.", nextFix: "Complete Calendar OAuth flow with calendar.readonly, calendar.events scopes. Store as GOOGLE_CALENDAR_REFRESH_TOKEN.", fmtCheck: googleRefreshTokenFormat },
 
     // ── Gemini / Penny AI ──────────────────────────────────────────────────
-    { id: "gemini-api-key",       primary: "GEMINI_API_KEY",            alts: ["GOOGLE_AI_API_KEY", "GOOGLE_AI_KEY", "PALM_API_KEY", "VERTEX_AI_API_KEY"], integration: "Gemini / Penny AI", category: "API Key", required: true,  purpose: "Authenticates all Penny (Gemini) AI requests — capability responses, assessments, coaching prompts, Trail Quests.", nextFix: "Google AI Studio (aistudio.google.com) → Get API Key → copy key starting with AIza.", fmtCheck: geminiKeyFormat },
+    { id: "gemini-api-key",       primary: "GEMINI_API_KEY",            alts: ["GOOGLE_AI_API_KEY", "GOOGLE_AI_KEY", "PALM_API_KEY", "VERTEX_AI_API_KEY"], integration: "Gemini / Penny AI", category: "API Key", required: true,  purpose: "Authenticates all Penny (Gemini) AI requests — capability responses, assessments, coaching prompts, Trail Quests.", nextFix: "Google AI Studio (aistudio.google.com) → Get API Key. New keys start with AQ. (secure auth key format); legacy keys start with AIza. Both formats are accepted.", fmtCheck: geminiKeyFormat },
 
     // ── Salesforce ─────────────────────────────────────────────────────────
     // Auth is managed via Replit Connectors SDK (proxyFetch) — no client ID/secret/instance URL env vars needed.

@@ -51,7 +51,7 @@ const CARDS: BacklogCard[] = [
     hue: 'violet',
     dependencies: [
       'Phase 1 right panel (ContextBar) architecture stable',
-      'Valid Gemini API key (AIza prefix) set in Secrets Audit',
+      'Valid Gemini API key set in Secrets Audit (new AQ. format or legacy AIza format)',
       'Trail Signals schema finalised',
       'Penny capability architecture (Phase 1) complete',
     ],
@@ -297,7 +297,7 @@ const CARDS: BacklogCard[] = [
     hue: 'yellow',
     dependencies: [
       'Trail Signals schema and source registry finalised (Phase 1)',
-      'Gemini API key valid (AIza prefix confirmed in Secrets Audit)',
+      'Gemini API key valid and confirmed in Secrets Audit (AQ. or AIza format)',
       'Source-to-signal mapping defined (Salesforce record, Google doc, Slack message)',
       'Penny context architecture (Universal Side Panel, p2-ask-penny-panel)',
     ],

@@ -70,7 +70,7 @@ const AREAS: ReadinessArea[] = [
       'Trail OS API server running (Express 5, port 8080)',
       'Slack POC: 8 secrets configured — bot token, app token, signing secret, 3 channel IDs, client ID/secret',
       'Slack bot (@coachconnectbot) posting live to Penny AI and Admin channels — POC confirmed',
-      'GEMINI_API_KEY configured — format verified (AIza prefix), API reachable — key auth issue detected (see below)',
+      'GEMINI_API_KEY configured — format accepted (AQ. or AIza prefix), API reachable — key auth issue detected (see below)',
       'GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET live-validated — format correct, Google APIs reachable in 25ms',
       'Salesforce webhook secret configured (SALESFORCE_WEBHOOK_SECRET)',
       'GitHub PAT and webhook secret configured',

@@ -57,7 +57,10 @@ router.get("/gemini/validate", async (_req, res) => {
   }
 
   // ── Format check ───────────────────────────────────────────────────────────
-  const formatValid = apiKey.startsWith("AIza") && apiKey.length >= 35;
+  // Google AI Studio now issues keys in two formats:
+  //   Legacy:  AIza…  (39 chars, still valid)
+  //   New:     AQ.…   (new "secure auth key" format, ≥35 chars)
+  const formatValid = (apiKey.startsWith("AIza") || apiKey.startsWith("AQ.")) && apiKey.length >= 35;
   if (!formatValid) {
     return res.json({
       timestamp: new Date().toISOString(),
@@ -69,10 +72,10 @@ router.get("/gemini/validate", async (_req, res) => {
       modelSample: [],
       status: "format_invalid" as GeminiStatus,
       errorCode: null,
-      errorMessage: "GEMINI_API_KEY does not match expected format (should start with 'AIza' and be ≥35 characters).",
+      errorMessage: "GEMINI_API_KEY format not recognised. Expected AIza… (legacy) or AQ.… (new Google AI Studio secure auth key), min 35 characters.",
       permissionsReady: false,
       integrationReady: false,
-      nextStep: "Verify the key from Google AI Studio — it should start with AIza.",
+      nextStep: "Get a fresh key from Google AI Studio (aistudio.google.com) — new keys start with AQ., legacy keys start with AIza. Both are accepted.",
       durationMs: Date.now() - start,
     } satisfies GeminiValidationResult);
   }
