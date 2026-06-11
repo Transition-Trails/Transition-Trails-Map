@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
-import { TERMS } from '@/config/terminology';
 import {
   Network, Compass, Shield, GraduationCap, Brain, BookOpen,
   Users, Plug, X, ChevronRight, ArrowRight, ExternalLink,
@@ -662,47 +661,44 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-3xl">
+      <div className="p-4 max-w-3xl">
         {/* Framing */}
-        <div className="mb-6">
-          <p className="text-[18px] font-serif font-bold text-foreground mb-1">What would you like to explore?</p>
-          <p className="text-[13px] text-muted-foreground leading-relaxed max-w-xl">
-            Pick a thing, see what it touches, understand what changes, take the next action.
-            The Digital Twin is not a dashboard to browse — it's the place to answer relationship, dependency, ownership, and impact questions.
-          </p>
+        <div className="mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Digital Twin · Explore</p>
+          <p className="text-[11px] text-muted-foreground">Pick an object to see what it touches — relationships, health, ownership, and change impact.</p>
         </div>
 
         {/* Entry tiles */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5">
           {kinds.map(([kind, cfg]) => {
             const isExpanded = expanded === kind;
             return (
               <div key={kind}
-                className={`rounded-xl border-2 bg-white transition-all duration-150 overflow-hidden cursor-pointer
-                  ${isExpanded ? `${cfg.border} shadow-md` : 'border-border hover:border-primary/30 hover:shadow-sm'}`}
+                className={`rounded-lg border bg-white transition-all duration-150 overflow-hidden cursor-pointer
+                  ${isExpanded ? `${cfg.border} shadow-sm` : 'border-border hover:border-primary/30 hover:shadow-sm'}`}
                 onClick={() => setExpanded(isExpanded ? null : kind)}
               >
-                <div className="p-4">
-                  <div className="flex items-start gap-3 mb-2">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.accent}`}>
-                      {cfg.icon}
+                <div className="p-3">
+                  <div className="flex items-start gap-2.5 mb-1.5">
+                    <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${cfg.bg} ${cfg.accent}`}>
+                      <span className="scale-75">{cfg.icon}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-bold text-foreground leading-tight">{cfg.verb}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{cfg.description}</p>
+                      <p className="text-[12px] font-bold text-foreground leading-tight">{cfg.verb}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{cfg.description}</p>
                     </div>
                   </div>
                   {/* Quick example pills — always visible */}
-                  <div className="flex flex-wrap gap-1 mt-2">
+                  <div className="flex flex-wrap gap-1 mt-1.5">
                     {cfg.examples.slice(0, 3).map(ex => (
                       <button key={ex.id}
                         onClick={e => { e.stopPropagation(); onSelect({ kind, ...ex }); }}
-                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border transition-colors hover:opacity-80 ${cfg.bg} ${cfg.border} ${cfg.accent}`}>
+                        className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border transition-colors hover:opacity-80 ${cfg.bg} ${cfg.border} ${cfg.accent}`}>
                         {ex.name}
                       </button>
                     ))}
                     {cfg.examples.length > 3 && (
-                      <span className="text-[10px] text-muted-foreground px-1 py-0.5">+{cfg.examples.length - 3} more</span>
+                      <span className="text-[9px] text-muted-foreground px-1 py-0.5">+{cfg.examples.length - 3}</span>
                     )}
                   </div>
                 </div>
@@ -712,13 +708,13 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
                     {cfg.examples.map(ex => (
                       <button key={ex.id}
                         onClick={e => { e.stopPropagation(); onSelect({ kind, ...ex }); }}
-                        className="w-full text-left px-4 py-2.5 flex items-center gap-3 hover:bg-white/50 transition-colors group">
+                        className="w-full text-left px-3 py-2 flex items-center gap-2.5 hover:bg-white/50 transition-colors group">
                         <div className="flex-1 min-w-0">
-                          <p className={`text-[12px] font-semibold ${cfg.accent}`}>{ex.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{ex.subtitle}</p>
+                          <p className={`text-[11px] font-semibold ${cfg.accent}`}>{ex.name}</p>
+                          <p className="text-[9px] text-muted-foreground">{ex.subtitle}</p>
                         </div>
                         <StatusBadge status={ex.status} />
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
+                        <ChevronRight className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
                       </button>
                     ))}
                   </div>
@@ -729,11 +725,10 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
         </div>
 
         {/* Guidance footer */}
-        <div className="mt-6 flex items-start gap-3 rounded-lg border border-border bg-muted/20 px-4 py-3">
-          <Info className="w-4 h-4 text-muted-foreground/50 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Selecting an object opens a workspace showing its <strong>relationships</strong>, <strong>health</strong>, <strong>ownership</strong>, and <strong>recommended actions</strong>.
-            Switch to <strong>Map</strong> to see a visual graph, or <strong>Impact</strong> to trace what changes if this object changes.
+        <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-border bg-muted/20 px-3 py-2">
+          <Info className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0 mt-0.5" />
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            Selecting an object opens a workspace with <strong>relationships</strong>, <strong>health</strong>, <strong>ownership</strong>, and <strong>recommended actions</strong>. Use <strong>Map</strong> for a visual graph or <strong>Impact</strong> to trace change cascades.
           </p>
         </div>
       </div>
@@ -898,24 +893,21 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
 function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-3xl space-y-6">
+      <div className="p-4 max-w-3xl space-y-4">
 
         <div>
-          <p className="text-[18px] font-serif font-bold text-foreground mb-1">Governance &amp; Object Model</p>
-          <p className="text-[13px] text-muted-foreground leading-relaxed max-w-xl">
-            Deep tools for architects and operations leads managing the Trail OS data model, lifecycle compliance, and ownership structure.
-            These tools define the vocabulary and rules that every workspace uses.
-          </p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Digital Twin · Governance</p>
+          <p className="text-[11px] text-muted-foreground">Manage the Trail OS object model, lifecycle compliance, and ownership structure.</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2.5">
           {[
             {
               title: 'Object Model',
               subtitle: '36 core object types',
-              desc: 'Every object type used across Trail OS — relationships, source-of-truth system, ownership patterns, and health definitions.',
+              desc: 'Every object type — relationships, source-of-truth system, ownership patterns, and health definitions.',
               href: '/uom',
-              icon: <Layers className="w-5 h-5" />,
+              icon: <Layers className="w-4 h-4" />,
               accent: 'text-primary',
               bg: 'bg-primary/5',
               border: 'border-primary/20',
@@ -923,9 +915,9 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
             {
               title: 'Object Explorer',
               subtitle: 'Browse and filter all types',
-              desc: 'Interactive explorer — filter by category, search by name, view full profiles with relationship matrices.',
+              desc: 'Filter by category, search by name, view full profiles with relationship matrices.',
               href: '/uom/explorer',
-              icon: <Search className="w-5 h-5" />,
+              icon: <Search className="w-4 h-4" />,
               accent: 'text-violet-700',
               bg: 'bg-violet-50',
               border: 'border-violet-200',
@@ -933,9 +925,9 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
             {
               title: 'Lifecycle Models',
               subtitle: '8 lifecycle models',
-              desc: 'Lifecycle stages for program, knowledge, people, and infrastructure objects — with approval workflows and review cadences.',
+              desc: 'Lifecycle stages for program, knowledge, people, and infrastructure objects — with approval workflows.',
               href: '/governance/lifecycle',
-              icon: <RotateCcw className="w-5 h-5" />,
+              icon: <RotateCcw className="w-4 h-4" />,
               accent: 'text-teal-700',
               bg: 'bg-teal-50',
               border: 'border-teal-200',
@@ -943,34 +935,34 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
             {
               title: 'Ownership Matrix',
               subtitle: 'Role-based ownership',
-              desc: 'Ownership assignments across all object types — primary owners, content stewards, data owners, and AI curators.',
+              desc: 'Ownership assignments across all object types — primary owners, stewards, data owners, and AI curators.',
               href: '/governance/ownership',
-              icon: <Users className="w-5 h-5" />,
+              icon: <Users className="w-4 h-4" />,
               accent: 'text-amber-700',
               bg: 'bg-amber-50',
               border: 'border-amber-200',
             },
           ].map(item => (
             <button key={item.href} onClick={() => onNavigate(item.href)}
-              className={`text-left p-5 rounded-xl border-2 ${item.border} bg-white hover:shadow-md transition-all group`}>
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${item.bg} ${item.accent}`}>
+              className={`text-left p-3 rounded-lg border ${item.border} bg-white hover:shadow-sm transition-all group`}>
+              <div className={`w-7 h-7 rounded-md flex items-center justify-center mb-2 ${item.bg} ${item.accent}`}>
                 {item.icon}
               </div>
-              <p className="text-[13px] font-bold text-foreground mb-0.5">{item.title}</p>
-              <p className={`text-[10px] font-semibold uppercase tracking-wide mb-2 ${item.accent}`}>{item.subtitle}</p>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
-              <div className="flex items-center gap-1 mt-3 text-[11px] text-muted-foreground group-hover:text-primary transition-colors">
-                <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+              <p className="text-[12px] font-bold text-foreground mb-0.5">{item.title}</p>
+              <p className={`text-[9px] font-semibold uppercase tracking-wide mb-1.5 ${item.accent}`}>{item.subtitle}</p>
+              <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">{item.desc}</p>
+              <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground group-hover:text-primary transition-colors">
+                <span>Open</span><ChevronRight className="w-3 h-3" />
               </div>
             </button>
           ))}
         </div>
 
-        <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 flex items-start gap-3">
-          <Shield className="w-4 h-4 text-muted-foreground/50 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+        <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 flex items-start gap-2.5">
+          <Shield className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0 mt-0.5" />
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
             These tools define the shared vocabulary for Universal Object Profiles, Global Search, and Penny AI context loading.
-            Changes to the object model or lifecycle definitions affect all workspaces — coordinate with the Operations Lead before making structural changes.
+            Coordinate with the Operations Lead before making structural changes.
           </p>
         </div>
       </div>
@@ -981,7 +973,7 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function DigitalTwin() {
-  const { openSlackPanel } = useAppContext();
+  useAppContext();
   const [, setLocation] = useLocation();
   const { isAdminOrAbove } = useTierFlags();
   const [selected, setSelected] = useState<SelectedObject | null>(null);
@@ -1004,9 +996,6 @@ export default function DigitalTwin() {
           : 'Pick a thing, see what it touches, and understand how it connects to the rest of the platform.'
       }
       badge={selected ? selected.name : undefined}
-      actions={[
-        { id: 'signals', label: TERMS.trailSignals, icon: Layers, variant: 'secondary' as const, onClick: () => openSlackPanel({ context: 'digital-twin', title: TERMS.digitalTwin, subtitle: TERMS.signalSubtitle(TERMS.digitalTwin) }) },
-      ]}
       tabs={[
         {
           id: 'explore',

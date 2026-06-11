@@ -27,20 +27,20 @@ const DOMAIN_ICONS: Record<IntegrationDomain, typeof Database> = {
   'Penny Services':  Brain,
 };
 
-function ViewTab({ label, icon: Icon, active, count, onClick }: {
-  label: string; icon: typeof Database; active: boolean; count?: number; onClick: () => void;
+function ViewTab({ label, active, count, onClick }: {
+  label: string; active: boolean; count?: number; onClick: () => void;
 }) {
   return (
     <button onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all border ${
-        active ? 'bg-foreground text-background border-foreground'
-               : 'border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+      className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium border-b-2 transition-all whitespace-nowrap ${
+        active
+          ? 'border-foreground text-foreground'
+          : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
       }`}
     >
-      <Icon className="w-3.5 h-3.5" />
       {label}
       {count !== undefined && (
-        <span className={`text-[10px] font-bold rounded-full px-1.5 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
+        <span className={`text-[10px] font-bold rounded-full px-1 leading-none ${active ? 'text-foreground' : 'text-muted-foreground/60'}`}>{count}</span>
       )}
     </button>
   );
@@ -227,32 +227,18 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
 function OverviewView() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-6 max-w-3xl">
-        {/* Hero */}
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
-          <div className="flex items-start gap-3">
-            <Network className="w-8 h-8 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h2 className="text-[15px] font-bold font-serif text-foreground mb-1">Integration Readiness Center</h2>
-              <p className="text-[12px] text-foreground/80 leading-relaxed">
-                The planning and readiness workspace for all Trail OS integrations. No live APIs are connected yet.
-                This center defines the integration architecture, governance rules, readiness criteria, risks, and launch plan
-                so the team can prepare without writing code.
-              </p>
-            </div>
-          </div>
-        </div>
+      <div className="p-4 space-y-4 max-w-3xl">
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {[
-            { label: 'Integrations',     value: IRC_SUMMARY.total,          sub: 'planned',       cls: 'border-foreground/20 bg-foreground/5' },
-            { label: 'P1 Priority',      value: IRC_SUMMARY.p1Count,        sub: 'critical path', cls: 'border-primary/20 bg-primary/5' },
-            { label: 'Open Risks',       value: IRC_SUMMARY.openRisks,      sub: 'need mitigation', cls: 'border-amber-200 bg-amber-50' },
-            { label: 'Avg Readiness',    value: `${IRC_SUMMARY.avgReadiness}%`, sub: 'overall score', cls: IRC_SUMMARY.avgReadiness >= 50 ? 'border-green-200 bg-green-50' : 'border-rose-200 bg-rose-50' },
+            { label: 'Integrations',  value: IRC_SUMMARY.total,               sub: 'planned',         cls: 'border-foreground/20 bg-foreground/5' },
+            { label: 'P1 Priority',   value: IRC_SUMMARY.p1Count,             sub: 'critical path',   cls: 'border-primary/20 bg-primary/5' },
+            { label: 'Open Risks',    value: IRC_SUMMARY.openRisks,           sub: 'need mitigation', cls: 'border-amber-200 bg-amber-50' },
+            { label: 'Avg Readiness', value: `${IRC_SUMMARY.avgReadiness}%`,  sub: 'overall score',   cls: IRC_SUMMARY.avgReadiness >= 50 ? 'border-green-200 bg-green-50' : 'border-rose-200 bg-rose-50' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 text-center ${s.cls}`}>
-              <p className="text-2xl font-bold text-foreground">{s.value}</p>
+              <p className="text-xl font-bold text-foreground">{s.value}</p>
               <p className="text-[11px] font-semibold text-foreground/80">{s.label}</p>
               <p className="text-[10px] text-muted-foreground">{s.sub}</p>
             </div>
@@ -261,7 +247,7 @@ function OverviewView() {
 
         {/* Status breakdown */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">Integration Status</h3>
+          <h3 className="text-[12px] font-bold text-foreground mb-2">Integration Status</h3>
           <div className="space-y-2">
             {(Object.entries(IRC_SUMMARY.byStatus) as [IntegrationStatus, number][])
               .filter(([,c]) => c > 0)
@@ -283,7 +269,7 @@ function OverviewView() {
 
         {/* Domain readiness */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">Readiness by Domain</h3>
+          <h3 className="text-[12px] font-bold text-foreground mb-2">Readiness by Domain</h3>
           <div className="rounded-xl border border-border bg-white overflow-hidden">
             {DOMAIN_ORDER.map((domain, i) => {
               const domInts = integrations.filter(int => int.domain === domain);
@@ -309,7 +295,7 @@ function OverviewView() {
 
         {/* Launch timeline summary */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">Launch Phases</h3>
+          <h3 className="text-[12px] font-bold text-foreground mb-2">Launch Phases</h3>
           <div className="space-y-2">
             {launchMilestones.map(ms => {
               const stsCls = ms.status === 'In Planning' ? 'text-amber-700 bg-amber-50 border-amber-200'
@@ -411,12 +397,7 @@ function DataFlowView() {
   const selected = dataFlowNodes.find(n => n.id === selectedId);
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-          <p className="text-[12px] text-foreground/80 leading-relaxed">
-            How data moves through Trail OS. Salesforce is the system of record. Google Drive and LMS are content sources. Penny is the intelligence layer in the middle. Communications channels are delivery. Calendar is the timing trigger. Click any node to see its connections.
-          </p>
-        </div>
+      <div className="p-4 space-y-4 max-w-3xl">
 
         {/* Central architecture diagram */}
         <div className="rounded-xl border border-border bg-white p-5">
@@ -535,14 +516,12 @@ function AuthView() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0">
-        <p className="text-[11px] text-muted-foreground">
-          All required permissions and scopes across every integration. No credentials are stored here — this is the access planning document.
-          <span className="font-bold text-rose-700 ml-1">No credentials should be entered into Trail OS until security review is complete.</span>
-        </p>
+      <div className="px-4 py-2 border-b border-border bg-amber-50/60 flex-shrink-0 flex items-center gap-2">
+        <Lock className="w-3 h-3 text-rose-600 shrink-0" />
+        <p className="text-[11px] text-rose-800 font-medium">Access planning only — no credentials stored here. Do not enter credentials until security review is complete.</p>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-4">
+        <div className="p-4 space-y-3">
           {DOMAIN_ORDER.map(domain => {
             const domAuths = allAuth.filter(a => a.domain === domain);
             if (!domAuths.length) return null;
@@ -694,11 +673,6 @@ function SyncReadinessView() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0">
-        <p className="text-[11px] text-muted-foreground">
-          8-point readiness checklist across all active integrations. Green = confirmed ready. Amber = partial. Grey = not started yet.
-        </p>
-      </div>
       <ScrollArea className="flex-1">
         <div className="p-4 overflow-x-auto">
           <table className="w-full text-[10px]">
@@ -1045,16 +1019,19 @@ export default function IntegrationReadinessCenter() {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <ViewTab label="Overview"       icon={Network}      active={view === 'overview'}      onClick={() => setView('overview')} />
-          <ViewTab label="Catalog"        icon={Database}     active={view === 'catalog'}       count={IRC_SUMMARY.total} onClick={() => setView('catalog')} />
-          <ViewTab label="Data Flow Map"  icon={GitBranch}    active={view === 'data-flow'}     onClick={() => setView('data-flow')} />
-          <ViewTab label="Auth & Perms"   icon={Lock}         active={view === 'auth'}          onClick={() => setView('auth')} />
-          <ViewTab label="Field Mapping"  icon={MapPin}       active={view === 'field-mapping'} onClick={() => setView('field-mapping')} />
-          <ViewTab label="Sync Readiness" icon={Activity}     active={view === 'sync-readiness'} onClick={() => setView('sync-readiness')} />
-          <ViewTab label="Testing"        icon={ClipboardList} active={view === 'testing'}      onClick={() => setView('testing')} />
-          <ViewTab label="Risk Register"  icon={AlertTriangle} active={view === 'risks'}        count={IRC_SUMMARY.openRisks} onClick={() => setView('risks')} />
-          <ViewTab label="Launch Plan"    icon={Rocket}       active={view === 'launch'}        count={IRC_SUMMARY.phases} onClick={() => setView('launch')} />
+        {/* Two-group tab row — one line, no wrap */}
+        <div className="flex items-center border-b border-border mt-2 -mb-2.5 gap-0">
+          <ViewTab label="Overview"   active={view === 'overview'}      onClick={() => setView('overview')} />
+          <ViewTab label={`Catalog (${IRC_SUMMARY.total})`} active={view === 'catalog'} onClick={() => setView('catalog')} />
+          <ViewTab label="Data Flow"  active={view === 'data-flow'}     onClick={() => setView('data-flow')} />
+          <ViewTab label={`Risks (${IRC_SUMMARY.openRisks})`} active={view === 'risks'} onClick={() => setView('risks')} />
+          <ViewTab label={`Launch (${IRC_SUMMARY.phases})`}  active={view === 'launch'} onClick={() => setView('launch')} />
+          <div className="w-px h-4 bg-border mx-1.5 self-center" />
+          <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 pr-1 self-center">Admin</span>
+          <ViewTab label="Auth"         active={view === 'auth'}           onClick={() => setView('auth')} />
+          <ViewTab label="Fields"       active={view === 'field-mapping'}  onClick={() => setView('field-mapping')} />
+          <ViewTab label="Sync"         active={view === 'sync-readiness'} onClick={() => setView('sync-readiness')} />
+          <ViewTab label="Testing"      active={view === 'testing'}        onClick={() => setView('testing')} />
         </div>
       </div>
 
