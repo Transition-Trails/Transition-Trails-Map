@@ -1,8 +1,12 @@
-import { Activity, BarChart2, Puzzle, GitBranch, TrendingUp, ChevronRight, AlertTriangle, CheckCircle2, Target, RefreshCw } from 'lucide-react';
+import {
+  Activity, BarChart2, Puzzle, GitBranch, TrendingUp, ChevronRight,
+  AlertTriangle, CheckCircle2, Target, RefreshCw,
+} from 'lucide-react';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
+import { useTierFlags } from '@/hooks/useTierFlags';
 import {
   domainHealthData, recommendations, readinessScorecards, trendInsights,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG,
@@ -15,15 +19,19 @@ import Intake                      from '@/pages/demand/Intake';
 // ── Executive Overview ────────────────────────────────────────────────────────
 function ExecutiveOverview() {
   const { setSelectedItem } = useAppContext();
+  const { isEveryday } = useTierFlags();
   const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
 
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5">
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 flex items-center gap-2">
-          <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Phase 1 Architecture Consolidation</span>
-          <span className="text-[11px] text-amber-600">— Operations, Integrations, and Demand are unified here. Demand Management is now a section of this hub.</span>
-        </div>
+        {/* Phase 1 banner — admin/power only */}
+        {!isEveryday && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 flex items-center gap-2">
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Phase 1 Architecture Consolidation</span>
+            <span className="text-[11px] text-amber-600">— Operations, Integrations, and Demand are unified here. Demand Management is now a section of this hub.</span>
+          </div>
+        )}
 
         {/* Overall score row */}
         <div className="rounded-lg border border-border bg-white p-5 flex items-start gap-6">
@@ -34,10 +42,10 @@ function ExecutiveOverview() {
           </div>
           <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2">
             {[
-              { l: 'Critical',    v: recommendations.filter(r => r.priority === 'critical').length, c: 'text-rose-600' },
-              { l: 'High Priority', v: recommendations.filter(r => r.priority === 'high').length,   c: 'text-orange-600' },
-              { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,  c: 'text-rose-600' },
-              { l: 'Needs Work', v: domainHealthData.filter(d => d.level === 'needs-work').length,  c: 'text-amber-600' },
+              { l: 'Critical',       v: recommendations.filter(r => r.priority === 'critical').length, c: 'text-rose-600' },
+              { l: 'High Priority',  v: recommendations.filter(r => r.priority === 'high').length,     c: 'text-orange-600' },
+              { l: 'Domains At Risk',v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600' },
+              { l: 'Needs Work',     v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600' },
             ].map(s => (
               <div key={s.l} className="rounded-lg border border-border px-3 py-2.5">
                 <p className={`text-2xl font-bold font-serif ${s.c}`}>{s.v}</p>
@@ -71,7 +79,9 @@ function ExecutiveOverview() {
 
         {/* Critical + high priority recs */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Critical & High Priority Actions</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">
+            {isEveryday ? 'Items Needing Attention' : 'Critical & High Priority Actions'}
+          </p>
           <div className="space-y-1.5">
             {recommendations.filter(r => r.priority === 'critical' || r.priority === 'high').map(r => {
               const pc = REC_PRIORITY_CONFIG[r.priority];
@@ -82,7 +92,7 @@ function ExecutiveOverview() {
                   <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 shrink-0 ${pc.cls}`}>{pc.label}</span>
                   <span className="text-[12px] font-semibold text-foreground group-hover:text-primary flex-1 text-left">{r.action}</span>
                   <span className="text-[10px] text-muted-foreground shrink-0">{r.domain}</span>
-                  <span className="text-[10px] text-muted-foreground shrink-0">Effort: {r.effort}</span>
+                  {!isEveryday && <span className="text-[10px] text-muted-foreground shrink-0">Effort: {r.effort}</span>}
                   <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />
                 </button>
               );
@@ -94,47 +104,83 @@ function ExecutiveOverview() {
   );
 }
 
-// ── Health Indicators detail ──────────────────────────────────────────────────
+// ── Health Indicators — compact 2-column grid ─────────────────────────────────
+// UI rule: each card shows domain + score + top 3 checks + one key action.
+// No full-width long cards. Scroll only below the fold.
 function HealthIndicators() {
   const { setSelectedItem } = useAppContext();
+
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-4">
-        {domainHealthData.map(d => {
-          const dc = HEALTH_LEVEL_CONFIG[d.level];
-          return (
-            <div key={d.id} className="rounded-lg border border-border bg-white overflow-hidden">
-              <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between bg-muted/20">
-                <div>
-                  <p className="text-[13px] font-bold text-foreground">{d.domain}</p>
-                  <p className="text-[10px] text-muted-foreground">Source: {d.sourceSystem}</p>
+      <div className="p-4">
+        <div className="grid grid-cols-2 gap-3">
+          {domainHealthData.map(d => {
+            const dc       = HEALTH_LEVEL_CONFIG[d.level];
+            const topInds  = d.indicators.slice(0, 3);
+            const extra    = d.indicators.length - 3;
+            const firstBad = d.indicators.find(i => i.status === 'at-risk' || i.status === 'needs-work');
+
+            return (
+              <div key={d.id} className="rounded-lg border border-border bg-white overflow-hidden flex flex-col">
+
+                {/* Card header — clickable to open full detail */}
+                <button
+                  onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
+                  className="px-3 py-2.5 border-b border-border/50 bg-muted/20 flex items-center justify-between w-full text-left hover:bg-primary/5 transition-colors group"
+                >
+                  <div className="min-w-0 mr-2">
+                    <p className="text-[12px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{d.domain}</p>
+                    <p className="text-[9px] text-muted-foreground truncate">{d.sourceSystem}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dc.label}</span>
+                    <span className={`text-[22px] font-bold font-serif leading-none ${dc.score}`}>{d.score}</span>
+                  </div>
+                </button>
+
+                {/* Indicator rows */}
+                <div className="px-3 py-1.5 flex-1">
+                  {topInds.map(ind => {
+                    const ic  = HEALTH_LEVEL_CONFIG[ind.status];
+                    const dot =
+                      ind.status === 'strong' || ind.status === 'good'
+                        ? 'bg-emerald-400'
+                        : ind.status === 'needs-work'
+                        ? 'bg-amber-400'
+                        : 'bg-rose-400';
+                    return (
+                      <button
+                        key={ind.id}
+                        onClick={() => setSelectedItem({ type: 'healthIndicator', id: ind.id, data: ind })}
+                        className="w-full flex items-center gap-2 py-[5px] rounded hover:bg-primary/5 transition-colors group text-left"
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-px ${dot}`} />
+                        <span className="text-[10px] text-foreground group-hover:text-primary flex-1 truncate leading-tight">{ind.label}</span>
+                        <span className={`text-[8px] font-bold border rounded-full px-1 py-0.5 shrink-0 leading-tight ${ic.cls}`}>{ic.label}</span>
+                      </button>
+                    );
+                  })}
+                  {extra > 0 && (
+                    <button
+                      onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
+                      className="text-[9px] text-primary hover:underline pl-3.5 mt-0.5 block"
+                    >
+                      +{extra} more checks
+                    </button>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-[9px] font-bold border rounded-full px-2 py-0.5 ${dc.cls}`}>{dc.label}</span>
-                  <span className={`text-2xl font-bold font-serif ${dc.score}`}>{d.score}</span>
-                </div>
+
+                {/* Key next action */}
+                {firstBad && (
+                  <div className="px-3 py-1.5 border-t border-border/40 bg-amber-50/50">
+                    <p className="text-[8px] font-bold uppercase tracking-wide text-amber-700/70 mb-0.5">Next action</p>
+                    <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2">{firstBad.detail}</p>
+                  </div>
+                )}
               </div>
-              <div className="px-4 py-2">
-                {d.indicators.map(ind => {
-                  const ic = HEALTH_LEVEL_CONFIG[ind.status];
-                  const Icon = ind.status === 'strong' || ind.status === 'good' ? CheckCircle2 : AlertTriangle;
-                  return (
-                    <div key={ind.id}
-                      onClick={() => setSelectedItem({ type: 'healthIndicator', id: ind.id, data: ind })}
-                      className="flex items-start gap-2.5 py-1.5 border-b border-border/40 last:border-0 hover:bg-primary/5 cursor-pointer rounded transition-colors px-1 group">
-                      <Icon className={`w-3 h-3 mt-0.5 shrink-0 ${ind.status === 'strong' || ind.status === 'good' ? 'text-emerald-500' : ind.status === 'needs-work' ? 'text-amber-500' : 'text-rose-500'}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-semibold text-foreground group-hover:text-primary">{ind.label}</p>
-                        <p className="text-[10px] text-muted-foreground">{ind.detail}</p>
-                      </div>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${ic.cls}`}>{ic.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </ScrollArea>
   );
@@ -227,7 +273,7 @@ function AllRecommendations() {
     <ScrollArea className="h-full">
       <div className="p-6 space-y-2">
         {recommendations.map(r => {
-          const pc = REC_PRIORITY_CONFIG[r.priority];
+          const pc     = REC_PRIORITY_CONFIG[r.priority];
           const effort = { Low: 'text-emerald-600', Medium: 'text-amber-600', High: 'text-rose-600' }[r.effort];
           return (
             <button key={r.id}
@@ -248,29 +294,53 @@ function AllRecommendations() {
   );
 }
 
-const OPS_ACTIONS: ActionItem[] = [
-  { id: 'phase1',       label: 'Phase 1 Readiness',  icon: Target,     href: '/admin/phase1-readiness',  variant: 'primary'   },
-  { id: 'integrations', label: 'Integrations',        icon: Puzzle,     href: '/operations/integrations', variant: 'secondary' },
-  { id: 'recs',         label: 'Recommendations',     icon: ChevronRight, href: '/operations/recommendations', variant: 'secondary' },
-  { id: 'trends',       label: 'Trends & Insights',   icon: TrendingUp, href: '/operations/trends',       variant: 'secondary' },
-];
+// ── Hub ───────────────────────────────────────────────────────────────────────
+// UI audit rule: Everyday User pages must not have multiple nav/action rows
+// above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
 
 export default function OperationsHub() {
+  const { isEveryday, isAdminOrAbove } = useTierFlags();
+
+  const TABS = [
+    {
+      id: 'overview',
+      label: isEveryday ? 'Overview' : 'Executive Overview',
+      path: '/operations',
+      icon: BarChart2,
+      content: <ExecutiveOverview />,
+    },
+    ...(!isEveryday ? [
+      { id: 'health',       label: 'Health Indicators', path: '/operations/health',           icon: Activity,      content: <HealthIndicators /> },
+      { id: 'integrations', label: 'Integrations',      path: '/operations/integrations',     icon: Puzzle,        content: <IntegrationReadinessCenter /> },
+      { id: 'demand',       label: 'Demand',            path: '/operations/demand',           icon: GitBranch,     content: <Intake /> },
+      { id: 'scorecards',   label: 'Scorecards',        path: '/operations/scorecards',       icon: TrendingUp,    content: <ScorecardsView /> },
+      { id: 'trends',       label: 'Trends & Insights', path: '/operations/trends',           icon: AlertTriangle, content: <TrendsView /> },
+      { id: 'recs',         label: 'Recommendations',   path: '/operations/recommendations',  icon: ChevronRight,  content: <AllRecommendations /> },
+    ] : []),
+  ];
+
+  const ACTIONS: ActionItem[] = [
+    ...(isAdminOrAbove ? [
+      { id: 'phase1', label: 'Phase 1 Readiness', icon: Target, href: '/admin/phase1-readiness', variant: 'primary' as const },
+    ] : []),
+    ...(!isEveryday ? [
+      { id: 'integrations', label: 'Integrations',      icon: Puzzle,       href: '/operations/integrations',    variant: 'secondary' as const },
+      { id: 'recs',         label: 'Recommendations',   icon: ChevronRight, href: '/operations/recommendations', variant: 'secondary' as const },
+      { id: 'trends',       label: 'Trends & Insights', icon: TrendingUp,   href: '/operations/trends',          variant: 'secondary' as const },
+    ] : []),
+  ];
+
   return (
     <HubShell
       title="Operations"
       icon={Activity}
-      description="Executive health, domain indicators, integration readiness, demand pipeline, readiness scorecards, and strategic trends."
-      actions={OPS_ACTIONS}
-      tabs={[
-        { id: 'overview',    label: 'Executive Overview', path: '/operations',              icon: BarChart2,   content: <ExecutiveOverview /> },
-        { id: 'health',      label: 'Health Indicators',  path: '/operations/health',       icon: Activity,    content: <HealthIndicators /> },
-        { id: 'integrations',label: 'Integrations',       path: '/operations/integrations', icon: Puzzle,      content: <IntegrationReadinessCenter /> },
-        { id: 'demand',      label: 'Demand',             path: '/operations/demand',       icon: GitBranch,   content: <Intake /> },
-        { id: 'scorecards',  label: 'Scorecards',         path: '/operations/scorecards',   icon: TrendingUp,  content: <ScorecardsView /> },
-        { id: 'trends',      label: 'Trends & Insights',  path: '/operations/trends',       icon: AlertTriangle, content: <TrendsView /> },
-        { id: 'recs',        label: 'Recommendations',    path: '/operations/recommendations', icon: ChevronRight, content: <AllRecommendations /> },
-      ]}
+      description={
+        isEveryday
+          ? 'Program health at a glance — key indicators and items needing attention.'
+          : 'Executive health, domain indicators, integration readiness, demand pipeline, readiness scorecards, and strategic trends.'
+      }
+      actions={ACTIONS}
+      tabs={TABS}
     />
   );
 }

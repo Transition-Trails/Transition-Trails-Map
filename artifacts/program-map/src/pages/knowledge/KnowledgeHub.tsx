@@ -2,10 +2,14 @@ import { BookOpen, Database, GitBranch, Archive, Search, BookMarked, Network, Ta
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionItem } from '@/components/workspace/ActionBar';
+import { useTierFlags } from '@/hooks/useTierFlags';
 import KnowledgeWorkspace     from '@/pages/knowledge/KnowledgeWorkspace';
 import KnowledgeRelationships from '@/pages/navigator/KnowledgeRelationships';
 import LibraryDocuments       from '@/pages/library/LibraryDocuments';
 import LibrarySearch          from '@/pages/library/LibrarySearch';
+
+// UI audit rule: Everyday User pages must not have multiple nav/action rows
+// above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
 
 function OrgMemoryPlaceholder() {
   const sections = [
@@ -29,11 +33,9 @@ function OrgMemoryPlaceholder() {
             The institutional memory layer of Trail OS — preserving not only what exists and how it is connected, but <em>why</em> decisions were made. Deep integration with the Digital Twin, Operational Intelligence, and the Knowledge Brief rail.
           </p>
         </div>
-
         <p className="text-[11px] text-muted-foreground">
           Org Memory is scheduled for Phase 2 implementation. The following sections will be available:
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {sections.map(s => (
             <div key={s.title} className="rounded-lg border border-border bg-white p-3">
@@ -42,7 +44,6 @@ function OrgMemoryPlaceholder() {
             </div>
           ))}
         </div>
-
         <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Example Decision Records (planned)</p>
           {[
@@ -60,28 +61,42 @@ function OrgMemoryPlaceholder() {
   );
 }
 
-const HUB_ACTIONS: ActionItem[] = [
-  { id: 'search',        label: 'Search Library',     icon: Search,    href: '/knowledge/search',        variant: 'primary'   },
-  { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/knowledge/relationships', variant: 'secondary' },
-  { id: 'digital-twin',  label: 'Open Digital Twin',  icon: Network,   href: '/digital-twin/knowledge',  variant: 'secondary' },
-  { id: 'memory',        label: 'Org Memory',         icon: Archive,   href: '/knowledge/memory',        variant: 'secondary' },
-  { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                  variant: 'secondary' },
-];
-
 export default function KnowledgeHub() {
+  const { isEveryday, isPowerOrAbove } = useTierFlags();
+
+  const HUB_ACTIONS: ActionItem[] = [
+    { id: 'search', label: isEveryday ? 'Search Documents' : 'Search Library', icon: Search, href: '/knowledge/search', variant: 'primary' as const },
+    ...(isPowerOrAbove ? [
+      { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/knowledge/relationships', variant: 'secondary' as const },
+      { id: 'digital-twin',  label: 'Open Digital Twin',  icon: Network,   href: '/digital-twin/knowledge',  variant: 'secondary' as const },
+      { id: 'memory',        label: 'Org Memory',         icon: Archive,   href: '/knowledge/memory',        variant: 'secondary' as const },
+      { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                  variant: 'secondary' as const },
+    ] : []),
+  ];
+
+  const TABS = [
+    ...(isPowerOrAbove ? [
+      { id: 'sources', label: 'Sources', path: '/knowledge', icon: Database, content: <KnowledgeWorkspace /> },
+    ] : []),
+    { id: 'library', label: isEveryday ? 'Documents' : 'Library', path: '/knowledge/library', icon: BookMarked, content: <LibraryDocuments /> },
+    ...(isPowerOrAbove ? [
+      { id: 'relationships', label: 'Relationships', path: '/knowledge/relationships', icon: GitBranch,  content: <KnowledgeRelationships /> },
+      { id: 'memory',        label: 'Org Memory',    path: '/knowledge/memory',        icon: Archive,    content: <OrgMemoryPlaceholder /> },
+    ] : []),
+    { id: 'search', label: 'Search', path: '/knowledge/search', icon: Search, content: <LibrarySearch /> },
+  ];
+
   return (
     <HubShell
       title="Knowledge"
       icon={BookOpen}
-      description="Knowledge source registry, relationship graph, document library, organizational memory, and full-text search."
+      description={
+        isEveryday
+          ? 'Find documents, guides, and resources for your programs. Use Search to find anything.'
+          : 'Knowledge source registry, relationship graph, document library, organizational memory, and full-text search.'
+      }
       actions={HUB_ACTIONS}
-      tabs={[
-        { id: 'sources',       label: 'Sources',       path: '/knowledge',               icon: Database,   content: <KnowledgeWorkspace /> },
-        { id: 'relationships', label: 'Relationships', path: '/knowledge/relationships', icon: GitBranch,  content: <KnowledgeRelationships /> },
-        { id: 'library',       label: 'Library',       path: '/knowledge/library',       icon: BookMarked, content: <LibraryDocuments /> },
-        { id: 'memory',        label: 'Org Memory',    path: '/knowledge/memory',        icon: Archive,    content: <OrgMemoryPlaceholder /> },
-        { id: 'search',        label: 'Search',        path: '/knowledge/search',        icon: Search,     content: <LibrarySearch /> },
-      ]}
+      tabs={TABS}
     />
   );
 }
