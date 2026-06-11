@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Key, RefreshCw, CheckCircle, XCircle, AlertTriangle, Shield,
   ChevronDown, ChevronRight, ExternalLink, Zap, Brain, Globe,
-  Lock, Wifi, WifiOff, ArrowRight,
+  Lock, Wifi, WifiOff, ArrowRight, Database,
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
@@ -58,6 +58,24 @@ interface GoogleResult {
   drive: ServiceReadiness; calendar: ServiceReadiness;
   sharedOAuth: { ready: boolean; tier: CredentialTier; label: string; details: string };
   nextSteps: string[]; durationMs: number;
+}
+
+// ── Types — Salesforce ────────────────────────────────────────────────────────
+
+interface SalesforceCheck {
+  id: string; category: string; label: string;
+  status: 'pass' | 'fail' | 'warning' | 'skip';
+  detail: string; meta?: Record<string, unknown>;
+}
+
+interface SalesforceResult {
+  checks: SalesforceCheck[];
+  orgInfo: { name: string | null; id: string | null; edition: string | null; sandboxType: string | null } | null;
+  objects: { object: string; accessible: boolean; count: number; error?: string }[];
+  npspDetected: boolean;
+  identity: { username: string | null; displayName: string | null; email: string | null } | null;
+  durationMs: number;
+  timestamp: string;
 }
 
 type LiveStatus = 'idle' | 'loading' | 'done' | 'error';
@@ -265,6 +283,117 @@ function GoogleCard({ result, loading }: { result: GoogleResult | null; loading:
   );
 }
 
+// ── Salesforce Validation Card ────────────────────────────────────────────────
+
+function SalesforceCard({ result, loading }: { result: SalesforceResult | null; loading: boolean }) {
+  const passCount   = result?.checks.filter(c => c.status === 'pass').length ?? 0;
+  const failCount   = result?.checks.filter(c => c.status === 'fail').length ?? 0;
+  const warnCount   = result?.checks.filter(c => c.status === 'warning').length ?? 0;
+  const totalChecks = result?.checks.length ?? 0;
+  const connected   = result !== null && failCount === 0 && passCount > 0;
+
+  const headerCls = connected
+    ? 'border-emerald-200 bg-emerald-50'
+    : result ? 'border-rose-200 bg-rose-50' : 'border-teal-200 bg-teal-50';
+
+  return (
+    <div className={`rounded-lg border bg-white overflow-hidden ${connected ? 'border-emerald-200' : result ? 'border-rose-200' : 'border-teal-200'}`}>
+      <div className={`flex items-center gap-2 px-4 py-2.5 border-b ${headerCls}`}>
+        <Database className={`w-4 h-4 ${connected ? 'text-emerald-600' : 'text-teal-600'}`} />
+        <span className={`text-[12px] font-bold ${connected ? 'text-emerald-800' : 'text-teal-800'}`}>Salesforce</span>
+        <span className="text-[10px] text-teal-600 ml-1">via Replit Connector</span>
+        {result && (
+          <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
+            connected
+              ? 'border-emerald-300 bg-white text-emerald-700'
+              : 'border-rose-300 bg-white text-rose-700'
+          }`}>
+            {connected ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+            {connected ? 'Connected' : 'Connection failed'}
+          </span>
+        )}
+      </div>
+
+      <div className="px-4 py-3 space-y-3">
+        {loading && <p className="text-[11px] text-muted-foreground italic">Calling Salesforce REST API via Replit Connector…</p>}
+
+        {result && connected && (
+          <>
+            {/* Org + identity banner */}
+            <div className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 space-y-1">
+              <p className="text-[11px] font-bold text-emerald-800">
+                {result.orgInfo?.name ?? 'Org'} · {result.orgInfo?.edition} · {result.orgInfo?.sandboxType}
+              </p>
+              {result.identity && (
+                <p className="text-[11px] text-emerald-700">
+                  Authenticated as <strong>{result.identity.displayName ?? result.identity.username}</strong>
+                  {result.identity.email ? ` (${result.identity.email})` : ''}
+                </p>
+              )}
+              <div className="flex items-center gap-3 pt-0.5 flex-wrap">
+                {result.objects.map(o => (
+                  <span key={o.object} className={`inline-flex items-center gap-1 text-[10px] font-bold ${o.accessible ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    {o.accessible ? <CheckCircle className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
+                    {o.object}: {o.accessible ? `${o.count.toLocaleString()} records` : 'no access'}
+                  </span>
+                ))}
+                {result.npspDetected && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-700">
+                    <CheckCircle className="w-3 h-3" /> NPSP detected
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Check list */}
+            <div className="space-y-1">
+              {result.checks.map(c => {
+                const icon = c.status === 'pass'
+                  ? <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
+                  : c.status === 'warning'
+                  ? <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                  : <XCircle className="w-3 h-3 text-rose-500 shrink-0 mt-0.5" />;
+                return (
+                  <div key={c.id} className="flex items-start gap-2">
+                    {icon}
+                    <div>
+                      <span className="text-[11px] font-semibold text-foreground">{c.label}</span>
+                      <span className="text-[10px] text-muted-foreground ml-1.5 leading-snug">{c.detail.slice(0, 120)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-3 pt-1">
+              <span className="text-[10px] text-muted-foreground/60">
+                {passCount}/{totalChecks} checks passed · {warnCount} warnings · {result.durationMs}ms
+              </span>
+              <span className="text-[10px] text-muted-foreground/60">
+                Validated at {new Date(result.timestamp).toLocaleTimeString()}
+              </span>
+            </div>
+          </>
+        )}
+
+        {result && !connected && (
+          <div className="rounded border border-rose-200 bg-rose-50 px-3 py-2 space-y-1">
+            {result.checks.filter(c => c.status === 'fail').map(c => (
+              <p key={c.id} className="text-[11px] text-rose-800"><strong>{c.label}:</strong> {c.detail.slice(0, 150)}</p>
+            ))}
+          </div>
+        )}
+
+        {!result && !loading && (
+          <p className="text-[11px] text-muted-foreground italic">
+            Click "Run Live Checks" to test the Salesforce connector (Replit Connector — no API keys needed).
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Audit helpers ─────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: SecretStatus }) {
@@ -391,9 +520,10 @@ export default function IntegrationSecretsAudit() {
   const [auditLoading, setAuditLoading] = useState(false);
   const [auditError, setAuditError] = useState<string | null>(null);
 
-  const [geminiResult, setGeminiResult] = useState<GeminiResult | null>(null);
-  const [googleResult, setGoogleResult] = useState<GoogleResult | null>(null);
-  const [liveStatus, setLiveStatus]     = useState<LiveStatus>('idle');
+  const [geminiResult, setGeminiResult]         = useState<GeminiResult | null>(null);
+  const [googleResult, setGoogleResult]         = useState<GoogleResult | null>(null);
+  const [salesforceResult, setSalesforceResult] = useState<SalesforceResult | null>(null);
+  const [liveStatus, setLiveStatus]             = useState<LiveStatus>('idle');
 
   const runAudit = useCallback(() => {
     setAuditLoading(true);
@@ -409,8 +539,14 @@ export default function IntegrationSecretsAudit() {
     Promise.all([
       fetch('/api/gemini/validate').then(r => r.json() as Promise<GeminiResult>),
       fetch('/api/google/validate').then(r => r.json() as Promise<GoogleResult>),
+      fetch('/api/salesforce/validate').then(r => r.json() as Promise<SalesforceResult>),
     ])
-      .then(([gem, goog]) => { setGeminiResult(gem); setGoogleResult(goog); setLiveStatus('done'); })
+      .then(([gem, goog, sf]) => {
+        setGeminiResult(gem);
+        setGoogleResult(goog);
+        setSalesforceResult(sf);
+        setLiveStatus('done');
+      })
       .catch(() => setLiveStatus('error'));
   }, []);
 
@@ -488,6 +624,7 @@ export default function IntegrationSecretsAudit() {
               <span className="text-[10px] text-muted-foreground">— 5-tier readiness: Secret present → Format valid → API reachable → Auth valid → Integration ready</span>
             </div>
             <div className="grid grid-cols-1 gap-3">
+              <SalesforceCard result={salesforceResult} loading={liveStatus === 'loading'} />
               <GeminiCard result={geminiResult} loading={liveStatus === 'loading'} />
               <GoogleCard result={googleResult} loading={liveStatus === 'loading'} />
             </div>
