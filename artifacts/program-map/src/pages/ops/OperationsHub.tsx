@@ -350,23 +350,25 @@ export default function OperationsHub() {
       content: <ExecutiveOverview />,
     },
     ...(!isEveryday ? [
-      { id: 'health',       label: 'Health Indicators', path: '/operations/health',           icon: Activity,      content: <HealthIndicators /> },
-      { id: 'integrations', label: 'Integrations',      path: '/operations/integrations',     icon: Puzzle,        content: <IntegrationReadinessCenter /> },
-      { id: 'demand',       label: 'Demand',            path: '/operations/demand',           icon: GitBranch,     content: <Intake /> },
-      { id: 'scorecards',   label: 'Scorecards',        path: '/operations/scorecards',       icon: TrendingUp,    content: <ScorecardsView /> },
-      { id: 'trends',       label: 'Trends & Insights', path: '/operations/trends',           icon: AlertTriangle, content: <TrendsView /> },
-      { id: 'recs',         label: 'Recommendations',   path: '/operations/recommendations',  icon: ChevronRight,  content: <AllRecommendations /> },
+      { id: 'health',     label: 'Health Indicators', path: '/operations/health',           icon: Activity,      content: <HealthIndicators /> },
+      { id: 'demand',     label: 'Demand',            path: '/operations/demand',           icon: GitBranch,     content: <Intake /> },
+      { id: 'scorecards', label: 'Scorecards',        path: '/operations/scorecards',       icon: TrendingUp,    content: <ScorecardsView /> },
+      { id: 'trends',     label: 'Trends & Insights', path: '/operations/trends',           icon: AlertTriangle, content: <TrendsView /> },
+      { id: 'recs',       label: 'Recommendations',   path: '/operations/recommendations',  icon: ChevronRight,  content: <AllRecommendations /> },
+    ] : []),
+    ...(isAdminOrAbove ? [
+      { id: 'integrations', label: 'Integrations', path: '/operations/integrations', icon: Puzzle, content: <IntegrationReadinessCenter /> },
     ] : []),
   ];
 
   const ACTIONS: ActionItem[] = [
     ...(isAdminOrAbove ? [
-      { id: 'phase1', label: 'Phase 1 Readiness', icon: Target, href: '/admin/phase1-readiness', variant: 'primary' as const },
+      { id: 'phase1',       label: 'Phase 1 Readiness', icon: Target,        href: '/admin/phase1-readiness',     variant: 'primary' as const },
+      { id: 'integrations', label: 'Integrations',      icon: Puzzle,        href: '/operations/integrations',    variant: 'secondary' as const },
     ] : []),
     ...(!isEveryday ? [
-      { id: 'integrations', label: 'Integrations',      icon: Puzzle,       href: '/operations/integrations',    variant: 'secondary' as const },
-      { id: 'recs',         label: 'Recommendations',   icon: ChevronRight, href: '/operations/recommendations', variant: 'secondary' as const },
-      { id: 'trends',       label: 'Trends & Insights', icon: TrendingUp,   href: '/operations/trends',          variant: 'secondary' as const },
+      { id: 'recs',   label: 'Recommendations',   icon: ChevronRight, href: '/operations/recommendations', variant: 'secondary' as const },
+      { id: 'trends', label: 'Trends & Insights', icon: TrendingUp,   href: '/operations/trends',          variant: 'secondary' as const },
     ] : []),
   ];
 

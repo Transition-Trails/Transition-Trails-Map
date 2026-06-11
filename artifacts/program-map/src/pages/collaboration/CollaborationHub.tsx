@@ -14,7 +14,7 @@ import GoogleCalendarIntegrationCenter from '@/pages/collaboration/GoogleCalenda
 // above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
 
 export default function CollaborationHub() {
-  const { isEveryday, isPowerOrAbove } = useTierFlags();
+  const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
 
   const TABS = [
     {
@@ -25,13 +25,15 @@ export default function CollaborationHub() {
       content: <CollaborationWorkspace />,
     },
     ...(isPowerOrAbove ? [
-      { id: 'slack',    label: 'Slack Integration', path: '/collaboration/slack',    icon: Hash,         content: <SlackIntegrationCenter /> },
-      { id: 'drive',    label: 'Google Drive',      path: '/collaboration/drive',    icon: HardDrive,    content: <GoogleDriveIntegrationCenter /> },
-      { id: 'calendar', label: 'Google Calendar',   path: '/collaboration/calendar', icon: CalendarDays, content: <GoogleCalendarIntegrationCenter /> },
       { id: 'channels',      label: 'Channels',      path: '/collaboration/channels',      icon: Hash,      content: <CommChannels /> },
       { id: 'templates',     label: 'Templates',     path: '/collaboration/templates',     icon: FileText,  content: <CommMessageTemplates /> },
       { id: 'briefs',        label: 'Weekly Briefs', path: '/collaboration/briefs',        icon: BookOpen,  content: <WeeklyBriefs /> },
       { id: 'notifications', label: 'Notifications', path: '/collaboration/notifications', icon: Bell,      content: <CommNotifications /> },
+    ] : []),
+    ...(isAdminOrAbove ? [
+      { id: 'slack',    label: 'Slack Integration', path: '/collaboration/slack',    icon: Hash,         content: <SlackIntegrationCenter /> },
+      { id: 'drive',    label: 'Google Drive',      path: '/collaboration/drive',    icon: HardDrive,    content: <GoogleDriveIntegrationCenter /> },
+      { id: 'calendar', label: 'Google Calendar',   path: '/collaboration/calendar', icon: CalendarDays, content: <GoogleCalendarIntegrationCenter /> },
     ] : []),
   ];
 
