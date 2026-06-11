@@ -35,19 +35,19 @@ export function HubShell({
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Hub header + tab bar */}
-      <div className="border-b border-border px-6 pt-5 pb-0 bg-background shrink-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <Icon className="w-4 h-4 text-primary" />
-          <h1 className="text-lg font-serif font-bold text-foreground">{title}</h1>
+      <div className="border-b border-border px-4 pt-2.5 pb-0 bg-background shrink-0">
+        <div className="flex items-center gap-2">
+          <Icon className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+          <h1 className="text-sm font-semibold text-foreground leading-none">{title}</h1>
           {badge && (
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
               {badge}
             </span>
           )}
+          <span className="text-[11px] text-muted-foreground line-clamp-1 hidden sm:block">{description}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground mb-3 max-w-3xl">{description}</p>
         {tabs.length > 1 && (
-          <div className="flex gap-0.5 overflow-x-auto pb-0.5">
+          <div className="flex gap-0.5 overflow-x-auto pb-0.5 mt-1.5">
             {tabs.map(tab => {
               const TabIcon = tab.icon;
               const isActive = activeTab.id === tab.id;
