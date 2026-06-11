@@ -24,53 +24,59 @@ function ExecutiveOverview() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-5">
+      <div className="p-4 space-y-3">
         {/* Phase 1 banner — admin/power only */}
         {!isEveryday && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 flex items-center gap-2">
-            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Phase 1 Architecture Consolidation</span>
-            <span className="text-[11px] text-amber-600">— Operations, Integrations, and Demand are unified here. Demand Management is now a section of this hub.</span>
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 flex items-center gap-2">
+            <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">Phase 1</span>
+            <span className="text-[10px] text-amber-600">Operations, Integrations, and Demand are unified here.</span>
           </div>
         )}
 
-        {/* Overall score row */}
-        <div className="rounded-lg border border-border bg-white p-5 flex items-start gap-6">
-          <div className="shrink-0">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Overall Health</p>
-            <p className={`text-5xl font-bold font-serif mt-1 ${cfg.score}`}>{overallHealthScore}</p>
-            <span className={`inline-block mt-1 text-[10px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>{cfg.label}</span>
+        {/* Overall health — compact single row */}
+        <div className="rounded-lg border border-border bg-white px-4 py-3 flex items-center gap-5">
+          {/* Score + label */}
+          <div className="flex items-baseline gap-2 shrink-0">
+            <p className={`text-4xl font-bold font-serif leading-none ${cfg.score}`}>{overallHealthScore}</p>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] text-muted-foreground/60 font-medium uppercase tracking-wider leading-none">Overall</span>
+              <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${cfg.cls}`}>{cfg.label}</span>
+            </div>
           </div>
-          <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2">
+          {/* Divider */}
+          <div className="w-px h-8 bg-border/60 shrink-0" />
+          {/* Stat chips */}
+          <div className="flex flex-1 items-center gap-2 flex-wrap">
             {[
-              { l: 'Critical',       v: recommendations.filter(r => r.priority === 'critical').length, c: 'text-rose-600' },
-              { l: 'High Priority',  v: recommendations.filter(r => r.priority === 'high').length,     c: 'text-orange-600' },
-              { l: 'Domains At Risk',v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600' },
-              { l: 'Needs Work',     v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600' },
+              { l: 'Critical',       v: recommendations.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+              { l: 'High Priority',  v: recommendations.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
+              { l: 'Domains At Risk',v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+              { l: 'Needs Work',     v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
             ].map(s => (
-              <div key={s.l} className="rounded-lg border border-border px-3 py-2.5">
-                <p className={`text-2xl font-bold font-serif ${s.c}`}>{s.v}</p>
-                <p className="text-[9px] text-muted-foreground font-medium mt-0.5">{s.l}</p>
+              <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
+                <span className={`text-xl font-bold font-serif leading-none ${s.c}`}>{s.v}</span>
+                <span className={`text-[9px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Domain health cards */}
+        {/* Domain health — compact 4-col cards, no paragraph text */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Domain Health</p>
+          <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5">Domain Health</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {domainHealthData.map(d => {
               const dc = HEALTH_LEVEL_CONFIG[d.level];
               return (
                 <button key={d.id}
                   onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
-                  className="rounded-lg border border-border bg-white p-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dc.label}</span>
-                    <span className={`text-xl font-bold font-serif ${dc.score}`}>{d.score}</span>
+                  className="rounded-lg border border-border bg-white px-2.5 py-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
+                    <span className={`text-lg font-bold font-serif leading-none ${dc.score}`}>{d.score}</span>
                   </div>
-                  <p className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors">{d.domain}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">{d.summary.slice(0, 85)}…</p>
+                  <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
                 </button>
               );
             })}
@@ -101,23 +107,23 @@ function ExecutiveOverview() {
                   </button>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {visible.map(r => {
                   const pc = REC_PRIORITY_CONFIG[r.priority];
                   return (
                     <button key={r.id}
                       onClick={() => setSelectedItem({ type: 'oicRecommendation', id: r.id, data: r })}
-                      className="text-left rounded-lg border border-border bg-white p-3 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${pc.cls}`}>
+                      className="text-left rounded-lg border border-border bg-white px-2.5 py-2 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight shrink-0 ${pc.cls}`}>
                           {pc.label}
                         </span>
-                        <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0" />
+                        <ChevronRight className="w-3 h-3 text-muted-foreground/25 group-hover:text-primary transition-colors shrink-0" />
                       </div>
-                      <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
+                      <p className="text-[10px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
                         {r.action}
                       </p>
-                      <p className="text-[9px] text-muted-foreground truncate">{r.domain}</p>
+                      <p className="text-[9px] text-muted-foreground/70 truncate">{r.domain}</p>
                     </button>
                   );
                 })}
