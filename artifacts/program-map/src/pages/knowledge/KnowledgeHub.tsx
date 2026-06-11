@@ -93,7 +93,7 @@ export default function KnowledgeHub() {
       description={
         isEveryday
           ? 'Find documents, guides, and resources for your programs — search by name, program, or category.'
-          : 'Knowledge source registry, relationship graph, document library, organizational memory, and full-text search.'
+          : 'Review source quality, explore knowledge relationships, search the document library, and surface organizational knowledge gaps.'
       }
       actions={HUB_ACTIONS}
       tabs={TABS}

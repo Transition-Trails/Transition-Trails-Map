@@ -12,6 +12,7 @@ import {
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
+import { useTierFlags } from '@/hooks/useTierFlags';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -982,6 +983,7 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
 export default function DigitalTwin() {
   const { openSlackPanel } = useAppContext();
   const [, setLocation] = useLocation();
+  const { isAdminOrAbove } = useTierFlags();
   const [selected, setSelected] = useState<SelectedObject | null>(null);
 
   const nav = (p: string) => setLocation(p);
@@ -996,7 +998,11 @@ export default function DigitalTwin() {
     <HubShell
       title="Digital Twin"
       icon={Network}
-      description="Pick a thing, see what it touches, understand what changes, take the next action."
+      description={
+        isAdminOrAbove
+          ? 'Explore the object graph, map relationships, model change impact, and govern the Unified Object Model.'
+          : 'Pick a thing, see what it touches, and understand how it connects to the rest of the platform.'
+      }
       badge={selected ? selected.name : undefined}
       actions={[
         { id: 'signals', label: TERMS.trailSignals, icon: Layers, variant: 'secondary' as const, onClick: () => openSlackPanel({ context: 'digital-twin', title: TERMS.digitalTwin, subtitle: TERMS.signalSubtitle(TERMS.digitalTwin) }) },
@@ -1009,27 +1015,29 @@ export default function DigitalTwin() {
           icon: Compass,
           content: <ExploreTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
         },
-        {
-          id: 'map',
-          label: 'Map',
-          path: '/digital-twin/map',
-          icon: MapPin,
-          content: <MapTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
-        },
-        {
-          id: 'impact',
-          label: 'Impact',
-          path: '/digital-twin/impact',
-          icon: Zap,
-          content: <ImpactTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
-        },
-        {
-          id: 'governance',
-          label: 'Governance',
-          path: '/digital-twin/governance',
-          icon: Shield,
-          content: <GovernanceTab onNavigate={nav} />,
-        },
+        ...(isAdminOrAbove ? [
+          {
+            id: 'map',
+            label: 'Map',
+            path: '/digital-twin/map',
+            icon: MapPin,
+            content: <MapTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
+          },
+          {
+            id: 'impact',
+            label: 'Impact',
+            path: '/digital-twin/impact',
+            icon: Zap,
+            content: <ImpactTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
+          },
+          {
+            id: 'governance',
+            label: 'Governance',
+            path: '/digital-twin/governance',
+            icon: Shield,
+            content: <GovernanceTab onNavigate={nav} />,
+          },
+        ] : []),
       ]}
     />
   );

@@ -377,7 +377,7 @@ export default function OperationsHub() {
       description={
         isEveryday
           ? 'Program health at a glance — key indicators and items needing attention.'
-          : 'Executive health, domain indicators, integration readiness, demand pipeline, readiness scorecards, and strategic trends.'
+          : 'Monitor program health, surface priority actions, track demand, and review integration readiness, scorecards, and operational trends.'
       }
       actions={ACTIONS}
       tabs={TABS}

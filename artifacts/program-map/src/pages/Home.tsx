@@ -229,7 +229,7 @@ export default function Home() {
               <CardFooter onClick={() => setLocation('/program')} label={isEveryday ? 'Open Program Hub' : 'Open Program & Curriculum'} />
             </Card>
 
-            {/* Everyday: My Tasks + Quick Resources | Power+: Demand queue */}
+            {/* Everyday: Tasks + Resources | Power: Penny Performance | Admin: Demand queue */}
             {isEveryday ? (
               <>
                 <Card label="My Tasks">
@@ -259,14 +259,38 @@ export default function Home() {
                   <CardFooter onClick={() => setLocation('/knowledge/library')} label="Open Knowledge Library" />
                 </Card>
               </>
+            ) : isPowerOrAbove && !isAdminOrAbove ? (
+              <Card label="Penny This Week">
+                {[
+                  { icon: Brain,         label: 'Interactions',     value: '234', sub: 'this week',  cls: 'text-violet-600', bg: 'bg-violet-50'  },
+                  { icon: Users,         label: 'Learner sessions', value: '12',  sub: 'active now', cls: 'text-sky-600',    bg: 'bg-sky-50'     },
+                  { icon: BarChart3,     label: 'Prompt quality',   value: '87%', sub: 'avg score',  cls: 'text-emerald-600',bg: 'bg-emerald-50' },
+                  { icon: AlertTriangle, label: 'Knowledge gaps',   value: '3',   sub: 'flagged',    cls: 'text-amber-600',  bg: 'bg-amber-50'   },
+                ].map((m, i, arr) => {
+                  const Icon = m.icon;
+                  return (
+                    <div key={m.label} className={`flex items-center gap-2.5 px-3 py-2 ${i < arr.length - 1 ? 'border-b border-border/30' : ''}`}>
+                      <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 ${m.bg}`}>
+                        <Icon className={`w-3 h-3 ${m.cls}`} />
+                      </div>
+                      <span className="text-[11px] text-muted-foreground flex-1">{m.label}</span>
+                      <div className="text-right">
+                        <p className={`text-[13px] font-bold leading-none ${m.cls}`}>{m.value}</p>
+                        <p className="text-[9px] text-muted-foreground/60 leading-none mt-0.5">{m.sub}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                <CardFooter onClick={() => setLocation('/penny/intelligence')} label="Open Penny Intelligence" />
+              </Card>
             ) : (
               <Card label="Open Demand">
                 {[
-                  { id: 'D-041', title: "Explorer's Trail expansion", status: 'New',        priority: 'High' },
-                  { id: 'D-039', title: 'Slack channel restructure',  status: 'In Review',  priority: 'Medium' },
-                  { id: 'D-037', title: 'Phase 2 curriculum audit',   status: 'In Review',  priority: 'High' },
-                  { id: 'D-035', title: 'Penny knowledge gap review', status: 'Blocked',    priority: 'Critical' },
-                  { id: 'D-033', title: 'Q3 capacity planning',       status: 'New',        priority: 'Medium' },
+                  { id: 'D-041', title: "Explorer's Trail expansion", priority: 'High'     },
+                  { id: 'D-039', title: 'Slack channel restructure',  priority: 'Medium'   },
+                  { id: 'D-037', title: 'Phase 2 curriculum audit',   priority: 'High'     },
+                  { id: 'D-035', title: 'Penny knowledge gap review', priority: 'Critical' },
+                  { id: 'D-033', title: 'Q3 capacity planning',       priority: 'Medium'   },
                 ].map((d, i, arr) => (
                   <div key={d.id} className={`flex items-center gap-2 px-3 py-2 ${i < arr.length - 1 ? 'border-b border-border/30' : ''}`}>
                     <span className="text-[10px] font-mono text-muted-foreground/50 flex-shrink-0 w-10">{d.id}</span>

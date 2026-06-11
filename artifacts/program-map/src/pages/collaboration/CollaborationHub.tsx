@@ -42,7 +42,7 @@ export default function CollaborationHub() {
       description={
         isEveryday
           ? 'Your upcoming sessions, events, and team communication channels.'
-          : 'Communication systems, integrations, channels, templates, and notification management. Select a system from the Overview workspace to explore its readiness and configuration.'
+          : 'Manage communication channels, review Slack and Drive integrations, access templates, and configure notification workflows.'
       }
       tabs={TABS}
     />
