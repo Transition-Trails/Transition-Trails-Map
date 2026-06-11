@@ -73,17 +73,18 @@ export default function KnowledgeHub() {
     { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                   variant: 'secondary' as const },
   ] : [];
 
-  const TABS = [
-    ...(isPowerOrAbove ? [
-      { id: 'sources', label: 'Sources', path: '/knowledge', icon: Database, content: <KnowledgeWorkspace /> },
-    ] : []),
-    { id: 'library', label: isEveryday ? 'Documents' : 'Library', path: '/knowledge/library', icon: BookMarked, content: <LibraryDocuments /> },
-    ...(isPowerOrAbove ? [
-      { id: 'relationships', label: 'Relationships', path: '/knowledge/relationships', icon: GitBranch,  content: <KnowledgeRelationships /> },
-      { id: 'memory',        label: 'Org Memory',    path: '/knowledge/memory',        icon: Archive,    content: <OrgMemoryPlaceholder /> },
-    ] : []),
-    { id: 'search', label: 'Search', path: '/knowledge/search', icon: Search, content: <LibrarySearch /> },
-  ];
+  // Everyday: single tab — SourceDocs already has inline search, no tab bar needed
+  const TABS = isEveryday
+    ? [
+        { id: 'library', label: 'Documents', path: '/knowledge/library', icon: BookMarked, content: <LibraryDocuments /> },
+      ]
+    : [
+        { id: 'sources',       label: 'Sources',       path: '/knowledge',               icon: Database,   content: <KnowledgeWorkspace /> },
+        { id: 'library',       label: 'Library',        path: '/knowledge/library',       icon: BookMarked, content: <LibraryDocuments /> },
+        { id: 'relationships', label: 'Relationships',  path: '/knowledge/relationships', icon: GitBranch,  content: <KnowledgeRelationships /> },
+        { id: 'memory',        label: 'Org Memory',     path: '/knowledge/memory',        icon: Archive,    content: <OrgMemoryPlaceholder /> },
+        { id: 'search',        label: 'Search',         path: '/knowledge/search',        icon: Search,     content: <LibrarySearch /> },
+      ];
 
   return (
     <HubShell
@@ -91,7 +92,7 @@ export default function KnowledgeHub() {
       icon={BookOpen}
       description={
         isEveryday
-          ? 'Find documents, guides, and resources for your programs. Use Search to find anything.'
+          ? 'Find documents, guides, and resources for your programs — search by name, program, or category.'
           : 'Knowledge source registry, relationship graph, document library, organizational memory, and full-text search.'
       }
       actions={HUB_ACTIONS}

@@ -85,10 +85,10 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/knowledge',
     items: [
       { id: 'know-sources',       path: '/knowledge',               label: 'Sources',        minTier: 'power' },
-      { id: 'know-library',       path: '/knowledge/library',       label: 'Library' },
+      { id: 'know-library',       path: '/knowledge/library',       label: 'Library',        minTier: 'power' },
       { id: 'know-relationships', path: '/knowledge/relationships', label: 'Relationships',  minTier: 'power' },
       { id: 'know-memory',        path: '/knowledge/memory',        label: 'Org Memory',     minTier: 'power' },
-      { id: 'know-search',        path: '/knowledge/search',        label: 'Search' },
+      { id: 'know-search',        path: '/knowledge/search',        label: 'Search',         minTier: 'power' },
     ],
   },
   {
