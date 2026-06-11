@@ -58,6 +58,10 @@ interface AppState {
   slackPanel: SlackPanelConfig | null;
   pennyPanelTab: 'penny' | 'signals' | 'ask';
   setPennyPanelTab: (tab: 'penny' | 'signals' | 'ask') => void;
+  rightPanelOpen: boolean;
+  setRightPanelOpen: (v: boolean) => void;
+  mobileSidebarOpen: boolean;
+  setMobileSidebarOpen: (v: boolean) => void;
   setActivePage: (page: string) => void;
   setActiveLens: (lens: string) => void;
   setUserTier: (tier: AccessTier) => void;
@@ -90,6 +94,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [actionPanel, setActionPanel]   = useState<ActionPanelConfig | null>(null);
   const [slackPanel,  setSlackPanel]    = useState<SlackPanelConfig | null>(null);
   const [pennyPanelTab, setPennyPanelTab] = useState<'penny' | 'signals' | 'ask'>('penny');
+  const [rightPanelOpen, setRightPanelOpen]       = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
   const [recentContexts, setRecentContexts]   = useState<ActiveContext[]>([]);
@@ -162,6 +168,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       actionPanel, openActionPanel, closeActionPanel,
       slackPanel, openSlackPanel, closeSlackPanel,
       pennyPanelTab, setPennyPanelTab,
+      rightPanelOpen, setRightPanelOpen,
+      mobileSidebarOpen, setMobileSidebarOpen,
       setActivePage, setActiveLens, setUserTier, setSelectedItem, setSearchOpen,
       setActiveContext,
       updateProgram, updateDocument, updateResolvePhase,

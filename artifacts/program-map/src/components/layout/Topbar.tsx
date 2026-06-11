@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut } from 'lucide-react';
+import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -352,11 +352,21 @@ function UserProfileButton() {
 export function Topbar() {
   const [location, setLocation] = useLocation();
   const { section, title } = getPageInfo(location);
+  const { rightPanelOpen, setRightPanelOpen, mobileSidebarOpen, setMobileSidebarOpen } = useAppContext();
 
   return (
-    <div className="flex items-center justify-between h-[48px] px-4 border-b bg-card shrink-0">
-      {/* Left — breadcrumb */}
-      <div className="flex items-center gap-2.5 min-w-0">
+    <div className="flex items-center justify-between h-[48px] px-3 border-b bg-card shrink-0">
+      {/* Left — hamburger (mobile) + breadcrumb */}
+      <div className="flex items-center gap-2 min-w-0">
+        {/* Hamburger — compact/mobile only (< md) */}
+        <button
+          className="md:hidden flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors flex-shrink-0"
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          title="Navigation menu"
+        >
+          <Menu className="w-4 h-4" />
+        </button>
+
         <div className="flex items-center justify-center w-7 h-7 rounded-md bg-primary/10 text-primary flex-shrink-0">
           <Map className="w-4 h-4" />
         </div>
@@ -369,8 +379,22 @@ export function Topbar() {
         <span className="text-sm text-foreground font-medium truncate">{title}</span>
       </div>
 
-      {/* Right — signals + search + user profile */}
+      {/* Right — Ask Penny toggle (split/mobile) + signals + search + user */}
       <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Ask Penny panel toggle — split view + mobile (< xl) */}
+        <button
+          className={`xl:hidden flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
+            rightPanelOpen
+              ? 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-muted hover:text-foreground'
+          }`}
+          onClick={() => setRightPanelOpen(!rightPanelOpen)}
+          title="Ask Penny / Trail Signals"
+        >
+          <Sparkles className="w-3 h-3 flex-shrink-0" />
+          <span className="hidden sm:inline">{rightPanelOpen ? 'Close' : 'Ask Penny'}</span>
+        </button>
+
         <SignalsIndicator />
         <Button
           variant="ghost" size="icon"
