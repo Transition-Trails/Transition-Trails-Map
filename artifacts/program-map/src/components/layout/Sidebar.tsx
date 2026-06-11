@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { type AccessTier, canAccess, TIER_CONFIG } from '@/config/accessTiers';
+import { useTierFlags } from '@/hooks/useTierFlags';
 
 type NavItem =
   | { id: string; path: string; label: string; isLabel?: false; minTier?: AccessTier }
@@ -139,6 +140,7 @@ function calcMaxHeight(items: NavItem[]): number {
 export function Sidebar() {
   const [location, setLocation] = useLocation();
   const { userTier } = useAppContext();
+  const { isEveryday, isAdminOrAbove } = useTierFlags();
 
   // Filter groups and items by access tier
   const visibleGroups = navGroups
@@ -204,18 +206,20 @@ export function Sidebar() {
           <span>Global Search</span>
         </button>
 
-        {/* Context Engine */}
-        <button
-          onClick={() => setLocation('/context')}
-          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
-            isContext
-              ? 'bg-primary text-primary-foreground'
-              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-          }`}
-        >
-          <Target className={`w-4 h-4 flex-shrink-0 ${isContext ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
-          <span>Context Engine</span>
-        </button>
+        {/* Context Engine / Focus — hidden for Everyday, "Focus" for Power, "Context Engine" for Admin+ */}
+        {!isEveryday && (
+          <button
+            onClick={() => setLocation('/context')}
+            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
+              isContext
+                ? 'bg-primary text-primary-foreground'
+                : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+            }`}
+          >
+            <Target className={`w-4 h-4 flex-shrink-0 ${isContext ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+            <span>{isAdminOrAbove ? 'Context Engine' : 'Focus'}</span>
+          </button>
+        )}
 
         <div className="h-px bg-sidebar-border/60 mx-1 my-1" />
 
