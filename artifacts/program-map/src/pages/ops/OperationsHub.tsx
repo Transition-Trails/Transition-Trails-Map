@@ -77,28 +77,62 @@ function ExecutiveOverview() {
           </div>
         </div>
 
-        {/* Critical + high priority recs */}
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">
-            {isEveryday ? 'Items Needing Attention' : 'Critical & High Priority Actions'}
-          </p>
-          <div className="space-y-1.5">
-            {recommendations.filter(r => r.priority === 'critical' || r.priority === 'high').map(r => {
-              const pc = REC_PRIORITY_CONFIG[r.priority];
-              return (
-                <button key={r.id}
-                  onClick={() => setSelectedItem({ type: 'oicRecommendation', id: r.id, data: r })}
-                  className="w-full text-left rounded-lg border border-border bg-white px-4 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex items-center gap-3">
-                  <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 shrink-0 ${pc.cls}`}>{pc.label}</span>
-                  <span className="text-[12px] font-semibold text-foreground group-hover:text-primary flex-1 text-left">{r.action}</span>
-                  <span className="text-[10px] text-muted-foreground shrink-0">{r.domain}</span>
-                  {!isEveryday && <span className="text-[10px] text-muted-foreground shrink-0">Effort: {r.effort}</span>}
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />
+        {/* Critical + high priority recs — compact 2-column grid */}
+        {(() => {
+          const allItems = [
+            ...recommendations.filter(r => r.priority === 'critical'),
+            ...recommendations.filter(r => r.priority === 'high'),
+          ];
+          const LIMIT   = 6;
+          const visible = allItems.slice(0, LIMIT);
+          const extra   = allItems.length - LIMIT;
+          return (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                  {isEveryday ? 'Items Needing Attention' : 'Critical & High Priority Actions'}
+                </p>
+                {extra > 0 && (
+                  <button
+                    onClick={() => setSelectedItem({ type: 'oicRecommendation', id: 'all', data: null })}
+                    className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+                  >
+                    View all {allItems.length} <ChevronRight className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {visible.map(r => {
+                  const pc = REC_PRIORITY_CONFIG[r.priority];
+                  return (
+                    <button key={r.id}
+                      onClick={() => setSelectedItem({ type: 'oicRecommendation', id: r.id, data: r })}
+                      className="text-left rounded-lg border border-border bg-white p-3 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${pc.cls}`}>
+                          {pc.label}
+                        </span>
+                        <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0" />
+                      </div>
+                      <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
+                        {r.action}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground truncate">{r.domain}</p>
+                    </button>
+                  );
+                })}
+              </div>
+              {extra > 0 && (
+                <button
+                  onClick={() => setSelectedItem({ type: 'oicRecommendation', id: 'all', data: null })}
+                  className="mt-2 w-full text-center text-[10px] font-semibold text-primary hover:underline py-1.5 rounded-lg border border-dashed border-primary/30 hover:border-primary/60 transition-colors"
+                >
+                  + {extra} more attention items
                 </button>
-              );
-            })}
-          </div>
-        </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </ScrollArea>
   );
