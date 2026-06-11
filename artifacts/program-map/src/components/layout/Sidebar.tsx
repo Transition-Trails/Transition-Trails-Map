@@ -124,6 +124,7 @@ const navGroups: NavGroup[] = [
       { id: 'admin-gauth',     path: '/admin/google-oauth',  label: 'Google Auth Setup' },
       { id: 'lbl-readiness',   label: 'Readiness', isLabel: true },
       { id: 'admin-readiness', path: '/admin/phase1-readiness', label: 'Phase 1 Readiness' },
+      { id: 'admin-ux-standards', path: '/admin/ux-standards',  label: 'Phase 1 UX Standards' },
     ],
   },
 ];

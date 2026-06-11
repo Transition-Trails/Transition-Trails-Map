@@ -4,7 +4,7 @@ import {
   Layers, FileText, Compass, Brain, Monitor, Plug,
   Search, ArrowLeft, ChevronRight, Save, X, AlertTriangle,
   ExternalLink, CheckCircle2, Users, Copy, User, Shield, Sliders, Building2, Plus,
-  Key, Lock,
+  Key, Lock, Layout,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
@@ -323,6 +323,26 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 <p className="font-semibold text-foreground text-sm mb-1.5">Create Actions Audit</p>
                 <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
                   Full audit of every create/add action across Trail OS — workspaces covered, object types, entry points, and read-only views by design.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => setLocation('/admin/ux-standards')}
+                className="text-left p-5 rounded-xl border-2 bg-card border-indigo-200 hover:border-indigo-400 transition-all duration-150 hover:shadow-md group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-700">
+                    <Layout className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Standards</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Phase 1 UX Standards</p>
+                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
+                  Codified design rules for Trail OS Phase 1 — navigation, layout, role-aware views, right panel, language, responsiveness, and the mobile-first future plan.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span>
