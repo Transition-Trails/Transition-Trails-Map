@@ -64,15 +64,14 @@ function OrgMemoryPlaceholder() {
 export default function KnowledgeHub() {
   const { isEveryday, isPowerOrAbove } = useTierFlags();
 
-  const HUB_ACTIONS: ActionItem[] = [
-    { id: 'search', label: isEveryday ? 'Search Documents' : 'Search Library', icon: Search, href: '/knowledge/search', variant: 'primary' as const },
-    ...(isPowerOrAbove ? [
-      { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/knowledge/relationships', variant: 'secondary' as const },
-      { id: 'digital-twin',  label: 'Open Digital Twin',  icon: Network,   href: '/digital-twin/knowledge',  variant: 'secondary' as const },
-      { id: 'memory',        label: 'Org Memory',         icon: Archive,   href: '/knowledge/memory',        variant: 'secondary' as const },
-      { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                  variant: 'secondary' as const },
-    ] : []),
-  ];
+  // Everyday: no ActionBar — inline search in Documents tab handles discovery
+  const HUB_ACTIONS: ActionItem[] = isPowerOrAbove ? [
+    { id: 'search',        label: 'Search Library',     icon: Search,    href: '/knowledge/search',         variant: 'secondary' as const },
+    { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/knowledge/relationships',  variant: 'secondary' as const },
+    { id: 'digital-twin',  label: 'Digital Twin',       icon: Network,   href: '/digital-twin/knowledge',   variant: 'secondary' as const },
+    { id: 'memory',        label: 'Org Memory',         icon: Archive,   href: '/knowledge/memory',         variant: 'secondary' as const },
+    { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                   variant: 'secondary' as const },
+  ] : [];
 
   const TABS = [
     ...(isPowerOrAbove ? [
