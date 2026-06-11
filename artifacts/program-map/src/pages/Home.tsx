@@ -6,7 +6,7 @@ import { useLocation } from 'wouter';
 import {
   Activity, Users, Inbox, Brain,
   ArrowRight,
-  Plus, BarChart3, FileText, Bot, Map, Layers, BookOpen,
+  Plus, BarChart3, FileText, Bot, Map, BookOpen,
 } from 'lucide-react';
 
 // ── Activity items — tagged by minimum tier to show ───────────────────────────
@@ -30,7 +30,7 @@ const PROGRAM_COLORS: Record<string, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const { programs, openSlackPanel, setPennyPanelTab } = useAppContext();
+  const { programs } = useAppContext();
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, setLocation] = useLocation();
 
@@ -109,15 +109,6 @@ export default function Home() {
             </button>
           );
         })}
-        <button
-          onClick={() => isEveryday
-            ? setPennyPanelTab('signals')
-            : openSlackPanel({ context: 'home', title: TERMS.missionControl, subtitle: TERMS.signalSubtitle(TERMS.missionControl) })}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white border border-[#4A154B]/20 text-[#4A154B] hover:bg-[#4A154B]/[0.04] transition-colors whitespace-nowrap ml-auto"
-        >
-          <Layers className="w-3 h-3" />
-          {TERMS.trailSignals}
-        </button>
       </div>
 
       {/* ── Status strip ── */}

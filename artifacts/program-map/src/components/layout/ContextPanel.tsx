@@ -1726,36 +1726,17 @@ export function ContextPanel() {
                 : TERMS.knowledgeBrief
               }
             </h3>
-            {/* Header action button — Trail Insights in Penny mode, Focus collapse in Brief mode */}
-            {(!selectedItem && !actionPanel && !slackPanel) ? (
-              <button
-                onClick={() => setPennyPanelTab('signals')}
-                aria-label="View Trail Signals"
-                title="View Trail Signals"
-                className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
-                  text-violet-700 bg-violet-50 border border-violet-200
-                  hover:bg-violet-100 hover:text-violet-800 hover:border-violet-300
-                  transition-all duration-150
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
-              >
-                Trail Signals
-                <ChevronRight className="w-3 h-3" />
-              </button>
-            ) : (
-              <button
-                onClick={() => setCollapsed(true)}
-                aria-label="Collapse panel"
-                title="Collapse panel"
-                className="flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold shrink-0
-                  text-muted-foreground bg-muted/50 border border-border/60
-                  hover:bg-muted hover:text-foreground hover:border-border
-                  transition-all duration-150
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              >
-                Focus
-                <ChevronRight className="w-3 h-3" />
-              </button>
-            )}
+            {/* Collapse button — always visible, unobtrusive */}
+            <button
+              onClick={() => setCollapsed(true)}
+              aria-label="Collapse panel"
+              title="Collapse panel"
+              className="p-1.5 rounded-md text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/40
+                transition-all duration-150 flex-shrink-0
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           {/* ── Trail Signals nudge strip ───────────────────────────────────

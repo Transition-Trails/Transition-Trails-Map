@@ -1,16 +1,16 @@
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Send, Sparkles, ArrowRight,
+  Send, Sparkles, ArrowRight, ChevronDown,
   CheckCircle2, AlertTriangle, Lightbulb,
-  Hash, Folder, Calendar, Mail, Database, ExternalLink, Info,
+  Hash, Folder, Calendar, Mail, Database, ExternalLink,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { useAppContext } from '@/context/AppContext';
 import { SIGNAL_COUNTS, locationToContext } from '@/data/signalCounts';
 
-// ── Page context ───────────────────────────────────────────────────────────────
+// ── Page context ──────────────────────────────────────────────────────────────
 
 type PageCtx =
   | 'home' | 'programs' | 'penny' | 'operations'
@@ -18,37 +18,34 @@ type PageCtx =
 
 function deriveCtx(loc: string): PageCtx {
   if (loc === '/' || loc === '') return 'home';
-  if (loc.startsWith('/program'))       return 'programs';
-  if (loc.startsWith('/penny'))         return 'penny';
-  if (loc.startsWith('/operations'))    return 'operations';
-  if (loc.startsWith('/knowledge'))     return 'knowledge';
-  if (loc.startsWith('/collaboration')) return 'collaboration';
-  if (loc.startsWith('/admin'))         return 'admin';
+  if (loc.startsWith('/program'))        return 'programs';
+  if (loc.startsWith('/penny'))          return 'penny';
+  if (loc.startsWith('/operations'))     return 'operations';
+  if (loc.startsWith('/knowledge'))      return 'knowledge';
+  if (loc.startsWith('/collaboration'))  return 'collaboration';
+  if (loc.startsWith('/admin'))          return 'admin';
   if (loc.startsWith('/digital-twin') || loc.startsWith('/uom') || loc.startsWith('/governance'))
     return 'digital-twin';
   return 'default';
 }
 
-// ── Signal source config ───────────────────────────────────────────────────────
+// ── Source config ─────────────────────────────────────────────────────────────
 
 const SOURCE_ICO = {
-  slack:      { Icon: Hash,     cls: 'text-[#4A154B]',    bg: 'bg-[#4A154B]/10', label: 'Slack' },
-  drive:      { Icon: Folder,   cls: 'text-blue-600',     bg: 'bg-blue-50',      label: 'Google Drive' },
-  calendar:   { Icon: Calendar, cls: 'text-emerald-600',  bg: 'bg-emerald-50',   label: 'Google Calendar' },
-  email:      { Icon: Mail,     cls: 'text-amber-600',    bg: 'bg-amber-50',     label: 'Gmail' },
-  salesforce: { Icon: Database, cls: 'text-sky-600',      bg: 'bg-sky-50',       label: 'Salesforce' },
+  slack:      { Icon: Hash,     cls: 'text-[#4A154B]',    bg: 'bg-[#4A154B]/8',  label: 'Slack' },
+  drive:      { Icon: Folder,   cls: 'text-blue-600',     bg: 'bg-blue-50',       label: 'Google Drive' },
+  calendar:   { Icon: Calendar, cls: 'text-emerald-600',  bg: 'bg-emerald-50',    label: 'Google Calendar' },
+  email:      { Icon: Mail,     cls: 'text-amber-600',    bg: 'bg-amber-50',      label: 'Gmail' },
+  salesforce: { Icon: Database, cls: 'text-sky-600',      bg: 'bg-sky-50',        label: 'Salesforce' },
 } as const;
 type SigSource = keyof typeof SOURCE_ICO;
 
-// Connection status per source — shown as trust cues in the Trail Signals tab
-const SOURCE_CONNECT: Record<SigSource, {
-  status: string; cls: string; dotCls: string; link?: string;
-}> = {
-  slack:      { status: 'Prototype-Ready', cls: 'text-amber-600',       dotCls: 'bg-amber-400',          link: 'https://transitiontrails.slack.com' },
-  drive:      { status: 'Connected',       cls: 'text-emerald-600',     dotCls: 'bg-emerald-500',         link: 'https://drive.google.com' },
-  calendar:   { status: 'Connected',       cls: 'text-emerald-600',     dotCls: 'bg-emerald-500',         link: 'https://calendar.google.com' },
+const SOURCE_CONNECT: Record<SigSource, { status: string; cls: string; dotCls: string; link?: string }> = {
+  slack:      { status: 'Prototype-Ready', cls: 'text-amber-600',        dotCls: 'bg-amber-400',          link: 'https://transitiontrails.slack.com' },
+  drive:      { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://drive.google.com' },
+  calendar:   { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://calendar.google.com' },
   email:      { status: 'Phase 2',         cls: 'text-muted-foreground', dotCls: 'bg-muted-foreground/30' },
-  salesforce: { status: 'Prototype',       cls: 'text-sky-600',         dotCls: 'bg-sky-400' },
+  salesforce: { status: 'Prototype',       cls: 'text-sky-600',          dotCls: 'bg-sky-400' },
 };
 
 type SigItem = {
@@ -56,7 +53,6 @@ type SigItem = {
   source: SigSource;
   text: string;
   meta: string;
-  /** Why Penny surfaced this — trains users to trust the data behind insights */
   why: string;
 };
 
@@ -65,7 +61,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: true,  source: 'slack',      text: 'Learning Coach: low confidence on Cohort 3 recap scoring',     meta: '8m ago',  why: 'Penny monitors coach confidence scores to flag when outputs may need human review before affecting learner feedback' },
     { urgent: true,  source: 'salesforce', text: 'Trail of Mastery source docs overdue — execute phase blocked', meta: '1h ago',  why: 'This Salesforce phase record requires documentation before Penny can generate content or update program status' },
     { urgent: false, source: 'slack',      text: 'Foundations Trail Cohort 2: enrollment at 89% capacity',       meta: '2h ago',  why: 'Penny watches enrollment channels to flag when a new cohort may need to open soon' },
-    { urgent: false, source: 'drive',      text: 'Sprint 3 Resume Writing materials updated',                    meta: '3h ago',  why: 'Penny reads Drive so learners and coaches always see the most current version of program materials' },
+    { urgent: false, source: 'drive',      text: 'Sprint 3 Resume Writing materials updated',                    meta: '3h ago',  why: 'Penny reads Drive so learners always see the most current version of program materials' },
     { urgent: false, source: 'calendar',   text: 'Sprint 3 session confirmed — Thursday 10am',                   meta: '5h ago',  why: 'Penny reads Calendar to surface upcoming milestones and session timing relevant to your programs' },
     { urgent: false, source: 'email',      text: 'Weekly brief generated — 3 cohort updates',                    meta: '6h ago',  why: 'Penny monitors email digests to track program communication patterns (Phase 2 — read-only access)' },
     { urgent: false, source: 'salesforce', text: "Explorer's Trail Cohort 3 — 3 enrollment slots open",          meta: '8h ago',  why: 'Penny tracks Salesforce enrollment records to surface open capacity for outreach or cohort planning' },
@@ -91,8 +87,8 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: 'Foundations Trail capacity alert: 89%',                        meta: '8h ago',  why: 'Penny monitors Salesforce cohort records to flag when enrollment is approaching its limit' },
   ],
   knowledge: [
-    { urgent: false, source: 'drive',      text: "12 documents flagged 'needs-review'",                          meta: '2h ago',  why: "Penny reads Drive metadata to surface documents that may be outdated — these affect what Penny can cite" },
-    { urgent: false, source: 'drive',      text: 'Source Mapping updated — RESOLVE Course Canvas',               meta: '3h ago',  why: 'Penny watches source mapping records to know when the knowledge graph changes and reindex accordingly' },
+    { urgent: false, source: 'drive',      text: "12 documents flagged 'needs-review'",                          meta: '2h ago',  why: "Penny reads Drive metadata to surface documents that may be outdated — these affect what Penny can reliably cite" },
+    { urgent: false, source: 'drive',      text: 'Source Mapping updated — RESOLVE Course Canvas',               meta: '3h ago',  why: 'Penny watches source mapping records to know when the knowledge graph changes and can reindex' },
     { urgent: false, source: 'slack',      text: 'Sprint 3 materials question in #guided-trail',                 meta: '5h ago',  why: 'Penny monitors program channels to surface learner questions that may indicate a materials gap' },
     { urgent: false, source: 'salesforce', text: 'Org Memory: 234 Penny interactions logged this week',          meta: '6h ago',  why: "Penny reads its interaction log to identify knowledge gaps and improve future answers" },
   ],
@@ -117,7 +113,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   ],
 };
 
-// ── Penny content definitions ──────────────────────────────────────────────────
+// ── Page content ──────────────────────────────────────────────────────────────
 
 type AttItem  = { icon: typeof CheckCircle2; bg: string; iconCls: string; text: string };
 type StepItem = { label: string; path: string };
@@ -341,19 +337,19 @@ const CONTENT: Record<PageCtx, PageContent> = {
   },
 };
 
-// ── Component ──────────────────────────────────────────────────────────────────
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function PagePennyGuide() {
   const [location, setLocation] = useLocation();
   const { isEveryday, isPowerOrAbove } = useTierFlags();
   const { pennyPanelTab, setPennyPanelTab } = useAppContext();
-  const [query, setQuery]       = useState('');
+  const [query, setQuery]   = useState('');
   const [response, setResponse] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const ctx         = deriveCtx(location);
-  const content     = CONTENT[ctx];
-  const signalCtx   = locationToContext(location);
+  const ctx        = deriveCtx(location);
+  const content    = CONTENT[ctx];
+  const signalCtx  = locationToContext(location);
   const nudgeCounts = SIGNAL_COUNTS[signalCtx] ?? null;
   const signalItems = SIGNAL_ITEMS[ctx] ?? SIGNAL_ITEMS.default;
   const urgentCount = nudgeCounts?.urgent ?? 0;
@@ -363,13 +359,21 @@ export function PagePennyGuide() {
   const steps    = isEveryday ? content.everydaySteps    : content.powerSteps;
   const canned   = isEveryday ? content.everydayCanned   : content.powerCanned;
 
-  // Group signal items by source for the Trail Signals tab
+  // Trail Signals accordion — open when pennyPanelTab === 'signals'
+  const signalsOpen = pennyPanelTab === 'signals';
+  function toggleSignals() {
+    setPennyPanelTab(signalsOpen ? 'penny' : 'signals');
+  }
+
+  // Active display tab — 'signals' maps to the Penny tab with accordion open
+  const activeTab = pennyPanelTab === 'ask' ? 'ask' : 'penny';
+
+  // Group signals by source
   const signalsBySource = signalItems.reduce<Partial<Record<SigSource, SigItem[]>>>((acc, item) => {
     if (!acc[item.source]) acc[item.source] = [];
     acc[item.source]!.push(item);
     return acc;
   }, {});
-  // Order: urgent sources first, then by source priority
   const sourceOrder: SigSource[] = ['slack', 'salesforce', 'drive', 'calendar', 'email'];
   const presentSources = sourceOrder.filter(s => signalsBySource[s]?.length);
 
@@ -379,44 +383,28 @@ export function PagePennyGuide() {
     setQuery('');
   }
 
-  // ── Tab bar ──────────────────────────────────────────────────────────────
-  const TABS = [
-    { id: 'penny'   as const, label: 'Penny',          badge: null,       urgent: false },
-    { id: 'signals' as const, label: 'Trail Signals',  badge: totalCount, urgent: urgentCount > 0 },
-    { id: 'ask'     as const, label: 'Ask',             badge: null,       urgent: false },
-  ];
-
   return (
     <div className="flex flex-col h-full overflow-hidden">
 
-      {/* Tab bar */}
+      {/* ── Tab bar: Penny | Ask ─────────────────────────────────────────── */}
       <div className="flex shrink-0 border-b border-border/40 bg-white/80">
-        {TABS.map(tab => (
+        {(['penny', 'ask'] as const).map(tab => (
           <button
-            key={tab.id}
-            onClick={() => setPennyPanelTab(tab.id)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-[11px] font-medium border-b-2 transition-all duration-150 ${
-              pennyPanelTab === tab.id
+            key={tab}
+            onClick={() => setPennyPanelTab(tab)}
+            className={`flex-1 px-3 py-2 text-[11px] font-medium border-b-2 transition-all duration-150 ${
+              activeTab === tab
                 ? 'border-violet-500 text-violet-700 bg-violet-50/40'
-                : 'border-transparent text-muted-foreground/70 hover:text-foreground hover:border-border/50'
+                : 'border-transparent text-muted-foreground/60 hover:text-foreground hover:border-border/40'
             }`}
           >
-            {tab.label}
-            {tab.badge !== null && tab.badge > 0 && (
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none ${
-                tab.urgent
-                  ? 'bg-amber-100 text-amber-700 border border-amber-200'
-                  : 'bg-muted/80 text-muted-foreground border border-border/60'
-              }`}>
-                {tab.badge}
-              </span>
-            )}
+            {tab === 'penny' ? 'Penny Insights' : 'Ask Penny'}
           </button>
         ))}
       </div>
 
-      {/* ── Penny Insights tab ────────────────────────────────────────────── */}
-      {pennyPanelTab === 'penny' && (
+      {/* ── Penny Insights tab ───────────────────────────────────────────── */}
+      {activeTab === 'penny' && (
         isEveryday && insights.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 text-center p-5 h-full">
             <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
@@ -426,18 +414,18 @@ export function PagePennyGuide() {
               Ask Penny a question or select an item to open its brief.
             </p>
             <button onClick={() => setPennyPanelTab('ask')} className="flex items-center gap-1 text-[10px] font-medium text-violet-600 hover:underline">
-              Open Ask <ArrowRight className="w-2.5 h-2.5" />
+              Ask a question <ArrowRight className="w-2.5 h-2.5" />
             </button>
           </div>
         ) : (
           <ScrollArea className="h-full">
             <div className="p-4 space-y-4">
 
-              {/* Penny Insights header */}
+              {/* Penny Insights section */}
               {insights.length > 0 && (
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-2">
-                    {isEveryday ? 'Penny Insights · Your Learning Coach' : 'Penny Insights · Chief of Staff'}
+                    {isEveryday ? 'Penny · Your Learning Coach' : 'Penny · Chief of Staff'}
                   </p>
                   <div className="rounded-lg border border-violet-100 bg-violet-50/50 p-3 space-y-1.5">
                     {insights.map((text, i) => (
@@ -447,15 +435,122 @@ export function PagePennyGuide() {
                       </div>
                     ))}
                   </div>
-                  {/* Trust bridge — directs users to verify via Trail Signals */}
+                </div>
+              )}
+
+              {/* ── Trail Signals accordion ──────────────────────────────────
+                  The evidence layer — shows the source-level data behind
+                  Penny's insights above. Collapsed by default, expand to verify.
+              ──────────────────────────────────────────────────────────────── */}
+              {totalCount > 0 && (
+                <div className="rounded-lg border border-border/60 overflow-hidden">
+
+                  {/* Accordion header — always visible */}
                   <button
-                    onClick={() => setPennyPanelTab('signals')}
-                    className="mt-1.5 w-full flex items-center gap-1 text-[9px] text-muted-foreground/50 hover:text-violet-600 transition-colors group"
+                    onClick={toggleSignals}
+                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-left transition-colors ${
+                      signalsOpen ? 'bg-slate-50 border-b border-border/40' : 'bg-white hover:bg-muted/20'
+                    }`}
                   >
-                    <Info className="w-2.5 h-2.5 shrink-0 group-hover:text-violet-500" />
-                    See the Trail Signals behind these insights
-                    <ArrowRight className="w-2.5 h-2.5 ml-auto group-hover:text-violet-500" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[10px] font-bold text-foreground/80 uppercase tracking-wide">Trail Signals</p>
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full leading-none ${
+                          urgentCount > 0
+                            ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                            : 'bg-muted text-muted-foreground border border-border/60'
+                        }`}>
+                          {totalCount}
+                        </span>
+                        {urgentCount > 0 && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+                        )}
+                      </div>
+                      {!signalsOpen && (
+                        <p className="text-[9px] text-muted-foreground/50 mt-0.5 leading-snug">
+                          {presentSources.length} source{presentSources.length !== 1 ? 's' : ''} · {urgentCount > 0 ? `${urgentCount} urgent · ` : ''}tap to see the data behind these insights
+                        </p>
+                      )}
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0 transition-transform duration-200 ${signalsOpen ? 'rotate-180' : ''}`} />
                   </button>
+
+                  {/* Accordion body — source-grouped signals */}
+                  {signalsOpen && (
+                    <div className="divide-y divide-border/30">
+                      {presentSources.map(src => {
+                        const items   = signalsBySource[src]!;
+                        const ico     = SOURCE_ICO[src];
+                        const conn    = SOURCE_CONNECT[src];
+                        const SrcIcon = ico.Icon;
+                        const hasUrgent = items.some(i => i.urgent);
+
+                        return (
+                          <div key={src}>
+                            {/* Source header */}
+                            <div className={`flex items-center gap-2 px-3 py-1.5 ${ico.bg}`}>
+                              <SrcIcon className={`w-3 h-3 ${ico.cls} flex-shrink-0`} />
+                              <div className="flex-1 min-w-0 flex items-center gap-1.5">
+                                <span className={`text-[10px] font-semibold ${ico.cls}`}>{ico.label}</span>
+                                {hasUrgent && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />}
+                                <span className={`text-[9px] ${conn.cls} ml-0.5`}>· {conn.status}</span>
+                              </div>
+                              {conn.link && (
+                                <a
+                                  href={conn.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-muted-foreground/30 hover:text-muted-foreground transition-colors"
+                                  title={`Open ${ico.label}`}
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </a>
+                              )}
+                            </div>
+
+                            {/* Signal items */}
+                            <div className="bg-white divide-y divide-border/20">
+                              {items.map((item, i) => (
+                                <div key={i} className={`px-3 py-2 ${item.urgent ? 'bg-amber-50/30' : ''}`}>
+                                  <div className="flex items-start gap-1.5">
+                                    {item.urgent
+                                      ? <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+                                      : <span className="w-1 h-1 rounded-full bg-muted-foreground/20 flex-shrink-0 mt-1.5" />
+                                    }
+                                    <div className="flex-1 min-w-0">
+                                      <p className={`text-[11px] leading-snug ${item.urgent ? 'font-medium text-amber-900' : 'text-foreground'}`}>
+                                        {item.text}
+                                      </p>
+                                      {item.meta && (
+                                        <p className="text-[9px] text-muted-foreground/40 mt-0.5">{item.meta}</p>
+                                      )}
+                                      <p className="text-[9px] text-muted-foreground/50 italic leading-snug mt-1 border-l-2 border-border/40 pl-1.5">
+                                        {item.why}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Footer — close + context note */}
+                      <div className="px-3 py-2 bg-muted/20 flex items-center justify-between gap-2">
+                        <p className="text-[9px] text-muted-foreground/40 leading-snug">
+                          Phase 1 · Prototype data — live connections Q3 2025
+                        </p>
+                        <button
+                          onClick={toggleSignals}
+                          className="text-[9px] text-muted-foreground/50 hover:text-foreground font-medium whitespace-nowrap transition-colors"
+                        >
+                          Hide ▴
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -477,7 +572,7 @@ export function PagePennyGuide() {
                 </div>
               )}
 
-              {/* Next steps */}
+              {/* Quick actions */}
               {steps.length > 0 && (
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5">
@@ -503,125 +598,26 @@ export function PagePennyGuide() {
                   </p>
                 </div>
               )}
+
             </div>
           </ScrollArea>
         )
       )}
 
-      {/* ── Trail Signals tab ─────────────────────────────────────────────── */}
-      {pennyPanelTab === 'signals' && (
-        <ScrollArea className="h-full">
-          <div className="p-3 space-y-3">
-
-            {/* Header */}
-            <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Trail Signals</p>
-              <p className="text-[11px] text-muted-foreground leading-snug">
-                The data Penny is watching — {totalCount} signal{totalCount !== 1 ? 's' : ''} across {presentSources.length} source{presentSources.length !== 1 ? 's' : ''}
-                {urgentCount > 0 && <> · <span className="font-semibold text-amber-600">{urgentCount} urgent</span></>}
-              </p>
-            </div>
-
-            {/* Source groups */}
-            {presentSources.map(src => {
-              const items  = signalsBySource[src]!;
-              const ico    = SOURCE_ICO[src];
-              const conn   = SOURCE_CONNECT[src];
-              const SrcIcon = ico.Icon;
-              const hasUrgent = items.some(i => i.urgent);
-
-              return (
-                <div key={src} className="rounded-lg border border-border/50 overflow-hidden">
-
-                  {/* Source header */}
-                  <div className={`flex items-center gap-2 px-3 py-2 ${ico.bg} border-b border-border/30`}>
-                    <span className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 bg-white/70`}>
-                      <SrcIcon className={`w-3 h-3 ${ico.cls}`} />
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`text-[10px] font-bold ${ico.cls}`}>{ico.label}</span>
-                        {hasUrgent && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${conn.dotCls}`} />
-                        <span className={`text-[9px] font-medium ${conn.cls}`}>{conn.status}</span>
-                      </div>
-                    </div>
-                    {conn.link && (
-                      <a
-                        href={conn.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-0.5 text-[9px] text-muted-foreground/50 hover:text-foreground transition-colors shrink-0"
-                        title={`Open ${ico.label}`}
-                      >
-                        <ExternalLink className="w-2.5 h-2.5" />
-                      </a>
-                    )}
-                  </div>
-
-                  {/* Signal items */}
-                  <div className="divide-y divide-border/30 bg-white">
-                    {items.map((item, i) => (
-                      <div key={i} className={`px-3 py-2.5 ${item.urgent ? 'bg-amber-50/40' : ''}`}>
-                        <div className="flex items-start gap-1.5">
-                          {item.urgent
-                            ? <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
-                            : <span className="w-1 h-1 rounded-full bg-muted-foreground/25 flex-shrink-0 mt-1.5" />
-                          }
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[11px] leading-snug ${item.urgent ? 'font-medium text-amber-900' : 'text-foreground'}`}>
-                              {item.text}
-                            </p>
-                            {item.meta && (
-                              <p className="text-[9px] text-muted-foreground/50 mt-0.5">{item.meta}</p>
-                            )}
-                            {/* Why this matters — trust cue */}
-                            <p className="text-[9px] text-muted-foreground/55 italic leading-snug mt-1 border-l-2 border-border/50 pl-1.5">
-                              {item.why}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Trust footer */}
-            <div className="rounded-md bg-muted/20 border border-border/40 p-2.5">
-              <p className="text-[9px] text-muted-foreground/50 leading-relaxed">
-                <span className="font-semibold text-muted-foreground/70">Penny Insights</span> interpret these signals into plain-language recommendations.{' '}
-                <button onClick={() => setPennyPanelTab('penny')} className="text-violet-600 hover:underline font-medium">
-                  View Penny Insights ›
-                </button>
-              </p>
-              <p className="text-[9px] text-muted-foreground/40 mt-1">Phase 1 · Prototype data — Live connections Q3 2025</p>
-            </div>
-
-          </div>
-        </ScrollArea>
-      )}
-
-      {/* ── Ask tab ───────────────────────────────────────────────────────── */}
-      {pennyPanelTab === 'ask' && (
+      {/* ── Ask Penny tab ─────────────────────────────────────────────────── */}
+      {activeTab === 'ask' && (
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
 
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-2">Ask Penny</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-1.5">Ask Penny</p>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
                 {isEveryday
-                  ? 'Ask me about your programs, upcoming sessions, or anything in the Knowledge Library. I can also explain any Trail Signal.'
-                  : 'Ask me about this page, system relationships, or operational context. I can explain any Trail Signal or Penny Insight.'}
+                  ? 'Ask me about your programs, upcoming sessions, or anything in the Knowledge Library. I can also explain any signal.'
+                  : 'Ask me about this page, system relationships, or operational context. I can explain any Trail Signal or insight.'}
               </p>
             </div>
 
-            {/* Response */}
             {response && (
               <div className="rounded-lg border border-violet-200 bg-violet-50 p-3">
                 <div className="flex items-center gap-1.5 mb-1.5">
@@ -637,7 +633,6 @@ export function PagePennyGuide() {
               </div>
             )}
 
-            {/* Input */}
             <div className="space-y-2">
               <div className="flex gap-1.5">
                 <input
@@ -661,13 +656,12 @@ export function PagePennyGuide() {
               </p>
             </div>
 
-            {/* Suggestions */}
             {!response && (
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Try asking</p>
                 <div className="space-y-1">
                   {(isEveryday
-                    ? ["What's happening with my programs?", "Why did Penny flag the Learning Coach signal?", "Find Sprint 3 materials"]
+                    ? ["What's happening with my programs?", "Why did Penny flag the Learning Coach?", "Find Sprint 3 materials"]
                     : ["What needs attention today?", "Why is Trail of Mastery blocked?", "Explain the Salesforce signals"]
                   ).map((suggestion, i) => (
                     <button
