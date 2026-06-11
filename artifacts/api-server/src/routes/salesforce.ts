@@ -143,18 +143,57 @@ router.get("/salesforce/validate", async (req, res) => {
     checks.push({ id: "npsp", category: "NPSP", label: "Nonprofit Success Pack detected", status: "warning", detail: "NPSP custom objects not found. Org may use Nonprofit Cloud or NPSP is not installed." });
   }
 
-  // ── 6. Program__c (Trail OS custom object) ────────────────────────────────
-  try {
-    const r = await sfQuery(proxyFetch, "SELECT Id, Name FROM Program__c LIMIT 5");
-    const names = r.records.map(p => String(p["Name"] ?? "")).filter(Boolean);
+  // ── 6. PMM (Program Management Module) detection ──────────────────────────
+  // PMM is a Salesforce managed package add-on for NPSP/Nonprofit Cloud.
+  // All PMM objects live under the pmdm__ namespace.
+  const PMM_OBJECTS: { api: string; label: string }[] = [
+    { api: "pmdm__Program__c",              label: "Programs" },
+    { api: "pmdm__ProgramEngagement__c",    label: "Program Engagements" },
+    { api: "pmdm__ServiceDelivery__c",      label: "Service Deliveries" },
+    { api: "pmdm__Service__c",              label: "Services" },
+    { api: "pmdm__ProgramCohort__c",        label: "Program Cohorts" },
+    { api: "pmdm__ServiceSchedule__c",      label: "Service Schedules" },
+    { api: "pmdm__ServiceSession__c",       label: "Service Sessions" },
+    { api: "pmdm__ServiceParticipant__c",   label: "Service Participants" },
+  ];
+
+  const pmmObjects: { object: string; label: string; accessible: boolean; count: number; error?: string }[] = [];
+  let pmmDetected = false;
+
+  await Promise.all(
+    PMM_OBJECTS.map(async ({ api, label }) => {
+      try {
+        const r = await sfQuery(proxyFetch, `SELECT COUNT() FROM ${api}`);
+        pmmObjects.push({ object: api, label, accessible: true, count: r.totalSize });
+        pmmDetected = true;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        pmmObjects.push({ object: api, label, accessible: false, count: 0, error: msg.slice(0, 120) });
+      }
+    })
+  );
+
+  // Sort: accessible first, then alphabetically
+  pmmObjects.sort((a, b) => {
+    if (a.accessible !== b.accessible) return a.accessible ? -1 : 1;
+    return a.label.localeCompare(b.label);
+  });
+
+  if (pmmDetected) {
+    const accessible = pmmObjects.filter(o => o.accessible);
+    const totalRecords = accessible.reduce((s, o) => s + o.count, 0);
     checks.push({
-      id: "program-object", category: "Trail OS", label: "Program__c object accessible", status: "pass",
-      detail: `Program__c queryable — ${r.totalSize} records. Sample: ${names.join(", ") || "(none)"}`,
-      meta: { count: r.totalSize, sample: r.records.map(p => ({ id: p["Id"], name: p["Name"] })) },
+      id: "pmm", category: "PMM", label: "Program Management Module detected",
+      status: "pass",
+      detail: `PMM installed — ${accessible.length}/${PMM_OBJECTS.length} objects accessible, ${totalRecords.toLocaleString()} total records across all PMM objects.`,
+      meta: { objectsAccessible: accessible.length, objectsTotal: PMM_OBJECTS.length, totalRecords, objects: pmmObjects },
     });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    checks.push({ id: "program-object", category: "Trail OS", label: "Program__c object accessible", status: "warning", detail: `Program__c: ${msg.slice(0, 150)}` });
+  } else {
+    checks.push({
+      id: "pmm", category: "PMM", label: "Program Management Module detected",
+      status: "warning",
+      detail: "No pmdm__ objects found. PMM may not be installed, or the connected user lacks access.",
+    });
   }
 
   return res.json({
@@ -162,6 +201,8 @@ router.get("/salesforce/validate", async (req, res) => {
     orgInfo,
     objects: objectResults,
     npspDetected,
+    pmmDetected,
+    pmmObjects,
     identity,
     durationMs: Date.now() - start,
     timestamp: new Date().toISOString(),

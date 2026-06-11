@@ -68,11 +68,17 @@ interface SalesforceCheck {
   detail: string; meta?: Record<string, unknown>;
 }
 
+interface PmmObject {
+  object: string; label: string; accessible: boolean; count: number; error?: string;
+}
+
 interface SalesforceResult {
   checks: SalesforceCheck[];
   orgInfo: { name: string | null; id: string | null; edition: string | null; sandboxType: string | null } | null;
   objects: { object: string; accessible: boolean; count: number; error?: string }[];
   npspDetected: boolean;
+  pmmDetected: boolean;
+  pmmObjects: PmmObject[];
   identity: { username: string | null; displayName: string | null; email: string | null } | null;
   durationMs: number;
   timestamp: string;
@@ -339,11 +345,46 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
                 ))}
                 {result.npspDetected && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-700">
-                    <CheckCircle className="w-3 h-3" /> NPSP detected
+                    <CheckCircle className="w-3 h-3" /> NPSP
+                  </span>
+                )}
+                {result.pmmDetected && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-violet-700">
+                    <CheckCircle className="w-3 h-3" /> PMM
                   </span>
                 )}
               </div>
             </div>
+
+            {/* PMM object breakdown */}
+            {result.pmmObjects && result.pmmObjects.length > 0 && (
+              <div className="rounded border border-violet-200 bg-violet-50 px-3 py-2 space-y-1.5">
+                <p className="text-[11px] font-bold text-violet-800">
+                  Program Management Module (PMM)
+                  {result.pmmDetected
+                    ? ` · ${result.pmmObjects.filter(o => o.accessible).length}/${result.pmmObjects.length} objects accessible`
+                    : ' · not detected'}
+                </p>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                  {result.pmmObjects.map(o => (
+                    <div key={o.object} className="flex items-center gap-1.5">
+                      {o.accessible
+                        ? <CheckCircle className="w-3 h-3 text-violet-500 shrink-0" />
+                        : <XCircle className="w-3 h-3 text-rose-400 shrink-0" />}
+                      <span className={`text-[10px] font-semibold ${o.accessible ? 'text-violet-800' : 'text-rose-700'}`}>{o.label}</span>
+                      {o.accessible && (
+                        <span className="text-[10px] text-violet-600 ml-auto">{o.count.toLocaleString()}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {result.pmmDetected && (
+                  <p className="text-[10px] text-violet-600 pt-0.5">
+                    Total: {result.pmmObjects.filter(o => o.accessible).reduce((s, o) => s + o.count, 0).toLocaleString()} records across {result.pmmObjects.filter(o => o.accessible).length} PMM objects
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Check list */}
             <div className="space-y-1">
