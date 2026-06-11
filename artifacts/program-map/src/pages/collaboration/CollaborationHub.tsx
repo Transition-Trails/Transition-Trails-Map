@@ -27,15 +27,7 @@ export default function CollaborationHub() {
     ...(isPowerOrAbove ? [
       { id: 'slack',    label: 'Slack Integration', path: '/collaboration/slack',    icon: Hash,         content: <SlackIntegrationCenter /> },
       { id: 'drive',    label: 'Google Drive',      path: '/collaboration/drive',    icon: HardDrive,    content: <GoogleDriveIntegrationCenter /> },
-    ] : []),
-    {
-      id: 'calendar',
-      label: 'Google Calendar',
-      path: '/collaboration/calendar',
-      icon: CalendarDays,
-      content: <GoogleCalendarIntegrationCenter />,
-    },
-    ...(isPowerOrAbove ? [
+      { id: 'calendar', label: 'Google Calendar',   path: '/collaboration/calendar', icon: CalendarDays, content: <GoogleCalendarIntegrationCenter /> },
       { id: 'channels',      label: 'Channels',      path: '/collaboration/channels',      icon: Hash,      content: <CommChannels /> },
       { id: 'templates',     label: 'Templates',     path: '/collaboration/templates',     icon: FileText,  content: <CommMessageTemplates /> },
       { id: 'briefs',        label: 'Weekly Briefs', path: '/collaboration/briefs',        icon: BookOpen,  content: <WeeklyBriefs /> },
