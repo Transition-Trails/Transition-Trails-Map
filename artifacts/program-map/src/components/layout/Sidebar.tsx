@@ -125,6 +125,8 @@ const navGroups: NavGroup[] = [
       { id: 'lbl-readiness',   label: 'Readiness', isLabel: true },
       { id: 'admin-readiness', path: '/admin/phase1-readiness', label: 'Phase 1 Readiness' },
       { id: 'admin-ux-standards', path: '/admin/ux-standards',  label: 'Phase 1 UX Standards' },
+      { id: 'lbl-backlog', label: 'Backlog', isLabel: true },
+      { id: 'admin-phase2-backlog', path: '/admin/phase2-backlog', label: 'Phase 2 Backlog' },
     ],
   },
 ];

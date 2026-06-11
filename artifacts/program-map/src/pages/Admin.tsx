@@ -4,7 +4,7 @@ import {
   Layers, FileText, Compass, Brain, Monitor, Plug,
   Search, ArrowLeft, ChevronRight, Save, X, AlertTriangle,
   ExternalLink, CheckCircle2, Users, Copy, User, Shield, Sliders, Building2, Plus,
-  Key, Lock, Layout,
+  Key, Lock, Layout, ListTodo,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
@@ -344,6 +344,32 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 <p className="font-semibold text-foreground text-sm mb-1.5">Phase 1 UX Standards</p>
                 <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
                   Codified design rules for Trail OS Phase 1 — navigation, layout, role-aware views, right panel, language, responsiveness, and the mobile-first future plan.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Phase 2 Planning */}
+          <div className="mt-5">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Planning</p>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => setLocation('/admin/phase2-backlog')}
+                className="text-left p-4 rounded-lg border bg-card border-stone-200 hover:border-stone-400 transition-all duration-150 hover:shadow-sm group"
+              >
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-stone-50 text-stone-700">
+                    <ListTodo className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Phase 2</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Phase 2 Backlog</p>
+                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
+                  10 draft feature cards for Phase 2 — Penny panel, Trail Signals control, Gmail & Calendar panels, Google Auth, Mural, mobile experience, and more.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span>
