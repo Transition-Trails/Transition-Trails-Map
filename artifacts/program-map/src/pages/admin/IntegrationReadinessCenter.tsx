@@ -1025,12 +1025,12 @@ export default function IntegrationReadinessCenter() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
+      <div className="px-4 pt-3 pb-2.5 border-b border-border flex-shrink-0 bg-background">
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration — Integration Planning</p>
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Integration Readiness Center</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <h1 className="text-[15px] font-semibold text-foreground">Integration Readiness Center</h1>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
               Plan real integrations without connecting live APIs. {IRC_SUMMARY.total} integrations across {DOMAIN_ORDER.length} domains.
             </p>
           </div>

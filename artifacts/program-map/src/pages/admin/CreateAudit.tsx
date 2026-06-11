@@ -239,25 +239,25 @@ export default function CreateAudit() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl mx-auto space-y-8">
+      <div className="p-4 max-w-5xl mx-auto space-y-4">
 
         {/* Header */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Administration — Audit</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Create Actions Audit</h1>
-          <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration — Audit</p>
+          <h1 className="text-base font-semibold text-foreground">Create Actions Audit</h1>
+          <p className="text-[12px] text-muted-foreground mt-0.5 max-w-2xl">
             Comprehensive record of every create/add action added across Trail OS. All use the shared <code className="text-[11px] bg-muted rounded px-1">CreatePanel</code> pattern — in-page, Draft status, consistent Cancel / Save Draft / Save &amp; View controls.
           </p>
 
           {/* Summary strip */}
-          <div className="grid grid-cols-3 gap-3 mt-5">
+          <div className="grid grid-cols-3 gap-2.5 mt-3">
             {[
               { label: 'Actions Added',          v: addedCount,        cls: 'text-emerald-600' },
               { label: 'Workspaces Covered',     v: workspaceCount,    cls: 'text-primary' },
               { label: 'Read-Only by Design',    v: READ_ONLY.length,  cls: 'text-sky-600' },
             ].map(s => (
-              <div key={s.label} className="rounded-xl border border-border bg-white px-4 py-3 text-center">
-                <p className={`text-3xl font-bold font-serif ${s.cls}`}>{s.v}</p>
+              <div key={s.label} className="rounded-lg border border-border bg-white px-3 py-2.5 text-center">
+                <p className={`text-xl font-bold ${s.cls}`}>{s.v}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
               </div>
             ))}
@@ -265,7 +265,7 @@ export default function CreateAudit() {
         </div>
 
         {/* Pattern card */}
-        <div className="rounded-xl border border-border bg-white p-5 space-y-3">
+        <div className="rounded-lg border border-border bg-white p-4 space-y-3">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Shared Pattern — CreatePanel</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[

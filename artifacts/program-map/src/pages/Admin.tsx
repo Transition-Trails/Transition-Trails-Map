@@ -198,12 +198,13 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <ScrollArea className="flex-1">
-        <div className="p-6 max-w-4xl">
+        <div className="p-4 max-w-4xl">
           {/* Header */}
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-serif font-bold text-foreground">Knowledge Management</h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration</p>
+              <h1 className="text-base font-semibold text-foreground">Knowledge Management</h1>
+              <p className="text-[12px] text-muted-foreground mt-0.5">
                 Edit dashboard content — programs, documents, capabilities, and frameworks.
               </p>
             </div>
@@ -223,15 +224,15 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
           </div>
 
           {/* 3-column card grid */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             {areas.map(area => (
               <button
                 key={area.id}
                 onClick={() => onNavigate(area.id)}
-                className={`text-left p-5 rounded-xl border-2 bg-card transition-all duration-150 hover:shadow-md group ${area.borderColor}`}
+                className={`text-left p-4 rounded-lg border bg-card transition-all duration-150 hover:shadow-sm group ${area.borderColor}`}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${area.iconBg}`}>
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${area.iconBg}`}>
                     {area.icon}
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold tabular-nums">{area.count}</Badge>
@@ -247,15 +248,15 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
           </div>
 
           {/* Integration & Readiness tools */}
-          <div className="mt-8">
+          <div className="mt-5">
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Integration &amp; Readiness</p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setLocation('/admin/secrets-audit')}
-                className="text-left p-5 rounded-xl border-2 bg-card border-sky-200 hover:border-sky-400 transition-all duration-150 hover:shadow-md group"
+                className="text-left p-4 rounded-lg border bg-card border-sky-200 hover:border-sky-400 transition-all duration-150 hover:shadow-sm group"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-sky-50 text-sky-700">
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-sky-50 text-sky-700">
                     <Key className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">Live</Badge>
@@ -272,10 +273,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
               <button
                 onClick={() => setLocation('/admin/google-oauth')}
-                className="text-left p-5 rounded-xl border-2 bg-card border-emerald-200 hover:border-emerald-400 transition-all duration-150 hover:shadow-md group"
+                className="text-left p-4 rounded-lg border bg-card border-emerald-200 hover:border-emerald-400 transition-all duration-150 hover:shadow-sm group"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-700">
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-700">
                     <Lock className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">OAuth</Badge>
@@ -292,10 +293,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
               <button
                 onClick={() => setLocation('/admin/phase1-readiness')}
-                className="text-left p-5 rounded-xl border-2 bg-card border-amber-200 hover:border-amber-400 transition-all duration-150 hover:shadow-md group"
+                className="text-left p-4 rounded-lg border bg-card border-amber-200 hover:border-amber-400 transition-all duration-150 hover:shadow-sm group"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-700">
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-700">
                     <Building2 className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">Phase 1</Badge>
@@ -312,10 +313,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
               <button
                 onClick={() => setLocation('/admin/create-audit')}
-                className="text-left p-5 rounded-xl border-2 bg-card border-emerald-200 hover:border-emerald-400 transition-all duration-150 hover:shadow-md group"
+                className="text-left p-4 rounded-lg border bg-card border-emerald-200 hover:border-emerald-400 transition-all duration-150 hover:shadow-sm group"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-700">
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-700">
                     <Plus className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">Audit</Badge>
@@ -332,10 +333,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
               <button
                 onClick={() => setLocation('/admin/ux-standards')}
-                className="text-left p-5 rounded-xl border-2 bg-card border-indigo-200 hover:border-indigo-400 transition-all duration-150 hover:shadow-md group"
+                className="text-left p-4 rounded-lg border bg-card border-indigo-200 hover:border-indigo-400 transition-all duration-150 hover:shadow-sm group"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-700">
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-700">
                     <Layout className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">Standards</Badge>

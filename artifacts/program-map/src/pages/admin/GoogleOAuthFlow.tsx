@@ -485,25 +485,25 @@ export default function GoogleOAuthFlow() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-border bg-white shrink-0">
-        <div className="flex items-center gap-2 text-[11px] text-muted-foreground mb-2">
+      <div className="px-4 py-3 border-b border-border bg-white shrink-0">
+        <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1.5">
           <button onClick={() => navigate('/admin/secrets-audit')} className="hover:text-foreground">Integration Secrets Audit</button>
           <ChevronRight className="w-3 h-3" />
           <span className="text-foreground font-semibold">Google Authorization</span>
         </div>
-        <div className="flex items-center gap-3 mb-1">
-          <Globe className="w-5 h-5 text-sky-600" />
-          <h1 className="text-[18px] font-bold text-foreground">Google OAuth Authorization</h1>
+        <div className="flex items-center gap-2 mb-1">
+          <Globe className="w-4 h-4 text-sky-600" />
+          <h1 className="text-[15px] font-semibold text-foreground">Google OAuth Authorization</h1>
           <TierBadge tier={tier} />
         </div>
-        <p className="text-[12px] text-muted-foreground leading-relaxed">
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
           Authorize Trail OS to access Google Drive and Google Calendar on behalf of your workspace.
           This generates a <strong>refresh token</strong> you'll store in Replit Secrets — no token values are ever logged or stored server-side.
         </p>
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 px-6 py-2.5 border-b border-border bg-muted/20 shrink-0">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-muted/20 shrink-0">
         <button onClick={loadInfo} disabled={infoLoading}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
           <RefreshCw className={`w-3.5 h-3.5 ${infoLoading ? 'animate-spin' : ''}`} />
@@ -522,7 +522,7 @@ export default function GoogleOAuthFlow() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-6 space-y-6 max-w-3xl">
+        <div className="p-4 space-y-4 max-w-3xl">
 
           {/* 5-step readiness ladder */}
           <div className="rounded-lg border border-border bg-white p-5 overflow-x-auto">

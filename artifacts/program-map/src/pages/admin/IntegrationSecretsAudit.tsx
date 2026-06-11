@@ -421,19 +421,19 @@ export default function IntegrationSecretsAudit() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-border bg-white shrink-0">
-        <div className="flex items-center gap-3 mb-1">
-          <Shield className="w-5 h-5 text-primary" />
-          <h1 className="text-[18px] font-bold text-foreground">Integration Secrets Audit</h1>
+      <div className="px-4 py-3 border-b border-border bg-white shrink-0">
+        <div className="flex items-center gap-2 mb-0.5">
+          <Shield className="w-4 h-4 text-primary" />
+          <h1 className="text-[15px] font-semibold text-foreground">Integration Secrets Audit</h1>
           <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border border-primary/20 bg-primary/5 text-primary uppercase">Live</span>
         </div>
-        <p className="text-[12px] text-muted-foreground leading-relaxed">
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
           Two-layer audit: <strong>Presence &amp; Format</strong> (instant, all integrations) and <strong>Live Validation</strong> (on-demand API calls to Gemini and Google). Secret <strong>values are never transmitted</strong>.
         </p>
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 px-6 py-2.5 border-b border-border bg-muted/20 shrink-0 flex-wrap">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-muted/20 shrink-0 flex-wrap">
         <button onClick={runAudit} disabled={auditLoading}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
           <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} />
@@ -465,7 +465,7 @@ export default function IntegrationSecretsAudit() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-6 space-y-6 max-w-4xl">
+        <div className="p-4 space-y-4 max-w-4xl">
 
           {/* Security notice */}
           <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 flex gap-3">

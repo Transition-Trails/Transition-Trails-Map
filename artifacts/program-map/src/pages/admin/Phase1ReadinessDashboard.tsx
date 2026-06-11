@@ -382,27 +382,29 @@ export default function Phase1ReadinessDashboard() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-4xl space-y-5">
+      <div className="p-4 max-w-4xl space-y-4">
 
         {/* Header */}
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Administration — Phase 1</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Phase 1 Readiness Dashboard</h1>
-          <p className="text-[13px] text-muted-foreground mt-1 max-w-2xl">
-            Architecture, integration, governance, knowledge, Penny, and operations readiness — scored, gap-analysed, and prioritised for production onboarding.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration — Phase 1</p>
+            <h1 className="text-base font-semibold text-foreground">Phase 1 Readiness Dashboard</h1>
+            <p className="text-[12px] text-muted-foreground mt-0.5 max-w-2xl">
+              Architecture, integration, governance, knowledge, Penny, and operations readiness — scored, gap-analysed, and prioritised for production onboarding.
+            </p>
+          </div>
         </div>
 
         {/* Summary strip */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2.5">
           {[
             { label: 'Complete',  v: completeCount,  cls: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
             { label: 'On Track',  v: onTrackCount,   cls: 'text-blue-600',    bg: 'bg-blue-50 border-blue-200'    },
             { label: 'At Risk',   v: atRiskCount,    cls: 'text-amber-600',   bg: 'bg-amber-50 border-amber-200'  },
             { label: 'Blocked',   v: blockedCount,   cls: 'text-rose-600',    bg: 'bg-rose-50 border-rose-200'    },
           ].map(s => (
-            <div key={s.label} className={`rounded-lg border p-3 text-center ${s.bg}`}>
-              <p className={`text-3xl font-bold font-serif ${s.cls}`}>{s.v}</p>
+            <div key={s.label} className={`rounded-lg border px-3 py-2.5 text-center ${s.bg}`}>
+              <p className={`text-xl font-bold ${s.cls}`}>{s.v}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
