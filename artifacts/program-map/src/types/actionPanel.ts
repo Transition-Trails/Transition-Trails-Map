@@ -35,6 +35,7 @@ export type SlackPanelContext =
   | 'digital-twin'
   | 'home'
   | 'operations'
+  | 'demand'
   | 'knowledge'
   | 'admin'
   | 'navigator';

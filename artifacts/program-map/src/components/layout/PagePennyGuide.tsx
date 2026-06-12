@@ -13,17 +13,18 @@ import { SIGNAL_COUNTS, locationToContext } from '@/data/signalCounts';
 // ── Page context ──────────────────────────────────────────────────────────────
 
 type PageCtx =
-  | 'home' | 'programs' | 'penny' | 'operations'
+  | 'home' | 'programs' | 'penny' | 'operations' | 'demand'
   | 'knowledge' | 'collaboration' | 'admin' | 'digital-twin' | 'default';
 
 function deriveCtx(loc: string): PageCtx {
   if (loc === '/' || loc === '') return 'home';
-  if (loc.startsWith('/program'))        return 'programs';
-  if (loc.startsWith('/penny'))          return 'penny';
-  if (loc.startsWith('/operations'))     return 'operations';
-  if (loc.startsWith('/knowledge'))      return 'knowledge';
-  if (loc.startsWith('/collaboration'))  return 'collaboration';
-  if (loc.startsWith('/admin'))          return 'admin';
+  if (loc.startsWith('/program'))                return 'programs';
+  if (loc.startsWith('/penny'))                  return 'penny';
+  if (loc.startsWith('/operations/demand'))      return 'demand';
+  if (loc.startsWith('/operations'))             return 'operations';
+  if (loc.startsWith('/knowledge'))              return 'knowledge';
+  if (loc.startsWith('/collaboration'))          return 'collaboration';
+  if (loc.startsWith('/admin'))                  return 'admin';
   if (loc.startsWith('/digital-twin') || loc.startsWith('/uom') || loc.startsWith('/governance'))
     return 'digital-twin';
   return 'default';
@@ -85,6 +86,13 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: 'Salesforce live — wire first data query to health dashboard',   meta: '4h ago',  why: 'Penny monitors integration status so the team knows when live data can replace prototype figures in the health dashboard' },
     { urgent: false, source: 'drive',      text: 'Integration readiness: 5 checklist items open',                meta: '6h ago',  why: 'Penny reads Drive checklists to surface open operational items affecting integration timelines' },
     { urgent: false, source: 'salesforce', text: 'Foundations Trail capacity alert: 89%',                        meta: '8h ago',  why: 'Penny monitors Salesforce cohort records to flag when enrollment is approaching its limit' },
+  ],
+  demand: [
+    { urgent: true,  source: 'slack',      text: 'REQ-030: Penny not responding to RESOLVE — 4 days open, no owner assigned',   meta: '4d ago',  why: 'Penny monitors demand channels for high-impact bug reports; stability issues are escalated when they age without an owner' },
+    { urgent: true,  source: 'salesforce', text: '2 change requests unassigned — queue stalling past SLA window',               meta: '3h ago',  why: 'Penny monitors the demand queue to flag items that risk missing triage SLA and creating delivery delays' },
+    { urgent: false, source: 'slack',      text: 'REQ-028: Trail Quest reminders — 7 days in backlog, no action',               meta: '7d ago',  why: 'Penny surfaces long-idle backlog items so the team can decide to triage, defer, or close them before they pile up' },
+    { urgent: false, source: 'salesforce', text: "Explorer's Trail generated 3 of 7 open requests this week",                   meta: '2d ago',  why: "Penny reads Salesforce intake records to show which programs are generating the most demand pressure" },
+    { urgent: false, source: 'salesforce', text: 'REQ-029 approved and in progress — Guided Trail Module 4 pacing update',      meta: '5d ago',  why: 'Penny confirms approved requests are moving to delivery so nothing gets approved-but-forgotten' },
   ],
   knowledge: [
     { urgent: false, source: 'drive',      text: "12 documents flagged 'needs-review'",                          meta: '2h ago',  why: "Penny reads Drive metadata to surface documents that may be outdated — these affect what Penny can reliably cite" },
@@ -223,7 +231,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     powerInsights: [
       'Health status: 3 active, 1 in discovery, 1 in planning',
       'Integration readiness: Salesforce live (REST API), Google OAuth in progress',
-      '5 open demand items — 2 flagged for follow-up',
+      '7 open demand items — 2 flagged at-risk by age and type',
       'Trail of Mastery execute phase needs source documentation before delivery',
     ],
     attentionItems: [
@@ -234,10 +242,38 @@ const CONTENT: Record<PageCtx, PageContent> = {
     powerSteps: [
       { label: 'Health indicators',     path: '/operations/health' },
       { label: 'Integration readiness', path: '/admin/integration-readiness' },
-      { label: 'Demand overview',       path: '/operations/demand' },
+      { label: 'Demand queue',          path: '/operations/demand' },
     ],
     everydayCanned: "Operations are running normally. Guided Trail Cohort 1 is in Week 3 of 8 and on track. Your next milestone is Sprint 3 on Thursday.",
     powerCanned:    "Ops summary: 3 programs in active delivery. Trail of Mastery execute phase is top priority — source documentation needed before delivery. Salesforce live — wire first data query to health dashboard at /api/salesforce/validate.",
+  },
+  demand: {
+    everydayInsights: [
+      'REQ-029 approved — Guided Trail Module 4 pacing update is in progress',
+      'Submit requests via the demand queue or #demand-queue Slack channel',
+    ],
+    powerInsights: [
+      'REQ-030 is highest priority — Penny not responding to RESOLVE, 4 days without an owner',
+      '2 change requests unassigned — queue at risk of stalling',
+      "Explorer's Trail is the top source of open requests this week (3 of 7)",
+      '7 open items total — 2 high-risk, 2 elevated by age',
+    ],
+    attentionItems: [
+      { icon: AlertTriangle, bg: 'bg-rose-50 border-rose-200',       iconCls: 'text-rose-500',   text: 'REQ-030 · Penny not responding · 4 days open, no owner' },
+      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',     iconCls: 'text-amber-500',  text: 'REQ-028 · Trail Quest reminders · 7 days in backlog' },
+      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'REQ-029 approved — Guided Trail pacing update in progress' },
+    ],
+    everydaySteps: [
+      { label: 'Check request status', path: '/operations/demand' },
+      { label: 'View program health',  path: '/operations' },
+    ],
+    powerSteps: [
+      { label: 'Triage queue',         path: '/operations/demand' },
+      { label: 'Health indicators',    path: '/operations/health' },
+      { label: 'SF Validation Center', path: '/admin/sf-validation' },
+    ],
+    everydayCanned: "Your open request REQ-029 was approved — the Guided Trail Module 4 pacing update is in progress. Submit new requests through the demand queue or the #demand-queue Slack channel.",
+    powerCanned:    "Demand queue: 7 open items. REQ-030 is the top priority — Penny not responding to RESOLVE questions, 4 days without an owner. 2 change requests are stalling. Triage recommended before end of week. Explorer's Trail is the highest-volume program for demand this week.",
   },
   knowledge: {
     everydayInsights: [

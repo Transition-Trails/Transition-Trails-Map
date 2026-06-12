@@ -1,84 +1,386 @@
-import { PageShell } from '@/components/platform/PageShell';
-import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAppContext } from '@/context/AppContext';
+import { useTierFlags } from '@/hooks/useTierFlags';
+import {
+  AlertTriangle, CheckCircle2, Clock, ChevronRight, ChevronDown, Plus, GitBranch,
+} from 'lucide-react';
 
-const recent = [
-  { id: 'REQ-031', type: 'New Feature',    subject: 'Add quiz checkpoints to Explorer\'s Trail', submitter: 'L. Torres',  date: '2d ago', status: 'Triaged' },
-  { id: 'REQ-030', type: 'Bug / Issue',    subject: 'Penny not responding to RESOLVE questions',  submitter: 'M. Reyes',   date: '4d ago', status: 'In Review' },
-  { id: 'REQ-029', type: 'Content Update', subject: 'Update Guided Trail module 4 pacing guide',  submitter: 'K. Brooks',  date: '5d ago', status: 'Approved' },
-  { id: 'REQ-028', type: 'New Feature',    subject: 'Automated reminder emails for Trail Quests', submitter: 'T. Nguyen',  date: '7d ago', status: 'Backlog' },
-  { id: 'REQ-027', type: 'Admin',          subject: 'Add new program cohort dates for Q4',        submitter: 'A. Johnson', date: '9d ago', status: 'Completed' },
+// ── Types ──────────────────────────────────────────────────────────────────────
+
+type RequestType   = 'New Feature' | 'Bug / Issue' | 'Content Update' | 'Change Request' | 'Admin';
+type RequestStatus = 'Triaged' | 'In Review' | 'Approved' | 'Backlog' | 'Completed';
+type RiskLevel     = 'high' | 'elevated' | 'normal';
+
+interface DemandRequest {
+  id: string;
+  type: RequestType;
+  subject: string;
+  submitter: string;
+  age: string;
+  status: RequestStatus;
+  risk: RiskLevel;
+  program: string;
+  notes?: string;
+}
+
+// ── Data ───────────────────────────────────────────────────────────────────────
+
+const REQUESTS: DemandRequest[] = [
+  {
+    id: 'REQ-031', type: 'New Feature',    status: 'Triaged',   risk: 'normal',   age: '2d',  submitter: 'L. Torres',
+    subject: "Add quiz checkpoints to Explorer's Trail",
+    program: "Explorer's Trail",
+    notes: 'Requested as part of Q3 engagement improvements. Needs product review before scoping.',
+  },
+  {
+    id: 'REQ-030', type: 'Bug / Issue',    status: 'In Review', risk: 'high',     age: '4d',  submitter: 'M. Reyes',
+    subject: 'Penny not responding to RESOLVE questions',
+    program: 'RESOLVE',
+    notes: 'Reported in #penny-support. No owner assigned. 4 days without triage — elevated risk to RESOLVE cohort delivery.',
+  },
+  {
+    id: 'REQ-029', type: 'Content Update', status: 'Approved',  risk: 'normal',   age: '5d',  submitter: 'K. Brooks',
+    subject: 'Update Guided Trail module 4 pacing guide',
+    program: 'Guided Trail',
+    notes: 'Approved by L. Torres. In progress — Drive doc revision underway.',
+  },
+  {
+    id: 'REQ-028', type: 'New Feature',    status: 'Backlog',   risk: 'elevated', age: '7d',  submitter: 'T. Nguyen',
+    subject: 'Automated reminder emails for Trail Quests',
+    program: 'All Programs',
+    notes: '7 days in backlog with no action. Requires Penny delivery pipeline. Recommend triage or deferral decision.',
+  },
+  {
+    id: 'REQ-027', type: 'Admin',          status: 'Completed', risk: 'normal',   age: '9d',  submitter: 'A. Johnson',
+    subject: 'Add new program cohort dates for Q4',
+    program: 'Foundations Trail',
+    notes: 'Completed. Salesforce cohort records updated for Q4 schedule.',
+  },
+  {
+    id: 'REQ-026', type: 'Change Request', status: 'In Review', risk: 'elevated', age: '12d', submitter: 'L. Torres',
+    subject: 'Revise Sprint 2 learner assessment rubric',
+    program: 'Guided Trail',
+    notes: '12 days open. Review with program lead needed before Sprint 2 closes.',
+  },
+  {
+    id: 'REQ-025', type: 'New Feature',    status: 'Backlog',   risk: 'normal',   age: '14d', submitter: 'M. Reyes',
+    subject: 'Penny confidence threshold for coaching outputs',
+    program: 'All Programs',
+    notes: 'Penny capability improvement. Deferred to Phase 2 capability sprint.',
+  },
 ];
 
-const statusStyle: Record<string, string> = {
-  Triaged:   'bg-sky-50 text-sky-700 border-sky-200',
-  'In Review': 'bg-amber-50 text-amber-700 border-amber-200',
-  Approved:  'bg-emerald-50 text-emerald-700 border-emerald-200',
-  Backlog:   'bg-muted text-muted-foreground border-border',
-  Completed: 'bg-primary/10 text-primary border-primary/20',
+// ── Config ─────────────────────────────────────────────────────────────────────
+
+const STATUS_CFG: Record<RequestStatus, { cls: string }> = {
+  Triaged:     { cls: 'bg-sky-50 text-sky-700 border-sky-200' },
+  'In Review': { cls: 'bg-amber-50 text-amber-700 border-amber-200' },
+  Approved:    { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  Backlog:     { cls: 'bg-muted text-muted-foreground border-border' },
+  Completed:   { cls: 'bg-primary/10 text-primary border-primary/20' },
 };
 
-export default function Intake() {
+const RISK_CFG: Record<RiskLevel, { badge: string; cls: string; dot: string } | null> = {
+  high:     { badge: 'At Risk',  cls: 'text-rose-700 bg-rose-50 border-rose-200',   dot: 'bg-rose-500' },
+  elevated: { badge: 'Elevated', cls: 'text-amber-700 bg-amber-50 border-amber-200', dot: 'bg-amber-400' },
+  normal:   null,
+};
+
+const TYPE_DOT: Record<RequestType, string> = {
+  'New Feature':    'bg-violet-400',
+  'Bug / Issue':    'bg-rose-400',
+  'Content Update': 'bg-sky-400',
+  'Change Request': 'bg-amber-400',
+  'Admin':          'bg-slate-400',
+};
+
+// ── Request card ───────────────────────────────────────────────────────────────
+
+function RequestCard({
+  req, expanded, onToggle,
+}: { req: DemandRequest; expanded: boolean; onToggle: () => void }) {
+  const status = STATUS_CFG[req.status];
+  const risk   = RISK_CFG[req.risk];
+  const dot    = TYPE_DOT[req.type];
+
   return (
-    <PageShell
-      section="Demand Management"
-      title="Intake"
-      badge="prototype"
-      subtitle="Work requests, change proposals, and feature submissions from the team. Future connection to Salesforce Cases for unified tracking."
-      integration="Salesforce Cases, Typeform / intake form"
-    >
-      <div className="space-y-6">
-        <div className="grid grid-cols-3 gap-4 text-sm">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">New This Week</p>
-            <p className="text-3xl font-bold font-serif text-foreground">4</p>
-            <p className="text-xs text-muted-foreground mt-1">requests submitted</p>
+    <div className={`rounded-lg border bg-white overflow-hidden transition-colors ${expanded ? 'border-primary/30 shadow-sm' : 'border-border hover:border-primary/20'}`}>
+      <button
+        onClick={onToggle}
+        className="w-full text-left px-3 py-2.5 flex items-start gap-2.5 group"
+      >
+        {/* type dot */}
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${dot}`} />
+
+        {/* main content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+            <span className="text-[9px] font-mono text-muted-foreground/60">{req.id}</span>
+            <span className="text-[9px] text-muted-foreground">{req.type}</span>
+            {risk && (
+              <span className={`text-[8px] font-bold border rounded-full px-1 py-0.5 leading-none ${risk.cls}`}>
+                {risk.badge}
+              </span>
+            )}
           </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Awaiting Review</p>
-            <p className="text-3xl font-bold font-serif text-foreground">7</p>
-            <p className="text-xs text-muted-foreground mt-1">in backlog or in review</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Completed (30d)</p>
-            <p className="text-3xl font-bold font-serif text-foreground">11</p>
-            <p className="text-xs text-muted-foreground mt-1">requests resolved</p>
+          <p className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-1">
+            {req.subject}
+          </p>
+          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+            <span className="text-[10px] text-muted-foreground">{req.program}</span>
+            <span className="text-muted-foreground/30 text-[9px]">·</span>
+            <span className="text-[10px] text-muted-foreground">{req.submitter}</span>
+            <span className="text-muted-foreground/30 text-[9px]">·</span>
+            <span className="text-[10px] text-muted-foreground">{req.age}</span>
           </div>
         </div>
 
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-3">Recent Requests</h2>
-          <div className="rounded-xl border border-border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">ID</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Type</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Subject</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Submitter</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Date</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
-                {recent.map(r => (
-                  <tr key={r.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{r.id}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-[13px]">{r.type}</td>
-                    <td className="px-4 py-3 text-foreground">{r.subject}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-[13px]">{r.submitter}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-[13px]">{r.date}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center text-[10px] font-semibold border px-2 py-0.5 rounded-full ${statusStyle[r.status]}`}>
-                        {r.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* status + chevron */}
+        <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+          <span className={`text-[9px] font-semibold border rounded-full px-1.5 py-0.5 whitespace-nowrap ${status.cls}`}>
+            {req.status}
+          </span>
+          <ChevronDown className={`w-3 h-3 text-muted-foreground/40 transition-transform shrink-0 ${expanded ? 'rotate-180' : ''}`} />
+        </div>
+      </button>
+
+      {/* Expanded detail */}
+      {expanded && req.notes && (
+        <div className="px-3 pb-3 pt-0 border-t border-border/50 bg-muted/20">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mt-2 mb-1">Notes</p>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">{req.notes}</p>
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <span className="text-[9px] font-medium text-muted-foreground/60">
+              Submitted by {req.submitter}
+            </span>
+            <span className="text-muted-foreground/30 text-[9px]">·</span>
+            <span className="text-[9px] font-medium text-muted-foreground/60">{req.age} ago</span>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
+
+type FilterKey = 'open' | 'all';
+
+export default function Intake() {
+  const { openActionPanel } = useAppContext();
+  const { isEveryday, isAdminOrAbove } = useTierFlags();
+
+  const [filter, setFilter]     = useState<FilterKey>('open');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Derived metrics
+  const open      = REQUESTS.filter(r => r.status !== 'Completed');
+  const atRisk    = REQUESTS.filter(r => r.risk !== 'normal');
+  const newThisWk = REQUESTS.filter(r => ['2d', '3d', '4d', '5d'].includes(r.age));
+  const closed30d = REQUESTS.filter(r => r.status === 'Completed').length;
+
+  const visible = filter === 'open' ? open : REQUESTS;
+
+  function toggleExpand(id: string) {
+    setExpandedId(prev => prev === id ? null : id);
+  }
+
+  function handleNewRequest() {
+    openActionPanel({
+      title: 'New Request',
+      objectType: 'Demand Request',
+      subtitle: 'Submit a work request, change proposal, or feature idea.',
+      fields: [
+        {
+          id: 'type', label: 'Request Type', type: 'select', required: true,
+          options: ['New Feature', 'Bug / Issue', 'Content Update', 'Change Request', 'Admin'],
+        },
+        { id: 'subject', label: 'Subject', type: 'text', required: true, placeholder: 'Brief description of the request…' },
+        {
+          id: 'program', label: 'Program', type: 'select', required: true,
+          options: ["Explorer's Trail", 'Foundations Trail', 'Guided Trail', 'Trail of Mastery', 'Digital Compass', 'All Programs'],
+        },
+        { id: 'detail', label: 'Detail', type: 'textarea', placeholder: 'What needs to happen and why?', rows: 3 },
+        { id: 'priority', label: 'Priority', type: 'select', options: ['Normal', 'Elevated', 'Critical'] },
+      ],
+    });
+  }
+
+  // By-type breakdown for right column
+  const TYPE_BREAKDOWN: [RequestType, string][] = [
+    ['New Feature',    'bg-violet-400'],
+    ['Content Update', 'bg-sky-400'],
+    ['Change Request', 'bg-amber-400'],
+    ['Bug / Issue',    'bg-rose-400'],
+    ['Admin',          'bg-slate-400'],
+  ];
+
+  const highRisk = REQUESTS.filter(r => r.risk !== 'normal');
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-4 space-y-4">
+
+        {/* ── Compact header ───────────────────────────────────────────── */}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5 flex items-center gap-1.5">
+              <GitBranch className="w-2.5 h-2.5" />
+              Operations · Demand
+            </p>
+            <h1 className="text-[15px] font-semibold text-foreground leading-snug">Demand Queue</h1>
+            <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed max-w-md">
+              Work requests, change proposals, and feature submissions. Triage and track open items here.
+            </p>
+          </div>
+          {!isEveryday && (
+            <button
+              onClick={handleNewRequest}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-85 transition-opacity shrink-0 mt-1"
+            >
+              <Plus className="w-3 h-3" />
+              New Request
+            </button>
+          )}
+        </div>
+
+        {/* ── Metric chips ─────────────────────────────────────────────── */}
+        <div className="flex items-stretch gap-2 flex-wrap">
+          {[
+            { label: 'Open',          value: open.length,      cls: 'border-border bg-white',                               numCls: 'text-foreground' },
+            { label: 'At Risk',       value: atRisk.length,    cls: 'border-rose-200 bg-rose-50',                           numCls: 'text-rose-700' },
+            { label: 'Elevated',      value: REQUESTS.filter(r => r.risk === 'elevated').length, cls: 'border-amber-200 bg-amber-50', numCls: 'text-amber-700' },
+            { label: 'New This Week', value: newThisWk.length, cls: 'border-sky-200 bg-sky-50',                             numCls: 'text-sky-800' },
+            { label: 'Closed (30d)',  value: closed30d,        cls: 'border-emerald-200 bg-emerald-50',                     numCls: 'text-emerald-800' },
+          ].map(m => (
+            <div key={m.label} className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${m.cls}`}>
+              <span className={`text-[22px] font-bold leading-none ${m.numCls}`}>{m.value}</span>
+              <span className="text-[9px] font-medium text-muted-foreground leading-tight max-w-[56px]">{m.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Two-column layout ─────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+          {/* Left: request list (2/3 width) */}
+          <div className="md:col-span-2 space-y-2">
+
+            {/* Filter row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                {(['open', 'all'] as FilterKey[]).map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors border ${
+                      filter === f
+                        ? 'bg-foreground text-background border-foreground'
+                        : 'border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+                    }`}
+                  >
+                    {f === 'open' ? `Open (${open.length})` : `All (${REQUESTS.length})`}
+                  </button>
+                ))}
+              </div>
+              <span className="text-[10px] text-muted-foreground/60">{visible.length} requests</span>
+            </div>
+
+            {/* Cards */}
+            <div className="space-y-1.5">
+              {visible.map(req => (
+                <RequestCard
+                  key={req.id}
+                  req={req}
+                  expanded={expandedId === req.id}
+                  onToggle={() => toggleExpand(req.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Right: attention + next steps + breakdown (1/3 width) */}
+          <div className="space-y-3">
+
+            {/* Needs Attention */}
+            {highRisk.length > 0 && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50/60 overflow-hidden">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-rose-700/70 px-3 py-2 border-b border-rose-200/80">
+                  Needs Attention
+                </p>
+                {highRisk.map(req => (
+                  <button
+                    key={req.id}
+                    onClick={() => { setFilter('all'); toggleExpand(req.id); }}
+                    className="w-full text-left px-3 py-2 border-b border-rose-100 last:border-0 hover:bg-rose-100/60 transition-colors flex items-start gap-2 group"
+                  >
+                    {req.risk === 'high'
+                      ? <AlertTriangle className="w-3 h-3 text-rose-500 shrink-0 mt-0.5" />
+                      : <Clock className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                    }
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-foreground group-hover:text-primary leading-snug line-clamp-2 transition-colors">
+                        {req.subject}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground mt-0.5">
+                        {req.id} · {req.age} old · {req.status}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary shrink-0 mt-0.5 transition-colors" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Next Steps */}
+            <div className="rounded-lg border border-border bg-white overflow-hidden">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 py-2 border-b border-border">
+                Next Steps
+              </p>
+              {[
+                { label: 'Assign REQ-030 to an owner',  hint: 'Penny bug · 4 days without owner' },
+                { label: 'Triage REQ-028 from backlog', hint: 'Trail Quest reminders · 7 days idle' },
+                { label: 'Resolve REQ-026 review',      hint: 'Sprint 2 rubric · 12 days open' },
+              ].map((step, i) => (
+                <div key={i} className="px-3 py-2 border-b border-border/60 last:border-0">
+                  <p className="text-[11px] font-semibold text-foreground leading-snug">{step.label}</p>
+                  <p className="text-[9px] text-muted-foreground mt-0.5">{step.hint}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* By type breakdown */}
+            <div className="rounded-lg border border-border bg-white p-3">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2.5">By Type</p>
+              <div className="space-y-1.5">
+                {TYPE_BREAKDOWN.map(([type, dot]) => {
+                  const count = REQUESTS.filter(r => r.type === type).length;
+                  return (
+                    <div key={type} className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
+                      <span className="text-[11px] text-muted-foreground flex-1">{type}</span>
+                      <span className="text-[11px] font-bold text-foreground">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Phase 1 notice — admin/power only, no stale future-state language */}
+            {isAdminOrAbove && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-amber-700/70 mb-1">Phase 1</p>
+                <p className="text-[10px] text-amber-700/80 leading-snug">
+                  Prototype data. Salesforce Cases sync is planned for Q3 — this queue will update live once connected.
+                </p>
+              </div>
+            )}
+
+          </div>
+        </div>
+
       </div>
-    </PageShell>
+    </ScrollArea>
   );
 }

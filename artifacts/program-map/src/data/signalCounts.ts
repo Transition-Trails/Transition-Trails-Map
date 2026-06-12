@@ -22,6 +22,10 @@ export const SIGNAL_COUNTS: Record<SlackPanelContext, SignalCounts> = {
     total: 5, urgent: 1,
     sources: { slack: 2, drive: 1, email: 0, calendar: 1, salesforce: 1 },
   },
+  demand: {
+    total: 4, urgent: 2,
+    sources: { slack: 2, drive: 0, email: 0, calendar: 0, salesforce: 2 },
+  },
   program: {
     total: 4, urgent: 1,
     sources: { slack: 2, drive: 1, email: 0, calendar: 1, salesforce: 0 },
@@ -75,6 +79,7 @@ export const SIGNAL_COUNTS: Record<SlackPanelContext, SignalCounts> = {
 const CONTEXT_PANEL_META: Record<SlackPanelContext, { title: string; subtitle: string }> = {
   home:            { title: TERMS.missionControl,  subtitle: TERMS.signalSubtitle(TERMS.missionControl) },
   operations:      { title: 'Operations',          subtitle: TERMS.signalSubtitle('Operations') },
+  demand:          { title: 'Demand Queue',         subtitle: TERMS.signalSubtitle('Demand Queue') },
   program:         { title: 'Programs',            subtitle: TERMS.signalSubtitle('Programs') },
   governance:      { title: 'Governance',          subtitle: TERMS.signalSubtitle('Governance') },
   'digital-twin':  { title: TERMS.digitalTwin,     subtitle: TERMS.signalSubtitle(TERMS.digitalTwin) },
@@ -92,7 +97,8 @@ const CONTEXT_PANEL_META: Record<SlackPanelContext, { title: string; subtitle: s
 export function locationToContext(location: string): SlackPanelContext {
   if (location === '/' || location === '') return 'home';
   if (location.startsWith('/trail-os-overview')) return 'home';
-  if (location.startsWith('/operations') || location.startsWith('/demand')) return 'operations';
+  if (location.startsWith('/operations/demand')) return 'demand';
+  if (location.startsWith('/operations')) return 'operations';
   if (location.startsWith('/governance')) return 'governance';
   if (location.startsWith('/digital-twin') || location.startsWith('/uom')) return 'digital-twin';
   if (location.startsWith('/penny')) return 'penny';

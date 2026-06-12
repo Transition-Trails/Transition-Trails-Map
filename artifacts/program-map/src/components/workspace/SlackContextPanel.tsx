@@ -99,6 +99,12 @@ const CONTEXT_META: Record<SlackPanelContext, {
     purposeFilter: ['admin', 'internal', 'cohort'],
     contextualChannelIds: ['trail-os-ops', 'foundations-coaches', 'exec-briefs'],
   },
+  demand: {
+    color: '#145A32',
+    label: 'Demand Queue',
+    purposeFilter: ['admin', 'internal'],
+    contextualChannelIds: ['trail-os-ops'],
+  },
   knowledge: {
     color: '#0F7B6C',
     label: 'Knowledge Library',
@@ -184,6 +190,11 @@ const CONTEXT_PENDING: Record<SlackPanelContext, PendingItem[]> = {
     { id:'p1', kind:'alert',    text:'Below-target enrollment: Guided Trail (4/8). Outreach in #foundations-coaches recommended.', channel:'#foundations-coaches', channelId:'foundations-coaches', time:'Ongoing', urgent:true },
     { id:'p2', kind:'escalation',text:'Trail of Mastery Q3 launch — no cohort scheduled. Planning thread in #trail-os-ops needed.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:false },
     { id:'p3', kind:'reminder', text:'Foundations Trail at 89% capacity — post in #exec-briefs to open a new cohort.', channel:'#exec-briefs', channelId:'exec-briefs', time:'This week', urgent:false },
+  ],
+  demand: [
+    { id:'p1', kind:'escalation', text:'REQ-030: Penny not responding to RESOLVE questions — 4 days open, no owner. Needs immediate triage.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'4d ago', urgent:true },
+    { id:'p2', kind:'alert',      text:'2 change requests unassigned — demand queue at risk of stalling past SLA.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'3h ago', urgent:true },
+    { id:'p3', kind:'reminder',   text:'REQ-028: Trail Quest reminder emails — 7 days in backlog. Triage or defer decision needed.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'7d ago', urgent:false },
   ],
   knowledge: [
     { id:'p1', kind:'reminder', text:'Source mapping update needed — RESOLVE Execute phase docs not yet mapped.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:true },
