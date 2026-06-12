@@ -1,16 +1,13 @@
 import {
-  GraduationCap, LayoutGrid, Star, FolderOpen,
-  CheckSquare, Plus,
+  GraduationCap, LayoutGrid, Star, Plus,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
-import ProgramWorkspace           from '@/pages/program/ProgramWorkspace';
-import StandardsStudio            from '@/pages/curriculum/StandardsStudio';
-import ProgramBlueprint           from '@/pages/curriculum/ProgramBlueprint';
-import SalesforceValidationCenter from '@/pages/curriculum/SalesforceValidationCenter';
-import ProgramResources           from '@/pages/admin/ProgramResources';
+import ProgramWorkspace from '@/pages/program/ProgramWorkspace';
+import StandardsStudio  from '@/pages/curriculum/StandardsStudio';
+import ProgramBlueprint from '@/pages/curriculum/ProgramBlueprint';
 
 export default function ProgramHub() {
   const { openActionPanel } = useAppContext();
@@ -46,13 +43,8 @@ export default function ProgramHub() {
       icon: Star, content: <StandardsStudio />,
     }] : []),
     ...(isAdminOrAbove ? [
-      { id: 'blueprint',     label: 'Blueprint',      path: '/program/blueprint',     icon: LayoutGrid,  content: <ProgramBlueprint /> },
-      { id: 'sf-validation', label: 'SF Validation',  path: '/program/sf-validation', icon: CheckSquare, content: <SalesforceValidationCenter /> },
+      { id: 'blueprint', label: 'Blueprint', path: '/program/blueprint', icon: LayoutGrid, content: <ProgramBlueprint /> },
     ] : []),
-    ...(!isEveryday ? [{
-      id: 'resources', label: 'Resources', path: '/program/resources',
-      icon: FolderOpen, content: <ProgramResources />,
-    }] : []),
   ];
 
   return (
@@ -62,7 +54,7 @@ export default function ProgramHub() {
       description={
         isEveryday
           ? 'Your active programs, upcoming sessions, curriculum, and Penny support.'
-          : 'Select a program to explore its blueprint alignment, curriculum, Penny integration, systems, and health. Use Standards and Blueprint tabs for cross-program reference content.'
+          : 'Select a program to explore its structure, curriculum, Penny assets, and health. Use Standards for the quality rulebook and Blueprint for the cross-program canvas.'
       }
       actions={HUB_ACTIONS}
       tabs={ALL_TABS}

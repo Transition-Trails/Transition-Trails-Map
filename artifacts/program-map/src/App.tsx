@@ -8,8 +8,10 @@ import { AppShell } from "@/components/layout/AppShell";
 
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
-import SalesforceMapping          from "@/pages/curriculum/SalesforceMapping";
-import IntegrationReadinessCenter from "@/pages/admin/IntegrationReadinessCenter";
+import SalesforceMapping            from "@/pages/curriculum/SalesforceMapping";
+import SalesforceValidationCenter  from "@/pages/curriculum/SalesforceValidationCenter";
+import ProgramResources             from "@/pages/admin/ProgramResources";
+import IntegrationReadinessCenter   from "@/pages/admin/IntegrationReadinessCenter";
 import AdminSetup                 from "@/pages/admin/AdminSetup";
 import PeopleAccess               from "@/pages/admin/PeopleAccess";
 import Admin   from "@/pages/Admin";
@@ -107,6 +109,10 @@ function Router() {
       <Route path="/communications/message-templates"> <Redirect to="/collaboration/templates" /></Route>
       <Route path="/communications">                   <Redirect to="/collaboration" /></Route>
 
+      {/* Program sub-paths that moved to Administration */}
+      <Route path="/program/sf-validation"> <Redirect to="/admin/sf-validation" /></Route>
+      <Route path="/program/resources">     <Redirect to="/admin/program-resources" /></Route>
+
       {/* Curriculum → program hub */}
       <Route path="/curriculum/blueprint">           <Redirect to="/program/blueprint" /></Route>
       <Route path="/curriculum/standards">           <Redirect to="/program/standards" /></Route>
@@ -134,7 +140,7 @@ function Router() {
       <Route path="/admin/comm-channels">         <Redirect to="/collaboration/channels" /></Route>
       <Route path="/admin/comm-routing">          <Redirect to="/collaboration/channels" /></Route>
       <Route path="/admin/comm-templates">        <Redirect to="/collaboration/templates" /></Route>
-      <Route path="/admin/program-resources">     <Redirect to="/program/resources" /></Route>
+      <Route path="/admin/program-resources"     component={ProgramResources} />
       {/* Removed stub pages — redirect to canonical locations */}
       <Route path="/admin/roles">        <Redirect to="/admin/people-access" /></Route>
       <Route path="/admin/access-roles"> <Redirect to="/admin/people-access" /></Route>
@@ -187,6 +193,7 @@ function Router() {
       <Route path="/admin/setup"             component={AdminSetup} />
       <Route path="/admin/people-access"     component={PeopleAccess} />
       <Route path="/admin/salesforce-arch"   component={SalesforceMapping} />
+      <Route path="/admin/sf-validation"    component={SalesforceValidationCenter} />
       <Route path="/admin/people">           <Redirect to="/admin/people-access" /></Route>
       <Route path="/admin/phase1-readiness"  component={Phase1ReadinessDashboard} />
       <Route path="/admin/ux-standards"     component={Phase1UXStandards} />

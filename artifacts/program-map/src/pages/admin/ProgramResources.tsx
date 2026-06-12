@@ -38,11 +38,10 @@ export default function ProgramResources() {
 
         {/* Header */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Administration — Program Management</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Program Resources</h1>
-          <p className="text-[13px] text-muted-foreground mt-1 max-w-2xl">
-            Configure and manage Google Drive folder workspaces for each program. This is the administrative layer —
-            no live Google Drive integration is active. Drive metadata is stored here and surfaced in each Program Blueprint.
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration · Program Resources</p>
+          <h1 className="text-[15px] font-semibold text-foreground leading-snug">Drive Workspaces</h1>
+          <p className="text-[12px] text-muted-foreground mt-0.5 max-w-2xl">
+            Configure Google Drive folder URLs, permissions, and metadata for each program. Metadata stored in prototype — live Drive API planned for Q4 2025.
           </p>
         </div>
 

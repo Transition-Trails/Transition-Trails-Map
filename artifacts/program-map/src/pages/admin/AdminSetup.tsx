@@ -227,6 +227,26 @@ const READINESS_LINKS: ReadinessLink[] = [
     badgeCls: 'bg-indigo-50 border-indigo-200 text-indigo-700',
     icon: Lock,
   },
+  {
+    id: 'sf-validation',
+    name: 'SF Validation Center',
+    detail: '16 Trail OS ↔ Salesforce object mappings, product readiness scores by cloud, and field-level validation workflow.',
+    action: 'View Validation',
+    href: '/admin/sf-validation',
+    badge: 'SF Readiness',
+    badgeCls: 'bg-blue-50 border-blue-200 text-blue-700',
+    icon: Database,
+  },
+  {
+    id: 'program-resources',
+    name: 'Program Drive Workspaces',
+    detail: 'Configure Google Drive folder URLs, shared drive IDs, permissions models, and sync status per program.',
+    action: 'Manage Resources',
+    href: '/admin/program-resources',
+    badge: 'Drive Config',
+    badgeCls: 'bg-green-50 border-green-200 text-green-700',
+    icon: FolderOpen,
+  },
 ];
 
 // ── Sub-components ───────────────────────────────────────────────────────────

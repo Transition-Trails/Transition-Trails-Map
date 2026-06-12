@@ -124,13 +124,13 @@ export default function ProgramBlueprint() {
       <div className="p-6 max-w-5xl space-y-5">
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Program Canvas</p>
-            <h1 className="text-3xl font-serif font-bold text-foreground">Program Canvas</h1>
-            <p className="text-[13px] text-muted-foreground mt-1">
-              What actually exists in each program — structure, assets, Salesforce records, and delivery content.
-              {isFoundations && <span className="ml-1 text-primary font-medium">Foundations Trail is the reference implementation of the Program Blueprint standard.</span>}
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Programs · Blueprint Canvas</p>
+            <h1 className="text-[15px] font-semibold text-foreground leading-snug">Program Canvas</h1>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              What actually exists — structure, curriculum, Penny assets, delivery, and content health.
+              {isFoundations && <span className="ml-1 text-primary font-medium">Foundations Trail is the reference implementation.</span>}
             </p>
           </div>
 

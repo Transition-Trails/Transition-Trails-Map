@@ -57,8 +57,6 @@ const navGroups: NavGroup[] = [
       { id: 'prog-programs',   path: '/program',            label: 'Programs',        minTier: 'admin' },
       { id: 'prog-standards',  path: '/program/standards',  label: 'Standards',       minTier: 'admin' },
       { id: 'prog-blueprint',  path: '/program/blueprint',  label: 'Blueprint',       minTier: 'admin' },
-
-      { id: 'prog-resources',  path: '/program/resources',  label: 'Resources',       minTier: 'admin' },
     ],
   },
   {

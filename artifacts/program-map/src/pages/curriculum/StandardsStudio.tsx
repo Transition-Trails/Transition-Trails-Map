@@ -734,13 +734,13 @@ export default function StandardsStudio() {
       {/* Page header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
-          Curriculum Studio — Standards Studio
+          Programs · Standards
         </p>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Standards Studio</h1>
+            <h1 className="text-[15px] font-semibold text-foreground leading-snug">Standards Studio</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5">
-              The rulebook Penny uses to create, review, and improve Transition Trails curriculum content consistently.
+              The rulebook Penny uses to create, review, and improve curriculum content consistently.
             </p>
           </div>
           {view === 'gap-report' && (

@@ -456,11 +456,11 @@ export default function SalesforceValidationCenter() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 pt-6 pb-0 border-b border-border/50">
-        <div className="flex items-start justify-between mb-3">
+      <div className="px-6 pt-5 pb-0 border-b border-border/50">
+        <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Curriculum Studio — Salesforce</p>
-            <h2 className="text-2xl font-serif font-bold text-foreground">Salesforce Validation & Mapping Center</h2>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration · SF Validation</p>
+            <h2 className="text-[15px] font-semibold text-foreground leading-snug">Salesforce Validation & Mapping Center</h2>
             <p className="text-[12px] text-muted-foreground mt-0.5">
               Object mapping inventory, validation workflows, and readiness tracking across PMM, NPSP, Nonprofit Cloud, VM, Assessments, and LMS.
             </p>
