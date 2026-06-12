@@ -93,7 +93,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
     connections: [
       { system: 'Curriculum',    label: '12 courses',     count: 12, color: '#b45309', href: '/program/curriculum', detail: 'Agile Foundations, Growth Mindset, Sprint Cadence, Trail Talks +8',
         items: [{ id:'c1', label:'Agile Foundations', statusColor:'bg-emerald-400' }, { id:'c2', label:'Growth Mindset', statusColor:'bg-emerald-400' }, { id:'c3', label:'Sprint Cadence', statusColor:'bg-emerald-400' }, { id:'c4', label:'Trail Talks', statusColor:'bg-emerald-400' }, { id:'c5', label:'+8 more', statusColor:'bg-slate-400' }] },
-      { system: 'Salesforce',    label: 'Program objects', count: 3,  color: '#0369a1', href: '/program/salesforce', detail: 'Program__c, Program_Engagement__c, Contact',
+      { system: 'Salesforce',    label: 'Program objects', count: 3,  color: '#0369a1', href: '/admin/salesforce-arch', detail: 'Program__c, Program_Engagement__c, Contact',
         items: [{ id:'s1', label:'Program__c', statusColor:'bg-sky-400' }, { id:'s2', label:'Program_Engagement__c', statusColor:'bg-sky-400' }, { id:'s3', label:'Contact', statusColor:'bg-sky-400' }] },
       { system: 'Penny AI',      label: '4 capabilities', count: 4,  color: '#be185d', href: '/penny',              detail: 'Trail Quest, Coach Brief, Sprint Coach, Resume Review',
         items: [{ id:'p1', label:'Trail Quest', statusColor:'bg-pink-400' }, { id:'p2', label:'Coach Brief', statusColor:'bg-pink-400' }, { id:'p3', label:'Sprint Coach', statusColor:'bg-amber-400' }, { id:'p4', label:'Resume Review', statusColor:'bg-pink-400' }] },
@@ -133,7 +133,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
         items: [{ id:'cu1', label:'Reflection Module', statusColor:'bg-amber-400' }, { id:'cu2', label:'Assessment Module', statusColor:'bg-amber-400' }, { id:'cu3', label:'Quest Module', statusColor:'bg-amber-400' }] },
       { system: 'Coaches',        label: '3 coaches',   count: 3,  color: '#1d4ed8', href: '/digital-twin',     detail: 'Coach brief and escalation recipients for this capability',
         items: [{ id:'co1', label:'3 coach recipients', statusColor:'bg-blue-400' }] },
-      { system: 'Salesforce',     label: 'Variables',   count: 3,  color: '#0369a1', href: '/program/salesforce', detail: 'Contact, Assessment__c, Program_Engagement__c',
+      { system: 'Salesforce',     label: 'Variables',   count: 3,  color: '#0369a1', href: '/admin/salesforce-arch', detail: 'Contact, Assessment__c, Program_Engagement__c',
         items: [{ id:'sf1', label:'Contact', statusColor:'bg-sky-400' }, { id:'sf2', label:'Assessment__c', statusColor:'bg-sky-400' }, { id:'sf3', label:'Program_Engagement__c', statusColor:'bg-sky-400' }] },
     ],
   },
@@ -165,7 +165,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
         items: [{ id:'a1', label:'Pre-course', statusColor:'bg-teal-400' }, { id:'a2', label:'Post-course', statusColor:'bg-teal-400' }] },
       { system: 'Coaches',       label: '4 coaches',       count: 4, color: '#1d4ed8', href: '/digital-twin',           detail: 'Facilitate this course across cohorts',
         items: [{ id:'co1', label:'4 facilitating coaches', statusColor:'bg-blue-400' }] },
-      { system: 'Salesforce',    label: 'Progress records', count: 1, color: '#0369a1', href: '/program/salesforce',   detail: 'Learner completion and progress data records',
+      { system: 'Salesforce',    label: 'Progress records', count: 1, color: '#0369a1', href: '/admin/salesforce-arch',   detail: 'Learner completion and progress data records',
         items: [{ id:'sf1', label:'Completion records', statusColor:'bg-sky-400' }, { id:'sf2', label:'Progress sync', statusColor:'bg-sky-400' }] },
     ],
   },
@@ -195,7 +195,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
         items: [{ id:'ai1', label:'Coach Brief', statusColor:'bg-pink-400' }, { id:'ai2', label:'Escalation Alerts', statusColor:'bg-pink-400' }] },
       { system: 'Slack Channels', label: '4 channels',   count: 4, color: '#c2410c', href: '/collaboration',      detail: '#coaches, #guided-trail, #penny-ai, #ops',
         items: [{ id:'sl1', label:'#coaches', statusColor:'bg-orange-400' }, { id:'sl2', label:'#guided-trail', statusColor:'bg-orange-400' }, { id:'sl3', label:'#penny-ai', statusColor:'bg-orange-400' }, { id:'sl4', label:'#ops', statusColor:'bg-orange-400' }] },
-      { system: 'Salesforce',    label: 'User + Contact', count: 2, color: '#0369a1', href: '/program/salesforce', detail: 'Salesforce user, contact record, permission set',
+      { system: 'Salesforce',    label: 'User + Contact', count: 2, color: '#0369a1', href: '/admin/salesforce-arch', detail: 'Salesforce user, contact record, permission set',
         items: [{ id:'sf1', label:'User record', statusColor:'bg-sky-400' }, { id:'sf2', label:'Contact record', statusColor:'bg-sky-400' }] },
       { system: 'Calendar',      label: '3 event types',  count: 3, color: '#0f766e', href: '/collaboration',     detail: 'Weekly check-ins, cohort sessions, retrospectives',
         items: [{ id:'ca1', label:'Weekly check-ins', statusColor:'bg-teal-400' }, { id:'ca2', label:'Cohort sessions', statusColor:'bg-teal-400' }, { id:'ca3', label:'Retrospectives', statusColor:'bg-teal-400' }] },
@@ -219,7 +219,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
       { id: 'lms',              name: 'LMS Integration',                subtitle: 'Course completion and progress sync',     status: 'planned'     },
     ],
     connections: [
-      { system: 'Salesforce',    label: '6 object mappings', count: 6, color: '#0369a1', href: '/program/salesforce', detail: 'Sync fields: Program__c, Contact, Engagement, Assessment',
+      { system: 'Salesforce',    label: '6 object mappings', count: 6, color: '#0369a1', href: '/admin/salesforce-arch', detail: 'Sync fields: Program__c, Contact, Engagement, Assessment',
         items: [{ id:'sf1', label:'Program__c', statusColor:'bg-sky-400' }, { id:'sf2', label:'Contact', statusColor:'bg-sky-400' }, { id:'sf3', label:'Engagement__c', statusColor:'bg-sky-400' }, { id:'sf4', label:'+3 more', statusColor:'bg-slate-400' }] },
       { system: 'Penny AI',      label: '3 capabilities',   count: 3, color: '#be185d', href: '/penny',               detail: 'Context variables, notification dispatch, data fetch',
         items: [{ id:'p1', label:'Trail Quest', statusColor:'bg-pink-400' }, { id:'p2', label:'Coach Brief', statusColor:'bg-pink-400' }, { id:'p3', label:'Resume Review', statusColor:'bg-amber-400' }] },
@@ -628,7 +628,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
             <div className="space-y-3">
               <p className="text-[11px] text-muted-foreground">Suggested next actions based on this object's current state and connections.</p>
               {[
-                { label: 'Open in Salesforce',        desc: 'Review the primary record and related data',           href: '/program/salesforce', icon: <Database className="w-4 h-4" />, variant: 'primary' as const },
+                { label: 'Open in Salesforce',        desc: 'Review the primary record and related data',           href: '/admin/salesforce-arch', icon: <Database className="w-4 h-4" />, variant: 'primary' as const },
                 { label: 'Review Knowledge Sources',  desc: '2 sources are flagged for currency review',            href: '/knowledge',          icon: <BookOpen  className="w-4 h-4" />, variant: 'secondary' as const },
                 { label: 'Check Penny Prompts',       desc: 'Verify prompt quality and consistency after changes',  href: '/penny/prompts',      icon: <Brain     className="w-4 h-4" />, variant: 'secondary' as const },
                 { label: 'View Impact Analysis',      desc: 'See the full cascade of changes for this object',      href: '/digital-twin/impact',icon: <Zap       className="w-4 h-4" />, variant: 'secondary' as const },

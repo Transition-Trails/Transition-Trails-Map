@@ -4,7 +4,7 @@ import {
   Layers, FileText, Compass, Brain, Monitor, Plug,
   Search, ArrowLeft, ChevronRight, Save, X, AlertTriangle,
   ExternalLink, CheckCircle2, Users, Copy, User, Shield, Sliders, Building2, Plus,
-  Key, Lock, Layout, ListTodo,
+  Key, Lock, Layout, ListTodo, Database,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
@@ -331,6 +331,25 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 <p className="font-semibold text-foreground text-sm mb-1.5">Create Actions Audit</p>
                 <p className="text-[12px] text-muted-foreground leading-snug">
                   Full audit of every create/add action across Trail OS — workspaces covered, object types, entry points, and read-only views.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => setLocation('/admin/salesforce-arch')}
+                className="text-left p-4 rounded-lg border bg-card border-blue-200 hover:border-blue-400 transition-all duration-150 hover:shadow-sm group"
+              >
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-blue-50 text-blue-700">
+                    <Database className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Mapping</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Salesforce Architecture</p>
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Object-level mapping between Trail OS, Salesforce (NPSP · PMM · Nonprofit Cloud), and Google Drive. Visual map, table, and by-product views.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />

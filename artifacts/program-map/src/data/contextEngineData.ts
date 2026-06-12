@@ -135,10 +135,10 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     id:'sf-program-engagement', objectTypeId:'salesforce-object', objectTypeName:'Salesforce Object',
     category:'Infrastructure Layer', categoryColor:'text-teal-700', categoryBg:'bg-teal-50 border-teal-200',
     name:'Salesforce Program Engagement', status:'Active', statusVariant:'active', health:'healthy', confidence:86,
-    owner:'Salesforce Admin', workspaceLink:'/program/salesforce', profileId:'sf-program-engagement',
+    owner:'Salesforce Admin', workspaceLink:'/admin/salesforce-arch', profileId:'sf-program-engagement',
     description:'Program_Engagement__c — 247 active records. Primary learner enrollment and progress record.',
     workspaceImpacts: [
-      { workspaceId:'program',      workspaceName:'Program & Curriculum',   workspaceLink:'/program/salesforce',description:'Shows Salesforce architecture and Program Engagement object details.', filterDescription:'Viewing SF architecture',    active:true },
+      { workspaceId:'program',      workspaceName:'Program & Curriculum',   workspaceLink:'/admin/salesforce-arch',description:'Shows Salesforce architecture and Program Engagement object details.', filterDescription:'Viewing SF architecture',    active:true },
       { workspaceId:'operations',   workspaceName:'Operations',             workspaceLink:'/operations',        description:'Shows data completeness, integrity errors, and sync status.', filterDescription:'Filtering to SF health',      active:true },
       { workspaceId:'digital-twin', workspaceName:'Digital Twin',           workspaceLink:'/digital-twin',      description:'Shows object node, relationships to Program and Contact objects.', filterDescription:'Focusing on SF object node',  active:false },
     ],

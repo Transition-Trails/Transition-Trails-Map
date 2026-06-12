@@ -615,7 +615,7 @@ export const PROFILES: ObjectProfile[] = [
     name: 'Salesforce Program Engagement', status: 'Active', statusVariant: 'active',
     description: 'The Program_Engagement__c custom object records each learner\'s participation in a specific program cohort — the primary enrollment and progress record linking a Contact to a Program and Cohort.',
     confidence: 86,
-    workspaceLink: '/program/salesforce',
+    workspaceLink: '/admin/salesforce-arch',
     overview: {
       purpose: 'Track each learner\'s enrollment, progress, and outcomes in a specific program cohort. The authoritative source for learner stage, health score, and completion status across all programs.',
       keyFacts: [

@@ -6,8 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
 
-import Home             from "@/pages/Home";
-import TrailOSOverview  from "@/pages/TrailOSOverview";
+import Home                from "@/pages/Home";
+import TrailOSOverview     from "@/pages/TrailOSOverview";
+import SalesforceMapping   from "@/pages/curriculum/SalesforceMapping";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
@@ -106,7 +107,8 @@ function Router() {
       {/* Curriculum → program hub */}
       <Route path="/curriculum/blueprint">           <Redirect to="/program/blueprint" /></Route>
       <Route path="/curriculum/standards">           <Redirect to="/program/standards" /></Route>
-      <Route path="/curriculum/salesforce-mapping">  <Redirect to="/program/salesforce" /></Route>
+      <Route path="/curriculum/salesforce-mapping">  <Redirect to="/admin/salesforce-arch" /></Route>
+      <Route path="/program/salesforce">             <Redirect to="/admin/salesforce-arch" /></Route>
       <Route path="/curriculum/overview">            <Redirect to="/program/curriculum" /></Route>
       <Route path="/curriculum/programs">            <Redirect to="/program/programs" /></Route>
       <Route path="/curriculum/:sub">                <Redirect to="/program/curriculum" /></Route>
@@ -177,6 +179,7 @@ function Router() {
       <Route path="/trail-os-overview"       component={TrailOSOverview} />
 
       {/* Administration */}
+      <Route path="/admin/salesforce-arch"   component={SalesforceMapping} />
       <Route path="/admin/people"            component={PeopleWorkspace} />
       <Route path="/admin/phase1-readiness"  component={Phase1ReadinessDashboard} />
       <Route path="/admin/ux-standards"     component={Phase1UXStandards} />

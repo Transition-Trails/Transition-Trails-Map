@@ -181,7 +181,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     powerSteps: [
       { label: 'Review standards',   path: '/program/standards' },
-      { label: 'Salesforce mapping', path: '/program/salesforce' },
+      { label: 'Salesforce mapping', path: '/admin/salesforce-arch' },
       { label: 'Program blueprint',  path: '/program/blueprint' },
     ],
     everydayCanned: "Each program has a structured curriculum, cohort schedule, and Penny support built in. Your active programs have all materials for this sprint uploaded.",

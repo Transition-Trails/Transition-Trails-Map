@@ -486,7 +486,7 @@ export const OBJECT_TYPES: UOMObjectType[] = [
     ],
     systems: ['Salesforce'],
     reviewCycle: 'Quarterly data quality review',
-    workspaceLink: '/program/salesforce',
+    workspaceLink: '/admin/salesforce-arch',
     standards: ['Program Blueprint'],
     profileTabs: ['Overview', 'Fields', 'Relationships', 'Security', 'Integrations'],
   },
