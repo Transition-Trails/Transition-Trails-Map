@@ -1,6 +1,6 @@
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Target, GitBranch, Activity, Clock, Zap } from 'lucide-react';
+import { Target, GitBranch, Activity, Clock, Zap, Search as SearchIcon } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useLocation } from 'wouter';
 
@@ -54,14 +54,14 @@ function OverviewTab() {
   const [, setLocation] = useLocation();
 
   const WORKSPACES = [
-    { id:'program',    name:'Program & Curriculum', link:'/program',        filtered: !!activeContext },
-    { id:'penny',      name:'Penny AI',             link:'/penny',          filtered: !!activeContext },
-    { id:'knowledge',  name:'Knowledge',            link:'/knowledge',      filtered: !!activeContext },
-    { id:'people',     name:'People & Access',      link:'/admin/people-access', filtered: !!activeContext },
-    { id:'collab',     name:'Collaboration',        link:'/collaboration',  filtered: !!activeContext },
-    { id:'twin',       name:'Digital Twin',         link:'/digital-twin',   filtered: false },
-    { id:'search',     name:'Global Search',        link:'/search',         filtered: !!activeContext },
-    { id:'governance', name:'Governance',           link:'/governance',     filtered: false },
+    { id:'program',    name:'Program & Curriculum', link:'/program',             filtered: !!activeContext, count: 5,  unit: 'programs'        },
+    { id:'penny',      name:'Penny AI',             link:'/penny',               filtered: !!activeContext, count: 17, unit: 'capabilities'    },
+    { id:'knowledge',  name:'Knowledge',            link:'/knowledge',           filtered: !!activeContext, count: 12, unit: 'sources'         },
+    { id:'people',     name:'People & Access',      link:'/admin/people-access', filtered: !!activeContext, count: 4,  unit: 'roles defined'   },
+    { id:'collab',     name:'Collaboration',        link:'/collaboration',       filtered: !!activeContext, count: 3,  unit: 'channels active' },
+    { id:'twin',       name:'Digital Twin',         link:'/digital-twin',        filtered: false,           count: 40, unit: 'objects mapped'  },
+    { id:'search',     name:'Global Search',        link:'/search',              filtered: !!activeContext, count: null, unit: 'cross-workspace' },
+    { id:'governance', name:'Governance',           link:'/governance',          filtered: false,           count: null, unit: 'Phase 2'        },
   ];
 
   return (
@@ -107,13 +107,20 @@ function OverviewTab() {
             </button>
           </div>
         ) : (
-          <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">No active context set. Navigate to <strong>Global Search</strong> to set one.</p>
+          <div className="rounded-lg border-2 border-dashed border-border bg-background p-8 text-center">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+              <Target className="w-5 h-5 text-muted-foreground/40" />
+            </div>
+            <h3 className="text-[13px] font-semibold text-foreground mb-1">No active context</h3>
+            <p className="text-[11px] text-muted-foreground mb-4 max-w-[280px] mx-auto leading-relaxed">
+              Set a context from Global Search — any program, capability, knowledge source, or object — to filter workspaces automatically.
+            </p>
             <button
               onClick={() => setLocation('/search')}
-              className="mt-2 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[11px] font-semibold hover:bg-primary/90 transition-colors"
             >
-              Open Global Search →
+              <SearchIcon className="w-3 h-3" />
+              Set Context via Search
             </button>
           </div>
         )}
@@ -125,13 +132,21 @@ function OverviewTab() {
               <button
                 key={ws.id}
                 onClick={() => setLocation(ws.link)}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border bg-white hover:bg-muted/40 text-left transition-colors"
+                className="flex flex-col items-start gap-1 px-3 py-2.5 rounded-lg border border-border bg-white hover:bg-muted/40 text-left transition-colors"
               >
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ws.filtered ? 'bg-emerald-400' : 'bg-gray-200'}`} />
-                <span className="text-[12px] text-foreground font-medium">{ws.name}</span>
-                {ws.filtered && (
-                  <span className="ml-auto text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded px-1 py-0.5">Context</span>
-                )}
+                <div className="flex items-center gap-2 w-full">
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ws.filtered ? 'bg-emerald-400' : 'bg-gray-200'}`} />
+                  <span className="text-[12px] text-foreground font-medium flex-1 truncate">{ws.name}</span>
+                  {ws.filtered && (
+                    <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded px-1 py-0.5 shrink-0">Context</span>
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground pl-3.5">
+                  {ws.count !== null
+                    ? <><span className="font-semibold text-foreground">{ws.count}</span> {ws.unit}</>
+                    : <span className="italic">{ws.unit}</span>
+                  }
+                </p>
               </button>
             ))}
           </div>

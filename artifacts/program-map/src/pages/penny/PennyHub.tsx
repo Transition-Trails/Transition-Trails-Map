@@ -1,6 +1,6 @@
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
-  Activity, GitBranch, Puzzle, Plus,
+  Activity, GitBranch, Puzzle, Plus, Sparkles,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -13,35 +13,33 @@ import Intelligence          from '@/pages/penny/Intelligence';
 import PennyHealth           from '@/pages/operations/PennyHealth';
 import PennyIntegrationLayer from '@/pages/penny/PennyIntegrationLayer';
 
-// UI audit rule: Everyday User pages must not have multiple nav/action rows
-// above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
-
 export default function PennyHub() {
-  const { openActionPanel } = useAppContext();
+  const { openActionPanel, setRightPanelOpen } = useAppContext();
   const { isEveryday, isAdminOrAbove } = useTierFlags();
 
-  const HUB_ACTIONS: ActionItem[] = [
-    ...(!isEveryday ? [
-      {
-        id: 'new-prompt',
-        label: 'New Prompt Template',
-        icon: Plus,
-        variant: 'primary' as const,
-        onClick: () => openActionPanel({
-          title: 'New Prompt Template',
-          objectType: 'Prompt Template',
-          subtitle: 'Define how Penny thinks, retrieves, and responds. Assigned Draft status.',
-          slackContext: 'penny',
-          fields: [
-            { id: 'name',       label: 'Template Name', type: 'text',     required: true, placeholder: 'e.g. Goal-Setting Coaching Prompt' },
-            { id: 'domain',     label: 'Domain',        type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
-            { id: 'purpose',    label: 'Purpose',       type: 'textarea', placeholder: 'What does this prompt do and when should Penny use it?', rows: 3 },
-            { id: 'promptBody', label: 'Prompt Body',   type: 'textarea', placeholder: 'Write the prompt. Use {{variable_name}} for dynamic tokens.', rows: 5 },
-            { id: 'tone',       label: 'Tone & Style',  type: 'text',     placeholder: 'e.g. Empathetic and direct.' },
-            { id: 'guardrails', label: 'Guardrails',    type: 'textarea', placeholder: 'Constraints: never recommend specific employers…', rows: 3 },
-          ],
-        }),
-      },
+  const HUB_ACTIONS: ActionItem[] = !isEveryday ? [
+    {
+      id: 'review-readiness',
+      label: 'Review Readiness',
+      icon: Activity,
+      variant: 'primary' as const,
+      href: '/penny/health',
+    },
+    {
+      id: 'view-relationships',
+      label: 'View Relationships',
+      icon: GitBranch,
+      variant: 'secondary' as const,
+      href: '/digital-twin',
+    },
+    {
+      id: 'ask-penny',
+      label: 'Ask Penny',
+      icon: Sparkles,
+      variant: 'secondary' as const,
+      onClick: () => setRightPanelOpen(true),
+    },
+    ...(isAdminOrAbove ? [
       {
         id: 'new-capability',
         label: 'New Capability',
@@ -61,13 +59,28 @@ export default function PennyHub() {
           ],
         }),
       },
-      { id: 'intelligence', label: 'View Intelligence',  icon: BarChart2,    href: '/penny/intelligence',         variant: 'secondary' as const },
-      { id: 'health',       label: 'Penny Health',       icon: Activity,     href: '/penny/health',               variant: 'secondary' as const },
+      {
+        id: 'new-prompt',
+        label: 'New Prompt Template',
+        icon: Plus,
+        variant: 'secondary' as const,
+        onClick: () => openActionPanel({
+          title: 'New Prompt Template',
+          objectType: 'Prompt Template',
+          subtitle: 'Define how Penny thinks, retrieves, and responds. Assigned Draft status.',
+          slackContext: 'penny',
+          fields: [
+            { id: 'name',       label: 'Template Name', type: 'text',     required: true, placeholder: 'e.g. Goal-Setting Coaching Prompt' },
+            { id: 'domain',     label: 'Domain',        type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
+            { id: 'purpose',    label: 'Purpose',       type: 'textarea', placeholder: 'What does this prompt do and when should Penny use it?', rows: 3 },
+            { id: 'promptBody', label: 'Prompt Body',   type: 'textarea', placeholder: 'Write the prompt. Use {{variable_name}} for dynamic tokens.', rows: 5 },
+            { id: 'tone',       label: 'Tone & Style',  type: 'text',     placeholder: 'e.g. Empathetic and direct.' },
+            { id: 'guardrails', label: 'Guardrails',    type: 'textarea', placeholder: 'Constraints: never recommend specific employers…', rows: 3 },
+          ],
+        }),
+      },
     ] : []),
-    ...(isAdminOrAbove ? [
-      { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/digital-twin/relationships', variant: 'secondary' as const },
-    ] : []),
-  ];
+  ] : [];
 
   const TABS = [
     ...(!isEveryday ? [
@@ -91,7 +104,7 @@ export default function PennyHub() {
       description={
         isEveryday
           ? 'Your learners and Penny AI coaching support. Ask Penny anything in the right panel.'
-          : 'Select a capability to explore its prompts, knowledge sources, quality metrics, and health. Use Prompt Studio, Learners, Intelligence, and Test tabs for cross-capability views.'
+          : 'Select a capability to explore its prompts, knowledge sources, quality metrics, and health. Use Prompt Studio, Learners, Intelligence, and Health tabs for cross-capability views.'
       }
       actions={HUB_ACTIONS}
       tabs={TABS}

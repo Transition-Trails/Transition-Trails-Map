@@ -1,6 +1,7 @@
 import {
-  GraduationCap, LayoutGrid, Star, Plus, LayoutDashboard,
+  GraduationCap, LayoutGrid, Star, Plus, LayoutDashboard, BarChart2, Eye,
 } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { useAppContext } from '@/context/AppContext';
@@ -13,8 +14,29 @@ import ProgramBlueprint from '@/pages/curriculum/ProgramBlueprint';
 export default function ProgramHub() {
   const { openActionPanel } = useAppContext();
   const { isEveryday, isAdminOrAbove } = useTierFlags();
+  const [location] = useLocation();
 
-  const HUB_ACTIONS: ActionItem[] = !isEveryday ? [{
+  const isStandardsTab = location === '/program/standards' || location.startsWith('/program/standards/');
+
+  const STANDARDS_ACTIONS: ActionItem[] = [
+    {
+      id: 'review-standards',
+      label: 'Review Standards',
+      icon: Eye,
+      variant: 'primary' as const,
+      href: '/program/standards',
+    },
+    {
+      id: 'gap-report',
+      label: 'Gap Report',
+      icon: BarChart2,
+      variant: 'secondary' as const,
+      disabled: true,
+      disabledReason: 'Gap Report available in Phase 2 · Sprint 3',
+    },
+  ];
+
+  const CREATE_ACTIONS: ActionItem[] = [{
     id: 'create-program', label: 'Create Program', icon: Plus, variant: 'primary' as const,
     onClick: () => openActionPanel({
       title: 'New Program', objectType: 'Program',
@@ -29,7 +51,11 @@ export default function ProgramHub() {
         { id: 'summary',     label: 'Summary',         type: 'textarea', placeholder: 'Brief description of the program purpose…', rows: 3 },
       ],
     }),
-  }] : [];
+  }];
+
+  const HUB_ACTIONS: ActionItem[] = !isEveryday
+    ? (isStandardsTab ? STANDARDS_ACTIONS : CREATE_ACTIONS)
+    : [];
 
   const ALL_TABS = [
     {

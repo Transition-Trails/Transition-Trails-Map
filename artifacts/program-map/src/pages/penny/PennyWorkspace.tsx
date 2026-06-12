@@ -165,7 +165,7 @@ function QualityTab({ cap }: { cap: PennyCapability }) {
           <>
             <div className="flex items-center gap-4">
               <div className="text-center">
-                <p className={`text-4xl font-bold font-serif ${scoreColor}`}>{score}</p>
+                <p className={`text-4xl font-bold ${scoreColor}`}>{score}</p>
                 <p className="text-[10px] text-muted-foreground">/ 100</p>
                 <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mt-1">Quality Score</p>
               </div>
