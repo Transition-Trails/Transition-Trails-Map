@@ -18,7 +18,7 @@ export default function CurriculumSprints() {
       <div className="p-6 max-w-5xl space-y-6">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Sprints</h1>
+          <h1 className="text-3xl font-bold text-foreground">Sprints</h1>
           <p className="text-[13px] text-muted-foreground mt-1">Each sprint is a 3-week themed learning arc containing 3 modules. Sprints align to the RESOLVE framework phases. Select a sprint to view its module sequence in the Knowledge Brief.</p>
         </div>
 

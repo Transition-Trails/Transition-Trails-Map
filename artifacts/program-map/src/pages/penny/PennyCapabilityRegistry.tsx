@@ -119,7 +119,7 @@ function CapabilityDetail({ cap, onOpenBrief }: { cap: PennyCapability; onOpenBr
           <div className="flex items-start justify-between gap-2 mb-2">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Penny Capability</p>
-              <h3 className="text-lg font-serif font-bold text-foreground leading-snug">{cap.name}</h3>
+              <h3 className="text-lg font-bold text-foreground leading-snug">{cap.name}</h3>
             </div>
             <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">
               Trail Insights
@@ -282,7 +282,7 @@ function ArchitectureView() {
           <div className="flex items-start gap-3">
             <Brain className="w-8 h-8 text-secondary shrink-0 mt-0.5" />
             <div>
-              <h2 className="text-[15px] font-bold font-serif text-foreground mb-1">Penny as the Intelligence Layer</h2>
+              <h2 className="text-[15px] font-bold text-foreground mb-1">Penny as the Intelligence Layer</h2>
               <p className="text-[12px] text-foreground/80 leading-relaxed mb-3">
                 Penny is not a chatbot. Penny is the intelligence layer that sits above Trail OS, Salesforce, the Knowledge Library,
                 Communications, Calendar, and Curriculum Studio — reading context from each and delivering personalized, standards-aligned
@@ -726,7 +726,7 @@ export default function PennyCapabilityRegistry() {
         </p>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Penny Capability Registry</h1>
+            <h1 className="text-2xl font-bold text-foreground">Penny Capability Registry</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5">
               Architecture inventory of all Penny capabilities across {DOMAIN_ORDER.length} domains — before POC integration.
             </p>

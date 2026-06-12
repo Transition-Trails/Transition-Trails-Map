@@ -616,7 +616,7 @@ export function UniversalObjectProfile({
             )}
           </div>
         </div>
-        <h2 className="text-lg font-serif font-bold text-foreground mb-1">{currentProfile.name}</h2>
+        <h2 className="text-lg font-bold text-foreground mb-1">{currentProfile.name}</h2>
         <p className="text-[11px] text-muted-foreground leading-relaxed mb-2 max-w-2xl">{currentProfile.description}</p>
 
         {/* Tab bar */}

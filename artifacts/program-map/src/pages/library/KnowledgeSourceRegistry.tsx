@@ -135,7 +135,7 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Knowledge Source</p>
-                <h3 className="text-[15px] font-serif font-bold text-foreground leading-snug">{src.name}</h3>
+                <h3 className="text-[15px] font-bold text-foreground leading-snug">{src.name}</h3>
               </div>
             </div>
             <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">
@@ -259,7 +259,7 @@ function OverviewView() {
           <div className="flex items-start gap-3">
             <Network className="w-8 h-8 text-primary shrink-0 mt-0.5" />
             <div>
-              <h2 className="text-[15px] font-bold font-serif text-foreground mb-1">Knowledge Source Registry</h2>
+              <h2 className="text-[15px] font-bold text-foreground mb-1">Knowledge Source Registry</h2>
               <p className="text-[12px] text-foreground/80 leading-relaxed mb-2">
                 The central place where Trail OS understands <em>where trusted information comes from</em> and how Penny should use it.
                 Every source Penny can draw on — Salesforce Knowledge, Google Drive, LMS content, assessments, standards, curriculum, and future communication data — is registered, governed, and mapped here.
@@ -911,7 +911,7 @@ export default function KnowledgeSourceRegistry() {
         </p>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Knowledge Source Registry</h1>
+            <h1 className="text-2xl font-bold text-foreground">Knowledge Source Registry</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5">
               Where trusted information comes from — and how Penny uses it. {SOURCE_SUMMARY.total} sources across {SOURCE_TYPE_ORDER.filter(t => SOURCE_SUMMARY.byType[t] > 0).length} types.
             </p>

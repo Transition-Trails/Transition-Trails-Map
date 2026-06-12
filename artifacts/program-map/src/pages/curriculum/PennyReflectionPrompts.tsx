@@ -11,7 +11,7 @@ export default function PennyReflectionPrompts() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Reflection Prompts</h1>
+          <h1 className="text-3xl font-bold text-foreground">Reflection Prompts</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Post-lesson or end-of-module reflection questions that connect learning content to the learner's career story and prior experience.
             Penny delivers these after lesson completion or at milestone moments.

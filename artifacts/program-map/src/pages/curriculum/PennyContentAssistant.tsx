@@ -57,7 +57,7 @@ export default function PennyContentAssistant() {
         {/* Header */}
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Content Assistant</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Content Workshop</h1>
+          <h1 className="text-3xl font-bold text-foreground">Content Workshop</h1>
           <p className="text-[13px] text-muted-foreground mt-1 max-w-2xl">
             Penny as <strong>curriculum architect and content co-author</strong> for Transition Trails staff.
             Select a learning object, then choose a generation action. Penny generates standards-aligned content

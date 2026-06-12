@@ -172,7 +172,7 @@ export default function ProgramBlueprint() {
                   {CONTENT_STATUS_CONFIG[program.status].label}
                 </span>
               </div>
-              <p className="text-[20px] font-serif font-bold text-foreground">{program.name}</p>
+              <p className="text-[20px] font-bold text-foreground">{program.name}</p>
               <p className="text-[12px] text-muted-foreground mt-1">{program.purpose}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 shrink-0">

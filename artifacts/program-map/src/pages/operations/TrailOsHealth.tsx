@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 
 const integrations = [
   { name: 'Salesforce REST',  status: 'Live',          eta: 'Active',    dot: 'green' as const, note: '127 Accounts · 129 Contacts · NPSP + PMM confirmed via Replit Connector' },
-  { name: 'Slack',            status: 'Live (POC)',    eta: 'Active',    dot: 'green' as const, note: '@coachconnectbot posting to Penny AI + Admin channels — POC confirmed' },
+  { name: 'Slack',            status: 'Live',          eta: 'Active',    dot: 'green' as const, note: '@coachconnectbot posting to Penny AI + Admin channels' },
   { name: 'Google Drive',     status: 'OAuth Pending', eta: 'In Progress', dot: 'amber' as const, note: 'Client configured — GOOGLE_DRIVE_REFRESH_TOKEN not yet obtained' },
   { name: 'GA4 via Zapier',   status: 'Phase 2',       eta: 'Phase 2',   dot: 'gray' as const,  note: 'Web analytics, goal tracking' },
   { name: 'Agentforce AI',    status: 'Phase 2',       eta: 'Phase 2',   dot: 'gray' as const,  note: 'Penny AI capability layer' },
@@ -74,7 +74,7 @@ export default function TrailOsHealth() {
                 {kbStats.map((s, i) => (
                   <div key={s.label} className={`flex justify-between items-center px-4 py-3 ${i > 0 ? 'border-t border-border' : ''}`}>
                     <span className="text-sm text-muted-foreground">{s.label}</span>
-                    <span className="text-sm font-bold font-serif text-foreground">{s.value}</span>
+                    <span className="text-sm font-bold text-foreground">{s.value}</span>
                   </div>
                 ))}
               </div>

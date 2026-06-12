@@ -23,7 +23,7 @@ export default function LearningLessons() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Lessons</h1>
+          <h1 className="text-3xl font-bold text-foreground">Lessons</h1>
           <p className="text-[13px] text-muted-foreground mt-1">Individual learning units inside each module. Each lesson has one objective, an instructional sequence, and linked Penny prompts. Select a lesson to see its full asset connections.</p>
         </div>
         <div className="flex gap-2 flex-wrap">

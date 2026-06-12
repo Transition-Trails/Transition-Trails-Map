@@ -42,7 +42,7 @@ export default function MessageTemplates() {
               <StatusDot status={s.dot} />
               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{s.label}</p>
             </div>
-            <p className="text-2xl font-bold font-serif text-foreground">{s.value}</p>
+            <p className="text-2xl font-bold text-foreground">{s.value}</p>
           </div>
         ))}
       </div>

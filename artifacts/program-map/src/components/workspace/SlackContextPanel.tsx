@@ -696,7 +696,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               </span>
               <OAuthStatusChip />
             </div>
-            <h2 className="text-[14px] font-serif font-bold text-foreground leading-tight">{config.title}</h2>
+            <h2 className="text-[14px] font-bold text-foreground leading-tight">{config.title}</h2>
             {config.subtitle && (
               <p className="text-[10px] text-muted-foreground/70 leading-snug mt-0.5">{config.subtitle}</p>
             )}

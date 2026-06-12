@@ -288,7 +288,7 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
             <ProgressBar score={area.score} bar={cfg.bar} />
           </div>
           <div className="text-right shrink-0 ml-4">
-            <p className={`font-bold font-serif ${isOverall ? 'text-4xl' : 'text-3xl'} ${area.score >= 70 ? 'text-blue-600' : area.score >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
+            <p className={`font-bold ${isOverall ? 'text-4xl' : 'text-3xl'} ${area.score >= 70 ? 'text-blue-600' : area.score >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
               {area.score}
             </p>
             <p className="text-[9px] text-muted-foreground">/ 100</p>

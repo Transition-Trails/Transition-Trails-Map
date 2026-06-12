@@ -11,7 +11,7 @@ export default function PennyCoachingPrompts() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Coaching Prompts</h1>
+          <h1 className="text-3xl font-bold text-foreground">Coaching Prompts</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Penny-delivered coaching messages triggered by learner context — module opens, stuck signals, or at-risk flags.
             Each prompt is linked to a specific module or lesson. Select a prompt to see its trigger context, tone, and sample output.

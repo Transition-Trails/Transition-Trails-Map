@@ -11,7 +11,7 @@ export default function DeliveryGoogleChat() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Google Chat Updates</h1>
+          <h1 className="text-3xl font-bold text-foreground">Google Chat Updates</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Structured Google Chat messages for cohort spaces and coaching team channels — sprint launches, progress updates,
             assessment reminders, and program announcements. Select an update to view its script in the Knowledge Brief.

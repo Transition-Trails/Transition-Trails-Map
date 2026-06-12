@@ -34,7 +34,7 @@ export default function PennyBroadcasts() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Penny Broadcasts</h1>
+          <h1 className="text-3xl font-bold text-foreground">Penny Broadcasts</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Automated messages Penny sends to learners, coaches, and cohorts — triggered by Trail OS events. Click any broadcast to open its Knowledge Brief.
           </p>

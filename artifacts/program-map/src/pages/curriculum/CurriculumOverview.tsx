@@ -25,7 +25,7 @@ export default function CurriculumOverview() {
       <div className="p-6 max-w-5xl space-y-7">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Learning Architecture Workspace</h1>
+          <h1 className="text-3xl font-bold text-foreground">Learning Architecture Workspace</h1>
           <p className="text-[13px] text-muted-foreground mt-2 max-w-2xl">
             Model relationships between Program Structure, Learning Assets, Penny Assets, and Delivery Assets so staff can build
             consistent, standards-based curriculum. Consistency comes from <strong>relationships</strong>, not templates.

@@ -30,7 +30,7 @@ export default function CurriculumLessons() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Lessons</h1>
+          <h1 className="text-3xl font-bold text-foreground">Lessons</h1>
           <p className="text-muted-foreground mt-2">Sample lessons from the Foundations Trail prototype. Each lesson has a type, duration, learning objective, and Penny prompt status. Click any lesson to open its Knowledge Brief.</p>
         </div>
 

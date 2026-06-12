@@ -67,7 +67,7 @@ export default function CommChannels() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Channels & Spaces</h1>
+          <h1 className="text-3xl font-bold text-foreground">Channels & Spaces</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Slack channels for the learning community. Google Chat Spaces for client and project collaboration. Click any channel to open its Trail Insights.
           </p>

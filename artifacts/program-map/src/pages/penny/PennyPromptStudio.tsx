@@ -98,7 +98,7 @@ function TemplateDetail({ t, onOpenBrief }: { t: PromptTemplate; onOpenBrief: ()
           <div className="flex items-start justify-between gap-2 mb-2">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Prompt Template · v{t.version}</p>
-              <h3 className="text-[16px] font-serif font-bold text-foreground leading-snug">{t.name}</h3>
+              <h3 className="text-[16px] font-bold text-foreground leading-snug">{t.name}</h3>
             </div>
             <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">Brief</button>
           </div>
@@ -255,7 +255,7 @@ function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplat
           <div className="flex items-start gap-3">
             <Brain className="w-7 h-7 text-primary shrink-0 mt-0.5" />
             <div>
-              <h2 className="text-[14px] font-bold font-serif text-foreground mb-1">Prompt Library</h2>
+              <h2 className="text-[14px] font-bold text-foreground mb-1">Prompt Library</h2>
               <p className="text-[12px] text-foreground/80 leading-relaxed">
                 All Penny prompt templates organized by capability domain. Each template defines how Penny thinks, what it retrieves, and what guardrails govern its output. Staff configure Penny behavior here — no code required.
               </p>
@@ -514,7 +514,7 @@ function OutputFormatsView() {
         <div className="p-5 max-w-2xl space-y-4">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Output Format</p>
-            <h2 className="text-[18px] font-serif font-bold text-foreground">{selected.name}</h2>
+            <h2 className="text-[18px] font-bold text-foreground">{selected.name}</h2>
           </div>
           <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
             <p className="text-[11px] font-bold text-primary/70 uppercase tracking-wider mb-1">Description</p>
@@ -874,7 +874,7 @@ export default function PennyPromptStudio() {
         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Penny Command Center — Prompt Studio</p>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Penny Prompt Studio</h1>
+            <h1 className="text-2xl font-bold text-foreground">Penny Prompt Studio</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5">
               The administrative control center for how Penny thinks. Configure prompts, variables, source rules, and output formats — no code required.
             </p>

@@ -11,7 +11,7 @@ export default function CurriculumCohorts() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Cohorts</h1>
+          <h1 className="text-3xl font-bold text-foreground">Cohorts</h1>
           <p className="text-[13px] text-muted-foreground mt-1">Active and past program cohorts. Each cohort is a group of learners moving through a program together. Select a cohort to view learner progress and delivery assets in the Knowledge Brief.</p>
         </div>
         <div className="grid gap-4">

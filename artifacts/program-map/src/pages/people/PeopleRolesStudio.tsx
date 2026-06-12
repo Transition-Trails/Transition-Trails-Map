@@ -36,7 +36,7 @@ function StatBox({ label, value, sub, color = 'text-foreground' }: { label: stri
   return (
     <div className="rounded-lg border border-border bg-white px-4 py-3">
       <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</p>
-      <p className={`text-2xl font-bold font-serif mt-0.5 ${color}`}>{value}</p>
+      <p className={`text-2xl font-bold mt-0.5 ${color}`}>{value}</p>
       {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   );
@@ -96,7 +96,7 @@ export default function PeopleRolesStudio() {
       <div className="border-b border-border px-6 pt-5 pb-0 bg-background">
         <div className="flex items-center gap-2 mb-1">
           <Users className="w-4 h-4 text-primary" />
-          <h1 className="text-lg font-serif font-bold text-foreground">People &amp; Roles Studio</h1>
+          <h1 className="text-lg font-bold text-foreground">People &amp; Roles Studio</h1>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Human Layer</span>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             <button

@@ -65,7 +65,7 @@ export function ContextPanel() {
                   {data.status}
                 </Badge>
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground">
+              <h2 className="text-[15px] font-semibold text-foreground">
                 {data.name}
               </h2>
             </div>
@@ -149,7 +149,7 @@ export function ContextPanel() {
                   {data.status === 'prototype' ? 'Prototype-Ready' : 'Future'}
                 </span>
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground">{data.name}</h2>
+              <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
               <p className="text-xs text-muted-foreground">{data.tagline}</p>
             </div>
             <div>
@@ -223,7 +223,7 @@ export function ContextPanel() {
                 <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Comm Route</Badge>
                 <Badge variant="outline" className="bg-amber-50 border-amber-200 text-amber-700 text-[10px]">Planned</Badge>
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground">{data.eventType}</h2>
+              <h2 className="text-[15px] font-semibold text-foreground">{data.eventType}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">{data.description}</p>
             </div>
             <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
@@ -287,7 +287,7 @@ export function ContextPanel() {
                   {data.status?.charAt(0).toUpperCase() + data.status?.slice(1)}
                 </Badge>
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground">{data.name}</h2>
+              <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
             </div>
             <div className="bg-muted/60 border border-border rounded-md p-3">
               <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5">Message Preview</span>
@@ -351,7 +351,7 @@ export function ContextPanel() {
                   </span>
                 )}
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground">{data.name}</h2>
+              <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
               <p className="text-xs text-muted-foreground italic leading-snug">{data.strategicRole}</p>
             </div>
 
@@ -512,7 +512,7 @@ export function ContextPanel() {
             <div className="p-5 space-y-5">
               <div className="space-y-2">
                 <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Operational Mapping</Badge>
-                <h2 className="text-xl font-serif font-bold text-foreground">{data.phase}</h2>
+                <h2 className="text-[15px] font-semibold text-foreground">{data.phase}</h2>
                 <p className="text-xs text-muted-foreground italic leading-snug">{data.description}</p>
               </div>
 
@@ -585,7 +585,7 @@ export function ContextPanel() {
                     <span className="text-muted-foreground">{lbl}</span>
                   </span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-foreground">{data.name as string}</h2>
+                <h2 className="text-[15px] font-semibold text-foreground">{data.name as string}</h2>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -632,7 +632,7 @@ export function ContextPanel() {
                 <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Demand Signal</Badge>
                 <div className="flex items-baseline gap-3">
                   <p className="text-5xl font-bold text-foreground leading-none">{data.count as number}</p>
-                  <h2 className="text-xl font-serif font-bold text-foreground">{data.label as string}</h2>
+                  <h2 className="text-[15px] font-semibold text-foreground">{data.label as string}</h2>
                 </div>
                 <p className="text-xs text-muted-foreground">{data.note as string}</p>
               </div>
@@ -672,7 +672,7 @@ export function ContextPanel() {
                   </span>
                 )}
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground">{data.letter} — {data.name}</h2>
+              <h2 className="text-[15px] font-semibold text-foreground">{data.letter} — {data.name}</h2>
               <p className="text-xs text-muted-foreground italic leading-snug">{data.purpose as string}</p>
             </div>
 
@@ -826,7 +826,7 @@ export function ContextPanel() {
                 </Badge>
                 <Badge variant="secondary" className="text-[10px]">{status}</Badge>
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground leading-snug">{title}</h2>
+              <h2 className="text-[15px] font-semibold text-foreground leading-snug">{title}</h2>
             </div>
 
             {data.purpose && (
@@ -924,7 +924,7 @@ export function ContextPanel() {
           <div className="p-4 space-y-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Penny Action</p>
-              <p className="text-xl font-serif font-bold text-foreground leading-snug">{action.name}</p>
+              <p className="text-[15px] font-semibold text-foreground leading-snug">{action.name}</p>
               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                 <span className={`inline-block text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg?.chip ?? ''}`}>{action.category}</span>
                 <span className="text-[10px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{action.estimatedTime}</span>
@@ -999,7 +999,7 @@ export function ContextPanel() {
           <div className="p-4 space-y-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — SF Architecture</p>
-              <p className="text-xl font-serif font-bold text-foreground leading-snug">{mapping.trailOsObject}</p>
+              <p className="text-[15px] font-semibold text-foreground leading-snug">{mapping.trailOsObject}</p>
               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                 <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                 <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${productCfg.cls}`}>{productCfg.label}</span>
@@ -1052,7 +1052,7 @@ export function ContextPanel() {
           <div className="p-4 space-y-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Program Resource</p>
-              <p className="text-xl font-serif font-bold text-foreground">{res.programName}</p>
+              <p className="text-[15px] font-semibold text-foreground">{res.programName}</p>
               <p className="text-[12px] text-muted-foreground">{res.folderName || 'No folder configured'}</p>
             </div>
             <p className="text-[12px] text-muted-foreground leading-relaxed">{res.description}</p>
@@ -1084,7 +1084,7 @@ export function ContextPanel() {
           <div className="p-4 space-y-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Penny Capability</p>
-              <p className="text-xl font-serif font-bold text-foreground leading-snug">{cap.name}</p>
+              <p className="text-[15px] font-semibold text-foreground leading-snug">{cap.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-1">
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${domCfg.cls}`}>{cap.domain}</span>
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${matCfg.cls}`}>{cap.maturity}</span>
@@ -1186,7 +1186,7 @@ export function ContextPanel() {
           <div className="p-4 space-y-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Content Standard</p>
-              <p className="text-xl font-serif font-bold text-foreground leading-snug">{std.name}</p>
+              <p className="text-[15px] font-semibold text-foreground leading-snug">{std.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-1">
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg.cls}`}>{std.category}</span>
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
@@ -1306,7 +1306,7 @@ export function ContextPanel() {
                   </span>
                 )}
               </div>
-              <h2 className="text-xl font-serif font-bold text-foreground leading-tight">{d.name}</h2>
+              <h2 className="text-[15px] font-semibold text-foreground leading-tight">{d.name}</h2>
             </div>
 
             {/* Purpose */}
@@ -1571,7 +1571,7 @@ export function ContextPanel() {
               </Badge>
               <ConfidenceBadge status={data.confidence || 'needs-review'} />
             </div>
-            <h2 className="text-xl font-serif font-bold text-foreground">
+            <h2 className="text-[15px] font-semibold text-foreground">
               {data.name}
             </h2>
           </div>

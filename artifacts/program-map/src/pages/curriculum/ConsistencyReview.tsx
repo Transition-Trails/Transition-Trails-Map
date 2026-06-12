@@ -72,7 +72,7 @@ export default function ConsistencyReview() {
       <div className="p-6 max-w-5xl space-y-6">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Content Assistant</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Consistency Review</h1>
+          <h1 className="text-3xl font-bold text-foreground">Consistency Review</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Standards-based relationship audit for Foundations Trail. Each module is checked against the Learning Architecture Standard —
             objectives, assessment, knowledge articles, Penny prompts, and delivery activities. This is what Penny's

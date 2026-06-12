@@ -285,7 +285,7 @@ export default function PennyIntegrationLayer() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Penny — POC Integration Layer</p>
-            <h2 className="text-2xl font-serif font-bold text-foreground">Penny Integration Readiness</h2>
+            <h2 className="text-2xl font-bold text-foreground">Penny Integration Readiness</h2>
             <p className="text-[12px] text-muted-foreground mt-1 max-w-2xl">
               Integration readiness tracking between Penny capabilities and all connected systems — internal registry and external platform integrations.
             </p>
@@ -318,7 +318,7 @@ export default function PennyIntegrationLayer() {
             { label: 'Blocked',          v: blockedCount,         cls: 'text-rose-600'     },
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-white px-3 py-3 text-center">
-              <p className={`text-2xl font-bold font-serif ${s.cls}`}>{s.v}</p>
+              <p className={`text-2xl font-bold ${s.cls}`}>{s.v}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}

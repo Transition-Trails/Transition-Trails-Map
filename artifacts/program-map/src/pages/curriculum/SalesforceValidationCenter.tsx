@@ -222,7 +222,7 @@ function ReadinessTrackingView() {
                   <p className="text-[13px] font-bold text-foreground">{prod.product}</p>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={prod.overallStatus} />
-                    <span className={`text-xl font-bold font-serif ${prod.score >= 60 ? 'text-blue-600' : prod.score >= 30 ? 'text-amber-600' : 'text-rose-600'}`}>{prod.score}</span>
+                    <span className={`text-xl font-bold ${prod.score >= 60 ? 'text-blue-600' : prod.score >= 30 ? 'text-amber-600' : 'text-rose-600'}`}>{prod.score}</span>
                     {open ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
                   </div>
                 </div>
@@ -375,7 +375,7 @@ function GapAnalysisView() {
           { label: 'Fields Validated',    v: `${validatedFields}/${totalFields}`, cls: 'text-blue-600' },
         ].map(s => (
           <div key={s.label} className="rounded-lg border border-border bg-white px-3 py-3 text-center">
-            <p className={`text-2xl font-bold font-serif ${s.cls}`}>{s.v}</p>
+            <p className={`text-2xl font-bold ${s.cls}`}>{s.v}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
           </div>
         ))}

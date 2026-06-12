@@ -10,7 +10,7 @@ import {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type AuditStatus = 'pass' | 'fixed' | 'watch' | 'fail';
-type HcClass = 'demo-ok' | 'phase2-data' | 'stale';
+type HcClass = 'demo-ok' | 'phase2-data' | 'stale' | 'fixed';
 type PocRisk = 'High' | 'Medium' | 'Low';
 
 interface PageAudit {
@@ -45,7 +45,7 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/',                              name: 'Home',                            role: 'All',    status: 'pass',  issues: '' },
   { path: '/trail-os-overview',             name: 'Trail OS Overview',               role: 'All',    status: 'fixed', issues: 'font-serif metric values removed' },
   { path: '/search',                        name: 'Global Search',                   role: 'All',    status: 'pass',  issues: '' },
-  { path: '/context',                       name: 'Context Engine',                  role: 'Power+', status: 'fixed', issues: 'font-serif active-context name removed' },
+  { path: '/context',                       name: 'Context Engine',                  role: 'Power+', status: 'fixed', issues: 'font-serif removed; Sprint 0: guided empty state + "Set Context via Search" CTA; workspace coverage grid shows object counts per workspace' },
   { path: '/digital-twin',                  name: 'Digital Twin · Explore',          role: 'Power+', status: 'pass',  issues: '' },
   { path: '/digital-twin/governance',       name: 'Digital Twin · Governance',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations',                    name: 'Operations · Overview',           role: 'Admin+', status: 'fixed', issues: 'font-serif removed from health score + stat chips' },
@@ -55,14 +55,15 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/operations/trends',             name: 'Operations · Trends',             role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations/recommendations',    name: 'Operations · Recommendations',    role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/program',                       name: 'Programs · Hub',                  role: 'All',    status: 'pass',  issues: '' },
-  { path: '/program/standards',             name: 'Programs · Standards',            role: 'Power+', status: 'pass',  issues: '' },
+  { path: '/program/standards',             name: 'Programs · Standards',            role: 'Power+', status: 'fixed', issues: 'Sprint 0: context-sensitive action bar — shows Review Standards + Gap Report on standards tab; Create Program on other tabs' },
   { path: '/program/blueprint',             name: 'Programs · Blueprint',            role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/penny',                         name: 'Penny · Capabilities',            role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/penny',                         name: 'Penny · Capabilities',            role: 'Admin+', status: 'fixed', issues: 'Sprint 0: action bar role-gated — Review Readiness + View Relationships + Ask Penny for Power+; New Capability + New Prompt Template admin-only' },
   { path: '/penny/prompts',                 name: 'Penny · Prompt Studio',           role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/penny/learners',                name: 'Penny · Learners',                role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/penny/intelligence',            name: 'Penny · Intelligence',            role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/penny/intelligence',            name: 'Penny · Intelligence',            role: 'Admin+', status: 'fixed', issues: 'Sprint 0: P5 Phase 2 Placeholder — 3 preview cards (Learner Trend Analysis, Cohort Health Signals, Weekly Report Archive) with data source attribution' },
   { path: '/penny/test',                    name: 'Penny · Test Penny (nav removed)', role: 'Admin+', status: 'fixed', issues: 'Removed from sidebar + hub tabs; /penny/test redirects to /penny; ask-penny panel is the testing surface' },
-  { path: '/knowledge',                     name: 'Knowledge · Sources',             role: 'Power+', status: 'pass',  issues: '' },
+  { path: '/knowledge',                     name: 'Knowledge · Overview',            role: 'Power+', status: 'fixed', issues: 'Sprint 0: breadcrumb fixed → Overview; /knowledge/sources added to Topbar PAGE_INFO with Sources label' },
+  { path: '/knowledge/sources',             name: 'Knowledge · Sources',             role: 'Power+', status: 'fixed', issues: 'Sprint 0: new route entry in Topbar — breadcrumb now reads Knowledge / Sources (was showing Dashboard)' },
   { path: '/knowledge/library',             name: 'Knowledge · Library',             role: 'All',    status: 'pass',  issues: '' },
   { path: '/knowledge/relationships',       name: 'Knowledge · Relationships (→ DT)', role: 'Power+', status: 'fixed', issues: 'Removed from Knowledge nav + hub tabs; redirects to /digital-twin; relationship mapping lives in Digital Twin Explore' },
   { path: '/knowledge/memory',              name: 'Knowledge · Org Memory',          role: 'Admin+', status: 'watch', issues: 'Phase 2 placeholder content — acceptable for Phase 1' },
@@ -72,11 +73,11 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/collaboration/calendar',        name: 'Collaboration · Calendar',        role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/collaboration/channels',        name: 'Collaboration · Channels',        role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/collaboration/templates',       name: 'Collaboration · Templates',       role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/governance',                    name: 'Governance Hub',                  role: 'Admin+', status: 'fixed', issues: '4× font-serif stat values removed' },
+  { path: '/governance',                    name: 'Governance Hub',                  role: 'Admin+', status: 'fixed', issues: '4× stat values removed' },
   { path: '/admin',                         name: 'Admin · Landing (→ Setup)',       role: 'Admin+', status: 'fixed', issues: '/admin now redirects to /admin/setup; AdminSetup is the canonical Administration landing' },
-  { path: '/admin/setup',                   name: 'Admin · Setup',                   role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/setup',                   name: 'Admin · Setup',                   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed Integration Readiness from sidebar; Setup is now canonical admin entry; Phase 2 backlog count updated to 19' },
   { path: '/admin/people-access',           name: 'Admin · People & Access',         role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/admin/integration-readiness',   name: 'Admin · Integration Readiness',   role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/integration-readiness',   name: 'Admin · Integration Readiness',   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed from sidebar nav; accessible only via Admin Setup deep-link; canonical entry is /admin/setup' },
   { path: '/admin/phase1-readiness',        name: 'Admin · Phase 1 Readiness',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/ux-standards',            name: 'Admin · UX Standards',            role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/secrets-audit',           name: 'Admin · Secrets Audit',           role: 'Admin+', status: 'pass',  issues: '' },
@@ -112,7 +113,7 @@ const HARDCODED_ITEMS: HardcodedItem[] = [
   { name: 'Phase 1 readiness scores',        location: 'admin/Phase1ReadinessDashboard.tsx', classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Manual updates; P2 = calculated from live integration checks' },
   { name: '"Future:" integration notices',   location: 'All active pages',                   classification: 'stale',       notes: 'Removed from Demand page this session; verified absent in all other active pages' },
   { name: 'TestPenny regex responses',       location: 'pages/penny/TestPenny.tsx',           classification: 'stale',       p2Item: 'p2-penny-live-llm', notes: 'Pattern-match responses should be replaced by live Gemini LLM calls' },
-  { name: '"Live (POC)" Slack status',       location: 'PagePennyGuide.tsx, TrailOsHealth',   classification: 'stale',       notes: 'Slack confirmed live; update label to "Live" — no separate P2 ticket needed' },
+  { name: '"Live (POC)" Slack status',       location: 'PagePennyGuide.tsx, TrailOsHealth',   classification: 'fixed',       notes: 'Sprint 1: updated to "Live" in PagePennyGuide (SOURCE_CONNECT + collaboration powerInsights) and TrailOsHealth integrations array' },
 ];
 
 const POC_ITEMS: PocItem[] = [
@@ -144,6 +145,7 @@ const HC_META: Record<HcClass, { label: string; badge: string }> = {
   'demo-ok':    { label: 'Phase 1 OK',   badge: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
   'phase2-data':{ label: 'Phase 2 Data', badge: 'bg-amber-50 border-amber-200 text-amber-700' },
   'stale':      { label: 'Stale',        badge: 'bg-rose-50 border-rose-200 text-rose-700' },
+  'fixed':      { label: 'Fixed',        badge: 'bg-sky-50 border-sky-200 text-sky-700' },
 };
 
 const RISK_META: Record<PocRisk, { badge: string }> = {
@@ -487,7 +489,7 @@ export default function Phase1CompletionAudit() {
                   Phase 1 UX: {failCount === 0 ? 'No violations' : `${failCount} violations found`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {passCount} pages pass, {fixedCount} pages had minor violations (font-serif on metric values) fixed this session,
+                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0 + Sprint 1 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup),
                   {watchCount > 0 ? ` ${watchCount} page(s) have acceptable Phase 2 placeholders` : ' 0 watch items'}. No major violations found.
                 </p>
               </div>

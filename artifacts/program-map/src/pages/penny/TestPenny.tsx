@@ -82,7 +82,7 @@ export default function TestPenny() {
               <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Penny Command Center</span>
               <Badge variant="outline" className="text-[10px] bg-sky-50 text-sky-700 border-sky-200">Prototype Mode</Badge>
             </div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Test Penny</h1>
+            <h1 className="text-2xl font-bold text-foreground">Test Penny</h1>
             <p className="text-xs text-muted-foreground mt-0.5">Interactive prototype — pattern-matched responses, not live AI</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">

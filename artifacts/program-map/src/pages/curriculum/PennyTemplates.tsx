@@ -9,7 +9,7 @@ export default function PennyTemplates() {
       <div className="p-6 max-w-4xl space-y-4">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Penny Templates</h1>
+          <h1 className="text-3xl font-bold text-foreground">Penny Templates</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             This section has moved. Penny content generation is now managed in the Penny Content Assistant — Content Workshop.
           </p>

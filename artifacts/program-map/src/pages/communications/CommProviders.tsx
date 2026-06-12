@@ -22,7 +22,7 @@ export default function CommProviders() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Providers</h1>
+          <h1 className="text-3xl font-bold text-foreground">Providers</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Communication providers are the adapters through which Trail OS and Penny deliver messages. Slack is the first planned adapter. The hub is designed to be provider-agnostic.
           </p>

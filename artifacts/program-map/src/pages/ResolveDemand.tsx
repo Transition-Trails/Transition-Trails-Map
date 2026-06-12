@@ -142,7 +142,7 @@ export default function ResolveDemand() {
       {/* ── Header ── */}
       <div className="flex-shrink-0">
         <div className="flex items-baseline gap-2">
-          <h1 className="text-2xl font-serif font-bold text-foreground leading-tight">
+          <h1 className="text-2xl font-bold text-foreground leading-tight">
             Delivery Operating System
           </h1>
           <span className="text-[10px] font-semibold text-muted-foreground/60 bg-muted/60 border border-border px-1.5 py-0.5 rounded flex-shrink-0">
@@ -273,13 +273,13 @@ function PhaseCard({
     >
       {/* Header */}
       <div className={`relative px-3 pt-2.5 pb-2 ${headerCls}`}>
-        <span className={`absolute top-1 right-2 text-[40px] font-serif font-black leading-none select-none ${watermarkCls}`}>
+        <span className={`absolute top-1 right-2 text-[40px] font-black leading-none select-none ${watermarkCls}`}>
           {phase.letter}
         </span>
         <p className={`text-[9px] font-bold uppercase tracking-wider mb-0.5 ${isSelected ? 'opacity-70' : 'text-muted-foreground'}`}>
           Phase {idx + 1}
         </p>
-        <p className={`font-serif font-bold text-[15px] leading-tight`}>
+        <p className={`font-bold text-[15px] leading-tight`}>
           {phase.name}
         </p>
       </div>
@@ -336,7 +336,7 @@ function MappingRow({
       } ${isSelected ? 'bg-primary/5 border-l-[3px] border-l-primary' : 'hover:bg-muted/20 border-l-[3px] border-l-transparent'}`}
     >
       <div className="pr-3 flex items-center gap-1 min-w-0">
-        <span className="text-[13px] font-black font-serif text-primary/60 flex-shrink-0">{mapping.phaseLetter}</span>
+        <span className="text-[13px] font-black text-primary/60 flex-shrink-0">{mapping.phaseLetter}</span>
         <span className="text-[11px] font-semibold text-foreground truncate">{mapping.phase}</span>
         <ArrowRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />
       </div>

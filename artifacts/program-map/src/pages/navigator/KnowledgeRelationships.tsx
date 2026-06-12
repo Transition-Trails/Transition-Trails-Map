@@ -69,7 +69,7 @@ export default function KnowledgeRelationships() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Navigator</p>
-            <h1 className="text-3xl font-serif font-bold text-foreground">Knowledge Relationships</h1>
+            <h1 className="text-3xl font-bold text-foreground">Knowledge Relationships</h1>
             <p className="text-muted-foreground mt-2 leading-relaxed">
               How Trail OS, Penny AI, and Programs connect — the foundational architecture of the Transition Trails technology ecosystem.
             </p>

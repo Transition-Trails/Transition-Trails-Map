@@ -71,7 +71,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
           </button>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-serif font-bold text-foreground">Access &amp; Roles</h1>
+              <h1 className="text-2xl font-bold text-foreground">Access &amp; Roles</h1>
               <p className="text-sm text-muted-foreground mt-1 max-w-xl">
                 Trail OS uses four access tiers to control what each user sees. In production, tiers are
                 assigned automatically via Google Workspace group membership. In prototype mode, use the

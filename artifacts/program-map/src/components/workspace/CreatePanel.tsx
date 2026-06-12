@@ -92,7 +92,7 @@ export function CreatePanel({
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
               Creating {objectType}
             </p>
-            <h1 className="text-[18px] font-serif font-bold text-foreground leading-snug">{title}</h1>
+            <h1 className="text-[18px] font-bold text-foreground leading-snug">{title}</h1>
             {subtitle && (
               <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{subtitle}</p>
             )}

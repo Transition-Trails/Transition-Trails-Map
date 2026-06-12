@@ -43,7 +43,7 @@ export default function CurriculumAssignments() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Assignments</h1>
+          <h1 className="text-3xl font-bold text-foreground">Assignments</h1>
           <p className="text-muted-foreground mt-2">2 assignments per module — practical exercises reinforcing lesson content in a Salesforce sandbox. Click any assignment to open its Knowledge Brief.</p>
         </div>
 

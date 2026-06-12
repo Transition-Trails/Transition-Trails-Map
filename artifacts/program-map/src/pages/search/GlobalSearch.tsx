@@ -125,7 +125,7 @@ function EverydayDetailPanel({ entry, onSetContext }: { entry: SearchEntry; onSe
           <span className="text-[11px] text-muted-foreground/40">·</span>
           <span className="text-[11px] text-muted-foreground">{entry.status}</span>
         </div>
-        <h2 className="text-xl font-bold font-serif text-foreground leading-tight">{entry.name}</h2>
+        <h2 className="text-xl font-bold text-foreground leading-tight">{entry.name}</h2>
         <p className="text-[12px] text-muted-foreground leading-relaxed">{entry.description}</p>
       </div>
 
@@ -233,7 +233,7 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
                 {entry.status}
               </span>
             </div>
-            <h2 className="text-lg font-bold font-serif text-foreground leading-tight">{entry.name}</h2>
+            <h2 className="text-lg font-bold text-foreground leading-tight">{entry.name}</h2>
           </div>
           <div className="text-right shrink-0">
             <ConfidenceBar value={entry.confidence} />
@@ -433,7 +433,7 @@ export default function GlobalSearch() {
 
       {/* Search header */}
       <div className="px-5 pt-5 pb-4 border-b border-border bg-card shrink-0">
-        <h1 className="text-lg font-bold font-serif text-foreground mb-3">{pageTitle}</h1>
+        <h1 className="text-lg font-bold text-foreground mb-3">{pageTitle}</h1>
         <div className="relative max-w-xl">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
           <input

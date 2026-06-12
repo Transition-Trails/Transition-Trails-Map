@@ -25,7 +25,7 @@ export function StatCard({
   return (
     <div className="bg-card border border-border rounded-xl p-3">
       <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
-      <p className="text-xl font-bold font-serif text-foreground leading-none">{value}</p>
+      <p className="text-xl font-bold text-foreground leading-none">{value}</p>
       {sub   && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
       {trend && <p className="text-xs font-medium mt-1 text-emerald-600">{trend}</p>}
     </div>

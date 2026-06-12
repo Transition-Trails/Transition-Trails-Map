@@ -27,7 +27,7 @@ export default function ContentHealth() {
       <div className="p-6 max-w-5xl space-y-6">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Content Health</h1>
+          <h1 className="text-3xl font-bold text-foreground">Content Health</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Standards-based health checks across all Foundations Trail modules. Issues are flagged when modules don't meet the
             Learning Architecture standard — missing objectives, assessments, articles, prompts, or delivery assets.

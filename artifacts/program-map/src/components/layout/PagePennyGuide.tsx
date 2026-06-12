@@ -42,7 +42,7 @@ const SOURCE_ICO = {
 type SigSource = keyof typeof SOURCE_ICO;
 
 const SOURCE_CONNECT: Record<SigSource, { status: string; cls: string; dotCls: string; link?: string }> = {
-  slack:      { status: 'Live (POC)',      cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://transitiontrails.slack.com' },
+  slack:      { status: 'Live',            cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://transitiontrails.slack.com' },
   drive:      { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://drive.google.com' },
   calendar:   { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://calendar.google.com' },
   email:      { status: 'Phase 2',         cls: 'text-muted-foreground', dotCls: 'bg-muted-foreground/30' },
@@ -101,14 +101,14 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: 'Org Memory: 234 Penny interactions logged this week',          meta: '6h ago',  why: "Penny reads its interaction log to identify knowledge gaps and improve future answers" },
   ],
   collaboration: [
-    { urgent: false, source: 'slack',      text: '@coachconnectbot live in Penny AI + Admin channels — Slack POC confirmed',  meta: '1h ago',  why: 'Penny monitors Slack bot status — the POC is confirmed and Penny delivery can now be wired to the live bot' },
+    { urgent: false, source: 'slack',      text: '@coachconnectbot live in Penny AI + Admin channels — delivery pipeline ready to wire',  meta: '1h ago',  why: 'Penny monitors Slack bot status — Slack is live and Penny delivery can now be wired to the live bot' },
     { urgent: false, source: 'calendar',   text: 'Sprint 3 Resume Workshop — Thursday 10am',                     meta: '2h ago',  why: 'Penny reads Calendar to surface upcoming collaborative sessions so you can prepare' },
     { urgent: false, source: 'slack',      text: '#guided-trail-cohort-1: Week 3 message from coach',            meta: '4h ago',  why: 'Penny monitors cohort channels to surface coach communications that may need a follow-up' },
     { urgent: false, source: 'drive',      text: '7 message templates ready for testing',                        meta: '6h ago',  why: 'Penny watches template folders to surface communication assets that are ready to use or review' },
   ],
   admin: [
     { urgent: false, source: 'salesforce', text: 'Salesforce fully connected — REST API live, PMM + NPSP confirmed', meta: '2h ago',  why: 'Penny monitors integration state to surface when platform dependencies unblock the next wave of live data wiring' },
-    { urgent: false, source: 'slack',      text: 'Phase 2 backlog: 10 draft features captured at /admin/phase2-backlog', meta: '4h ago', why: 'Penny tracks backlog progress in admin channels so the team can see which deferred features are queued and ready to scope' },
+    { urgent: false, source: 'slack',      text: 'Phase 2 backlog: 19 draft features captured at /admin/phase2-backlog', meta: '4h ago', why: 'Penny tracks backlog progress in admin channels so the team can see which deferred features are queued and ready to scope' },
     { urgent: false, source: 'drive',      text: 'Secrets audit: last run 3 days ago',                           meta: '6h ago',  why: 'Penny monitors Drive audit logs to surface security hygiene status for the admin team' },
   ],
   'digital-twin': [
@@ -212,12 +212,12 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Test Penny is available for prototype queries' },
     ],
     everydaySteps: [
-      { label: 'Test Penny',          path: '/penny/test' },
+      { label: 'Ask Penny',           path: '/penny' },
       { label: 'My learner profile',  path: '/penny/learners' },
     ],
     powerSteps: [
       { label: 'Capability map',         path: '/penny' },
-      { label: 'Test Penny',             path: '/penny/test' },
+      { label: 'Ask Penny',              path: '/penny' },
       { label: 'Intelligence dashboard', path: '/penny/intelligence' },
     ],
     everydayCanned: "I'm Penny — here to guide you through your program, help find resources, and answer questions. Try asking about your current sprint, upcoming sessions, or anything in the Knowledge Library.",
@@ -241,7 +241,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     everydaySteps: [{ label: 'View program status', path: '/operations' }],
     powerSteps: [
       { label: 'Health indicators',     path: '/operations/health' },
-      { label: 'Integration readiness', path: '/admin/integration-readiness' },
+      { label: 'Integration & setup',   path: '/admin/setup' },
       { label: 'Demand queue',          path: '/operations/demand' },
     ],
     everydayCanned: "Operations are running normally. Guided Trail Cohort 1 is in Week 3 of 8 and on track. Your next milestone is Sprint 3 on Thursday.",
@@ -297,7 +297,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     powerSteps: [
       { label: 'Source documents', path: '/knowledge' },
-      { label: 'Relationships',    path: '/knowledge/relationships' },
+      { label: 'Digital Twin',     path: '/digital-twin' },
     ],
     everydayCanned: "The Knowledge Library has all program documents, templates, and resources. Sprint 3 Resume Writing materials were just updated. Use Knowledge Search to find anything specific.",
     powerCanned:    "Knowledge health: 47 active docs, 12 flagged for review. Source mapping updated 3h ago — RESOLVE Course Canvas is current. Org Memory shows 234 Penny interactions this week.",
@@ -309,7 +309,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Message templates ready — wire Penny output to @coachconnectbot to activate broadcasts',
     ],
     powerInsights: [
-      'Slack live (POC) — @coachconnectbot posting to Penny AI + Admin channels',
+      'Slack live — @coachconnectbot posting to Penny AI + Admin channels',
       'Google Calendar: connected for timing context',
       '3 communication routes defined — ready to wire Penny output to Slack delivery',
       '7 message templates ready for testing',
@@ -330,9 +330,9 @@ const CONTENT: Record<PageCtx, PageContent> = {
     everydayInsights: [],
     powerInsights: [
       'Salesforce live — REST API connected, PMM + NPSP confirmed. Next: wire to dashboard.',
-      'Slack live (POC) — @coachconnectbot posting. Next: add channels:read scope.',
+      'Slack live — @coachconnectbot posting. Next: add channels:read scope.',
       'Google OAuth setup available — run at /admin/google-oauth to get refresh tokens',
-      'Phase 2 backlog: 10 draft features captured at /admin/phase2-backlog',
+      'Phase 2 backlog: 19 draft features captured at /admin/phase2-backlog',
     ],
     attentionItems: [
       { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Salesforce live — REST API + PMM confirmed' },

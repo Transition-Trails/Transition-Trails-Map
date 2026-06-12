@@ -19,7 +19,7 @@ export default function DeliverySlackActivities() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Slack Activities</h1>
+          <h1 className="text-3xl font-bold text-foreground">Slack Activities</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Penny-posted Slack threads, lab shares, and cohort engagement activities linked to modules and lessons.
             Each activity has a defined trigger timing and channel target. Select an activity to view its full script and Knowledge Brief.

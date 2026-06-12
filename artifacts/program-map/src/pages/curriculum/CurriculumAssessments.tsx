@@ -11,7 +11,7 @@ export default function CurriculumAssessments() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Assessments</h1>
+          <h1 className="text-3xl font-bold text-foreground">Assessments</h1>
           <p className="text-muted-foreground mt-2">11 assessments — one per module in Foundations Trail (Module 4.3 is missing its assessment — flagged in Content Health). Click any assessment to open its Knowledge Brief.</p>
         </div>
 
@@ -24,7 +24,7 @@ export default function CurriculumAssessments() {
             { label: 'Penny Coached',value: curriculumAssessments.filter(a => a.hasPennyCoach as boolean).length,   color: 'text-secondary' },
           ].map(s => (
             <div key={s.label} className="rounded-xl border border-border bg-white p-4 text-center shadow-sm">
-              <p className={`text-2xl font-bold font-serif ${s.color}`}>{s.value}</p>
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
               <p className="text-[11px] text-muted-foreground mt-1">{s.label}</p>
             </div>
           ))}

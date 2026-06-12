@@ -47,7 +47,7 @@ export default function TrailOSPenny() {
         {activeLayer === 'trailOs' && (
           <div className="max-w-6xl mx-auto animate-in fade-in">
             <div className="mb-6">
-              <h2 className="text-2xl font-serif font-bold mb-2">Trail OS Capabilities</h2>
+              <h2 className="text-2xl font-bold mb-2">Trail OS Capabilities</h2>
               <p className="text-muted-foreground">Core infrastructural features enabling program delivery. Click any card to open its Knowledge Brief.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -81,7 +81,7 @@ export default function TrailOSPenny() {
         {activeLayer === 'penny' && (
           <div className="max-w-6xl mx-auto animate-in fade-in">
             <div className="mb-6">
-              <h2 className="text-2xl font-serif font-bold mb-2">Penny AI Features</h2>
+              <h2 className="text-2xl font-bold mb-2">Penny AI Features</h2>
               <p className="text-muted-foreground">Intelligent coaching and guidance embedded in the learning journey. Click any card to open its Knowledge Brief.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -114,7 +114,7 @@ export default function TrailOSPenny() {
 
         {activeLayer === 'delivery' && (
           <div className="max-w-5xl mx-auto animate-in fade-in">
-            <h2 className="text-2xl font-serif font-bold mb-6">Delivery Loop</h2>
+            <h2 className="text-2xl font-bold mb-6">Delivery Loop</h2>
             <div className="bg-white rounded-xl p-8 border shadow-sm flex items-center justify-between overflow-x-auto min-h-[300px]">
               {['Intake', 'Orientation', 'Learning Sprints', 'Project Work', 'Review & Assessment', 'Outcomes Capture', 'Alumni Engagement'].map((step, i, arr) => (
                 <div key={step} className="flex items-center flex-shrink-0">
@@ -135,7 +135,7 @@ export default function TrailOSPenny() {
 
         {activeLayer === 'analytics' && (
           <div className="max-w-5xl mx-auto animate-in fade-in">
-            <h2 className="text-2xl font-serif font-bold mb-2">Platform Analytics</h2>
+            <h2 className="text-2xl font-bold mb-2">Platform Analytics</h2>
             <p className="text-sm text-muted-foreground mb-6">Illustrative — for planning purposes only.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
@@ -149,7 +149,7 @@ export default function TrailOSPenny() {
                 <Card key={stat.label} className="shadow-sm">
                   <CardContent className="p-6">
                     <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
-                    <div className={`text-4xl font-bold font-serif mt-2 ${stat.color}`}>{stat.value}</div>
+                    <div className={`text-4xl font-bold mt-2 ${stat.color}`}>{stat.value}</div>
                     <div className="h-2 w-full bg-muted/50 rounded-full mt-4 overflow-hidden">
                       <div className="h-full bg-border w-2/3 rounded-full" />
                     </div>

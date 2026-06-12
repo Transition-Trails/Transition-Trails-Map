@@ -34,7 +34,7 @@ export default function Learners() {
           ].map(s => (
             <div key={s.label} className="rounded-xl border border-border bg-card p-4">
               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">{s.label}</p>
-              <p className="text-2xl font-bold font-serif text-foreground">{s.value}</p>
+              <p className="text-2xl font-bold text-foreground">{s.value}</p>
             </div>
           ))}
         </div>

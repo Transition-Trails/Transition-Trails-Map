@@ -23,7 +23,7 @@ export default function CommCalendar() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Calendar</h1>
+          <h1 className="text-3xl font-bold text-foreground">Calendar</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Google Calendar is the operational timing layer for Trail OS — telling Penny and Trail OS <em>when</em> things happen so communications fire at the right moment, not on a fixed schedule.
           </p>

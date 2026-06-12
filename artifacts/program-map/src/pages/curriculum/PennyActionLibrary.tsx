@@ -19,7 +19,7 @@ export default function PennyActionLibrary() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Content Assistant</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Action Library</h1>
+          <h1 className="text-3xl font-bold text-foreground">Action Library</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             All 11 prototype content generation actions available in the Penny Content Assistant.
             Each action is context-aware — it generates content aligned to the selected learning object and the Trail OS architecture standards.

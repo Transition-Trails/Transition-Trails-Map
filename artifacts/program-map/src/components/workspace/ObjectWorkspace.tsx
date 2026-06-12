@@ -177,7 +177,7 @@ export function ObjectWorkspace({
                     <Icon className="w-4 h-4 text-primary" />
                   </div>
                   <div className="min-w-0">
-                    <h1 className="text-lg font-serif font-bold text-foreground leading-tight truncate">
+                    <h1 className="text-lg font-bold text-foreground leading-tight truncate">
                       {selected.name}
                     </h1>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">

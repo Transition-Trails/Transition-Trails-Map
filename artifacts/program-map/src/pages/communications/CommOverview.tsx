@@ -90,7 +90,7 @@ export default function CommOverview() {
         {/* Header */}
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Overview</h1>
+          <h1 className="text-3xl font-bold text-foreground">Overview</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             The messaging and timing layer for Trail OS and Penny — routing program signals, learner nudges, and weekly briefs to the right people, through the right channel, at the right moment.
           </p>

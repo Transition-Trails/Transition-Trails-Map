@@ -140,7 +140,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
                 Draft
               </span>
             </div>
-            <h2 className="text-[15px] font-serif font-bold text-foreground leading-tight">{title}</h2>
+            <h2 className="text-[15px] font-bold text-foreground leading-tight">{title}</h2>
             <p className="text-[9px] font-semibold text-muted-foreground/60 uppercase tracking-wide mt-0.5">
               {objectType}
             </p>

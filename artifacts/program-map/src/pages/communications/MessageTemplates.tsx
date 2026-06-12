@@ -22,7 +22,7 @@ export default function MessageTemplates() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Message Templates</h1>
+          <h1 className="text-3xl font-bold text-foreground">Message Templates</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Reusable, reviewable templates that Penny and Trail OS use to compose broadcasts, briefs, and notifications. Click any template to open its Knowledge Brief.
           </p>

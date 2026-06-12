@@ -38,7 +38,7 @@ function FullProfileBrief({ profile }: { profile: ObjectProfile }) {
             </span>
             <span className="text-[9px] text-muted-foreground">{profile.objectTypeName}</span>
           </div>
-          <h2 className="text-base font-serif font-bold text-foreground">{profile.name}</h2>
+          <h2 className="text-base font-bold text-foreground">{profile.name}</h2>
           <p className="text-[11px] text-muted-foreground leading-relaxed">{profile.description}</p>
         </div>
 
@@ -133,13 +133,13 @@ function UOMTypeBrief({ type, data }: { type: string; data: any }) {
         {uomType && (
           <div className="space-y-1.5">
             <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">{uomType.category.replace('-layer', '').replace('-', ' ')} Layer</span>
-            <h2 className="text-base font-serif font-bold text-foreground">{name}</h2>
+            <h2 className="text-base font-bold text-foreground">{name}</h2>
             <p className="text-[11px] text-muted-foreground leading-relaxed">{uomType.purpose}</p>
           </div>
         )}
         {!uomType && (
           <div>
-            <h2 className="text-base font-serif font-bold text-foreground">{name}</h2>
+            <h2 className="text-base font-bold text-foreground">{name}</h2>
             {data?.description && <p className="text-[11px] text-muted-foreground">{data.description}</p>}
           </div>
         )}

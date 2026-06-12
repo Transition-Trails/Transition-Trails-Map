@@ -112,7 +112,7 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
               <div className={`p-1.5 rounded-lg border ${domCfg.cls} mt-0.5`}><DomIcon className="w-4 h-4" /></div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">{i.domain} · {i.priority}</p>
-                <h3 className="text-[15px] font-serif font-bold text-foreground leading-snug">{i.name}</h3>
+                <h3 className="text-[15px] font-bold text-foreground leading-snug">{i.name}</h3>
               </div>
             </div>
             <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">Brief</button>
@@ -924,7 +924,7 @@ function LaunchPlanView() {
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">{ms.phase}</p>
-                <h2 className="text-[16px] font-serif font-bold text-foreground">{ms.title}</h2>
+                <h2 className="text-[16px] font-bold text-foreground">{ms.title}</h2>
               </div>
               <span className={`text-[10px] font-bold border rounded-full px-2 py-1 shrink-0 ${stsCls[ms.status]}`}>{ms.status}</span>
             </div>

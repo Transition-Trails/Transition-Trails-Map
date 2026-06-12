@@ -438,7 +438,7 @@ export default function AdminSetup() {
                 onClick={() => setLocation('/admin/phase2-backlog')}
                 className="rounded-lg border border-dashed border-border/60 bg-muted/10 p-3 flex items-center justify-between hover:border-primary/30 hover:bg-muted/20 transition-all col-span-2 group"
               >
-                <p className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors">View full Phase 2 backlog — 10 feature cards</p>
+                <p className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors">View full Phase 2 backlog — 19 feature cards</p>
                 <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
               </button>
             </div>

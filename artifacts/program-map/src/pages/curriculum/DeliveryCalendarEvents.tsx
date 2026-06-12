@@ -18,7 +18,7 @@ export default function DeliveryCalendarEvents() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Calendar Events</h1>
+          <h1 className="text-3xl font-bold text-foreground">Calendar Events</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Scheduled live touchpoints in the learning journey — office hours, kickoff sessions, progress reviews, and workshops.
             Each event is linked to a module or cohort. Select an event to view its full agenda in the Knowledge Brief.

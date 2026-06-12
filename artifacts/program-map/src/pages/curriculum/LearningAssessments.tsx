@@ -11,7 +11,7 @@ export default function LearningAssessments() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Assessments</h1>
+          <h1 className="text-3xl font-bold text-foreground">Assessments</h1>
           <p className="text-[13px] text-muted-foreground mt-1">Knowledge checks and practice exams linked to modules. Every module in the Foundations Trail standard requires at least one assessment. Select an assessment to view its alignment in the Knowledge Brief.</p>
         </div>
         <div className="grid gap-3">

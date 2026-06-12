@@ -371,7 +371,7 @@ export function Topbar() {
         <div className="flex items-center justify-center w-7 h-7 rounded-md bg-primary/10 text-primary flex-shrink-0">
           <Map className="w-4 h-4" />
         </div>
-        <span className="text-base font-semibold font-serif text-foreground leading-none flex-shrink-0">
+        <span className="text-base font-semibold text-foreground leading-none flex-shrink-0">
           {TERMS.brand}
         </span>
         <span className="text-muted-foreground/30 select-none mx-0.5 flex-shrink-0">·</span>

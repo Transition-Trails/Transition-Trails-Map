@@ -204,7 +204,7 @@ export default function ProgramMap() {
   return (
     <div className="h-full w-full flex flex-col p-4 overflow-hidden">
       <div className="mb-3 flex-shrink-0 flex items-baseline gap-2">
-        <h1 className="text-2xl font-serif font-bold text-foreground leading-tight">Program Ecosystem</h1>
+        <h1 className="text-2xl font-bold text-foreground leading-tight">Program Ecosystem</h1>
         <span className="text-[10px] font-semibold text-muted-foreground/60 bg-muted/60 border border-border px-1.5 py-0.5 rounded flex-shrink-0">
           Prototype Data
         </span>
@@ -321,7 +321,7 @@ function ProgramNode({
       <div className={`${bgClass} px-3 pt-2 pb-1.5 flex-shrink-0`}>
         <div className="flex items-start gap-1 min-w-0">
           <div className="flex-1 min-w-0">
-            <p className="font-serif font-bold text-[14px] leading-tight line-clamp-2">{program.name}</p>
+            <p className="font-bold text-[14px] leading-tight line-clamp-2">{program.name}</p>
             <p className="text-[10px] opacity-75 leading-tight line-clamp-1 mt-0.5">{program.strategicRole}</p>
           </div>
           {program.confidence === 'draft' && (

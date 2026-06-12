@@ -578,7 +578,7 @@ function FormHeader({
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{entityLabel}</span>
           {confidence && <ConfidenceBadge status={confidence as any} />}
         </div>
-        <p className="font-serif font-semibold text-foreground text-base leading-tight mt-0.5 line-clamp-1">{name}</p>
+        <p className="font-semibold text-foreground text-base leading-tight mt-0.5 line-clamp-1">{name}</p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         {saved && (
@@ -1116,7 +1116,7 @@ function SalesforceEditor() {
       <div className="flex items-center justify-between px-5 py-3 border-b bg-card flex-shrink-0">
         <div>
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Integration</span>
-          <p className="font-serif font-semibold text-foreground text-base leading-tight mt-0.5">Salesforce Cases Kanban</p>
+          <p className="font-semibold text-foreground text-base leading-tight mt-0.5">Salesforce Cases Kanban</p>
         </div>
         <Badge variant="outline" className="text-[10px] text-muted-foreground border-border">Future State</Badge>
       </div>

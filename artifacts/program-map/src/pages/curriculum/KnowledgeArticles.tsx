@@ -16,7 +16,7 @@ export default function KnowledgeArticles() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Knowledge Articles</h1>
+          <h1 className="text-3xl font-bold text-foreground">Knowledge Articles</h1>
           <p className="text-[13px] text-muted-foreground mt-1">Reference articles, concept guides, and decision frameworks linked to modules and lessons. Select an article to view its module connections in the Knowledge Brief.</p>
         </div>
         <div className="flex gap-2 flex-wrap">

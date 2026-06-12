@@ -40,7 +40,7 @@ export default function CurriculumModules() {
         {/* Header */}
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Modules</h1>
+          <h1 className="text-3xl font-bold text-foreground">Modules</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Module is the central connective node in the learning architecture. Each module links Learning Assets, Penny Assets,
             and Delivery Assets. Select a module to see its full relationship map in the Knowledge Brief.

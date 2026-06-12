@@ -11,7 +11,7 @@ export default function PennyTrailQuests() {
       <div className="p-6 max-w-5xl space-y-5">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Assets</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Trail Quests</h1>
+          <h1 className="text-3xl font-bold text-foreground">Trail Quests</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Earnable badges and challenge quests that celebrate learning milestones beyond the standard assessments.
             Trail Quests are designed by staff and awarded by Penny based on completion criteria.

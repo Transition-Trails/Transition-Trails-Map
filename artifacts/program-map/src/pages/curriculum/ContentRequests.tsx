@@ -28,7 +28,7 @@ export default function ContentRequests() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Content Requests</h1>
+          <h1 className="text-3xl font-bold text-foreground">Content Requests</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed">
             Future home for governed content change requests — connected to Demand Management intake, case creation, and roadmap prioritization.
             This page is a planning layer. Demand Management will govern new program and content change requests once governance workflows are in place.

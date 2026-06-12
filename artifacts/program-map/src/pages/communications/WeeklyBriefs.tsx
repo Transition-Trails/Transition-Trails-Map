@@ -24,7 +24,7 @@ export default function WeeklyBriefs() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Weekly Briefs</h1>
+          <h1 className="text-3xl font-bold text-foreground">Weekly Briefs</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Auto-generated digests that Trail OS and Penny assemble and deliver on a schedule. Click any brief to open its Knowledge Brief.
           </p>
@@ -41,7 +41,7 @@ export default function WeeklyBriefs() {
                 <div className="flex items-start gap-3">
                   <CalendarDays className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
-                    <p className="font-bold text-foreground text-lg font-serif">{b.name}</p>
+                    <p className="font-bold text-foreground text-lg">{b.name}</p>
                     <p className="text-[11px] text-muted-foreground mt-0.5">{b.audience} · {b.frequency} · {b.channel}</p>
                   </div>
                 </div>

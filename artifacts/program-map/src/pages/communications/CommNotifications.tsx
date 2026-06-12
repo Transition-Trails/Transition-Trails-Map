@@ -21,7 +21,7 @@ export default function CommNotifications() {
 
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
-          <h1 className="text-3xl font-serif font-bold text-foreground">Notifications</h1>
+          <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Routing rules combining audience, timing, and provider — Slack for community, Google Chat for clients, Google Calendar for timing context. Click any rule to open its Knowledge Brief.
           </p>
