@@ -59,7 +59,6 @@ const EVERYDAY_SECTIONS: SectionDef[] = [
   { prefix: '/penny/test',                           label: 'Penny',             hint: 'Ask Penny a question in the right panel →',    icon: Brain         },
   { prefix: '/penny',                                label: 'Penny',             hint: 'Ask anything in the Penny panel →',             icon: Brain         },
   { prefix: '/knowledge/library',                    label: 'Knowledge Library', hint: 'Browse program documents and resources',       icon: BookOpen      },
-  { prefix: '/knowledge/search',                     label: 'Knowledge Search',  hint: 'Search across all documents',                   icon: Search        },
   { prefix: '/knowledge',                            label: 'Knowledge',         hint: 'Documents, templates, and guides',              icon: BookOpen      },
   { prefix: '/collaboration/calendar',               label: 'Google Calendar',   hint: 'Upcoming sessions and events',                  icon: Calendar      },
   { prefix: '/collaboration',                        label: 'Collaboration',     hint: 'Sessions and team communication',               icon: MessageSquare },

@@ -1,6 +1,6 @@
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
-  Activity, Map, FlaskConical, GitBranch, Puzzle, Plus,
+  Activity, FlaskConical, GitBranch, Puzzle, Plus,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -10,7 +10,6 @@ import PennyWorkspace        from '@/pages/penny/PennyWorkspace';
 import PennyPromptStudio     from '@/pages/penny/PennyPromptStudio';
 import Learners              from '@/pages/penny/Learners';
 import Intelligence          from '@/pages/penny/Intelligence';
-import TrailOSPenny          from '@/pages/TrailOSPenny';
 import PennyHealth           from '@/pages/operations/PennyHealth';
 import TestPenny             from '@/pages/penny/TestPenny';
 import PennyIntegrationLayer from '@/pages/penny/PennyIntegrationLayer';
@@ -80,7 +79,6 @@ export default function PennyHub() {
     { id: 'learners', label: isEveryday ? 'My Learners' : 'Learners', path: '/penny/learners', icon: Users, content: <Learners /> },
     ...(!isEveryday ? [
       { id: 'intelligence',  label: 'Intelligence',     path: '/penny/intelligence',      icon: BarChart2,    content: <Intelligence /> },
-      { id: 'trail-os-map',  label: 'Trail OS Map',     path: '/penny/trail-os-map',      icon: Map,          content: <TrailOSPenny /> },
       { id: 'health',        label: 'Health',           path: '/penny/health',            icon: Activity,     content: <PennyHealth /> },
       { id: 'test',          label: 'Test Penny',       path: '/penny/test',              icon: FlaskConical, content: <TestPenny /> },
     ] : []),

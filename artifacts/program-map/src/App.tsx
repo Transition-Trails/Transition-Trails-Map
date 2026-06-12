@@ -6,7 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
 
-import Home    from "@/pages/Home";
+import Home             from "@/pages/Home";
+import TrailOSOverview  from "@/pages/TrailOSOverview";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
@@ -48,16 +49,18 @@ function Router() {
       <Route path="/navigator/program-map">              <Redirect to="/program" /></Route>
       <Route path="/navigator/resolve">                  <Redirect to="/operations/demand" /></Route>
       <Route path="/navigator/roles">                    <Redirect to="/digital-twin" /></Route>
-      <Route path="/navigator/trail-os-map">             <Redirect to="/penny/trail-os-map" /></Route>
+      <Route path="/navigator/trail-os-map">             <Redirect to="/trail-os-overview" /></Route>
       <Route path="/navigator/knowledge-relationships">  <Redirect to="/knowledge/relationships" /></Route>
 
       {/* Old Digital Twin sub-routes → Explore */}
       <Route path="/digital-twin/org-graph">     <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/programs">      <Redirect to="/digital-twin/map" /></Route>
-      <Route path="/digital-twin/knowledge">     <Redirect to="/digital-twin/map" /></Route>
-      <Route path="/digital-twin/penny-network"> <Redirect to="/digital-twin/map" /></Route>
+      <Route path="/digital-twin/programs">      <Redirect to="/digital-twin" /></Route>
+      <Route path="/digital-twin/knowledge">     <Redirect to="/digital-twin" /></Route>
+      <Route path="/digital-twin/penny-network"> <Redirect to="/digital-twin" /></Route>
       <Route path="/digital-twin/people">        <Redirect to="/digital-twin" /></Route>
       <Route path="/digital-twin/relationships"> <Redirect to="/digital-twin" /></Route>
+      <Route path="/digital-twin/map">           <Redirect to="/digital-twin" /></Route>
+      <Route path="/digital-twin/impact">        <Redirect to="/digital-twin" /></Route>
 
       {/* Old operations sub-pages */}
       <Route path="/operations/program-health">    <Redirect to="/operations/health" /></Route>
@@ -115,7 +118,8 @@ function Router() {
       <Route path="/library/templates">         <Redirect to="/knowledge/library" /></Route>
       <Route path="/library/salesforce-kb">     <Redirect to="/knowledge/library" /></Route>
       <Route path="/library/source-mapping">    <Redirect to="/knowledge/relationships" /></Route>
-      <Route path="/library/search">            <Redirect to="/knowledge/search" /></Route>
+      <Route path="/library/search">            <Redirect to="/search" /></Route>
+      <Route path="/knowledge/search">          <Redirect to="/search" /></Route>
       <Route path="/library/:sub">              <Redirect to="/knowledge/library" /></Route>
       <Route path="/library">                   <Redirect to="/knowledge" /></Route>
 
@@ -132,7 +136,8 @@ function Router() {
       <Route path="/admin/templates"> <Redirect to="/knowledge/library" /></Route>
 
       {/* Root-level legacy aliases */}
-      <Route path="/trail-os-penny">  <Redirect to="/penny/trail-os-map" /></Route>
+      <Route path="/trail-os-penny">        <Redirect to="/trail-os-overview" /></Route>
+      <Route path="/penny/trail-os-map">    <Redirect to="/trail-os-overview" /></Route>
       <Route path="/resolve-demand">  <Redirect to="/operations/demand" /></Route>
       <Route path="/source-docs">     <Redirect to="/knowledge/library" /></Route>
 
@@ -167,6 +172,9 @@ function Router() {
       <Route path="/search"               component={GlobalSearch} />
       <Route path="/context/:tab"         component={ContextHub} />
       <Route path="/context"              component={ContextHub} />
+
+      {/* Standalone platform pages */}
+      <Route path="/trail-os-overview"       component={TrailOSOverview} />
 
       {/* Administration */}
       <Route path="/admin/people"            component={PeopleWorkspace} />

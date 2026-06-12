@@ -982,8 +982,6 @@ export default function DigitalTwin() {
 
   function handleSelect(obj: SelectedObject | null) {
     setSelected(obj);
-    if (!obj) return;
-    // If on Map or Impact tab when selecting, stay there; otherwise stay on Explore
   }
 
   return (
@@ -992,7 +990,7 @@ export default function DigitalTwin() {
       icon={Network}
       description={
         isAdminOrAbove
-          ? 'Explore the object graph, map relationships, model change impact, and govern the Unified Object Model.'
+          ? 'Explore the object graph, trace relationships, and govern the Unified Object Model.'
           : 'Pick a thing, see what it touches, and understand how it connects to the rest of the platform.'
       }
       badge={selected ? selected.name : undefined}
@@ -1005,20 +1003,6 @@ export default function DigitalTwin() {
           content: <ExploreTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
         },
         ...(isAdminOrAbove ? [
-          {
-            id: 'map',
-            label: 'Map',
-            path: '/digital-twin/map',
-            icon: MapPin,
-            content: <MapTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
-          },
-          {
-            id: 'impact',
-            label: 'Impact',
-            path: '/digital-twin/impact',
-            icon: Zap,
-            content: <ImpactTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
-          },
           {
             id: 'governance',
             label: 'Governance',

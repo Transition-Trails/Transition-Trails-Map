@@ -1,4 +1,4 @@
-import { BookOpen, Database, GitBranch, Archive, Search, BookMarked, Network, Target } from 'lucide-react';
+import { BookOpen, Database, GitBranch, Archive, BookMarked, Network, Target } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -6,7 +6,6 @@ import { useTierFlags } from '@/hooks/useTierFlags';
 import KnowledgeWorkspace     from '@/pages/knowledge/KnowledgeWorkspace';
 import KnowledgeRelationships from '@/pages/navigator/KnowledgeRelationships';
 import LibraryDocuments       from '@/pages/library/LibraryDocuments';
-import LibrarySearch          from '@/pages/library/LibrarySearch';
 
 // UI audit rule: Everyday User pages must not have multiple nav/action rows
 // above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
@@ -66,11 +65,10 @@ export default function KnowledgeHub() {
 
   // Everyday: no ActionBar — inline search in Documents tab handles discovery
   const HUB_ACTIONS: ActionItem[] = isPowerOrAbove ? [
-    { id: 'search',        label: 'Search Library',     icon: Search,    href: '/knowledge/search',         variant: 'secondary' as const },
+    { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                   variant: 'secondary' as const },
     { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/knowledge/relationships',  variant: 'secondary' as const },
     { id: 'digital-twin',  label: 'Digital Twin',       icon: Network,   href: '/digital-twin/knowledge',   variant: 'secondary' as const },
     { id: 'memory',        label: 'Org Memory',         icon: Archive,   href: '/knowledge/memory',         variant: 'secondary' as const },
-    { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                   variant: 'secondary' as const },
   ] : [];
 
   // Everyday: single tab — SourceDocs already has inline search, no tab bar needed
@@ -83,7 +81,6 @@ export default function KnowledgeHub() {
         { id: 'library',       label: 'Library',        path: '/knowledge/library',       icon: BookMarked, content: <LibraryDocuments /> },
         { id: 'relationships', label: 'Relationships',  path: '/knowledge/relationships', icon: GitBranch,  content: <KnowledgeRelationships /> },
         { id: 'memory',        label: 'Org Memory',     path: '/knowledge/memory',        icon: Archive,    content: <OrgMemoryPlaceholder /> },
-        { id: 'search',        label: 'Search',         path: '/knowledge/search',        icon: Search,     content: <LibrarySearch /> },
       ];
 
   return (
@@ -93,7 +90,7 @@ export default function KnowledgeHub() {
       description={
         isEveryday
           ? 'Find documents, guides, and resources for your programs — search by name, program, or category.'
-          : 'Review source quality, explore knowledge relationships, search the document library, and surface organizational knowledge gaps.'
+          : 'Review source quality, explore knowledge relationships, and surface organizational knowledge gaps. Use Global Search for cross-system search.'
       }
       actions={HUB_ACTIONS}
       tabs={TABS}

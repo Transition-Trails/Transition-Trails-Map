@@ -91,6 +91,7 @@ const CONTEXT_PANEL_META: Record<SlackPanelContext, { title: string; subtitle: s
 
 export function locationToContext(location: string): SlackPanelContext {
   if (location === '/' || location === '') return 'home';
+  if (location.startsWith('/trail-os-overview')) return 'home';
   if (location.startsWith('/operations') || location.startsWith('/demand')) return 'operations';
   if (location.startsWith('/governance')) return 'governance';
   if (location.startsWith('/digital-twin') || location.startsWith('/uom')) return 'digital-twin';

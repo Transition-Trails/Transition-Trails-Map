@@ -6,7 +6,7 @@ import {
   Activity, Users, Inbox, Brain,
   ArrowRight, CheckCircle2, Circle,
   Plus, BarChart3, FileText, Bot, Map, BookOpen,
-  AlertTriangle, Calendar,
+  AlertTriangle, Calendar, Monitor,
 } from 'lucide-react';
 
 // ── Activity items ────────────────────────────────────────────────────────────
@@ -72,11 +72,12 @@ export default function Home() {
         { icon: FileText, label: 'Knowledge',      path: '/knowledge/library', primary: false },
       ]
     : [
-        { icon: Plus,      label: 'New Request',   path: '/operations/demand',   primary: true  },
-        { icon: Inbox,     label: 'Cases',         path: '/operations/demand',   primary: false },
-        { icon: BarChart3, label: 'Health',        path: '/operations/health',   primary: false },
-        { icon: Bot,       label: 'Test Penny',    path: '/penny/test',          primary: false },
-        { icon: Map,       label: 'Program Map',   path: '/program',             primary: false },
+        { icon: Plus,      label: 'New Request',      path: '/operations/demand',   primary: true  },
+        { icon: Inbox,     label: 'Cases',            path: '/operations/demand',   primary: false },
+        { icon: BarChart3, label: 'Health',           path: '/operations/health',   primary: false },
+        { icon: Bot,       label: 'Test Penny',       path: '/penny/test',          primary: false },
+        { icon: Map,       label: 'Program Map',      path: '/program',             primary: false },
+        { icon: Monitor,   label: 'Trail OS Overview',path: '/trail-os-overview',   primary: false },
       ];
 
   const activityItems = isEveryday

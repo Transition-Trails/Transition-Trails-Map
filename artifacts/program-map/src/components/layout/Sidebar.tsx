@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
   Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
-  ChevronDown, Search, Target,
+  ChevronDown, Search, Target, Monitor,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { type AccessTier, canAccess, TIER_CONFIG } from '@/config/accessTiers';
@@ -32,8 +32,6 @@ const navGroups: NavGroup[] = [
     extraPrefixes: ['/uom', '/governance'],
     items: [
       { id: 'dt-explore',    path: '/digital-twin',              label: 'Explore',    minTier: 'admin' },
-      { id: 'dt-map',        path: '/digital-twin/map',          label: 'Map',        minTier: 'admin' },
-      { id: 'dt-impact',     path: '/digital-twin/impact',       label: 'Impact',     minTier: 'admin' },
       { id: 'dt-governance', path: '/digital-twin/governance',   label: 'Governance', minTier: 'admin' },
     ],
   },
@@ -74,7 +72,6 @@ const navGroups: NavGroup[] = [
       { id: 'penny-prompts',       path: '/penny/prompts',      label: 'Prompt Studio', minTier: 'admin' },
       { id: 'penny-learners',      path: '/penny/learners',     label: 'Learners',      minTier: 'admin' },
       { id: 'penny-intelligence',  path: '/penny/intelligence', label: 'Intelligence',  minTier: 'admin' },
-      { id: 'penny-trail-os-map',  path: '/penny/trail-os-map', label: 'Trail OS Map',  minTier: 'admin' },
       { id: 'penny-test',          path: '/penny/test',         label: 'Test Penny',    minTier: 'admin' },
     ],
   },
@@ -88,7 +85,6 @@ const navGroups: NavGroup[] = [
       { id: 'know-library',       path: '/knowledge/library',       label: 'Library',        minTier: 'admin' },
       { id: 'know-relationships', path: '/knowledge/relationships', label: 'Relationships',  minTier: 'admin' },
       { id: 'know-memory',        path: '/knowledge/memory',        label: 'Org Memory',     minTier: 'admin' },
-      { id: 'know-search',        path: '/knowledge/search',        label: 'Search',         minTier: 'admin' },
     ],
   },
   {
@@ -214,6 +210,12 @@ export function Sidebar() {
           <button title="Home" onClick={() => nav('/')} className={topBtnCls(location === '/')}>
             <Home className={`w-4 h-4 flex-shrink-0 ${location === '/' ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
             <span className="hidden xl:inline">Home</span>
+          </button>
+
+          {/* Trail OS Overview */}
+          <button title="Trail OS Overview" onClick={() => nav('/trail-os-overview')} className={topBtnCls(location === '/trail-os-overview')}>
+            <Monitor className={`w-4 h-4 flex-shrink-0 ${location === '/trail-os-overview' ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+            <span className="hidden xl:inline">Trail OS Overview</span>
           </button>
 
           {/* Global Search */}

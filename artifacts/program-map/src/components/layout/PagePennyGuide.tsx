@@ -257,7 +257,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     everydaySteps: [
       { label: 'Open Knowledge Library', path: '/knowledge/library' },
-      { label: 'Search knowledge',       path: '/knowledge/search' },
+      { label: 'Search knowledge',       path: '/search' },
     ],
     powerSteps: [
       { label: 'Source documents', path: '/knowledge' },
