@@ -37,7 +37,7 @@ function ExecutiveOverview() {
         <div className="rounded-lg border border-border bg-white px-4 py-3 flex items-center gap-5">
           {/* Score + label */}
           <div className="flex items-baseline gap-2 shrink-0">
-            <p className={`text-4xl font-bold font-serif leading-none ${cfg.score}`}>{overallHealthScore}</p>
+            <p className={`text-4xl font-bold leading-none ${cfg.score}`}>{overallHealthScore}</p>
             <div className="flex flex-col gap-0.5">
               <span className="text-[9px] text-muted-foreground/60 font-medium uppercase tracking-wider leading-none">Overall</span>
               <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${cfg.cls}`}>{cfg.label}</span>
@@ -54,7 +54,7 @@ function ExecutiveOverview() {
               { l: 'Needs Work',     v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
             ].map(s => (
               <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
-                <span className={`text-xl font-bold font-serif leading-none ${s.c}`}>{s.v}</span>
+                <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
                 <span className={`text-[9px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>
               </div>
             ))}
@@ -73,7 +73,7 @@ function ExecutiveOverview() {
                   className="rounded-lg border border-border bg-white px-2.5 py-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
                   <div className="flex items-center justify-between mb-1">
                     <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
-                    <span className={`text-lg font-bold font-serif leading-none ${dc.score}`}>{d.score}</span>
+                    <span className={`text-lg font-bold leading-none ${dc.score}`}>{d.score}</span>
                   </div>
                   <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
                   <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
@@ -174,7 +174,7 @@ function HealthIndicators() {
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dc.label}</span>
-                    <span className={`text-[22px] font-bold font-serif leading-none ${dc.score}`}>{d.score}</span>
+                    <span className={`text-[22px] font-bold leading-none ${dc.score}`}>{d.score}</span>
                   </div>
                 </button>
 

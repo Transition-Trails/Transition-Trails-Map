@@ -57,7 +57,7 @@ function Router() {
       <Route path="/navigator/resolve">                  <Redirect to="/operations/demand" /></Route>
       <Route path="/navigator/roles">                    <Redirect to="/digital-twin" /></Route>
       <Route path="/navigator/trail-os-map">             <Redirect to="/trail-os-overview" /></Route>
-      <Route path="/navigator/knowledge-relationships">  <Redirect to="/knowledge/relationships" /></Route>
+      <Route path="/navigator/knowledge-relationships">  <Redirect to="/digital-twin" /></Route>
 
       {/* Old Digital Twin sub-routes → Explore */}
       <Route path="/digital-twin/org-graph">     <Redirect to="/digital-twin" /></Route>
@@ -91,7 +91,8 @@ function Router() {
       {/* Old Penny paths → penny hub tabs */}
       <Route path="/penny/capability-registry"> <Redirect to="/penny" /></Route>
       <Route path="/penny/prompt-studio">       <Redirect to="/penny/prompts" /></Route>
-      <Route path="/penny/test-penny">          <Redirect to="/penny/test" /></Route>
+      <Route path="/penny/test-penny">          <Redirect to="/penny" /></Route>
+      <Route path="/penny/test">                <Redirect to="/penny" /></Route>
       <Route path="/penny/prompt-library">      <Redirect to="/penny/prompts" /></Route>
       <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
       <Route path="/penny/integrations">        <Redirect to="/admin/integration-readiness" /></Route>
@@ -129,7 +130,8 @@ function Router() {
       <Route path="/library/documents">         <Redirect to="/knowledge/library" /></Route>
       <Route path="/library/templates">         <Redirect to="/knowledge/library" /></Route>
       <Route path="/library/salesforce-kb">     <Redirect to="/knowledge/library" /></Route>
-      <Route path="/library/source-mapping">    <Redirect to="/knowledge/relationships" /></Route>
+      <Route path="/library/source-mapping">    <Redirect to="/digital-twin" /></Route>
+      <Route path="/knowledge/relationships">   <Redirect to="/digital-twin" /></Route>
       <Route path="/library/search">            <Redirect to="/search" /></Route>
       <Route path="/knowledge/search">          <Redirect to="/search" /></Route>
       <Route path="/library/:sub">              <Redirect to="/knowledge/library" /></Route>
@@ -204,7 +206,7 @@ function Router() {
       <Route path="/admin/phase2-backlog"    component={Phase2Backlog} />
       <Route path="/admin/phase1-audit"     component={Phase1CompletionAudit} />
       <Route path="/admin/:section"          component={Admin} />
-      <Route path="/admin"                component={Admin} />
+      <Route path="/admin">               <Redirect to="/admin/setup" /></Route>
 
       <Route component={NotFound} />
     </Switch>

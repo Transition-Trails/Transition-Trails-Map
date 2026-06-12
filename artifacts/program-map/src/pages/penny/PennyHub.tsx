@@ -1,6 +1,6 @@
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
-  Activity, FlaskConical, GitBranch, Puzzle, Plus,
+  Activity, GitBranch, Puzzle, Plus,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -11,7 +11,6 @@ import PennyPromptStudio     from '@/pages/penny/PennyPromptStudio';
 import Learners              from '@/pages/penny/Learners';
 import Intelligence          from '@/pages/penny/Intelligence';
 import PennyHealth           from '@/pages/operations/PennyHealth';
-import TestPenny             from '@/pages/penny/TestPenny';
 import PennyIntegrationLayer from '@/pages/penny/PennyIntegrationLayer';
 
 // UI audit rule: Everyday User pages must not have multiple nav/action rows
@@ -62,7 +61,6 @@ export default function PennyHub() {
           ],
         }),
       },
-      { id: 'test',         label: 'Test Penny',         icon: FlaskConical, href: '/penny/test',                 variant: 'secondary' as const },
       { id: 'intelligence', label: 'View Intelligence',  icon: BarChart2,    href: '/penny/intelligence',         variant: 'secondary' as const },
       { id: 'health',       label: 'Penny Health',       icon: Activity,     href: '/penny/health',               variant: 'secondary' as const },
     ] : []),
@@ -78,9 +76,8 @@ export default function PennyHub() {
     ] : []),
     { id: 'learners', label: isEveryday ? 'My Learners' : 'Learners', path: '/penny/learners', icon: Users, content: <Learners /> },
     ...(!isEveryday ? [
-      { id: 'intelligence',  label: 'Intelligence',     path: '/penny/intelligence',      icon: BarChart2,    content: <Intelligence /> },
-      { id: 'health',        label: 'Health',           path: '/penny/health',            icon: Activity,     content: <PennyHealth /> },
-      { id: 'test',          label: 'Test Penny',       path: '/penny/test',              icon: FlaskConical, content: <TestPenny /> },
+      { id: 'intelligence', label: 'Intelligence', path: '/penny/intelligence', icon: BarChart2, content: <Intelligence /> },
+      { id: 'health',       label: 'Health',       path: '/penny/health',       icon: Activity,  content: <PennyHealth /> },
     ] : []),
     ...(isAdminOrAbove ? [
       { id: 'integration-layer', label: 'POC Integrations', path: '/penny/integration-layer', icon: Puzzle, content: <PennyIntegrationLayer /> },

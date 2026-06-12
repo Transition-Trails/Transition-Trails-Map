@@ -1,12 +1,11 @@
-import { BookOpen, Database, GitBranch, Archive, BookMarked, Network, Target, LayoutDashboard } from 'lucide-react';
+import { BookOpen, Database, Archive, BookMarked, Network, Target, LayoutDashboard } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { useTierFlags } from '@/hooks/useTierFlags';
-import KnowledgeOverview      from '@/pages/knowledge/KnowledgeOverview';
-import KnowledgeWorkspace     from '@/pages/knowledge/KnowledgeWorkspace';
-import KnowledgeRelationships from '@/pages/navigator/KnowledgeRelationships';
-import LibraryDocuments       from '@/pages/library/LibraryDocuments';
+import KnowledgeOverview  from '@/pages/knowledge/KnowledgeOverview';
+import KnowledgeWorkspace from '@/pages/knowledge/KnowledgeWorkspace';
+import LibraryDocuments   from '@/pages/library/LibraryDocuments';
 
 // UI audit rule: Everyday User pages must not have multiple nav/action rows
 // above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
@@ -66,10 +65,9 @@ export default function KnowledgeHub() {
 
   // Everyday: no ActionBar — inline search in Documents tab handles discovery
   const HUB_ACTIONS: ActionItem[] = isPowerOrAbove ? [
-    { id: 'global-search', label: 'Global Search',      icon: Target,    href: '/search',                   variant: 'secondary' as const },
-    { id: 'relationships', label: 'View Relationships', icon: GitBranch, href: '/knowledge/relationships',  variant: 'secondary' as const },
-    { id: 'digital-twin',  label: 'Digital Twin',       icon: Network,   href: '/digital-twin/knowledge',   variant: 'secondary' as const },
-    { id: 'memory',        label: 'Org Memory',         icon: Archive,   href: '/knowledge/memory',         variant: 'secondary' as const },
+    { id: 'global-search', label: 'Global Search', icon: Target,   href: '/search',        variant: 'secondary' as const },
+    { id: 'digital-twin',  label: 'Digital Twin',  icon: Network,  href: '/digital-twin',  variant: 'secondary' as const },
+    { id: 'memory',        label: 'Org Memory',    icon: Archive,  href: '/knowledge/memory', variant: 'secondary' as const },
   ] : [];
 
   // Everyday: single tab — SourceDocs already has inline search, no tab bar needed
@@ -78,11 +76,10 @@ export default function KnowledgeHub() {
         { id: 'library', label: 'Documents', path: '/knowledge/library', icon: BookMarked, content: <LibraryDocuments /> },
       ]
     : [
-        { id: 'overview',      label: 'Overview',       path: '/knowledge',               icon: LayoutDashboard, content: <KnowledgeOverview /> },
-        { id: 'sources',       label: 'Sources',        path: '/knowledge/sources',       icon: Database,        content: <KnowledgeWorkspace /> },
-        { id: 'library',       label: 'Library',        path: '/knowledge/library',       icon: BookMarked,      content: <LibraryDocuments /> },
-        { id: 'relationships', label: 'Relationships',  path: '/knowledge/relationships', icon: GitBranch,       content: <KnowledgeRelationships /> },
-        { id: 'memory',        label: 'Org Memory',     path: '/knowledge/memory',        icon: Archive,         content: <OrgMemoryPlaceholder /> },
+        { id: 'overview', label: 'Overview',   path: '/knowledge',         icon: LayoutDashboard, content: <KnowledgeOverview /> },
+        { id: 'sources',  label: 'Sources',    path: '/knowledge/sources', icon: Database,        content: <KnowledgeWorkspace /> },
+        { id: 'library',  label: 'Library',    path: '/knowledge/library', icon: BookMarked,      content: <LibraryDocuments /> },
+        { id: 'memory',   label: 'Org Memory', path: '/knowledge/memory',  icon: Archive,         content: <OrgMemoryPlaceholder /> },
       ];
 
   return (
