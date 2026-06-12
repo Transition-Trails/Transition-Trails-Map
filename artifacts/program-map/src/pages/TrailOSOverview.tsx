@@ -212,7 +212,7 @@ export default function TrailOSOverview() {
                 {ANALYTICS_STATS.map(stat => (
                   <div key={stat.label} className="p-3 rounded-lg border bg-white/80 border-border/60">
                     <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1 leading-tight">{stat.label}</p>
-                    <p className={`text-[24px] font-bold font-serif leading-none ${stat.cls}`}>{stat.value}</p>
+                    <p className={`text-[24px] font-bold leading-none ${stat.cls}`}>{stat.value}</p>
                     <p className="text-[10px] text-muted-foreground/60 mt-1">{stat.note}</p>
                     <div className="h-1.5 w-full bg-muted/40 rounded-full mt-2.5 overflow-hidden">
                       <div className="h-full bg-primary/25 w-2/3 rounded-full" />

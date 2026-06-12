@@ -122,7 +122,7 @@ function OverviewTab() {
             { label:'Overdue Reviews',       value:String(overdueReviews),sub:'Of 20 review cycles',    cls: overdueReviews > 0 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
-              <p className="text-2xl font-bold font-serif text-foreground">{s.value}</p>
+              <p className="text-2xl font-bold text-foreground">{s.value}</p>
               <p className="text-[11px] font-semibold text-foreground mt-0.5">{s.label}</p>
               <p className="text-[10px] text-muted-foreground">{s.sub}</p>
             </div>
@@ -211,7 +211,7 @@ function LifecycleTab() {
           {/* Header */}
           <div className="flex items-start gap-3">
             <div>
-              <h3 className="text-base font-bold font-serif text-foreground">{model.objectTypeName}</h3>
+              <h3 className="text-[15px] font-semibold text-foreground">{model.objectTypeName}</h3>
               <LayerBadge layer={model.layer} />
               {model.note && <p className="text-[11px] text-amber-700 mt-1">{model.note}</p>}
             </div>
@@ -499,7 +499,7 @@ function ComplianceTab() {
                     <p className="text-[12px] font-bold text-foreground">{c.objectTypeName}</p>
                     <LayerBadge layer={c.layer} />
                   </div>
-                  <span className={`text-lg font-bold font-serif ${pct >= 85 ? 'text-emerald-600' : pct >= 70 ? 'text-amber-600' : 'text-rose-600'}`}>
+                  <span className={`text-lg font-bold ${pct >= 85 ? 'text-emerald-600' : pct >= 70 ? 'text-amber-600' : 'text-rose-600'}`}>
                     {pct}%
                   </span>
                 </div>
@@ -555,7 +555,7 @@ function HealthTab() {
               onClick={() => setFilter(f.key as typeof filter)}
               className={`flex-1 rounded-lg border p-2.5 text-center transition-all ${f.cls} ${filter === f.key ? 'ring-2 ring-foreground ring-offset-1' : ''}`}
             >
-              <p className="text-lg font-bold font-serif text-foreground">{f.count}</p>
+              <p className="text-xl font-bold text-foreground">{f.count}</p>
               <p className="text-[10px] font-semibold text-foreground/70">{f.label}</p>
             </button>
           ))}

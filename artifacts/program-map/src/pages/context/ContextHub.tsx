@@ -86,7 +86,7 @@ function OverviewTab() {
                     {activeContext.objectTypeName}
                   </span>
                 </div>
-                <h2 className="text-lg font-bold font-serif text-foreground">{activeContext.name}</h2>
+                <h2 className="text-[15px] font-semibold text-foreground">{activeContext.name}</h2>
               </div>
               <div className="text-right shrink-0">
                 <HealthDot health={activeContext.health} />

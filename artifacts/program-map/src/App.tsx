@@ -22,6 +22,7 @@ import IntegrationSecretsAudit  from "@/pages/admin/IntegrationSecretsAudit";
 import GoogleOAuthFlow           from "@/pages/admin/GoogleOAuthFlow";
 import CreateAudit               from "@/pages/admin/CreateAudit";
 import Phase2Backlog             from "@/pages/admin/Phase2Backlog";
+import Phase1CompletionAudit    from "@/pages/admin/Phase1CompletionAudit";
 
 import DigitalTwin      from "@/pages/twin/DigitalTwin";
 import OperationsHub    from "@/pages/ops/OperationsHub";
@@ -201,6 +202,7 @@ function Router() {
       <Route path="/admin/google-oauth"      component={GoogleOAuthFlow} />
       <Route path="/admin/create-audit"      component={CreateAudit} />
       <Route path="/admin/phase2-backlog"    component={Phase2Backlog} />
+      <Route path="/admin/phase1-audit"     component={Phase1CompletionAudit} />
       <Route path="/admin/:section"          component={Admin} />
       <Route path="/admin"                component={Admin} />
 
