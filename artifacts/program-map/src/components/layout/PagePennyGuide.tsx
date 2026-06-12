@@ -233,7 +233,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     everydaySteps: [{ label: 'View program status', path: '/operations' }],
     powerSteps: [
       { label: 'Health indicators',     path: '/operations/health' },
-      { label: 'Integration readiness', path: '/operations/integrations' },
+      { label: 'Integration readiness', path: '/admin/integration-readiness' },
       { label: 'Demand overview',       path: '/operations/demand' },
     ],
     everydayCanned: "Operations are running normally. Guided Trail Cohort 1 is in Week 3 of 8 and on track. Your next milestone is Sprint 3 on Thursday.",

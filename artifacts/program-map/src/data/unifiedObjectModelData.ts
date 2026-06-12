@@ -509,7 +509,7 @@ export const OBJECT_TYPES: UOMObjectType[] = [
     ],
     systems: ['Operations Hub', 'Salesforce', 'Google Drive', 'Slack', 'LMS', 'Agentforce'],
     reviewCycle: 'Quarterly + on platform change',
-    workspaceLink: '/operations/integrations',
+    workspaceLink: '/admin/integration-readiness',
     standards: [],
     profileTabs: ['Overview', 'Readiness Checks', 'Field Mappings', 'Risks', 'Data Flow', 'Timeline'],
   },

@@ -8,7 +8,8 @@ import { AppShell } from "@/components/layout/AppShell";
 
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
-import SalesforceMapping   from "@/pages/curriculum/SalesforceMapping";
+import SalesforceMapping          from "@/pages/curriculum/SalesforceMapping";
+import IntegrationReadinessCenter from "@/pages/admin/IntegrationReadinessCenter";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
@@ -88,7 +89,7 @@ function Router() {
       <Route path="/penny/test-penny">          <Redirect to="/penny/test" /></Route>
       <Route path="/penny/prompt-library">      <Redirect to="/penny/prompts" /></Route>
       <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
-      <Route path="/penny/integrations">        <Redirect to="/operations/integrations" /></Route>
+      <Route path="/penny/integrations">        <Redirect to="/admin/integration-readiness" /></Route>
       <Route path="/penny/trail-quests">        <Redirect to="/penny" /></Route>
       <Route path="/penny/assessments">         <Redirect to="/penny/learners" /></Route>
       <Route path="/penny/logs">                <Redirect to="/penny/learners" /></Route>
@@ -126,7 +127,8 @@ function Router() {
       <Route path="/library">                   <Redirect to="/knowledge" /></Route>
 
       {/* Old admin sub-pages */}
-      <Route path="/admin/integration-readiness"> <Redirect to="/operations/integrations" /></Route>
+      <Route path="/operations/integrations">      <Redirect to="/admin/integration-readiness" /></Route>
+      <Route path="/admin/integration-readiness"  component={IntegrationReadinessCenter} />
       <Route path="/admin/comm-channels">         <Redirect to="/collaboration/channels" /></Route>
       <Route path="/admin/comm-routing">          <Redirect to="/collaboration/channels" /></Route>
       <Route path="/admin/comm-templates">        <Redirect to="/collaboration/templates" /></Route>

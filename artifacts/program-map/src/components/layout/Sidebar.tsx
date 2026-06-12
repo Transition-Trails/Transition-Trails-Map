@@ -43,7 +43,6 @@ const navGroups: NavGroup[] = [
     items: [
       { id: 'ops-overview',      path: '/operations',              label: 'Executive Overview',    minTier: 'admin' },
       { id: 'ops-health',        path: '/operations/health',       label: 'Health Indicators',     minTier: 'admin' },
-      { id: 'ops-integrations',  path: '/operations/integrations', label: 'Integration Readiness', minTier: 'admin' },
       { id: 'ops-scorecards',    path: '/operations/scorecards',   label: 'Scorecards',            minTier: 'admin' },
       { id: 'ops-trends',        path: '/operations/trends',       label: 'Trends & Insights',     minTier: 'admin' },
       { id: 'ops-demand',        path: '/operations/demand',       label: 'Demand',                minTier: 'admin' },
@@ -115,7 +114,8 @@ const navGroups: NavGroup[] = [
       { id: 'admin-secrets',   path: '/admin/secrets-audit', label: 'Secrets Audit' },
       { id: 'admin-gauth',     path: '/admin/google-oauth',  label: 'Google Auth Setup' },
       { id: 'lbl-readiness',   label: 'Readiness', isLabel: true },
-      { id: 'admin-readiness', path: '/admin/phase1-readiness', label: 'Phase 1 Readiness' },
+      { id: 'admin-integration-readiness', path: '/admin/integration-readiness', label: 'Integration Readiness' },
+      { id: 'admin-readiness',             path: '/admin/phase1-readiness',      label: 'Phase 1 Readiness' },
       { id: 'admin-ux-standards', path: '/admin/ux-standards',  label: 'Phase 1 UX Standards' },
       { id: 'lbl-backlog', label: 'Backlog', isLabel: true },
       { id: 'admin-phase2-backlog', path: '/admin/phase2-backlog', label: 'Phase 2 Backlog' },

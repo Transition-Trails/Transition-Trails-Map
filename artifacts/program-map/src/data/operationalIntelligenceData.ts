@@ -341,6 +341,7 @@ export const trendInsights: TrendInsight[] = [
     affectedPrograms: ['All programs'],
     relatedSystems: ['Integration Readiness Center', 'Salesforce Architecture Mapping'],
     actionPath: '/admin/integration-readiness',
+
   },
   {
     id: 'trend-3',

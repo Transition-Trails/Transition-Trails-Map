@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Activity, BarChart2, Puzzle, GitBranch, TrendingUp, ChevronRight, ChevronDown,
+  Activity, BarChart2, GitBranch, TrendingUp, ChevronRight, ChevronDown,
   AlertTriangle, CheckCircle2, Target, RefreshCw,
 } from 'lucide-react';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -13,8 +13,7 @@ import {
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG,
   overallHealthScore, overallHealthLevel,
 } from '@/data/operationalIntelligenceData';
-import IntegrationReadinessCenter from '@/pages/admin/IntegrationReadinessCenter';
-import ProgramHealth               from '@/pages/operations/ProgramHealth';
+import ProgramHealth from '@/pages/operations/ProgramHealth';
 import Intake                      from '@/pages/demand/Intake';
 
 // ── Executive Overview ────────────────────────────────────────────────────────
@@ -30,7 +29,7 @@ function ExecutiveOverview() {
         {!isEveryday && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 flex items-center gap-2">
             <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">Phase 1</span>
-            <span className="text-[10px] text-amber-600">Operations, Integrations, and Demand are unified here.</span>
+            <span className="text-[10px] text-amber-600">Operations, Health, Demand, Scorecards, and Trends are unified here.</span>
           </div>
         )}
 
@@ -428,15 +427,11 @@ export default function OperationsHub() {
       { id: 'trends',     label: 'Trends & Insights', path: '/operations/trends',           icon: AlertTriangle, content: <TrendsView /> },
       { id: 'recs',       label: 'Recommendations',   path: '/operations/recommendations',  icon: ChevronRight,  content: <AllRecommendations /> },
     ] : []),
-    ...(isAdminOrAbove ? [
-      { id: 'integrations', label: 'Integrations', path: '/operations/integrations', icon: Puzzle, content: <IntegrationReadinessCenter /> },
-    ] : []),
   ];
 
   const ACTIONS: ActionItem[] = [
     ...(isAdminOrAbove ? [
-      { id: 'phase1',       label: 'Phase 1 Readiness', icon: Target,        href: '/admin/phase1-readiness',     variant: 'primary' as const },
-      { id: 'integrations', label: 'Integrations',      icon: Puzzle,        href: '/operations/integrations',    variant: 'secondary' as const },
+      { id: 'phase1', label: 'Phase 1 Readiness', icon: Target, href: '/admin/phase1-readiness', variant: 'primary' as const },
     ] : []),
     ...(!isEveryday ? [
       { id: 'recs',   label: 'Recommendations',   icon: ChevronRight, href: '/operations/recommendations', variant: 'secondary' as const },
@@ -451,7 +446,7 @@ export default function OperationsHub() {
       description={
         isEveryday
           ? 'Program health at a glance — key indicators and items needing attention.'
-          : 'Monitor program health, surface priority actions, track demand, and review integration readiness, scorecards, and operational trends.'
+          : 'Monitor program health, surface priority actions, track demand, and review scorecards and operational trends.'
       }
       actions={ACTIONS}
       tabs={TABS}

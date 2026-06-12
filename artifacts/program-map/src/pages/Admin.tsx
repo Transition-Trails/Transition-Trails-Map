@@ -281,6 +281,25 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Integration &amp; Credentials</p>
             <div className="grid grid-cols-3 gap-3">
               <button
+                onClick={() => setLocation('/admin/integration-readiness')}
+                className="text-left p-4 rounded-lg border bg-card border-violet-200 hover:border-violet-400 transition-all duration-150 hover:shadow-sm group"
+              >
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-violet-50 text-violet-700">
+                    <Plug className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">9 integrations</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Integration Readiness Center</p>
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Full integration planning workspace — catalog, data flow, auth, field mapping, sync readiness, risk register, testing, and launch planning.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+
+              <button
                 onClick={() => setLocation('/admin/secrets-audit')}
                 className="text-left p-4 rounded-lg border bg-card border-sky-200 hover:border-sky-400 transition-all duration-150 hover:shadow-sm group"
               >
