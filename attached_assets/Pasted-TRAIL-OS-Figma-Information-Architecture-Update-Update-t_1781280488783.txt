@@ -1,0 +1,271 @@
+TRAIL OS Figma Information Architecture Update
+
+Update the existing Figma file:
+
+TRAIL OS
+https://www.figma.com/design/RDC5G7bAmxIHddZnJeXVYq/TRAIL-OS
+
+Do not create a new file.
+
+Create a new page:
+
+05 — TRAIL OS Product Map
+
+This page becomes the canonical information architecture and navigation reference for the platform.
+
+Goal
+
+Document the entire TRAIL OS structure as editable Figma frames and layers.
+
+This is not a UI mockup.
+
+This is a product architecture map.
+
+Everything should remain fully editable.
+
+Page Structure
+
+Create top-level sections as frames:
+
+Home
+My Dashboard
+Trail OS Overview
+Global Search
+Search Results
+Relationship Explorer
+Context Engine / Focus
+Focus Overview
+Relationships
+Health
+Activity
+Impact
+Digital Twin
+Explore
+Object Workspace
+Relationships
+Governance
+Impact
+Operations
+Landing Page
+
+Operations Command Center
+
+Pages
+Executive Overview
+Health Indicators
+Demand
+Scorecards
+Trends & Insights
+Recommendations
+Programs
+Landing Page
+
+Programs Command Center
+
+Pages
+Programs
+Standards
+Blueprint
+
+Notes:
+
+Landing page follows Phase 1 hub pattern.
+Penny Insights drives navigation.
+Remove redundant navigation concepts.
+Penny
+Landing Page
+
+Penny Command Center
+
+Areas
+Capabilities
+Prompt Studio
+Intelligence
+Learners
+Integrations
+Ask Penny
+Trail Signals
+
+Notes:
+
+Penny Command Center becomes the primary power-user experience.
+
+Penny identifies:
+
+highest impact improvements
+optimization opportunities
+system gaps
+governance risks
+adoption opportunities
+
+Each recommendation should link users to the correct workspace.
+
+Knowledge
+Landing Page
+
+Knowledge Command Center
+
+Pages
+Sources
+Library
+Relationships
+Org Memory
+
+Notes:
+
+Landing page becomes:
+
+source health
+knowledge gaps
+relationship insights
+trust scoring
+governance alerts
+
+Global Search owns searching.
+
+Knowledge owns governance and quality.
+
+Collaboration
+Landing Page
+
+Collaboration Command Center
+
+Pages
+Slack
+Google Drive
+Google Calendar
+Channels
+Templates
+Weekly Briefs
+Notifications
+
+Notes:
+
+Landing page becomes:
+
+communication health
+collaboration effectiveness
+engagement metrics
+routing recommendations
+Penny insights
+Administration
+Landing Page
+
+Administration Command Center
+
+Pages
+Setup
+
+Single setup experience replacing:
+
+Integration Readiness
+Secrets Audit
+Google Auth Setup
+Integration Setup pages
+
+Setup contains:
+
+Salesforce
+Slack
+Google Drive
+Google Calendar
+Gmail
+Gemini
+Future integrations
+
+Each integration contains:
+
+status
+health
+readiness
+validation
+documentation
+
+Penny explains:
+
+why it matters
+recommended next action
+impact of configuration
+People & Access
+
+Merge:
+
+People & Roles
+Access & Roles
+
+Single ownership page.
+
+Knowledge Management
+Salesforce Architecture
+Program Resources
+Phase 1 Readiness
+Phase 1 UX Standards
+Phase 2 Backlog
+Cross-Cutting System
+
+Add dedicated architecture frame:
+
+Right Panel System
+Ask Penny
+
+Universal assistant.
+
+Penny Insights
+
+Explains:
+
+what matters
+why it matters
+expected impact
+Trail Signals
+
+Evidence layer.
+
+Sources include:
+
+Salesforce
+Slack
+Google Drive
+Google Calendar
+Gmail
+Future systems
+Add Architecture Notes
+
+Include a section documenting:
+
+Phase 1 UX Rules
+One concept = one owner page
+No redundant pages
+Overview-first navigation
+Landing pages are insight-driven
+Penny available everywhere
+Trail Signals provide evidence
+Technical setup belongs in Administration
+Search belongs in Global Search
+Add Future Phase 2 Section
+
+Document future candidate areas:
+
+Learning Delivery Center
+LMS integrations
+Google Classroom
+Penny voice/avatar
+Custom Trail Signals
+Automated recommendations
+Workflow orchestration
+Gmail action center
+Layer Naming
+
+Every frame and sub-frame must be named cleanly.
+
+Examples:
+
+Programs / Command Center
+Programs / Standards
+Operations / Executive Overview
+Administration / Setup
+Administration / People & Access
+Knowledge / Sources
+Collaboration / Slack
+
+Use slash hierarchy consistently.
