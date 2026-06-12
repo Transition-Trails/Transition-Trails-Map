@@ -17,6 +17,7 @@ const PAGE_INFO: Array<[string, string, string]> = [
   ['/operations',                        'Operations',             'Executive Overview'],
   ['/operations/health',                 'Operations',             'Health Indicators'],
   ['/admin/setup',                        'Administration',         'Setup'],
+  ['/admin/people-access',               'Administration',         'People & Access'],
   ['/admin/integration-readiness',       'Administration',         'Integration Readiness Center'],
   ['/operations/scorecards',             'Operations',             'Scorecards'],
   ['/operations/trends',                 'Operations',             'Trends & Insights'],

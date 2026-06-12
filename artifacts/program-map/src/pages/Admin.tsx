@@ -19,17 +19,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import AccessRolesMatrix from '@/pages/admin/AccessRolesMatrix';
 
 type AdminView = 'home' | 'programs' | 'documents' | 'resolve' | 'penny' | 'trailOs' | 'integrations'
-  | 'roles' | 'templates' | 'users' | 'permissions' | 'settings' | 'access';
+  | 'roles' | 'templates' | 'users' | 'permissions' | 'settings';
 
 const URL_SECTION_MAP: Partial<Record<string, AdminView>> = {
   programs: 'programs', documents: 'documents', resolve: 'resolve',
   'trail-os': 'trailOs', penny: 'penny', roles: 'roles',
   templates: 'templates', integrations: 'integrations',
   users: 'users', permissions: 'permissions', settings: 'settings',
-  'access-roles': 'access',
 };
 
 // ─── Main ──────────────────────────────────────────────────────────────────────
@@ -55,8 +53,7 @@ export default function Admin() {
     setSearch('');
   }
 
-  if (view === 'home')   return <AdminHome onNavigate={navigate} />;
-  if (view === 'access') return <AccessRolesMatrix onBack={() => navigate('home')} />;
+  if (view === 'home') return <AdminHome onNavigate={navigate} />;
 
   return (
     <AreaEditor
@@ -178,8 +175,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 { concept: 'Program data records (CMS edit)',  path: '/admin → Program Records' },
                 { concept: 'Penny capabilities & AI ops',      path: '/penny' },
                 { concept: 'Penny capability records (CMS)',   path: '/admin → Penny Capability Records' },
-                { concept: 'People, personas & org roles',     path: '/admin/people' },
-                { concept: 'Role-based access control',        path: '/admin/access-roles' },
+                { concept: 'People, roles &amp; access tiers',   path: '/admin/people-access' },
                 { concept: 'Source docs & knowledge',          path: '/knowledge' },
                 { concept: 'Integration credentials & auth',   path: '/admin/secrets-audit' },
               ] as const).map(row => (
@@ -224,37 +220,18 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Platform Administration</p>
             <div className="grid grid-cols-3 gap-3">
               <button
-                onClick={() => onNavigate('access')}
+                onClick={() => setLocation('/admin/people-access')}
                 className="text-left p-4 rounded-lg border bg-card border-indigo-200 hover:border-indigo-400 transition-all duration-150 hover:shadow-sm group"
               >
                 <div className="flex items-start justify-between mb-2.5">
                   <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-700">
-                    <Shield className="w-5 h-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">4 tiers</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Access &amp; Roles</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
-                  Google Groups → Trail OS tier mapping, navigation visibility matrix, and feature capability grid by access level.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setLocation('/admin/people')}
-                className="text-left p-4 rounded-lg border bg-card border-violet-200 hover:border-violet-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-violet-50 text-violet-700">
                     <Users className="w-5 h-5" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Roles</Badge>
+                  <Badge variant="secondary" className="text-xs font-semibold">People · Access</Badge>
                 </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">People &amp; Roles</p>
+                <p className="font-semibold text-foreground text-sm mb-1.5">People &amp; Access</p>
                 <p className="text-[12px] text-muted-foreground leading-snug">
-                  Personas, organizational roles, and platform user archetypes. Canonical page for who uses Trail OS and how each role interacts with the platform.
+                  Personas, organizational roles, access tiers, Google Groups mapping, navigation visibility matrix, and feature permission grid.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
@@ -425,7 +402,6 @@ function AreaEditor({
     users: 'Users',
     permissions: 'Permissions',
     settings: 'Settings',
-    access: 'Access & Roles',
   };
 
   const STUB_VIEWS = new Set<AdminView>(['roles', 'templates', 'users', 'permissions', 'settings']);

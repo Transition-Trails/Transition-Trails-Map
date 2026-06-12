@@ -222,7 +222,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     name: 'Access & Roles',
     detail: 'Google Groups → Trail OS tier mapping, navigation visibility matrix, and feature capability grid by access level.',
     action: 'View Matrix',
-    href: '/admin/access-roles',
+    href: '/admin/people-access',
     badge: '4 tiers',
     badgeCls: 'bg-indigo-50 border-indigo-200 text-indigo-700',
     icon: Lock,

@@ -108,8 +108,7 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/admin',
     items: [
       { id: 'admin-home',   path: '/admin',               label: 'Knowledge Management' },
-      { id: 'admin-people', path: '/admin/people',         label: 'People & Roles' },
-      { id: 'admin-access', path: '/admin/access-roles',   label: 'Access & Roles' },
+      { id: 'admin-people-access', path: '/admin/people-access', label: 'People & Access' },
       { id: 'lbl-setup',    label: 'Setup',                isLabel: true },
       { id: 'admin-setup',  path: '/admin/setup',          label: 'Setup' },
       { id: 'admin-irc',    path: '/admin/integration-readiness', label: 'Integration Readiness' },

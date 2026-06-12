@@ -11,6 +11,7 @@ import TrailOSOverview     from "@/pages/TrailOSOverview";
 import SalesforceMapping          from "@/pages/curriculum/SalesforceMapping";
 import IntegrationReadinessCenter from "@/pages/admin/IntegrationReadinessCenter";
 import AdminSetup                 from "@/pages/admin/AdminSetup";
+import PeopleAccess               from "@/pages/admin/PeopleAccess";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
@@ -135,7 +136,8 @@ function Router() {
       <Route path="/admin/comm-templates">        <Redirect to="/collaboration/templates" /></Route>
       <Route path="/admin/program-resources">     <Redirect to="/program/resources" /></Route>
       {/* Removed stub pages — redirect to canonical locations */}
-      <Route path="/admin/roles">     <Redirect to="/admin/access-roles" /></Route>
+      <Route path="/admin/roles">        <Redirect to="/admin/people-access" /></Route>
+      <Route path="/admin/access-roles"> <Redirect to="/admin/people-access" /></Route>
       <Route path="/admin/penny">     <Redirect to="/penny" /></Route>
       <Route path="/admin/settings">  <Redirect to="/admin" /></Route>
       <Route path="/admin/templates"> <Redirect to="/knowledge/library" /></Route>
@@ -183,8 +185,9 @@ function Router() {
 
       {/* Administration */}
       <Route path="/admin/setup"             component={AdminSetup} />
+      <Route path="/admin/people-access"     component={PeopleAccess} />
       <Route path="/admin/salesforce-arch"   component={SalesforceMapping} />
-      <Route path="/admin/people"            component={PeopleWorkspace} />
+      <Route path="/admin/people">           <Redirect to="/admin/people-access" /></Route>
       <Route path="/admin/phase1-readiness"  component={Phase1ReadinessDashboard} />
       <Route path="/admin/ux-standards"     component={Phase1UXStandards} />
       <Route path="/admin/secrets-audit"     component={IntegrationSecretsAudit} />
