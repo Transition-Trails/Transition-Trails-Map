@@ -1,10 +1,11 @@
 import {
-  GraduationCap, LayoutGrid, Star, Plus,
+  GraduationCap, LayoutGrid, Star, Plus, LayoutDashboard,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import ProgramOverview  from '@/pages/program/ProgramOverview';
 import ProgramWorkspace from '@/pages/program/ProgramWorkspace';
 import StandardsStudio  from '@/pages/curriculum/StandardsStudio';
 import ProgramBlueprint from '@/pages/curriculum/ProgramBlueprint';
@@ -32,9 +33,16 @@ export default function ProgramHub() {
 
   const ALL_TABS = [
     {
+      id: 'overview',
+      label: 'Overview',
+      path: '/program',
+      icon: LayoutDashboard,
+      content: <ProgramOverview />,
+    },
+    {
       id: 'programs',
       label: isEveryday ? 'My Programs' : 'Programs',
-      path: '/program',
+      path: '/program/programs',
       icon: LayoutGrid,
       content: <ProgramWorkspace />,
     },
@@ -54,7 +62,7 @@ export default function ProgramHub() {
       description={
         isEveryday
           ? 'Your active programs, upcoming sessions, curriculum, and Penny support.'
-          : 'Select a program to explore its structure, curriculum, Penny assets, and health. Use Standards for the quality rulebook and Blueprint for the cross-program canvas.'
+          : 'Program health, blueprint coverage, Penny readiness, and standards status — explore the full program suite, standards rulebook, and cross-program blueprint canvas.'
       }
       actions={HUB_ACTIONS}
       tabs={ALL_TABS}

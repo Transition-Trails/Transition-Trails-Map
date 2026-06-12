@@ -54,9 +54,10 @@ const navGroups: NavGroup[] = [
     icon: GraduationCap,
     pathPrefix: '/program',
     items: [
-      { id: 'prog-programs',   path: '/program',            label: 'Programs',        minTier: 'admin' },
-      { id: 'prog-standards',  path: '/program/standards',  label: 'Standards',       minTier: 'admin' },
-      { id: 'prog-blueprint',  path: '/program/blueprint',  label: 'Blueprint',       minTier: 'admin' },
+      { id: 'prog-overview',   path: '/program',             label: 'Overview',        minTier: 'admin' },
+      { id: 'prog-programs',   path: '/program/programs',    label: 'Programs',        minTier: 'admin' },
+      { id: 'prog-standards',  path: '/program/standards',   label: 'Standards',       minTier: 'admin' },
+      { id: 'prog-blueprint',  path: '/program/blueprint',   label: 'Blueprint',       minTier: 'admin' },
     ],
   },
   {
@@ -78,7 +79,8 @@ const navGroups: NavGroup[] = [
     icon: BookOpen,
     pathPrefix: '/knowledge',
     items: [
-      { id: 'know-sources',       path: '/knowledge',               label: 'Sources',        minTier: 'admin' },
+      { id: 'know-overview',      path: '/knowledge',               label: 'Overview',       minTier: 'admin' },
+      { id: 'know-sources',       path: '/knowledge/sources',       label: 'Sources',        minTier: 'admin' },
       { id: 'know-library',       path: '/knowledge/library',       label: 'Library',        minTier: 'admin' },
       { id: 'know-relationships', path: '/knowledge/relationships', label: 'Relationships',  minTier: 'admin' },
       { id: 'know-memory',        path: '/knowledge/memory',        label: 'Org Memory',     minTier: 'admin' },

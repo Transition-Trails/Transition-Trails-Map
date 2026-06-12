@@ -1,8 +1,9 @@
-import { BookOpen, Database, GitBranch, Archive, BookMarked, Network, Target } from 'lucide-react';
+import { BookOpen, Database, GitBranch, Archive, BookMarked, Network, Target, LayoutDashboard } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import KnowledgeOverview      from '@/pages/knowledge/KnowledgeOverview';
 import KnowledgeWorkspace     from '@/pages/knowledge/KnowledgeWorkspace';
 import KnowledgeRelationships from '@/pages/navigator/KnowledgeRelationships';
 import LibraryDocuments       from '@/pages/library/LibraryDocuments';
@@ -77,10 +78,11 @@ export default function KnowledgeHub() {
         { id: 'library', label: 'Documents', path: '/knowledge/library', icon: BookMarked, content: <LibraryDocuments /> },
       ]
     : [
-        { id: 'sources',       label: 'Sources',       path: '/knowledge',               icon: Database,   content: <KnowledgeWorkspace /> },
-        { id: 'library',       label: 'Library',        path: '/knowledge/library',       icon: BookMarked, content: <LibraryDocuments /> },
-        { id: 'relationships', label: 'Relationships',  path: '/knowledge/relationships', icon: GitBranch,  content: <KnowledgeRelationships /> },
-        { id: 'memory',        label: 'Org Memory',     path: '/knowledge/memory',        icon: Archive,    content: <OrgMemoryPlaceholder /> },
+        { id: 'overview',      label: 'Overview',       path: '/knowledge',               icon: LayoutDashboard, content: <KnowledgeOverview /> },
+        { id: 'sources',       label: 'Sources',        path: '/knowledge/sources',       icon: Database,        content: <KnowledgeWorkspace /> },
+        { id: 'library',       label: 'Library',        path: '/knowledge/library',       icon: BookMarked,      content: <LibraryDocuments /> },
+        { id: 'relationships', label: 'Relationships',  path: '/knowledge/relationships', icon: GitBranch,       content: <KnowledgeRelationships /> },
+        { id: 'memory',        label: 'Org Memory',     path: '/knowledge/memory',        icon: Archive,         content: <OrgMemoryPlaceholder /> },
       ];
 
   return (
