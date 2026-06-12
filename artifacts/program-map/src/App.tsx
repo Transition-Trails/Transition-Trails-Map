@@ -125,6 +125,11 @@ function Router() {
       <Route path="/admin/comm-routing">          <Redirect to="/collaboration/channels" /></Route>
       <Route path="/admin/comm-templates">        <Redirect to="/collaboration/templates" /></Route>
       <Route path="/admin/program-resources">     <Redirect to="/program/resources" /></Route>
+      {/* Removed stub pages — redirect to canonical locations */}
+      <Route path="/admin/roles">     <Redirect to="/admin/access-roles" /></Route>
+      <Route path="/admin/penny">     <Redirect to="/penny" /></Route>
+      <Route path="/admin/settings">  <Redirect to="/admin" /></Route>
+      <Route path="/admin/templates"> <Redirect to="/knowledge/library" /></Route>
 
       {/* Root-level legacy aliases */}
       <Route path="/trail-os-penny">  <Redirect to="/penny/trail-os-map" /></Route>

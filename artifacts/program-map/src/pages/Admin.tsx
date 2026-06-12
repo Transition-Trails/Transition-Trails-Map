@@ -76,7 +76,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
   const [, setLocation] = useLocation();
   const { programs, sourceDocuments, resolvePhases, pennyCapabilities, trailOsCapabilities, openSlackPanel } = useAppContext();
 
-  const areas: {
+  const cmsAreas: {
     id: AdminView;
     icon: React.ReactNode;
     label: string;
@@ -88,11 +88,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
     {
       id: 'programs',
       icon: <Layers className="w-5 h-5" />,
-      label: 'Programs',
+      label: 'Program Records',
       count: programs.length,
       borderColor: 'border-primary/20 hover:border-primary/40',
       iconBg: 'bg-primary/10 text-primary',
-      description: 'Edit program cards — strategic roles, core outcomes, audience, duration, and confidence status.',
+      description: 'Edit program cards — strategic roles, core outcomes, audience, duration, and confidence status. Canonical CMS for program data.',
     },
     {
       id: 'documents',
@@ -115,11 +115,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
     {
       id: 'penny',
       icon: <Brain className="w-5 h-5" />,
-      label: 'Penny AI Capabilities',
+      label: 'Penny Capability Records',
       count: pennyCapabilities.length,
       borderColor: 'border-amber-200 hover:border-amber-400',
       iconBg: 'bg-amber-50 text-amber-700',
-      description: 'Manage Penny AI capability records — purpose, executive summary, why it matters, key facts, and program connections.',
+      description: 'Edit Penny AI capability records — purpose, executive summary, key facts, and program connections. Canonical CMS for Penny data.',
     },
     {
       id: 'trailOs',
@@ -133,65 +133,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
     {
       id: 'integrations',
       icon: <Plug className="w-5 h-5" />,
-      label: 'Integrations',
+      label: 'Integration Config',
       count: 1,
       borderColor: 'border-border hover:border-border/60',
       iconBg: 'bg-muted text-muted-foreground',
-      description: 'Configure external integrations — Salesforce Cases Kanban and future data connections. Currently future-state only.',
-    },
-    {
-      id: 'roles' as AdminView,
-      icon: <Users className="w-5 h-5" />,
-      label: 'Roles',
-      count: 0,
-      borderColor: 'border-violet-200 hover:border-violet-400',
-      iconBg: 'bg-violet-50 text-violet-700',
-      description: 'Define organizational roles across programs, RESOLVE methodology, Penny, and Trail OS operations.',
-    },
-    {
-      id: 'templates' as AdminView,
-      icon: <Copy className="w-5 h-5" />,
-      label: 'Templates',
-      count: 0,
-      borderColor: 'border-emerald-200 hover:border-emerald-400',
-      iconBg: 'bg-emerald-50 text-emerald-700',
-      description: 'Manage document and deliverable templates — future sync from Google Drive.',
-    },
-    {
-      id: 'users' as AdminView,
-      icon: <User className="w-5 h-5" />,
-      label: 'Users',
-      count: 0,
-      borderColor: 'border-border hover:border-border/60',
-      iconBg: 'bg-muted text-muted-foreground',
-      description: 'Manage Trail OS platform users, access levels, and account provisioning.',
-    },
-    {
-      id: 'permissions' as AdminView,
-      icon: <Shield className="w-5 h-5" />,
-      label: 'Permissions',
-      count: 0,
-      borderColor: 'border-border hover:border-border/60',
-      iconBg: 'bg-muted text-muted-foreground',
-      description: 'Configure role-based access permissions for all Trail OS platform sections.',
-    },
-    {
-      id: 'settings' as AdminView,
-      icon: <Sliders className="w-5 h-5" />,
-      label: 'Settings',
-      count: 0,
-      borderColor: 'border-border hover:border-border/60',
-      iconBg: 'bg-muted text-muted-foreground',
-      description: 'Global platform settings — branding, environment configuration, and system preferences.',
-    },
-    {
-      id: 'access' as AdminView,
-      icon: <Shield className="w-5 h-5" />,
-      label: 'Access & Roles',
-      count: 4,
-      borderColor: 'border-indigo-200 hover:border-indigo-400',
-      iconBg: 'bg-indigo-50 text-indigo-700',
-      description: 'Google Groups → Trail OS role mapping, navigation visibility matrix, feature capabilities, and Google Sign-In setup.',
+      description: 'Configure external integration data settings — Salesforce Cases Kanban field mapping and future data connections.',
     },
   ];
 
@@ -205,7 +151,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration</p>
               <h1 className="text-base font-semibold text-foreground">Knowledge Management</h1>
               <p className="text-[12px] text-muted-foreground mt-0.5">
-                Edit dashboard content — programs, documents, capabilities, and frameworks.
+                Admin &amp; Super Admin functions — data editing, access control, integration credentials, and system readiness.
               </p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -223,33 +169,116 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             </div>
           </div>
 
-          {/* 3-column card grid */}
-          <div className="grid grid-cols-3 gap-3">
-            {areas.map(area => (
-              <button
-                key={area.id}
-                onClick={() => onNavigate(area.id)}
-                className={`text-left p-4 rounded-lg border bg-card transition-all duration-150 hover:shadow-sm group ${area.borderColor}`}
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${area.iconBg}`}>
-                    {area.icon}
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold tabular-nums">{area.count}</Badge>
+          {/* Canonical page map */}
+          <div className="mb-5 rounded-lg border border-border/50 bg-muted/20 p-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2.5">Canonical Page Map — one home per concept</p>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
+              {([
+                { concept: 'Program operations & blueprints',  path: '/program' },
+                { concept: 'Program data records (CMS edit)',  path: '/admin → Program Records' },
+                { concept: 'Penny capabilities & AI ops',      path: '/penny' },
+                { concept: 'Penny capability records (CMS)',   path: '/admin → Penny Capability Records' },
+                { concept: 'People, personas & org roles',     path: '/admin/people' },
+                { concept: 'Role-based access control',        path: '/admin/access-roles' },
+                { concept: 'Source docs & knowledge',          path: '/knowledge' },
+                { concept: 'Integration credentials & auth',   path: '/admin/secrets-audit' },
+              ] as const).map(row => (
+                <div key={row.concept} className="flex items-center gap-2 text-[11px]">
+                  <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />
+                  <span className="text-muted-foreground flex-1">{row.concept}</span>
+                  <code className="text-[10px] font-mono text-foreground bg-background border border-border/40 px-1.5 py-0.5 rounded shrink-0 ml-2">{row.path}</code>
                 </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">{area.label}</p>
-                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">{area.description}</p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Manage</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Integration & Readiness tools */}
+          {/* ── Section 1: Knowledge Management CMS ── */}
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Knowledge Management</p>
+            <div className="grid grid-cols-3 gap-3">
+              {cmsAreas.map(area => (
+                <button
+                  key={area.id}
+                  onClick={() => onNavigate(area.id)}
+                  className={`text-left p-4 rounded-lg border bg-card transition-all duration-150 hover:shadow-sm group ${area.borderColor}`}
+                >
+                  <div className="flex items-start justify-between mb-2.5">
+                    <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${area.iconBg}`}>
+                      {area.icon}
+                    </div>
+                    <Badge variant="secondary" className="text-xs font-semibold tabular-nums">{area.count}</Badge>
+                  </div>
+                  <p className="font-semibold text-foreground text-sm mb-1.5">{area.label}</p>
+                  <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">{area.description}</p>
+                  <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                    <span>Manage</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Section 2: Platform Administration ── */}
           <div className="mt-5">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Integration &amp; Readiness</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Platform Administration</p>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => onNavigate('access')}
+                className="text-left p-4 rounded-lg border bg-card border-indigo-200 hover:border-indigo-400 transition-all duration-150 hover:shadow-sm group"
+              >
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-700">
+                    <Shield className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">4 tiers</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Access &amp; Roles</p>
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Google Groups → Trail OS tier mapping, navigation visibility matrix, and feature capability grid by access level.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => setLocation('/admin/people')}
+                className="text-left p-4 rounded-lg border bg-card border-violet-200 hover:border-violet-400 transition-all duration-150 hover:shadow-sm group"
+              >
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-violet-50 text-violet-700">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Roles</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">People &amp; Roles</p>
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Personas, organizational roles, and platform user archetypes. Canonical page for who uses Trail OS and how each role interacts with the platform.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+
+              <div className="p-4 rounded-lg border border-dashed border-border/50 bg-muted/10">
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-muted/60 text-muted-foreground/50">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold text-muted-foreground/60">Phase 2</Badge>
+                </div>
+                <p className="font-semibold text-muted-foreground/50 text-sm mb-1.5">Platform Controls</p>
+                <p className="text-[12px] text-muted-foreground/40 leading-snug">
+                  User provisioning, permissions configuration, settings, and template management — planned for Phase 2.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Section 3: Integration & Credentials ── */}
+          <div className="mt-5">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Integration &amp; Credentials</p>
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setLocation('/admin/secrets-audit')}
@@ -262,12 +291,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <Badge variant="secondary" className="text-xs font-semibold">Live</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Secrets Audit</p>
-                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
+                <p className="text-[12px] text-muted-foreground leading-snug">
                   Two-layer audit of all integration secrets — presence &amp; format check plus live API validation for Gemini and Google.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
 
@@ -282,15 +310,39 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <Badge variant="secondary" className="text-xs font-semibold">OAuth</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Google Auth Setup</p>
-                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
-                  Step-by-step Google OAuth wizard — displays the exact redirect URI, runs the authorization flow, and reveals the refresh token once for Replit Secrets.
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Step-by-step Google OAuth wizard — redirect URI, authorization flow, and one-time refresh token retrieval for Replit Secrets.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
 
+              <button
+                onClick={() => setLocation('/admin/create-audit')}
+                className="text-left p-4 rounded-lg border bg-card border-slate-200 hover:border-slate-400 transition-all duration-150 hover:shadow-sm group"
+              >
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-slate-50 text-slate-600">
+                    <Plus className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Audit</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Create Actions Audit</p>
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Full audit of every create/add action across Trail OS — workspaces covered, object types, entry points, and read-only views.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* ── Section 4: Readiness & Planning ── */}
+          <div className="mt-5">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Readiness &amp; Planning</p>
+            <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setLocation('/admin/phase1-readiness')}
                 className="text-left p-4 rounded-lg border bg-card border-amber-200 hover:border-amber-400 transition-all duration-150 hover:shadow-sm group"
@@ -302,32 +354,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <Badge variant="secondary" className="text-xs font-semibold">Phase 1</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Phase 1 Readiness</p>
-                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
-                  Architecture consolidation readiness dashboard — integration scores, capability progress, and blockers across all Phase 1 workstreams.
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Architecture consolidation readiness — integration scores, capability progress, and blockers across all Phase 1 workstreams.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setLocation('/admin/create-audit')}
-                className="text-left p-4 rounded-lg border bg-card border-emerald-200 hover:border-emerald-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-700">
-                    <Plus className="w-5 h-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Audit</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Create Actions Audit</p>
-                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
-                  Full audit of every create/add action across Trail OS — workspaces covered, object types, entry points, and read-only views by design.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
 
@@ -342,21 +373,14 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <Badge variant="secondary" className="text-xs font-semibold">Standards</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Phase 1 UX Standards</p>
-                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
-                  Codified design rules for Trail OS Phase 1 — navigation, layout, role-aware views, right panel, language, responsiveness, and the mobile-first future plan.
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Codified design rules for Trail OS Phase 1 — navigation, layout, role-aware views, right panel, language, and responsiveness.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
-            </div>
-          </div>
 
-          {/* Phase 2 Planning */}
-          <div className="mt-5">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Planning</p>
-            <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setLocation('/admin/phase2-backlog')}
                 className="text-left p-4 rounded-lg border bg-card border-stone-200 hover:border-stone-400 transition-all duration-150 hover:shadow-sm group"
@@ -368,12 +392,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <Badge variant="secondary" className="text-xs font-semibold">Phase 2</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Phase 2 Backlog</p>
-                <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">
-                  10 draft feature cards for Phase 2 — Penny panel, Trail Signals control, Gmail & Calendar panels, Google Auth, Mural, mobile experience, and more.
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  10 draft feature cards for Phase 2 — Penny panel, Trail Signals control, Gmail &amp; Calendar panels, Google Auth, Mural, and more.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
             </div>
@@ -407,12 +430,12 @@ function AreaEditor({
 
   const areaLabels: Record<AdminView, string> = {
     home: '',
-    programs: 'Programs',
+    programs: 'Program Records',
     documents: 'Source Documents',
     resolve: 'RESOLVE Framework',
-    penny: 'Penny AI Capabilities',
+    penny: 'Penny Capability Records',
     trailOs: 'Trail OS Capabilities',
-    integrations: 'Integrations',
+    integrations: 'Integration Config',
     roles: 'Roles',
     templates: 'Templates',
     users: 'Users',
@@ -429,7 +452,7 @@ function AreaEditor({
         <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-card flex-shrink-0">
           <button onClick={onBack} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" />
-            Knowledge Base
+            Administration
           </button>
           <span className="text-muted-foreground/40">/</span>
           <span className="text-xs font-medium text-foreground">{areaLabels[view]}</span>
