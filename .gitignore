@@ -41,6 +41,18 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Environment variables — NEVER commit secrets
+.env
+.env.*
+!.env.example
+
+# Private keys and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*service-account*.json
+
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
