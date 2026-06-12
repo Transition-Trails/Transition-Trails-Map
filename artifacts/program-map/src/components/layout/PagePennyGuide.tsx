@@ -41,11 +41,11 @@ const SOURCE_ICO = {
 type SigSource = keyof typeof SOURCE_ICO;
 
 const SOURCE_CONNECT: Record<SigSource, { status: string; cls: string; dotCls: string; link?: string }> = {
-  slack:      { status: 'Prototype-Ready', cls: 'text-amber-600',        dotCls: 'bg-amber-400',          link: 'https://transitiontrails.slack.com' },
+  slack:      { status: 'Live (POC)',      cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://transitiontrails.slack.com' },
   drive:      { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://drive.google.com' },
   calendar:   { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://calendar.google.com' },
   email:      { status: 'Phase 2',         cls: 'text-muted-foreground', dotCls: 'bg-muted-foreground/30' },
-  salesforce: { status: 'Prototype',       cls: 'text-sky-600',          dotCls: 'bg-sky-400' },
+  salesforce: { status: 'Live',            cls: 'text-emerald-600',      dotCls: 'bg-emerald-500' },
 };
 
 type SigItem = {
@@ -67,14 +67,14 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: "Explorer's Trail Cohort 3 — 3 enrollment slots open",          meta: '8h ago',  why: 'Penny tracks Salesforce enrollment records to surface open capacity for outreach or cohort planning' },
   ],
   programs: [
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before Q3',      meta: '1h ago',  why: 'Salesforce execution phases require documentation records — Penny flags these as blockers to Q3 delivery' },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before execute phase can proceed', meta: '1h ago',  why: 'Salesforce execution phases require documentation records — Penny flags these as blockers to program delivery' },
     { urgent: false, source: 'slack',      text: "Explorer's Trail Cohort 3 — enrollment at 80%",                meta: '2h ago',  why: 'Penny watches cohort enrollment channels to surface capacity trends across active programs' },
     { urgent: false, source: 'drive',      text: 'Content standards: 4 items pending review',                    meta: '4h ago',  why: 'Penny reads Drive metadata to surface content quality review backlogs before they affect delivery' },
     { urgent: false, source: 'calendar',   text: 'Sprint 3 review scheduled — Thursday',                         meta: '5h ago',  why: 'Penny reads Calendar to surface program milestone timing and flag missing reviews' },
   ],
   penny: [
     { urgent: true,  source: 'slack',      text: 'Learning Coach: confidence flag on Cohort 3 recap',            meta: '8m ago',  why: "Penny self-monitors its own Learning Coach output to flag when its recommendations may need human verification" },
-    { urgent: false, source: 'salesforce', text: '14 capabilities pending Agentforce integration (Q3 2025)',      meta: '2h ago',  why: 'Penny tracks Agentforce readiness in Salesforce to surface integration blockers before Q3 launch' },
+    { urgent: false, source: 'salesforce', text: 'Gemini API key format updated — add new key from aistudio.google.com to unblock live Penny responses', meta: '2h ago',  why: 'Penny monitors API key status so the team knows when a live key update will unblock end-to-end capability testing' },
     { urgent: false, source: 'slack',      text: 'Test Penny: 12 prototype queries this week',                   meta: '3h ago',  why: 'Penny monitors its own usage in test channels to measure adoption and identify capability gaps' },
     { urgent: false, source: 'drive',      text: 'Trail Quest capability spec updated',                          meta: '5h ago',  why: 'Penny watches Drive for spec updates to its own capability definitions so guidance stays current' },
     { urgent: false, source: 'salesforce', text: 'Penny interaction log: 234 this week',                         meta: '8h ago',  why: 'Penny reads its interaction log from Salesforce to surface usage patterns for system improvement' },
@@ -82,7 +82,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   operations: [
     { urgent: true,  source: 'salesforce', text: 'Trail of Mastery execute phase: source docs required',         meta: '1h ago',  why: 'Penny flags Salesforce phase blockers that prevent program delivery from moving forward' },
     { urgent: false, source: 'slack',      text: '2 demand change requests unassigned in queue',                 meta: '3h ago',  why: 'Penny monitors demand channels to flag unassigned work that may accumulate into delivery delays' },
-    { urgent: false, source: 'calendar',   text: 'Q3 sprint review not yet scheduled',                           meta: '4h ago',  why: 'Penny reads Calendar to surface missing milestone events before they become launch blockers' },
+    { urgent: false, source: 'salesforce', text: 'Salesforce live — wire first data query to health dashboard',   meta: '4h ago',  why: 'Penny monitors integration status so the team knows when live data can replace prototype figures in the health dashboard' },
     { urgent: false, source: 'drive',      text: 'Integration readiness: 5 checklist items open',                meta: '6h ago',  why: 'Penny reads Drive checklists to surface open operational items affecting integration timelines' },
     { urgent: false, source: 'salesforce', text: 'Foundations Trail capacity alert: 89%',                        meta: '8h ago',  why: 'Penny monitors Salesforce cohort records to flag when enrollment is approaching its limit' },
   ],
@@ -93,14 +93,14 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: 'Org Memory: 234 Penny interactions logged this week',          meta: '6h ago',  why: "Penny reads its interaction log to identify knowledge gaps and improve future answers" },
   ],
   collaboration: [
-    { urgent: false, source: 'slack',      text: 'Slack activation ready — awaiting Q3 go-live',                 meta: '1h ago',  why: 'Penny monitors Slack integration status — once live, Penny will send reminders and cohort updates through Slack' },
+    { urgent: false, source: 'slack',      text: '@coachconnectbot live in Penny AI + Admin channels — Slack POC confirmed',  meta: '1h ago',  why: 'Penny monitors Slack bot status — the POC is confirmed and Penny delivery can now be wired to the live bot' },
     { urgent: false, source: 'calendar',   text: 'Sprint 3 Resume Workshop — Thursday 10am',                     meta: '2h ago',  why: 'Penny reads Calendar to surface upcoming collaborative sessions so you can prepare' },
     { urgent: false, source: 'slack',      text: '#guided-trail-cohort-1: Week 3 message from coach',            meta: '4h ago',  why: 'Penny monitors cohort channels to surface coach communications that may need a follow-up' },
     { urgent: false, source: 'drive',      text: '7 message templates ready for testing',                        meta: '6h ago',  why: 'Penny watches template folders to surface communication assets that are ready to use or review' },
   ],
   admin: [
-    { urgent: false, source: 'slack',      text: 'Phase 1 readiness: 3 of 8 integration checks complete',        meta: '2h ago',  why: 'Penny tracks readiness checklist progress in admin channels to surface Phase 1 launch status' },
-    { urgent: false, source: 'calendar',   text: 'Q3 launch review not yet scheduled',                           meta: '4h ago',  why: 'Penny watches Calendar to flag missing launch milestone events before they become timeline risks' },
+    { urgent: false, source: 'salesforce', text: 'Salesforce fully connected — REST API live, PMM + NPSP confirmed', meta: '2h ago',  why: 'Penny monitors integration state to surface when platform dependencies unblock the next wave of live data wiring' },
+    { urgent: false, source: 'slack',      text: 'Phase 2 backlog: 10 draft features captured at /admin/phase2-backlog', meta: '4h ago', why: 'Penny tracks backlog progress in admin channels so the team can see which deferred features are queued and ready to scope' },
     { urgent: false, source: 'drive',      text: 'Secrets audit: last run 3 days ago',                           meta: '6h ago',  why: 'Penny monitors Drive audit logs to surface security hygiene status for the admin team' },
   ],
   'digital-twin': [
@@ -137,7 +137,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     powerInsights: [
       '5 open demand items — 2 change requests awaiting triage',
-      'Trail of Mastery · Execute phase needs source documentation before Q3 review',
+      'Trail of Mastery · Execute phase needs source documentation before delivery can proceed',
       '234 Penny interactions this week · 1 Learning Coach confidence flag',
       'Foundations Trail Cohort 2 approaching capacity (89%)',
     ],
@@ -157,7 +157,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Penny activity log',     path: '/penny/intelligence' },
     ],
     everydayCanned: "Your programs are on track this week. Guided Trail Cohort 1 is in Week 3 with all materials uploaded. Your next session is the Sprint 3 Resume Workshop on Thursday. Foundations Trail is nearly full — you may want to check if any colleagues need enrollment support.",
-    powerCanned:    "Current priority: Trail of Mastery execute phase needs source documentation before Q3. 2 change requests are unassigned. Penny flagged 1 Learning Coach confidence issue — review at /penny/intelligence.",
+    powerCanned:    "Current priority: Trail of Mastery execute phase needs source documentation before delivery can proceed. 2 change requests are unassigned. Penny flagged 1 Learning Coach confidence issue — review at /penny/intelligence.",
   },
   programs: {
     everydayInsights: [
@@ -185,7 +185,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Program blueprint',  path: '/program/blueprint' },
     ],
     everydayCanned: "Each program has a structured curriculum, cohort schedule, and Penny support built in. Your active programs have all materials for this sprint uploaded.",
-    powerCanned:    "Programs overview: Explorer's Trail has the most complete Salesforce mapping. Trail of Mastery execute phase needs source documentation before Q3 review. Content standards flagged 4 items needing updates.",
+    powerCanned:    "Programs overview: Explorer's Trail has the most complete Salesforce mapping. Trail of Mastery execute phase needs source documentation before delivery can proceed. Content standards flagged 4 items needing updates.",
   },
   penny: {
     everydayInsights: [
@@ -197,7 +197,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       '22 Penny capabilities mapped — 8 in prototype, 14 planned',
       'Learning Coach capability: 1 confidence flag this week',
       'Trail Quest and Assessment capabilities are POC-ready',
-      'Agentforce integration planned Q3 — live Salesforce data coming',
+      'Salesforce live — SF Data Intelligence capability can now be wired to real data',
     ],
     attentionItems: [
       { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: '1 Learning Coach confidence flag this week' },
@@ -213,7 +213,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Intelligence dashboard', path: '/penny/intelligence' },
     ],
     everydayCanned: "I'm Penny — here to guide you through your program, help find resources, and answer questions. Try asking about your current sprint, upcoming sessions, or anything in the Knowledge Library.",
-    powerCanned:    "Penny status: Learning Coach, Trail Quest, and Assessment capabilities are in prototype. 14 more planned pending Agentforce integration in Q3. The confidence flag on Learning Coach relates to Cohort 3 recap scoring — review at /penny/intelligence.",
+    powerCanned:    "Penny status: Learning Coach, Trail Quest, and Assessment capabilities are in prototype. Salesforce is live — SF Data Intelligence can now be wired to real data. The confidence flag on Learning Coach relates to Cohort 3 recap scoring — review at /penny/intelligence.",
   },
   operations: {
     everydayInsights: [
@@ -222,9 +222,9 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     powerInsights: [
       'Health status: 3 active, 1 in discovery, 1 in planning',
-      'Integration readiness: Salesforce connected (prototype), Google Workspace Q3',
+      'Integration readiness: Salesforce live (REST API), Google OAuth in progress',
       '5 open demand items — 2 flagged for follow-up',
-      'Trail of Mastery execute phase needs attention before Q3',
+      'Trail of Mastery execute phase needs source documentation before delivery',
     ],
     attentionItems: [
       { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',   iconCls: 'text-amber-500', text: 'Execute phase — source documentation needed' },
@@ -237,7 +237,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Demand overview',       path: '/operations/demand' },
     ],
     everydayCanned: "Operations are running normally. Guided Trail Cohort 1 is in Week 3 of 8 and on track. Your next milestone is Sprint 3 on Thursday.",
-    powerCanned:    "Ops summary: 3 programs in active delivery. Trail of Mastery execute phase is top priority — source documentation needed before Q3. Google Workspace SSO coming Q3.",
+    powerCanned:    "Ops summary: 3 programs in active delivery. Trail of Mastery execute phase is top priority — source documentation needed before delivery. Salesforce live — wire first data query to health dashboard at /api/salesforce/validate.",
   },
   knowledge: {
     everydayInsights: [
@@ -269,17 +269,17 @@ const CONTENT: Record<PageCtx, PageContent> = {
   collaboration: {
     everydayInsights: [
       'Google Calendar shows your next session: Sprint 3 Resume Workshop — Thursday',
-      'Slack channels for your programs are coming Q3 2025',
-      'Penny will send session reminders once Slack integration is live',
+      '@coachconnectbot is live in Slack — Penny can send session reminders once delivery pipeline is wired',
+      'Message templates ready — wire Penny output to @coachconnectbot to activate broadcasts',
     ],
     powerInsights: [
-      'Slack integration: prototype-ready, activation planned Q3 2025',
-      'Google Calendar: connected for timing context; event-write coming Q3',
-      '3 communication routes defined — all in prototype status',
+      'Slack live (POC) — @coachconnectbot posting to Penny AI + Admin channels',
+      'Google Calendar: connected for timing context',
+      '3 communication routes defined — ready to wire Penny output to Slack delivery',
       '7 message templates ready for testing',
     ],
     attentionItems: [
-      { icon: Lightbulb,    bg: 'bg-sky-50 border-sky-200',          iconCls: 'text-sky-500',     text: 'Slack activation ready — awaiting Q3 go-live' },
+      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Slack live — @coachconnectbot posting to Penny AI + Admin' },
       { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Google Calendar connected for session timing' },
     ],
     everydaySteps: [{ label: 'View Google Calendar', path: '/collaboration/calendar' }],
@@ -287,26 +287,28 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Slack integration', path: '/collaboration/slack' },
       { label: 'Message templates', path: '/collaboration/templates' },
     ],
-    everydayCanned: "Google Calendar is connected and shows your upcoming sessions. Slack channels for your programs will be activated in Q3 2025 — Penny will send reminders and updates through there.",
-    powerCanned:    "Collaboration stack: Google Calendar is connected. Slack is prototype-ready — Q3 go-live. 3 communication routes and 7 message templates defined and ready to test.",
+    everydayCanned: "Google Calendar is connected and shows your upcoming sessions. Slack @coachconnectbot is live — once Penny's output is wired to Slack delivery, reminders and updates will go through there automatically.",
+    powerCanned:    "Collaboration stack: Slack live (POC confirmed — @coachconnectbot posting). Google Calendar connected. 3 communication routes and 7 message templates defined. Next: wire Penny capability output to Slack delivery pipeline.",
   },
   admin: {
     everydayInsights: [],
     powerInsights: [
-      'Phase 1 readiness: 3 of 8 integration checks complete',
-      'Google OAuth setup available — configure at /admin/google-oauth',
-      'Access roles matrix reviewed and up to date',
+      'Salesforce live — REST API connected, PMM + NPSP confirmed. Next: wire to dashboard.',
+      'Slack live (POC) — @coachconnectbot posting. Next: add channels:read scope.',
+      'Google OAuth setup available — run at /admin/google-oauth to get refresh tokens',
+      'Phase 2 backlog: 10 draft features captured at /admin/phase2-backlog',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200', iconCls: 'text-amber-500', text: 'Phase 1 readiness: 3 of 8 items complete' },
+      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Salesforce live — REST API + PMM confirmed' },
     ],
     everydaySteps: [],
     powerSteps: [
       { label: 'Phase 1 readiness', path: '/admin/phase1-readiness' },
+      { label: 'Phase 2 backlog',   path: '/admin/phase2-backlog' },
       { label: 'Google Auth setup', path: '/admin/google-oauth' },
     ],
     everydayCanned: "",
-    powerCanned:    "Admin status: Phase 1 readiness at 3 of 8 checks. Google OAuth is configured and ready to test. Next: complete Google Workspace SSO before Q3 launch.",
+    powerCanned:    "Admin status: Salesforce live (REST API + PMM). Slack POC confirmed (@coachconnectbot). Google OAuth client ready — run /admin/google-oauth to get refresh tokens. Phase 2 backlog: 10 draft features at /admin/phase2-backlog.",
   },
   'digital-twin': {
     everydayInsights: [],
@@ -540,7 +542,7 @@ export function PagePennyGuide() {
                       {/* Footer — close + context note */}
                       <div className="px-3 py-2 bg-muted/20 flex items-center justify-between gap-2">
                         <p className="text-[9px] text-muted-foreground/40 leading-snug">
-                          Phase 1 · Prototype data — live connections Q3 2025
+                          Phase 1 · Salesforce + Slack live · Google OAuth in progress
                         </p>
                         <button
                           onClick={toggleSignals}
@@ -594,7 +596,7 @@ export function PagePennyGuide() {
               {isPowerOrAbove && (
                 <div className="rounded-md bg-muted/30 border border-border/50 p-2.5">
                   <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
-                    <span className="font-semibold text-muted-foreground/70">Prototype mode</span> — Salesforce, Agentforce, and GA4 connections planned Q3–Q4 2025. Select any item to open its Trail Insights.
+                    <span className="font-semibold text-muted-foreground/70">Salesforce + Slack live.</span> Google OAuth in progress. Agentforce + GA4: Phase 2. Select any item to open its Trail Insights.
                   </p>
                 </div>
               )}
@@ -652,7 +654,7 @@ export function PagePennyGuide() {
                 </button>
               </div>
               <p className="text-[9px] text-muted-foreground/40 leading-snug">
-                Phase 1 · Prototype responses — Live Agentforce Q3 2025
+                Phase 1 · Prototype responses — new Gemini key needed · Agentforce: Phase 2
               </p>
             </div>
 

@@ -450,7 +450,7 @@ export function ContextPanel() {
             {data.commChannels?.length > 0 && (
               <div>
                 <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
-                  Slack Channels <span className="text-muted-foreground/50 normal-case font-normal">(Planned Q3 2025)</span>
+                  Slack Channels <span className="text-muted-foreground/50 normal-case font-normal">(Live — @coachconnectbot active)</span>
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {data.commChannels.map((c: string) => (
@@ -534,7 +534,7 @@ export function ContextPanel() {
                 <div>
                   <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
                     Slack Channels{' '}
-                    <span className="normal-case text-muted-foreground/50 font-normal">(Planned Q3 2025)</span>
+                    <span className="normal-case text-muted-foreground/50 font-normal">(Live — @coachconnectbot active)</span>
                   </span>
                   <div className="flex flex-wrap gap-1">
                     {(data.commChannels as string[]).map((c) => (
@@ -556,7 +556,7 @@ export function ContextPanel() {
                 </div>
               )}
 
-              <p className="text-[11px] text-muted-foreground/50">Prototype · Future: Salesforce MCP · Knowledge links</p>
+              <p className="text-[11px] text-muted-foreground/50">Salesforce REST API live · Future: Salesforce MCP · Knowledge links</p>
             </div>
           </ScrollArea>
         );
@@ -754,7 +754,7 @@ export function ContextPanel() {
               {(data.commChannels as string[])?.length > 0 ? (
                 <div className="space-y-2">
                   <div>
-                    <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 mb-1">Slack (Planned Q3 2025)</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 mb-1">Slack (Live — @coachconnectbot active)</p>
                     <div className="flex flex-wrap gap-1">
                       {(data.commChannels as string[]).map((c) => (
                         <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">#{c.replace(/^#/, '')}</Badge>
@@ -764,7 +764,7 @@ export function ContextPanel() {
                   <p className="text-[10px] text-muted-foreground">Google Chat: Q4 2025+ · Reminders, alerts, digests · channel-agnostic model</p>
                 </div>
               ) : (
-                <p className="text-[11px] text-muted-foreground/60">No channels configured · Future: Slack Q3 2025 · Google Chat Q4 2025+</p>
+                <p className="text-[11px] text-muted-foreground/60">No channels configured · Slack live (@coachconnectbot) · Google Chat: Phase 2</p>
               )}
             </div>
 
@@ -1909,7 +1909,7 @@ function HomeWelcomeGuide() {
 
         <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            <strong>Prototype Mode —</strong> Salesforce, Agentforce, and GA4 connections planned Q3–Q4 2025.
+            <strong>Salesforce live</strong> (REST API + PMM confirmed). Agentforce + GA4: Phase 2.
           </p>
         </div>
 
@@ -1988,7 +1988,7 @@ function CommsBriefGuide() {
 
         <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            <strong>Prototype mode —</strong> No live connections. Slack adapter planned Q3 2025. Google Chat and Calendar to follow.
+            <strong>Slack live</strong> (@coachconnectbot active). Google Calendar + Drive OAuth in progress. Google Chat: Phase 2.
           </p>
         </div>
 

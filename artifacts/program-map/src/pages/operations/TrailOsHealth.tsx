@@ -3,12 +3,12 @@ import { OpsHeader, StatCard, StatusDot } from '@/components/platform/PageShell'
 import { Badge } from '@/components/ui/badge';
 
 const integrations = [
-  { name: 'Salesforce MCP',   status: 'Not Connected', eta: 'Q3 2025', dot: 'gray' as const, note: 'Cases, leads, opportunities, contacts' },
-  { name: 'GA4 via Zapier',   status: 'Not Connected', eta: 'Q3 2025', dot: 'gray' as const, note: 'Web analytics, goal tracking' },
-  { name: 'Google Drive',     status: 'Not Connected', eta: 'Q3 2025', dot: 'gray' as const, note: 'Document sync, template library' },
-  { name: 'Slack',            status: 'Not Connected', eta: 'Q3 2025', dot: 'gray' as const, note: 'Ops alerts, support notifications' },
-  { name: 'Agentforce AI',    status: 'Not Connected', eta: 'Q4 2025', dot: 'gray' as const, note: 'Penny AI capability layer' },
-  { name: 'GitHub Projects',  status: 'Not Connected', eta: 'Q4 2025', dot: 'gray' as const, note: 'Epics, features, stories backlog' },
+  { name: 'Salesforce REST',  status: 'Live',          eta: 'Active',    dot: 'green' as const, note: '127 Accounts · 129 Contacts · NPSP + PMM confirmed via Replit Connector' },
+  { name: 'Slack',            status: 'Live (POC)',    eta: 'Active',    dot: 'green' as const, note: '@coachconnectbot posting to Penny AI + Admin channels — POC confirmed' },
+  { name: 'Google Drive',     status: 'OAuth Pending', eta: 'In Progress', dot: 'amber' as const, note: 'Client configured — GOOGLE_DRIVE_REFRESH_TOKEN not yet obtained' },
+  { name: 'GA4 via Zapier',   status: 'Phase 2',       eta: 'Phase 2',   dot: 'gray' as const,  note: 'Web analytics, goal tracking' },
+  { name: 'Agentforce AI',    status: 'Phase 2',       eta: 'Phase 2',   dot: 'gray' as const,  note: 'Penny AI capability layer' },
+  { name: 'GitHub Projects',  status: 'Phase 2',       eta: 'Phase 2',   dot: 'gray' as const,  note: 'Epics, features, stories backlog' },
 ];
 
 const kbStats = [
@@ -32,7 +32,7 @@ export default function TrailOsHealth() {
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-4 gap-4">
             <StatCard label="System Status"    value="Operational" sub="Running in prototype mode" />
-            <StatCard label="Live Integrations" value="0"           sub="All connections future state" />
+            <StatCard label="Live Integrations" value="2"           sub="Salesforce + Slack confirmed" />
             <StatCard label="KB Items"         value="40"           sub="Across all entity types" />
             <StatCard label="Last Updated"     value="Today"        sub="Admin knowledge base" />
           </div>
@@ -44,7 +44,7 @@ export default function TrailOsHealth() {
             </div>
             <p className="text-xs text-muted-foreground">
               All navigation, knowledge brief, admin management, and RESOLVE framework features are active.
-              Live data integrations are planned for Q3–Q4 2025. No production data flows yet.
+              Salesforce REST API live (Replit Connector). Slack bot confirmed. Google OAuth in progress. Agentforce + GA4: Phase 2.
             </p>
           </div>
 

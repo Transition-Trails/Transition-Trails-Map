@@ -104,10 +104,10 @@ export default function PennyIntegrations() {
           <h2 className="text-sm font-semibold text-foreground mb-3">Other Future Integrations</h2>
           <div className="space-y-2">
             {[
-              { name: 'Agentforce AI',   desc: 'Penny\'s production AI backbone — replaces prototype pattern-matching with live Agentforce LLM', eta: 'Q4 2025' },
-              { name: 'Salesforce',      desc: 'Learner records, case status, and cohort data — feeds Penny context in real time',              eta: 'Q3 2025' },
-              { name: 'Google Drive',    desc: 'Penny knowledge base — source documents synced and indexed for retrieval',                       eta: 'Q3 2025' },
-              { name: 'Zapier',          desc: 'Automation bridge — Penny log export, Slack webhook delivery, and cross-system triggers',        eta: 'Q3 2025' },
+              { name: 'Agentforce AI',   desc: 'Penny\'s production AI backbone — replaces prototype pattern-matching with live Agentforce LLM', eta: 'Phase 2' },
+              { name: 'Salesforce',      desc: 'REST API live (Replit Connector) — wire Penny capability to query learner records and cohort data', eta: 'Wire Now' },
+              { name: 'Google Drive',    desc: 'Penny knowledge base — source documents synced and indexed for retrieval. OAuth client ready.',    eta: 'In Progress' },
+              { name: 'Zapier',          desc: 'Automation bridge — Penny log export, Slack webhook delivery, and cross-system triggers',          eta: 'Phase 2' },
             ].map(int => (
               <div key={int.name} className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border">
                 <StatusDot status="gray" />
