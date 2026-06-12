@@ -276,10 +276,36 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             </div>
           </div>
 
-          {/* ── Section 3: Integration & Credentials ── */}
+          {/* ── Section 3: Setup & Integration ── */}
           <div className="mt-5">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Integration &amp; Credentials</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Setup &amp; Integration</p>
             <div className="grid grid-cols-3 gap-3">
+              {/* Primary Setup entry — spans full row visually as the command center */}
+              <button
+                onClick={() => setLocation('/admin/setup')}
+                className="text-left p-4 rounded-lg border bg-card border-amber-200 hover:border-amber-400 transition-all duration-150 hover:shadow-sm group col-span-3"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-700">
+                      <Plug className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="font-semibold text-foreground text-sm">Setup</p>
+                        <Badge variant="secondary" className="text-xs font-semibold">Command Center</Badge>
+                      </div>
+                      <p className="text-[12px] text-muted-foreground leading-snug max-w-2xl">
+                        One view of every integration, credential, and readiness area — Salesforce, Slack, Google Workspace, Gemini AI, Phase 1 readiness, Phase 2 backlog, UX standards, secrets audit, and access matrix.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 ml-4 text-xs text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0">
+                    <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </button>
+
               <button
                 onClick={() => setLocation('/admin/integration-readiness')}
                 className="text-left p-4 rounded-lg border bg-card border-violet-200 hover:border-violet-400 transition-all duration-150 hover:shadow-sm group"
@@ -288,68 +314,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-violet-50 text-violet-700">
                     <Plug className="w-5 h-5" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">9 integrations</Badge>
+                  <Badge variant="secondary" className="text-xs font-semibold">17 integrations</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Integration Readiness Center</p>
                 <p className="text-[12px] text-muted-foreground leading-snug">
                   Full integration planning workspace — catalog, data flow, auth, field mapping, sync readiness, risk register, testing, and launch planning.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setLocation('/admin/secrets-audit')}
-                className="text-left p-4 rounded-lg border bg-card border-sky-200 hover:border-sky-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-sky-50 text-sky-700">
-                    <Key className="w-5 h-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Live</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Secrets Audit</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
-                  Two-layer audit of all integration secrets — presence &amp; format check plus live API validation for Gemini and Google.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setLocation('/admin/google-oauth')}
-                className="text-left p-4 rounded-lg border bg-card border-emerald-200 hover:border-emerald-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-emerald-50 text-emerald-700">
-                    <Lock className="w-5 h-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">OAuth</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Google Auth Setup</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
-                  Step-by-step Google OAuth wizard — redirect URI, authorization flow, and one-time refresh token retrieval for Replit Secrets.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setLocation('/admin/create-audit')}
-                className="text-left p-4 rounded-lg border bg-card border-slate-200 hover:border-slate-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-slate-50 text-slate-600">
-                    <Plus className="w-5 h-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Audit</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Create Actions Audit</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
-                  Full audit of every create/add action across Trail OS — workspaces covered, object types, entry points, and read-only views.
                 </p>
                 <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
@@ -374,69 +343,46 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
+
+              <button
+                onClick={() => setLocation('/admin/create-audit')}
+                className="text-left p-4 rounded-lg border bg-card border-slate-200 hover:border-slate-400 transition-all duration-150 hover:shadow-sm group"
+              >
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-slate-50 text-slate-600">
+                    <Plus className="w-5 h-5" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-semibold">Audit</Badge>
+                </div>
+                <p className="font-semibold text-foreground text-sm mb-1.5">Create Actions Audit</p>
+                <p className="text-[12px] text-muted-foreground leading-snug">
+                  Full audit of every create/add action across Trail OS — workspaces covered, object types, entry points, and read-only views.
+                </p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
             </div>
-          </div>
 
-          {/* ── Section 4: Readiness & Planning ── */}
-          <div className="mt-5">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Readiness &amp; Planning</p>
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                onClick={() => setLocation('/admin/phase1-readiness')}
-                className="text-left p-4 rounded-lg border bg-card border-amber-200 hover:border-amber-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-700">
-                    <Building2 className="w-5 h-5" />
+            {/* Compact readiness drill-ins */}
+            <div className="mt-2.5 grid grid-cols-3 gap-2">
+              {[
+                { label: 'Phase 1 Readiness',   badge: 'Phase 1',   href: '/admin/phase1-readiness',  cls: 'border-amber-200 hover:border-amber-400'   },
+                { label: 'Phase 1 UX Standards', badge: 'Standards', href: '/admin/ux-standards',      cls: 'border-indigo-200 hover:border-indigo-400'  },
+                { label: 'Phase 2 Backlog',      badge: '10 items',  href: '/admin/phase2-backlog',     cls: 'border-stone-200 hover:border-stone-400'    },
+              ].map(item => (
+                <button
+                  key={item.href}
+                  onClick={() => setLocation(item.href)}
+                  className={`text-left px-3 py-2.5 rounded-md border bg-card transition-all duration-150 hover:shadow-sm group flex items-center justify-between ${item.cls}`}
+                >
+                  <span className="text-[12px] font-medium text-foreground">{item.label}</span>
+                  <div className="flex items-center gap-1.5">
+                    <Badge variant="secondary" className="text-[10px] font-semibold">{item.badge}</Badge>
+                    <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Phase 1</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Phase 1 Readiness</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
-                  Architecture consolidation readiness — integration scores, capability progress, and blockers across all Phase 1 workstreams.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setLocation('/admin/ux-standards')}
-                className="text-left p-4 rounded-lg border bg-card border-indigo-200 hover:border-indigo-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-700">
-                    <Layout className="w-5 h-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Standards</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Phase 1 UX Standards</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
-                  Codified design rules for Trail OS Phase 1 — navigation, layout, role-aware views, right panel, language, and responsiveness.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setLocation('/admin/phase2-backlog')}
-                className="text-left p-4 rounded-lg border bg-card border-stone-200 hover:border-stone-400 transition-all duration-150 hover:shadow-sm group"
-              >
-                <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-stone-50 text-stone-700">
-                    <ListTodo className="w-5 h-5" />
-                  </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Phase 2</Badge>
-                </div>
-                <p className="font-semibold text-foreground text-sm mb-1.5">Phase 2 Backlog</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
-                  10 draft feature cards for Phase 2 — Penny panel, Trail Signals control, Gmail &amp; Calendar panels, Google Auth, Mural, and more.
-                </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                  <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
+                </button>
+              ))}
             </div>
           </div>
 

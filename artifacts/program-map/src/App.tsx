@@ -10,6 +10,7 @@ import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
 import SalesforceMapping          from "@/pages/curriculum/SalesforceMapping";
 import IntegrationReadinessCenter from "@/pages/admin/IntegrationReadinessCenter";
+import AdminSetup                 from "@/pages/admin/AdminSetup";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
@@ -181,6 +182,7 @@ function Router() {
       <Route path="/trail-os-overview"       component={TrailOSOverview} />
 
       {/* Administration */}
+      <Route path="/admin/setup"             component={AdminSetup} />
       <Route path="/admin/salesforce-arch"   component={SalesforceMapping} />
       <Route path="/admin/people"            component={PeopleWorkspace} />
       <Route path="/admin/phase1-readiness"  component={Phase1ReadinessDashboard} />
