@@ -602,7 +602,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-vitest-automation',
     title: 'Automated Test Suite (Vitest)',
-    column: 'Draft',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Add a Vitest test suite to the pnpm workspace — starting from the 70 metadata-driven validation cases already defined in slackIntegrationData.ts and googleCalendarData.ts, expanding to cover API routes, data transformations, and key UI behaviours.',
