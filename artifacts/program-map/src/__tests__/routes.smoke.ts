@@ -36,7 +36,7 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   // ── Operations ────────────────────────────────────────────────────────────
   { path: '/operations',                   kind: 'active' },
   { path: '/operations/:tab',              kind: 'active' },
-  { path: '/operations/integrations',      kind: 'redirect', target: '/admin/integration-readiness' },
+  { path: '/operations/integrations',      kind: 'redirect', target: '/admin/setup',                  note: 'Old ops integrations path → canonical Setup hub' },
 
   // ── Programs ─────────────────────────────────────────────────────────────
   { path: '/program',                      kind: 'active' },

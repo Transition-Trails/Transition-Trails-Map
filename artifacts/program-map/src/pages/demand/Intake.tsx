@@ -114,10 +114,10 @@ function SfCasesStrip() {
   const isStale   = data && data.cacheAge > 5 * 60;
 
   return (
-    <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 overflow-hidden">
+    <div className="rounded-lg border border-emerald-200 bg-white overflow-hidden">
 
-      {/* Header */}
-      <div className="px-3 py-2 border-b border-emerald-200/80 flex items-center justify-between">
+      {/* ── Live SF header bar ─────────────────────────────────────────────── */}
+      <div className="px-3 py-2 border-b border-emerald-200/80 bg-emerald-50/60 flex items-center justify-between">
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
             isLoading || isFetching ? 'bg-amber-400 animate-pulse'
@@ -150,9 +150,12 @@ function SfCasesStrip() {
         </button>
       </div>
 
-      {/* Body */}
+      {/* ── Search / filter controls (future slot) ─────────────────────────── */}
+      {/* Add search input + priority/status filter dropdowns here */}
+
+      {/* ── Body ───────────────────────────────────────────────────────────── */}
       {isError ? (
-        <div className="px-3 py-2.5 flex items-center gap-2">
+        <div className="px-4 py-3 flex items-center gap-2">
           <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
           <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — cases unavailable.</span>
           <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
@@ -160,54 +163,75 @@ function SfCasesStrip() {
           </button>
         </div>
       ) : isLoading ? (
-        <div className="p-2 space-y-1">
-          {[1, 2, 3].map(i => <div key={i} className="h-8 rounded bg-emerald-100 animate-pulse" />)}
+        <div className="p-3 space-y-2">
+          {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-7 rounded bg-muted/40 animate-pulse" />)}
         </div>
       ) : data && data.cases.length === 0 ? (
-        <div className="px-3 py-2.5">
-          <p className="text-[10px] text-emerald-700/70">No open cases in Salesforce.</p>
+        <div className="px-4 py-4 text-center">
+          <p className="text-[11px] text-muted-foreground">No open cases in Salesforce.</p>
         </div>
       ) : data ? (
-        <div className="divide-y divide-emerald-100">
-          {data.cases.map(c => {
-            const priCfg      = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
-            const contactName = c.Contact?.Name ?? c.Account?.Name ?? null;
-            const sfUrl       = data.orgBaseUrl
-              ? `${data.orgBaseUrl}/lightning/r/Case/${c.Id}/view`
-              : null;
-            return (
-              <div key={c.Id} className="px-3 py-2 flex items-center gap-2.5">
-                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none shrink-0 ${priCfg.cls}`}>
-                  {priCfg.label}
-                </span>
-                {sfUrl ? (
-                  <a
-                    href={sfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[9px] font-mono font-semibold text-primary hover:underline shrink-0 leading-none"
-                    onClick={e => e.stopPropagation()}
-                  >
-                    {c.CaseNumber ?? c.Id.slice(0, 8)}
-                  </a>
-                ) : (
-                  <span className="text-[9px] font-mono text-muted-foreground/60 shrink-0">
-                    {c.CaseNumber ?? '—'}
-                  </span>
-                )}
-                <p className="text-[11px] font-semibold text-foreground flex-1 truncate leading-snug">
-                  {c.Subject ?? '(No subject)'}
-                </p>
-                {c.Status && (
-                  <span className="text-[9px] text-muted-foreground shrink-0">{c.Status}</span>
-                )}
-                {contactName && (
-                  <span className="text-[9px] text-muted-foreground/60 shrink-0 hidden sm:block">{contactName}</span>
-                )}
-                <span className="text-[9px] text-muted-foreground/50 shrink-0">{caseAge(c.CreatedDate)}</span>
-              </div>
-            );
-          })}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-border bg-muted/30">
+                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[80px]">Priority</th>
+                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[90px]">Case #</th>
+                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">Subject</th>
+                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[100px]">Status</th>
+                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[140px] hidden md:table-cell">Contact</th>
+                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[52px] text-right">Age</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/40">
+              {data.cases.map(c => {
+                const priCfg      = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
+                const contactName = c.Contact?.Name ?? c.Account?.Name ?? null;
+                const sfUrl       = data.orgBaseUrl
+                  ? `${data.orgBaseUrl}/lightning/r/Case/${c.Id}/view`
+                  : null;
+                return (
+                  <tr key={c.Id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCfg.cls}`}>
+                        {priCfg.label}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {sfUrl ? (
+                        <a
+                          href={sfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] font-mono font-semibold text-primary hover:underline"
+                        >
+                          {c.CaseNumber ?? c.Id.slice(0, 8)}
+                        </a>
+                      ) : (
+                        <span className="text-[10px] font-mono text-muted-foreground/60">
+                          {c.CaseNumber ?? '—'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 max-w-0">
+                      <p className="text-[11px] font-medium text-foreground truncate leading-snug">
+                        {c.Subject ?? '(No subject)'}
+                      </p>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <span className="text-[10px] text-muted-foreground">{c.Status ?? '—'}</span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap hidden md:table-cell">
+                      <span className="text-[10px] text-muted-foreground/70">{contactName ?? '—'}</span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-right">
+                      <span className="text-[10px] text-muted-foreground/50">{caseAge(c.CreatedDate)}</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       ) : null}
     </div>

@@ -137,7 +137,7 @@ function Router() {
       <Route path="/library">                   <Redirect to="/knowledge" /></Route>
 
       {/* Old admin sub-pages */}
-      <Route path="/operations/integrations">      <Redirect to="/admin/integration-readiness" /></Route>
+      <Route path="/operations/integrations">      <Redirect to="/admin/setup" /></Route>
       <Route path="/admin/integration-readiness"  component={IntegrationReadinessCenter} />
       <Route path="/admin/comm-channels">         <Redirect to="/collaboration/channels" /></Route>
       <Route path="/admin/comm-routing">          <Redirect to="/collaboration/channels" /></Route>

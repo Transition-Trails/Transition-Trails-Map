@@ -111,7 +111,7 @@ export default function PennyHub() {
       description={
         isEveryday
           ? 'Your learners and Penny AI coaching support. Ask Penny anything in the right panel.'
-          : 'Select a capability to explore its prompts, knowledge sources, quality metrics, and health. Use Prompt Studio, Learners, Intelligence, and Health tabs for cross-capability views.'
+          : 'Monitor Penny AI status, explore capabilities and prompts, track learner coaching, and ask Penny anything. Trail Quests, Assessments, and Agentforce are live (Sprint 4).'
       }
       actions={HUB_ACTIONS}
       tabs={TABS}

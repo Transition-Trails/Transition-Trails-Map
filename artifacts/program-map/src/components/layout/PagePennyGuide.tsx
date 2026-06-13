@@ -76,7 +76,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   penny: [
     { urgent: true,  source: 'slack',      text: 'Learning Coach: confidence flag on Cohort 3 recap',            meta: '8m ago',  why: "Penny self-monitors its own Learning Coach output to flag when its recommendations may need human verification" },
     { urgent: false, source: 'salesforce', text: 'Gemini API live — 21 models available including Gemini 2.5 Flash. Ready to wire first capability call.', meta: '1h ago',  why: 'Penny monitors API integration status so the team knows when live AI responses are unblocked end-to-end' },
-    { urgent: false, source: 'slack',      text: 'Test Penny: 12 prototype queries this week',                   meta: '3h ago',  why: 'Penny monitors its own usage in test channels to measure adoption and identify capability gaps' },
+    { urgent: false, source: 'slack',      text: 'Ask Penny: 12 live queries this week — Gemini AI active',      meta: '3h ago',  why: 'Penny monitors its own usage to measure adoption, identify capability gaps, and confirm the live Gemini pipeline is handling requests' },
     { urgent: false, source: 'drive',      text: 'Trail Quest capability spec updated',                          meta: '5h ago',  why: 'Penny watches Drive for spec updates to its own capability definitions so guidance stays current' },
     { urgent: false, source: 'salesforce', text: 'Penny interaction log: 234 this week',                         meta: '8h ago',  why: 'Penny reads its interaction log from Salesforce to surface usage patterns for system improvement' },
   ],
@@ -202,14 +202,14 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Penny remembers context from your current program phase',
     ],
     powerInsights: [
-      '22 Penny capabilities mapped — 8 in prototype, 14 planned',
+      '22 Penny capabilities mapped — 8 live, 14 in development',
       'Learning Coach capability: 1 confidence flag this week',
-      'Trail Quest and Assessment capabilities are POC-ready',
+      'Trail Quest, Assessment, and Agentforce capabilities live (Sprint 4)',
       'Salesforce live — SF Data Intelligence capability can now be wired to real data',
     ],
     attentionItems: [
       { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: '1 Learning Coach confidence flag this week' },
-      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Test Penny is available for prototype queries' },
+      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Ask Penny live — Gemini AI connected' },
     ],
     everydaySteps: [
       { label: 'Ask Penny',           path: '/penny' },
@@ -221,7 +221,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Intelligence dashboard', path: '/penny/intelligence' },
     ],
     everydayCanned: "I'm Penny — here to guide you through your program, help find resources, and answer questions. Try asking about your current sprint, upcoming sessions, or anything in the Knowledge Library.",
-    powerCanned:    "Penny status: Learning Coach, Trail Quest, and Assessment capabilities are in prototype. Salesforce is live — SF Data Intelligence can now be wired to real data. The confidence flag on Learning Coach relates to Cohort 3 recap scoring — review at /penny/intelligence.",
+    powerCanned:    "Penny status: Learning Coach active via Gemini API. Trail Quest, Assessment, and Agentforce capabilities live (Sprint 4). Salesforce live — SF Data Intelligence wired to demand and health views. The confidence flag on Learning Coach relates to Cohort 3 recap scoring — review at /penny/intelligence.",
   },
   operations: {
     everydayInsights: [

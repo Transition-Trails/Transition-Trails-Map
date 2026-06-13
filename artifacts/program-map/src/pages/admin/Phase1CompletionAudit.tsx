@@ -50,7 +50,7 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/digital-twin/governance',       name: 'Digital Twin · Governance',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations',                    name: 'Operations · Overview',           role: 'Admin+', status: 'fixed', issues: 'font-serif removed from health score + stat chips' },
   { path: '/operations/health',             name: 'Operations · Health',             role: 'Admin+', status: 'fixed', issues: 'font-serif removed from domain score values' },
-  { path: '/operations/demand',             name: 'Operations · Demand',             role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/operations/demand',             name: 'Operations · Demand',             role: 'Admin+', status: 'fixed', issues: 'SF Cases live strip: table view added (Priority / Case # / Subject / Status / Contact / Age columns with sticky header); case links corrected to use actual MyDomain Lightning URL via OAuth userinfo endpoint (https://transition-trails.my.salesforce.com/lightning/r/Case/{Id}/view); opens target="_blank" — does not affect Penny panel' },
   { path: '/operations/scorecards',         name: 'Operations · Scorecards',         role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations/trends',             name: 'Operations · Trends',             role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations/recommendations',    name: 'Operations · Recommendations',    role: 'Admin+', status: 'pass',  issues: '' },
@@ -117,14 +117,16 @@ const HARDCODED_ITEMS: HardcodedItem[] = [
   { name: 'Context Engine workspace items',  location: 'data/contextEngineData.ts',          classification: 'phase2-data', p2Item: 'p2-ask-penny-panel',      notes: 'Hardcoded; P2 = dynamic from active Salesforce records' },
   { name: 'Phase 1 readiness scores',        location: 'admin/Phase1ReadinessDashboard.tsx', classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Manual updates; P2 = calculated from live integration checks' },
   { name: '"Future:" integration notices',   location: 'All active pages',                   classification: 'stale',       notes: 'Removed from Demand page this session; verified absent in all other active pages' },
-  { name: 'TestPenny regex responses',       location: 'pages/penny/TestPenny.tsx',           classification: 'stale',       p2Item: 'p2-penny-live-llm', notes: 'Pattern-match responses should be replaced by live Gemini LLM calls' },
+  { name: 'TestPenny (Ask Penny tab)',       location: 'pages/penny/TestPenny.tsx',           classification: 'fixed',       notes: 'Live Gemini LLM wired — Sprint 2; "Ask Penny" tab in PennyHub uses real Gemini responses; pattern-match fallback retained for offline only' },
   { name: '"Live (POC)" Slack status',       location: 'PagePennyGuide.tsx, TrailOsHealth',   classification: 'fixed',       notes: 'Sprint 1: updated to "Live" in PagePennyGuide (SOURCE_CONNECT + collaboration powerInsights) and TrailOsHealth integrations array' },
   { name: '"new Gemini key needed" footer', location: 'PagePennyGuide.tsx line 696 (Ask Penny tab)', classification: 'fixed', notes: 'Phase 1 UX: stale text "Prototype responses — new Gemini key needed · Agentforce: Phase 2" updated to "Live · Gemini API · Agentforce upgrade: Phase 2"' },
   { name: '"Google OAuth in progress" footer', location: 'PagePennyGuide.tsx Trail Signals footer', classification: 'fixed', notes: 'Jun 13: stale text "Google OAuth in progress" updated to "Salesforce + Slack + Google OAuth live" after refresh tokens obtained' },
+  { name: 'Stale "Test Penny / prototype" text', location: 'PagePennyGuide.tsx Trail Signals + Penny insights', classification: 'fixed', notes: 'Jun 13: "Test Penny: 12 prototype queries" → "Ask Penny: 12 live queries — Gemini AI active"; "8 in prototype" → "8 live"; "POC-ready" → "live (Sprint 4)"; canned Penny response updated to reflect live capabilities; PennyHub description updated' },
+  { name: '/operations/integrations redirect', location: 'App.tsx + routes.smoke.ts',              classification: 'fixed', notes: 'Jun 13: /operations/integrations → /admin/setup (was /admin/integration-readiness); smoke manifest target updated' },
 ];
 
 const POC_ITEMS: PocItem[] = [
-  { capability: 'Learning Coach (LLM)',           pocState: 'Regex/pattern match only',  trailOsState: 'TestPenny.tsx',                risk: 'High',   p2Item: 'p2-penny-live-llm' },
+  { capability: 'Learning Coach (LLM)',           pocState: 'Live · Gemini API active',  trailOsState: 'PennyHub > Ask Penny ✅',     risk: 'Low',    p2Item: 'p2-penny-live-llm' },
   { capability: 'Prompt Studio',                  pocState: 'Substantially implemented', trailOsState: 'PennyHub > Prompts ✅',        risk: null,     p2Item: null },
   { capability: 'Salesforce Intelligence',        pocState: 'Live API probe confirmed',  trailOsState: 'SF Validation ✅',             risk: 'Low',    p2Item: 'p2-sf-live-queries' },
   { capability: 'Slack Bot (@coachconnectbot)',    pocState: 'Functional (live POC)',     trailOsState: 'Collaboration > Slack ✅',     risk: 'Low',    p2Item: 'p2-trail-quest-live' },
