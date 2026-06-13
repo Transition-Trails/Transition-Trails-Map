@@ -75,7 +75,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   ],
   penny: [
     { urgent: true,  source: 'slack',      text: 'Learning Coach: confidence flag on Cohort 3 recap',            meta: '8m ago',  why: "Penny self-monitors its own Learning Coach output to flag when its recommendations may need human verification" },
-    { urgent: false, source: 'salesforce', text: 'Gemini API key format updated — add new key from aistudio.google.com to unblock live Penny responses', meta: '2h ago',  why: 'Penny monitors API key status so the team knows when a live key update will unblock end-to-end capability testing' },
+    { urgent: false, source: 'salesforce', text: 'Gemini API live — 21 models available including Gemini 2.5 Flash. Ready to wire first capability call.', meta: '1h ago',  why: 'Penny monitors API integration status so the team knows when live AI responses are unblocked end-to-end' },
     { urgent: false, source: 'slack',      text: 'Test Penny: 12 prototype queries this week',                   meta: '3h ago',  why: 'Penny monitors its own usage in test channels to measure adoption and identify capability gaps' },
     { urgent: false, source: 'drive',      text: 'Trail Quest capability spec updated',                          meta: '5h ago',  why: 'Penny watches Drive for spec updates to its own capability definitions so guidance stays current' },
     { urgent: false, source: 'salesforce', text: 'Penny interaction log: 234 this week',                         meta: '8h ago',  why: 'Penny reads its interaction log from Salesforce to surface usage patterns for system improvement' },

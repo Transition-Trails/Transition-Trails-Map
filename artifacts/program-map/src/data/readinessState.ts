@@ -50,11 +50,12 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
   gemini: {
     id: 'gemini',
     label: 'Gemini / Penny AI',
-    health: 'in-progress',
-    summary: 'Key format updated (AQ. and AIza both accepted) — new key needed from AI Studio',
+    health: 'live',
+    summary: 'GEMINI_API_KEY validated — 21 models live including Gemini 2.5 Flash + Pro',
     detail:
-      'GEMINI_API_KEY validation now accepts new AQ. secure auth key format (Google AI Studio June 2026 change) and legacy AIza format. ' +
-      'Enter new key from aistudio.google.com in Replit Secrets to unblock live Penny responses. ' +
+      'GEMINI_API_KEY confirmed valid. API reachable, auth accepted, 21 models available. ' +
+      'Gemini 2.5 Flash is the recommended model for Penny capability calls. ' +
+      'Next: wire first Penny capability to GEMINI_API_KEY via /api/penny/ask endpoint. ' +
       'Validation endpoint: GET /api/gemini/validate',
     lastVerified: 'June 2026',
   },
