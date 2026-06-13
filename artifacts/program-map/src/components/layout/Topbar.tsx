@@ -99,7 +99,11 @@ function SignalsIndicator() {
       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
         panelOpen ? 'bg-[#4A154B]/50' : counts.urgent > 0 ? 'bg-amber-400 animate-pulse' : 'bg-muted-foreground/40'
       }`} />
-      <span>
+      {/* xs: show urgent count only (keep button compact); sm+: full label */}
+      {counts.urgent > 0 && !panelOpen && (
+        <span className="sm:hidden text-[10px] font-bold">{counts.urgent}</span>
+      )}
+      <span className="hidden sm:inline">
         {panelOpen
           ? TERMS.trailSignals
           : counts.urgent > 0
