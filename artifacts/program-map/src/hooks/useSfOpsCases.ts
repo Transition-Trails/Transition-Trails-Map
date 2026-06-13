@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export interface SfCase {
   Id: string;
+  CaseNumber: string | null;
   Subject: string | null;
   Priority: 'High' | 'Medium' | 'Low' | null;
   Status: string | null;
@@ -14,6 +15,7 @@ export interface SfOpsCases {
   cases: SfCase[];
   totalOpen: number | null;
   highPriority: number | null;
+  instanceName: string;
   lastUpdated: string;
   fromCache: boolean;
   cacheAge: number;

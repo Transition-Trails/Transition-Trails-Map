@@ -297,18 +297,27 @@ router.get("/salesforce/operations/cases", async (req, res) => {
     catch { return null; }
   };
 
-  const [cases, totalOpen, highPriority] = await Promise.all([
+  const safeFirst = async (soql: string): Promise<Record<string, unknown> | null> => {
+    try { const r = await sfQuery(proxyFetch, soql); return r.records[0] ?? null; }
+    catch { return null; }
+  };
+
+  const [cases, totalOpen, highPriority, org] = await Promise.all([
     safeRecords(
-      "SELECT Id, Subject, Priority, Status, CreatedDate, Contact.Name, Account.Name FROM Case WHERE IsClosed = false ORDER BY Priority DESC, CreatedDate ASC LIMIT 25"
+      "SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, Contact.Name, Account.Name FROM Case WHERE IsClosed = false ORDER BY Priority DESC, CreatedDate ASC LIMIT 25"
     ),
     safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false"),
     safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = 'High'"),
+    safeFirst("SELECT InstanceName FROM Organization LIMIT 1"),
   ]);
+
+  const instanceName = org ? String(org["InstanceName"] ?? "") : "";
 
   const data = {
     cases: cases ?? [],
     totalOpen,
     highPriority,
+    instanceName,
     lastUpdated: new Date().toISOString(),
     fromCache: false,
     cacheAge: 0,

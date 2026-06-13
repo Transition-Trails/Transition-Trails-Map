@@ -170,13 +170,31 @@ function SfCasesStrip() {
       ) : data ? (
         <div className="divide-y divide-emerald-100">
           {data.cases.map(c => {
-            const priCfg     = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
+            const priCfg      = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
             const contactName = c.Contact?.Name ?? c.Account?.Name ?? null;
+            const sfUrl       = data.instanceName
+              ? `https://${data.instanceName.toLowerCase()}.salesforce.com/${c.Id}`
+              : null;
             return (
               <div key={c.Id} className="px-3 py-2 flex items-center gap-2.5">
                 <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none shrink-0 ${priCfg.cls}`}>
                   {priCfg.label}
                 </span>
+                {sfUrl ? (
+                  <a
+                    href={sfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[9px] font-mono font-semibold text-primary hover:underline shrink-0 leading-none"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    {c.CaseNumber ?? c.Id.slice(0, 8)}
+                  </a>
+                ) : (
+                  <span className="text-[9px] font-mono text-muted-foreground/60 shrink-0">
+                    {c.CaseNumber ?? '—'}
+                  </span>
+                )}
                 <p className="text-[11px] font-semibold text-foreground flex-1 truncate leading-snug">
                   {c.Subject ?? '(No subject)'}
                 </p>
