@@ -14,6 +14,7 @@ import {
   overallHealthScore, overallHealthLevel,
 } from '@/data/operationalIntelligenceData';
 import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
+import { useSfOpsPrograms } from '@/hooks/useSfOpsPrograms';
 import ProgramHealth from '@/pages/operations/ProgramHealth';
 import Intake        from '@/pages/demand/Intake';
 
@@ -88,6 +89,7 @@ function ExecutiveOverview() {
   const { setSelectedItem } = useAppContext();
   const { isEveryday } = useTierFlags();
   const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
+  const { data: sfPrograms } = useSfOpsPrograms();
 
   return (
     <ScrollArea className="h-full">
@@ -147,6 +149,11 @@ function ExecutiveOverview() {
                   </div>
                   <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
                   <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
+                  {d.id === 'dh-programs' && sfPrograms != null && (
+                    <span className="text-[8px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5 mt-1 inline-block leading-none">
+                      SF: {sfPrograms.active ?? '?'} active · {sfPrograms.total ?? '?'} total
+                    </span>
+                  )}
                 </button>
               );
             })}

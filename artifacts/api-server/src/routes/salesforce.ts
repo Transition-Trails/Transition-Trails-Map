@@ -270,4 +270,102 @@ router.get("/salesforce/operations/summary", async (req, res) => {
   return res.json(data);
 });
 
+// ── GET /salesforce/operations/cases ──────────────────────────────────────────
+// Live open Cases from Salesforce for the Operations Demand tab. 5-min cache.
+
+router.get("/salesforce/operations/cases", async (req, res) => {
+  const CACHE_KEY = "ops-cases";
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
+  }
+
+  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
+  try {
+    proxyFetch = makeConnectors().createProxyFetch("salesforce");
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(503).json({ error: "Salesforce connector unavailable", detail: msg });
+  }
+
+  const safeCount = async (soql: string): Promise<number | null> => {
+    try { return (await sfQuery(proxyFetch, soql)).totalSize; }
+    catch { return null; }
+  };
+  const safeRecords = async (soql: string): Promise<Record<string, unknown>[] | null> => {
+    try { return (await sfQuery(proxyFetch, soql)).records; }
+    catch { return null; }
+  };
+
+  const [cases, totalOpen, highPriority] = await Promise.all([
+    safeRecords(
+      "SELECT Id, Subject, Priority, Status, CreatedDate, Contact.Name, Account.Name FROM Case WHERE IsClosed = false ORDER BY Priority DESC, CreatedDate ASC LIMIT 25"
+    ),
+    safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false"),
+    safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = 'High'"),
+  ]);
+
+  const data = {
+    cases: cases ?? [],
+    totalOpen,
+    highPriority,
+    lastUpdated: new Date().toISOString(),
+    fromCache: false,
+    cacheAge: 0,
+  };
+
+  opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+  return res.json(data);
+});
+
+// ── GET /salesforce/operations/programs ───────────────────────────────────────
+// Live PMM program records for the Operations hub. 5-min cache.
+
+router.get("/salesforce/operations/programs", async (req, res) => {
+  const CACHE_KEY = "ops-programs";
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
+  }
+
+  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
+  try {
+    proxyFetch = makeConnectors().createProxyFetch("salesforce");
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(503).json({ error: "Salesforce connector unavailable", detail: msg });
+  }
+
+  const safeCount = async (soql: string): Promise<number | null> => {
+    try { return (await sfQuery(proxyFetch, soql)).totalSize; }
+    catch { return null; }
+  };
+  const safeRecords = async (soql: string): Promise<Record<string, unknown>[] | null> => {
+    try { return (await sfQuery(proxyFetch, soql)).records; }
+    catch { return null; }
+  };
+
+  const [programs, total, active, planning] = await Promise.all([
+    safeRecords(
+      "SELECT Id, Name, pmdm__Status__c, pmdm__StartDate__c, pmdm__EndDate__c FROM pmdm__Program__c ORDER BY pmdm__Status__c, Name LIMIT 50"
+    ),
+    safeCount("SELECT COUNT() FROM pmdm__Program__c"),
+    safeCount("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Active'"),
+    safeCount("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Planning'"),
+  ]);
+
+  const data = {
+    programs: programs ?? [],
+    total,
+    active,
+    planning,
+    lastUpdated: new Date().toISOString(),
+    fromCache: false,
+    cacheAge: 0,
+  };
+
+  opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+  return res.json(data);
+});
+
 export default router;

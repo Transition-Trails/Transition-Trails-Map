@@ -508,10 +508,10 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-sf-live-queries',
     title: 'Live Salesforce Queries in Operations',
-    column: 'Active',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
-    summary: 'Replace hardcoded health scores, demand records, and program status in the Operations hub with live SOQL queries through the Salesforce proxy — so dashboards reflect real program data at all times.',
+    summary: 'Live SF data wired across Operations: Demand tab shows real Salesforce open Cases (subject, priority, status, contact, computed age) via GET /api/salesforce/operations/cases. Programs domain card shows live active/total counts from pmdm__Program__c via GET /api/salesforce/operations/programs. All endpoints use 5-min cache with stale/error indicators and refresh controls. Qualitative domain health (curriculum governance, Penny maturity) retained as editorial — not derivable from SF data alone.',
     tags: ['Salesforce', 'Operations', 'Data'],
     icon: Database,
     hue: 'emerald',

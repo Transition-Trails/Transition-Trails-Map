@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import { useSfOpsCases, caseAge } from '@/hooks/useSfOpsCases';
+import { formatSyncAge } from '@/hooks/useSfOpsSummary';
 import {
   AlertTriangle, CheckCircle2, Clock, ChevronRight, ChevronDown, Plus, GitBranch,
+  Database, RefreshCw, WifiOff,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -94,6 +97,104 @@ const TYPE_DOT: Record<RequestType, string> = {
   'Change Request': 'bg-amber-400',
   'Admin':          'bg-slate-400',
 };
+
+// ── Live Salesforce Cases Strip ───────────────────────────────────────────────
+
+const CASE_PRIORITY_CFG: Record<string, { cls: string; label: string }> = {
+  High:   { cls: 'text-rose-700 bg-rose-50 border-rose-200',   label: 'High' },
+  Medium: { cls: 'text-amber-700 bg-amber-50 border-amber-200', label: 'Medium' },
+  Low:    { cls: 'text-slate-600 bg-slate-50 border-slate-200', label: 'Low' },
+};
+
+function SfCasesStrip() {
+  const { data, isLoading, isError, refetch, isFetching } = useSfOpsCases();
+
+  const n = (v: number | null | undefined) => v == null ? '—' : v.toLocaleString();
+  const syncLabel = data ? formatSyncAge(data.lastUpdated) : null;
+  const isStale   = data && data.cacheAge > 5 * 60;
+
+  return (
+    <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 overflow-hidden">
+
+      {/* Header */}
+      <div className="px-3 py-2 border-b border-emerald-200/80 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+            isLoading || isFetching ? 'bg-amber-400 animate-pulse'
+            : isError ? 'bg-rose-500'
+            : isStale  ? 'bg-amber-400'
+            : 'bg-emerald-500'
+          }`} />
+          <Database className="w-2.5 h-2.5 text-emerald-700/60" />
+          <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-800">
+            Live · Salesforce Cases
+          </span>
+          {data && (
+            <span className={`text-[9px] ${isStale ? 'text-amber-600' : 'text-emerald-600/70'}`}>
+              · {isStale ? 'stale · ' : ''}{syncLabel}
+            </span>
+          )}
+          {data && (
+            <span className="text-[9px] text-emerald-700/60">
+              · {n(data.totalOpen)} open · {n(data.highPriority)} high priority
+            </span>
+          )}
+        </div>
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="text-[9px] text-emerald-700/60 hover:text-emerald-800 flex items-center gap-0.5 disabled:opacity-40"
+          aria-label="Refresh cases"
+        >
+          <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+
+      {/* Body */}
+      {isError ? (
+        <div className="px-3 py-2.5 flex items-center gap-2">
+          <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
+          <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — cases unavailable.</span>
+          <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
+            <RefreshCw className="w-2.5 h-2.5" /> Retry
+          </button>
+        </div>
+      ) : isLoading ? (
+        <div className="p-2 space-y-1">
+          {[1, 2, 3].map(i => <div key={i} className="h-8 rounded bg-emerald-100 animate-pulse" />)}
+        </div>
+      ) : data && data.cases.length === 0 ? (
+        <div className="px-3 py-2.5">
+          <p className="text-[10px] text-emerald-700/70">No open cases in Salesforce.</p>
+        </div>
+      ) : data ? (
+        <div className="divide-y divide-emerald-100">
+          {data.cases.map(c => {
+            const priCfg     = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
+            const contactName = c.Contact?.Name ?? c.Account?.Name ?? null;
+            return (
+              <div key={c.Id} className="px-3 py-2 flex items-center gap-2.5">
+                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none shrink-0 ${priCfg.cls}`}>
+                  {priCfg.label}
+                </span>
+                <p className="text-[11px] font-semibold text-foreground flex-1 truncate leading-snug">
+                  {c.Subject ?? '(No subject)'}
+                </p>
+                {c.Status && (
+                  <span className="text-[9px] text-muted-foreground shrink-0">{c.Status}</span>
+                )}
+                {contactName && (
+                  <span className="text-[9px] text-muted-foreground/60 shrink-0 hidden sm:block">{contactName}</span>
+                )}
+                <span className="text-[9px] text-muted-foreground/50 shrink-0">{caseAge(c.CreatedDate)}</span>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 // ── Request card ───────────────────────────────────────────────────────────────
 
@@ -261,6 +362,16 @@ export default function Intake() {
           ))}
         </div>
 
+        {/* ── Live Salesforce Cases ─────────────────────────────────────── */}
+        <SfCasesStrip />
+
+        {/* ── Internal Requests ─────────────────────────────────────────── */}
+        <div>
+          <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-2">
+            Internal Requests
+          </p>
+        </div>
+
         {/* ── Two-column layout ─────────────────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 
@@ -367,12 +478,12 @@ export default function Intake() {
               </div>
             </div>
 
-            {/* Phase 1 notice — admin/power only, no stale future-state language */}
+            {/* SF live notice — admin/power only */}
             {isAdminOrAbove && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-amber-700/70 mb-1">Phase 1</p>
-                <p className="text-[10px] text-amber-700/80 leading-snug">
-                  Prototype data. Salesforce Cases sync is planned for Q3 — this queue will update live once connected.
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-700/70 mb-1">Live</p>
+                <p className="text-[10px] text-emerald-700/80 leading-snug">
+                  Open Salesforce Cases appear above in real time. Internal requests below are tracked separately.
                 </p>
               </div>
             )}
