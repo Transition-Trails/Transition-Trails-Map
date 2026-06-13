@@ -5,8 +5,8 @@ import { curriculumAssessments, CONTENT_STATUS_CONFIG } from '@/data/curriculumD
 import { useAppContext } from '@/context/AppContext';
 import {
   ClipboardCheck, Sparkles, AlertTriangle, CheckCircle2,
-  ChevronRight, Brain, BarChart2, Users, BookOpen,
-  TrendingUp, Zap,
+  ChevronRight, Brain, BarChart2, Bot, RefreshCw,
+  TrendingUp, Zap, X,
 } from 'lucide-react';
 
 // ── Per-learner assessment results (cross-referenced data) ────────────────────
@@ -34,10 +34,24 @@ const LEARNER_RESULTS: LearnerResult[] = [
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
+// ── Agentforce coaching panel state ──────────────────────────────────────────
+
+interface AgentCoaching {
+  key: string;
+  learner: string;
+  assessmentName: string;
+  query: string;
+  status: 'loading' | 'success' | 'error';
+  response?: string;
+  sessionId?: string;
+  error?: string;
+}
+
 export default function Assessments() {
   const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const [, setLocation] = useLocation();
-  const [filterStatus, setFilterStatus] = useState<'all' | 'needs-coaching' | 'failed'>('all');
+  const [filterStatus,   setFilterStatus]   = useState<'all' | 'needs-coaching' | 'failed'>('all');
+  const [activeCoaching, setActiveCoaching] = useState<AgentCoaching | null>(null);
 
   const totalPassed   = LEARNER_RESULTS.filter(r => r.passed).length;
   const needsCoaching = LEARNER_RESULTS.filter(r => !r.pennyCoached && !r.passed).length;
@@ -49,13 +63,56 @@ export default function Assessments() {
     return true;
   });
 
-  function askPennyAbout(learner: string, assessmentId: string, score: number, passed: boolean) {
+  async function coachWithBothAIs(learner: string, assessmentId: string, score: number, passed: boolean) {
     const asmnt = curriculumAssessments.find(a => a.id === assessmentId);
+    const assessmentName = (asmnt?.name as string) ?? assessmentId;
+
     const query = passed
-      ? `${learner} passed the "${asmnt?.name ?? assessmentId}" assessment with a score of ${score}%. What personalised next step should Penny suggest to extend their learning momentum?`
-      : `${learner} scored ${score}% on the "${asmnt?.name ?? assessmentId}" assessment (passing score: ${asmnt?.passingScore ?? 75}%). They haven't passed yet. What coaching approach should Penny use to help them prepare for a retake?`;
+      ? `${learner} passed the "${assessmentName}" assessment with a score of ${score}%. What personalised next step should Penny suggest to extend their learning momentum?`
+      : `${learner} scored ${score}% on the "${assessmentName}" assessment (passing score: ${(asmnt?.passingScore as number) ?? 75}%). They haven't passed yet. What coaching approach should Penny use to help them prepare for a retake?`;
+
+    // 1. Open Penny right panel immediately
     setPendingPennyQuery(query);
     setAskPennyOpen(true);
+
+    // 2. Fire Agentforce in parallel
+    const key = `${learner}-${assessmentId}`;
+    setActiveCoaching({ key, learner, assessmentName, query, status: 'loading' });
+
+    try {
+      const resp = await fetch('/api/agentforce/invoke', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: query,
+          learnerId: learner,   // learner name as proxy; real SF Contact ID would replace this
+          programId: asmnt ? String(asmnt.program) : undefined,
+        }),
+      });
+      const data = await resp.json() as {
+        ok?: boolean;
+        response?: string;
+        sessionId?: string;
+        detail?: string;
+        error?: string;
+      };
+      if (data.ok && data.response) {
+        setActiveCoaching(prev => prev?.key === key
+          ? { ...prev, status: 'success', response: data.response, sessionId: data.sessionId }
+          : prev
+        );
+      } else {
+        setActiveCoaching(prev => prev?.key === key
+          ? { ...prev, status: 'error', error: data.detail ?? data.error ?? 'Agentforce returned no response' }
+          : prev
+        );
+      }
+    } catch {
+      setActiveCoaching(prev => prev?.key === key
+        ? { ...prev, status: 'error', error: 'Network error — could not reach Agentforce' }
+        : prev
+      );
+    }
   }
 
   return (
@@ -127,7 +184,7 @@ export default function Assessments() {
 
           <div className="rounded-xl border border-border overflow-hidden">
             <div className="grid grid-cols-[1fr_180px_70px_70px_80px_80px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
-              {['Learner', 'Assessment', 'Score', 'Passed', 'Attempts', 'Penny'].map(h => (
+              {['Learner', 'Assessment', 'Score', 'Passed', 'Attempts', 'AI Coach'].map(h => (
                 <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
               ))}
             </div>
@@ -162,12 +219,18 @@ export default function Assessments() {
                         : null
                       }
                       <button
-                        onClick={() => askPennyAbout(r.learner, r.assessmentId, r.score, r.passed)}
-                        className="flex items-center gap-1 text-[10px] text-primary border border-primary/20 rounded-md px-1.5 py-0.5 hover:bg-primary/5 transition-colors"
-                        title="Get Penny coaching advice"
+                        onClick={() => void coachWithBothAIs(r.learner, r.assessmentId, r.score, r.passed)}
+                        className={`flex items-center gap-0.5 text-[10px] border rounded-md px-1.5 py-0.5 transition-colors ${
+                          activeCoaching?.key === `${r.learner}-${r.assessmentId}` && activeCoaching.status === 'loading'
+                            ? 'text-cyan-700 border-cyan-300 bg-cyan-50'
+                            : 'text-primary border-primary/20 hover:bg-primary/5'
+                        }`}
+                        title="Coach with Penny + Agentforce"
+                        disabled={activeCoaching?.status === 'loading'}
                       >
                         <Brain className="w-2.5 h-2.5" />
-                        <span>{r.passed ? 'Next' : 'Coach'}</span>
+                        <Bot className="w-2.5 h-2.5 -ml-0.5" />
+                        <span className="ml-0.5">{r.passed ? 'Next' : 'Coach'}</span>
                       </button>
                     </div>
                   </div>
@@ -181,6 +244,91 @@ export default function Assessments() {
             </div>
           </div>
         </div>
+
+        {/* Dual-AI coaching panel */}
+        {activeCoaching && (
+          <div className="rounded-xl border border-cyan-200 bg-cyan-50/60 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-cyan-200/60 bg-cyan-50">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <Brain className="w-3.5 h-3.5 text-violet-600" />
+                  <Bot className="w-3.5 h-3.5 text-cyan-600" />
+                </div>
+                <p className="text-[11px] font-semibold text-foreground">
+                  Dual-AI Coaching — {activeCoaching.learner}
+                </p>
+                <span className="text-[10px] text-muted-foreground">· {activeCoaching.assessmentName}</span>
+              </div>
+              <button
+                onClick={() => setActiveCoaching(null)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Dismiss coaching panel"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="divide-y divide-cyan-200/40">
+              {/* Penny row */}
+              <div className="flex items-start gap-3 px-4 py-3">
+                <div className="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <Brain className="w-3 h-3 text-violet-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-violet-600/70 mb-0.5">Penny</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Panel opened with coaching query — see the Ask Penny panel on the right.
+                  </p>
+                </div>
+                <span className="text-[9px] font-semibold bg-violet-100 text-violet-700 rounded-full px-2 py-0.5 shrink-0">Active</span>
+              </div>
+
+              {/* Agentforce row */}
+              <div className="flex items-start gap-3 px-4 py-3">
+                <div className="w-5 h-5 rounded-full bg-cyan-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <Bot className="w-3 h-3 text-cyan-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-600/70 mb-0.5">Agentforce</p>
+
+                  {activeCoaching.status === 'loading' && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <RefreshCw className="w-3 h-3 animate-spin text-cyan-500" />
+                      <span>Connecting to Penny–Transition Trails Assistant…</span>
+                    </div>
+                  )}
+
+                  {activeCoaching.status === 'success' && (
+                    <p className="text-[11px] text-foreground leading-relaxed whitespace-pre-wrap">
+                      {activeCoaching.response}
+                    </p>
+                  )}
+
+                  {activeCoaching.status === 'error' && (
+                    <div className="flex items-start gap-1.5">
+                      <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-amber-700">{activeCoaching.error}</p>
+                    </div>
+                  )}
+
+                  {activeCoaching.sessionId && (
+                    <p className="text-[9px] text-muted-foreground/50 mt-1 font-mono">
+                      Session {activeCoaching.sessionId.slice(0, 16)}…
+                    </p>
+                  )}
+                </div>
+                <span className={`text-[9px] font-semibold rounded-full px-2 py-0.5 shrink-0 ${
+                  activeCoaching.status === 'loading' ? 'bg-cyan-100 text-cyan-700' :
+                  activeCoaching.status === 'success' ? 'bg-emerald-100 text-emerald-700' :
+                  'bg-amber-100 text-amber-700'
+                }`}>
+                  {activeCoaching.status === 'loading' ? 'Connecting' :
+                   activeCoaching.status === 'success' ? 'Responded' : 'Error'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Assessment catalogue summary */}
         <div>

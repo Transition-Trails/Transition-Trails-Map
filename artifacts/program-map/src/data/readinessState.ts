@@ -102,11 +102,14 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
   agentforce: {
     id: 'agentforce',
     label: 'Agentforce',
-    health: 'phase-2',
-    summary: 'Phase 2 — not yet started',
+    health: 'live',
+    summary: 'Penny–Transition Trails Assistant live · Sessions API wired via Salesforce Connector',
     detail:
-      'Agentforce (Salesforce AI) integration deferred to Phase 2. ' +
-      'Salesforce REST API is live and can validate object access when needed.',
+      'AGENTFORCE_API_KEY set (Agent ID 0Xxan0…). Sessions API wired: create → message → close per invoke cycle. ' +
+      'POC confirmed: Agentforce and Penny (Gemini) coexisted simultaneously in the #penny-ai Slack channel. ' +
+      'Trail OS can now explicitly invoke Agentforce with learner + program context via POST /api/agentforce/invoke. ' +
+      'Assessment coaching wired: dual-AI coaching panel triggers both Penny and Agentforce on every Coach/Next click.',
+    lastVerified: 'June 2026',
   },
   ga4: {
     id: 'ga4',

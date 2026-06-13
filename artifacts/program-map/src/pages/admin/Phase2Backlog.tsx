@@ -415,7 +415,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-trail-quest-live',
     title: 'Live Trail Quest Delivery',
-    column: 'Active',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Make Trail Quests real — Penny delivers daily micro-challenges, reflections, and skill prompts through Slack (and later in-app), tracks completions, and links outcomes to Salesforce program engagements.',
@@ -446,7 +446,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-penny-assessment',
     title: 'Penny Assessment & Quiz Flow',
-    column: 'Active',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Enable Penny to conduct assessments — structured quizzes, knowledge checks, and competency evaluations — delivered conversationally through Trail OS or Slack, with results stored in Salesforce.',
@@ -539,10 +539,10 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-agentforce',
     title: 'Agentforce Coexistence & Handoff',
-    column: 'Active',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
-    summary: 'Define the coexistence model between Penny (Gemini-powered) and Salesforce Agentforce — when each AI is invoked, how context is handed off, and how to avoid learner confusion when both are active.',
+    summary: 'Coexistence model live — Penny (Gemini) and Agentforce (Penny–Transition Trails Assistant) both active. Sessions API wired via Trail OS: POST /api/agentforce/invoke fires per assessment coaching request. Assessment page triggers both AIs in parallel with learner + program context. POC confirmed in #penny-ai Slack channel.',
     tags: ['Agentforce', 'Penny', 'Salesforce', 'AI'],
     icon: Bot,
     hue: 'orange',

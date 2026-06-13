@@ -57,8 +57,9 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/penny/response-quality',       kind: 'redirect', target: '/penny/intelligence' },
   { path: '/penny/integrations',           kind: 'redirect', target: '/admin/setup' },
   { path: '/penny/integration-layer',      kind: 'redirect', target: '/admin/setup' },
-  { path: '/penny/trail-quests',           kind: 'redirect', target: '/penny' },
-  { path: '/penny/assessments',            kind: 'redirect', target: '/penny/learners' },
+  { path: '/penny/trail-quests',           kind: 'active',   note: 'Sprint 4: restored live tab in PennyHub — Trail Quest management page' },
+  { path: '/penny/assessments',            kind: 'active',   note: 'Sprint 4: restored live tab in PennyHub — Assessment coaching page with dual-AI (Penny + Agentforce)' },
+  { path: '/penny/agentforce',             kind: 'active',   note: 'Sprint 4: Agentforce Center live tab — Sessions API wired, 8/8 POC steps confirmed' },
   { path: '/penny/logs',                   kind: 'redirect', target: '/penny/learners' },
 
   // ── Knowledge ────────────────────────────────────────────────────────────

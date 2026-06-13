@@ -4,7 +4,7 @@ import {
   Database, MessageSquare, Lock, Brain, FolderOpen, Calendar,
   MessageCircle, Mail, Layout as LayoutIcon, GraduationCap,
   CheckSquare, ChevronRight, ExternalLink, AlertTriangle, CheckCircle2,
-  Clock, Plug, Layers, Key,
+  Clock, Plug, Layers, Key, Bot,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -140,6 +140,20 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     href: '/collaboration/calendar-live',
     needs: 'Map program-specific Google Calendar IDs to enable cohort-scoped event queries',
   },
+  {
+    id: 'agentforce',
+    name: 'Agentforce',
+    tagline: 'Penny–Transition Trails Assistant',
+    status: 'live-partial',
+    icon: Bot,
+    iconCls: 'bg-cyan-50 text-cyan-700',
+    owner: 'Salesforce Admin',
+    detail: 'Sessions API wired (Sprint 4). AGENTFORCE_API_KEY set. Dual-AI coaching active — Assessment page fires both Penny and Agentforce in parallel per learner. POC confirmed: both AIs active simultaneously in #penny-ai Slack channel.',
+    lastCheck: 'Today',
+    action: 'Agentforce Center',
+    href: '/penny/agentforce',
+    needs: 'Map learnerId to Salesforce Contact ID for full context handoff',
+  },
 ];
 
 const NEEDS_CONFIG: SetupCard[] = [
@@ -177,7 +191,6 @@ interface Phase2Item { id: string; name: string; tagline: string; phase: string;
 const PHASE_2: Phase2Item[] = [
   { id: 'mural',      name: 'Mural',           tagline: 'Visual Collaboration',       phase: 'Q4 2025', detail: 'Whiteboard integration for sprint planning and retrospectives.' },
   { id: 'lms',        name: 'LMS',             tagline: 'Learning Delivery Platform', phase: 'Q3 2025', detail: 'Learning management system for content delivery and assessment.' },
-  { id: 'agentforce', name: 'Agentforce',      tagline: 'Penny AI Upgrade',           phase: 'Q4 2025', detail: 'Salesforce Agentforce to upgrade Penny beyond standalone POC.' },
 ];
 
 const READINESS_LINKS: ReadinessLink[] = [
