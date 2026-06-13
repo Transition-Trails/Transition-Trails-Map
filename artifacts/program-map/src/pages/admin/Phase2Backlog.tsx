@@ -508,7 +508,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-sf-live-queries',
     title: 'Live Salesforce Queries in Operations',
-    column: 'Draft',
+    column: 'Active',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Replace hardcoded health scores, demand records, and program status in the Operations hub with live SOQL queries through the Salesforce proxy — so dashboards reflect real program data at all times.',

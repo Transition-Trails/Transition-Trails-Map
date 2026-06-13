@@ -5,6 +5,10 @@ import { ReplitConnectors } from "@replit/connectors-sdk";
 
 const router = Router();
 
+// ── 5-minute in-memory cache ───────────────────────────────────────────────────
+const opsCache = new Map<string, { data: unknown; ts: number }>();
+const OPS_CACHE_TTL = 5 * 60 * 1000;
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 type CheckStatus = "pass" | "fail" | "warning" | "skip";
@@ -207,6 +211,63 @@ router.get("/salesforce/validate", async (req, res) => {
     durationMs: Date.now() - start,
     timestamp: new Date().toISOString(),
   });
+});
+
+// ── GET /salesforce/operations/summary ────────────────────────────────────────
+// Live SOQL counts for Operations hub panels. 5-minute in-memory cache.
+
+router.get("/salesforce/operations/summary", async (req, res) => {
+  const CACHE_KEY = "ops-summary";
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
+  }
+
+  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
+  try {
+    proxyFetch = makeConnectors().createProxyFetch("salesforce");
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(503).json({ error: "Salesforce connector unavailable", detail: msg });
+  }
+
+  // Run all SOQL counts in parallel — each wrapped so one failure doesn't abort others
+  const safe = async (soql: string): Promise<number | null> => {
+    try { return (await sfQuery(proxyFetch, soql)).totalSize; }
+    catch { return null; }
+  };
+
+  const [
+    progTotal, progActive, progPlanning,
+    engTotal, engActive,
+    sdLast30,
+    casesOpen, casesHigh,
+    contacts,
+  ] = await Promise.all([
+    safe("SELECT COUNT() FROM pmdm__Program__c"),
+    safe("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Active'"),
+    safe("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Planning'"),
+    safe("SELECT COUNT() FROM pmdm__ProgramEngagement__c"),
+    safe("SELECT COUNT() FROM pmdm__ProgramEngagement__c WHERE pmdm__Stage__c = 'Active'"),
+    safe("SELECT COUNT() FROM pmdm__ServiceDelivery__c WHERE pmdm__DeliveryDate__c = LAST_N_DAYS:30"),
+    safe("SELECT COUNT() FROM Case WHERE IsClosed = false"),
+    safe("SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = 'High'"),
+    safe("SELECT COUNT() FROM Contact"),
+  ]);
+
+  const data = {
+    programs:          { total: progTotal,  active: progActive,  planning: progPlanning },
+    engagements:       { total: engTotal,   active: engActive },
+    serviceDeliveries: { last30Days: sdLast30 },
+    cases:             { open: casesOpen,   highPriority: casesHigh },
+    contacts:          { total: contacts },
+    lastUpdated:       new Date().toISOString(),
+    fromCache:         false,
+    cacheAge:          0,
+  };
+
+  opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+  return res.json(data);
 });
 
 export default router;

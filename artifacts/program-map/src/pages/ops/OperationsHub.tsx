@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Activity, BarChart2, GitBranch, TrendingUp, ChevronRight, ChevronDown,
-  AlertTriangle, CheckCircle2, Target, RefreshCw,
+  AlertTriangle, Target, RefreshCw, Users, Database, Wifi, WifiOff,
 } from 'lucide-react';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { HubShell } from '@/components/layout/HubShell';
@@ -13,8 +13,75 @@ import {
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG,
   overallHealthScore, overallHealthLevel,
 } from '@/data/operationalIntelligenceData';
+import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
 import ProgramHealth from '@/pages/operations/ProgramHealth';
-import Intake                      from '@/pages/demand/Intake';
+import Intake        from '@/pages/demand/Intake';
+
+// ── Live Salesforce Strip ─────────────────────────────────────────────────────
+function SfLiveStrip() {
+  const { data, isLoading, isError, refetch, isFetching } = useSfOpsSummary();
+
+  const n = (v: number | null | undefined) => v == null ? '—' : v.toLocaleString();
+
+  if (isError) {
+    return (
+      <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 flex items-center gap-2">
+        <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
+        <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — live counts unavailable.</span>
+        <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
+          <RefreshCw className="w-2.5 h-2.5" /> Retry
+        </button>
+      </div>
+    );
+  }
+
+  const isStale = data && data.cacheAge > 5 * 60;
+  const syncLabel = data ? formatSyncAge(data.lastUpdated) : null;
+
+  return (
+    <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-1.5">
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLoading || isFetching ? 'bg-amber-400 animate-pulse' : isStale ? 'bg-amber-400' : 'bg-emerald-500'}`} />
+          <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-800">Live from Salesforce</span>
+          {data && (
+            <span className={`text-[9px] ${isStale ? 'text-amber-600' : 'text-emerald-600/70'}`}>
+              · {isStale ? 'stale · ' : ''}{syncLabel}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="text-[9px] text-emerald-700/60 hover:text-emerald-800 flex items-center gap-0.5 disabled:opacity-40"
+        >
+          <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex gap-2">
+          {[1,2,3,4].map(i => <div key={i} className="h-7 flex-1 rounded bg-emerald-100 animate-pulse" />)}
+        </div>
+      ) : data ? (
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { icon: Database, label: 'Programs',    value: n(data.programs.total),      sub: `${n(data.programs.active)} active` },
+            { icon: Users,    label: 'Enrollments', value: n(data.engagements.total),   sub: `${n(data.engagements.active)} active` },
+            { icon: Activity, label: 'Deliveries',  value: n(data.serviceDeliveries.last30Days), sub: 'last 30 days' },
+            { icon: AlertTriangle, label: 'Open Cases', value: n(data.cases.open),      sub: `${n(data.cases.highPriority)} high priority` },
+          ].map(m => (
+            <div key={m.label} className="rounded bg-white/70 border border-emerald-100 px-2 py-1.5">
+              <p className="text-[9px] font-bold text-emerald-700/60 uppercase tracking-wider mb-0.5">{m.label}</p>
+              <p className="text-[15px] font-bold text-emerald-900 leading-none">{m.value}</p>
+              <p className="text-[9px] text-emerald-700/60 mt-0.5">{m.sub}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 // ── Executive Overview ────────────────────────────────────────────────────────
 function ExecutiveOverview() {
@@ -32,6 +99,9 @@ function ExecutiveOverview() {
             <span className="text-[10px] text-amber-600">Operations, Health, Demand, Scorecards, and Trends are unified here.</span>
           </div>
         )}
+
+        {/* Live SF data strip — always shown */}
+        <SfLiveStrip />
 
         {/* Overall health — compact single row */}
         <div className="rounded-lg border border-border bg-white px-4 py-3 flex items-center gap-5">
