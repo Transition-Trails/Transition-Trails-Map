@@ -172,8 +172,8 @@ function SfCasesStrip() {
           {data.cases.map(c => {
             const priCfg      = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
             const contactName = c.Contact?.Name ?? c.Account?.Name ?? null;
-            const sfUrl       = data.instanceName
-              ? `https://${data.instanceName.toLowerCase()}.salesforce.com/${c.Id}`
+            const sfUrl       = data.orgBaseUrl
+              ? `${data.orgBaseUrl}/lightning/r/Case/${c.Id}/view`
               : null;
             return (
               <div key={c.Id} className="px-3 py-2 flex items-center gap-2.5">

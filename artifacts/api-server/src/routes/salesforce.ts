@@ -297,27 +297,44 @@ router.get("/salesforce/operations/cases", async (req, res) => {
     catch { return null; }
   };
 
-  const safeFirst = async (soql: string): Promise<Record<string, unknown> | null> => {
-    try { const r = await sfQuery(proxyFetch, soql); return r.records[0] ?? null; }
-    catch { return null; }
+  // Get real org base URL from the OAuth Identity endpoint — more reliable than InstanceName
+  const getOrgBaseUrl = async (): Promise<string> => {
+    try {
+      const res = await proxyFetch("/services/oauth2/userinfo", {
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) return "";
+      const info = await res.json() as Record<string, unknown>;
+      // `urls.sobjects` is like "https://myorg.lightning.force.com/services/data/v59.0/sobjects/"
+      // `profile` is like "https://myorg.my.salesforce.com/005xxx"
+      const urls = info["urls"] as Record<string, string> | undefined;
+      const sobjectsUrl = urls?.["sobjects"] ?? "";
+      if (sobjectsUrl) {
+        // Strip everything from /services/... onward to get the base URL
+        return sobjectsUrl.replace(/\/services\/.*$/, "");
+      }
+      // Fallback: strip user-id from profile URL
+      const profile = String(info["profile"] ?? "");
+      return profile.replace(/\/[A-Za-z0-9]{15,18}$/, "");
+    } catch {
+      return "";
+    }
   };
 
-  const [cases, totalOpen, highPriority, org] = await Promise.all([
+  const [cases, totalOpen, highPriority, orgBaseUrl] = await Promise.all([
     safeRecords(
       "SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, Contact.Name, Account.Name FROM Case WHERE IsClosed = false ORDER BY Priority DESC, CreatedDate ASC LIMIT 25"
     ),
     safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false"),
     safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = 'High'"),
-    safeFirst("SELECT InstanceName FROM Organization LIMIT 1"),
+    getOrgBaseUrl(),
   ]);
-
-  const instanceName = org ? String(org["InstanceName"] ?? "") : "";
 
   const data = {
     cases: cases ?? [],
     totalOpen,
     highPriority,
-    instanceName,
+    orgBaseUrl,
     lastUpdated: new Date().toISOString(),
     fromCache: false,
     cacheAge: 0,

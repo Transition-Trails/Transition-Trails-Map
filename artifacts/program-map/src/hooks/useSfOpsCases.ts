@@ -15,7 +15,7 @@ export interface SfOpsCases {
   cases: SfCase[];
   totalOpen: number | null;
   highPriority: number | null;
-  instanceName: string;
+  orgBaseUrl: string;
   lastUpdated: string;
   fromCache: boolean;
   cacheAge: number;
