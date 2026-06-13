@@ -134,7 +134,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-calendar-panel',
     title: 'Calendar Action Panel',
-    column: 'Draft',
+    column: 'Active',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Surface no-response invites, meeting prep briefs, upcoming Trail Talks, reminders, and calendar event context from the Trail OS right panel — powered by Google Calendar.',

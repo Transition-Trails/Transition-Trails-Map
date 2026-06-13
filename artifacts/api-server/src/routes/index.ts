@@ -7,6 +7,7 @@ import googleRouter      from "./google";
 import googleOAuthRouter from "./googleOAuth";
 import salesforceRouter  from "./salesforce";
 import pennyRouter       from "./penny";
+import calendarRouter    from "./calendar";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(googleRouter);
 router.use(googleOAuthRouter);
 router.use(salesforceRouter);
 router.use(pennyRouter);
+router.use(calendarRouter);
 
 export default router;

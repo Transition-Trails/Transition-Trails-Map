@@ -1,4 +1,4 @@
-import { MessageSquare, Hash, CalendarDays, HardDrive, FileText, BookOpen, Bell } from 'lucide-react';
+import { MessageSquare, Hash, CalendarDays, HardDrive, FileText, BookOpen, Bell, Zap } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import CollaborationWorkspace          from '@/pages/collaboration/CollaborationWorkspace';
@@ -9,6 +9,7 @@ import CommNotifications               from '@/pages/communications/CommNotifica
 import SlackIntegrationCenter          from '@/pages/collaboration/SlackIntegrationCenter';
 import GoogleDriveIntegrationCenter    from '@/pages/collaboration/GoogleDriveIntegrationCenter';
 import GoogleCalendarIntegrationCenter from '@/pages/collaboration/GoogleCalendarIntegrationCenter';
+import CalendarPanel                   from '@/pages/collaboration/CalendarPanel';
 
 // UI audit rule: Everyday User pages must not have multiple nav/action rows
 // above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
@@ -29,6 +30,9 @@ export default function CollaborationHub() {
       { id: 'templates',     label: 'Templates',     path: '/collaboration/templates',     icon: FileText,  content: <CommMessageTemplates /> },
       { id: 'briefs',        label: 'Weekly Briefs', path: '/collaboration/briefs',        icon: BookOpen,  content: <WeeklyBriefs /> },
       { id: 'notifications', label: 'Notifications', path: '/collaboration/notifications', icon: Bell,      content: <CommNotifications /> },
+    ] : []),
+    ...(isPowerOrAbove ? [
+      { id: 'calendar-live', label: 'Calendar', path: '/collaboration/calendar-live', icon: Zap, content: <CalendarPanel /> },
     ] : []),
     ...(isAdminOrAbove ? [
       { id: 'slack',    label: 'Slack Integration', path: '/collaboration/slack',    icon: Hash,         content: <SlackIntegrationCenter /> },
