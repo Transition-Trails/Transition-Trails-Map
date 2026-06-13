@@ -51,11 +51,11 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
     id: 'gemini',
     label: 'Gemini / Penny AI',
     health: 'live',
-    summary: 'GEMINI_API_KEY validated — 21 models live including Gemini 2.5 Flash + Pro',
+    summary: 'Penny live — Ask Penny → Gemini 2.5 Flash · POST /api/penny/ask · serviceTier: standard',
     detail:
-      'GEMINI_API_KEY confirmed valid. API reachable, auth accepted, 21 models available. ' +
-      'Gemini 2.5 Flash is the recommended model for Penny capability calls. ' +
-      'Next: wire first Penny capability to GEMINI_API_KEY via /api/penny/ask endpoint. ' +
+      'GEMINI_API_KEY confirmed valid, billing active (serviceTier: standard). ' +
+      'POST /api/penny/ask endpoint live — Gemini 2.5 Flash responding with Trail OS context. ' +
+      'Ask Penny panel in ContextBar now returns real AI responses. ' +
       'Validation endpoint: GET /api/gemini/validate',
     lastVerified: 'June 2026',
   },

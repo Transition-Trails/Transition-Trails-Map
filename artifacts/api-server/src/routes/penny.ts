@@ -48,9 +48,9 @@ router.post("/penny/ask", async (req, res) => {
     : null;
   const userMessage = pageCtx ? `[Page context: ${pageCtx}]\n\n${query.trim()}` : query.trim();
 
-  // ── Call Gemini 2.0 Flash (stable) via REST ──────────────────────────────────
-  // Using 2.0-flash as the stable confirmed model; easy to bump to 2.5-flash
-  const model = "gemini-2.0-flash";
+  // ── Call Gemini 2.5 Flash via REST ───────────────────────────────────────────
+  // 2.5-flash confirmed live (serviceTier: standard); 2x token budget for thinking
+  const model = "gemini-2.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   try {
@@ -61,7 +61,7 @@ router.post("/penny/ask", async (req, res) => {
         system_instruction: { parts: [{ text: PENNY_SYSTEM }] },
         contents: [{ role: "user", parts: [{ text: userMessage }] }],
         generationConfig: {
-          maxOutputTokens: 512,
+          maxOutputTokens: 1024,
           temperature: 0.7,
         },
       }),
