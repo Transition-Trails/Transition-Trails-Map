@@ -92,12 +92,12 @@ const navGroups: NavGroup[] = [
     icon: MessageSquare,
     pathPrefix: '/collaboration',
     items: [
-      { id: 'collab-overview',   path: '/collaboration',               label: 'Overview',         minTier: 'admin' },
-      { id: 'collab-slack',      path: '/collaboration/slack',         label: 'Slack',            minTier: 'admin' },
-      { id: 'collab-drive',      path: '/collaboration/drive',         label: 'Google Drive',     minTier: 'admin' },
-      { id: 'collab-calendar',   path: '/collaboration/calendar',      label: 'Google Calendar',  minTier: 'admin' },
-      { id: 'collab-channels',   path: '/collaboration/channels',      label: 'Channels',         minTier: 'admin' },
-      { id: 'collab-templates',  path: '/collaboration/templates',     label: 'Templates',        minTier: 'admin' },
+      { id: 'collab-overview',       path: '/collaboration',                    label: 'Overview',        minTier: 'admin' },
+      { id: 'collab-calendar-live', path: '/collaboration/calendar-live',      label: 'Calendar',        minTier: 'power' },
+      { id: 'collab-slack',         path: '/collaboration/slack',              label: 'Slack',           minTier: 'admin' },
+      { id: 'collab-drive',         path: '/collaboration/drive',              label: 'Google Drive',    minTier: 'admin' },
+      { id: 'collab-channels',      path: '/collaboration/channels',           label: 'Channels',        minTier: 'admin' },
+      { id: 'collab-templates',     path: '/collaboration/templates',          label: 'Templates',       minTier: 'admin' },
     ],
   },
   {

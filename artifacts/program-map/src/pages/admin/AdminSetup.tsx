@@ -136,9 +136,9 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     owner: 'IT Admin',
     detail: 'OAuth refresh token active. Replit connector live. Cohort event model defined. Calendar panel and event-trigger wiring are Phase 2.',
     lastCheck: 'Today',
-    action: 'Calendar Hub',
-    href: '/collaboration/calendar',
-    needs: 'Wire cohort schedule read to Calendar panel — events by program',
+    action: 'Calendar Panel',
+    href: '/collaboration/calendar-live',
+    needs: 'Map program-specific Google Calendar IDs to enable cohort-scoped event queries',
   },
 ];
 

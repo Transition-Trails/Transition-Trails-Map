@@ -51,8 +51,8 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/penny/capabilities',           kind: 'active',   note: 'Capabilities workspace (canonical)' },
   { path: '/penny/capability-registry',    kind: 'redirect', target: '/penny' },
   { path: '/penny/prompt-studio',          kind: 'redirect', target: '/penny/prompts' },
-  { path: '/penny/test-penny',             kind: 'redirect', target: '/penny' },
-  { path: '/penny/test',                   kind: 'redirect', target: '/penny' },
+  { path: '/penny/test-penny',             kind: 'redirect', target: '/penny/test' },
+  { path: '/penny/test',                   kind: 'active',   note: 'PennyHub "Ask Penny" tab — served via /penny/:tab wildcard; standalone route removed' },
   { path: '/penny/prompt-library',         kind: 'redirect', target: '/penny/prompts' },
   { path: '/penny/response-quality',       kind: 'redirect', target: '/penny/intelligence' },
   { path: '/penny/integrations',           kind: 'redirect', target: '/admin/setup' },
@@ -70,6 +70,7 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   // ── Collaboration ────────────────────────────────────────────────────────
   { path: '/collaboration',                kind: 'active' },
   { path: '/collaboration/:tab',           kind: 'active' },
+  { path: '/collaboration/calendar-live',  kind: 'active',   note: 'Live Google Calendar Action Panel — served via /collaboration/:tab; sidebar nav entry for Power+ users' },
 
   // ── Governance / UOM ─────────────────────────────────────────────────────
   { path: '/governance',                   kind: 'active' },
