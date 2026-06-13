@@ -184,7 +184,7 @@ function AccessTiersTab({
           </div>
           <p className="text-[10px] text-muted-foreground mt-2">
             Live group addresses:{' '}
-            <span className="font-mono">trailosuers@transitiontrails.org</span> (Everyday),{' '}
+            <span className="font-mono">trailosusers@transitiontrails.org</span> (Everyday),{' '}
             <span className="font-mono">trailospennyadmin@transitiontrails.org</span> (Power),{' '}
             <span className="font-mono">trailosadmin@transitiontrails.org</span> (Admin)
             — managed in Google Workspace Admin.
@@ -223,7 +223,7 @@ function AccessTiersTab({
                 {
                   icon: <Users className="w-4 h-4 text-emerald-600" />,
                   title: 'Step 2 — Google Groups',
-                  body: 'Three Trail OS groups defined in Google Workspace Admin: trailosadmin, trailospennyadmin, and trailosuers.',
+                  body: 'Three Trail OS groups defined in Google Workspace Admin: trailosadmin, trailospennyadmin, and trailosusers.',
                   status: 'live',
                 },
                 {

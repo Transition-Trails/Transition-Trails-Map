@@ -5,7 +5,7 @@ const router = Router();
 const TRAIL_OS_GROUPS = [
   { tier: 'admin',    email: 'trailosadmin@transitiontrails.org',      label: 'Trail OS Admin' },
   { tier: 'power',    email: 'trailospennyadmin@transitiontrails.org',  label: 'Trail OS Penny Admin' },
-  { tier: 'everyday', email: 'trailosuers@transitiontrails.org',        label: 'TRAIL OS Users' },
+  { tier: 'everyday', email: 'trailosusers@transitiontrails.org',        label: 'TRAIL OS Users' },
 ] as const;
 
 async function getDirectoryAccessToken(): Promise<string | null> {

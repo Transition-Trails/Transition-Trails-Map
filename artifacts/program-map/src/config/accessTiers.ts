@@ -6,7 +6,7 @@
 // so that future Google Sign-In can assign them automatically.
 //
 // GOOGLE GROUPS MAPPING (active — matches Workspace admin console):
-//   trailosuers@transitiontrails.org        → everyday     (Regular/Everyday User)
+//   trailosusers@transitiontrails.org       → everyday     (Regular/Everyday User)
 //   trailospennyadmin@transitiontrails.org  → power        (Penny Power User)
 //   trailosadmin@transitiontrails.org       → admin        (Full Admin)
 //   N/A — email whitelist only              → superadmin   (Builder / Super Admin)
@@ -34,7 +34,7 @@ export const TIER_CONFIG = {
   everyday: {
     label:       'Everyday User',
     shortLabel:  'Everyday',
-    googleGroup: 'trailosuers@transitiontrails.org',
+    googleGroup: 'trailosusers@transitiontrails.org',
     groupLabel:  'TRAIL OS Users',
     description: 'Program team, coaches, and coordinators.',
     detail:      'Simplified program health, learner activity, and guided next actions. Visual indicators, counts, and page-level Trail Signals. Digital Twin runs as silent background infrastructure.',

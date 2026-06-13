@@ -5,7 +5,7 @@ const router = Router();
 const TRAIL_OS_GROUPS = {
   admin:    'trailosadmin@transitiontrails.org',
   power:    'trailospennyadmin@transitiontrails.org',
-  everyday: 'trailosuers@transitiontrails.org',
+  everyday: 'trailosusers@transitiontrails.org',
 } as const;
 
 const DOMAIN = 'transitiontrails.org';
