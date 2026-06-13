@@ -28,6 +28,7 @@ import DigitalTwin      from "@/pages/twin/DigitalTwin";
 import OperationsHub    from "@/pages/ops/OperationsHub";
 import ProgramHub       from "@/pages/program/ProgramHub";
 import PennyHub         from "@/pages/penny/PennyHub";
+import TestPenny        from "@/pages/penny/TestPenny";
 import KnowledgeHub     from "@/pages/knowledge/KnowledgeHub";
 import CollaborationHub from "@/pages/collaboration/CollaborationHub";
 import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
@@ -91,8 +92,8 @@ function Router() {
       {/* Old Penny paths → penny hub tabs */}
       <Route path="/penny/capability-registry"> <Redirect to="/penny" /></Route>
       <Route path="/penny/prompt-studio">       <Redirect to="/penny/prompts" /></Route>
-      <Route path="/penny/test-penny">          <Redirect to="/penny" /></Route>
-      <Route path="/penny/test">                <Redirect to="/penny" /></Route>
+      <Route path="/penny/test-penny">          <Redirect to="/penny/test" /></Route>
+      <Route path="/penny/test">                <TestPenny /></Route>
       <Route path="/penny/prompt-library">      <Redirect to="/penny/prompts" /></Route>
       <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
       <Route path="/penny/integrations">        <Redirect to="/admin/setup" /></Route>

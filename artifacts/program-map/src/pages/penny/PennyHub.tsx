@@ -12,6 +12,7 @@ import Learners              from '@/pages/penny/Learners';
 import Intelligence          from '@/pages/penny/Intelligence';
 import PennyHealth           from '@/pages/operations/PennyHealth';
 import PennyCommandCenter    from '@/pages/penny/PennyCommandCenter';
+import TestPenny            from '@/pages/penny/TestPenny';
 
 export default function PennyHub() {
   const { openActionPanel, setRightPanelOpen } = useAppContext();
@@ -92,6 +93,7 @@ export default function PennyHub() {
     ...(!isEveryday ? [
       { id: 'intelligence', label: 'Intelligence', path: '/penny/intelligence', icon: BarChart2, content: <Intelligence /> },
       { id: 'health',       label: 'Health',       path: '/penny/health',       icon: Activity,  content: <PennyHealth /> },
+      { id: 'test',         label: 'Ask Penny',    path: '/penny/test',         icon: Sparkles,  content: <TestPenny /> },
     ] : []),
   ];
 
