@@ -353,7 +353,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-penny-live-llm',
     title: 'Penny Live LLM (Gemini Wire-Up)',
-    column: 'Active',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Replace TestPenny regex pattern matching and all capability stubs with live Gemini API calls — wiring the Prompt Studio templates, capability registry, and trail context into a real generative AI session.',
