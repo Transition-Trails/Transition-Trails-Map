@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays } from 'lucide-react';
+import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -96,13 +96,13 @@ function SignalsIndicator() {
           : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-        panelOpen ? 'bg-[#4A154B]/50' : counts.urgent > 0 ? 'bg-amber-400 animate-pulse' : 'bg-muted-foreground/40'
-      }`} />
-      {/* xs: show urgent count only (keep button compact); sm+: full label */}
+      {/* Icon — always visible (mirrors Sparkles for Penny, CalendarDays for Calendar) */}
+      <Activity className="w-3 h-3 flex-shrink-0" />
+      {/* Urgent pulse dot — only when there are urgent signals and panel is closed */}
       {counts.urgent > 0 && !panelOpen && (
-        <span className="sm:hidden text-[10px] font-bold">{counts.urgent}</span>
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
       )}
+      {/* Text — hidden below sm breakpoint, matching Penny/Calendar pattern */}
       <span className="hidden sm:inline">
         {panelOpen
           ? TERMS.trailSignals
