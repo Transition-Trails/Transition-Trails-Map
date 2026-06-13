@@ -95,7 +95,8 @@ function Router() {
       <Route path="/penny/test">                <Redirect to="/penny" /></Route>
       <Route path="/penny/prompt-library">      <Redirect to="/penny/prompts" /></Route>
       <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
-      <Route path="/penny/integrations">        <Redirect to="/admin/integration-readiness" /></Route>
+      <Route path="/penny/integrations">        <Redirect to="/admin/setup" /></Route>
+      <Route path="/penny/integration-layer">   <Redirect to="/admin/setup" /></Route>
       <Route path="/penny/trail-quests">        <Redirect to="/penny" /></Route>
       <Route path="/penny/assessments">         <Redirect to="/penny/learners" /></Route>
       <Route path="/penny/logs">                <Redirect to="/penny/learners" /></Route>

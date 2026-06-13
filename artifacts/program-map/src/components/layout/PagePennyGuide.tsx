@@ -690,7 +690,7 @@ export function PagePennyGuide() {
                 </button>
               </div>
               <p className="text-[9px] text-muted-foreground/40 leading-snug">
-                Phase 1 · Prototype responses — new Gemini key needed · Agentforce: Phase 2
+                Live · Gemini API · Agentforce upgrade: Phase 2
               </p>
             </div>
 

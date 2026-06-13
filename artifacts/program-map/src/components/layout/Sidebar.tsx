@@ -67,8 +67,9 @@ const navGroups: NavGroup[] = [
     icon: Brain,
     pathPrefix: '/penny',
     items: [
-      { id: 'penny-capabilities',  path: '/penny',              label: 'Capabilities',  minTier: 'admin' },
-      { id: 'penny-prompts',       path: '/penny/prompts',      label: 'Prompt Studio', minTier: 'admin' },
+      { id: 'penny-overview',      path: '/penny',              label: 'Command Center', minTier: 'admin' },
+      { id: 'penny-capabilities',  path: '/penny/capabilities', label: 'Capabilities',   minTier: 'admin' },
+      { id: 'penny-prompts',       path: '/penny/prompts',      label: 'Prompt Studio',  minTier: 'admin' },
       { id: 'penny-learners',      path: '/penny/learners',     label: 'Learners',      minTier: 'admin' },
       { id: 'penny-intelligence',  path: '/penny/intelligence', label: 'Intelligence',  minTier: 'admin' },
     ],

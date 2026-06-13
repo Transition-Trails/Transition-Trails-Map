@@ -57,7 +57,8 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/program',                       name: 'Programs · Hub',                  role: 'All',    status: 'pass',  issues: '' },
   { path: '/program/standards',             name: 'Programs · Standards',            role: 'Power+', status: 'fixed', issues: 'Sprint 0: context-sensitive action bar — shows Review Standards + Gap Report on standards tab; Create Program on other tabs' },
   { path: '/program/blueprint',             name: 'Programs · Blueprint',            role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/penny',                         name: 'Penny · Capabilities',            role: 'Admin+', status: 'fixed', issues: 'Sprint 0: action bar role-gated — Review Readiness + View Relationships + Ask Penny for Power+; New Capability + New Prompt Template admin-only' },
+  { path: '/penny',                         name: 'Penny · Command Center',          role: 'Admin+', status: 'fixed', issues: 'Sprint 0: action bar role-gated — Review Readiness + View Relationships + Ask Penny for Power+; New Capability + New Prompt Template admin-only; Phase 1 UX: Command Center overview landing tab added at base path; POC Integrations tab removed with /penny/integration-layer → /admin/setup redirect' },
+  { path: '/penny/capabilities',            name: 'Penny · Capabilities',            role: 'Admin+', status: 'fixed', issues: 'Phase 1 UX: canonical route for Capabilities workspace shifted from /penny to /penny/capabilities; Sidebar item updated (Command Center at /penny, Capabilities at /penny/capabilities); tab ordering: Command Center → Capabilities → Prompt Studio' },
   { path: '/penny/prompts',                 name: 'Penny · Prompt Studio',           role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/penny/learners',                name: 'Penny · Learners',                role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/penny/intelligence',            name: 'Penny · Intelligence',            role: 'Admin+', status: 'fixed', issues: 'Sprint 0: P5 Phase 2 Placeholder — 3 preview cards (Learner Trend Analysis, Cohort Health Signals, Weekly Report Archive) with data source attribution' },
@@ -75,7 +76,7 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/collaboration/templates',       name: 'Collaboration · Templates',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/governance',                    name: 'Governance Hub',                  role: 'Admin+', status: 'fixed', issues: '4× stat values removed' },
   { path: '/admin',                         name: 'Admin · Landing (→ Setup)',       role: 'Admin+', status: 'fixed', issues: '/admin now redirects to /admin/setup; AdminSetup is the canonical Administration landing' },
-  { path: '/admin/setup',                   name: 'Admin · Setup',                   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed Integration Readiness from sidebar; Setup is now canonical admin entry; Phase 2 backlog count updated to 19' },
+  { path: '/admin/setup',                   name: 'Admin · Setup',                   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed Integration Readiness from sidebar; Setup is now canonical admin entry; Phase 1 UX: Gmail card added to NEEDS_CONFIG (google-mail Replit connector confirmed); Google Drive + Calendar hrefs updated to /collaboration/drive and /collaboration/calendar; Drive + Calendar status updated to configured; PHASE_2 items reduced to 3 (Mural, LMS, Agentforce)' },
   { path: '/admin/people-access',           name: 'Admin · People & Access',         role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/integration-readiness',   name: 'Admin · Integration Readiness',   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed from sidebar nav; accessible only via Admin Setup deep-link; canonical entry is /admin/setup' },
   { path: '/admin/phase1-readiness',        name: 'Admin · Phase 1 Readiness',       role: 'Admin+', status: 'pass',  issues: '' },
@@ -114,6 +115,7 @@ const HARDCODED_ITEMS: HardcodedItem[] = [
   { name: '"Future:" integration notices',   location: 'All active pages',                   classification: 'stale',       notes: 'Removed from Demand page this session; verified absent in all other active pages' },
   { name: 'TestPenny regex responses',       location: 'pages/penny/TestPenny.tsx',           classification: 'stale',       p2Item: 'p2-penny-live-llm', notes: 'Pattern-match responses should be replaced by live Gemini LLM calls' },
   { name: '"Live (POC)" Slack status',       location: 'PagePennyGuide.tsx, TrailOsHealth',   classification: 'fixed',       notes: 'Sprint 1: updated to "Live" in PagePennyGuide (SOURCE_CONNECT + collaboration powerInsights) and TrailOsHealth integrations array' },
+  { name: '"new Gemini key needed" footer', location: 'PagePennyGuide.tsx line 696 (Ask Penny tab)', classification: 'fixed', notes: 'Phase 1 UX: stale text "Prototype responses — new Gemini key needed · Agentforce: Phase 2" updated to "Live · Gemini API · Agentforce upgrade: Phase 2"' },
 ];
 
 const POC_ITEMS: PocItem[] = [
@@ -121,7 +123,7 @@ const POC_ITEMS: PocItem[] = [
   { capability: 'Prompt Studio',                  pocState: 'Substantially implemented', trailOsState: 'PennyHub > Prompts ✅',        risk: null,     p2Item: null },
   { capability: 'Salesforce Intelligence',        pocState: 'Live API probe confirmed',  trailOsState: 'SF Validation ✅',             risk: 'Low',    p2Item: 'p2-sf-live-queries' },
   { capability: 'Slack Bot (@coachconnectbot)',    pocState: 'Functional (live POC)',     trailOsState: 'Collaboration > Slack ✅',     risk: 'Low',    p2Item: 'p2-trail-quest-live' },
-  { capability: 'Gemini API route',               pocState: 'Route exists, key expired', trailOsState: 'API server route ✅',          risk: 'High',   p2Item: 'p2-penny-live-llm' },
+  { capability: 'Gemini API route',               pocState: 'Live · Gemini API active',  trailOsState: 'API server route ✅',          risk: 'Low',    p2Item: 'p2-penny-live-llm' },
   { capability: 'Trail Quest delivery',           pocState: 'Data model only',           trailOsState: 'Not wired to Slack/Gemini',    risk: 'Medium', p2Item: 'p2-trail-quest-live' },
   { capability: 'Assessment / Quiz flow',         pocState: 'Not started',               trailOsState: 'Not implemented',              risk: 'Medium', p2Item: 'p2-penny-assessment' },
   { capability: 'RAG / Knowledge retrieval',      pocState: 'Not started',               trailOsState: 'Not implemented',              risk: 'High',   p2Item: 'p2-penny-rag' },
@@ -489,7 +491,7 @@ export default function Phase1CompletionAudit() {
                   Phase 1 UX: {failCount === 0 ? 'No violations' : `${failCount} violations found`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0 + Sprint 1 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup),
+                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0 + Sprint 1 + Phase 1 UX Consolidation (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup Gmail card + href fixes),
                   {watchCount > 0 ? ` ${watchCount} page(s) have acceptable Phase 2 placeholders` : ' 0 watch items'}. No major violations found.
                 </p>
               </div>

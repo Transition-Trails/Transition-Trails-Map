@@ -1,6 +1,6 @@
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
-  Activity, GitBranch, Puzzle, Plus, Sparkles,
+  Activity, GitBranch, Plus, Sparkles, LayoutDashboard,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -11,7 +11,7 @@ import PennyPromptStudio     from '@/pages/penny/PennyPromptStudio';
 import Learners              from '@/pages/penny/Learners';
 import Intelligence          from '@/pages/penny/Intelligence';
 import PennyHealth           from '@/pages/operations/PennyHealth';
-import PennyIntegrationLayer from '@/pages/penny/PennyIntegrationLayer';
+import PennyCommandCenter    from '@/pages/penny/PennyCommandCenter';
 
 export default function PennyHub() {
   const { openActionPanel, setRightPanelOpen } = useAppContext();
@@ -84,16 +84,14 @@ export default function PennyHub() {
 
   const TABS = [
     ...(!isEveryday ? [
-      { id: 'capabilities', label: 'Capabilities',  path: '/penny',             icon: Layers,        content: <PennyWorkspace /> },
-      { id: 'prompts',      label: 'Prompt Studio', path: '/penny/prompts',     icon: MessageSquare, content: <PennyPromptStudio /> },
+      { id: 'overview',      label: 'Command Center', path: '/penny',              icon: LayoutDashboard, content: <PennyCommandCenter /> },
+      { id: 'capabilities',  label: 'Capabilities',   path: '/penny/capabilities', icon: Layers,          content: <PennyWorkspace /> },
+      { id: 'prompts',       label: 'Prompt Studio',  path: '/penny/prompts',      icon: MessageSquare,   content: <PennyPromptStudio /> },
     ] : []),
     { id: 'learners', label: isEveryday ? 'My Learners' : 'Learners', path: '/penny/learners', icon: Users, content: <Learners /> },
     ...(!isEveryday ? [
       { id: 'intelligence', label: 'Intelligence', path: '/penny/intelligence', icon: BarChart2, content: <Intelligence /> },
       { id: 'health',       label: 'Health',       path: '/penny/health',       icon: Activity,  content: <PennyHealth /> },
-    ] : []),
-    ...(isAdminOrAbove ? [
-      { id: 'integration-layer', label: 'POC Integrations', path: '/penny/integration-layer', icon: Puzzle, content: <PennyIntegrationLayer /> },
     ] : []),
   ];
 
