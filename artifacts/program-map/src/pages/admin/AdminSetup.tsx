@@ -237,7 +237,7 @@ const READINESS_LINKS: ReadinessLink[] = [
   {
     id: 'phase1-audit',
     name: 'Phase 1 Completion Audit',
-    detail: 'Full audit report — 42 pages, UX compliance, hardcoded content inventory (26 items), Penny POC capability review (13 items), and test coverage summary.',
+    detail: 'Full audit report — 48 pages, UX compliance, hardcoded content inventory (28 items), Penny POC capability review (13 items), and test coverage summary.',
     action: 'View Audit',
     href: '/admin/phase1-audit',
     badge: 'Audit',

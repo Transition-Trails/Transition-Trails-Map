@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
-import { useSfOpsCases, caseAge } from '@/hooks/useSfOpsCases';
+import { useSfOpsCases, caseAge, type SfCase } from '@/hooks/useSfOpsCases';
 import { formatSyncAge } from '@/hooks/useSfOpsSummary';
 import {
   AlertTriangle, CheckCircle2, Clock, ChevronRight, ChevronDown, Plus, GitBranch,
-  Database, RefreshCw, WifiOff,
+  Database, RefreshCw, WifiOff, Sparkles, X,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -108,10 +108,28 @@ const CASE_PRIORITY_CFG: Record<string, { cls: string; label: string }> = {
 
 function SfCasesStrip() {
   const { data, isLoading, isError, refetch, isFetching } = useSfOpsCases();
+  const { setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery } = useAppContext();
+  const [focusedCaseId, setFocusedCaseId] = useState<string | null>(null);
 
   const n = (v: number | null | undefined) => v == null ? '—' : v.toLocaleString();
   const syncLabel = data ? formatSyncAge(data.lastUpdated) : null;
   const isStale   = data && data.cacheAge > 5 * 60;
+
+  const focusedCase = focusedCaseId && data
+    ? data.cases.find(c => c.Id === focusedCaseId) ?? null
+    : null;
+
+  function handleFocusCase(c: SfCase, contactName: string | null) {
+    const age = caseAge(c.CreatedDate);
+    const query =
+      `SF Case ${c.CaseNumber ?? c.Id}: "${c.Subject ?? 'No subject'}"\n` +
+      `Priority: ${c.Priority ?? '—'} · Status: ${c.Status ?? '—'} · Contact: ${contactName ?? '—'} · Age: ${age}\n\n` +
+      `Summarise the key risks for this case, recommend the most important next actions for the Transition Trails team, and flag any connections to current program delivery or open demand items.`;
+    setFocusedCaseId(c.Id);
+    setCalendarPanelOpen(false);
+    setAskPennyOpen(true);
+    setPendingPennyQuery(query);
+  }
 
   return (
     <div className="rounded-lg border border-emerald-200 bg-white overflow-hidden">
@@ -171,68 +189,112 @@ function SfCasesStrip() {
           <p className="text-[11px] text-muted-foreground">No open cases in Salesforce.</p>
         </div>
       ) : data ? (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[80px]">Priority</th>
-                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[90px]">Case #</th>
-                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">Subject</th>
-                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[100px]">Status</th>
-                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[140px] hidden md:table-cell">Contact</th>
-                <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[52px] text-right">Age</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/40">
-              {data.cases.map(c => {
-                const priCfg      = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
-                const contactName = c.Contact?.Name ?? c.Account?.Name ?? null;
-                const sfUrl       = data.orgBaseUrl
-                  ? `${data.orgBaseUrl}/lightning/r/Case/${c.Id}/view`
-                  : null;
-                return (
-                  <tr key={c.Id} className="hover:bg-muted/20 transition-colors">
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCfg.cls}`}>
-                        {priCfg.label}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      {sfUrl ? (
-                        <a
-                          href={sfUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] font-mono font-semibold text-primary hover:underline"
-                        >
-                          {c.CaseNumber ?? c.Id.slice(0, 8)}
-                        </a>
-                      ) : (
-                        <span className="text-[10px] font-mono text-muted-foreground/60">
-                          {c.CaseNumber ?? '—'}
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-border bg-muted/30">
+                  <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[80px]">Priority</th>
+                  <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[90px]">Case #</th>
+                  <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">Subject</th>
+                  <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[100px]">Status</th>
+                  <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[140px] hidden md:table-cell">Contact</th>
+                  <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[52px] text-right">Age</th>
+                  <th className="px-2 py-2 w-[32px]" title="Click any row to get Penny insights">
+                    <Sparkles className="w-3 h-3 text-muted-foreground/30 mx-auto" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {data.cases.map(c => {
+                  const priCfg      = CASE_PRIORITY_CFG[c.Priority ?? 'Low'] ?? CASE_PRIORITY_CFG['Low'];
+                  const contactName = c.Contact?.Name ?? c.Account?.Name ?? null;
+                  const sfUrl       = data.orgBaseUrl
+                    ? `${data.orgBaseUrl}/lightning/r/Case/${c.Id}/view`
+                    : null;
+                  const isFocused = focusedCaseId === c.Id;
+                  return (
+                    <tr
+                      key={c.Id}
+                      onClick={() => handleFocusCase(c, contactName)}
+                      className={`cursor-pointer transition-colors group border-l-2 ${
+                        isFocused
+                          ? 'bg-primary/5 border-l-primary'
+                          : 'hover:bg-muted/20 border-l-transparent'
+                      }`}
+                    >
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCfg.cls}`}>
+                          {priCfg.label}
                         </span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 max-w-0">
-                      <p className="text-[11px] font-medium text-foreground truncate leading-snug">
-                        {c.Subject ?? '(No subject)'}
-                      </p>
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      <span className="text-[10px] text-muted-foreground">{c.Status ?? '—'}</span>
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap hidden md:table-cell">
-                      <span className="text-[10px] text-muted-foreground/70">{contactName ?? '—'}</span>
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-right">
-                      <span className="text-[10px] text-muted-foreground/50">{caseAge(c.CreatedDate)}</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        {sfUrl ? (
+                          <a
+                            href={sfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            className="text-[10px] font-mono font-semibold text-primary hover:underline"
+                          >
+                            {c.CaseNumber ?? c.Id.slice(0, 8)}
+                          </a>
+                        ) : (
+                          <span className="text-[10px] font-mono text-muted-foreground/60">
+                            {c.CaseNumber ?? '—'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 max-w-0">
+                        <p className="text-[11px] font-medium text-foreground truncate leading-snug">
+                          {c.Subject ?? '(No subject)'}
+                        </p>
+                      </td>
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <span className="text-[10px] text-muted-foreground">{c.Status ?? '—'}</span>
+                      </td>
+                      <td className="px-3 py-2 whitespace-nowrap hidden md:table-cell">
+                        <span className="text-[10px] text-muted-foreground/70">{contactName ?? '—'}</span>
+                      </td>
+                      <td className="px-3 py-2 whitespace-nowrap text-right">
+                        <span className="text-[10px] text-muted-foreground/50">{caseAge(c.CreatedDate)}</span>
+                      </td>
+                      <td className="px-2 py-2 whitespace-nowrap text-center">
+                        <Sparkles className={`w-3 h-3 mx-auto transition-colors ${
+                          isFocused
+                            ? 'text-primary'
+                            : 'text-transparent group-hover:text-primary/40'
+                        }`} />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* ── Focused-record strip ──────────────────────────────────────────── */}
+          {focusedCase ? (
+            <div className="flex items-center gap-2 px-3 py-2 border-t border-primary/20 bg-primary/5">
+              <Sparkles className="w-3 h-3 text-primary shrink-0" />
+              <p className="text-[10px] text-primary flex-1 truncate">
+                <span className="font-semibold">Focused:</span> {focusedCase.CaseNumber} · {focusedCase.Subject ?? 'No subject'}
+                <span className="text-primary/60 ml-1">— Penny insights loading in right panel</span>
+              </p>
+              <button
+                onClick={() => setFocusedCaseId(null)}
+                className="text-primary/50 hover:text-primary transition-colors shrink-0"
+                aria-label="Clear focus"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ) : (
+            <div className="px-3 py-1.5 border-t border-border/40">
+              <p className="text-[9px] text-muted-foreground/40">Click any row to get Penny insights about that case</p>
+            </div>
+          )}
+        </>
       ) : null}
     </div>
   );

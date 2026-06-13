@@ -50,7 +50,7 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/digital-twin/governance',       name: 'Digital Twin · Governance',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations',                    name: 'Operations · Overview',           role: 'Admin+', status: 'fixed', issues: 'font-serif removed from health score + stat chips' },
   { path: '/operations/health',             name: 'Operations · Health',             role: 'Admin+', status: 'fixed', issues: 'font-serif removed from domain score values' },
-  { path: '/operations/demand',             name: 'Operations · Demand',             role: 'Admin+', status: 'fixed', issues: 'SF Cases live strip: table view added (Priority / Case # / Subject / Status / Contact / Age columns with sticky header); case links corrected to use actual MyDomain Lightning URL via OAuth userinfo endpoint (https://transition-trails.my.salesforce.com/lightning/r/Case/{Id}/view); opens target="_blank" — does not affect Penny panel' },
+  { path: '/operations/demand',             name: 'Operations · Demand',             role: 'Admin+', status: 'fixed', issues: 'SF Cases live strip: table view added (Priority / Case # / Subject / Status / Contact / Age columns with sticky header); case links corrected to use actual MyDomain Lightning URL via OAuth userinfo endpoint (https://transition-trails.my.salesforce.com/lightning/r/Case/{Id}/view); opens target="_blank" — does not affect Penny panel. Sprint 5: case row click → Penny focus — clicking any live SF case row sets it as the Trail OS focus record, auto-opens AskPennyPanel, fires a rich Penny query (case #, subject, priority, status, contact, age); focused row highlighted with left-border + Sparkles indicator; dismissible focus strip below table; SF case # link still opens Salesforce via e.stopPropagation.' },
   { path: '/operations/scorecards',         name: 'Operations · Scorecards',         role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations/trends',             name: 'Operations · Trends',             role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/operations/recommendations',    name: 'Operations · Recommendations',    role: 'Admin+', status: 'pass',  issues: '' },
@@ -123,6 +123,8 @@ const HARDCODED_ITEMS: HardcodedItem[] = [
   { name: '"Google OAuth in progress" footer', location: 'PagePennyGuide.tsx Trail Signals footer', classification: 'fixed', notes: 'Jun 13: stale text "Google OAuth in progress" updated to "Salesforce + Slack + Google OAuth live" after refresh tokens obtained' },
   { name: 'Stale "Test Penny / prototype" text', location: 'PagePennyGuide.tsx Trail Signals + Penny insights', classification: 'fixed', notes: 'Jun 13: "Test Penny: 12 prototype queries" → "Ask Penny: 12 live queries — Gemini AI active"; "8 in prototype" → "8 live"; "POC-ready" → "live (Sprint 4)"; canned Penny response updated to reflect live capabilities; PennyHub description updated' },
   { name: '/operations/integrations redirect', location: 'App.tsx + routes.smoke.ts',              classification: 'fixed', notes: 'Jun 13: /operations/integrations → /admin/setup (was /admin/integration-readiness); smoke manifest target updated' },
+  { name: 'TrailOsHealth stale integration data', location: 'pages/operations/TrailOsHealth.tsx', classification: 'fixed', notes: 'Jun 13: Google Drive updated to Live (OAuth token obtained); Agentforce updated to Live · POC (Sessions API wired Sprint 4); Live Integrations stat updated 2→5; header text updated from "prototype mode" to "integrations live"; Connected/Not connected label now per-row conditional' },
+  { name: 'SF Case → Penny focus (demand cases table)', location: 'pages/demand/Intake.tsx', classification: 'fixed', notes: 'Jun 13: clicking any live SF case row sets Trail OS focus, auto-opens AskPennyPanel, fires Penny query with case context (number, subject, priority, status, contact, age). Row highlights with left border + Sparkles icon. Dismissible focus strip below table. SF case # link preserved with e.stopPropagation.' },
 ];
 
 const POC_ITEMS: PocItem[] = [
@@ -131,11 +133,11 @@ const POC_ITEMS: PocItem[] = [
   { capability: 'Salesforce Intelligence',        pocState: 'Live API probe confirmed',  trailOsState: 'SF Validation ✅',             risk: 'Low',    p2Item: 'p2-sf-live-queries' },
   { capability: 'Slack Bot (@coachconnectbot)',    pocState: 'Functional (live POC)',     trailOsState: 'Collaboration > Slack ✅',     risk: 'Low',    p2Item: 'p2-trail-quest-live' },
   { capability: 'Gemini API route',               pocState: 'Live · Gemini API active',  trailOsState: 'API server route ✅',          risk: 'Low',    p2Item: 'p2-penny-live-llm' },
-  { capability: 'Trail Quest delivery',           pocState: 'Data model only',           trailOsState: 'Not wired to Slack/Gemini',    risk: 'Medium', p2Item: 'p2-trail-quest-live' },
-  { capability: 'Assessment / Quiz flow',         pocState: 'Not started',               trailOsState: 'Not implemented',              risk: 'Medium', p2Item: 'p2-penny-assessment' },
-  { capability: 'RAG / Knowledge retrieval',      pocState: 'Not started',               trailOsState: 'Not implemented',              risk: 'High',   p2Item: 'p2-penny-rag' },
+  { capability: 'Trail Quest delivery',           pocState: 'Live · Sprint 4',           trailOsState: 'PennyHub > Trail Quests ✅',   risk: 'Low',    p2Item: 'p2-trail-quest-live' },
+  { capability: 'Assessment / Quiz flow',         pocState: 'Live · Sprint 4',           trailOsState: 'PennyHub > Assessments ✅',    risk: 'Low',    p2Item: 'p2-penny-assessment' },
+  { capability: 'RAG / Knowledge retrieval',      pocState: 'Live · Sprint 3',           trailOsState: 'Penny RAG 22-chunk corpus ✅', risk: 'Low',    p2Item: 'p2-penny-rag' },
   { capability: 'Voice / HeyGen avatar',          pocState: 'Not started',               trailOsState: 'Phase 2 Backlog only',         risk: 'Low',    p2Item: 'p2-penny-asset-library' },
-  { capability: 'Agentforce coexistence',         pocState: 'Not started',               trailOsState: 'Not implemented',              risk: 'Medium', p2Item: 'p2-agentforce' },
+  { capability: 'Agentforce coexistence',         pocState: 'Live · Sprint 4',           trailOsState: 'PennyHub > Agentforce ✅',     risk: 'Low',    p2Item: 'p2-agentforce' },
   { capability: 'Coaching conversation flows',    pocState: 'Regex/pattern match',       trailOsState: 'TestPenny.tsx',                risk: 'Medium', p2Item: 'p2-coaching-flows' },
   { capability: 'Security quiz (Slack delivery)', pocState: 'Not started',               trailOsState: 'Not implemented',              risk: 'Low',    p2Item: 'p2-penny-assessment' },
   { capability: 'Career Translator',              pocState: 'Data model only',           trailOsState: 'Not implemented',              risk: 'Low',    p2Item: 'p2-coaching-flows' },
@@ -498,7 +500,7 @@ export default function Phase1CompletionAudit() {
                   Phase 1 UX: {failCount === 0 ? 'No violations' : `${failCount} violations found`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0 + Sprint 1 + Phase 1 UX Consolidation (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup Gmail card + href fixes),
+                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0–5 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup Gmail card + href fixes, Calendar panel, Agentforce coexistence, SF live cases table, SF case → Penny focus),
                   {watchCount > 0 ? ` ${watchCount} page(s) have acceptable Phase 2 placeholders` : ' 0 watch items'}. No major violations found.
                 </p>
               </div>
@@ -509,9 +511,9 @@ export default function Phase1CompletionAudit() {
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `${hcOk} hardcoded data sets classified as Phase 1 acceptable — realistic sample data.` },
                   { icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />,  text: `${hcP2} hardcoded items identified as Phase 2 data-connection work — all logged in backlog.` },
                   { icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />,  text: `No automated test suite. 70 metadata-driven cases + 4 smoke tools cover Phase 1 validation.` },
-                  { icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />,  text: `Gemini API key needs refresh (AQ. format) before any live Penny LLM capability can ship.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `Salesforce integration operational. Slack bot live. Google OAuth flow documented.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `9 new Phase 2 backlog items added from Penny POC review and hardcoded content analysis.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `Gemini API live — powers Penny Insights, Ask Penny panel, and RAG knowledge retrieval.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `5 integrations live: Salesforce, Slack, Google Drive, Google Calendar, Agentforce (Sprint 4).` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `10 Phase 2 backlog items moved to Done (Ask Penny panel, RAG, Trail Signals, Calendar, Trail Quest, Assessment, Agentforce, SF live queries, Vitest automation, SF case → Penny focus).` },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <span className="shrink-0 mt-0.5">{item.icon}</span>
