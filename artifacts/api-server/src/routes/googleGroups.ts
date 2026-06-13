@@ -1,35 +1,13 @@
 import { Router } from "express";
+import { getAdminAccessToken, getAdminDirectoryStatus } from "../lib/googleAdmin";
 
 const router = Router();
 
 const TRAIL_OS_GROUPS = [
   { tier: 'admin',    email: 'trailosadmin@transitiontrails.org',      label: 'Trail OS Admin' },
   { tier: 'power',    email: 'trailospennyadmin@transitiontrails.org',  label: 'Trail OS Penny Admin' },
-  { tier: 'everyday', email: 'trailosusers@transitiontrails.org',        label: 'TRAIL OS Users' },
+  { tier: 'everyday', email: 'trailosusers@transitiontrails.org',        label: 'Trail OS Users' },
 ] as const;
-
-async function getDirectoryAccessToken(): Promise<string | null> {
-  const refreshToken = process.env.GOOGLE_DIRECTORY_REFRESH_TOKEN;
-  if (!refreshToken) return null;
-
-  try {
-    const res = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id:     process.env.GOOGLE_CLIENT_ID     || '',
-        client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
-        refresh_token: refreshToken,
-        grant_type:    'refresh_token',
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json() as { access_token?: string };
-    return data.access_token ?? null;
-  } catch {
-    return null;
-  }
-}
 
 async function getGroupMembers(groupEmail: string, accessToken: string) {
   try {
@@ -46,12 +24,33 @@ async function getGroupMembers(groupEmail: string, accessToken: string) {
 }
 
 router.get('/admin/google-groups', async (_req, res) => {
-  const accessToken = await getDirectoryAccessToken();
+  const status = getAdminDirectoryStatus();
+
+  if (!status.configured) {
+    res.json({
+      configured: false,
+      method: status.method,
+      message: 'Google Admin Directory not configured. Set GOOGLE_ADMIN_CREDENTIALS (service account JSON key) and GOOGLE_ADMIN_IMPERSONATE_EMAIL in Replit Secrets, then restart the API server.',
+      setupSteps: [
+        'GCP Console → IAM & Admin → Service Accounts → Create service account',
+        'Enable domain-wide delegation on the service account',
+        'Enable "Admin SDK API" in GCP Console → APIs & Services → Library',
+        'In Google Workspace Admin → Security → API controls → Domain-wide delegation: add service account client ID with scope https://www.googleapis.com/auth/admin.directory.group.member.readonly',
+        'Download the service account JSON key and set it as GOOGLE_ADMIN_CREDENTIALS in Replit Secrets',
+        'Set GOOGLE_ADMIN_IMPERSONATE_EMAIL to a Google Workspace admin email (e.g. admin@transitiontrails.org)',
+      ],
+      groups: [],
+    });
+    return;
+  }
+
+  const accessToken = await getAdminAccessToken();
 
   if (!accessToken) {
     res.json({
       configured: false,
-      message: 'GOOGLE_DIRECTORY_REFRESH_TOKEN not set. Authorize Google Directory access in Admin → Setup → Google Groups.',
+      method: status.method,
+      message: 'Directory credentials found but token exchange failed — check that the service account has domain-wide delegation enabled and the correct scope.',
       groups: [],
     });
     return;
@@ -64,16 +63,19 @@ router.get('/admin/google-groups', async (_req, res) => {
         tier:    g.tier,
         email:   g.email,
         label:   g.label,
-        members: members.map(m => ({
-          email: m.email,
-          role:  m.role,
-        })),
-        count: members.length,
+        members: members.map(m => ({ email: m.email, role: m.role })),
+        count:   members.length,
       };
     })
   );
 
-  res.json({ configured: true, groups: results, syncedAt: new Date().toISOString() });
+  res.json({
+    configured:  true,
+    method:      status.method,
+    serviceAccountEmail: status.serviceAccountEmail,
+    groups:      results,
+    syncedAt:    new Date().toISOString(),
+  });
 });
 
 export default router;

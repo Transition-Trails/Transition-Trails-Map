@@ -227,9 +227,9 @@ function AccessTiersTab({
                   status: 'live',
                 },
                 {
-                  icon: <Network className="w-4 h-4 text-emerald-600" />,
+                  icon: <Network className="w-4 h-4 text-amber-500" />,
                   title: 'Step 3 — Auto Tier Assignment',
-                  body: 'On sign-in, /api/auth/tier checks Google Directory API group membership and assigns the matching access tier.',
+                  body: 'Requires GOOGLE_ADMIN_CREDENTIALS (service account JSON) + GOOGLE_ADMIN_IMPERSONATE_EMAIL in Replit Secrets. Once set, /api/auth/tier reads group membership and assigns the matching tier on each sign-in.',
                   status: 'needs-token',
                 },
               ].map(step => (
@@ -254,8 +254,12 @@ function AccessTiersTab({
               <Mail className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
               <span>
                 <strong className="text-amber-800">To enable group-based tier assignment:</strong>{' '}
-                Set <code className="bg-amber-100 px-1 rounded">GOOGLE_DIRECTORY_REFRESH_TOKEN</code> in Admin → Setup.
-                Without it, all @transitiontrails.org users default to the Everyday tier.
+                Add a GCP service account JSON key as{' '}
+                <code className="bg-amber-100 px-1 rounded">GOOGLE_ADMIN_CREDENTIALS</code>{' '}
+                and a Workspace admin email as{' '}
+                <code className="bg-amber-100 px-1 rounded">GOOGLE_ADMIN_IMPERSONATE_EMAIL</code>{' '}
+                in Replit Secrets. See the Secrets Audit for step-by-step setup instructions.
+                Without these, all @transitiontrails.org users default to the Everyday tier.
               </span>
             </div>
 

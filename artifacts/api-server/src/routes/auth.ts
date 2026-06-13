@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getAdminAccessToken, getAdminDirectoryStatus } from "../lib/googleAdmin";
 
 const router = Router();
 
@@ -15,29 +16,6 @@ function getSuperadminEmails(): string[] {
     .split(',')
     .map(e => e.trim())
     .filter(Boolean);
-}
-
-async function getDirectoryAccessToken(): Promise<string | null> {
-  const refreshToken = process.env.GOOGLE_DIRECTORY_REFRESH_TOKEN;
-  if (!refreshToken) return null;
-
-  try {
-    const res = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id:     process.env.GOOGLE_CLIENT_ID     || '',
-        client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
-        refresh_token: refreshToken,
-        grant_type:    'refresh_token',
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json() as { access_token?: string };
-    return data.access_token ?? null;
-  } catch {
-    return null;
-  }
 }
 
 async function getUserGroupEmails(email: string, accessToken: string): Promise<string[]> {
@@ -67,7 +45,7 @@ router.get('/auth/tier', async (req, res) => {
     return;
   }
 
-  const accessToken = await getDirectoryAccessToken();
+  const accessToken = await getAdminAccessToken();
 
   if (accessToken) {
     const groups = await getUserGroupEmails(email, accessToken);
@@ -86,7 +64,11 @@ router.get('/auth/tier', async (req, res) => {
     }
 
     if (email.endsWith(`@${DOMAIN}`)) {
-      res.json({ tier: 'everyday', source: 'domain-fallback', note: 'Not in any Trail OS group — defaulting to Everyday.' });
+      res.json({
+        tier: 'everyday',
+        source: 'domain-fallback',
+        note: `Not in any Trail OS group — defaulting to Everyday. Add ${email} to a Trail OS Google Group in Workspace Admin.`,
+      });
       return;
     }
 
@@ -98,7 +80,7 @@ router.get('/auth/tier', async (req, res) => {
     res.json({
       tier: 'everyday',
       source: 'domain-fallback',
-      note: 'GOOGLE_DIRECTORY_REFRESH_TOKEN not set — group-based tier assignment unavailable. Configure it in Admin → Setup to enable Google Groups tier mapping.',
+      note: 'Google Admin Directory not configured — group-based tier assignment unavailable. Set GOOGLE_ADMIN_CREDENTIALS + GOOGLE_ADMIN_IMPERSONATE_EMAIL in Replit Secrets.',
     });
     return;
   }
@@ -107,9 +89,11 @@ router.get('/auth/tier', async (req, res) => {
 });
 
 router.get('/auth/groups-status', (_req, res) => {
-  const hasToken = !!process.env.GOOGLE_DIRECTORY_REFRESH_TOKEN;
+  const status = getAdminDirectoryStatus();
   res.json({
-    directoryConfigured: hasToken,
+    directoryConfigured: status.configured,
+    directoryMethod:     status.method,
+    serviceAccountEmail: status.serviceAccountEmail,
     groups: Object.entries(TRAIL_OS_GROUPS).map(([tier, email]) => ({ tier, email })),
     domain: DOMAIN,
     superadminCount: getSuperadminEmails().length,

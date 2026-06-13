@@ -109,6 +109,21 @@ function googleClientSecretFormat(v: string) {
 function googleRefreshTokenFormat(v: string) {
   return { plausible: v.startsWith("1//") || v.length > 40, hint: v.startsWith("1//") ? "1// prefix ✓" : v.length > 40 ? "Token length plausible ✓" : "Unexpected refresh token format." };
 }
+function googleServiceAccountFormat(v: string) {
+  try {
+    const key = JSON.parse(v) as { type?: string; private_key?: string; client_email?: string };
+    if (key.type !== "service_account") return { plausible: false, hint: 'JSON parsed but "type" is not "service_account".' };
+    if (!key.private_key?.includes("BEGIN")) return { plausible: false, hint: "Missing or malformed private_key field." };
+    if (!key.client_email?.includes(".iam.gserviceaccount.com")) return { plausible: false, hint: `client_email "${(key.client_email ?? "").slice(0, 20)}…" does not look like a service account address.` };
+    return { plausible: true, hint: `service_account ✓ · ${key.client_email}` };
+  } catch {
+    return { plausible: false, hint: "Not valid JSON — paste the full service account key JSON from Google Cloud Console." };
+  }
+}
+function googleAdminEmailFormat(v: string) {
+  const ok = v.includes("@") && v.endsWith("@transitiontrails.org");
+  return { plausible: ok, hint: ok ? `${v} ✓` : "Should be a Workspace admin email ending in @transitiontrails.org." };
+}
 
 // ─── Secret Catalog ──────────────────────────────────────────────────────────
 
@@ -163,6 +178,10 @@ function buildCatalog(): SecretEntry[] {
     { id: "github-pat",           primary: "GITHUB_PERSONAL_ACCESS_TOKEN", alts: ["GH_TOKEN", "GITHUB_TOKEN"], integration: "GitHub", category: "Personal Access Token", required: false, purpose: "GitHub API access for repository operations, workflow triggers, and content management.", nextFix: "GitHub → Settings → Developer settings → Personal access tokens → Generate new token.", fmtCheck: githubPatFormat },
     { id: "github-webhook",       primary: "GITHUB_WEBHOOK_SECRET",     alts: ["GH_WEBHOOK_SECRET"],          integration: "GitHub", category: "Webhook Secret", required: false, purpose: "Verifies incoming GitHub webhook payloads for repository event processing.", nextFix: "Set a strong random string in GitHub repo → Settings → Webhooks → Secret.", fmtCheck: webhookSecretFormat },
 
+    // ── Google Admin SDK (Directory API — Google Groups auto-tier) ───────────
+    { id: "google-admin-creds",   primary: "GOOGLE_ADMIN_CREDENTIALS",       alts: [], integration: "Google Admin SDK", category: "Service Account", required: true,  purpose: "Service account JSON key with Google Admin SDK Directory API + domain-wide delegation — enables Google Groups auto-tier assignment on sign-in.", nextFix: "GCP Console → IAM & Admin → Service Accounts → Create → Keys → JSON. Enable domain-wide delegation. In Workspace Admin → Security → API Controls → Domain-wide delegation, add the service account client ID with scope https://www.googleapis.com/auth/admin.directory.group.member.readonly. Paste the full JSON here.", fmtCheck: googleServiceAccountFormat },
+    { id: "google-admin-email",   primary: "GOOGLE_ADMIN_IMPERSONATE_EMAIL",  alts: [], integration: "Google Admin SDK", category: "Impersonate Email", required: true, purpose: "A Google Workspace admin email the service account impersonates to read group membership from the Directory API.", nextFix: "Set to any @transitiontrails.org admin account (e.g. admin@transitiontrails.org). The impersonated account must have access to the Admin SDK.", fmtCheck: googleAdminEmailFormat },
+
     // ── Session / Security ─────────────────────────────────────────────────
     { id: "session-secret",       primary: "SESSION_SECRET",             alts: [],                             integration: "Session", category: "Session Security", required: true,  purpose: "Signs and verifies Trail OS user sessions — required for secure auth state management.", nextFix: "Generate with: openssl rand -hex 32. Add as SESSION_SECRET in Replit Secrets.", fmtCheck: sessionSecretFormat },
   ];
@@ -203,6 +222,7 @@ function buildSummaries(entries: SecretEntry[]): IntegrationSummary[] {
     "Salesforce": "border-teal-200 bg-teal-50 text-teal-800",
     "Agentforce": "border-cyan-200 bg-cyan-50 text-cyan-800",
     "GitHub": "border-slate-200 bg-slate-50 text-slate-800",
+    "Google Admin SDK": "border-green-200 bg-green-50 text-green-800",
     "Session": "border-emerald-200 bg-emerald-50 text-emerald-800",
   };
 
