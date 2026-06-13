@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import {
   Send, Sparkles, ArrowRight, ChevronDown,
   CheckCircle2, AlertTriangle, Lightbulb,
-  Hash, Folder, Calendar, Mail, Database, ExternalLink,
+  Hash, Folder, Calendar, Mail, Database, ExternalLink, Loader2,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -381,8 +381,10 @@ export function PagePennyGuide() {
   const [location, setLocation] = useLocation();
   const { isEveryday, isPowerOrAbove } = useTierFlags();
   const { pennyPanelTab, setPennyPanelTab } = useAppContext();
-  const [query, setQuery]   = useState('');
+  const [query, setQuery]     = useState('');
   const [response, setResponse] = useState<string | null>(null);
+  const [loading, setLoading]  = useState(false);
+  const [isError, setIsError]  = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const ctx        = deriveCtx(location);
@@ -415,10 +417,33 @@ export function PagePennyGuide() {
   const sourceOrder: SigSource[] = ['slack', 'salesforce', 'drive', 'calendar', 'email'];
   const presentSources = sourceOrder.filter(s => signalsBySource[s]?.length);
 
-  function handleAsk() {
-    if (!query.trim() || !canned) return;
-    setResponse(canned);
+  async function handleAsk() {
+    if (!query.trim() || loading) return;
+    const q = query.trim();
     setQuery('');
+    setResponse(null);
+    setIsError(false);
+    setLoading(true);
+    try {
+      const res = await fetch('/api/penny/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q, context: ctx }),
+      });
+      const data = await res.json() as { reply?: string; error?: string };
+      if (!res.ok || data.error) {
+        setIsError(true);
+        setResponse(data.error ?? 'Penny ran into an issue. Try again in a moment.');
+      } else {
+        setIsError(false);
+        setResponse(data.reply ?? 'No response returned.');
+      }
+    } catch {
+      setIsError(true);
+      setResponse('Could not reach the Penny API. Check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -656,18 +681,34 @@ export function PagePennyGuide() {
               </p>
             </div>
 
-            {response && (
-              <div className="rounded-lg border border-violet-200 bg-violet-50 p-3">
+            {loading && (
+              <div className="rounded-lg border border-violet-200/60 bg-violet-50/60 p-3 flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 text-violet-500 animate-spin flex-shrink-0" />
+                <span className="text-[11px] text-violet-700">Penny is thinking…</span>
+              </div>
+            )}
+
+            {response && !loading && (
+              <div className={`rounded-lg border p-3 ${isError ? 'border-amber-200 bg-amber-50' : 'border-violet-200 bg-violet-50'}`}>
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <div className="w-3.5 h-3.5 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-2 h-2 text-white" />
+                  <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 ${isError ? 'bg-amber-500' : 'bg-violet-600'}`}>
+                    {isError
+                      ? <AlertTriangle className="w-2 h-2 text-white" />
+                      : <Sparkles className="w-2 h-2 text-white" />}
                   </div>
-                  <span className="text-[9px] font-bold text-violet-700 uppercase tracking-wide">Penny</span>
-                  <button onClick={() => setResponse(null)} className="ml-auto text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+                  <span className={`text-[9px] font-bold uppercase tracking-wide ${isError ? 'text-amber-700' : 'text-violet-700'}`}>
+                    {isError ? 'Error' : 'Penny'}
+                  </span>
+                  <button
+                    onClick={() => { setResponse(null); setIsError(false); }}
+                    className="ml-auto text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                  >
                     ✕
                   </button>
                 </div>
-                <p className="text-[11px] text-violet-900 leading-snug">{response}</p>
+                <p className={`text-[11px] leading-snug whitespace-pre-wrap ${isError ? 'text-amber-900' : 'text-violet-900'}`}>
+                  {response}
+                </p>
               </div>
             )}
 
@@ -683,10 +724,12 @@ export function PagePennyGuide() {
                 />
                 <button
                   onClick={handleAsk}
-                  disabled={!query.trim()}
+                  disabled={!query.trim() || loading}
                   className="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-35 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  {loading
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <Send className="w-3.5 h-3.5" />}
                 </button>
               </div>
               <p className="text-[9px] text-muted-foreground/40 leading-snug">

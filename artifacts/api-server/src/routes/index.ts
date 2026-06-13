@@ -6,6 +6,7 @@ import geminiRouter      from "./gemini";
 import googleRouter      from "./google";
 import googleOAuthRouter from "./googleOAuth";
 import salesforceRouter  from "./salesforce";
+import pennyRouter       from "./penny";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(geminiRouter);
 router.use(googleRouter);
 router.use(googleOAuthRouter);
 router.use(salesforceRouter);
+router.use(pennyRouter);
 
 export default router;
