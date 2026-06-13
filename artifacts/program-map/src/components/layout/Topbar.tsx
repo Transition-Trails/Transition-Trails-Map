@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles } from 'lucide-react';
+import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -353,7 +353,12 @@ function UserProfileButton() {
 export function Topbar() {
   const [location, setLocation] = useLocation();
   const { section, title } = getPageInfo(location);
-  const { rightPanelOpen, setRightPanelOpen, askPennyOpen, setAskPennyOpen, mobileSidebarOpen, setMobileSidebarOpen } = useAppContext();
+  const {
+    rightPanelOpen, setRightPanelOpen,
+    askPennyOpen, setAskPennyOpen,
+    calendarPanelOpen, setCalendarPanelOpen,
+    mobileSidebarOpen, setMobileSidebarOpen,
+  } = useAppContext();
 
   return (
     <div className="flex items-center justify-between h-[48px] px-3 border-b bg-card shrink-0">
@@ -389,11 +394,39 @@ export function Topbar() {
               ? 'bg-violet-100 border-violet-300 text-violet-700 hover:bg-violet-200'
               : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700'
           }`}
-          onClick={() => setAskPennyOpen(!askPennyOpen)}
+          onClick={() => {
+            if (askPennyOpen) {
+              setAskPennyOpen(false);
+            } else {
+              setAskPennyOpen(true);
+              setCalendarPanelOpen(false);
+            }
+          }}
           title="Ask Penny (AI guide)"
         >
           <Sparkles className="w-3 h-3 flex-shrink-0" />
           <span className="hidden sm:inline">{askPennyOpen ? 'Close' : TERMS.aiAssistant}</span>
+        </button>
+
+        {/* Calendar action panel toggle */}
+        <button
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
+            calendarPanelOpen
+              ? 'bg-emerald-100 border-emerald-300 text-emerald-700 hover:bg-emerald-200'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700'
+          }`}
+          onClick={() => {
+            if (calendarPanelOpen) {
+              setCalendarPanelOpen(false);
+            } else {
+              setCalendarPanelOpen(true);
+              setAskPennyOpen(false);
+            }
+          }}
+          title="Calendar — upcoming events & Penny prep briefs"
+        >
+          <CalendarDays className="w-3 h-3 flex-shrink-0" />
+          <span className="hidden sm:inline">{calendarPanelOpen ? 'Close' : 'Calendar'}</span>
         </button>
 
         <SignalsIndicator />

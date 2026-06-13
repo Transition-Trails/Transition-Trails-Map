@@ -62,6 +62,8 @@ interface AppState {
   setRightPanelOpen: (v: boolean) => void;
   askPennyOpen: boolean;
   setAskPennyOpen: (v: boolean) => void;
+  calendarPanelOpen: boolean;
+  setCalendarPanelOpen: (v: boolean) => void;
   pendingPennyQuery: string | null;
   setPendingPennyQuery: (q: string | null) => void;
   mobileSidebarOpen: boolean;
@@ -99,8 +101,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [slackPanel,  setSlackPanel]    = useState<SlackPanelConfig | null>(null);
   const [pennyPanelTab, setPennyPanelTab] = useState<'penny' | 'signals' | 'ask'>('penny');
   const [rightPanelOpen, setRightPanelOpen]       = useState(false);
-  const [askPennyOpen, setAskPennyOpen]           = useState(false);
-  const [pendingPennyQuery, setPendingPennyQuery] = useState<string | null>(null);
+  const [askPennyOpen, setAskPennyOpen]             = useState(false);
+  const [calendarPanelOpen, setCalendarPanelOpen]   = useState(false);
+  const [pendingPennyQuery, setPendingPennyQuery]   = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
@@ -176,6 +179,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       pennyPanelTab, setPennyPanelTab,
       rightPanelOpen, setRightPanelOpen,
       askPennyOpen, setAskPennyOpen,
+      calendarPanelOpen, setCalendarPanelOpen,
       pendingPennyQuery, setPendingPennyQuery,
       mobileSidebarOpen, setMobileSidebarOpen,
       setActivePage, setActiveLens, setUserTier, setSelectedItem, setSearchOpen,
