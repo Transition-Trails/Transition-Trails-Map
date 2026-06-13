@@ -78,13 +78,13 @@ function AccessTiersTab({
     <ScrollArea className="h-full">
       <div className="p-5 space-y-6 max-w-5xl">
 
-        {/* Prototype notice */}
-        <div className="flex items-center gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50">
-          <Lock className="w-4 h-4 text-amber-600 flex-shrink-0" />
-          <p className="text-[12px] text-amber-800 leading-snug">
-            <strong>Prototype mode</strong> — no auth enforced. Use "Preview this tier" below to simulate any
-            access level. Google Workspace SSO (planned Q3–Q4) will auto-assign tiers from Google Group
-            membership — no component changes needed when that ships.
+        {/* Auth live notice */}
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-200 bg-emerald-50">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+          <p className="text-[12px] text-emerald-800 leading-snug">
+            <strong>Authentication is live</strong> — Google Sign-In via Clerk is active. Tier is
+            auto-assigned from Google Group membership on sign-in. Use "Preview this tier" below
+            to simulate a different access level in the current session.
           </p>
         </div>
 
@@ -183,28 +183,31 @@ function AccessTiersTab({
             </div>
           </div>
           <p className="text-[10px] text-muted-foreground mt-2">
-            Full group addresses:{' '}
-            <span className="font-mono">trail-os-users@transitiontrails.org</span>,{' '}
-            <span className="font-mono">trail-power-users@…</span>,{' '}
-            <span className="font-mono">trail-admins@…</span>{' '}
-            — update in <code>src/config/accessTiers.ts</code> when Google Workspace domain is finalized.
+            Live group addresses:{' '}
+            <span className="font-mono">trailosuers@transitiontrails.org</span> (Everyday),{' '}
+            <span className="font-mono">trailospennyadmin@transitiontrails.org</span> (Power),{' '}
+            <span className="font-mono">trailosadmin@transitiontrails.org</span> (Admin)
+            — managed in Google Workspace Admin.
           </p>
         </div>
 
-        {/* Google Workspace SSO roadmap */}
+        {/* Google Workspace Authentication — live */}
         <div>
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">
-            Future: Google Workspace Authentication
+            Google Workspace Authentication
           </p>
-          <div className="rounded-xl border border-dashed border-border bg-muted/10 p-5 space-y-4">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-5 space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white border border-border flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-9 h-9 rounded-lg bg-white border border-emerald-200 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <Chrome className="w-5 h-5 text-[#4285F4]" />
               </div>
-              <div>
-                <p className="text-[13px] font-semibold text-foreground">Google Sign-In (OAuth 2.0 + OpenID Connect)</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Users sign in with their Transition Trails Google account. No separate Trail OS password required.
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-[13px] font-semibold text-foreground">Google Sign-In (OAuth 2.0 + OpenID Connect)</p>
+                  <span className="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-wide">Live</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Users sign in with their Transition Trails Google account. Tier is auto-assigned from Google Group membership.
                 </p>
               </div>
             </div>
@@ -212,33 +215,33 @@ function AccessTiersTab({
             <div className="grid grid-cols-3 gap-3">
               {[
                 {
-                  icon: <Globe className="w-4 h-4 text-blue-500" />,
-                  title: 'Step 1 — Google OAuth App',
-                  body: 'OAuth client configured in /admin/google-oauth for the prototype. Production client ID to be set for the Trail OS domain.',
-                  status: 'partial',
+                  icon: <Globe className="w-4 h-4 text-emerald-600" />,
+                  title: 'Step 1 — Google Sign-In',
+                  body: 'Clerk handles Google OAuth. Users sign in with @transitiontrails.org accounts — no separate Trail OS password.',
+                  status: 'live',
                 },
                 {
-                  icon: <Users className="w-4 h-4 text-violet-500" />,
-                  title: 'Step 2 — Google Groups Setup',
-                  body: 'Create trail-os-users, trail-power-users, and trail-admins groups in Google Admin. Members get access tiers automatically.',
-                  status: 'planned',
+                  icon: <Users className="w-4 h-4 text-emerald-600" />,
+                  title: 'Step 2 — Google Groups',
+                  body: 'Three Trail OS groups defined in Google Workspace Admin: trailosadmin, trailospennyadmin, and trailosuers.',
+                  status: 'live',
                 },
                 {
-                  icon: <Network className="w-4 h-4 text-emerald-500" />,
-                  title: 'Step 3 — Group Membership Check',
-                  body: 'On sign-in, Trail OS calls Google Directory API to check group membership and assign the matching access tier automatically.',
-                  status: 'planned',
+                  icon: <Network className="w-4 h-4 text-emerald-600" />,
+                  title: 'Step 3 — Auto Tier Assignment',
+                  body: 'On sign-in, /api/auth/tier checks Google Directory API group membership and assigns the matching access tier.',
+                  status: 'needs-token',
                 },
               ].map(step => (
                 <div key={step.title} className="bg-white border border-border rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     {step.icon}
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
-                      step.status === 'partial'
-                        ? 'bg-amber-100 text-amber-700'
-                        : 'bg-muted text-muted-foreground'
+                      step.status === 'live'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-amber-100 text-amber-700'
                     }`}>
-                      {step.status === 'partial' ? 'Partial' : 'Planned'}
+                      {step.status === 'live' ? 'Live' : 'Needs Token'}
                     </span>
                   </div>
                   <p className="text-[11px] font-semibold text-foreground mb-1">{step.title}</p>
@@ -247,13 +250,12 @@ function AccessTiersTab({
               ))}
             </div>
 
-            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-sky-50 border border-sky-100 rounded-lg px-3 py-2">
-              <Mail className="w-3.5 h-3.5 text-sky-500 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+              <Mail className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
               <span>
-                <strong className="text-sky-800">Prototype access:</strong>{' '}
-                Use the tier switcher (★ Super button in Topbar) to preview any tier. Google Workspace SSO will
-                replace this — wire auth response to{' '}
-                <code className="bg-sky-100 px-1 rounded">setUserTier()</code> in AppContext.
+                <strong className="text-amber-800">To enable group-based tier assignment:</strong>{' '}
+                Set <code className="bg-amber-100 px-1 rounded">GOOGLE_DIRECTORY_REFRESH_TOKEN</code> in Admin → Setup.
+                Without it, all @transitiontrails.org users default to the Everyday tier.
               </span>
             </div>
 

@@ -5,11 +5,11 @@
 // each user sees. The three production tiers map to Google Workspace Groups
 // so that future Google Sign-In can assign them automatically.
 //
-// GOOGLE GROUPS MAPPING (planned):
-//   trail-os-users@<domain>        → everyday     (Regular/Everyday User)
-//   trail-power-users@<domain>     → power        (Penny Power User)
-//   trail-admins@<domain>          → admin        (Full Admin)
-//   N/A — prototype only           → superadmin   (Builder / Super Admin)
+// GOOGLE GROUPS MAPPING (active — matches Workspace admin console):
+//   trailosuers@transitiontrails.org        → everyday     (Regular/Everyday User)
+//   trailospennyadmin@transitiontrails.org  → power        (Penny Power User)
+//   trailosadmin@transitiontrails.org       → admin        (Full Admin)
+//   N/A — email whitelist only              → superadmin   (Builder / Super Admin)
 //
 // PROTOTYPE STATE (current):
 //   Default tier = 'superadmin'. The tier switcher in the Topbar lets the
@@ -34,8 +34,8 @@ export const TIER_CONFIG = {
   everyday: {
     label:       'Everyday User',
     shortLabel:  'Everyday',
-    googleGroup: 'trail-os-users@transitiontrails.org',
-    groupLabel:  'TRAIL OS user',
+    googleGroup: 'trailosuers@transitiontrails.org',
+    groupLabel:  'TRAIL OS Users',
     description: 'Program team, coaches, and coordinators.',
     detail:      'Simplified program health, learner activity, and guided next actions. Visual indicators, counts, and page-level Trail Signals. Digital Twin runs as silent background infrastructure.',
     color:       'emerald',
@@ -48,8 +48,8 @@ export const TIER_CONFIG = {
   power: {
     label:       'Penny Power User',
     shortLabel:  'Power',
-    googleGroup: 'trail-power-users@transitiontrails.org',
-    groupLabel:  'TRAIL Power User',
+    googleGroup: 'trailospennyadmin@transitiontrails.org',
+    groupLabel:  'Trail OS Penny Admin',
     description: 'Penny governors and AI operations.',
     detail:      'Full Penny analytics, prompt governance, quality metrics, source trust, usage analytics, learner/cohort intelligence, and deeper Trail Signals. Digital Twin as explainable context layer.',
     color:       'violet',
@@ -62,8 +62,8 @@ export const TIER_CONFIG = {
   admin: {
     label:       'Admin',
     shortLabel:  'Admin',
-    googleGroup: 'trail-admins@transitiontrails.org',
-    groupLabel:  'TRAIL Admin',
+    googleGroup: 'trailosadmin@transitiontrails.org',
+    groupLabel:  'Trail OS Admin',
     description: 'System integrators and platform operators.',
     detail:      'All integration, authentication, secrets, Salesforce, Slack, Google, Drive, Calendar, Gmail, object model, governance, Digital Twin studio, lifecycle, ownership, and configuration.',
     color:       'amber',

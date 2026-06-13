@@ -13,6 +13,9 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@clerk/express": "^2.1.26",
+    "@clerk/shared": "^4.17.1",
+    "http-proxy-middleware": "^3.0.0",
     "@replit/connectors-sdk": "^0.4.1",
     "@vitest/coverage-v8": "^4.1.8",
     "@workspace/api-zod": "workspace:*",

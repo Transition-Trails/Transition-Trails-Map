@@ -1,15 +1,17 @@
 import { Router, type IRouter } from "express";
-import healthRouter      from "./health";
-import slackRouter       from "./slack";
-import secretsRouter     from "./secrets";
-import geminiRouter      from "./gemini";
-import googleRouter      from "./google";
-import googleOAuthRouter from "./googleOAuth";
-import salesforceRouter  from "./salesforce";
-import pennyRouter       from "./penny";
-import retrieveRouter    from "./retrieve";
-import calendarRouter    from "./calendar";
-import agentforceRouter  from "./agentforce";
+import healthRouter       from "./health";
+import slackRouter        from "./slack";
+import secretsRouter      from "./secrets";
+import geminiRouter       from "./gemini";
+import googleRouter       from "./google";
+import googleOAuthRouter  from "./googleOAuth";
+import salesforceRouter   from "./salesforce";
+import pennyRouter        from "./penny";
+import retrieveRouter     from "./retrieve";
+import calendarRouter     from "./calendar";
+import agentforceRouter   from "./agentforce";
+import authRouter         from "./auth";
+import googleGroupsRouter from "./googleGroups";
 
 const router: IRouter = Router();
 
@@ -24,5 +26,7 @@ router.use(pennyRouter);
 router.use(retrieveRouter);
 router.use(calendarRouter);
 router.use(agentforceRouter);
+router.use(authRouter);
+router.use(googleGroupsRouter);
 
 export default router;

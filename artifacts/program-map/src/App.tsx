@@ -3,8 +3,30 @@ import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppProvider } from "@/context/AppContext";
+import { AppProvider, useAppContext } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
+import { ClerkProvider, useUser, Show } from "@clerk/react";
+import { publishableKeyFromHost } from "@clerk/react/internal";
+import SignInPage from "@/pages/SignIn";
+import { type AccessTier } from "@/config/accessTiers";
+import { Map } from "lucide-react";
+
+// Module-level — required by Clerk skill. publishableKeyFromHost resolves the
+// key from the hostname so the same build serves multiple Clerk custom domains.
+const clerkPubKey = publishableKeyFromHost(
+  window.location.hostname,
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+);
+// Empty in dev (Clerk hits FAPI directly); auto-set in prod by the proxy system.
+const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+// Strip the Vite base path prefix from Clerk's full-path navigation events.
+function stripBase(path: string): string {
+  return basePath && path.startsWith(basePath)
+    ? path.slice(basePath.length) || "/"
+    : path;
+}
 
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
@@ -212,20 +234,104 @@ function Router() {
   );
 }
 
+// ── Tier initializer — auto-sets tier from Google Groups after sign-in ─────────
+function TierInitializer() {
+  const { user, isSignedIn } = useUser();
+  const { setUserTier } = useAppContext();
+
+  useEffect(() => {
+    if (!isSignedIn || !user) return;
+    const email = user.primaryEmailAddress?.emailAddress;
+    if (!email) return;
+    fetch(`/api/auth/tier?email=${encodeURIComponent(email)}`)
+      .then(r => r.json())
+      .then((data: { tier?: string }) => {
+        const VALID: string[] = ['everyday', 'power', 'admin', 'superadmin'];
+        if (data.tier && VALID.includes(data.tier)) {
+          setUserTier(data.tier as AccessTier);
+        }
+      })
+      .catch(() => {});
+  }, [isSignedIn, user?.id]);
+
+  return null;
+}
+
+// ── Sign-in landing for "/" when not authenticated ──────────────────────────────
+function SignInLanding() {
+  const [, setLocation] = useLocation();
+  return (
+    <div className="min-h-screen bg-[hsl(40_30%_94%)] flex flex-col items-center justify-center gap-6 px-4">
+      <div className="text-center space-y-2">
+        <div className="flex justify-center mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-md">
+            <Map className="w-7 h-7 text-primary-foreground" />
+          </div>
+        </div>
+        <h1 className="text-3xl font-semibold text-foreground">Trail OS</h1>
+        <p className="text-sm text-muted-foreground">Internal platform · Transition Trails Academy</p>
+      </div>
+      <button
+        onClick={() => setLocation('/sign-in')}
+        className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm"
+      >
+        Sign in with Google
+      </button>
+      <p className="text-[11px] text-muted-foreground/60">@transitiontrails.org accounts only</p>
+    </div>
+  );
+}
+
+// ── Inner app: inside WouterRouter so useLocation is available for ClerkProvider
+function InnerApp() {
+  const [, setLocation] = useLocation();
+
+  return (
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      proxyUrl={clerkProxyUrl}
+      routerPush={(to: string) => setLocation(stripBase(to))}
+      routerReplace={(to: string) => setLocation(stripBase(to))}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-in`}
+      appearance={{ cssLayerName: 'clerk' }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AppProvider>
+            <Switch>
+              {/* Auth pages — no AppShell */}
+              <Route path="/sign-in/*?" component={SignInPage} />
+
+              {/* Everything else — auth-gated */}
+              <Route>
+                <Show when="signed-in">
+                  <TierInitializer />
+                  <AppShell>
+                    <Router />
+                  </AppShell>
+                </Show>
+                <Show when="signed-out">
+                  <Switch>
+                    <Route path="/" component={SignInLanding} />
+                    <Route component={SignInPage} />
+                  </Switch>
+                </Show>
+              </Route>
+            </Switch>
+          </AppProvider>
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
+  );
+}
+
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AppProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <AppShell>
-              <Router />
-            </AppShell>
-          </WouterRouter>
-        </AppProvider>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+      <InnerApp />
+    </WouterRouter>
   );
 }
 

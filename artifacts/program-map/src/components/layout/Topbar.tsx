@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { useUser, useClerk } from '@clerk/react';
 import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
@@ -128,14 +129,6 @@ const TIER_SEGMENTS: { tier: AccessTier; label: string; icon?: string }[] = [
   { tier: 'superadmin', label: 'Super', icon: '★' },
 ];
 
-// Placeholder prototype user (replaced with real Google data post-auth)
-const PROTOTYPE_USER = {
-  name:     'Trail OS User',
-  email:    'prototype@transitiontrails.org',
-  initials: 'TT',
-  photoUrl: null as string | null,
-};
-
 // ── Section row used in the preferences list ──────────────────────────────────
 function PrefRow({ icon: Icon, label, hint, badge, onClick }: {
   icon: React.ComponentType<{ className?: string }>;
@@ -168,12 +161,22 @@ function PrefRow({ icon: Icon, label, hint, badge, onClick }: {
 // ── User profile button + panel ───────────────────────────────────────────────
 function UserProfileButton() {
   const { userTier, setUserTier } = useAppContext();
+  const { user: clerkUser }       = useUser();
+  const { signOut }               = useClerk();
   const [open, setOpen]           = useState(false);
   const ref                       = useRef<HTMLDivElement>(null);
 
   const current      = TIER_CONFIG[userTier];
   const isPreviewing = userTier !== 'superadmin';
-  const user         = PROTOTYPE_USER;
+
+  // Derive display data from Clerk user
+  const name     = clerkUser?.fullName ?? clerkUser?.firstName ?? 'Trail OS User';
+  const email    = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
+  const initials = clerkUser
+    ? (`${clerkUser.firstName?.[0] ?? ''}${clerkUser.lastName?.[0] ?? ''}`
+        .toUpperCase() || 'TO')
+    : 'TO';
+  const photoUrl = clerkUser?.imageUrl ?? null;
 
   // Close panel on outside click
   useEffect(() => {
@@ -198,7 +201,7 @@ function UserProfileButton() {
       {/* ── Avatar button ── */}
       <button
         onClick={() => setOpen(o => !o)}
-        title={`Signed in as ${user.name} · ${current.label} view`}
+        title={`Signed in as ${name} · ${current.label} view`}
         className={`relative flex items-center justify-center w-7 h-7 rounded-full ring-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-primary/50 ${
           open
             ? `ring-primary/40 ring-offset-1 ring-offset-background`
@@ -207,11 +210,11 @@ function UserProfileButton() {
             : 'ring-border/60 hover:ring-primary/30 ring-offset-1 ring-offset-background'
         }`}
       >
-        {user.photoUrl ? (
-          <img src={user.photoUrl} alt={user.name} className="w-full h-full rounded-full object-cover" />
+        {photoUrl ? (
+          <img src={photoUrl} alt={name} className="w-full h-full rounded-full object-cover" />
         ) : (
           <div className="w-full h-full rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold select-none">
-            {user.initials}
+            {initials}
           </div>
         )}
         {/* Tier dot — bottom-right overlay */}
@@ -227,11 +230,11 @@ function UserProfileButton() {
             <div className="flex items-center gap-3">
               {/* Large avatar */}
               <div className="relative w-10 h-10 flex-shrink-0">
-                {user.photoUrl ? (
-                  <img src={user.photoUrl} alt={user.name} className="w-full h-full rounded-full object-cover ring-2 ring-border" />
+                {photoUrl ? (
+                  <img src={photoUrl} alt={name} className="w-full h-full rounded-full object-cover ring-2 ring-border" />
                 ) : (
                   <div className="w-full h-full rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold ring-2 ring-border select-none">
-                    {user.initials}
+                    {initials}
                   </div>
                 )}
                 <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${tierDot[userTier]}`} />
@@ -239,13 +242,13 @@ function UserProfileButton() {
 
               {/* Name + email */}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-foreground truncate">{user.name}</p>
-                <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+                <p className="text-[13px] font-semibold text-foreground truncate">{name}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{email}</p>
               </div>
 
-              {/* Prototype badge */}
-              <span className="text-[8px] font-bold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700 px-1.5 py-0.5 rounded flex-shrink-0">
-                Prototype
+              {/* Google connected badge */}
+              <span className="text-[8px] font-bold uppercase tracking-wide bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded flex-shrink-0">
+                Google
               </span>
             </div>
 
@@ -284,7 +287,7 @@ function UserProfileButton() {
               })}
             </div>
             <p className="text-[9px] text-muted-foreground/50 mt-2 leading-snug">
-              Super Admin can preview any tier. Future: assigned automatically via Google Groups.
+              Tier auto-assigned via Google Groups on sign-in. Super Admin can preview any tier.
             </p>
           </div>
 
@@ -322,27 +325,29 @@ function UserProfileButton() {
           {/* ── Google account section ── */}
           <div className="px-4 py-3 border-t border-border bg-muted/10">
             <div className="flex items-start gap-2.5">
-              <Chrome className="w-3.5 h-3.5 text-muted-foreground/50 mt-0.5 flex-shrink-0" />
+              <Chrome className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-[11px] font-semibold text-foreground">Google Account</p>
-                  <span className="text-[8px] font-bold bg-sky-50 border border-sky-200 text-sky-700 px-1.5 py-0.5 rounded uppercase tracking-wide">
-                    Q3 Planned
+                  <span className="text-[8px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                    Connected
                   </span>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
-                  Sign-in, profile photo, and tier assignment via Google Workspace SSO + Groups.
+                <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug truncate">
+                  {email || 'Signed in via Google Workspace'}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* ── Sign out stub ── */}
+          {/* ── Sign out ── */}
           <div className="px-4 py-2 border-t border-border">
-            <button className="w-full flex items-center gap-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors py-1 group">
+            <button
+              onClick={() => { setOpen(false); void signOut(); }}
+              className="w-full flex items-center gap-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors py-1 group"
+            >
               <LogOut className="w-3.5 h-3.5 flex-shrink-0 group-hover:text-rose-500 transition-colors" />
               <span className="group-hover:text-rose-600 transition-colors">Sign out</span>
-              <span className="ml-auto text-[8px] opacity-40 font-medium">prototype only</span>
             </button>
           </div>
 
