@@ -39,7 +39,7 @@ interface PocItem {
 
 // ── Audit data ────────────────────────────────────────────────────────────────
 
-const AUDIT_DATE = 'Jun 12, 2026';
+const AUDIT_DATE = 'Jun 13, 2026';
 
 const PAGE_AUDITS: PageAudit[] = [
   { path: '/',                              name: 'Home',                            role: 'All',    status: 'pass',  issues: '' },
@@ -76,13 +76,13 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/collaboration/templates',       name: 'Collaboration · Templates',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/governance',                    name: 'Governance Hub',                  role: 'Admin+', status: 'fixed', issues: '4× stat values removed' },
   { path: '/admin',                         name: 'Admin · Landing (→ Setup)',       role: 'Admin+', status: 'fixed', issues: '/admin now redirects to /admin/setup; AdminSetup is the canonical Administration landing' },
-  { path: '/admin/setup',                   name: 'Admin · Setup',                   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed Integration Readiness from sidebar; Setup is now canonical admin entry; Phase 1 UX: Gmail card added to NEEDS_CONFIG (google-mail Replit connector confirmed); Google Drive + Calendar hrefs updated to /collaboration/drive and /collaboration/calendar; Drive + Calendar status updated to configured; PHASE_2 items reduced to 3 (Mural, LMS, Agentforce)' },
+  { path: '/admin/setup',                   name: 'Admin · Setup',                   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed Integration Readiness from sidebar; Setup is now canonical admin entry; Phase 1 UX: Gmail card added to NEEDS_CONFIG; Drive + Calendar moved to LIVE_INTEGRATIONS (OAuth tokens obtained); Google OAuth status updated to live; admin sidebar deduplicated — removed Phase 1 Readiness, UX Standards, Phase 2 Backlog, Phase 1 Audit from sidebar nav (all accessible via Admin Setup readiness grid)' },
   { path: '/admin/people-access',           name: 'Admin · People & Access',         role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/integration-readiness',   name: 'Admin · Integration Readiness',   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed from sidebar nav; accessible only via Admin Setup deep-link; canonical entry is /admin/setup' },
   { path: '/admin/phase1-readiness',        name: 'Admin · Phase 1 Readiness',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/ux-standards',            name: 'Admin · UX Standards',            role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/secrets-audit',           name: 'Admin · Secrets Audit',           role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/admin/google-oauth',            name: 'Admin · Google OAuth',            role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/google-oauth',            name: 'Admin · Google OAuth',            role: 'Admin+', status: 'fixed', issues: 'OAuth flow unblocked: Authorize button changed to target="_blank" (Google blocks OAuth inside iframes); GOOGLE_DRIVE_REFRESH_TOKEN and GOOGLE_CALENDAR_REFRESH_TOKEN obtained and stored in Replit Secrets; Drive + Calendar status updated to live across AdminSetup, readinessState.ts, and PagePennyGuide footer' },
   { path: '/admin/sf-validation',           name: 'Admin · SF Validation',           role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/program-resources',       name: 'Admin · Drive Workspaces',        role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/phase2-backlog',          name: 'Admin · Phase 2 Backlog',         role: 'Admin+', status: 'pass',  issues: '' },
@@ -116,6 +116,7 @@ const HARDCODED_ITEMS: HardcodedItem[] = [
   { name: 'TestPenny regex responses',       location: 'pages/penny/TestPenny.tsx',           classification: 'stale',       p2Item: 'p2-penny-live-llm', notes: 'Pattern-match responses should be replaced by live Gemini LLM calls' },
   { name: '"Live (POC)" Slack status',       location: 'PagePennyGuide.tsx, TrailOsHealth',   classification: 'fixed',       notes: 'Sprint 1: updated to "Live" in PagePennyGuide (SOURCE_CONNECT + collaboration powerInsights) and TrailOsHealth integrations array' },
   { name: '"new Gemini key needed" footer', location: 'PagePennyGuide.tsx line 696 (Ask Penny tab)', classification: 'fixed', notes: 'Phase 1 UX: stale text "Prototype responses — new Gemini key needed · Agentforce: Phase 2" updated to "Live · Gemini API · Agentforce upgrade: Phase 2"' },
+  { name: '"Google OAuth in progress" footer', location: 'PagePennyGuide.tsx Trail Signals footer', classification: 'fixed', notes: 'Jun 13: stale text "Google OAuth in progress" updated to "Salesforce + Slack + Google OAuth live" after refresh tokens obtained' },
 ];
 
 const POC_ITEMS: PocItem[] = [

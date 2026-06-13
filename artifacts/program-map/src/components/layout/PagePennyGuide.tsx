@@ -230,7 +230,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     powerInsights: [
       'Health status: 3 active, 1 in discovery, 1 in planning',
-      'Integration readiness: Salesforce live (REST API), Google OAuth in progress',
+      'Integration readiness: Salesforce + Google OAuth live — Drive + Calendar tokens active',
       '7 open demand items — 2 flagged at-risk by age and type',
       'Trail of Mastery execute phase needs source documentation before delivery',
     ],
@@ -331,20 +331,21 @@ const CONTENT: Record<PageCtx, PageContent> = {
     powerInsights: [
       'Salesforce live — REST API connected, PMM + NPSP confirmed. Next: wire to dashboard.',
       'Slack live — @coachconnectbot posting. Next: add channels:read scope.',
-      'Google OAuth setup available — run at /admin/google-oauth to get refresh tokens',
+      'Google OAuth live — Drive + Calendar refresh tokens obtained and stored in Replit Secrets',
       'Phase 2 backlog: 19 draft features captured at /admin/phase2-backlog',
     ],
     attentionItems: [
       { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Salesforce live — REST API + PMM confirmed' },
+      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Google OAuth live — Drive + Calendar tokens active' },
     ],
     everydaySteps: [],
     powerSteps: [
       { label: 'Phase 1 readiness', path: '/admin/phase1-readiness' },
       { label: 'Phase 2 backlog',   path: '/admin/phase2-backlog' },
-      { label: 'Google Auth setup', path: '/admin/google-oauth' },
+      { label: 'Google OAuth',      path: '/admin/google-oauth' },
     ],
     everydayCanned: "",
-    powerCanned:    "Admin status: Salesforce live (REST API + PMM). Slack POC confirmed (@coachconnectbot). Google OAuth client ready — run /admin/google-oauth to get refresh tokens. Phase 2 backlog: 10 draft features at /admin/phase2-backlog.",
+    powerCanned:    "Admin status: Salesforce + Google OAuth live (REST API + PMM, Drive + Calendar tokens stored). Slack POC confirmed (@coachconnectbot). Phase 2 backlog: 19 draft features at /admin/phase2-backlog.",
   },
   'digital-twin': {
     everydayInsights: [],
@@ -603,7 +604,7 @@ export function PagePennyGuide() {
                       {/* Footer — close + context note */}
                       <div className="px-3 py-2 bg-muted/20 flex items-center justify-between gap-2">
                         <p className="text-[9px] text-muted-foreground/40 leading-snug">
-                          Phase 1 · Salesforce + Slack live · Google OAuth in progress
+                          Phase 1 · Salesforce + Slack + Google OAuth live
                         </p>
                         <button
                           onClick={toggleSignals}
@@ -657,7 +658,7 @@ export function PagePennyGuide() {
               {isPowerOrAbove && (
                 <div className="rounded-md bg-muted/30 border border-border/50 p-2.5">
                   <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
-                    <span className="font-semibold text-muted-foreground/70">Salesforce + Slack live.</span> Google OAuth in progress. Agentforce + GA4: Phase 2. Select any item to open its Trail Insights.
+                    <span className="font-semibold text-muted-foreground/70">Salesforce + Slack + Google OAuth live.</span> Drive + Calendar tokens active. Agentforce + GA4: Phase 2. Select any item to open its Trail Insights.
                   </p>
                 </div>
               )}

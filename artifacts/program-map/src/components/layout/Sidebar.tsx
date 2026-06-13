@@ -107,13 +107,8 @@ const navGroups: NavGroup[] = [
     icon: Settings,
     pathPrefix: '/admin',
     items: [
-      { id: 'admin-home',          path: '/admin/setup',          label: 'Administration' },
-      { id: 'admin-people-access', path: '/admin/people-access',  label: 'People & Access' },
-      { id: 'lbl-tools',           label: 'Tools',                isLabel: true },
-      { id: 'admin-p1',            path: '/admin/phase1-readiness', label: 'Phase 1 Readiness' },
-      { id: 'admin-ux',            path: '/admin/ux-standards',   label: 'UX Standards' },
-      { id: 'admin-p2',            path: '/admin/phase2-backlog', label: 'Phase 2 Backlog' },
-      { id: 'admin-audit',         path: '/admin/phase1-audit',   label: 'Phase 1 Audit' },
+      { id: 'admin-home',          path: '/admin/setup',         label: 'Administration' },
+      { id: 'admin-people-access', path: '/admin/people-access', label: 'People & Access' },
     ],
   },
 ];

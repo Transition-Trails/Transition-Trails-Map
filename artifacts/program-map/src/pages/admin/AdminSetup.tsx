@@ -90,15 +90,14 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     id: 'google-oauth',
     name: 'Google OAuth',
     tagline: 'Auth Foundation',
-    status: 'configured',
+    status: 'live',
     icon: Lock,
     iconCls: 'bg-emerald-50 text-emerald-700',
     owner: 'IT Admin',
-    detail: 'Redirect URI set. OAuth client ID public and safe in URL.',
-    lastCheck: 'This week',
+    detail: 'Refresh tokens obtained and stored. Drive + Calendar OAuth scopes active. Wizard available if tokens need rotation.',
+    lastCheck: 'Today',
     action: 'Auth Wizard',
     href: '/admin/google-oauth',
-    needs: 'Run wizard once per environment to generate and store refresh token',
   },
   {
     id: 'gemini',
@@ -113,18 +112,16 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     action: 'Secrets Audit',
     href: '/admin/secrets-audit',
   },
-];
-
-const NEEDS_CONFIG: SetupCard[] = [
   {
     id: 'google-drive',
     name: 'Google Drive',
     tagline: 'Content Repository',
-    status: 'configured',
+    status: 'live',
     icon: FolderOpen,
     iconCls: 'bg-green-50 text-green-700',
     owner: 'Ops Lead',
-    detail: 'Replit connector active. Drive folder structure defined in prototype. UI wiring and program workspace sync are Phase 2 priorities.',
+    detail: 'OAuth refresh token active. Replit connector live. Drive folder structure defined. UI wiring and program workspace sync are Phase 2 priorities.',
+    lastCheck: 'Today',
     action: 'Drive Hub',
     href: '/collaboration/drive',
     needs: 'Wire first program folder read to Drive workspace panel',
@@ -133,15 +130,19 @@ const NEEDS_CONFIG: SetupCard[] = [
     id: 'google-calendar',
     name: 'Google Calendar',
     tagline: 'Timing & Trigger Layer',
-    status: 'configured',
+    status: 'live',
     icon: Calendar,
     iconCls: 'bg-amber-50 text-amber-700',
     owner: 'IT Admin',
-    detail: 'Replit connector active. Cohort event model defined. Calendar panel and event-trigger wiring are Phase 2.',
+    detail: 'OAuth refresh token active. Replit connector live. Cohort event model defined. Calendar panel and event-trigger wiring are Phase 2.',
+    lastCheck: 'Today',
     action: 'Calendar Hub',
     href: '/collaboration/calendar',
     needs: 'Wire cohort schedule read to Calendar panel — events by program',
   },
+];
+
+const NEEDS_CONFIG: SetupCard[] = [
   {
     id: 'gmail',
     name: 'Gmail',
@@ -417,7 +418,7 @@ export default function AdminSetup() {
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Needs Configuration</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Needs Setup</p>
               <Badge variant="secondary" className="text-[10px] font-semibold">{needsCount} pending</Badge>
             </div>
             <div className="grid grid-cols-2 gap-2.5">

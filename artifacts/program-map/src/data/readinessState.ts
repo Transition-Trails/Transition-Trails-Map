@@ -62,21 +62,24 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
   googleDrive: {
     id: 'google-drive',
     label: 'Google Drive',
-    health: 'in-progress',
-    summary: 'OAuth client configured — GOOGLE_DRIVE_REFRESH_TOKEN not yet obtained',
+    health: 'live',
+    summary: 'OAuth refresh token obtained — GOOGLE_DRIVE_REFRESH_TOKEN stored in Replit Secrets',
     detail:
-      'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are live and validated. ' +
-      'Complete OAuth flow at /admin/google-oauth to get GOOGLE_DRIVE_REFRESH_TOKEN. ' +
-      'Replit integration bound (google-drive==1.0.0).',
+      'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_DRIVE_REFRESH_TOKEN all configured. ' +
+      'OAuth flow completed via /admin/google-oauth. Replit integration bound (google-drive==1.0.0). ' +
+      'Phase 2: wire first Drive API read to program workspace panel.',
+    lastVerified: 'June 2026',
   },
   googleCalendar: {
     id: 'google-calendar',
     label: 'Google Calendar',
-    health: 'in-progress',
-    summary: 'OAuth client configured — GOOGLE_CALENDAR_REFRESH_TOKEN not yet obtained',
+    health: 'live',
+    summary: 'OAuth refresh token obtained — GOOGLE_CALENDAR_REFRESH_TOKEN stored in Replit Secrets',
     detail:
-      'Same OAuth flow as Drive. Run /admin/google-oauth to get GOOGLE_CALENDAR_REFRESH_TOKEN. ' +
-      'Replit integration bound (google-calendar==1.0.0).',
+      'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_CALENDAR_REFRESH_TOKEN all configured. ' +
+      'OAuth flow completed via /admin/google-oauth. Replit integration bound (google-calendar==1.0.0). ' +
+      'Phase 2: wire cohort schedule read to Calendar panel.',
+    lastVerified: 'June 2026',
   },
   gmail: {
     id: 'gmail',
