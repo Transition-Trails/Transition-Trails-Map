@@ -384,7 +384,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-penny-rag',
     title: 'Penny RAG — Knowledge Retrieval',
-    column: 'Draft',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Give Penny the ability to search and retrieve from the Trail OS Knowledge Library (source documents, Salesforce KB, curriculum data) using retrieval-augmented generation — so answers are grounded in trusted TT content.',

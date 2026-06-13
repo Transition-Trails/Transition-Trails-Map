@@ -58,6 +58,24 @@ function roleContext(role?: string): string {
   }
 }
 
+// ─── Retrieved knowledge context ──────────────────────────────────────────────
+
+interface RetrievedChunk {
+  name: string;
+  category: string;
+  sourceType: string;
+  snippet: string;
+  relevance: number;
+}
+
+function buildRetrievedSection(chunks: RetrievedChunk[]): string {
+  if (chunks.length === 0) return '';
+  const lines = chunks.map((c, i) =>
+    `[Source ${i + 1}: ${c.name} (${c.category} · ${c.sourceType})]\n${c.snippet}`
+  ).join('\n\n');
+  return `\n\n---\nRetrieved Knowledge (ground your answer in these sources where relevant):\n\n${lines}\n---`;
+}
+
 // ─── POST /api/penny/ask ───────────────────────────────────────────────────────
 
 interface HistoryItem { role: 'user' | 'model'; text: string; }
@@ -75,11 +93,12 @@ router.post("/penny/ask", async (req, res) => {
     });
   }
 
-  const { query, context, role, history } = req.body as {
+  const { query, context, role, history, retrievedChunks } = req.body as {
     query?: unknown;
     context?: unknown;
     role?: unknown;
     history?: unknown;
+    retrievedChunks?: unknown;
   };
 
   // ── Validate query ────────────────────────────────────────────────────────
@@ -95,9 +114,16 @@ router.post("/penny/ask", async (req, res) => {
     return res.status(503).json({ error: "Gemini API key not configured. Set GEMINI_API_KEY in Replit Secrets." });
   }
 
-  // ── Build system prompt ───────────────────────────────────────────────────
-  const roleStr    = typeof role === 'string' ? role : undefined;
-  const systemText = PENNY_BASE + roleContext(roleStr);
+  // ── Build system prompt (with optional retrieved knowledge) ──────────────
+  const roleStr      = typeof role === 'string' ? role : undefined;
+  const validChunks: RetrievedChunk[] = Array.isArray(retrievedChunks)
+    ? (retrievedChunks as unknown[]).filter((c): c is RetrievedChunk =>
+        typeof c === 'object' && c !== null &&
+        typeof (c as RetrievedChunk).name    === 'string' &&
+        typeof (c as RetrievedChunk).snippet === 'string'
+      ).slice(0, 5)
+    : [];
+  const systemText = PENNY_BASE + roleContext(roleStr) + buildRetrievedSection(validChunks);
 
   // ── Build context-enriched user message ──────────────────────────────────
   const pageCtx = typeof context === "string" && context.trim()

@@ -5,7 +5,7 @@
  */
 import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Brain, Zap, AlertCircle, Sparkles, RotateCcw } from 'lucide-react';
+import { X, Send, Brain, Zap, AlertCircle, Sparkles, RotateCcw, BookOpen, ChevronDown, ChevronUp, FileText, Database, GraduationCap } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -63,12 +63,103 @@ function getPageLabel(path: string): string {
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+export interface Source {
+  id: string;
+  name: string;
+  category: string;
+  sourceType: 'drive-doc' | 'salesforce-kb' | 'curriculum' | string;
+  confidence: string;
+  snippet: string;
+  relevance: number;
+  driveUrl?: string;
+}
+
 interface Message {
   role: 'user' | 'penny';
   content: string;
   time: string;
   durationMs?: number;
   error?: boolean;
+  sources?: Source[];
+  retrievalMs?: number;
+}
+
+// ── Source icon by type ───────────────────────────────────────────────────────
+
+function SourceIcon({ type }: { type: string }) {
+  if (type === 'salesforce-kb') return <Database className="w-3 h-3 flex-shrink-0" />;
+  if (type === 'curriculum')    return <GraduationCap className="w-3 h-3 flex-shrink-0" />;
+  return <FileText className="w-3 h-3 flex-shrink-0" />;
+}
+
+function sourceTypeLabel(type: string) {
+  if (type === 'salesforce-kb') return 'Salesforce KB';
+  if (type === 'curriculum')    return 'Curriculum';
+  return 'Drive Doc';
+}
+
+// ── Collapsible Sources section ───────────────────────────────────────────────
+
+function SourcesSection({ sources }: { sources: Source[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="mt-2 border border-border/50 rounded-xl overflow-hidden bg-background/60">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors gap-2"
+      >
+        <span className="flex items-center gap-1.5">
+          <BookOpen className="w-3 h-3" />
+          {sources.length} {sources.length === 1 ? 'source' : 'sources'} retrieved
+        </span>
+        {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-2.5 pt-0.5 space-y-2">
+              {sources.map(s => (
+                <div key={s.id} className="flex items-start gap-2">
+                  <div className="mt-0.5 text-muted-foreground/60 flex-shrink-0">
+                    <SourceIcon type={s.sourceType} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[11px] font-medium text-foreground leading-tight">{s.name}</span>
+                      <span className="text-[9px] bg-muted/60 border border-border/60 rounded-full px-1.5 py-0.5 text-muted-foreground whitespace-nowrap">
+                        {sourceTypeLabel(s.sourceType)}
+                      </span>
+                      {s.confidence === 'draft' && (
+                        <span className="text-[9px] bg-amber-50 border border-amber-200 rounded-full px-1.5 py-0.5 text-amber-700 whitespace-nowrap">Draft</span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{s.snippet}</p>
+                    {s.driveUrl && (
+                      <a
+                        href={s.driveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[9px] text-primary/70 hover:text-primary mt-0.5 inline-block"
+                      >
+                        Open in Drive →
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 function makeSeed(): Message[] {
@@ -151,14 +242,35 @@ export function AskPennyPanel() {
     setLoading(true);
 
     try {
+      // ── Step 1: retrieve relevant knowledge chunks ───────────────────────
+      const retrievalStart = Date.now();
+      let retrievedSources: Source[] = [];
+      try {
+        const rResp = await fetch('/api/penny/retrieve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: text, userTier, topN: 3 }),
+          signal: AbortSignal.timeout(5_000),
+        });
+        if (rResp.ok) {
+          const rData = await rResp.json() as { sources?: Source[] };
+          retrievedSources = rData.sources ?? [];
+        }
+      } catch {
+        // Retrieval failure is non-fatal — Penny still answers without RAG context
+      }
+      const retrievalMs = Date.now() - retrievalStart;
+
+      // ── Step 2: call Penny with retrieved context ────────────────────────
       const resp = await fetch('/api/penny/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query:   text,
-          context: pageLabel,
-          role:    userTier,
+          query:           text,
+          context:         pageLabel,
+          role:            userTier,
           history,
+          retrievedChunks: retrievedSources,
         }),
       });
 
@@ -172,8 +284,12 @@ export function AskPennyPanel() {
       } else {
         setLastMs(data.durationMs ?? null);
         setMessages(prev => [...prev, {
-          role: 'penny', content: data.reply!,
-          time: ts(), durationMs: data.durationMs,
+          role: 'penny',
+          content: data.reply!,
+          time: ts(),
+          durationMs: data.durationMs,
+          sources: retrievedSources.length > 0 ? retrievedSources : undefined,
+          retrievalMs: retrievedSources.length > 0 ? retrievalMs : undefined,
         }]);
       }
     } catch {
@@ -291,23 +407,31 @@ export function AskPennyPanel() {
                           : <Brain className="w-3 h-3 text-primary" />}
                       </div>
                     )}
-                    <div className={`max-w-[84%] rounded-2xl px-3.5 py-2.5 ${
-                      m.role === 'user'
-                        ? 'bg-primary text-primary-foreground rounded-br-sm'
-                        : m.error
-                          ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm'
-                          : 'bg-muted/60 border border-border/60 text-foreground rounded-bl-sm'
-                    }`}>
-                      <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
-                      {m.time !== '—' && (
-                        <p className={`text-[10px] mt-1 ${
-                          m.role === 'user' ? 'text-primary-foreground/50 text-right' : 'text-muted-foreground'
-                        }`}>
-                          {m.time}
-                          {m.durationMs !== undefined && (
-                            <span className="ml-1.5 opacity-60">· {(m.durationMs / 1000).toFixed(1)}s</span>
-                          )}
-                        </p>
+                    <div className={`max-w-[84%] ${m.role === 'penny' && m.sources ? 'w-full' : ''}`}>
+                      <div className={`rounded-2xl px-3.5 py-2.5 ${
+                        m.role === 'user'
+                          ? 'bg-primary text-primary-foreground rounded-br-sm'
+                          : m.error
+                            ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm'
+                            : 'bg-muted/60 border border-border/60 text-foreground rounded-bl-sm'
+                      }`}>
+                        <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                        {m.time !== '—' && (
+                          <p className={`text-[10px] mt-1 ${
+                            m.role === 'user' ? 'text-primary-foreground/50 text-right' : 'text-muted-foreground'
+                          }`}>
+                            {m.time}
+                            {m.durationMs !== undefined && (
+                              <span className="ml-1.5 opacity-60">· {(m.durationMs / 1000).toFixed(1)}s</span>
+                            )}
+                            {m.retrievalMs !== undefined && (
+                              <span className="ml-1.5 opacity-40">· {m.retrievalMs}ms retrieval</span>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                      {m.sources && m.sources.length > 0 && (
+                        <SourcesSection sources={m.sources} />
                       )}
                     </div>
                   </div>
