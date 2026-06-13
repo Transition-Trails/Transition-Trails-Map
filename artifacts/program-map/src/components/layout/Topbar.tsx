@@ -353,7 +353,7 @@ function UserProfileButton() {
 export function Topbar() {
   const [location, setLocation] = useLocation();
   const { section, title } = getPageInfo(location);
-  const { rightPanelOpen, setRightPanelOpen, mobileSidebarOpen, setMobileSidebarOpen } = useAppContext();
+  const { rightPanelOpen, setRightPanelOpen, askPennyOpen, setAskPennyOpen, mobileSidebarOpen, setMobileSidebarOpen } = useAppContext();
 
   return (
     <div className="flex items-center justify-between h-[48px] px-3 border-b bg-card shrink-0">
@@ -382,18 +382,18 @@ export function Topbar() {
 
       {/* Right — Ask Penny toggle (split/mobile) + signals + search + user */}
       <div className="flex items-center gap-2 flex-shrink-0">
-        {/* Ask Penny panel toggle — split view + mobile (< xl) */}
+        {/* Ask Penny panel toggle — always visible */}
         <button
-          className={`xl:hidden flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
-            rightPanelOpen
-              ? 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100'
-              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-muted hover:text-foreground'
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
+            askPennyOpen
+              ? 'bg-violet-100 border-violet-300 text-violet-700 hover:bg-violet-200'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700'
           }`}
-          onClick={() => setRightPanelOpen(!rightPanelOpen)}
-          title="Ask Penny / Trail Signals"
+          onClick={() => setAskPennyOpen(!askPennyOpen)}
+          title="Ask Penny (AI guide)"
         >
           <Sparkles className="w-3 h-3 flex-shrink-0" />
-          <span className="hidden sm:inline">{rightPanelOpen ? 'Close' : 'Ask Penny'}</span>
+          <span className="hidden sm:inline">{askPennyOpen ? 'Close' : TERMS.aiAssistant}</span>
         </button>
 
         <SignalsIndicator />

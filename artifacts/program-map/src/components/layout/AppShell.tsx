@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { ContextPanel } from './ContextPanel';
 import { ContextBar } from '@/components/context/ContextBar';
 import { CommandPalette } from '../CommandPalette';
+import { AskPennyPanel } from './AskPennyPanel';
 import React from 'react';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <ContextPanel />
       </div>
       <CommandPalette />
+      <AskPennyPanel />
     </div>
   );
 }

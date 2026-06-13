@@ -60,6 +60,8 @@ interface AppState {
   setPennyPanelTab: (tab: 'penny' | 'signals' | 'ask') => void;
   rightPanelOpen: boolean;
   setRightPanelOpen: (v: boolean) => void;
+  askPennyOpen: boolean;
+  setAskPennyOpen: (v: boolean) => void;
   mobileSidebarOpen: boolean;
   setMobileSidebarOpen: (v: boolean) => void;
   setActivePage: (page: string) => void;
@@ -95,6 +97,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [slackPanel,  setSlackPanel]    = useState<SlackPanelConfig | null>(null);
   const [pennyPanelTab, setPennyPanelTab] = useState<'penny' | 'signals' | 'ask'>('penny');
   const [rightPanelOpen, setRightPanelOpen]       = useState(false);
+  const [askPennyOpen, setAskPennyOpen]           = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
@@ -169,6 +172,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       slackPanel, openSlackPanel, closeSlackPanel,
       pennyPanelTab, setPennyPanelTab,
       rightPanelOpen, setRightPanelOpen,
+      askPennyOpen, setAskPennyOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       setActivePage, setActiveLens, setUserTier, setSelectedItem, setSearchOpen,
       setActiveContext,

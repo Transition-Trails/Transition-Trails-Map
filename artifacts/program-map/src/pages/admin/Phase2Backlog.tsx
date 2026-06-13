@@ -43,7 +43,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-ask-penny-panel',
     title: 'Universal Ask Penny Side Panel',
-    column: 'Draft',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Ask Penny available from anywhere through the right-side panel using page context, user role, Trail Signals, and connected systems — no navigation change required.',
