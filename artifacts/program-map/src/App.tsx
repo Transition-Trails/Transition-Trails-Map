@@ -96,8 +96,7 @@ function Router() {
       <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
       <Route path="/penny/integrations">        <Redirect to="/admin/setup" /></Route>
       <Route path="/penny/integration-layer">   <Redirect to="/admin/setup" /></Route>
-      <Route path="/penny/trail-quests">        <Redirect to="/penny" /></Route>
-      <Route path="/penny/assessments">         <Redirect to="/penny/learners" /></Route>
+      {/* Trail Quests, Assessments, and Agentforce — now live tabs in PennyHub */}
       <Route path="/penny/logs">                <Redirect to="/penny/learners" /></Route>
 
       {/* Communications → collaboration */}

@@ -415,7 +415,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-trail-quest-live',
     title: 'Live Trail Quest Delivery',
-    column: 'Draft',
+    column: 'Active',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Make Trail Quests real — Penny delivers daily micro-challenges, reflections, and skill prompts through Slack (and later in-app), tracks completions, and links outcomes to Salesforce program engagements.',
@@ -446,7 +446,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-penny-assessment',
     title: 'Penny Assessment & Quiz Flow',
-    column: 'Draft',
+    column: 'Active',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Enable Penny to conduct assessments — structured quizzes, knowledge checks, and competency evaluations — delivered conversationally through Trail OS or Slack, with results stored in Salesforce.',
@@ -539,7 +539,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-agentforce',
     title: 'Agentforce Coexistence & Handoff',
-    column: 'Draft',
+    column: 'Active',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Define the coexistence model between Penny (Gemini-powered) and Salesforce Agentforce — when each AI is invoked, how context is handed off, and how to avoid learner confusion when both are active.',

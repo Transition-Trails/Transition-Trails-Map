@@ -2,15 +2,15 @@ import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
-  Activity, ChevronRight, Sparkles,
+  Activity, ChevronRight, Sparkles, Star, ClipboardCheck, Bot,
 } from 'lucide-react';
 import { pennyCapabilities } from '@/data/pennyCapabilities';
 
 const STATUS_PILLS = [
-  { label: 'Gemini API',  value: 'Live',    color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
-  { label: 'Slack',       value: 'Live POC', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
-  { label: 'Salesforce',  value: 'Live',    color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
-  { label: 'Agentforce',  value: 'Phase 2', color: 'text-slate-500',   bg: 'bg-slate-50 border-slate-200' },
+  { label: 'Gemini API',  value: 'Live',          color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+  { label: 'Slack',       value: 'Live POC',      color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+  { label: 'Salesforce',  value: 'Live',          color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+  { label: 'Agentforce',  value: 'POC Confirmed', color: 'text-cyan-700',    bg: 'bg-cyan-50 border-cyan-200' },
 ];
 
 interface NavTile {
@@ -48,6 +48,24 @@ const NAV_TILES: NavTile[] = [
     desc: 'Trend analysis, cohort health signals, and weekly performance report archive',
     badge: 'Phase 2',
     badgeCls: 'bg-amber-50 border-amber-200 text-amber-600',
+  },
+  {
+    icon: Star,
+    label: 'Trail Quests',
+    path: '/penny/trail-quests',
+    desc: 'Earnable badges and challenges delivered by Penny via Slack — track completion and coaching',
+  },
+  {
+    icon: ClipboardCheck,
+    label: 'Assessments',
+    path: '/penny/assessments',
+    desc: 'Competency assessments administered by Penny — results stored in Salesforce, coaching in-platform',
+  },
+  {
+    icon: Bot,
+    label: 'Agentforce',
+    path: '/penny/agentforce',
+    desc: 'Salesforce-native AI coexisting with Penny — POC confirmed, restoration checklist and decision matrix',
   },
   {
     icon: Activity,
@@ -155,7 +173,7 @@ export default function PennyCommandCenter() {
               <p className="text-[11px] font-medium text-violet-800 mb-0.5">Phase 1 POC active</p>
               <p className="text-[10px] text-violet-700/70 leading-snug">
                 Penny runs on Gemini API with live Salesforce + Slack data access.
-                Agentforce upgrade and RAG knowledge retrieval are Phase 2 priorities.
+                Agentforce POC confirmed — Trail Quests and Assessments restored and active.
               </p>
             </div>
           </div>
