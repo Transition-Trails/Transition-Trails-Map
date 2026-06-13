@@ -289,7 +289,7 @@ const CARDS: BacklogCard[] = [
   {
     id: 'p2-penny-reacts-signals',
     title: 'Penny Reacts to Trail Signals',
-    column: 'Draft',
+    column: 'Done',
     phase: 'Phase 2',
     owner: 'TBD',
     summary: 'Penny interprets Trail Signals, explains why they matter, prioritises them, and suggests next actions — citing the trusted source that triggered each signal.',

@@ -198,7 +198,7 @@ function buildHistory(msgs: Message[]) {
 // ── Panel ────────────────────────────────────────────────────────────────────
 
 export function AskPennyPanel() {
-  const { askPennyOpen, setAskPennyOpen, userTier } = useAppContext();
+  const { askPennyOpen, setAskPennyOpen, userTier, pendingPennyQuery, setPendingPennyQuery } = useAppContext();
   const [location] = useLocation();
   const pageLabel  = getPageLabel(location);
 
@@ -206,20 +206,40 @@ export function AskPennyPanel() {
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [lastMs, setLastMs]     = useState<number | null>(null);
-  const bottomRef  = useRef<HTMLDivElement>(null);
-  const inputRef   = useRef<HTMLInputElement>(null);
+  const bottomRef      = useRef<HTMLDivElement>(null);
+  const inputRef       = useRef<HTMLInputElement>(null);
+  const pendingFireRef = useRef(false);
 
   // Scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  // Focus input when panel opens
+  // Focus input when panel opens; auto-fire pending signal query
   useEffect(() => {
-    if (askPennyOpen) {
-      setTimeout(() => inputRef.current?.focus(), 300);
+    if (!askPennyOpen) return undefined;
+    if (pendingPennyQuery) {
+      const captured = pendingPennyQuery;
+      const t = setTimeout(() => {
+        setPendingPennyQuery(null);
+        pendingFireRef.current = true;
+        setInput(captured);
+      }, 350);
+      return () => clearTimeout(t);
     }
+    setTimeout(() => inputRef.current?.focus(), 300);
+    return undefined;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [askPennyOpen]);
+
+  // Auto-send when pendingFireRef is set and input is populated
+  useEffect(() => {
+    if (pendingFireRef.current && input.trim()) {
+      pendingFireRef.current = false;
+      void send();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [input]);
 
   // Close on Escape
   useEffect(() => {

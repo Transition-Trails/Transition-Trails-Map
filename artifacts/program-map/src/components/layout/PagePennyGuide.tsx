@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import {
   Send, Sparkles, ArrowRight, ChevronDown,
   CheckCircle2, AlertTriangle, Lightbulb,
-  Hash, Folder, Calendar, Mail, Database, ExternalLink, Loader2,
+  Hash, Folder, Calendar, Mail, Database, ExternalLink, Loader2, Brain,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -230,7 +230,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     powerInsights: [
       'Health status: 3 active, 1 in discovery, 1 in planning',
-      'Integration readiness: Salesforce + Google OAuth live — Drive + Calendar tokens active',
+      'Integration readiness: Salesforce · Slack · Google Drive · Google Calendar live — Agentforce + GA4: Phase 2',
       '7 open demand items — 2 flagged at-risk by age and type',
       'Trail of Mastery execute phase needs source documentation before delivery',
     ],
@@ -376,12 +376,42 @@ const CONTENT: Record<PageCtx, PageContent> = {
   },
 };
 
+// ── Priority scoring ──────────────────────────────────────────────────────────
+
+function computePriority(item: SigItem): number {
+  let score = 2;
+  if (item.urgent) score += 4;
+  if (item.source === 'salesforce') score += 2;
+  else if (item.source === 'slack') score += 1;
+  // Recency bonus
+  if (item.meta.includes('m ago'))              score += 3;
+  else if (/^[12]h/.test(item.meta))            score += 2;
+  else if (/^[345]h/.test(item.meta))           score += 1;
+  return Math.min(score, 10);
+}
+
+function PriorityBadge({ score }: { score: number }) {
+  const cls =
+    score >= 8 ? 'bg-rose-50 border-rose-200 text-rose-700' :
+    score >= 5 ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                 'bg-muted/60 border-border/60 text-muted-foreground';
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-[8px] font-bold px-1.5 py-0.5 rounded border leading-none ${cls}`}>
+      P{score}
+    </span>
+  );
+}
+
+function buildSignalQuery(item: SigItem, srcLabel: string): string {
+  return `[Trail Signal · ${srcLabel}${item.urgent ? ' · URGENT' : ''} · ${item.meta}]\n\n"${item.text}"\n\nWhy Penny flagged this: ${item.why}\n\nPlease: (1) explain what this signal means in plain language, (2) cite the source or relevant record if applicable, (3) suggest 1–3 concrete next actions ranked by urgency.`;
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function PagePennyGuide() {
   const [location, setLocation] = useLocation();
   const { isEveryday, isPowerOrAbove } = useTierFlags();
-  const { pennyPanelTab, setPennyPanelTab } = useAppContext();
+  const { pennyPanelTab, setPennyPanelTab, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const [query, setQuery]     = useState('');
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading]  = useState(false);
@@ -575,27 +605,43 @@ export function PagePennyGuide() {
 
                             {/* Signal items */}
                             <div className="bg-white divide-y divide-border/20">
-                              {items.map((item, i) => (
-                                <div key={i} className={`px-3 py-2 ${item.urgent ? 'bg-amber-50/30' : ''}`}>
-                                  <div className="flex items-start gap-1.5">
-                                    {item.urgent
-                                      ? <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
-                                      : <span className="w-1 h-1 rounded-full bg-muted-foreground/20 flex-shrink-0 mt-1.5" />
-                                    }
-                                    <div className="flex-1 min-w-0">
-                                      <p className={`text-[11px] leading-snug ${item.urgent ? 'font-medium text-amber-900' : 'text-foreground'}`}>
-                                        {item.text}
-                                      </p>
-                                      {item.meta && (
-                                        <p className="text-[9px] text-muted-foreground/40 mt-0.5">{item.meta}</p>
-                                      )}
-                                      <p className="text-[9px] text-muted-foreground/50 italic leading-snug mt-1 border-l-2 border-border/40 pl-1.5">
-                                        {item.why}
-                                      </p>
+                              {items.map((item, i) => {
+                                const priority = computePriority(item);
+                                return (
+                                  <div key={i} className={`px-3 py-2 ${item.urgent ? 'bg-amber-50/30' : ''}`}>
+                                    <div className="flex items-start gap-1.5">
+                                      {item.urgent
+                                        ? <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+                                        : <span className="w-1 h-1 rounded-full bg-muted-foreground/20 flex-shrink-0 mt-1.5" />
+                                      }
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-start justify-between gap-1.5">
+                                          <p className={`text-[11px] leading-snug flex-1 ${item.urgent ? 'font-medium text-amber-900' : 'text-foreground'}`}>
+                                            {item.text}
+                                          </p>
+                                          <PriorityBadge score={priority} />
+                                        </div>
+                                        {item.meta && (
+                                          <p className="text-[9px] text-muted-foreground/40 mt-0.5">{item.meta}</p>
+                                        )}
+                                        <p className="text-[9px] text-muted-foreground/50 italic leading-snug mt-1 border-l-2 border-border/40 pl-1.5">
+                                          {item.why}
+                                        </p>
+                                        <button
+                                          onClick={() => {
+                                            setPendingPennyQuery(buildSignalQuery(item, ico.label));
+                                            setAskPennyOpen(true);
+                                          }}
+                                          className="mt-1.5 flex items-center gap-1 text-[9px] font-medium text-violet-600 hover:text-violet-800 hover:underline transition-colors"
+                                        >
+                                          <Brain className="w-2.5 h-2.5" />
+                                          Ask Penny about this signal
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         );
@@ -604,7 +650,7 @@ export function PagePennyGuide() {
                       {/* Footer — close + context note */}
                       <div className="px-3 py-2 bg-muted/20 flex items-center justify-between gap-2">
                         <p className="text-[9px] text-muted-foreground/40 leading-snug">
-                          Phase 1 · Salesforce + Slack + Google OAuth live
+                          Phase 1 · Salesforce · Slack · Google Drive · Google Calendar live
                         </p>
                         <button
                           onClick={toggleSignals}
@@ -658,7 +704,7 @@ export function PagePennyGuide() {
               {isPowerOrAbove && (
                 <div className="rounded-md bg-muted/30 border border-border/50 p-2.5">
                   <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
-                    <span className="font-semibold text-muted-foreground/70">Salesforce + Slack + Google OAuth live.</span> Drive + Calendar tokens active. Agentforce + GA4: Phase 2. Select any item to open its Trail Insights.
+                    <span className="font-semibold text-muted-foreground/70">Salesforce · Slack · Google Drive · Google Calendar live.</span> Agentforce + GA4: Phase 2. Select any item to open its Trail Insights.
                   </p>
                 </div>
               )}

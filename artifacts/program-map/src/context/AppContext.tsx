@@ -62,6 +62,8 @@ interface AppState {
   setRightPanelOpen: (v: boolean) => void;
   askPennyOpen: boolean;
   setAskPennyOpen: (v: boolean) => void;
+  pendingPennyQuery: string | null;
+  setPendingPennyQuery: (q: string | null) => void;
   mobileSidebarOpen: boolean;
   setMobileSidebarOpen: (v: boolean) => void;
   setActivePage: (page: string) => void;
@@ -98,6 +100,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [pennyPanelTab, setPennyPanelTab] = useState<'penny' | 'signals' | 'ask'>('penny');
   const [rightPanelOpen, setRightPanelOpen]       = useState(false);
   const [askPennyOpen, setAskPennyOpen]           = useState(false);
+  const [pendingPennyQuery, setPendingPennyQuery] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
@@ -173,6 +176,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       pennyPanelTab, setPennyPanelTab,
       rightPanelOpen, setRightPanelOpen,
       askPennyOpen, setAskPennyOpen,
+      pendingPennyQuery, setPendingPennyQuery,
       mobileSidebarOpen, setMobileSidebarOpen,
       setActivePage, setActiveLens, setUserTier, setSelectedItem, setSearchOpen,
       setActiveContext,
