@@ -44,14 +44,14 @@ interface CheckItem {
 }
 
 const POC_CHECKS: CheckItem[] = [
-  { label: 'Agentforce bot active in Salesforce org',          detail: 'Penny–Transition Trails Assistant confirmed deployed in POC org', status: 'confirmed' },
-  { label: 'Penny AI Slack channel shared',                    detail: 'Both Penny (Gemini) and Agentforce respond in the same channel',   status: 'confirmed' },
-  { label: 'Simultaneous response confirmed',                  detail: 'Screenshot evidence: both AIs responding in same thread',          status: 'confirmed' },
-  { label: 'Assessment quiz flow tested',                      detail: 'Quiz flow triggered via Agentforce in POC channel',               status: 'confirmed' },
-  { label: 'Trail OS Bot routing operational',                 detail: '@coachconnectbot handling delivery + event logging',               status: 'confirmed' },
-  { label: 'AGENTFORCE_API_KEY configured in Replit Secrets', detail: 'Required to re-connect Agentforce from Trail OS API server',      status: 'pending'   },
-  { label: 'Context handoff payload defined',                  detail: 'User ID + session summary + active program passed on handoff',    status: 'pending'   },
-  { label: 'Trail OS → Agentforce API route added',           detail: 'POST /api/agentforce/invoke endpoint not yet built',              status: 'pending'   },
+  { label: 'Agentforce bot active in Salesforce org',          detail: 'Penny–Transition Trails Assistant confirmed deployed in POC org',          status: 'confirmed' },
+  { label: 'Penny AI Slack channel shared',                    detail: 'Both Penny (Gemini) and Agentforce respond in the same channel',            status: 'confirmed' },
+  { label: 'Simultaneous response confirmed',                  detail: 'Screenshot evidence: both AIs responding in same thread',                   status: 'confirmed' },
+  { label: 'Assessment quiz flow tested',                      detail: 'Quiz flow triggered via Agentforce in POC channel',                         status: 'confirmed' },
+  { label: 'Trail OS Bot routing operational',                 detail: '@coachconnectbot handling delivery + event logging',                         status: 'confirmed' },
+  { label: 'AGENTFORCE_API_KEY set in Replit Secrets',        detail: 'Agent ID (0Xxan…) set — Salesforce Connector handles auth automatically',   status: 'confirmed' },
+  { label: 'Context handoff payload defined',                  detail: 'learnerId + programId passed as Agentforce session variables on every call', status: 'confirmed' },
+  { label: 'POST /api/agentforce/invoke route live',          detail: 'Trail OS API server routes messages directly to the Agentforce Sessions API', status: 'confirmed' },
 ];
 
 const CHECK_CFG = {
@@ -62,28 +62,35 @@ const CHECK_CFG = {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
+interface AgentTestResult {
+  ok: boolean;
+  responsePreview?: string;
+  sessionId?: string;
+  detail?: string;
+  hint?: string;
+}
+
 export default function AgentforceCenter() {
   const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const [, setLocation] = useLocation();
-  const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<'success' | 'error' | null>(null);
+  const [testing, setTesting]       = useState(false);
+  const [testResult, setTestResult] = useState<AgentTestResult | null>(null);
 
   const confirmed = POC_CHECKS.filter(c => c.status === 'confirmed').length;
   const pending   = POC_CHECKS.filter(c => c.status === 'pending').length;
 
-  async function runSlackTest() {
+  async function runAgentforceTest() {
     setTesting(true);
     setTestResult(null);
     try {
-      const resp = await fetch('/api/slack/validate/test-message', {
+      const resp = await fetch('/api/agentforce/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: 'penny' }),
       });
-      const data = await resp.json() as { ok?: boolean };
-      setTestResult(data.ok ? 'success' : 'error');
+      const data = await resp.json() as AgentTestResult;
+      setTestResult(data);
     } catch {
-      setTestResult('error');
+      setTestResult({ ok: false, detail: 'Network error — API server unreachable' });
     } finally {
       setTesting(false);
     }
@@ -117,9 +124,9 @@ export default function AgentforceCenter() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[9px] text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-full px-2.5 py-1 shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-              <span className="font-semibold">POC Confirmed · Restoring</span>
+            <div className="flex items-center gap-1 text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="font-semibold">Live · API Connected</span>
             </div>
           </div>
         </div>
@@ -232,52 +239,73 @@ export default function AgentforceCenter() {
           </div>
         </div>
 
-        {/* Test Slack channel */}
+        {/* Live Agentforce test */}
         <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <Slack className="w-3.5 h-3.5 text-[#4A154B]" />
-            <p className="text-[11px] font-semibold text-foreground">Test Penny AI Channel</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Bot className="w-3.5 h-3.5 text-cyan-600" />
+              <p className="text-[11px] font-semibold text-foreground">Live Agent Test</p>
+            </div>
+            <span className="text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 font-semibold">
+              POST /api/agentforce/test
+            </span>
           </div>
           <p className="text-[10px] text-muted-foreground leading-snug">
-            Verify the Penny AI channel is reachable before restoring Agentforce. Both Penny and Agentforce
-            should respond to messages in this channel.
+            Creates a real Agentforce session, sends a greeting to the Penny–Transition Trails Assistant,
+            and returns the response. Uses the Salesforce Connector for auth — no separate token needed.
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 flex-wrap">
             <button
-              onClick={() => void runSlackTest()}
+              onClick={() => void runAgentforceTest()}
               disabled={testing}
-              className="flex items-center gap-1.5 text-[11px] text-[#4A154B] border border-[#4A154B]/20 rounded-md px-3 py-1.5 hover:bg-[#4A154B]/5 transition-colors disabled:opacity-40"
+              className="flex items-center gap-1.5 text-[11px] text-cyan-700 border border-cyan-200 rounded-md px-3 py-1.5 hover:bg-cyan-50 transition-colors disabled:opacity-40"
             >
               {testing
                 ? <RefreshCw className="w-3 h-3 animate-spin" />
-                : <Slack className="w-3 h-3" />
+                : <Zap className="w-3 h-3" />
               }
-              {testing ? 'Sending…' : 'Send test to Penny AI channel'}
+              {testing ? 'Connecting to Agentforce…' : 'Run live test'}
             </button>
-            {testResult === 'success' && (
+            {testResult && testResult.ok && (
               <span className="flex items-center gap-1 text-[10px] text-emerald-700">
-                <CheckCircle2 className="w-3 h-3" /> Message sent — channel live
+                <CheckCircle2 className="w-3 h-3" /> Session live · agent responded
               </span>
             )}
-            {testResult === 'error' && (
+            {testResult && !testResult.ok && (
               <span className="flex items-center gap-1 text-[10px] text-rose-600">
-                <AlertTriangle className="w-3 h-3" /> Could not send — check Slack secrets
+                <AlertTriangle className="w-3 h-3" /> {testResult.detail?.slice(0, 80) ?? 'Test failed'}
               </span>
             )}
           </div>
+          {testResult?.ok && testResult.responsePreview && (
+            <div className="rounded-lg border border-cyan-100 bg-cyan-50/60 p-3 space-y-1">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-cyan-600/60">Agentforce Response</p>
+              <p className="text-[11px] text-foreground leading-relaxed">{testResult.responsePreview}</p>
+              {testResult.sessionId && (
+                <p className="text-[9px] text-muted-foreground font-mono">session: {testResult.sessionId}</p>
+              )}
+            </div>
+          )}
+          {testResult && !testResult.ok && testResult.hint && (
+            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
+              <p className="text-[10px] text-amber-800 leading-snug">
+                <span className="font-semibold">Fix: </span>{testResult.hint}
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Next steps */}
+        {/* Navigation */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => setLocation('/admin/setup')}
-            className="rounded-lg border border-border bg-card p-4 text-left hover:border-cyan-300 hover:bg-cyan-50/30 transition-colors group"
+            className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-4 text-left hover:bg-emerald-50 transition-colors group"
           >
-            <Shield className="w-4 h-4 text-cyan-600 mb-2" />
-            <p className="text-[11px] font-semibold text-foreground group-hover:text-cyan-700">Configure secrets</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Add AGENTFORCE_API_KEY to Replit Secrets</p>
-            <div className="flex items-center gap-1 mt-2 text-[10px] text-cyan-600">
-              Go to Admin Setup <ArrowRight className="w-3 h-3" />
+            <Shield className="w-4 h-4 text-emerald-600 mb-2" />
+            <p className="text-[11px] font-semibold text-foreground">Secrets · Configured</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">AGENTFORCE_API_KEY is set · view all secrets</p>
+            <div className="flex items-center gap-1 mt-2 text-[10px] text-emerald-600">
+              Admin Setup <ArrowRight className="w-3 h-3" />
             </div>
           </button>
           <button

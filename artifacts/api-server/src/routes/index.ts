@@ -9,6 +9,7 @@ import salesforceRouter  from "./salesforce";
 import pennyRouter       from "./penny";
 import retrieveRouter    from "./retrieve";
 import calendarRouter    from "./calendar";
+import agentforceRouter  from "./agentforce";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(salesforceRouter);
 router.use(pennyRouter);
 router.use(retrieveRouter);
 router.use(calendarRouter);
+router.use(agentforceRouter);
 
 export default router;
