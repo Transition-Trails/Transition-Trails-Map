@@ -38,6 +38,8 @@ const SCOPES = [
   "https://www.googleapis.com/auth/drive.file",
   "https://www.googleapis.com/auth/calendar.readonly",
   "https://www.googleapis.com/auth/calendar.events",
+  "https://www.googleapis.com/auth/gmail.readonly",
+  "https://www.googleapis.com/auth/gmail.send",
   "openid",
   "email",
 ];
@@ -91,7 +93,7 @@ router.get("/google/oauth/info", (req: Request, res: Response) => {
   return res.json({
     redirectUri,
     scopes: SCOPES,
-    scopeDisplay: "drive.readonly, drive.file, calendar.readonly, calendar.events",
+    scopeDisplay: "drive.readonly, drive.file, calendar.readonly, calendar.events, gmail.readonly, gmail.send",
     credentials: creds,
     tokens,
     authUrl: creds.ok
@@ -291,6 +293,7 @@ router.get("/google/oauth/session/:id", (req: Request, res: Response) => {
     instructions: {
       drive:    "Add GOOGLE_DRIVE_REFRESH_TOKEN = <value> to Replit Secrets",
       calendar: "Add GOOGLE_CALENDAR_REFRESH_TOKEN = <value> to Replit Secrets (same value)",
+      gmail:    "Add GOOGLE_GMAIL_REFRESH_TOKEN = <value> to Replit Secrets (same value — covers gmail.readonly + gmail.send)",
       restart:  "Restart the API server after adding secrets so they load into the environment",
     },
   });

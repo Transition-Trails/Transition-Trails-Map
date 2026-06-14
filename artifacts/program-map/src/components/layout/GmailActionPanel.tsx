@@ -1,16 +1,16 @@
 /**
  * GmailActionPanel — global mail slide-over accessible from the Topbar.
  * Hybrid layout: thread list on top, collapsible reply/compose drawer at bottom.
- * Penny AI drafting via /api/penny/ask. Mounts in AppShell.
+ * Real data from GET /api/gmail/threads. Penny AI drafting via /api/penny/ask.
+ * Send via POST /api/gmail/send. Mounts in AppShell.
  * Triggered via gmailPanelOpen in AppContext.
- * Gmail OAuth (gmail.readonly + gmail.compose) is Phase 2 — uses mock data now.
  */
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Mail, RefreshCw, Brain, Send, Paperclip,
   ChevronDown, ChevronUp, Star, Sparkles, AlertCircle,
-  ArrowRight, Pencil, Reply, Trash2,
+  ArrowRight, Pencil, Reply, Trash2, CheckCircle2,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -20,61 +20,63 @@ import { useAppContext } from '@/context/AppContext';
 
 interface Thread {
   id: string;
+  threadId: string;
   from: string;
-  initials: string;
-  avatarCls: string;
+  fromEmail: string;
   subject: string;
   snippet: string;
-  time: string;
+  date: string;
   unread: boolean;
   starred: boolean;
+  important: boolean;
   needsAction: boolean;
-  replyTo: string;
 }
 
 type ComposeMode = 'hidden' | 'reply' | 'new';
 
-// ── Mock data (Phase 2: replace with /api/gmail/threads) ────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────────
 
-const MOCK_THREADS: Thread[] = [
-  {
-    id: '1', from: 'Sarah Chen', initials: 'SC', avatarCls: 'bg-violet-100 text-violet-700',
-    replyTo: 'sarah.chen@grantpartners.org',
-    subject: 'Q3 Grant Report — Action Required',
-    snippet: 'We need the program outcome data from your team before we can finalize the application.',
-    time: '9:42 AM', unread: true, starred: true, needsAction: true,
-  },
-  {
-    id: '2', from: 'Marcus Thompson', initials: 'MT', avatarCls: 'bg-sky-100 text-sky-700',
-    replyTo: 'm.thompson@transitiontrails.org',
-    subject: 'Learner Cohort 7 — Enrollment Data',
-    snippet: 'Please review and confirm the Penny intake survey links are ready before launch.',
-    time: '8:15 AM', unread: true, starred: false, needsAction: true,
-  },
-  {
-    id: '3', from: 'Keisha Williams', initials: 'KW', avatarCls: 'bg-emerald-100 text-emerald-700',
-    replyTo: 'k.williams@transitiontrails.org',
-    subject: 'Re: Trail OS onboarding — notes',
-    snippet: 'Can we schedule a follow-up next week? The team had great questions about Penny.',
-    time: 'Yesterday', unread: false, starred: false, needsAction: false,
-  },
-  {
-    id: '4', from: 'Jordan Lee', initials: 'JL', avatarCls: 'bg-amber-100 text-amber-700',
-    replyTo: 'j.lee@transitiontrails.org',
-    subject: 'Curriculum review — Modules 4–6',
-    snippet: 'Gap analysis attached. A few areas need instructor sign-off before finalizing.',
-    time: 'Mon', unread: false, starred: true, needsAction: false,
-  },
+function formatDate(iso: string): string {
+  const d     = new Date(iso);
+  const now   = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const msgDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.floor((today.getTime() - msgDay.getTime()) / 86_400_000);
+
+  if (diffDays === 0) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7)  return d.toLocaleDateString([], { weekday: 'short' });
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+const AVATAR_COLORS = [
+  'bg-violet-100 text-violet-700',
+  'bg-sky-100 text-sky-700',
+  'bg-emerald-100 text-emerald-700',
+  'bg-amber-100 text-amber-700',
+  'bg-rose-100 text-rose-700',
+  'bg-indigo-100 text-indigo-700',
+  'bg-teal-100 text-teal-700',
 ];
 
-// ── Penny draft via API ────────────────────────────────────────────────────────
+function initials(name: string): string {
+  return name.split(/\s+/).map(w => w[0] ?? '').join('').slice(0, 2).toUpperCase() || '?';
+}
+
+function avatarColor(email: string): string {
+  let h = 0;
+  for (let i = 0; i < email.length; i++) h = (h * 31 + email.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length]!;
+}
+
+// ── Penny draft ────────────────────────────────────────────────────────────────
 
 async function fetchPennyDraft(thread: Thread): Promise<string> {
   const query =
-    `I need to write a professional email reply to ${thread.from} (${thread.replyTo}). ` +
-    `Subject: "${thread.subject}". Their message: "${thread.snippet}". ` +
+    `I need to write a professional email reply to ${thread.from} (${thread.fromEmail}). ` +
+    `Subject: "${thread.subject}". Their message preview: "${thread.snippet}". ` +
     `Write a concise, warm reply (3–5 sentences) in first person as Angela from Transition Trails. ` +
-    `Start with a greeting, acknowledge their message, and give a clear next step.`;
+    `Start with a greeting, acknowledge their message specifically, and provide a clear next step.`;
 
   const resp = await fetch('/api/penny/ask', {
     method: 'POST',
@@ -91,26 +93,61 @@ async function fetchPennyDraft(thread: Thread): Promise<string> {
 export function GmailActionPanel() {
   const { gmailPanelOpen, setGmailPanelOpen } = useAppContext();
 
-  const [selectedId, setSelectedId]     = useState<string | null>('1');
-  const [composeMode, setComposeMode]   = useState<ComposeMode>('reply');
-  const [to, setTo]                     = useState(MOCK_THREADS[0].replyTo);
-  const [body, setBody]                 = useState('');
-  const [generating, setGenerating]     = useState(false);
-  const [pennyDone, setPennyDone]       = useState(false);
-  const [pennyError, setPennyError]     = useState<string | null>(null);
-  const [composeCollapsed, setComposeCollapsed] = useState(false);
-  const [sentId, setSentId]             = useState<string | null>(null);
+  // Thread state
+  const [threads,    setThreads]    = useState<Thread[]>([]);
+  const [loading,    setLoading]    = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [fetchedAt,  setFetchedAt]  = useState<string | null>(null);
 
-  const unreadCount = MOCK_THREADS.filter(t => t.unread).length;
-  const selectedThread = MOCK_THREADS.find(t => t.id === selectedId);
+  // Compose state
+  const [selectedId,       setSelectedId]       = useState<string | null>(null);
+  const [composeMode,      setComposeMode]       = useState<ComposeMode>('hidden');
+  const [to,               setTo]               = useState('');
+  const [body,             setBody]             = useState('');
+  const [generating,       setGenerating]       = useState(false);
+  const [pennyDone,        setPennyDone]        = useState(false);
+  const [pennyError,       setPennyError]       = useState<string | null>(null);
+  const [composeCollapsed, setComposeCollapsed] = useState(false);
+
+  // Send state
+  const [sending,  setSending]  = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [sentIds,  setSentIds]  = useState<Set<string>>(new Set());
+
+  // ── Fetch threads ─────────────────────────────────────────────────────────
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setFetchError(null);
+    try {
+      const resp = await fetch('/api/gmail/threads');
+      const data = await resp.json() as { threads?: Thread[]; error?: string; fetchedAt?: string };
+      if (!resp.ok || data.error) throw new Error(data.error ?? `HTTP ${resp.status}`);
+      setThreads(data.threads ?? []);
+      setFetchedAt(data.fetchedAt ?? null);
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Could not load inbox.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (gmailPanelOpen) void load();
+  }, [gmailPanelOpen, load]);
+
+  // ── Compose helpers ───────────────────────────────────────────────────────
+
+  const selectedThread = threads.find(t => t.id === selectedId) ?? null;
 
   function selectThread(t: Thread) {
     setSelectedId(t.id);
-    setTo(t.replyTo);
+    setTo(t.fromEmail);
     setComposeMode('reply');
     setBody('');
     setPennyDone(false);
     setPennyError(null);
+    setSendError(null);
     setComposeCollapsed(false);
   }
 
@@ -121,7 +158,16 @@ export function GmailActionPanel() {
     setBody('');
     setPennyDone(false);
     setPennyError(null);
+    setSendError(null);
     setComposeCollapsed(false);
+  }
+
+  function closeCompose() {
+    setComposeMode('hidden');
+    setBody('');
+    setPennyDone(false);
+    setPennyError(null);
+    setSendError(null);
   }
 
   async function handlePenny() {
@@ -139,13 +185,42 @@ export function GmailActionPanel() {
     }
   }
 
-  function handleSend() {
-    setSentId(selectedId);
-    setComposeMode('hidden');
-    setBody('');
-    setPennyDone(false);
-    setTimeout(() => setSentId(null), 3000);
+  async function handleSend() {
+    if (!body.trim() || !to.trim()) return;
+    setSending(true);
+    setSendError(null);
+    try {
+      const subject = composeMode === 'reply' && selectedThread
+        ? (selectedThread.subject.startsWith('Re:') ? selectedThread.subject : `Re: ${selectedThread.subject}`)
+        : '(no subject)';
+
+      const payload: Record<string, string> = { to, subject, body };
+      if (composeMode === 'reply' && selectedThread) {
+        payload['threadId'] = selectedThread.threadId;
+      }
+
+      const resp = await fetch('/api/gmail/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await resp.json() as { ok?: boolean; error?: string };
+      if (!resp.ok || data.error) throw new Error(data.error ?? `Send failed: HTTP ${resp.status}`);
+
+      if (selectedId) setSentIds(prev => new Set([...prev, selectedId]));
+      closeCompose();
+    } catch (e) {
+      setSendError(e instanceof Error ? e.message : 'Could not send message.');
+    } finally {
+      setSending(false);
+    }
   }
+
+  // ── Derived ───────────────────────────────────────────────────────────────
+
+  const unreadCount  = threads.filter(t => t.unread && !sentIds.has(t.id)).length;
+  const actionNeeded = threads.filter(t => t.needsAction && !sentIds.has(t.id));
+  const isLive       = !fetchError && threads.length > 0;
 
   return (
     <AnimatePresence>
@@ -188,16 +263,28 @@ export function GmailActionPanel() {
                     )}
                   </div>
                   <p className="text-[9px] text-muted-foreground mt-0.5">
-                    Inbox · {MOCK_THREADS.length} threads · Gmail phase 2
+                    {loading
+                      ? 'Loading…'
+                      : fetchError
+                        ? 'Could not load inbox'
+                        : `Inbox · ${threads.length} thread${threads.length !== 1 ? 's' : ''}`}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-1 flex-shrink-0">
-                <div className="flex items-center gap-1 text-[9px] text-rose-700 bg-rose-50 border border-rose-200 rounded-full px-2 py-0.5 mr-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                  <span className="font-semibold">Preview</span>
-                </div>
+                {/* Live / error badge */}
+                {!loading && (
+                  <div className={`flex items-center gap-1 text-[9px] rounded-full px-2 py-0.5 mr-0.5 border ${
+                    fetchError
+                      ? 'text-rose-700 bg-rose-50 border-rose-200'
+                      : 'text-rose-700 bg-rose-50 border-rose-200'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${fetchError ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                    <span className="font-semibold">{fetchError ? 'Error' : 'Live'}</span>
+                  </div>
+                )}
+
                 <button
                   onClick={startNew}
                   className="flex items-center gap-1 text-[10px] font-semibold text-primary border border-primary/30 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
@@ -206,10 +293,12 @@ export function GmailActionPanel() {
                   <Pencil className="w-2.5 h-2.5" /> Compose
                 </button>
                 <button
-                  className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted/60 transition-colors"
-                  title="Refresh"
+                  onClick={() => void load()}
+                  disabled={loading}
+                  className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted/60 transition-colors disabled:opacity-40"
+                  title="Refresh inbox"
                 >
-                  <RefreshCw className="w-3 h-3" />
+                  <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
                 </button>
                 <button
                   onClick={() => setGmailPanelOpen(false)}
@@ -220,69 +309,137 @@ export function GmailActionPanel() {
               </div>
             </div>
 
-            {/* Strip: open gmail link */}
-            <div className="flex items-center justify-between px-4 py-1.5 bg-muted/20 border-b border-border/50 flex-shrink-0">
-              <span className="text-[9px] text-muted-foreground/60">Mock data · Gmail OAuth in Phase 2</span>
-              <a
-                href="https://mail.google.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-0.5 text-[9px] text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Open Gmail <ArrowRight className="w-2.5 h-2.5" />
-              </a>
-            </div>
+            {/* Updated strip */}
+            {fetchedAt && !loading && !fetchError && (
+              <div className="flex items-center justify-between px-4 py-1.5 bg-muted/20 border-b border-border/50 flex-shrink-0">
+                <span className="text-[9px] text-muted-foreground/60">
+                  Updated {new Date(fetchedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+                <a
+                  href="https://mail.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-0.5 text-[9px] text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Open Gmail <ArrowRight className="w-2.5 h-2.5" />
+                </a>
+              </div>
+            )}
 
             {/* Thread list */}
             <div className="flex-1 min-h-0 overflow-hidden">
               <ScrollArea className="h-full">
-                <div className="divide-y divide-border/50">
-                  {MOCK_THREADS.map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => selectThread(t)}
-                      className={`w-full flex items-start gap-2.5 px-4 py-3 text-left transition-colors hover:bg-muted/40 ${
-                        selectedId === t.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''
-                      } ${sentId === t.id ? 'opacity-50' : ''}`}
-                    >
-                      {/* Avatar */}
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${t.avatarCls}`}>
-                        {t.initials}
-                      </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1 mb-0.5">
-                          <div className="flex items-center gap-1 min-w-0">
-                            {t.unread && sentId !== t.id && (
-                              <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                            )}
-                            <span className={`text-[11px] truncate ${t.unread && sentId !== t.id ? 'font-bold' : 'font-medium text-foreground/80'}`}>
-                              {t.from}
-                            </span>
-                            {t.starred && <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400 shrink-0" />}
-                          </div>
-                          <span className="text-[9px] text-muted-foreground shrink-0">{t.time}</span>
+                {/* Loading skeleton */}
+                {loading && (
+                  <div className="p-3 space-y-2">
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="flex items-start gap-2.5 p-3 animate-pulse">
+                        <div className="w-7 h-7 rounded-full bg-muted shrink-0" />
+                        <div className="flex-1 space-y-1.5">
+                          <div className="h-2.5 bg-muted rounded w-1/3" />
+                          <div className="h-2 bg-muted rounded w-2/3" />
+                          <div className="h-2 bg-muted rounded w-full" />
                         </div>
-
-                        <p className={`text-[11px] truncate mb-0.5 ${t.unread && sentId !== t.id ? 'font-semibold' : 'text-foreground/70'}`}>
-                          {t.subject}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground truncate">{t.snippet}</p>
-
-                        {t.needsAction && sentId !== t.id && (
-                          <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-1.5 py-0.5">
-                            <AlertCircle className="w-2 h-2" /> Reply needed
-                          </span>
-                        )}
-                        {sentId === t.id && (
-                          <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5">
-                            ✓ Replied
-                          </span>
-                        )}
                       </div>
-                    </button>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Error */}
+                {!loading && fetchError && (
+                  <div className="p-4">
+                    <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 space-y-2">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[12px] font-semibold text-rose-800">Could not load inbox</p>
+                          <p className="text-[11px] text-rose-700 mt-0.5">{fetchError}</p>
+                          {fetchError.includes('GOOGLE_GMAIL_REFRESH_TOKEN') && (
+                            <p className="text-[10px] text-rose-600 mt-1">
+                              Store your Gmail refresh token as <code className="font-mono bg-rose-100 px-1 rounded">GOOGLE_GMAIL_REFRESH_TOKEN</code> in Replit Secrets and restart the API server.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => void load()}
+                        className="text-[11px] text-rose-700 border border-rose-200 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Needs action section */}
+                {!loading && !fetchError && actionNeeded.length > 0 && (
+                  <div className="px-4 pt-3 pb-1">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <AlertCircle className="w-3 h-3 text-amber-600" />
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                        Needs Response ({actionNeeded.length})
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Thread rows */}
+                {!loading && !fetchError && threads.map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => selectThread(t)}
+                    className={`w-full flex items-start gap-2.5 px-4 py-3 text-left transition-colors hover:bg-muted/40 border-b border-border/30 ${
+                      selectedId === t.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''
+                    } ${sentIds.has(t.id) ? 'opacity-50' : ''}`}
+                  >
+                    {/* Avatar */}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${avatarColor(t.fromEmail)}`}>
+                      {initials(t.from)}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1 mb-0.5">
+                        <div className="flex items-center gap-1 min-w-0">
+                          {t.unread && !sentIds.has(t.id) && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                          )}
+                          <span className={`text-[11px] truncate ${t.unread && !sentIds.has(t.id) ? 'font-bold' : 'font-medium text-foreground/80'}`}>
+                            {t.from}
+                          </span>
+                          {t.starred && <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400 shrink-0" />}
+                        </div>
+                        <span className="text-[9px] text-muted-foreground shrink-0">{formatDate(t.date)}</span>
+                      </div>
+
+                      <p className={`text-[11px] truncate mb-0.5 ${t.unread && !sentIds.has(t.id) ? 'font-semibold' : 'text-foreground/70'}`}>
+                        {t.subject}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{t.snippet}</p>
+
+                      {t.needsAction && !sentIds.has(t.id) && (
+                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-1.5 py-0.5">
+                          <AlertCircle className="w-2 h-2" /> Reply needed
+                        </span>
+                      )}
+                      {sentIds.has(t.id) && (
+                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5">
+                          <CheckCircle2 className="w-2 h-2" /> Replied
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+
+                {/* Zero state */}
+                {!loading && !fetchError && threads.length === 0 && (
+                  <div className="p-6 text-center">
+                    <CheckCircle2 className="w-7 h-7 text-emerald-500 mx-auto mb-2" />
+                    <p className="text-[13px] font-semibold text-foreground mb-1">Inbox zero</p>
+                    <p className="text-[11px] text-muted-foreground">No messages in your inbox.</p>
+                  </div>
+                )}
+
               </ScrollArea>
             </div>
 
@@ -311,7 +468,7 @@ export function GmailActionPanel() {
                       {composeCollapsed ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                     </button>
                     <button
-                      onClick={() => { setComposeMode('hidden'); setBody(''); setPennyDone(false); setPennyError(null); }}
+                      onClick={closeCompose}
                       className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted/60 transition-colors"
                     >
                       <X className="w-3 h-3" />
@@ -323,17 +480,18 @@ export function GmailActionPanel() {
                   <div className="p-3 space-y-2">
 
                     {/* To field */}
-                    <div className="flex items-center gap-2 text-[11px]">
-                      <span className="text-muted-foreground font-medium w-8 shrink-0">To</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-muted-foreground font-medium w-8 shrink-0">To</span>
                       <input
                         value={to}
                         onChange={e => setTo(e.target.value)}
+                        placeholder="recipient@example.com"
                         className="flex-1 text-[11px] text-foreground bg-muted/30 border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40"
                       />
                     </div>
 
-                    {/* Penny draft prompt */}
-                    {!body && !generating && composeMode === 'reply' && (
+                    {/* Penny prompt — only for replies before body is written */}
+                    {!body && !generating && composeMode === 'reply' && selectedThread && (
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => void handlePenny()}
@@ -346,9 +504,9 @@ export function GmailActionPanel() {
                       </div>
                     )}
 
-                    {/* Penny generating state */}
+                    {/* Penny generating */}
                     {generating && (
-                      <div className="flex items-center gap-2 py-1">
+                      <div className="flex items-center gap-2 py-0.5">
                         <Brain className="w-3.5 h-3.5 text-primary animate-pulse" />
                         <span className="text-[10px] text-muted-foreground">Penny is drafting…</span>
                       </div>
@@ -362,7 +520,7 @@ export function GmailActionPanel() {
                       </div>
                     )}
 
-                    {/* Body */}
+                    {/* Body textarea */}
                     <div className="relative">
                       <textarea
                         value={body}
@@ -379,36 +537,53 @@ export function GmailActionPanel() {
                       )}
                     </div>
 
-                    {/* Send + toolbar */}
+                    {/* Send error */}
+                    {sendError && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-rose-600">
+                        <AlertCircle className="w-3 h-3 shrink-0" />
+                        <span>{sendError}</span>
+                      </div>
+                    )}
+
+                    {/* Actions */}
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={handleSend}
-                        disabled={!body.trim()}
+                        onClick={() => void handleSend()}
+                        disabled={!body.trim() || !to.trim() || sending}
                         className="flex items-center gap-1.5 text-[11px] font-semibold text-primary-foreground bg-primary rounded-md px-3 py-1.5 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
-                        <Send className="w-3 h-3" />
-                        {composeMode === 'reply' ? 'Send Reply' : 'Send'}
+                        <Send className={`w-3 h-3 ${sending ? 'animate-pulse' : ''}`} />
+                        {sending ? 'Sending…' : composeMode === 'reply' ? 'Send Reply' : 'Send'}
                       </button>
                       <button
                         className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted/60 transition-colors"
-                        title="Attach file"
+                        title="Attach file (coming soon)"
                       >
                         <Paperclip className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => { setBody(''); setPennyDone(false); }}
                         className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted/60 transition-colors ml-auto"
-                        title="Discard draft"
+                        title="Clear draft"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
                     <p className="text-[9px] text-muted-foreground/40 text-center">
-                      Phase 2 · sends via Gmail · Penny draft by Gemini 2.5 Flash · no auto-send
+                      Sends via Gmail · Penny draft by Gemini 2.5 Flash · no auto-send
                     </p>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Footer */}
+            {!loading && !fetchError && threads.length > 0 && composeMode === 'hidden' && (
+              <div className="px-4 py-2 border-t border-border flex-shrink-0 bg-muted/20">
+                <p className="text-[9px] text-muted-foreground/50 text-center">
+                  gmail.readonly + gmail.send · Penny draft by Gemini 2.5 Flash
+                </p>
               </div>
             )}
 

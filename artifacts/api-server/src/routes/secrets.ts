@@ -161,6 +161,9 @@ function buildCatalog(): SecretEntry[] {
     // ── Google Calendar ────────────────────────────────────────────────────
     { id: "google-cal-refresh",   primary: "GOOGLE_CALENDAR_REFRESH_TOKEN", alts: ["GCAL_REFRESH_TOKEN", "GOOGLE_CAL_REFRESH_TOKEN"], integration: "Google Calendar", category: "OAuth Token", required: true,  purpose: "Persistent access token for Google Calendar API — cohort sessions, coaching events, Penny reminders.", nextFix: "Complete Calendar OAuth flow with calendar.readonly, calendar.events scopes. Store as GOOGLE_CALENDAR_REFRESH_TOKEN.", fmtCheck: googleRefreshTokenFormat },
 
+    // ── Gmail ──────────────────────────────────────────────────────────────
+    { id: "google-gmail-refresh", primary: "GOOGLE_GMAIL_REFRESH_TOKEN", alts: [], integration: "Gmail", category: "OAuth Token", required: true, purpose: "Persistent access token for Gmail API — inbox read (gmail.readonly) and send (gmail.send) for the Mail action panel in Trail OS.", nextFix: "Re-run the Google OAuth wizard at /admin/google-oauth — scopes now include gmail.readonly + gmail.send. Store the new refresh token as GOOGLE_GMAIL_REFRESH_TOKEN in Replit Secrets.", fmtCheck: googleRefreshTokenFormat },
+
     // ── Gemini / Penny AI ──────────────────────────────────────────────────
     { id: "gemini-api-key",       primary: "GEMINI_API_KEY",            alts: ["GOOGLE_AI_API_KEY", "GOOGLE_AI_KEY", "PALM_API_KEY", "VERTEX_AI_API_KEY"], integration: "Gemini / Penny AI", category: "API Key", required: true,  purpose: "Authenticates all Penny (Gemini) AI requests — capability responses, assessments, coaching prompts, Trail Quests.", nextFix: "Google AI Studio (aistudio.google.com) → Get API Key. New keys start with AQ. (secure auth key format); legacy keys start with AIza. Both formats are accepted.", fmtCheck: geminiKeyFormat },
 
@@ -218,6 +221,7 @@ function buildSummaries(entries: SecretEntry[]): IntegrationSummary[] {
     "Google": "border-sky-200 bg-sky-50 text-sky-800",
     "Google Drive": "border-blue-200 bg-blue-50 text-blue-800",
     "Google Calendar": "border-indigo-200 bg-indigo-50 text-indigo-800",
+    "Gmail": "border-rose-200 bg-rose-50 text-rose-800",
     "Gemini / Penny AI": "border-violet-200 bg-violet-50 text-violet-800",
     "Salesforce": "border-teal-200 bg-teal-50 text-teal-800",
     "Agentforce": "border-cyan-200 bg-cyan-50 text-cyan-800",
