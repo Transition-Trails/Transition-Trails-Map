@@ -35,7 +35,7 @@ router.get('/admin/google-groups', async (_req, res) => {
         'GCP Console → IAM & Admin → Service Accounts → Create service account',
         'Enable domain-wide delegation on the service account',
         'Enable "Admin SDK API" in GCP Console → APIs & Services → Library',
-        'In Google Workspace Admin → Security → API controls → Domain-wide delegation: add service account client ID with scope https://www.googleapis.com/auth/admin.directory.group.member.readonly',
+        'In Google Workspace Admin → Security → API controls → Domain-wide delegation: add service account Unique ID with scope https://www.googleapis.com/auth/admin.directory.group.member.readonly',
         'Download the service account JSON key and set it as GOOGLE_ADMIN_CREDENTIALS in Replit Secrets',
         'Set GOOGLE_ADMIN_IMPERSONATE_EMAIL to a Google Workspace admin email (e.g. admin@transitiontrails.org)',
       ],
