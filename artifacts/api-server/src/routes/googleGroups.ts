@@ -23,6 +23,15 @@ async function getGroupMembers(groupEmail: string, accessToken: string) {
   }
 }
 
+router.get('/admin/google-groups/client-id', (_req, res) => {
+  try {
+    const raw = process.env.GOOGLE_ADMIN_CREDENTIALS;
+    if (!raw) { res.status(404).json({ error: 'GOOGLE_ADMIN_CREDENTIALS not set' }); return; }
+    const key = JSON.parse(raw) as { client_id?: string; client_email?: string; project_id?: string };
+    res.json({ client_id: key.client_id, client_email: key.client_email, project_id: key.project_id });
+  } catch { res.status(500).json({ error: 'Failed to parse credentials' }); }
+});
+
 router.get('/admin/google-groups', async (_req, res) => {
   const status = getAdminDirectoryStatus();
 
