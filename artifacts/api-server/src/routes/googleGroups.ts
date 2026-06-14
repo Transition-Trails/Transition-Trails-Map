@@ -23,29 +23,6 @@ async function getGroupMembers(groupEmail: string, accessToken: string) {
   }
 }
 
-router.get('/admin/google-groups/client-id', (_req, res) => {
-  try {
-    const raw = process.env.GOOGLE_ADMIN_CREDENTIALS;
-    if (!raw) { res.status(404).json({ error: 'GOOGLE_ADMIN_CREDENTIALS not set' }); return; }
-    const key = JSON.parse(raw) as { client_id?: string; client_email?: string; project_id?: string };
-    res.json({
-      client_id: key.client_id,
-      client_email: key.client_email,
-      project_id: key.project_id,
-      impersonate_email: process.env.GOOGLE_ADMIN_IMPERSONATE_EMAIL ?? '(not set)',
-    });
-  } catch { res.status(500).json({ error: 'Failed to parse credentials' }); }
-});
-
-router.get('/admin/google-groups/debug', async (_req, res) => {
-  const accessToken = await (await import('../lib/googleAdmin')).getAdminAccessToken();
-  if (!accessToken) { res.json({ error: 'no token' }); return; }
-  const url = `https://admin.googleapis.com/admin/directory/v1/groups/${encodeURIComponent('trailosadmin@transitiontrails.org')}/members`;
-  const r = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-  const body = await r.json();
-  res.json({ status: r.status, body });
-});
-
 router.get('/admin/google-groups', async (_req, res) => {
   const status = getAdminDirectoryStatus();
 

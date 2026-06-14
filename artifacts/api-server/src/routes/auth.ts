@@ -18,15 +18,14 @@ function getSuperadminEmails(): string[] {
     .filter(Boolean);
 }
 
-async function getUserGroupEmails(email: string, accessToken: string): Promise<string[]> {
+/** Check group membership via members list (uses member.readonly scope only). */
+async function getGroupMemberEmails(groupEmail: string, accessToken: string): Promise<string[]> {
   try {
-    const url = `https://admin.googleapis.com/admin/directory/v1/groups?userKey=${encodeURIComponent(email)}&domain=${DOMAIN}`;
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const url = `https://admin.googleapis.com/admin/directory/v1/groups/${encodeURIComponent(groupEmail)}/members`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
     if (!res.ok) return [];
-    const data = await res.json() as { groups?: Array<{ email: string }> };
-    return (data.groups ?? []).map(g => g.email.toLowerCase());
+    const data = await res.json() as { members?: Array<{ email: string; type: string }> };
+    return (data.members ?? []).filter(m => m.type === 'USER').map(m => m.email.toLowerCase());
   } catch {
     return [];
   }
@@ -48,18 +47,22 @@ router.get('/auth/tier', async (req, res) => {
   const accessToken = await getAdminAccessToken();
 
   if (accessToken) {
-    const groups = await getUserGroupEmails(email, accessToken);
+    const [adminMembers, powerMembers, everydayMembers] = await Promise.all([
+      getGroupMemberEmails(TRAIL_OS_GROUPS.admin,    accessToken),
+      getGroupMemberEmails(TRAIL_OS_GROUPS.power,    accessToken),
+      getGroupMemberEmails(TRAIL_OS_GROUPS.everyday, accessToken),
+    ]);
 
-    if (groups.includes(TRAIL_OS_GROUPS.admin)) {
-      res.json({ tier: 'admin', source: 'google-groups', groups });
+    if (adminMembers.includes(email)) {
+      res.json({ tier: 'admin', source: 'google-groups' });
       return;
     }
-    if (groups.includes(TRAIL_OS_GROUPS.power)) {
-      res.json({ tier: 'power', source: 'google-groups', groups });
+    if (powerMembers.includes(email)) {
+      res.json({ tier: 'power', source: 'google-groups' });
       return;
     }
-    if (groups.includes(TRAIL_OS_GROUPS.everyday)) {
-      res.json({ tier: 'everyday', source: 'google-groups', groups });
+    if (everydayMembers.includes(email)) {
+      res.json({ tier: 'everyday', source: 'google-groups' });
       return;
     }
 
