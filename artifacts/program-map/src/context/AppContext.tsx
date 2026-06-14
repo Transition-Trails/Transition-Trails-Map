@@ -64,6 +64,8 @@ interface AppState {
   setAskPennyOpen: (v: boolean) => void;
   calendarPanelOpen: boolean;
   setCalendarPanelOpen: (v: boolean) => void;
+  gmailPanelOpen: boolean;
+  setGmailPanelOpen: (v: boolean) => void;
   pendingPennyQuery: string | null;
   setPendingPennyQuery: (q: string | null) => void;
   mobileSidebarOpen: boolean;
@@ -103,6 +105,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [rightPanelOpen, setRightPanelOpen]       = useState(false);
   const [askPennyOpen, setAskPennyOpen]             = useState(false);
   const [calendarPanelOpen, setCalendarPanelOpen]   = useState(false);
+  const [gmailPanelOpen,    setGmailPanelOpen]      = useState(false);
   const [pendingPennyQuery, setPendingPennyQuery]   = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -180,6 +183,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       rightPanelOpen, setRightPanelOpen,
       askPennyOpen, setAskPennyOpen,
       calendarPanelOpen, setCalendarPanelOpen,
+      gmailPanelOpen, setGmailPanelOpen,
       pendingPennyQuery, setPendingPennyQuery,
       mobileSidebarOpen, setMobileSidebarOpen,
       setActivePage, setActiveLens, setUserTier, setSelectedItem, setSearchOpen,

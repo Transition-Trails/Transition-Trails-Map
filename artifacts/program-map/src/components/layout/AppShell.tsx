@@ -5,6 +5,7 @@ import { ContextBar } from '@/components/context/ContextBar';
 import { CommandPalette } from '../CommandPalette';
 import { AskPennyPanel } from './AskPennyPanel';
 import { CalendarActionPanel } from './CalendarActionPanel';
+import { GmailActionPanel } from './GmailActionPanel';
 import React from 'react';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -22,6 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <CommandPalette />
       <AskPennyPanel />
       <CalendarActionPanel />
+      <GmailActionPanel />
     </div>
   );
 }

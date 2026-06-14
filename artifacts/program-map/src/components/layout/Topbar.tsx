@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useUser, useClerk } from '@clerk/react';
-import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity } from 'lucide-react';
+import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -366,6 +366,7 @@ export function Topbar() {
     rightPanelOpen, setRightPanelOpen,
     askPennyOpen, setAskPennyOpen,
     calendarPanelOpen, setCalendarPanelOpen,
+    gmailPanelOpen, setGmailPanelOpen,
     mobileSidebarOpen, setMobileSidebarOpen,
   } = useAppContext();
 
@@ -430,12 +431,35 @@ export function Topbar() {
             } else {
               setCalendarPanelOpen(true);
               setAskPennyOpen(false);
+              setGmailPanelOpen(false);
             }
           }}
           title="Calendar — upcoming events & Penny prep briefs"
         >
           <CalendarDays className="w-3 h-3 flex-shrink-0" />
           <span className="hidden sm:inline">{calendarPanelOpen ? 'Close' : 'Calendar'}</span>
+        </button>
+
+        {/* Gmail action panel toggle */}
+        <button
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
+            gmailPanelOpen
+              ? 'bg-rose-100 border-rose-300 text-rose-700 hover:bg-rose-200'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700'
+          }`}
+          onClick={() => {
+            if (gmailPanelOpen) {
+              setGmailPanelOpen(false);
+            } else {
+              setGmailPanelOpen(true);
+              setAskPennyOpen(false);
+              setCalendarPanelOpen(false);
+            }
+          }}
+          title="Mail — inbox & Penny draft assist"
+        >
+          <Mail className="w-3 h-3 flex-shrink-0" />
+          <span className="hidden sm:inline">{gmailPanelOpen ? 'Close' : 'Mail'}</span>
         </button>
 
         <SignalsIndicator />
