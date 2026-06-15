@@ -74,21 +74,26 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
     id: 'google-calendar',
     label: 'Google Calendar',
     health: 'live',
-    summary: 'OAuth refresh token obtained — GOOGLE_CALENDAR_REFRESH_TOKEN stored in Replit Secrets',
+    summary: 'Live — real event data via /api/calendar/events · Calendar panel + Penny prep briefs active',
     detail:
       'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_CALENDAR_REFRESH_TOKEN all configured. ' +
       'OAuth flow completed via /admin/google-oauth. Replit integration bound (google-calendar==1.0.0). ' +
-      'Phase 2: wire cohort schedule read to Calendar panel.',
+      'CalendarPanel live at /collaboration/calendar-live — next 5 real events, pending invite flags, per-event Penny prep briefs via Gemini. ' +
+      'Collaboration Overview wires today\'s meeting count + next upcoming meeting into the rule management hub. ' +
+      'Phase 2: map program-specific Calendar IDs for cohort-scoped event queries.',
     lastVerified: 'June 2026',
   },
   gmail: {
     id: 'gmail',
     label: 'Gmail',
-    health: 'phase-2',
-    summary: 'Phase 2 — Email / Gmail Action Panel (draft in backlog)',
+    health: 'live',
+    summary: 'Live — gmail.readonly + gmail.send confirmed · Real inbox at /collaboration/gmail',
     detail:
-      'Gmail read/compose integration deferred to Phase 2. ' +
-      'See /admin/phase2-backlog — "Email / Gmail Action Panel" draft card.',
+      'GOOGLE_GMAIL_REFRESH_TOKEN stored and active. gmail.readonly + gmail.send scopes confirmed. ' +
+      'GmailCenter live at /collaboration/gmail — real inbox (15 threads), thread read, Penny-assisted draft, real send via POST /api/gmail/send. ' +
+      'Collaboration Overview refactored to rule management hub — channel signal rules, Penny routing, Trail Signals config. ' +
+      'Validation endpoint: GET /api/gmail/validate',
+    lastVerified: 'June 2026',
   },
   mural: {
     id: 'mural',
@@ -135,10 +140,12 @@ export const PHASE_OWNERSHIP = {
     route: '/admin/phase2-backlog',
     label: 'Phase 2 Backlog',
     scope:
-      'Authoritative source for all deferred and future features. 10 draft cards: ' +
-      'Universal Ask Penny Panel · Trail Signals Control Center · Gmail Panel · ' +
-      'Calendar Panel · Google SSO & Groups · Mural · Penny Asset Library · ' +
-      'Mobile Trail OS · Penny Reacts to Signals · Learning Delivery Center.',
+      'Authoritative source for all deferred and future features. ' +
+      'Gmail Panel and Calendar Panel graduated to Live in Phase 1. Remaining backlog: ' +
+      'Universal Ask Penny Panel · Trail Signals Control Center · ' +
+      'Google SSO & Groups · Mural · Penny Asset Library · ' +
+      'Mobile Trail OS · Penny Reacts to Signals · Learning Delivery Center · ' +
+      'Google Drive rule config · Google Chat spaces · Google Chat client channel.',
   },
 } as const;
 

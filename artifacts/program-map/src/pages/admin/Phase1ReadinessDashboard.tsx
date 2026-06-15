@@ -66,7 +66,7 @@ const AREAS: ReadinessArea[] = [
     id: 'integration',
     title: 'Integration Readiness',
     icon: Puzzle,
-    score: 93,
+    score: 97,
     status: 'on-track',
     owner: 'Tech Lead',
     description: 'Salesforce API, Google Workspace, Slack, Agentforce, Penny, and auth layer live connections.',
@@ -79,6 +79,9 @@ const AREAS: ReadinessArea[] = [
       'GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET live-validated — format correct, Google APIs reachable in 25ms',
       'GOOGLE_DRIVE_REFRESH_TOKEN obtained — Google Drive OAuth fully live (Jun 13 2026)',
       'GOOGLE_CALENDAR_REFRESH_TOKEN obtained — Google Calendar OAuth fully live (Jun 13 2026)',
+      'CalendarPanel live — real events via /api/calendar/events, Penny prep briefs per event, pending invite flags',
+      'GOOGLE_GMAIL_REFRESH_TOKEN obtained — gmail.readonly + gmail.send scopes confirmed live (Jun 2026)',
+      'GmailCenter live at /collaboration/gmail — real inbox (15 threads), thread read, Penny draft, real send via POST /api/gmail/send',
       'AGENTFORCE_API_KEY confirmed (0Xxan0… prefix) — Agentforce Sessions API live, coexistence POC complete',
       'Salesforce webhook secret configured (SALESFORCE_WEBHOOK_SECRET)',
       'GitHub PAT and webhook secret configured',
@@ -91,7 +94,6 @@ const AREAS: ReadinessArea[] = [
     gaps: [
       'Salesforce REST API read-only — SOQL write/mutation not yet implemented',
       'Slack channels:read + groups:read scopes not yet added',
-      'Gmail OAuth scope not yet configured (gmail.readonly + gmail.compose — Phase 2)',
     ],
     blockers: [],
     nextActions: [
@@ -245,7 +247,9 @@ const OVERALL: ReadinessArea = {
     'Agentforce coexistence confirmed — 8/8 POC steps, live API (0Xxan0… key), session flow live',
     'SF Case → Penny focus wired — case row click fires rich Penny query; highlighted row + dismissible strip',
     'Google OAuth fully live — GOOGLE_DRIVE_REFRESH_TOKEN + GOOGLE_CALENDAR_REFRESH_TOKEN obtained (Jun 13 2026)',
-    'Google Drive + Google Calendar + Agentforce promoted to Live integrations — Admin Setup updated',
+    'Gmail fully live — GOOGLE_GMAIL_REFRESH_TOKEN active · gmail.readonly + gmail.send confirmed · GmailCenter at /collaboration/gmail (Jun 2026)',
+    'Collaboration Overview refactored to rule management hub — channel signal rules, Penny routing config, Trail Signals destinations',
+    'Google Drive + Google Calendar + Gmail + Agentforce promoted to Live integrations — Admin Setup updated',
     'Phase 1 UX Consolidation complete — sidebar deduplicated, all stale status text cleared',
     'Trail Signals button responsive — icon-only below sm breakpoint, matching Penny + Calendar pattern',
     'Google Sign-In live — Clerk v6, branded sign-in page, Google OAuth, role-gated Show components across all routes',
@@ -255,7 +259,6 @@ const OVERALL: ReadinessArea = {
   gaps: [
     'Salesforce live — data not yet wired to any live dashboard or capability',
     'Slack live (POC) — Penny Weekly Brief delivery pipeline not yet wired end-to-end',
-    'Gmail OAuth scope not yet configured (gmail.readonly + gmail.compose — Phase 2)',
   ],
   blockers: [],
   nextActions: [

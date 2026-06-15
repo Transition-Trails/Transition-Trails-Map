@@ -49,14 +49,14 @@ const INTEGRATIONS: IntegCard[] = [
   {
     id: 'gmail',
     name: 'Gmail',
-    tagline: 'Mail Panel & Notifications',
-    status: 'needs-auth',
+    tagline: 'Mail Panel & Signal Routing',
+    status: 'live',
     icon: Mail,
     iconCls: 'bg-rose-50 text-rose-700',
-    detail: 'gmail.readonly + gmail.send scopes added to the OAuth wizard. Run the wizard and save the result as GOOGLE_GMAIL_REFRESH_TOKEN to activate the Mail panel.',
-    action: 'Authorize Gmail',
-    href: '/admin/integrations/google-auth',
-    needs: 'Re-run OAuth wizard → copy refresh token → save as GOOGLE_GMAIL_REFRESH_TOKEN in Replit Secrets',
+    detail: 'GOOGLE_GMAIL_REFRESH_TOKEN active. gmail.readonly + gmail.send confirmed. Real inbox (15 threads), Penny-assisted draft, and send live at /collaboration/gmail. Label-based signal routing configured in Collaboration Overview.',
+    action: 'Gmail Center',
+    href: '/collaboration/gmail',
+    needs: 'Configure cohort-specific Gmail labels for automated Trail Signals routing',
   },
   {
     id: 'google-drive',
@@ -167,12 +167,11 @@ interface QuickAction {
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
-    id: 'gmail-auth',
-    label: 'Authorize Gmail',
-    desc: 'Re-run OAuth wizard to activate the Mail panel',
-    href: '/admin/integrations/google-auth',
-    icon: Lock,
-    urgent: true,
+    id: 'collab-overview',
+    label: 'Signal Rules',
+    desc: 'Configure how each channel feeds Penny and Trail Signals',
+    href: '/collaboration',
+    icon: MessageSquare,
   },
   {
     id: 'secrets',
@@ -347,7 +346,7 @@ export default function IntegrationHub() {
           <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/60 bg-muted/10 p-3">
             <Clock className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
             <p className="text-[11px] text-muted-foreground/60">
-              Mural and LMS integrations are planned for Phase 2 (Q4 2025). Gmail, Google Chat, and full Agentforce context handoff are on the Phase 2 backlog.{' '}
+              Mural and LMS integrations are planned for Phase 2 (Q4 2025). Gmail and Calendar graduated to Live. Google Chat, full Agentforce context handoff, and Drive rule config remain on the Phase 2 backlog.{' '}
               <button onClick={() => setLocation('/admin/phase2-backlog')} className="text-primary hover:underline font-medium">View backlog →</button>
             </p>
           </div>
