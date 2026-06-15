@@ -730,7 +730,6 @@ export default function GoogleOAuthFlow() {
                   { icon: <HardDrive className="w-3.5 h-3.5" />, scope: 'drive.file',        label: 'Create and write Penny source files' },
                   { icon: <Calendar  className="w-3.5 h-3.5" />, scope: 'calendar.readonly', label: 'Read cohort and program calendars' },
                   { icon: <Calendar  className="w-3.5 h-3.5" />, scope: 'calendar.events',   label: 'Create Penny reminder events' },
-                  { icon: <Mail      className="w-3.5 h-3.5" />, scope: 'gmail.readonly',    label: 'Read inbox threads for the Mail panel' },
                   { icon: <Mail      className="w-3.5 h-3.5" />, scope: 'gmail.send',        label: 'Send emails via Penny draft flow' },
                   { icon: <Shield    className="w-3.5 h-3.5" />, scope: 'openid + email',    label: 'Identify the authorizing Google account' },
                 ].map(({ icon, scope, label }) => (
@@ -744,13 +743,8 @@ export default function GoogleOAuthFlow() {
               <div className="flex items-start gap-2 rounded border border-amber-200 bg-amber-50 px-3 py-2 mt-1">
                 <Info className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                 <p className="text-[11px] text-amber-800 leading-snug">
-                  <strong>Drive, Calendar, and Gmail scopes must all be added.</strong> Gmail scopes (gmail.readonly, gmail.send) are restricted and require a separate consent prompt.
-                  Go to{' '}
-                  <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener noreferrer"
-                    className="font-semibold underline inline-flex items-center gap-0.5">
-                    OAuth Consent Screen <ExternalLink className="w-3 h-3" />
-                  </a>
-                  {' '}→ Edit App → Add or remove scopes → search for drive, calendar, and gmail → Save.
+                  <strong>Drive and Calendar scopes must be added to your OAuth Consent Screen.</strong> <code className="font-mono bg-amber-100 px-1 rounded">gmail.send</code> is a sensitive scope that works in Testing mode.
+                  Note: <code className="font-mono bg-amber-100 px-1 rounded">gmail.readonly</code> (inbox reading) is a <em>restricted</em> scope — Google requires a formal app security review before it works. Inbox reading is disabled in development; compose &amp; send work now.
                 </p>
               </div>
             </div>

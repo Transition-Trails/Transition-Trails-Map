@@ -349,26 +349,40 @@ export function GmailActionPanel() {
                 {/* Error */}
                 {!loading && fetchError && (
                   <div className="p-4">
-                    <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 space-y-2">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-[12px] font-semibold text-rose-800">Could not load inbox</p>
-                          <p className="text-[11px] text-rose-700 mt-0.5">{fetchError}</p>
-                          {fetchError.includes('GOOGLE_GMAIL_REFRESH_TOKEN') && (
-                            <p className="text-[10px] text-rose-600 mt-1">
-                              Store your Gmail refresh token as <code className="font-mono bg-rose-100 px-1 rounded">GOOGLE_GMAIL_REFRESH_TOKEN</code> in Replit Secrets and restart the API server.
+                    {fetchError.includes('insufficient authentication scopes') ? (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[12px] font-semibold text-amber-800">Inbox reading requires app verification</p>
+                            <p className="text-[11px] text-amber-700 mt-0.5 leading-snug">
+                              Reading Gmail inbox requires <code className="font-mono bg-amber-100 px-1 rounded">gmail.readonly</code> — a Google "restricted" scope that needs a formal security review before it works in production. <strong>Compose and send still work</strong> via the button below.
                             </p>
-                          )}
+                          </div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => void load()}
-                        className="text-[11px] text-rose-700 border border-rose-200 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
-                      >
-                        Try again
-                      </button>
-                    </div>
+                    ) : (
+                      <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 space-y-2">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[12px] font-semibold text-rose-800">Could not load inbox</p>
+                            <p className="text-[11px] text-rose-700 mt-0.5">{fetchError}</p>
+                            {fetchError.includes('GOOGLE_GMAIL_REFRESH_TOKEN') && (
+                              <p className="text-[10px] text-rose-600 mt-1">
+                                Store your Gmail refresh token as <code className="font-mono bg-rose-100 px-1 rounded">GOOGLE_GMAIL_REFRESH_TOKEN</code> in Replit Secrets and restart the API server.
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => void load()}
+                          className="text-[11px] text-rose-700 border border-rose-200 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+                        >
+                          Try again
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -578,12 +592,18 @@ export function GmailActionPanel() {
               </div>
             )}
 
-            {/* Footer */}
-            {!loading && !fetchError && threads.length > 0 && composeMode === 'hidden' && (
-              <div className="px-4 py-2 border-t border-border flex-shrink-0 bg-muted/20">
-                <p className="text-[9px] text-muted-foreground/50 text-center">
-                  gmail.readonly + gmail.send · Penny draft by Gemini 2.5 Flash
+            {/* Compose button — always available when token is present, even if inbox reading is blocked */}
+            {!loading && composeMode === 'hidden' && (
+              <div className="px-4 py-2 border-t border-border flex-shrink-0 bg-muted/20 flex items-center justify-between gap-2">
+                <p className="text-[9px] text-muted-foreground/50">
+                  {fetchError?.includes('insufficient') ? 'Send-only mode · inbox reading requires app verification' : 'gmail.send · Penny draft by Gemini 2.5 Flash'}
                 </p>
+                <button
+                  onClick={() => setComposeMode('new')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[11px] font-semibold hover:opacity-90 transition-opacity shrink-0"
+                >
+                  <Pencil className="w-3 h-3" /> Compose
+                </button>
               </div>
             )}
 

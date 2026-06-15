@@ -38,7 +38,10 @@ const SCOPES = [
   "https://www.googleapis.com/auth/drive.file",
   "https://www.googleapis.com/auth/calendar.readonly",
   "https://www.googleapis.com/auth/calendar.events",
-  "https://www.googleapis.com/auth/gmail.readonly",
+  // gmail.send is a "sensitive" scope — works in Testing mode for test users.
+  // gmail.readonly is a "restricted" scope — requires Google security assessment
+  // before it works even in Testing mode. Inbox reading is disabled until the
+  // app passes that review; compose/send still works via gmail.send alone.
   "https://www.googleapis.com/auth/gmail.send",
   "openid",
   "email",
