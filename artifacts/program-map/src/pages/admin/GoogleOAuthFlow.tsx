@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Shield, CheckCircle, XCircle, AlertTriangle, Copy, ExternalLink,
   RefreshCw, Lock, Key, ChevronRight, Eye, EyeOff, ArrowRight,
-  Globe, HardDrive, Calendar, Zap, Info, TriangleAlert, Users,
+  Globe, HardDrive, Calendar, Mail, Zap, Info, TriangleAlert, Users,
   CircleAlert, Search, ChevronDown,
 } from 'lucide-react';
 import { useLocation } from 'wouter';
@@ -721,7 +721,7 @@ export default function GoogleOAuthFlow() {
             </div>
             <div className="px-4 py-3 space-y-2">
               <p className="text-[12px] text-muted-foreground">
-                Drive and Calendar will be authorized in one flow. These scopes must be added to your OAuth Consent Screen's scope list in Google Cloud Console.
+                Drive, Calendar, and Gmail are all authorized in one flow. All scopes below must be added to your OAuth Consent Screen in Google Cloud Console.
               </p>
               <div className="grid grid-cols-1 gap-1.5">
                 {[
@@ -729,6 +729,8 @@ export default function GoogleOAuthFlow() {
                   { icon: <HardDrive className="w-3.5 h-3.5" />, scope: 'drive.file',        label: 'Create and write Penny source files' },
                   { icon: <Calendar  className="w-3.5 h-3.5" />, scope: 'calendar.readonly', label: 'Read cohort and program calendars' },
                   { icon: <Calendar  className="w-3.5 h-3.5" />, scope: 'calendar.events',   label: 'Create Penny reminder events' },
+                  { icon: <Mail      className="w-3.5 h-3.5" />, scope: 'gmail.readonly',    label: 'Read inbox threads for the Mail panel' },
+                  { icon: <Mail      className="w-3.5 h-3.5" />, scope: 'gmail.send',        label: 'Send emails via Penny draft flow' },
                   { icon: <Shield    className="w-3.5 h-3.5" />, scope: 'openid + email',    label: 'Identify the authorizing Google account' },
                 ].map(({ icon, scope, label }) => (
                   <div key={scope} className="flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-muted/20">
@@ -741,13 +743,13 @@ export default function GoogleOAuthFlow() {
               <div className="flex items-start gap-2 rounded border border-amber-200 bg-amber-50 px-3 py-2 mt-1">
                 <Info className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                 <p className="text-[11px] text-amber-800 leading-snug">
-                  <strong>Drive and Calendar are sensitive scopes.</strong> They must be added on the OAuth Consent Screen page under <em>Scopes</em>.
+                  <strong>Drive, Calendar, and Gmail scopes must all be added.</strong> Gmail scopes (gmail.readonly, gmail.send) are restricted and require a separate consent prompt.
                   Go to{' '}
                   <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener noreferrer"
                     className="font-semibold underline inline-flex items-center gap-0.5">
                     OAuth Consent Screen <ExternalLink className="w-3 h-3" />
                   </a>
-                  {' '}→ Edit App → Add or remove scopes → search for drive and calendar → Save.
+                  {' '}→ Edit App → Add or remove scopes → search for drive, calendar, and gmail → Save.
                 </p>
               </div>
             </div>
@@ -764,59 +766,53 @@ export default function GoogleOAuthFlow() {
             </div>
             <div className="px-4 py-4 space-y-3">
 
-              {info?.tokens.drive && info?.tokens.calendar ? (
-                <div className="rounded border border-emerald-200 bg-emerald-50 px-4 py-3 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <div>
-                    <p className="text-[12px] font-bold text-emerald-800">Both refresh tokens are already configured</p>
-                    <p className="text-[11px] text-emerald-700">Drive and Calendar are authorized. Re-authorize only if you need to refresh the tokens.</p>
+              {/* Status summary — shows which tokens are configured */}
+              {info && (info.tokens.drive || info.tokens.calendar || info.tokens.gmail) && (
+                <div className={`rounded border px-4 py-3 ${info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    {info.tokens.drive && info.tokens.calendar && info.tokens.gmail
+                      ? <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      : <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />}
+                    <p className={`text-[12px] font-bold ${info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? 'text-emerald-800' : 'text-amber-800'}`}>
+                      {info.tokens.drive && info.tokens.calendar && info.tokens.gmail
+                        ? 'All three refresh tokens configured (Drive · Calendar · Gmail)'
+                        : `${[info.tokens.drive && 'Drive', info.tokens.calendar && 'Calendar', info.tokens.gmail && 'Gmail'].filter(Boolean).join(' · ')} configured — ${[!info.tokens.drive && 'Drive', !info.tokens.calendar && 'Calendar', !info.tokens.gmail && 'Gmail'].filter(Boolean).join(' + ')} missing`}
+                    </p>
                   </div>
-                </div>
-              ) : (
-                <>
-                  <p className="text-[12px] text-muted-foreground leading-relaxed">
-                    Clicking the button below opens Google's consent screen. After approving, you'll be redirected back here with a refresh token to copy into Replit Secrets.
-                    Make sure you've completed <strong>Steps 2–3 and the 403 checklist</strong> before proceeding.
-                  </p>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <a
-                      href="/api/google/oauth/start"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-bold transition-colors ${info?.credentials.ok ? 'bg-sky-600 text-white hover:bg-sky-700' : 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'}`}
-                    >
-                      <Globe className="w-4 h-4" />
-                      Authorize with Google
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
-                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <Lock className="w-3 h-3" />
-                      <span>Redirects to accounts.google.com — you'll consent on Google's domain</span>
-                    </div>
-                  </div>
-                  {!info?.credentials.ok && (
-                    <p className="text-[11px] text-rose-600 flex items-center gap-1">
-                      <XCircle className="w-3 h-3" /> Configure client credentials first (Step 1).
+                  {!(info.tokens.drive && info.tokens.calendar && info.tokens.gmail) && (
+                    <p className="text-[11px] text-amber-700 ml-6">
+                      Re-authorize below to get a token covering all three services. On the success screen, save the value as all three secret names.
                     </p>
                   )}
-                </>
+                </div>
               )}
 
-              {info?.tokens.drive && info?.tokens.calendar && (
-                <details className="text-[11px]">
-                  <summary className="cursor-pointer text-muted-foreground hover:text-foreground">Re-authorize (refresh or rotate tokens)</summary>
-                  <div className="mt-2 space-y-2">
-                    <p className="text-muted-foreground leading-snug">
-                      Re-authorizing will issue a new refresh token. You'll need to update the secrets and restart the server again.
-                    </p>
-                    <a href="/api/google/oauth/start"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-white text-[11px] font-semibold hover:bg-muted/30">
-                      <RefreshCw className="w-3 h-3" /> Re-authorize with Google
-                    </a>
-                  </div>
-                </details>
+              {/* Always-visible authorize button */}
+              <p className="text-[12px] text-muted-foreground leading-relaxed">
+                {info?.tokens.drive || info?.tokens.calendar || info?.tokens.gmail
+                  ? 'Re-authorize to issue a fresh token. The success screen will show all three secret names to fill in. Accept every Google permission prompt — including the Gmail screen.'
+                  : "Clicking the button below opens Google's consent screen. After approving, you'll be redirected back here with a refresh token to copy into Replit Secrets. Make sure you've completed Steps 2–3 before proceeding."}
+              </p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <a
+                  href="/api/google/oauth/start"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-bold transition-colors ${info?.credentials.ok ? 'bg-sky-600 text-white hover:bg-sky-700' : 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'}`}
+                >
+                  <Globe className="w-4 h-4" />
+                  {info?.tokens.drive || info?.tokens.calendar || info?.tokens.gmail ? 'Re-authorize with Google' : 'Authorize with Google'}
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <Lock className="w-3 h-3" />
+                  <span>Redirects to accounts.google.com — consent on Google's domain</span>
+                </div>
+              </div>
+              {!info?.credentials.ok && (
+                <p className="text-[11px] text-rose-600 flex items-center gap-1">
+                  <XCircle className="w-3 h-3" /> Configure client credentials first (Step 1).
+                </p>
               )}
 
               {/* Authorization URL Inspector */}
