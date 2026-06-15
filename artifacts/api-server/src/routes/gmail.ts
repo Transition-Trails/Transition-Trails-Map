@@ -94,6 +94,34 @@ function parseFromHeader(raw: string): { name: string; email: string } {
   return { name: raw, email: raw };
 }
 
+// ─── GET /api/gmail/validate ─────────────────────────────────────────────────
+// Exchanges the refresh token and calls Google's tokeninfo endpoint so we can
+// see exactly which scopes the stored token covers (diagnostic only).
+
+router.get("/gmail/validate", async (req, res) => {
+  try {
+    const token = await getAccessToken();
+    const infoResp = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?access_token=${token}`,
+      { signal: AbortSignal.timeout(10_000) }
+    );
+    const info = await infoResp.json() as Record<string, unknown>;
+    const scopeStr = typeof info["scope"] === "string" ? info["scope"] : "";
+    const scopes = scopeStr.split(" ").filter(Boolean);
+    return res.json({
+      ok: infoResp.ok,
+      scopes,
+      hasGmailReadonly: scopes.some(s => s.includes("gmail.readonly") || s.includes("mail.google.com")),
+      hasGmailSend:     scopes.some(s => s.includes("gmail.send")),
+      tokenSource:      process.env["GOOGLE_GMAIL_REFRESH_TOKEN"] ? "GOOGLE_GMAIL_REFRESH_TOKEN" : "GOOGLE_CALENDAR_REFRESH_TOKEN (fallback)",
+      raw: info,
+    });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(502).json({ error: msg });
+  }
+});
+
 // ─── GET /api/gmail/threads ───────────────────────────────────────────────────
 // Returns up to 15 inbox threads with sender, subject, snippet, unread flag.
 
