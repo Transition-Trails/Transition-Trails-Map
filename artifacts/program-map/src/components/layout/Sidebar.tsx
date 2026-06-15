@@ -92,9 +92,10 @@ const navGroups: NavGroup[] = [
     icon: MessageSquare,
     pathPrefix: '/collaboration',
     items: [
-      { id: 'collab-overview',      path: '/collaboration',               label: 'Overview',  minTier: 'admin' },
-      { id: 'collab-calendar-live', path: '/collaboration/calendar-live', label: 'Calendar',  minTier: 'power' },
-      { id: 'collab-gmail',         path: '/collaboration/gmail',         label: 'Gmail',     minTier: 'power' },
+      { id: 'collab-overview',      path: '/collaboration',               label: 'Overview',         minTier: 'admin' },
+      { id: 'collab-my-signals',    path: '/collaboration/my-signals',    label: 'My Trail Signals', minTier: 'power' },
+      { id: 'collab-calendar-live', path: '/collaboration/calendar-live', label: 'Calendar',         minTier: 'power' },
+      { id: 'collab-gmail',         path: '/collaboration/gmail',         label: 'Gmail',            minTier: 'power' },
       { id: 'collab-slack',         path: '/collaboration/slack',         label: 'Slack',     minTier: 'admin' },
       { id: 'collab-channels',      path: '/collaboration/channels',      label: 'Channels',  minTier: 'admin' },
       { id: 'collab-templates',     path: '/collaboration/templates',     label: 'Templates', minTier: 'admin' },

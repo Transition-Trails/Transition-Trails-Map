@@ -1,7 +1,8 @@
-import { MessageSquare, Hash, FileText, BookOpen, Bell, Zap, Mail } from 'lucide-react';
+import { MessageSquare, Hash, FileText, BookOpen, Bell, Zap, Mail, Activity } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import CollaborationWorkspace from '@/pages/collaboration/CollaborationWorkspace';
+import MyTrailSignals         from '@/pages/collaboration/MyTrailSignals';
 import CommChannels           from '@/pages/communications/CommChannels';
 import CommMessageTemplates   from '@/pages/communications/MessageTemplates';
 import WeeklyBriefs           from '@/pages/communications/WeeklyBriefs';
@@ -25,6 +26,9 @@ export default function CollaborationHub() {
       icon: MessageSquare,
       content: <CollaborationWorkspace />,
     },
+    ...(isPowerOrAbove ? [
+      { id: 'my-signals',    label: 'My Trail Signals', path: '/collaboration/my-signals', icon: Activity,  content: <MyTrailSignals /> },
+    ] : []),
     ...(isPowerOrAbove ? [
       { id: 'channels',      label: 'Channels',      path: '/collaboration/channels',      icon: Hash,      content: <CommChannels /> },
       { id: 'templates',     label: 'Templates',     path: '/collaboration/templates',     icon: FileText,  content: <CommMessageTemplates /> },
