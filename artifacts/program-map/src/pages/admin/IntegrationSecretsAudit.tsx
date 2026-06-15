@@ -761,8 +761,8 @@ export default function IntegrationSecretsAudit() {
                         )}
                       </div>
                       <p className="text-[12px] text-sky-900 leading-relaxed mb-3">
-                        GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are configured. The built-in OAuth flow will authorize Drive and Calendar together,
-                        display the refresh token once for copying into Replit Secrets, and guide you through every step.
+                        GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are configured. The built-in OAuth flow will authorize Drive, Calendar, and Gmail together,
+                        display the refresh token once for copying into Replit Secrets as three separate secret names, and guide you through every step.
                       </p>
                       <button
                         onClick={() => navigate('/admin/google-oauth')}
@@ -778,19 +778,38 @@ export default function IntegrationSecretsAudit() {
               )}
 
               {/* Already authorized confirmation */}
-              {auditData.entries.filter(e => (e.id === 'google-drive-refresh' || e.id === 'google-cal-refresh') && e.status !== 'missing').length === 2 && (
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 flex items-center gap-3">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-[12px] font-bold text-emerald-800">Google Drive + Calendar: Refresh tokens configured</p>
-                    <p className="text-[11px] text-emerald-700 mt-0.5">Run Live Checks above to confirm the tokens are valid and API-ready.</p>
+              {(() => {
+                const googleTokenIds = ['google-drive-refresh', 'google-cal-refresh', 'google-gmail-refresh'];
+                const presentCount = auditData.entries.filter(e => googleTokenIds.includes(e.id) && e.status !== 'missing').length;
+                const missingGmail = auditData.entries.find(e => e.id === 'google-gmail-refresh' && e.status === 'missing');
+                if (presentCount === 0) return null;
+                return (
+                  <div className={`rounded-lg border px-4 py-3 flex items-center gap-3 ${presentCount === 3 ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+                    {presentCount === 3
+                      ? <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      : <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />}
+                    <div className="flex-1">
+                      {presentCount === 3 ? (
+                        <>
+                          <p className="text-[12px] font-bold text-emerald-800">Google Drive + Calendar + Gmail: All refresh tokens configured</p>
+                          <p className="text-[11px] text-emerald-700 mt-0.5">Run Live Checks above to confirm the tokens are valid and API-ready.</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-[12px] font-bold text-amber-800">Google OAuth: {presentCount}/3 refresh tokens configured</p>
+                          <p className="text-[11px] text-amber-700 mt-0.5">
+                            {missingGmail ? 'GOOGLE_GMAIL_REFRESH_TOKEN is missing — re-run the OAuth wizard and save the token under all three secret names.' : 'Re-run the OAuth wizard to authorize all three services.'}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <button onClick={() => navigate('/admin/integrations/google-auth')}
+                      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded border text-[11px] font-semibold ${presentCount === 3 ? 'border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50' : 'border-amber-300 bg-white text-amber-700 hover:bg-amber-50'}`}>
+                      Re-authorize <ArrowRight className="w-3 h-3" />
+                    </button>
                   </div>
-                  <button onClick={() => navigate('/admin/google-oauth')}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-emerald-300 bg-white text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50">
-                    Re-authorize <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
+                );
+              })()}
             </>
           )}
         </div>
