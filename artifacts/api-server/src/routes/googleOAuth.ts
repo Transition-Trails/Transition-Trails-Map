@@ -166,7 +166,7 @@ router.get("/google/oauth/callback", async (req: Request, res: Response) => {
   // ── OAuth error from Google ─────────────────────────────────────────────────
   if (error) {
     return res.redirect(
-      `${frontendBase}/admin/google-oauth?status=error&error=${encodeURIComponent(error)}`
+      `${frontendBase}/admin/integrations/google-auth?status=error&error=${encodeURIComponent(error)}`
     );
   }
 
@@ -175,14 +175,14 @@ router.get("/google/oauth/callback", async (req: Request, res: Response) => {
   const pending = sessions.get(stateId);
   if (!pending || pending.phase !== "state" || pending.state !== stateVal) {
     return res.redirect(
-      `${frontendBase}/admin/google-oauth?status=error&error=${encodeURIComponent("Invalid or expired state — please restart the authorization flow.")}`
+      `${frontendBase}/admin/integrations/google-auth?status=error&error=${encodeURIComponent("Invalid or expired state — please restart the authorization flow.")}`
     );
   }
   sessions.delete(stateId);
 
   if (!code) {
     return res.redirect(
-      `${frontendBase}/admin/google-oauth?status=error&error=${encodeURIComponent("No authorization code received from Google.")}`
+      `${frontendBase}/admin/integrations/google-auth?status=error&error=${encodeURIComponent("No authorization code received from Google.")}`
     );
   }
 
@@ -220,13 +220,13 @@ router.get("/google/oauth/callback", async (req: Request, res: Response) => {
     if (!tokenRes.ok || body.error) {
       const msg = body.error_description ?? body.error ?? `HTTP ${tokenRes.status}`;
       return res.redirect(
-        `${frontendBase}/admin/google-oauth?status=error&error=${encodeURIComponent(`Token exchange failed: ${msg}`)}`
+        `${frontendBase}/admin/integrations/google-auth?status=error&error=${encodeURIComponent(`Token exchange failed: ${msg}`)}`
       );
     }
 
     if (!body.refresh_token) {
       return res.redirect(
-        `${frontendBase}/admin/google-oauth?status=error&error=${encodeURIComponent("Google did not return a refresh token. This can happen if the account was previously authorized without prompt=consent. Please revoke access at myaccount.google.com/permissions and try again.")}`
+        `${frontendBase}/admin/integrations/google-auth?status=error&error=${encodeURIComponent("Google did not return a refresh token. This can happen if the account was previously authorized without prompt=consent. Please revoke access at myaccount.google.com/permissions and try again.")}`
       );
     }
 
@@ -245,7 +245,7 @@ router.get("/google/oauth/callback", async (req: Request, res: Response) => {
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     return res.redirect(
-      `${frontendBase}/admin/google-oauth?status=error&error=${encodeURIComponent(`Network error during token exchange: ${msg}`)}`
+      `${frontendBase}/admin/integrations/google-auth?status=error&error=${encodeURIComponent(`Network error during token exchange: ${msg}`)}`
     );
   }
 
@@ -260,7 +260,7 @@ router.get("/google/oauth/callback", async (req: Request, res: Response) => {
   });
 
   return res.redirect(
-    `${frontendBase}/admin/google-oauth?status=success&session=${encodeURIComponent(sessionId)}`
+    `${frontendBase}/admin/integrations/google-auth?status=success&session=${encodeURIComponent(sessionId)}`
   );
 });
 
