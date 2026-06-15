@@ -225,68 +225,74 @@ export function CommandCenter() {
       {/* ── Main 3-column layout ── */}
       <div className="flex flex-1 overflow-hidden gap-0">
 
-        {/* ── Col 1: Needs Attention ── */}
+        {/* ── Col 1: Needs Attention + Recent Activity ── */}
         <div className="flex-1 flex flex-col overflow-hidden border-r border-zinc-200">
-          <div className="px-5 py-3 border-b border-zinc-100 flex items-center gap-2 bg-white shrink-0">
-            <Bell className="w-3.5 h-3.5 text-zinc-400" />
-            <span className="text-[11px] font-semibold text-zinc-700">Needs Attention</span>
-            <span className="text-[9px] bg-zinc-100 text-zinc-500 rounded-full px-1.5 py-0.5 font-medium ml-auto">
-              {filtered.filter(i => i.priority === 'high').length} high
-            </span>
-            {activeChannel && (
-              <button onClick={() => setActiveChannel(null)} className="text-[9px] text-zinc-400 hover:text-zinc-600 underline">Clear filter</button>
-            )}
-          </div>
-          <div className="flex-1 overflow-auto">
-            {filtered.map(item => (
-              <div key={item.id} className="px-5 py-3.5 border-b border-zinc-50 hover:bg-white/70 transition-colors group">
-                <div className="flex items-start gap-3">
-                  <div className={`w-7 h-7 rounded-lg ${item.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
-                    <item.icon className={`w-3.5 h-3.5 ${item.iconText}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <PriorityDot p={item.priority} />
-                      <p className="text-[12px] font-medium text-zinc-800 truncate leading-snug">{item.title}</p>
-                    </div>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-[10px] text-zinc-400">{item.from}</span>
-                      <span className="text-[9px] text-zinc-300">·</span>
-                      <span className="text-[10px] text-zinc-400">{item.time}</span>
-                    </div>
-                    {item.penny && (
-                      <div className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-100">
-                        <Sparkles className="w-2 h-2" />
-                        {item.penny}
-                      </div>
-                    )}
-                  </div>
-                  <button className="text-[10px] font-semibold text-zinc-500 hover:text-zinc-800 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
-                    {item.action} <ArrowUpRight className="w-2.5 h-2.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
 
-          {/* Activity feed */}
-          <div className="border-t border-zinc-200 shrink-0">
-            <div className="px-5 py-2.5 border-b border-zinc-100 bg-white flex items-center gap-2">
-              <Zap className="w-3 h-3 text-zinc-400" />
-              <span className="text-[11px] font-semibold text-zinc-700">Recent Activity</span>
+          {/* — Needs Attention — */}
+          <div className="bg-white flex flex-col flex-1 overflow-hidden min-h-0">
+            <div className="px-5 py-2.5 border-b border-zinc-100 flex items-center gap-2 shrink-0">
+              <Bell className="w-3.5 h-3.5 text-amber-500" />
+              <span className="text-[11px] font-semibold text-zinc-800">Needs Attention</span>
+              <span className="text-[9px] bg-amber-50 text-amber-600 border border-amber-200 rounded-full px-1.5 py-0.5 font-semibold ml-1">
+                {filtered.filter(i => i.priority === 'high').length} high priority
+              </span>
+              {activeChannel && (
+                <button onClick={() => setActiveChannel(null)} className="text-[9px] text-zinc-400 hover:text-zinc-600 underline ml-auto">Clear filter</button>
+              )}
             </div>
-            <div className="bg-white overflow-auto max-h-44">
-              {ACTIVITY.map(a => (
-                <div key={a.id} className="px-5 py-2.5 border-b border-zinc-50 flex items-start gap-2.5 hover:bg-zinc-50 transition-colors">
-                  <div className={`w-5 h-5 rounded-md ${a.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
-                    <a.icon className={`w-2.5 h-2.5 ${a.iconText}`} />
+            <div className="flex-1 overflow-auto bg-white">
+              {filtered.map(item => (
+                <div key={item.id} className="px-5 py-3.5 border-b border-zinc-100 hover:bg-zinc-50 transition-colors group">
+                  <div className="flex items-start gap-3">
+                    <div className={`w-7 h-7 rounded-lg ${item.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
+                      <item.icon className={`w-3.5 h-3.5 ${item.iconText}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <PriorityDot p={item.priority} />
+                        <p className="text-[12px] font-medium text-zinc-800 truncate leading-snug">{item.title}</p>
+                      </div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="text-[10px] text-zinc-400">{item.from}</span>
+                        <span className="text-[9px] text-zinc-300">·</span>
+                        <span className="text-[10px] text-zinc-400">{item.time}</span>
+                      </div>
+                      {item.penny && (
+                        <div className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-100">
+                          <Sparkles className="w-2 h-2" />
+                          {item.penny}
+                        </div>
+                      )}
+                    </div>
+                    <button className="text-[10px] font-semibold text-zinc-500 hover:text-zinc-800 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 mt-1">
+                      {item.action} <ArrowUpRight className="w-2.5 h-2.5" />
+                    </button>
                   </div>
-                  <p className="text-[11px] text-zinc-600 flex-1 leading-snug">{a.text}</p>
-                  <span className="text-[9px] text-zinc-400 shrink-0">{a.time}</span>
                 </div>
               ))}
             </div>
           </div>
+
+          {/* — Divider band — */}
+          <div className="bg-zinc-100 border-y border-zinc-200 px-5 py-2 flex items-center gap-2 shrink-0">
+            <Zap className="w-3 h-3 text-zinc-400" />
+            <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Recent Activity</span>
+            <span className="text-[9px] text-zinc-400 ml-auto">{ACTIVITY.length} events</span>
+          </div>
+
+          {/* — Recent Activity — */}
+          <div className="bg-zinc-50 overflow-auto shrink-0" style={{ maxHeight: '38%' }}>
+            {ACTIVITY.map(a => (
+              <div key={a.id} className="px-5 py-2.5 border-b border-zinc-100 flex items-start gap-2.5 hover:bg-white transition-colors">
+                <div className={`w-5 h-5 rounded-md ${a.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
+                  <a.icon className={`w-2.5 h-2.5 ${a.iconText}`} />
+                </div>
+                <p className="text-[11px] text-zinc-600 flex-1 leading-snug">{a.text}</p>
+                <span className="text-[9px] text-zinc-400 shrink-0 whitespace-nowrap">{a.time}</span>
+              </div>
+            ))}
+          </div>
+
         </div>
 
         {/* ── Col 2: Penny Intelligence ── */}
