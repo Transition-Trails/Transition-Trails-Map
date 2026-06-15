@@ -42,6 +42,9 @@ import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
 import Phase1UXStandards        from "@/pages/admin/Phase1UXStandards";
 import IntegrationSecretsAudit  from "@/pages/admin/IntegrationSecretsAudit";
 import GoogleOAuthFlow           from "@/pages/admin/GoogleOAuthFlow";
+import GoogleDriveIntegrationCenter    from "@/pages/collaboration/GoogleDriveIntegrationCenter";
+import GoogleCalendarIntegrationCenter from "@/pages/collaboration/GoogleCalendarIntegrationCenter";
+import IntegrationHub            from "@/pages/admin/IntegrationHub";
 import CreateAudit               from "@/pages/admin/CreateAudit";
 import Phase2Backlog             from "@/pages/admin/Phase2Backlog";
 import Phase1CompletionAudit    from "@/pages/admin/Phase1CompletionAudit";
@@ -120,6 +123,16 @@ function Router() {
       <Route path="/penny/integration-layer">   <Redirect to="/admin/setup" /></Route>
       {/* Trail Quests, Assessments, and Agentforce — now live tabs in PennyHub */}
       <Route path="/penny/logs">                <Redirect to="/penny/learners" /></Route>
+
+      {/* Old collaboration config tabs → Integration Hub */}
+      <Route path="/collaboration/drive/:sub">   <Redirect to="/admin/integrations/google-drive" /></Route>
+      <Route path="/collaboration/drive">        <Redirect to="/admin/integrations/google-drive" /></Route>
+      <Route path="/collaboration/calendar/:sub"><Redirect to="/admin/integrations/google-calendar" /></Route>
+      <Route path="/collaboration/calendar">     <Redirect to="/admin/integrations/google-calendar" /></Route>
+
+      {/* Old standalone admin pages → Integration Hub */}
+      <Route path="/admin/google-oauth">  <Redirect to="/admin/integrations/google-auth" /></Route>
+      <Route path="/admin/secrets-audit"> <Redirect to="/admin/integrations/secrets" /></Route>
 
       {/* Communications → collaboration */}
       <Route path="/communications/overview">          <Redirect to="/collaboration" /></Route>
@@ -221,11 +234,17 @@ function Router() {
       <Route path="/admin/people">           <Redirect to="/admin/people-access" /></Route>
       <Route path="/admin/phase1-readiness"  component={Phase1ReadinessDashboard} />
       <Route path="/admin/ux-standards"     component={Phase1UXStandards} />
-      <Route path="/admin/secrets-audit"     component={IntegrationSecretsAudit} />
-      <Route path="/admin/google-oauth"      component={GoogleOAuthFlow} />
       <Route path="/admin/create-audit"      component={CreateAudit} />
       <Route path="/admin/phase2-backlog"    component={Phase2Backlog} />
       <Route path="/admin/phase1-audit"     component={Phase1CompletionAudit} />
+
+      {/* Integration Hub — unified setup center */}
+      <Route path="/admin/integrations/google-auth"     component={GoogleOAuthFlow} />
+      <Route path="/admin/integrations/google-drive"    component={GoogleDriveIntegrationCenter} />
+      <Route path="/admin/integrations/google-calendar" component={GoogleCalendarIntegrationCenter} />
+      <Route path="/admin/integrations/secrets"         component={IntegrationSecretsAudit} />
+      <Route path="/admin/integrations"                 component={IntegrationHub} />
+
       <Route path="/admin/:section"          component={Admin} />
       <Route path="/admin">               <Redirect to="/admin/setup" /></Route>
 

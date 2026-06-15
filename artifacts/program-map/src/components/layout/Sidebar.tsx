@@ -92,12 +92,11 @@ const navGroups: NavGroup[] = [
     icon: MessageSquare,
     pathPrefix: '/collaboration',
     items: [
-      { id: 'collab-overview',       path: '/collaboration',                    label: 'Overview',        minTier: 'admin' },
-      { id: 'collab-calendar-live', path: '/collaboration/calendar-live',      label: 'Calendar',        minTier: 'power' },
-      { id: 'collab-slack',         path: '/collaboration/slack',              label: 'Slack',           minTier: 'admin' },
-      { id: 'collab-drive',         path: '/collaboration/drive',              label: 'Google Drive',    minTier: 'admin' },
-      { id: 'collab-channels',      path: '/collaboration/channels',           label: 'Channels',        minTier: 'admin' },
-      { id: 'collab-templates',     path: '/collaboration/templates',          label: 'Templates',       minTier: 'admin' },
+      { id: 'collab-overview',      path: '/collaboration',               label: 'Overview',  minTier: 'admin' },
+      { id: 'collab-calendar-live', path: '/collaboration/calendar-live', label: 'Calendar',  minTier: 'power' },
+      { id: 'collab-slack',         path: '/collaboration/slack',         label: 'Slack',     minTier: 'admin' },
+      { id: 'collab-channels',      path: '/collaboration/channels',      label: 'Channels',  minTier: 'admin' },
+      { id: 'collab-templates',     path: '/collaboration/templates',     label: 'Templates', minTier: 'admin' },
     ],
   },
   {
@@ -107,8 +106,9 @@ const navGroups: NavGroup[] = [
     icon: Settings,
     pathPrefix: '/admin',
     items: [
-      { id: 'admin-home',          path: '/admin/setup',         label: 'Administration' },
-      { id: 'admin-people-access', path: '/admin/people-access', label: 'People & Access' },
+      { id: 'admin-home',          path: '/admin/setup',          label: 'Administration' },
+      { id: 'admin-integrations',  path: '/admin/integrations',   label: 'Integrations'   },
+      { id: 'admin-people-access', path: '/admin/people-access',  label: 'People & Access' },
     ],
   },
 ];

@@ -1,18 +1,17 @@
-import { MessageSquare, Hash, CalendarDays, HardDrive, FileText, BookOpen, Bell, Zap } from 'lucide-react';
+import { MessageSquare, Hash, FileText, BookOpen, Bell, Zap } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { useTierFlags } from '@/hooks/useTierFlags';
-import CollaborationWorkspace          from '@/pages/collaboration/CollaborationWorkspace';
-import CommChannels                    from '@/pages/communications/CommChannels';
-import CommMessageTemplates            from '@/pages/communications/MessageTemplates';
-import WeeklyBriefs                    from '@/pages/communications/WeeklyBriefs';
-import CommNotifications               from '@/pages/communications/CommNotifications';
-import SlackIntegrationCenter          from '@/pages/collaboration/SlackIntegrationCenter';
-import GoogleDriveIntegrationCenter    from '@/pages/collaboration/GoogleDriveIntegrationCenter';
-import GoogleCalendarIntegrationCenter from '@/pages/collaboration/GoogleCalendarIntegrationCenter';
-import CalendarPanel                   from '@/pages/collaboration/CalendarPanel';
+import CollaborationWorkspace from '@/pages/collaboration/CollaborationWorkspace';
+import CommChannels           from '@/pages/communications/CommChannels';
+import CommMessageTemplates   from '@/pages/communications/MessageTemplates';
+import WeeklyBriefs           from '@/pages/communications/WeeklyBriefs';
+import CommNotifications      from '@/pages/communications/CommNotifications';
+import SlackIntegrationCenter from '@/pages/collaboration/SlackIntegrationCenter';
+import CalendarPanel          from '@/pages/collaboration/CalendarPanel';
 
 // UI audit rule: Everyday User pages must not have multiple nav/action rows
 // above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
+// Integration config (Drive, Calendar setup) moved to Administration → Integrations.
 
 export default function CollaborationHub() {
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
@@ -35,9 +34,7 @@ export default function CollaborationHub() {
       { id: 'calendar-live', label: 'Calendar', path: '/collaboration/calendar-live', icon: Zap, content: <CalendarPanel /> },
     ] : []),
     ...(isAdminOrAbove ? [
-      { id: 'slack',    label: 'Slack Integration', path: '/collaboration/slack',    icon: Hash,         content: <SlackIntegrationCenter /> },
-      { id: 'drive',    label: 'Google Drive',      path: '/collaboration/drive',    icon: HardDrive,    content: <GoogleDriveIntegrationCenter /> },
-      { id: 'calendar', label: 'Google Calendar',   path: '/collaboration/calendar', icon: CalendarDays, content: <GoogleCalendarIntegrationCenter /> },
+      { id: 'slack', label: 'Slack Integration', path: '/collaboration/slack', icon: Hash, content: <SlackIntegrationCenter /> },
     ] : []),
   ];
 
