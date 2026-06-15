@@ -72,6 +72,7 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/collaboration',                kind: 'active' },
   { path: '/collaboration/:tab',           kind: 'active' },
   { path: '/collaboration/calendar-live',  kind: 'active',   note: 'Live Google Calendar Action Panel — served via /collaboration/:tab; sidebar nav entry for Power+ users' },
+  { path: '/collaboration/gmail',          kind: 'active',   note: 'Gmail Center — Penny label intelligence + real inbox; Power+ users' },
 
   // ── Governance / UOM ─────────────────────────────────────────────────────
   { path: '/governance',                   kind: 'active' },

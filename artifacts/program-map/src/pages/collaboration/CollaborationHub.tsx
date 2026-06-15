@@ -1,4 +1,4 @@
-import { MessageSquare, Hash, FileText, BookOpen, Bell, Zap } from 'lucide-react';
+import { MessageSquare, Hash, FileText, BookOpen, Bell, Zap, Mail } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import CollaborationWorkspace from '@/pages/collaboration/CollaborationWorkspace';
@@ -8,6 +8,7 @@ import WeeklyBriefs           from '@/pages/communications/WeeklyBriefs';
 import CommNotifications      from '@/pages/communications/CommNotifications';
 import SlackIntegrationCenter from '@/pages/collaboration/SlackIntegrationCenter';
 import CalendarPanel          from '@/pages/collaboration/CalendarPanel';
+import GmailCenter            from '@/pages/collaboration/GmailCenter';
 
 // UI audit rule: Everyday User pages must not have multiple nav/action rows
 // above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
@@ -32,6 +33,9 @@ export default function CollaborationHub() {
     ] : []),
     ...(isPowerOrAbove ? [
       { id: 'calendar-live', label: 'Calendar', path: '/collaboration/calendar-live', icon: Zap, content: <CalendarPanel /> },
+    ] : []),
+    ...(isPowerOrAbove ? [
+      { id: 'gmail', label: 'Gmail', path: '/collaboration/gmail', icon: Mail, content: <GmailCenter /> },
     ] : []),
     ...(isAdminOrAbove ? [
       { id: 'slack', label: 'Slack Integration', path: '/collaboration/slack', icon: Hash, content: <SlackIntegrationCenter /> },
