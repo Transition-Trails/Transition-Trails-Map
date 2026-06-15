@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Image, FileText, Music, Video, File, FolderOpen,
-  ExternalLink, RefreshCw, AlertCircle, CheckCircle2,
-  HardDrive, Sparkles, Settings2, Info, ChevronDown, ChevronRight,
-  Mic, Layers, Play,
+  Sparkles, Layers, FileText, Mic, Play, CheckCircle2,
+  Image, Music, Video, File, ExternalLink, RefreshCw,
+  HardDrive, AlertTriangle, LayoutGrid, List, AlertCircle,
 } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -16,10 +14,8 @@ interface DriveFile {
   mimeType:      string;
   thumbnailLink?: string;
   webViewLink?:  string;
-  iconLink?:     string;
   modifiedTime?: string;
   size?:         string;
-  description?:  string;
 }
 
 interface AssetGroup {
@@ -46,74 +42,49 @@ interface DriveStatusResponse {
   pennyFolderId?:        string | null;
 }
 
-// ── Penny states definition ───────────────────────────────────────────────────
+// ── State definitions ─────────────────────────────────────────────────────────
 
-interface PennyState {
-  id:          string;
-  label:       string;
-  description: string;
-  icon:        React.ElementType;
-  color:       string;
-  bg:          string;
-  border:      string;
-  folderHint:  string;
+interface PennyStateConfig {
+  id:         string;
+  label:      string;
+  sub:        string;
+  icon:       React.ElementType;
+  accent:     string;
+  lightBg:    string;
+  folderHint: string;
 }
 
-const PENNY_STATES: PennyState[] = [
-  {
-    id: 'coaching', label: 'Coaching', folderHint: 'coaching',
-    description: 'One-on-one coaching sessions, check-ins, goal setting',
-    icon: Sparkles, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200',
-  },
-  {
-    id: 'trail-talk', label: 'Trail Talk', folderHint: 'trail-talk',
-    description: 'Trail Talk presentations and group session assets',
-    icon: Layers, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-200',
-  },
-  {
-    id: 'resume-review', label: 'Resume Review', folderHint: 'resume-review',
-    description: 'Career document review, CV feedback, and job prep',
-    icon: FileText, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200',
-  },
-  {
-    id: 'interview-prep', label: 'Interview Prep', folderHint: 'interview-prep',
-    description: 'Mock interviews, prep frameworks, and confidence builders',
-    icon: Mic, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200',
-  },
-  {
-    id: 'confidence-builder', label: 'Confidence Builder', folderHint: 'confidence-builder',
-    description: 'Motivational assets, affirmations, and self-efficacy tools',
-    icon: Play, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200',
-  },
-  {
-    id: 'quest-debrief', label: 'Quest Debrief', folderHint: 'quest-debrief',
-    description: 'Trail Quest completion celebrations and debrief guides',
-    icon: CheckCircle2, color: 'text-teal-600', bg: 'bg-teal-50', border: 'border-teal-200',
-  },
+const PENNY_STATES: PennyStateConfig[] = [
+  { id: 'coaching',           label: 'Coaching',           sub: 'Check-ins & goal setting',       icon: Sparkles,     accent: '#7c3aed', lightBg: '#f5f3ff', folderHint: 'coaching'           },
+  { id: 'trail-talk',         label: 'Trail Talk',         sub: 'Group sessions & presentations', icon: Layers,       accent: '#0284c7', lightBg: '#f0f9ff', folderHint: 'trail-talk'         },
+  { id: 'resume-review',      label: 'Resume Review',      sub: 'Career documents & CV feedback', icon: FileText,     accent: '#059669', lightBg: '#f0fdf4', folderHint: 'resume-review'      },
+  { id: 'interview-prep',     label: 'Interview Prep',     sub: 'Mock interviews & frameworks',   icon: Mic,          accent: '#e11d48', lightBg: '#fff1f2', folderHint: 'interview-prep'     },
+  { id: 'confidence-builder', label: 'Confidence Builder', sub: 'Affirmations & motivation',      icon: Play,         accent: '#d97706', lightBg: '#fffbeb', folderHint: 'confidence-builder' },
+  { id: 'quest-debrief',      label: 'Quest Debrief',      sub: 'Trail Quest completions',        icon: CheckCircle2, accent: '#0d9488', lightBg: '#f0fdfa', folderHint: 'quest-debrief'      },
 ];
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── MIME helpers ──────────────────────────────────────────────────────────────
 
-function mimeIcon(mimeType: string): React.ElementType {
-  if (mimeType.startsWith('image/') || mimeType === 'application/vnd.google-apps.drawing') return Image;
-  if (mimeType.startsWith('video/') || mimeType === 'application/vnd.google-apps.video')  return Video;
-  if (mimeType.startsWith('audio/'))                                                        return Music;
-  if (mimeType.includes('document') || mimeType.includes('text'))                          return FileText;
-  return File;
+type FileKind = 'image' | 'audio' | 'video' | 'doc' | 'other';
+
+function fileKind(mimeType: string): FileKind {
+  if (mimeType.startsWith('image/') || mimeType === 'application/vnd.google-apps.drawing') return 'image';
+  if (mimeType.startsWith('video/') || mimeType === 'application/vnd.google-apps.video')  return 'video';
+  if (mimeType.startsWith('audio/'))                                                        return 'audio';
+  if (mimeType.includes('document') || mimeType.includes('text') || mimeType === 'application/pdf' || mimeType.includes('presentation')) return 'doc';
+  return 'other';
 }
 
 function mimeLabel(mimeType: string): string {
   const map: Record<string, string> = {
-    'image/png':  'PNG', 'image/jpeg': 'JPG', 'image/gif': 'GIF', 'image/webp': 'WebP',
-    'image/svg+xml': 'SVG',
-    'video/mp4':  'MP4', 'video/quicktime': 'MOV',
+    'image/png': 'PNG', 'image/jpeg': 'JPG', 'image/gif': 'GIF', 'image/webp': 'WebP', 'image/svg+xml': 'SVG',
+    'video/mp4': 'MP4', 'video/quicktime': 'MOV',
     'audio/mpeg': 'MP3', 'audio/wav': 'WAV', 'audio/ogg': 'OGG',
     'application/pdf': 'PDF',
-    'application/vnd.google-apps.document':     'Doc',
+    'application/vnd.google-apps.document': 'Doc',
     'application/vnd.google-apps.presentation': 'Slides',
-    'application/vnd.google-apps.drawing':      'Drawing',
-    'application/vnd.google-apps.video':        'Video',
-    'application/vnd.google-apps.folder':       'Folder',
+    'application/vnd.google-apps.drawing': 'Drawing',
+    'application/vnd.google-apps.video': 'Video',
   };
   return map[mimeType] ?? mimeType.split('/')[1]?.toUpperCase().slice(0, 6) ?? 'File';
 }
@@ -123,37 +94,76 @@ function formatDate(iso?: string): string {
   return new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-// ── Asset file card ───────────────────────────────────────────────────────────
+const KIND_META: Record<FileKind, { icon: React.ElementType; bg: string; text: string }> = {
+  image: { icon: Image,    bg: 'bg-violet-50', text: 'text-violet-600' },
+  audio: { icon: Music,    bg: 'bg-sky-50',    text: 'text-sky-600'    },
+  video: { icon: Video,    bg: 'bg-rose-50',   text: 'text-rose-600'   },
+  doc:   { icon: FileText, bg: 'bg-amber-50',  text: 'text-amber-600'  },
+  other: { icon: File,     bg: 'bg-zinc-100',  text: 'text-zinc-500'   },
+};
 
-function AssetCard({ file }: { file: DriveFile }) {
-  const Icon = mimeIcon(file.mimeType);
-  const hasThumb = !!file.thumbnailLink;
+// ── File row (list view) ──────────────────────────────────────────────────────
 
+function FileRow({ file }: { file: DriveFile }) {
+  const kind = fileKind(file.mimeType);
+  const meta = KIND_META[kind];
+  const FIcon = meta.icon;
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden group hover:shadow-sm transition-shadow">
-      {/* Thumbnail / icon */}
-      <div className="h-20 bg-zinc-50 flex items-center justify-center border-b border-zinc-100 relative overflow-hidden">
+    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-50 rounded-lg group transition-colors">
+      <div className={`p-1.5 rounded-lg ${meta.bg} shrink-0`}>
+        <FIcon className={`w-3.5 h-3.5 ${meta.text}`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] font-medium text-zinc-700 truncate" title={file.name}>{file.name}</p>
+        <p className="text-[10px] text-zinc-400">{formatDate(file.modifiedTime)}{file.size ? ` · ${file.size}` : ''}</p>
+      </div>
+      <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded ${meta.bg} ${meta.text}`}>
+        {mimeLabel(file.mimeType)}
+      </span>
+      {file.webViewLink && (
+        <a
+          href={file.webViewLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-zinc-200"
+        >
+          <ExternalLink className="w-3 h-3 text-zinc-400" />
+        </a>
+      )}
+    </div>
+  );
+}
+
+// ── File card (grid view) ─────────────────────────────────────────────────────
+
+function FileCard({ file }: { file: DriveFile }) {
+  const kind = fileKind(file.mimeType);
+  const meta = KIND_META[kind];
+  const FIcon = meta.icon;
+  const hasThumb = !!file.thumbnailLink;
+  return (
+    <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden group hover:shadow-md transition-shadow">
+      <div className="h-24 bg-zinc-50 flex items-center justify-center border-b border-zinc-100 relative overflow-hidden">
         {hasThumb
           ? <img src={file.thumbnailLink} alt={file.name} className="w-full h-full object-cover" />
-          : <Icon className="w-8 h-8 text-zinc-300" />}
+          : <FIcon className="w-9 h-9 text-zinc-200" />}
         {file.webViewLink && (
           <a
             href={file.webViewLink}
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
-            className="absolute top-1.5 right-1.5 p-1 rounded bg-white/80 border border-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity"
-            title="Open in Drive"
+            className="absolute top-2 right-2 p-1.5 rounded-lg bg-white border border-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
           >
-            <ExternalLink className="w-3 h-3 text-zinc-500" />
+            <ExternalLink className="w-3 h-3 text-zinc-400" />
           </a>
         )}
       </div>
-      {/* Meta */}
-      <div className="px-2.5 py-2">
-        <p className="text-[11px] font-medium text-zinc-700 truncate leading-snug" title={file.name}>{file.name}</p>
-        <div className="flex items-center justify-between mt-1">
-          <span className="text-[9px] font-semibold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded">
+      <div className="px-3 py-2.5">
+        <p className="text-[11px] font-medium text-zinc-700 truncate" title={file.name}>{file.name}</p>
+        <div className="flex items-center justify-between mt-1.5">
+          <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded ${meta.bg} ${meta.text}`}>
             {mimeLabel(file.mimeType)}
           </span>
           <span className="text-[9px] text-zinc-400">{formatDate(file.modifiedTime)}</span>
@@ -163,237 +173,310 @@ function AssetCard({ file }: { file: DriveFile }) {
   );
 }
 
-// ── State section ─────────────────────────────────────────────────────────────
-
-function StateSection({ state, group }: { state: PennyState; group?: AssetGroup }) {
-  const [open, setOpen] = useState(true);
-  const files = group?.files ?? [];
-
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center gap-3 px-5 py-3.5 text-left hover:brightness-[0.98] transition-all ${state.bg}`}
-      >
-        <div className={`p-1.5 rounded-lg border ${state.border} ${state.bg}`}>
-          <state.icon className={`w-3.5 h-3.5 ${state.color}`} />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] font-semibold text-zinc-800">{state.label}</span>
-            <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${state.bg} ${state.border} ${state.color}`}>
-              {files.length} {files.length === 1 ? 'asset' : 'assets'}
-            </span>
-            {files.length === 0 && (
-              <span className="text-[9px] text-zinc-400 italic">— no folder found in Drive yet</span>
-            )}
-          </div>
-          <p className="text-[10px] text-zinc-500 mt-0.5">{state.description}</p>
-        </div>
-        <span className="text-[9px] text-zinc-400 mr-2">
-          Folder: <code className="font-mono">{state.folderHint}/</code>
-        </span>
-        {open
-          ? <ChevronDown className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          : <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />}
-      </button>
-
-      {open && (
-        <div className="border-t border-zinc-100 px-5 py-4">
-          {files.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {files.map(f => <AssetCard key={f.id} file={f} />)}
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 text-[11px] text-zinc-400 py-2">
-              <FolderOpen className="w-4 h-4 text-zinc-300" />
-              Create a subfolder named <code className="font-mono text-zinc-500 bg-zinc-100 px-1 py-0.5 rounded">{state.folderHint}</code> inside your Penny Assets Drive folder, then upload assets there.
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function PennyAssetLibrary() {
-  const { data: status } = useQuery<DriveStatusResponse>({
-    queryKey: ['drive-status'],
-    queryFn:  () => fetch('/api/drive/status').then(r => r.json()),
+  const [activeId, setActiveId]   = useState(PENNY_STATES[0].id);
+  const [viewMode, setViewMode]   = useState<'grid' | 'list'>('grid');
+
+  const { data: status, isLoading: statusLoading } = useQuery<DriveStatusResponse>({
+    queryKey:  ['drive-status'],
+    queryFn:   () => fetch('/api/drive/status').then(r => r.json()),
     staleTime: 60_000,
   });
 
   const { data, isLoading, isError, refetch } = useQuery<PennyAssetsResponse>({
-    queryKey: ['penny-assets'],
-    queryFn:  () => fetch('/api/drive/penny-assets').then(r => r.json()),
+    queryKey:  ['penny-assets'],
+    queryFn:   () => fetch('/api/drive/penny-assets').then(r => r.json()),
     staleTime: 60_000,
-    enabled:  status?.connected === true,
+    enabled:   status?.connected === true,
   });
 
-  const groups = data?.groups ?? [];
+  const groups      = data?.groups ?? [];
+  const ungrouped   = data?.ungrouped ?? [];
+  const totalAssets = groups.reduce((n, g) => n + g.files.length, 0) + ungrouped.length;
 
-  // Match Drive subfolders to PENNY_STATES by normalized folder name
-  const getGroup = (state: PennyState): AssetGroup | undefined =>
+  const getGroup = (state: PennyStateConfig): AssetGroup | undefined =>
     groups.find(g => g.state === state.folderHint || g.folderName.toLowerCase().replace(/\s+/g, '-') === state.folderHint);
 
-  const totalAssets = groups.reduce((n, g) => n + g.files.length, 0) + (data?.ungrouped?.length ?? 0);
+  const active    = PENNY_STATES.find(s => s.id === activeId)!;
+  const isSpecial = activeId === '__ungrouped__';
+
+  // Files for the selected sidebar item
+  const activeFiles: DriveFile[] = isSpecial
+    ? ungrouped
+    : (getGroup(active)?.files ?? []);
+
+  // Drive connection state for the status pill
+  const driveConnected = status?.connected === true;
+  const folderConfigured = status?.pennyFolderConfigured === true;
 
   return (
-    <ScrollArea className="h-full">
-      <div className="max-w-5xl mx-auto px-6 py-6 space-y-6">
+    <div className="h-full bg-white flex flex-col overflow-hidden">
 
-        {/* ── Drive connection status ── */}
-        <div className="flex items-start justify-between gap-4">
-          <p className="text-[13px] text-zinc-600 leading-relaxed max-w-2xl">
-            Manage themed Penny images, voice scripts, avatar variants, and contextual
-            coaching assets — all stored in Google Drive and organised by Penny state.
-            Create subfolders matching the state names below inside your configured Drive folder.
-          </p>
-          <div className="flex items-center gap-2 shrink-0">
-            {status?.connected
-              ? <span className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
-                  <CheckCircle2 className="w-3 h-3" /> Drive connected
+      {/* ── Top bar ── */}
+      <div className="border-b border-zinc-200 px-5 py-3 flex items-center justify-between bg-white shrink-0">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-violet-500" />
+          <span className="text-[13px] font-semibold text-zinc-800">Asset Library</span>
+          {isLoading && (
+            <span className="text-[10px] text-zinc-400 italic ml-1">Loading from Drive…</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Config warning */}
+          {driveConnected && !folderConfigured && (
+            <span className="flex items-center gap-1.5 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-1">
+              <AlertTriangle className="w-3 h-3" />
+              Folder not configured
+            </span>
+          )}
+          {/* Drive status pill */}
+          {!statusLoading && (
+            driveConnected
+              ? <span className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                  Drive live
                 </span>
-              : <span className="flex items-center gap-1.5 text-[10px] font-semibold text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-full px-2.5 py-1">
-                  <AlertCircle className="w-3 h-3" /> Drive not connected
-                </span>}
-            <button
-              onClick={() => refetch()}
-              className="p-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors"
-              title="Refresh"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-zinc-500 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
+              : <span className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 bg-zinc-100 border border-zinc-200 rounded-full px-2.5 py-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 inline-block" />
+                  Drive offline
+                </span>
+          )}
+          <button
+            onClick={() => refetch()}
+            className="p-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors"
+            title="Refresh assets"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-zinc-400 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
+      </div>
 
-        {/* ── Configuration strip ── */}
-        {status?.connected && (
-          <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 ${
-            status.pennyFolderConfigured
-              ? 'border-emerald-200 bg-emerald-50'
-              : 'border-amber-200 bg-amber-50'
-          }`}>
-            {status.pennyFolderConfigured
-              ? <HardDrive className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-              : <Info      className="w-3.5 h-3.5 text-amber-500  shrink-0 mt-0.5" />}
-            <div className="space-y-0.5">
-              {status.pennyFolderConfigured ? (
-                <>
-                  <p className="text-[11px] font-semibold text-emerald-800">
-                    Penny Assets folder configured — {data?.folderName ?? 'Loading…'}
-                  </p>
-                  <p className="text-[10px] text-emerald-700">
-                    Folder ID: <code className="font-mono">{status.pennyFolderId}</code>
-                    {' · '}{totalAssets} total assets across {groups.length} state folders
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-[11px] font-semibold text-amber-800">
-                    Penny Assets folder not configured
-                  </p>
-                  <p className="text-[10px] text-amber-700">
-                    Create a folder named <strong>Penny Assets</strong> in Google Drive, copy its folder ID from the URL, and add it as the secret{' '}
-                    <code className="font-mono bg-amber-100 px-1 rounded">GOOGLE_DRIVE_PENNY_FOLDER_ID</code> in Administration → Integrations.
-                    Then create subfolders for each Penny state below.
-                  </p>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ── Not connected notice ── */}
-        {!status?.connected && (
-          <div className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-4">
-            <HardDrive className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-[12px] font-semibold text-zinc-700">Google Drive not connected</p>
-              <p className="text-[11px] text-zinc-500 mt-0.5">
-                {status?.reason ?? 'GOOGLE_DRIVE_REFRESH_TOKEN is missing.'}{' '}
-                Complete the Google OAuth flow at <strong>Administration → Google OAuth Setup</strong> with <code className="font-mono text-[10px]">drive.readonly</code> scope.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* ── Error ── */}
-        {isError && (
-          <div className="flex items-center gap-2 text-[11px] text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-4 py-3">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            Error loading assets from Drive. Check the API server logs.
-          </div>
-        )}
-
-        {/* ── API error from server ── */}
-        {data?.error && (
-          <div className="flex items-center gap-2 text-[11px] text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-4 py-3">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            Drive error: {data.error}
-          </div>
-        )}
-
-        {/* ── Folder structure guide ── */}
-        <div className="flex items-start gap-2.5 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3">
-          <Settings2 className="w-3.5 h-3.5 text-sky-500 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-sky-800 leading-snug">
-            <span className="font-semibold">Folder structure:</span>{' '}
-            In your Drive <em>Penny Assets</em> folder, create one subfolder per state below
-            (e.g. <code className="font-mono text-[10px] bg-sky-100 px-1 rounded">coaching/</code>,{' '}
-            <code className="font-mono text-[10px] bg-sky-100 px-1 rounded">trail-talk/</code>).
-            Upload images (PNG/JPG), voice scripts (PDF/Doc), and any media files into each.
-            Penny will use these assets when a learner enters that coaching context.
+      {/* ── Drive not connected notice ── */}
+      {!statusLoading && !driveConnected && (
+        <div className="flex items-center gap-2.5 px-5 py-3 bg-zinc-50 border-b border-zinc-100 shrink-0">
+          <HardDrive className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <p className="text-[11px] text-zinc-500">
+            <span className="font-semibold text-zinc-600">Google Drive not connected. </span>
+            {status?.reason ?? 'GOOGLE_DRIVE_REFRESH_TOKEN is missing. '}
+            Complete the OAuth flow at <strong>Administration → Google OAuth Setup</strong>.
           </p>
         </div>
+      )}
 
-        {/* ── Penny state sections ── */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-zinc-400" />
-            <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Penny states</h2>
-            {isLoading && <span className="text-[10px] text-zinc-400 italic">Loading from Drive…</span>}
-          </div>
-          <div className="space-y-3">
-            {PENNY_STATES.map(state => (
-              <StateSection key={state.id} state={state} group={getGroup(state)} />
-            ))}
-          </div>
+      {/* ── API error notice ── */}
+      {(isError || data?.error) && (
+        <div className="flex items-center gap-2 px-5 py-2.5 bg-rose-50 border-b border-rose-100 shrink-0">
+          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+          <p className="text-[11px] text-rose-600">
+            {data?.error ?? 'Error loading assets from Drive.'}
+          </p>
         </div>
+      )}
 
-        {/* ── Ungrouped / root files ── */}
-        {(data?.ungrouped?.length ?? 0) > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <FolderOpen className="w-3.5 h-3.5 text-zinc-400" />
-              <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
-                Ungrouped assets ({data!.ungrouped.length})
-              </h2>
+      {/* ── Two-panel body ── */}
+      <div className="flex flex-1 overflow-hidden">
+
+        {/* LEFT: state sidebar */}
+        <aside className="w-52 border-r border-zinc-100 bg-zinc-50/60 flex flex-col shrink-0 overflow-y-auto">
+          <div className="px-4 pt-4 pb-2">
+            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Penny states</p>
+          </div>
+          <nav className="flex-1 px-2 pb-2 space-y-0.5">
+            {PENNY_STATES.map(s => {
+              const SI = s.icon;
+              const isActive = s.id === activeId;
+              const count = getGroup(s)?.files.length ?? 0;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setActiveId(s.id)}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all ${
+                    isActive ? 'bg-white shadow-sm border border-zinc-200' : 'hover:bg-white/70'
+                  }`}
+                >
+                  <div
+                    className="p-1.5 rounded-lg shrink-0"
+                    style={{ background: isActive ? s.lightBg : '#f4f4f5' }}
+                  >
+                    <SI
+                      className="w-3 h-3"
+                      style={{ color: isActive ? s.accent : '#a1a1aa' }}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-[11px] font-semibold truncate ${isActive ? 'text-zinc-800' : 'text-zinc-600'}`}>
+                      {s.label}
+                    </p>
+                  </div>
+                  {count > 0 ? (
+                    <span
+                      className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                      style={{ background: isActive ? s.lightBg : '#f4f4f5', color: isActive ? s.accent : '#a1a1aa' }}
+                    >
+                      {count}
+                    </span>
+                  ) : (
+                    <span className="text-[9px] text-zinc-300 shrink-0">—</span>
+                  )}
+                </button>
+              );
+            })}
+
+            {/* Ungrouped separator + item */}
+            {ungrouped.length > 0 && (
+              <>
+                <div className="px-3 pt-3 pb-1">
+                  <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Other</p>
+                </div>
+                <button
+                  onClick={() => setActiveId('__ungrouped__')}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all ${
+                    isSpecial ? 'bg-white shadow-sm border border-zinc-200' : 'hover:bg-white/70'
+                  }`}
+                >
+                  <div className="p-1.5 rounded-lg shrink-0" style={{ background: '#f4f4f5' }}>
+                    <HardDrive className="w-3 h-3 text-zinc-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold truncate text-zinc-600">Ungrouped</p>
+                  </div>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-400 shrink-0">
+                    {ungrouped.length}
+                  </span>
+                </button>
+              </>
+            )}
+          </nav>
+
+          {/* Total count footer */}
+          {totalAssets > 0 && (
+            <div className="px-4 py-3 border-t border-zinc-100 shrink-0">
+              <p className="text-[9px] text-zinc-400">{totalAssets} total assets across {groups.length} folders</p>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-white px-5 py-4">
-              <p className="text-[10px] text-zinc-400 mb-3">
-                Files at the root of the Penny Assets folder — move them into a state subfolder to assign them to a Penny context.
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {data!.ungrouped.map(f => <AssetCard key={f.id} file={f} />)}
+          )}
+        </aside>
+
+        {/* RIGHT: asset panel */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+
+          {/* Panel header */}
+          {!isSpecial ? (
+            <div
+              className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between shrink-0"
+              style={{ background: active.lightBg }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-white/80">
+                  <active.icon className="w-4 h-4" style={{ color: active.accent }} />
+                </div>
+                <div>
+                  <h2 className="text-[14px] font-semibold text-zinc-800">{active.label}</h2>
+                  <p className="text-[11px] text-zinc-500">{active.sub}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-zinc-500 mr-2">
+                  <code className="font-mono bg-white/70 px-1.5 py-0.5 rounded text-zinc-600">{active.folderHint}/</code>
+                </span>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1.5 rounded-lg border transition-colors ${viewMode === 'grid' ? 'bg-white border-zinc-300 shadow-sm' : 'border-transparent hover:bg-white/50'}`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5 text-zinc-500" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-1.5 rounded-lg border transition-colors ${viewMode === 'list' ? 'bg-white border-zinc-300 shadow-sm' : 'border-transparent hover:bg-white/50'}`}
+                >
+                  <List className="w-3.5 h-3.5 text-zinc-500" />
+                </button>
               </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-white border border-zinc-200">
+                  <HardDrive className="w-4 h-4 text-zinc-400" />
+                </div>
+                <div>
+                  <h2 className="text-[14px] font-semibold text-zinc-700">Ungrouped assets</h2>
+                  <p className="text-[11px] text-zinc-400">Files at the root of your Penny Assets folder — move into a state subfolder to assign them.</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-lg border transition-colors ${viewMode === 'grid' ? 'bg-white border-zinc-300 shadow-sm' : 'border-transparent hover:bg-zinc-100'}`}>
+                  <LayoutGrid className="w-3.5 h-3.5 text-zinc-400" />
+                </button>
+                <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-lg border transition-colors ${viewMode === 'list' ? 'bg-white border-zinc-300 shadow-sm' : 'border-transparent hover:bg-zinc-100'}`}>
+                  <List className="w-3.5 h-3.5 text-zinc-400" />
+                </button>
+              </div>
+            </div>
+          )}
 
-        {/* ── Empty state when no folder configured ── */}
-        {data && !data.configured && (
-          <div className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50 px-6 py-10 text-center">
-            <HardDrive className="w-8 h-8 text-zinc-300 mx-auto mb-3" />
-            <p className="text-[13px] font-semibold text-zinc-500 mb-1">No Penny Assets folder configured</p>
-            <p className="text-[11px] text-zinc-400 max-w-md mx-auto">{data.message}</p>
-          </div>
-        )}
+          {/* Asset content */}
+          <div className="flex-1 overflow-y-auto px-6 py-5">
 
+            {/* Not configured empty state */}
+            {driveConnected && !folderConfigured && !data?.configured && (
+              <div className="flex flex-col items-center justify-center h-full min-h-[280px] text-center">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-amber-50">
+                  <HardDrive className="w-7 h-7 text-amber-300" />
+                </div>
+                <p className="text-[13px] font-semibold text-zinc-600 mb-2">Penny Assets folder not configured</p>
+                <p className="text-[11px] text-zinc-400 max-w-sm leading-relaxed mb-3">
+                  Create a folder named <strong>Penny Assets</strong> in Google Drive, copy the folder ID from its URL, and add it as the secret{' '}
+                  <code className="font-mono bg-zinc-100 px-1 rounded text-zinc-500">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>{' '}
+                  in Administration → Integrations.
+                </p>
+                <p className="text-[10px] text-zinc-400">
+                  Then create subfolders: <code className="font-mono text-zinc-500">coaching/</code>,{' '}
+                  <code className="font-mono text-zinc-500">trail-talk/</code>,{' '}
+                  <code className="font-mono text-zinc-500">resume-review/</code>, etc.
+                </p>
+              </div>
+            )}
+
+            {/* Active state has files */}
+            {activeFiles.length > 0 && (
+              viewMode === 'grid' ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {activeFiles.map(f => <FileCard key={f.id} file={f} />)}
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {activeFiles.map(f => <FileRow key={f.id} file={f} />)}
+                </div>
+              )
+            )}
+
+            {/* Active state has no files — but Drive is connected and configured */}
+            {activeFiles.length === 0 && driveConnected && (data?.configured || folderConfigured) && !isSpecial && (
+              <div className="flex flex-col items-center justify-center h-full min-h-[260px] text-center">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: active.lightBg }}
+                >
+                  <HardDrive className="w-7 h-7" style={{ color: active.accent + '66' }} />
+                </div>
+                <p className="text-[13px] font-semibold text-zinc-600 mb-1">No assets for {active.label}</p>
+                <p className="text-[11px] text-zinc-400 max-w-xs leading-relaxed">
+                  Create a subfolder named{' '}
+                  <code className="font-mono bg-zinc-100 px-1 rounded text-zinc-500">{active.folderHint}/</code>{' '}
+                  inside your Penny Assets Drive folder, then upload images, voice scripts, or media.
+                </p>
+                <div className="mt-4 flex items-center gap-1.5 text-[10px] text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5">
+                  <AlertTriangle className="w-3 h-3" />
+                  No folder detected in Drive
+                </div>
+              </div>
+            )}
+
+          </div>
+        </main>
       </div>
-    </ScrollArea>
+    </div>
   );
 }
