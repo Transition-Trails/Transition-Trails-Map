@@ -1,7 +1,7 @@
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
   Activity, GitBranch, Plus, Sparkles, LayoutDashboard,
-  Star, ClipboardCheck, Bot,
+  Star, ClipboardCheck, Bot, Image,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -17,6 +17,7 @@ import TestPenny             from '@/pages/penny/TestPenny';
 import TrailQuests           from '@/pages/penny/TrailQuests';
 import Assessments           from '@/pages/penny/Assessments';
 import AgentforceCenter      from '@/pages/penny/AgentforceCenter';
+import PennyAssetLibrary     from '@/pages/penny/PennyAssetLibrary';
 
 export default function PennyHub() {
   const { openActionPanel, setRightPanelOpen } = useAppContext();
@@ -101,6 +102,7 @@ export default function PennyHub() {
       { id: 'intelligence', label: 'Intelligence',  path: '/penny/intelligence',  icon: BarChart2,     content: <Intelligence /> },
       { id: 'health',       label: 'Health',        path: '/penny/health',        icon: Activity,      content: <PennyHealth /> },
       { id: 'test',         label: 'Ask Penny',     path: '/penny/test',          icon: Sparkles,      content: <TestPenny /> },
+      { id: 'asset-library', label: 'Asset Library', path: '/penny/asset-library', icon: Image,        content: <PennyAssetLibrary /> },
     ] : []),
   ];
 

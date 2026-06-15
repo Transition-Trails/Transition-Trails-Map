@@ -13,6 +13,7 @@ import gmailRouter        from "./gmail";
 import agentforceRouter   from "./agentforce";
 import authRouter         from "./auth";
 import googleGroupsRouter from "./googleGroups";
+import driveRouter        from "./drive";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(gmailRouter);
 router.use(agentforceRouter);
 router.use(authRouter);
 router.use(googleGroupsRouter);
+router.use(driveRouter);
 
 export default router;
