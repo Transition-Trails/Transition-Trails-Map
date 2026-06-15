@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import {
   MessageSquare, Mail, CalendarDays, HardDrive, Hash,
   Sparkles, ArrowUpRight, Settings2, CheckCircle2,
-  AlertCircle, Clock, Zap, Shield, Bell, FileText,
-  ChevronRight, Circle,
+  Clock, Zap, Shield, Bell, FileText,
+  ChevronRight, ChevronDown, Circle,
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -262,6 +263,14 @@ function RuleStatus({ status }: { status: 'active' | 'pending' | 'phase-2' }) {
 
 export default function CollaborationWorkspace() {
   const [, navigate] = useLocation();
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  const toggle = (id: string) =>
+    setExpanded(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
 
   const liveChannels   = CHANNELS.filter(c => c.status === 'live');
   const phase2Channels = CHANNELS.filter(c => c.status === 'phase-2');
@@ -334,78 +343,98 @@ export default function CollaborationWorkspace() {
             <Settings2 className="w-3.5 h-3.5 text-zinc-400" />
             <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Channel signal rules</h2>
           </div>
-          <div className="space-y-4">
-            {CHANNELS.filter(c => c.status !== 'phase-2').map(ch => (
-              <div key={ch.id} className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+          <div className="space-y-3">
+            {CHANNELS.filter(c => c.status !== 'phase-2').map(ch => {
+              const isOpen = expanded.has(ch.id);
+              const hasRules = ch.rules.length > 0;
+              return (
+                <div key={ch.id} className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
 
-                {/* Card header */}
-                <div className={`px-5 py-3.5 border-b border-zinc-100 flex items-center gap-3 ${ch.headerBg}`}>
-                  <span className={`w-2 h-2 rounded-full ${ch.dot} shrink-0`} />
-                  <ch.icon className={`w-4 h-4 ${ch.iconColor} shrink-0`} />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[13px] font-semibold text-zinc-800">{ch.name}</span>
-                      <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${ch.bg} ${ch.border} ${ch.iconColor}`}>
-                        {ch.statusLabel}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-zinc-500 mt-0.5">{ch.pennyRole}</p>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex items-center gap-5 mr-4">
-                    {ch.stats.map(s => (
-                      <div key={s.label} className="text-center">
-                        <div className="text-[14px] font-bold text-zinc-800 leading-none">{s.value}</div>
-                        <div className="text-[9px] text-zinc-400 mt-0.5 whitespace-nowrap">{s.label}</div>
+                  {/* Card header — always visible, clickable to toggle */}
+                  <button
+                    type="button"
+                    onClick={() => hasRules && toggle(ch.id)}
+                    className={`w-full px-5 py-3.5 flex items-center gap-3 transition-colors text-left ${ch.headerBg} ${
+                      hasRules ? 'cursor-pointer hover:brightness-95' : 'cursor-default'
+                    } ${isOpen ? '' : ''}`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${ch.dot} shrink-0`} />
+                    <ch.icon className={`w-4 h-4 ${ch.iconColor} shrink-0`} />
+                    <div className="flex-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] font-semibold text-zinc-800">{ch.name}</span>
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${ch.bg} ${ch.border} ${ch.iconColor}`}>
+                          {ch.statusLabel}
+                        </span>
                       </div>
-                    ))}
-                  </div>
+                      <p className="text-[10px] text-zinc-500 mt-0.5">{ch.pennyRole}</p>
+                    </div>
 
-                  {/* Manage button */}
-                  {ch.managePath ? (
-                    <button
-                      onClick={() => navigate(ch.managePath!)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-semibold transition-all hover:shadow-sm shrink-0 ${ch.bg} ${ch.border} ${ch.iconColor}`}
-                    >
-                      <Settings2 className="w-3 h-3" />
-                      {ch.manageLabel}
-                      <ChevronRight className="w-3 h-3" />
-                    </button>
-                  ) : (
-                    <span className="text-[10px] text-zinc-400 font-medium shrink-0 italic">{ch.manageLabel}</span>
+                    {/* Stats */}
+                    <div className="flex items-center gap-5 mr-3">
+                      {ch.stats.map(s => (
+                        <div key={s.label} className="text-center">
+                          <div className="text-[14px] font-bold text-zinc-800 leading-none">{s.value}</div>
+                          <div className="text-[9px] text-zinc-400 mt-0.5 whitespace-nowrap">{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Manage button */}
+                    {ch.managePath ? (
+                      <span
+                        role="button"
+                        onClick={e => { e.stopPropagation(); navigate(ch.managePath!); }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-semibold transition-all hover:shadow-sm shrink-0 ${ch.bg} ${ch.border} ${ch.iconColor}`}
+                      >
+                        <Settings2 className="w-3 h-3" />
+                        {ch.manageLabel}
+                        <ChevronRight className="w-3 h-3" />
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-zinc-400 font-medium shrink-0 italic">{ch.manageLabel}</span>
+                    )}
+
+                    {/* Expand chevron */}
+                    {hasRules && (
+                      <span className="ml-1 shrink-0">
+                        {isOpen
+                          ? <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+                          : <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Rule groups — collapsible */}
+                  {hasRules && isOpen && (
+                    <div className={`border-t border-zinc-100 grid gap-0 ${ch.rules.length > 1 ? 'grid-cols-2 divide-x divide-zinc-100' : 'grid-cols-1'}`}>
+                      {ch.rules.map(group => (
+                        <div key={group.label} className="px-5 py-3.5">
+                          <div className="text-[9px] font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">{group.label}</div>
+                          <div className="space-y-2">
+                            {group.items.map(item => (
+                              <div key={item.text} className="flex items-start gap-2">
+                                <RuleStatus status={item.status} />
+                                <span className={`text-[11px] leading-snug ${
+                                  item.status === 'phase-2' ? 'text-zinc-400' : 'text-zinc-700'
+                                }`}>
+                                  {item.text}
+                                </span>
+                                {item.status === 'phase-2' && (
+                                  <span className="text-[8px] font-semibold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap mt-0.5">
+                                    Phase 2
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-
-                {/* Rule groups */}
-                {ch.rules.length > 0 && (
-                  <div className={`grid gap-0 ${ch.rules.length > 1 ? 'grid-cols-2 divide-x divide-zinc-100' : 'grid-cols-1'}`}>
-                    {ch.rules.map(group => (
-                      <div key={group.label} className="px-5 py-3.5">
-                        <div className="text-[9px] font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">{group.label}</div>
-                        <div className="space-y-2">
-                          {group.items.map(item => (
-                            <div key={item.text} className="flex items-start gap-2">
-                              <RuleStatus status={item.status} />
-                              <span className={`text-[11px] leading-snug ${
-                                item.status === 'phase-2' ? 'text-zinc-400' : 'text-zinc-700'
-                              }`}>
-                                {item.text}
-                              </span>
-                              {item.status === 'phase-2' && (
-                                <span className="text-[8px] font-semibold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap mt-0.5">
-                                  Phase 2
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
 
             {/* Phase 2 channel stubs */}
             {CHANNELS.filter(c => c.status === 'phase-2').map(ch => (
