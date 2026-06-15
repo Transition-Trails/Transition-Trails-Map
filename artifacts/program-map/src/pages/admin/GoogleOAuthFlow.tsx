@@ -15,7 +15,7 @@ interface OAuthInfo {
   scopes: string[];
   scopeDisplay: string;
   credentials: { clientId: boolean; clientSecret: boolean; ok: boolean };
-  tokens: { drive: boolean; calendar: boolean };
+  tokens: { drive: boolean; calendar: boolean; gmail: boolean };
   authUrl: string | null;
   status: 'credentials_missing' | 'awaiting_oauth' | 'partially_authorized' | 'fully_authorized';
 }
@@ -514,9 +514,9 @@ export default function GoogleOAuthFlow() {
           ← Back to Secrets Audit
         </button>
         {info && (
-          <div className={`ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-semibold ${info.tokens.drive && info.tokens.calendar ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'}`}>
-            {info.tokens.drive && info.tokens.calendar ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
-            Drive: {info.tokens.drive ? 'token set' : 'not authorized'} · Calendar: {info.tokens.calendar ? 'token set' : 'not authorized'}
+          <div className={`ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-semibold ${info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'}`}>
+            {info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
+            Drive: {info.tokens.drive ? '✓' : '✗'} · Calendar: {info.tokens.calendar ? '✓' : '✗'} · Gmail: {info.tokens.gmail ? '✓' : '✗'}
           </div>
         )}
       </div>
@@ -583,15 +583,15 @@ export default function GoogleOAuthFlow() {
                   <div className="rounded-lg border border-amber-300 bg-white p-4 space-y-3">
                     <div className="flex items-center gap-2 mb-1">
                       <AlertTriangle className="w-4 h-4 text-amber-600" />
-                      <p className="text-[12px] font-bold text-amber-800">One Refresh Token — Add to Two Secrets</p>
+                      <p className="text-[12px] font-bold text-amber-800">One Refresh Token — Add to Three Secrets</p>
                     </div>
                     <p className="text-[11px] text-amber-700 leading-snug">
-                      Google issued a single refresh token covering all authorized scopes. Add the <strong>same value</strong> as both{' '}
-                      <code className="font-mono bg-amber-50 border border-amber-200 rounded px-1 mx-1">GOOGLE_DRIVE_REFRESH_TOKEN</code> and{' '}
-                      <code className="font-mono bg-amber-50 border border-amber-200 rounded px-1 mx-1">GOOGLE_CALENDAR_REFRESH_TOKEN</code> in Replit Secrets.
+                      Google issued a single refresh token covering all authorized scopes (Drive, Calendar, <strong>Gmail</strong>).
+                      Add the <strong>same value</strong> to all three secret names below in Replit Secrets.
                     </p>
-                    <TokenRow label="Refresh Token (Drive + Calendar)" secretName="GOOGLE_DRIVE_REFRESH_TOKEN" value={tokenSession.refreshToken} />
-                    <TokenRow label="Same value for Calendar"          secretName="GOOGLE_CALENDAR_REFRESH_TOKEN" value={tokenSession.refreshToken} />
+                    <TokenRow label="Google Drive"    secretName="GOOGLE_DRIVE_REFRESH_TOKEN"    value={tokenSession.refreshToken} />
+                    <TokenRow label="Google Calendar" secretName="GOOGLE_CALENDAR_REFRESH_TOKEN" value={tokenSession.refreshToken} />
+                    <TokenRow label="Gmail (Mail panel)" secretName="GOOGLE_GMAIL_REFRESH_TOKEN" value={tokenSession.refreshToken} />
                   </div>
 
                   <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 space-y-2">
@@ -601,8 +601,9 @@ export default function GoogleOAuthFlow() {
                         'Open the Replit Secrets panel (🔒 lock icon in the left sidebar of your Repl).',
                         'Add secret: GOOGLE_DRIVE_REFRESH_TOKEN = <paste the value above>.',
                         'Add secret: GOOGLE_CALENDAR_REFRESH_TOKEN = <paste the same value>.',
+                        'Add secret: GOOGLE_GMAIL_REFRESH_TOKEN = <paste the same value> — this activates the Mail panel.',
                         'Restart the API server workflow so the new secrets load into the environment.',
-                        'Return to Integration Secrets Audit → Run Live Checks to confirm Drive and Calendar show as API Ready.',
+                        'Return here and click Refresh Status — Drive, Calendar, and Gmail should all show as authorized.',
                       ].map((text, n) => (
                         <li key={n} className="flex gap-2 text-[11px] text-sky-800 leading-snug">
                           <span className="font-bold shrink-0 w-4">{n + 1}.</span>

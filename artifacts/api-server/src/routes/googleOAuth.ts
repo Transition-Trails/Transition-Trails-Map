@@ -68,7 +68,7 @@ function credentialsPresent(): { clientId: boolean; clientSecret: boolean; ok: b
   return { clientId, clientSecret, ok: clientId && clientSecret };
 }
 
-function refreshTokensPresent(): { drive: boolean; calendar: boolean } {
+function refreshTokensPresent(): { drive: boolean; calendar: boolean; gmail: boolean } {
   const drive = !!(
     process.env["GOOGLE_DRIVE_REFRESH_TOKEN"] ??
     process.env["GDRIVE_REFRESH_TOKEN"] ??
@@ -79,7 +79,8 @@ function refreshTokensPresent(): { drive: boolean; calendar: boolean } {
     process.env["GCAL_REFRESH_TOKEN"] ??
     process.env["GOOGLE_CAL_REFRESH_TOKEN"]
   );
-  return { drive, calendar };
+  const gmail = !!process.env["GOOGLE_GMAIL_REFRESH_TOKEN"];
+  return { drive, calendar, gmail };
 }
 
 // ── GET /google/oauth/info ────────────────────────────────────────────────────
@@ -107,9 +108,9 @@ router.get("/google/oauth/info", (req: Request, res: Response) => {
       : null,
     status: !creds.ok
       ? "credentials_missing"
-      : tokens.drive && tokens.calendar
+      : tokens.drive && tokens.calendar && tokens.gmail
       ? "fully_authorized"
-      : tokens.drive || tokens.calendar
+      : tokens.drive || tokens.calendar || tokens.gmail
       ? "partially_authorized"
       : "awaiting_oauth",
   });
