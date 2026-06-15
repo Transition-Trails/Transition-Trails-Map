@@ -6,5 +6,7 @@ export const modules: ModuleMap = {
   "./components/mockups/gmail-page/OptionB.tsx": () => import("../components/mockups/gmail-page/OptionB.tsx"),
   "./components/mockups/gmail-panel/InboxHybrid.tsx": () => import("../components/mockups/gmail-panel/InboxHybrid.tsx"),
   "./components/mockups/gmail-panel/InboxSummary.tsx": () => import("../components/mockups/gmail-panel/InboxSummary.tsx"),
-  "./components/mockups/gmail-panel/QuickCompose.tsx": () => import("../components/mockups/gmail-panel/QuickCompose.tsx")
+  "./components/mockups/gmail-panel/QuickCompose.tsx": () => import("../components/mockups/gmail-panel/QuickCompose.tsx"),
+  "./components/mockups/penny-assets-v1/StatePicker.tsx": () => import("../components/mockups/penny-assets-v1/StatePicker.tsx"),
+  "./components/mockups/penny-assets-v2/TwoPanel.tsx": () => import("../components/mockups/penny-assets-v2/TwoPanel.tsx")
 };
