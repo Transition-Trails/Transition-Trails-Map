@@ -77,7 +77,7 @@ const AREAS: ReadinessArea[] = [
       'Slack bot (@coachconnectbot) posting live to Penny AI and Admin channels — POC confirmed',
       'GEMINI_API_KEY validated live — 21 models available (Gemini 2.5 Flash + Pro), auth confirmed',
       'GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET live-validated — format correct, Google APIs reachable in 25ms',
-      'GOOGLE_DRIVE_REFRESH_TOKEN obtained — Google Drive OAuth fully live (Jun 13 2026)',
+      'GOOGLE_DRIVE_REFRESH_TOKEN obtained — Google Drive OAuth fully live (Jun 13 2026); GOOGLE_DRIVE_PENNY_FOLDER_ID set — Penny Asset Library reading real files from Shared Drive (Jun 16 2026)',
       'GOOGLE_CALENDAR_REFRESH_TOKEN obtained — Google Calendar OAuth fully live (Jun 13 2026)',
       'CalendarPanel live — real events via /api/calendar/events, Penny prep briefs per event, pending invite flags',
       'GOOGLE_GMAIL_REFRESH_TOKEN obtained — gmail.readonly + gmail.send scopes confirmed live (Jun 2026)',
@@ -147,7 +147,7 @@ const AREAS: ReadinessArea[] = [
     gaps: [
       '3 sources still Unverified — not yet activated in Penny',
       'Salesforce KB sync not yet configured',
-      'Google Drive sources not yet linked to specific programs (refresh token live — linkage work remains)',
+      'Google Drive linked for Penny Asset Library (Shared Drive live) — program-specific workspace folder linkage remains Phase 2',
       'Org Memory Phase 2 — decision records not yet created',
     ],
     blockers: [],
@@ -190,7 +190,7 @@ const AREAS: ReadinessArea[] = [
     nextActions: [
       'Wire Slack integration for Weekly Brief capability using confirmed SLACK_BOT_TOKEN',
       'Complete trust review for 3 Unverified knowledge sources and activate in Penny',
-      'Activate Google Drive source in Knowledge Library using live refresh token',
+      'Link program-specific Google Drive workspace folders in source registry (Drive OAuth + Shared Drive support now live)',
     ],
   },
   {

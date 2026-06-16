@@ -63,11 +63,13 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
     id: 'google-drive',
     label: 'Google Drive',
     health: 'live',
-    summary: 'OAuth refresh token obtained — GOOGLE_DRIVE_REFRESH_TOKEN stored in Replit Secrets',
+    summary: 'Live — Penny Asset Library reads real files from Shared Drive (TT Content → Penny Asset Library) · Shared Drive support active',
     detail:
-      'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_DRIVE_REFRESH_TOKEN all configured. ' +
-      'OAuth flow completed via /admin/google-oauth. Replit integration bound (google-drive==1.0.0). ' +
-      'Phase 2: wire first Drive API read to program workspace panel.',
+      'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_DRIVE_REFRESH_TOKEN, and GOOGLE_DRIVE_PENNY_FOLDER_ID all configured. ' +
+      'OAuth flow completed via /admin/integrations/google-auth. Replit integration bound (google-drive==1.0.0). ' +
+      'Penny Asset Library live at /penny/asset-library — reads 6 Penny state subfolders from a Shared Drive (supportsAllDrives + includeItemsFromAllDrives params active). ' +
+      'GET /api/drive/penny-assets + /api/drive/status endpoints live. ' +
+      'Phase 2: link program-specific Drive workspace folders; Google Drive rule config in Collaboration Overview.',
     lastVerified: 'June 2026',
   },
   googleCalendar: {
@@ -141,9 +143,9 @@ export const PHASE_OWNERSHIP = {
     label: 'Phase 2 Backlog',
     scope:
       'Authoritative source for all deferred and future features. ' +
-      'Gmail Panel and Calendar Panel graduated to Live in Phase 1. Remaining backlog: ' +
+      'Gmail Panel, Calendar Panel, and Penny Asset Library graduated to Live in Phase 1. Remaining backlog: ' +
       'Universal Ask Penny Panel · Trail Signals Control Center · ' +
-      'Google SSO & Groups · Mural · Penny Asset Library · ' +
+      'Google SSO & Groups · Mural · ' +
       'Mobile Trail OS · Penny Reacts to Signals · Learning Delivery Center · ' +
       'Google Drive rule config · Google Chat spaces · Google Chat client channel.',
   },
