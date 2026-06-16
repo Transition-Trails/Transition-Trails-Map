@@ -146,7 +146,7 @@ function FileCard({ file }: { file: DriveFile }) {
     <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden group hover:shadow-md transition-shadow">
       <div className="h-24 bg-zinc-50 flex items-center justify-center border-b border-zinc-100 relative overflow-hidden">
         {hasThumb
-          ? <img src={file.thumbnailLink} alt={file.name} className="w-full h-full object-cover" />
+          ? <img src={file.thumbnailLink} alt={file.name} className="w-full h-full object-cover object-top" />
           : <FIcon className="w-9 h-9 text-zinc-200" />}
         {file.webViewLink && (
           <a
@@ -442,7 +442,7 @@ export default function PennyAssetLibrary() {
             {/* Active state has files */}
             {activeFiles.length > 0 && (
               viewMode === 'grid' ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   {activeFiles.map(f => <FileCard key={f.id} file={f} />)}
                 </div>
               ) : (
