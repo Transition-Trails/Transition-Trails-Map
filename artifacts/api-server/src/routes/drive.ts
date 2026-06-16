@@ -64,7 +64,7 @@ interface DriveFolder {
 async function listFilesInFolder(token: string, folderId: string): Promise<DriveFile[]> {
   const fields  = "files(id,name,mimeType,thumbnailLink,webViewLink,iconLink,modifiedTime,size,parents,description)";
   const query   = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
-  const url     = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=${fields}&pageSize=100&orderBy=name`;
+  const url     = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=${fields}&pageSize=200&orderBy=name&supportsAllDrives=true&includeItemsFromAllDrives=true`;
 
   const resp = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -82,7 +82,7 @@ async function listFilesInFolder(token: string, folderId: string): Promise<Drive
 
 async function getFolderMeta(token: string, folderId: string): Promise<DriveFolder | null> {
   const resp = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${folderId}?fields=id,name`,
+    `https://www.googleapis.com/drive/v3/files/${folderId}?fields=id,name&supportsAllDrives=true`,
     { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(8_000) }
   );
   if (!resp.ok) return null;
