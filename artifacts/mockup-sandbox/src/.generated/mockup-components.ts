@@ -10,6 +10,9 @@ export const modules: ModuleMap = {
   "./components/mockups/integration-hub/OptionA.tsx": () => import("../components/mockups/integration-hub/OptionA.tsx"),
   "./components/mockups/integration-hub/OptionB.tsx": () => import("../components/mockups/integration-hub/OptionB.tsx"),
   "./components/mockups/integration-hub/OptionC.tsx": () => import("../components/mockups/integration-hub/OptionC.tsx"),
+  "./components/mockups/penny-assets-v1/StatePicker.tsx": () => import("../components/mockups/penny-assets-v1/StatePicker.tsx"),
   "./components/mockups/penny-assets-v2/TwoPanel.tsx": () => import("../components/mockups/penny-assets-v2/TwoPanel.tsx"),
-  "./components/mockups/penny-assets-v1/StatePicker.tsx": () => import("../components/mockups/penny-assets-v1/StatePicker.tsx")
+  "./components/mockups/people-access/OptionA.tsx": () => import("../components/mockups/people-access/OptionA.tsx"),
+  "./components/mockups/people-access/OptionB.tsx": () => import("../components/mockups/people-access/OptionB.tsx"),
+  "./components/mockups/people-access/OptionC.tsx": () => import("../components/mockups/people-access/OptionC.tsx")
 };
