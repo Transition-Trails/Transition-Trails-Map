@@ -7,6 +7,9 @@ export const modules: ModuleMap = {
   "./components/mockups/gmail-panel/InboxHybrid.tsx": () => import("../components/mockups/gmail-panel/InboxHybrid.tsx"),
   "./components/mockups/gmail-panel/InboxSummary.tsx": () => import("../components/mockups/gmail-panel/InboxSummary.tsx"),
   "./components/mockups/gmail-panel/QuickCompose.tsx": () => import("../components/mockups/gmail-panel/QuickCompose.tsx"),
-  "./components/mockups/penny-assets-v1/StatePicker.tsx": () => import("../components/mockups/penny-assets-v1/StatePicker.tsx"),
-  "./components/mockups/penny-assets-v2/TwoPanel.tsx": () => import("../components/mockups/penny-assets-v2/TwoPanel.tsx")
+  "./components/mockups/integration-hub/OptionA.tsx": () => import("../components/mockups/integration-hub/OptionA.tsx"),
+  "./components/mockups/integration-hub/OptionB.tsx": () => import("../components/mockups/integration-hub/OptionB.tsx"),
+  "./components/mockups/integration-hub/OptionC.tsx": () => import("../components/mockups/integration-hub/OptionC.tsx"),
+  "./components/mockups/penny-assets-v2/TwoPanel.tsx": () => import("../components/mockups/penny-assets-v2/TwoPanel.tsx"),
+  "./components/mockups/penny-assets-v1/StatePicker.tsx": () => import("../components/mockups/penny-assets-v1/StatePicker.tsx")
 };
