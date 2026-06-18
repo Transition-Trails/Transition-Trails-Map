@@ -9,16 +9,17 @@ Trail OS is an internal platform for Transition Trails. This guide covers the de
 1. [Development Setup](#development-setup)
 2. [Workspace Rules](#workspace-rules)
 3. [Branch Conventions](#branch-conventions)
-4. [Commit Style](#commit-style)
-5. [Pull Request Process](#pull-request-process)
-6. [Docs Sync Automation](#docs-sync-automation)
-7. [Code Standards](#code-standards)
-8. [UX Standards](#ux-standards)
-9. [Testing Requirements](#testing-requirements)
-10. [Adding New Pages or Sections](#adding-new-pages-or-sections)
-11. [Working with Data](#working-with-data)
-12. [Adding New Integrations](#adding-new-integrations)
-13. [Environment Variables](#environment-variables)
+4. [Branch Protection Rules](#branch-protection-rules)
+5. [Commit Style](#commit-style)
+6. [Pull Request Process](#pull-request-process)
+7. [Docs Sync Automation](#docs-sync-automation)
+8. [Code Standards](#code-standards)
+9. [UX Standards](#ux-standards)
+10. [Testing Requirements](#testing-requirements)
+11. [Adding New Pages or Sections](#adding-new-pages-or-sections)
+12. [Working with Data](#working-with-data)
+13. [Adding New Integrations](#adding-new-integrations)
+14. [Environment Variables](#environment-variables)
 
 ---
 
@@ -93,6 +94,41 @@ Trail OS is a pnpm monorepo. Key rules:
 - Keep branches short-lived — merge or close within one sprint.
 - Delete branches after merge.
 - One feature or fix per branch — don't bundle unrelated changes.
+
+---
+
+## Branch Protection Rules
+
+The `main` branch is protected on GitHub to prevent history corruption from the post-merge automation and any other direct pushes. The rules are configured under **Settings → Branches → Branch protection rules** in the GitHub repository.
+
+### Active rules on `main`
+
+| Rule | Setting |
+|---|---|
+| Require a pull request before merging | Enabled — at least 1 approval required |
+| Allow force pushes | Disabled |
+| Allow deletions | Disabled |
+| Require status checks to pass before merging | `Sync Docs to GitHub / validate-and-tag` must pass |
+
+### Why these rules exist
+
+- **No force pushes** — the post-merge script uses `git push origin HEAD:main`. Without this guard, a misconfigured push could rewrite history and overwrite legitimate commits including documentation.
+- **PR required** — all intentional changes to `main` go through code review via `dev → main` release PRs, not direct pushes.
+- **`validate-and-tag` required check** — the `sync-docs` workflow validates that all required docs are present and non-empty. Requiring it as a status check means a PR that accidentally deletes or empties a root doc file cannot merge. The job runs on both `push` to `main` and `pull_request` targeting `main` (for doc-touching files), so GitHub can enforce it on PRs before they land.
+
+### Configuring the protection rule (one-time setup)
+
+If the rule was ever removed or the repo was re-created, restore it:
+
+1. Go to **Settings → Branches → Add branch protection rule**.
+2. Branch name pattern: `main`.
+3. Check **Require a pull request before merging** → set required approvals to `1`.
+4. Check **Require status checks to pass before merging** → search for `validate-and-tag` and add it.
+5. Check **Do not allow bypassing the above settings**.
+6. Uncheck **Allow force pushes** and **Allow deletions**.
+7. Save.
+
+> **Note:** The GitHub Actions bot (`github-actions[bot]`) is exempt from branch protection when it pushes the `latest-docs` tag — tags are not subject to the branch rules above.
 
 ---
 
