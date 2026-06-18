@@ -11,13 +11,14 @@ Trail OS is an internal platform for Transition Trails. This guide covers the de
 3. [Branch Conventions](#branch-conventions)
 4. [Commit Style](#commit-style)
 5. [Pull Request Process](#pull-request-process)
-6. [Code Standards](#code-standards)
-7. [UX Standards](#ux-standards)
-8. [Testing Requirements](#testing-requirements)
-9. [Adding New Pages or Sections](#adding-new-pages-or-sections)
-10. [Working with Data](#working-with-data)
-11. [Adding New Integrations](#adding-new-integrations)
-12. [Environment Variables](#environment-variables)
+6. [Docs Sync Automation](#docs-sync-automation)
+7. [Code Standards](#code-standards)
+8. [UX Standards](#ux-standards)
+9. [Testing Requirements](#testing-requirements)
+10. [Adding New Pages or Sections](#adding-new-pages-or-sections)
+11. [Working with Data](#working-with-data)
+12. [Adding New Integrations](#adding-new-integrations)
+13. [Environment Variables](#environment-variables)
 
 ---
 
@@ -157,6 +158,37 @@ chore(deps): update lucide-react to 0.400.0
 5. **At least one reviewer** must approve before merge.
 6. **Squash and merge** into `dev` — keep the commit history clean.
 7. Periodically, `dev` is merged into `main` as a release.
+
+---
+
+## Docs Sync Automation
+
+Root-level documentation files (`TRAIL_OS_SPEC.md`, `ROADMAP.md`, `CHANGELOG.md`, `README.md`, `CONTRIBUTING.md`, `SECURITY.md`) are automatically kept in sync with the GitHub remote through two layers of automation.
+
+### Layer 1 — Post-merge push (Replit → GitHub)
+
+`scripts/post-merge.sh` runs automatically after every Replit task merge. It installs dependencies, runs migrations, and then pushes the merged commit to `origin main`. This means every merge in Replit — including doc-only changes — is immediately reflected on GitHub without a separate manual push.
+
+If the push fails (e.g. the remote is temporarily unreachable), the script prints a warning but does **not** block the merge. Resolve it by running:
+
+```bash
+git push origin HEAD:main
+```
+
+### Layer 2 — GitHub Actions validation (`.github/workflows/sync-docs.yml`)
+
+Once a commit lands on `origin main`, the `sync-docs` workflow triggers automatically on any push that touches a root-level doc file. It:
+
+1. **Validates** that all required docs exist and are non-empty — fails loudly if any are missing.
+2. **Summarises** which files changed (visible in the GitHub Actions run summary).
+3. **Moves the `latest-docs` tag** to the current commit, so the GitHub UI always shows exactly which commit has the most recent documentation state.
+
+### Convention
+
+If you update `TRAIL_OS_SPEC.md`, `ROADMAP.md`, or any root doc:
+
+- **In Replit**: no extra steps needed — the post-merge push handles it.
+- **Outside Replit** (local clone): push to `origin main` after your commit. The `docs/<branch>` branch convention in [Branch Conventions](#branch-conventions) is a good fit for doc-only changes.
 
 ---
 

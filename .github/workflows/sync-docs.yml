@@ -1,0 +1,59 @@
+name: Sync Docs to GitHub
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "TRAIL_OS_SPEC.md"
+      - "ROADMAP.md"
+      - "CHANGELOG.md"
+      - "README.md"
+      - "CONTRIBUTING.md"
+      - "SECURITY.md"
+      - ".env.example"
+
+jobs:
+  validate-and-tag:
+    name: Validate docs and mark sync point
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check required docs exist and are non-empty
+        run: |
+          MISSING=()
+          for doc in TRAIL_OS_SPEC.md ROADMAP.md CHANGELOG.md README.md CONTRIBUTING.md SECURITY.md; do
+            if [ ! -s "$doc" ]; then
+              MISSING+=("$doc")
+            fi
+          done
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "ERROR: The following required docs are missing or empty:"
+            printf '  - %s\n' "${MISSING[@]}"
+            exit 1
+          fi
+          echo "All required docs present and non-empty."
+
+      - name: Summarise changed docs
+        run: |
+          echo "## Docs changed in this push" >> $GITHUB_STEP_SUMMARY
+          git diff --name-only HEAD~1 HEAD -- "*.md" ".env.example" | while read f; do
+            SIZE=$(wc -l < "$f" 2>/dev/null || echo "?")
+            echo "- \`$f\` (${SIZE} lines)" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: Move latest-docs tag to this commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f latest-docs
+          git push origin latest-docs --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
