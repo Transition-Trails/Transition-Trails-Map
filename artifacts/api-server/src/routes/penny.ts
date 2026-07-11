@@ -1,4 +1,15 @@
 import { Router } from "express";
+import { getSalesforceClient } from "../lib/getSalesforceClient.js";
+import {
+  getLearnerContext,
+  getTrailConfig,
+  getInteractionHistory,
+  logInteraction,
+} from "../lib/salesforceService.js";
+import { buildPennySystemPrompt } from "../lib/pennyPromptBuilder.js";
+import { DEFAULT_TRAIL_CONFIG } from "../lib/defaultTrailConfig.js";
+import type { SalesforceClient } from "../lib/salesforceClient.js";
+import { logger } from "../lib/logger.js";
 
 const router = Router();
 
@@ -114,7 +125,7 @@ router.post("/penny/ask", async (req, res) => {
     return res.status(503).json({ error: "Gemini API key not configured. Set GEMINI_API_KEY in Replit Secrets." });
   }
 
-  // ── Build system prompt (with optional retrieved knowledge) ──────────────
+  // ── Build system prompt (Salesforce-backed if authenticated, PENNY_BASE fallback) ──
   const roleStr      = typeof role === 'string' ? role : undefined;
   const validChunks: RetrievedChunk[] = Array.isArray(retrievedChunks)
     ? (retrievedChunks as unknown[]).filter((c): c is RetrievedChunk =>
@@ -123,7 +134,29 @@ router.post("/penny/ask", async (req, res) => {
         typeof (c as RetrievedChunk).snippet === 'string'
       ).slice(0, 5)
     : [];
-  const systemText = PENNY_BASE + roleContext(roleStr) + buildRetrievedSection(validChunks);
+
+  let systemText: string;
+  let sfClient: SalesforceClient | null = null;
+  let sfContactId: string | null = null;
+
+  try {
+    sfClient    = getSalesforceClient(req);
+    sfContactId = req.session.sfUserId ?? null;
+    if (!sfContactId) throw new Error("No Salesforce contact ID in session");
+
+    const learnerCtx   = await getLearnerContext(sfClient, sfContactId);
+    const trailCfg     = learnerCtx.pennyTrailConfigId
+      ? await getTrailConfig(sfClient, learnerCtx.pennyTrailConfigId)
+      : DEFAULT_TRAIL_CONFIG;
+    const interactions = await getInteractionHistory(sfClient, sfContactId, 10);
+
+    systemText = buildPennySystemPrompt(learnerCtx, trailCfg, interactions)
+      + buildRetrievedSection(validChunks);
+  } catch (err) {
+    logger.warn({ err }, "Salesforce context unavailable — falling back to PENNY_BASE");
+    sfClient   = null;
+    systemText = PENNY_BASE + roleContext(roleStr) + buildRetrievedSection(validChunks);
+  }
 
   // ── Build context-enriched user message ──────────────────────────────────
   const pageCtx = typeof context === "string" && context.trim()
@@ -177,6 +210,19 @@ router.post("/penny/ask", async (req, res) => {
     const text = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     if (!text) {
       return res.status(502).json({ error: "Penny returned an empty response. Try rephrasing your question." });
+    }
+
+    // Fire-and-forget interaction log — never blocks the Penny response
+    if (sfClient !== null && sfContactId !== null) {
+      logInteraction(sfClient, {
+        contactId:     sfContactId,
+        userMessage:   query.trim(),
+        pennyResponse: text,
+        promptMode:    "ask",
+        source:        "web",
+      }).catch((logErr: unknown) => {
+        logger.warn({ logErr }, "Failed to log Penny interaction to Salesforce");
+      });
     }
 
     return res.json({ reply: text, model, durationMs: Date.now() - start });
