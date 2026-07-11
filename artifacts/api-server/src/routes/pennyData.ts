@@ -274,4 +274,128 @@ router.post(
   })
 );
 
+// ── GET /logs/today ───────────────────────────────────────────────────────────
+
+interface SfInteractionLog {
+  Id: string;
+  Learner__c: string | null;
+  User_Message__c: string | null;
+  Penny_Response__c: string | null;
+  Prompt_Mode__c: string | null;
+  Source__c: string | null;
+  CreatedDate: string;
+}
+
+interface SfContactName {
+  Id: string;
+  FirstName: string | null;
+  LastName: string | null;
+}
+
+router.get(
+  "/logs/today",
+  withClient(async (_req, res, client) => {
+    const logsResult = await client.query<SfInteractionLog>(
+      "SELECT Id, Learner__c, User_Message__c, Penny_Response__c, Prompt_Mode__c, Source__c, CreatedDate " +
+      "FROM Penny_Interaction_Log__c WHERE CreatedDate = TODAY ORDER BY CreatedDate DESC LIMIT 100"
+    );
+    const logs = logsResult.records;
+
+    const contactIds = [
+      ...new Set(
+        logs.map(l => l.Learner__c).filter((id): id is string => id !== null)
+      ),
+    ];
+    const nameMap = new Map<string, string>();
+    if (contactIds.length > 0) {
+      const idList = contactIds.map(id => `'${id}'`).join(",");
+      const contactsResult = await client.query<SfContactName>(
+        `SELECT Id, FirstName, LastName FROM Contact WHERE Id IN (${idList})`
+      );
+      for (const c of contactsResult.records) {
+        const name = [c.FirstName, c.LastName].filter(Boolean).join(" ");
+        nameMap.set(c.Id, name || "Unknown");
+      }
+    }
+
+    res.json(
+      logs.map(l => ({
+        id:            l.Id,
+        learnerName:   l.Learner__c ? (nameMap.get(l.Learner__c) ?? "Unknown") : "Unknown",
+        userMessage:   l.User_Message__c ?? "",
+        pennyResponse: l.Penny_Response__c ?? "",
+        promptMode:    l.Prompt_Mode__c ?? "",
+        source:        l.Source__c ?? "",
+        createdDate:   l.CreatedDate,
+      }))
+    );
+  })
+);
+
+// ── GET /learners/directory ───────────────────────────────────────────────────
+
+interface SfContactLearner {
+  Id: string;
+  FirstName: string | null;
+  LastName: string | null;
+  Email: string | null;
+  Penny_Trail__c: string | null;
+  Penny_Current_Phase__c: string | null;
+  Penny_Current_Goal__c: string | null;
+  Penny_Confidence_Score__c: number | null;
+  Penny_Skill_Score__c: number | null;
+  Penny_Sprint_Week__c: number | null;
+  Penny_Onboarding_Complete__c: boolean | null;
+  Penny_Coaching_Tone__c: string | null;
+}
+
+interface SfAggLastInteraction {
+  Learner__c: string;
+  lastInteraction: string;
+}
+
+router.get(
+  "/learners/directory",
+  withClient(async (_req, res, client) => {
+    const contactsResult = await client.query<SfContactLearner>(
+      "SELECT Id, FirstName, LastName, Email, Penny_Trail__c, Penny_Current_Phase__c, " +
+      "Penny_Current_Goal__c, Penny_Confidence_Score__c, Penny_Skill_Score__c, " +
+      "Penny_Sprint_Week__c, Penny_Onboarding_Complete__c, Penny_Coaching_Tone__c " +
+      "FROM Contact WHERE Penny_Trail__c != null ORDER BY LastName ASC"
+    );
+    const contacts = contactsResult.records;
+
+    const lastMap = new Map<string, string>();
+    if (contacts.length > 0) {
+      const idList = contacts.map(c => `'${c.Id}'`).join(",");
+      const lastResult = await client.query<SfAggLastInteraction>(
+        `SELECT Learner__c, MAX(CreatedDate) lastInteraction ` +
+        `FROM Penny_Interaction_Log__c WHERE Learner__c IN (${idList}) GROUP BY Learner__c`
+      );
+      for (const r of lastResult.records) {
+        lastMap.set(r.Learner__c, r.lastInteraction);
+      }
+    }
+
+    res.json(
+      contacts.map(c => ({
+        id:                 c.Id,
+        firstName:          c.FirstName ?? "",
+        lastName:           c.LastName ?? "",
+        email:              c.Email ?? "",
+        pennyTrail:         c.Penny_Trail__c,
+        currentPhase:       c.Penny_Current_Phase__c,
+        currentGoal:        c.Penny_Current_Goal__c,
+        confidenceScore:    c.Penny_Confidence_Score__c,
+        skillScore:         c.Penny_Skill_Score__c,
+        sprintWeek:         c.Penny_Sprint_Week__c,
+        onboardingComplete: c.Penny_Onboarding_Complete__c ?? false,
+        coachingTone:       c.Penny_Coaching_Tone__c,
+        lastInteraction:    lastMap.get(c.Id) ?? null,
+      }))
+    );
+  })
+);
+
 export default router;
+

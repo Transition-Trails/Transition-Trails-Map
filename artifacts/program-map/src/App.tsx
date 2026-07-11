@@ -53,6 +53,7 @@ import DigitalTwin      from "@/pages/twin/DigitalTwin";
 import OperationsHub    from "@/pages/ops/OperationsHub";
 import ProgramHub       from "@/pages/program/ProgramHub";
 import PennyHub         from "@/pages/penny/PennyHub";
+import LearnerDetail    from "@/pages/penny/LearnerDetail";
 import KnowledgeHub     from "@/pages/knowledge/KnowledgeHub";
 import CollaborationHub from "@/pages/collaboration/CollaborationHub";
 import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
@@ -204,6 +205,7 @@ function Router() {
       <Route path="/program/:tab"         component={ProgramHub} />
       <Route path="/program"              component={ProgramHub} />
 
+      <Route path="/penny/learner/:contactId" component={LearnerDetail} />
       <Route path="/penny/:tab"           component={PennyHub} />
       <Route path="/penny"                component={PennyHub} />
 

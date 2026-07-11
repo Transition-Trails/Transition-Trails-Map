@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -77,10 +78,29 @@ const NAV_TILES: NavTile[] = [
 
 export default function PennyCommandCenter() {
   const [, setLocation] = useLocation();
+  const [sfAuthenticated, setSfAuthenticated] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    fetch('/api/auth/salesforce/status')
+      .then(r => r.ok ? r.json() as Promise<{ authenticated: boolean }> : Promise.reject(r.status))
+      .then(data => setSfAuthenticated(data.authenticated))
+      .catch(() => setSfAuthenticated(false));
+  }, []);
+
+  // TODO: replace with Penny_Capability__c query when object is built
   const total     = pennyCapabilities.length;
   const confirmed = pennyCapabilities.filter(c => c.confidence === 'confirmed').length;
   const inReview  = pennyCapabilities.filter(c => c.confidence === 'needs-review').length;
+
+  const sfPill = sfAuthenticated === null
+    ? { value: 'Checking…', color: 'text-muted-foreground',  bg: 'bg-muted/30 border-border' }
+    : sfAuthenticated
+      ? { value: 'Connected',     color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' }
+      : { value: 'Auth Required', color: 'text-amber-700',   bg: 'bg-amber-50 border-amber-200' };
+
+  const statusPills = STATUS_PILLS.map(p =>
+    p.label === 'Salesforce' ? { ...p, ...sfPill } : p
+  );
 
   return (
     <ScrollArea className="h-full">
@@ -103,7 +123,7 @@ export default function PennyCommandCenter() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {STATUS_PILLS.map(p => (
+            {statusPills.map(p => (
               <div
                 key={p.label}
                 className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium ${p.bg}`}
