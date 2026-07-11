@@ -13,7 +13,7 @@ import {
   Brain, BookOpen, Layers, ShieldCheck, Database, Search, Filter,
   ChevronDown, ChevronRight, ArrowRight, AlertTriangle, CheckCircle2,
   Zap, Clock, Star, GitBranch, FlaskConical, ClipboardCheck, BarChart3,
-  Play, RotateCcw, Users, FileText, Plus, Hash,
+  Play, RotateCcw, Users, FileText, Plus, Hash, Loader2,
 } from 'lucide-react';
 
 type StudioView = 'library' | 'templates' | 'variables' | 'source-rules' | 'formats' | 'test-bench' | 'history' | 'quality' | 'create';
@@ -562,20 +562,73 @@ function OutputFormatsView() {
 
 // ── Test Bench View ────────────────────────────────────────────────────────
 
+type RunStatus = 'idle' | 'loading' | 'success' | 'error';
+
+function interpolatePrompt(body: string, inputs: Record<string, string>): string {
+  return body.replace(/\{\{(\w+)\}\}/g, (_, key: string) => inputs[key] ?? '');
+}
+
 function TestBenchView() {
-  const [selectedId, setSelectedId]    = useState(promptTemplates[0].id);
-  const [simulated, setSimulated]      = useState(false);
-  const [inputs, setInputs]            = useState<Record<string, string>>({});
+  const [selectedId, setSelectedId]      = useState(promptTemplates[0].id);
+  const [status, setStatus]              = useState<RunStatus>('idle');
+  const [liveReply, setLiveReply]        = useState('');
+  const [liveDurationMs, setLiveDurationMs] = useState<number | null>(null);
+  const [errorMsg, setErrorMsg]          = useState('');
+  const [inputs, setInputs]              = useState<Record<string, string>>({});
   const t = promptTemplates.find(t => t.id === selectedId) ?? promptTemplates[0];
 
   function loadTemplate(id: string) {
     const tmpl = promptTemplates.find(t => t.id === id) ?? promptTemplates[0];
     setSelectedId(id);
-    setSimulated(false);
+    setStatus('idle');
+    setLiveReply('');
+    setLiveDurationMs(null);
+    setErrorMsg('');
     setInputs({ ...tmpl.testBench.sampleInputs });
   }
 
+  function reset() {
+    setStatus('idle');
+    setLiveReply('');
+    setLiveDurationMs(null);
+    setErrorMsg('');
+  }
+
+  async function runPenny() {
+    setStatus('loading');
+    setLiveReply('');
+    setLiveDurationMs(null);
+    setErrorMsg('');
+    const interpolated = interpolatePrompt(t.promptBody, inputs);
+    try {
+      const resp = await fetch('/api/penny/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: interpolated,
+          systemOverride: interpolated,
+          role: 'admin',
+          context: 'Prompt Studio Test Bench',
+        }),
+      });
+      const data = await resp.json() as { reply?: string; durationMs?: number; error?: string };
+      if (!resp.ok || data.error) {
+        setErrorMsg(data.error ?? `HTTP ${resp.status}`);
+        setStatus('error');
+        return;
+      }
+      setLiveReply(data.reply ?? '');
+      setLiveDurationMs(data.durationMs ?? null);
+      setStatus('success');
+    } catch (e: unknown) {
+      setErrorMsg(e instanceof Error ? e.message : 'Network error — could not reach API.');
+      setStatus('error');
+    }
+  }
+
   const domCls = DOMAIN_CLS[t.domain];
+  const isLoading = status === 'loading';
+  const showOutput = status === 'success' || status === 'error';
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -606,7 +659,7 @@ function TestBenchView() {
         </ScrollArea>
       </div>
 
-      {/* Simulation panel */}
+      {/* Run panel */}
       <ScrollArea className="flex-1">
         <div className="p-5 max-w-2xl space-y-4">
           <div className={`rounded-xl border p-3 ${domCls}`}>
@@ -625,6 +678,7 @@ function TestBenchView() {
                     value={inputs[key] ?? ''}
                     onChange={e => setInputs(prev => ({ ...prev, [key]: e.target.value }))}
                     className="mt-0.5 h-7 text-[11px] bg-white"
+                    disabled={isLoading}
                   />
                 </div>
               ))}
@@ -643,37 +697,79 @@ function TestBenchView() {
             </div>
           </div>
 
-          {/* Simulate button */}
+          {/* Run button */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setSimulated(true)}
-              className="flex items-center gap-2 bg-foreground text-background px-4 py-2 rounded-full text-[12px] font-bold hover:opacity-90 transition-opacity"
+              onClick={runPenny}
+              disabled={isLoading}
+              className="flex items-center gap-2 bg-foreground text-background px-4 py-2 rounded-full text-[12px] font-bold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Play className="w-3.5 h-3.5" />
-              Simulate Penny Output
+              {isLoading
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : <Play className="w-3.5 h-3.5" />
+              }
+              {isLoading ? 'Running…' : 'Run Penny'}
             </button>
-            {simulated && (
-              <button onClick={() => setSimulated(false)} className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground">
+            {showOutput && (
+              <button onClick={reset} className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground">
                 <RotateCcw className="w-3 h-3" />Reset
               </button>
             )}
           </div>
 
-          {/* Simulated output */}
-          {simulated && (
-            <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 space-y-3">
+          {/* Loading skeleton */}
+          {isLoading && (
+            <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 space-y-3 animate-pulse">
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-secondary" />
-                <p className="text-[12px] font-bold text-foreground">Penny Simulated Output</p>
-                <span className="text-[9px] font-bold text-secondary border border-secondary/20 rounded-full px-1.5 py-0.5 ml-auto">Prototype — Not AI-generated</span>
+                <p className="text-[12px] font-bold text-foreground">Penny Output</p>
+                <span className="text-[9px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
               </div>
-              <div className="rounded-lg border border-secondary/20 bg-white p-3">
-                <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">{t.testBench.simulatedOutput}</p>
+              <div className="rounded-lg border border-secondary/20 bg-white p-3 space-y-2">
+                <div className="h-2.5 bg-muted rounded w-full" />
+                <div className="h-2.5 bg-muted rounded w-5/6" />
+                <div className="h-2.5 bg-muted rounded w-4/6" />
+                <div className="h-2.5 bg-muted rounded w-3/4" />
               </div>
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Simulation Notes</p>
-                <p className="text-[11px] text-amber-900 leading-snug">{t.testBench.simulationNotes}</p>
+            </div>
+          )}
+
+          {/* Live output */}
+          {showOutput && (
+            <div className={`rounded-xl border p-4 space-y-3 ${status === 'error' ? 'border-red-200 bg-red-50/50' : 'border-secondary/20 bg-secondary/5'}`}>
+              <div className="flex items-center gap-2">
+                <Brain className="w-4 h-4 text-secondary" />
+                <p className="text-[12px] font-bold text-foreground">Penny Output</p>
+                {status === 'success' && (
+                  <span className="text-[9px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
+                )}
+                {status === 'error' && (
+                  <span className="text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 rounded-full px-1.5 py-0.5 ml-auto">Error</span>
+                )}
               </div>
+
+              {status === 'success' && (
+                <>
+                  <div className="rounded-lg border border-secondary/20 bg-white p-3">
+                    <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">{liveReply}</p>
+                  </div>
+                  {liveDurationMs !== null && (
+                    <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+                      <p className="text-[10px] font-bold text-green-700 uppercase tracking-wider mb-1">Run Complete</p>
+                      <p className="text-[11px] text-green-900 leading-snug">
+                        Completed in {liveDurationMs.toLocaleString()} ms
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {status === 'error' && (
+                <div className="rounded-lg border border-red-200 bg-white p-3">
+                  <p className="text-[12px] text-red-700 leading-relaxed">{errorMsg}</p>
+                </div>
+              )}
+
               <div className="flex items-center gap-3">
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${RISK_CONFIG[t.hallucinationRisk].cls}`}>Hallucination Risk: {t.hallucinationRisk}</span>
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${PROMPT_STATUS_CONFIG[t.status].cls}`}>{t.status}</span>
