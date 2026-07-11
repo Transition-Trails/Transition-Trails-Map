@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState } from 'react';
-import { programs as staticPrograms, type Program } from '@/data/programs';
-import { sourceDocuments as staticDocs, type SourceDocument } from '@/data/sourceDocuments';
-import { resolvePhases as staticResolvePhases, type ResolvePhase } from '@/data/resolvePhases';
-import { pennyCapabilities as staticPenny, type PennyCapability } from '@/data/pennyCapabilities';
-import { trailOsCapabilities as staticTrailOs, type TrailOsCapability } from '@/data/trailOsCapabilities';
-import { commProviders as staticCommProviders, type CommProvider } from '@/data/commProviders';
-import { commRoutes as staticCommRoutes, type CommRoute } from '@/data/commRouting';
-import { messageTemplates as staticTemplates, type MessageTemplate } from '@/data/messageTemplates';
+// TODO Layer 3 — replaced by Salesforce live data; static data files kept on disk but no longer imported at startup
+import type { Program } from '@/data/programs';
+import type { SourceDocument } from '@/data/sourceDocuments';
+import type { ResolvePhase } from '@/data/resolvePhases';
+import type { PennyCapability } from '@/data/pennyCapabilities';
+import type { TrailOsCapability } from '@/data/trailOsCapabilities';
+import type { CommProvider } from '@/data/commProviders';
+import type { CommRoute } from '@/data/commRouting';
+import type { MessageTemplate } from '@/data/messageTemplates';
 import type { ActionPanelConfig, SlackPanelConfig } from '@/types/actionPanel';
 import { type AccessTier, TIER_CONFIG } from '@/config/accessTiers';
 
@@ -123,14 +124,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const openSlackPanel   = (cfg: SlackPanelConfig)   => { setSlackPanel(cfg); setActionPanel(null); };
   const closeSlackPanel  = ()                        => setSlackPanel(null);
 
-  const [programs, setPrograms]                       = useState<Program[]>(staticPrograms);
-  const [sourceDocuments, setSourceDocuments]         = useState<SourceDocument[]>(staticDocs);
-  const [resolvePhases, setResolvePhases]             = useState<ResolvePhase[]>(staticResolvePhases);
-  const [pennyCapabilities, setPennyCapabilities]     = useState<PennyCapability[]>(staticPenny);
-  const [trailOsCapabilities, setTrailOsCapabilities] = useState<TrailOsCapability[]>(staticTrailOs);
-  const [commProviders]     = useState<CommProvider[]>(staticCommProviders);
-  const [commRoutes]        = useState<CommRoute[]>(staticCommRoutes);
-  const [messageTemplates]  = useState<MessageTemplate[]>(staticTemplates);
+  // TODO Layer 3 — static initializers replaced with empty arrays; live data comes from Salesforce via hooks
+  const [programs, setPrograms]                       = useState<Program[]>([]);
+  const [sourceDocuments, setSourceDocuments]         = useState<SourceDocument[]>([]);
+  const [resolvePhases, setResolvePhases]             = useState<ResolvePhase[]>([]);
+  const [pennyCapabilities, setPennyCapabilities]     = useState<PennyCapability[]>([]);
+  const [trailOsCapabilities, setTrailOsCapabilities] = useState<TrailOsCapability[]>([]);
+  const [commProviders]     = useState<CommProvider[]>([]);
+  const [commRoutes]        = useState<CommRoute[]>([]);
+  const [messageTemplates]  = useState<MessageTemplate[]>([]);
 
   function setActiveContext(ctx: ActiveContext | null) {
     setActiveContextRaw(ctx);

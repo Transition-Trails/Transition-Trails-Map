@@ -118,6 +118,7 @@ router.get("/status", async (req, res): Promise<void> => {
 
   res.json({
     authenticated: true,
+    contactId: sfUserId ?? null,
     user: {
       userId:   sfUserId,
       username: sfUsername,

@@ -7,6 +7,7 @@ import googleRouter          from "./google";
 import googleOAuthRouter     from "./googleOAuth";
 import salesforceRouter      from "./salesforce";
 import salesforceAuthRouter  from "./salesforceAuth";
+import pennyDataRouter       from "./pennyData";
 import pennyRouter           from "./penny";
 import retrieveRouter        from "./retrieve";
 import calendarRouter        from "./calendar";
@@ -19,6 +20,7 @@ import driveRouter           from "./drive";
 const router: IRouter = Router();
 
 router.use("/auth/salesforce", salesforceAuthRouter);
+router.use("/penny/data", pennyDataRouter);
 router.use(healthRouter);
 router.use(slackRouter);
 router.use(secretsRouter);
