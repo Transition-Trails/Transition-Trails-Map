@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
-import { Send, Brain, Zap, AlertCircle } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Send, Brain, Zap, AlertCircle, ChevronDown, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useAppContext } from '@/context/AppContext';
+
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Message {
   role: 'user' | 'penny';
@@ -11,7 +13,30 @@ interface Message {
   time: string;
   durationMs?: number;
   error?: boolean;
+  system?: boolean;
 }
+
+interface LearnerSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  pennyTrail: string | null;
+}
+
+interface ContextMeta {
+  contactId: string | null;
+  learnerName: string | null;
+  trailId: string | null;
+  trailConfigId: string | null;
+  currentPhase: string | null;
+  currentGoal: string | null;
+  coachingTone: string | null;
+  confidenceScore: number | null;
+  promptPath: 'salesforce' | 'fallback';
+  interactionLogged: boolean;
+}
+
+// ── Constants ─────────────────────────────────────────────────────────────────
 
 const SEED: Message[] = [
   {
@@ -31,11 +56,13 @@ const STARTERS = [
 ];
 
 const ROLE_LABELS: Record<string, string> = {
-  superadmin:  'Super Admin',
-  admin:       'Admin',
-  poweruser:   'Power User',
-  everyday:    'Everyday User',
+  superadmin: 'Super Admin',
+  admin:      'Admin',
+  poweruser:  'Power User',
+  everyday:   'Everyday User',
 };
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function now() {
   return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -43,21 +70,86 @@ function now() {
 
 function buildHistory(messages: Message[]): Array<{ role: 'user' | 'model'; text: string }> {
   return messages
-    .filter(m => m.time !== '—' && !m.error)
-    .map(m => ({ role: m.role === 'user' ? 'user' : 'model', text: m.content }));
+    .filter(m => m.time !== '—' && !m.error && !m.system)
+    .map(m => ({ role: m.role === 'user' ? ('user' as const) : ('model' as const), text: m.content }));
 }
+
+function trailBadgeClass(trail: string | null): string {
+  if (!trail) return 'bg-muted/60 text-muted-foreground border-border';
+  const t = trail.toLowerCase();
+  if (t.includes('guided'))                              return 'bg-blue-50 text-blue-700 border-blue-200';
+  if (t.includes('explorer'))                            return 'bg-green-50 text-green-700 border-green-200';
+  if (t.includes('mastery'))                             return 'bg-purple-50 text-purple-700 border-purple-200';
+  if (t.includes('community') || t.includes('alumni'))  return 'bg-amber-50 text-amber-700 border-amber-200';
+  return 'bg-muted/60 text-muted-foreground border-border';
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function TestPenny() {
   const { userTier } = useAppContext();
+
+  // Chat state
   const [messages, setMessages] = useState<Message[]>(SEED);
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [lastMs, setLastMs]     = useState<number | null>(null);
+
+  // Learner selector state
+  const [learners, setLearners]                 = useState<LearnerSummary[]>([]);
+  const [learnersLoading, setLearnersLoading]   = useState(true);
+  const [learnersError, setLearnersError]       = useState(false);
+  const [selectedLearner, setSelectedLearner]   = useState<LearnerSummary | null>(null);
+
+  // Live context state
+  const [contextMeta, setContextMeta] = useState<ContextMeta | null>(null);
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Fetch learners on mount
+  useEffect(() => {
+    fetch('/api/penny/data/learners/directory')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<LearnerSummary[]>;
+      })
+      .then(data => {
+        setLearners(data);
+        setLearnersLoading(false);
+      })
+      .catch(() => {
+        setLearnersLoading(false);
+        setLearnersError(true);
+      });
+  }, []);
+
+  // Scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Handle learner selection change
+  const handleLearnerChange = useCallback((id: string) => {
+    if (!id) {
+      setSelectedLearner(null);
+      setContextMeta(null);
+      setMessages(SEED);
+      return;
+    }
+    const learner = learners.find(l => l.id === id) ?? null;
+    setSelectedLearner(learner);
+    setContextMeta(null);
+    if (learner) {
+      setMessages([{
+        role:    'penny',
+        content: `Now testing as ${learner.firstName} ${learner.lastName} on ${learner.pennyTrail ?? 'No trail assigned'}. Conversation cleared.`,
+        time:    now(),
+        system:  true,
+      }]);
+    } else {
+      setMessages(SEED);
+    }
+  }, [learners]);
 
   async function send() {
     const text = input.trim();
@@ -71,41 +163,52 @@ export default function TestPenny() {
     setLoading(true);
 
     try {
+      const body: Record<string, unknown> = {
+        query:   text,
+        context: 'Test Penny',
+        role:    userTier,
+        history,
+      };
+      if (selectedLearner) {
+        body['contactId'] = selectedLearner.id;
+      }
+
       const resp = await fetch('/api/penny/ask', {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query:   text,
-          context: 'Test Penny',
-          role:    userTier,
-          history,
-        }),
+        body:    JSON.stringify(body),
       });
 
-      const data = await resp.json() as { reply?: string; error?: string; durationMs?: number };
+      const data = await resp.json() as {
+        reply?: string;
+        error?: string;
+        durationMs?: number;
+        contextMeta?: ContextMeta;
+      };
 
       if (!resp.ok || data.error) {
         setMessages(prev => [...prev, {
-          role: 'penny',
+          role:    'penny',
           content: data.error ?? 'Something went wrong. Please try again.',
-          time: now(),
-          error: true,
+          time:    now(),
+          error:   true,
         }]);
       } else {
         setLastMs(data.durationMs ?? null);
+        if (data.contextMeta) setContextMeta(data.contextMeta);
         setMessages(prev => [...prev, {
-          role: 'penny',
-          content: data.reply!,
-          time: now(),
+          role:      'penny',
+          content:   data.reply!,
+          time:      now(),
           durationMs: data.durationMs,
         }]);
       }
     } catch {
       setMessages(prev => [...prev, {
-        role: 'penny',
+        role:    'penny',
         content: "Couldn't reach Penny right now — check your connection and try again.",
-        time: now(),
-        error: true,
+        time:    now(),
+        error:   true,
       }]);
     } finally {
       setLoading(false);
@@ -116,11 +219,13 @@ export default function TestPenny() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(); }
   }
 
-  const msgCount = messages.filter(m => m.role === 'user').length;
+  const msgCount      = messages.filter(m => m.role === 'user').length;
+  const hasSentMessage = msgCount > 0;
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      {/* Header */}
+
+      {/* ── Header ── */}
       <div className="flex-shrink-0 px-6 pt-5 pb-4 border-b bg-card">
         <div className="flex items-center justify-between">
           <div>
@@ -144,17 +249,22 @@ export default function TestPenny() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Chat area */}
+
+        {/* ── Chat area ── */}
         <div className="flex-1 flex flex-col overflow-hidden">
+
+          {/* Messages */}
           <ScrollArea className="flex-1 px-6 py-4">
             <div className="space-y-4 max-w-2xl">
               {messages.map((m, i) => (
                 <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {m.role === 'penny' && (
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${m.error ? 'bg-rose-100' : 'bg-primary/10'}`}>
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      m.error ? 'bg-rose-100' : m.system ? 'bg-amber-100' : 'bg-primary/10'
+                    }`}>
                       {m.error
                         ? <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-                        : <Brain className="w-3.5 h-3.5 text-primary" />}
+                        : <Brain className={`w-3.5 h-3.5 ${m.system ? 'text-amber-600' : 'text-primary'}`} />}
                     </div>
                   )}
                   <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${
@@ -162,11 +272,15 @@ export default function TestPenny() {
                       ? 'bg-primary text-primary-foreground rounded-br-sm'
                       : m.error
                         ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm'
-                        : 'bg-card border border-border text-foreground rounded-bl-sm'
+                        : m.system
+                          ? 'bg-amber-50 border border-amber-200 text-amber-800 rounded-bl-sm'
+                          : 'bg-card border border-border text-foreground rounded-bl-sm'
                   }`}>
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{m.content}</p>
                     {m.time !== '—' && (
-                      <p className={`text-[10px] mt-1 flex items-center gap-1.5 ${m.role === 'user' ? 'text-primary-foreground/60 justify-end' : 'text-muted-foreground'}`}>
+                      <p className={`text-[10px] mt-1 flex items-center gap-1.5 ${
+                        m.role === 'user' ? 'text-primary-foreground/60 justify-end' : 'text-muted-foreground'
+                      }`}>
                         {m.time}
                         {m.durationMs !== undefined && (
                           <span className="text-muted-foreground/60">· {(m.durationMs / 1000).toFixed(1)}s</span>
@@ -195,8 +309,38 @@ export default function TestPenny() {
             </div>
           </ScrollArea>
 
-          {/* Input */}
-          <div className="flex-shrink-0 px-6 py-4 border-t bg-card">
+          {/* Input area */}
+          <div className="flex-shrink-0 px-6 py-4 border-t bg-card space-y-3">
+
+            {/* Learner selector */}
+            <div className="flex items-center gap-2 max-w-2xl">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap flex-shrink-0">
+                Test as
+              </span>
+              {learnersLoading ? (
+                <span className="text-[12px] text-muted-foreground">Loading learners…</span>
+              ) : learnersError ? (
+                <span className="text-[12px] text-red-500">Unable to load learners</span>
+              ) : (
+                <div className="relative flex-1">
+                  <select
+                    value={selectedLearner?.id ?? ''}
+                    onChange={e => handleLearnerChange(e.target.value)}
+                    className="w-full text-[12px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/40 appearance-none pr-7"
+                  >
+                    <option value="">Your Salesforce Session (default)</option>
+                    {learners.map(l => (
+                      <option key={l.id} value={l.id}>
+                        {l.firstName} {l.lastName} — {l.pennyTrail ?? 'No trail'}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                </div>
+              )}
+            </div>
+
+            {/* Message input + send */}
             <div className="flex gap-2 max-w-2xl">
               <input
                 value={input}
@@ -218,42 +362,126 @@ export default function TestPenny() {
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="w-[220px] flex-shrink-0 border-l bg-card p-4 overflow-y-auto">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Session Info</p>
-          <div className="space-y-3 text-xs text-muted-foreground">
-            <div>
-              <span className="font-semibold text-foreground block mb-0.5">Mode</span>
-              <span className="flex items-center gap-1 text-emerald-700 font-medium">
-                <Zap className="w-3 h-3" /> Live AI
-              </span>
-            </div>
-            <div>
-              <span className="font-semibold text-foreground block mb-0.5">Model</span>
-              Gemini 2.5 Flash
-            </div>
-            <div>
-              <span className="font-semibold text-foreground block mb-0.5">Role</span>
-              {ROLE_LABELS[userTier] ?? userTier}
-            </div>
-            <div>
-              <span className="font-semibold text-foreground block mb-0.5">Messages</span>
-              {msgCount} sent
-            </div>
-            {lastMs !== null && (
-              <div>
-                <span className="font-semibold text-foreground block mb-0.5">Last response</span>
-                {(lastMs / 1000).toFixed(1)}s
+        {/* ── Sidebar — Live Context Panel ── */}
+        <div className="w-[240px] flex-shrink-0 border-l bg-card p-4 overflow-y-auto space-y-4">
+
+          {/* SECTION 1 — Testing As */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Testing As</p>
+            {selectedLearner ? (
+              <div className="space-y-1.5">
+                <p className="text-[13px] font-semibold text-foreground leading-tight">
+                  {selectedLearner.firstName} {selectedLearner.lastName}
+                </p>
+                <span className={`inline-flex text-[10px] font-medium border rounded-full px-2 py-0.5 ${trailBadgeClass(selectedLearner.pennyTrail)}`}>
+                  {selectedLearner.pennyTrail ?? 'No trail'}
+                </span>
+                {contextMeta?.currentPhase && (
+                  <p className="text-[11px] text-muted-foreground">Phase: {contextMeta.currentPhase}</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-[12px] text-muted-foreground">Your Salesforce Session</p>
+            )}
+          </div>
+
+          {/* SECTION 2 — Live Context */}
+          <div className="pt-3 border-t border-border">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Live Context</p>
+            {!hasSentMessage ? (
+              <p className="text-[11px] text-muted-foreground/60 italic leading-relaxed">
+                Send a message to load live context.
+              </p>
+            ) : (
+              <div className="space-y-2.5 text-[12px]">
+
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Prompt Path</span>
+                  {contextMeta ? (
+                    contextMeta.promptPath === 'salesforce' ? (
+                      <span className="flex items-center gap-1 text-emerald-700 font-medium">
+                        <CheckCircle2 className="w-3 h-3" /> Salesforce
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-amber-600 font-medium">
+                        <AlertTriangle className="w-3 h-3" /> Fallback
+                      </span>
+                    )
+                  ) : <span className="text-muted-foreground">—</span>}
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Current Goal</span>
+                  <span className={`leading-snug ${contextMeta?.currentGoal ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {contextMeta?.currentGoal ?? '—'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Current Phase</span>
+                  <span className="text-muted-foreground">{contextMeta?.currentPhase ?? '—'}</span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Coaching Tone</span>
+                  <span className="text-muted-foreground">{contextMeta?.coachingTone ?? '—'}</span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Confidence Score</span>
+                  <span className="text-muted-foreground">
+                    {contextMeta?.confidenceScore != null ? `${contextMeta.confidenceScore}/10` : '—'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Trail</span>
+                  <span className="text-muted-foreground">{contextMeta?.trailId ?? '—'}</span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Interaction Logged</span>
+                  {contextMeta ? (
+                    contextMeta.promptPath === 'salesforce' ? (
+                      <span className="flex items-center gap-1 text-emerald-700 font-medium text-[11px]">
+                        <CheckCircle2 className="w-3 h-3" /> Yes
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground text-[11px]">No (fallback)</span>
+                    )
+                  ) : <span className="text-muted-foreground">—</span>}
+                </div>
+
               </div>
             )}
-            <div>
-              <span className="font-semibold text-foreground block mb-0.5">Context</span>
-              Role · page · history (up to 10 turns)
+          </div>
+
+          {/* SECTION 3 — Session */}
+          <div className="pt-3 border-t border-border">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Session</p>
+            <div className="space-y-2 text-[12px]">
+              <div>
+                <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Model</span>
+                <span className="flex items-center gap-1 text-muted-foreground">
+                  <Zap className="w-3 h-3" /> Gemini 2.5 Flash
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Messages</span>
+                <span className="text-muted-foreground">{msgCount} sent</span>
+              </div>
+              {lastMs !== null && (
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Last Response</span>
+                  <span className="text-muted-foreground">{(lastMs / 1000).toFixed(1)}s</span>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-border">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Try asking:</p>
+          {/* Starter prompts */}
+          <div className="pt-3 border-t border-border">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Try asking</p>
             <div className="space-y-1.5">
               {STARTERS.map(q => (
                 <button
@@ -268,11 +496,6 @@ export default function TestPenny() {
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-border">
-            <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
-              Responses grounded in Transition Trails context. Live data wiring (Salesforce, Drive) coming in Phase 2.
-            </p>
-          </div>
         </div>
       </div>
     </div>

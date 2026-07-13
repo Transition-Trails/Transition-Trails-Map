@@ -104,12 +104,13 @@ router.post("/penny/ask", async (req, res) => {
     });
   }
 
-  const { query, context, role, history, retrievedChunks } = req.body as {
+  const { query, context, role, history, retrievedChunks, contactId: contactIdOverride } = req.body as {
     query?: unknown;
     context?: unknown;
     role?: unknown;
     history?: unknown;
     retrievedChunks?: unknown;
+    contactId?: unknown;
   };
 
   // ── Validate query ────────────────────────────────────────────────────────
@@ -138,20 +139,32 @@ router.post("/penny/ask", async (req, res) => {
   let systemText: string;
   let sfClient: SalesforceClient | null = null;
   let sfContactId: string | null = null;
+  let learnerCtx: Awaited<ReturnType<typeof getLearnerContext>> | null = null;
+  let trailCfg:   Awaited<ReturnType<typeof getTrailConfig>> | null   = null;
+  let promptPath: 'salesforce' | 'fallback' = 'fallback';
+
+  const contactIdStr = typeof contactIdOverride === 'string' && contactIdOverride.trim()
+    ? contactIdOverride.trim()
+    : undefined;
 
   try {
     sfClient    = getSalesforceClient(req);
-    sfContactId = req.session.sfUserId ?? null;
+    sfContactId = contactIdStr ?? req.session.sfUserId ?? null;
     if (!sfContactId) throw new Error("No Salesforce contact ID in session");
 
-    const learnerCtx   = await getLearnerContext(sfClient, sfContactId);
-    const trailCfg     = learnerCtx.pennyTrailConfigId
+    if (contactIdStr) {
+      logger.info({ contactIdOverride: contactIdStr, sfContactId }, 'Admin testing Penny as learner override');
+    }
+
+    learnerCtx         = await getLearnerContext(sfClient, sfContactId);
+    trailCfg           = learnerCtx.pennyTrailConfigId
       ? await getTrailConfig(sfClient, learnerCtx.pennyTrailConfigId)
       : DEFAULT_TRAIL_CONFIG;
     const interactions = await getInteractionHistory(sfClient, sfContactId, 10);
 
     systemText = buildPennySystemPrompt(learnerCtx, trailCfg, interactions)
       + buildRetrievedSection(validChunks);
+    promptPath = 'salesforce';
   } catch (err) {
     logger.warn({ err }, "Salesforce context unavailable — falling back to PENNY_BASE");
     sfClient   = null;
@@ -225,7 +238,23 @@ router.post("/penny/ask", async (req, res) => {
       });
     }
 
-    return res.json({ reply: text, model, durationMs: Date.now() - start });
+    return res.json({
+      reply: text,
+      model,
+      durationMs: Date.now() - start,
+      contextMeta: {
+        contactId:         sfContactId,
+        learnerName:       learnerCtx ? `${learnerCtx.firstName} ${learnerCtx.lastName}` : null,
+        trailId:           trailCfg?.trailId ?? null,
+        trailConfigId:     learnerCtx?.pennyTrailConfigId ?? null,
+        currentPhase:      learnerCtx?.currentPhase ?? null,
+        currentGoal:       learnerCtx?.currentGoal ?? null,
+        coachingTone:      learnerCtx?.coachingTone ?? null,
+        confidenceScore:   learnerCtx?.confidenceScore ?? null,
+        promptPath,
+        interactionLogged: sfClient !== null && sfContactId !== null,
+      },
+    });
   } catch (e: unknown) {
     const isTimeout = e instanceof Error && e.name === "TimeoutError";
     const msg = isTimeout
