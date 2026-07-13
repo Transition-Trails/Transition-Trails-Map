@@ -17,7 +17,8 @@ import TestPenny             from '@/pages/penny/TestPenny';
 import TrailQuests           from '@/pages/penny/TrailQuests';
 import Assessments           from '@/pages/penny/Assessments';
 import AgentforceCenter      from '@/pages/penny/AgentforceCenter';
-import PennyAssetLibrary     from '@/pages/penny/PennyAssetLibrary';
+import PennyAssetLibrary        from '@/pages/penny/PennyAssetLibrary';
+import PennyCapabilityRegistry  from '@/pages/penny/PennyCapabilityRegistry';
 
 export default function PennyHub() {
   const { openActionPanel, setRightPanelOpen } = useAppContext();
@@ -91,7 +92,7 @@ export default function PennyHub() {
   const TABS = [
     ...(!isEveryday ? [
       { id: 'overview',      label: 'Command Center', path: '/penny',              icon: LayoutDashboard, content: <PennyCommandCenter /> },
-      { id: 'capabilities',  label: 'Capabilities',   path: '/penny/capabilities', icon: Layers,          content: <PennyWorkspace /> },
+      { id: 'capabilities',  label: 'Capabilities',   path: '/penny/capabilities', icon: Layers,          content: <PennyCapabilityRegistry /> },
       { id: 'prompts',       label: 'Prompt Studio',  path: '/penny/prompts',      icon: MessageSquare,   content: <PennyPromptStudio /> },
     ] : []),
     { id: 'learners', label: isEveryday ? 'My Learners' : 'Learners', path: '/penny/learners', icon: Users, content: <Learners /> },

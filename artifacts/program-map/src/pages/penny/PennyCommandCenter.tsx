@@ -4,8 +4,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
   Activity, ChevronRight, Sparkles, Star, ClipboardCheck, Bot,
+  Map, MessageCircle, Database,
 } from 'lucide-react';
-import { pennyCapabilities } from '@/data/pennyCapabilities';
+
+// ── Static config ─────────────────────────────────────────────────────────────
 
 const STATUS_PILLS = [
   { label: 'Gemini API',  value: 'Live',          color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
@@ -76,10 +78,39 @@ const NAV_TILES: NavTile[] = [
   },
 ];
 
+// ── API response shapes ───────────────────────────────────────────────────────
+
+interface LearnerEntry {
+  onboardingComplete?: boolean;
+  [key: string]: unknown;
+}
+
+interface TrailConfig {
+  isActive?: boolean;
+  [key: string]: unknown;
+}
+
+interface LogEntry {
+  [key: string]: unknown;
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function PennyCommandCenter() {
   const [, setLocation] = useLocation();
+
+  // Salesforce auth
   const [sfAuthenticated, setSfAuthenticated] = useState<boolean | null>(null);
 
+  // Live metrics
+  const [metricsLoading,    setMetricsLoading]    = useState(true);
+  const [totalLearners,     setTotalLearners]     = useState<number | null>(null);
+  const [onboardedLearners, setOnboardedLearners] = useState<number | null>(null);
+  const [activeTrails,      setActiveTrails]      = useState<number | null>(null);
+  const [todayInteractions, setTodayInteractions] = useState<number | null>(null);
+  const [metricsError,      setMetricsError]      = useState(false);
+
+  // 1 — Check Salesforce auth on mount
   useEffect(() => {
     fetch('/api/auth/salesforce/status')
       .then(r => r.ok ? r.json() as Promise<{ authenticated: boolean }> : Promise.reject(r.status))
@@ -87,11 +118,41 @@ export default function PennyCommandCenter() {
       .catch(() => setSfAuthenticated(false));
   }, []);
 
-  // TODO: replace with Penny_Capability__c query when object is built
-  const total     = pennyCapabilities.length;
-  const confirmed = pennyCapabilities.filter(c => c.confidence === 'confirmed').length;
-  const inReview  = pennyCapabilities.filter(c => c.confidence === 'needs-review').length;
+  // 2 — Fetch live metrics once sfAuthenticated is resolved
+  useEffect(() => {
+    if (sfAuthenticated === null) return;
 
+    if (!sfAuthenticated) {
+      setMetricsLoading(false);
+      return;
+    }
+
+    Promise.all([
+      fetch('/api/penny/data/learners/directory'),
+      fetch('/api/penny/data/trail-configs'),
+      fetch('/api/penny/data/logs/today'),
+    ]).then(async ([learnersRes, configsRes, logsRes]) => {
+      if (learnersRes.ok) {
+        const learners = await learnersRes.json() as LearnerEntry[];
+        setTotalLearners(learners.length);
+        setOnboardedLearners(learners.filter(l => l.onboardingComplete === true).length);
+      }
+      if (configsRes.ok) {
+        const configs = await configsRes.json() as TrailConfig[];
+        setActiveTrails(configs.filter(c => c.isActive === true).length);
+      }
+      if (logsRes.ok) {
+        const logs = await logsRes.json() as LogEntry[];
+        setTodayInteractions(logs.length);
+      }
+      setMetricsLoading(false);
+    }).catch(() => {
+      setMetricsError(true);
+      setMetricsLoading(false);
+    });
+  }, [sfAuthenticated]);
+
+  // Salesforce status pill — dynamic
   const sfPill = sfAuthenticated === null
     ? { value: 'Checking…', color: 'text-muted-foreground',  bg: 'bg-muted/30 border-border' }
     : sfAuthenticated
@@ -101,6 +162,43 @@ export default function PennyCommandCenter() {
   const statusPills = STATUS_PILLS.map(p =>
     p.label === 'Salesforce' ? { ...p, ...sfPill } : p
   );
+
+  // ── Metric cards config ────────────────────────────────────────────────────
+
+  const metricCards = [
+    {
+      icon:    Users,
+      label:   'Total Learners',
+      value:   totalLearners !== null ? String(totalLearners) : '—',
+      sub:     `${onboardedLearners ?? '—'} onboarded`,
+      iconBg:  'bg-blue-100',
+      iconCls: 'text-blue-600',
+    },
+    {
+      icon:    Map,
+      label:   'Active Trails',
+      value:   activeTrails !== null ? String(activeTrails) : '—',
+      sub:     'of 4 configured',
+      iconBg:  'bg-emerald-100',
+      iconCls: 'text-emerald-600',
+    },
+    {
+      icon:    MessageCircle,
+      label:   "Today's Interactions",
+      value:   todayInteractions !== null ? String(todayInteractions) : '—',
+      sub:     todayInteractions === 0 ? 'No conversations yet today' : 'Penny conversations logged',
+      iconBg:  'bg-violet-100',
+      iconCls: 'text-violet-600',
+    },
+    {
+      icon:    Database,
+      label:   'Data Source',
+      value:   sfAuthenticated ? 'Connected' : 'Not Connected',
+      sub:     sfAuthenticated ? 'Live from Salesforce' : 'Authentication required',
+      iconBg:  sfAuthenticated ? 'bg-emerald-100' : 'bg-amber-100',
+      iconCls: sfAuthenticated ? 'text-emerald-600' : 'text-amber-600',
+    },
+  ];
 
   return (
     <ScrollArea className="h-full">
@@ -135,19 +233,39 @@ export default function PennyCommandCenter() {
           </div>
         </div>
 
-        {/* ── Stats ───────────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { value: total,     label: 'Capabilities', color: 'text-violet-600' },
-            { value: confirmed, label: 'Confirmed',     color: 'text-emerald-600' },
-            { value: inReview,  label: 'In Review',     color: 'text-amber-600' },
-          ].map(s => (
-            <div key={s.label} className="flex flex-col items-center px-3 py-3 rounded-lg border border-border bg-card">
-              <span className={`text-xl font-semibold ${s.color}`}>{s.value}</span>
-              <span className="text-[10px] text-muted-foreground mt-0.5 text-center leading-tight">{s.label}</span>
-            </div>
-          ))}
-        </div>
+        {/* ── Live metrics grid ────────────────────────────────────────────── */}
+        {metricsLoading ? (
+          <div className="grid grid-cols-2 gap-3">
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} className="animate-pulse rounded-xl border border-border bg-muted/30 h-24" />
+            ))}
+          </div>
+        ) : metricsError ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5">
+            <p className="text-[11px] text-amber-700">
+              Unable to load live metrics. Check Salesforce connection.
+            </p>
+          </div>
+        ) : !sfAuthenticated ? (
+          <div className="rounded-lg border border-border bg-muted/20 px-3 py-2.5">
+            <p className="text-[11px] text-muted-foreground">
+              Connect Salesforce to see live metrics.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {metricCards.map(card => (
+              <div key={card.label} className="rounded-xl border border-border bg-card p-4">
+                <div className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center`}>
+                  <card.icon className={`w-4 h-4 ${card.iconCls}`} />
+                </div>
+                <p className="text-2xl font-bold text-foreground mt-2 leading-none">{card.value}</p>
+                <p className="text-[11px] font-medium text-muted-foreground mt-1">{card.label}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{card.sub}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ── Navigation tiles ─────────────────────────────────────────────── */}
         <div>
