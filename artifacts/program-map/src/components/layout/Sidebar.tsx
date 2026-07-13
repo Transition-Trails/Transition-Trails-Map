@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
   Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
-  ChevronDown, Search, Target, Monitor,
+  ChevronDown, Search, Target, Monitor, Sliders,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { type AccessTier, canAccess, TIER_CONFIG } from '@/config/accessTiers';
@@ -70,8 +70,9 @@ const navGroups: NavGroup[] = [
       { id: 'penny-overview',      path: '/penny',              label: 'Command Center', minTier: 'admin' },
       { id: 'penny-capabilities',  path: '/penny/capabilities', label: 'Capabilities',   minTier: 'admin' },
       { id: 'penny-prompts',       path: '/penny/prompts',      label: 'Prompt Studio',  minTier: 'admin' },
-      { id: 'penny-learners',      path: '/penny/learners',     label: 'Learners',      minTier: 'admin' },
-      { id: 'penny-intelligence',  path: '/penny/intelligence', label: 'Intelligence',  minTier: 'admin' },
+      { id: 'penny-learners',       path: '/penny/learners',       label: 'Learners',         minTier: 'admin' },
+      { id: 'penny-trail-configs', path: '/penny/trail-configs',  label: 'Trail Configs',    minTier: 'admin' },
+      { id: 'penny-intelligence',  path: '/penny/intelligence',   label: 'Intelligence',     minTier: 'admin' },
     ],
   },
   {

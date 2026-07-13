@@ -240,6 +240,72 @@ router.patch(
   })
 );
 
+// ── PATCH /learner/:contactId/coaching ────────────────────────────────────────
+
+router.patch(
+  "/learner/:contactId/coaching",
+  withClient(async (req, res, client) => {
+    const { contactId } = req.params as { contactId: string };
+    if (!contactId) {
+      res.status(400).json({ error: "contactId is required" });
+      return;
+    }
+    await updateLearnerContext(
+      client,
+      contactId,
+      req.body as Partial<LearnerContextUpdate>
+    );
+    res.json({ success: true });
+  })
+);
+
+// ── PATCH /learner/:contactId/trail ───────────────────────────────────────────
+
+router.patch(
+  "/learner/:contactId/trail",
+  withClient(async (req, res, client) => {
+    const { contactId } = req.params as { contactId: string };
+    const body = req.body as { pennyTrail?: unknown; pennyTrailConfigId?: unknown };
+    if (!body.pennyTrail || !body.pennyTrailConfigId) {
+      res.status(400).json({ error: "pennyTrail and pennyTrailConfigId are required" });
+      return;
+    }
+    await client.updateRecord("Contact", contactId, {
+      Penny_Trail__c:        body.pennyTrail,
+      Penny_Trail_Config__c: body.pennyTrailConfigId,
+    });
+    res.json({ success: true });
+  })
+);
+
+// ── PATCH /trail-config/:trailConfigId ────────────────────────────────────────
+
+router.patch(
+  "/trail-config/:trailConfigId",
+  withClient(async (req, res, client) => {
+    const { trailConfigId } = req.params as { trailConfigId: string };
+    if (!trailConfigId) {
+      res.status(400).json({ error: "trailConfigId is required" });
+      return;
+    }
+    const body = req.body as {
+      pennyRole?:          string;
+      tone?:               string;
+      focalPoints?:        string;
+      specialInstructions?: string;
+      isActive?:           boolean;
+    };
+    const mapped: Record<string, unknown> = {};
+    if (body.pennyRole          !== undefined) mapped["Penny_Role__c"]          = body.pennyRole;
+    if (body.tone               !== undefined) mapped["Tone__c"]                = body.tone;
+    if (body.focalPoints        !== undefined) mapped["Focal_Points__c"]        = body.focalPoints;
+    if (body.specialInstructions !== undefined) mapped["Special_Instructions__c"] = body.specialInstructions;
+    if (body.isActive           !== undefined) mapped["Is_Active__c"]           = body.isActive;
+    await client.updateRecord("Penny_Trail_Config__c", trailConfigId, mapped);
+    res.json({ success: true });
+  })
+);
+
 // ── GET /weekly-reports ───────────────────────────────────────────────────────
 
 router.get(

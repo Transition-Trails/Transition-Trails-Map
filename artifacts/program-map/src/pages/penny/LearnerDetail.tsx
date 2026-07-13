@@ -1,67 +1,96 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'wouter';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, User, MessageSquare, ClipboardList, Briefcase, CheckCircle2, XCircle } from 'lucide-react';
+import {
+  ArrowLeft, User, MessageSquare, ClipboardList, Briefcase,
+  CheckCircle2, XCircle, X, Pencil, Loader2,
+} from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 interface LearnerProfile {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  pennyTrail: string | null;
+  id:                 string;
+  firstName:          string;
+  lastName:           string;
+  email:              string;
+  pennyTrail:         string | null;
   pennyTrailConfigId: string | null;
-  currentPhase: string | null;
-  currentGoal: string | null;
-  currentBlockers: string | null;
-  coachingTone: string | null;
-  confidenceScore: number | null;
-  skillScore: number | null;
-  sprintWeek: number | null;
+  currentPhase:       string | null;
+  currentGoal:        string | null;
+  currentBlockers:    string | null;
+  coachingTone:       string | null;
+  confidenceScore:    number | null;
+  skillScore:         number | null;
+  sprintWeek:         number | null;
   onboardingComplete: boolean;
 }
 
+interface TrailConfigOption {
+  id:      string;
+  name:    string;
+  trailId: string;
+}
+
 interface Interaction {
-  id: string;
-  userMessage: string;
+  id:            string;
+  userMessage:   string;
   pennyResponse: string;
-  promptMode: string;
-  source: string;
-  createdDate: string;
+  promptMode:    string;
+  source:        string;
+  createdDate:   string;
 }
 
 interface QuestSubmission {
-  id: string;
-  name: string;
+  id:             string;
+  name:           string;
   submissionText: string;
-  submittedAt: string;
+  submittedAt:    string;
 }
 
 interface CareerReview {
-  id: string;
-  targetRole: string;
+  id:            string;
+  targetRole:    string;
   readinessLabel: string;
-  reviewedAt: string;
-  reviewMode: string;
-  feedbackJson: string;
-  areaScores: string;
+  reviewedAt:    string;
+  reviewMode:    string;
+  feedbackJson:  string;
+  areaScores:    string;
 }
 
 type TabId = 'profile' | 'conversations' | 'quests' | 'career';
 
+// ── Constants ──────────────────────────────────────────────────────────────────
+
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: 'profile',       label: 'Profile',            icon: User },
-  { id: 'conversations', label: 'Conversations',       icon: MessageSquare },
-  { id: 'quests',        label: 'Quest Submissions',   icon: ClipboardList },
-  { id: 'career',        label: 'Career Reviews',      icon: Briefcase },
+  { id: 'profile',       label: 'Profile',          icon: User },
+  { id: 'conversations', label: 'Conversations',     icon: MessageSquare },
+  { id: 'quests',        label: 'Quest Submissions', icon: ClipboardList },
+  { id: 'career',        label: 'Career Reviews',    icon: Briefcase },
 ];
+
+const TRAIL_OPTIONS: { value: string; label: string }[] = [
+  { value: 'Guided Trail',      label: 'Guided Trail' },
+  { value: 'Foundations Trail', label: 'Foundations Trail' },
+  { value: 'Trail of Mastery',  label: 'Trail of Mastery' },
+  { value: 'explorer-journey',  label: "Explorer's Trail" },
+];
+
+const TONE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'Warm',          label: 'Warm' },
+  { value: 'Professional',  label: 'Professional' },
+  { value: 'Challenging.',  label: 'Challenging' },
+];
+
+function trailValueToId(trail: string): string {
+  return trail.toLowerCase().replace(/\s+/g, '-').replace(/'/g, '');
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function relativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
-  const days = Math.floor(diffMs / 86_400_000);
+  const days   = Math.floor(diffMs / 86_400_000);
   if (days === 0) return 'Today';
   if (days === 1) return 'Yesterday';
   if (days < 30)  return `${days}d ago`;
@@ -113,39 +142,54 @@ function ErrorBox({ message }: { message: string }) {
   );
 }
 
-// ── Tab panels ─────────────────────────────────────────────────────────────────
+// ── Profile panel ──────────────────────────────────────────────────────────────
 
-function ProfilePanel({ contactId }: { contactId: string }) {
-  const [profile, setProfile] = useState<LearnerProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch(`/api/penny/data/learner/${contactId}`)
-      .then(r => {
-        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        return r.json() as Promise<LearnerProfile>;
-      })
-      .then(data => { setProfile(data); setLoading(false); })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Failed to load profile');
-        setLoading(false);
-      });
-  }, [contactId]);
-
+function ProfilePanel({
+  profile,
+  loading,
+  error,
+  onEdit,
+}: {
+  profile: LearnerProfile | null;
+  loading: boolean;
+  error:   string | null;
+  onEdit:  () => void;
+}) {
   if (loading) return <SkeletonBlock lines={8} />;
   if (error)   return <ErrorBox message={error} />;
   if (!profile) return <p className="text-[12px] text-muted-foreground">Learner not found.</p>;
 
+  const trailDisplay =
+    TRAIL_OPTIONS.find(t => t.value === profile.pennyTrail)?.label ?? profile.pennyTrail;
+
   return (
     <div className="space-y-6">
+      {/* Name + edit button row */}
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[15px] font-bold text-foreground">
+            {profile.firstName} {profile.lastName}
+          </p>
+          <p className="text-[11px] text-muted-foreground">{profile.email}</p>
+        </div>
+        <button
+          onClick={onEdit}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
+        >
+          <Pencil className="w-3 h-3" />
+          Edit Learner
+        </button>
+      </div>
+
+      {/* Fields */}
       <div className="rounded-lg border border-border bg-card p-4 space-y-0">
-        <FieldRow label="Email"          value={profile.email} />
-        <FieldRow label="Trail"          value={profile.pennyTrail} />
-        <FieldRow label="Current Phase"  value={profile.currentPhase} />
-        <FieldRow label="Current Goal"   value={profile.currentGoal} />
-        <FieldRow label="Coaching Tone"  value={profile.coachingTone} />
-        <FieldRow label="Sprint Week"    value={profile.sprintWeek !== null ? `Week ${profile.sprintWeek}` : null} />
+        <FieldRow label="Trail"         value={trailDisplay} />
+        <FieldRow label="Current Phase" value={profile.currentPhase} />
+        <FieldRow label="Current Goal"  value={profile.currentGoal} />
+        <FieldRow label="Coaching Tone" value={
+          profile.coachingTone === 'Challenging.' ? 'Challenging' : profile.coachingTone
+        } />
+        <FieldRow label="Sprint Week"   value={profile.sprintWeek !== null ? `Week ${profile.sprintWeek}` : null} />
         <div className="grid grid-cols-[140px_1fr] gap-2 py-2 border-b border-border/50">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Onboarding</span>
           <span className="flex items-center gap-1.5">
@@ -157,6 +201,7 @@ function ProfilePanel({ contactId }: { contactId: string }) {
         </div>
       </div>
 
+      {/* Scores */}
       <div className="rounded-lg border border-border bg-card p-4 space-y-4">
         <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50">Scores</p>
         <div>
@@ -169,6 +214,7 @@ function ProfilePanel({ contactId }: { contactId: string }) {
         </div>
       </div>
 
+      {/* Blockers */}
       {profile.currentBlockers && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600/70 mb-1.5">Current Blockers</p>
@@ -179,6 +225,8 @@ function ProfilePanel({ contactId }: { contactId: string }) {
   );
 }
 
+// ── Conversations panel ────────────────────────────────────────────────────────
+
 function ConversationsPanel({ contactId }: { contactId: string }) {
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [loading, setLoading]           = useState(true);
@@ -186,22 +234,14 @@ function ConversationsPanel({ contactId }: { contactId: string }) {
 
   useEffect(() => {
     fetch(`/api/penny/data/learner/${contactId}/interactions?limit=50`)
-      .then(r => {
-        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        return r.json() as Promise<Interaction[]>;
-      })
+      .then(r => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json() as Promise<Interaction[]>; })
       .then(data => { setInteractions(data); setLoading(false); })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Failed to load conversations');
-        setLoading(false);
-      });
+      .catch((err: unknown) => { setError(err instanceof Error ? err.message : 'Failed to load conversations'); setLoading(false); });
   }, [contactId]);
 
   if (loading) return <SkeletonBlock lines={6} />;
   if (error)   return <ErrorBox message={error} />;
-  if (interactions.length === 0) {
-    return <p className="text-[12px] text-muted-foreground text-center py-8">No conversations yet.</p>;
-  }
+  if (interactions.length === 0) return <p className="text-[12px] text-muted-foreground text-center py-8">No conversations yet.</p>;
 
   return (
     <div className="space-y-6">
@@ -209,9 +249,7 @@ function ConversationsPanel({ contactId }: { contactId: string }) {
         <div key={ix.id} className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-muted-foreground/60">{relativeTime(ix.createdDate)}</span>
-            <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full border bg-muted text-muted-foreground border-border">
-              {ix.promptMode}
-            </span>
+            <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full border bg-muted text-muted-foreground border-border">{ix.promptMode}</span>
           </div>
           <div className="flex justify-end">
             <div className="max-w-[75%] bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm px-3 py-2">
@@ -232,30 +270,24 @@ function ConversationsPanel({ contactId }: { contactId: string }) {
   );
 }
 
+// ── Quests panel ───────────────────────────────────────────────────────────────
+
 function QuestsPanel({ contactId }: { contactId: string }) {
-  const [quests, setQuests]   = useState<QuestSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
+  const [quests, setQuests]     = useState<QuestSubmission[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch(`/api/penny/data/learner/${contactId}/quests`)
-      .then(r => {
-        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        return r.json() as Promise<QuestSubmission[]>;
-      })
+      .then(r => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json() as Promise<QuestSubmission[]>; })
       .then(data => { setQuests(data); setLoading(false); })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Failed to load quest submissions');
-        setLoading(false);
-      });
+      .catch((err: unknown) => { setError(err instanceof Error ? err.message : 'Failed to load quest submissions'); setLoading(false); });
   }, [contactId]);
 
   if (loading) return <SkeletonBlock lines={4} />;
   if (error)   return <ErrorBox message={error} />;
-  if (quests.length === 0) {
-    return <p className="text-[12px] text-muted-foreground text-center py-8">No quest submissions yet.</p>;
-  }
+  if (quests.length === 0) return <p className="text-[12px] text-muted-foreground text-center py-8">No quest submissions yet.</p>;
 
   return (
     <div className="space-y-3">
@@ -273,11 +305,7 @@ function QuestsPanel({ contactId }: { contactId: string }) {
             </p>
             {q.submissionText.length > 200 && (
               <button
-                onClick={() => setExpanded(prev => {
-                  const next = new Set(prev);
-                  isExpanded ? next.delete(q.id) : next.add(q.id);
-                  return next;
-                })}
+                onClick={() => setExpanded(prev => { const next = new Set(prev); isExpanded ? next.delete(q.id) : next.add(q.id); return next; })}
                 className="text-[11px] text-primary hover:underline mt-1.5"
               >
                 {isExpanded ? 'Show less' : 'Show more'}
@@ -290,6 +318,8 @@ function QuestsPanel({ contactId }: { contactId: string }) {
   );
 }
 
+// ── Career panel ───────────────────────────────────────────────────────────────
+
 function CareerPanel({ contactId }: { contactId: string }) {
   const [reviews, setReviews] = useState<CareerReview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -297,29 +327,20 @@ function CareerPanel({ contactId }: { contactId: string }) {
 
   useEffect(() => {
     fetch(`/api/penny/data/learner/${contactId}/career-reviews`)
-      .then(r => {
-        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-        return r.json() as Promise<CareerReview[]>;
-      })
+      .then(r => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json() as Promise<CareerReview[]>; })
       .then(data => { setReviews(data); setLoading(false); })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Failed to load career reviews');
-        setLoading(false);
-      });
+      .catch((err: unknown) => { setError(err instanceof Error ? err.message : 'Failed to load career reviews'); setLoading(false); });
   }, [contactId]);
 
   if (loading) return <SkeletonBlock lines={5} />;
   if (error)   return <ErrorBox message={error} />;
-  if (reviews.length === 0) {
-    return <p className="text-[12px] text-muted-foreground text-center py-8">No career reviews yet.</p>;
-  }
+  if (reviews.length === 0) return <p className="text-[12px] text-muted-foreground text-center py-8">No career reviews yet.</p>;
 
   return (
     <div className="space-y-4">
       {reviews.map(r => {
         let feedbackParsed: Record<string, unknown> | null = null;
         try { feedbackParsed = JSON.parse(r.feedbackJson) as Record<string, unknown>; } catch { /* ok */ }
-
         return (
           <div key={r.id} className="rounded-lg border border-border bg-card p-4 space-y-3">
             <div className="flex items-start justify-between gap-2">
@@ -327,9 +348,7 @@ function CareerPanel({ contactId }: { contactId: string }) {
                 <p className="text-[13px] font-semibold text-foreground">{r.targetRole || '—'}</p>
                 <p className="text-[11px] text-muted-foreground">{formatDate(r.reviewedAt)} · {r.reviewMode}</p>
               </div>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-semibold bg-violet-50 border-violet-200 text-violet-700 shrink-0">
-                {r.readinessLabel}
-              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-semibold bg-violet-50 border-violet-200 text-violet-700 shrink-0">{r.readinessLabel}</span>
             </div>
             {feedbackParsed !== null ? (
               <div className="space-y-1.5">
@@ -350,17 +369,447 @@ function CareerPanel({ contactId }: { contactId: string }) {
   );
 }
 
+// ── Edit Drawer ────────────────────────────────────────────────────────────────
+
+interface EditTrailForm {
+  pennyTrail:         string;
+  pennyTrailConfigId: string;
+}
+
+interface EditCoachingForm {
+  Penny_Coaching_Tone__c:       string;
+  Penny_Current_Phase__c:       string;
+  Penny_Current_Goal__c:        string;
+  Penny_Current_Blockers__c:    string;
+  Penny_Confidence_Score__c:    string;
+  Penny_Skill_Score__c:         string;
+  Penny_Sprint_Week__c:         string;
+  Penny_Onboarding_Complete__c: boolean;
+}
+
+function EditDrawer({
+  open,
+  onClose,
+  profile,
+  trailConfigs,
+  contactId,
+  onSaved,
+}: {
+  open:         boolean;
+  onClose:      () => void;
+  profile:      LearnerProfile;
+  trailConfigs: TrailConfigOption[];
+  contactId:    string;
+  onSaved:      () => void;
+}) {
+  const [trailForm, setTrailForm]       = useState<EditTrailForm>({ pennyTrail: '', pennyTrailConfigId: '' });
+  const [trailSaving, setTrailSaving]   = useState(false);
+  const [trailError, setTrailError]     = useState<string | null>(null);
+  const [trailSuccess, setTrailSuccess] = useState(false);
+
+  const [coachingForm, setCoachingForm]       = useState<EditCoachingForm>({
+    Penny_Coaching_Tone__c:       '',
+    Penny_Current_Phase__c:       '',
+    Penny_Current_Goal__c:        '',
+    Penny_Current_Blockers__c:    '',
+    Penny_Confidence_Score__c:    '',
+    Penny_Skill_Score__c:         '',
+    Penny_Sprint_Week__c:         '',
+    Penny_Onboarding_Complete__c: false,
+  });
+  const [coachingSaving, setCoachingSaving]   = useState(false);
+  const [coachingError, setCoachingError]     = useState<string | null>(null);
+  const [coachingSuccess, setCoachingSuccess] = useState(false);
+
+  useEffect(() => {
+    if (open && profile) {
+      setTrailForm({
+        pennyTrail:         profile.pennyTrail         ?? '',
+        pennyTrailConfigId: profile.pennyTrailConfigId ?? '',
+      });
+      setCoachingForm({
+        Penny_Coaching_Tone__c:       profile.coachingTone       ?? '',
+        Penny_Current_Phase__c:       profile.currentPhase       ?? '',
+        Penny_Current_Goal__c:        profile.currentGoal        ?? '',
+        Penny_Current_Blockers__c:    profile.currentBlockers    ?? '',
+        Penny_Confidence_Score__c:    profile.confidenceScore    !== null ? String(profile.confidenceScore) : '',
+        Penny_Skill_Score__c:         profile.skillScore         !== null ? String(profile.skillScore)      : '',
+        Penny_Sprint_Week__c:         profile.sprintWeek         !== null ? String(profile.sprintWeek)      : '',
+        Penny_Onboarding_Complete__c: profile.onboardingComplete ?? false,
+      });
+      setTrailError(null);
+      setCoachingError(null);
+      setTrailSuccess(false);
+      setCoachingSuccess(false);
+    }
+  }, [open, profile]);
+
+  function handleTrailChange(val: string) {
+    const matchedConfig = trailConfigs.find(c => c.trailId === trailValueToId(val));
+    setTrailForm(prev => ({
+      pennyTrail:         val,
+      pennyTrailConfigId: matchedConfig ? matchedConfig.id : prev.pennyTrailConfigId,
+    }));
+  }
+
+  async function handleSaveTrail() {
+    setTrailSaving(true);
+    setTrailError(null);
+    try {
+      const resp = await fetch(`/api/penny/data/learner/${contactId}/trail`, {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(trailForm),
+      });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` })) as { error?: string };
+        throw new Error(data.error ?? `HTTP ${resp.status}`);
+      }
+      setTrailSuccess(true);
+      onSaved();
+      setTimeout(() => setTrailSuccess(false), 3000);
+    } catch (err: unknown) {
+      setTrailError(err instanceof Error ? err.message : 'Save failed');
+    } finally {
+      setTrailSaving(false);
+    }
+  }
+
+  async function handleSaveCoaching() {
+    setCoachingSaving(true);
+    setCoachingError(null);
+    try {
+      const payload: Record<string, unknown> = {};
+      if (coachingForm.Penny_Coaching_Tone__c)    payload.Penny_Coaching_Tone__c    = coachingForm.Penny_Coaching_Tone__c;
+      if (coachingForm.Penny_Current_Phase__c)     payload.Penny_Current_Phase__c    = coachingForm.Penny_Current_Phase__c;
+      if (coachingForm.Penny_Current_Goal__c)      payload.Penny_Current_Goal__c     = coachingForm.Penny_Current_Goal__c;
+      if (coachingForm.Penny_Current_Blockers__c)  payload.Penny_Current_Blockers__c = coachingForm.Penny_Current_Blockers__c;
+      if (coachingForm.Penny_Confidence_Score__c !== '') payload.Penny_Confidence_Score__c = Number(coachingForm.Penny_Confidence_Score__c);
+      if (coachingForm.Penny_Skill_Score__c     !== '') payload.Penny_Skill_Score__c      = Number(coachingForm.Penny_Skill_Score__c);
+      if (coachingForm.Penny_Sprint_Week__c     !== '') payload.Penny_Sprint_Week__c      = Number(coachingForm.Penny_Sprint_Week__c);
+      payload.Penny_Onboarding_Complete__c = coachingForm.Penny_Onboarding_Complete__c;
+
+      const resp = await fetch(`/api/penny/data/learner/${contactId}/coaching`, {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` })) as { error?: string };
+        throw new Error(data.error ?? `HTTP ${resp.status}`);
+      }
+      setCoachingSuccess(true);
+      onSaved();
+      setTimeout(() => setCoachingSuccess(false), 3000);
+    } catch (err: unknown) {
+      setCoachingError(err instanceof Error ? err.message : 'Save failed');
+    } finally {
+      setCoachingSaving(false);
+    }
+  }
+
+  const inputCls    = 'w-full h-7 rounded-md border border-input bg-white px-2 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring';
+  const textareaCls = 'w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y';
+  const labelCls    = 'block text-[10px] font-bold text-foreground mb-1';
+  const noteCls     = 'text-[10px] text-muted-foreground leading-snug mb-3';
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Scrim */}
+          <motion.div
+            key="learner-edit-scrim"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-black/10"
+            onClick={onClose}
+          />
+
+          {/* Panel */}
+          <motion.div
+            key="learner-edit-panel"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed inset-y-0 right-0 z-50 flex flex-col w-full max-w-[440px] bg-card border-l border-border shadow-2xl"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border flex-shrink-0 bg-card">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+                  <Pencil className="w-3.5 h-3.5 text-violet-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold text-foreground leading-tight truncate">
+                    Edit Learner — {profile.firstName} {profile.lastName}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate">{profile.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-1 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                aria-label="Close edit drawer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+
+              {/* ── Section 1: Trail Assignment ─────────────────────────── */}
+              <div className="rounded-lg border border-border bg-background p-4 space-y-4">
+                <div>
+                  <p className="text-[11px] font-bold text-foreground uppercase tracking-widest mb-0.5">Trail Assignment</p>
+                  <p className={noteCls}>Changing the trail updates which Penny persona this learner receives.</p>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Trail</label>
+                  <select
+                    value={trailForm.pennyTrail}
+                    onChange={e => handleTrailChange(e.target.value)}
+                    className={inputCls}
+                  >
+                    <option value="">Select trail…</option>
+                    {TRAIL_OPTIONS.map(t => (
+                      <option key={t.value} value={t.value}>{t.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Trail Config</label>
+                  <select
+                    value={trailForm.pennyTrailConfigId}
+                    onChange={e => setTrailForm(prev => ({ ...prev, pennyTrailConfigId: e.target.value }))}
+                    className={inputCls}
+                  >
+                    <option value="">Select config…</option>
+                    {trailConfigs.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] text-muted-foreground mt-1 leading-snug">
+                    Config auto-matches when you select a trail, or choose manually.
+                  </p>
+                </div>
+
+                {trailError && (
+                  <p className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded px-2.5 py-1.5">{trailError}</p>
+                )}
+
+                <div className="flex items-center gap-2 pt-1">
+                  {trailSuccess && (
+                    <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Saved
+                    </span>
+                  )}
+                  <button
+                    onClick={() => void handleSaveTrail()}
+                    disabled={trailSaving || !trailForm.pennyTrail || !trailForm.pennyTrailConfigId}
+                    className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {trailSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                    Save Trail
+                  </button>
+                </div>
+              </div>
+
+              {/* ── Section 2: Coaching Context ─────────────────────────── */}
+              <div className="rounded-lg border border-border bg-background p-4 space-y-4">
+                <div>
+                  <p className="text-[11px] font-bold text-foreground uppercase tracking-widest mb-0.5">Coaching Context</p>
+                  <p className={noteCls}>These fields feed directly into Penny's system prompt for this learner.</p>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Coaching Tone</label>
+                  <select
+                    value={coachingForm.Penny_Coaching_Tone__c}
+                    onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Coaching_Tone__c: e.target.value }))}
+                    className={inputCls}
+                  >
+                    <option value="">Select tone…</option>
+                    {TONE_OPTIONS.map(t => (
+                      <option key={t.value} value={t.value}>{t.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Current Phase</label>
+                  <input
+                    type="text"
+                    maxLength={255}
+                    value={coachingForm.Penny_Current_Phase__c}
+                    onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Current_Phase__c: e.target.value }))}
+                    placeholder="e.g. Phase 2 — Job Search"
+                    className={inputCls}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelCls}>Current Goal</label>
+                  <input
+                    type="text"
+                    maxLength={255}
+                    value={coachingForm.Penny_Current_Goal__c}
+                    onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Current_Goal__c: e.target.value }))}
+                    placeholder="e.g. Land first Salesforce Admin role"
+                    className={inputCls}
+                  />
+                </div>
+
+                <div>
+                  <label className={labelCls}>Current Blockers</label>
+                  <textarea
+                    value={coachingForm.Penny_Current_Blockers__c}
+                    onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Current_Blockers__c: e.target.value }))}
+                    placeholder="What's getting in the way?"
+                    className={`${textareaCls} min-h-[80px]`}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelCls}>Confidence Score</label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={10}
+                      step={0.5}
+                      value={coachingForm.Penny_Confidence_Score__c}
+                      onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Confidence_Score__c: e.target.value }))}
+                      placeholder="0–10"
+                      className={inputCls}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Skill Score</label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={10}
+                      step={0.5}
+                      value={coachingForm.Penny_Skill_Score__c}
+                      onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Skill_Score__c: e.target.value }))}
+                      placeholder="0–10"
+                      className={inputCls}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Sprint Week</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={52}
+                    step={1}
+                    value={coachingForm.Penny_Sprint_Week__c}
+                    onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Sprint_Week__c: e.target.value }))}
+                    placeholder="1–52"
+                    className={inputCls}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <input
+                    id="onboarding-complete"
+                    type="checkbox"
+                    checked={coachingForm.Penny_Onboarding_Complete__c}
+                    onChange={e => setCoachingForm(prev => ({ ...prev, Penny_Onboarding_Complete__c: e.target.checked }))}
+                    className="w-3.5 h-3.5 rounded border-border accent-primary"
+                  />
+                  <label htmlFor="onboarding-complete" className="text-[11px] font-medium text-foreground cursor-pointer">
+                    Onboarding Complete
+                  </label>
+                </div>
+
+                {coachingError && (
+                  <p className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded px-2.5 py-1.5">{coachingError}</p>
+                )}
+
+                <div className="flex items-center gap-2 pt-1">
+                  {coachingSuccess && (
+                    <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Saved
+                    </span>
+                  )}
+                  <button
+                    onClick={() => void handleSaveCoaching()}
+                    disabled={coachingSaving}
+                    className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {coachingSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                    Save Coaching Context
+                  </button>
+                </div>
+              </div>
+
+              {/* Live notice */}
+              <div className="rounded border border-emerald-200 bg-emerald-50/60 px-3 py-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 inline-block" />
+                <p className="text-[10px] text-emerald-800 leading-snug">
+                  <strong>Live · Salesforce.</strong> Changes write directly to the Contact record in production.
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function LearnerDetail({ params }: { params?: { contactId?: string } }) {
   const contactId = params?.contactId ?? '';
-  const [, navigate]      = useLocation();
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const loadedTabs = useRef<Set<TabId>>(new Set(['profile']));
+
+  const [profile, setProfile]           = useState<LearnerProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  const [trailConfigs, setTrailConfigs] = useState<TrailConfigOption[]>([]);
+
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+
+  const fetchProfile = useCallback(() => {
+    setProfileLoading(true);
+    setProfileError(null);
+    fetch(`/api/penny/data/learner/${contactId}`)
+      .then(r => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json() as Promise<LearnerProfile>; })
+      .then(data => { setProfile(data); setProfileLoading(false); })
+      .catch((err: unknown) => { setProfileError(err instanceof Error ? err.message : 'Failed to load profile'); setProfileLoading(false); });
+  }, [contactId]);
+
+  useEffect(() => {
+    if (!contactId) return;
+    fetchProfile();
+    fetch('/api/penny/data/trail-configs')
+      .then(r => r.ok ? r.json() as Promise<TrailConfigOption[]> : Promise.resolve([]))
+      .then(data => setTrailConfigs(data))
+      .catch(() => { /* non-critical */ });
+  }, [contactId, fetchProfile]);
 
   function handleTabClick(id: TabId) {
     loadedTabs.current.add(id);
     setActiveTab(id);
+  }
+
+  function openEdit() {
+    setEditDrawerOpen(true);
   }
 
   if (!contactId) {
@@ -372,69 +821,90 @@ export default function LearnerDetail({ params }: { params?: { contactId?: strin
   }
 
   return (
-    <ScrollArea className="h-full">
-      <div className="max-w-3xl mx-auto">
+    <>
+      <ScrollArea className="h-full">
+        <div className="max-w-3xl mx-auto">
 
-        {/* ── Back + header ────────────────────────────────────────────── */}
-        <div className="flex items-center gap-3 px-6 pt-5 pb-3 border-b border-border sticky top-0 bg-background z-10">
-          <button
-            onClick={() => navigate('/penny/learners')}
-            className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Learners
-          </button>
-          <span className="text-muted-foreground/30">/</span>
-          <span className="text-[12px] text-foreground font-medium truncate">Learner Profile</span>
-          <div className="ml-auto flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-            <span className="text-[10px] text-muted-foreground">Live · Salesforce</span>
-          </div>
-        </div>
-
-        {/* ── Tab bar ──────────────────────────────────────────────────── */}
-        <div className="flex gap-1 px-6 border-b border-border">
-          {TABS.map(tab => (
+          {/* ── Back + header ──────────────────────────────────────────── */}
+          <div className="flex items-center gap-3 px-6 pt-5 pb-3 border-b border-border sticky top-0 bg-background z-10">
             <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
-              className={`flex items-center gap-1.5 py-2.5 px-1 text-[12px] font-medium border-b-2 -mb-px transition-colors ${
-                activeTab === tab.id
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
+              onClick={() => navigate('/penny/learners')}
+              className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
             >
-              <tab.icon className="w-3.5 h-3.5 shrink-0" />
-              {tab.label}
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Learners
             </button>
-          ))}
-        </div>
+            <span className="text-muted-foreground/30">/</span>
+            <span className="text-[12px] text-foreground font-medium truncate">
+              {profile ? `${profile.firstName} ${profile.lastName}` : 'Learner Profile'}
+            </span>
+            <div className="ml-auto flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              <span className="text-[10px] text-muted-foreground">Live · Salesforce</span>
+            </div>
+          </div>
 
-        {/* ── Tab content ──────────────────────────────────────────────── */}
-        <div className="p-6">
-          {loadedTabs.current.has('profile') && (
-            <div className={activeTab !== 'profile' ? 'hidden' : ''}>
-              <ProfilePanel contactId={contactId} />
-            </div>
-          )}
-          {loadedTabs.current.has('conversations') && (
-            <div className={activeTab !== 'conversations' ? 'hidden' : ''}>
-              <ConversationsPanel contactId={contactId} />
-            </div>
-          )}
-          {loadedTabs.current.has('quests') && (
-            <div className={activeTab !== 'quests' ? 'hidden' : ''}>
-              <QuestsPanel contactId={contactId} />
-            </div>
-          )}
-          {loadedTabs.current.has('career') && (
-            <div className={activeTab !== 'career' ? 'hidden' : ''}>
-              <CareerPanel contactId={contactId} />
-            </div>
-          )}
-        </div>
+          {/* ── Tab bar ────────────────────────────────────────────────── */}
+          <div className="flex gap-1 px-6 border-b border-border">
+            {TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabClick(tab.id)}
+                className={`flex items-center gap-1.5 py-2.5 px-1 text-[12px] font-medium border-b-2 -mb-px transition-colors ${
+                  activeTab === tab.id
+                    ? 'border-primary text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <tab.icon className="w-3.5 h-3.5 shrink-0" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-      </div>
-    </ScrollArea>
+          {/* ── Tab content ────────────────────────────────────────────── */}
+          <div className="p-6">
+            {loadedTabs.current.has('profile') && (
+              <div className={activeTab !== 'profile' ? 'hidden' : ''}>
+                <ProfilePanel
+                  profile={profile}
+                  loading={profileLoading}
+                  error={profileError}
+                  onEdit={openEdit}
+                />
+              </div>
+            )}
+            {loadedTabs.current.has('conversations') && (
+              <div className={activeTab !== 'conversations' ? 'hidden' : ''}>
+                <ConversationsPanel contactId={contactId} />
+              </div>
+            )}
+            {loadedTabs.current.has('quests') && (
+              <div className={activeTab !== 'quests' ? 'hidden' : ''}>
+                <QuestsPanel contactId={contactId} />
+              </div>
+            )}
+            {loadedTabs.current.has('career') && (
+              <div className={activeTab !== 'career' ? 'hidden' : ''}>
+                <CareerPanel contactId={contactId} />
+              </div>
+            )}
+          </div>
+
+        </div>
+      </ScrollArea>
+
+      {/* ── Edit Drawer (portaled outside ScrollArea) ─────────────────── */}
+      {profile && (
+        <EditDrawer
+          open={editDrawerOpen}
+          onClose={() => setEditDrawerOpen(false)}
+          profile={profile}
+          trailConfigs={trailConfigs}
+          contactId={contactId}
+          onSaved={fetchProfile}
+        />
+      )}
+    </>
   );
 }
