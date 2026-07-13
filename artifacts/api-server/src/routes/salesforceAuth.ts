@@ -52,60 +52,90 @@ router.get("/login", (req, res): void => {
 
 router.get("/callback", async (req, res): Promise<void> => {
   try {
-  const { code, state, error: sfError, error_description } = req.query as Record<string, string | undefined>;
+    const { code, state, error: sfError, error_description } = req.query as Record<string, string | undefined>;
 
-  if (sfError) {
-    logger.warn({ sfError, error_description }, "Salesforce OAuth error returned to callback");
-    res.status(400).json({ error: sfError, description: error_description });
-    return;
-  }
+    // FIX 3 — reject duplicate / stale callback requests where the session
+    // PKCE state has already been consumed or was never written.
+    if (!req.session.state || !req.session.codeVerifier) {
+      logger.warn("Salesforce callback arrived with no PKCE state in session — duplicate or expired request");
+      res.status(400).json({ error: "Invalid or expired OAuth session. Please try logging in again." });
+      return;
+    }
 
-  if (!state || state !== req.session.state) {
-    logger.warn({ receivedState: state, sessionState: req.session.state }, "Salesforce OAuth state mismatch");
-    res.status(403).json({ error: "State mismatch — possible CSRF attempt. Please restart the login flow." });
-    return;
-  }
+    if (sfError) {
+      logger.warn({ sfError, error_description }, "Salesforce OAuth error returned to callback");
+      res.status(400).json({ error: sfError, description: error_description });
+      return;
+    }
 
-  if (!code || !req.session.codeVerifier) {
-    res.status(400).json({ error: "Missing authorization code or PKCE verifier." });
-    return;
-  }
+    if (!state || state !== req.session.state) {
+      logger.warn({ receivedState: state, sessionState: req.session.state }, "Salesforce OAuth state mismatch");
+      res.status(403).json({ error: "State mismatch — possible CSRF attempt. Please restart the login flow." });
+      return;
+    }
 
-  try {
-    const tokens  = await exchangeCodeForTokens(code, req.session.codeVerifier);
-    const identity = await getUserIdentity(tokens.accessToken, tokens.instanceUrl);
+    if (!code) {
+      res.status(400).json({ error: "Missing authorization code." });
+      return;
+    }
 
-    req.session.sfAccessToken  = tokens.accessToken;
-    req.session.sfRefreshToken = tokens.refreshToken;
-    req.session.sfInstanceUrl  = tokens.instanceUrl;
-    req.session.sfIssuedAt     = tokens.issuedAt;
-    req.session.sfUserId       = identity.userId;
-    req.session.sfUsername     = identity.username;
-    req.session.sfEmail        = identity.email;
-    req.session.sfOrgId        = identity.organizationId;
-
+    // Capture verifier and immediately clear PKCE fields so any duplicate
+    // callback request that arrives while this one is in-flight hits FIX 3.
+    const codeVerifier = req.session.codeVerifier;
     delete req.session.codeVerifier;
     delete req.session.state;
 
-    req.session.save((err) => {
-      if (err) {
-        logger.error({ err }, "Failed to save session after Salesforce callback");
-        res.status(500).json({ error: "Session error after authentication." });
-        return;
+    try {
+      const tokens   = await exchangeCodeForTokens(code, codeVerifier);
+      const identity = await getUserIdentity(tokens.accessToken, tokens.instanceUrl);
+
+      req.session.sfAccessToken  = tokens.accessToken;
+      req.session.sfRefreshToken = tokens.refreshToken;
+      req.session.sfInstanceUrl  = tokens.instanceUrl;
+      req.session.sfIssuedAt     = tokens.issuedAt;
+      req.session.sfUserId       = identity.userId;
+      req.session.sfUsername     = identity.username;
+      req.session.sfEmail        = identity.email;
+      req.session.sfOrgId        = identity.organizationId;
+
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          logger.error({ err: saveErr }, "Failed to save session after Salesforce callback");
+          // FIX 1 — guard before responding; headers may already be sent
+          if (!res.headersSent) {
+            res.status(500).json({ error: "Session error after authentication." });
+          } else {
+            logger.warn("Headers already sent — skipping error response after session save failure");
+          }
+          return;
+        }
+        logger.info({ userId: identity.userId, username: identity.username }, "Salesforce OAuth complete");
+        // FIX 1 — guard before redirect; a duplicate callback may have already responded
+        if (!res.headersSent) {
+          res.redirect("/");
+        } else {
+          logger.warn("Headers already sent — skipping redirect after session save");
+        }
+      });
+    } catch (err) {
+      logger.error({ err }, "Salesforce OAuth callback error");
+      if (!res.headersSent) {
+        res.status(502).json({ error: err instanceof Error ? err.message : "Salesforce authentication failed." });
+      } else {
+        logger.warn("Headers already sent — skipping 502 in OAuth callback catch");
       }
-      logger.info({ userId: identity.userId, username: identity.username }, "Salesforce OAuth complete");
-      res.redirect("/");
-    });
+    }
   } catch (err) {
-    logger.error({ err }, "Salesforce OAuth callback error");
-    res.status(502).json({ error: err instanceof Error ? err.message : "Salesforce authentication failed." });
-  }
-  } catch (err) {
+    // FIX 2 — outer safety net; guard in case inner handlers already responded
     logger.error({ err }, "Salesforce OAuth configuration error in /callback");
-    res.status(500).json({
-      error: "Salesforce OAuth configuration error",
-      details: err instanceof Error ? err.message : String(err),
-    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "Salesforce OAuth configuration error",
+        details: err instanceof Error ? err.message : String(err),
+      });
+    } else {
+      logger.warn("Headers already sent — skipping 500 in outer callback catch");
+    }
   }
 });
 
