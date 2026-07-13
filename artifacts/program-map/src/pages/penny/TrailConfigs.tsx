@@ -56,11 +56,13 @@ function ConfigCard({
   isEditing,
   onEdit,
   onCancel,
+  onSave,
 }: {
   config:    TrailConfig;
   isEditing: boolean;
   onEdit:    () => void;
   onCancel:  () => void;
+  onSave:    (configs: TrailConfig[]) => void;
 }) {
   const [form, setForm]           = useState<EditForm>({
     pennyRole:           config.pennyRole           ?? '',
@@ -114,6 +116,11 @@ function ConfigCard({
         throw new Error(data.error ?? `HTTP ${resp.status}`);
       }
       setSaveSuccess(true);
+      const freshResp = await fetch('/api/penny/data/trail-configs?t=' + Date.now());
+      if (freshResp.ok) {
+        const freshData = await freshResp.json() as TrailConfig[];
+        onSave(freshData);
+      }
       successTimer.current = setTimeout(() => {
         setSaveSuccess(false);
         onCancel();
@@ -403,6 +410,7 @@ export default function TrailConfigs() {
                 isEditing={editingId === config.id}
                 onEdit={() => setEditingId(config.id)}
                 onCancel={() => setEditingId(null)}
+                onSave={(fresh) => { setConfigs(fresh); setEditingId(null); }}
               />
             ))}
           </div>

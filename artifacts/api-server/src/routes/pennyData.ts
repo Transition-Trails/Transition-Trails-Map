@@ -102,6 +102,7 @@ router.get(
   "/trail-configs",
   withClient(async (_req, res, client) => {
     const data = await getActiveTrailConfigs(client);
+    res.set('Cache-Control', 'no-store');
     res.json(data);
   })
 );
@@ -443,6 +444,7 @@ router.get(
       }
     }
 
+    res.set('Cache-Control', 'no-store');
     res.json(
       contacts.map(c => ({
         id:                 c.Id,
