@@ -17,6 +17,8 @@ import authRouter            from "./auth";
 import googleGroupsRouter    from "./googleGroups";
 import driveRouter           from "./drive";
 import notificationsRouter   from "./notifications";
+import learnerAuthRouter      from "./learnerAuth";
+import learnerRouter          from "./learner";
 
 const router: IRouter = Router();
 
@@ -38,5 +40,7 @@ router.use(authRouter);
 router.use(googleGroupsRouter);
 router.use(driveRouter);
 router.use(notificationsRouter);
+router.use(learnerAuthRouter);
+router.use(learnerRouter);
 
 export default router;

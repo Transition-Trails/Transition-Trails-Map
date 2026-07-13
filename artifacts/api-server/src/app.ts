@@ -3,6 +3,7 @@ import cors from "cors";
 import session from "express-session";
 import sessionFileStore from "session-file-store";
 import pinoHttp from "pino-http";
+import passport from "passport";
 import { clerkMiddleware } from "@clerk/express";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
 import {
@@ -64,6 +65,9 @@ app.use(
     },
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 

@@ -13,5 +13,14 @@ declare module "express-session" {
     sfContactId?:    string | null;
     codeVerifier?:   string;
     state?:          string;
+
+    // ── Learner surface ───────────────────────────────────────────────────
+    learnerAuthenticated?: boolean;
+    learnerContactId?:     string;
+    learnerEmail?:         string;
+    learnerName?:          string;
+    learnerTrail?:         string | null;
+    dailyQuest?:           Record<string, unknown>;
+    dailyQuestDate?:       string;
   }
 }

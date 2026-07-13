@@ -1,5 +1,5 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -63,6 +63,11 @@ import UnifiedObjectModel from "@/pages/uom/UnifiedObjectModel";
 import GovernanceHub      from "@/pages/governance/GovernanceHub";
 import GlobalSearch       from "@/pages/search/GlobalSearch";
 import ContextHub         from "@/pages/context/ContextHub";
+import LearnerLogin       from "@/pages/learner/LearnerLogin";
+import LearnerDashboard   from "@/pages/learner/LearnerDashboard";
+import LearnerPenny       from "@/pages/learner/LearnerPenny";
+import LearnerQuest       from "@/pages/learner/LearnerQuest";
+import LearnerProgress    from "@/pages/learner/LearnerProgress";
 
 const queryClient = new QueryClient();
 
@@ -257,6 +262,25 @@ function Router() {
   );
 }
 
+// ── Learner route guard — checks /api/learner/auth/status ──────────────────────
+function LearnerRoute({ children }: { children: React.ReactNode }) {
+  const [status, setStatus] = useState<'loading' | 'ok'>('loading');
+  const [, navigate]        = useLocation();
+
+  useEffect(() => {
+    fetch('/api/learner/auth/status')
+      .then(r => r.ok ? r.json() as Promise<{ authenticated: boolean }> : Promise.reject())
+      .then((data: { authenticated: boolean }) => {
+        if (data.authenticated) setStatus('ok');
+        else navigate('/learner/login');
+      })
+      .catch(() => navigate('/learner/login'));
+  }, []);
+
+  if (status === 'loading') return <div className="min-h-screen" style={{ background: '#FAFAF7' }} />;
+  return <>{children}</>;
+}
+
 // ── Tier initializer — auto-sets tier from Google Groups after sign-in ─────────
 function TierInitializer() {
   const { user, isSignedIn } = useUser();
@@ -325,6 +349,21 @@ function InnerApp() {
             <Switch>
               {/* Auth pages — no AppShell */}
               <Route path="/sign-in/*?" component={SignInPage} />
+
+              {/* Learner surface — no Clerk auth required */}
+              <Route path="/learner/login"    component={LearnerLogin} />
+              <Route path="/learner/dashboard">
+                <LearnerRoute><LearnerDashboard /></LearnerRoute>
+              </Route>
+              <Route path="/learner/penny">
+                <LearnerRoute><LearnerPenny /></LearnerRoute>
+              </Route>
+              <Route path="/learner/quest">
+                <LearnerRoute><LearnerQuest /></LearnerRoute>
+              </Route>
+              <Route path="/learner/progress">
+                <LearnerRoute><LearnerProgress /></LearnerRoute>
+              </Route>
 
               {/* Everything else — auth-gated */}
               <Route>
