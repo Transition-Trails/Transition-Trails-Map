@@ -944,7 +944,7 @@ export default function PennyPromptStudio() {
 
   function handleNewTemplate() {
     openActionPanel({
-      title: 'New Prompt Template', objectType: 'Prompt Template',
+      title: 'Request New Prompt Template', objectType: 'Prompt Template',
       subtitle: 'Configure how Penny thinks, retrieves, and responds in a specific context.',
       slackContext: 'penny',
       fields: [

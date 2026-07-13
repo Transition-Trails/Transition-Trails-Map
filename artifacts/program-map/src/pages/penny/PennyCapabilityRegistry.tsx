@@ -701,7 +701,7 @@ export default function PennyCapabilityRegistry() {
 
   function handleNewCapability() {
     openActionPanel({
-      title: 'New Penny Capability', objectType: 'Penny Capability',
+      title: 'Request New Capability', objectType: 'Penny Capability',
       subtitle: 'Register a new Penny AI capability. Appears with Planned/Draft status until validated.',
       slackContext: 'penny',
       fields: [

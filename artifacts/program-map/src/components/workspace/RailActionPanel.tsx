@@ -91,14 +91,13 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     setValues(prev => ({ ...prev, [id]: val }));
   }
 
-  function handleSaveDraft() {
+  function handleSendRequest() {
     onSaveDraft?.(values);
-    setSaved(true);
-    setTimeout(() => { setSaved(false); onClose(); }, 1600);
-  }
-
-  function handleSaveAndView() {
-    (onSaveAndView ?? onSaveDraft)?.(values);
+    fetch('/api/slack/notify', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ objectType, fields: values }),
+    }).catch(() => {});
     setSaved(true);
     setTimeout(() => { setSaved(false); onClose(); }, 1600);
   }
@@ -114,12 +113,15 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
           <CheckCircle2 className="w-5 h-5 text-emerald-600" />
         </div>
-        <p className="text-[13px] font-bold text-foreground text-center">Saved as Draft</p>
+        <p className="text-[13px] font-bold text-foreground text-center">Request Sent to Slack</p>
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-          {objectType} added in prototype mode. Resets on refresh.
+          Your {objectType} request has been sent to the Penny AI Team channel for review. A team member will follow up to implement it.
+        </p>
+        <p className="text-[10px] text-muted-foreground/60 text-center leading-snug mt-1">
+          This request will not appear in the list until manually added by a developer.
         </p>
         <span className="text-[9px] font-bold uppercase tracking-widest text-amber-600 border border-amber-200 bg-amber-50 rounded-full px-2.5 py-1">
-          Draft · Prototype Only
+          Pending Review · Not Yet Live
         </span>
       </div>
     );
@@ -241,10 +243,6 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
             </div>
           </div>
 
-          {/* Slack notify stub (contextual) */}
-          {slackContext && (
-            <SlackNotifyStub context={slackContext} />
-          )}
 
         </div>
       </ScrollArea>
@@ -258,20 +256,13 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
           >
             Cancel
           </button>
-          <div className="ml-auto flex items-center gap-1.5">
-            <button
-              onClick={handleSaveDraft}
-              className="px-2.5 py-1.5 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors"
-            >
-              Save as Draft
-            </button>
-            <button
-              onClick={handleSaveAndView}
-              className="px-3 py-1.5 text-[10px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity"
-            >
-              Save &amp; View
-            </button>
-          </div>
+          <button
+            onClick={handleSendRequest}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity"
+          >
+            <Send className="w-3 h-3" />
+            Send Request to Slack
+          </button>
         </div>
         <p className="text-[9px] text-muted-foreground/40 text-center leading-snug">
           Create from the right panel · workspace stays focused

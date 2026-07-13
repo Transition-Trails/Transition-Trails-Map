@@ -16,6 +16,7 @@ import agentforceRouter      from "./agentforce";
 import authRouter            from "./auth";
 import googleGroupsRouter    from "./googleGroups";
 import driveRouter           from "./drive";
+import notificationsRouter   from "./notifications";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(agentforceRouter);
 router.use(authRouter);
 router.use(googleGroupsRouter);
 router.use(driveRouter);
+router.use(notificationsRouter);
 
 export default router;
