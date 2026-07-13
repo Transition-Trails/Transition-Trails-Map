@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import {
   promptTemplates, promptVariables, outputFormats, versionHistory, qualityReviews,
@@ -568,13 +568,44 @@ function interpolatePrompt(body: string, inputs: Record<string, string>): string
   return body.replace(/\{\{(\w+)\}\}/g, (_, key: string) => inputs[key] ?? '');
 }
 
+interface LearnerOption {
+  id: string;
+  firstName: string;
+  lastName: string;
+  pennyTrail: string | null;
+}
+
+interface ContextMeta {
+  promptPath: string;
+  currentGoal: string | null;
+  currentPhase: string | null;
+  coachingTone: string | null;
+  trailId: string | null;
+}
+
 function TestBenchView() {
-  const [selectedId, setSelectedId]      = useState(promptTemplates[0].id);
-  const [status, setStatus]              = useState<RunStatus>('idle');
-  const [liveReply, setLiveReply]        = useState('');
+  const [selectedId, setSelectedId]         = useState(promptTemplates[0].id);
+  const [status, setStatus]                 = useState<RunStatus>('idle');
+  const [liveReply, setLiveReply]           = useState('');
   const [liveDurationMs, setLiveDurationMs] = useState<number | null>(null);
-  const [errorMsg, setErrorMsg]          = useState('');
-  const [inputs, setInputs]              = useState<Record<string, string>>({});
+  const [errorMsg, setErrorMsg]             = useState('');
+  const [inputs, setInputs]                 = useState<Record<string, string>>({});
+
+  const [learners, setLearners]                 = useState<LearnerOption[]>([]);
+  const [learnersLoading, setLearnersLoading]   = useState(true);
+  const [selectedLearnerId, setSelectedLearnerId] = useState<string>('');
+  const [contextMeta, setContextMeta]           = useState<ContextMeta | null>(null);
+
+  useEffect(() => {
+    fetch('/api/penny/data/learners/directory')
+      .then(r => r.ok ? r.json() as Promise<LearnerOption[]> : Promise.resolve([]))
+      .then((data: LearnerOption[]) => {
+        setLearners(data);
+        setLearnersLoading(false);
+      })
+      .catch(() => setLearnersLoading(false));
+  }, []);
+
   const t = promptTemplates.find(t => t.id === selectedId) ?? promptTemplates[0];
 
   function loadTemplate(id: string) {
@@ -609,9 +640,10 @@ function TestBenchView() {
           systemOverride: interpolated,
           role: 'admin',
           context: 'Prompt Studio Test Bench',
+          ...(selectedLearnerId ? { contactId: selectedLearnerId } : {}),
         }),
       });
-      const data = await resp.json() as { reply?: string; durationMs?: number; error?: string };
+      const data = await resp.json() as { reply?: string; durationMs?: number; error?: string; contextMeta?: ContextMeta };
       if (!resp.ok || data.error) {
         setErrorMsg(data.error ?? `HTTP ${resp.status}`);
         setStatus('error');
@@ -619,6 +651,7 @@ function TestBenchView() {
       }
       setLiveReply(data.reply ?? '');
       setLiveDurationMs(data.durationMs ?? null);
+      setContextMeta(data.contextMeta ?? null);
       setStatus('success');
     } catch (e: unknown) {
       setErrorMsg(e instanceof Error ? e.message : 'Network error — could not reach API.');
@@ -665,6 +698,50 @@ function TestBenchView() {
           <div className={`rounded-xl border p-3 ${domCls}`}>
             <p className="text-[13px] font-bold">{t.name}</p>
             <p className="text-[10px] text-muted-foreground">{t.shortDescription}</p>
+          </div>
+
+          {/* Learner selector */}
+          <div>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1.5">Test As Learner</p>
+            <p className="text-[10px] text-muted-foreground mb-2">Select a learner to inject their live Salesforce context into this prompt. Leave blank to use the generic fallback prompt.</p>
+            <select
+              value={selectedLearnerId}
+              onChange={e => {
+                setSelectedLearnerId(e.target.value);
+                setContextMeta(null);
+                setLiveReply('');
+                setStatus('idle');
+              }}
+              disabled={isLoading}
+              className="w-full h-7 rounded-md border border-input bg-white px-2 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-60"
+            >
+              <option value="">No learner — use fallback prompt</option>
+              {learnersLoading
+                ? <option disabled>Loading learners…</option>
+                : learners.map(l => (
+                    <option key={l.id} value={l.id}>
+                      {l.firstName} {l.lastName} — {l.pennyTrail ?? 'No trail'}
+                    </option>
+                  ))
+              }
+            </select>
+            {selectedLearnerId && (
+              <div className="mt-1.5">
+                {contextMeta === null ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                    ⚡ Learner context will load on first run
+                  </span>
+                ) : contextMeta.promptPath === 'salesforce' ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+                    ✓ Live Salesforce context active for {learners.find(l => l.id === selectedLearnerId)?.firstName ?? 'learner'}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                    ⚠ Using fallback prompt — check Salesforce connection
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Inputs */}
@@ -759,6 +836,16 @@ function TestBenchView() {
                       <p className="text-[11px] text-green-900 leading-snug">
                         Completed in {liveDurationMs.toLocaleString()} ms
                       </p>
+                      {contextMeta && selectedLearnerId && contextMeta.promptPath === 'salesforce' && (
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          Context: Salesforce ✓ · Trail: {contextMeta.trailId ?? '—'} · Phase: {contextMeta.currentPhase ?? '—'} · Tone: {contextMeta.coachingTone ?? '—'}
+                        </p>
+                      )}
+                      {contextMeta && contextMeta.promptPath === 'fallback' && (
+                        <p className="text-[10px] text-amber-600 mt-1">
+                          Context: Fallback (generic prompt — no learner data)
+                        </p>
+                      )}
                     </div>
                   )}
                 </>
