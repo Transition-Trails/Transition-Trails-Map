@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import session from "express-session";
+import sessionFileStore from "session-file-store";
 import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
@@ -20,6 +21,8 @@ if (!SESSION_SECRET) {
     "and set it in Replit Secrets."
   );
 }
+
+const FileStore = sessionFileStore(session);
 
 const app: Express = express();
 
@@ -48,6 +51,12 @@ app.use(
     secret:            SESSION_SECRET,
     resave:            false,
     saveUninitialized: false,
+    store: new FileStore({
+      path:    '/tmp/sessions',
+      ttl:     7 * 24 * 60 * 60,
+      retries: 1,
+      logFn:   () => {},
+    }),
     cookie: {
       httpOnly: true,
       secure:   process.env["NODE_ENV"] === "production",
