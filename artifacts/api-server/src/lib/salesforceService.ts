@@ -194,12 +194,19 @@ export async function getTrailConfig(
   return mapTrailConfig(requireOne(result.records, `Penny_Trail_Config__c/${trailConfigId}`));
 }
 
+export async function getAllTrailConfigs(
+  client: SalesforceClient
+): Promise<TrailConfig[]> {
+  const soql = `SELECT Id, Name, Trail_ID__c, Penny_Role__c, Tone__c, Focal_Points__c, Special_Instructions__c, Is_Active__c FROM Penny_Trail_Config__c ORDER BY Is_Active__c DESC, Trail_ID__c ASC`;
+  const result = await client.query<RawTrailConfig>(soql);
+  return result.records.map(mapTrailConfig);
+}
+
 export async function getActiveTrailConfigs(
   client: SalesforceClient
 ): Promise<TrailConfig[]> {
-  const soql = `SELECT Id, Name, Trail_ID__c, Penny_Role__c, Tone__c, Focal_Points__c, Special_Instructions__c, Is_Active__c FROM Penny_Trail_Config__c WHERE Is_Active__c = true ORDER BY Trail_ID__c ASC`;
-  const result = await client.query<RawTrailConfig>(soql);
-  return result.records.map(mapTrailConfig);
+  const all = await getAllTrailConfigs(client);
+  return all.filter(c => c.isActive);
 }
 
 // ── Interaction logs ──────────────────────────────────────────────────────────

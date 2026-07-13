@@ -132,13 +132,39 @@ function ConfigCard({
     }
   }
 
+  const [reactivating, setReactivating] = useState(false);
+
+  async function handleReactivate() {
+    setReactivating(true);
+    try {
+      const resp = await fetch(`/api/penny/data/trail-config/${config.id}`, {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ isActive: true }),
+      });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` })) as { error?: string };
+        throw new Error(data.error ?? `HTTP ${resp.status}`);
+      }
+      const freshResp = await fetch('/api/penny/data/trail-configs?t=' + Date.now());
+      if (freshResp.ok) {
+        const freshData = await freshResp.json() as TrailConfig[];
+        onSave(freshData);
+      }
+    } catch {
+      // silent — card will retain its state if refetch fails
+    } finally {
+      setReactivating(false);
+    }
+  }
+
   const inputCls    = 'w-full h-7 rounded-md border border-input bg-white px-2 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring';
   const textareaCls = 'w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y';
   const labelCls    = 'block text-[10px] font-bold text-foreground mb-1';
   const noteCls     = 'text-[10px] text-muted-foreground leading-snug mb-2';
 
   return (
-    <div className={`rounded-lg border bg-card transition-shadow ${isEditing ? 'border-primary/40 shadow-md' : 'border-border'}`}>
+    <div className={`rounded-lg border bg-card transition-shadow ${isEditing ? 'border-primary/40 shadow-md' : config.isActive ? 'border-border' : 'border-border/40'} ${!config.isActive && !isEditing ? 'opacity-60' : ''}`}>
 
       {/* Card header — always visible */}
       <div className="p-4">
@@ -153,18 +179,47 @@ function ConfigCard({
               {config.trailId}
             </code>
           </div>
-          <button
-            onClick={isEditing ? onCancel : onEdit}
-            className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
-          >
-            {isEditing ? (
-              <><ChevronUp className="w-3 h-3" /> Cancel</>
-            ) : (
-              <><ChevronDown className="w-3 h-3" /> Edit</>
-            )}
-          </button>
+          {isEditing ? (
+            <button
+              onClick={onCancel}
+              className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
+            >
+              <ChevronUp className="w-3 h-3" /> Cancel
+            </button>
+          ) : !config.isActive ? (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                onClick={() => void handleReactivate()}
+                disabled={reactivating}
+                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 border border-emerald-300 bg-emerald-50 rounded-full hover:bg-emerald-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {reactivating && <Loader2 className="w-3 h-3 animate-spin" />}
+                Reactivate
+              </button>
+              <button
+                onClick={onEdit}
+                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors"
+              >
+                <ChevronDown className="w-3 h-3" /> Edit
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onEdit}
+              className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
+            >
+              <ChevronDown className="w-3 h-3" /> Edit
+            </button>
+          )}
         </div>
 
+        {!config.isActive && (
+          <div className="mt-2 flex items-start gap-1.5 rounded border border-amber-200 bg-amber-50 px-2 py-1">
+            <span className="text-[10px] text-amber-600 leading-snug">
+              ⚠ This trail is inactive. Learners on this trail will receive the fallback Penny persona.
+            </span>
+          </div>
+        )}
         {!isEditing && (
           <div className="mt-2 space-y-1.5">
             <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">Penny Persona</p>
@@ -187,6 +242,24 @@ function ConfigCard({
       {/* Expanded edit form */}
       {isEditing && (
         <div className="border-t border-border/60 p-4 space-y-4">
+
+          <div className="flex items-start gap-2.5 rounded border border-border/60 bg-muted/20 px-3 py-2.5">
+            <input
+              id={`active-top-${config.id}`}
+              type="checkbox"
+              checked={form.isActive}
+              onChange={e => setForm(prev => ({ ...prev, isActive: e.target.checked }))}
+              className="w-3.5 h-3.5 rounded border-border accent-primary mt-0.5 shrink-0"
+            />
+            <div>
+              <label htmlFor={`active-top-${config.id}`} className="text-[11px] font-medium text-foreground cursor-pointer">
+                Trail is active
+              </label>
+              <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">
+                Saving with this toggle OFF keeps the trail inactive.
+              </p>
+            </div>
+          </div>
 
           <div>
             <label className={labelCls}>Penny Role</label>
@@ -234,19 +307,6 @@ function ConfigCard({
               placeholder="e.g. Never discuss salary negotiations. Always redirect to coach for…"
               className={`${textareaCls} min-h-[80px]`}
             />
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            <input
-              id={`active-${config.id}`}
-              type="checkbox"
-              checked={form.isActive}
-              onChange={e => setForm(prev => ({ ...prev, isActive: e.target.checked }))}
-              className="w-3.5 h-3.5 rounded border-border accent-primary"
-            />
-            <label htmlFor={`active-${config.id}`} className="text-[11px] font-medium text-foreground cursor-pointer">
-              Trail is active
-            </label>
           </div>
 
           {saveError && (
@@ -306,7 +366,8 @@ export default function TrailConfigs() {
       });
   }, []);
 
-  const activeCount = configs.filter(c => c.isActive).length;
+  const activeCount   = configs.filter(c =>  c.isActive).length;
+  const inactiveCount = configs.filter(c => !c.isActive).length;
 
   return (
     <ScrollArea className="h-full">
@@ -330,11 +391,20 @@ export default function TrailConfigs() {
             </p>
           </div>
           {!loading && !error && (
-            <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-              <span className="text-[10px] font-semibold text-emerald-800">
-                {activeCount} trail{activeCount !== 1 ? 's' : ''} active
+            <div className="shrink-0 flex items-center gap-2 px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50">
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                <span className="text-[10px] font-semibold text-emerald-800">{activeCount} active</span>
               </span>
+              {inactiveCount > 0 && (
+                <>
+                  <span className="text-[10px] text-emerald-600/50">·</span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 inline-block" />
+                    <span className="text-[10px] font-semibold text-muted-foreground">{inactiveCount} inactive</span>
+                  </span>
+                </>
+              )}
             </div>
           )}
         </div>

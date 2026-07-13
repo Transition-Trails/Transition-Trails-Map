@@ -5,6 +5,7 @@ import {
   getLearnerContext,
   getTrailConfig,
   getActiveTrailConfigs,
+  getAllTrailConfigs,
   getInteractionHistory,
   logInteraction,
   getCareerReviews,
@@ -101,7 +102,7 @@ router.get(
 router.get(
   "/trail-configs",
   withClient(async (_req, res, client) => {
-    const data = await getActiveTrailConfigs(client);
+    const data = await getAllTrailConfigs(client);
     res.set('Cache-Control', 'no-store');
     res.json(data);
   })
