@@ -89,6 +89,25 @@ router.get("/callback", async (req, res): Promise<void> => {
       const tokens   = await exchangeCodeForTokens(code, codeVerifier);
       const identity = await getUserIdentity(tokens.accessToken, tokens.instanceUrl);
 
+      // Resolve Contact ID (003xxx) — sfUserId is a User record (005xxx),
+      // not usable for Contact-scoped Penny queries.
+      let sfContactId: string | null = null;
+      try {
+        const soql = `SELECT Id FROM Contact WHERE Email = '${identity.email}' LIMIT 1`;
+        const contactResp = await fetch(
+          `${tokens.instanceUrl}/services/data/v62.0/query?q=${encodeURIComponent(soql)}`,
+          { headers: { Authorization: `Bearer ${tokens.accessToken}` } }
+        );
+        if (contactResp.ok) {
+          const contactData = await contactResp.json() as { records?: Array<{ Id: string }> };
+          sfContactId = contactData.records?.[0]?.Id ?? null;
+        } else {
+          logger.warn({ status: contactResp.status }, 'Contact lookup returned non-OK — sfContactId will be null');
+        }
+      } catch (contactErr) {
+        logger.warn({ contactErr }, 'Failed to resolve Contact ID during OAuth — Penny will use fallback');
+      }
+
       req.session.sfAccessToken  = tokens.accessToken;
       req.session.sfRefreshToken = tokens.refreshToken;
       req.session.sfInstanceUrl  = tokens.instanceUrl;
@@ -97,6 +116,7 @@ router.get("/callback", async (req, res): Promise<void> => {
       req.session.sfUsername     = identity.username;
       req.session.sfEmail        = identity.email;
       req.session.sfOrgId        = identity.organizationId;
+      req.session.sfContactId    = sfContactId;
 
       req.session.save((saveErr) => {
         if (saveErr) {
@@ -109,7 +129,7 @@ router.get("/callback", async (req, res): Promise<void> => {
           }
           return;
         }
-        logger.info({ userId: identity.userId, username: identity.username }, "Salesforce OAuth complete");
+        logger.info({ userId: identity.userId, username: identity.username, sfContactId }, "Salesforce OAuth complete");
         // FIX 1 — guard before redirect; a duplicate callback may have already responded
         if (!res.headersSent) {
           res.redirect("/");
@@ -192,6 +212,7 @@ router.get("/logout", (req, res): void => {
   delete req.session.sfUsername;
   delete req.session.sfEmail;
   delete req.session.sfOrgId;
+  delete req.session.sfContactId;
 
   req.session.save((err) => {
     if (err) {

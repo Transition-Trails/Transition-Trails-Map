@@ -363,7 +363,7 @@ export default function TestPenny() {
         </div>
 
         {/* ── Sidebar — Live Context Panel ── */}
-        <div className="w-[240px] flex-shrink-0 border-l bg-card p-4 overflow-y-auto space-y-4">
+        <div className="w-80 flex-shrink-0 border-l border-gray-700 bg-gray-900 p-4 overflow-y-auto space-y-4">
 
           {/* SECTION 1 — Testing As */}
           <div>

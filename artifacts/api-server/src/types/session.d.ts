@@ -10,6 +10,7 @@ declare module "express-session" {
     sfEmail?:        string;
     sfOrgId?:        string;
     sfIssuedAt?:     string;
+    sfContactId?:    string | null;
     codeVerifier?:   string;
     state?:          string;
   }

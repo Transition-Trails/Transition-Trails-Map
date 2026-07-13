@@ -149,7 +149,18 @@ router.post("/penny/ask", async (req, res) => {
 
   try {
     sfClient    = getSalesforceClient(req);
-    sfContactId = contactIdStr ?? req.session.sfUserId ?? null;
+    sfContactId = contactIdStr ?? req.session.sfContactId ?? null;
+
+    logger.info(
+      {
+        sfContactId,
+        contactIdOverride:  contactIdStr ?? null,
+        sessionContactId:   req.session.sfContactId ?? null,
+        sessionUserId:      req.session.sfUserId ?? null,
+      },
+      'Penny ask — resolved contact ID'
+    );
+
     if (!sfContactId) throw new Error("No Salesforce contact ID in session");
 
     if (contactIdStr) {
