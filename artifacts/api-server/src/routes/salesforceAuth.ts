@@ -16,25 +16,42 @@ const SF_TOKEN_TTL_MS = 7_200_000; // Salesforce access tokens expire in 2 hours
 // ── GET /login ────────────────────────────────────────────────────────────────
 
 router.get("/login", (req, res): void => {
-  const { codeVerifier, codeChallenge } = generatePKCE();
-  const state = randomBytes(16).toString("hex");
+  try {
+    const { codeVerifier, codeChallenge } = generatePKCE();
+    const state = randomBytes(16).toString("hex");
 
-  req.session.codeVerifier = codeVerifier;
-  req.session.state        = state;
+    req.session.codeVerifier = codeVerifier;
+    req.session.state        = state;
 
-  req.session.save((err) => {
-    if (err) {
-      logger.error({ err }, "Failed to save session before Salesforce redirect");
-      res.status(500).json({ error: "Session error — could not initiate login." });
-      return;
-    }
-    res.redirect(buildAuthorizationUrl(codeChallenge, state));
-  });
+    req.session.save((err) => {
+      if (err) {
+        logger.error({ err }, "Failed to save session before Salesforce redirect");
+        res.status(500).json({ error: "Session error — could not initiate login." });
+        return;
+      }
+      try {
+        res.redirect(buildAuthorizationUrl(codeChallenge, state));
+      } catch (buildErr) {
+        logger.error({ err: buildErr }, "Salesforce OAuth configuration error in /login");
+        res.status(500).json({
+          error: "Salesforce OAuth configuration error",
+          details: buildErr instanceof Error ? buildErr.message : String(buildErr),
+        });
+      }
+    });
+  } catch (err) {
+    logger.error({ err }, "Salesforce OAuth configuration error in /login");
+    res.status(500).json({
+      error: "Salesforce OAuth configuration error",
+      details: err instanceof Error ? err.message : String(err),
+    });
+  }
 });
 
 // ── GET /callback ─────────────────────────────────────────────────────────────
 
 router.get("/callback", async (req, res): Promise<void> => {
+  try {
   const { code, state, error: sfError, error_description } = req.query as Record<string, string | undefined>;
 
   if (sfError) {
@@ -82,6 +99,13 @@ router.get("/callback", async (req, res): Promise<void> => {
   } catch (err) {
     logger.error({ err }, "Salesforce OAuth callback error");
     res.status(502).json({ error: err instanceof Error ? err.message : "Salesforce authentication failed." });
+  }
+  } catch (err) {
+    logger.error({ err }, "Salesforce OAuth configuration error in /callback");
+    res.status(500).json({
+      error: "Salesforce OAuth configuration error",
+      details: err instanceof Error ? err.message : String(err),
+    });
   }
 });
 
