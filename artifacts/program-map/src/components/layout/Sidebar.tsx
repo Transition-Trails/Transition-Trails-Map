@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Home, Network, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
-  ChevronDown, Search, Target, Monitor, Sliders,
+  Home, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
+  ChevronDown, Search, Monitor,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { type AccessTier, canAccess, TIER_CONFIG } from '@/config/accessTiers';
-import { useTierFlags } from '@/hooks/useTierFlags';
 
 type NavItem =
   | { id: string; path: string; label: string; isLabel?: false; minTier?: AccessTier }
@@ -23,18 +22,6 @@ type NavGroup = {
 };
 
 const navGroups: NavGroup[] = [
-  {
-    id: 'digital-twin',
-    minTier: 'power',
-    label: 'Digital Twin',
-    icon: Network,
-    pathPrefix: '/digital-twin',
-    extraPrefixes: ['/uom', '/governance'],
-    items: [
-      { id: 'dt-explore',    path: '/digital-twin',              label: 'Explore',    minTier: 'admin' },
-      { id: 'dt-governance', path: '/digital-twin/governance',   label: 'Governance', minTier: 'admin' },
-    ],
-  },
   {
     id: 'operations',
     label: 'Operations',
@@ -112,10 +99,12 @@ const navGroups: NavGroup[] = [
     label: 'Administration',
     icon: Settings,
     pathPrefix: '/admin',
+    extraPrefixes: ['/digital-twin', '/uom', '/governance'],
     items: [
       { id: 'admin-home',          path: '/admin/setup',          label: 'Administration' },
       { id: 'admin-integrations',  path: '/admin/integrations',   label: 'Integrations'   },
       { id: 'admin-people-access', path: '/admin/people-access',  label: 'People & Access' },
+      { id: 'admin-digital-twin',  path: '/digital-twin',         label: 'Digital Twin',   minTier: 'admin' },
     ],
   },
 ];
@@ -132,7 +121,6 @@ function calcMaxHeight(items: NavItem[]): number {
 export function Sidebar() {
   const [location, setLocation] = useLocation();
   const { userTier, mobileSidebarOpen, setMobileSidebarOpen } = useAppContext();
-  const { isEveryday, isAdminOrAbove } = useTierFlags();
 
   const visibleGroups = navGroups
     .filter(g => canAccess(g.minTier, userTier))
@@ -164,8 +152,7 @@ export function Sidebar() {
     });
   }
 
-  const isSearch  = location === '/search';
-  const isContext = location === '/context' || location.startsWith('/context/');
+  const isSearch = location === '/search';
 
   const topBtnCls = (active: boolean) =>
     `w-full flex items-center justify-center xl:justify-start gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
@@ -220,18 +207,6 @@ export function Sidebar() {
             <Search className={`w-4 h-4 flex-shrink-0 ${isSearch ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
             <span className="hidden xl:inline">Global Search</span>
           </button>
-
-          {/* Context Engine / Focus — Power+ only */}
-          {!isEveryday && (
-            <button
-              title={isAdminOrAbove ? 'Context Engine' : 'Focus'}
-              onClick={() => nav('/context')}
-              className={topBtnCls(isContext)}
-            >
-              <Target className={`w-4 h-4 flex-shrink-0 ${isContext ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
-              <span className="hidden xl:inline">{isAdminOrAbove ? 'Context Engine' : 'Focus'}</span>
-            </button>
-          )}
 
           <div className="h-px bg-sidebar-border/60 mx-1 my-1" />
 

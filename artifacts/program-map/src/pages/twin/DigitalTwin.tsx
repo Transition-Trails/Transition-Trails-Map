@@ -8,7 +8,6 @@ import {
   HardDrive, Calendar, MessageSquare, Database, Search,
   AlertTriangle, CheckCircle, Info, Star, Layers,
 } from 'lucide-react';
-import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -974,7 +973,7 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
 
 export default function DigitalTwin() {
   useAppContext();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { isAdminOrAbove } = useTierFlags();
   const [selected, setSelected] = useState<SelectedObject | null>(null);
 
@@ -984,34 +983,8 @@ export default function DigitalTwin() {
     setSelected(obj);
   }
 
-  return (
-    <HubShell
-      title="Digital Twin"
-      icon={Network}
-      description={
-        isAdminOrAbove
-          ? 'Explore the object graph, trace relationships, and govern the Unified Object Model.'
-          : 'Pick a thing, see what it touches, and understand how it connects to the rest of the platform.'
-      }
-      badge={selected ? selected.name : undefined}
-      tabs={[
-        {
-          id: 'explore',
-          label: 'Explore',
-          path: '/digital-twin',
-          icon: Compass,
-          content: <ExploreTab selected={selected} onSelect={handleSelect} onNavigate={nav} />,
-        },
-        ...(isAdminOrAbove ? [
-          {
-            id: 'governance',
-            label: 'Governance',
-            path: '/digital-twin/governance',
-            icon: Shield,
-            content: <GovernanceTab onNavigate={nav} />,
-          },
-        ] : []),
-      ]}
-    />
-  );
+  if (isAdminOrAbove && location.startsWith('/digital-twin/governance')) {
+    return <GovernanceTab onNavigate={nav} />;
+  }
+  return <ExploreTab selected={selected} onSelect={handleSelect} onNavigate={nav} />;
 }

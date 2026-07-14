@@ -1,6 +1,5 @@
-import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Target, GitBranch, Activity, Clock, Zap, Search as SearchIcon } from 'lucide-react';
+import { Target, Search as SearchIcon } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useLocation } from 'wouter';
 
@@ -317,19 +316,10 @@ function ImpactTab() {
 }
 
 export default function ContextHub() {
-  return (
-    <HubShell
-      title="Workspace Context Engine"
-      icon={Target}
-      description="Set an active context from any UOM object and the Context Engine surfaces relevant relationships, health, activity, and workspace impact across all of Trail OS."
-      badge="Phase 1"
-      tabs={[
-        { id:'overview',       label:'Overview',      path:'/context',              icon:Target,    content:<OverviewTab /> },
-        { id:'relationships',  label:'Relationships', path:'/context/relationships',icon:GitBranch, content:<RelationshipsTab /> },
-        { id:'health',         label:'Health',        path:'/context/health',       icon:Activity,  content:<HealthTab /> },
-        { id:'activity',       label:'Activity',      path:'/context/activity',     icon:Clock,     content:<ActivityTab /> },
-        { id:'impact',         label:'Impact',        path:'/context/impact',       icon:Zap,       content:<ImpactTab /> },
-      ]}
-    />
-  );
+  const [location] = useLocation();
+  if (location.startsWith('/context/relationships')) return <RelationshipsTab />;
+  if (location.startsWith('/context/health'))         return <HealthTab />;
+  if (location.startsWith('/context/activity'))       return <ActivityTab />;
+  if (location.startsWith('/context/impact'))         return <ImpactTab />;
+  return <OverviewTab />;
 }
