@@ -295,14 +295,11 @@ export default function IntegrationHub() {
                 </div>
               </div>
 
-              {/* Phase 2 footer */}
+              {/* Phase 2 note */}
               <div className="flex items-start gap-2 rounded-lg border border-dashed border-border/60 bg-muted/10 p-3">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
                 <p className="text-[11px] text-muted-foreground/60">
-                  Mural, LMS, Google Chat, full Agentforce context handoff, and Drive rule config are Phase 2.{' '}
-                  <button onClick={() => setLocation('/admin/phase2-backlog')} className="text-primary hover:underline font-medium">
-                    View backlog →
-                  </button>
+                  Mural, LMS, Google Chat, full Agentforce context handoff, and Drive rule config are Phase 2. Phase 2 features are tracked in Salesforce.
                 </p>
               </div>
 

@@ -224,16 +224,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     badgeCls: 'bg-amber-50 border-amber-200 text-amber-700',
     icon: CheckCircle2,
   },
-  {
-    id: 'phase2',
-    name: 'Phase 2 Backlog',
-    detail: '19 draft feature cards for Phase 2 — Penny panel, Trail Signals, Gmail, Calendar, Mural, live LLM, RAG, Trail Quest, assessments, coaching flows, SF live data, Agentforce, and Vitest.',
-    action: 'View Backlog',
-    href: '/admin/phase2-backlog',
-    badge: '19 features',
-    badgeCls: 'bg-stone-50 border-stone-200 text-stone-600',
-    icon: Layers,
-  },
+
   {
     id: 'phase1-audit',
     name: 'Phase 1 Completion Audit',
@@ -460,14 +451,6 @@ export default function AdminSetup() {
                   </div>
                 </div>
               ))}
-              {/* Full backlog link */}
-              <button
-                onClick={() => setLocation('/admin/phase2-backlog')}
-                className="rounded-lg border border-dashed border-border/60 bg-muted/10 p-3 flex items-center justify-between hover:border-primary/30 hover:bg-muted/20 transition-all col-span-2 group"
-              >
-                <p className="text-[11px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors">View full Phase 2 backlog — 19 feature cards</p>
-                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
-              </button>
             </div>
           </div>
 

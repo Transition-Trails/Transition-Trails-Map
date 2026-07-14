@@ -5,8 +5,7 @@
 //     current platform status, live connection state, blockers, gaps, and next
 //     actions across all 6 readiness domains.
 //
-//   Phase 2 Backlog    (/admin/phase2-backlog) — authoritative place for all
-//     deferred and future-state features. 10 draft cards captured as of June 2026.
+//   Phase 2 features are tracked in Salesforce (not in-app).
 //
 // All pages that surface integration or phase status should reflect this model.
 // Admin pages may show full detail; Everyday/Power User pages surface only
@@ -104,7 +103,7 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
     summary: 'Phase 2 — Mural Integration (draft in backlog)',
     detail:
       'Mural OAuth and board embedding deferred to Phase 2. ' +
-      'See /admin/phase2-backlog — "Mural Integration" draft card.',
+      'Mural Integration is tracked in Salesforce as a Phase 2 feature.',
   },
   agentforce: {
     id: 'agentforce',
@@ -138,17 +137,7 @@ export const PHASE_OWNERSHIP = {
       'readiness scores, blockers, gaps, and next actions across all 6 domains ' +
       '(Architecture, Integration, Governance, Knowledge, Penny, Operations).',
   },
-  phase2: {
-    route: '/admin/phase2-backlog',
-    label: 'Phase 2 Backlog',
-    scope:
-      'Authoritative source for all deferred and future features. ' +
-      'Gmail Panel, Calendar Panel, and Penny Asset Library graduated to Live in Phase 1. Remaining backlog: ' +
-      'Universal Ask Penny Panel · Trail Signals Control Center · ' +
-      'Google SSO & Groups · Mural · ' +
-      'Mobile Trail OS · Penny Reacts to Signals · Learning Delivery Center · ' +
-      'Google Drive rule config · Google Chat spaces · Google Chat client channel.',
-  },
+
 } as const;
 
 // ── Convenience helpers ───────────────────────────────────────────────────────

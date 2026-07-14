@@ -96,7 +96,7 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/admin/secrets-audit',          kind: 'active' },
   { path: '/admin/google-oauth',           kind: 'active' },
   { path: '/admin/create-audit',           kind: 'active' },
-  { path: '/admin/phase2-backlog',         kind: 'active' },
+
   { path: '/admin/phase1-audit',           kind: 'active' },
   { path: '/admin/:section',              kind: 'active',   note: 'Admin section catch-all (Admin.tsx URL routing)' },
 ];

@@ -87,7 +87,7 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/admin/google-oauth',            name: 'Admin · Google OAuth',            role: 'Admin+', status: 'fixed', issues: 'OAuth flow unblocked: Authorize button changed to target="_blank" (Google blocks OAuth inside iframes); GOOGLE_DRIVE_REFRESH_TOKEN and GOOGLE_CALENDAR_REFRESH_TOKEN obtained and stored in Replit Secrets; Drive + Calendar status updated to live across AdminSetup, readinessState.ts, and PagePennyGuide footer' },
   { path: '/admin/sf-validation',           name: 'Admin · SF Validation',           role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/program-resources',       name: 'Admin · Drive Workspaces',        role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/admin/phase2-backlog',          name: 'Admin · Phase 2 Backlog',         role: 'Admin+', status: 'fixed', issues: 'Sprint 3: four backlog cards moved to Done — Ask Penny Panel (global slide-over), Penny RAG (knowledge corpus + /api/penny/retrieve), Penny Reacts to Trail Signals (priority badges + auto-send signal context), Calendar Action Panel (global slide-over from Topbar — next 5 events, pending response flags, Trail Talk badges, Penny prep briefs via Gemini). Sprint 4: three more moved to Done — Trail Quest Live, Penny Assessment, Agentforce Coexistence.' },
+  { path: '/admin/setup',                   name: 'Admin · Phase 2 Backlog',         role: 'Admin+', status: 'fixed', issues: 'Phase 2 backlog page removed — Phase 2 features are now tracked in Salesforce. Sprint 3 completions: Ask Penny Panel, Penny RAG, Trail Signals, Calendar Action Panel. Sprint 4 completions: Trail Quest Live, Penny Assessment, Agentforce Coexistence.' },
   { path: '/penny/trail-quests',            name: 'Penny · Trail Quests',            role: 'Admin+', status: 'fixed', issues: 'Sprint 4: restored from redirect stub to live PennyHub tab — full Trail Quest management page with active quests, catalogue, stats (11 quests, 78% completion, 24 streaks), category filter, and Penny coaching trigger. Redirects from old /penny/trail-quests removed.' },
   { path: '/penny/assessments',             name: 'Penny · Assessments',             role: 'Admin+', status: 'fixed', issues: 'Sprint 4: restored from stub to live PennyHub tab — per-learner result table, filter (all/failed/needs-coaching), assessment catalogue. Dual-AI coaching wired: Coach/Next button fires both Penny (right panel) + Agentforce (Sessions API) in parallel; coaching panel renders Agentforce live response inline. Column header updated to "AI Coach".' },
   { path: '/penny/agentforce',              name: 'Penny · Agentforce Center',       role: 'Admin+', status: 'fixed', issues: 'Sprint 4: new live PennyHub tab — 8/8 POC steps confirmed, "Live · API Connected" badge, coexistence decision matrix, restoration checklist, live test panel (POST /api/agentforce/test). API routes: GET /api/agentforce/status, POST /api/agentforce/invoke (session create → message → close), POST /api/agentforce/test. AGENTFORCE_API_KEY confirmed (0Xxan0… prefix). readinessState.ts updated: agentforce health → live.' },
@@ -347,12 +347,7 @@ export default function Phase1CompletionAudit() {
                         </td>
                         <td className="px-3 py-1.5 text-muted-foreground font-mono text-[10px]">
                           {item.p2Item ? (
-                            <button
-                              onClick={() => setLocation('/admin/phase2-backlog')}
-                              className="hover:text-primary transition-colors"
-                            >
-                              {item.p2Item}
-                            </button>
+                            <span>{item.p2Item}</span>
                           ) : '—'}
                         </td>
                         <td className="px-3 py-1.5 text-muted-foreground">{item.notes}</td>
@@ -464,12 +459,7 @@ export default function Phase1CompletionAudit() {
                       </td>
                       <td className="px-3 py-1.5">
                         {item.p2Item ? (
-                          <button
-                            onClick={() => setLocation('/admin/phase2-backlog')}
-                            className="font-mono text-[10px] text-muted-foreground hover:text-primary transition-colors"
-                          >
-                            {item.p2Item}
-                          </button>
+                          <span className="font-mono text-[10px] text-muted-foreground">{item.p2Item}</span>
                         ) : (
                           <span className="text-emerald-600 font-semibold text-[10px]">In Phase 1 ✅</span>
                         )}
@@ -524,12 +514,7 @@ export default function Phase1CompletionAudit() {
               </div>
 
               <div className="flex items-center gap-2 pt-1">
-                <button
-                  onClick={() => setLocation('/admin/phase2-backlog')}
-                  className="text-[11px] font-bold text-primary hover:text-primary/80 flex items-center gap-1"
-                >
-                  View Phase 2 Backlog <ExternalLink className="w-3 h-3" />
-                </button>
+                <span className="text-[11px] text-muted-foreground">Phase 2 features tracked in Salesforce.</span>
                 <span className="text-muted-foreground/40">·</span>
                 <button
                   onClick={() => setLocation('/admin/phase1-readiness')}

@@ -59,7 +59,7 @@ export const CANONICAL_ROUTES = [
   '/admin/integration-readiness',
   '/admin/phase1-readiness',
   '/admin/ux-standards',
-  '/admin/phase2-backlog',
+
   '/admin/phase1-audit',
   '/admin/secrets-audit',
   '/admin/google-oauth',

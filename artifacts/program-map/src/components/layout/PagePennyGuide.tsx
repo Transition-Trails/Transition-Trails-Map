@@ -108,7 +108,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   ],
   admin: [
     { urgent: false, source: 'salesforce', text: 'Salesforce fully connected — REST API live, PMM + NPSP confirmed', meta: '2h ago',  why: 'Penny monitors integration state to surface when platform dependencies unblock the next wave of live data wiring' },
-    { urgent: false, source: 'slack',      text: 'Phase 2 backlog: 19 draft features captured at /admin/phase2-backlog', meta: '4h ago', why: 'Penny tracks backlog progress in admin channels so the team can see which deferred features are queued and ready to scope' },
+
     { urgent: false, source: 'drive',      text: 'Secrets audit: last run 3 days ago',                           meta: '6h ago',  why: 'Penny monitors Drive audit logs to surface security hygiene status for the admin team' },
   ],
   'digital-twin': [
@@ -332,7 +332,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Salesforce live — REST API connected, PMM + NPSP confirmed. Next: wire to dashboard.',
       'Slack live — @coachconnectbot posting. Next: add channels:read scope.',
       'Google OAuth live — Drive + Calendar refresh tokens obtained and stored in Replit Secrets',
-      'Phase 2 backlog: 19 draft features captured at /admin/phase2-backlog',
+
     ],
     attentionItems: [
       { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Salesforce live — REST API + PMM confirmed' },
@@ -341,11 +341,11 @@ const CONTENT: Record<PageCtx, PageContent> = {
     everydaySteps: [],
     powerSteps: [
       { label: 'Phase 1 readiness', path: '/admin/phase1-readiness' },
-      { label: 'Phase 2 backlog',   path: '/admin/phase2-backlog' },
+
       { label: 'Google OAuth',      path: '/admin/google-oauth' },
     ],
     everydayCanned: "",
-    powerCanned:    "Admin status: Salesforce + Google OAuth live (REST API + PMM, Drive + Calendar tokens stored). Slack POC confirmed (@coachconnectbot). Phase 2 backlog: 19 draft features at /admin/phase2-backlog.",
+    powerCanned:    "Admin status: Salesforce + Google OAuth live (REST API + PMM, Drive + Calendar tokens stored). Slack POC confirmed (@coachconnectbot). Phase 2 features are tracked in Salesforce.",
   },
   'digital-twin': {
     everydayInsights: [],

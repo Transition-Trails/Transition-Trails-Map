@@ -1,7 +1,7 @@
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
   Activity, GitBranch, Plus, Sparkles, LayoutDashboard,
-  Star, ClipboardCheck, Bot, Image, Settings, CalendarDays,
+  Star, ClipboardCheck, Bot, Image, CalendarDays, Zap, FlaskConical, ScrollText,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
@@ -19,7 +19,7 @@ import Assessments              from '@/pages/penny/Assessments';
 import AgentforceCenter         from '@/pages/penny/AgentforceCenter';
 import PennyAssetLibrary        from '@/pages/penny/PennyAssetLibrary';
 import PennyCapabilityRegistry  from '@/pages/penny/PennyCapabilityRegistry';
-import PennyAdminCenter         from '@/pages/penny/PennyAdminCenter';
+import PennyLogs                from '@/pages/penny/PennyLogs';
 import SessionLog               from '@/pages/penny/SessionLog';
 
 export default function PennyHub() {
@@ -103,9 +103,11 @@ export default function PennyHub() {
       { id: 'trail-quests',   label: 'Trail Quests',   path: '/penny/trail-quests',  icon: Star,           content: <TrailQuests /> },
       { id: 'assessments',    label: 'Assessments',    path: '/penny/assessments',   icon: ClipboardCheck, content: <Assessments /> },
       { id: 'agentforce',     label: 'Agentforce',     path: '/penny/agentforce',    icon: Bot,            content: <AgentforceCenter /> },
-      { id: 'health',         label: 'Health',         path: '/penny/health',        icon: Activity,       content: <PennyHealth /> },
-      { id: 'asset-library',  label: 'Asset Library',  path: '/penny/asset-library', icon: Image,          content: <PennyAssetLibrary /> },
-      { id: 'admin-center',   label: '⚙ Command Center', path: '/penny/admin-center', icon: Settings,      content: <PennyAdminCenter /> },
+      { id: 'health',          label: 'Health',         path: '/penny/health',         icon: Activity,      content: <PennyHealth /> },
+      { id: 'asset-library',  label: 'Asset Library',  path: '/penny/asset-library',  icon: Image,         content: <PennyAssetLibrary /> },
+      { id: 'quest-library',  label: 'Quest Library',  path: '/penny/quest-library',  icon: Zap,           content: <TrailQuests /> },
+      { id: 'penny-logs',     label: 'Penny Logs',     path: '/penny/penny-logs',     icon: ScrollText,    content: <PennyLogs /> },
+      { id: 'penny-sandbox',  label: 'Penny Sandbox',  path: '/penny/penny-sandbox',  icon: FlaskConical,  content: <TestPenny /> },
     ] : []),
   ];
 

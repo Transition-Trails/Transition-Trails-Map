@@ -342,11 +342,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             </div>
 
             {/* Compact readiness drill-ins */}
-            <div className="mt-2.5 grid grid-cols-3 gap-2">
+            <div className="mt-2.5 grid grid-cols-2 gap-2">
               {[
-                { label: 'Phase 1 Readiness',   badge: 'Phase 1',   href: '/admin/phase1-readiness',  cls: 'border-amber-200 hover:border-amber-400'   },
-                { label: 'Phase 1 UX Standards', badge: 'Standards', href: '/admin/ux-standards',      cls: 'border-indigo-200 hover:border-indigo-400'  },
-                { label: 'Phase 2 Backlog',      badge: '10 items',  href: '/admin/phase2-backlog',     cls: 'border-stone-200 hover:border-stone-400'    },
+                { label: 'Phase 1 Readiness',    badge: 'Phase 1',   href: '/admin/phase1-readiness', cls: 'border-amber-200 hover:border-amber-400'  },
+                { label: 'Phase 1 UX Standards', badge: 'Standards', href: '/admin/ux-standards',     cls: 'border-indigo-200 hover:border-indigo-400' },
               ].map(item => (
                 <button
                   key={item.href}
