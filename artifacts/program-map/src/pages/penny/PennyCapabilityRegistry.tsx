@@ -1,427 +1,735 @@
-import { useState, useMemo } from 'react';
-import { X, Plus, Hash, Search } from 'lucide-react';
-import { useAppContext } from '@/context/AppContext';
+import { useState, useEffect, useMemo } from 'react';
+import { Plus, Trash2, X, Search, Pencil, ExternalLink } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  pennyCapabilities,
+  pennyCapabilities as ALL_CAPABILITIES,
   type PennyCapability,
+  type CapabilityDomain,
+  type CapabilityReadiness,
 } from '@/data/pennyCapabilityData';
 
-// ── Badge helpers ─────────────────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────────────
 
-function getDomainColor(domain: string): string {
-  const map: Record<string, string> = {
-    Coaching:       'bg-violet-100 text-violet-700',
-    Career:         'bg-blue-100 text-blue-700',
-    Learning:       'bg-emerald-100 text-emerald-700',
-    Knowledge:      'bg-amber-100 text-amber-700',
-    Operations:     'bg-orange-100 text-orange-700',
-    Communications: 'bg-cyan-100 text-cyan-700',
-    Questing:       'bg-pink-100 text-pink-700',
-  };
-  return map[domain] ?? 'bg-gray-100 text-gray-600';
+const MATURITY_STAGES: CapabilityReadiness[] = [
+  'Prototype', 'Defined', 'In Development', 'Integrated', 'Operational',
+];
+
+const DOMAIN_COLORS: Record<CapabilityDomain, string> = {
+  Coaching:       'bg-violet-100 text-violet-700',
+  Career:         'bg-blue-100 text-blue-700',
+  Learning:       'bg-teal-100 text-teal-700',
+  Knowledge:      'bg-amber-100 text-amber-700',
+  Communications: 'bg-orange-100 text-orange-700',
+  Questing:       'bg-pink-100 text-pink-700',
+  Operations:     'bg-gray-100 text-gray-600',
+};
+
+const FILTER_PILLS: { label: string; value: string }[] = [
+  { label: 'All',       value: '' },
+  { label: 'Coaching',  value: 'Coaching' },
+  { label: 'Career',    value: 'Career' },
+  { label: 'Learning',  value: 'Learning' },
+  { label: 'Knowledge', value: 'Knowledge' },
+  { label: 'Comms',     value: 'Communications' },
+  { label: 'Questing',  value: 'Questing' },
+];
+
+const BASE_CAPABILITIES = ALL_CAPABILITIES.filter(
+  c => c.pocStatus === 'exists' || c.pocStatus === 'partial'
+);
+
+// ── Add-form state shape ──────────────────────────────────────────────────────
+
+interface AddFormData {
+  name:             string;
+  domain:           CapabilityDomain;
+  maturity:         CapabilityReadiness;
+  shortDescription: string;
+  purpose:          string;
+  audience:         string;
+  trails:           string;
+  inputs:           string;
+  outputs:          string;
+  nextSteps:        string;
 }
 
-function getMaturityColor(maturity: string): string {
-  const map: Record<string, string> = {
-    'Prototype':      'bg-amber-100 text-amber-700',
-    'Defined':        'bg-blue-100 text-blue-700',
-    'Planned':        'bg-violet-100 text-violet-700',
-    'In Development': 'bg-orange-100 text-orange-700',
-    'Integrated':     'bg-cyan-100 text-cyan-700',
-    'Operational':    'bg-emerald-100 text-emerald-700',
-  };
-  return map[maturity] ?? 'bg-gray-100 text-gray-600';
-}
+const EMPTY_FORM: AddFormData = {
+  name: '', domain: 'Coaching', maturity: 'Prototype',
+  shortDescription: '', purpose: '', audience: '',
+  trails: '', inputs: '', outputs: '', nextSteps: '',
+};
 
-function getPocLabel(pocStatus: string): string {
-  const map: Record<string, string> = {
-    exists:  'In POC',
-    partial: 'Partial',
-    planned: 'Planned',
-    none:    'Not in POC',
-  };
-  return map[pocStatus] ?? pocStatus;
-}
+// ── Shared micro-components ───────────────────────────────────────────────────
 
-function getPocColor(pocStatus: string): string {
-  const map: Record<string, string> = {
-    exists:  'bg-emerald-100 text-emerald-700',
-    partial: 'bg-amber-100 text-amber-700',
-    planned: 'bg-violet-100 text-violet-700',
-    none:    'bg-gray-100 text-gray-500',
-  };
-  return map[pocStatus] ?? 'bg-gray-100 text-gray-500';
-}
-
-// ── Chip ─────────────────────────────────────────────────────────────────────
-
-function Chip({ label, mono }: { label: string; mono?: boolean }) {
+function DomainBadge({ domain }: { domain: CapabilityDomain }) {
   return (
-    <span className={`inline-block bg-muted px-2 py-0.5 rounded-full text-[10px] text-foreground leading-tight ${mono ? 'font-mono' : ''}`}>
-      {label}
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide ${DOMAIN_COLORS[domain]}`}>
+      {domain === 'Communications' ? 'Comms' : domain}
     </span>
   );
 }
 
-// ── Section block used in drawer ─────────────────────────────────────────────
-
-function DrawerSection({ title, children }: { title: string; children: React.ReactNode }) {
+function StatusChip({ pocStatus }: { pocStatus: 'exists' | 'partial' }) {
+  const live = pocStatus === 'exists';
   return (
-    <div>
-      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1.5">
-        {title}
-      </p>
+    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${live ? 'text-emerald-600' : 'text-amber-600'}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${live ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+      {live ? 'Live' : 'Partial'}
+    </span>
+  );
+}
+
+function MaturityBadge({ maturity }: { maturity: string }) {
+  return (
+    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-muted text-muted-foreground">
+      {maturity}
+    </span>
+  );
+}
+
+function Tag({
+  label, onRemove, mono,
+}: {
+  label: string;
+  onRemove?: () => void;
+  mono?: boolean;
+}) {
+  return (
+    <span className={`group inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-foreground font-medium ${mono ? 'font-mono text-[10px]' : 'text-[11px]'}`}>
+      {label}
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+          aria-label={`Remove ${label}`}
+        >
+          <X className="w-2.5 h-2.5" />
+        </button>
+      )}
+    </span>
+  );
+}
+
+function InlineTagInput({ onAdd, placeholder }: { onAdd: (v: string) => void; placeholder: string }) {
+  const [val, setVal] = useState('');
+  return (
+    <form
+      className="inline-flex"
+      onSubmit={e => {
+        e.preventDefault();
+        const t = val.trim();
+        if (t) { onAdd(t); setVal(''); }
+      }}
+    >
+      <input
+        value={val}
+        onChange={e => setVal(e.target.value)}
+        placeholder={placeholder}
+        className="text-[11px] border border-dashed border-border rounded-full px-2 py-0.5 bg-white focus:outline-none focus:border-primary/50 w-24 placeholder:text-muted-foreground/40"
+      />
+    </form>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-2">
       {children}
+    </p>
+  );
+}
+
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-3 px-3 py-2 border-b border-border/40 last:border-0">
+      <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wide w-24 shrink-0 mt-0.5">
+        {label}
+      </span>
+      <div className="flex-1 flex flex-wrap gap-1 items-start">{children}</div>
     </div>
   );
 }
 
-// ── Detail Drawer ─────────────────────────────────────────────────────────────
+// ── Maturity track ────────────────────────────────────────────────────────────
 
-function CapabilityDrawer({
-  cap,
-  onClose,
-  onRequestChanges,
+function MaturityTrack({
+  maturity,
+  onPromote,
 }: {
-  cap: PennyCapability;
-  onClose: () => void;
-  onRequestChanges: () => void;
+  maturity: CapabilityReadiness;
+  onPromote: (m: CapabilityReadiness) => void;
 }) {
-  const depNames = cap.dependencies
-    .map(id => pennyCapabilities.find(c => c.id === id)?.name ?? id)
-    .filter(Boolean);
+  const currentIdx = MATURITY_STAGES.indexOf(maturity);
 
   return (
-    <>
-      {/* Scrim */}
-      <div
-        className="fixed inset-0 z-40 bg-black/10"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    <div className="flex items-stretch gap-0 w-full rounded-lg overflow-hidden border border-border">
+      {MATURITY_STAGES.map((stage, i) => {
+        const isDone    = currentIdx >= 0 && i < currentIdx;
+        const isCurrent = i === currentIdx;
+        const isFuture  = currentIdx < 0 ? true : i > currentIdx;
 
-      {/* Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 flex flex-col w-full max-w-[480px] bg-card border-l border-border shadow-2xl">
+        return (
+          <button
+            key={stage}
+            onClick={() => isFuture && onPromote(stage)}
+            disabled={isDone || isCurrent}
+            className={`flex-1 py-2 px-1.5 text-[9px] font-semibold text-center border-r border-border/50 last:border-0 transition-colors leading-tight ${
+              isCurrent
+                ? 'bg-primary/10 text-primary font-bold'
+                : isDone
+                  ? 'bg-emerald-50 text-emerald-700 cursor-default'
+                  : 'bg-muted/30 text-muted-foreground hover:bg-primary/5 hover:text-primary cursor-pointer'
+            }`}
+            title={isFuture ? `Promote to ${stage}` : undefined}
+          >
+            {isDone && <span className="block text-emerald-500 mb-0.5 text-[8px]">✓</span>}
+            {stage}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
-        {/* Header */}
-        <div className="flex-shrink-0 p-4 border-b border-border">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getDomainColor(cap.domain)}`}>
-                {cap.domain}
-              </span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getMaturityColor(cap.maturity)}`}>
-                {cap.maturity}
-              </span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getPocColor(cap.pocStatus)}`}>
-                {getPocLabel(cap.pocStatus)}
-              </span>
+// ── Capability detail panel ───────────────────────────────────────────────────
+
+function CapabilityDetail({
+  capability,
+  onDelete,
+  onUpdate,
+}: {
+  capability: PennyCapability;
+  onDelete: () => void;
+  onUpdate: (updated: PennyCapability) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft,   setDraft]   = useState<PennyCapability>(capability);
+
+  useEffect(() => {
+    if (!editing) setDraft(capability);
+  }, [capability, editing]);
+
+  function handleSave() {
+    console.log('[Penny Capabilities] Save to Salesforce — not yet wired:', draft);
+    onUpdate(draft);
+    setEditing(false);
+  }
+
+  function handleCancel() {
+    setDraft(capability);
+    setEditing(false);
+  }
+
+  function removeFrom(field: keyof PennyCapability, value: string) {
+    setDraft(d => ({ ...d, [field]: (d[field] as string[]).filter(v => v !== value) }));
+  }
+
+  function addTo(field: keyof PennyCapability, value: string) {
+    setDraft(d => {
+      const arr = d[field] as string[];
+      return arr.includes(value) ? d : { ...d, [field]: [...arr, value] };
+    });
+  }
+
+  const cap = editing ? draft : capability;
+
+  return (
+    <div className="flex flex-col h-full">
+
+      {/* Header */}
+      <div className="px-6 pt-5 pb-4 border-b border-border shrink-0">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            {editing ? (
+              <input
+                value={draft.name}
+                onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
+                className="text-[16px] font-medium text-foreground w-full border-b border-border focus:outline-none focus:border-primary pb-0.5 bg-transparent leading-snug"
+              />
+            ) : (
+              <h2 className="text-[16px] font-medium text-foreground leading-snug">{cap.name}</h2>
+            )}
+            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              <DomainBadge domain={cap.domain} />
+              <StatusChip pocStatus={cap.pocStatus as 'exists' | 'partial'} />
+              <MaturityBadge maturity={cap.maturity} />
             </div>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
-              onClick={onClose}
-              className="p-1 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors shrink-0"
-              aria-label="Close"
+              onClick={() => editing ? handleCancel() : setEditing(true)}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-colors ${
+                editing
+                  ? 'border-primary/30 bg-primary/5 text-primary'
+                  : 'border-border bg-white text-muted-foreground hover:text-foreground hover:border-primary/30'
+              }`}
             >
-              <X className="w-3.5 h-3.5" />
+              <Pencil className="w-3 h-3" />
+              {editing ? 'Editing…' : 'Edit'}
+            </button>
+            <button
+              onClick={onDelete}
+              className="p-1.5 rounded-lg border border-border bg-white text-muted-foreground hover:border-rose-300 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              aria-label="Delete capability"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
-          <h2 className="text-base font-bold text-foreground mt-2 leading-snug">{cap.name}</h2>
-          <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{cap.shortDescription}</p>
         </div>
+      </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-5">
+      {/* Scrollable body */}
+      <ScrollArea className="flex-1">
+        <div className="px-6 py-5 space-y-6 max-w-2xl">
 
-          <DrawerSection title="Purpose">
-            <p className="text-[12px] text-foreground leading-relaxed">{cap.purpose}</p>
-          </DrawerSection>
-
-          <DrawerSection title="Audience">
-            <div className="flex flex-wrap gap-1">
-              {cap.audience.map(a => <Chip key={a} label={a} />)}
+          {/* ── Section 1: Description ─────────────────────────────────── */}
+          <div>
+            <SectionLabel>Description</SectionLabel>
+            <div className="rounded-lg border border-border bg-white overflow-hidden">
+              <FieldRow label="What it does">
+                {editing ? (
+                  <input
+                    value={draft.shortDescription}
+                    onChange={e => setDraft(d => ({ ...d, shortDescription: e.target.value }))}
+                    className="flex-1 text-[12px] text-foreground border border-border rounded px-2 py-1 focus:outline-none focus:border-primary/50 bg-white"
+                  />
+                ) : (
+                  <span className="text-[12px] text-foreground leading-relaxed">{cap.shortDescription}</span>
+                )}
+              </FieldRow>
+              <FieldRow label="Audience">
+                {cap.audience.map(a => (
+                  <Tag key={a} label={a} onRemove={editing ? () => removeFrom('audience', a) : undefined} />
+                ))}
+                {editing && <InlineTagInput onAdd={v => addTo('audience', v)} placeholder="Add…" />}
+              </FieldRow>
+              <FieldRow label="Trails">
+                {cap.relatedPrograms.map(p => (
+                  <Tag key={p} label={p} onRemove={editing ? () => removeFrom('relatedPrograms', p) : undefined} />
+                ))}
+                {editing
+                  ? <InlineTagInput onAdd={v => addTo('relatedPrograms', v)} placeholder="Add trail…" />
+                  : (
+                    <button
+                      onClick={() => console.log('[Penny Capabilities] Add trail — not yet wired')}
+                      className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full border border-dashed border-border text-[10px] text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                    >
+                      <Plus className="w-2.5 h-2.5" /> add
+                    </button>
+                  )
+                }
+              </FieldRow>
             </div>
-          </DrawerSection>
+          </div>
 
-          <DrawerSection title="Inputs">
-            <div className="flex flex-wrap gap-1">
-              {cap.inputs.map(i => <Chip key={i} label={i} />)}
+          {/* ── Section 2: How it works ────────────────────────────────── */}
+          <div>
+            <SectionLabel>How it works</SectionLabel>
+            <div className="rounded-lg border border-border bg-white overflow-hidden">
+              <FieldRow label="Inputs">
+                {cap.inputs.map(i => (
+                  <Tag key={i} label={i} onRemove={editing ? () => removeFrom('inputs', i) : undefined} />
+                ))}
+                {editing && <InlineTagInput onAdd={v => addTo('inputs', v)} placeholder="Add input…" />}
+              </FieldRow>
+              <FieldRow label="Outputs">
+                {cap.outputs.map(o => (
+                  <Tag key={o} label={o} onRemove={editing ? () => removeFrom('outputs', o) : undefined} />
+                ))}
+                {editing && <InlineTagInput onAdd={v => addTo('outputs', v)} placeholder="Add output…" />}
+              </FieldRow>
+              <FieldRow label="Prompt template">
+                <button
+                  onClick={() => console.log('[Penny Capabilities] Navigate to Prompt Studio')}
+                  className="flex items-center gap-1 text-[11px] text-primary font-medium hover:underline"
+                >
+                  {cap.name} <ExternalLink className="w-2.5 h-2.5" />
+                </button>
+              </FieldRow>
             </div>
-          </DrawerSection>
+          </div>
 
-          <DrawerSection title="Outputs">
-            <div className="flex flex-wrap gap-1">
-              {cap.outputs.map(o => <Chip key={o} label={o} />)}
-            </div>
-          </DrawerSection>
+          {/* ── Section 3: Maturity progress ───────────────────────────── */}
+          <div>
+            <SectionLabel>Maturity progress</SectionLabel>
+            <MaturityTrack
+              maturity={capability.maturity}
+              onPromote={m => onUpdate({ ...capability, maturity: m })}
+            />
+          </div>
 
-          <DrawerSection title="POC Status">
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getPocColor(cap.pocStatus)}`}>
-              {getPocLabel(cap.pocStatus)}
-            </span>
-            <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">{cap.pocMapping}</p>
-          </DrawerSection>
+          {/* ── Section 4: Next steps ──────────────────────────────────── */}
+          <div>
+            <SectionLabel>Next steps to activate</SectionLabel>
+            {editing ? (
+              <textarea
+                value={draft.nextSteps.join('\n')}
+                onChange={e => setDraft(d => ({ ...d, nextSteps: e.target.value.split('\n') }))}
+                rows={Math.max(draft.nextSteps.length + 1, 4)}
+                placeholder="One step per line"
+                className="w-full text-[12px] border border-border rounded-lg px-3 py-2 focus:outline-none focus:border-primary/50 bg-white resize-none"
+              />
+            ) : (
+              <ol className="space-y-1.5">
+                {cap.nextSteps.filter(Boolean).map((step, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[12px] text-foreground leading-snug">
+                    <span className="w-4 h-4 rounded-full bg-muted text-muted-foreground text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
 
-          <DrawerSection title="Next Steps">
-            <ol className="space-y-1">
-              {cap.nextSteps.map((s, i) => (
-                <li key={i} className="text-[12px] text-foreground leading-snug">
-                  <span className="text-muted-foreground mr-1">{i + 1}.</span>{s}
-                </li>
+          {/* ── Section 5: Connected Salesforce objects ─────────────────── */}
+          <div>
+            <SectionLabel>Connected Salesforce objects</SectionLabel>
+            <div className="flex flex-wrap gap-1.5">
+              {cap.relatedSfObjects.map(o => (
+                <Tag key={o} label={o} mono onRemove={editing ? () => removeFrom('relatedSfObjects', o) : undefined} />
               ))}
-            </ol>
-          </DrawerSection>
-
-          {cap.relatedSfObjects.length > 0 && (
-            <DrawerSection title="Related Salesforce Objects">
-              <div className="flex flex-wrap gap-1">
-                {cap.relatedSfObjects.map(o => <Chip key={o} label={o} mono />)}
-              </div>
-            </DrawerSection>
-          )}
-
-          {depNames.length > 0 && (
-            <DrawerSection title="Dependencies">
-              <div className="flex flex-wrap gap-1">
-                {depNames.map(n => <Chip key={n} label={n} />)}
-              </div>
-            </DrawerSection>
-          )}
-
-          {cap.foundationsTrailExample && (
-            <DrawerSection title="Foundations Trail Example">
-              <p className="text-[12px] text-muted-foreground leading-relaxed italic border-l-2 border-border pl-3">
-                {cap.foundationsTrailExample}
-              </p>
-            </DrawerSection>
-          )}
-
-          <DrawerSection title="Future Integration">
-            <p className="text-[12px] text-muted-foreground leading-snug">{cap.futureIntegrationStatus}</p>
-          </DrawerSection>
+              {editing
+                ? <InlineTagInput onAdd={v => addTo('relatedSfObjects', v)} placeholder="API name…" />
+                : (
+                  <button
+                    onClick={() => console.log('[Penny Capabilities] Add SF object — not yet wired')}
+                    className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full border border-dashed border-border text-[10px] font-mono text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                  >
+                    <Plus className="w-2.5 h-2.5" /> add
+                  </button>
+                )
+              }
+            </div>
+          </div>
 
         </div>
+      </ScrollArea>
 
-        {/* Footer */}
-        <div className="flex-shrink-0 p-4 border-t border-border flex items-center justify-between">
-          <span className="text-[10px] text-muted-foreground">
-            Owner: <strong className="text-foreground">{cap.owner}</strong>
-          </span>
+      {/* Footer — visible in edit mode only */}
+      {editing && (
+        <div className="shrink-0 px-6 py-3 border-t border-border bg-background flex items-center justify-end gap-2">
           <button
-            onClick={onRequestChanges}
-            className="px-3 py-1.5 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors"
+            onClick={handleCancel}
+            className="px-4 py-1.5 rounded-lg border border-border text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
           >
-            Request Changes
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="px-4 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold hover:opacity-90 transition-opacity"
+          >
+            Save to Salesforce
           </button>
         </div>
+      )}
+    </div>
+  );
+}
 
+// ── Add capability form ───────────────────────────────────────────────────────
+
+function AddCapabilityForm({
+  onCancel,
+  onAdd,
+}: {
+  onCancel: () => void;
+  onAdd: (cap: PennyCapability) => void;
+}) {
+  const [form, setForm] = useState<AddFormData>(EMPTY_FORM);
+
+  function set(field: keyof AddFormData) {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm(f => ({ ...f, [field]: e.target.value }));
+  }
+
+  function handleSubmit() {
+    const newCap: PennyCapability = {
+      id:                     `cap-custom-${Date.now()}`,
+      name:                   form.name.trim(),
+      domain:                 form.domain,
+      maturity:               form.maturity,
+      shortDescription:       form.shortDescription.trim(),
+      purpose:                form.purpose.trim(),
+      audience:               form.audience.split(',').map(s => s.trim()).filter(Boolean),
+      inputs:                 form.inputs.split(',').map(s => s.trim()).filter(Boolean),
+      outputs:                form.outputs.split(',').map(s => s.trim()).filter(Boolean),
+      relatedPrograms:        form.trails.split(',').map(s => s.trim()).filter(Boolean),
+      nextSteps:              form.nextSteps.split('\n').map(s => s.trim()).filter(Boolean),
+      relatedSfObjects:       [],
+      relatedKnowledgeSources:[],
+      relatedCommChannels:    [],
+      relatedCalendarEvents:  [],
+      relatedStandards:       [],
+      dependencies:           [],
+      owner:                  '',
+      futureIntegrationStatus:'',
+      pocMapping:             '',
+      pocStatus:              'partial',
+    };
+    console.log('[Penny Capabilities] Save to Salesforce — not yet wired:', newCap);
+    onAdd(newCap);
+  }
+
+  const inputCls  = 'w-full text-[12px] border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary/50 bg-white placeholder:text-muted-foreground/40';
+  const labelCls  = 'block text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1';
+  const hintCls   = 'text-[9px] text-muted-foreground mt-0.5';
+
+  return (
+    <div className="flex flex-col h-full">
+
+      {/* Header */}
+      <div className="px-6 pt-5 pb-4 border-b border-border shrink-0">
+        <h2 className="text-[16px] font-medium text-foreground">Add a capability</h2>
+        <p className="text-[11px] text-muted-foreground mt-1 leading-snug max-w-md">
+          Define what Penny can do. This creates a record in Salesforce and makes the capability available to Prompt Studio.
+        </p>
       </div>
-    </>
+
+      {/* Form */}
+      <ScrollArea className="flex-1">
+        <div className="px-6 py-5">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-4 max-w-2xl">
+
+            {/* Name — full width */}
+            <div className="col-span-2">
+              <label className={labelCls}>Capability name *</label>
+              <input value={form.name} onChange={set('name')} placeholder="e.g. Salary Negotiation Coach" className={inputCls} />
+            </div>
+
+            {/* Domain */}
+            <div>
+              <label className={labelCls}>Domain</label>
+              <select value={form.domain} onChange={set('domain')} className={inputCls}>
+                {(['Coaching','Career','Learning','Knowledge','Communications','Questing','Operations'] as CapabilityDomain[]).map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Maturity */}
+            <div>
+              <label className={labelCls}>Maturity</label>
+              <select value={form.maturity} onChange={set('maturity')} className={inputCls}>
+                {(['Prototype','Defined','Planned','In Development','Integrated','Operational'] as CapabilityReadiness[]).map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Short description — full width */}
+            <div className="col-span-2">
+              <label className={labelCls}>Short description</label>
+              <input value={form.shortDescription} onChange={set('shortDescription')} placeholder="One-line summary of what this capability does" className={inputCls} />
+            </div>
+
+            {/* Purpose — full width */}
+            <div className="col-span-2">
+              <label className={labelCls}>Purpose</label>
+              <textarea value={form.purpose} onChange={set('purpose')} placeholder="What does this capability do for learners or coaches?" rows={3} className={`${inputCls} resize-none`} />
+            </div>
+
+            {/* Audience */}
+            <div>
+              <label className={labelCls}>Audience</label>
+              <input value={form.audience} onChange={set('audience')} placeholder="Learners, Coaches" className={inputCls} />
+              <p className={hintCls}>Comma-separated</p>
+            </div>
+
+            {/* Trails in scope */}
+            <div>
+              <label className={labelCls}>Trails in scope</label>
+              <input value={form.trails} onChange={set('trails')} placeholder="Foundations Trail, Guided Trail" className={inputCls} />
+              <p className={hintCls}>Comma-separated</p>
+            </div>
+
+            {/* Inputs — full width */}
+            <div className="col-span-2">
+              <label className={labelCls}>Inputs — what Penny needs</label>
+              <input value={form.inputs} onChange={set('inputs')} placeholder="Learner context, Module data, Assessment scores" className={inputCls} />
+              <p className={hintCls}>Comma-separated</p>
+            </div>
+
+            {/* Outputs — full width */}
+            <div className="col-span-2">
+              <label className={labelCls}>Outputs — what Penny produces</label>
+              <input value={form.outputs} onChange={set('outputs')} placeholder="Coaching message, Follow-up questions, Log entry" className={inputCls} />
+              <p className={hintCls}>Comma-separated</p>
+            </div>
+
+            {/* Next steps — full width */}
+            <div className="col-span-2">
+              <label className={labelCls}>Next steps to activate</label>
+              <textarea value={form.nextSteps} onChange={set('nextSteps')} placeholder={"Step 1\nStep 2\nStep 3"} rows={4} className={`${inputCls} resize-none`} />
+              <p className={hintCls}>One step per line</p>
+            </div>
+
+          </div>
+        </div>
+      </ScrollArea>
+
+      {/* Footer */}
+      <div className="shrink-0 px-6 py-3 border-t border-border bg-background flex items-center justify-end gap-2">
+        <button
+          onClick={onCancel}
+          className="px-4 py-1.5 rounded-lg border border-border text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={!form.name.trim()}
+          className="px-4 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-40"
+        >
+          Save to Salesforce
+        </button>
+      </div>
+    </div>
   );
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PennyCapabilityRegistry() {
-  const { openActionPanel, openSlackPanel } = useAppContext();
-
-  const [search,         setSearch]         = useState('');
-  const [domainFilter,   setDomainFilter]   = useState('');
-  const [maturityFilter, setMaturityFilter] = useState('');
-  const [pocFilter,      setPocFilter]      = useState('');
-  const [selected,       setSelected]       = useState<PennyCapability | null>(null);
-  const [drawerOpen,     setDrawerOpen]     = useState(false);
+  const [capabilities, setCapabilities] = useState<PennyCapability[]>(BASE_CAPABILITIES);
+  const [selectedId,   setSelectedId]   = useState<string | null>(BASE_CAPABILITIES[0]?.id ?? null);
+  const [isAdding,     setIsAdding]     = useState(false);
+  const [search,       setSearch]       = useState('');
+  const [domainFilter, setDomainFilter] = useState('');
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return pennyCapabilities.filter(c => {
+    return capabilities.filter(c => {
       if (q && !c.name.toLowerCase().includes(q) && !c.shortDescription.toLowerCase().includes(q)) return false;
-      if (domainFilter   && c.domain    !== domainFilter)   return false;
-      if (maturityFilter && c.maturity  !== maturityFilter) return false;
-      if (pocFilter      && c.pocStatus !== pocFilter)      return false;
+      if (domainFilter && c.domain !== domainFilter) return false;
       return true;
     });
-  }, [search, domainFilter, maturityFilter, pocFilter]);
+  }, [capabilities, search, domainFilter]);
 
-  const anyFilter = search || domainFilter || maturityFilter || pocFilter;
+  const selected = capabilities.find(c => c.id === selectedId) ?? null;
 
-  function clearFilters() {
-    setSearch('');
-    setDomainFilter('');
-    setMaturityFilter('');
-    setPocFilter('');
+  function handleAdd(newCap: PennyCapability) {
+    setCapabilities(cs => [...cs, newCap]);
+    setSelectedId(newCap.id);
+    setIsAdding(false);
   }
 
-  function openCapability(cap: PennyCapability) {
-    setSelected(cap);
-    setDrawerOpen(true);
+  function handleUpdate(updated: PennyCapability) {
+    setCapabilities(cs => cs.map(c => c.id === updated.id ? updated : c));
   }
 
-  function handleNewCapability() {
-    openActionPanel({
-      title: 'Request New Capability', objectType: 'Penny Capability',
-      subtitle: 'Register a new Penny AI capability. Appears with Planned/Draft status until validated.',
-      slackContext: 'penny',
-      fields: [
-        { id: 'name',              label: 'Capability Name',       type: 'text',     required: true, placeholder: 'e.g. Salary Negotiation Coach' },
-        { id: 'domain',            label: 'Domain',                type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
-        { id: 'description',       label: 'Description',           type: 'textarea', placeholder: 'What does this capability do for learners?', rows: 3 },
-        { id: 'trigger',           label: 'When to Use',           type: 'textarea', placeholder: 'Describe the context where Penny should invoke this…', rows: 3 },
-        { id: 'maturity',          label: 'Maturity Level',        type: 'select',   options: ['Concept', 'Planned', 'In Development', 'POC Ready', 'Live'] },
-        { id: 'hallucinationRisk', label: 'Hallucination Risk',    type: 'select',   options: ['Low', 'Medium', 'High'] },
-        { id: 'knowledgeSources',  label: 'Key Knowledge Sources', type: 'textarea', placeholder: 'Which sources should Penny query?', rows: 2 },
-      ],
-    });
+  function handleDelete() {
+    const nextId = filtered.find(c => c.id !== selectedId)?.id ?? null;
+    setCapabilities(cs => cs.filter(c => c.id !== selectedId));
+    setSelectedId(nextId);
   }
-
-  const selectClasses = 'h-7 text-[11px] rounded-md border border-input bg-white px-2 focus:outline-none focus:ring-1 focus:ring-ring';
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex h-full overflow-hidden bg-background">
 
-      {/* Page header */}
-      <div className="px-5 pt-5 pb-4 border-b border-border flex-shrink-0 bg-background">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Penny Capabilities</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              {filtered.length} of {pennyCapabilities.length} capabilities across 7 domains
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
+      {/* ── Left panel: list ─────────────────────────────────────────────── */}
+      <div className="w-[260px] shrink-0 flex flex-col border-r border-border bg-card">
+
+        {/* List header */}
+        <div className="px-3 pt-3 pb-2 border-b border-border/60 space-y-2 shrink-0">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] font-medium text-foreground">
+              All capabilities
+            </span>
             <button
-              onClick={() => openSlackPanel({ context: 'penny', title: 'Penny Capabilities', subtitle: 'Slack channels and pending bot status for capability work.' })}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
+              onClick={() => { setIsAdding(true); }}
+              className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary text-primary-foreground text-[10px] font-bold hover:opacity-90 transition-opacity"
             >
-              <Hash className="w-3.5 h-3.5" />
-              Slack
-            </button>
-            <button
-              onClick={handleNewCapability}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[10px] font-bold hover:opacity-90 transition-opacity"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Request New Capability
+              <Plus className="w-3 h-3" /> Add
             </button>
           </div>
-        </div>
 
-        {/* Filter bar */}
-        <div className="flex items-center gap-2 mt-4 flex-wrap">
+          {/* Search */}
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/50 pointer-events-none" />
             <input
-              type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search by name or description…"
-              className="h-7 text-[11px] rounded-md border border-input bg-white pl-6 pr-2.5 w-64 focus:outline-none focus:ring-1 focus:ring-ring"
+              placeholder="Search capabilities…"
+              className="w-full text-[11px] border border-border rounded-md pl-6 pr-2.5 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/40"
             />
           </div>
 
-          <select value={domainFilter} onChange={e => setDomainFilter(e.target.value)} className={selectClasses}>
-            <option value="">All Domains</option>
-            {(['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'] as const).map(d => (
-              <option key={d} value={d}>{d}</option>
+          {/* Domain filter pills */}
+          <div className="flex flex-wrap gap-1">
+            {FILTER_PILLS.map(p => (
+              <button
+                key={p.label}
+                onClick={() => setDomainFilter(p.value)}
+                className={`px-2 py-0.5 rounded-full text-[9px] font-bold transition-colors ${
+                  domainFilter === p.value
+                    ? 'bg-foreground text-background'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                }`}
+              >
+                {p.label}
+              </button>
             ))}
-          </select>
+          </div>
+        </div>
 
-          <select value={maturityFilter} onChange={e => setMaturityFilter(e.target.value)} className={selectClasses}>
-            <option value="">All Maturity Levels</option>
-            {(['Prototype', 'Defined', 'Planned', 'In Development', 'Integrated', 'Operational'] as const).map(m => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-
-          <select value={pocFilter} onChange={e => setPocFilter(e.target.value)} className={selectClasses}>
-            <option value="">All POC Status</option>
-            <option value="exists">In POC</option>
-            <option value="partial">Partial</option>
-            <option value="planned">Planned</option>
-            <option value="none">Not in POC</option>
-          </select>
-
-          {anyFilter && (
-            <button
-              onClick={clearFilters}
-              className="text-[10px] text-muted-foreground hover:text-foreground underline transition-colors"
-            >
-              Clear filters
-            </button>
+        {/* List items */}
+        <div className="flex-1 overflow-y-auto">
+          {filtered.length === 0 ? (
+            <p className="px-3 py-6 text-[11px] text-muted-foreground text-center">
+              No capabilities match.
+            </p>
+          ) : (
+            filtered.map(cap => {
+              const isActive = cap.id === selectedId && !isAdding;
+              return (
+                <button
+                  key={cap.id}
+                  onClick={() => { setSelectedId(cap.id); setIsAdding(false); }}
+                  className={`w-full text-left px-3 py-2.5 border-b border-border/30 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary ${
+                    isActive
+                      ? 'bg-primary/5 border-l-2 border-l-primary'
+                      : 'hover:bg-muted/30 border-l-2 border-l-transparent'
+                  }`}
+                >
+                  <p className={`text-[12px] font-medium leading-snug truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
+                    {cap.name}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                    <StatusChip pocStatus={cap.pocStatus as 'exists' | 'partial'} />
+                    <DomainBadge domain={cap.domain} />
+                  </div>
+                </button>
+              );
+            })
           )}
         </div>
       </div>
 
-      {/* Table */}
-      <div className="flex-1 overflow-auto px-5 py-4">
-        <div className="border border-border rounded-lg overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-muted/30 border-b border-border">
-                <th className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wide w-44">Name</th>
-                <th className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wide w-28">Domain</th>
-                <th className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wide w-28">Maturity</th>
-                <th className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wide w-24">POC</th>
-                <th className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wide w-28">Owner</th>
-                <th className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-3 py-8 text-center text-[12px] text-muted-foreground">
-                    No capabilities match your filters.{' '}
-                    <button onClick={clearFilters} className="underline hover:text-foreground transition-colors">
-                      Clear filters
-                    </button>
-                  </td>
-                </tr>
-              ) : (
-                filtered.map(cap => (
-                  <tr
-                    key={cap.id}
-                    onClick={() => openCapability(cap)}
-                    className="bg-white hover:bg-muted/20 cursor-pointer border-b border-border/50 last:border-0 transition-colors"
-                  >
-                    <td className="px-3 py-2.5 text-[12px] font-medium text-foreground w-44">
-                      {cap.name}
-                    </td>
-                    <td className="px-3 py-2.5 w-28">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${getDomainColor(cap.domain)}`}>
-                        {cap.domain}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 w-28">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${getMaturityColor(cap.maturity)}`}>
-                        {cap.maturity}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 w-24">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${getPocColor(cap.pocStatus)}`}>
-                        {getPocLabel(cap.pocStatus)}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 text-[11px] text-muted-foreground w-28">
-                      {cap.owner}
-                    </td>
-                    <td className="px-3 py-2.5 text-[11px] text-muted-foreground max-w-xs">
-                      <span className="line-clamp-2">{cap.shortDescription}</span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+      {/* ── Right panel: detail / add form ───────────────────────────────── */}
+      <div className="flex-1 overflow-hidden">
+        {isAdding ? (
+          <AddCapabilityForm
+            onCancel={() => setIsAdding(false)}
+            onAdd={handleAdd}
+          />
+        ) : selected ? (
+          <CapabilityDetail
+            key={selected.id}
+            capability={selected}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
+            <p className="text-[13px] font-medium text-foreground mb-1">Select a capability</p>
+            <p className="text-[11px] max-w-xs">
+              Choose a capability from the list, or click Add to define a new one.
+            </p>
+          </div>
+        )}
       </div>
-
-      {/* Detail drawer */}
-      {drawerOpen && selected && (
-        <CapabilityDrawer
-          cap={selected}
-          onClose={() => setDrawerOpen(false)}
-          onRequestChanges={handleNewCapability}
-        />
-      )}
 
     </div>
   );
