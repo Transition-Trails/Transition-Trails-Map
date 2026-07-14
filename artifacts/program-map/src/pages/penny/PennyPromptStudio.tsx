@@ -1054,7 +1054,7 @@ export default function PennyPromptStudio() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Penny Command Center — Prompt Studio</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Penny — Prompt Studio</p>
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Penny Prompt Studio</h1>
