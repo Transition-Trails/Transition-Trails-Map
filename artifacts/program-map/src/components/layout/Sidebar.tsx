@@ -17,6 +17,7 @@ type NavGroup = {
   icon: React.ComponentType<{ className?: string }>;
   pathPrefix: string;
   extraPrefixes?: string[];
+  excludePrefixes?: string[];
   items: NavItem[];
   minTier?: AccessTier;
 };
@@ -41,11 +42,10 @@ const navGroups: NavGroup[] = [
     label: 'Programs',
     icon: GraduationCap,
     pathPrefix: '/program',
+    excludePrefixes: ['/program/blueprint', '/program/standards'],
     items: [
-      { id: 'prog-overview',   path: '/program',             label: 'Overview',        minTier: 'admin' },
-      { id: 'prog-programs',   path: '/program/programs',    label: 'Programs',        minTier: 'admin' },
-      { id: 'prog-standards',  path: '/program/standards',   label: 'Standards',       minTier: 'admin' },
-      { id: 'prog-blueprint',  path: '/program/blueprint',   label: 'Blueprint',       minTier: 'admin' },
+      { id: 'prog-overview',  path: '/program',          label: 'Overview',  minTier: 'admin' },
+      { id: 'prog-programs',  path: '/program/programs', label: 'Programs',  minTier: 'admin' },
     ],
   },
   {
@@ -99,17 +99,19 @@ const navGroups: NavGroup[] = [
     label: 'Administration',
     icon: Settings,
     pathPrefix: '/admin',
-    extraPrefixes: ['/digital-twin', '/uom', '/governance'],
+    extraPrefixes: ['/digital-twin', '/uom', '/governance', '/program/blueprint', '/program/standards'],
     items: [
       { id: 'admin-home',          path: '/admin/setup',          label: 'Administration' },
       { id: 'admin-integrations',  path: '/admin/integrations',   label: 'Integrations'   },
       { id: 'admin-people-access', path: '/admin/people-access',  label: 'People & Access' },
       { id: 'admin-digital-twin',  path: '/digital-twin',         label: 'Digital Twin',   minTier: 'admin' },
+      { id: 'admin-blueprint',     path: '/program/blueprint',    label: 'Blueprint',       minTier: 'admin' },
     ],
   },
 ];
 
 function isGroupActive(group: NavGroup, location: string): boolean {
+  if ((group.excludePrefixes ?? []).some(p => location.startsWith(p))) return false;
   if (location.startsWith(group.pathPrefix)) return true;
   return (group.extraPrefixes ?? []).some(p => location.startsWith(p));
 }
