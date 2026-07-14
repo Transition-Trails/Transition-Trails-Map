@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
   Home, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
-  ChevronDown, Search, Monitor,
+  ChevronDown, Search,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { type AccessTier, canAccess, TIER_CONFIG } from '@/config/accessTiers';
@@ -196,12 +196,6 @@ export function Sidebar() {
           <button title="Home" onClick={() => nav('/')} className={topBtnCls(location === '/')}>
             <Home className={`w-4 h-4 flex-shrink-0 ${location === '/' ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
             <span className="hidden xl:inline">Home</span>
-          </button>
-
-          {/* Trail OS Overview */}
-          <button title="Trail OS Overview" onClick={() => nav('/trail-os-overview')} className={topBtnCls(location === '/trail-os-overview')}>
-            <Monitor className={`w-4 h-4 flex-shrink-0 ${location === '/trail-os-overview' ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
-            <span className="hidden xl:inline">Trail OS Overview</span>
           </button>
 
           {/* Global Search */}
