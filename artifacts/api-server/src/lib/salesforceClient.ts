@@ -2,15 +2,24 @@ import { refreshAccessToken } from "./salesforceOAuth.js";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface SoqlQueryResult<T> {
+export interface SoqlQueryResult<T> {
   records: T[];
   totalSize: number;
   done: boolean;
 }
 
-interface SalesforceCreateResult {
+export interface SalesforceCreateResult {
   id: string;
   success: boolean;
+}
+
+// Shared interface implemented by both SalesforceClient (session-based)
+// and ConnectorSalesforceClient (Replit proxy-based).
+export interface ISalesforceClient {
+  query<T>(soql: string): Promise<SoqlQueryResult<T>>;
+  getRecord<T>(objectApiName: string, recordId: string, fields: string[]): Promise<T>;
+  createRecord(objectApiName: string, data: Record<string, unknown>): Promise<SalesforceCreateResult>;
+  updateRecord(objectApiName: string, recordId: string, data: Record<string, unknown>): Promise<void>;
 }
 
 // ── Client ────────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import type { SalesforceClient } from "./salesforceClient.js";
+import type { ISalesforceClient } from "./salesforceClient.js";
 import type {
   LearnerContext,
   LearnerContextUpdate,
@@ -119,7 +119,7 @@ function requireOne<T>(records: T[], label: string): T {
 // ── Learner context ───────────────────────────────────────────────────────────
 
 export async function getLearnerContext(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   contactId: string
 ): Promise<LearnerContext> {
   const soql = `SELECT Id, FirstName, LastName, Email, Penny_Trail__c, Penny_Trail_Config__c, Penny_Current_Phase__c, Penny_Current_Goal__c, Penny_Current_Blockers__c, Penny_Coaching_Tone__c, Penny_Confidence_Score__c, Penny_Skill_Score__c, Penny_Sprint_Week__c, Penny_Onboarding_Complete__c FROM Contact WHERE Id = '${contactId}' LIMIT 1`;
@@ -157,7 +157,7 @@ const WRITABLE_LEARNER_FIELDS = new Set<keyof LearnerContextUpdate>([
 ]);
 
 export async function updateLearnerContext(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   contactId: string,
   fields: Partial<LearnerContextUpdate>
 ): Promise<void> {
@@ -186,7 +186,7 @@ function mapTrailConfig(raw: RawTrailConfig): TrailConfig {
 }
 
 export async function getTrailConfig(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   trailConfigId: string
 ): Promise<TrailConfig> {
   const soql = `SELECT Id, Name, Trail_ID__c, Penny_Role__c, Tone__c, Focal_Points__c, Special_Instructions__c, Is_Active__c FROM Penny_Trail_Config__c WHERE Id = '${trailConfigId}' LIMIT 1`;
@@ -195,7 +195,7 @@ export async function getTrailConfig(
 }
 
 export async function getAllTrailConfigs(
-  client: SalesforceClient
+  client: ISalesforceClient
 ): Promise<TrailConfig[]> {
   const soql = `SELECT Id, Name, Trail_ID__c, Penny_Role__c, Tone__c, Focal_Points__c, Special_Instructions__c, Is_Active__c FROM Penny_Trail_Config__c ORDER BY Is_Active__c DESC, Trail_ID__c ASC`;
   const result = await client.query<RawTrailConfig>(soql);
@@ -203,7 +203,7 @@ export async function getAllTrailConfigs(
 }
 
 export async function getActiveTrailConfigs(
-  client: SalesforceClient
+  client: ISalesforceClient
 ): Promise<TrailConfig[]> {
   const all = await getAllTrailConfigs(client);
   return all.filter(c => c.isActive);
@@ -212,7 +212,7 @@ export async function getActiveTrailConfigs(
 // ── Interaction logs ──────────────────────────────────────────────────────────
 
 export async function logInteraction(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   payload: LogInteractionPayload
 ): Promise<{ id: string }> {
   const result = await client.createRecord("Penny_Interaction_Log__c", {
@@ -228,7 +228,7 @@ export async function logInteraction(
 }
 
 export async function getInteractionHistory(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   contactId: string,
   limitCount: number
 ): Promise<InteractionLogRecord[]> {
@@ -261,7 +261,7 @@ function mapCareerReview(raw: RawCareerReview): CareerReviewRecord {
 }
 
 export async function getCareerReviews(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   contactId: string
 ): Promise<CareerReviewRecord[]> {
   const soql = `SELECT Id, Name, Area_Scores__c, Feedback_JSON__c, Readiness_Label__c, Review_Mode__c, Reviewed_At__c, Target_Role__c, CreatedDate FROM Penny_Career_Review__c WHERE Learner__c = '${contactId}' ORDER BY CreatedDate DESC`;
@@ -270,7 +270,7 @@ export async function getCareerReviews(
 }
 
 export async function createCareerReview(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   payload: CreateCareerReviewPayload
 ): Promise<{ id: string }> {
   const result = await client.createRecord("Penny_Career_Review__c", {
@@ -288,7 +288,7 @@ export async function createCareerReview(
 // ── Quest submissions ─────────────────────────────────────────────────────────
 
 export async function getQuestSubmissions(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   contactId: string
 ): Promise<QuestSubmissionRecord[]> {
   // Querying via Learner__c lookup. If this field does not exist on
@@ -307,7 +307,7 @@ export async function getQuestSubmissions(
 }
 
 export async function createQuestSubmission(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   payload: CreateQuestSubmissionPayload
 ): Promise<{ id: string }> {
   const result = await client.createRecord("Penny_Quest_Submission__c", {
@@ -323,7 +323,7 @@ export async function createQuestSubmission(
 // ── Badges ────────────────────────────────────────────────────────────────────
 
 export async function getBadges(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   contactId: string
 ): Promise<BadgeRecord[]> {
   const soql = `SELECT Id, Name, Awarded_By__c, Learner__c, CreatedDate FROM Penny_Badge__c WHERE Learner__c = '${contactId}' ORDER BY CreatedDate DESC`;
@@ -340,7 +340,7 @@ export async function getBadges(
 // ── Gamification ──────────────────────────────────────────────────────────────
 
 export async function getGamification(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   contactId: string
 ): Promise<GamificationRecord[]> {
   const soql = `SELECT Id, Name, Points__c, Sprint_Points__c, Sprint_Number__c, Reason__c, Note__c, Awarded_By__c, CreatedDate FROM Penny_Gamification__c WHERE Learner__c = '${contactId}' ORDER BY CreatedDate DESC`;
@@ -361,11 +361,11 @@ export async function getGamification(
 // ── Weekly reports ────────────────────────────────────────────────────────────
 
 export async function getWeeklyReports(
-  client: SalesforceClient
+  client: ISalesforceClient
 ): Promise<WeeklyReportRecord[]> {
   const soql = `SELECT Id, Name, Generated_At__c, Top_Themes__c, Support_Flags__c, Suggested_Actions__c, Trail_Breakdown__c, Week_Start__c, Week_End__c, CreatedDate FROM Penny_Weekly_Report__c ORDER BY CreatedDate DESC LIMIT 10`;
   const result = await client.query<RawWeeklyReport>(soql);
-  return result.records.map((raw) => ({
+  return result.records.map((raw: RawWeeklyReport) => ({
     id:               raw.Id,
     name:             raw.Name,
     generatedAt:      raw.Generated_At__c,
@@ -380,7 +380,7 @@ export async function getWeeklyReports(
 }
 
 export async function createWeeklyReport(
-  client: SalesforceClient,
+  client: ISalesforceClient,
   payload: CreateWeeklyReportPayload
 ): Promise<{ id: string }> {
   const result = await client.createRecord("Penny_Weekly_Report__c", {

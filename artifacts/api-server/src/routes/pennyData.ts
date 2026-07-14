@@ -1,7 +1,7 @@
 import { Router, type Request, type Response, type RequestHandler } from "express";
 import { getSalesforceClient } from "../lib/getSalesforceClient.js";
-import { SalesforceClient } from "../lib/salesforceClient.js";
-import { getCachedSfToken, setCachedSfToken } from "../lib/sfTokenCache.js";
+import type { ISalesforceClient } from "../lib/salesforceClient.js";
+import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
 import {
   getLearnerContext,
   getTrailConfig,
@@ -27,39 +27,18 @@ const router = Router();
 // Resolves the per-request SalesforceClient from session tokens and wraps
 // both auth errors (401) and Salesforce API errors (500) in one place.
 
-type SfHandler = (req: Request, res: Response, client: SalesforceClient) => Promise<void>;
+type SfHandler = (req: Request, res: Response, client: ISalesforceClient) => Promise<void>;
 
 function withClient(handler: SfHandler): RequestHandler {
   return async (req, res): Promise<void> => {
-    let client: SalesforceClient;
+    let client: ISalesforceClient;
     try {
+      // Prefer the session-based client (admin who completed SF OAuth)
       client = getSalesforceClient(req);
-      // Keep the server-side cache warm whenever a session-based client is available
-      if (req.session.sfAccessToken && req.session.sfRefreshToken && req.session.sfInstanceUrl) {
-        setCachedSfToken({
-          accessToken:  req.session.sfAccessToken,
-          refreshToken: req.session.sfRefreshToken,
-          instanceUrl:  req.session.sfInstanceUrl,
-        });
-      }
     } catch {
-      // No session-based SF token — fall back to the server-side cached token
-      // (populated the first time any admin completes the SF OAuth flow)
-      const cached = getCachedSfToken();
-      if (!cached) {
-        res.status(401).json({
-          error: "Salesforce not connected — please complete SF OAuth in Admin → Integrations → Salesforce",
-        });
-        return;
-      }
-      client = new SalesforceClient(
-        cached.accessToken,
-        cached.refreshToken,
-        cached.instanceUrl,
-        async (newToken) => {
-          setCachedSfToken({ ...cached, accessToken: newToken });
-        }
-      );
+      // No session-based SF token — fall back to the Replit Connectors proxy.
+      // The proxy holds long-lived credentials; no per-user OAuth required.
+      client = new ConnectorSalesforceClient();
     }
     try {
       await handler(req, res, client);
