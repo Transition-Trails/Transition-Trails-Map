@@ -5,8 +5,8 @@ import { useLocation } from 'wouter';
 import {
   Activity, Users, Inbox, Brain,
   ArrowRight, CheckCircle2, Circle,
-  Plus, BarChart3, FileText, Bot, Map, BookOpen,
-  AlertTriangle, Calendar, Monitor,
+  BarChart3, FileText, Bot,
+  AlertTriangle, Calendar,
 } from 'lucide-react';
 
 // ── Activity items ────────────────────────────────────────────────────────────
@@ -58,28 +58,6 @@ export default function Home() {
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, setLocation] = useLocation();
 
-  const quickActions = isEveryday
-    ? [
-        { icon: Map,      label: 'My Programs',      path: '/program',           primary: true  },
-        { icon: BookOpen, label: 'Knowledge Library', path: '/knowledge/library', primary: false },
-        { icon: Users,    label: 'My Cohort',         path: '/program',           primary: false },
-      ]
-    : isPowerOrAbove && !isAdminOrAbove
-    ? [
-        { icon: Map,      label: 'Program Map',    path: '/program',           primary: false },
-        { icon: Bot,      label: 'Test Penny',     path: '/penny/test',        primary: false },
-        { icon: BarChart3,label: 'Health',         path: '/operations/health', primary: false },
-        { icon: FileText, label: 'Knowledge',      path: '/knowledge/library', primary: false },
-      ]
-    : [
-        { icon: Plus,      label: 'New Request',      path: '/operations/demand',   primary: true  },
-        { icon: Inbox,     label: 'Cases',            path: '/operations/demand',   primary: false },
-        { icon: BarChart3, label: 'Health',           path: '/operations/health',   primary: false },
-        { icon: Bot,       label: 'Test Penny',       path: '/penny/test',          primary: false },
-        { icon: Map,       label: 'Program Map',      path: '/program',             primary: false },
-        { icon: Monitor,   label: 'Trail OS Overview',path: '/trail-os-overview',   primary: false },
-      ];
-
   const activityItems = isEveryday
     ? ALL_ACTIVITY.filter(a => !a.minPower)
     : ALL_ACTIVITY;
@@ -101,35 +79,11 @@ export default function Home() {
   return (
     <div className="h-full w-full flex flex-col p-3 gap-2.5 overflow-hidden">
 
-      {/* ── Header + Quick Actions row ── */}
-      <div className="flex-shrink-0 flex items-center gap-3 flex-wrap">
-        <h1 className="text-sm font-semibold text-foreground leading-none mr-1">
+      {/* ── Header ── */}
+      <div className="flex-shrink-0">
+        <h1 className="text-sm font-semibold text-foreground leading-none">
           {isEveryday ? 'My Dashboard' : 'Mission Control'}
         </h1>
-        {isAdminOrAbove && (
-          <span className="text-[10px] font-medium text-muted-foreground/50 bg-muted/50 border border-border/60 px-1.5 py-0.5 rounded leading-none">
-            Prototype Data
-          </span>
-        )}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {quickActions.map(a => {
-            const Icon = a.icon;
-            return (
-              <button
-                key={a.label}
-                onClick={() => setLocation(a.path)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors whitespace-nowrap ${
-                  a.primary
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                    : 'bg-white border border-border/70 text-foreground/70 hover:text-foreground hover:bg-muted/50 hover:border-border'
-                }`}
-              >
-                <Icon className={`w-3 h-3 flex-shrink-0 ${a.primary ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
-                {a.label}
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       {/* ── Metric strip ── */}

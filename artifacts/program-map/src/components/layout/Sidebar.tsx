@@ -29,12 +29,8 @@ const navGroups: NavGroup[] = [
     icon: Activity,
     pathPrefix: '/operations',
     items: [
-      { id: 'ops-overview',         path: '/operations',                    label: 'Executive Overview',  minTier: 'admin' },
-      { id: 'ops-health',           path: '/operations/health',             label: 'Health Indicators',   minTier: 'admin' },
-      { id: 'ops-scorecards',       path: '/operations/scorecards',         label: 'Scorecards',          minTier: 'admin' },
-      { id: 'ops-trends',           path: '/operations/trends',             label: 'Trends & Insights',   minTier: 'admin' },
-      { id: 'ops-demand',           path: '/operations/demand',             label: 'Demand',              minTier: 'admin' },
-      { id: 'ops-recommendations',  path: '/operations/recommendations',    label: 'Recommendations',     minTier: 'admin' },
+      { id: 'ops-overview', path: '/operations',       label: 'Executive Overview', minTier: 'admin' },
+      { id: 'ops-demand',   path: '/operations/demand', label: 'Demand',            minTier: 'admin' },
     ],
   },
   {
