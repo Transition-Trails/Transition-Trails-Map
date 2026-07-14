@@ -68,7 +68,10 @@ import TestPenny               from "@/pages/penny/TestPenny";
 import LearnerDetail           from "@/pages/penny/LearnerDetail";
 import TrailConfigs            from "@/pages/penny/TrailConfigs";
 import { PennyPageShell }      from "@/components/penny/PennyPageShell";
-import KnowledgeHub     from "@/pages/knowledge/KnowledgeHub";
+import KnowledgeOverview  from "@/pages/knowledge/KnowledgeOverview";
+import KnowledgeWorkspace from "@/pages/knowledge/KnowledgeWorkspace";
+import LibraryDocuments   from "@/pages/library/LibraryDocuments";
+import OrgMemory          from "@/pages/knowledge/OrgMemory";
 import CollaborationHub from "@/pages/collaboration/CollaborationHub";
 import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
 import PeopleWorkspace    from "@/pages/people/PeopleWorkspace";
@@ -248,8 +251,10 @@ function Router() {
       <Route path="/penny/penny-sandbox">      <PennyPageShell><TestPenny /></PennyPageShell></Route>
       <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
-      <Route path="/knowledge/:tab"       component={KnowledgeHub} />
-      <Route path="/knowledge"            component={KnowledgeHub} />
+      <Route path="/knowledge/sources" component={KnowledgeWorkspace} />
+      <Route path="/knowledge/library" component={LibraryDocuments} />
+      <Route path="/knowledge/memory"  component={OrgMemory} />
+      <Route path="/knowledge"         component={KnowledgeOverview} />
 
       <Route path="/collaboration/slack/:subtab"     component={CollaborationHub} />
       <Route path="/collaboration/drive/:subtab"     component={CollaborationHub} />
