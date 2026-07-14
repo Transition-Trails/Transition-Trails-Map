@@ -8,6 +8,7 @@ import {
   getUserIdentity,
 } from "../lib/salesforceOAuth.js";
 import { logger } from "../lib/logger.js";
+import { setCachedSfToken } from "../lib/sfTokenCache.js";
 
 const router = Router();
 
@@ -118,6 +119,13 @@ router.get("/callback", async (req, res): Promise<void> => {
       req.session.sfOrgId        = identity.organizationId;
       req.session.sfContactId    = sfContactId;
 
+      // Cache tokens server-side so routes can use them without a personal SF session
+      setCachedSfToken({
+        accessToken:  tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        instanceUrl:  tokens.instanceUrl,
+      });
+
       req.session.save((saveErr) => {
         if (saveErr) {
           logger.error({ err: saveErr }, "Failed to save session after Salesforce callback");
@@ -178,6 +186,12 @@ router.get("/status", async (req, res): Promise<void> => {
         const refreshed = await refreshAccessToken(sfRefreshToken);
         req.session.sfAccessToken = refreshed.accessToken;
         req.session.sfIssuedAt    = refreshed.issuedAt;
+        // Keep the server-side cache fresh whenever a refresh succeeds
+        setCachedSfToken({
+          accessToken:  refreshed.accessToken,
+          refreshToken: sfRefreshToken,
+          instanceUrl:  req.session.sfInstanceUrl ?? "",
+        });
         req.session.save((err) => {
           if (err) logger.warn({ err }, "Failed to persist refreshed Salesforce token");
         });
