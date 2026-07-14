@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-// TODO Layer 3 — replaced by Salesforce live data; static data files kept on disk but no longer imported at startup
-import type { Program } from '@/data/programs';
+import { programs as STATIC_PROGRAMS, type Program } from '@/data/programs';
 import type { SourceDocument } from '@/data/sourceDocuments';
 import type { ResolvePhase } from '@/data/resolvePhases';
 import type { PennyCapability } from '@/data/pennyCapabilities';
@@ -124,8 +123,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const openSlackPanel   = (cfg: SlackPanelConfig)   => { setSlackPanel(cfg); setActionPanel(null); };
   const closeSlackPanel  = ()                        => setSlackPanel(null);
 
-  // TODO Layer 3 — static initializers replaced with empty arrays; live data comes from Salesforce via hooks
-  const [programs, setPrograms]                       = useState<Program[]>([]);
+  const [programs, setPrograms]                       = useState<Program[]>(STATIC_PROGRAMS);
   const [sourceDocuments, setSourceDocuments]         = useState<SourceDocument[]>([]);
   const [resolvePhases, setResolvePhases]             = useState<ResolvePhase[]>([]);
   const [pennyCapabilities, setPennyCapabilities]     = useState<PennyCapability[]>([]);

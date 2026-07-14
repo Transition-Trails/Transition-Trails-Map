@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useLocation } from 'wouter';
-import { LayoutGrid, Star, Layers, CheckCircle, AlertCircle, FileEdit, Brain, ChevronRight, Sparkles, Clock } from 'lucide-react';
+import { LayoutGrid, CheckCircle, AlertCircle, FileEdit, Brain, ChevronRight, Sparkles, Clock } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -289,7 +289,7 @@ export default function ProgramOverview() {
         {/* ── Navigation cards ─────────────────────────────────────────────── */}
         <div className="space-y-2">
           <Eyebrow>Program Areas</Eyebrow>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             <NavCard
               icon={LayoutGrid}
               title="Programs"
@@ -298,20 +298,6 @@ export default function ProgramOverview() {
               badge={stats.needsReview > 0 ? `${stats.needsReview} need review` : undefined}
               badgeColor="bg-amber-50 text-amber-700 border-amber-200"
             />
-            <NavCard
-              icon={Star}
-              title="Standards"
-              desc="Quality rulebook, gap report, and standards audit checklist."
-              path="/program/standards"
-            />
-            {isAdminOrAbove && (
-              <NavCard
-                icon={Layers}
-                title="Blueprint"
-                desc="Cross-program blueprint canvas — structure, curriculum, and Penny mapping."
-                path="/program/blueprint"
-              />
-            )}
           </div>
         </div>
 
