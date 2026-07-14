@@ -87,10 +87,9 @@ const navGroups: NavGroup[] = [
     icon: BookOpen,
     pathPrefix: '/knowledge',
     items: [
-      { id: 'know-overview',  path: '/knowledge',         label: 'Overview',   minTier: 'admin' },
-      { id: 'know-sources',  path: '/knowledge/sources', label: 'Sources',    minTier: 'admin' },
-      { id: 'know-library',  path: '/knowledge/library', label: 'Library',    minTier: 'admin' },
-      { id: 'know-memory',   path: '/knowledge/memory',  label: 'Org Memory', minTier: 'admin' },
+      { id: 'know-overview', path: '/knowledge',         label: 'Overview', minTier: 'admin' },
+      { id: 'know-sources',  path: '/knowledge/sources', label: 'Sources',  minTier: 'admin' },
+      { id: 'know-library',  path: '/knowledge/library', label: 'Library',  minTier: 'admin' },
     ],
   },
   {
