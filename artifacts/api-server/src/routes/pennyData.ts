@@ -34,8 +34,19 @@ function withClient(handler: SfHandler): RequestHandler {
     try {
       client = getSalesforceClient(req);
     } catch {
-      res.status(401).json({ error: "Not authenticated with Salesforce" });
-      return;
+      // No session-based SF token — fall back to the service account token
+      const serviceToken = process.env["SF_SERVICE_TOKEN"];
+      const instanceUrl  = process.env["SALESFORCE_INSTANCE_URL"];
+      if (!serviceToken || !instanceUrl) {
+        res.status(401).json({ error: "Not authenticated with Salesforce — set SF_SERVICE_TOKEN in Secrets or complete SF OAuth in Admin → Integrations" });
+        return;
+      }
+      client = new SalesforceClient(
+        serviceToken,
+        "",          // service tokens don't refresh via OAuth
+        instanceUrl,
+        async () => { /* no-op: service token has no refresh flow */ }
+      );
     }
     try {
       await handler(req, res, client);
