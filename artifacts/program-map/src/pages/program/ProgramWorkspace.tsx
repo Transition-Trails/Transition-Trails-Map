@@ -73,11 +73,29 @@ function OverviewTab({ p }: { p: Program }) {
             <RichText html={p.whyItMatters} className="text-foreground" />
           </Section>
         )}
-        {p.outcomes?.length > 0 && (
-          <Section title="Outcomes">
-            <ul className="space-y-1">
-              {p.outcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-emerald-500 mt-0.5">✓</span>{o}</li>)}
-            </ul>
+        {(p.expectedOutcomes || p.outcomes?.length > 0) && (
+          <Section title="Expected Outcomes">
+            {p.expectedOutcomes
+              ? <RichText html={p.expectedOutcomes} className="text-foreground" />
+              : <ul className="space-y-1">
+                  {p.outcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-emerald-500 mt-0.5">✓</span>{o}</li>)}
+                </ul>
+            }
+          </Section>
+        )}
+        {p.successMetrics && (
+          <Section title="Success Metrics">
+            <RichText html={p.successMetrics} className="text-foreground" />
+          </Section>
+        )}
+        {p.fundingStrategy && (
+          <Section title="Funding Strategy">
+            <RichText html={p.fundingStrategy} className="text-muted-foreground" />
+          </Section>
+        )}
+        {p.partnershipOpportunities && (
+          <Section title="Partnership Opportunities">
+            <RichText html={p.partnershipOpportunities} className="text-muted-foreground" />
           </Section>
         )}
         {!isEveryday && p.whatBreaksIfMissing && (
@@ -247,7 +265,6 @@ export default function ProgramWorkspace() {
     typeBg: 'bg-emerald-50',
     status: p.status ?? (p.confidence === 'confirmed' ? 'Active' : p.confidence === 'needs-review' ? 'Review' : p.confidence),
     statusVariant: (p.status === 'Active' || p.confidence === 'confirmed') ? ('active' as const) : ('planning' as const),
-    health: (p.status === 'Active' || p.confidence === 'confirmed') ? ('healthy' as const) : ('needs-attention' as const),
     secondary: p.status
       ? `${p.status}${p.startDate ? ` · From ${p.startDate}` : ''}`
       : `${p.format} · ${p.duration}`,

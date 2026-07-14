@@ -130,7 +130,7 @@ export function ObjectWorkspace({
                       {item.name}
                     </span>
                     <div className="flex items-center gap-1 shrink-0">
-                      <HealthDot health={item.health} />
+                      {item.health && <HealthDot health={item.health} />}
                       {item.confidence !== undefined && (
                         <span className={`text-[9px] font-bold tabular-nums ${isActive ? 'text-primary-foreground/80' : item.confidence >= 85 ? 'text-emerald-600' : item.confidence >= 70 ? 'text-amber-600' : 'text-rose-600'}`}>
                           {item.confidence}%
@@ -189,9 +189,11 @@ export function ObjectWorkspace({
                       {selected.status && (
                         <StatusBadge status={selected.status} variant={selected.statusVariant} />
                       )}
-                      <HealthDot health={selected.health} />
                       {selected.health && (
-                        <span className="text-[10px] text-muted-foreground">{selected.health.replace('-', ' ')}</span>
+                        <>
+                          <HealthDot health={selected.health} />
+                          <span className="text-[10px] text-muted-foreground">{selected.health.replace('-', ' ')}</span>
+                        </>
                       )}
                       {selected.confidence !== undefined && (
                         <span className="text-[10px] text-muted-foreground">· <ConfidencePill value={selected.confidence} /></span>

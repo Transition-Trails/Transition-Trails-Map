@@ -143,3 +143,15 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Quill rich text viewer — matches classes emitted by Salesforce Rich Text Areas */
+.ql-quote-block {
+  border-left: 3px solid #ccc;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #555;
+}
+.ql-align-center { text-align: center; }
+.ql-align-right  { text-align: right; }
+.ql-indent-1     { padding-left: 2em; }
+.ql-indent-2     { padding-left: 4em; }
