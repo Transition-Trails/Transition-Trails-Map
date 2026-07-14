@@ -1,24 +1,26 @@
 import {
   Brain, Layers, MessageSquare, Users, BarChart2,
   Activity, GitBranch, Plus, Sparkles, LayoutDashboard,
-  Star, ClipboardCheck, Bot, Image,
+  Star, ClipboardCheck, Bot, Image, Settings, CalendarDays,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
-import PennyWorkspace        from '@/pages/penny/PennyWorkspace';
-import PennyPromptStudio     from '@/pages/penny/PennyPromptStudio';
-import Learners              from '@/pages/penny/Learners';
-import Intelligence          from '@/pages/penny/Intelligence';
-import PennyHealth           from '@/pages/operations/PennyHealth';
-import PennyCommandCenter    from '@/pages/penny/PennyCommandCenter';
-import TestPenny             from '@/pages/penny/TestPenny';
-import TrailQuests           from '@/pages/penny/TrailQuests';
-import Assessments           from '@/pages/penny/Assessments';
-import AgentforceCenter      from '@/pages/penny/AgentforceCenter';
+import PennyWorkspace           from '@/pages/penny/PennyWorkspace';
+import PennyPromptStudio        from '@/pages/penny/PennyPromptStudio';
+import Learners                 from '@/pages/penny/Learners';
+import Intelligence             from '@/pages/penny/Intelligence';
+import PennyHealth              from '@/pages/operations/PennyHealth';
+import PennyCommandCenter       from '@/pages/penny/PennyCommandCenter';
+import TestPenny                from '@/pages/penny/TestPenny';
+import TrailQuests              from '@/pages/penny/TrailQuests';
+import Assessments              from '@/pages/penny/Assessments';
+import AgentforceCenter         from '@/pages/penny/AgentforceCenter';
 import PennyAssetLibrary        from '@/pages/penny/PennyAssetLibrary';
 import PennyCapabilityRegistry  from '@/pages/penny/PennyCapabilityRegistry';
+import PennyAdminCenter         from '@/pages/penny/PennyAdminCenter';
+import SessionLog               from '@/pages/penny/SessionLog';
 
 export default function PennyHub() {
   const { openActionPanel, setRightPanelOpen } = useAppContext();
@@ -91,19 +93,19 @@ export default function PennyHub() {
 
   const TABS = [
     ...(!isEveryday ? [
-      { id: 'overview',      label: 'Command Center', path: '/penny',              icon: LayoutDashboard, content: <PennyCommandCenter /> },
-      { id: 'capabilities',  label: 'Capabilities',   path: '/penny/capabilities', icon: Layers,          content: <PennyCapabilityRegistry /> },
-      { id: 'prompts',       label: 'Prompt Studio',  path: '/penny/prompts',      icon: MessageSquare,   content: <PennyPromptStudio /> },
+      { id: 'overview',      label: 'Command Center',  path: '/penny',              icon: LayoutDashboard, content: <PennyCommandCenter /> },
+      { id: 'capabilities',  label: 'Capabilities',    path: '/penny/capabilities', icon: Layers,          content: <PennyCapabilityRegistry /> },
+      { id: 'prompts',       label: 'Prompt Studio',   path: '/penny/prompts',      icon: MessageSquare,   content: <PennyPromptStudio /> },
     ] : []),
-    { id: 'learners', label: isEveryday ? 'My Learners' : 'Learners', path: '/penny/learners', icon: Users, content: <Learners /> },
+    { id: 'learners',     label: isEveryday ? 'My Learners' : 'Learner Pipeline', path: '/penny/learners',     icon: Users,        content: <Learners /> },
+    { id: 'session-log',  label: 'Session Log',                                   path: '/penny/session-log',  icon: CalendarDays, content: <SessionLog /> },
     ...(!isEveryday ? [
-      { id: 'trail-quests', label: 'Trail Quests',  path: '/penny/trail-quests',  icon: Star,          content: <TrailQuests /> },
-      { id: 'assessments',  label: 'Assessments',   path: '/penny/assessments',   icon: ClipboardCheck, content: <Assessments /> },
-      { id: 'agentforce',   label: 'Agentforce',    path: '/penny/agentforce',    icon: Bot,           content: <AgentforceCenter /> },
-      { id: 'intelligence', label: 'Intelligence',  path: '/penny/intelligence',  icon: BarChart2,     content: <Intelligence /> },
-      { id: 'health',       label: 'Health',        path: '/penny/health',        icon: Activity,      content: <PennyHealth /> },
-      { id: 'test',         label: 'Ask Penny',     path: '/penny/test',          icon: Sparkles,      content: <TestPenny /> },
-      { id: 'asset-library', label: 'Asset Library', path: '/penny/asset-library', icon: Image,        content: <PennyAssetLibrary /> },
+      { id: 'trail-quests',   label: 'Trail Quests',   path: '/penny/trail-quests',  icon: Star,           content: <TrailQuests /> },
+      { id: 'assessments',    label: 'Assessments',    path: '/penny/assessments',   icon: ClipboardCheck, content: <Assessments /> },
+      { id: 'agentforce',     label: 'Agentforce',     path: '/penny/agentforce',    icon: Bot,            content: <AgentforceCenter /> },
+      { id: 'health',         label: 'Health',         path: '/penny/health',        icon: Activity,       content: <PennyHealth /> },
+      { id: 'asset-library',  label: 'Asset Library',  path: '/penny/asset-library', icon: Image,          content: <PennyAssetLibrary /> },
+      { id: 'admin-center',   label: '⚙ Command Center', path: '/penny/admin-center', icon: Settings,      content: <PennyAdminCenter /> },
     ] : []),
   ];
 

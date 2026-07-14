@@ -123,13 +123,19 @@ function Router() {
       {/* Old Penny paths → penny hub tabs */}
       <Route path="/penny/capability-registry"> <Redirect to="/penny" /></Route>
       <Route path="/penny/prompt-studio">       <Redirect to="/penny/prompts" /></Route>
-      <Route path="/penny/test-penny">          <Redirect to="/penny/test" /></Route>
       <Route path="/penny/prompt-library">      <Redirect to="/penny/prompts" /></Route>
       <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
       <Route path="/penny/integrations">        <Redirect to="/admin/setup" /></Route>
       <Route path="/penny/integration-layer">   <Redirect to="/admin/setup" /></Route>
-      {/* Trail Quests, Assessments, and Agentforce — now live tabs in PennyHub */}
-      <Route path="/penny/logs">                <Redirect to="/penny/learners" /></Route>
+      {/* Relocated pages → Penny Admin Center tabs */}
+      <Route path="/penny/test-penny">          <Redirect to="/penny/admin-center?tab=penny-sandbox" /></Route>
+      <Route path="/penny/test">                <Redirect to="/penny/admin-center?tab=penny-sandbox" /></Route>
+      <Route path="/penny/trails">              <Redirect to="/penny/admin-center?tab=trail-config" /></Route>
+      <Route path="/penny/quest-templates">     <Redirect to="/penny/admin-center?tab=quest-library" /></Route>
+      <Route path="/penny/weekly-reports">      <Redirect to="/penny/admin-center?tab=intelligence" /></Route>
+      <Route path="/penny/logs">                <Redirect to="/penny/admin-center?tab=penny-logs" /></Route>
+      {/* Quest Activity is redundant — content lives in Learner Detail quest history tab */}
+      <Route path="/penny/quest-activity">      <Redirect to="/penny/learners" /></Route>
 
       {/* Old collaboration config tabs → Integration Hub */}
       <Route path="/collaboration/drive/:sub">   <Redirect to="/admin/integrations/google-drive" /></Route>
