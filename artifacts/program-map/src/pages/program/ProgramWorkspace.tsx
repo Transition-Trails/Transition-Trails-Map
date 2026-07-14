@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, RefreshCw, WifiOff } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import { useSfPrograms } from '@/hooks/useSfPrograms';
 import { ObjectWorkspace, HealthDot, StatusBadge } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
 import type { Program } from '@/data/programs';
@@ -233,6 +234,7 @@ function HealthTab({ p }: { p: Program }) {
 export default function ProgramWorkspace() {
   const { programs } = useAppContext();
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
+  const { isLoading, isError, refetch, isFetching } = useSfPrograms();
 
   const items = useMemo<WorkspaceItem[]>(() => programs.map(p => ({
     id: p.id,
@@ -240,11 +242,13 @@ export default function ProgramWorkspace() {
     typeName: 'Program',
     typeColor: 'text-emerald-700',
     typeBg: 'bg-emerald-50',
-    status: p.confidence === 'confirmed' ? 'Active' : p.confidence === 'needs-review' ? 'Review' : p.confidence,
-    statusVariant: p.confidence === 'confirmed' ? ('active' as const) : ('planning' as const),
-    health: p.confidence === 'confirmed' ? ('healthy' as const) : ('needs-attention' as const),
-    secondary: `${p.format} · ${p.duration}`,
-    owner: !isEveryday ? 'Program Director' : undefined,
+    status: p.status ?? (p.confidence === 'confirmed' ? 'Active' : p.confidence === 'needs-review' ? 'Review' : p.confidence),
+    statusVariant: (p.status === 'Active' || p.confidence === 'confirmed') ? ('active' as const) : ('planning' as const),
+    health: (p.status === 'Active' || p.confidence === 'confirmed') ? ('healthy' as const) : ('needs-attention' as const),
+    secondary: p.status
+      ? `${p.status}${p.startDate ? ` · From ${p.startDate}` : ''}`
+      : `${p.format} · ${p.duration}`,
+    owner: !isEveryday ? (p.programManager ?? 'Program Director') : undefined,
     confidence: !isEveryday ? (p.confidence === 'confirmed' ? 91 : 72) : undefined,
   })), [programs, isEveryday]);
 
@@ -277,6 +281,37 @@ export default function ProgramWorkspace() {
       { id:'health', label:'Health', render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <HealthTab p={p} /> : null; } },
     ] : []),
   ], [programs, isEveryday, isPowerOrAbove, isAdminOrAbove]);
+
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
+        <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
+          <WifiOff className="w-5 h-5 text-rose-500" />
+        </div>
+        <div>
+          <p className="text-[13px] font-semibold text-foreground mb-1">Could not load programs</p>
+          <p className="text-[11px] text-muted-foreground">Salesforce is unreachable. Check your connection and try again.</p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-[11px] font-semibold text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3 h-3 ${isFetching ? 'animate-spin' : ''}`} />
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-2">
+        <RefreshCw className="w-5 h-5 text-primary/40 animate-spin" />
+        <p className="text-[11px] text-muted-foreground">Loading programs from Salesforce…</p>
+      </div>
+    );
+  }
 
   return (
     <ObjectWorkspace

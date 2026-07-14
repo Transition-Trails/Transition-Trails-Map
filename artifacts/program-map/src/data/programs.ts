@@ -26,6 +26,30 @@ export interface Program {
   resolvePhases: string[];
   docs: string[];
   relatedConcepts: Array<{ label: string; type: string; id: string }>;
+  // Live Salesforce fields (populated when data comes from pmdm__Program__c)
+  status?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  description?: string | null;
+  shortSummary?: string | null;
+  targetPopulation?: string | null;
+  programIssueArea?: string | null;
+  programManager?: string | null;
+  programGoals?: string | null;
+  programStructure?: string | null;
+  targetAudience?: string | null;
+  expectedOutcomes?: string | null;
+  problemStatement?: string | null;
+  successMetrics?: string | null;
+  risksAssumptions?: string | null;
+  budgetResources?: string | null;
+  fundingStrategy?: string | null;
+  implementationPlan?: string | null;
+  partnershipOpportunities?: string | null;
+  googleDriveFolder?: string | null;
+  canvaFolder?: string | null;
+  referenceLink?: string | null;
+  requiresPayment?: boolean | null;
 }
 
 export const programs: Program[] = [

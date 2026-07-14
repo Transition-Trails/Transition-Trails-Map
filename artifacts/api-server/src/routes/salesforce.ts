@@ -394,4 +394,48 @@ router.get("/salesforce/operations/programs", async (req, res) => {
   return res.json(data);
 });
 
+// ── GET /salesforce/programs/list ─────────────────────────────────────────────
+// Full pmdm__Program__c record list for the Programs workspace. 5-min cache.
+
+router.get("/salesforce/programs/list", async (req, res) => {
+  const CACHE_KEY = "programs-list";
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
+  }
+
+  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
+  try {
+    proxyFetch = makeConnectors().createProxyFetch("salesforce");
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(503).json({ error: "Salesforce connector unavailable", detail: msg });
+  }
+
+  const safeCount   = async (soql: string): Promise<number | null> => {
+    try { return (await sfQuery(proxyFetch, soql)).totalSize; } catch { return null; }
+  };
+  const safeRecords = async (soql: string): Promise<Record<string, unknown>[] | null> => {
+    try { return (await sfQuery(proxyFetch, soql)).records; } catch { return null; }
+  };
+
+  const [programs, total] = await Promise.all([
+    safeRecords(
+      "SELECT Id, Name, pmdm__Status__c, pmdm__StartDate__c, pmdm__EndDate__c, pmdm__Description__c, pmdm__ShortSummary__c, pmdm__TargetPopulation__c, pmdm__ProgramIssueArea__c, Program_Manager__c, Program_Goals__c, Program_Structure__c, Program_Target_Audience__c, Program_Expected_Outcomes__c, Problem_Statement__c, Success_Metrics_Evaluation_Plan__c, Risks_Assumptions__c, Budget_Resouces__c, Funding_Strategy__c, Implementation_Plan__c, Partnership_Opportunities__c, Google_Drive_Folder__c, Canva_Folder__c, Program_Reference_Link__c, Requires_Payment__c FROM pmdm__Program__c ORDER BY Name LIMIT 200"
+    ),
+    safeCount("SELECT COUNT() FROM pmdm__Program__c"),
+  ]);
+
+  const data = {
+    programs:    programs ?? [],
+    total,
+    lastUpdated: new Date().toISOString(),
+    fromCache:   false,
+    cacheAge:    0,
+  };
+
+  opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+  return res.json(data);
+});
+
 export default router;

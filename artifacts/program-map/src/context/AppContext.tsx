@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
-import { programs as STATIC_PROGRAMS, type Program } from '@/data/programs';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { type Program, type ConfidenceStatus } from '@/data/programs';
+import { useSfPrograms, type SfProgramRecord } from '@/hooks/useSfPrograms';
 import type { SourceDocument } from '@/data/sourceDocuments';
 import type { ResolvePhase } from '@/data/resolvePhases';
 import type { PennyCapability } from '@/data/pennyCapabilities';
@@ -91,6 +92,70 @@ const AppContext = createContext<AppState | undefined>(undefined);
 
 const MAX_RECENT = 5;
 
+function mapSfToProgram(sf: SfProgramRecord): Program {
+  const sfStatus = sf.pmdm__Status__c;
+  const confidence: ConfidenceStatus =
+    sfStatus === 'Active'    ? 'confirmed'    :
+    sfStatus === 'Planning'  ? 'draft'        :
+    sfStatus === 'Completed' ? 'deprecated'   :
+    'needs-review';
+
+  const pricingStatus: Program['pricingStatus'] =
+    sf.Requires_Payment__c === true ? 'paid' : 'subsidized';
+
+  return {
+    id:            sf.Id,
+    entityType:    'program',
+    name:          sf.Name,
+    color:         '',
+    pricingStatus,
+    confidence,
+    sourceDoc:     sf.pmdm__ProgramIssueArea__c ?? '',
+    strategicRole: sf.Program_Structure__c ?? '',
+    audience:      sf.Program_Target_Audience__c ?? sf.pmdm__TargetPopulation__c ?? '',
+    prerequisite:  '',
+    format:        '',
+    duration:      '',
+    pricing:       sf.Funding_Strategy__c ?? '',
+    coreOutcome:   sf.Program_Goals__c ?? '',
+    executiveSummary: sf.pmdm__ShortSummary__c ?? sf.pmdm__Description__c ?? '',
+    whyItMatters:  sf.Problem_Statement__c ?? '',
+    keyFacts:      [],
+    outcomes:      sf.Program_Expected_Outcomes__c ? [sf.Program_Expected_Outcomes__c] : [],
+    whatBreaksIfMissing: sf.Risks_Assumptions__c ?? '',
+    dependencies:  sf.Implementation_Plan__c ?? '',
+    pennyFeatures:        [],
+    trailOsCapabilities:  [],
+    resolvePhases:        [],
+    docs:                 [],
+    relatedConcepts:      [],
+    // Salesforce-sourced fields
+    status:                sf.pmdm__Status__c,
+    startDate:             sf.pmdm__StartDate__c,
+    endDate:               sf.pmdm__EndDate__c,
+    description:           sf.pmdm__Description__c,
+    shortSummary:          sf.pmdm__ShortSummary__c,
+    targetPopulation:      sf.pmdm__TargetPopulation__c,
+    programIssueArea:      sf.pmdm__ProgramIssueArea__c,
+    programManager:        sf.Program_Manager__c,
+    programGoals:          sf.Program_Goals__c,
+    programStructure:      sf.Program_Structure__c,
+    targetAudience:        sf.Program_Target_Audience__c,
+    expectedOutcomes:      sf.Program_Expected_Outcomes__c,
+    problemStatement:      sf.Problem_Statement__c,
+    successMetrics:        sf.Success_Metrics_Evaluation_Plan__c,
+    risksAssumptions:      sf.Risks_Assumptions__c,
+    budgetResources:       sf.Budget_Resouces__c,
+    fundingStrategy:       sf.Funding_Strategy__c,
+    implementationPlan:    sf.Implementation_Plan__c,
+    partnershipOpportunities: sf.Partnership_Opportunities__c,
+    googleDriveFolder:     sf.Google_Drive_Folder__c,
+    canvaFolder:           sf.Canva_Folder__c,
+    referenceLink:         sf.Program_Reference_Link__c,
+    requiresPayment:       sf.Requires_Payment__c,
+  };
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activePage, setActivePage]     = useState('program-map');
   // activeLens is auto-managed based on userTier; kept for backward compat (ProgramMap uses it)
@@ -123,7 +188,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const openSlackPanel   = (cfg: SlackPanelConfig)   => { setSlackPanel(cfg); setActionPanel(null); };
   const closeSlackPanel  = ()                        => setSlackPanel(null);
 
-  const [programs, setPrograms]                       = useState<Program[]>(STATIC_PROGRAMS);
+  const { data: sfProgramsData } = useSfPrograms();
+  const [programs, setPrograms]                       = useState<Program[]>([]);
+
+  useEffect(() => {
+    if (sfProgramsData?.programs?.length) {
+      setPrograms(sfProgramsData.programs.map(mapSfToProgram));
+    }
+  }, [sfProgramsData]);
+
   const [sourceDocuments, setSourceDocuments]         = useState<SourceDocument[]>([]);
   const [resolvePhases, setResolvePhases]             = useState<ResolvePhase[]>([]);
   const [pennyCapabilities, setPennyCapabilities]     = useState<PennyCapability[]>([]);
