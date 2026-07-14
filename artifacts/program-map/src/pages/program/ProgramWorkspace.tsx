@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { GraduationCap, RefreshCw, WifiOff } from 'lucide-react';
+import { ExternalLink, GraduationCap, RefreshCw, WifiOff } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { useSfPrograms } from '@/hooks/useSfPrograms';
+import { useSfCourseByProgram, useSfCurriculum } from '@/hooks/useSfCurriculum';
 import { ObjectWorkspace, HealthDot, StatusBadge } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
 import type { Program } from '@/data/programs';
@@ -146,6 +147,154 @@ function BlueprintTab({ p }: { p: Program }) {
   );
 }
 
+// ── CurriculumTab ─────────────────────────────────────────────────────────────
+function ModuleStatusDot({ status }: { status: string | null }) {
+  const cls =
+    status === 'Completed'   ? 'bg-emerald-500' :
+    status === 'In Progress' ? 'bg-sky-500'     :
+    status === 'Not Started' ? 'bg-gray-300'    : 'bg-gray-300';
+  return <span className={`inline-block w-2 h-2 rounded-full shrink-0 mt-0.5 ${cls}`} />;
+}
+
+function ModuleStatusLabel({ status }: { status: string | null }) {
+  if (!status) return null;
+  const cls =
+    status === 'Completed'   ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+    status === 'In Progress' ? 'text-sky-700 bg-sky-50 border-sky-200'             :
+    status === 'Not Started' ? 'text-gray-500 bg-gray-50 border-gray-200'          :
+                               'text-gray-500 bg-gray-50 border-gray-200';
+  return (
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border shrink-0 ${cls}`}>
+      {status}
+    </span>
+  );
+}
+
+function CurriculumTab({ programName }: { programName: string }) {
+  const byProgram = useSfCourseByProgram(programName);
+  const courseId  = byProgram.data?.course?.Id ?? null;
+  const curriculum = useSfCurriculum(courseId);
+
+  const isLoading = byProgram.isLoading || (!!courseId && curriculum.isLoading);
+  const course    = curriculum.data?.course ?? null;
+  const modules   = curriculum.data?.modules ?? [];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full gap-2">
+        <RefreshCw className="w-4 h-4 text-primary/40 animate-spin" />
+        <span className="text-[11px] text-muted-foreground">Loading curriculum from Salesforce…</span>
+      </div>
+    );
+  }
+
+  if (!byProgram.data?.course) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-2 p-8 text-center">
+        <GraduationCap className="w-8 h-8 text-muted-foreground/30" />
+        <p className="text-[12px] text-muted-foreground">No curriculum found for this program in Salesforce.</p>
+      </div>
+    );
+  }
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-5 space-y-5 max-w-3xl">
+
+        {/* Course header */}
+        <div className="rounded-lg border border-border bg-white px-4 py-3 space-y-1">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase text-muted-foreground/50 tracking-wide mb-0.5">Course</p>
+              <h2 className="text-[14px] font-bold text-foreground leading-tight">
+                {course?.Course_Title__c ?? byProgram.data.course.Course_Title__c ?? byProgram.data.course.Name}
+              </h2>
+            </div>
+            {(course?.Status__c ?? byProgram.data.course.Status__c) && (
+              <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border bg-muted text-muted-foreground border-border mt-1">
+                {course?.Status__c ?? byProgram.data.course.Status__c}
+              </span>
+            )}
+          </div>
+          {(course?.Estimated_Start_Date__c || course?.Estimated_End_Date__c) && (
+            <p className="text-[11px] text-muted-foreground">
+              {course.Estimated_Start_Date__c ?? '?'} → {course.Estimated_End_Date__c ?? '?'}
+            </p>
+          )}
+          {course?.Total_Modules__c != null && (
+            <p className="text-[11px] text-muted-foreground">{course.Total_Modules__c} modules</p>
+          )}
+          {/* External links */}
+          {(course?.Google_Drive_Folder__c || course?.Canva_Course_Folder__c) && (
+            <div className="flex items-center gap-3 pt-1">
+              {course.Google_Drive_Folder__c && (
+                <a href={course.Google_Drive_Folder__c} target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline">
+                  <ExternalLink className="w-3 h-3" /> Google Drive
+                </a>
+              )}
+              {course.Canva_Course_Folder__c && (
+                <a href={course.Canva_Course_Folder__c} target="_blank" rel="noopener noreferrer"
+                   className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline">
+                  <ExternalLink className="w-3 h-3" /> Canva Folder
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Rich text fields */}
+        {course?.Overview__c && (
+          <Section title="Overview">
+            <RichText html={course.Overview__c} className="text-foreground" />
+          </Section>
+        )}
+        {course?.Learning_Goals__c && (
+          <Section title="Learning Goals">
+            <RichText html={course.Learning_Goals__c} className="text-foreground" />
+          </Section>
+        )}
+        {course?.Structure__c && (
+          <Section title="Course Structure">
+            <RichText html={course.Structure__c} className="text-muted-foreground" />
+          </Section>
+        )}
+
+        {/* Module list */}
+        {modules.length > 0 && (
+          <Section title={`Modules (${modules.length})`}>
+            <div className="space-y-1.5">
+              {modules.map((m) => {
+                const pct = m.PercentCompleted__c ?? 0;
+                return (
+                  <div key={m.Id} className="rounded-lg border border-border bg-white px-3 py-2.5 space-y-1.5">
+                    <div className="flex items-start gap-2">
+                      <ModuleStatusDot status={m.Status__c} />
+                      <span className="text-[12px] text-foreground font-medium flex-1 leading-snug">{m.Name}</span>
+                      <ModuleStatusLabel status={m.Status__c} />
+                    </div>
+                    {pct > 0 && (
+                      <div className="flex items-center gap-2 pl-4">
+                        <div className="flex-1 h-1 rounded-full bg-border overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-sky-400 transition-all"
+                            style={{ width: `${Math.min(pct, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-[9px] font-bold tabular-nums text-muted-foreground">{Math.round(pct)}%</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Section>
+        )}
+      </div>
+    </ScrollArea>
+  );
+}
+
 function PennyTab({ p }: { p: Program }) {
   const { isEveryday } = useTierFlags();
   return (
@@ -276,22 +425,7 @@ export default function ProgramWorkspace() {
     ...(isPowerOrAbove ? [
       { id:'blueprint',  label:'Blueprint',   render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <BlueprintTab p={p} /> : null; } },
     ] : []),
-    { id:'curriculum', label:'Curriculum',  render:() => (
-      <ScrollArea className="h-full">
-        <div className="p-5 max-w-2xl">
-          <p className="text-[11px] text-muted-foreground mb-3">Curriculum content is managed in the Standards Studio. Navigate to the full Standards or Curriculum pages for detailed module and lesson editing.</p>
-          <div className="space-y-2">
-            {['Sprint 1 — Job Search Foundations','Sprint 2 — LinkedIn & Digital Presence','Sprint 3 — Resume Writing','Sprint 4 — Interview Preparation'].map((s, i) => (
-              <div key={s} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0">{i+1}</span>
-                <span className="text-[12px] text-foreground font-medium">{s}</span>
-                <span className="ml-auto text-[10px] text-emerald-600 font-bold">Active</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </ScrollArea>
-    )},
+    { id:'curriculum', label:'Curriculum',  render:(item) => <CurriculumTab programName={item.name} /> },
     { id:'penny', label: isEveryday ? 'Penny Help' : 'Penny', render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <PennyTab p={p} /> : null; } },
     ...(isPowerOrAbove ? [
       { id:'systems', label:'Systems', render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <SystemsTab p={p} /> : null; } },

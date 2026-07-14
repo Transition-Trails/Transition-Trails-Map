@@ -442,4 +442,95 @@ router.get("/salesforce/programs/list", async (req, res) => {
   return res.json(data);
 });
 
+// ── GET /salesforce/curriculum/by-program/:programName ────────────────────────
+// Lightweight lookup — finds Course__c whose Name matches the program name.
+// Pattern: strip articles, split words, join with LIKE wildcards. 5-min cache.
+
+router.get("/salesforce/curriculum/by-program/:programName", async (req, res) => {
+  const raw = decodeURIComponent(req.params.programName);
+  const CACHE_KEY = `curriculum-byprogram-${raw}`;
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true });
+  }
+
+  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
+  try {
+    proxyFetch = makeConnectors().createProxyFetch("salesforce");
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(503).json({ error: "Salesforce connector unavailable", detail: msg });
+  }
+
+  // Build SOQL LIKE pattern from program name.
+  // "The Foundations Trail" → strip "The ", split, filter short words → "%Foundations%Trail%"
+  const words = raw
+    .replace(/^the\s+/i, "")
+    .split(/\s+/)
+    .filter((w) => w.length > 2)
+    .map((w) => w.replace(/'/g, "''")); // SOQL escaping: single quote → ''
+  const likePattern = "%" + words.join("%") + "%";
+
+  try {
+    const result = await sfQuery(
+      proxyFetch,
+      `SELECT Id, Name, Course_Title__c, Status__c, Total_Modules__c FROM Course__c WHERE Name LIKE '${likePattern}' LIMIT 1`
+    );
+    const course = (result.records ?? [])[0] ?? null;
+    const data = { course, fromCache: false };
+    opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+    return res.json(data);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: "SOQL failed", detail: msg });
+  }
+});
+
+// ── GET /salesforce/curriculum/course/:courseId ────────────────────────────────
+// Full Course__c record + all child Course_Module__c records. 5-min cache.
+
+router.get("/salesforce/curriculum/course/:courseId", async (req, res) => {
+  const courseId = req.params.courseId;
+  // Validate Salesforce ID format (15 or 18 alphanumeric chars)
+  if (!/^[a-zA-Z0-9]{15,18}$/.test(courseId)) {
+    return res.status(400).json({ error: "Invalid Salesforce ID" });
+  }
+
+  const CACHE_KEY = `curriculum-${courseId}`;
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true });
+  }
+
+  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
+  try {
+    proxyFetch = makeConnectors().createProxyFetch("salesforce");
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(503).json({ error: "Salesforce connector unavailable", detail: msg });
+  }
+
+  try {
+    const [courseResult, modulesResult] = await Promise.all([
+      sfQuery(
+        proxyFetch,
+        `SELECT Id, Name, Course_Title__c, Status__c, Estimated_Start_Date__c, Estimated_End_Date__c, Total_Modules__c, Overview__c, Learning_Goals__c, Structure__c, Google_Drive_Folder__c, Canva_Course_Folder__c FROM Course__c WHERE Id = '${courseId}' LIMIT 1`
+      ),
+      sfQuery(
+        proxyFetch,
+        `SELECT Id, Name, Course__c, Order__c, Status__c, PercentCompleted__c FROM Course_Module__c WHERE Course__c = '${courseId}' ORDER BY Order__c ASC LIMIT 50`
+      ),
+    ]);
+
+    const course  = (courseResult.records  ?? [])[0] ?? null;
+    const modules =  modulesResult.records ?? [];
+    const data = { course, modules, fromCache: false };
+    opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+    return res.json(data);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: "SOQL failed", detail: msg });
+  }
+});
+
 export default router;
