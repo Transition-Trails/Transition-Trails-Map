@@ -9,6 +9,16 @@ import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectW
 import type { Program } from '@/data/programs';
 
 // ── Shared utilities ───────────────────────────────────────────────────────────
+function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
+  if (!html) return <span className="text-[12px] text-muted-foreground">—</span>;
+  return (
+    <div
+      className={`text-[12px] leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:mb-2 [&_li]:mb-0.5 [&_strong]:font-semibold [&_em]:italic [&_br]:block [&_br]:mb-1 ${className ?? ''}`}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
+
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
@@ -47,27 +57,20 @@ function OverviewTab({ p }: { p: Program }) {
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-3xl">
         {p.executiveSummary && (
-          <p className="text-[13px] text-muted-foreground italic leading-relaxed border-l-4 border-primary/20 pl-4">{p.executiveSummary}</p>
+          <div className="text-[13px] text-muted-foreground italic leading-relaxed border-l-4 border-primary/20 pl-4 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-0.5 [&_strong]:font-semibold" dangerouslySetInnerHTML={{ __html: p.executiveSummary }} />
         )}
         <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-          <InfoRow label="Audience"     value={p.audience} />
-          <InfoRow label="Format"       value={p.format} />
-          <InfoRow label="Duration"     value={p.duration} />
-          <InfoRow label="Prerequisite" value={p.prerequisite || '—'} />
-          <InfoRow label="Core Outcome" value={p.coreOutcome} />
-          {!isEveryday && <InfoRow label="Source of Truth" value={p.sourceDoc} />}
-          <InfoRow label="Strategic Role" value={p.strategicRole} />
+          <InfoRow label="Audience"      value={<RichText html={p.audience} />} />
+          <InfoRow label="Format"        value={p.format || '—'} />
+          <InfoRow label="Duration"      value={p.duration || '—'} />
+          <InfoRow label="Prerequisite"  value={p.prerequisite || '—'} />
+          <InfoRow label="Core Outcome"  value={<RichText html={p.coreOutcome} />} />
+          {!isEveryday && <InfoRow label="Source of Truth" value={p.sourceDoc || '—'} />}
+          <InfoRow label="Strategic Role" value={<RichText html={p.strategicRole} />} />
         </div>
         {p.whyItMatters && (
           <Section title="Why It Matters">
-            <p className="text-[12px] text-foreground leading-relaxed">{p.whyItMatters}</p>
-          </Section>
-        )}
-        {p.keyFacts?.length > 0 && (
-          <Section title="Key Facts">
-            <ul className="space-y-1">
-              {p.keyFacts.map((f, i) => <li key={i} className="text-[12px] text-muted-foreground flex items-start gap-2"><span className="text-primary mt-0.5">·</span>{f}</li>)}
-            </ul>
+            <RichText html={p.whyItMatters} className="text-foreground" />
           </Section>
         )}
         {p.outcomes?.length > 0 && (
@@ -80,7 +83,7 @@ function OverviewTab({ p }: { p: Program }) {
         {!isEveryday && p.whatBreaksIfMissing && (
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
             <p className="text-[10px] font-bold text-rose-700 uppercase mb-1">What Breaks if Missing</p>
-            <p className="text-[12px] text-rose-800 leading-relaxed">{p.whatBreaksIfMissing}</p>
+            <RichText html={p.whatBreaksIfMissing} className="text-rose-800" />
           </div>
         )}
       </div>
@@ -114,7 +117,7 @@ function BlueprintTab({ p }: { p: Program }) {
         </Section>
         {p.dependencies && (
           <Section title="Dependencies">
-            <p className="text-[12px] text-muted-foreground leading-relaxed">{p.dependencies}</p>
+            <RichText html={p.dependencies} className="text-muted-foreground" />
           </Section>
         )}
         <Section title="Source Documents">
@@ -249,7 +252,6 @@ export default function ProgramWorkspace() {
       ? `${p.status}${p.startDate ? ` · From ${p.startDate}` : ''}`
       : `${p.format} · ${p.duration}`,
     owner: !isEveryday ? (p.programManager ?? 'Program Director') : undefined,
-    confidence: !isEveryday ? (p.confidence === 'confirmed' ? 91 : 72) : undefined,
   })), [programs, isEveryday]);
 
   const tabs = useMemo<WorkspaceTab[]>(() => [

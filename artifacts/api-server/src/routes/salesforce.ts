@@ -426,8 +426,12 @@ router.get("/salesforce/programs/list", async (req, res) => {
     safeCount("SELECT COUNT() FROM pmdm__Program__c"),
   ]);
 
+  const filtered = (programs ?? []).filter(p =>
+    p['Name'] !== 'TEST PROGRAM' && p['pmdm__Status__c'] !== 'Canceled'
+  );
+
   const data = {
-    programs:    programs ?? [],
+    programs:    filtered,
     total,
     lastUpdated: new Date().toISOString(),
     fromCache:   false,
