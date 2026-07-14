@@ -72,7 +72,15 @@ import KnowledgeOverview  from "@/pages/knowledge/KnowledgeOverview";
 import KnowledgeWorkspace from "@/pages/knowledge/KnowledgeWorkspace";
 import LibraryDocuments   from "@/pages/library/LibraryDocuments";
 import OrgMemory          from "@/pages/knowledge/OrgMemory";
-import CollaborationHub from "@/pages/collaboration/CollaborationHub";
+import CollaborationWorkspace from "@/pages/collaboration/CollaborationWorkspace";
+import MyTrailSignals         from "@/pages/collaboration/MyTrailSignals";
+import CalendarPanel          from "@/pages/collaboration/CalendarPanel";
+import GmailCenter            from "@/pages/collaboration/GmailCenter";
+import SlackIntegrationCenter from "@/pages/collaboration/SlackIntegrationCenter";
+import CommChannels           from "@/pages/communications/CommChannels";
+import CommMessageTemplates   from "@/pages/communications/MessageTemplates";
+import WeeklyBriefs           from "@/pages/communications/WeeklyBriefs";
+import CommNotifications      from "@/pages/communications/CommNotifications";
 import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
 import PeopleWorkspace    from "@/pages/people/PeopleWorkspace";
 import UnifiedObjectModel from "@/pages/uom/UnifiedObjectModel";
@@ -256,11 +264,15 @@ function Router() {
       <Route path="/knowledge/memory"  component={OrgMemory} />
       <Route path="/knowledge"         component={KnowledgeOverview} />
 
-      <Route path="/collaboration/slack/:subtab"     component={CollaborationHub} />
-      <Route path="/collaboration/drive/:subtab"     component={CollaborationHub} />
-      <Route path="/collaboration/calendar/:subtab"  component={CollaborationHub} />
-      <Route path="/collaboration/:tab"              component={CollaborationHub} />
-      <Route path="/collaboration"                   component={CollaborationHub} />
+      <Route path="/collaboration/my-signals"    component={MyTrailSignals} />
+      <Route path="/collaboration/channels"      component={CommChannels} />
+      <Route path="/collaboration/templates"     component={CommMessageTemplates} />
+      <Route path="/collaboration/briefs"        component={WeeklyBriefs} />
+      <Route path="/collaboration/notifications" component={CommNotifications} />
+      <Route path="/collaboration/calendar-live" component={CalendarPanel} />
+      <Route path="/collaboration/gmail"         component={GmailCenter} />
+      <Route path="/collaboration/slack"         component={SlackIntegrationCenter} />
+      <Route path="/collaboration"               component={CollaborationWorkspace} />
 
       {/* Governance + Search + Context Engine */}
       <Route path="/governance/:tab"      component={GovernanceHub} />
