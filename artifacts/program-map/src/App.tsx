@@ -52,9 +52,22 @@ import Phase1CompletionAudit    from "@/pages/admin/Phase1CompletionAudit";
 import DigitalTwin      from "@/pages/twin/DigitalTwin";
 import OperationsHub    from "@/pages/ops/OperationsHub";
 import ProgramHub       from "@/pages/program/ProgramHub";
-import PennyHub         from "@/pages/penny/PennyHub";
-import LearnerDetail    from "@/pages/penny/LearnerDetail";
-import TrailConfigs     from "@/pages/penny/TrailConfigs";
+import PennyCommandCenter      from "@/pages/penny/PennyCommandCenter";
+import PennyCapabilityRegistry from "@/pages/penny/PennyCapabilityRegistry";
+import PennyPromptStudio       from "@/pages/penny/PennyPromptStudio";
+import Learners                from "@/pages/penny/Learners";
+import SessionLog              from "@/pages/penny/SessionLog";
+import TrailQuests             from "@/pages/penny/TrailQuests";
+import Intelligence            from "@/pages/penny/Intelligence";
+import Assessments             from "@/pages/penny/Assessments";
+import AgentforceCenter        from "@/pages/penny/AgentforceCenter";
+import PennyHealth             from "@/pages/operations/PennyHealth";
+import PennyAssetLibrary       from "@/pages/penny/PennyAssetLibrary";
+import PennyLogs               from "@/pages/penny/PennyLogs";
+import TestPenny               from "@/pages/penny/TestPenny";
+import LearnerDetail           from "@/pages/penny/LearnerDetail";
+import TrailConfigs            from "@/pages/penny/TrailConfigs";
+import { PennyPageShell }      from "@/components/penny/PennyPageShell";
 import KnowledgeHub     from "@/pages/knowledge/KnowledgeHub";
 import CollaborationHub from "@/pages/collaboration/CollaborationHub";
 import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
@@ -220,8 +233,20 @@ function Router() {
 
       <Route path="/penny/learner/:contactId"  component={LearnerDetail} />
       <Route path="/penny/trail-configs"       component={TrailConfigs} />
-      <Route path="/penny/:tab"                component={PennyHub} />
-      <Route path="/penny"                     component={PennyHub} />
+      <Route path="/penny/capabilities">       <PennyPageShell><PennyCapabilityRegistry /></PennyPageShell></Route>
+      <Route path="/penny/prompts">            <PennyPageShell><PennyPromptStudio /></PennyPageShell></Route>
+      <Route path="/penny/learners">           <PennyPageShell><Learners /></PennyPageShell></Route>
+      <Route path="/penny/session-log">        <PennyPageShell><SessionLog /></PennyPageShell></Route>
+      <Route path="/penny/trail-quests">       <PennyPageShell><TrailQuests /></PennyPageShell></Route>
+      <Route path="/penny/intelligence">       <PennyPageShell><Intelligence /></PennyPageShell></Route>
+      <Route path="/penny/assessments">        <PennyPageShell><Assessments /></PennyPageShell></Route>
+      <Route path="/penny/agentforce">         <PennyPageShell><AgentforceCenter /></PennyPageShell></Route>
+      <Route path="/penny/health">             <PennyPageShell><PennyHealth /></PennyPageShell></Route>
+      <Route path="/penny/asset-library">      <PennyPageShell><PennyAssetLibrary /></PennyPageShell></Route>
+      <Route path="/penny/quest-library">      <PennyPageShell><TrailQuests /></PennyPageShell></Route>
+      <Route path="/penny/penny-logs">         <PennyPageShell><PennyLogs /></PennyPageShell></Route>
+      <Route path="/penny/penny-sandbox">      <PennyPageShell><TestPenny /></PennyPageShell></Route>
+      <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
       <Route path="/knowledge/:tab"       component={KnowledgeHub} />
       <Route path="/knowledge"            component={KnowledgeHub} />

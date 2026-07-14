@@ -1647,7 +1647,7 @@ export function ContextPanel() {
   return (
     <div
       className={`flex-shrink-0 h-full bg-white flex-col overflow-hidden transition-[width] duration-[250ms] ease-in-out ${
-        rightPanelOpen ? 'flex' : 'hidden xl:flex'
+        rightPanelOpen ? 'flex' : 'hidden'
       } ${
         collapsed
           ? 'w-9 border-l-2 border-primary/25'

@@ -46,21 +46,34 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/curriculum/salesforce-arch',   kind: 'redirect', target: '/admin/salesforce-arch' },
 
   // ── Penny ─────────────────────────────────────────────────────────────────
-  { path: '/penny',                        kind: 'active',   note: 'Command Center landing' },
-  { path: '/penny/:tab',                   kind: 'active' },
-  { path: '/penny/capabilities',           kind: 'active',   note: 'Capabilities workspace (canonical)' },
+  // Sidebar nav: Overview / Operate (Learners, Session Log, Trail Quests) /
+  //              Configure Penny (Trail Configs, Prompt Studio, Capabilities) / Admin (Sandbox, Logs)
+  // Retired from nav (routes intact): Intelligence, Assessments, Agentforce, Health, Asset Library, Quest Library
+  { path: '/penny',                        kind: 'active',   note: 'Overview dashboard — PennyPageShell, no tab bar' },
+  { path: '/penny/learners',               kind: 'active',   note: 'Operate > Learners' },
+  { path: '/penny/session-log',            kind: 'active',   note: 'Operate > Session Log' },
+  { path: '/penny/trail-quests',           kind: 'active',   note: 'Operate > Trail Quests' },
+  { path: '/penny/trail-configs',          kind: 'active',   note: 'Configure Penny > Trail Configs' },
+  { path: '/penny/prompts',                kind: 'active',   note: 'Configure Penny > Prompt Studio' },
+  { path: '/penny/capabilities',           kind: 'active',   note: 'Configure Penny > Capabilities' },
+  { path: '/penny/penny-sandbox',          kind: 'active',   note: 'Admin > Penny Sandbox' },
+  { path: '/penny/penny-logs',             kind: 'active',   note: 'Admin > Penny Logs' },
+  { path: '/penny/intelligence',           kind: 'active',   note: 'Retired from nav; route intact' },
+  { path: '/penny/assessments',            kind: 'active',   note: 'Retired from nav; route intact' },
+  { path: '/penny/agentforce',             kind: 'active',   note: 'Retired from nav; route intact' },
+  { path: '/penny/health',                 kind: 'active',   note: 'Retired from nav; route intact' },
+  { path: '/penny/asset-library',          kind: 'active',   note: 'Retired from nav; route intact' },
+  { path: '/penny/quest-library',          kind: 'active',   note: 'Retired from nav; route intact' },
+  { path: '/penny/learner/:contactId',     kind: 'active',   note: 'Learner detail standalone' },
   { path: '/penny/capability-registry',    kind: 'redirect', target: '/penny' },
   { path: '/penny/prompt-studio',          kind: 'redirect', target: '/penny/prompts' },
-  { path: '/penny/test-penny',             kind: 'redirect', target: '/penny/test' },
-  { path: '/penny/test',                   kind: 'active',   note: 'PennyHub "Ask Penny" tab — served via /penny/:tab wildcard; standalone route removed' },
+  { path: '/penny/test-penny',             kind: 'redirect', target: '/penny/penny-sandbox' },
+  { path: '/penny/test',                   kind: 'redirect', target: '/penny/penny-sandbox' },
   { path: '/penny/prompt-library',         kind: 'redirect', target: '/penny/prompts' },
   { path: '/penny/response-quality',       kind: 'redirect', target: '/penny/intelligence' },
   { path: '/penny/integrations',           kind: 'redirect', target: '/admin/setup' },
   { path: '/penny/integration-layer',      kind: 'redirect', target: '/admin/setup' },
-  { path: '/penny/trail-quests',           kind: 'active',   note: 'Sprint 4: restored live tab in PennyHub — Trail Quest management page' },
-  { path: '/penny/assessments',            kind: 'active',   note: 'Sprint 4: restored live tab in PennyHub — Assessment coaching page with dual-AI (Penny + Agentforce)' },
-  { path: '/penny/agentforce',             kind: 'active',   note: 'Sprint 4: Agentforce Center live tab — Sessions API wired, 8/8 POC steps confirmed' },
-  { path: '/penny/logs',                   kind: 'redirect', target: '/penny/learners' },
+  { path: '/penny/logs',                   kind: 'redirect', target: '/penny/penny-logs' },
 
   // ── Knowledge ────────────────────────────────────────────────────────────
   { path: '/knowledge',                    kind: 'active' },
