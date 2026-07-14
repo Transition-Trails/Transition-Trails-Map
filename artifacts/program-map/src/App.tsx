@@ -272,7 +272,7 @@ function Router() {
       <Route path="/collaboration/calendar-live" component={CalendarPanel} />
       <Route path="/collaboration/gmail"         component={GmailCenter} />
       <Route path="/collaboration/slack"         component={SlackIntegrationCenter} />
-      <Route path="/collaboration"               component={CollaborationWorkspace} />
+      <Route path="/collaboration">              <Redirect to="/collaboration/my-signals" /></Route>
 
       {/* Governance + Search + Context Engine */}
       <Route path="/governance/:tab"      component={GovernanceHub} />
