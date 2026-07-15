@@ -227,6 +227,29 @@ router.get("/salesforce/validate", async (req, res) => {
   });
 });
 
+// ── GET /salesforce/org-url ───────────────────────────────────────────────────
+// Returns just the org base URL — used by the frontend to construct SF links.
+// Shares the same 5-minute in-memory cache as other ops endpoints.
+
+router.get("/salesforce/org-url", async (req, res) => {
+  const CACHE_KEY = "org-url";
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true });
+  }
+  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
+  try {
+    proxyFetch = makeConnectors().createProxyFetch("salesforce");
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(503).json({ error: "SF connector unavailable", detail: msg, orgBaseUrl: "" });
+  }
+  const orgBaseUrl = await getOrgBaseUrl(proxyFetch);
+  const data = { orgBaseUrl };
+  opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+  return res.json(data);
+});
+
 // ── GET /salesforce/operations/summary ────────────────────────────────────────
 // Live SOQL counts for Operations hub panels. 5-minute in-memory cache.
 

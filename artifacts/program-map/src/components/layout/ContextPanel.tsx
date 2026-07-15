@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
-import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2, Pencil, Hash, Bot } from 'lucide-react';
+import { Layers, Calendar, ArrowRight, ChevronRight, ChevronLeft, Database, Sparkles, MessageSquare, Bell, Radio, CalendarDays, FileText, BookOpen, GraduationCap, AlertTriangle, Zap, CheckCircle2, Clock, Shield, Link2, Pencil, Hash, Bot, ExternalLink } from 'lucide-react';
 import { PagePennyGuide } from './PagePennyGuide';
 import { RailActionPanel } from '@/components/workspace/RailActionPanel';
 import { SlackContextPanel } from '@/components/workspace/SlackContextPanel';
@@ -17,11 +17,13 @@ import { useLocation } from 'wouter';
 import { locationToContext, getSignalPanelConfig, SIGNAL_COUNTS } from '@/data/signalCounts';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import { useSfOrgUrl } from '@/hooks/useSfOrgUrl';
 
 export function ContextPanel() {
   const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel, setPennyPanelTab, rightPanelOpen, setRightPanelOpen } = useAppContext();
   const [location, setLocation] = useLocation();
   const { isEveryday } = useTierFlags();
+  const { data: sfOrgData } = useSfOrgUrl();
 
   // ── Focus / Brief mode ────────────────────────────────────────────────────
   const [collapsed, setCollapsed] = useState(false);
@@ -1014,6 +1016,18 @@ export function ContextPanel() {
               <p className="text-[11px] font-mono text-blue-700">{mapping.sfApiName}</p>
               <p className="text-[11px] text-blue-800">{mapping.sfPackageSource}</p>
             </div>
+            {sfOrgData?.orgBaseUrl && (
+              <a
+                href={`${sfOrgData.orgBaseUrl}/lightning/setup/ObjectManager/${mapping.sfApiName}/view`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-[12px] font-semibold text-[#0070d2] border border-[#0070d2]/25 bg-[#0070d2]/5 rounded-lg px-3 py-2 hover:bg-[#0070d2]/10 transition-colors"
+              >
+                <Database className="w-3.5 h-3.5 shrink-0" />
+                <span className="flex-1">Open in Salesforce Object Manager</span>
+                <ExternalLink className="w-3 h-3 shrink-0" />
+              </a>
+            )}
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Purpose</p>
               <p className="text-[12px] text-foreground leading-relaxed">{mapping.purpose}</p>
