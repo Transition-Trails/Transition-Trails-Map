@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { TERMS } from '@/config/terminology';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -282,7 +283,7 @@ function PennyAssetsSetupTab() {
                   })}
                 </div>
                 <p className="text-[10px] text-muted-foreground">
-                  Upload PNG/JPG images, MP3 audio scripts, PDFs, and video files into the relevant subfolder. Penny will surface these when a learner enters that coaching context.
+                  {`Upload PNG/JPG images, MP3 audio scripts, PDFs, and video files into the relevant subfolder. ${TERMS.aiAssistant} will surface these when a learner enters that coaching context.`}
                 </p>
               </div>
             </div>
@@ -293,7 +294,7 @@ function PennyAssetsSetupTab() {
               <div className="space-y-1.5">
                 <p className="text-[13px] font-semibold text-foreground">Verify in the Asset Library</p>
                 <p className="text-[11px] text-muted-foreground leading-snug">
-                  Navigate to <strong>Penny → Asset Library</strong> in the sidebar. The status pill should turn green ("Drive live") and each state in the sidebar will show an asset count. Hit the refresh button if it hasn't updated yet.
+                  Navigate to <strong>{TERMS.aiAssistant} → Asset Library</strong> in the sidebar. The status pill should turn green ("Drive live") and each state in the sidebar will show an asset count. Hit the refresh button if it hasn't updated yet.
                 </p>
               </div>
             </div>
@@ -304,7 +305,7 @@ function PennyAssetsSetupTab() {
         {/* Verify note */}
         <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 flex items-center gap-2">
           <Image className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <p className="text-[11px] text-muted-foreground">Once configured, navigate to <strong>Penny → Asset Library</strong> in the sidebar to manage and browse assets.</p>
+          <p className="text-[11px] text-muted-foreground">Once configured, navigate to <strong>{TERMS.aiAssistant} → Asset Library</strong> in the sidebar to manage and browse assets.</p>
         </div>
 
       </div>
@@ -319,11 +320,11 @@ export default function GoogleDriveIntegrationCenter() {
     <HubShell
       title="Google Drive Integration Center"
       icon={HardDrive}
-      description="Connect Google Drive to Trail OS — Penny asset library setup and program folder management."
+      description={`Connect Google Drive to Trail OS — ${TERMS.aiAssistant} asset library setup and program folder management.`}
       badge="Google Drive"
       tabs={[
         { id: 'overview',     label: 'Overview',           path: '/admin/integrations/google-drive',              icon: Activity, content: <OverviewTab /> },
-        { id: 'penny-assets', label: 'Penny Assets Setup', path: '/admin/integrations/google-drive/penny-assets', icon: Settings, content: <PennyAssetsSetupTab /> },
+        { id: 'penny-assets', label: `${TERMS.aiAssistant} Assets Setup`, path: '/admin/integrations/google-drive/penny-assets', icon: Settings, content: <PennyAssetsSetupTab /> },
       ]}
     />
   );

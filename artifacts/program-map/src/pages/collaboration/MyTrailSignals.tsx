@@ -49,7 +49,7 @@ interface WatchRule {
 
 const SOURCES: SignalSource[] = [
   {
-    id: 'penny', label: 'Penny AI', icon: Sparkles,
+    id: 'penny', label: `${TERMS.aiAssistant} AI`, icon: Sparkles,
     color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200',
     description: 'Penny recommendations, insight flags, and coaching nudges',
     signals: ['Coaching recommendations', 'Attrition risk flags', 'Program health insights'],

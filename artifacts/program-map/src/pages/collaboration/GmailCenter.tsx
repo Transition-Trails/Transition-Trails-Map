@@ -6,6 +6,7 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TERMS } from '@/config/terminology';
 import { Button } from '@/components/ui/button';
 import {
   Search, Sparkles, ChevronRight, CheckCircle2, Circle,
@@ -162,7 +163,7 @@ function ThreadRow({
       {badge && (
         <div className="inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full border mt-1 bg-violet-100 text-violet-700 border-violet-200">
           <Sparkles className="w-2 h-2" />
-          Penny · {badge}
+          {TERMS.aiAssistant} · {badge}
         </div>
       )}
       {thread.needsAction && !badge && (
@@ -268,7 +269,7 @@ function ThreadPreview({
         <div className="px-6 py-2 bg-violet-50 border-b border-violet-100 flex items-center gap-2 shrink-0">
           <Sparkles className="w-3.5 h-3.5 text-violet-600 shrink-0" />
           <p className="text-[11px] text-violet-800 flex-1">
-            <strong>Penny</strong> · {pennyAction.desc}
+            <strong>{TERMS.aiAssistant}</strong> · {pennyAction.desc}
           </p>
           <button className="text-[10px] font-semibold text-violet-600 hover:underline flex items-center gap-0.5 shrink-0">
             Adjust <ChevronRight className="w-3 h-3" />
@@ -312,7 +313,7 @@ function ThreadPreview({
                 className="flex items-center gap-1.5 text-[10px] text-violet-600 font-medium hover:underline disabled:opacity-50"
               >
                 <Sparkles className="w-3 h-3" />
-                {draftLoading ? 'Drafting…' : 'Draft with Penny'}
+                {draftLoading ? 'Drafting…' : `Draft with ${TERMS.aiAssistant}`}
               </button>
               <Button
                 size="sm"
@@ -349,7 +350,7 @@ function PennyConfigPanel({
     <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-violet-100 px-6 py-4 shrink-0">
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="w-4 h-4 text-violet-600" />
-        <h3 className="text-[13px] font-semibold text-violet-900">Penny Label Intelligence</h3>
+        <h3 className="text-[13px] font-semibold text-violet-900">{TERMS.aiAssistant} Label Intelligence</h3>
         <span className="text-[10px] text-violet-500 bg-violet-100 px-2 py-0.5 rounded-full">{watchedCount} active</span>
         <button onClick={onClose} className="ml-auto text-violet-400 hover:text-violet-600 transition-colors">
           <X className="w-3.5 h-3.5" />
@@ -381,7 +382,7 @@ function PennyConfigPanel({
               </div>
               {cfg.watched ? (
                 <div>
-                  <div className="text-[9px] text-violet-500 font-semibold uppercase tracking-wide mb-1.5">Penny action</div>
+                  <div className="text-[9px] text-violet-500 font-semibold uppercase tracking-wide mb-1.5">{TERMS.aiAssistant} action</div>
                   <div className="space-y-1">
                     {PENNY_ACTIONS.map(action => (
                       <button
@@ -498,7 +499,7 @@ export default function GmailCenter() {
             }`}
           >
             <Sparkles className="w-2.5 h-2.5" />
-            Penny Labels
+            {TERMS.aiAssistant} Labels
             <span className="text-[9px] bg-violet-500 text-white rounded-full px-1 ml-0.5">{watchedCount}</span>
           </button>
         </div>

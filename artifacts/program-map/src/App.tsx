@@ -267,10 +267,6 @@ function Router() {
       <Route path="/collaboration/briefs"        component={WeeklyBriefs} />
       <Route path="/collaboration/notifications" component={CommNotifications} />
       <Route path="/collaboration/calendar-live" component={CalendarPanel} />
-      <Route path="/collaboration/calendar/:tab"  component={GoogleCalendarIntegrationCenter} />
-      <Route path="/collaboration/calendar"       component={GoogleCalendarIntegrationCenter} />
-      <Route path="/collaboration/drive/:tab"     component={GoogleDriveIntegrationCenter} />
-      <Route path="/collaboration/drive"          component={GoogleDriveIntegrationCenter} />
       <Route path="/collaboration/gmail"         component={GmailCenter} />
       <Route path="/collaboration/slack/:tab"     component={SlackIntegrationCenter} />
       <Route path="/collaboration/slack"          component={SlackIntegrationCenter} />

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback, createContext, useContext } from 'react';
+import { TERMS } from '@/config/terminology';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace } from '@/components/workspace/ObjectWorkspace';
@@ -380,9 +381,9 @@ function WorkspaceValidationTab() {
             }`}
           >
             {testMsgTargets.penny === 'sending' ? '⌛ Sending…' :
-             testMsgTargets.penny === 'sent'    ? '✓ Penny Sent' :
-             testMsgTargets.penny === 'error'   ? '✕ Penny Failed' :
-             '✉ Test → Penny AI'}
+             testMsgTargets.penny === 'sent'    ? `✓ ${TERMS.aiAssistant} Sent` :
+             testMsgTargets.penny === 'error'   ? `✕ ${TERMS.aiAssistant} Failed` :
+             `✉ Test → ${TERMS.aiAssistant} AI`}
           </button>
         )}
 
@@ -1755,7 +1756,7 @@ function SlackIntegrationCenterInner({ onOpenCreate }: { onOpenCreate: () => voi
         { id:'validation',  label:'Workspace Validation',path:'/collaboration/slack/validation',        icon:Key,           content:<WorkspaceValidationTab /> },
         { id:'prog-channel',label:'Program → Channel',   path:'/collaboration/slack/prog-channel',      icon:Map,           content:<ProgramChannelTab /> },
         { id:'role-user',   label:'Role → User',         path:'/collaboration/slack/role-user',         icon:Users,         content:<RoleUserTab /> },
-        { id:'penny-ch',    label:'Penny → Channel',     path:'/collaboration/slack/penny-channel',     icon:Brain,         content:<PennyDeliveryTab /> },
+        { id:'penny-ch',    label:`${TERMS.aiAssistant} → Channel`, path:'/collaboration/slack/penny-channel',     icon:Brain,         content:<PennyDeliveryTab /> },
         { id:'flows',       label:'Flow Explorer',        path:'/collaboration/slack/flows',             icon:Workflow,      content:<FlowExplorerTab /> },
         { id:'channels',    label:'Channel Registry',    path:'/collaboration/slack/channels',          icon:Hash,          content:<ChannelRegistry /> },
         { id:'profiles',    label:'Object Profiles',     path:'/collaboration/slack/profiles',          icon:Layers,        content:<ObjectProfilesTab /> },
@@ -1780,15 +1781,15 @@ export default function SlackIntegrationCenter() {
   function handleAddChannelMapping() {
     openActionPanel({
       title: 'Add Channel Mapping', objectType: 'Channel Mapping',
-      subtitle: 'Connect a Slack channel to a Trail OS object — program, role, cohort, or Penny capability.',
+      subtitle: `Connect a Slack channel to a Trail OS object — program, role, cohort, or ${TERMS.aiAssistant} capability.`,
       slackContext: 'slack',
       fields: [
         { id: 'channelName', label: 'Slack Channel Name',  type: 'text',     required: true, placeholder: 'e.g. #career-coaching-jan25' },
-        { id: 'mapType',     label: 'Mapping Type',        type: 'select',   options: ['Program → Channel', 'Role → User', 'Penny → Channel', 'Cohort → Channel'], required: true },
+        { id: 'mapType',     label: 'Mapping Type',        type: 'select',   options: ['Program → Channel', 'Role → User', `${TERMS.aiAssistant} → Channel`, 'Cohort → Channel'], required: true },
         { id: 'trailObject', label: 'Trail OS Object',     type: 'text',     required: true, placeholder: 'e.g. Job Seekers — Digital Literacy Trail' },
         { id: 'purpose',     label: 'Purpose',             type: 'textarea', placeholder: 'What is this channel used for in Trail OS?', rows: 2 },
         { id: 'visibility',  label: 'Channel Visibility',  type: 'select',   options: ['Public', 'Private'] },
-        { id: 'pennyAccess', label: 'Penny Can Post',      type: 'select',   options: ['Yes', 'No — humans only', 'Read-only'] },
+        { id: 'pennyAccess', label: `${TERMS.aiAssistant} Can Post`, type: 'select',   options: ['Yes', 'No — humans only', 'Read-only'] },
       ],
     });
   }

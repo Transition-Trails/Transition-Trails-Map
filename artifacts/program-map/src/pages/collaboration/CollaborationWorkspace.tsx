@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TERMS } from '@/config/terminology';
 
 // ── Channel rule configs ───────────────────────────────────────────────────────
 
@@ -207,7 +208,7 @@ const CHANNELS: ChannelConfig[] = [
 const SIGNAL_DESTINATIONS = [
   {
     id: 'penny',
-    label: 'Penny',
+    label: TERMS.aiAssistant,
     description: 'Receives all flagged signals for synthesis, follow-up, and recommendations',
     icon: Sparkles,
     color: 'text-violet-600',
@@ -241,7 +242,7 @@ const SIGNAL_DESTINATIONS = [
   {
     id: 'templates',
     label: 'Message Templates',
-    description: 'Penny uses approved templates for all outbound Slack + Gmail messages',
+    description: `${TERMS.aiAssistant} uses approved templates for all outbound Slack + Gmail messages`,
     icon: FileText,
     color: 'text-teal-600',
     bg: 'bg-teal-50',
