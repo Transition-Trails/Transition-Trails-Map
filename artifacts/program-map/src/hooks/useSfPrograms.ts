@@ -45,8 +45,9 @@ export function useSfPrograms() {
       if (!res.ok) throw new Error(`${res.status}`);
       return res.json() as Promise<SfProgramsResponse>;
     },
-    staleTime:       4 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
+    staleTime:        0,
+    refetchInterval:  5 * 60 * 1000,
+    refetchOnMount:   true,
     retry: 1,
   });
 }

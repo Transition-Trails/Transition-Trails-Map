@@ -55,8 +55,10 @@ function ChipList({ items }: { items: string[] }) {
 function OverviewTab({ p }: { p: Program }) {
   const { isEveryday } = useTierFlags();
   const { data: sfData } = useSfPrograms();
-  const sfUrl = (sfData?.orgBaseUrl && p.sfId)
-    ? `${sfData.orgBaseUrl}/lightning/r/pmdm__Program__c/${p.sfId}/view`
+  // SF record IDs are 15–18 purely alphanumeric chars (no hyphens like slugs)
+  const sfRecordId = p.sfId ?? (/^[a-zA-Z0-9]{15,18}$/.test(p.id) ? p.id : null);
+  const sfUrl = (sfData?.orgBaseUrl && sfRecordId)
+    ? `${sfData.orgBaseUrl}/lightning/r/pmdm__Program__c/${sfRecordId}/view`
     : null;
 
   return (
