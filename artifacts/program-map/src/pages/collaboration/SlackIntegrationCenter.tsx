@@ -195,11 +195,10 @@ function OverviewTab() {
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5 max-w-4xl">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-          <p className="text-[11px] font-bold text-primary uppercase mb-1">Slack Integration Center — Phase 2: Operational Workflow Validation</p>
+          <p className="text-[11px] font-bold text-primary uppercase mb-1">Slack Integration Center — Operational Workflow Status</p>
           <p className="text-[12px] text-foreground leading-relaxed">
-            Phase 2 advances from architecture and readiness into real object flows. Program-to-channel mapping, role-to-user
-            routing, Penny delivery mapping, and end-to-end flow validation are all configured. Workspace Validation now runs
-            live against your Replit secrets — see the Workspace Validation tab for real-time results.
+            Program-to-channel mapping, role-to-user routing, Penny delivery mapping, and end-to-end flow validation are all configured.
+            Workspace Validation runs live against your Replit secrets — see the Workspace Validation tab for real-time results.
           </p>
         </div>
 
@@ -263,7 +262,7 @@ function OverviewTab() {
 
         {/* Phase 2 readiness by area */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Phase 2 Readiness by Area</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Integration Readiness by Area</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {[
               { area:'Program-to-Channel Mapping', pct:72, note:'5 programs mapped · 8 channels · 3 missing bot access' },
@@ -1063,7 +1062,7 @@ function ScenariosTab() {
     <div className="flex h-full">
       <div className="w-56 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Mock Scenarios</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Scenarios</p>
           <p className="text-[10px] text-muted-foreground">{summary.partial} partial · {summary.blocked} blocked · avg {summary.avgScore}%</p>
         </div>
         <ScrollArea className="flex-1">
@@ -1749,8 +1748,8 @@ function SlackIntegrationCenterInner({ onOpenCreate }: { onOpenCreate: () => voi
     <HubShell
       title="Slack Integration Center"
       icon={Hash}
-      description={`Phase 2: Operational workflow validation. ${descParts.join(' · ')}.`}
-      badge={criticalBadge ?? 'Phase 2 — Workflow Validation'}
+      description={`Operational workflow validation. ${descParts.join(' · ')}.`}
+      badge={criticalBadge ?? 'Workflow Validation'}
       actions={actions}
       tabs={[
         { id:'overview',    label:'Overview',            path:'/collaboration/slack',                   icon:Hash,          content:<OverviewTab /> },
