@@ -11,6 +11,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import { TERMS } from '@/config/terminology';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -76,7 +77,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
     icon: <GraduationCap className="w-5 h-5" />,
     verb: 'Explore a Program',
     label: 'Programs',
-    description: 'Follow a program across curriculum, learners, coaches, Salesforce, Penny AI, and all team workflows.',
+    description: `Follow a program across curriculum, learners, coaches, Salesforce, ${TERMS.aiAssistant}, and all team workflows.`,
     question: 'What does this program touch?',
     hexColor: '#059669',
     accent: 'text-emerald-700',
@@ -94,7 +95,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
         items: [{ id:'c1', label:'Agile Foundations', statusColor:'bg-emerald-400' }, { id:'c2', label:'Growth Mindset', statusColor:'bg-emerald-400' }, { id:'c3', label:'Sprint Cadence', statusColor:'bg-emerald-400' }, { id:'c4', label:'Trail Talks', statusColor:'bg-emerald-400' }, { id:'c5', label:'+8 more', statusColor:'bg-slate-400' }] },
       { system: 'Salesforce',    label: 'Program objects', count: 3,  color: '#0369a1', href: '/admin/salesforce-arch', detail: 'Program__c, Program_Engagement__c, Contact',
         items: [{ id:'s1', label:'Program__c', statusColor:'bg-sky-400' }, { id:'s2', label:'Program_Engagement__c', statusColor:'bg-sky-400' }, { id:'s3', label:'Contact', statusColor:'bg-sky-400' }] },
-      { system: 'Penny AI',      label: '4 capabilities', count: 4,  color: '#be185d', href: '/penny',              detail: 'Trail Quest, Coach Brief, Sprint Coach, Resume Review',
+      { system: TERMS.aiAssistant, label: '4 capabilities', count: 4,  color: '#be185d', href: '/penny',              detail: 'Trail Quest, Coach Brief, Sprint Coach, Resume Review',
         items: [{ id:'p1', label:'Trail Quest', statusColor:'bg-pink-400' }, { id:'p2', label:'Coach Brief', statusColor:'bg-pink-400' }, { id:'p3', label:'Sprint Coach', statusColor:'bg-amber-400' }, { id:'p4', label:'Resume Review', statusColor:'bg-pink-400' }] },
       { system: 'Roles',         label: '6 role types',   count: 6,  color: '#1d4ed8', href: '/digital-twin',       detail: 'Coach, Cohort Lead, Content Specialist, Ops Lead, Evaluator, Learner',
         items: [{ id:'r1', label:'Coach', statusColor:'bg-blue-400' }, { id:'r2', label:'Cohort Lead', statusColor:'bg-blue-400' }, { id:'r3', label:'Content Specialist', statusColor:'bg-blue-400' }, { id:'r4', label:'+3 more', statusColor:'bg-slate-400' }] },
@@ -106,9 +107,9 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
   },
   capability: {
     icon: <Brain className="w-5 h-5" />,
-    verb: 'Trace a Penny Capability',
-    label: 'Penny Capabilities',
-    description: 'Map how Penny draws on knowledge, prompts, learner context, and Salesforce variables to deliver this capability.',
+    verb: `Trace a ${TERMS.aiAssistant} Capability`,
+    label: `${TERMS.aiAssistant} Capabilities`,
+    description: `Map how ${TERMS.aiAssistant} draws on knowledge, prompts, learner context, and Salesforce variables to deliver this capability.`,
     question: 'What does this capability depend on?',
     hexColor: '#be185d',
     accent: 'text-pink-700',
@@ -158,7 +159,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
         items: [{ id:'pr1', label:'Guided Trail', statusColor:'bg-emerald-400' }, { id:'pr2', label:'Foundations Trail', statusColor:'bg-emerald-400' }] },
       { system: 'Knowledge',     label: '5 articles',      count: 5, color: '#6d28d9', href: '/knowledge',              detail: 'Agile guides, sprint retrospective frameworks, learning science',
         items: [{ id:'k1', label:'Agile Guide', statusColor:'bg-violet-400' }, { id:'k2', label:'Sprint Framework', statusColor:'bg-violet-400' }, { id:'k3', label:'Learning Science', statusColor:'bg-violet-400' }, { id:'k4', label:'+2 more', statusColor:'bg-slate-400' }] },
-      { system: 'Penny AI',      label: '6 prompts',       count: 6, color: '#be185d', href: '/penny/prompts',          detail: 'Reflection, quest, and assessment-linked prompts',
+      { system: TERMS.aiAssistant, label: '6 prompts',       count: 6, color: '#be185d', href: '/penny/prompts',          detail: 'Reflection, quest, and assessment-linked prompts',
         items: [{ id:'p1', label:'Reflection Prompt', statusColor:'bg-pink-400' }, { id:'p2', label:'Quest Hook', statusColor:'bg-pink-400' }, { id:'p3', label:'Assessment Feedback', statusColor:'bg-pink-400' }, { id:'p4', label:'+3 more', statusColor:'bg-slate-400' }] },
       { system: 'Assessments',   label: '2 assessments',   count: 2, color: '#0f766e', href: '/program',                detail: 'Pre-course and post-course assessments',
         items: [{ id:'a1', label:'Pre-course', statusColor:'bg-teal-400' }, { id:'a2', label:'Post-course', statusColor:'bg-teal-400' }] },
@@ -190,7 +191,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
         items: [{ id:'p1', label:'Guided Trail', statusColor:'bg-emerald-400' }, { id:'p2', label:"Explorer's Trail", statusColor:'bg-emerald-400' }, { id:'p3', label:'Trail of Mastery', statusColor:'bg-amber-400' }] },
       { system: 'Learners',      label: '12 learners',    count: 12, color: '#059669', href: '/penny/learners',   detail: 'Currently assigned active learners',
         items: [{ id:'l1', label:'12 active learners', statusColor:'bg-emerald-400' }] },
-      { system: 'Penny AI',      label: 'Coach support',  count: 2, color: '#be185d', href: '/penny',             detail: 'Coach Brief generator, escalation alert logic',
+      { system: TERMS.aiAssistant, label: 'Coach support',  count: 2, color: '#be185d', href: '/penny',             detail: 'Coach Brief generator, escalation alert logic',
         items: [{ id:'ai1', label:'Coach Brief', statusColor:'bg-pink-400' }, { id:'ai2', label:'Escalation Alerts', statusColor:'bg-pink-400' }] },
       { system: 'Slack Channels', label: '4 channels',   count: 4, color: '#c2410c', href: '/collaboration',      detail: '#coaches, #guided-trail, #penny-ai, #ops',
         items: [{ id:'sl1', label:'#coaches', statusColor:'bg-orange-400' }, { id:'sl2', label:'#guided-trail', statusColor:'bg-orange-400' }, { id:'sl3', label:'#penny-ai', statusColor:'bg-orange-400' }, { id:'sl4', label:'#ops', statusColor:'bg-orange-400' }] },
@@ -204,7 +205,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
     icon: <Plug className="w-5 h-5" />,
     verb: 'Analyze an Integration',
     label: 'Integrations',
-    description: 'Trace how an integration connects to programs, Penny AI context, Salesforce sync, and team communications.',
+    description: `Trace how an integration connects to programs, ${TERMS.aiAssistant} context, Salesforce sync, and team communications.`,
     question: 'What depends on this integration being live?',
     hexColor: '#0f766e',
     accent: 'text-teal-700',
@@ -220,7 +221,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
     connections: [
       { system: 'Salesforce',    label: '6 object mappings', count: 6, color: '#0369a1', href: '/admin/salesforce-arch', detail: 'Sync fields: Program__c, Contact, Engagement, Assessment',
         items: [{ id:'sf1', label:'Program__c', statusColor:'bg-sky-400' }, { id:'sf2', label:'Contact', statusColor:'bg-sky-400' }, { id:'sf3', label:'Engagement__c', statusColor:'bg-sky-400' }, { id:'sf4', label:'+3 more', statusColor:'bg-slate-400' }] },
-      { system: 'Penny AI',      label: '3 capabilities',   count: 3, color: '#be185d', href: '/penny',               detail: 'Context variables, notification dispatch, data fetch',
+      { system: TERMS.aiAssistant, label: '3 capabilities',   count: 3, color: '#be185d', href: '/penny',               detail: 'Context variables, notification dispatch, data fetch',
         items: [{ id:'p1', label:'Trail Quest', statusColor:'bg-pink-400' }, { id:'p2', label:'Coach Brief', statusColor:'bg-pink-400' }, { id:'p3', label:'Resume Review', statusColor:'bg-amber-400' }] },
       { system: 'Programs',      label: '4 programs',       count: 4, color: '#059669', href: '/program',               detail: 'All active programs depend on this integration',
         items: [{ id:'pr1', label:'Guided Trail', statusColor:'bg-emerald-400' }, { id:'pr2', label:'Foundations Trail', statusColor:'bg-emerald-400' }, { id:'pr3', label:"+2 more", statusColor:'bg-slate-400' }] },
@@ -236,7 +237,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
     icon: <FileText className="w-5 h-5" />,
     verb: 'Inspect a Knowledge Source',
     label: 'Knowledge Sources',
-    description: 'Trace where a knowledge source is cited in Penny AI, which courses it underpins, and whether it is current.',
+    description: `Trace where a knowledge source is cited in ${TERMS.aiAssistant}, which courses it underpins, and whether it is current.`,
     question: 'Where is this source used and is it up to date?',
     hexColor: '#6d28d9',
     accent: 'text-violet-700',
@@ -250,7 +251,7 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
       { id: 'source-registry',   name: 'Source Registry',         subtitle: 'All approved source documents',     status: 'active'      },
     ],
     connections: [
-      { system: 'Penny AI',      label: '6 capabilities', count: 6, color: '#be185d', href: '/penny',               detail: 'Referenced in capability prompts and context loading',
+      { system: TERMS.aiAssistant, label: '6 capabilities', count: 6, color: '#be185d', href: '/penny',               detail: 'Referenced in capability prompts and context loading',
         items: [{ id:'p1', label:'Resume Review', statusColor:'bg-pink-400' }, { id:'p2', label:'Trail Quest', statusColor:'bg-pink-400' }, { id:'p3', label:'Coach Brief', statusColor:'bg-pink-400' }, { id:'p4', label:'+3 more', statusColor:'bg-slate-400' }] },
       { system: 'Curriculum',    label: '6 modules',      count: 6, color: '#b45309', href: '/program/curriculum',   detail: 'Linked to course content and reflection prompts',
         items: [{ id:'c1', label:'Agile Foundations', statusColor:'bg-amber-400' }, { id:'c2', label:'Growth Mindset', statusColor:'bg-amber-400' }, { id:'c3', label:'Trail Talks', statusColor:'bg-amber-400' }, { id:'c4', label:'+3 more', statusColor:'bg-slate-400' }] },
@@ -272,14 +273,14 @@ const IMPACT_CATALOG: Record<ObjectKind, { headline: string; areas: ImpactArea[]
     areas: [
       { area: 'Curriculum',      severity: 'high',   items: ['All 12 courses need learning objective review', 'Agile Foundations and Growth Mindset directly affected', 'Sprint structure may need realignment', 'Assessment rubrics may need updating'] },
       { area: 'Salesforce',      severity: 'high',   items: ['Program__c record must be updated immediately', 'Program_Engagement__c records cascade', 'Outcome reports and PMM dashboards reflect change', 'Contact relationship records affected'] },
-      { area: 'Penny AI',        severity: 'high',   items: ['Trail Quest context and framing must be reviewed', 'Coach Brief generator references program outcomes', 'Sprint Coach cadence tied to program calendar', 'Resume Review criteria may need updating'] },
+      { area: TERMS.aiAssistant,  severity: 'high',   items: ['Trail Quest context and framing must be reviewed', 'Coach Brief generator references program outcomes', 'Sprint Coach cadence tied to program calendar', 'Resume Review criteria may need updating'] },
       { area: 'Roles & Blueprints', severity: 'medium', items: ['Role participation mappings must be reviewed', 'Coach assignment and capacity may shift', 'Blueprint responsibilities may need revision'] },
       { area: 'Collaboration',   severity: 'medium', items: ['Slack cohort channel configuration affected', 'Calendar sprint events may need updating', 'Welcome and kickoff message templates affected'] },
       { area: 'Knowledge Sources', severity: 'low',  items: ['8 linked sources flagged for review', 'Program Framework Doc may need version update', 'Trail Design Guide alignment check required'] },
     ],
   },
   capability: {
-    headline: 'What cascades if this Penny capability changes?',
+    headline: `What cascades if this ${TERMS.aiAssistant} capability changes?`,
     areas: [
       { area: 'Prompt Studio',   severity: 'high',   items: ['10+ governed templates are dependent', 'Prompt testing and re-certification required', 'Regression review against golden test cases needed'] },
       { area: 'Learner Experience', severity: 'high', items: ['8 active sessions may be disrupted', 'Coaching responses may change in tone or accuracy', 'Reflection quality may degrade during transition'] },
@@ -293,7 +294,7 @@ const IMPACT_CATALOG: Record<ObjectKind, { headline: string; areas: ImpactArea[]
     headline: 'What cascades if this course changes?',
     areas: [
       { area: 'Assessments',     severity: 'high',   items: ['Pre/post assessments must align with updated content', 'Scoring rubrics and criteria need review', '6 learners currently enrolled — active impact'] },
-      { area: 'Penny AI Prompts', severity: 'high',  items: ['6 reflection and quest prompts reference this course', 'Trail quest framing must be updated for accuracy', 'Consistency review must be triggered in Prompt Studio'] },
+      { area: `${TERMS.aiAssistant} Prompts`, severity: 'high',  items: ['6 reflection and quest prompts reference this course', 'Trail quest framing must be updated for accuracy', 'Consistency review must be triggered in Prompt Studio'] },
       { area: 'Design Standards', severity: 'high',  items: ['Change must clear active design standards review', 'Standards consistency score will recalculate', 'Content Specialist sign-off required before publishing'] },
       { area: 'Knowledge Articles', severity: 'medium', items: ['5 linked articles may need updating', 'Content health score for this course will change', 'New articles may need to be created'] },
       { area: 'Programs',        severity: 'medium', items: ['2 programs that include this course need review', 'Cohort pacing and sprint sequence may be affected'] },
@@ -305,7 +306,7 @@ const IMPACT_CATALOG: Record<ObjectKind, { headline: string; areas: ImpactArea[]
     areas: [
       { area: 'Salesforce Access', severity: 'high', items: ['Profile and permission set assignments must be reviewed', 'Related record ownership and visibility changes', 'User record requires immediate update'] },
       { area: 'Program Assignments', severity: 'high', items: ['3 active program participation mappings affected', 'Blueprint responsibilities must be reviewed', 'Handoff and escalation paths need remapping'] },
-      { area: 'Penny AI Support', severity: 'high',  items: ['Penny support mapping for this role needs updating', 'Coach brief escalation logic affected', 'Role-specific prompt context must be re-parameterized'] },
+      { area: `${TERMS.aiAssistant} Support`, severity: 'high',  items: [`${TERMS.aiAssistant} support mapping for this role needs updating`, 'Coach brief escalation logic affected', 'Role-specific prompt context must be re-parameterized'] },
       { area: 'Learners',        severity: 'medium', items: ['12 currently assigned learners need continuity plan', 'Coaching coverage must be reassigned immediately', 'Active Trail Quest sessions have coach dependencies'] },
       { area: 'Collaboration',   severity: 'medium', items: ['Slack channel and space assignments may change', 'Calendar event ownership and invites affected', 'Google Chat space membership must be updated'] },
       { area: 'Blueprints',      severity: 'low',    items: ['Role blueprint document needs version update', 'RACI matrix entries for this role must be revised'] },
@@ -314,7 +315,7 @@ const IMPACT_CATALOG: Record<ObjectKind, { headline: string; areas: ImpactArea[]
   integration: {
     headline: 'What cascades if this integration changes or goes down?',
     areas: [
-      { area: 'Penny AI',        severity: 'high',   items: ['Context variables may be unavailable mid-session', 'Prompt rendering may fail without required variables', '3 capabilities silently degrade if integration goes down'] },
+      { area: TERMS.aiAssistant,  severity: 'high',   items: ['Context variables may be unavailable mid-session', 'Prompt rendering may fail without required variables', '3 capabilities silently degrade if integration goes down'] },
       { area: 'Salesforce Sync', severity: 'high',   items: ['Object mappings and sync fields affected', 'PMM records may show stale or missing data', 'Contact and program records may diverge'] },
       { area: 'Learner Data',    severity: 'high',   items: ['Learner progress sync paused during change', 'Completion records may be delayed or missing', 'Assessment data may not flow to Salesforce correctly'] },
       { area: 'Programs',        severity: 'medium', items: ['4 active programs depend on this integration', 'Sprint delivery workflows may have data gaps', 'Reporting dashboards may show incomplete data'] },
@@ -325,7 +326,7 @@ const IMPACT_CATALOG: Record<ObjectKind, { headline: string; areas: ImpactArea[]
   knowledge: {
     headline: 'What cascades if this knowledge source changes?',
     areas: [
-      { area: 'Penny AI Quality', severity: 'high',  items: ['Penny may surface outdated or inaccurate content', 'Hallucination risk increases if source is stale', '6 capabilities reference this source directly', 'Prompt grounding must be re-validated immediately'] },
+      { area: `${TERMS.aiAssistant} Quality`, severity: 'high',  items: [`${TERMS.aiAssistant} may surface outdated or inaccurate content`, 'Hallucination risk increases if source is stale', '6 capabilities reference this source directly', 'Prompt grounding must be re-validated immediately'] },
       { area: 'Curriculum Content', severity: 'high', items: ['6 modules linked to this source are flagged', 'Course content health score drops', 'Reflection prompts may reference incorrect information', 'Content Specialist review required before republishing'] },
       { area: 'Coaches',         severity: 'medium', items: ['8 coaches have this in required reading', 'Coach brief accuracy may be affected', 'Facilitation guides may need updating'] },
       { area: 'Learner Experience', severity: 'medium', items: ['Quest answers and coaching responses may degrade', 'Trail OS search results may surface stale content', 'Knowledge Brief rail may show outdated snippets'] },
@@ -552,7 +553,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
                 { label: 'Data completeness', pct: 85, color: 'bg-emerald-500', note: 'Core fields populated across all connected systems' },
                 { label: 'Salesforce sync',    pct: 100, color: 'bg-emerald-500', note: 'Last synced less than 1 hour ago' },
                 { label: 'Knowledge freshness', pct: 72, color: 'bg-amber-400',  note: '2 of 8 sources flagged for review — last audit Q1 2025' },
-                { label: 'Penny AI coverage',  pct: obj.kind === 'capability' ? 95 : 60, color: obj.kind === 'capability' ? 'bg-emerald-500' : 'bg-amber-400', note: 'Capabilities configured for this object' },
+                { label: `${TERMS.aiAssistant} coverage`,  pct: obj.kind === 'capability' ? 95 : 60, color: obj.kind === 'capability' ? 'bg-emerald-500' : 'bg-amber-400', note: 'Capabilities configured for this object' },
                 { label: 'Governance status',  pct: 78, color: 'bg-amber-400',  note: 'Lifecycle review due Q3 — ownership confirmed' },
               ].map(h => (
                 <div key={h.label} className="rounded-lg border border-border bg-white p-3 space-y-1.5">
@@ -575,7 +576,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
                 { role: 'Primary Owner',   name: 'Program Manager',     detail: 'Accountable for this object\'s health and currency', status: 'active' as const },
                 { role: 'Content Steward', name: 'Content Specialist',  detail: 'Manages content quality and knowledge alignment',    status: 'active' as const },
                 { role: 'Data Owner',      name: 'Operations Lead',     detail: 'Owns Salesforce records and integration mappings',   status: 'active' as const },
-                { role: 'AI Curator',      name: 'Penny Lead',          detail: 'Reviews Penny prompts and capability quality',       status: 'review' as const },
+                { role: 'AI Curator',      name: `${TERMS.aiAssistant} Lead`, detail: `Reviews ${TERMS.aiAssistant} prompts and capability quality`, status: 'review' as const },
               ].map(o => (
                 <div key={o.role} className="rounded-lg border border-border bg-white p-3 flex items-start gap-3">
                   <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0">
@@ -605,7 +606,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
           {wsTab === 'activity' && (
             <div className="space-y-2">
               {[
-                { date: 'Today',          actor: 'Penny AI',         action: 'Trail Quest session completed',                   color: 'bg-pink-400'   },
+                { date: 'Today',          actor: TERMS.aiAssistant,  action: 'Trail Quest session completed',                   color: 'bg-pink-400'   },
                 { date: 'Yesterday',      actor: 'Coach',            action: 'Coach brief reviewed before session',             color: 'bg-blue-400'   },
                 { date: '3 days ago',     actor: 'Salesforce Sync',  action: 'Program_Engagement__c updated',                  color: 'bg-sky-400'    },
                 { date: 'Last week',      actor: 'Content Specialist', action: 'Knowledge source linked and confirmed current', color: 'bg-violet-400' },
@@ -663,7 +664,7 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
       <div className="p-4 max-w-3xl">
         {/* Framing */}
         <div className="mb-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Digital Twin · Explore</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Explore</p>
           <p className="text-[11px] text-muted-foreground">Pick an object to see what it touches — relationships, health, ownership, and change impact.</p>
         </div>
 
@@ -822,7 +823,7 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
           <Zap className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-[15px] font-semibold text-foreground mb-1.5">Select an object to trace impact</p>
           <p className="text-[12px] text-muted-foreground leading-relaxed">
-            Impact Analysis answers: <em>"What changes if this object changes?"</em> — across programs, curriculum, Penny AI, Salesforce, communication channels, and team ownership.
+            Impact Analysis answers: <em>"What changes if this object changes?"</em> — across programs, curriculum, {TERMS.aiAssistant}, Salesforce, communication channels, and team ownership.
           </p>
         </div>
         <button onClick={() => onNavigate('/digital-twin')}
@@ -895,8 +896,8 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
       <div className="p-4 max-w-3xl space-y-4">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Digital Twin · Governance</p>
-          <p className="text-[11px] text-muted-foreground">Manage the Trail OS object model, lifecycle compliance, and ownership structure.</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Governance</p>
+          <p className="text-[11px] text-muted-foreground">Manage the {TERMS.platform} object model, lifecycle compliance, and ownership structure.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
@@ -960,7 +961,7 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
         <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 flex items-start gap-2.5">
           <Shield className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0 mt-0.5" />
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            These tools define the shared vocabulary for Universal Object Profiles, Global Search, and Penny AI context loading.
+            These tools define the shared vocabulary for Universal Object Profiles, Global Search, and {TERMS.aiAssistant} context loading.
             Coordinate with the Operations Lead before making structural changes.
           </p>
         </div>
