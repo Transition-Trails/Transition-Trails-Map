@@ -7,9 +7,41 @@ import {
   ArrowRight, CheckCircle2, Circle,
   BarChart3, FileText, Bot,
   AlertTriangle, Calendar,
+  RefreshCw, WifiOff, ChevronRight,
 } from 'lucide-react';
+import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
+import {
+  domainHealthData, recommendations,
+  HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG,
+  overallHealthScore, overallHealthLevel,
+} from '@/data/operationalIntelligenceData';
 
-// ── Activity items ────────────────────────────────────────────────────────────
+// ── Route maps (mirrors OperationsHub) ───────────────────────────────────────
+const REC_ID_ROUTE: Record<string, string> = {
+  'rec-1':  '/roles',
+  'rec-2':  '/admin/integrations',
+  'rec-3':  '/collaboration/slack',
+  'rec-4':  '/roles',
+  'rec-5':  '/penny/capabilities',
+  'rec-6':  '/admin/integrations',
+  'rec-7':  '/penny/capabilities',
+  'rec-8':  '/knowledge/sources',
+  'rec-9':  '/navigator/program-map',
+  'rec-10': '/admin/integrations',
+  'rec-11': '/admin/integrations',
+  'rec-12': '/penny/prompts',
+};
+const REC_DOMAIN_ROUTE: Record<string, string> = {
+  'Penny AI':       '/penny/capabilities',
+  'People & Roles': '/roles',
+  'Programs':       '/navigator/program-map',
+  'Communications': '/collaboration/slack',
+  'Integrations':   '/admin/integrations',
+  'Knowledge':      '/knowledge/sources',
+  'Curriculum':     '/navigator/program-map',
+};
+
+// ── Static prototype data ─────────────────────────────────────────────────────
 const ALL_ACTIVITY = [
   { id: 'a1', icon: Bot,      catCls: 'bg-violet-100 text-violet-700', cat: 'Penny',    text: "Learning Coach flagged low confidence on Cohort 3 recap",      time: '8m',  minPower: false },
   { id: 'a2', icon: Inbox,    catCls: 'bg-amber-100 text-amber-700',   cat: 'Demand',   text: "New intake case — Explorer's Trail expansion",                 time: '23m', minPower: true  },
@@ -19,21 +51,15 @@ const ALL_ACTIVITY = [
 ];
 
 const UPCOMING_SESSIONS = [
-  { label: 'Guided Trail · Week 3 Session',     date: 'Today, 2:00 PM',   done: false },
-  { label: 'Foundations Trail · Cohort Check-in',date: 'Tomorrow, 10:00 AM', done: false },
-  { label: 'RESOLVE Phase Review',               date: 'Thu, Jun 13',      done: false },
+  { label: 'Guided Trail · Week 3 Session',      date: 'Today, 2:00 PM'     },
+  { label: 'Foundations Trail · Cohort Check-in', date: 'Tomorrow, 10:00 AM' },
+  { label: 'RESOLVE Phase Review',                date: 'Thu, Jun 13'        },
 ];
 
 const MY_TASKS = [
-  { label: 'Review Week 3 materials',   done: false },
-  { label: 'Update Cohort 1 attendance',done: false },
-  { label: 'Complete program survey',   done: true  },
-];
-
-const ATTENTION_ITEMS = [
-  { level: 'critical', text: 'Assign Penny Admin Owner', sub: 'Penny AI' },
-  { level: 'high',     text: 'Plan Nonprofit Cloud Migration Sprint', sub: 'Integrations' },
-  { level: 'high',     text: 'Build Penny Slack Adapter MVP', sub: 'Communications' },
+  { label: 'Review Week 3 materials',    done: false },
+  { label: 'Update Cohort 1 attendance', done: false },
+  { label: 'Complete program survey',    done: true  },
 ];
 
 const QUICK_LINKS = [
@@ -56,60 +82,200 @@ const PROGRAM_COLORS: Record<string, string> = {
 export default function Home() {
   const { programs } = useAppContext();
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
+
+  const { data: sfData, isLoading: sfLoading, isError: sfError, refetch, isFetching } = useSfOpsSummary();
+
+  const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
+  const n = (v: number | null | undefined) => v == null ? '—' : v.toLocaleString();
 
   const activityItems = isEveryday
     ? ALL_ACTIVITY.filter(a => !a.minPower)
     : ALL_ACTIVITY;
 
-  const metrics = isEveryday
-    ? [
-        { label: 'My Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
-        { label: 'Cohort Learners',value: '47',  icon: Users,  cls: 'text-sky-600' },
-        { label: 'Upcoming Tasks', value: '3',   icon: Inbox,  cls: 'text-amber-600' },
-        { label: 'Penny Nudges',   value: '12',  icon: Brain,  cls: 'text-violet-600' },
-      ]
-    : [
-        { label: 'Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
-        { label: 'Learners',    value: '47',  icon: Users,  cls: 'text-sky-600' },
-        { label: 'Open Demand', value: '5',   icon: Inbox,  cls: 'text-amber-600' },
-        { label: 'Penny / wk', value: '234', icon: Brain,  cls: 'text-violet-600' },
-      ];
+  const everydayMetrics = [
+    { label: 'My Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
+    { label: 'Cohort Learners',value: '47',  icon: Users,  cls: 'text-sky-600'    },
+    { label: 'Upcoming Tasks', value: '3',   icon: Inbox,  cls: 'text-amber-600'  },
+    { label: 'Penny Nudges',   value: '12',  icon: Brain,  cls: 'text-violet-600' },
+  ];
 
   return (
-    <div className="h-full w-full flex flex-col p-3 gap-2.5 overflow-hidden">
+    <div className="h-full w-full flex flex-col overflow-hidden">
 
       {/* ── Header ── */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 px-3 pt-3 pb-0">
         <h1 className="text-sm font-semibold text-foreground leading-none">
           {isEveryday ? 'My Dashboard' : 'Mission Control'}
         </h1>
       </div>
 
-      {/* ── Metric strip ── */}
-      <div className="flex-shrink-0 flex items-stretch rounded-xl border border-border/60 bg-white/80 shadow-sm overflow-hidden">
-        {metrics.map((m, i) => {
-          const Icon = m.icon;
-          return (
-            <div key={m.label} className={`flex-1 flex items-center gap-2 px-3 py-2 ${i > 0 ? 'border-l border-border/40' : ''}`}>
-              <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${m.cls}`} />
-              <div>
-                <p className="text-base font-bold text-foreground leading-none">{m.value}</p>
-                <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{m.label}</p>
+      {/* ── Scrollable body ── */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
+
+        {/* ── EVERYDAY: compact metric strip ── */}
+        {isEveryday && (
+          <div className="flex items-stretch rounded-xl border border-border/60 bg-white/80 shadow-sm overflow-hidden">
+            {everydayMetrics.map((m, i) => {
+              const Icon = m.icon;
+              return (
+                <div key={m.label} className={`flex-1 flex items-center gap-2 px-3 py-2 ${i > 0 ? 'border-l border-border/40' : ''}`}>
+                  <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${m.cls}`} />
+                  <div>
+                    <p className="text-base font-bold text-foreground leading-none">{m.value}</p>
+                    <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{m.label}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── POWER+: Live Salesforce strip ── */}
+        {!isEveryday && (
+          sfError ? (
+            <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 flex items-center gap-2">
+              <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
+              <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — live counts unavailable.</span>
+              <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
+                <RefreshCw className="w-2.5 h-2.5" /> Retry
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${sfLoading || isFetching ? 'bg-amber-400 animate-pulse' : (sfData && sfData.cacheAge > 300) ? 'bg-amber-400' : 'bg-emerald-500'}`} />
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-800">Live from Salesforce</span>
+                  {sfData && (
+                    <span className={`text-[9px] ${sfData.cacheAge > 300 ? 'text-amber-600' : 'text-emerald-600/70'}`}>
+                      · {sfData.cacheAge > 300 ? 'stale · ' : ''}{formatSyncAge(sfData.lastUpdated)}
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => refetch()} disabled={isFetching} className="text-[9px] text-emerald-700/60 hover:text-emerald-800 disabled:opacity-40">
+                  <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+              {sfLoading ? (
+                <div className="flex gap-2">{[1,2,3,4].map(i => <div key={i} className="h-7 flex-1 rounded bg-emerald-100 animate-pulse" />)}</div>
+              ) : sfData ? (
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { label: 'Programs',    value: n(sfData.programs.total),                   sub: `${n(sfData.programs.active)} active`         },
+                    { label: 'Enrollments', value: n(sfData.engagements.total),                sub: `${n(sfData.engagements.active)} active`       },
+                    { label: 'Deliveries',  value: n(sfData.serviceDeliveries.last30Days),     sub: 'last 30 days'                                 },
+                    { label: 'Open Cases',  value: n(sfData.cases.open),                       sub: `${n(sfData.cases.highPriority)} high priority` },
+                  ].map(m => (
+                    <div key={m.label} className="rounded bg-white/70 border border-emerald-100 px-2 py-1.5">
+                      <p className="text-[9px] font-bold text-emerald-700/60 uppercase tracking-wider mb-0.5">{m.label}</p>
+                      <p className="text-[15px] font-bold text-emerald-900 leading-none">{m.value}</p>
+                      <p className="text-[9px] text-emerald-700/60 mt-0.5">{m.sub}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          )
+        )}
+
+        {/* ── POWER+: Overall health score row ── */}
+        {!isEveryday && (
+          <div className="rounded-lg border border-border bg-white px-4 py-3 flex items-center gap-5">
+            <div className="flex items-baseline gap-2 shrink-0">
+              <p className={`text-4xl font-bold leading-none ${cfg.score}`}>{overallHealthScore}</p>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[9px] text-muted-foreground/60 font-medium uppercase tracking-wider leading-none">Overall</span>
+                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${cfg.cls}`}>{cfg.label}</span>
               </div>
             </div>
+            <div className="w-px h-8 bg-border/60 shrink-0" />
+            <div className="flex flex-1 items-center gap-2 flex-wrap">
+              {[
+                { l: 'Critical',        v: recommendations.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+                { l: 'High Priority',   v: recommendations.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
+                { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+                { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
+              ].map(s => (
+                <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
+                  <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
+                  <span className={`text-[9px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => navigate('/operations')}
+              className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5 shrink-0"
+            >
+              Full report <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
+        {/* ── POWER+: Critical & High Priority Actions ── */}
+        {!isEveryday && (() => {
+          const allItems = [
+            ...recommendations.filter(r => r.priority === 'critical'),
+            ...recommendations.filter(r => r.priority === 'high'),
+          ];
+          const LIMIT   = 6;
+          const visible = allItems.slice(0, LIMIT);
+          const extra   = allItems.length - LIMIT;
+          return (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                  Critical &amp; High Priority Actions
+                </p>
+                {extra > 0 && (
+                  <button
+                    onClick={() => navigate('/operations/recommendations')}
+                    className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+                  >
+                    View all {allItems.length} <ChevronRight className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-3 gap-1.5">
+                {visible.map(r => {
+                  const pc   = REC_PRIORITY_CONFIG[r.priority];
+                  const dest = REC_ID_ROUTE[r.id] ?? REC_DOMAIN_ROUTE[r.domain] ?? '/operations';
+                  return (
+                    <button key={r.id}
+                      onClick={() => navigate(dest)}
+                      className="text-left rounded-lg border border-border bg-white px-2.5 py-2 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight shrink-0 ${pc.cls}`}>
+                          {pc.label}
+                        </span>
+                        <ChevronRight className="w-3 h-3 text-muted-foreground/25 group-hover:text-primary transition-colors shrink-0" />
+                      </div>
+                      <p className="text-[10px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
+                        {r.action}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground/70 truncate">{r.domain}</p>
+                    </button>
+                  );
+                })}
+              </div>
+              {extra > 0 && (
+                <button
+                  onClick={() => navigate('/operations/recommendations')}
+                  className="mt-2 w-full text-center text-[10px] font-semibold text-primary hover:underline py-1.5 rounded-lg border border-dashed border-primary/30 hover:border-primary/60 transition-colors"
+                >
+                  + {extra} more attention items
+                </button>
+              )}
+            </div>
           );
-        })}
-      </div>
+        })()}
 
-      {/* ── Two-column body ── */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3">
+        {/* ── Two-column body ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-          {/* ── LEFT column ── */}
+          {/* LEFT column */}
           <div className="space-y-3">
 
-            {/* Recent Activity */}
             <Card label="Recent Activity">
               {activityItems.map((item, i) => {
                 const Icon = item.icon;
@@ -125,11 +291,10 @@ export default function Home() {
                   </div>
                 );
               })}
-              <CardFooter onClick={() => setLocation('/operations/health')} label="View all activity" />
+              <CardFooter onClick={() => navigate('/operations/health')} label="View all activity" />
             </Card>
 
-            {/* Everyday: Upcoming Sessions | Power+: Attention Items */}
-            {isEveryday ? (
+            {isEveryday && (
               <Card label="Upcoming Sessions">
                 {UPCOMING_SESSIONS.map((s, i) => (
                   <div key={s.label} className={`flex items-center gap-2.5 px-3 py-2 ${i < UPCOMING_SESSIONS.length - 1 ? 'border-b border-border/30' : ''}`}>
@@ -140,38 +305,22 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
-                <CardFooter onClick={() => setLocation('/collaboration')} label="Open calendar" />
-              </Card>
-            ) : (
-              <Card label="Attention Required">
-                {ATTENTION_ITEMS.map((a, i) => (
-                  <div key={a.text} className={`flex items-start gap-2.5 px-3 py-2 ${i < ATTENTION_ITEMS.length - 1 ? 'border-b border-border/30' : ''}`}>
-                    <AlertTriangle className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${a.level === 'critical' ? 'text-red-500' : 'text-amber-500'}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium text-foreground truncate">{a.text}</p>
-                      <p className="text-[9px] text-muted-foreground/60 mt-0.5">{a.sub}</p>
-                    </div>
-                    <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded-full whitespace-nowrap ${a.level === 'critical' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-amber-50 text-amber-600 border border-amber-200'}`}>
-                      {a.level}
-                    </span>
-                  </div>
-                ))}
-                <CardFooter onClick={() => setLocation('/operations')} label="View all in Operations" />
+                <CardFooter onClick={() => navigate('/collaboration')} label="Open calendar" />
               </Card>
             )}
+
           </div>
 
-          {/* ── RIGHT column ── */}
+          {/* RIGHT column */}
           <div className="space-y-3">
 
-            {/* My Programs / Program Portfolio */}
             <Card label={isEveryday ? 'My Programs' : 'Program Portfolio'}>
               {programs.map((p, i) => {
                 const dot = PROGRAM_COLORS[p.id] ?? 'bg-muted';
                 return (
                   <button
                     key={p.id}
-                    onClick={() => setLocation('/program')}
+                    onClick={() => navigate('/program')}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/30 transition-colors ${i < programs.length - 1 ? 'border-b border-border/30' : ''}`}
                   >
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
@@ -181,10 +330,9 @@ export default function Home() {
                   </button>
                 );
               })}
-              <CardFooter onClick={() => setLocation('/program')} label={isEveryday ? 'Open Program Hub' : 'Open Program & Curriculum'} />
+              <CardFooter onClick={() => navigate('/program')} label={isEveryday ? 'Open Program Hub' : 'Open Program & Curriculum'} />
             </Card>
 
-            {/* Everyday: Tasks + Resources | Power: Penny Performance | Admin: Demand queue */}
             {isEveryday ? (
               <>
                 <Card label="My Tasks">
@@ -203,7 +351,7 @@ export default function Home() {
                   {QUICK_LINKS.map((l, i) => (
                     <button
                       key={l.label}
-                      onClick={() => setLocation(l.path)}
+                      onClick={() => navigate(l.path)}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-muted/30 transition-colors ${i < QUICK_LINKS.length - 1 ? 'border-b border-border/30' : ''}`}
                     >
                       <FileText className="w-3 h-3 text-indigo-400 flex-shrink-0" />
@@ -211,16 +359,16 @@ export default function Home() {
                       <ArrowRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />
                     </button>
                   ))}
-                  <CardFooter onClick={() => setLocation('/knowledge/library')} label="Open Knowledge Library" />
+                  <CardFooter onClick={() => navigate('/knowledge/library')} label="Open Knowledge Library" />
                 </Card>
               </>
             ) : isPowerOrAbove && !isAdminOrAbove ? (
               <Card label="Penny This Week">
                 {[
-                  { icon: Brain,         label: 'Interactions',     value: '234', sub: 'this week',  cls: 'text-violet-600', bg: 'bg-violet-50'  },
-                  { icon: Users,         label: 'Learner sessions', value: '12',  sub: 'active now', cls: 'text-sky-600',    bg: 'bg-sky-50'     },
-                  { icon: BarChart3,     label: 'Prompt quality',   value: '87%', sub: 'avg score',  cls: 'text-emerald-600',bg: 'bg-emerald-50' },
-                  { icon: AlertTriangle, label: 'Knowledge gaps',   value: '3',   sub: 'flagged',    cls: 'text-amber-600',  bg: 'bg-amber-50'   },
+                  { icon: Brain,         label: 'Interactions',     value: '234', sub: 'this week',  cls: 'text-violet-600', bg: 'bg-violet-50'   },
+                  { icon: Users,         label: 'Learner sessions', value: '12',  sub: 'active now', cls: 'text-sky-600',    bg: 'bg-sky-50'      },
+                  { icon: BarChart3,     label: 'Prompt quality',   value: '87%', sub: 'avg score',  cls: 'text-emerald-600',bg: 'bg-emerald-50'  },
+                  { icon: AlertTriangle, label: 'Knowledge gaps',   value: '3',   sub: 'flagged',    cls: 'text-amber-600',  bg: 'bg-amber-50'    },
                 ].map((m, i, arr) => {
                   const Icon = m.icon;
                   return (
@@ -236,7 +384,7 @@ export default function Home() {
                     </div>
                   );
                 })}
-                <CardFooter onClick={() => setLocation('/penny/intelligence')} label="Open Penny Intelligence" />
+                <CardFooter onClick={() => navigate('/penny/intelligence')} label="Open Penny Intelligence" />
               </Card>
             ) : (
               <Card label="Open Demand">
@@ -257,12 +405,44 @@ export default function Home() {
                     }`}>{d.priority}</span>
                   </div>
                 ))}
-                <CardFooter onClick={() => setLocation('/operations/demand')} label="Open Demand Management" />
+                <CardFooter onClick={() => navigate('/operations/demand')} label="Open Demand Management" />
               </Card>
             )}
           </div>
-
         </div>
+
+        {/* ── POWER+: Domain Health ── */}
+        {!isEveryday && (
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Domain Health</p>
+              <button
+                onClick={() => navigate('/operations/health')}
+                className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+              >
+                Health Indicators <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {domainHealthData.map(d => {
+                const dc = HEALTH_LEVEL_CONFIG[d.level];
+                return (
+                  <button key={d.id}
+                    onClick={() => navigate('/operations/health')}
+                    className="rounded-lg border border-border bg-white px-2.5 py-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
+                      <span className={`text-lg font-bold leading-none ${dc.score}`}>{d.score}</span>
+                    </div>
+                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
+                    <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
