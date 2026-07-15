@@ -319,10 +319,10 @@ export default function KnowledgeOverview() {
             {[
               {
                 priority: '1',
-                action: 'Connect Google Drive API',
-                why: `${stats.syncCounts.Disconnected} sources are disconnected — Google Drive folders for Foundations and Guided Trail are inaccessible to Trail OS and ${TERMS.aiAssistant}. Connecting Drive unblocks curriculum content retrieval and blueprint validation.`,
-                tag: 'Phase 2',
-                tagColor: 'bg-slate-100 text-slate-600 border-slate-200',
+                action: 'Configure Google Drive folder indexing',
+                why: `The Google Drive API is connected. The next step is configuring folder indexing for the Foundations and Guided Trail program folders so ${TERMS.aiAssistant} can retrieve curriculum content, coach guides, and assessment rubrics.`,
+                tag: 'Action Now',
+                tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
               },
               {
                 priority: '2',
@@ -358,7 +358,7 @@ export default function KnowledgeOverview() {
           <div className="flex items-center gap-1.5 pt-1 border-t border-primary/10">
             <Clock className="w-3 h-3 text-muted-foreground/50" />
             <p className="text-[10px] text-muted-foreground/60">
-              Penny insights are Phase 1 guidance — live impact scoring arrives in Phase 2.
+              {TERMS.aiAssistant} insights reflect current source health — live impact scoring is a Phase 2 capability.
             </p>
           </div>
         </div>
