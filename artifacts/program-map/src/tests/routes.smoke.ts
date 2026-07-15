@@ -50,6 +50,8 @@ export const CANONICAL_ROUTES = [
   '/collaboration/slack/validation',
   '/collaboration/drive',
   '/collaboration/calendar',
+  '/collaboration/calendar/registry',
+  '/collaboration/calendar/events',
   '/collaboration/channels',
   '/collaboration/templates',
 

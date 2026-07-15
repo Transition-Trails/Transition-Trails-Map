@@ -71,11 +71,18 @@ function OverviewTab() {
   const testSummary = getCalTestSummary();
   const healthAvg   = Math.round(CAL_HEALTH_SCORES.reduce((s, h) => s + (h.score / h.maxScore) * 100, 0) / CAL_HEALTH_SCORES.length);
 
+  const programCohortCount = TRAIL_CALENDARS.filter(c => c.calendarType === 'Program' || c.calendarType === 'Cohort').length;
+  const specializedCount   = TRAIL_CALENDARS.length - programCohortCount;
+  const eventTypeCount     = new Set(CALENDAR_EVENTS.map(e => e.eventType)).size;
+  const recurringCount     = CALENDAR_EVENTS.filter(e => e.status === 'recurring').length;
+  const prototypeCapCount  = PENNY_SCHEDULING_CAPABILITIES.filter(c => c.status === 'Prototype').length;
+  const plannedCapCount    = PENNY_SCHEDULING_CAPABILITIES.filter(c => c.status === 'Planned').length;
+
   const stats = [
-    { label:'Calendars Registered', value:'11', sub:'5 program/cohort · 6 specialized', icon:CalendarDays,  color:'text-blue-600' },
-    { label:'Events Catalogued',    value:'15', sub:'6 types · 5 recurring',             icon:CalendarCheck, color:'text-emerald-600' },
-    { label:'Penny Capabilities',   value:'7',  sub:'1 prototype · 6 planned',           icon:Brain,         color:'text-purple-500' },
-    { label:'Calendar Readiness',   value:`${healthAvg}%`, sub:`${testSummary.pass}/${testSummary.total} tests passing`, icon:Activity, color:'text-amber-500' },
+    { label:'Calendars Registered', value:`${TRAIL_CALENDARS.length}`,                    sub:`${programCohortCount} program/cohort · ${specializedCount} specialized`, icon:CalendarDays,  color:'text-blue-600' },
+    { label:'Events Catalogued',    value:`${CALENDAR_EVENTS.length}`,                    sub:`${eventTypeCount} types · ${recurringCount} recurring`,                  icon:CalendarCheck, color:'text-emerald-600' },
+    { label:'Penny Capabilities',   value:`${PENNY_SCHEDULING_CAPABILITIES.length}`,      sub:`${prototypeCapCount} prototype · ${plannedCapCount} planned`,            icon:Brain,         color:'text-purple-500' },
+    { label:'Calendar Readiness',   value:`${healthAvg}%`, sub:`${testSummary.pass}/${testSummary.total} tests passing`,                                               icon:Activity,      color:'text-amber-500' },
   ];
 
   const criticals = CAL_GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical' && i.status !== 'Resolved');
@@ -121,7 +128,7 @@ function OverviewTab() {
       )}
 
       <div className="bg-card border border-border rounded-lg p-3">
-        <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-3">Readiness Scorecard — Google Calendar as Trail OS Timing Layer</div>
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-3">Integration Readiness by Area</div>
         <div className="space-y-2">
           {readinessAreas.map(a => {
             const pct = Math.round((a.score / a.max) * 100);
@@ -902,7 +909,7 @@ export default function GoogleCalendarIntegrationCenter() {
   const { openActionPanel } = useAppContext();
   const govSummary   = getCalGovernanceSummary();
   const criticalCount = govSummary.critical;
-  const badge = criticalCount > 0 ? `${criticalCount} CRITICAL ISSUES` : 'Phase 1 — Calendar Integration';
+  const badge = criticalCount > 0 ? `${criticalCount} CRITICAL ISSUES` : 'Calendar Integration';
 
   const actions = [
     { id: 'add-calendar', label: 'Add Calendar Mapping', icon: Plus, variant: 'primary' as const, onClick: () => openActionPanel({
