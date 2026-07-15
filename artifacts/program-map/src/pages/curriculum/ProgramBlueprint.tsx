@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   curriculumPrograms, curriculumCohorts, curriculumSprints, curriculumModules,
@@ -21,7 +22,7 @@ type BlueprintTab = 'structure' | 'learning' | 'penny' | 'delivery' | 'salesforc
 const TABS: { id: BlueprintTab; label: string; icon: React.ElementType }[] = [
   { id: 'structure',  label: 'Program Structure', icon: Layers },
   { id: 'learning',   label: 'Learning Assets',   icon: BookOpen },
-  { id: 'penny',      label: 'Penny Assets',       icon: Sparkles },
+  { id: 'penny',      label: `${TERMS.aiAssistant} Assets`, icon: Sparkles },
   { id: 'delivery',   label: 'Delivery Assets',    icon: Hash },
   { id: 'salesforce', label: 'Salesforce',         icon: Database },
   { id: 'drive',      label: 'Google Drive',       icon: FolderOpen },
@@ -294,12 +295,12 @@ export default function ProgramBlueprint() {
               </p>
             </div>
             <div className="space-y-2">
-              {sfMappings.slice(0, 10).map(mapping => {
+              {sfMappings.map(mapping => {
                 const statusCfg = SF_STATUS_CONFIG[mapping.status];
                 return (
                   <button
                     key={mapping.id}
-                    onClick={() => setSelectedItem({ type: 'sfMapping' as any, id: mapping.id, data: mapping })}
+                    onClick={() => setSelectedItem({ type: 'sfMapping', id: mapping.id, data: mapping })}
                     className="w-full rounded-xl border border-border bg-white p-3 text-left hover:shadow-sm hover:border-blue-200 transition-all"
                   >
                     <div className="flex items-center gap-3">
