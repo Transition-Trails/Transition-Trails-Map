@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   MessageSquare, Mail, CalendarDays, Database, Sparkles,
   Lock, Plus, Trash2, Pause, Play, Zap, Bell,
@@ -107,6 +107,8 @@ const DEFAULT_RULES: WatchRule[] = [
     threshold: '50%', action: 'Digest (daily)', paused: true, required: false,
   },
 ];
+
+const LS_KEY = 'trail-os:my-trail-signals-prefs';
 
 const OBJECT_TYPES  = ['Learner', 'Coach', 'Program', 'Case', 'Contact'];
 const FIELDS        = ['Inactivity', 'Completion %', 'Status', 'Priority', 'Case Count', 'Last Activity'];
@@ -218,7 +220,31 @@ export default function MyTrailSignals() {
     setSaved(false);
   };
 
-  const handleSave = () => setSaved(true);
+  // Hydrate from localStorage on first mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { settings?: Record<SourceId, SourceSetting>; rules?: WatchRule[] };
+      if (parsed.settings) setSettings(parsed.settings);
+      if (parsed.rules) {
+        setRules([
+          ...DEFAULT_RULES.filter(r => r.required),
+          ...parsed.rules.filter(r => !r.required),
+        ]);
+      }
+    } catch { /* corrupt storage — ignore */ }
+  }, []);
+
+  const handleSave = () => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        settings,
+        rules: rules.filter(r => !r.required),
+      }));
+    } catch { /* storage unavailable — ignore */ }
+    setSaved(true);
+  };
 
   const activeCount  = Object.values(settings).filter(s => s.active).length;
   const ruleCount    = rules.filter(r => !r.paused).length;
@@ -474,7 +500,7 @@ export default function MyTrailSignals() {
         <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-3.5">
           <p className="text-[11px] text-zinc-500">
             {saved
-              ? '✓ Preferences saved (in-memory — will reset on refresh until DB persistence ships in Phase 2)'
+              ? '✓ Preferences saved — your settings will persist across sessions.'
               : 'Changes are unsaved — click Save to apply your preferences.'}
           </p>
           <button
