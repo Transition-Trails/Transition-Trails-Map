@@ -308,24 +308,6 @@ export default function Home() {
           {/* LEFT column */}
           <div className="space-y-3">
 
-            <Card label="Recent Activity">
-              {activityItems.map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.id} className={`flex items-start gap-2 px-3 py-2 ${i < activityItems.length - 1 ? 'border-b border-border/30' : ''}`}>
-                    <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 ${item.catCls}`}>
-                      <Icon className="w-3 h-3" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-foreground leading-snug">{item.text}</p>
-                      <p className="text-[9px] text-muted-foreground/60 mt-0.5">{item.cat} · {item.time} ago</p>
-                    </div>
-                  </div>
-                );
-              })}
-              <CardFooter onClick={() => navigate('/operations/health')} label="View all activity" />
-            </Card>
-
             {isEveryday && (
               <Card label="Upcoming Sessions">
                 {UPCOMING_SESSIONS.map((s, i) => (
@@ -345,25 +327,6 @@ export default function Home() {
 
           {/* RIGHT column */}
           <div className="space-y-3">
-
-            <Card label={isEveryday ? 'My Programs' : 'Program Portfolio'}>
-              {programs.map((p, i) => {
-                const dot = PROGRAM_COLORS[p.id] ?? 'bg-muted';
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => navigate('/program')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/30 transition-colors ${i < programs.length - 1 ? 'border-b border-border/30' : ''}`}
-                  >
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
-                    <span className="text-[11px] font-medium text-foreground flex-1 truncate">{p.name}</span>
-                    <span className="text-[10px] text-muted-foreground hidden sm:block">{p.duration}</span>
-                    <ArrowRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />
-                  </button>
-                );
-              })}
-              <CardFooter onClick={() => navigate('/program')} label={isEveryday ? 'Open Program Hub' : 'Open Program & Curriculum'} />
-            </Card>
 
             {isEveryday ? (
               <>
@@ -418,28 +381,7 @@ export default function Home() {
                 })}
                 <CardFooter onClick={() => navigate('/penny/intelligence')} label="Open Penny Intelligence" />
               </Card>
-            ) : (
-              <Card label="Open Demand">
-                {[
-                  { id: 'D-041', title: "Explorer's Trail expansion", priority: 'High'     },
-                  { id: 'D-039', title: 'Slack channel restructure',  priority: 'Medium'   },
-                  { id: 'D-037', title: 'Phase 2 curriculum audit',   priority: 'High'     },
-                  { id: 'D-035', title: 'Penny knowledge gap review', priority: 'Critical' },
-                  { id: 'D-033', title: 'Q3 capacity planning',       priority: 'Medium'   },
-                ].map((d, i, arr) => (
-                  <div key={d.id} className={`flex items-center gap-2 px-3 py-2 ${i < arr.length - 1 ? 'border-b border-border/30' : ''}`}>
-                    <span className="text-[10px] font-mono text-muted-foreground/50 flex-shrink-0 w-10">{d.id}</span>
-                    <span className="text-[11px] text-foreground flex-1 truncate">{d.title}</span>
-                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap border ${
-                      d.priority === 'Critical' ? 'bg-red-50 text-red-600 border-red-200'
-                      : d.priority === 'High'   ? 'bg-orange-50 text-orange-600 border-orange-200'
-                      : 'bg-muted text-muted-foreground border-border/60'
-                    }`}>{d.priority}</span>
-                  </div>
-                ))}
-                <CardFooter onClick={() => navigate('/operations/demand')} label="Open Demand Management" />
-              </Card>
-            )}
+            ) : null}
           </div>
         </div>
 
