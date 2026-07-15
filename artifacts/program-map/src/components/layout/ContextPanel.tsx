@@ -1523,10 +1523,23 @@ export function ContextPanel() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Object Mapping</p>
               <div className="space-y-1.5">
                 {d.relatedSalesforceObject && (
-                  <div className="flex items-center gap-2">
-                    <Database className="w-3 h-3 text-primary flex-shrink-0" />
-                    <span className="text-[11px] text-foreground">{d.relatedSalesforceObject}</span>
-                  </div>
+                  sfOrgData?.orgBaseUrl ? (
+                    <a
+                      href={`${sfOrgData.orgBaseUrl}/lightning/setup/ObjectManager/${d.relatedSalesforceObject}/view`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 group w-full"
+                    >
+                      <Database className="w-3 h-3 text-[#0070d2] flex-shrink-0" />
+                      <span className="text-[11px] text-[#0070d2] font-medium group-hover:underline flex-1">{d.relatedSalesforceObject}</span>
+                      <ExternalLink className="w-2.5 h-2.5 text-[#0070d2]/60 flex-shrink-0" />
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Database className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="text-[11px] text-foreground">{d.relatedSalesforceObject}</span>
+                    </div>
+                  )
                 )}
                 {d.relatedLmsObject && (
                   <div className="flex items-center gap-2">
