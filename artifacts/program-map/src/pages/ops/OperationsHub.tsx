@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useLocation } from 'wouter';
 import {
-  Activity, BarChart2, GitBranch, TrendingUp, ChevronRight, ChevronDown,
-  AlertTriangle, Target, RefreshCw, Users, Database, Wifi, WifiOff,
+  Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown,
+  AlertTriangle, Target,
 } from 'lucide-react';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import { HubShell } from '@/components/layout/HubShell';
@@ -12,242 +11,8 @@ import { useTierFlags } from '@/hooks/useTierFlags';
 import {
   domainHealthData, recommendations, readinessScorecards, trendInsights,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG,
-  overallHealthScore, overallHealthLevel,
 } from '@/data/operationalIntelligenceData';
-import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
-import { useSfOpsPrograms } from '@/hooks/useSfOpsPrograms';
-import ProgramHealth from '@/pages/operations/ProgramHealth';
 import Intake        from '@/pages/demand/Intake';
-
-// ── Live Salesforce Strip ─────────────────────────────────────────────────────
-function SfLiveStrip() {
-  const { data, isLoading, isError, refetch, isFetching } = useSfOpsSummary();
-
-  const n = (v: number | null | undefined) => v == null ? '—' : v.toLocaleString();
-
-  if (isError) {
-    return (
-      <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 flex items-center gap-2">
-        <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
-        <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — live counts unavailable.</span>
-        <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
-          <RefreshCw className="w-2.5 h-2.5" /> Retry
-        </button>
-      </div>
-    );
-  }
-
-  const isStale = data && data.cacheAge > 5 * 60;
-  const syncLabel = data ? formatSyncAge(data.lastUpdated) : null;
-
-  return (
-    <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-1.5">
-          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLoading || isFetching ? 'bg-amber-400 animate-pulse' : isStale ? 'bg-amber-400' : 'bg-emerald-500'}`} />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-800">Live from Salesforce</span>
-          {data && (
-            <span className={`text-[9px] ${isStale ? 'text-amber-600' : 'text-emerald-600/70'}`}>
-              · {isStale ? 'stale · ' : ''}{syncLabel}
-            </span>
-          )}
-        </div>
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="text-[9px] text-emerald-700/60 hover:text-emerald-800 flex items-center gap-0.5 disabled:opacity-40"
-        >
-          <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
-        </button>
-      </div>
-
-      {isLoading ? (
-        <div className="flex gap-2">
-          {[1,2,3,4].map(i => <div key={i} className="h-7 flex-1 rounded bg-emerald-100 animate-pulse" />)}
-        </div>
-      ) : data ? (
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { icon: Database, label: 'Programs',    value: n(data.programs.total),      sub: `${n(data.programs.active)} active` },
-            { icon: Users,    label: 'Enrollments', value: n(data.engagements.total),   sub: `${n(data.engagements.active)} active` },
-            { icon: Activity, label: 'Deliveries',  value: n(data.serviceDeliveries.last30Days), sub: 'last 30 days' },
-            { icon: AlertTriangle, label: 'Open Cases', value: n(data.cases.open),      sub: `${n(data.cases.highPriority)} high priority` },
-          ].map(m => (
-            <div key={m.label} className="rounded bg-white/70 border border-emerald-100 px-2 py-1.5">
-              <p className="text-[9px] font-bold text-emerald-700/60 uppercase tracking-wider mb-0.5">{m.label}</p>
-              <p className="text-[15px] font-bold text-emerald-900 leading-none">{m.value}</p>
-              <p className="text-[9px] text-emerald-700/60 mt-0.5">{m.sub}</p>
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-// ── Route map for attention-required cards ─────────────────────────────────
-const REC_ID_ROUTE: Record<string, string> = {
-  'rec-1':  '/roles',                   // Assign Penny Admin Owner → People & Roles
-  'rec-2':  '/admin/integrations',      // Plan Nonprofit Cloud Migration Sprint
-  'rec-3':  '/collaboration/slack',     // Build Penny Slack Adapter MVP
-  'rec-4':  '/roles',                   // Assign Owners to Unowned Roles
-  'rec-5':  '/penny/capabilities',      // Configure Digital Compass Penny Coverage
-  'rec-6':  '/admin/integrations',      // Define External Partner Salesforce Models
-  'rec-7':  '/penny/capabilities',      // Activate Executive Intelligence Briefs
-  'rec-8':  '/knowledge/sources',       // Resolve Overdue Knowledge Source Reviews
-  'rec-9':  '/navigator/program-map',   // Complete Explorer's Trail Learning Objectives
-  'rec-10': '/admin/integrations',      // Configure Google Drive Live Sync
-  'rec-11': '/admin/integrations',      // Start Agentforce Readiness Assessment
-  'rec-12': '/penny/prompts',           // Formalise Prompt Governance SLA
-};
-const REC_DOMAIN_ROUTE: Record<string, string> = {
-  'Penny AI':       '/penny/capabilities',
-  'People & Roles': '/roles',
-  'Programs':       '/navigator/program-map',
-  'Communications': '/collaboration/slack',
-  'Integrations':   '/admin/integrations',
-  'Knowledge':      '/knowledge/sources',
-  'Curriculum':     '/navigator/program-map',
-};
-
-// ── Executive Overview ────────────────────────────────────────────────────────
-function ExecutiveOverview() {
-  const [, navigate] = useLocation();
-  const { setSelectedItem } = useAppContext();
-  const { isEveryday } = useTierFlags();
-  const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
-  const { data: sfPrograms } = useSfOpsPrograms();
-
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-4 space-y-3">
-        {/* Phase 1 banner — admin/power only */}
-        {!isEveryday && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 flex items-center gap-2">
-            <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">Phase 1</span>
-            <span className="text-[10px] text-amber-600">Operations, Health, Demand, Scorecards, and Trends are unified here.</span>
-          </div>
-        )}
-
-        {/* Live SF data strip — always shown */}
-        <SfLiveStrip />
-
-        {/* Overall health — compact single row */}
-        <div className="rounded-lg border border-border bg-white px-4 py-3 flex items-center gap-5">
-          {/* Score + label */}
-          <div className="flex items-baseline gap-2 shrink-0">
-            <p className={`text-4xl font-bold leading-none ${cfg.score}`}>{overallHealthScore}</p>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] text-muted-foreground/60 font-medium uppercase tracking-wider leading-none">Overall</span>
-              <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${cfg.cls}`}>{cfg.label}</span>
-            </div>
-          </div>
-          {/* Divider */}
-          <div className="w-px h-8 bg-border/60 shrink-0" />
-          {/* Stat chips */}
-          <div className="flex flex-1 items-center gap-2 flex-wrap">
-            {[
-              { l: 'Critical',       v: recommendations.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-              { l: 'High Priority',  v: recommendations.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-              { l: 'Domains At Risk',v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-              { l: 'Needs Work',     v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
-            ].map(s => (
-              <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
-                <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
-                <span className={`text-[9px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Critical + high priority recs — ABOVE domain health */}
-        {(() => {
-          const allItems = [
-            ...recommendations.filter(r => r.priority === 'critical'),
-            ...recommendations.filter(r => r.priority === 'high'),
-          ];
-          const LIMIT   = 6;
-          const visible = allItems.slice(0, LIMIT);
-          const extra   = allItems.length - LIMIT;
-          return (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-                  {isEveryday ? 'Items Needing Attention' : 'Critical & High Priority Actions'}
-                </p>
-                {extra > 0 && (
-                  <button
-                    onClick={() => navigate('/operations/recommendations')}
-                    className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
-                  >
-                    View all {allItems.length} <ChevronRight className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {visible.map(r => {
-                  const pc = REC_PRIORITY_CONFIG[r.priority];
-                  const dest = REC_ID_ROUTE[r.id] ?? REC_DOMAIN_ROUTE[r.domain] ?? '/operations';
-                  return (
-                    <button key={r.id}
-                      onClick={() => navigate(dest)}
-                      className="text-left rounded-lg border border-border bg-white px-2.5 py-2 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight shrink-0 ${pc.cls}`}>
-                          {pc.label}
-                        </span>
-                        <ChevronRight className="w-3 h-3 text-muted-foreground/25 group-hover:text-primary transition-colors shrink-0" />
-                      </div>
-                      <p className="text-[10px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
-                        {r.action}
-                      </p>
-                      <p className="text-[9px] text-muted-foreground/70 truncate">{r.domain}</p>
-                    </button>
-                  );
-                })}
-              </div>
-              {extra > 0 && (
-                <button
-                  onClick={() => navigate('/operations/recommendations')}
-                  className="mt-2 w-full text-center text-[10px] font-semibold text-primary hover:underline py-1.5 rounded-lg border border-dashed border-primary/30 hover:border-primary/60 transition-colors"
-                >
-                  + {extra} more attention items
-                </button>
-              )}
-            </div>
-          );
-        })()}
-
-        {/* Domain health — compact 4-col cards */}
-        <div>
-          <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5">Domain Health</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {domainHealthData.map(d => {
-              const dc = HEALTH_LEVEL_CONFIG[d.level];
-              return (
-                <button key={d.id}
-                  onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
-                  className="rounded-lg border border-border bg-white px-2.5 py-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
-                    <span className={`text-lg font-bold leading-none ${dc.score}`}>{d.score}</span>
-                  </div>
-                  <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
-                  <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
-                  {d.id === 'dh-programs' && sfPrograms != null && (
-                    <span className="text-[8px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5 mt-1 inline-block leading-none">
-                      SF: {sfPrograms.active ?? '?'} active · {sfPrograms.total ?? '?'} total
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </ScrollArea>
-  );
-}
 
 // ── Health Indicators — compact 2-column grid ─────────────────────────────────
 // UI rule: each card shows domain + score + top 3 checks + one key action.
@@ -518,20 +283,11 @@ export default function OperationsHub() {
   const { isEveryday, isAdminOrAbove } = useTierFlags();
 
   const TABS = [
-    {
-      id: 'overview',
-      label: isEveryday ? 'Overview' : 'Executive Overview',
-      path: '/operations',
-      icon: BarChart2,
-      content: <ExecutiveOverview />,
-    },
-    ...(!isEveryday ? [
-      { id: 'health',     label: 'Health Indicators', path: '/operations/health',           icon: Activity,      content: <HealthIndicators /> },
-      { id: 'demand',     label: 'Demand',            path: '/operations/demand',           icon: GitBranch,     content: <Intake /> },
-      { id: 'scorecards', label: 'Scorecards',        path: '/operations/scorecards',       icon: TrendingUp,    content: <ScorecardsView /> },
-      { id: 'trends',     label: 'Trends & Insights', path: '/operations/trends',           icon: AlertTriangle, content: <TrendsView /> },
-      { id: 'recs',       label: 'Recommendations',   path: '/operations/recommendations',  icon: ChevronRight,  content: <AllRecommendations /> },
-    ] : []),
+    { id: 'health',     label: 'Health Indicators', path: '/operations/health',           icon: Activity,      content: <HealthIndicators /> },
+    { id: 'demand',     label: 'Demand',            path: '/operations/demand',           icon: GitBranch,     content: <Intake /> },
+    { id: 'scorecards', label: 'Scorecards',        path: '/operations/scorecards',       icon: TrendingUp,    content: <ScorecardsView /> },
+    { id: 'trends',     label: 'Trends & Insights', path: '/operations/trends',           icon: AlertTriangle, content: <TrendsView /> },
+    { id: 'recs',       label: 'Recommendations',   path: '/operations/recommendations',  icon: ChevronRight,  content: <AllRecommendations /> },
   ];
 
   const ACTIONS: ActionItem[] = [

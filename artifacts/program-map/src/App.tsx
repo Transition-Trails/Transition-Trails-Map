@@ -237,7 +237,7 @@ function Router() {
       <Route path="/digital-twin"         component={DigitalTwin} />
 
       <Route path="/operations/:tab"      component={OperationsHub} />
-      <Route path="/operations"           component={OperationsHub} />
+      <Route path="/operations">          <Redirect to="/operations/health" /></Route>
 
       <Route path="/program/:tab"         component={ProgramHub} />
       <Route path="/program"              component={ProgramHub} />
