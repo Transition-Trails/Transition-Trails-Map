@@ -52,7 +52,7 @@ interface PennyAction {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const LABELS: LabelDef[] = [
-  { id: 'penny',    name: 'Penny',    color: 'violet',  hex: '#8b5cf6' },
+  { id: 'penny',    name: TERMS.aiAssistant, color: 'violet',  hex: '#8b5cf6' },
   { id: 'insights', name: 'Insights', color: 'sky',     hex: '#0ea5e9' },
   { id: 'programs', name: 'Programs', color: 'emerald', hex: '#10b981' },
   { id: 'urgent',   name: 'Urgent',   color: 'red',     hex: '#ef4444' },
@@ -60,9 +60,9 @@ const LABELS: LabelDef[] = [
 ];
 
 const PENNY_ACTIONS: PennyAction[] = [
-  { id: 'follow-up', label: 'Auto follow-up', desc: 'Penny drafts a reply if no response in 48h',  icon: Clock },
-  { id: 'digest',    label: 'Add to digest',  desc: 'Summarized in the Trail Signals weekly brief', icon: Zap   },
-  { id: 'alert',     label: 'Immediate alert',desc: 'Penny surfaces this in Trail Signals now',     icon: Bell  },
+  { id: 'follow-up', label: 'Auto follow-up', desc: `${TERMS.aiAssistant} drafts a reply if no response in 48h`,  icon: Clock },
+  { id: 'digest',    label: 'Add to digest',  desc: 'Summarized in the Trail Signals weekly brief',               icon: Zap   },
+  { id: 'alert',     label: 'Immediate alert',desc: `${TERMS.aiAssistant} surfaces this in Trail Signals now`,     icon: Bell  },
 ];
 
 const LABEL_BG: Record<string, string> = {
@@ -184,8 +184,9 @@ function ThreadPreview({
   thread: Thread;
   labelCfg: Record<string, LabelCfg>;
 }) {
-  const [replyBody, setReplyBody]   = useState('');
+  const [replyBody, setReplyBody]       = useState('');
   const [draftLoading, setDraftLoading] = useState(false);
+  const [draftError, setDraftError]     = useState<string | null>(null);
   const [sendLoading, setSendLoading]   = useState(false);
   const [sendDone, setSendDone]         = useState(false);
   const [sendError, setSendError]       = useState<string | null>(null);
@@ -197,6 +198,7 @@ function ThreadPreview({
 
   async function draftWithPenny() {
     setDraftLoading(true);
+    setDraftError(null);
     try {
       const resp = await fetch('/api/penny/ask', {
         method: 'POST',
@@ -208,10 +210,10 @@ function ThreadPreview({
         }),
       });
       const data = await resp.json() as { reply?: string; error?: string };
-      if (!resp.ok || data.error) throw new Error(data.error ?? 'Penny could not draft a reply.');
+      if (!resp.ok || data.error) throw new Error(data.error ?? `${TERMS.aiAssistant} could not draft a reply.`);
       setReplyBody(data.reply ?? '');
     } catch (e) {
-      setReplyBody('');
+      setDraftError(e instanceof Error ? e.message : `${TERMS.aiAssistant} could not draft a reply.`);
     } finally {
       setDraftLoading(false);
     }
@@ -300,6 +302,9 @@ function ThreadPreview({
               value={replyBody}
               onChange={e => setReplyBody(e.target.value)}
             />
+            {draftError && (
+              <p className="text-[10px] text-rose-600 mb-2">{draftError}</p>
+            )}
             {sendError && (
               <p className="text-[10px] text-rose-600 mb-2">{sendError}</p>
             )}
@@ -419,7 +424,7 @@ export default function GmailCenter() {
   const [error, setError]           = useState<string | null>(null);
   const [selected, setSelected]     = useState<string | null>(null);
   const [search, setSearch]         = useState('');
-  const [configOpen, setConfigOpen] = useState(true);
+  const [configOpen, setConfigOpen] = useState(false);
   const [labelCfg, setLabelCfg]     = useState<Record<string, LabelCfg>>(DEFAULT_CFG);
 
   const fetchThreads = useCallback(async () => {
