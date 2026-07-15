@@ -17,9 +17,21 @@ const PAGE_INFO: Array<[string, string, string]> = [
   ['/digital-twin/governance',           'Digital Twin',           'Governance'],
   ['/operations',                        'Operations',             'Executive Overview'],
   ['/operations/health',                 'Operations',             'Health Indicators'],
-  ['/admin/setup',                        'Administration',         'Setup'],
-  ['/admin/people-access',               'Administration',         'People & Access'],
-  ['/admin/integration-readiness',       'Administration',         'Integration Readiness Center'],
+  ['/admin/setup',                          'Administration',         'Setup'],
+  ['/admin/people-access',                 'Administration',         'People & Access'],
+  ['/admin/integration-readiness',         'Administration',         'Integration Readiness Center'],
+  ['/admin/integrations/google-auth',      'Administration',         'Google OAuth Authorization'],
+  ['/admin/integrations/google-drive',     'Administration',         'Google Drive Integration'],
+  ['/admin/integrations/google-calendar',  'Administration',         'Google Calendar Integration'],
+  ['/admin/integrations/secrets',          'Administration',         'Secrets Audit'],
+  ['/admin/integrations',                  'Administration',         'Integrations'],
+  ['/admin/phase1-readiness',              'Administration',         'Phase 1 Readiness'],
+  ['/admin/phase1-audit',                  'Administration',         'Phase 1 Audit'],
+  ['/admin/ux-standards',                  'Administration',         'UX Standards'],
+  ['/admin/create-audit',                  'Administration',         'Create Audit'],
+  ['/admin/sf-validation',                 'Administration',         'SF Validation'],
+  ['/admin/salesforce-arch',               'Administration',         'Salesforce Architecture'],
+  ['/admin/program-resources',             'Administration',         'Program Resources'],
   ['/operations/scorecards',             'Operations',             'Scorecards'],
   ['/operations/trends',                 'Operations',             'Trends & Insights'],
   ['/operations/demand',                 'Operations',             'Demand'],
@@ -53,7 +65,7 @@ function getPageInfo(location: string) {
   for (const [path, section, title] of PAGE_INFO) {
     if (location === path) return { section, title };
   }
-  if (location.startsWith('/admin'))        return { section: 'Administration', title: 'Knowledge Management' };
+  if (location.startsWith('/admin'))        return { section: 'Administration', title: 'Administration' };
   if (location.startsWith('/digital-twin')) return { section: 'Digital Twin',   title: 'Explore' };
   if (location.startsWith('/governance'))   return { section: 'Digital Twin',   title: 'Governance' };
   if (location.startsWith('/uom'))          return { section: 'Digital Twin',   title: 'Object Model' };

@@ -372,7 +372,7 @@ function AccessDeniedPanel({ forceOpen = false }: { forceOpen?: boolean }) {
             </p>
           )}
         </div>
-        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${severityStyle.critical.badge}`}>2 Critical</span>
+        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${severityStyle.critical.badge}`}>{items.filter(i => i.severity === 'critical').length} Critical</span>
         <ChevronDown className={`w-3.5 h-3.5 shrink-0 text-amber-500 transition-transform ${open ? '' : '-rotate-90'}`} />
       </button>
 
