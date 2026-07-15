@@ -97,7 +97,6 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/admin',
     extraPrefixes: ['/digital-twin', '/uom', '/governance', '/program/blueprint', '/program/standards'],
     items: [
-      { id: 'admin-home',          path: '/admin/setup',          label: 'Administration' },
       { id: 'admin-integrations',  path: '/admin/integrations',   label: 'Integrations'   },
       { id: 'admin-people-access', path: '/admin/people-access',  label: 'People & Access' },
       { id: 'admin-digital-twin',  path: '/digital-twin',         label: 'Digital Twin',   minTier: 'admin' },

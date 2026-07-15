@@ -34,7 +34,6 @@ import SalesforceMapping            from "@/pages/curriculum/SalesforceMapping";
 import SalesforceValidationCenter  from "@/pages/curriculum/SalesforceValidationCenter";
 import ProgramResources             from "@/pages/admin/ProgramResources";
 import IntegrationReadinessCenter   from "@/pages/admin/IntegrationReadinessCenter";
-import AdminSetup                 from "@/pages/admin/AdminSetup";
 import PeopleAccess               from "@/pages/admin/PeopleAccess";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
@@ -149,8 +148,8 @@ function Router() {
       <Route path="/penny/prompt-studio">       <Redirect to="/penny/prompts" /></Route>
       <Route path="/penny/prompt-library">      <Redirect to="/penny/prompts" /></Route>
       <Route path="/penny/response-quality">    <Redirect to="/penny/intelligence" /></Route>
-      <Route path="/penny/integrations">        <Redirect to="/admin/setup" /></Route>
-      <Route path="/penny/integration-layer">   <Redirect to="/admin/setup" /></Route>
+      <Route path="/penny/integrations">        <Redirect to="/admin/integrations" /></Route>
+      <Route path="/penny/integration-layer">   <Redirect to="/admin/integrations" /></Route>
       {/* Old paths → direct nav items */}
       <Route path="/penny/test-penny">          <Redirect to="/penny/penny-sandbox" /></Route>
       <Route path="/penny/test">                <Redirect to="/penny/penny-sandbox" /></Route>
@@ -210,7 +209,7 @@ function Router() {
       <Route path="/library">                   <Redirect to="/knowledge" /></Route>
 
       {/* Old admin sub-pages */}
-      <Route path="/operations/integrations">      <Redirect to="/admin/setup" /></Route>
+      <Route path="/operations/integrations">      <Redirect to="/admin/integrations" /></Route>
       <Route path="/admin/integration-readiness"  component={IntegrationReadinessCenter} />
       <Route path="/admin/comm-channels">         <Redirect to="/collaboration/channels" /></Route>
       <Route path="/admin/comm-routing">          <Redirect to="/collaboration/channels" /></Route>
@@ -285,7 +284,7 @@ function Router() {
       <Route path="/trail-os-overview"       component={TrailOSOverview} />
 
       {/* Administration */}
-      <Route path="/admin/setup"             component={AdminSetup} />
+      <Route path="/admin/setup">             <Redirect to="/admin/integrations" /></Route>
       <Route path="/admin/people-access"     component={PeopleAccess} />
       <Route path="/admin/salesforce-arch"   component={SalesforceMapping} />
       <Route path="/admin/sf-validation"    component={SalesforceValidationCenter} />
@@ -304,7 +303,7 @@ function Router() {
       <Route path="/admin/integrations"                 component={IntegrationHub} />
 
       <Route path="/admin/:section"          component={Admin} />
-      <Route path="/admin">               <Redirect to="/admin/setup" /></Route>
+      <Route path="/admin">               <Redirect to="/admin/integrations" /></Route>
 
       <Route component={NotFound} />
     </Switch>

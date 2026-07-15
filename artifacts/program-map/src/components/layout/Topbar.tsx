@@ -17,7 +17,6 @@ const PAGE_INFO: Array<[string, string, string]> = [
   ['/digital-twin/governance',           'Digital Twin',           'Governance'],
   ['/operations',                        'Operations',             'Executive Overview'],
   ['/operations/health',                 'Operations',             'Health Indicators'],
-  ['/admin/setup',                          'Administration',         'Setup'],
   ['/admin/people-access',                 'Administration',         'People & Access'],
   ['/admin/integration-readiness',         'Administration',         'Integration Readiness Center'],
   ['/admin/integrations/google-auth',      'Administration',         'Google OAuth Authorization'],
