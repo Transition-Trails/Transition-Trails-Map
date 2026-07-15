@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Brain, FolderOpen, MessageSquare, Shield, BookOpen, Activity,
   ChevronDown, ChevronUp,
-  Key, Calendar, Clock,
+  Key, Calendar,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -143,10 +144,10 @@ const DOMAINS: DomainCard[] = [
 // ── Sub-pages ─────────────────────────────────────────────────────────────────
 
 const SUB_PAGES = [
-  { id: 'secrets',  label: 'Secrets Audit',    desc: 'Token health — all env vars and API keys',       icon: Key },
-  { id: 'drive',    label: 'Google Drive',      desc: 'Penny Asset Library and program folder setup',   icon: FolderOpen },
-  { id: 'calendar', label: 'Google Calendar',   desc: 'Calendar IDs and cohort event mapping',          icon: Calendar },
-  { id: 'collab',   label: 'Signal Rules',      desc: 'Channel routing for Penny and Trail Signals',    icon: MessageSquare },
+  { id: 'secrets',  label: 'Secrets Audit',    desc: 'Token health — all env vars and API keys',       icon: Key,           href: '/admin/integrations/secrets' },
+  { id: 'drive',    label: 'Google Drive',      desc: 'Penny Asset Library and program folder setup',   icon: FolderOpen,    href: '/admin/integrations/google-drive' },
+  { id: 'calendar', label: 'Google Calendar',   desc: 'Calendar IDs and cohort event mapping',          icon: Calendar,      href: '/admin/integrations/google-calendar' },
+  { id: 'collab',   label: 'Signal Rules',      desc: 'Channel routing for Penny and Trail Signals',    icon: MessageSquare, href: '/collaboration' },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -159,6 +160,7 @@ function domainScore(card: DomainCard) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function IntegrationHub() {
+  const [, setLocation] = useLocation();
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [expandedDep, setExpandedDep] = useState<string | null>(null);
 
@@ -273,29 +275,22 @@ export default function IntegrationHub() {
                   {SUB_PAGES.map((sp) => {
                     const Icon = sp.icon;
                     return (
-                      <div
+                      <button
                         key={sp.id}
-                        className="rounded-lg border border-border bg-card p-3 flex items-start gap-2.5"
+                        onClick={() => setLocation(sp.href)}
+                        className="rounded-lg border border-border bg-card p-3 flex items-start gap-2.5 text-left hover:shadow-sm hover:border-muted-foreground/30 transition-all group"
                       >
-                        <div className="w-6 h-6 rounded-md bg-muted/40 flex items-center justify-center flex-shrink-0 mt-0.5 text-muted-foreground">
+                        <div className="w-6 h-6 rounded-md bg-muted/40 flex items-center justify-center flex-shrink-0 mt-0.5 text-muted-foreground group-hover:text-primary transition-colors">
                           <Icon className="w-3.5 h-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[12px] font-bold text-foreground leading-tight">{sp.label}</p>
+                          <p className="text-[12px] font-bold text-foreground leading-tight group-hover:text-primary transition-colors">{sp.label}</p>
                           <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">{sp.desc}</p>
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
-              </div>
-
-              {/* Phase 2 note */}
-              <div className="flex items-start gap-2 rounded-lg border border-dashed border-border/60 bg-muted/10 p-3">
-                <Clock className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
-                <p className="text-[11px] text-muted-foreground/60">
-                  Mural, LMS, Google Chat, full Agentforce context handoff, and Drive rule config are Phase 2. Phase 2 features are tracked in Salesforce.
-                </p>
               </div>
 
             </div>
