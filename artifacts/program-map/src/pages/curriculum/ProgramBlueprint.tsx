@@ -130,7 +130,7 @@ export default function ProgramBlueprint() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Programs · Blueprint Canvas</p>
             <h1 className="text-[15px] font-semibold text-foreground leading-snug">Program Canvas</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5">
-              What actually exists — structure, curriculum, Penny assets, delivery, and content health.
+              What actually exists — structure, curriculum, {TERMS.aiAssistant} assets, delivery, and content health.
               {isFoundations && <span className="ml-1 text-primary font-medium">Foundations Trail is the reference implementation.</span>}
             </p>
           </div>
