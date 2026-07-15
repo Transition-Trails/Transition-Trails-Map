@@ -195,7 +195,6 @@ function OverviewTab() {
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5 max-w-4xl">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-          <p className="text-[11px] font-bold text-primary uppercase mb-1">Slack Integration Center — Operational Workflow Status</p>
           <p className="text-[12px] text-foreground leading-relaxed">
             Program-to-channel mapping, role-to-user routing, Penny delivery mapping, and end-to-end flow validation are all configured.
             Workspace Validation runs live against your Replit secrets — see the Workspace Validation tab for real-time results.
