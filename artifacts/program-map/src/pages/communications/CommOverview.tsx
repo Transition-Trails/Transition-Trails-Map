@@ -1,4 +1,5 @@
 import { Database, Sparkles, MessageSquare, ArrowRight, Bell, FileText, Radio, CalendarDays, Hash, Users } from 'lucide-react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 
 const WHAT_IT_DOES = [
@@ -22,7 +23,7 @@ const WHAT_IT_DOES = [
   },
   {
     icon: Radio,
-    label: 'Penny Broadcasts',
+    label: `${TERMS.aiAssistant} Broadcasts`,
     desc: 'Calendar-aware learner nudges, Trail Quest prompts, Trail Wins, reminders, and celebrations via Slack.',
     path: '/communications/penny-broadcasts',
   },
@@ -51,7 +52,7 @@ const PROVIDERS = [
     label: 'Slack',
     role: 'Community & Program',
     note: 'Planned · Primary Prototype',
-    desc: 'Learners, coaches, cohorts, ops alerts, Trail Wins, Trail Quests, Penny nudges',
+    desc: `Learners, coaches, cohorts, ops alerts, Trail Wins, Trail Quests, ${TERMS.aiAssistant} nudges`,
     color: 'border-primary/30 bg-primary/5 text-primary',
     noteCls: 'text-primary/70',
   },
@@ -74,7 +75,7 @@ const PROVIDERS = [
 ];
 
 const MENTAL_MODEL = [
-  { label: 'Knowledge Library', role: 'what', note: 'The content — docs, templates, Penny context', color: 'border-secondary/30 bg-secondary/5 text-secondary' },
+  { label: 'Knowledge Library', role: 'what', note: `The content — docs, templates, ${TERMS.aiAssistant} context`, color: 'border-secondary/30 bg-secondary/5 text-secondary' },
   { label: 'Salesforce / Demand', role: 'work', note: 'The cases — intake, epics, features, changes', color: 'border-amber-200 bg-amber-50 text-amber-800' },
   { label: 'Communications', role: 'who', note: 'The message — who gets what, through which channel', color: 'border-primary/30 bg-primary/5 text-primary' },
   { label: 'Calendar', role: 'when', note: 'The timing — when communications fire based on events', color: 'border-emerald-200 bg-emerald-50 text-emerald-800' },
@@ -92,7 +93,7 @@ export default function CommOverview() {
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
           <h1 className="text-3xl font-bold text-foreground">Overview</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            The messaging and timing layer for Trail OS and Penny — routing program signals, learner nudges, and weekly briefs to the right people, through the right channel, at the right moment.
+            The messaging and timing layer for Trail OS and {TERMS.aiAssistant} — routing program signals, learner nudges, and weekly briefs to the right people, through the right channel, at the right moment.
           </p>
         </div>
 
@@ -119,7 +120,7 @@ export default function CommOverview() {
           <div className="flex items-center gap-2 flex-wrap text-sm">
             {[
               { icon: Database, label: 'Trail OS', sub: 'events', color: 'text-primary' },
-              { icon: Sparkles, label: 'Penny', sub: 'composes', color: 'text-secondary' },
+              { icon: Sparkles, label: TERMS.aiAssistant, sub: 'composes', color: 'text-secondary' },
               { icon: FileText, label: 'Templates', sub: 'formats', color: 'text-foreground/60' },
               { icon: MessageSquare, label: 'Provider', sub: 'delivers', color: 'text-foreground/60' },
               { icon: Bell, label: 'Channel', sub: 'receives', color: 'text-foreground/60' },

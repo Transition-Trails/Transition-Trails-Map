@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import {
   Send, Sparkles, ArrowRight, ChevronDown,
@@ -59,65 +60,65 @@ type SigItem = {
 
 const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   home: [
-    { urgent: true,  source: 'slack',      text: 'Learning Coach: low confidence on Cohort 3 recap scoring',     meta: '8m ago',  why: 'Penny monitors coach confidence scores to flag when outputs may need human review before affecting learner feedback' },
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery source docs overdue — execute phase blocked', meta: '1h ago',  why: 'This Salesforce phase record requires documentation before Penny can generate content or update program status' },
-    { urgent: false, source: 'slack',      text: 'Foundations Trail Cohort 2: enrollment at 89% capacity',       meta: '2h ago',  why: 'Penny watches enrollment channels to flag when a new cohort may need to open soon' },
-    { urgent: false, source: 'drive',      text: 'Sprint 3 Resume Writing materials updated',                    meta: '3h ago',  why: 'Penny reads Drive so learners always see the most current version of program materials' },
-    { urgent: false, source: 'calendar',   text: 'Sprint 3 session confirmed — Thursday 10am',                   meta: '5h ago',  why: 'Penny reads Calendar to surface upcoming milestones and session timing relevant to your programs' },
-    { urgent: false, source: 'email',      text: 'Weekly brief generated — 3 cohort updates',                    meta: '6h ago',  why: 'Penny monitors email digests to track program communication patterns (Phase 2 — read-only access)' },
-    { urgent: false, source: 'salesforce', text: "Explorer's Trail Cohort 3 — 3 enrollment slots open",          meta: '8h ago',  why: 'Penny tracks Salesforce enrollment records to surface open capacity for outreach or cohort planning' },
+    { urgent: true,  source: 'slack',      text: 'Learning Coach: low confidence on Cohort 3 recap scoring',     meta: '8m ago',  why: `${TERMS.aiAssistant} monitors coach confidence scores to flag when outputs may need human review before affecting learner feedback` },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery source docs overdue — execute phase blocked', meta: '1h ago',  why: `This Salesforce phase record requires documentation before ${TERMS.aiAssistant} can generate content or update program status` },
+    { urgent: false, source: 'slack',      text: 'Foundations Trail Cohort 2: enrollment at 89% capacity',       meta: '2h ago',  why: `${TERMS.aiAssistant} watches enrollment channels to flag when a new cohort may need to open soon` },
+    { urgent: false, source: 'drive',      text: 'Sprint 3 Resume Writing materials updated',                    meta: '3h ago',  why: `${TERMS.aiAssistant} reads Drive so learners always see the most current version of program materials` },
+    { urgent: false, source: 'calendar',   text: 'Sprint 3 session confirmed — Thursday 10am',                   meta: '5h ago',  why: `${TERMS.aiAssistant} reads Calendar to surface upcoming milestones and session timing relevant to your programs` },
+    { urgent: false, source: 'email',      text: 'Weekly brief generated — 3 cohort updates',                    meta: '6h ago',  why: `${TERMS.aiAssistant} monitors email digests to track program communication patterns (Phase 2 — read-only access)` },
+    { urgent: false, source: 'salesforce', text: "Explorer's Trail Cohort 3 — 3 enrollment slots open",          meta: '8h ago',  why: `${TERMS.aiAssistant} tracks Salesforce enrollment records to surface open capacity for outreach or cohort planning` },
   ],
   programs: [
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before execute phase can proceed', meta: '1h ago',  why: 'Salesforce execution phases require documentation records — Penny flags these as blockers to program delivery' },
-    { urgent: false, source: 'slack',      text: "Explorer's Trail Cohort 3 — enrollment at 80%",                meta: '2h ago',  why: 'Penny watches cohort enrollment channels to surface capacity trends across active programs' },
-    { urgent: false, source: 'drive',      text: 'Content standards: 4 items pending review',                    meta: '4h ago',  why: 'Penny reads Drive metadata to surface content quality review backlogs before they affect delivery' },
-    { urgent: false, source: 'calendar',   text: 'Sprint 3 review scheduled — Thursday',                         meta: '5h ago',  why: 'Penny reads Calendar to surface program milestone timing and flag missing reviews' },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before execute phase can proceed', meta: '1h ago',  why: `Salesforce execution phases require documentation records — ${TERMS.aiAssistant} flags these as blockers to program delivery` },
+    { urgent: false, source: 'slack',      text: "Explorer's Trail Cohort 3 — enrollment at 80%",                meta: '2h ago',  why: `${TERMS.aiAssistant} watches cohort enrollment channels to surface capacity trends across active programs` },
+    { urgent: false, source: 'drive',      text: 'Content standards: 4 items pending review',                    meta: '4h ago',  why: `${TERMS.aiAssistant} reads Drive metadata to surface content quality review backlogs before they affect delivery` },
+    { urgent: false, source: 'calendar',   text: 'Sprint 3 review scheduled — Thursday',                         meta: '5h ago',  why: `${TERMS.aiAssistant} reads Calendar to surface program milestone timing and flag missing reviews` },
   ],
   penny: [
-    { urgent: true,  source: 'slack',      text: 'Learning Coach: confidence flag on Cohort 3 recap',            meta: '8m ago',  why: "Penny self-monitors its own Learning Coach output to flag when its recommendations may need human verification" },
-    { urgent: false, source: 'salesforce', text: 'Gemini API live — 21 models available including Gemini 2.5 Flash. Ready to wire first capability call.', meta: '1h ago',  why: 'Penny monitors API integration status so the team knows when live AI responses are unblocked end-to-end' },
-    { urgent: false, source: 'slack',      text: 'Ask Penny: 12 live queries this week — Gemini AI active',      meta: '3h ago',  why: 'Penny monitors its own usage to measure adoption, identify capability gaps, and confirm the live Gemini pipeline is handling requests' },
-    { urgent: false, source: 'drive',      text: 'Trail Quest capability spec updated',                          meta: '5h ago',  why: 'Penny watches Drive for spec updates to its own capability definitions so guidance stays current' },
-    { urgent: false, source: 'salesforce', text: 'Penny interaction log: 234 this week',                         meta: '8h ago',  why: 'Penny reads its interaction log from Salesforce to surface usage patterns for system improvement' },
+    { urgent: true,  source: 'slack',      text: 'Learning Coach: confidence flag on Cohort 3 recap',            meta: '8m ago',  why: `${TERMS.aiAssistant} self-monitors its own Learning Coach output to flag when its recommendations may need human verification` },
+    { urgent: false, source: 'salesforce', text: 'Gemini API live — 21 models available including Gemini 2.5 Flash. Ready to wire first capability call.', meta: '1h ago',  why: `${TERMS.aiAssistant} monitors API integration status so the team knows when live AI responses are unblocked end-to-end` },
+    { urgent: false, source: 'slack',      text: `Ask ${TERMS.aiAssistant}: 12 live queries this week — Gemini AI active`,      meta: '3h ago',  why: `${TERMS.aiAssistant} monitors its own usage to measure adoption, identify capability gaps, and confirm the live Gemini pipeline is handling requests` },
+    { urgent: false, source: 'drive',      text: 'Trail Quest capability spec updated',                          meta: '5h ago',  why: `${TERMS.aiAssistant} watches Drive for spec updates to its own capability definitions so guidance stays current` },
+    { urgent: false, source: 'salesforce', text: `${TERMS.aiAssistant} interaction log: 234 this week`,                         meta: '8h ago',  why: `${TERMS.aiAssistant} reads its interaction log from Salesforce to surface usage patterns for system improvement` },
   ],
   operations: [
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery execute phase: source docs required',         meta: '1h ago',  why: 'Penny flags Salesforce phase blockers that prevent program delivery from moving forward' },
-    { urgent: false, source: 'slack',      text: '2 demand change requests unassigned in queue',                 meta: '3h ago',  why: 'Penny monitors demand channels to flag unassigned work that may accumulate into delivery delays' },
-    { urgent: false, source: 'salesforce', text: 'Salesforce live — wire first data query to health dashboard',   meta: '4h ago',  why: 'Penny monitors integration status so the team knows when live data can replace prototype figures in the health dashboard' },
-    { urgent: false, source: 'drive',      text: 'Integration readiness: 5 checklist items open',                meta: '6h ago',  why: 'Penny reads Drive checklists to surface open operational items affecting integration timelines' },
-    { urgent: false, source: 'salesforce', text: 'Foundations Trail capacity alert: 89%',                        meta: '8h ago',  why: 'Penny monitors Salesforce cohort records to flag when enrollment is approaching its limit' },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery execute phase: source docs required',         meta: '1h ago',  why: `${TERMS.aiAssistant} flags Salesforce phase blockers that prevent program delivery from moving forward` },
+    { urgent: false, source: 'slack',      text: '2 demand change requests unassigned in queue',                 meta: '3h ago',  why: `${TERMS.aiAssistant} monitors demand channels to flag unassigned work that may accumulate into delivery delays` },
+    { urgent: false, source: 'salesforce', text: 'Salesforce live — wire first data query to health dashboard',   meta: '4h ago',  why: `${TERMS.aiAssistant} monitors integration status so the team knows when live data can replace prototype figures in the health dashboard` },
+    { urgent: false, source: 'drive',      text: 'Integration readiness: 5 checklist items open',                meta: '6h ago',  why: `${TERMS.aiAssistant} reads Drive checklists to surface open operational items affecting integration timelines` },
+    { urgent: false, source: 'salesforce', text: 'Foundations Trail capacity alert: 89%',                        meta: '8h ago',  why: `${TERMS.aiAssistant} monitors Salesforce cohort records to flag when enrollment is approaching its limit` },
   ],
   demand: [
-    { urgent: true,  source: 'slack',      text: 'REQ-030: Penny not responding to RESOLVE — 4 days open, no owner assigned',   meta: '4d ago',  why: 'Penny monitors demand channels for high-impact bug reports; stability issues are escalated when they age without an owner' },
-    { urgent: true,  source: 'salesforce', text: '2 change requests unassigned — queue stalling past SLA window',               meta: '3h ago',  why: 'Penny monitors the demand queue to flag items that risk missing triage SLA and creating delivery delays' },
-    { urgent: false, source: 'slack',      text: 'REQ-028: Trail Quest reminders — 7 days in backlog, no action',               meta: '7d ago',  why: 'Penny surfaces long-idle backlog items so the team can decide to triage, defer, or close them before they pile up' },
-    { urgent: false, source: 'salesforce', text: "Explorer's Trail generated 3 of 7 open requests this week",                   meta: '2d ago',  why: "Penny reads Salesforce intake records to show which programs are generating the most demand pressure" },
-    { urgent: false, source: 'salesforce', text: 'REQ-029 approved and in progress — Guided Trail Module 4 pacing update',      meta: '5d ago',  why: 'Penny confirms approved requests are moving to delivery so nothing gets approved-but-forgotten' },
+    { urgent: true,  source: 'slack',      text: `REQ-030: ${TERMS.aiAssistant} not responding to RESOLVE — 4 days open, no owner assigned`,   meta: '4d ago',  why: `${TERMS.aiAssistant} monitors demand channels for high-impact bug reports; stability issues are escalated when they age without an owner` },
+    { urgent: true,  source: 'salesforce', text: '2 change requests unassigned — queue stalling past SLA window',               meta: '3h ago',  why: `${TERMS.aiAssistant} monitors the demand queue to flag items that risk missing triage SLA and creating delivery delays` },
+    { urgent: false, source: 'slack',      text: 'REQ-028: Trail Quest reminders — 7 days in backlog, no action',               meta: '7d ago',  why: `${TERMS.aiAssistant} surfaces long-idle backlog items so the team can decide to triage, defer, or close them before they pile up` },
+    { urgent: false, source: 'salesforce', text: "Explorer's Trail generated 3 of 7 open requests this week",                   meta: '2d ago',  why: `${TERMS.aiAssistant} reads Salesforce intake records to show which programs are generating the most demand pressure` },
+    { urgent: false, source: 'salesforce', text: 'REQ-029 approved and in progress — Guided Trail Module 4 pacing update',      meta: '5d ago',  why: `${TERMS.aiAssistant} confirms approved requests are moving to delivery so nothing gets approved-but-forgotten` },
   ],
   knowledge: [
-    { urgent: false, source: 'drive',      text: "12 documents flagged 'needs-review'",                          meta: '2h ago',  why: "Penny reads Drive metadata to surface documents that may be outdated — these affect what Penny can reliably cite" },
-    { urgent: false, source: 'drive',      text: 'Source Mapping updated — RESOLVE Course Canvas',               meta: '3h ago',  why: 'Penny watches source mapping records to know when the knowledge graph changes and can reindex' },
-    { urgent: false, source: 'slack',      text: 'Sprint 3 materials question in #guided-trail',                 meta: '5h ago',  why: 'Penny monitors program channels to surface learner questions that may indicate a materials gap' },
-    { urgent: false, source: 'salesforce', text: 'Org Memory: 234 Penny interactions logged this week',          meta: '6h ago',  why: "Penny reads its interaction log to identify knowledge gaps and improve future answers" },
+    { urgent: false, source: 'drive',      text: "12 documents flagged 'needs-review'",                          meta: '2h ago',  why: `${TERMS.aiAssistant} reads Drive metadata to surface documents that may be outdated — these affect what ${TERMS.aiAssistant} can reliably cite` },
+    { urgent: false, source: 'drive',      text: 'Source Mapping updated — RESOLVE Course Canvas',               meta: '3h ago',  why: `${TERMS.aiAssistant} watches source mapping records to know when the knowledge graph changes and can reindex` },
+    { urgent: false, source: 'slack',      text: 'Sprint 3 materials question in #guided-trail',                 meta: '5h ago',  why: `${TERMS.aiAssistant} monitors program channels to surface learner questions that may indicate a materials gap` },
+    { urgent: false, source: 'salesforce', text: `Org Memory: 234 ${TERMS.aiAssistant} interactions logged this week`,          meta: '6h ago',  why: `${TERMS.aiAssistant} reads its interaction log to identify knowledge gaps and improve future answers` },
   ],
   collaboration: [
-    { urgent: false, source: 'slack',      text: '@coachconnectbot live in Penny AI + Admin channels — delivery pipeline ready to wire',  meta: '1h ago',  why: 'Penny monitors Slack bot status — Slack is live and Penny delivery can now be wired to the live bot' },
-    { urgent: false, source: 'calendar',   text: 'Sprint 3 Resume Workshop — Thursday 10am',                     meta: '2h ago',  why: 'Penny reads Calendar to surface upcoming collaborative sessions so you can prepare' },
-    { urgent: false, source: 'slack',      text: '#guided-trail-cohort-1: Week 3 message from coach',            meta: '4h ago',  why: 'Penny monitors cohort channels to surface coach communications that may need a follow-up' },
-    { urgent: false, source: 'drive',      text: '7 message templates ready for testing',                        meta: '6h ago',  why: 'Penny watches template folders to surface communication assets that are ready to use or review' },
+    { urgent: false, source: 'slack',      text: `@coachconnectbot live in ${TERMS.aiAssistant} AI + Admin channels — delivery pipeline ready to wire`,  meta: '1h ago',  why: `${TERMS.aiAssistant} monitors Slack bot status — Slack is live and ${TERMS.aiAssistant} delivery can now be wired to the live bot` },
+    { urgent: false, source: 'calendar',   text: 'Sprint 3 Resume Workshop — Thursday 10am',                     meta: '2h ago',  why: `${TERMS.aiAssistant} reads Calendar to surface upcoming collaborative sessions so you can prepare` },
+    { urgent: false, source: 'slack',      text: '#guided-trail-cohort-1: Week 3 message from coach',            meta: '4h ago',  why: `${TERMS.aiAssistant} monitors cohort channels to surface coach communications that may need a follow-up` },
+    { urgent: false, source: 'drive',      text: '7 message templates ready for testing',                        meta: '6h ago',  why: `${TERMS.aiAssistant} watches template folders to surface communication assets that are ready to use or review` },
   ],
   admin: [
-    { urgent: false, source: 'salesforce', text: 'Salesforce fully connected — REST API live, PMM + NPSP confirmed', meta: '2h ago',  why: 'Penny monitors integration state to surface when platform dependencies unblock the next wave of live data wiring' },
+    { urgent: false, source: 'salesforce', text: 'Salesforce fully connected — REST API live, PMM + NPSP confirmed', meta: '2h ago',  why: `${TERMS.aiAssistant} monitors integration state to surface when platform dependencies unblock the next wave of live data wiring` },
 
-    { urgent: false, source: 'drive',      text: 'Secrets audit: last run 3 days ago',                           meta: '6h ago',  why: 'Penny monitors Drive audit logs to surface security hygiene status for the admin team' },
+    { urgent: false, source: 'drive',      text: 'Secrets audit: last run 3 days ago',                           meta: '6h ago',  why: `${TERMS.aiAssistant} monitors Drive audit logs to surface security hygiene status for the admin team` },
   ],
   'digital-twin': [
-    { urgent: false, source: 'salesforce', text: 'Digital Compass: 6 object relationships unmapped',             meta: '3h ago',  why: 'Penny reads Salesforce object metadata to surface gaps in Digital Twin coverage' },
-    { urgent: false, source: 'drive',      text: 'Governance policy document updated',                           meta: '5h ago',  why: 'Penny watches governance docs in Drive to surface policy changes that affect object rules' },
-    { urgent: false, source: 'slack',      text: '#trail-os-ops: governance review thread active',               meta: '8h ago',  why: 'Penny monitors ops channels to surface active governance discussions needing attention' },
+    { urgent: false, source: 'salesforce', text: 'Digital Compass: 6 object relationships unmapped',             meta: '3h ago',  why: `${TERMS.aiAssistant} reads Salesforce object metadata to surface gaps in Digital Twin coverage` },
+    { urgent: false, source: 'drive',      text: 'Governance policy document updated',                           meta: '5h ago',  why: `${TERMS.aiAssistant} watches governance docs in Drive to surface policy changes that affect object rules` },
+    { urgent: false, source: 'slack',      text: '#trail-os-ops: governance review thread active',               meta: '8h ago',  why: `${TERMS.aiAssistant} monitors ops channels to surface active governance discussions needing attention` },
   ],
   default: [
-    { urgent: false, source: 'slack',      text: 'No context-specific signals for this page yet',                meta: '',        why: 'Penny will surface signals as you navigate to pages with active data connections' },
+    { urgent: false, source: 'slack',      text: 'No context-specific signals for this page yet',                meta: '',        why: `${TERMS.aiAssistant} will surface signals as you navigate to pages with active data connections` },
   ],
 };
 
@@ -146,7 +147,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     powerInsights: [
       '5 open demand items — 2 change requests awaiting triage',
       'Trail of Mastery · Execute phase needs source documentation before delivery can proceed',
-      '234 Penny interactions this week · 1 Learning Coach confidence flag',
+      `234 ${TERMS.aiAssistant} interactions this week · 1 Learning Coach confidence flag`,
       'Foundations Trail Cohort 2 approaching capacity (89%)',
     ],
     attentionItems: [
@@ -162,10 +163,10 @@ const CONTENT: Record<PageCtx, PageContent> = {
     powerSteps: [
       { label: 'Triage demand queue',    path: '/operations/demand' },
       { label: 'Review program health',  path: '/operations/health' },
-      { label: 'Penny activity log',     path: '/penny/intelligence' },
+      { label: `${TERMS.aiAssistant} activity log`,     path: '/penny/intelligence' },
     ],
     everydayCanned: "Your programs are on track this week. Guided Trail Cohort 1 is in Week 3 with all materials uploaded. Your next session is the Sprint 3 Resume Workshop on Thursday. Foundations Trail is nearly full — you may want to check if any colleagues need enrollment support.",
-    powerCanned:    "Current priority: Trail of Mastery execute phase needs source documentation before delivery can proceed. 2 change requests are unassigned. Penny flagged 1 Learning Coach confidence issue — review at /penny/intelligence.",
+    powerCanned:    `Current priority: Trail of Mastery execute phase needs source documentation before delivery can proceed. 2 change requests are unassigned. ${TERMS.aiAssistant} flagged 1 Learning Coach confidence issue — review at /penny/intelligence.`,
   },
   programs: {
     everydayInsights: [
@@ -192,36 +193,36 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Salesforce mapping', path: '/admin/salesforce-arch' },
       { label: 'Program blueprint',  path: '/program/blueprint' },
     ],
-    everydayCanned: "Each program has a structured curriculum, cohort schedule, and Penny support built in. Your active programs have all materials for this sprint uploaded.",
+    everydayCanned: `Each program has a structured curriculum, cohort schedule, and ${TERMS.aiAssistant} support built in. Your active programs have all materials for this sprint uploaded.`,
     powerCanned:    "Programs overview: Explorer's Trail has the most complete Salesforce mapping. Trail of Mastery execute phase needs source documentation before delivery can proceed. Content standards flagged 4 items needing updates.",
   },
   penny: {
     everydayInsights: [
-      'Penny can answer questions about your program, cohort, and learning progress',
-      'Ask Penny for help finding any document or resource',
-      'Penny remembers context from your current program phase',
+      `${TERMS.aiAssistant} can answer questions about your program, cohort, and learning progress`,
+      `Ask ${TERMS.aiAssistant} for help finding any document or resource`,
+      `${TERMS.aiAssistant} remembers context from your current program phase`,
     ],
     powerInsights: [
-      '22 Penny capabilities mapped — 8 live, 14 in development',
+      `22 ${TERMS.aiAssistant} capabilities mapped — 8 live, 14 in development`,
       'Learning Coach capability: 1 confidence flag this week',
       'Trail Quest, Assessment, and Agentforce capabilities live (Sprint 4)',
       'Salesforce live — SF Data Intelligence capability can now be wired to real data',
     ],
     attentionItems: [
       { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: '1 Learning Coach confidence flag this week' },
-      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Ask Penny live — Gemini AI connected' },
+      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: `Ask ${TERMS.aiAssistant} live — Gemini AI connected` },
     ],
     everydaySteps: [
-      { label: 'Ask Penny',           path: '/penny' },
+      { label: `Ask ${TERMS.aiAssistant}`,           path: '/penny' },
       { label: 'My learner profile',  path: '/penny/learners' },
     ],
     powerSteps: [
       { label: 'Capability map',         path: '/penny' },
-      { label: 'Ask Penny',              path: '/penny' },
+      { label: `Ask ${TERMS.aiAssistant}`,              path: '/penny' },
       { label: 'Intelligence dashboard', path: '/penny/intelligence' },
     ],
-    everydayCanned: "I'm Penny — here to guide you through your program, help find resources, and answer questions. Try asking about your current sprint, upcoming sessions, or anything in the Knowledge Library.",
-    powerCanned:    "Penny status: Learning Coach active via Gemini API. Trail Quest, Assessment, and Agentforce capabilities live (Sprint 4). Salesforce live — SF Data Intelligence wired to demand and health views. The confidence flag on Learning Coach relates to Cohort 3 recap scoring — review at /penny/intelligence.",
+    everydayCanned: `I'm ${TERMS.aiAssistant} — here to guide you through your program, help find resources, and answer questions. Try asking about your current sprint, upcoming sessions, or anything in the Knowledge Library.`,
+    powerCanned:    `${TERMS.aiAssistant} status: Learning Coach active via Gemini API. Trail Quest, Assessment, and Agentforce capabilities live (Sprint 4). Salesforce live — SF Data Intelligence wired to demand and health views. The confidence flag on Learning Coach relates to Cohort 3 recap scoring — review at /penny/intelligence.`,
   },
   operations: {
     everydayInsights: [
@@ -253,13 +254,13 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Submit requests via the demand queue or #demand-queue Slack channel',
     ],
     powerInsights: [
-      'REQ-030 is highest priority — Penny not responding to RESOLVE, 4 days without an owner',
+      `REQ-030 is highest priority — ${TERMS.aiAssistant} not responding to RESOLVE, 4 days without an owner`,
       '2 change requests unassigned — queue at risk of stalling',
       "Explorer's Trail is the top source of open requests this week (3 of 7)",
       '7 open items total — 2 high-risk, 2 elevated by age',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-rose-50 border-rose-200',       iconCls: 'text-rose-500',   text: 'REQ-030 · Penny not responding · 4 days open, no owner' },
+      { icon: AlertTriangle, bg: 'bg-rose-50 border-rose-200',       iconCls: 'text-rose-500',   text: `REQ-030 · ${TERMS.aiAssistant} not responding · 4 days open, no owner` },
       { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',     iconCls: 'text-amber-500',  text: 'REQ-028 · Trail Quest reminders · 7 days in backlog' },
       { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'REQ-029 approved — Guided Trail pacing update in progress' },
     ],
@@ -273,7 +274,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'SF Validation Center', path: '/admin/sf-validation' },
     ],
     everydayCanned: "Your open request REQ-029 was approved — the Guided Trail Module 4 pacing update is in progress. Submit new requests through the demand queue or the #demand-queue Slack channel.",
-    powerCanned:    "Demand queue: 7 open items. REQ-030 is the top priority — Penny not responding to RESOLVE questions, 4 days without an owner. 2 change requests are stalling. Triage recommended before end of week. Explorer's Trail is the highest-volume program for demand this week.",
+    powerCanned:    `Demand queue: 7 open items. REQ-030 is the top priority — ${TERMS.aiAssistant} not responding to RESOLVE questions, 4 days without an owner. 2 change requests are stalling. Triage recommended before end of week. Explorer's Trail is the highest-volume program for demand this week.`,
   },
   knowledge: {
     everydayInsights: [
@@ -285,7 +286,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       '47 active documents across 5 programs',
       "Source trust: 12 documents flagged 'needs-review'",
       'Source Mapping updated — RESOLVE Course Canvas synced 3h ago',
-      'Org Memory: 234 Penny interactions logged this week',
+      `Org Memory: 234 ${TERMS.aiAssistant} interactions logged this week`,
     ],
     attentionItems: [
       { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: "12 documents flagged 'needs-review'" },
@@ -300,22 +301,22 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Digital Twin',     path: '/digital-twin' },
     ],
     everydayCanned: "The Knowledge Library has all program documents, templates, and resources. Sprint 3 Resume Writing materials were just updated. Use Knowledge Search to find anything specific.",
-    powerCanned:    "Knowledge health: 47 active docs, 12 flagged for review. Source mapping updated 3h ago — RESOLVE Course Canvas is current. Org Memory shows 234 Penny interactions this week.",
+    powerCanned:    `Knowledge health: 47 active docs, 12 flagged for review. Source mapping updated 3h ago — RESOLVE Course Canvas is current. Org Memory shows 234 ${TERMS.aiAssistant} interactions this week.`,
   },
   collaboration: {
     everydayInsights: [
       'Google Calendar shows your next session: Sprint 3 Resume Workshop — Thursday',
-      '@coachconnectbot is live in Slack — Penny can send session reminders once delivery pipeline is wired',
-      'Message templates ready — wire Penny output to @coachconnectbot to activate broadcasts',
+      `@coachconnectbot is live in Slack — ${TERMS.aiAssistant} can send session reminders once delivery pipeline is wired`,
+      `Message templates ready — wire ${TERMS.aiAssistant} output to @coachconnectbot to activate broadcasts`,
     ],
     powerInsights: [
-      'Slack live — @coachconnectbot posting to Penny AI + Admin channels',
+      `Slack live — @coachconnectbot posting to ${TERMS.aiAssistant} AI + Admin channels`,
       'Google Calendar: connected for timing context',
-      '3 communication routes defined — ready to wire Penny output to Slack delivery',
+      `3 communication routes defined — ready to wire ${TERMS.aiAssistant} output to Slack delivery`,
       '7 message templates ready for testing',
     ],
     attentionItems: [
-      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Slack live — @coachconnectbot posting to Penny AI + Admin' },
+      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: `Slack live — @coachconnectbot posting to ${TERMS.aiAssistant} AI + Admin` },
       { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Google Calendar connected for session timing' },
     ],
     everydaySteps: [{ label: 'View Google Calendar', path: '/collaboration/calendar' }],
@@ -323,8 +324,8 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Slack integration', path: '/collaboration/slack' },
       { label: 'Message templates', path: '/collaboration/templates' },
     ],
-    everydayCanned: "Google Calendar is connected and shows your upcoming sessions. Slack @coachconnectbot is live — once Penny's output is wired to Slack delivery, reminders and updates will go through there automatically.",
-    powerCanned:    "Collaboration stack: Slack live (POC confirmed — @coachconnectbot posting). Google Calendar connected. 3 communication routes and 7 message templates defined. Next: wire Penny capability output to Slack delivery pipeline.",
+    everydayCanned: `Google Calendar is connected and shows your upcoming sessions. Slack @coachconnectbot is live — once ${TERMS.aiAssistant}'s output is wired to Slack delivery, reminders and updates will go through there automatically.`,
+    powerCanned:    `Collaboration stack: Slack live (POC confirmed — @coachconnectbot posting). Google Calendar connected. 3 communication routes and 7 message templates defined. Next: wire ${TERMS.aiAssistant} capability output to Slack delivery pipeline.`,
   },
   admin: {
     everydayInsights: [],
@@ -403,7 +404,7 @@ function PriorityBadge({ score }: { score: number }) {
 }
 
 function buildSignalQuery(item: SigItem, srcLabel: string): string {
-  return `[Trail Signal · ${srcLabel}${item.urgent ? ' · URGENT' : ''} · ${item.meta}]\n\n"${item.text}"\n\nWhy Penny flagged this: ${item.why}\n\nPlease: (1) explain what this signal means in plain language, (2) cite the source or relevant record if applicable, (3) suggest 1–3 concrete next actions ranked by urgency.`;
+  return `[Trail Signal · ${srcLabel}${item.urgent ? ' · URGENT' : ''} · ${item.meta}]\n\n"${item.text}"\n\nWhy ${TERMS.aiAssistant} flagged this: ${item.why}\n\nPlease: (1) explain what this signal means in plain language, (2) cite the source or relevant record if applicable, (3) suggest 1–3 concrete next actions ranked by urgency.`;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -464,14 +465,14 @@ export function PagePennyGuide() {
       const data = await res.json() as { reply?: string; error?: string };
       if (!res.ok || data.error) {
         setIsError(true);
-        setResponse(data.error ?? 'Penny ran into an issue. Try again in a moment.');
+        setResponse(data.error ?? `${TERMS.aiAssistant} ran into an issue. Try again in a moment.`);
       } else {
         setIsError(false);
         setResponse(data.reply ?? 'No response returned.');
       }
     } catch {
       setIsError(true);
-      setResponse('Could not reach the Penny API. Check your connection and try again.');
+      setResponse(`Could not reach the ${TERMS.aiAssistant} API. Check your connection and try again.`);
     } finally {
       setLoading(false);
     }
@@ -492,7 +493,7 @@ export function PagePennyGuide() {
                 : 'border-transparent text-muted-foreground/60 hover:text-foreground hover:border-border/40'
             }`}
           >
-            {tab === 'penny' ? 'Penny Insights' : 'Ask Penny'}
+            {tab === 'penny' ? `${TERMS.aiAssistant} Insights` : `Ask ${TERMS.aiAssistant}`}
           </button>
         ))}
       </div>
@@ -505,7 +506,7 @@ export function PagePennyGuide() {
               <Sparkles className="w-4 h-4 text-violet-500" />
             </div>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Ask Penny a question or select an item to open its brief.
+              Ask {TERMS.aiAssistant} a question or select an item to open its brief.
             </p>
             <button onClick={() => setPennyPanelTab('ask')} className="flex items-center gap-1 text-[10px] font-medium text-violet-600 hover:underline">
               Ask a question <ArrowRight className="w-2.5 h-2.5" />
@@ -519,7 +520,7 @@ export function PagePennyGuide() {
               {insights.length > 0 && (
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-2">
-                    {isEveryday ? 'Penny · Your Learning Coach' : 'Penny · Chief of Staff'}
+                    {isEveryday ? `${TERMS.aiAssistant} · Your Learning Coach` : `${TERMS.aiAssistant} · Chief of Staff`}
                   </p>
                   <div className="rounded-lg border border-violet-100 bg-violet-50/50 p-3 space-y-1.5">
                     {insights.map((text, i) => (
@@ -635,7 +636,7 @@ export function PagePennyGuide() {
                                           className="mt-1.5 flex items-center gap-1 text-[9px] font-medium text-violet-600 hover:text-violet-800 hover:underline transition-colors"
                                         >
                                           <Brain className="w-2.5 h-2.5" />
-                                          Ask Penny about this signal
+                                          Ask {TERMS.aiAssistant} about this signal
                                         </button>
                                       </div>
                                     </div>
@@ -720,7 +721,7 @@ export function PagePennyGuide() {
           <div className="p-4 space-y-4">
 
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-1.5">Ask Penny</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-1.5">Ask {TERMS.aiAssistant}</p>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
                 {isEveryday
                   ? 'Ask me about your programs, upcoming sessions, or anything in the Knowledge Library. I can also explain any signal.'
@@ -731,7 +732,7 @@ export function PagePennyGuide() {
             {loading && (
               <div className="rounded-lg border border-violet-200/60 bg-violet-50/60 p-3 flex items-center gap-2">
                 <Loader2 className="w-3.5 h-3.5 text-violet-500 animate-spin flex-shrink-0" />
-                <span className="text-[11px] text-violet-700">Penny is thinking…</span>
+                <span className="text-[11px] text-violet-700">{TERMS.aiAssistant} is thinking…</span>
               </div>
             )}
 
@@ -744,7 +745,7 @@ export function PagePennyGuide() {
                       : <Sparkles className="w-2 h-2 text-white" />}
                   </div>
                   <span className={`text-[9px] font-bold uppercase tracking-wide ${isError ? 'text-amber-700' : 'text-violet-700'}`}>
-                    {isError ? 'Error' : 'Penny'}
+                    {isError ? 'Error' : `${TERMS.aiAssistant}`}
                   </span>
                   <button
                     onClick={() => { setResponse(null); setIsError(false); }}
@@ -789,7 +790,7 @@ export function PagePennyGuide() {
                 <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Try asking</p>
                 <div className="space-y-1">
                   {(isEveryday
-                    ? ["What's happening with my programs?", "Why did Penny flag the Learning Coach?", "Find Sprint 3 materials"]
+                    ? ["What's happening with my programs?", `Why did ${TERMS.aiAssistant} flag the Learning Coach?`, "Find Sprint 3 materials"]
                     : ["What needs attention today?", "Why is Trail of Mastery blocked?", "Explain the Salesforce signals"]
                   ).map((suggestion, i) => (
                     <button

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -275,7 +276,7 @@ export default function ProgramResources() {
             {[
               { phase: 'Phase 1 — Now', label: 'Metadata Management', desc: 'Admin configures folder URLs, owners, permissions model, and descriptions. Displayed in Program Blueprint and Knowledge Brief.', status: 'In Progress', cls: 'text-green-700 bg-green-50 border-green-200' },
               { phase: 'Phase 2 — Q3 2025', label: 'Salesforce Sync', desc: 'Drive metadata synced to Program_Resource__c in Salesforce org. URL and status visible in SF Program record.', status: 'Planned', cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-              { phase: 'Phase 3 — Q4 2025', label: 'Google Drive API Integration', desc: 'Live folder browsing, file listing, and folder structure display in Trail OS. Penny-generated content auto-saves draft to Drive.', status: 'Future', cls: 'text-slate-600 bg-slate-50 border-slate-200' },
+              { phase: 'Phase 3 — Q4 2025', label: 'Google Drive API Integration', desc: `Live folder browsing, file listing, and folder structure display in Trail OS. ${TERMS.aiAssistant}-generated content auto-saves draft to Drive.`, status: 'Future', cls: 'text-slate-600 bg-slate-50 border-slate-200' },
               { phase: 'Phase 4 — 2026', label: 'Permissions & Sync Automation', desc: 'Automated permissions management (add learner to cohort = add to Drive folder). Bi-directional sync with SF.', status: 'Future', cls: 'text-slate-600 bg-slate-50 border-slate-200' },
             ].map(item => (
               <div key={item.phase} className="flex items-start gap-3">

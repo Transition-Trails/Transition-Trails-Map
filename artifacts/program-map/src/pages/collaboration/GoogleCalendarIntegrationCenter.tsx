@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { TERMS } from '@/config/terminology';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace } from '@/components/workspace/ObjectWorkspace';
@@ -81,7 +82,7 @@ function OverviewTab() {
   const stats = [
     { label:'Calendars Registered', value:`${TRAIL_CALENDARS.length}`,                    sub:`${programCohortCount} program/cohort · ${specializedCount} specialized`, icon:CalendarDays,  color:'text-blue-600' },
     { label:'Events Catalogued',    value:`${CALENDAR_EVENTS.length}`,                    sub:`${eventTypeCount} types · ${recurringCount} recurring`,                  icon:CalendarCheck, color:'text-emerald-600' },
-    { label:'Penny Capabilities',   value:`${PENNY_SCHEDULING_CAPABILITIES.length}`,      sub:`${prototypeCapCount} prototype · ${plannedCapCount} planned`,            icon:Brain,         color:'text-purple-500' },
+    { label:`${TERMS.aiAssistant} Capabilities`,   value:`${PENNY_SCHEDULING_CAPABILITIES.length}`,      sub:`${prototypeCapCount} prototype · ${plannedCapCount} planned`,            icon:Brain,         color:'text-purple-500' },
     { label:'Calendar Readiness',   value:`${healthAvg}%`, sub:`${testSummary.pass}/${testSummary.total} tests passing`,                                               icon:Activity,      color:'text-amber-500' },
   ];
 
@@ -92,7 +93,7 @@ function OverviewTab() {
     { label:'Calendar Access',             score: CAL_HEALTH_SCORES.find(h => h.dimension === 'calendar-access')?.score   ?? 0, max:10 },
     { label:'Event Readiness',             score: CAL_HEALTH_SCORES.find(h => h.dimension === 'event-readiness')?.score   ?? 0, max:10 },
     { label:'Role & People Mapping',       score: CAL_HEALTH_SCORES.find(h => h.dimension === 'role-mapping')?.score      ?? 0, max:10 },
-    { label:'Penny Scheduling',            score: CAL_HEALTH_SCORES.find(h => h.dimension === 'penny-readiness')?.score   ?? 0, max:10 },
+    { label:`${TERMS.aiAssistant} Scheduling`,            score: CAL_HEALTH_SCORES.find(h => h.dimension === 'penny-readiness')?.score   ?? 0, max:10 },
     { label:'Communication Mapping',       score: CAL_HEALTH_SCORES.find(h => h.dimension === 'comm-mapping')?.score      ?? 0, max:10 },
     { label:'Governance',                  score: CAL_HEALTH_SCORES.find(h => h.dimension === 'governance')?.score        ?? 0, max:10 },
   ];
@@ -346,7 +347,7 @@ function EventCatalogTab() {
           <div className="space-y-3 p-1">
             <div className="flex items-center gap-2">
               <EventTypeBadge t={ev.eventType} />
-              {ev.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-50 text-purple-700 border border-purple-200 font-semibold uppercase">Penny Enabled</span>}
+              {ev.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-50 text-purple-700 border border-purple-200 font-semibold uppercase">{TERMS.aiAssistant} Enabled</span>}
             </div>
             <div className="bg-card border border-border rounded-lg divide-y divide-border/40">
               <InfoRow label="Program"     value={ev.programName} />
@@ -524,7 +525,7 @@ function RolePeopleMappingTab() {
             <Users className="w-5 h-5 text-muted-foreground" />
             <div>
               <div className="text-[15px] font-semibold text-foreground">{selected.roleName}</div>
-              <div className="text-[12px] text-muted-foreground">Penny Persona: <span className="font-medium text-foreground">{selected.pennyPersona}</span> · {selected.peopleCount} people</div>
+              <div className="text-[12px] text-muted-foreground">{TERMS.aiAssistant} Persona: <span className="font-medium text-foreground">{selected.pennyPersona}</span> · {selected.peopleCount} people</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -552,7 +553,7 @@ function RolePeopleMappingTab() {
             ))}
           </div>
           <div className="bg-card border border-border rounded-lg p-3">
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Penny Reminder Types</div>
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">{TERMS.aiAssistant} Reminder Types</div>
             {selected.reminderTypes.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {selected.reminderTypes.map(r => <span key={r} className="px-2 py-0.5 rounded text-[11px] bg-purple-50 text-purple-700 border border-purple-200">{r}</span>)}
@@ -922,7 +923,7 @@ export default function GoogleCalendarIntegrationCenter() {
           { id: 'mapTo',        label: 'Maps To',             type: 'select',   options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Scheduling', 'Comms Cadence'], required: true },
           { id: 'trailObject',  label: 'Trail OS Object',     type: 'text',     placeholder: 'e.g. Digital Literacy Trail' },
           { id: 'eventTypes',   label: 'Event Types',         type: 'textarea', placeholder: 'What kinds of events will be on this calendar?', rows: 2 },
-          { id: 'pennyCanRead', label: 'Penny Can Read',      type: 'select',   options: ['Yes — auto-sync', 'Yes — on request', 'No'] },
+          { id: 'pennyCanRead', label: `${TERMS.aiAssistant} Can Read`,      type: 'select',   options: ['Yes — auto-sync', 'Yes — on request', 'No'] },
         ],
       })
     },
@@ -942,7 +943,7 @@ export default function GoogleCalendarIntegrationCenter() {
         { id:'events',         label:'Event Catalog',       path:'/admin/integrations/google-calendar/events',             icon:CalendarCheck, content:<EventCatalogTab /> },
         { id:'program-map',    label:'Program & Cohort',    path:'/admin/integrations/google-calendar/program-map',        icon:Layers,        content:<ProgramCohortMappingTab /> },
         { id:'roles',          label:'Role & People',       path:'/admin/integrations/google-calendar/roles',              icon:Users,         content:<RolePeopleMappingTab /> },
-        { id:'penny',          label:'Penny Scheduling',    path:'/admin/integrations/google-calendar/penny',              icon:Brain,         content:<PennySchedulingTab /> },
+        { id:'penny',          label:`${TERMS.aiAssistant} Scheduling`,    path:'/admin/integrations/google-calendar/penny',              icon:Brain,         content:<PennySchedulingTab /> },
         { id:'comms',          label:'Comms Mapping',       path:'/admin/integrations/google-calendar/comms',              icon:Hash,          content:<CommMappingTab /> },
         { id:'governance',     label:'Governance',          path:'/admin/integrations/google-calendar/governance',         icon:Shield,        content:<GovernanceTab /> },
         { id:'testing',        label:'Test Suite',          path:'/admin/integrations/google-calendar/testing',            icon:FlaskConical,  content:<TestSuiteTab /> },

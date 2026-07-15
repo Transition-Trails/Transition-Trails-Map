@@ -1,4 +1,5 @@
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import type { ResolvePhase } from '@/data/resolvePhases';
 import { ArrowRight } from 'lucide-react';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
@@ -40,7 +41,7 @@ const OP_MAPPINGS = [
     trailOs:  'Org Readiness',
     penny:    'Source mapping needed',
     artifact: 'Evaluation Brief',
-    description: 'Intake records and discovery briefs are assessed against org capacity, strategic fit, and learner readiness using Org Readiness. No confirmed Penny AI capability is mapped to this phase yet — pending source document review. Output is an Evaluation Brief that gates the Solve phase.',
+    description: `Intake records and discovery briefs are assessed against org capacity, strategic fit, and learner readiness using Org Readiness. No confirmed ${TERMS.aiAssistant} AI capability is mapped to this phase yet — pending source document review. Output is an Evaluation Brief that gates the Solve phase.`,
     commChannels: ['#org-assessment (planned)'],
     sources: ['RESOLVE Course Canvas', 'Program Comparison Sheet'],
   },
@@ -179,11 +180,11 @@ export default function ResolveDemand() {
         {/* ── Section 2: Operational Mapping ── */}
         <SectionHead
           title="Operational Mapping"
-          note="RESOLVE Phase → Trail OS Capability → Penny AI Function → Program Artifact · click any row for details"
+          note={`RESOLVE Phase → Trail OS Capability → ${TERMS.aiAssistant} AI Function → Program Artifact · click any row for details`}
         />
         <div className="rounded-xl border border-border/60 bg-white/60 shadow-sm overflow-hidden">
           <div className="grid grid-cols-4 px-4 py-2 border-b border-border/40 bg-muted/20">
-            {['RESOLVE Phase', 'Trail OS Capability', 'Penny AI Function', 'Program Artifact'].map(h => (
+            {['RESOLVE Phase', 'Trail OS Capability', `${TERMS.aiAssistant} AI Function`, 'Program Artifact'].map(h => (
               <p key={h} className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">{h}</p>
             ))}
           </div>

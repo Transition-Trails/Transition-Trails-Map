@@ -40,11 +40,11 @@ const PAGE_INFO: Array<[string, string, string]> = [
   ['/admin/salesforce-arch',             'Administration',         'Salesforce Architecture'],
   ['/admin/sf-validation',               'Administration',         'SF Validation Center'],
   ['/admin/program-resources',           'Administration',         'Drive Workspaces'],
-  ['/penny',                             'Penny',                  'Capabilities'],
-  ['/penny/prompts',                     'Penny',                  'Prompt Studio'],
-  ['/penny/learners',                    'Penny',                  'Learners'],
-  ['/penny/intelligence',                'Penny',                  'Intelligence'],
-  ['/penny/test',                        'Penny',                  'Test Penny'],
+  ['/penny',                             TERMS.aiAssistant,        'Capabilities'],
+  ['/penny/prompts',                     TERMS.aiAssistant,        'Prompt Studio'],
+  ['/penny/learners',                    TERMS.aiAssistant,        'Learners'],
+  ['/penny/intelligence',               TERMS.aiAssistant,        'Intelligence'],
+  ['/penny/test',                        TERMS.aiAssistant,        `Test ${TERMS.aiAssistant}`],
   ['/knowledge',                         'Knowledge',              'Overview'],
   ['/knowledge/sources',                 'Knowledge',              'Sources'],
   ['/knowledge/library',                 'Knowledge',              'Library'],
@@ -70,7 +70,7 @@ function getPageInfo(location: string) {
   if (location.startsWith('/uom'))          return { section: 'Digital Twin',   title: 'Object Model' };
   if (location.startsWith('/operations'))   return { section: 'Operations',     title: 'Dashboard' };
   if (location.startsWith('/program'))      return { section: 'Programs',       title: 'Dashboard' };
-  if (location.startsWith('/penny'))        return { section: 'Penny',          title: 'Dashboard' };
+  if (location.startsWith('/penny'))        return { section: TERMS.aiAssistant, title: 'Dashboard' };
   if (location.startsWith('/knowledge'))    return { section: 'Knowledge',      title: 'Dashboard' };
   if (location.startsWith('/collaboration'))return { section: 'Collaboration',  title: 'Dashboard' };
   return { section: 'Trail OS', title: 'Dashboard' };
@@ -423,7 +423,7 @@ export function Topbar() {
               setCalendarPanelOpen(false);
             }
           }}
-          title="Ask Penny (AI guide)"
+          title={`Ask ${TERMS.aiAssistant} (AI guide)`}
         >
           <Sparkles className="w-3 h-3 flex-shrink-0" />
           <span className="hidden sm:inline">{askPennyOpen ? 'Close' : TERMS.aiAssistant}</span>
@@ -445,7 +445,7 @@ export function Topbar() {
               setGmailPanelOpen(false);
             }
           }}
-          title="Calendar — upcoming events & Penny prep briefs"
+          title={`Calendar — upcoming events & ${TERMS.aiAssistant} prep briefs`}
         >
           <CalendarDays className="w-3 h-3 flex-shrink-0" />
           <span className="hidden sm:inline">{calendarPanelOpen ? 'Close' : 'Calendar'}</span>
@@ -467,7 +467,7 @@ export function Topbar() {
               setCalendarPanelOpen(false);
             }
           }}
-          title="Mail — inbox & Penny draft assist"
+          title={`Mail — inbox & ${TERMS.aiAssistant} draft assist`}
         >
           <Mail className="w-3 h-3 flex-shrink-0" />
           <span className="hidden sm:inline">{gmailPanelOpen ? 'Close' : 'Mail'}</span>

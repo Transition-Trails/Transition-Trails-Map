@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { useLocation } from 'wouter';
@@ -32,7 +33,7 @@ const REC_ID_ROUTE: Record<string, string> = {
   'rec-12': '/penny/prompts',
 };
 const REC_DOMAIN_ROUTE: Record<string, string> = {
-  'Penny AI':       '/penny/capabilities',
+  [TERMS.aiAssistant]: '/penny/capabilities',
   'People & Roles': '/roles',
   'Programs':       '/navigator/program-map',
   'Communications': '/collaboration/slack',
@@ -43,7 +44,7 @@ const REC_DOMAIN_ROUTE: Record<string, string> = {
 
 // ── Static prototype data ─────────────────────────────────────────────────────
 const ALL_ACTIVITY = [
-  { id: 'a1', icon: Bot,      catCls: 'bg-violet-100 text-violet-700', cat: 'Penny',    text: "Learning Coach flagged low confidence on Cohort 3 recap",      time: '8m',  minPower: false },
+  { id: 'a1', icon: Bot,      catCls: 'bg-violet-100 text-violet-700', cat: TERMS.aiAssistant,    text: "Learning Coach flagged low confidence on Cohort 3 recap",      time: '8m',  minPower: false },
   { id: 'a2', icon: Inbox,    catCls: 'bg-amber-100 text-amber-700',   cat: 'Demand',   text: "New intake case — Explorer's Trail expansion",                 time: '23m', minPower: true  },
   { id: 'a3', icon: Users,    catCls: 'bg-sky-100 text-sky-700',       cat: 'Cohort',   text: 'Guided Trail Cohort 1 · Week 3 materials uploaded',            time: '1h',  minPower: false },
   { id: 'a4', icon: Activity, catCls: 'bg-emerald-100 text-emerald-700',cat:'Programs', text: 'Foundations Trail cohort at 89% capacity',                    time: '2h',  minPower: false },
@@ -97,7 +98,7 @@ export default function Home() {
     { label: 'My Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
     { label: 'Cohort Learners',value: '47',  icon: Users,  cls: 'text-sky-600'    },
     { label: 'Upcoming Tasks', value: '3',   icon: Inbox,  cls: 'text-amber-600'  },
-    { label: 'Penny Nudges',   value: '12',  icon: Brain,  cls: 'text-violet-600' },
+    { label: `${TERMS.aiAssistant} Nudges`,   value: '12',  icon: Brain,  cls: 'text-violet-600' },
   ];
 
   return (
@@ -358,7 +359,7 @@ export default function Home() {
                 </Card>
               </>
             ) : isPowerOrAbove && !isAdminOrAbove ? (
-              <Card label="Penny This Week">
+              <Card label={`${TERMS.aiAssistant} This Week`}>
                 {[
                   { icon: Brain,         label: 'Interactions',     value: '234', sub: 'this week',  cls: 'text-violet-600', bg: 'bg-violet-50'   },
                   { icon: Users,         label: 'Learner sessions', value: '12',  sub: 'active now', cls: 'text-sky-600',    bg: 'bg-sky-50'      },
@@ -379,7 +380,7 @@ export default function Home() {
                     </div>
                   );
                 })}
-                <CardFooter onClick={() => navigate('/penny/intelligence')} label="Open Penny Intelligence" />
+                <CardFooter onClick={() => navigate('/penny/intelligence')} label={`Open ${TERMS.aiAssistant} Intelligence`} />
               </Card>
             ) : null}
           </div>

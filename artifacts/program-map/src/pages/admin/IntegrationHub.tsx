@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -55,15 +56,15 @@ const CONNECTIONS: Connection[] = [
     action: 'Manage', href: '/admin/integrations/google-auth',
   },
   {
-    id: 'gemini', name: 'Gemini AI', tagline: 'Penny Intelligence Layer',
+    id: 'gemini', name: 'Gemini AI', tagline: `${TERMS.aiAssistant} Intelligence Layer`,
     status: 'live', icon: Brain, iconCls: 'bg-violet-50 text-violet-700', owner: 'Admin',
-    detail: 'API key active and validated. Powers Penny insights and context generation.',
+    detail: `API key active and validated. Powers ${TERMS.aiAssistant} insights and context generation.`,
     action: 'Secrets', href: '/admin/integrations/secrets',
   },
   {
     id: 'google-drive', name: 'Google Drive', tagline: 'Content Repository',
     status: 'live', icon: FolderOpen, iconCls: 'bg-green-50 text-green-700', owner: 'Ops Lead',
-    detail: 'OAuth active. Penny Assets folder configured. Program workspace sync is Phase 2.',
+    detail: `OAuth active. ${TERMS.aiAssistant} Assets folder configured. Program workspace sync is Phase 2.`,
     action: 'Drive Config', href: '/admin/integrations/google-drive',
   },
   {
@@ -81,7 +82,7 @@ const CONNECTIONS: Connection[] = [
     needs: 'channels:read scope not yet approved — bot cannot list channels or members',
   },
   {
-    id: 'agentforce', name: 'Agentforce', tagline: 'Penny–Transition Trails Assistant',
+    id: 'agentforce', name: 'Agentforce', tagline: `${TERMS.aiAssistant}–Transition Trails Assistant`,
     status: 'live-partial', icon: Bot, iconCls: 'bg-cyan-50 text-cyan-700', owner: 'Salesforce Admin',
     detail: 'Sessions API wired. Dual-AI coaching active on Assessment page.',
     action: 'Agentforce', href: '/penny/agentforce',
@@ -240,51 +241,51 @@ interface DomainCard {
 
 const DOMAINS: DomainCard[] = [
   {
-    id: 'ai-core', icon: Brain, title: 'Penny AI Core', subtitle: 'What Penny thinks with',
+    id: 'ai-core', icon: Brain, title: `${TERMS.aiAssistant} AI Core`, subtitle: `What ${TERMS.aiAssistant} thinks with`,
     color: 'text-violet-700', border: 'border-violet-200', headerBg: 'bg-violet-50', iconCls: 'bg-violet-50 text-violet-600',
     deps: [
       { label: 'Gemini 2.5 Flash key',        status: 'live',    note: 'GEMINI_API_KEY active · billing confirmed · POST /api/penny/ask live · validated via /api/gemini/validate',                                         action: '/admin/integrations/secrets',  actionLabel: 'Secrets audit'     },
-      { label: 'RAG knowledge corpus',         status: 'partial', note: '22 chunks active · 3 sources still Unverified — complete trust review in Knowledge Library to activate them in Penny',                              action: '/knowledge/sources',           actionLabel: 'Review sources'    },
+      { label: 'RAG knowledge corpus',         status: 'partial', note: `22 chunks active · 3 sources still Unverified — complete trust review in Knowledge Library to activate them in ${TERMS.aiAssistant}`,                              action: '/knowledge/sources',           actionLabel: 'Review sources'    },
       { label: 'Agentforce Sessions API',      status: 'live',    note: 'Dual-AI coaching wired · Assessment panel fires both Penny + Agentforce per Coach/Next click · Agent ID 0Xxan0…',                                 action: '/penny/assessments',           actionLabel: 'Open Assessments'  },
-      { label: 'Penny capability registry',    status: 'live',    note: '12 confirmed capabilities · prompt library active · Trail Quests + Assessments live',                                                               action: '/penny/capabilities',          actionLabel: 'View capabilities' },
+      { label: `${TERMS.aiAssistant} capability registry`,    status: 'live',    note: '12 confirmed capabilities · prompt library active · Trail Quests + Assessments live',                                                               action: '/penny/capabilities',          actionLabel: 'View capabilities' },
     ],
   },
   {
-    id: 'data-access', icon: FolderOpen, title: 'Data Access', subtitle: 'What Penny reads',
+    id: 'data-access', icon: FolderOpen, title: 'Data Access', subtitle: `What ${TERMS.aiAssistant} reads`,
     color: 'text-sky-700', border: 'border-sky-200', headerBg: 'bg-sky-50', iconCls: 'bg-sky-50 text-sky-600',
     deps: [
       { label: 'Salesforce — Accounts, Contacts, Cases', status: 'live',        note: '127 Accounts · 129 Contacts · NPSP + PMM (7/8 objects) · read-only REST API live via Replit connector',                                   action: '/admin/integrations',          actionLabel: 'SF config'       },
       { label: 'Google Drive — Penny Asset Library',     status: 'live',        note: 'GOOGLE_DRIVE_PENNY_FOLDER_ID set · Shared Drive (TT Content → Penny Asset Library) · 6 state folders · 38 assets loaded',                action: '/penny/asset-library',         actionLabel: 'Asset Library'   },
       { label: 'Google Drive — Program folders',         status: 'needs-setup', note: 'Drive OAuth active and Shared Drive accessible. Next: create a Drive folder per program and link each in the Knowledge Source registry.', action: '/knowledge/sources',           actionLabel: 'Link folders'    },
-      { label: 'SF Insights field mapping',              status: 'needs-setup', note: 'Salesforce Accounts, Contacts, and Cases data is live. Penny context fields (program match, risk level, engagement score) not yet mapped.', action: '/operations/scorecards',       actionLabel: 'Map fields'      },
+      { label: 'SF Insights field mapping',              status: 'needs-setup', note: `Salesforce Accounts, Contacts, and Cases data is live. ${TERMS.aiAssistant} context fields (program match, risk level, engagement score) not yet mapped.`, action: '/operations/scorecards',       actionLabel: 'Map fields'      },
     ],
   },
   {
-    id: 'channels', icon: MessageSquare, title: 'Channels & Comms', subtitle: 'How Penny communicates',
+    id: 'channels', icon: MessageSquare, title: 'Channels & Comms', subtitle: `How ${TERMS.aiAssistant} communicates`,
     color: 'text-emerald-700', border: 'border-emerald-200', headerBg: 'bg-emerald-50', iconCls: 'bg-emerald-50 text-emerald-600',
     deps: [
       { label: 'Slack bot (@coachconnectbot)', status: 'partial', note: 'Bot posting confirmed to Penny AI + Admin channels. Missing: channels:read + groups:read scopes — add to Slack app manifest to resolve channel names.', action: '/collaboration/slack',          actionLabel: 'Slack config'  },
-      { label: 'Gmail read + send',            status: 'live',    note: 'gmail.readonly + gmail.send confirmed · Real inbox (15 threads) · Penny-assisted draft + send via POST /api/gmail/send live',                         action: '/collaboration/gmail',          actionLabel: 'Open Gmail'    },
-      { label: 'Google Calendar events',       status: 'live',    note: 'Real events via /api/calendar/events · Penny prep briefs per event · pending invite flags live',                                                      action: '/collaboration/calendar-live',  actionLabel: 'Open Calendar' },
-      { label: 'Signal routing rules',         status: 'partial', note: 'Collaboration Overview rule hub live — Slack, Gmail, Calendar, Drive channel rules visible and structured. Automated Penny routing is Phase 2.',      action: '/collaboration',                actionLabel: 'Edit rules'    },
+      { label: 'Gmail read + send',            status: 'live',    note: `gmail.readonly + gmail.send confirmed · Real inbox (15 threads) · ${TERMS.aiAssistant}-assisted draft + send via POST /api/gmail/send live`,                         action: '/collaboration/gmail',          actionLabel: 'Open Gmail'    },
+      { label: 'Google Calendar events',       status: 'live',    note: `Real events via /api/calendar/events · ${TERMS.aiAssistant} prep briefs per event · pending invite flags live`,                                                      action: '/collaboration/calendar-live',  actionLabel: 'Open Calendar' },
+      { label: 'Signal routing rules',         status: 'partial', note: `Collaboration Overview rule hub live — Slack, Gmail, Calendar, Drive channel rules visible and structured. Automated ${TERMS.aiAssistant} routing is Phase 2.`,      action: '/collaboration',                actionLabel: 'Edit rules'    },
     ],
   },
   {
-    id: 'access', icon: Shield, title: 'Access Control', subtitle: 'Who Penny talks to',
+    id: 'access', icon: Shield, title: 'Access Control', subtitle: `Who ${TERMS.aiAssistant} talks to`,
     color: 'text-amber-700', border: 'border-amber-200', headerBg: 'bg-amber-50', iconCls: 'bg-amber-50 text-amber-600',
     deps: [
       { label: 'Google Sign-In (Clerk v6)',       status: 'live', note: 'Branded /sign-in · Google OAuth wired · ClerkProvider + proxy configured · signed-in/out gating live across all routes',                  action: '/admin/integrations/google-auth', actionLabel: 'Google Auth'   },
       { label: 'Google Groups auto-tier',         status: 'live', note: '3 Groups → Everyday / Power / Admin tiers · DWD service account configured · real-time group membership on every login via /api/auth/tier', action: '/admin/integrations',             actionLabel: 'View config'   },
-      { label: 'Penny tier-filtered responses',   status: 'live', note: 'RAG corpus filtered by access tier — Everyday / Power / Admin receive different context depth from Penny',                                  action: '/penny',                          actionLabel: 'Test Penny'    },
+      { label: `${TERMS.aiAssistant} tier-filtered responses`,   status: 'live', note: `RAG corpus filtered by access tier — Everyday / Power / Admin receive different context depth from ${TERMS.aiAssistant}`,                                  action: '/penny',                          actionLabel: 'Test Penny'    },
       { label: 'Role-gated routes & tabs',        status: 'live', note: 'HubShell tier guards active · Admin+ tabs, actions, and sidebar items hidden from Everyday users',                                         action: '/admin/integrations',             actionLabel: 'Integrations'  },
     ],
   },
   {
-    id: 'content', icon: BookOpen, title: 'Content & Knowledge', subtitle: 'What Penny knows',
+    id: 'content', icon: BookOpen, title: 'Content & Knowledge', subtitle: `What ${TERMS.aiAssistant} knows`,
     color: 'text-rose-700', border: 'border-rose-200', headerBg: 'bg-rose-50', iconCls: 'bg-rose-50 text-rose-600',
     deps: [
-      { label: 'Knowledge source library',    status: 'partial',    note: 'Sources, Library, and Org Memory tabs live · 3 sources Unverified — complete trust review for each to activate in Penny RAG',       action: '/knowledge/sources', actionLabel: 'Review sources' },
-      { label: 'Penny Asset Library',         status: 'live',       note: '38 assets across 6 Penny states · Drive-backed thumbnails · grid + list views · 3-per-row face-anchored at /penny/asset-library',   action: '/penny/asset-library', actionLabel: 'Open Library'  },
+      { label: 'Knowledge source library',    status: 'partial',    note: `Sources, Library, and Org Memory tabs live · 3 sources Unverified — complete trust review for each to activate in ${TERMS.aiAssistant} RAG`,       action: '/knowledge/sources', actionLabel: 'Review sources' },
+      { label: `${TERMS.aiAssistant} Asset Library`,         status: 'live',       note: `38 assets across 6 ${TERMS.aiAssistant} states · Drive-backed thumbnails · grid + list views · 3-per-row face-anchored at /penny/asset-library`,   action: '/penny/asset-library', actionLabel: 'Open Library'  },
       { label: 'Salesforce KB sync',          status: 'needs-setup', note: 'REST API live querying Accounts/Contacts/Cases. SF Knowledge Base object not yet connected to Knowledge Library.',                  action: '/knowledge/sources', actionLabel: 'Configure'      },
       { label: 'Org Memory decision records', status: 'phase-2',    note: 'Org Memory tab built — decision record creation, structured templates, and AI indexing are Phase 2.',                                action: '/knowledge/memory',  actionLabel: 'View Memory'   },
     ],
@@ -452,9 +453,9 @@ interface ConfigLink {
 const SETUP_PAGES: ConfigLink[] = [
   { id: 'secrets',       name: 'Secrets & Credentials',  detail: 'Presence and format check plus live API validation for Gemini and Google.', href: '/admin/integrations/secrets',         badge: 'Audit tool',     badgeCls: 'bg-sky-50 border-sky-200 text-sky-700',       icon: Key          },
   { id: 'google-auth',   name: 'Google OAuth',            detail: 'OAuth wizard for Drive, Calendar, and Gmail refresh tokens.',               href: '/admin/integrations/google-auth',     badge: 'Auth',           badgeCls: 'bg-emerald-50 border-emerald-200 text-emerald-700', icon: Lock     },
-  { id: 'drive',         name: 'Google Drive Config',     detail: 'Penny Asset Library setup and program folder configuration.',               href: '/admin/integrations/google-drive',    badge: 'Drive Config',   badgeCls: 'bg-green-50 border-green-200 text-green-700',   icon: FolderOpen   },
+  { id: 'drive',         name: 'Google Drive Config',     detail: `${TERMS.aiAssistant} Asset Library setup and program folder configuration.`,               href: '/admin/integrations/google-drive',    badge: 'Drive Config',   badgeCls: 'bg-green-50 border-green-200 text-green-700',   icon: FolderOpen   },
   { id: 'calendar',      name: 'Google Calendar Config',  detail: 'Calendar IDs, cohort event mapping, and event-trigger readiness.',          href: '/admin/integrations/google-calendar', badge: 'Calendar',       badgeCls: 'bg-amber-50 border-amber-200 text-amber-700',   icon: Calendar     },
-  { id: 'signal-rules',  name: 'Signal Rules',            detail: 'Configure how each channel routes signals to Penny and Trail Signals.',     href: '/collaboration',                      badge: 'Channel Rules',  badgeCls: 'bg-violet-50 border-violet-200 text-violet-700', icon: MessageSquare },
+  { id: 'signal-rules',  name: 'Signal Rules',            detail: `Configure how each channel routes signals to ${TERMS.aiAssistant} and ${TERMS.trailSignals}.`,     href: '/collaboration',                      badge: 'Channel Rules',  badgeCls: 'bg-violet-50 border-violet-200 text-violet-700', icon: MessageSquare },
 ];
 
 const GOVERNANCE_LINKS: ConfigLink[] = [

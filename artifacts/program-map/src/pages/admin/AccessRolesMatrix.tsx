@@ -7,10 +7,11 @@ import {
 import { TIER_CONFIG, TIER_FEATURES, TIER_NAV_SUMMARY, TIER_ORDER, type AccessTier } from '@/config/accessTiers';
 import { useAppContext } from '@/context/AppContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TERMS } from '@/config/terminology';
 
 const NAV_SECTIONS = [
   'Home', 'Global Search', 'Context Engine',
-  'Operations', 'Programs', 'Penny', 'Knowledge',
+  'Operations', 'Programs', TERMS.aiAssistant, 'Knowledge',
   'Collaboration', 'Digital Twin', 'Administration',
 ];
 

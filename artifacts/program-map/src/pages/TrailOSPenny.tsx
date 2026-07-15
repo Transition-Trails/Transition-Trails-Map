@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import { trailOsCapabilities } from '@/data/trailOsCapabilities';
 import { pennyCapabilities } from '@/data/pennyCapabilities';
@@ -13,7 +14,7 @@ export default function TrailOSPenny() {
 
   const layers = [
     { id: 'trailOs',   label: 'Trail OS',      icon: Database  },
-    { id: 'penny',     label: 'Penny AI',       icon: Sparkles  },
+    { id: 'penny',     label: `${TERMS.aiAssistant} AI`,       icon: Sparkles  },
     { id: 'delivery',  label: 'Delivery Loop',  icon: Workflow  },
     { id: 'analytics', label: 'Analytics',      icon: Activity  },
   ];
@@ -81,7 +82,7 @@ export default function TrailOSPenny() {
         {activeLayer === 'penny' && (
           <div className="max-w-6xl mx-auto animate-in fade-in">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">Penny AI Features</h2>
+              <h2 className="text-2xl font-bold mb-2">{TERMS.aiAssistant} AI Features</h2>
               <p className="text-muted-foreground">Intelligent coaching and guidance embedded in the learning journey. Click any card to open its Knowledge Brief.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

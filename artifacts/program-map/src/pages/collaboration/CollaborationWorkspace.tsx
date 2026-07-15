@@ -52,19 +52,19 @@ const CHANNELS: ChannelConfig[] = [
     stats: [
       { label: 'Channels monitored', value: '5' },
       { label: 'Bot posting rules',  value: '3' },
-      { label: 'Penny triggers',     value: '6' },
+      { label: `${TERMS.aiAssistant} triggers`,     value: '6' },
     ],
     rules: [
       {
         label: 'Channel Monitoring',
         items: [
-          { text: '#trail-os-ops — all messages flagged for Penny review', status: 'active' },
+          { text: `#trail-os-ops — all messages flagged for ${TERMS.aiAssistant} review`, status: 'active' },
           { text: '#guided-trail-cohort — enrollment + completion signals', status: 'active' },
           { text: '#guided-trail-coaches — coach activity cadence tracking', status: 'active' },
         ],
       },
       {
-        label: 'Penny Posting Rules',
+        label: `${TERMS.aiAssistant} Posting Rules`,
         items: [
           { text: 'Trail Talk reminders → #guided-trail-cohort (weekly)', status: 'active' },
           { text: 'Insight Digest → #trail-os-ops (weekly, Fridays)', status: 'active' },
@@ -89,23 +89,23 @@ const CHANNELS: ChannelConfig[] = [
     pennyRole: 'Watches 4 labels · Flags follow-ups · Feeds Trail Signals digest',
     stats: [
       { label: 'Labels watched',    value: '4' },
-      { label: 'Penny flags / wk', value: '6' },
+      { label: `${TERMS.aiAssistant} flags / wk`, value: '6' },
       { label: 'Auto-routed',       value: '2' },
     ],
     rules: [
       {
         label: 'Label Routing Rules',
         items: [
-          { text: 'TRAIL_OS label → Penny review queue (all threads)', status: 'active' },
+          { text: `TRAIL_OS label → ${TERMS.aiAssistant} review queue (all threads)`, status: 'active' },
           { text: 'CASE_ALERTS label → Trail Signals within 1h', status: 'active' },
-          { text: 'LEARNER_COMMS label → Penny follow-up watch (48h)', status: 'active' },
+          { text: `LEARNER_COMMS label → ${TERMS.aiAssistant} follow-up watch (48h)`, status: 'active' },
           { text: 'COACH_COMMS label → Coach activity digest (weekly)', status: 'pending' },
         ],
       },
       {
-        label: 'Penny Follow-Up Rules',
+        label: `${TERMS.aiAssistant} Follow-Up Rules`,
         items: [
-          { text: 'No reply after 48h → Penny surfaces to admin inbox', status: 'active' },
+          { text: `No reply after 48h → ${TERMS.aiAssistant} surfaces to admin inbox`, status: 'active' },
           { text: 'Attrition signal keywords → Trail Signal auto-created', status: 'active' },
           { text: 'Bulk send tracking → weekly delivery stats', status: 'phase-2' },
         ],
@@ -128,16 +128,16 @@ const CHANNELS: ChannelConfig[] = [
     pennyRole: 'Preps meetings on request · Tracks coach cadence · Flags overdue check-ins',
     stats: [
       { label: 'Event types tracked', value: '3' },
-      { label: 'Penny prep triggers', value: 'On demand' },
+      { label: `${TERMS.aiAssistant} prep triggers`, value: 'On demand' },
       { label: 'Cadence alerts',      value: 'Active' },
     ],
     rules: [
       {
-        label: 'Penny Prep Rules',
+        label: `${TERMS.aiAssistant} Prep Rules`,
         items: [
-          { text: 'Program Sync meetings → Penny prep brief available on demand', status: 'active' },
-          { text: 'Coach Check-ins → attendance + cadence logged to Penny', status: 'active' },
-          { text: 'Trail Quest Reviews → Penny pulls learner readiness snapshot', status: 'pending' },
+          { text: `Program Sync meetings → ${TERMS.aiAssistant} prep brief available on demand`, status: 'active' },
+          { text: `Coach Check-ins → attendance + cadence logged to ${TERMS.aiAssistant}`, status: 'active' },
+          { text: `Trail Quest Reviews → ${TERMS.aiAssistant} pulls learner readiness snapshot`, status: 'pending' },
         ],
       },
       {
@@ -145,7 +145,7 @@ const CHANNELS: ChannelConfig[] = [
         items: [
           { text: 'Coach check-in gap > 2 weeks → Trail Signal (attrition risk)', status: 'active' },
           { text: 'Sprint close meetings → auto-logged to program timeline', status: 'pending' },
-          { text: 'Recurring meeting drop → Penny insight flag', status: 'phase-2' },
+          { text: `Recurring meeting drop → ${TERMS.aiAssistant} insight flag`, status: 'phase-2' },
         ],
       },
     ],
@@ -166,7 +166,7 @@ const CHANNELS: ChannelConfig[] = [
     pennyRole: 'File change notifications planned · Rule configuration coming in Phase 2',
     stats: [
       { label: 'Folders watched',    value: '—' },
-      { label: 'Penny triggers',     value: '—' },
+      { label: `${TERMS.aiAssistant} triggers`,     value: '—' },
       { label: 'Routing rules',      value: '—' },
     ],
     rules: [
@@ -174,7 +174,7 @@ const CHANNELS: ChannelConfig[] = [
         label: 'Planned Rules (Phase 2)',
         items: [
           { text: 'Trail Quest template changes → notify program leads', status: 'phase-2' },
-          { text: 'Assessment uploads → Penny queues review task', status: 'phase-2' },
+          { text: `Assessment uploads → ${TERMS.aiAssistant} queues review task`, status: 'phase-2' },
           { text: 'Shared document activity → weekly Drive digest', status: 'phase-2' },
         ],
       },
@@ -196,7 +196,7 @@ const CHANNELS: ChannelConfig[] = [
     pennyRole: 'Client-facing spaces planned for Q3 — not yet connected',
     stats: [
       { label: 'Spaces',         value: '—' },
-      { label: 'Penny routing',  value: '—' },
+      { label: `${TERMS.aiAssistant} routing`,  value: '—' },
       { label: 'Rules',          value: '—' },
     ],
     rules: [],

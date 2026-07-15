@@ -1,6 +1,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { OpsHeader, StatCard, StatusDot } from '@/components/platform/PageShell';
+import { TERMS } from '@/config/terminology';
 
 const cases = [
   { id: 'SF-1247', subject: 'Cannot access learning portal',       priority: 'Urgent', status: 'Open',        age: '4h' },
@@ -8,7 +9,7 @@ const cases = [
   { id: 'SF-1245', subject: 'Curriculum question — pacing',         priority: 'Low',    status: 'Open',        age: '2d' },
   { id: 'SF-1244', subject: 'Billing dispute — refund request',     priority: 'High',   status: 'Escalated',   age: '3d' },
   { id: 'SF-1243', subject: 'Program scheduling inquiry',           priority: 'Normal', status: 'Pending',     age: '4d' },
-  { id: 'SF-1242', subject: 'Penny not responding correctly',       priority: 'High',   status: 'In Progress', age: '5d' },
+  { id: 'SF-1242', subject: `${TERMS.aiAssistant} not responding correctly`,       priority: 'High',   status: 'In Progress', age: '5d' },
   { id: 'SF-1241', subject: 'Certificate delivery delay',           priority: 'Normal', status: 'Open',        age: '7d' },
 ];
 

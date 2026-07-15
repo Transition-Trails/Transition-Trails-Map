@@ -6,6 +6,7 @@
  * Triggered via gmailPanelOpen in AppContext.
  */
 import { useState, useEffect, useCallback } from 'react';
+import { TERMS } from '@/config/terminology';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Mail, RefreshCw, Brain, Send, Paperclip,
@@ -84,7 +85,7 @@ async function fetchPennyDraft(thread: Thread): Promise<string> {
     body: JSON.stringify({ query, context: 'Gmail Action Panel', role: 'admin' }),
   });
   const data = await resp.json() as { reply?: string; error?: string };
-  if (!resp.ok || data.error) throw new Error(data.error ?? 'Penny could not generate a draft.');
+  if (!resp.ok || data.error) throw new Error(data.error ?? `${TERMS.aiAssistant} could not generate a draft.`);
   return data.reply!;
 }
 
@@ -512,7 +513,7 @@ export function GmailActionPanel() {
                           className="flex items-center gap-1.5 text-[10px] font-semibold text-primary border border-primary/30 rounded-md px-2.5 py-1.5 hover:bg-primary/5 transition-colors"
                         >
                           <Sparkles className="w-3 h-3" />
-                          Ask Penny to draft
+                          Ask {TERMS.aiAssistant} to draft
                         </button>
                         <span className="text-[9px] text-muted-foreground">or write below</span>
                       </div>
@@ -522,7 +523,7 @@ export function GmailActionPanel() {
                     {generating && (
                       <div className="flex items-center gap-2 py-0.5">
                         <Brain className="w-3.5 h-3.5 text-primary animate-pulse" />
-                        <span className="text-[10px] text-muted-foreground">Penny is drafting…</span>
+                        <span className="text-[10px] text-muted-foreground">{TERMS.aiAssistant} is drafting…</span>
                       </div>
                     )}
 
@@ -546,7 +547,7 @@ export function GmailActionPanel() {
                       {pennyDone && (
                         <div className="absolute top-2 right-2 flex items-center gap-1 text-[9px] text-primary opacity-70">
                           <Sparkles className="w-2.5 h-2.5" />
-                          <span>Penny draft</span>
+                          <span>{TERMS.aiAssistant} draft</span>
                         </div>
                       )}
                     </div>
@@ -585,7 +586,7 @@ export function GmailActionPanel() {
                     </div>
 
                     <p className="text-[9px] text-muted-foreground/40 text-center">
-                      Sends via Gmail · Penny draft by Gemini 2.5 Flash · no auto-send
+                      Sends via Gmail · {TERMS.aiAssistant} draft by Gemini 2.5 Flash · no auto-send
                     </p>
                   </div>
                 )}
@@ -596,7 +597,7 @@ export function GmailActionPanel() {
             {!loading && composeMode === 'hidden' && (
               <div className="px-4 py-2 border-t border-border flex-shrink-0 bg-muted/20 flex items-center justify-between gap-2">
                 <p className="text-[9px] text-muted-foreground/50">
-                  {fetchError?.includes('insufficient') ? 'Send-only mode · inbox reading requires app verification' : 'gmail.send · Penny draft by Gemini 2.5 Flash'}
+                  {fetchError?.includes('insufficient') ? 'Send-only mode · inbox reading requires app verification' : `gmail.send · ${TERMS.aiAssistant} draft by Gemini 2.5 Flash`}
                 </p>
                 <button
                   onClick={() => setComposeMode('new')}

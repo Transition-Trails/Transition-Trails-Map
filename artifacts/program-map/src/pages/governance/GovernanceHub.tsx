@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { TERMS } from '@/config/terminology';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -662,7 +663,7 @@ export default function GovernanceHub() {
         subtitle: 'Define the lifecycle stages, transition rules, and review cadence for a Trail OS object type.',
         slackContext: 'governance',
         fields: [
-          { id: 'objectType',    label: 'Object Type',       type: 'select',   options: ['Program', 'Course', 'Penny Capability', 'Knowledge Source', 'Role', 'Integration', 'Content Standard', 'Cohort', 'Sprint', 'Module', 'Lesson', 'Assessment', 'Persona', 'Decision', 'Policy', 'Resource'], required: true },
+          { id: 'objectType',    label: 'Object Type',       type: 'select',   options: ['Program', 'Course', `${TERMS.aiAssistant} Capability`, 'Knowledge Source', 'Role', 'Integration', 'Content Standard', 'Cohort', 'Sprint', 'Module', 'Lesson', 'Assessment', 'Persona', 'Decision', 'Policy', 'Resource'], required: true },
           { id: 'modelName',     label: 'Model Name',        type: 'text',     required: true, placeholder: 'e.g. Program Lifecycle v2' },
           { id: 'stages',        label: 'Lifecycle Stages',  type: 'textarea', required: true, placeholder: 'e.g. Draft → Review → Approved → Active → Retired', rows: 3 },
           { id: 'approval',      label: 'Approval Required', type: 'select',   options: ['Yes — single approver', 'Yes — group review', 'No — self-service'] },

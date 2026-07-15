@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Key, RefreshCw, CheckCircle, XCircle, AlertTriangle, Shield,
@@ -146,7 +147,7 @@ function GeminiCard({ result, loading }: { result: GeminiResult | null; loading:
     <div className="rounded-lg border border-violet-200 bg-white overflow-hidden">
       <div className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 border-b border-violet-200">
         <Brain className="w-4 h-4 text-violet-600" />
-        <span className="text-[12px] font-bold text-violet-800">Gemini / Penny AI</span>
+        <span className="text-[12px] font-bold text-violet-800">Gemini / {TERMS.aiAssistant} AI</span>
         <code className="text-[10px] font-mono text-violet-600 ml-1">GEMINI_API_KEY</code>
         {result && cfg && (
           <span className={`ml-auto inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${cfg.cls}`}>{cfg.label}</span>

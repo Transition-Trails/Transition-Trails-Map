@@ -1,5 +1,6 @@
 import { PageShell } from '@/components/platform/PageShell';
 import { Badge } from '@/components/ui/badge';
+import { TERMS } from '@/config/terminology';
 
 type Priority = 'Urgent' | 'High' | 'Normal' | 'Low';
 
@@ -31,7 +32,7 @@ const columns: { key: string; label: string; cases: Case[] }[] = [
     key: 'progress', label: 'In Progress',
     cases: [
       { id: 'SF-1246', subject: "Invoice question — Explorer's Trail", priority: 'Normal', age: '1d' },
-      { id: 'SF-1242', subject: 'Penny not responding correctly',       priority: 'High',   age: '5d' },
+      { id: 'SF-1242', subject: `${TERMS.aiAssistant} not responding correctly`,       priority: 'High',   age: '5d' },
       { id: 'SF-1239', subject: 'Session reschedule needed',            priority: 'Normal', age: '8d' },
     ],
   },

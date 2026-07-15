@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   sfMappings, SF_STATUS_CONFIG, SF_PRODUCT_CONFIG,

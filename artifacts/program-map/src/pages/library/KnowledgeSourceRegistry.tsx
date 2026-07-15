@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import {
   knowledgeSources, pennyRetrievalMap, SOURCE_SUMMARY, SF_KNOWLEDGE_CATEGORIES,
@@ -176,10 +177,10 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
         </div>
 
         {/* Penny use */}
-        <Section id="penny" label="Penny Use">
+        <Section id="penny" label={`${TERMS.aiAssistant} Use`}>
           <div className="flex items-center gap-2 mb-2">
             <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${src.approvedForPenny ? 'text-green-700 bg-green-50 border-green-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>
-              {src.approvedForPenny ? '✓ Approved for Penny' : '✗ Not Approved for Penny'}
+              {src.approvedForPenny ? `✓ Approved for ${TERMS.aiAssistant}` : `✗ Not Approved for ${TERMS.aiAssistant}`}
             </span>
           </div>
           <p className="text-[11px] text-foreground leading-relaxed">{src.pennyUseDescription}</p>
@@ -193,7 +194,7 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
               { label: 'Knowledge Categories', items: src.relatedKnowledgeCategories, icon: Database },
               { label: 'Salesforce Objects',  items: src.relatedSfObjects,          icon: Database },
               { label: 'Standards',           items: src.relatedStandards,          icon: ShieldCheck },
-              { label: 'Penny Capabilities',  items: src.relatedPennyCapabilities.map(id => id.replace('cap-', '').replace(/-/g, ' ')), icon: Brain },
+              { label: `${TERMS.aiAssistant} Capabilities`,  items: src.relatedPennyCapabilities.map(id => id.replace('cap-', '').replace(/-/g, ' ')), icon: Brain },
             ].map(({ label, items, icon: I }) => (
               <div key={label}>
                 <div className="flex items-center gap-1.5 mb-1"><I className="w-3 h-3 text-muted-foreground/60" /><p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{label}</p></div>
@@ -261,8 +262,8 @@ function OverviewView() {
             <div>
               <h2 className="text-[15px] font-bold text-foreground mb-1">Knowledge Source Registry</h2>
               <p className="text-[12px] text-foreground/80 leading-relaxed mb-2">
-                The central place where Trail OS understands <em>where trusted information comes from</em> and how Penny should use it.
-                Every source Penny can draw on — Salesforce Knowledge, Google Drive, LMS content, assessments, standards, curriculum, and future communication data — is registered, governed, and mapped here.
+                The central place where Trail OS understands <em>where trusted information comes from</em> and how {TERMS.aiAssistant} should use it.
+                Every source {TERMS.aiAssistant} can draw on — Salesforce Knowledge, Google Drive, LMS content, assessments, standards, curriculum, and future communication data — is registered, governed, and mapped here.
               </p>
               <p className="text-[12px] text-foreground/80 leading-relaxed">
                 This is architecture and governance, not live integration. No APIs are connected yet. This registry defines the <strong>source-of-truth model</strong> Transition Trails will build toward.
@@ -275,7 +276,7 @@ function OverviewView() {
         <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Sources',       value: SOURCE_SUMMARY.total,          sub: 'registered',  cls: 'border-foreground/20 bg-foreground/5' },
-            { label: 'Penny Approved', value: SOURCE_SUMMARY.approvedForPenny, sub: 'active',    cls: 'border-green-200 bg-green-50' },
+            { label: `${TERMS.aiAssistant} Approved`, value: SOURCE_SUMMARY.approvedForPenny, sub: 'active',    cls: 'border-green-200 bg-green-50' },
             { label: 'Healthy',       value: SOURCE_SUMMARY.healthy,         sub: 'no issues',   cls: 'border-green-200 bg-green-50' },
             { label: 'Need Attention', value: SOURCE_SUMMARY.warnings + SOURCE_SUMMARY.critical, sub: 'issues found', cls: 'border-amber-200 bg-amber-50' },
           ].map(s => (
@@ -509,7 +510,7 @@ function RelationshipsView() {
               { label: 'SF Objects',              items: src.relatedSfObjects,          icon: Database,    cls: 'border-blue-200 bg-blue-50 text-blue-700' },
               { label: 'Knowledge Categories',    items: src.relatedKnowledgeCategories,icon: Database,    cls: 'border-amber-200 bg-amber-50 text-amber-700' },
               { label: 'Standards',               items: src.relatedStandards,          icon: ShieldCheck, cls: 'border-rose-200 bg-rose-50 text-rose-700' },
-              { label: 'Penny Capabilities',      items: src.relatedPennyCapabilities.map(id => id.replace('cap-', '').replace(/-/g, ' ')), icon: Brain, cls: 'border-secondary/20 bg-secondary/5 text-secondary' },
+              { label: `${TERMS.aiAssistant} Capabilities`,      items: src.relatedPennyCapabilities.map(id => id.replace('cap-', '').replace(/-/g, ' ')), icon: Brain, cls: 'border-secondary/20 bg-secondary/5 text-secondary' },
               { label: 'Related Sources',         items: related.map(s => s.shortName), icon: Link2, cls: 'border-slate-200 bg-slate-50 text-slate-600' },
             ].map(({ label, items, icon: I, cls }) => (
               <div key={label} className={`rounded-xl border p-3 ${cls.split(' ').filter(c => !c.startsWith('text-')).join(' ')}`}>
@@ -583,7 +584,7 @@ function RetrievalMapView() {
       {/* Capability picker */}
       <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Penny Capability</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">{TERMS.aiAssistant} Capability</p>
         </div>
         <div className="p-2 space-y-1">
           {pennyRetrievalMap.map((e, i) => (
@@ -701,14 +702,14 @@ function GovernanceView() {
       <div className="px-5 py-3 border-b border-border flex items-center gap-3 flex-shrink-0 bg-white">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-1.5">
           <p className="text-[11px] font-semibold text-primary">
-            {SOURCE_SUMMARY.approvedForPenny} approved for Penny · {SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny} pending or restricted
+            {SOURCE_SUMMARY.approvedForPenny} approved for {TERMS.aiAssistant} · {SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny} pending or restricted
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
           <select value={filterApproved} onChange={e => setFilterApproved(e.target.value as any)} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
             <option value="all">All sources</option>
-            <option value="yes">Penny approved</option>
+            <option value="yes">{TERMS.aiAssistant} approved</option>
             <option value="no">Not approved</option>
           </select>
         </div>
@@ -717,7 +718,7 @@ function GovernanceView() {
         <div className="p-5 space-y-1">
           {/* Header */}
           <div className="grid grid-cols-[1fr_100px_100px_80px_80px_80px] gap-2 px-3 py-1.5">
-            {['Source', 'Owner', 'Last Review', 'Trust', 'Sync', 'Penny'].map(h => (
+            {['Source', 'Owner', 'Last Review', 'Trust', 'Sync', TERMS.aiAssistant].map(h => (
               <p key={h} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{h}</p>
             ))}
           </div>
@@ -894,10 +895,10 @@ export default function KnowledgeSourceRegistry() {
         { id: 'name',        label: 'Source Name',          type: 'text',     required: true, placeholder: 'e.g. Transition Trails Program Guide — Google Drive' },
         { id: 'type',        label: 'Source Type',          type: 'select',   options: ['Salesforce Knowledge', 'Google Drive', 'LMS Content', 'Assessments', 'Standards Studio', 'Curriculum Studio', 'Penny Generated', 'Slack History', 'Google Chat History', 'Calendar Events'], required: true },
         { id: 'trustLevel',  label: 'Trust Level',          type: 'select',   options: ['Authoritative', 'Reference', 'Supplementary', 'Unverified'] },
-        { id: 'description', label: 'Description',          type: 'textarea', placeholder: 'What does this source contain and how should Penny use it?', rows: 3 },
+        { id: 'description', label: 'Description',          type: 'textarea', placeholder: `What does this source contain and how should ${TERMS.aiAssistant} use it?`, rows: 3 },
         { id: 'sourceUrl',   label: 'Source URL / ID',      type: 'text',     placeholder: 'e.g. Google Drive folder ID, Salesforce category name' },
         { id: 'syncCadence', label: 'Sync Cadence',         type: 'select',   options: ['Real-time', 'Daily', 'Weekly', 'Manual', 'Not Synced'] },
-        { id: 'usedByPenny', label: 'Available to Penny',   type: 'select',   options: ['Yes — approved', 'Pending review', 'No — not approved'] },
+        { id: 'usedByPenny', label: `Available to ${TERMS.aiAssistant}`,   type: 'select',   options: ['Yes — approved', 'Pending review', 'No — not approved'] },
       ],
     });
   }
@@ -913,7 +914,7 @@ export default function KnowledgeSourceRegistry() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Knowledge Source Registry</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5">
-              Where trusted information comes from — and how Penny uses it. {SOURCE_SUMMARY.total} sources across {SOURCE_TYPE_ORDER.filter(t => SOURCE_SUMMARY.byType[t] > 0).length} types.
+              Where trusted information comes from — and how {TERMS.aiAssistant} uses it. {SOURCE_SUMMARY.total} sources across {SOURCE_TYPE_ORDER.filter(t => SOURCE_SUMMARY.byType[t] > 0).length} types.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -930,7 +931,7 @@ export default function KnowledgeSourceRegistry() {
               </span>
             )}
             <span className="text-[11px] font-semibold text-green-700 border border-green-200 bg-green-50 rounded-full px-3 py-1">
-              {SOURCE_SUMMARY.approvedForPenny} Penny-approved
+              {SOURCE_SUMMARY.approvedForPenny} {TERMS.aiAssistant}-approved
             </span>
           </div>
         </div>
@@ -939,7 +940,7 @@ export default function KnowledgeSourceRegistry() {
           <ViewTab label="Overview"           icon={Network}    active={view === 'overview'}      onClick={() => setView('overview')} />
           <ViewTab label="Source Catalog"     icon={Database}   active={view === 'catalog'}       count={SOURCE_SUMMARY.total} onClick={() => setView('catalog')} />
           <ViewTab label="Relationships"      icon={GitBranch}  active={view === 'relationships'} onClick={() => setView('relationships')} />
-          <ViewTab label="Penny Retrieval Map" icon={Brain}     active={view === 'retrieval-map'} count={pennyRetrievalMap.length} onClick={() => setView('retrieval-map')} />
+          <ViewTab label={`${TERMS.aiAssistant} Retrieval Map`} icon={Brain}     active={view === 'retrieval-map'} count={pennyRetrievalMap.length} onClick={() => setView('retrieval-map')} />
           <ViewTab label="Governance"         icon={ShieldCheck}active={view === 'governance'}    onClick={() => setView('governance')} />
           <ViewTab label="Source Health"      icon={Activity}   active={view === 'health'}        count={totalIssues} onClick={() => setView('health')} />
         </div>

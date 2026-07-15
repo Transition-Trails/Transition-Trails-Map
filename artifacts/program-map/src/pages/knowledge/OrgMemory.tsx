@@ -1,11 +1,12 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TERMS } from '@/config/terminology';
 
 const sections = [
   { title: 'Decisions',               desc: 'Key organizational decisions with rationale, owner, impact, and review dates.' },
   { title: 'Program History',         desc: 'Major program evolution — launches, retirements, redesigns, and cohort milestones.' },
-  { title: 'Standards History',       desc: 'Changes to Program, Module, Lesson, Assessment, Knowledge, Penny, and Communication Blueprints.' },
+  { title: 'Standards History',       desc: `Changes to Program, Module, Lesson, Assessment, Knowledge, ${TERMS.aiAssistant}, and Communication Blueprints.` },
   { title: 'Architecture History',    desc: 'Trail OS architecture decisions — platform choices, naming conventions, structural design.' },
-  { title: 'Penny History',           desc: 'Capability, prompt, and governance evolution — what Penny could do and when.' },
+  { title: `${TERMS.aiAssistant} History`,           desc: `Capability, prompt, and governance evolution — what ${TERMS.aiAssistant} could do and when.` },
   { title: 'Lessons Learned',         desc: 'Retrospective insights from programs, curriculum, operations, and integrations.' },
   { title: 'Institutional Knowledge', desc: 'Curated repository of important organizational context and rationale for future staff.' },
   { title: 'Governance Records',      desc: 'Policy, standards, ownership, and review history across all domains.' },
@@ -40,7 +41,7 @@ export default function OrgMemory() {
             'Slack as primary learner communication platform — async community rationale',
             'Salesforce as system of record — single source of truth decision',
             'Google Drive as program content repository — linked to Salesforce, accessible to curriculum team',
-            'Penny as learning intelligence layer (not automation) — Penny supports, not replaces coaches',
+            `${TERMS.aiAssistant} as learning intelligence layer (not automation) — ${TERMS.aiAssistant} supports, not replaces coaches`,
           ].map(ex => (
             <p key={ex} className="text-[11px] text-muted-foreground py-0.5 border-b border-border/40 last:border-0">· {ex}</p>
           ))}

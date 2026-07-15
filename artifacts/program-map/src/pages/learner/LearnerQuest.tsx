@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import { Sparkles, CheckCircle } from 'lucide-react';
 import LearnerShell from '@/layouts/LearnerShell';
@@ -207,7 +208,7 @@ export default function LearnerQuest() {
                 >
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-[11px] font-bold" style={{ color: '#4A4F4D' }}>Penny's feedback</p>
+                <p className="text-[11px] font-bold" style={{ color: '#4A4F4D' }}>{TERMS.aiAssistant}'s feedback</p>
               </div>
               <p className="text-[13px] whitespace-pre-line" style={{ color: '#2A2E2C' }}>
                 {result.feedback}

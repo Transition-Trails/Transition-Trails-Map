@@ -1,4 +1,5 @@
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { curriculumTrailQuests, CONTENT_STATUS_CONFIG } from '@/data/curriculumData';
 import { Star, ArrowRight, CheckCircle2 } from 'lucide-react';
@@ -10,11 +11,11 @@ export default function PennyTrailQuests() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Assets</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — {TERMS.aiAssistant} Assets</p>
           <h1 className="text-3xl font-bold text-foreground">Trail Quests</h1>
           <p className="text-[13px] text-muted-foreground mt-1">
             Earnable badges and challenge quests that celebrate learning milestones beyond the standard assessments.
-            Trail Quests are designed by staff and awarded by Penny based on completion criteria.
+            Trail Quests are designed by staff and awarded by {TERMS.aiAssistant} based on completion criteria.
           </p>
         </div>
         <div className="grid gap-4">

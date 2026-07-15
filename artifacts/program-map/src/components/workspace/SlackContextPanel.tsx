@@ -39,7 +39,7 @@ const CONTEXT_META: Record<SlackPanelContext, {
 }> = {
   penny: {
     color: '#4A154B',
-    label: 'Penny AI',
+    label: `${TERMS.aiAssistant} AI`,
     purposeFilter: ['penny', 'admin'],
     contextualChannelIds: ['penny-qa', 'trail-os-ops', 'penny-admin-team'],
   },
@@ -540,7 +540,7 @@ function ChannelRow({ ch, showProgram }: { ch: SlackChannel; showProgram?: boole
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-[11px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{ch.name}</span>
           {ch.pennyEnabled && (
-            <span className="text-[8px] font-bold bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-1.5 py-0.5 shrink-0">Penny</span>
+            <span className="text-[8px] font-bold bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-1.5 py-0.5 shrink-0">{TERMS.aiAssistant}</span>
           )}
         </div>
         {showProgram && ch.relatedProgram && (
@@ -825,7 +825,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                       className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#4A154B]/20 bg-white shadow-sm hover:bg-[#4A154B]/[0.05] transition-colors text-[10px] font-semibold text-foreground"
                     >
                       <Send className="w-3 h-3 text-[#4A154B]" />
-                      Send Test Message via Penny
+                      Send Test Message via {TERMS.aiAssistant}
                       <ExternalLink className="w-2.5 h-2.5 ml-auto text-muted-foreground/40" />
                     </a>
                   )}
@@ -869,7 +869,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               {/* Penny / workspace status for Penny context */}
               {config.context === 'penny' && pennyReadiness && (
                 <div className="pt-2 border-t border-border/40">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 px-0.5 mb-1.5">Penny Slack Status</p>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 px-0.5 mb-1.5">{TERMS.aiAssistant} Slack Status</p>
                   <div className="rounded-lg border border-[#4A154B]/15 bg-white shadow-sm px-2.5 py-2 space-y-1">
                     {pennyReadiness.items.slice(0, 4).map((item, i) => (
                       <div key={i} className="flex items-center gap-2">

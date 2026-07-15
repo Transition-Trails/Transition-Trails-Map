@@ -5,6 +5,7 @@
  * Mounts in AppShell. Triggered via calendarPanelOpen in AppContext.
  */
 import { useState, useEffect, useCallback } from 'react';
+import { TERMS } from '@/config/terminology';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import {
@@ -100,7 +101,7 @@ async function fetchPennyPrep(ev: CalEvent): Promise<string> {
     body: JSON.stringify({ query, context: 'Calendar Action Panel', role: 'admin' }),
   });
   const data = await resp.json() as { reply?: string; error?: string };
-  if (!resp.ok || data.error) throw new Error(data.error ?? 'Penny could not generate a prep brief.');
+  if (!resp.ok || data.error) throw new Error(data.error ?? `${TERMS.aiAssistant} could not generate a prep brief.`);
   return data.reply!;
 }
 
@@ -214,7 +215,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
               onClick={() => void requestPrep()}
               className="flex items-center gap-1 text-[10px] text-primary border border-primary/20 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
             >
-              <Brain className="w-2.5 h-2.5" /> Penny prep brief
+              <Brain className="w-2.5 h-2.5" /> {TERMS.aiAssistant} prep brief
             </button>
           )}
 
@@ -229,7 +230,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
             <div className="rounded-md border border-primary/20 bg-primary/5 p-2 space-y-1">
               <div className="flex items-center gap-1 mb-0.5">
                 <Brain className="w-2.5 h-2.5 text-primary" />
-                <span className="text-[9px] font-bold uppercase tracking-wider text-primary">Penny Prep Brief</span>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-primary">{TERMS.aiAssistant} Prep Brief</span>
               </div>
               <p className="text-[11px] text-foreground leading-relaxed whitespace-pre-wrap">{prep.reply}</p>
               <button
@@ -458,7 +459,7 @@ export function CalendarActionPanel() {
             {!loading && !error && events.length > 0 && (
               <div className="px-4 py-2.5 border-t border-border flex-shrink-0 bg-muted/20">
                 <p className="text-[9px] text-muted-foreground/50 text-center leading-snug">
-                  Read-only · no calendar writes without your action · Penny prep by Gemini 2.5 Flash
+                  Read-only · no calendar writes without your action · {TERMS.aiAssistant} prep by Gemini 2.5 Flash
                 </p>
               </div>
             )}

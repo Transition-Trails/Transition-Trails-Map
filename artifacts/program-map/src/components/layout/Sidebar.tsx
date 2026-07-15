@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import {
   Home, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
@@ -46,7 +47,7 @@ const navGroups: NavGroup[] = [
   },
   {
     id: 'penny',
-    label: 'Penny',
+    label: TERMS.aiAssistant,
     icon: Brain,
     pathPrefix: '/penny',
     items: [
@@ -55,7 +56,7 @@ const navGroups: NavGroup[] = [
       { id: 'penny-learners',      path: '/penny/learners',      label: 'Learners',         minTier: 'admin' },
       { id: 'penny-session-log',   path: '/penny/session-log',   label: 'Session Log',      minTier: 'admin' },
       { id: 'penny-trail-quests',  path: '/penny/trail-quests',  label: 'Trail Quests',     minTier: 'admin' },
-      { id: 'penny-config-label',  label: 'Configure Penny',     isLabel: true },
+      { id: 'penny-config-label',  label: `Configure ${TERMS.aiAssistant}`,     isLabel: true },
       { id: 'penny-trail-configs', path: '/penny/trail-configs', label: 'Trail Configs',    minTier: 'admin' },
       { id: 'penny-prompts',       path: '/penny/prompts',       label: 'Prompt Studio',    minTier: 'admin' },
       { id: 'penny-capabilities',  path: '/penny/capabilities',  label: 'Capabilities',     minTier: 'admin' },

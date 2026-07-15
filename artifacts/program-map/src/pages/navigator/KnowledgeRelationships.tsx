@@ -1,5 +1,6 @@
 import { Database, Sparkles, Layers, ArrowRight, Plus, Hash } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 
 // ── Architecture moved from Trail OS Capability Map > Overview (removed) ──────
 // Trail OS → Penny AI → Programs is the foundational relationship that no longer
@@ -19,7 +20,7 @@ const ARCH_LAYERS = [
     icon: Sparkles,
     iconCls: 'text-secondary',
     bg: 'bg-secondary/5 border-secondary/20',
-    label: 'Penny AI',
+    label: `${TERMS.aiAssistant} AI`,
     sublabel: 'Intelligence Layer',
     description:
       'The AI learning and guidance layer embedded across all programs, providing personalized coaching, skill translation, and learning intelligence at every stage of the learner journey.',
@@ -31,16 +32,16 @@ const ARCH_LAYERS = [
     label: 'Programs',
     sublabel: 'Experience Layer',
     description:
-      "Explorer's Trail, Foundations Trail, Guided Trail, Trail of Mastery, and Digital Compass — the learner-facing program experiences powered by Trail OS and guided by Penny.",
+      `Explorer's Trail, Foundations Trail, Guided Trail, Trail of Mastery, and Digital Compass — the learner-facing program experiences powered by Trail OS and guided by ${TERMS.aiAssistant}.`,
   },
 ];
 
 const RELATIONSHIP_ROWS = [
-  { from: 'Trail OS',  rel: 'powers',    to: 'Penny AI',  note: 'Trail OS provides the data infrastructure, session records, and intake context that Penny uses to generate relevant coaching.' },
-  { from: 'Penny AI',  rel: 'guides',    to: 'Programs',  note: 'Penny delivers personalised coaching, skill translation, and progress intelligence directly within each program experience.' },
+  { from: 'Trail OS',  rel: 'powers',    to: `${TERMS.aiAssistant} AI`,  note: `Trail OS provides the data infrastructure, session records, and intake context that ${TERMS.aiAssistant} uses to generate relevant coaching.` },
+  { from: `${TERMS.aiAssistant} AI`,  rel: 'guides',    to: 'Programs',  note: `${TERMS.aiAssistant} delivers personalised coaching, skill translation, and progress intelligence directly within each program experience.` },
   { from: 'Trail OS',  rel: 'tracks',    to: 'Programs',  note: 'Trail OS records cohort health, capacity, completion, and outcomes data for all active programs.' },
   { from: 'Programs',  rel: 'generates', to: 'Trail OS',  note: 'Program activity (intake submissions, cohort updates, alumni data) feeds back into Trail OS, closing the delivery loop.' },
-  { from: 'Programs',  rel: 'trains',    to: 'Penny AI',  note: 'Learner interactions and outcome data across programs inform Penny confidence scores and coaching quality over time.' },
+  { from: 'Programs',  rel: 'trains',    to: `${TERMS.aiAssistant} AI`,  note: `Learner interactions and outcome data across programs inform ${TERMS.aiAssistant} confidence scores and coaching quality over time.` },
 ];
 
 export default function KnowledgeRelationships() {
@@ -49,7 +50,7 @@ export default function KnowledgeRelationships() {
   function handleAddRelationship() {
     openActionPanel({
       title: 'Add Knowledge Relationship', objectType: 'Knowledge Relationship',
-      subtitle: "Document a new connection between two Trail OS objects. Powers the Digital Twin and Penny's contextual awareness.",
+      subtitle: `Document a new connection between two Trail OS objects. Powers the Digital Twin and ${TERMS.aiAssistant}'s contextual awareness.`,
       ownerHint: 'Who is responsible for maintaining this relationship definition?',
       fields: [
         { id: 'fromObject',   label: 'From Object',          type: 'text',     required: true, placeholder: 'e.g. Program, Penny Capability, Role' },
@@ -71,7 +72,7 @@ export default function KnowledgeRelationships() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Navigator</p>
             <h1 className="text-3xl font-bold text-foreground">Knowledge Relationships</h1>
             <p className="text-muted-foreground mt-2 leading-relaxed">
-              How Trail OS, Penny AI, and Programs connect — the foundational architecture of the Transition Trails technology ecosystem.
+              How Trail OS, {TERMS.aiAssistant} AI, and Programs connect — the foundational architecture of the Transition Trails technology ecosystem.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
@@ -119,7 +120,7 @@ export default function KnowledgeRelationships() {
               <ArrowRight className="w-3 h-3 mx-0.5 text-muted-foreground/40" />
               <span className="italic text-muted-foreground/60">powers</span>
               <ArrowRight className="w-3 h-3 mx-0.5 text-muted-foreground/40" />
-              <Sparkles className="w-3 h-3 text-secondary" />Penny AI
+              <Sparkles className="w-3 h-3 text-secondary" />{TERMS.aiAssistant} AI
               <ArrowRight className="w-3 h-3 mx-0.5 text-muted-foreground/40" />
               <span className="italic text-muted-foreground/60">guides</span>
               <ArrowRight className="w-3 h-3 mx-0.5 text-muted-foreground/40" />

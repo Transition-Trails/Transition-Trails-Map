@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TERMS } from '@/config/terminology';
 import { CheckCircle2, AlertTriangle, XCircle, Clock, Database, ChevronDown, ChevronRight } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -179,7 +180,7 @@ const VALIDATION_WORKFLOWS: ValidationWorkflow[] = [
     steps: [
       { id: 'v8',  label: 'Validate relationship integrity (lookups, master-detail)',                     status: 'pending',   owner: 'Tech Lead',           detail: 'Ensure all Trail OS relationships have equivalent SF relationship fields.' },
       { id: 'v9',  label: 'Validate PMM Program ↔ NPSP Contact relationship design',                     status: 'pending',   owner: 'Platform Lead',       detail: 'PMM Program Engagement links to NPSP Contact — validate this works in org.' },
-      { id: 'v10', label: 'Test Penny interaction logging into Activity / custom object',                 status: 'blocked',   owner: 'Penny Lead',          detail: 'Blocked on Penny API access; design drafted but not testable.' },
+      { id: 'v10', label: `Test ${TERMS.aiAssistant} interaction logging into Activity / custom object`,                 status: 'blocked',   owner: `${TERMS.aiAssistant} Lead`,          detail: `Blocked on ${TERMS.aiAssistant} API access; design drafted but not testable.` },
     ],
   },
   {

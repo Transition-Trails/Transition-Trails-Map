@@ -14,10 +14,10 @@ type ActiveTab = 'capabilities' | 'delivery' | 'analytics';
 
 const DELIVERY_STEPS: Array<{ step: string; detail: string }> = [
   { step: 'Intake',              detail: 'Applications reviewed, screened, and placed into cohorts via structured intake flows.' },
-  { step: 'Orientation',         detail: 'Learners onboarded to platform expectations, tools, cohort norms, and Penny.' },
+  { step: 'Orientation',         detail: `Learners onboarded to platform expectations, tools, cohort norms, and ${TERMS.aiAssistant}.` },
   { step: 'Learning Sprints',    detail: 'Curriculum delivered in timed sprints with materials, coaching, and peer sessions.' },
   { step: 'Project Work',        detail: 'Applied projects, resume work, and skills demonstrations tied to program outcomes.' },
-  { step: 'Review & Assessment', detail: 'Learner progress reviewed against outcomes framework with Penny insights.' },
+  { step: 'Review & Assessment', detail: `Learner progress reviewed against outcomes framework with ${TERMS.aiAssistant} insights.` },
   { step: 'Outcomes Capture',    detail: 'Placement, completion, and learner outcome data captured for reporting.' },
   { step: 'Alumni Engagement',   detail: 'Continued coaching support and alumni network pathways post-program.' },
 ];
@@ -36,7 +36,7 @@ const PLATFORM_AREAS = [
   { id: 'delivery',  label: 'Project Delivery',    description: 'Sprint-based delivery infrastructure — curriculum, coaching sessions, milestone tracking.',     ring: 'border-emerald-200', bg: 'bg-emerald-50/60', tag: 'text-emerald-700' },
   { id: 'readiness', label: 'Org Readiness',        description: 'Org capability mapping, readiness scoring, and platform health monitoring.',                  ring: 'border-amber-200',  bg: 'bg-amber-50/60',  tag: 'text-amber-700'  },
   { id: 'coaching',  label: 'Coach Visibility',     description: 'Coach dashboards, learner health signals, and session support across all programs.',          ring: 'border-violet-200', bg: 'bg-violet-50/60', tag: 'text-violet-700' },
-  { id: 'analytics', label: 'Analytics',            description: 'Cross-program metrics, placement rates, Penny AI performance, and cohort health indicators.', ring: 'border-indigo-200', bg: 'bg-indigo-50/60', tag: 'text-indigo-700' },
+  { id: 'analytics', label: 'Analytics',            description: `Cross-program metrics, placement rates, ${TERMS.aiAssistant} AI performance, and cohort health indicators.`, ring: 'border-indigo-200', bg: 'bg-indigo-50/60', tag: 'text-indigo-700' },
   { id: 'loops',     label: 'Delivery Loops',       description: 'Closed feedback loops from intake through alumni engagement for continuous improvement.',     ring: 'border-rose-200',   bg: 'bg-rose-50/60',   tag: 'text-rose-700'   },
 ];
 

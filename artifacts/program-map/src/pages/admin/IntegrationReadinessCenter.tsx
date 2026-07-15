@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import {
   integrations, risks, launchMilestones, dataFlowNodes, IRC_SUMMARY,
@@ -133,7 +134,7 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
         {/* Penny note */}
         {i.pennyNote && (
           <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-3">
-            <p className="text-[10px] font-bold text-secondary/70 uppercase tracking-wider mb-1">Penny Note</p>
+            <p className="text-[10px] font-bold text-secondary/70 uppercase tracking-wider mb-1">{TERMS.aiAssistant} Note</p>
             <p className="text-[11px] text-foreground leading-relaxed">{i.pennyNote}</p>
           </div>
         )}

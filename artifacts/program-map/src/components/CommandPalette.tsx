@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { TERMS } from '@/config/terminology';
 import {
   CommandDialog,
   CommandEmpty,
@@ -51,7 +52,7 @@ export function CommandPalette() {
           ))}
         </CommandGroup>
 
-        <CommandGroup heading="Penny Capabilities">
+        <CommandGroup heading={`${TERMS.aiAssistant} Capabilities`}>
           {pennyCapabilities.map((p) => (
             <CommandItem key={p.id} onSelect={() => handleSelect(p, 'penny', '/trail-os-penny')}>
               <Database className="mr-2 h-4 w-4 text-secondary" />

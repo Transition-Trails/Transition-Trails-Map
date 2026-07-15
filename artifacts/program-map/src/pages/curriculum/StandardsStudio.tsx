@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import {
   contentStandards, gapReportItems,
   STANDARDS_SUMMARY, GAP_SUMMARY,
@@ -181,7 +182,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
         </Section>
 
         {/* Penny Checks */}
-        <Section id="checks" label={`Penny Checks (${std.pennyChecks.length})`}>
+        <Section id="checks" label={`${TERMS.aiAssistant} Checks (${std.pennyChecks.length})`}>
           <div className="space-y-2">
             {std.pennyChecks.map(chk => (
               <div key={chk.id} className="rounded border border-border bg-muted/20 p-2.5 space-y-1">
@@ -286,7 +287,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           {[
             { label: 'Standards', value: STANDARDS_SUMMARY.total, sub: 'defined', cls: 'border-foreground/20 bg-foreground/5' },
             { label: 'Active',    value: STANDARDS_SUMMARY.byStatus.active, sub: 'live', cls: 'border-green-200 bg-green-50' },
-            { label: 'Penny Checks', value: STANDARDS_SUMMARY.totalChecks, sub: 'total', cls: 'border-secondary/20 bg-secondary/5' },
+            { label: `${TERMS.aiAssistant} Checks`, value: STANDARDS_SUMMARY.totalChecks, sub: 'total', cls: 'border-secondary/20 bg-secondary/5' },
             { label: 'Required Checks', value: STANDARDS_SUMMARY.requiredChecks, sub: 'must-pass', cls: 'border-rose-200 bg-rose-50' },
           ].map(stat => (
             <div key={stat.label} className={`rounded-lg border p-3 text-center ${stat.cls}`}>
@@ -303,7 +304,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           <div className="grid grid-cols-3 gap-3">
             {[
               { step: '1', title: 'Author creates content', desc: 'Curriculum authors use the required fields list as a checklist while writing modules, lessons, prompts, or delivery assets.' },
-              { step: '2', title: 'Penny audits with checklist', desc: 'Before publishing, Penny runs the Standards Checklist against each content object — flagging missing fields and quality issues.' },
+              { step: '2', title: `${TERMS.aiAssistant} audits with checklist`, desc: `Before publishing, ${TERMS.aiAssistant} runs the Standards Checklist against each content object — flagging missing fields and quality issues.` },
               { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps in the reference implementation and all programs, sorted by severity, so teams can prioritise fixes before the next cohort.' },
             ].map(s => (
               <div key={s.step} className="rounded-lg border border-border bg-white p-3">
@@ -359,7 +360,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           >
             <ClipboardList className="w-5 h-5 text-secondary mb-2" />
             <p className="text-[12px] font-bold text-foreground mb-1">Standards Checklist</p>
-            <p className="text-[11px] text-muted-foreground">Penny's audit tool — run all required checks against any content object.</p>
+            <p className="text-[11px] text-muted-foreground">{TERMS.aiAssistant}'s audit tool — run all required checks against any content object.</p>
           </button>
           <button
             onClick={() => onNavigate('gap-report')}
@@ -715,7 +716,7 @@ export default function StandardsStudio() {
   function handleNewStandard() {
     openActionPanel({
       title: 'New Content Standard', objectType: 'Content Standard',
-      subtitle: 'Define a new quality rule that Penny will use to create, review, and improve curriculum content.',
+      subtitle: `Define a new quality rule that ${TERMS.aiAssistant} will use to create, review, and improve curriculum content.`,
       fields: [
         { id: 'title',       label: 'Standard Title',   type: 'text',     required: true, placeholder: 'e.g. Lesson Learning Objectives Format' },
         { id: 'category',    label: 'Category',          type: 'select',   options: ['Program Architecture', 'Learning Content', 'Penny AI', 'Assessments', 'Delivery'], required: true },

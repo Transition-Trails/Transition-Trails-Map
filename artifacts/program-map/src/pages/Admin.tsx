@@ -112,11 +112,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
     {
       id: 'penny',
       icon: <Brain className="w-5 h-5" />,
-      label: 'Penny Capability Records',
+      label: `${TERMS.aiAssistant} Capability Records`,
       count: pennyCapabilities.length,
       borderColor: 'border-amber-200 hover:border-amber-400',
       iconBg: 'bg-amber-50 text-amber-700',
-      description: 'Edit Penny AI capability records — purpose, executive summary, key facts, and program connections. Canonical CMS for Penny data.',
+      description: `Edit ${TERMS.aiAssistant} AI capability records — purpose, executive summary, key facts, and program connections. Canonical CMS for ${TERMS.aiAssistant} data.`,
     },
     {
       id: 'trailOs',
@@ -125,7 +125,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
       count: trailOsCapabilities.length,
       borderColor: 'border-slate-200 hover:border-slate-400',
       iconBg: 'bg-slate-50 text-slate-600',
-      description: 'Manage Trail OS operational capability records — descriptions, RESOLVE phase connections, and Penny capability links.',
+      description: `Manage Trail OS operational capability records — descriptions, RESOLVE phase connections, and ${TERMS.aiAssistant} capability links.`,
     },
     {
       id: 'integrations',
@@ -173,8 +173,8 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
               {([
                 { concept: 'Program operations & blueprints',  path: '/program' },
                 { concept: 'Program data records (CMS edit)',  path: '/admin → Program Records' },
-                { concept: 'Penny capabilities & AI ops',      path: '/penny' },
-                { concept: 'Penny capability records (CMS)',   path: '/admin → Penny Capability Records' },
+                { concept: `${TERMS.aiAssistant} capabilities & AI ops`,      path: '/penny' },
+                { concept: `${TERMS.aiAssistant} capability records (CMS)`,   path: `/admin → ${TERMS.aiAssistant} Capability Records` },
                 { concept: 'People, roles &amp; access tiers',   path: '/admin/people-access' },
                 { concept: 'Source docs & knowledge',          path: '/knowledge' },
                 { concept: 'Integration credentials & auth',   path: '/admin/secrets-audit' },
@@ -393,7 +393,7 @@ function AreaEditor({
     programs: 'Program Records',
     documents: 'Source Documents',
     resolve: 'RESOLVE Framework',
-    penny: 'Penny Capability Records',
+    penny: `${TERMS.aiAssistant} Capability Records`,
     trailOs: 'Trail OS Capabilities',
     integrations: 'Integration Config',
     roles: 'Roles',
@@ -960,7 +960,7 @@ function PennyCapabilityEditor({ id }: { id: string }) {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <FormHeader
-        name={form.name} entityLabel="Penny AI Capability" confidence={form.confidence}
+        name={form.name} entityLabel={`${TERMS.aiAssistant} AI Capability`} confidence={form.confidence}
         dirty={dirty} saved={saved}
         onSave={() => { updatePennyCapability(id, form); markSaved(); }}
         onCancel={() => { setForm({ ...original }); markCanceled(); }}
@@ -1086,8 +1086,8 @@ function TrailOsCapabilityEditor({ id }: { id: string }) {
               rows={3}
             />
             <MultilineField
-              label="Penny Capabilities"
-              hint="Penny AI capabilities connected to this Trail OS capability."
+              label={`${TERMS.aiAssistant} Capabilities`}
+              hint={`${TERMS.aiAssistant} AI capabilities connected to this Trail OS capability.`}
               value={form.penny}
               onChange={v => set('penny', v)}
               rows={2}

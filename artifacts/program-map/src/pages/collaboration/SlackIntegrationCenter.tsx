@@ -12,10 +12,9 @@ import {
   Play, Map, Workflow, Zap, Plus,
 } from 'lucide-react';
 import {
-  SLACK_WORKSPACE, SLACK_CHANNELS, SLACK_USER_MAPPINGS, PENNY_SLACK_CAPABILITIES,
-  SLACK_TEMPLATES, SLACK_ACTIVITY, SLACK_HEALTH_SCORES,
+  SLACK_WORKSPACE, SLACK_CHANNELS, SLACK_HEALTH_SCORES,
   getPennyEnabledChannels,
-  type SlackChannel, type SlackUserMapping,
+  type SlackChannel,
 } from '@/data/slackIntegrationData';
 import {
   VALIDATION_CHECKS, PROGRAM_CHANNEL_MAPS, ROLE_GROUPS, PENNY_DELIVERY_MAPS,
@@ -197,7 +196,7 @@ function OverviewTab() {
       <div className="p-6 space-y-5 max-w-4xl">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
           <p className="text-[12px] text-foreground leading-relaxed">
-            Program-to-channel mapping, role-to-user routing, Penny delivery mapping, and end-to-end flow validation are all configured.
+            Program-to-channel mapping, role-to-user routing, {TERMS.aiAssistant} delivery mapping, and end-to-end flow validation are all configured.
             Workspace Validation runs live against your Replit secrets — see the Workspace Validation tab for real-time results.
           </p>
         </div>
@@ -267,7 +266,7 @@ function OverviewTab() {
             {[
               { area:'Program-to-Channel Mapping', pct:72, note:'5 programs mapped · 8 channels · 3 missing bot access' },
               { area:'Role-to-User Mapping',        pct:60, note:'5 of 7 role groups have at least one mapped user' },
-              { area:'Penny Delivery Mapping',      pct:55, note:'6 capabilities mapped · 4 with configured routes' },
+              { area:`${TERMS.aiAssistant} Delivery Mapping`,      pct:55, note:'6 capabilities mapped · 4 with configured routes' },
               { area:'Communication Flows',          pct:65, note:'5 flows defined · 2 configured · 3 planned/blocked' },
               { area:'Operational Scenarios',        pct:scenSummary.avgScore, note:`${scenSummary.partial} partially ready · ${scenSummary.blocked} blocked` },
               { area:'Governance Compliance',        pct:45, note:`${govSummary.critical + govSummary.high} critical/high issues open` },
@@ -292,7 +291,7 @@ function OverviewTab() {
             <InfoRow label="Domain"          value={SLACK_WORKSPACE.domain} />
             <InfoRow label="Bot User"        value={SLACK_WORKSPACE.botUser} />
             <InfoRow label="Connection"      value={<ReadinessBadge status={SLACK_WORKSPACE.oauthStatus} />} />
-            <InfoRow label="Channels"        value={`${SLACK_CHANNELS.length} mapped · ${pennyEnabled.length} Penny-enabled`} />
+            <InfoRow label="Channels"        value={`${SLACK_CHANNELS.length} mapped · ${pennyEnabled.length} ${TERMS.aiAssistant}-enabled`} />
             <InfoRow label="Production Score" value={productionScore ? `${productionScore.score}/${productionScore.maxScore}` : '—'} />
           </div>
         </div>
@@ -494,7 +493,7 @@ function WorkspaceValidationTab() {
                               ch.resolvedRole === 'default' ? 'bg-teal-50 text-teal-700 border-teal-200' :
                               'bg-muted text-muted-foreground border-border'
                             }`}>
-                              {ch.resolvedRole === 'penny' ? 'Penny AI' : ch.resolvedRole === 'admin' ? 'Admin' : ch.resolvedRole === 'default' ? 'Default' : 'Unknown'}
+                              {ch.resolvedRole === 'penny' ? `${TERMS.aiAssistant} AI` : ch.resolvedRole === 'admin' ? 'Admin' : ch.resolvedRole === 'default' ? 'Default' : 'Unknown'}
                             </span>
                           </div>
                           {ch.scopeIssue && (
@@ -632,7 +631,7 @@ function ProgramChannelTab() {
             </div>
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
               <p className="text-[11px] font-bold text-amber-700 mb-1">Bot Access Required</p>
-              <p className="text-[11px] text-amber-700">After app installation, invite <code className="font-mono bg-amber-100 px-1 rounded">@trail-os-bot</code> to each channel above. Bot access is required before Penny can deliver messages.</p>
+              <p className="text-[11px] text-amber-700">After app installation, invite <code className="font-mono bg-amber-100 px-1 rounded">@trail-os-bot</code> to each channel above. Bot access is required before {TERMS.aiAssistant} can deliver messages.</p>
             </div>
           </div>
         </ScrollArea>
@@ -689,7 +688,7 @@ function RoleUserTab() {
             </div>
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
               <InfoRow label="People Count"    value={String(selected.count)} />
-              <InfoRow label="Penny Persona"   value={selected.pennyPersona} />
+              <InfoRow label={`${TERMS.aiAssistant} Persona`}   value={selected.pennyPersona} />
               <InfoRow label="Programs"        value={selected.programs.join(', ')} />
               <InfoRow label="Delivery Channels" value={selected.deliveryChannels.length > 0 ? selected.deliveryChannels.join(', ') : '—'} />
               <InfoRow label="User Groups"     value={selected.slackUserGroups.length > 0 ? selected.slackUserGroups.join(', ') : '—'} />
@@ -741,7 +740,7 @@ function PennyDeliveryTab() {
     <div className="flex h-full">
       <div className="w-56 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Penny Capabilities</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">{TERMS.aiAssistant} Capabilities</p>
           <p className="text-[10px] text-muted-foreground">{PENNY_DELIVERY_MAPS.length} capabilities mapped</p>
         </div>
         <ScrollArea className="flex-1">
@@ -909,14 +908,14 @@ function ChannelOverview({ ch }: { ch: SlackChannel }) {
         <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
           <InfoRow label="Purpose"      value={ch.purpose} />
           <InfoRow label="Lifecycle"    value={<ReadinessBadge status={ch.lifecycle} />} />
-          <InfoRow label="Penny"        value={ch.pennyEnabled ? `Enabled · ${ch.pennyCapabilities.length} capabilities` : 'Not enabled'} />
+          <InfoRow label={TERMS.aiAssistant}        value={ch.pennyEnabled ? `Enabled · ${ch.pennyCapabilities.length} capabilities` : 'Not enabled'} />
           <InfoRow label="UOM Object"   value={ch.uomObjectId ?? '—'} />
           <InfoRow label="Governance"   value={ch.governanceStatus} />
         </div>
         <p className="text-[12px] text-muted-foreground leading-relaxed">{ch.description}</p>
         {ch.pennyCapabilities.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Penny Capabilities</p>
+            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">{TERMS.aiAssistant} Capabilities</p>
             <div className="flex flex-wrap gap-1.5">
               {ch.pennyCapabilities.map(c => <span key={c} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-pink-50 border border-pink-200 text-pink-700">{c}</span>)}
             </div>
@@ -947,7 +946,7 @@ function ChannelRegistry() {
             {[
               { label:'Channel Lifecycle',  health:ch.health,                                                                                                                                                                              note:ch.healthNote },
               { label:'Governance',         health:(ch.governanceStatus === 'compliant' ? 'healthy' : ch.governanceStatus === 'needs-review' ? 'needs-attention' : 'incomplete') as any, note:ch.governanceStatus },
-              { label:'Penny Integration',  health:(ch.pennyEnabled ? 'healthy' : 'incomplete') as any,                                                                                                                                    note:ch.pennyEnabled ? `${ch.pennyCapabilities.length} capabilities` : 'Not enabled' },
+              { label:`${TERMS.aiAssistant} Integration`,  health:(ch.pennyEnabled ? 'healthy' : 'incomplete') as any,                                                                                                                                    note:ch.pennyEnabled ? `${ch.pennyCapabilities.length} capabilities` : 'Not enabled' },
               { label:'UOM Mapping',        health:(ch.uomObjectId ? 'healthy' : 'needs-attention') as any,                                                                                                                                 note:ch.uomObjectId ?? 'No UOM object ID' },
             ].map(ind => (
               <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
@@ -961,7 +960,7 @@ function ChannelRegistry() {
     },
   ], []);
 
-  return <ObjectWorkspace icon={Hash} items={items} tabs={tabs} emptyTitle="Select a channel" emptyBody="Choose a Slack channel to view its configuration, Penny integration, and health." />;
+  return <ObjectWorkspace icon={Hash} items={items} tabs={tabs} emptyTitle="Select a channel" emptyBody={`Choose a Slack channel to view its configuration, ${TERMS.aiAssistant} integration, and health.`} />;
 }
 
 // ── Tab 8: Object Profiles ────────────────────────────────────────────────────
@@ -977,7 +976,7 @@ function ProfileDetail({ profile }: { profile: typeof SLACK_OBJECT_PROFILES[0] }
           <InfoRow label="Governance"    value={profile.governanceStatus} />
           {profile.memberCount !== undefined && <InfoRow label="Members" value={String(profile.memberCount)} />}
           {profile.botAccess !== undefined && <InfoRow label="Bot Access" value={profile.botAccess ? 'Granted' : 'Not granted'} />}
-          {profile.pennyEnabled !== undefined && <InfoRow label="Penny Enabled" value={profile.pennyEnabled ? 'Yes' : 'No'} />}
+          {profile.pennyEnabled !== undefined && <InfoRow label={`${TERMS.aiAssistant} Enabled`} value={profile.pennyEnabled ? 'Yes' : 'No'} />}
           {profile.lastActivity && <InfoRow label="Last Activity" value={profile.lastActivity} />}
         </div>
         <div>
@@ -1094,7 +1093,7 @@ function ScenariosTab() {
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
               <InfoRow label="Trigger"         value={selected.trigger} />
               <InfoRow label="Programs"        value={selected.programs.join(', ')} />
-              <InfoRow label="Penny"           value={selected.pennyCapability} />
+              <InfoRow label={TERMS.aiAssistant}           value={selected.pennyCapability} />
               <InfoRow label="Destination"     value={<code className="font-mono text-[11px]">{selected.destination}</code>} />
               <InfoRow label="Status"          value={<ReadinessBadge status={selected.status} />} />
               <InfoRow label="Readiness"       value={<ScoreBar score={selected.readinessScore} />} />
@@ -1367,118 +1366,6 @@ function IntegrationHealthTab() {
             ))}
           </div>
         </div>
-      </div>
-    </ScrollArea>
-  );
-}
-
-// ── Tab: User & Role Map (legacy enhanced) ────────────────────────────────────
-
-function UserMappingDetail({ mapping }: { mapping: SlackUserMapping }) {
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-2xl">
-        <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-          <InfoRow label="Slack Handle"   value={<code className="font-mono text-[11px]">{mapping.slackUserId}</code>} />
-          <InfoRow label="Mapping Status" value={<ReadinessBadge status={mapping.mappingStatus} />} />
-          <InfoRow label="Trail OS Persona" value={mapping.trailOsPersonaName ?? '—'} />
-          <InfoRow label="Programs"       value={mapping.relatedPrograms.join(', ') || '—'} />
-          <InfoRow label="Penny Enabled"  value={mapping.pennyEnabled ? 'Yes' : 'No'} />
-        </div>
-      </div>
-    </ScrollArea>
-  );
-}
-
-function UserRoleMapping() {
-  const items = useMemo<WorkspaceItem[]>(() => SLACK_USER_MAPPINGS.map(m => ({
-    id: m.id, name: m.slackDisplayName,
-    typeName: m.roleType, typeColor:'text-violet-700', typeBg:'bg-violet-50',
-    status: m.mappingStatus, statusVariant: m.healthStatus === 'healthy' ? 'active' as const : 'planning' as const,
-    health: m.healthStatus,
-    secondary: `${m.slackUserId} · ${m.trailOsPersonaName ?? 'No persona'}`,
-    owner: 'Admin',
-  })), []);
-
-  const tabs = useMemo<WorkspaceTab[]>(() => [
-    { id:'detail', label:'Detail', render:(item) => { const m = SLACK_USER_MAPPINGS.find(x => x.id === item.id); return m ? <UserMappingDetail mapping={m} /> : null; } },
-    { id:'health', label:'Health', render:(item) => {
-        const m = SLACK_USER_MAPPINGS.find(x => x.id === item.id);
-        if (!m) return null;
-        return (
-          <ScrollArea className="h-full"><div className="p-5 space-y-2 max-w-xl">
-            {[
-              { label:'Mapping Status',   health:m.healthStatus,                                                 note:m.mappingStatus },
-              { label:'Persona Assigned', health:(m.trailOsPersonaId ? 'healthy' : 'incomplete') as any,        note:m.trailOsPersonaName || '—' },
-              { label:'Penny Enabled',    health:(m.pennyEnabled ? 'healthy' : 'incomplete') as any,            note:m.pennyEnabled ? 'Enabled' : 'Not enabled' },
-              { label:'Program Coverage', health:(m.relatedPrograms.length > 0 ? 'healthy' : 'needs-attention') as any, note:m.relatedPrograms.join(', ') || 'No programs' },
-            ].map(ind => (
-              <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[12px] font-medium">{ind.label}</span></div>
-                <span className="text-[11px] text-muted-foreground">{ind.note}</span>
-              </div>
-            ))}
-          </div></ScrollArea>
-        );
-      },
-    },
-  ], []);
-
-  return <ObjectWorkspace icon={Users} items={items} tabs={tabs} emptyTitle="Select a user mapping" emptyBody="Choose a user mapping to view its detail and health." />;
-}
-
-// ── Tab: Templates ────────────────────────────────────────────────────────────
-
-function TemplatesTab() {
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-6 space-y-3 max-w-3xl">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-1">Message Templates</p>
-        {SLACK_TEMPLATES.map(tmpl => (
-          <div key={tmpl.id} className="rounded-lg border border-border bg-white px-4 py-3">
-            <div className="flex items-start gap-3 mb-2">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-[13px] font-bold text-foreground">{tmpl.name}</span>
-                  <ReadinessBadge status={tmpl.readiness} />
-                </div>
-                <p className="text-[11px] text-muted-foreground">{tmpl.purpose} · {tmpl.audience}</p>
-              </div>
-            </div>
-            {tmpl.promptTemplateId && <p className="text-[11px] text-muted-foreground">Template ID: <span className="font-medium text-foreground font-mono">{tmpl.promptTemplateId}</span></p>}
-            {tmpl.channel && (
-              <div className="flex flex-wrap gap-1 mt-1.5">
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-mono bg-teal-50 border border-teal-200 text-teal-700">{tmpl.channel}</span>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
-  );
-}
-
-// ── Tab: Activity Feed ────────────────────────────────────────────────────────
-
-function ActivityFeedTab() {
-  const eventCls: Record<string, string> = {
-    message:'bg-teal-50 text-teal-700','user-joined':'bg-emerald-50 text-emerald-700',
-    'bot-action':'bg-pink-50 text-pink-700','config-change':'bg-amber-50 text-amber-700',
-    'health-check':'bg-violet-50 text-violet-700',
-  };
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-6 space-y-2 max-w-3xl">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-1">Recent Activity</p>
-        {SLACK_ACTIVITY.map(ev => (
-          <div key={ev.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
-            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 ${eventCls[ev.type] ?? 'bg-muted text-muted-foreground'}`}>{ev.type}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-[12px] text-foreground font-medium">{ev.summary}</p>
-              <p className="text-[10px] text-muted-foreground">{ev.channel} · {ev.timestamp} · {ev.actor}</p>
-            </div>
-          </div>
-        ))}
       </div>
     </ScrollArea>
   );

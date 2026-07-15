@@ -1,4 +1,5 @@
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { commProviders, type CommProvider } from '@/data/commData';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, ExternalLink } from 'lucide-react';
@@ -24,7 +25,7 @@ export default function CommProviders() {
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
           <h1 className="text-3xl font-bold text-foreground">Providers</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            Communication providers are the adapters through which Trail OS and Penny deliver messages. Slack is the first planned adapter. The hub is designed to be provider-agnostic.
+            Communication providers are the adapters through which Trail OS and {TERMS.aiAssistant} deliver messages. Slack is the first planned adapter. The hub is designed to be provider-agnostic.
           </p>
         </div>
 

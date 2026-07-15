@@ -1,4 +1,5 @@
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 import type { Program } from '@/data/programs';
 import { ArrowRight, Calendar } from 'lucide-react';
@@ -141,7 +142,7 @@ const PULSE: Record<string, Array<{ title: string; rows: string[] }>> = {
       rows: ['8 capabilities used', '5 programs mapped', 'Intake · Delivery · Coach Vis', 'Outcomes · Org Readiness'],
     },
     {
-      title: 'Penny Capabilities',
+      title: `${TERMS.aiAssistant} Capabilities`,
       rows: ['5 capabilities active', 'Trail Guide: all 5 programs', 'Quest Master: Guided only', 'Coach Intelligence: future'],
     },
     {

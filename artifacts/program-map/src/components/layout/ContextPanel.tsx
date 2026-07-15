@@ -184,7 +184,7 @@ export function ContextPanel() {
             )}
             {data.relatedPennyCaps?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Penny Capabilities</span>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capabilities</span>
                 <div className="flex flex-wrap gap-1">
                   {data.relatedPennyCaps.map((c: string) => <Badge key={c} variant="secondary">{c}</Badge>)}
                 </div>
@@ -265,7 +265,7 @@ export function ContextPanel() {
             )}
             {data.relatedPennyCap && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Penny Capability</span>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capability</span>
                 <Badge variant="secondary">{data.relatedPennyCap}</Badge>
               </div>
             )}
@@ -322,7 +322,7 @@ export function ContextPanel() {
             </div>
             {data.relatedPennyCap && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Penny Capability</span>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capability</span>
                 <Badge variant="secondary">{data.relatedPennyCap}</Badge>
               </div>
             )}
@@ -430,7 +430,7 @@ export function ContextPanel() {
             {/* Penny capabilities */}
             {data.pennyFeatures?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Penny Capabilities</span>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">{TERMS.aiAssistant} Capabilities</span>
                 <div className="flex flex-wrap gap-1">
                   {data.pennyFeatures.map((f: string) => (
                     <Badge key={f} variant="secondary" className="text-[10px]">{f}</Badge>
@@ -525,7 +525,7 @@ export function ContextPanel() {
                 {([
                   { label: 'RESOLVE Phase',     value: data.phase,    cls: 'bg-primary/10 border-primary/20 text-primary' },
                   { label: 'Trail OS Capability', value: data.trailOs,  cls: 'bg-sky-50 border-sky-200 text-sky-800' },
-                  { label: 'Penny AI Function',  value: `⚡ ${data.penny as string}`, cls: 'bg-violet-50 border-violet-200 text-violet-800' },
+                  { label: `${TERMS.aiAssistant} AI Function`,  value: `⚡ ${data.penny as string}`, cls: 'bg-violet-50 border-violet-200 text-violet-800' },
                   { label: 'Program Artifact',   value: data.artifact, cls: 'bg-muted border-border text-foreground' },
                 ] as Array<{ label: string; value: string; cls: string }>).map((row) => (
                   <div key={row.label}>
@@ -738,7 +738,7 @@ export function ContextPanel() {
             {/* Penny section */}
             {(data.penny as string[])?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Penny AI Capabilities</span>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">{TERMS.aiAssistant} Capabilities</span>
                 <div className="space-y-1.5">
                   {(data.penny as string[]).map((p) => {
                     const cap = (pennyCapabilities as Array<{ name: string; description?: string }>)?.find(c => c.name === p);
@@ -809,7 +809,7 @@ export function ContextPanel() {
     ) {
       const TYPE_META: Record<string, { label: string; icon: React.ReactNode }> = {
         commChannel:      { label: 'Channel / Space',    icon: <MessageSquare className="w-4 h-4 text-primary" /> },
-        commBroadcast:    { label: 'Penny Broadcast',    icon: <Radio className="w-4 h-4 text-secondary" /> },
+        commBroadcast:    { label: `${TERMS.aiAssistant} Broadcast`,    icon: <Radio className="w-4 h-4 text-secondary" /> },
         commWeeklyBrief:  { label: 'Weekly Brief',       icon: <CalendarDays className="w-4 h-4 text-primary" /> },
         commNotification: { label: 'Notification Rule',  icon: <Bell className="w-4 h-4 text-primary" /> },
         commCalendar:     { label: 'Calendar Category',  icon: <CalendarDays className="w-4 h-4 text-emerald-700" /> },
@@ -851,7 +851,7 @@ export function ContextPanel() {
             {data.pennyCapability && (
               <div className="rounded-md bg-secondary/5 border border-secondary/20 px-3 py-2">
                 <span className="block text-[10px] font-bold text-secondary/80 uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> Penny Capability
+                  <Sparkles className="w-3 h-3" /> {TERMS.aiAssistant} Capability
                 </span>
                 <p className="text-sm font-medium text-foreground">{data.pennyCapability}</p>
               </div>
@@ -928,7 +928,7 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Penny Action</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{TERMS.aiAssistant} Action</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{action.name}</p>
               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                 <span className={`inline-block text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg?.chip ?? ''}`}>{action.category}</span>
@@ -1100,7 +1100,7 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Penny Capability</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — {TERMS.aiAssistant} Capability</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{cap.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-1">
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${domCfg.cls}`}>{cap.domain}</span>
@@ -1256,14 +1256,14 @@ export function ContextPanel() {
             </div>
 
             <div className="rounded-lg border border-secondary/15 bg-secondary/5 p-3">
-              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">How Penny Uses This</p>
+              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">How {TERMS.aiAssistant} Uses This</p>
               <p className="text-[11px] text-foreground/80 leading-relaxed">{std.howPennyUsesIt}</p>
             </div>
 
             <div className="rounded-lg border border-border bg-muted/20 p-3 text-[11px] space-y-1.5">
               <div><span className="text-muted-foreground">Owner</span><span className="font-semibold text-foreground ml-2">{std.owner}</span></div>
               <div><span className="text-muted-foreground">Review cycle</span><span className="font-semibold text-foreground ml-2">{std.reviewCycle}</span></div>
-              <div><span className="text-muted-foreground">Penny checks</span><span className="font-semibold text-foreground ml-2">{std.pennyChecks.length} ({std.pennyChecks.filter(c => c.required).length} required)</span></div>
+              <div><span className="text-muted-foreground">{TERMS.aiAssistant} checks</span><span className="font-semibold text-foreground ml-2">{std.pennyChecks.length} ({std.pennyChecks.filter(c => c.required).length} required)</span></div>
             </div>
           </div>
         </ScrollArea>
@@ -1296,7 +1296,7 @@ export function ContextPanel() {
       const objLabel: Record<string, string> = {
         program: 'Program', sprint: 'Sprint', module: 'Module', lesson: 'Lesson',
         assignment: 'Assignment', assessment: 'Assessment', knowledgeArticle: 'Knowledge Article',
-        pennyTemplate: 'Penny Template', healthIssue: 'Content Health Issue',
+        pennyTemplate: `${TERMS.aiAssistant} Template`, healthIssue: 'Content Health Issue',
       };
       const ObjIcon = objType === 'pennyTemplate' ? Sparkles
         : objType === 'knowledgeArticle' ? BookOpen
@@ -1553,7 +1553,7 @@ export function ContextPanel() {
             {/* Penny generation actions */}
             {Array.isArray(d.pennyActions) && d.pennyActions.length > 0 && (
               <div className="space-y-2 pt-1 border-t border-border/40">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Penny Generation</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{TERMS.aiAssistant} Generation</p>
                 <div className="flex flex-wrap gap-1">
                   {(d.pennyActions as string[]).map(action => (
                     <span key={action} className="inline-flex items-center gap-1 text-[10px] font-medium text-secondary border border-secondary/20 bg-secondary/5 rounded-full px-2 py-0.5">
@@ -1562,7 +1562,7 @@ export function ContextPanel() {
                     </span>
                   ))}
                 </div>
-                <p className="text-[10px] text-muted-foreground/60">Future state — requires Penny Content Assistant integration</p>
+                <p className="text-[10px] text-muted-foreground/60">Future state — requires {TERMS.aiAssistant} Content Assistant integration</p>
               </div>
             )}
 
@@ -1595,7 +1595,7 @@ export function ContextPanel() {
           <div className="space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
-                {type === 'penny' && 'Penny AI Capability'}
+                {type === 'penny' && `${TERMS.aiAssistant} Capability`}
                 {type === 'trailOs' && 'Trail OS Capability'}
                 {type === 'demand' && 'Demand Stage'}
               </Badge>
@@ -1754,7 +1754,7 @@ export function ContextPanel() {
                 : slackPanel
                 ? TERMS.trailSignals
                 : !selectedItem
-                ? 'Ask Penny'
+                ? `Ask ${TERMS.aiAssistant}`
                 : TERMS.knowledgeBrief
               }
             </h3>
@@ -1847,7 +1847,7 @@ const NAV_SECTIONS: NavSection[] = [
   },
   {
     label: 'Operations',
-    body: 'Real-time health for programs, Salesforce, automation, Penny, and the website. Start with Program Health for cohort and capacity status.',
+    body: `Real-time health for programs, Salesforce, automation, ${TERMS.aiAssistant}, and the website. Start with Program Health for cohort and capacity status.`,
     path: '/operations/program-health',
     pathLabel: 'Open Program Health',
   },
@@ -1858,20 +1858,20 @@ const NAV_SECTIONS: NavSection[] = [
     pathLabel: 'Open Intake',
   },
   {
-    label: 'Penny',
-    body: 'AI coaching and operations layer. Learners shows cohort data, Logs shows session history, Trail Quests holds guided flows, Test Penny lets you run live interactions.',
+    label: TERMS.aiAssistant,
+    body: `AI coaching and operations layer. Learners shows cohort data, Logs shows session history, Trail Quests holds guided flows, Test ${TERMS.aiAssistant} lets you run live interactions.`,
     path: '/penny/test-penny',
-    pathLabel: 'Open Test Penny',
+    pathLabel: `Open Test ${TERMS.aiAssistant}`,
   },
   {
     label: 'Library',
-    body: 'Source of truth for all documentation. Documents holds source blueprints. Source Mapping tracks how each document connects to programs, phases, and Penny capabilities.',
+    body: `Source of truth for all documentation. Documents holds source blueprints. Source Mapping tracks how each document connects to programs, phases, and ${TERMS.aiAssistant} capabilities.`,
     path: '/library/documents',
     pathLabel: 'Open Documents',
   },
   {
     label: 'Admin',
-    body: 'Configure programs, RESOLVE phases, Trail OS capabilities, Penny settings, users, and permissions. Changes here affect the entire platform.',
+    body: `Configure programs, RESOLVE phases, Trail OS capabilities, ${TERMS.aiAssistant} settings, users, and permissions. Changes here affect the entire platform.`,
     path: '/admin',
     pathLabel: 'Open Admin',
   },
@@ -1958,7 +1958,7 @@ function CommsBriefGuide() {
     { icon: MessageSquare, label: 'Providers',         path: '/communications/providers',         desc: 'Slack (community), Google Chat (client), Google Calendar (timing).' },
     { icon: MessageSquare, label: 'Channels & Spaces', path: '/communications/channels',          desc: 'Slack channels for learners/coaches/ops. Chat Spaces for clients.' },
     { icon: CalendarDays,  label: 'Calendar',          path: '/communications/calendar',          desc: 'Operational timing: cohort starts, UAT sessions, sprint reviews.' },
-    { icon: Radio,         label: 'Penny Broadcasts',  path: '/communications/penny-broadcasts',  desc: 'Calendar-aware learner nudges, Trail Wins, Trail Quests, celebrations.' },
+    { icon: Radio,         label: `${TERMS.aiAssistant} Broadcasts`,  path: '/communications/penny-broadcasts',  desc: 'Calendar-aware learner nudges, Trail Wins, Trail Quests, celebrations.' },
     { icon: CalendarDays,  label: 'Weekly Briefs',     path: '/communications/weekly-briefs',     desc: 'Executive and coach digests — Slack + Google Chat, Calendar-triggered.' },
     { icon: Bell,          label: 'Notifications',     path: '/communications/notifications',     desc: 'Audience + timing rules: Slack, Google Chat, and Calendar combined.' },
     { icon: FileText,      label: 'Templates',         path: '/communications/message-templates', desc: 'Reusable templates for Slack, Google Chat, and Calendar reminders.' },
@@ -1980,7 +1980,7 @@ function CommsBriefGuide() {
             Communications & Collaboration
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Trail OS and Penny's messaging and timing layer. Select any item on the page to open its brief here.
+            Trail OS and {TERMS.aiAssistant}'s messaging and timing layer. Select any item on the page to open its brief here.
           </p>
         </div>
 
@@ -2063,7 +2063,7 @@ function TrailOSCapabilityGuide() {
         <div className="rounded-lg border border-border/60 bg-white/70 p-3 space-y-1.5">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-secondary shrink-0" />
-            <p className="text-[11px] font-bold text-foreground">Penny AI</p>
+            <p className="text-[11px] font-bold text-foreground">{TERMS.aiAssistant}</p>
             <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Intelligence Layer</span>
           </div>
           <p className="text-[10px] text-muted-foreground leading-relaxed">
@@ -2078,7 +2078,7 @@ function TrailOSCapabilityGuide() {
             <span className="flex items-center gap-1 text-primary"><Database className="w-3 h-3" />Trail OS</span>
             <span className="text-muted-foreground/40 italic text-[9px]">powers</span>
             <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
-            <span className="flex items-center gap-1 text-secondary"><Sparkles className="w-3 h-3" />Penny AI</span>
+            <span className="flex items-center gap-1 text-secondary"><Sparkles className="w-3 h-3" />{TERMS.aiAssistant}</span>
             <span className="text-muted-foreground/40 italic text-[9px]">guides</span>
             <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
             <span className="flex items-center gap-1 text-foreground/70"><Layers className="w-3 h-3" />Programs</span>

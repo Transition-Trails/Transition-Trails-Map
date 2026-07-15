@@ -1,6 +1,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { OpsHeader, StatCard, StatusDot } from '@/components/platform/PageShell';
 import { Badge } from '@/components/ui/badge';
+import { TERMS } from '@/config/terminology';
 
 const integrations = [
   { name: 'Salesforce REST',  status: 'Live',       eta: 'Active',   dot: 'green' as const, note: '127 Accounts · 129 Contacts · NPSP + PMM confirmed via Replit Connector. Live demand cases in Operations.' },
@@ -16,7 +17,7 @@ const kbStats = [
   { label: 'Source Documents',      value: '14' },
   { label: 'RESOLVE Phases',        value: '7' },
   { label: 'Active Programs',       value: '5' },
-  { label: 'Penny Capabilities',    value: '7' },
+  { label: `${TERMS.aiAssistant} Capabilities`,    value: '7' },
   { label: 'Trail OS Capabilities', value: '7' },
 ];
 

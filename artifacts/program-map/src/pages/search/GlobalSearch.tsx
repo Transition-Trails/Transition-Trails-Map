@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import { Search as SearchIcon, ArrowRight, Target, ExternalLink, X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -51,7 +52,7 @@ const EVERYDAY_FILTERS = [
 const POWER_FILTERS = [
   { id: 'all',      label: 'All',      types: null as string[] | null },
   { id: 'programs', label: 'Programs', types: ['program', 'cohort', 'sprint', 'module'] },
-  { id: 'penny',    label: 'Penny',    types: ['penny-capability'] },
+  { id: 'penny',    label: TERMS.aiAssistant,    types: ['penny-capability'] },
   { id: 'knowledge',label: 'Knowledge',types: ['knowledge-source', 'knowledge-article', 'standard'] },
   { id: 'people',   label: 'People',   types: ['person'] },
 ];

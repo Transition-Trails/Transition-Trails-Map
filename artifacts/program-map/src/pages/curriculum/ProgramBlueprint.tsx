@@ -218,7 +218,7 @@ export default function ProgramBlueprint() {
             <div className="rounded-lg border border-border bg-white p-3">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Full Relationship Chain</p>
               <div className="flex items-center gap-2 flex-wrap">
-                {['Program', 'Cohorts', 'Sprints', 'Modules', 'Lessons', 'Assessments', 'Knowledge Articles', 'Penny Assets', 'Delivery Assets', 'Salesforce Objects'].map((step, i, arr) => (
+                {['Program', 'Cohorts', 'Sprints', 'Modules', 'Lessons', 'Assessments', 'Knowledge Articles', `${TERMS.aiAssistant} Assets`, 'Delivery Assets', 'Salesforce Objects'].map((step, i, arr) => (
                   <div key={step} className="flex items-center gap-1">
                     <span className="text-[11px] font-semibold text-foreground bg-muted/50 rounded px-2 py-0.5">{step}</span>
                     {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-muted-foreground/40" />}

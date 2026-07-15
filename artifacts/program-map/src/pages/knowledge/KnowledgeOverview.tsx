@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import { Database, BookMarked, GitBranch, Archive, CheckCircle, AlertTriangle, XCircle, Shield, ChevronRight, Brain, Clock } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -125,7 +126,7 @@ export default function KnowledgeOverview() {
           <StatPill value={SOURCE_SUMMARY.healthy}      label="Healthy"         color="text-emerald-600" />
           <StatPill value={SOURCE_SUMMARY.warnings}     label="Warnings"        color="text-amber-600" />
           <StatPill value={SOURCE_SUMMARY.critical}     label="Critical"        color="text-rose-600" />
-          <StatPill value={SOURCE_SUMMARY.approvedForPenny} label="Penny Ready" color="text-primary" />
+          <StatPill value={SOURCE_SUMMARY.approvedForPenny} label={`${TERMS.aiAssistant} Ready`} color="text-primary" />
         </div>
 
         {/* ── Source health + Trust breakdown ─────────────────────────────── */}
@@ -181,7 +182,7 @@ export default function KnowledgeOverview() {
             </div>
             <p className="text-[10px] text-muted-foreground leading-relaxed">
               {stats.trustCounts.Unverified > 0
-                ? `${stats.trustCounts.Unverified} source${stats.trustCounts.Unverified > 1 ? 's' : ''} require trust review before Penny activation.`
+                ? `${stats.trustCounts.Unverified} source${stats.trustCounts.Unverified > 1 ? 's' : ''} require trust review before ${TERMS.aiAssistant} activation.`
                 : 'All sources have a trust level assigned.'}
             </p>
           </div>
@@ -219,11 +220,11 @@ export default function KnowledgeOverview() {
 
           {/* Penny readiness */}
           <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
-            <Eyebrow>Penny Readiness</Eyebrow>
+            <Eyebrow>{TERMS.aiAssistant} Readiness</Eyebrow>
             <div className="flex items-end gap-4">
               <div>
                 <span className="text-xl font-semibold text-primary">{SOURCE_SUMMARY.approvedForPenny}</span>
-                <p className="text-[10px] text-muted-foreground">approved for Penny</p>
+                <p className="text-[10px] text-muted-foreground">approved for {TERMS.aiAssistant}</p>
               </div>
               <div>
                 <span className="text-xl font-semibold text-muted-foreground">
@@ -233,7 +234,7 @@ export default function KnowledgeOverview() {
               </div>
             </div>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Sources must pass trust review before Penny can retrieve from them. Governance records are managed in the Sources workspace.
+              Sources must pass trust review before {TERMS.aiAssistant} can retrieve from them. Governance records are managed in the Sources workspace.
             </p>
             <button
               onClick={() => setLocation('/knowledge/sources')}
@@ -276,7 +277,7 @@ export default function KnowledgeOverview() {
             <NavCard
               icon={Database}
               title="Sources"
-              desc="Source governance, trust reviews, sync status, and Penny activation."
+              desc={`Source governance, trust reviews, sync status, and ${TERMS.aiAssistant} activation.`}
               path="/knowledge/sources"
               badge={SOURCE_SUMMARY.warnings + SOURCE_SUMMARY.critical > 0
                 ? `${SOURCE_SUMMARY.warnings + SOURCE_SUMMARY.critical} issues`
@@ -294,7 +295,7 @@ export default function KnowledgeOverview() {
             <NavCard
               icon={GitBranch}
               title="Relationships"
-              desc="How knowledge sources connect to programs, Penny, and systems."
+              desc={`How knowledge sources connect to programs, ${TERMS.aiAssistant}, and systems.`}
               path="/knowledge/relationships"
             />
             <NavCard
@@ -312,21 +313,21 @@ export default function KnowledgeOverview() {
         <div className="rounded-lg border border-primary/20 bg-primary/[0.03] p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Brain className="w-3.5 h-3.5 text-primary" />
-            <Eyebrow>Penny — What Would Create the Most Impact</Eyebrow>
+            <Eyebrow>{TERMS.aiAssistant} — What Would Create the Most Impact</Eyebrow>
           </div>
           <div className="space-y-2">
             {[
               {
                 priority: '1',
                 action: 'Connect Google Drive API',
-                why: `${stats.syncCounts.Disconnected} sources are disconnected — Google Drive folders for Foundations and Guided Trail are inaccessible to Trail OS and Penny. Connecting Drive unblocks curriculum content retrieval and blueprint validation.`,
+                why: `${stats.syncCounts.Disconnected} sources are disconnected — Google Drive folders for Foundations and Guided Trail are inaccessible to Trail OS and ${TERMS.aiAssistant}. Connecting Drive unblocks curriculum content retrieval and blueprint validation.`,
                 tag: 'Phase 2',
                 tagColor: 'bg-slate-100 text-slate-600 border-slate-200',
               },
               {
                 priority: '2',
                 action: 'Complete trust reviews for pending sources',
-                why: `${SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny} source${SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny > 1 ? 's' : ''} cannot be used by Penny until trust review is complete. Approving these expands Penny's knowledge retrieval surface and improves coaching quality.`,
+                why: `${SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny} source${SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny > 1 ? 's' : ''} cannot be used by ${TERMS.aiAssistant} until trust review is complete. Approving these expands ${TERMS.aiAssistant}'s knowledge retrieval surface and improves coaching quality.`,
                 tag: 'Action Now',
                 tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
               },

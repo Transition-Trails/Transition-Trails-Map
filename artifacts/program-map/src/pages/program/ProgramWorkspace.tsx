@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { ExternalLink, GraduationCap, RefreshCw, WifiOff } from 'lucide-react';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -144,7 +145,7 @@ function BlueprintTab({ p }: { p: Program }) {
           </p>
         </div>
         <Section title="Governing Blueprints">
-          <ChipList items={['Program Blueprint v2', 'Module Blueprint', 'Penny Blueprint']} />
+          <ChipList items={['Program Blueprint v2', 'Module Blueprint', `${TERMS.aiAssistant} Blueprint`]} />
         </Section>
         <Section title="RESOLVE Phases">
           <ChipList items={p.resolvePhases ?? []} />
@@ -320,10 +321,10 @@ function PennyTab({ p }: { p: Program }) {
       <div className="p-5 space-y-4 max-w-3xl">
         <p className="text-[12px] text-muted-foreground">
           {isEveryday
-            ? 'Penny features available in this program to help you with coaching, feedback, and learning activities.'
-            : 'Penny AI capabilities that are activated or planned for this program.'}
+            ? `${TERMS.aiAssistant} features available in this program to help you with coaching, feedback, and learning activities.`
+            : `${TERMS.aiAssistant} capabilities that are activated or planned for this program.`}
         </p>
-        <Section title={isEveryday ? 'Available Penny Features' : 'Active Penny Features'}>
+        <Section title={isEveryday ? `Available ${TERMS.aiAssistant} Features` : `Active ${TERMS.aiAssistant} Features`}>
           {p.pennyFeatures?.length > 0 ? (
             <div className="space-y-2">
               {p.pennyFeatures.map(f => (
@@ -335,7 +336,7 @@ function PennyTab({ p }: { p: Program }) {
               ))}
             </div>
           ) : (
-            <p className="text-[12px] text-muted-foreground">No Penny features mapped yet.</p>
+            <p className="text-[12px] text-muted-foreground">No {TERMS.aiAssistant} features mapped yet.</p>
           )}
         </Section>
         {!isEveryday && (
@@ -364,7 +365,7 @@ function SystemsTab({ p }: { p: Program }) {
     { name:'Salesforce',     status:'Connected', detail:'Program records, cohort data, learner enrollment', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'Google Drive',   status:'Connected', detail:`${p.name} curriculum folder and sprint resources`, cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'Slack',          status:'Active',    detail:'Cohort and coach channels', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { name:'Penny AI',       status:'Active',    detail:(p.pennyFeatures ?? []).join(', ') || 'No features activated', cls:'border-primary/20 bg-primary/5', badge:'bg-primary/10 text-primary border-primary/20' },
+    { name:`${TERMS.aiAssistant}`,  status:'Active',    detail:(p.pennyFeatures ?? []).join(', ') || 'No features activated', cls:'border-primary/20 bg-primary/5', badge:'bg-primary/10 text-primary border-primary/20' },
     { name:'Google Calendar',status:'Active',    detail:'Sprint schedule and cohort events', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'PMM (Salesforce)',status:'Planned',  detail:'Marketing Cloud integration planned for Q3 2025', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
     { name:'LMS',            status:'Planned',   detail:'Learner progress and content delivery — Q4 2025', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
@@ -391,7 +392,7 @@ function HealthTab({ p }: { p: Program }) {
   const indicators = [
     { label:'Blueprint Compliance',   status: p.confidence === 'confirmed' ? 'healthy' : 'needs-attention', note: p.confidence === 'confirmed' ? 'Fully compliant with Program Blueprint v2' : 'Review required' },
     { label:'Salesforce Data Quality',status:'healthy',         note:'94% field completion across program records' },
-    { label:'Penny Integration',      status: (p.pennyFeatures?.length ?? 0) > 0 ? 'healthy' : 'needs-attention', note: (p.pennyFeatures?.length ?? 0) > 0 ? `${p.pennyFeatures.length} features active` : 'No Penny features activated' },
+    { label:`${TERMS.aiAssistant} Integration`,      status: (p.pennyFeatures?.length ?? 0) > 0 ? 'healthy' : 'needs-attention', note: (p.pennyFeatures?.length ?? 0) > 0 ? `${p.pennyFeatures.length} features active` : `No ${TERMS.aiAssistant} features activated` },
     { label:'Knowledge Sources',      status:'healthy',         note:'Knowledge registry linkage confirmed' },
     { label:'Coach Assignment',       status:'healthy',         note:'All active cohorts have assigned coaches' },
     { label:'Org Memory',             status:isHealthy ? 'healthy' : 'incomplete', note: isHealthy ? 'Decisions documented' : 'Missing decision records from last retrospective' },
@@ -444,7 +445,7 @@ export default function ProgramWorkspace() {
       { id:'blueprint',  label:'Blueprint',   render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <BlueprintTab p={p} /> : null; } },
     ] : []),
     { id:'curriculum', label:'Curriculum',  render:(item) => <CurriculumTab programName={item.name} /> },
-    { id:'penny', label: isEveryday ? 'Penny Help' : 'Penny', render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <PennyTab p={p} /> : null; } },
+    { id:'penny', label: isEveryday ? `${TERMS.aiAssistant} Help` : TERMS.aiAssistant, render:(item) => { const p = programs.find(x => x.id === item.id); return p ? <PennyTab p={p} /> : null; } },
     ...(isPowerOrAbove ? [
       { id:'systems', label:'Systems', render:(item: WorkspaceItem) => { const p = programs.find(x => x.id === item.id); return p ? <SystemsTab p={p} /> : null; } },
     ] : []),

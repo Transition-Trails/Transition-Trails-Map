@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Users } from 'lucide-react';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
@@ -142,7 +143,7 @@ function PennyTabP({ item }: { item: PersonaOrRole }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Penny capabilities linked to this {isPersona ? 'persona' : 'role'}.</p>
+        <p className="text-[12px] text-muted-foreground">{TERMS.aiAssistant} capabilities linked to this {isPersona ? 'persona' : 'role'}.</p>
         {caps.length > 0 ? (
           <div className="space-y-2">
             {caps.map((cap: string) => (
@@ -174,7 +175,7 @@ function HealthTabP({ item }: { item: PersonaOrRole }) {
           { label:'Overall Health',      health: health === 'healthy' ? 'healthy' as const : health === 'needs-attention' ? 'needs-attention' as const : 'incomplete' as const, note: health.replace('-',' ') },
           { label:'Blueprint',           health: blueprintStatus === 'complete' ? 'healthy' as const : blueprintStatus === 'draft' ? 'needs-attention' as const : 'incomplete' as const, note: blueprintStatus.charAt(0).toUpperCase() + blueprintStatus.slice(1) },
           { label:'Program Coverage',    health:'healthy' as const, note:'All active programs have assigned personnel' },
-          { label:'Penny Integration',   health:'healthy' as const, note:'Penny support configured' },
+          { label:`${TERMS.aiAssistant} Integration`,   health:'healthy' as const, note:`${TERMS.aiAssistant} support configured` },
           { label:'SF Mapping',          health:'healthy' as const, note:'Salesforce object mappings documented' },
         ].map(ind => (
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
@@ -225,7 +226,7 @@ export default function PeopleWorkspace() {
     { id:'overview',        label:'Overview',        render:(item) => { const i = findItem(item.id); return i ? <OverviewTab item={i} /> : null; } },
     { id:'responsibilities',label:'Responsibilities',render:(item) => { const i = findItem(item.id); return i ? <ResponsibilitiesTab item={i} /> : null; } },
     { id:'programs',        label:'Programs',        render:(item) => { const i = findItem(item.id); return i ? <ProgramsTab item={i} /> : null; } },
-    { id:'penny',           label:'Penny',           render:(item) => { const i = findItem(item.id); return i ? <PennyTabP item={i} /> : null; } },
+    { id:'penny',           label:TERMS.aiAssistant, render:(item) => { const i = findItem(item.id); return i ? <PennyTabP item={i} /> : null; } },
     { id:'health',          label:'Health',          render:(item) => { const i = findItem(item.id); return i ? <HealthTabP item={i} /> : null; } },
   ], [combined]);
 

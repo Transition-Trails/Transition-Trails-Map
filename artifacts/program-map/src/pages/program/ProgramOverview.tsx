@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useLocation } from 'wouter';
+import { TERMS } from '@/config/terminology';
 import { LayoutGrid, CheckCircle, AlertCircle, FileEdit, Brain, ChevronRight, Sparkles, Clock } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -85,7 +86,7 @@ const CONFIDENCE_CONFIG = {
 const STANDARDS_ROWS = [
   { category: 'Architecture', status: 'Defined', dot: 'bg-emerald-500', note: 'Program + Module + Lesson blueprints active',  path: '/program/standards' },
   { category: 'Content',      status: 'Partial', dot: 'bg-amber-400',   note: 'Curriculum standards in review',               path: '/program/standards' },
-  { category: 'Penny',        status: 'Defined', dot: 'bg-emerald-500', note: 'Penny Blueprint v1 governs capabilities',       path: '/penny/capabilities' },
+  { category: TERMS.aiAssistant,        status: 'Defined', dot: 'bg-emerald-500', note: `${TERMS.aiAssistant} Blueprint v1 governs capabilities`,       path: '/penny/capabilities' },
   { category: 'Delivery',     status: 'Partial', dot: 'bg-amber-400',   note: 'Facilitator standards being finalized',         path: '/program/standards' },
 ] as const;
 
@@ -160,7 +161,7 @@ export default function ProgramOverview() {
           <StatPill value={stats.confirmed}  label="Confirmed"      color="text-emerald-600"   onClick={() => setLocation('/program/programs')} />
           <StatPill value={stats.needsReview} label="Needs Review"  color="text-amber-600"     onClick={() => setLocation('/program/programs')} />
           <StatPill value={stats.draft}      label="Draft"          color="text-slate-500"     onClick={() => setLocation('/program/programs')} />
-          <StatPill value={stats.pennyActive} label="Penny Active"  color="text-primary"       onClick={() => setLocation('/penny/capabilities')} />
+          <StatPill value={stats.pennyActive} label={`${TERMS.aiAssistant} Active`}  color="text-primary"       onClick={() => setLocation('/penny/capabilities')} />
         </div>
 
         {/* ── Program health + Blueprint coverage ─────────────────────────── */}
@@ -270,7 +271,7 @@ export default function ProgramOverview() {
 
           {/* Penny coverage — each row opens that program in Programs workspace */}
           <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
-            <Eyebrow>Penny Coverage</Eyebrow>
+            <Eyebrow>{TERMS.aiAssistant} Coverage</Eyebrow>
             <div className="space-y-1">
               {programs.filter(p => p.confidence !== 'deprecated').map(p => (
                 <button
@@ -297,7 +298,7 @@ export default function ProgramOverview() {
                 className="group w-full text-left rounded border border-amber-200 bg-amber-50 px-2.5 py-1.5 hover:border-amber-400 transition-colors"
               >
                 <p className="text-[10px] text-amber-700 font-medium group-hover:underline">
-                  {stats.withoutPenny} program{stats.withoutPenny > 1 ? 's' : ''} without Penny features — add mapping in Penny Capabilities →
+                  {stats.withoutPenny} program{stats.withoutPenny > 1 ? 's' : ''} without {TERMS.aiAssistant} features — add mapping in {TERMS.aiAssistant} Capabilities →
                 </p>
               </button>
             )}
@@ -346,7 +347,7 @@ export default function ProgramOverview() {
             <NavCard
               icon={LayoutGrid}
               title="Programs"
-              desc="Explore and manage individual programs, curriculum, Penny features, and system health."
+              desc={`Explore and manage individual programs, curriculum, ${TERMS.aiAssistant} features, and system health.`}
               path="/program/programs"
               badge={stats.needsReview > 0 ? `${stats.needsReview} need review` : undefined}
               badgeColor="bg-amber-50 text-amber-700 border-amber-200"
@@ -358,14 +359,14 @@ export default function ProgramOverview() {
         <div className="rounded-lg border border-primary/20 bg-primary/[0.03] p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Brain className="w-3.5 h-3.5 text-primary" />
-            <Eyebrow>Penny — What Would Create the Most Impact</Eyebrow>
+            <Eyebrow>{TERMS.aiAssistant} — What Would Create the Most Impact</Eyebrow>
           </div>
           <div className="space-y-2">
             {[
               {
                 priority: '1',
                 action: `Complete blueprint migration for ${stats.needsReview > 0 ? stats.needsReview + ' programs needing review' : 'all programs'}`,
-                why: 'Programs without confirmed blueprints cannot be fully governed by Trail OS standards. Completing blueprint compliance unlocks accurate gap reporting, curriculum readiness scoring, and Penny template matching.',
+                why: `Programs without confirmed blueprints cannot be fully governed by Trail OS standards. Completing blueprint compliance unlocks accurate gap reporting, curriculum readiness scoring, and ${TERMS.aiAssistant} template matching.`,
                 tag: stats.needsReview > 0 ? 'Action Now' : 'Complete',
                 tagColor: stats.needsReview > 0
                   ? 'bg-amber-50 text-amber-700 border-amber-200'

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import { curriculumLessons, curriculumModules, CONTENT_STATUS_CONFIG } from '@/data/curriculumData';
 import { ArrowRight, CheckCircle2, AlertTriangle } from 'lucide-react';
@@ -31,7 +32,7 @@ export default function CurriculumLessons() {
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
           <h1 className="text-3xl font-bold text-foreground">Lessons</h1>
-          <p className="text-muted-foreground mt-2">Sample lessons from the Foundations Trail prototype. Each lesson has a type, duration, learning objective, and Penny prompt status. Click any lesson to open its Knowledge Brief.</p>
+          <p className="text-muted-foreground mt-2">Sample lessons from the Foundations Trail prototype. Each lesson has a type, duration, learning objective, and {TERMS.aiAssistant} prompt status. Click any lesson to open its Knowledge Brief.</p>
         </div>
 
         {/* Module filter */}
@@ -60,7 +61,7 @@ export default function CurriculumLessons() {
 
         <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
           <div className="grid grid-cols-[80px_1fr_130px_60px_70px_60px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
-            {['#', 'Lesson', 'Type', 'Duration', 'Objective', 'Penny'].map(h => (
+            {['#', 'Lesson', 'Type', 'Duration', 'Objective', TERMS.aiAssistant].map(h => (
               <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
             ))}
           </div>

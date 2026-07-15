@@ -13,6 +13,7 @@ import { useAppContext } from '@/context/AppContext';
 import type { ActiveContext } from '@/context/AppContext';
 import { EXAMPLE_CONTEXTS } from '@/data/contextEngineData';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import { TERMS } from '@/config/terminology';
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
@@ -56,8 +57,8 @@ const EVERYDAY_SECTIONS: SectionDef[] = [
   { prefix: '/',                        exact: true, label: 'My Dashboard',     hint: 'Check your programs and upcoming sessions',  icon: Home          },
   { prefix: '/program',                              label: 'My Programs',       hint: 'Your active programs and learning materials',  icon: GraduationCap },
   { prefix: '/penny/learners',                       label: 'Learners',          hint: 'View your cohort and learning progress',        icon: GraduationCap },
-  { prefix: '/penny/test',                           label: 'Penny',             hint: 'Ask Penny a question in the right panel →',    icon: Brain         },
-  { prefix: '/penny',                                label: 'Penny',             hint: 'Ask anything in the Penny panel →',             icon: Brain         },
+  { prefix: '/penny/test',                           label: TERMS.aiAssistant,   hint: `Ask ${TERMS.aiAssistant} a question in the right panel →`,    icon: Brain         },
+  { prefix: '/penny',                                label: TERMS.aiAssistant,   hint: `Ask anything in the ${TERMS.aiAssistant} panel →`,             icon: Brain         },
   { prefix: '/knowledge/library',                    label: 'Knowledge Library', hint: 'Browse program documents and resources',       icon: BookOpen      },
   { prefix: '/knowledge',                            label: 'Knowledge',         hint: 'Documents, templates, and guides',              icon: BookOpen      },
   { prefix: '/collaboration/calendar',               label: 'Google Calendar',   hint: 'Upcoming sessions and events',                  icon: Calendar      },

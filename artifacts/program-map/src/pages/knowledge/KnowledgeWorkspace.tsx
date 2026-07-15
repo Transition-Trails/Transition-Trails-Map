@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { TERMS } from '@/config/terminology';
 import { BookOpen, Brain, Network, GraduationCap } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspace';
@@ -38,7 +39,7 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
         {src.trustLevel === 'Unverified' && (
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
             <p className="text-[11px] font-bold text-rose-700 mb-1">⚠ Unverified Source</p>
-            <p className="text-[12px] text-rose-800">This source has not passed a trust review. It may not be activated in Penny without Knowledge Manager approval.</p>
+            <p className="text-[12px] text-rose-800">This source has not passed a trust review. It may not be activated in {TERMS.aiAssistant} without Knowledge Manager approval.</p>
           </div>
         )}
       </div>
@@ -53,8 +54,8 @@ function GovernanceTab({ src }: { src: KnowledgeSource }) {
       <div className="p-5 space-y-4 max-w-3xl">
         <div className="space-y-2">
           {[
-            { label:'Trust Review',    status: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel !== 'Unverified' ? 'Trust level assigned' : 'Trust review required before Penny activation' },
-            { label:'Penny Activation',status: isActive ? 'healthy' as const : 'incomplete' as const, note: isActive ? 'Source active in Penny registry' : 'Not yet active in Penny' },
+            { label:'Trust Review',    status: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel !== 'Unverified' ? 'Trust level assigned' : `Trust review required before ${TERMS.aiAssistant} activation` },
+            { label:`${TERMS.aiAssistant} Activation`,status: isActive ? 'healthy' as const : 'incomplete' as const, note: isActive ? `Source active in ${TERMS.aiAssistant} registry` : `Not yet active in ${TERMS.aiAssistant}` },
             { label:'Review Cadence',  status:'healthy' as const, note:'Quarterly review scheduled' },
             { label:'Access Control',  status:'healthy' as const, note:'Access controls documented' },
           ].map(ind => (
@@ -70,12 +71,12 @@ function GovernanceTab({ src }: { src: KnowledgeSource }) {
         <div className="rounded-lg border border-border bg-white p-4 space-y-2">
           <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Ownership</p>
           <p className="text-[12px] text-foreground">Primary: <strong>Knowledge Manager</strong></p>
-          <p className="text-[12px] text-foreground">Secondary: <strong>Penny Lead</strong></p>
+          <p className="text-[12px] text-foreground">Secondary: <strong>{TERMS.aiAssistant} Lead</strong></p>
           <p className="text-[12px] text-foreground">Approval: <strong>Knowledge Manager</strong></p>
         </div>
         <div className="rounded-lg border border-muted bg-muted/30 p-3">
           <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1">Governance Policy</p>
-          <p className="text-[11px] text-muted-foreground">Per Source Trust Standard: all sources must pass trust review before Penny activation. Quarterly reviews required to maintain Active status.</p>
+          <p className="text-[11px] text-muted-foreground">Per Source Trust Standard: all sources must pass trust review before {TERMS.aiAssistant} activation. Quarterly reviews required to maintain Active status.</p>
         </div>
       </div>
     </ScrollArea>
@@ -92,7 +93,7 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Penny capabilities and prompts that depend on this knowledge source.</p>
+        <p className="text-[12px] text-muted-foreground">{TERMS.aiAssistant} capabilities and prompts that depend on this knowledge source.</p>
         {caps.length > 0 ? (
           <div className="space-y-2">
             {caps.map(c => (
@@ -105,7 +106,7 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
           </div>
         ) : (
           <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">No Penny assets currently depend on this source.</p>
+            <p className="text-[12px] text-muted-foreground">No {TERMS.aiAssistant} assets currently depend on this source.</p>
           </div>
         )}
       </div>
@@ -118,7 +119,7 @@ function RelatedProgramsTab({ src }: { src: KnowledgeSource }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Programs that reference this knowledge source in their curriculum or Penny integration.</p>
+        <p className="text-[12px] text-muted-foreground">Programs that reference this knowledge source in their curriculum or {TERMS.aiAssistant} integration.</p>
         <div className="space-y-2">
           {programs.map(prog => (
             <div key={prog} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
@@ -152,9 +153,9 @@ function RelationshipsTabKS({ src }: { src: KnowledgeSource }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Digital Twin relationships — programs, Penny capabilities, and graph connections for this source.</p>
+        <p className="text-[12px] text-muted-foreground">Digital Twin relationships — programs, {TERMS.aiAssistant} capabilities, and graph connections for this source.</p>
         <RelationshipCard title="Programs"          icon={GraduationCap} items={programItems}                   viewAllHref="/program"          emptyMessage="No programs linked" />
-        <RelationshipCard title="Penny Capabilities" icon={Brain}         items={capMap[(src as any).id] ?? []}  viewAllHref="/penny"            emptyMessage="No capabilities depend on this source" />
+        <RelationshipCard title={`${TERMS.aiAssistant} Capabilities`} icon={Brain}         items={capMap[(src as any).id] ?? []}  viewAllHref="/penny"            emptyMessage="No capabilities depend on this source" />
         <RelationshipCard title="Digital Twin"       icon={Network}       items={dtItems}                        viewAllHref="/digital-twin/knowledge" />
       </div>
     </ScrollArea>
@@ -222,7 +223,7 @@ export default function KnowledgeWorkspace() {
     { id:'overview',   label:'Overview',     render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <OverviewTab src={s} /> : null; } },
     { id:'governance', label:'Governance',   render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <GovernanceTab src={s} /> : null; } },
     { id:'programs',   label:'Programs',     render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelatedProgramsTab src={s} /> : null; } },
-    { id:'penny',      label:'Penny Assets', render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <PennyAssetsTab src={s} /> : null; } },
+    { id:'penny',      label:`${TERMS.aiAssistant} Assets`, render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <PennyAssetsTab src={s} /> : null; } },
     { id:'health',         label:'Health',        render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <HealthTabKS src={s} /> : null; } },
     { id:'relationships',  label:'Relationships', render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelationshipsTabKS src={s} /> : null; } },
   ], []);
@@ -233,7 +234,7 @@ export default function KnowledgeWorkspace() {
       items={items}
       tabs={tabs}
       emptyTitle="Select a knowledge source"
-      emptyBody="Choose a knowledge source to view its trust governance, program usage, Penny dependencies, and health."
+      emptyBody={`Choose a knowledge source to view its trust governance, program usage, ${TERMS.aiAssistant} dependencies, and health.`}
     />
   );
 }

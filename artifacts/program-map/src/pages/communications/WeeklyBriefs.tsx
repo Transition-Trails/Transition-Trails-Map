@@ -1,4 +1,5 @@
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { commWeeklyBriefs, type CommWeeklyBrief } from '@/data/commData';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, CheckCircle, ChevronRight } from 'lucide-react';
@@ -26,7 +27,7 @@ export default function WeeklyBriefs() {
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
           <h1 className="text-3xl font-bold text-foreground">Weekly Briefs</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            Auto-generated digests that Trail OS and Penny assemble and deliver on a schedule. Click any brief to open its Knowledge Brief.
+            Auto-generated digests that Trail OS and {TERMS.aiAssistant} assemble and deliver on a schedule. Click any brief to open its Knowledge Brief.
           </p>
         </div>
 

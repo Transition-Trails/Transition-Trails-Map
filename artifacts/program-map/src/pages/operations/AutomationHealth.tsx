@@ -1,5 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { OpsHeader, StatCard, StatusDot } from '@/components/platform/PageShell';
+import { TERMS } from '@/config/terminology';
 
 const zaps = [
   {
@@ -33,8 +34,8 @@ const zaps = [
     note:     'Expected daily. Last run was 3 days ago.',
   },
   {
-    name:     'Penny Log Export → Google Sheets',
-    trigger:  'Penny: New interaction',
+    name:     `${TERMS.aiAssistant} Log Export → Google Sheets`,
+    trigger:  `${TERMS.aiAssistant}: New interaction`,
     action:   'Append row to Sheets',
     status:   'Active'  as const,
     dot:      'green'   as const,

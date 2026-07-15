@@ -1,9 +1,10 @@
 import { PageShell } from '@/components/platform/PageShell';
+import { TERMS } from '@/config/terminology';
 
 const milestones = [
-  { quarter: 'Q2 2025', label: 'Now',    items: ['Trail OS shell launch', 'Admin knowledge base', 'Penny v1 (prototype)', 'RESOLVE framework mapping'], done: true },
+  { quarter: 'Q2 2025', label: 'Now',    items: ['Trail OS shell launch', 'Admin knowledge base', `${TERMS.aiAssistant} v1 (prototype)`, 'RESOLVE framework mapping'], done: true },
   { quarter: 'Q3 2025', label: 'Next',   items: ['Salesforce MCP connection', 'GA4 integration', 'Google Drive sync', 'Slack ops alerts', 'Live Demand Management'], done: false },
-  { quarter: 'Q4 2025', label: 'Later',  items: ['Agentforce / Penny production', 'GitHub Projects sync', 'Response quality automation', 'Learner portal v1'], done: false },
+  { quarter: 'Q4 2025', label: 'Later',  items: [`Agentforce / ${TERMS.aiAssistant} production`, 'GitHub Projects sync', 'Response quality automation', 'Learner portal v1'], done: false },
   { quarter: 'Q1 2026', label: 'Future', items: ['Full automation health dashboard', 'External change request portal', 'Advanced analytics', 'Trail OS v2 planning'], done: false },
 ];
 

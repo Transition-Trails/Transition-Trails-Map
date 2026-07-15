@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 
@@ -83,7 +84,7 @@ export default function PeopleRolesStudio() {
         { id: 'category',    label: 'Category',          type: 'select',   options: ['Staff', 'Participant', 'Partner', 'Admin', 'Coach', 'Volunteer'] },
         { id: 'description', label: 'Description',       type: 'textarea', placeholder: 'What is this role responsible for?', rows: 3 },
         { id: 'programs',    label: 'Programs',          type: 'text',     placeholder: 'Which programs does this role operate in?' },
-        { id: 'pennySupport',label: 'Penny Support',     type: 'text',     placeholder: 'How does Penny support this role?' },
+        { id: 'pennySupport',label: `${TERMS.aiAssistant} Support`,     type: 'text',     placeholder: `How does ${TERMS.aiAssistant} support this role?` },
         { id: 'sfObject',    label: 'Salesforce Object', type: 'text',     placeholder: 'e.g. Contact (role: Volunteer)' },
       ],
       onSaveAndView: () => setView('Roles'),
@@ -173,7 +174,7 @@ export default function PeopleRolesStudio() {
                     { label: 'Blueprints complete',    value: `${blueprintsDone}/${roleBlueprints.length}` },
                     { label: 'Programs mapped',        value: programParticipation.length },
                     { label: 'Comm mappings',          value: commMappings.length },
-                    { label: 'Penny support mapped',   value: pennySupportMappings.length },
+                    { label: `${TERMS.aiAssistant} support mapped`,   value: pennySupportMappings.length },
                     { label: 'SF mappings defined',    value: salesforceMappings.length },
                   ].map(s => (
                     <div key={s.label} className="flex items-center justify-between text-[11px]">
@@ -294,7 +295,7 @@ export default function PeopleRolesStudio() {
                     <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Area</th>
                     <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px] hidden md:table-cell">Description</th>
                     <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Required</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Penny</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">{TERMS.aiAssistant}</th>
                     <th className="px-3 py-2 w-6" />
                   </tr>
                 </thead>
@@ -554,7 +555,7 @@ export default function PeopleRolesStudio() {
                       <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Owner</th>
                       <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Blueprint</th>
                       <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Comms</th>
-                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Penny</th>
+                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">{TERMS.aiAssistant}</th>
                       <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">SF</th>
                     </tr>
                   </thead>

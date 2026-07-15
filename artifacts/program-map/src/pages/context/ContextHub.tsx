@@ -1,4 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TERMS } from '@/config/terminology';
 import { Target, Search as SearchIcon } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useLocation } from 'wouter';
@@ -54,7 +55,7 @@ function OverviewTab() {
 
   const WORKSPACES = [
     { id:'program',    name:'Program & Curriculum', link:'/program',             filtered: !!activeContext, count: 5,  unit: 'programs'        },
-    { id:'penny',      name:'Penny AI',             link:'/penny',               filtered: !!activeContext, count: 17, unit: 'capabilities'    },
+    { id:'penny',      name:`${TERMS.aiAssistant} AI`,             link:'/penny',               filtered: !!activeContext, count: 17, unit: 'capabilities'    },
     { id:'knowledge',  name:'Knowledge',            link:'/knowledge',           filtered: !!activeContext, count: 12, unit: 'sources'         },
     { id:'people',     name:'People & Access',      link:'/admin/people-access', filtered: !!activeContext, count: 4,  unit: 'roles defined'   },
     { id:'collab',     name:'Collaboration',        link:'/collaboration',       filtered: !!activeContext, count: 3,  unit: 'channels active' },
@@ -183,7 +184,7 @@ function RelationshipsTab() {
     { name:'Program Blueprint v2',    direction:'upstream', type:'Governance', relation:'governed by' },
     { name:'Cohort 2',                direction:'downstream', type:'Cohort', relation:'contains' },
     { name:'Sprint 3 — Resume',       direction:'downstream', type:'Sprint', relation:'has sprint' },
-    { name:'Resume Review (Penny)',   direction:'downstream', type:'Penny Capability', relation:'activates' },
+    { name:`Resume Review (${TERMS.aiAssistant})`,   direction:'downstream', type:`${TERMS.aiAssistant} Capability`, relation:'activates' },
     { name:'Salesforce Program Record', direction:'downstream', type:'SF Object', relation:'maps to' },
     { name:'Resume Writing Guide',    direction:'upstream', type:'Knowledge Source', relation:'sources from' },
     { name:'Program Director',        direction:'upstream', type:'Role', relation:'owned by' },
@@ -222,7 +223,7 @@ function HealthTab() {
     { label:'Governance Status',   health:'healthy' as const,           note:'Review cycle current' },
     { label:'Blueprint Compliance',health:'healthy' as const,           note:'Compliant with relevant blueprint' },
     { label:'Salesforce Sync',     health:'healthy' as const,           note:'SF record up to date' },
-    { label:'Penny Integration',   health: activeContext.objectTypeName === 'Program' ? 'healthy' as const : 'needs-attention' as const, note: activeContext.objectTypeName === 'Program' ? 'Capabilities active' : 'Verify Penny linkage' },
+    { label:`${TERMS.aiAssistant} Integration`,   health: activeContext.objectTypeName === 'Program' ? 'healthy' as const : 'needs-attention' as const, note: activeContext.objectTypeName === 'Program' ? 'Capabilities active' : `Verify ${TERMS.aiAssistant} linkage` },
     { label:'Knowledge Sources',   health:'healthy' as const,           note:'Trust reviews current' },
   ];
   return (
@@ -280,7 +281,7 @@ function ImpactTab() {
   if (!activeContext) return <EmptyContextState label="impact analysis" />;
   const impacts = [
     { workspace:'Program & Curriculum', filter:`Programs containing or related to "${activeContext.name}"`,         active:true,  link:'/program'       },
-    { workspace:'Penny AI',             filter:`Capabilities used in or related to "${activeContext.name}"`,        active:true,  link:'/penny'         },
+    { workspace:`${TERMS.aiAssistant} AI`,             filter:`Capabilities used in or related to "${activeContext.name}"`,        active:true,  link:'/penny'         },
     { workspace:'Knowledge',            filter:`Sources referenced by or supporting "${activeContext.name}"`,       active:true,  link:'/knowledge'     },
     { workspace:'People & Access',      filter:`Roles and personas associated with "${activeContext.name}"`,        active:true,  link:'/admin/people-access' },
     { workspace:'Collaboration',        filter:`Channels and systems active for "${activeContext.name}"`,           active:true,  link:'/collaboration' },

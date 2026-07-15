@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -38,7 +39,7 @@ const REQUESTS: DemandRequest[] = [
   },
   {
     id: 'REQ-030', type: 'Bug / Issue',    status: 'In Review', risk: 'high',     age: '4d',  submitter: 'M. Reyes',
-    subject: 'Penny not responding to RESOLVE questions',
+    subject: `${TERMS.aiAssistant} not responding to RESOLVE questions`,
     program: 'RESOLVE',
     notes: 'Reported in #penny-support. No owner assigned. 4 days without triage — elevated risk to RESOLVE cohort delivery.',
   },
@@ -52,7 +53,7 @@ const REQUESTS: DemandRequest[] = [
     id: 'REQ-028', type: 'New Feature',    status: 'Backlog',   risk: 'elevated', age: '7d',  submitter: 'T. Nguyen',
     subject: 'Automated reminder emails for Trail Quests',
     program: 'All Programs',
-    notes: '7 days in backlog with no action. Requires Penny delivery pipeline. Recommend triage or deferral decision.',
+    notes: `7 days in backlog with no action. Requires ${TERMS.aiAssistant} delivery pipeline. Recommend triage or deferral decision.`,
   },
   {
     id: 'REQ-027', type: 'Admin',          status: 'Completed', risk: 'normal',   age: '9d',  submitter: 'A. Johnson',
@@ -68,9 +69,9 @@ const REQUESTS: DemandRequest[] = [
   },
   {
     id: 'REQ-025', type: 'New Feature',    status: 'Backlog',   risk: 'normal',   age: '14d', submitter: 'M. Reyes',
-    subject: 'Penny confidence threshold for coaching outputs',
+    subject: `${TERMS.aiAssistant} confidence threshold for coaching outputs`,
     program: 'All Programs',
-    notes: 'Penny capability improvement. Deferred to Phase 2 capability sprint.',
+    notes: `${TERMS.aiAssistant} capability improvement. Deferred to Phase 2 capability sprint.`,
   },
 ];
 
@@ -200,7 +201,7 @@ function SfCasesStrip() {
                   <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[100px]">Status</th>
                   <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[140px] hidden md:table-cell">Contact</th>
                   <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[52px] text-right">Age</th>
-                  <th className="px-2 py-2 w-[32px]" title="Click any row to get Penny insights">
+                  <th className="px-2 py-2 w-[32px]" title={`Click any row to get ${TERMS.aiAssistant} insights`}>
                     <Sparkles className="w-3 h-3 text-muted-foreground/30 mx-auto" />
                   </th>
                 </tr>
@@ -279,7 +280,7 @@ function SfCasesStrip() {
               <Sparkles className="w-3 h-3 text-primary shrink-0" />
               <p className="text-[10px] text-primary flex-1 truncate">
                 <span className="font-semibold">Focused:</span> {focusedCase.CaseNumber} · {focusedCase.Subject ?? 'No subject'}
-                <span className="text-primary/60 ml-1">— Penny insights loading in right panel</span>
+                <span className="text-primary/60 ml-1">— {TERMS.aiAssistant} insights loading in right panel</span>
               </p>
               <button
                 onClick={() => setFocusedCaseId(null)}
@@ -291,7 +292,7 @@ function SfCasesStrip() {
             </div>
           ) : (
             <div className="px-3 py-1.5 border-t border-border/40">
-              <p className="text-[9px] text-muted-foreground/40">Click any row to get Penny insights about that case</p>
+              <p className="text-[9px] text-muted-foreground/40">Click any row to get {TERMS.aiAssistant} insights about that case</p>
             </div>
           )}
         </>
@@ -554,7 +555,7 @@ export default function Intake() {
                 Next Steps
               </p>
               {[
-                { label: 'Assign REQ-030 to an owner',  hint: 'Penny bug · 4 days without owner' },
+                { label: 'Assign REQ-030 to an owner',  hint: `${TERMS.aiAssistant} bug · 4 days without owner` },
                 { label: 'Triage REQ-028 from backlog', hint: 'Trail Quest reminders · 7 days idle' },
                 { label: 'Resolve REQ-026 review',      hint: 'Sprint 2 rubric · 12 days open' },
               ].map((step, i) => (

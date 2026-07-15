@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -52,7 +53,7 @@ const PROFILE_TABS = [
   { id: 'history',        label: 'History',        icon: Clock      },
   { id: 'standards',      label: 'Standards',      icon: Shield     },
   { id: 'knowledge',      label: 'Knowledge',      icon: BookOpen   },
-  { id: 'penny',          label: 'Penny',          icon: Brain      },
+  { id: 'penny',          label: TERMS.aiAssistant, icon: Brain      },
   { id: 'systems',        label: 'Systems',        icon: Database   },
   { id: 'activity',       label: 'Activity',       icon: Zap        },
 ] as const;
@@ -352,7 +353,7 @@ function KnowledgeTab({ p }: { p: ObjectProfile }) {
                 <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.pennyApproved ? 'bg-violet-500' : 'bg-muted-foreground/30'}`} />
                 <p className="text-[12px] text-foreground flex-1">{s.name}</p>
                 <span className="text-[9px] bg-teal-50 border border-teal-200 text-teal-700 rounded px-1">{s.trustLevel}</span>
-                {s.pennyApproved && <span className="text-[9px] bg-violet-50 border border-violet-200 text-violet-700 rounded px-1">Penny ✓</span>}
+                {s.pennyApproved && <span className="text-[9px] bg-violet-50 border border-violet-200 text-violet-700 rounded px-1">{TERMS.aiAssistant} ✓</span>}
               </div>
             ))}
           </div>
@@ -397,8 +398,8 @@ function PennyTab({ p }: { p: ObjectProfile }) {
   return (
     <div className="space-y-4">
       <div>
-        <SectionLabel>Active Penny Capabilities</SectionLabel>
-        {p.penny.capabilities.length === 0 ? <EmptyState msg="No Penny capabilities linked to this object." /> : (
+        <SectionLabel>Active {TERMS.aiAssistant} Capabilities</SectionLabel>
+        {p.penny.capabilities.length === 0 ? <EmptyState msg={`No ${TERMS.aiAssistant} capabilities linked to this object.`} /> : (
           <div className="space-y-1.5">
             {p.penny.capabilities.map(cap => (
               <Card key={cap.name}>

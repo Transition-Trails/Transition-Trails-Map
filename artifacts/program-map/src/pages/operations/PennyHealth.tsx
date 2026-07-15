@@ -1,5 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { OpsHeader, StatCard, StatusDot } from '@/components/platform/PageShell';
+import { TERMS } from '@/config/terminology';
 
 const topQueries = [
   { query: "What's next in my trail?",             count: 23 },
@@ -14,7 +15,7 @@ const issues = [
   { type: 'Quality Flag', msg: 'Response on "refund policy" below threshold — needs review', severity: 'amber' as const },
   { type: 'Quality Flag', msg: 'Trail Quest guidance unclear for Explore phase — reprompt suggested', severity: 'amber' as const },
   { type: 'Escalation',   msg: 'Learner escalated to human support — portal access issue', severity: 'amber' as const },
-  { type: 'Escalation',   msg: 'Billing dispute escalated — beyond Penny scope', severity: 'amber' as const },
+  { type: 'Escalation',   msg: `Billing dispute escalated — beyond ${TERMS.aiAssistant} scope`, severity: 'amber' as const },
   { type: 'Blocked',      msg: 'Phrase "guarantee" triggered blocked phrase rule', severity: 'red'   as const },
 ];
 
@@ -22,9 +23,9 @@ export default function PennyHealth() {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <OpsHeader
-        title="Penny Health"
+        title={`${TERMS.aiAssistant} Health`}
         subtitle="Daily interaction volume, response quality, escalation rates, and blocked phrase alerts."
-        integration="Agentforce AI + Penny log export via Zapier"
+        integration={`Agentforce AI + ${TERMS.aiAssistant} log export via Zapier`}
       />
 
       <ScrollArea className="flex-1">

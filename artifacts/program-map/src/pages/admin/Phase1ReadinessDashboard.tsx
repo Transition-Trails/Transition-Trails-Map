@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Network, Puzzle, Shield, BookOpen, Brain, Activity, Target,
@@ -46,13 +47,13 @@ const AREAS: ReadinessArea[] = [
       'Context engine wired with workspace context switching',
       'Salesforce connected via Replit Connector — REST API live; 127 Accounts, 129 Contacts, NPSP + PMM (7/8 objects) confirmed',
       'Phase 1 UX Consolidation complete — sidebar deduplicated, 48 routes audited, all stale status text cleared',
-      'Trail Signals button responsive — Activity icon always visible, label collapses to icon-only below sm breakpoint (matches Penny + Calendar pattern)',
+      `${TERMS.trailSignals} button responsive — Activity icon always visible, label collapses to icon-only below sm breakpoint (matches ${TERMS.aiAssistant} + Calendar pattern)`,
       'Google Sign-In live — Clerk v6, branded /sign-in page, Google OAuth, Show-gated access across all routes',
     ],
     gaps: [
       'pmdm__Program__c (PMM) accessible — Trail OS Program__c custom object not yet created in org',
       'No production data wired — all UOM objects are prototype/in-memory',
-      'Penny capability ↔ program linkages are partial',
+      `${TERMS.aiAssistant} capability ↔ program linkages are partial`,
       'Digital Twin relationship graph uses placeholder data',
     ],
     blockers: [],
@@ -69,7 +70,7 @@ const AREAS: ReadinessArea[] = [
     score: 97,
     status: 'on-track',
     owner: 'Tech Lead',
-    description: 'Salesforce API, Google Workspace, Slack, Agentforce, Penny, and auth layer live connections.',
+    description: `Salesforce API, Google Workspace, Slack, Agentforce, ${TERMS.aiAssistant}, and auth layer live connections.`,
     completed: [
       'Trail OS API server running (Express 5, port 8080)',
       'Salesforce REST API live via Replit Connector — 127 Accounts, 129 Contacts, NPSP + PMM (7/8 objects) confirmed',
@@ -77,11 +78,11 @@ const AREAS: ReadinessArea[] = [
       'Slack bot (@coachconnectbot) posting live to Penny AI and Admin channels — POC confirmed',
       'GEMINI_API_KEY validated live — 21 models available (Gemini 2.5 Flash + Pro), auth confirmed',
       'GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET live-validated — format correct, Google APIs reachable in 25ms',
-      'GOOGLE_DRIVE_REFRESH_TOKEN obtained — Google Drive OAuth fully live (Jun 13 2026); GOOGLE_DRIVE_PENNY_FOLDER_ID set — Penny Asset Library reading real files from Shared Drive (Jun 16 2026)',
+      `GOOGLE_DRIVE_REFRESH_TOKEN obtained — Google Drive OAuth fully live (Jun 13 2026); GOOGLE_DRIVE_PENNY_FOLDER_ID set — ${TERMS.aiAssistant} Asset Library reading real files from Shared Drive (Jun 16 2026)`,
       'GOOGLE_CALENDAR_REFRESH_TOKEN obtained — Google Calendar OAuth fully live (Jun 13 2026)',
-      'CalendarPanel live — real events via /api/calendar/events, Penny prep briefs per event, pending invite flags',
+      `CalendarPanel live — real events via /api/calendar/events, ${TERMS.aiAssistant} prep briefs per event, pending invite flags`,
       'GOOGLE_GMAIL_REFRESH_TOKEN obtained — gmail.readonly + gmail.send scopes confirmed live (Jun 2026)',
-      'GmailCenter live at /collaboration/gmail — real inbox (15 threads), thread read, Penny draft, real send via POST /api/gmail/send',
+      `GmailCenter live at /collaboration/gmail — real inbox (15 threads), thread read, ${TERMS.aiAssistant} draft, real send via POST /api/gmail/send`,
       'AGENTFORCE_API_KEY confirmed (0Xxan0… prefix) — Agentforce Sessions API live, coexistence POC complete',
       'Salesforce webhook secret configured (SALESFORCE_WEBHOOK_SECRET)',
       'GitHub PAT and webhook secret configured',
@@ -114,7 +115,7 @@ const AREAS: ReadinessArea[] = [
       'Standards Studio built with filterable standard cards',
       'Governance hub live with framework, policies, roles views',
       'RESOLVE framework documented and wired into demand pipeline',
-      'Role definitions drafted (Program Director, LC, Curriculum, Penny Lead)',
+      `Role definitions drafted (Program Director, LC, Curriculum, ${TERMS.aiAssistant} Lead)`,
     ],
     gaps: [
       'Standards documents not yet uploaded to Knowledge Library',
@@ -136,7 +137,7 @@ const AREAS: ReadinessArea[] = [
     score: 68,
     status: 'on-track',
     owner: 'Knowledge Manager',
-    description: 'Source registry completeness, trust levels, sync status, and Penny activation.',
+    description: `Source registry completeness, trust levels, sync status, and ${TERMS.aiAssistant} activation.`,
     completed: [
       'Knowledge source registry live with 9 registered sources',
       'Trust level taxonomy defined (Authoritative → Unverified)',
@@ -145,9 +146,9 @@ const AREAS: ReadinessArea[] = [
       'Library, Sources, and Org Memory tabs built',
     ],
     gaps: [
-      '3 sources still Unverified — not yet activated in Penny',
+      `3 sources still Unverified — not yet activated in ${TERMS.aiAssistant}`,
       'Salesforce KB sync not yet configured',
-      'Google Drive linked for Penny Asset Library (Shared Drive live) — program-specific workspace folder linkage remains Phase 2',
+      `Google Drive linked for ${TERMS.aiAssistant} Asset Library (Shared Drive live) — program-specific workspace folder linkage remains Phase 2`,
       'Org Memory Phase 2 — decision records not yet created',
     ],
     blockers: [],
@@ -159,37 +160,37 @@ const AREAS: ReadinessArea[] = [
   },
   {
     id: 'penny',
-    title: 'Penny Readiness',
+    title: `${TERMS.aiAssistant} Readiness`,
     icon: Brain,
     score: 80,
     status: 'on-track',
-    owner: 'Penny Lead',
+    owner: `${TERMS.aiAssistant} Lead`,
     description: 'Capability registry, prompt library, Slack + knowledge integration, and POC validation.',
     completed: [
       '22 capabilities defined and documented in registry (Phase 1 + Phase 2 scope)',
       'Prompt drafts written for core capabilities',
       'Trail OS map built (capability ↔ program ↔ knowledge graph)',
-      'PennyHub + Prompt Studio + Intelligence views live',
-      'GEMINI_API_KEY live · Ask Penny → Gemini 2.5 Flash (serviceTier: standard, billing active)',
+      `${TERMS.aiAssistant} Hub + Prompt Studio + Intelligence views live`,
+      `GEMINI_API_KEY live · Ask ${TERMS.aiAssistant} → Gemini 2.5 Flash (serviceTier: standard, billing active)`,
       'POST /api/penny/ask endpoint live — Trail OS context-aware AI responses with RAG (22-chunk corpus)',
-      'Penny Reacts to Trail Signals — P1–P10 priority badges, auto-fire signal context into AskPennyPanel',
-      'Calendar Action Panel live — next 5 events, pending-response flags, per-event Penny prep briefs via Gemini',
-      'Trail Quests workspace live — 11 quests, 78% completion rate, 24 streaks, Penny coaching trigger wired',
-      'Assessments workspace live — per-learner results, filter, dual-AI coaching: Penny + Agentforce in parallel',
+      `${TERMS.aiAssistant} Reacts to ${TERMS.trailSignals} — P1–P10 priority badges, auto-fire signal context into Ask${TERMS.aiAssistant}Panel`,
+      `Calendar Action Panel live — next 5 events, pending-response flags, per-event ${TERMS.aiAssistant} prep briefs via Gemini`,
+      `Trail Quests workspace live — 11 quests, 78% completion rate, 24 streaks, ${TERMS.aiAssistant} coaching trigger wired`,
+      `Assessments workspace live — per-learner results, filter, dual-AI coaching: ${TERMS.aiAssistant} + Agentforce in parallel`,
       'Agentforce coexistence confirmed — 8/8 POC steps, live API, POST /api/agentforce/invoke session flow',
-      'SF Case → Penny focus wired (Sprint 5) — case row click auto-fires rich Penny query (case #, subject, priority, status, contact, age)',
+      `SF Case → ${TERMS.aiAssistant} focus wired (Sprint 5) — case row click auto-fires rich ${TERMS.aiAssistant} query (case #, subject, priority, status, contact, age)`,
       'Slack POC: @coachconnectbot posting to Penny AI channel (confirmed working)',
       'Google OAuth fully live — GOOGLE_DRIVE_REFRESH_TOKEN + GOOGLE_CALENDAR_REFRESH_TOKEN obtained (Jun 13 2026)',
     ],
     gaps: [
-      'Penny delivery pipeline for Slack Weekly Brief not yet wired end-to-end',
-      'Knowledge source activation incomplete (3 sources unverified — not yet fed to Penny)',
-      'Learner journey ↔ Penny capability linkage not validated end-to-end',
+      `${TERMS.aiAssistant} delivery pipeline for Slack Weekly Brief not yet wired end-to-end`,
+      `Knowledge source activation incomplete (3 sources unverified — not yet fed to ${TERMS.aiAssistant})`,
+      `Learner journey ↔ ${TERMS.aiAssistant} capability linkage not validated end-to-end`,
     ],
     blockers: [],
     nextActions: [
       'Wire Slack integration for Weekly Brief capability using confirmed SLACK_BOT_TOKEN',
-      'Complete trust review for 3 Unverified knowledge sources and activate in Penny',
+      `Complete trust review for 3 Unverified knowledge sources and activate in ${TERMS.aiAssistant}`,
       'Link program-specific Google Drive workspace folders in source registry (Drive OAuth + Shared Drive support now live)',
     ],
   },
@@ -208,7 +209,7 @@ const AREAS: ReadinessArea[] = [
       'Trends & recommendations views built',
       'OperationsHub consolidated (Operations + Integrations + Demand)',
       'SF Cases live strip — table view with Priority / Case # / Subject / Status / Contact / Age; links open Salesforce Lightning via MyDomain URL',
-      'SF Case → Penny focus wired (Sprint 5) — clicking a live SF case row highlights the row, opens AskPennyPanel, and fires a rich Penny query; dismissible focus strip below table',
+      `SF Case → ${TERMS.aiAssistant} focus wired (Sprint 5) — clicking a live SF case row highlights the row, opens Ask${TERMS.aiAssistant}Panel, and fires a rich ${TERMS.aiAssistant} query; dismissible focus strip below table`,
     ],
     gaps: [
       'Health dashboard data not yet wired to Salesforce REST API (connection accessible at /api/salesforce/validate)',
@@ -239,26 +240,26 @@ const OVERALL: ReadinessArea = {
     'Digital Twin foundation built',
     'Context engine + lens system live',
     '48 routes wired, audited, and working',
-    'Penny live — Ask Penny → Gemini 2.5 Flash · POST /api/penny/ask · billing active · RAG (22-chunk corpus)',
-    'Penny Reacts to Trail Signals — P1–P10 priority badges, auto-fire signal context into AskPennyPanel',
-    'Calendar Action Panel live — next 5 events, pending flags, per-event Penny prep briefs via Gemini',
-    'Trail Quests workspace live — 11 quests, 78% completion, 24 streaks, Penny coaching trigger',
-    'Assessments workspace live — dual-AI coaching: Penny + Agentforce in parallel',
+    `${TERMS.aiAssistant} live — Ask ${TERMS.aiAssistant} → Gemini 2.5 Flash · POST /api/penny/ask · billing active · RAG (22-chunk corpus)`,
+    `${TERMS.aiAssistant} Reacts to ${TERMS.trailSignals} — P1–P10 priority badges, auto-fire signal context into Ask${TERMS.aiAssistant}Panel`,
+    `Calendar Action Panel live — next 5 events, pending flags, per-event ${TERMS.aiAssistant} prep briefs via Gemini`,
+    `Trail Quests workspace live — 11 quests, 78% completion, 24 streaks, ${TERMS.aiAssistant} coaching trigger`,
+    `Assessments workspace live — dual-AI coaching: ${TERMS.aiAssistant} + Agentforce in parallel`,
     'Agentforce coexistence confirmed — 8/8 POC steps, live API (0Xxan0… key), session flow live',
-    'SF Case → Penny focus wired — case row click fires rich Penny query; highlighted row + dismissible strip',
+    `SF Case → ${TERMS.aiAssistant} focus wired — case row click fires rich ${TERMS.aiAssistant} query; highlighted row + dismissible strip`,
     'Google OAuth fully live — GOOGLE_DRIVE_REFRESH_TOKEN + GOOGLE_CALENDAR_REFRESH_TOKEN obtained (Jun 13 2026)',
     'Gmail fully live — GOOGLE_GMAIL_REFRESH_TOKEN active · gmail.readonly + gmail.send confirmed · GmailCenter at /collaboration/gmail (Jun 2026)',
-    'Collaboration Overview refactored to rule management hub — channel signal rules, Penny routing config, Trail Signals destinations',
+    `Collaboration Overview refactored to rule management hub — channel signal rules, ${TERMS.aiAssistant} routing config, ${TERMS.trailSignals} destinations`,
     'Google Drive + Google Calendar + Gmail + Agentforce promoted to Live integrations — Admin Setup updated',
     'Phase 1 UX Consolidation complete — sidebar deduplicated, all stale status text cleared',
-    'Trail Signals button responsive — icon-only below sm breakpoint, matching Penny + Calendar pattern',
+    `${TERMS.trailSignals} button responsive — icon-only below sm breakpoint, matching ${TERMS.aiAssistant} + Calendar pattern`,
     'Google Sign-In live — Clerk v6, branded sign-in page, Google OAuth, role-gated Show components across all routes',
     'Access tier architecture wired — 3 Google Groups mapped (trailosadmin, trailospennyadmin, trailosusers); tier API endpoints built',
     'Google Groups auto-tier LIVE — service account DWD + GOOGLE_ADMIN_CREDENTIALS configured; real-time group membership drives tier assignment on every login (Jun 14 2026)',
   ],
   gaps: [
     'Salesforce live — data not yet wired to any live dashboard or capability',
-    'Slack live (POC) — Penny Weekly Brief delivery pipeline not yet wired end-to-end',
+    `Slack live (POC) — ${TERMS.aiAssistant} Weekly Brief delivery pipeline not yet wired end-to-end`,
   ],
   blockers: [],
   nextActions: [
@@ -407,7 +408,7 @@ export default function Phase1ReadinessDashboard() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration — Phase 1</p>
             <h1 className="text-base font-semibold text-foreground">Phase 1 Readiness Dashboard</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5 max-w-2xl">
-              Architecture, integration, governance, knowledge, Penny, and operations readiness — scored, gap-analysed, and prioritised for production onboarding.
+              Architecture, integration, governance, knowledge, {TERMS.aiAssistant}, and operations readiness — scored, gap-analysed, and prioritised for production onboarding.
             </p>
           </div>
         </div>
@@ -480,7 +481,7 @@ export default function Phase1ReadinessDashboard() {
               <div className="space-y-1.5">
                 {[
                   { tier: 'Everyday User',      dot: 'bg-emerald-500', signals: 'Simplified counts + visual health indicators + guided next actions — no source detail required' },
-                  { tier: 'Penny Power User',   dot: 'bg-violet-500',  signals: 'Penny quality metrics, source trust scores, usage analytics, learner/cohort intelligence, and deeper analytics' },
+                  { tier: `${TERMS.aiAssistant} Power User`,   dot: 'bg-violet-500',  signals: `${TERMS.aiAssistant} quality metrics, source trust scores, usage analytics, learner/cohort intelligence, and deeper analytics` },
                   { tier: 'Admin / Super Admin', dot: 'bg-amber-500',  signals: 'Integration health, governance flags, secrets status, full Digital Twin alerts, and system-level ops signals' },
                 ].map(r => (
                   <div key={r.tier} className="flex items-start gap-2 bg-white/60 border border-emerald-100 rounded-lg px-3 py-2">

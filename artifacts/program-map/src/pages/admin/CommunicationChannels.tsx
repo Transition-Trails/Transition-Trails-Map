@@ -1,3 +1,4 @@
+import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import { commProviders } from '@/data/commProviders';
 import { commRoutes } from '@/data/commRouting';
@@ -39,7 +40,7 @@ export default function CommunicationChannels() {
           <div>
             <p className="text-sm font-semibold text-foreground mb-1">Channel-Agnostic Architecture</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Events (Trail Talk reminders, case escalations, Penny nudges) are defined once in the{' '}
+              Events (Trail Talk reminders, case escalations, {TERMS.aiAssistant} nudges) are defined once in the{' '}
               <strong>Comm Routing</strong> model. Each event maps to a <em>provider + destination</em> pair.
               Switching from Slack to Google Chat means updating the destination adapter only — no changes to
               event definitions, templates, or core logic.

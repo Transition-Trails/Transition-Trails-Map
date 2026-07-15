@@ -175,7 +175,7 @@ const STARTERS = [
   'Explain the RESOLVE framework',
   'What should I check in Operations today?',
   'How does Salesforce connect to Trail OS?',
-  'What can Penny do right now?',
+  `What can ${TERMS.aiAssistant} do right now?`,
 ];
 
 const ROLE_LABELS: Record<string, string> = {
@@ -315,7 +315,7 @@ export function AskPennyPanel() {
     } catch {
       setMessages(prev => [...prev, {
         role: 'penny',
-        content: "Couldn't reach Penny — check your connection and try again.",
+        content: `Couldn't reach ${TERMS.aiAssistant} — check your connection and try again.`,
         time: ts(), error: true,
       }]);
     } finally {

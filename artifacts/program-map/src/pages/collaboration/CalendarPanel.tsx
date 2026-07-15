@@ -98,7 +98,7 @@ async function fetchPennyPrep(ev: CalendarEvent): Promise<string> {
     body: JSON.stringify({ query, context: 'Calendar Panel', role: 'admin' }),
   });
   const data = await resp.json() as { reply?: string; error?: string };
-  if (!resp.ok || data.error) throw new Error(data.error ?? 'Penny could not generate a prep brief.');
+  if (!resp.ok || data.error) throw new Error(data.error ?? `${TERMS.aiAssistant} could not generate a prep brief.`);
   return data.reply!;
 }
 

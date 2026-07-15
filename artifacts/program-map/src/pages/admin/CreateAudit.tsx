@@ -1,4 +1,5 @@
 import { CheckCircle2, Plus, Eye, MinusCircle } from 'lucide-react';
+import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Link } from 'wouter';
 
@@ -43,8 +44,8 @@ const ADDED: AuditEntry[] = [
     path: '/program/standards',
   },
   {
-    workspace: 'Penny Command Center',
-    section: 'Penny Hub',
+    workspace: `${TERMS.aiAssistant} Command Center`,
+    section: `${TERMS.aiAssistant} Hub`,
     action: 'New Prompt Template',
     objectType: 'Prompt Template',
     entryPoint: 'ActionBar → "New Prompt Template" button (primary)',
@@ -53,17 +54,17 @@ const ADDED: AuditEntry[] = [
     path: '/penny',
   },
   {
-    workspace: 'Penny Command Center',
-    section: 'Penny Hub',
-    action: 'New Penny Capability',
-    objectType: 'Penny Capability',
+    workspace: `${TERMS.aiAssistant} Command Center`,
+    section: `${TERMS.aiAssistant} Hub`,
+    action: `New ${TERMS.aiAssistant} Capability`,
+    objectType: `${TERMS.aiAssistant} Capability`,
     entryPoint: 'ActionBar → "New Capability" button (secondary)',
     status: 'added',
     notes: 'Fields: Name, Domain, Description, When to Use, Maturity, Hallucination Risk, Knowledge Sources, Owner.',
     path: '/penny',
   },
   {
-    workspace: 'Penny Command Center',
+    workspace: `${TERMS.aiAssistant} Command Center`,
     section: 'Prompt Studio',
     action: 'New Template',
     objectType: 'Prompt Template',
@@ -73,17 +74,17 @@ const ADDED: AuditEntry[] = [
     path: '/penny/prompts',
   },
   {
-    workspace: 'Penny Command Center',
+    workspace: `${TERMS.aiAssistant} Command Center`,
     section: 'Capability Registry',
     action: 'New Capability',
-    objectType: 'Penny Capability',
+    objectType: `${TERMS.aiAssistant} Capability`,
     entryPoint: 'Header → "New Capability" button',
     status: 'added',
     notes: 'Full capability fields including hallucination risk and knowledge sources.',
     path: '/penny',
   },
   {
-    workspace: 'Penny Command Center',
+    workspace: `${TERMS.aiAssistant} Command Center`,
     section: 'POC Integrations',
     action: 'Add Integration Connection',
     objectType: 'Integration Connection',
@@ -99,7 +100,7 @@ const ADDED: AuditEntry[] = [
     objectType: 'Knowledge Source',
     entryPoint: 'Header → "Add Source" button',
     status: 'added',
-    notes: 'Fields: Name, Type, Trust Level, Description, Source URL/ID, Sync Cadence, Penny Approval, Owner.',
+    notes: `Fields: Name, Type, Trust Level, Description, Source URL/ID, Sync Cadence, ${TERMS.aiAssistant} Approval, Owner.`,
     path: '/knowledge',
   },
   {
@@ -119,7 +120,7 @@ const ADDED: AuditEntry[] = [
     objectType: 'Role',
     entryPoint: 'Header → "New Role" button (secondary)',
     status: 'added',
-    notes: 'Fields: Name, Category, Description, Programs, Penny Support, Salesforce Object, Owner.',
+    notes: `Fields: Name, Category, Description, Programs, ${TERMS.aiAssistant} Support, Salesforce Object, Owner.`,
     path: '/admin/people-access',
   },
   {
@@ -149,7 +150,7 @@ const ADDED: AuditEntry[] = [
     objectType: 'Channel Mapping',
     entryPoint: 'ActionBar or outer wrapper — "Add Channel Mapping" button',
     status: 'added',
-    notes: 'Fields: Channel Name, Mapping Type, Trail OS Object, Purpose, Visibility, Penny Access, Owner.',
+    notes: `Fields: Channel Name, Mapping Type, Trail OS Object, Purpose, Visibility, ${TERMS.aiAssistant} Access, Owner.`,
     path: '/collaboration/slack',
   },
   {
@@ -159,7 +160,7 @@ const ADDED: AuditEntry[] = [
     objectType: 'Folder Mapping',
     entryPoint: 'ActionBar → "Add Folder Mapping" button',
     status: 'added',
-    notes: 'Fields: Folder Name, Drive ID, Maps To, Trail OS Object, Content Type, Sync to Penny, Owner.',
+    notes: `Fields: Folder Name, Drive ID, Maps To, Trail OS Object, Content Type, Sync to ${TERMS.aiAssistant}, Owner.`,
     path: '/collaboration/drive',
   },
   {
@@ -169,7 +170,7 @@ const ADDED: AuditEntry[] = [
     objectType: 'Calendar Mapping',
     entryPoint: 'ActionBar → "Add Calendar Mapping" button',
     status: 'added',
-    notes: 'Fields: Calendar Name, Google Calendar ID, Maps To, Trail OS Object, Event Types, Penny Access, Owner.',
+    notes: `Fields: Calendar Name, Google Calendar ID, Maps To, Trail OS Object, Event Types, ${TERMS.aiAssistant} Access, Owner.`,
     path: '/collaboration/calendar',
   },
 ];
@@ -182,7 +183,7 @@ const READ_ONLY: ReadOnlyEntry[] = [
   },
   {
     workspace: 'Operations Center',
-    view: 'Program Health, Ops Health, Penny Health, etc.',
+    view: `Program Health, Ops Health, ${TERMS.aiAssistant} Health, etc.`,
     reason: 'Health views are computed read-only dashboards. No creation applies — they reflect the state of objects created elsewhere.',
   },
   {
@@ -191,17 +192,17 @@ const READ_ONLY: ReadOnlyEntry[] = [
     reason: 'Demand items (Epics, Features, Stories) will be sourced from Salesforce backlog. Direct creation is planned via Salesforce integration (Q3).',
   },
   {
-    workspace: 'Penny Command Center',
+    workspace: `${TERMS.aiAssistant} Command Center`,
     view: 'Learners, Intelligence, Logs',
-    reason: 'Read-only analytics surfaces — data generated by learner activity and Penny operations. No manual creation applies.',
+    reason: `Read-only analytics surfaces — data generated by learner activity and ${TERMS.aiAssistant} operations. No manual creation applies.`,
   },
   {
-    workspace: 'Penny Command Center',
-    view: 'Test Penny',
+    workspace: `${TERMS.aiAssistant} Command Center`,
+    view: `Test ${TERMS.aiAssistant}`,
     reason: 'Interactive testing surface. Tests are run, not created. Prompt creation lives in Prompt Studio.',
   },
   {
-    workspace: 'Penny Command Center',
+    workspace: `${TERMS.aiAssistant} Command Center`,
     view: 'Trail OS Map',
     reason: 'Capability relationship visualisation. Read-only. Capabilities created in Capability Registry.',
   },
