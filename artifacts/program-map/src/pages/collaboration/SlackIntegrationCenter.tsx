@@ -1764,8 +1764,8 @@ function SlackIntegrationCenterInner({ onOpenCreate }: { onOpenCreate: () => voi
         { id:'governance',  label:'Governance',          path:'/collaboration/slack/governance',        icon:Shield,        content:<GovernanceTab /> },
         { id:'testing',     label:'Test Suite',          path:'/collaboration/slack/testing',           icon:FlaskConical,  content:<TestSuiteTab /> },
         { id:'health',      label:'Health',              path:'/collaboration/slack/health',            icon:BarChart2,     content:<IntegrationHealthTab /> },
-        { id:'poc-state',   label:'POC State',           path:'/collaboration/slack/poc-state',         icon:CheckCircle,   content:<PocStateTab /> },
-        { id:'poc-ready',   label:'POC Readiness',       path:'/collaboration/slack/poc-readiness',     icon:Zap,           content:<PocReadinessTab /> },
+        { id:'poc-state',   label:'Confirmed State',      path:'/collaboration/slack/poc-state',         icon:CheckCircle,   content:<PocStateTab /> },
+        { id:'poc-ready',   label:'Go-Live Checklist',   path:'/collaboration/slack/poc-readiness',     icon:Zap,           content:<PocReadinessTab /> },
       ]}
     />
   );
