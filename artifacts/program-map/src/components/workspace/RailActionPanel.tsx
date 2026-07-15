@@ -93,6 +93,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
 
   function handleSendRequest() {
     onSaveDraft?.(values);
+    onSaveAndView?.(values);
     fetch('/api/slack/notify', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -115,13 +116,13 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         </div>
         <p className="text-[13px] font-bold text-foreground text-center">Request Sent to Slack</p>
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-          Your {objectType} request has been sent to the Penny AI Team channel for review. A team member will follow up to implement it.
+          Your {objectType} has been saved to the list and a notification sent to the team channel.
         </p>
         <p className="text-[10px] text-muted-foreground/60 text-center leading-snug mt-1">
-          This request will not appear in the list until manually added by a developer.
+          Changes are session-only and will reset on page refresh.
         </p>
-        <span className="text-[9px] font-bold uppercase tracking-widest text-amber-600 border border-amber-200 bg-amber-50 rounded-full px-2.5 py-1">
-          Pending Review · Not Yet Live
+        <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-700 border border-emerald-200 bg-emerald-50 rounded-full px-2.5 py-1">
+          Saved · Session Only
         </span>
       </div>
     );
@@ -261,7 +262,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
             className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity"
           >
             <Send className="w-3 h-3" />
-            Send Request to Slack
+            Save &amp; Notify Slack
           </button>
         </div>
         <p className="text-[9px] text-muted-foreground/40 text-center leading-snug">
