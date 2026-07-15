@@ -337,6 +337,81 @@ export function ContextPanel() {
       );
     }
 
+    if (type === 'promptTemplate') {
+      const statusColor = data.status === 'Approved' ? 'text-green-700'
+        : data.status === 'Review' ? 'text-sky-700'
+        : data.status === 'Draft' ? 'text-amber-700'
+        : 'text-muted-foreground';
+      const riskCls = data.hallucinationRisk === 'Low'
+        ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+        : data.hallucinationRisk === 'Medium'
+        ? 'text-amber-700 bg-amber-50 border-amber-200'
+        : 'text-rose-700 bg-rose-50 border-rose-200';
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Prompt Template</Badge>
+                <Badge variant="outline" className={`text-[10px] ${statusColor} bg-white`}>{data.status}</Badge>
+                <Badge variant="outline" className={`text-[10px] ${riskCls}`}>Risk: {data.hallucinationRisk}</Badge>
+              </div>
+              <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.name}</h2>
+              <p className="text-[11px] text-muted-foreground">v{data.version} · Score: {data.qualityScore}/100</p>
+            </div>
+            <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
+              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Purpose</span>
+              <p className="text-[12px] text-foreground leading-relaxed">{data.purpose}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: 'Domain',   value: data.domain },
+                { label: 'Owner',    value: data.owner },
+                { label: 'Audience', value: Array.isArray(data.audience) ? data.audience.join(', ') : data.audience },
+                { label: 'Tone',     value: typeof data.tone === 'string' ? data.tone.split('.')[0] : data.tone },
+                { label: 'Output',   value: data.outputFormatId },
+                { label: 'Reviewed', value: data.lastReviewed },
+              ].map((f: { label: string; value: string }) => (
+                <div key={f.label}>
+                  <span className="block text-xs font-semibold text-foreground uppercase mb-0.5">{f.label}</span>
+                  <p className="text-[12px] text-muted-foreground font-mono">{f.value}</p>
+                </div>
+              ))}
+            </div>
+            {Array.isArray(data.guardrails) && data.guardrails.length > 0 && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Guardrails</span>
+                <div className="space-y-1.5">
+                  {data.guardrails.map((g: string, i: number) => (
+                    <div key={i} className="flex items-start gap-1.5 rounded border border-rose-200 bg-rose-50 p-2">
+                      <span className="text-rose-600 shrink-0 mt-0.5 text-[11px]">⚔</span>
+                      <p className="text-[11px] text-rose-900 leading-snug">{g}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {data.capabilityId && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capability</span>
+                <Badge variant="secondary" className="capitalize">
+                  {String(data.capabilityId).replace('cap-', '').replace(/-/g, ' ')}
+                </Badge>
+              </div>
+            )}
+            {data.promptBody && (
+              <div>
+                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Prompt Body</span>
+                <pre className="text-[10px] font-mono text-foreground bg-muted/40 rounded-lg p-3 whitespace-pre-wrap leading-relaxed overflow-x-auto">
+                  {data.promptBody}
+                </pre>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      );
+    }
+
     if (type === 'program') {
       const opStatus = data.operationalStatus;
       const statusDot = opStatus === 'active' ? 'bg-emerald-500' : opStatus === 'in-discovery' ? 'bg-sky-400' : 'bg-muted-foreground/50';
