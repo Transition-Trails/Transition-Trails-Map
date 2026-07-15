@@ -14,7 +14,7 @@
 // PROTOTYPE STATE (current):
 //   Default tier = 'superadmin'. The tier switcher in the Topbar lets the
 //   builder preview what each tier would see. No URL-level access enforcement
-//   exists yet — that ships with Google Workspace SSO (planned Q3–Q4).
+//   exists yet — that ships with Google Workspace SSO (Phase 2).
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type AccessTier = 'everyday' | 'power' | 'admin' | 'superadmin';
