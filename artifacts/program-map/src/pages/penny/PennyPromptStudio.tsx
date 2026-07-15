@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, createContext, useContext } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import {
   promptTemplates, promptVariables, outputFormats, versionHistory, qualityReviews,
@@ -248,9 +248,19 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
   );
 }
 
+// ── Studio context (live template state) ───────────────────────────────────
+
+interface StudioCtxValue {
+  templates: PromptTemplate[];
+  setTemplates: React.Dispatch<React.SetStateAction<PromptTemplate[]>>;
+}
+const StudioCtx = createContext<StudioCtxValue>({ templates: promptTemplates, setTemplates: () => undefined });
+function useStudioTemplates() { return useContext(StudioCtx).templates; }
+
 // ── Library View ───────────────────────────────────────────────────────────
 
 function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplate) => void }) {
+  const templates = useStudioTemplates();
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-3xl">
@@ -267,7 +277,7 @@ function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplat
         </div>
 
         {DOMAIN_ORDER.map(domain => {
-          const domTemplates = promptTemplates.filter(t => t.domain === domain);
+          const domTemplates = templates.filter(t => t.domain === domain);
           if (!domTemplates.length) return null;
           const cls = DOMAIN_CLS[domain];
           return (
@@ -306,21 +316,22 @@ function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplat
 // ── Templates View ─────────────────────────────────────────────────────────
 
 function TemplatesView({ onOpenBrief, onEdit }: { onOpenBrief: (t: PromptTemplate) => void; onEdit: (t: PromptTemplate) => void }) {
-  const [selectedId, setSelectedId] = useState(promptTemplates[0].id);
+  const templates = useStudioTemplates();
+  const [selectedId, setSelectedId] = useState(() => templates[0]?.id ?? '');
   const [search, setSearch]         = useState('');
   const [filterDomain, setFilterDomain]   = useState<PromptDomain | 'all'>('all');
   const [filterStatus, setFilterStatus]   = useState<PromptStatus | 'all'>('all');
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return promptTemplates.filter(t =>
+    return templates.filter(t =>
       (filterDomain === 'all' || t.domain === filterDomain) &&
       (filterStatus === 'all' || t.status === filterStatus) &&
       (!q || t.name.toLowerCase().includes(q) || t.shortDescription.toLowerCase().includes(q))
     );
-  }, [search, filterDomain, filterStatus]);
+  }, [templates, search, filterDomain, filterStatus]);
 
-  const selected = promptTemplates.find(t => t.id === selectedId) ?? promptTemplates[0];
+  const selected = templates.find(t => t.id === selectedId) ?? templates[0];
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -408,8 +419,9 @@ function VariablesView() {
 // ── Source Rules View ──────────────────────────────────────────────────────
 
 function SourceRulesView() {
-  const [selectedId, setSelectedId] = useState(promptTemplates[0].id);
-  const t = promptTemplates.find(t => t.id === selectedId) ?? promptTemplates[0];
+  const templates = useStudioTemplates();
+  const [selectedId, setSelectedId] = useState(() => templates[0]?.id ?? '');
+  const t = templates.find(t => t.id === selectedId) ?? templates[0];
 
   const roleConfig = {
     Required:  'text-green-700 bg-green-50 border-green-200',
@@ -427,7 +439,7 @@ function SourceRulesView() {
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {DOMAIN_ORDER.map(domain => {
-              const ts = promptTemplates.filter(t => t.domain === domain);
+              const ts = templates.filter(t => t.domain === domain);
               if (!ts.length) return null;
               return (
                 <div key={domain}>
@@ -490,6 +502,7 @@ function SourceRulesView() {
 // ── Output Formats View ────────────────────────────────────────────────────
 
 function OutputFormatsView() {
+  const templates = useStudioTemplates();
   const [selectedId, setSelectedId] = useState<string>(outputFormats[0].id);
   const selected = outputFormats.find(f => f.id === selectedId) ?? outputFormats[0];
   return (
@@ -552,7 +565,7 @@ function OutputFormatsView() {
             <p className="text-[11px] font-bold text-foreground mb-2">Used by Templates</p>
             <div className="flex flex-wrap gap-1">
               {selected.usedBy.map(id => {
-                const t = promptTemplates.find(t => t.id === id);
+                const t = templates.find(t => t.id === id);
                 return t ? <span key={id} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{t.name}</span> : null;
               })}
             </div>
@@ -587,7 +600,8 @@ interface ContextMeta {
 }
 
 function TestBenchView() {
-  const [selectedId, setSelectedId]         = useState(promptTemplates[0].id);
+  const templates = useStudioTemplates();
+  const [selectedId, setSelectedId]         = useState(() => templates[0]?.id ?? '');
   const [status, setStatus]                 = useState<RunStatus>('idle');
   const [liveReply, setLiveReply]           = useState('');
   const [liveDurationMs, setLiveDurationMs] = useState<number | null>(null);
@@ -609,10 +623,10 @@ function TestBenchView() {
       .catch(() => setLearnersLoading(false));
   }, []);
 
-  const t = promptTemplates.find(t => t.id === selectedId) ?? promptTemplates[0];
+  const t = templates.find(t => t.id === selectedId) ?? templates[0];
 
   function loadTemplate(id: string) {
-    const tmpl = promptTemplates.find(t => t.id === id) ?? promptTemplates[0];
+    const tmpl = templates.find(t => t.id === id) ?? templates[0];
     setSelectedId(id);
     setStatus('idle');
     setLiveReply('');
@@ -676,7 +690,7 @@ function TestBenchView() {
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {DOMAIN_ORDER.map(domain => {
-              const ts = promptTemplates.filter(t => t.domain === domain);
+              const ts = templates.filter(t => t.domain === domain);
               if (!ts.length) return null;
               return (
                 <div key={domain}>
@@ -875,8 +889,9 @@ function TestBenchView() {
 // ── Version History View ───────────────────────────────────────────────────
 
 function VersionHistoryView() {
-  const [selectedId, setSelectedId] = useState(promptTemplates[0].id);
-  const t       = promptTemplates.find(t => t.id === selectedId) ?? promptTemplates[0];
+  const templates = useStudioTemplates();
+  const [selectedId, setSelectedId] = useState(() => templates[0]?.id ?? '');
+  const t       = templates.find(t => t.id === selectedId) ?? templates[0];
   const entries = versionHistory.filter(v => v.templateId === selectedId).sort((a, b) => b.version.localeCompare(a.version));
 
   const changeTypeCls = {
@@ -896,7 +911,7 @@ function VersionHistoryView() {
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {DOMAIN_ORDER.map(domain => {
-              const ts = promptTemplates.filter(t => t.domain === domain);
+              const ts = templates.filter(t => t.domain === domain);
               if (!ts.length) return null;
               return (
                 <div key={domain}>
@@ -955,6 +970,7 @@ function VersionHistoryView() {
 // ── Quality Review View ────────────────────────────────────────────────────
 
 function QualityReviewView() {
+  const templates = useStudioTemplates();
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const filtered = filterStatus === 'all' ? qualityReviews : qualityReviews.filter(q => q.reviewStatus === filterStatus);
 
@@ -982,7 +998,7 @@ function QualityReviewView() {
             ))}
           </div>
           {filtered.map(qr => {
-            const t = promptTemplates.find(t => t.id === qr.templateId);
+            const t = templates.find(t => t.id === qr.templateId);
             if (!t) return null;
             const stsCls = qr.reviewStatus === 'Approved' ? 'text-green-700 bg-green-50 border-green-200'
                          : qr.reviewStatus === 'In Review' ? 'text-amber-700 bg-amber-50 border-amber-200'
@@ -1022,6 +1038,7 @@ export default function PennyPromptStudio() {
   const { setSelectedItem, openActionPanel, openSlackPanel } = useAppContext();
   const [view, setView] = useState<StudioView>('library');
   const [librarySelectedTemplate, setLibrarySelectedTemplate] = useState<PromptTemplate | null>(null);
+  const [liveTemplates, setLiveTemplates] = useState<PromptTemplate[]>(promptTemplates);
 
   function openBrief(t: PromptTemplate) {
     setSelectedItem({ type: 'promptTemplate', id: t.id, data: t });
@@ -1048,7 +1065,20 @@ export default function PennyPromptStudio() {
         { id: 'guardrails',   label: 'Guardrails',       type: 'textarea', placeholder: t.guardrails.join('\n'), rows: 3 },
         { id: 'reviewStatus', label: 'Review Status',    type: 'select',   options: ['Draft', 'In Review', 'Approved', 'Needs Revision'] },
       ],
-      onSaveAndView: () => setView('templates'),
+      onSaveAndView: (data) => {
+        setLiveTemplates(prev => prev.map(pt => pt.id === t.id ? {
+          ...pt,
+          ...(data.name         ? { name: data.name }                                                          : {}),
+          ...(data.domain       ? { domain: data.domain as PromptDomain }                                      : {}),
+          ...(data.purpose      ? { purpose: data.purpose }                                                    : {}),
+          ...(data.promptBody   ? { promptBody: data.promptBody }                                              : {}),
+          ...(data.tone         ? { tone: data.tone }                                                          : {}),
+          ...(data.guardrails   ? { guardrails: data.guardrails.split('\n').filter(Boolean) }                  : {}),
+          ...(data.reviewStatus ? { status: data.reviewStatus as PromptStatus }                                : {}),
+          lastReviewed: 'Just now',
+        } : pt));
+        setView('templates');
+      },
     });
   }
 
@@ -1069,11 +1099,41 @@ export default function PennyPromptStudio() {
         { id: 'reviewStatus', label: 'Review Status',  type: 'select',   options: ['Draft', 'In Review', 'Approved', 'Needs Revision'] },
         { id: 'testCase',   label: 'Test Case',        type: 'textarea', placeholder: 'Describe a test input and expected Penny response…', rows: 3 },
       ],
-      onSaveAndView: () => setView('templates'),
+      onSaveAndView: (data) => {
+        if (data.name?.trim()) {
+          const newTemplate: PromptTemplate = {
+            id: `tpl-${Date.now()}`,
+            name: data.name.trim(),
+            domain: (data.domain as PromptDomain) || 'Coaching',
+            capabilityId: 'cap-general',
+            shortDescription: data.purpose?.slice(0, 80) || '',
+            purpose: data.purpose || '',
+            audience: data.audience ? [data.audience] : ['Coach'],
+            requiredVariables: [],
+            sourceRules: [],
+            outputFormatId: 'Knowledge Answer',
+            tone: data.tone || 'Professional and clear.',
+            guardrails: data.guardrails ? data.guardrails.split('\n').filter(Boolean) : [],
+            owner: 'Staff',
+            status: (data.reviewStatus as PromptStatus) || 'Draft',
+            version: '1.0',
+            lastReviewed: 'Just now',
+            promptBody: data.promptBody || '',
+            relatedStandards: [],
+            relatedSfObjects: [],
+            hallucinationRisk: 'Medium',
+            qualityScore: 0,
+            testBench: { sampleInputs: {}, simulatedOutput: '', simulationNotes: '' },
+          };
+          setLiveTemplates(prev => [...prev, newTemplate]);
+        }
+        setView('templates');
+      },
     });
   }
 
   return (
+    <StudioCtx.Provider value={{ templates: liveTemplates, setTemplates: setLiveTemplates }}>
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
@@ -1102,16 +1162,16 @@ export default function PennyPromptStudio() {
               New Template
             </button>
             <span className="text-[11px] font-semibold text-green-700 border border-green-200 bg-green-50 rounded-full px-3 py-1">
-              {PROMPT_STUDIO_SUMMARY.approved} Approved
+              {liveTemplates.filter(t => t.status === 'Approved').length} Approved
             </span>
             <span className="text-[11px] font-semibold text-amber-700 border border-amber-200 bg-amber-50 rounded-full px-3 py-1">
-              {PROMPT_STUDIO_SUMMARY.inReview} In Review
+              {liveTemplates.filter(t => t.status === 'Review').length} In Review
             </span>
           </div>
         </div>
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           <ViewTab label="Prompt Library"   icon={BookOpen}       active={view === 'library'}      onClick={() => setView('library')} />
-          <ViewTab label="Templates"        icon={Brain}          active={view === 'templates'}    count={PROMPT_STUDIO_SUMMARY.total} onClick={() => setView('templates')} />
+          <ViewTab label="Templates"        icon={Brain}          active={view === 'templates'}    count={liveTemplates.length} onClick={() => setView('templates')} />
           <ViewTab label="Variables"        icon={Zap}            active={view === 'variables'}    count={PROMPT_STUDIO_SUMMARY.variables} onClick={() => setView('variables')} />
           <ViewTab label="Source Rules"     icon={Database}       active={view === 'source-rules'} onClick={() => setView('source-rules')} />
           <ViewTab label="Output Formats"   icon={FileText}       active={view === 'formats'}      count={PROMPT_STUDIO_SUMMARY.formats} onClick={() => setView('formats')} />
@@ -1141,5 +1201,6 @@ export default function PennyPromptStudio() {
         {view === 'quality'      && <QualityReviewView />}
       </div>
     </div>
+    </StudioCtx.Provider>
   );
 }
