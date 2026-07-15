@@ -57,7 +57,6 @@ export interface DomainHealth {
   relatedStandards: string[];
   relatedPeople: string[];
   relatedPennyCapabilities: string[];
-  recommendedActions: string[];
 }
 
 // ── RECOMMENDATION ────────────────────────────────────────────────────────────
@@ -121,7 +120,6 @@ export const domainHealthData: DomainHealth[] = [
     relatedStandards: ['Learner Engagement Standard', 'Assessment Coverage Standard'],
     relatedPeople: ['Program Lead', 'Lead Coach', 'Curriculum Designer'],
     relatedPennyCapabilities: ['Study Coach', 'Trail Quests', 'Coach Briefs', 'Program Health Summaries'],
-    recommendedActions: ['Complete Digital Compass Penny coverage', 'Assign owners to all roles in each program', 'Complete Salesforce PMM integration assessment'],
   },
   {
     id: 'dh-curriculum',
@@ -143,7 +141,6 @@ export const domainHealthData: DomainHealth[] = [
     relatedStandards: ['Content Quality Standard', 'Prompt Governance Standard', 'Assessment Coverage Standard'],
     relatedPeople: ['Curriculum Designer', 'Penny Admin'],
     relatedPennyCapabilities: ['Curriculum Generation', 'Consistency Review', 'Prompt Quality Review'],
-    recommendedActions: ['Add learning objectives for Explorer\'s Trail Modules 4–6', 'Link 8 outstanding knowledge articles', 'Schedule overdue standards reviews'],
   },
   {
     id: 'dh-knowledge',
@@ -164,7 +161,6 @@ export const domainHealthData: DomainHealth[] = [
     relatedStandards: ['Source Trust Standard', 'Data Privacy Standard'],
     relatedPeople: ['Penny Admin', 'Salesforce Admin'],
     relatedPennyCapabilities: ['Source Control', 'Prompt Quality Review'],
-    recommendedActions: ['Assign trust levels to 3 remaining sources', 'Assign owners to unowned sources', 'Trigger sync on stale sources', 'Define review cycles for all sources'],
   },
   {
     id: 'dh-penny',
@@ -186,7 +182,6 @@ export const domainHealthData: DomainHealth[] = [
     relatedStandards: ['Prompt Governance Standard', 'Source Trust Standard'],
     relatedPeople: ['Penny Admin', 'Curriculum Designer'],
     relatedPennyCapabilities: ['All capabilities'],
-    recommendedActions: ['Assign formal Penny Admin owner urgently', 'Define prompt governance SLA', 'Extend Penny access to 3 remaining knowledge sources', 'Prioritise Coach Briefs and Executive Summaries for Q3'],
   },
   {
     id: 'dh-people',
@@ -207,7 +202,6 @@ export const domainHealthData: DomainHealth[] = [
     relatedStandards: ['Role Ownership Standard', 'Facilitation Quality Standard'],
     relatedPeople: ['All personas'],
     relatedPennyCapabilities: ['Coach Briefs', 'Executive Briefs'],
-    recommendedActions: ['Assign owners to 6 unowned roles', 'Create blueprints for high-priority missing roles', 'Define Salesforce record types for Client Sponsor and Employer Partner'],
   },
   {
     id: 'dh-communications',
@@ -219,7 +213,7 @@ export const domainHealthData: DomainHealth[] = [
       { id: 'comm-1', domain: 'Communications', label: 'Slack channel readiness',        status: 'good',       detail: 'Cohort, coach, program-ops, and admin Slack channels mapped.', sourceSystem: 'Communications & Collaboration' },
       { id: 'comm-2', domain: 'Communications', label: 'Google Chat readiness',          status: 'needs-work', detail: 'Google Chat spaces defined in prototype but not live connections.', sourceSystem: 'Integration Readiness Center' },
       { id: 'comm-3', domain: 'Communications', label: 'Calendar coverage',              status: 'good',       detail: 'Calendar events defined for all core program phases.', sourceSystem: 'Communications & Collaboration' },
-      { id: 'comm-4', domain: 'Communications', label: 'Penny message integration',      status: 'needs-work', detail: 'Penny-to-Slack adapter planned Q3 2025, not yet built.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'comm-4', domain: 'Communications', label: 'Penny message integration',      status: 'needs-work', detail: 'Penny-to-Slack adapter not yet built. Message routing and API auth pending.', sourceSystem: 'Integration Readiness Center' },
       { id: 'comm-5', domain: 'Communications', label: 'External partner comms',         status: 'at-risk',    detail: 'Client Sponsor and NP Partner communication flows not defined.', sourceSystem: 'People & Roles Studio' },
       { id: 'comm-6', domain: 'Communications', label: 'Broadcast templates',            status: 'good',       detail: 'Message templates defined for core communication events.', sourceSystem: 'Communications & Collaboration' },
     ],
@@ -228,7 +222,6 @@ export const domainHealthData: DomainHealth[] = [
     relatedStandards: ['Communication Quality Standard'],
     relatedPeople: ['Program Lead', 'Lead Coach', 'Active Learner'],
     relatedPennyCapabilities: ['Weekly Review', 'Coach Briefs', 'Executive Briefs'],
-    recommendedActions: ['Prioritise Penny-to-Slack adapter for Q3', 'Define Client Sponsor communication flow', 'Build Google Chat live integration'],
   },
   {
     id: 'dh-integration',
@@ -237,12 +230,12 @@ export const domainHealthData: DomainHealth[] = [
     level: 'needs-work',
     summary: 'Integration Readiness Center identifies 9 planned integrations. Salesforce NPSP is the most mature; Google Drive, LMS, Slack, and Agentforce are all in varying stages of readiness. Nonprofit Cloud migration is the most impactful blocker.',
     indicators: [
-      { id: 'int-1', domain: 'Integrations', label: 'Salesforce NPSP readiness',    status: 'good',       detail: 'NPSP in use. Core objects mapped. Nonprofit Cloud migration planned Q3.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'int-1', domain: 'Integrations', label: 'Salesforce NPSP readiness',    status: 'good',       detail: 'NPSP in use. Core objects mapped. Nonprofit Cloud migration not yet planned.', sourceSystem: 'Integration Readiness Center' },
       { id: 'int-2', domain: 'Integrations', label: 'Google Drive integration',     status: 'needs-work', detail: 'Drive as content repository defined in prototype. Live sync not configured.', sourceSystem: 'Integration Readiness Center' },
       { id: 'int-3', domain: 'Integrations', label: 'LMS integration',              status: 'needs-work', detail: 'LMS object model defined. API auth not configured.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'int-4', domain: 'Integrations', label: 'Slack adapter',               status: 'at-risk',    detail: 'Planned Q3 2025. No auth or field mapping configured yet.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'int-4', domain: 'Integrations', label: 'Slack adapter',               status: 'at-risk',    detail: 'No auth or field mapping configured. Build not yet started.', sourceSystem: 'Integration Readiness Center' },
       { id: 'int-5', domain: 'Integrations', label: 'Google Chat / Calendar',       status: 'needs-work', detail: 'API endpoints defined. Auth and sync readiness incomplete.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'int-6', domain: 'Integrations', label: 'Agentforce (Penny future)',    status: 'at-risk',    detail: 'Planned Q4 2025. No readiness work started.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'int-6', domain: 'Integrations', label: 'Agentforce (Penny future)',    status: 'at-risk',    detail: 'No readiness work started. Agentforce context handoff is a future milestone.', sourceSystem: 'Integration Readiness Center' },
       { id: 'int-7', domain: 'Integrations', label: 'Assessment platform',         status: 'needs-work', detail: 'Assessment data model defined. Live integration not started.', sourceSystem: 'Integration Readiness Center' },
     ],
     sourceSystem: 'Integration Readiness Center',
@@ -250,7 +243,6 @@ export const domainHealthData: DomainHealth[] = [
     relatedStandards: ['Data Privacy Standard'],
     relatedPeople: ['Salesforce Admin', 'Penny Admin'],
     relatedPennyCapabilities: ['Source Control', 'Agentforce (planned)'],
-    recommendedActions: ['Plan Nonprofit Cloud migration sprint', 'Build Slack adapter MVP for Q3', 'Configure Google Drive live sync', 'Start Agentforce readiness assessment'],
   },
 ];
 
