@@ -1,3 +1,5 @@
+import { TERMS } from '@/config/terminology';
+
 export interface MessageTemplate {
   id: string;
   name: string;
@@ -6,7 +8,7 @@ export interface MessageTemplate {
   audience: string;
   triggerEvent: string;
   messageSummary: string;
-  status: 'draft' | 'active' | 'planned';
+  status: 'draft' | 'approved' | 'active' | 'planned';
   owner: string;
   lastReviewed: string;
   whyItMatters: string;
@@ -24,7 +26,7 @@ export const messageTemplates: MessageTemplate[] = [
     triggerEvent: 'Trail Talk Reminder (Monday scheduled)',
     messageSummary: "👋 Hey @learner — it's Trail Talk time! Your weekly reflection is due. What's one insight from your trail this week? Drop it in the thread. 🌲",
     status: 'draft',
-    owner: 'Penny',
+    owner: 'Program Manager',
     lastReviewed: 'Jun 2025',
     whyItMatters: 'Regular reflection is a core RESOLVE behavior. Automated reminders maintain cadence without manual facilitator effort.',
     relatedPennyCap: 'Trail Quest Prompting',
@@ -37,7 +39,7 @@ export const messageTemplates: MessageTemplate[] = [
     audience: 'Enrolled learners + facilitators',
     triggerEvent: 'Salesforce: Cohort stage change',
     messageSummary: '📣 Heads up Cohort {N}! Your next {program} session is on {date} at {time}. Come prepared with your Trail Quest from this week. See you there!',
-    status: 'draft',
+    status: 'approved',
     owner: 'Operations Team',
     lastReviewed: 'Jun 2025',
     whyItMatters: 'Cohort announcements replace ad hoc email chains. Consistent formatting ensures learners always know what to expect.',
@@ -52,23 +54,23 @@ export const messageTemplates: MessageTemplate[] = [
     triggerEvent: 'Salesforce: Learner milestone event',
     messageSummary: '🏆 Trail Win! @learner just completed the {phase} phase of {program}. A huge step forward on their trail. Drop some encouragement! 👏',
     status: 'draft',
-    owner: 'Penny',
+    owner: TERMS.aiAssistant,
     lastReviewed: 'Jun 2025',
     whyItMatters: 'Celebrating wins publicly builds culture and keeps learners motivated through their full trail.',
     relatedPennyCap: 'Proactive Nudge',
   },
   {
-    id: 'tpl-penny-nudge',
-    name: 'Penny Coaching Nudge',
+    id: 'tpl-coach-nudge',
+    name: `${TERMS.aiAssistant} Coaching Nudge`,
     provider: 'slack',
-    destination: '#penny-alerts',
+    destination: '#coach-alerts',
     audience: 'Coaches',
-    triggerEvent: 'Penny: At-risk flag OR 3+ escalations',
-    messageSummary: '⚠️ Penny Flag: @learner may need attention. Reason: {flag_reason}. Last active: {last_active}. Suggested action: {recommendation}.',
-    status: 'draft',
-    owner: 'Penny',
+    triggerEvent: `${TERMS.aiAssistant}: At-risk flag OR 3+ escalations`,
+    messageSummary: `⚠️ ${TERMS.aiAssistant} Flag: @learner may need attention. Reason: {flag_reason}. Last active: {last_active}. Suggested action: {recommendation}.`,
+    status: 'approved',
+    owner: TERMS.aiAssistant,
     lastReviewed: 'Jun 2025',
-    whyItMatters: 'Coaches cannot monitor every learner continuously. Penny flags surface the right context at the right time.',
+    whyItMatters: `Coaches cannot monitor every learner continuously. ${TERMS.aiAssistant} flags surface the right context at the right time.`,
     relatedPennyCap: 'At-Risk Detection',
   },
   {
@@ -79,7 +81,7 @@ export const messageTemplates: MessageTemplate[] = [
     audience: 'Operations staff',
     triggerEvent: 'Salesforce: Case escalated OR urgent OR age > 48h',
     messageSummary: '🚨 Case Escalated: {case_id} — "{subject}" | Priority: {priority} | Age: {age} | View in Salesforce → {link}',
-    status: 'draft',
+    status: 'approved',
     owner: 'Demand Management',
     lastReviewed: 'Jun 2025',
     whyItMatters: 'Urgent cases must not fall through the cracks. Automated alerts ensure immediate visibility without manual monitoring.',
@@ -92,7 +94,7 @@ export const messageTemplates: MessageTemplate[] = [
     destination: '#facilitators',
     audience: 'Facilitators',
     triggerEvent: 'Scheduled: 24h before cohort session',
-    messageSummary: '📅 Tomorrow: {program} Cohort {N} at {time}. {enrolled} learners expected. Check Trail Quest completion in Trail OS before the call. 🌲',
+    messageSummary: `📅 Tomorrow: {program} Cohort {N} at {time}. {enrolled} learners expected. Check Trail Quest completion in ${TERMS.platform} before the call. 🌲`,
     status: 'draft',
     owner: 'Operations Team',
     lastReviewed: 'Jun 2025',
@@ -105,10 +107,10 @@ export const messageTemplates: MessageTemplate[] = [
     destination: '#leadership',
     audience: 'Leadership team',
     triggerEvent: 'Scheduled: Monday 9am',
-    messageSummary: '📊 Trail OS Weekly — {date} | Active Learners: {n} | Open Cases: {n} | Penny Quality: {score}/100 | Automations: {status}',
-    status: 'draft',
-    owner: 'Trail OS / Automation',
+    messageSummary: `📊 ${TERMS.platform} Weekly — {date} | Active Learners: {n} | Open Cases: {n} | ${TERMS.aiAssistant} Quality: {score}/100 | Automations: {status}`,
+    status: 'active',
+    owner: `${TERMS.platform} / Automation`,
     lastReviewed: 'Jun 2025',
-    whyItMatters: 'Leadership needs a weekly pulse on the platform without logging in. The digest brings Trail OS context to where they already are.',
+    whyItMatters: `Leadership needs a weekly pulse on the platform without logging in. The digest brings ${TERMS.platform} context to where they already are.`,
   },
 ];

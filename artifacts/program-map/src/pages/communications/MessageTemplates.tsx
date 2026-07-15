@@ -1,9 +1,10 @@
 import { useAppContext } from '@/context/AppContext';
-import { commTemplates, type CommTemplate } from '@/data/commData';
+import { messageTemplates, type MessageTemplate } from '@/data/messageTemplates';
+import { TERMS } from '@/config/terminology';
 import { Badge } from '@/components/ui/badge';
 import { FileText, ChevronRight } from 'lucide-react';
 
-function statusBadge(s: CommTemplate['status']) {
+function statusBadge(s: MessageTemplate['status']) {
   if (s === 'active')    return <Badge className="text-[10px] bg-green-50 text-green-800 border-green-200 border">Active</Badge>;
   if (s === 'approved')  return <Badge className="text-[10px] bg-secondary/10 text-secondary border-secondary/20 border">Approved</Badge>;
   return <Badge variant="secondary" className="text-[10px]">Draft</Badge>;
@@ -12,7 +13,7 @@ function statusBadge(s: CommTemplate['status']) {
 export default function MessageTemplates() {
   const { setSelectedItem } = useAppContext();
 
-  function select(t: CommTemplate) {
+  function select(t: MessageTemplate) {
     setSelectedItem({ type: 'commTemplate', id: t.id, data: t });
   }
 
@@ -24,24 +25,24 @@ export default function MessageTemplates() {
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications</p>
           <h1 className="text-3xl font-bold text-foreground">Message Templates</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            Reusable, reviewable templates that Penny and Trail OS use to compose broadcasts, briefs, and notifications. Click any template to open its Knowledge Brief.
+            Reusable, reviewable templates that {TERMS.aiAssistant} and {TERMS.platform} use to compose broadcasts, briefs, and notifications. Click any template to open its Knowledge Brief.
           </p>
         </div>
 
         {/* Table */}
         <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
-          <div className="grid grid-cols-[1fr_80px_110px_90px_80px] gap-3 px-5 py-2.5 bg-muted/30 border-b border-border/60">
+          <div className="grid grid-cols-[1fr_90px_130px_160px_100px] gap-3 px-5 py-2.5 bg-muted/30 border-b border-border/60">
             {['Template', 'Provider', 'Audience', 'Trigger', 'Status'].map(h => (
               <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
             ))}
           </div>
 
-          {commTemplates.map((t, i) => (
+          {messageTemplates.map((t, i) => (
             <button
               key={t.id}
               onClick={() => select(t)}
-              className={`w-full grid grid-cols-[1fr_80px_110px_90px_80px] gap-3 items-start px-5 py-3.5 text-left hover:bg-muted/30 transition-colors group ${
-                i < commTemplates.length - 1 ? 'border-b border-border/30' : ''
+              className={`w-full grid grid-cols-[1fr_90px_130px_160px_100px] gap-3 items-start px-5 py-3.5 text-left hover:bg-muted/30 transition-colors group ${
+                i < messageTemplates.length - 1 ? 'border-b border-border/30' : ''
               }`}
             >
               <div className="flex items-start gap-2">
@@ -71,7 +72,7 @@ export default function MessageTemplates() {
                 ['Template Name', 'Short descriptive name used across the Communications Hub.'],
                 ['Provider', 'Slack, Google Chat, Teams, or Email — the adapter through which this template is delivered.'],
                 ['Audience', 'Who receives this message — learners, coaches, ops team, or leadership.'],
-                ['Trigger Event', 'The Trail OS or Penny event that fires this template.'],
+                ['Trigger Event', `The ${TERMS.platform} or ${TERMS.aiAssistant} event that fires this template.`],
                 ['Destination', 'The specific channel, space, or inbox this template is routed to.'],
                 ['Owner', 'Who is responsible for keeping this template current.'],
                 ['Status', 'Draft → Approved → Active. Templates must be Approved before they can go Active.'],
