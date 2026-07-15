@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
-import { useTierFlags } from '@/hooks/useTierFlags';
 import { TERMS } from '@/config/terminology';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -116,11 +115,11 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
     bg: 'bg-pink-50',
     border: 'border-pink-200',
     examples: [
-      { id: 'resume-review', name: 'Penny Resume Review',     subtitle: 'AI-powered resume feedback engine',    status: 'active'      },
+      { id: 'resume-review', name: `${TERMS.aiAssistant} Resume Review`, subtitle: 'AI-powered resume feedback engine',    status: 'active'      },
       { id: 'trail-quest',   name: 'Trail Quest Companion',   subtitle: 'Contextual quest and reflection',      status: 'active'      },
       { id: 'coach-brief',   name: 'Coach Brief Generator',   subtitle: 'Pre-session learner summary',          status: 'active'      },
       { id: 'sprint-coach',  name: 'Sprint Coach',            subtitle: 'Sprint retrospective AI support',      status: 'in-progress' },
-      { id: 'slack-penny',   name: 'Slack Penny AI Channel',  subtitle: 'Real-time learner support via Slack',  status: 'active'      },
+      { id: 'slack-penny',   name: `Slack ${TERMS.aiAssistant} Channel`, subtitle: 'Real-time learner support via Slack',  status: 'active'      },
     ],
     connections: [
       { system: 'Knowledge',      label: '6 sources',   count: 6,  color: '#6d28d9', href: '/knowledge',        detail: 'Resume frameworks, feedback guides, program content',
@@ -212,10 +211,10 @@ const CATALOG: Record<ObjectKind, KindConfig> = {
     bg: 'bg-teal-50',
     border: 'border-teal-200',
     examples: [
-      { id: 'google-drive',     name: 'Google Drive Resources',         subtitle: 'Program content and document source',     status: 'in-progress' },
-      { id: 'slack-penny-ai',   name: 'Slack Penny AI Channel',         subtitle: 'Real-time AI learner engagement',         status: 'active'      },
+      { id: 'google-drive',     name: 'Google Drive Resources',         subtitle: 'Program content and document source',     status: 'active'      },
+      { id: 'slack-penny-ai',   name: `Slack ${TERMS.aiAssistant} Channel`, subtitle: 'Real-time AI learner engagement',    status: 'active'      },
       { id: 'salesforce-pe',    name: 'Salesforce Program Engagement',  subtitle: 'CRM source of record for programs',       status: 'active'      },
-      { id: 'google-calendar',  name: 'Google Calendar Events',         subtitle: 'Sprint and cohort scheduling sync',       status: 'in-progress' },
+      { id: 'google-calendar',  name: 'Google Calendar Events',         subtitle: 'Sprint and cohort scheduling sync',       status: 'active'      },
       { id: 'lms',              name: 'LMS Integration',                subtitle: 'Course completion and progress sync',     status: 'planned'     },
     ],
     connections: [
@@ -630,7 +629,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
               {[
                 { label: 'Open in Salesforce',        desc: 'Review the primary record and related data',           href: '/admin/salesforce-arch', icon: <Database className="w-4 h-4" />, variant: 'primary' as const },
                 { label: 'Review Knowledge Sources',  desc: '2 sources are flagged for currency review',            href: '/knowledge',          icon: <BookOpen  className="w-4 h-4" />, variant: 'secondary' as const },
-                { label: 'Check Penny Prompts',       desc: 'Verify prompt quality and consistency after changes',  href: '/penny/prompts',      icon: <Brain     className="w-4 h-4" />, variant: 'secondary' as const },
+                { label: `Check ${TERMS.aiAssistant} Prompts`, desc: 'Verify prompt quality and consistency after changes', href: '/penny/prompts', icon: <Brain className="w-4 h-4" />, variant: 'secondary' as const },
                 { label: 'View Impact Analysis',      desc: 'See the full cascade of changes for this object',      href: '/digital-twin/impact',icon: <Zap       className="w-4 h-4" />, variant: 'secondary' as const },
                 { label: 'Check Governance Status',   desc: 'Review lifecycle stage and ownership assignments',     href: '/digital-twin/governance', icon: <Shield className="w-4 h-4" />, variant: 'secondary' as const },
               ].map((a, i) => (
@@ -776,7 +775,7 @@ function MapTab({ selected, onSelect, onNavigate }: {
             <div className="grid grid-cols-3 gap-2">
               {([
                 { kind: 'program' as ObjectKind, ex: { id: 'guided-trail', name: 'Guided Trail', subtitle: 'Cohort-based coaching', status: 'active' as const } },
-                { kind: 'capability' as ObjectKind, ex: { id: 'resume-review', name: 'Penny Resume Review', subtitle: 'AI feedback engine', status: 'active' as const } },
+                { kind: 'capability' as ObjectKind, ex: { id: 'resume-review', name: `${TERMS.aiAssistant} Resume Review`, subtitle: 'AI feedback engine', status: 'active' as const } },
                 { kind: 'course' as ObjectKind, ex: { id: 'agile-foundations', name: 'Agile Foundations', subtitle: 'Sprint fundamentals', status: 'active' as const } },
                 { kind: 'role' as ObjectKind, ex: { id: 'coach', name: 'Coach', subtitle: 'Learner support role', status: 'active' as const } },
                 { kind: 'integration' as ObjectKind, ex: { id: 'salesforce-pe', name: 'Salesforce Engagement', subtitle: 'CRM source of record', status: 'active' as const } },
@@ -975,7 +974,6 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
 export default function DigitalTwin() {
   useAppContext();
   const [location, setLocation] = useLocation();
-  const { isAdminOrAbove } = useTierFlags();
   const [selected, setSelected] = useState<SelectedObject | null>(null);
 
   const nav = (p: string) => setLocation(p);
@@ -984,8 +982,8 @@ export default function DigitalTwin() {
     setSelected(obj);
   }
 
-  if (isAdminOrAbove && location.startsWith('/digital-twin/governance')) {
-    return <GovernanceTab onNavigate={nav} />;
-  }
+  if (location.startsWith('/digital-twin/governance')) return <GovernanceTab onNavigate={nav} />;
+  if (location.startsWith('/digital-twin/map'))        return <MapTab selected={selected} onSelect={handleSelect} onNavigate={nav} />;
+  if (location.startsWith('/digital-twin/impact'))     return <ImpactTab selected={selected} onSelect={handleSelect} onNavigate={nav} />;
   return <ExploreTab selected={selected} onSelect={handleSelect} onNavigate={nav} />;
 }

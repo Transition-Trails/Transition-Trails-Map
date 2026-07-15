@@ -88,8 +88,6 @@ export const REDIRECT_MAP: Record<string, string> = {
   '/digital-twin/penny-network':         '/digital-twin',
   '/digital-twin/people':                '/digital-twin',
   '/digital-twin/relationships':         '/digital-twin',
-  '/digital-twin/map':                   '/digital-twin',
-  '/digital-twin/impact':                '/digital-twin',
 
   // Operations legacy
   '/operations/program-health':          '/operations/health',

@@ -28,8 +28,8 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/trail-os-overview',            kind: 'active' },
   { path: '/digital-twin',                 kind: 'active' },
   { path: '/digital-twin/:tab',            kind: 'active' },
-  { path: '/digital-twin/map',             kind: 'redirect', target: '/digital-twin', note: 'tab handled by hub' },
-  { path: '/digital-twin/impact',          kind: 'redirect', target: '/digital-twin', note: 'tab handled by hub' },
+  { path: '/digital-twin/map',             kind: 'active',   note: 'MapTab — focused radial SVG' },
+  { path: '/digital-twin/impact',          kind: 'active',   note: 'ImpactTab — change cascade analysis' },
   { path: '/uom',                          kind: 'active' },
   { path: '/uom/:tab',                     kind: 'active' },
 

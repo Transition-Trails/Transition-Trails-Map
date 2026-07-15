@@ -121,8 +121,6 @@ function Router() {
       <Route path="/digital-twin/penny-network"> <Redirect to="/digital-twin" /></Route>
       <Route path="/digital-twin/people">        <Redirect to="/digital-twin" /></Route>
       <Route path="/digital-twin/relationships"> <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/map">           <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/impact">        <Redirect to="/digital-twin" /></Route>
 
       {/* Old operations sub-pages */}
       <Route path="/operations/program-health">    <Redirect to="/operations/health" /></Route>
