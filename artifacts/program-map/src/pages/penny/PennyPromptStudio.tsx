@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, createContext, useContext } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { usePromptTemplates } from '@/hooks/usePromptTemplates';
 import {
   promptTemplates, promptVariables, outputFormats, versionHistory, qualityReviews,
   PROMPT_STUDIO_SUMMARY, DOMAIN_ORDER, DOMAIN_CLS,
@@ -250,11 +251,8 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
 
 // ── Studio context (live template state) ───────────────────────────────────
 
-interface StudioCtxValue {
-  templates: PromptTemplate[];
-  setTemplates: React.Dispatch<React.SetStateAction<PromptTemplate[]>>;
-}
-const StudioCtx = createContext<StudioCtxValue>({ templates: promptTemplates, setTemplates: () => undefined });
+interface StudioCtxValue { templates: PromptTemplate[]; }
+const StudioCtx = createContext<StudioCtxValue>({ templates: promptTemplates });
 function useStudioTemplates() { return useContext(StudioCtx).templates; }
 
 // ── Library View ───────────────────────────────────────────────────────────
@@ -1036,9 +1034,9 @@ function QualityReviewView() {
 
 export default function PennyPromptStudio() {
   const { setSelectedItem, openActionPanel, openSlackPanel } = useAppContext();
+  const { templates: liveTemplates, create, update } = usePromptTemplates();
   const [view, setView] = useState<StudioView>('library');
   const [librarySelectedTemplate, setLibrarySelectedTemplate] = useState<PromptTemplate | null>(null);
-  const [liveTemplates, setLiveTemplates] = useState<PromptTemplate[]>(promptTemplates);
 
   function openBrief(t: PromptTemplate) {
     setSelectedItem({ type: 'promptTemplate', id: t.id, data: t });
@@ -1053,7 +1051,7 @@ export default function PennyPromptStudio() {
     openActionPanel({
       title: `Edit: ${t.name}`,
       objectType: 'Prompt Template',
-      subtitle: 'Update the prompt configuration. Changes are prototype-only and reset on refresh.',
+      subtitle: 'Update the prompt configuration. Changes are saved to the database.',
       slackContext: 'penny',
       fields: [
         { id: 'name',         label: 'Template Name',   type: 'text',     required: true, placeholder: t.name },
@@ -1066,17 +1064,16 @@ export default function PennyPromptStudio() {
         { id: 'reviewStatus', label: 'Review Status',    type: 'select',   options: ['Draft', 'In Review', 'Approved', 'Needs Revision'] },
       ],
       onSaveAndView: (data) => {
-        setLiveTemplates(prev => prev.map(pt => pt.id === t.id ? {
-          ...pt,
-          ...(data.name         ? { name: data.name }                                                          : {}),
-          ...(data.domain       ? { domain: data.domain as PromptDomain }                                      : {}),
-          ...(data.purpose      ? { purpose: data.purpose }                                                    : {}),
-          ...(data.promptBody   ? { promptBody: data.promptBody }                                              : {}),
-          ...(data.tone         ? { tone: data.tone }                                                          : {}),
-          ...(data.guardrails   ? { guardrails: data.guardrails.split('\n').filter(Boolean) }                  : {}),
-          ...(data.reviewStatus ? { status: data.reviewStatus as PromptStatus }                                : {}),
+        update({ id: t.id, updates: {
+          ...(data.name         ? { name: data.name }                                          : {}),
+          ...(data.domain       ? { domain: data.domain as PromptDomain }                     : {}),
+          ...(data.purpose      ? { purpose: data.purpose }                                    : {}),
+          ...(data.promptBody   ? { promptBody: data.promptBody }                             : {}),
+          ...(data.tone         ? { tone: data.tone }                                          : {}),
+          ...(data.guardrails   ? { guardrails: data.guardrails.split('\n').filter(Boolean) } : {}),
+          ...(data.reviewStatus ? { status: data.reviewStatus as PromptStatus }               : {}),
           lastReviewed: 'Just now',
-        } : pt));
+        }});
         setView('templates');
       },
     });
@@ -1125,7 +1122,7 @@ export default function PennyPromptStudio() {
             qualityScore: 0,
             testBench: { sampleInputs: {}, simulatedOutput: '', simulationNotes: '' },
           };
-          setLiveTemplates(prev => [...prev, newTemplate]);
+          create(newTemplate);
         }
         setView('templates');
       },
@@ -1133,7 +1130,7 @@ export default function PennyPromptStudio() {
   }
 
   return (
-    <StudioCtx.Provider value={{ templates: liveTemplates, setTemplates: setLiveTemplates }}>
+    <StudioCtx.Provider value={{ templates: liveTemplates }}>
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">

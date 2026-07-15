@@ -19,6 +19,7 @@ import driveRouter           from "./drive";
 import notificationsRouter   from "./notifications";
 import learnerAuthRouter      from "./learnerAuth";
 import learnerRouter          from "./learner";
+import promptTemplatesRouter  from "./promptTemplates";
 
 const router: IRouter = Router();
 
@@ -42,5 +43,6 @@ router.use(driveRouter);
 router.use(notificationsRouter);
 router.use(learnerAuthRouter);
 router.use(learnerRouter);
+router.use(promptTemplatesRouter);
 
 export default router;
