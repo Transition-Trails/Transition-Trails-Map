@@ -19,7 +19,7 @@ import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 import { useTierFlags } from '@/hooks/useTierFlags';
 
 export function ContextPanel() {
-  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel, setPennyPanelTab, rightPanelOpen } = useAppContext();
+  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel, setPennyPanelTab, rightPanelOpen, setRightPanelOpen } = useAppContext();
   const [location, setLocation] = useLocation();
   const { isEveryday } = useTierFlags();
 
@@ -27,7 +27,10 @@ export function ContextPanel() {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    if (selectedItem) setCollapsed(false);
+    if (selectedItem) {
+      setCollapsed(false);
+      setRightPanelOpen(true);
+    }
   }, [selectedItem]);
 
   useEffect(() => {
