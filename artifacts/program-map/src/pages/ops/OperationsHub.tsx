@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 import {
   Activity, BarChart2, GitBranch, TrendingUp, ChevronRight, ChevronDown,
   AlertTriangle, Target, RefreshCw, Users, Database, Wifi, WifiOff,
@@ -84,8 +85,34 @@ function SfLiveStrip() {
   );
 }
 
+// ── Route map for attention-required cards ─────────────────────────────────
+const REC_ID_ROUTE: Record<string, string> = {
+  'rec-1':  '/roles',                   // Assign Penny Admin Owner → People & Roles
+  'rec-2':  '/admin/integrations',      // Plan Nonprofit Cloud Migration Sprint
+  'rec-3':  '/collaboration/slack',     // Build Penny Slack Adapter MVP
+  'rec-4':  '/roles',                   // Assign Owners to Unowned Roles
+  'rec-5':  '/penny/capabilities',      // Configure Digital Compass Penny Coverage
+  'rec-6':  '/admin/integrations',      // Define External Partner Salesforce Models
+  'rec-7':  '/penny/capabilities',      // Activate Executive Intelligence Briefs
+  'rec-8':  '/knowledge/sources',       // Resolve Overdue Knowledge Source Reviews
+  'rec-9':  '/navigator/program-map',   // Complete Explorer's Trail Learning Objectives
+  'rec-10': '/admin/integrations',      // Configure Google Drive Live Sync
+  'rec-11': '/admin/integrations',      // Start Agentforce Readiness Assessment
+  'rec-12': '/penny/prompts',           // Formalise Prompt Governance SLA
+};
+const REC_DOMAIN_ROUTE: Record<string, string> = {
+  'Penny AI':       '/penny/capabilities',
+  'People & Roles': '/roles',
+  'Programs':       '/navigator/program-map',
+  'Communications': '/collaboration/slack',
+  'Integrations':   '/admin/integrations',
+  'Knowledge':      '/knowledge/sources',
+  'Curriculum':     '/navigator/program-map',
+};
+
 // ── Executive Overview ────────────────────────────────────────────────────────
 function ExecutiveOverview() {
+  const [, navigate] = useLocation();
   const { setSelectedItem } = useAppContext();
   const { isEveryday } = useTierFlags();
   const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
@@ -133,7 +160,65 @@ function ExecutiveOverview() {
           </div>
         </div>
 
-        {/* Domain health — compact 4-col cards, no paragraph text */}
+        {/* Critical + high priority recs — ABOVE domain health */}
+        {(() => {
+          const allItems = [
+            ...recommendations.filter(r => r.priority === 'critical'),
+            ...recommendations.filter(r => r.priority === 'high'),
+          ];
+          const LIMIT   = 6;
+          const visible = allItems.slice(0, LIMIT);
+          const extra   = allItems.length - LIMIT;
+          return (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                  {isEveryday ? 'Items Needing Attention' : 'Critical & High Priority Actions'}
+                </p>
+                {extra > 0 && (
+                  <button
+                    onClick={() => navigate('/operations/recommendations')}
+                    className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+                  >
+                    View all {allItems.length} <ChevronRight className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {visible.map(r => {
+                  const pc = REC_PRIORITY_CONFIG[r.priority];
+                  const dest = REC_ID_ROUTE[r.id] ?? REC_DOMAIN_ROUTE[r.domain] ?? '/operations';
+                  return (
+                    <button key={r.id}
+                      onClick={() => navigate(dest)}
+                      className="text-left rounded-lg border border-border bg-white px-2.5 py-2 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight shrink-0 ${pc.cls}`}>
+                          {pc.label}
+                        </span>
+                        <ChevronRight className="w-3 h-3 text-muted-foreground/25 group-hover:text-primary transition-colors shrink-0" />
+                      </div>
+                      <p className="text-[10px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
+                        {r.action}
+                      </p>
+                      <p className="text-[9px] text-muted-foreground/70 truncate">{r.domain}</p>
+                    </button>
+                  );
+                })}
+              </div>
+              {extra > 0 && (
+                <button
+                  onClick={() => navigate('/operations/recommendations')}
+                  className="mt-2 w-full text-center text-[10px] font-semibold text-primary hover:underline py-1.5 rounded-lg border border-dashed border-primary/30 hover:border-primary/60 transition-colors"
+                >
+                  + {extra} more attention items
+                </button>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Domain health — compact 4-col cards */}
         <div>
           <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5">Domain Health</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -159,63 +244,6 @@ function ExecutiveOverview() {
             })}
           </div>
         </div>
-
-        {/* Critical + high priority recs — compact 2-column grid */}
-        {(() => {
-          const allItems = [
-            ...recommendations.filter(r => r.priority === 'critical'),
-            ...recommendations.filter(r => r.priority === 'high'),
-          ];
-          const LIMIT   = 6;
-          const visible = allItems.slice(0, LIMIT);
-          const extra   = allItems.length - LIMIT;
-          return (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-                  {isEveryday ? 'Items Needing Attention' : 'Critical & High Priority Actions'}
-                </p>
-                {extra > 0 && (
-                  <button
-                    onClick={() => setSelectedItem({ type: 'oicRecommendation', id: 'all', data: null })}
-                    className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
-                  >
-                    View all {allItems.length} <ChevronRight className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {visible.map(r => {
-                  const pc = REC_PRIORITY_CONFIG[r.priority];
-                  return (
-                    <button key={r.id}
-                      onClick={() => setSelectedItem({ type: 'oicRecommendation', id: r.id, data: r })}
-                      className="text-left rounded-lg border border-border bg-white px-2.5 py-2 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight shrink-0 ${pc.cls}`}>
-                          {pc.label}
-                        </span>
-                        <ChevronRight className="w-3 h-3 text-muted-foreground/25 group-hover:text-primary transition-colors shrink-0" />
-                      </div>
-                      <p className="text-[10px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
-                        {r.action}
-                      </p>
-                      <p className="text-[9px] text-muted-foreground/70 truncate">{r.domain}</p>
-                    </button>
-                  );
-                })}
-              </div>
-              {extra > 0 && (
-                <button
-                  onClick={() => setSelectedItem({ type: 'oicRecommendation', id: 'all', data: null })}
-                  className="mt-2 w-full text-center text-[10px] font-semibold text-primary hover:underline py-1.5 rounded-lg border border-dashed border-primary/30 hover:border-primary/60 transition-colors"
-                >
-                  + {extra} more attention items
-                </button>
-              )}
-            </div>
-          );
-        })()}
       </div>
     </ScrollArea>
   );
