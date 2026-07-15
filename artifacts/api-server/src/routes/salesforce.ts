@@ -11,6 +11,20 @@ const OPS_CACHE_TTL = 5 * 60 * 1000;
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
+// Get the org base URL from the OAuth Identity endpoint (shared across handlers)
+async function getOrgBaseUrl(proxyFetch: (url: string, init?: RequestInit) => Promise<Response>): Promise<string> {
+  try {
+    const res = await proxyFetch("/services/oauth2/userinfo", { headers: { Accept: "application/json" } });
+    if (!res.ok) return "";
+    const info = await res.json() as Record<string, unknown>;
+    const urls = info["urls"] as Record<string, string> | undefined;
+    const sobjectsUrl = urls?.["sobjects"] ?? "";
+    if (sobjectsUrl) return sobjectsUrl.replace(/\/services\/.*$/, "");
+    const profile = String(info["profile"] ?? "");
+    return profile.replace(/\/[A-Za-z0-9]{15,18}$/, "");
+  } catch { return ""; }
+}
+
 type CheckStatus = "pass" | "fail" | "warning" | "skip";
 
 interface Check {
@@ -297,37 +311,13 @@ router.get("/salesforce/operations/cases", async (req, res) => {
     catch { return null; }
   };
 
-  // Get real org base URL from the OAuth Identity endpoint — more reliable than InstanceName
-  const getOrgBaseUrl = async (): Promise<string> => {
-    try {
-      const res = await proxyFetch("/services/oauth2/userinfo", {
-        headers: { Accept: "application/json" },
-      });
-      if (!res.ok) return "";
-      const info = await res.json() as Record<string, unknown>;
-      // `urls.sobjects` is like "https://myorg.lightning.force.com/services/data/v59.0/sobjects/"
-      // `profile` is like "https://myorg.my.salesforce.com/005xxx"
-      const urls = info["urls"] as Record<string, string> | undefined;
-      const sobjectsUrl = urls?.["sobjects"] ?? "";
-      if (sobjectsUrl) {
-        // Strip everything from /services/... onward to get the base URL
-        return sobjectsUrl.replace(/\/services\/.*$/, "");
-      }
-      // Fallback: strip user-id from profile URL
-      const profile = String(info["profile"] ?? "");
-      return profile.replace(/\/[A-Za-z0-9]{15,18}$/, "");
-    } catch {
-      return "";
-    }
-  };
-
   const [cases, totalOpen, highPriority, orgBaseUrl] = await Promise.all([
     safeRecords(
       "SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, Contact.Name, Account.Name FROM Case WHERE IsClosed = false ORDER BY Priority DESC, CreatedDate ASC LIMIT 25"
     ),
     safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false"),
     safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = 'High'"),
-    getOrgBaseUrl(),
+    getOrgBaseUrl(proxyFetch),
   ]);
 
   const data = {
@@ -419,11 +409,12 @@ router.get("/salesforce/programs/list", async (req, res) => {
     try { return (await sfQuery(proxyFetch, soql)).records; } catch { return null; }
   };
 
-  const [programs, total] = await Promise.all([
+  const [programs, total, orgBaseUrl] = await Promise.all([
     safeRecords(
       "SELECT Id, Name, pmdm__Status__c, pmdm__StartDate__c, pmdm__EndDate__c, pmdm__Description__c, pmdm__ShortSummary__c, pmdm__TargetPopulation__c, pmdm__ProgramIssueArea__c, Program_Manager__c, Program_Goals__c, Program_Structure__c, Program_Target_Audience__c, Program_Expected_Outcomes__c, Problem_Statement__c, Success_Metrics_Evaluation_Plan__c, Risks_Assumptions__c, Budget_Resouces__c, Funding_Strategy__c, Implementation_Plan__c, Partnership_Opportunities__c, Google_Drive_Folder__c, Canva_Folder__c, Program_Reference_Link__c, Requires_Payment__c FROM pmdm__Program__c ORDER BY Name LIMIT 200"
     ),
     safeCount("SELECT COUNT() FROM pmdm__Program__c"),
+    getOrgBaseUrl(proxyFetch),
   ]);
 
   const filtered = (programs ?? []).filter(p =>
@@ -433,6 +424,7 @@ router.get("/salesforce/programs/list", async (req, res) => {
   const data = {
     programs:    filtered,
     total,
+    orgBaseUrl,
     lastUpdated: new Date().toISOString(),
     fromCache:   false,
     cacheAge:    0,

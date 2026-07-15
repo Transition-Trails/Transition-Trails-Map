@@ -153,6 +153,7 @@ function mapSfToProgram(sf: SfProgramRecord): Program {
     canvaFolder:           sf.Canva_Folder__c,
     referenceLink:         sf.Program_Reference_Link__c,
     requiresPayment:       sf.Requires_Payment__c,
+    sfId:                  sf.Id,
   };
 }
 

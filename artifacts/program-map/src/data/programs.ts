@@ -50,6 +50,7 @@ export interface Program {
   canvaFolder?: string | null;
   referenceLink?: string | null;
   requiresPayment?: boolean | null;
+  sfId?: string | null;
 }
 
 export const programs: Program[] = [

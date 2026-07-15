@@ -31,6 +31,7 @@ export interface SfProgramRecord {
 export interface SfProgramsResponse {
   programs:    SfProgramRecord[];
   total:       number | null;
+  orgBaseUrl:  string;
   lastUpdated: string;
   fromCache:   boolean;
   cacheAge:    number;

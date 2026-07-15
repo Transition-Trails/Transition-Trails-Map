@@ -54,11 +54,27 @@ function ChipList({ items }: { items: string[] }) {
 // ── Tab components ─────────────────────────────────────────────────────────────
 function OverviewTab({ p }: { p: Program }) {
   const { isEveryday } = useTierFlags();
+  const { data: sfData } = useSfPrograms();
+  const sfUrl = (sfData?.orgBaseUrl && p.sfId)
+    ? `${sfData.orgBaseUrl}/lightning/r/pmdm__Program__c/${p.sfId}/view`
+    : null;
+
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-3xl">
         {p.executiveSummary && (
           <div className="text-[13px] text-muted-foreground italic leading-relaxed border-l-4 border-primary/20 pl-4 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-0.5 [&_strong]:font-semibold" dangerouslySetInnerHTML={{ __html: p.executiveSummary }} />
+        )}
+        {sfUrl && (
+          <a
+            href={sfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary hover:underline"
+          >
+            <ExternalLink className="w-3 h-3" />
+            View in Salesforce
+          </a>
         )}
         <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
           <InfoRow label="Audience"      value={<RichText html={p.audience} />} />
