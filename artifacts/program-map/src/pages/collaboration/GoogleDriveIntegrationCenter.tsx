@@ -7,10 +7,9 @@ import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectW
 import {
   HardDrive, FolderOpen, FileText, Settings, Shield, Activity, FlaskConical,
   CheckCircle, XCircle, AlertTriangle, Clock, ChevronRight, Key,
-  Layers, Brain, BookOpen, Database, RefreshCw, File, Folder, Plus,
+  Layers, Brain, BookOpen, Database, RefreshCw, File, Folder,
   Sparkles, Image, CheckCircle2, ExternalLink,
 } from 'lucide-react';
-import { useAppContext } from '@/context/AppContext';
 import {
   DRIVE_VALIDATION_CHECKS, PROGRAM_FOLDERS, DRIVE_FILES,
   CONTENT_MAPPINGS, PENNY_SOURCE_MAPPINGS, KNOWLEDGE_SOURCE_MAPPINGS,
@@ -144,12 +143,12 @@ function OverviewTab() {
           </div>
         </div>
         <div className="bg-card border border-border rounded-lg p-3">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Go-Live Blockers</div>
+          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Setup Checklist</div>
           <div className="text-[12px] text-foreground space-y-1">
-            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-red-500" /><span>GOOGLE_CLIENT_ID not configured</span></div>
-            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-red-500" /><span>GOOGLE_CLIENT_SECRET not configured</span></div>
-            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-red-500" /><span>GOOGLE_DRIVE_REFRESH_TOKEN not configured</span></div>
-            <div className="flex gap-2 items-center"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /><span>Google Drive API not verified in GCP</span></div>
+            <div className="flex gap-2 items-center"><CheckCircle className="w-3.5 h-3.5 text-emerald-500" /><span>Google Drive connected via Replit integration</span></div>
+            <div className="flex gap-2 items-center"><CheckCircle className="w-3.5 h-3.5 text-emerald-500" /><span>OAuth refresh token active</span></div>
+            <div className="flex gap-2 items-center"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /><span>GOOGLE_DRIVE_PENNY_FOLDER_ID — set in Replit Secrets</span></div>
+            <div className="flex gap-2 items-center"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /><span>Program Drive folders — create one per program and link in Knowledge Sources</span></div>
           </div>
         </div>
       </div>
@@ -951,15 +950,10 @@ function PennyAssetsSetupTab() {
           </div>
         </div>
 
-        {/* Verify link */}
-        <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Image className="w-3.5 h-3.5 text-muted-foreground" />
-            <p className="text-[11px] text-muted-foreground">Once configured, manage and browse assets in the Penny Asset Library.</p>
-          </div>
-          <a href="/penny/asset-library" className="text-[11px] font-semibold text-primary hover:underline whitespace-nowrap ml-3">
-            Open Asset Library →
-          </a>
+        {/* Verify note */}
+        <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 flex items-center gap-2">
+          <Image className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+          <p className="text-[11px] text-muted-foreground">Once configured, navigate to <strong>Penny → Asset Library</strong> in the sidebar to manage and browse assets.</p>
         </div>
 
       </div>
@@ -970,35 +964,12 @@ function PennyAssetsSetupTab() {
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
 export default function GoogleDriveIntegrationCenter() {
-  const { openActionPanel } = useAppContext();
-  const govSummary = getDriveGovernanceSummary();
-  const criticalCount = govSummary.critical;
-  const badge = criticalCount > 0 ? `${criticalCount} CRITICAL ISSUES` : 'Phase 1 — Drive Integration';
-
-  const actions = [
-    { id: 'add-folder', label: 'Add Folder Mapping', icon: Plus, variant: 'primary' as const, onClick: () => openActionPanel({
-        title: 'Add Folder Mapping', objectType: 'Folder Mapping',
-        subtitle: 'Connect a Google Drive folder to a Trail OS program, cohort, or content type.',
-        slackContext: 'collaboration',
-        fields: [
-          { id: 'folderName',  label: 'Folder Name',             type: 'text',   required: true, placeholder: 'e.g. Digital Literacy Trail — Cohort 3' },
-          { id: 'folderId',    label: 'Google Drive Folder ID',   type: 'text',   placeholder: 'Paste the Drive folder ID or URL' },
-          { id: 'mapTo',       label: 'Maps To',                  type: 'select', options: ['Program', 'Cohort', 'Sprint', 'Role', 'Penny Source', 'Knowledge Source'], required: true },
-          { id: 'trailObject', label: 'Trail OS Object',          type: 'text',   placeholder: 'e.g. Digital Literacy Trail' },
-          { id: 'contentType', label: 'Content Type',             type: 'select', options: ['Program Materials', 'Assessments', 'Templates', 'Reference Docs', 'Media', 'Penny Knowledge'] },
-          { id: 'syncEnabled', label: 'Sync to Penny',            type: 'select', options: ['Yes — auto-sync', 'Yes — manual sync', 'No'] },
-        ],
-      })
-    },
-  ];
-
   return (
     <HubShell
       title="Google Drive Integration Center"
       icon={HardDrive}
       description="Drive folders and files as first-class Trail OS objects. Program Folder Registry, File Catalog, Content Mapping, Penny Source Mapping, and Governance in one place."
-      badge={badge}
-      actions={actions}
+      badge="Phase 1 — Google Drive"
       tabs={[
         { id:'overview',       label:'Overview',               path:'/collaboration/drive',                  icon:Activity,    content:<OverviewTab /> },
         { id:'account',        label:'Account Config',         path:'/collaboration/drive/account',          icon:Settings,    content:<AccountConfigTab /> },

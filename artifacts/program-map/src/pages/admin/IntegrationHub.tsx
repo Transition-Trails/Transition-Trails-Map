@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Brain, FolderOpen, MessageSquare, Shield, BookOpen, Activity,
-  ChevronDown, ChevronUp, ChevronRight,
-  Key, Calendar, Plug, ShieldCheck, Clock,
+  ChevronDown, ChevronUp,
+  Key, Calendar, Clock,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -141,15 +140,13 @@ const DOMAINS: DomainCard[] = [
   },
 ];
 
-// ── Quick actions ─────────────────────────────────────────────────────────────
+// ── Sub-pages ─────────────────────────────────────────────────────────────────
 
-const QUICK_ACTIONS = [
-  { id: 'collab', label: 'Signal Rules',         desc: 'Configure channel feeding for Penny and Trail Signals', href: '/collaboration',               icon: MessageSquare },
-  { id: 'secrets', label: 'Secrets Audit',       desc: 'Check all tokens are present and valid',               href: '/admin/integrations/secrets',   icon: Key },
-  { id: 'drive', label: 'Google Drive',           desc: 'Penny Asset Library and program folder config',        href: '/admin/integrations/google-drive', icon: FolderOpen },
-  { id: 'calendar', label: 'Google Calendar',    desc: 'Calendar IDs and cohort event mapping',                href: '/admin/integrations/google-calendar', icon: Calendar },
-  { id: 'readiness', label: 'Integration Plan',  desc: 'Full planning workspace — 17 integrations, auth, risks', href: '/admin/integration-readiness', icon: Plug },
-  { id: 'sf', label: 'Salesforce Validation',    desc: '16 Trail OS ↔ SF object mappings and readiness scores', href: '/admin/sf-validation',          icon: ShieldCheck },
+const SUB_PAGES = [
+  { id: 'secrets',  label: 'Secrets Audit',    desc: 'Token health — all env vars and API keys',       icon: Key },
+  { id: 'drive',    label: 'Google Drive',      desc: 'Penny Asset Library and program folder setup',   icon: FolderOpen },
+  { id: 'calendar', label: 'Google Calendar',   desc: 'Calendar IDs and cohort event mapping',          icon: Calendar },
+  { id: 'collab',   label: 'Signal Rules',      desc: 'Channel routing for Penny and Trail Signals',    icon: MessageSquare },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -162,7 +159,6 @@ function domainScore(card: DomainCard) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function IntegrationHub() {
-  const [, setLocation] = useLocation();
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [expandedDep, setExpandedDep] = useState<string | null>(null);
 
@@ -270,26 +266,25 @@ export default function IntegrationHub() {
                 </div>
               </div>
 
-              {/* Quick actions */}
+              {/* Sub-pages reference */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2.5">Quick Actions</p>
-                <div className={`grid gap-2 ${activeDomain ? 'grid-cols-1' : 'grid-cols-3'}`}>
-                  {QUICK_ACTIONS.map((qa) => {
-                    const Icon = qa.icon;
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2.5">Detail Pages</p>
+                <div className={`grid gap-2 ${activeDomain ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  {SUB_PAGES.map((sp) => {
+                    const Icon = sp.icon;
                     return (
-                      <button
-                        key={qa.id}
-                        onClick={() => setLocation(qa.href)}
-                        className="rounded-lg border border-border bg-card p-3 text-left hover:shadow-sm hover:border-muted-foreground/30 transition-all flex items-start gap-2.5 group"
+                      <div
+                        key={sp.id}
+                        className="rounded-lg border border-border bg-card p-3 flex items-start gap-2.5"
                       >
                         <div className="w-6 h-6 rounded-md bg-muted/40 flex items-center justify-center flex-shrink-0 mt-0.5 text-muted-foreground">
                           <Icon className="w-3.5 h-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[12px] font-bold text-foreground leading-tight">{qa.label}</p>
-                          <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">{qa.desc}</p>
+                          <p className="text-[12px] font-bold text-foreground leading-tight">{sp.label}</p>
+                          <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">{sp.desc}</p>
                         </div>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -353,15 +348,7 @@ export default function IntegrationHub() {
                       </button>
                       {isOpen && (
                         <div className="px-4 pb-4 pt-2.5 border-t border-border bg-muted/20">
-                          <p className="text-[12px] text-muted-foreground leading-relaxed mb-3">{dep.note}</p>
-                          {dep.action && (
-                            <button
-                              onClick={() => setLocation(dep.action!)}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors"
-                            >
-                              {dep.actionLabel} <ChevronRight className="w-3 h-3" />
-                            </button>
-                          )}
+                          <p className="text-[12px] text-muted-foreground leading-relaxed">{dep.note}</p>
                         </div>
                       )}
                     </div>
