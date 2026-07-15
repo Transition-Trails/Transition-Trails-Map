@@ -267,10 +267,9 @@ export function Sidebar() {
 
         {/* Footer */}
         <div className="px-1 xl:px-3 py-2 border-t border-sidebar-border flex-shrink-0">
-          <p className="hidden xl:block text-[9px] font-bold text-amber-600/70 uppercase tracking-wider">Phase 1 Architecture</p>
-          <p className="hidden xl:block text-[9px] text-muted-foreground/40 mt-0.5">Trail OS v1.0 · Internal Prototype</p>
-          <div className="xl:hidden flex justify-center py-0.5" title="Phase 1 · Trail OS v1.0">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500/40" />
+          <p className="hidden xl:block text-[9px] text-muted-foreground/40">Trail OS v1.0 · Internal</p>
+          <div className="xl:hidden flex justify-center py-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
           </div>
         </div>
       </div>

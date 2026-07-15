@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import {
   Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown,
-  AlertTriangle, Target,
+  AlertTriangle,
 } from 'lucide-react';
-import type { ActionItem } from '@/components/workspace/ActionBar';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -280,7 +279,7 @@ function AllRecommendations() {
 // above content. Keep ≤ 1 tab row, no ActionBar, and plain-language labels.
 
 export default function OperationsHub() {
-  const { isEveryday, isAdminOrAbove } = useTierFlags();
+  const { isEveryday } = useTierFlags();
 
   const TABS = [
     { id: 'health',     label: 'Health Indicators', path: '/operations/health',           icon: Activity,      content: <HealthIndicators /> },
@@ -288,16 +287,6 @@ export default function OperationsHub() {
     { id: 'scorecards', label: 'Scorecards',        path: '/operations/scorecards',       icon: TrendingUp,    content: <ScorecardsView /> },
     { id: 'trends',     label: 'Trends & Insights', path: '/operations/trends',           icon: AlertTriangle, content: <TrendsView /> },
     { id: 'recs',       label: 'Recommendations',   path: '/operations/recommendations',  icon: ChevronRight,  content: <AllRecommendations /> },
-  ];
-
-  const ACTIONS: ActionItem[] = [
-    ...(isAdminOrAbove ? [
-      { id: 'phase1', label: 'Phase 1 Readiness', icon: Target, href: '/admin/phase1-readiness', variant: 'primary' as const },
-    ] : []),
-    ...(!isEveryday ? [
-      { id: 'recs',   label: 'Recommendations',   icon: ChevronRight, href: '/operations/recommendations', variant: 'secondary' as const },
-      { id: 'trends', label: 'Trends & Insights', icon: TrendingUp,   href: '/operations/trends',          variant: 'secondary' as const },
-    ] : []),
   ];
 
   return (
@@ -309,7 +298,6 @@ export default function OperationsHub() {
           ? 'Program health at a glance — key indicators and items needing attention.'
           : 'Monitor program health, surface priority actions, track demand, and review scorecards and operational trends.'
       }
-      actions={ACTIONS}
       tabs={TABS}
     />
   );
