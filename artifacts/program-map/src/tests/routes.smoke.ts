@@ -47,6 +47,7 @@ export const CANONICAL_ROUTES = [
 
   '/collaboration',
   '/collaboration/slack',
+  '/collaboration/slack/validation',
   '/collaboration/drive',
   '/collaboration/calendar',
   '/collaboration/channels',

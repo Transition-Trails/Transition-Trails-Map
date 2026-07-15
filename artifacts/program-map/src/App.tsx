@@ -270,7 +270,8 @@ function Router() {
       <Route path="/collaboration/notifications" component={CommNotifications} />
       <Route path="/collaboration/calendar-live" component={CalendarPanel} />
       <Route path="/collaboration/gmail"         component={GmailCenter} />
-      <Route path="/collaboration/slack"         component={SlackIntegrationCenter} />
+      <Route path="/collaboration/slack/:tab"     component={SlackIntegrationCenter} />
+      <Route path="/collaboration/slack"          component={SlackIntegrationCenter} />
       <Route path="/collaboration">              <Redirect to="/collaboration/my-signals" /></Route>
 
       {/* Governance + Search + Context Engine */}
