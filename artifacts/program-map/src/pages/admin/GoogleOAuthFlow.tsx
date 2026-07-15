@@ -8,6 +8,20 @@ import {
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
+// ── Scope metadata — drives the Step 3 table from info.scopes ────────────────
+// Keys are the full scope URLs returned by the API (plus 'openid' / 'email').
+// If the server adds or removes a scope, this table will reflect it automatically.
+
+const SCOPE_META: Record<string, { short: string; icon: React.ReactNode; label: string }> = {
+  'https://www.googleapis.com/auth/drive.readonly':    { short: 'drive.readonly',    icon: <HardDrive className="w-3.5 h-3.5" />, label: 'Read program folders and documents' },
+  'https://www.googleapis.com/auth/drive.file':        { short: 'drive.file',        icon: <HardDrive className="w-3.5 h-3.5" />, label: 'Create and write Penny source files' },
+  'https://www.googleapis.com/auth/calendar.readonly': { short: 'calendar.readonly', icon: <Calendar  className="w-3.5 h-3.5" />, label: 'Read cohort and program calendars' },
+  'https://www.googleapis.com/auth/calendar.events':   { short: 'calendar.events',   icon: <Calendar  className="w-3.5 h-3.5" />, label: 'Create Penny reminder events' },
+  'https://www.googleapis.com/auth/gmail.send':        { short: 'gmail.send',        icon: <Mail      className="w-3.5 h-3.5" />, label: 'Send emails via Penny draft flow' },
+  'openid':                                            { short: 'openid + email',    icon: <Shield    className="w-3.5 h-3.5" />, label: 'Identify the authorizing Google account' },
+  'email':                                             { short: 'email',             icon: <Shield    className="w-3.5 h-3.5" />, label: '(grouped with openid)' },
+};
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface OAuthInfo {
@@ -488,7 +502,7 @@ export default function GoogleOAuthFlow() {
       {/* Header */}
       <div className="px-4 py-3 border-b border-border bg-white shrink-0">
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1.5">
-          <button onClick={() => navigate('/admin/secrets-audit')} className="hover:text-foreground">Integration Secrets Audit</button>
+          <button onClick={() => navigate('/admin/integrations/secrets')} className="hover:text-foreground">Integration Secrets Audit</button>
           <ChevronRight className="w-3 h-3" />
           <span className="text-foreground font-semibold">Google Authorization</span>
         </div>
@@ -510,7 +524,7 @@ export default function GoogleOAuthFlow() {
           <RefreshCw className={`w-3.5 h-3.5 ${infoLoading ? 'animate-spin' : ''}`} />
           {infoLoading ? 'Checking…' : 'Refresh Status'}
         </button>
-        <button onClick={() => navigate('/admin/secrets-audit')}
+        <button onClick={() => navigate('/admin/integrations/secrets')}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-medium border border-border bg-white hover:bg-muted/30">
           ← Back to Secrets Audit
         </button>
@@ -725,20 +739,19 @@ export default function GoogleOAuthFlow() {
                 Drive, Calendar, and Gmail are all authorized in one flow. All scopes below must be added to your OAuth Consent Screen in Google Cloud Console.
               </p>
               <div className="grid grid-cols-1 gap-1.5">
-                {[
-                  { icon: <HardDrive className="w-3.5 h-3.5" />, scope: 'drive.readonly',   label: 'Read program folders and documents' },
-                  { icon: <HardDrive className="w-3.5 h-3.5" />, scope: 'drive.file',        label: 'Create and write Penny source files' },
-                  { icon: <Calendar  className="w-3.5 h-3.5" />, scope: 'calendar.readonly', label: 'Read cohort and program calendars' },
-                  { icon: <Calendar  className="w-3.5 h-3.5" />, scope: 'calendar.events',   label: 'Create Penny reminder events' },
-                  { icon: <Mail      className="w-3.5 h-3.5" />, scope: 'gmail.send',        label: 'Send emails via Penny draft flow' },
-                  { icon: <Shield    className="w-3.5 h-3.5" />, scope: 'openid + email',    label: 'Identify the authorizing Google account' },
-                ].map(({ icon, scope, label }) => (
-                  <div key={scope} className="flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-muted/20">
-                    <span className="text-muted-foreground">{icon}</span>
-                    <code className="text-[11px] font-mono text-foreground w-36 shrink-0">{scope}</code>
-                    <span className="text-[11px] text-muted-foreground">{label}</span>
-                  </div>
-                ))}
+                {(info?.scopes ?? Object.keys(SCOPE_META))
+                  .filter(s => s !== 'email')
+                  .map(s => {
+                    const meta = SCOPE_META[s];
+                    const short = meta?.short ?? s.replace('https://www.googleapis.com/auth/', '');
+                    return (
+                      <div key={s} className="flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-muted/20">
+                        <span className="text-muted-foreground">{meta?.icon ?? <Shield className="w-3.5 h-3.5" />}</span>
+                        <code className="text-[11px] font-mono text-foreground w-36 shrink-0">{short}</code>
+                        <span className="text-[11px] text-muted-foreground">{meta?.label ?? ''}</span>
+                      </div>
+                    );
+                  })}
               </div>
               <div className="flex items-start gap-2 rounded border border-amber-200 bg-amber-50 px-3 py-2 mt-1">
                 <Info className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
@@ -828,6 +841,7 @@ export default function GoogleOAuthFlow() {
                 {[
                   { name: 'GOOGLE_DRIVE_REFRESH_TOKEN',     present: info?.tokens.drive,    icon: <HardDrive className="w-3.5 h-3.5" />, service: 'Google Drive' },
                   { name: 'GOOGLE_CALENDAR_REFRESH_TOKEN',  present: info?.tokens.calendar, icon: <Calendar  className="w-3.5 h-3.5" />, service: 'Google Calendar' },
+                  { name: 'GOOGLE_GMAIL_REFRESH_TOKEN',     present: info?.tokens.gmail,    icon: <Mail      className="w-3.5 h-3.5" />, service: 'Gmail (Mail panel)' },
                 ].map(t => (
                   <div key={t.name} className={`rounded border px-3 py-2.5 flex items-start gap-2 ${t.present ? 'border-emerald-200 bg-emerald-50' : 'border-rose-100 bg-rose-50/60'}`}>
                     <span className={t.present ? 'text-emerald-600' : 'text-rose-400'}>{t.icon}</span>

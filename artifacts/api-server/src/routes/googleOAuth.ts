@@ -97,7 +97,7 @@ router.get("/google/oauth/info", (req: Request, res: Response) => {
   return res.json({
     redirectUri,
     scopes: SCOPES,
-    scopeDisplay: "drive.readonly, drive.file, calendar.readonly, calendar.events, gmail.readonly, gmail.send",
+    scopeDisplay: "drive.readonly, drive.file, calendar.readonly, calendar.events, gmail.send",
     credentials: creds,
     tokens,
     authUrl: creds.ok
