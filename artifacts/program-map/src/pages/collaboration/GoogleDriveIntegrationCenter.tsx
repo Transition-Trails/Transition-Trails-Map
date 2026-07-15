@@ -322,8 +322,8 @@ export default function GoogleDriveIntegrationCenter() {
       description="Connect Google Drive to Trail OS — Penny asset library setup and program folder management."
       badge="Google Drive"
       tabs={[
-        { id: 'overview',     label: 'Overview',          path: '/collaboration/drive',              icon: Activity, content: <OverviewTab /> },
-        { id: 'penny-assets', label: 'Penny Assets Setup', path: '/collaboration/drive/penny-assets', icon: Settings, content: <PennyAssetsSetupTab /> },
+        { id: 'overview',     label: 'Overview',           path: '/admin/integrations/google-drive',              icon: Activity, content: <OverviewTab /> },
+        { id: 'penny-assets', label: 'Penny Assets Setup', path: '/admin/integrations/google-drive/penny-assets', icon: Settings, content: <PennyAssetsSetupTab /> },
       ]}
     />
   );

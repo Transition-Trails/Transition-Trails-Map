@@ -301,9 +301,11 @@ function Router() {
       <Route path="/admin/phase1-audit"     component={Phase1CompletionAudit} />
 
       {/* Integration Hub — unified setup center */}
-      <Route path="/admin/integrations/google-auth"     component={GoogleOAuthFlow} />
-      <Route path="/admin/integrations/google-drive"    component={GoogleDriveIntegrationCenter} />
-      <Route path="/admin/integrations/google-calendar" component={GoogleCalendarIntegrationCenter} />
+      <Route path="/admin/integrations/google-auth"          component={GoogleOAuthFlow} />
+      <Route path="/admin/integrations/google-drive/:tab"    component={GoogleDriveIntegrationCenter} />
+      <Route path="/admin/integrations/google-drive"         component={GoogleDriveIntegrationCenter} />
+      <Route path="/admin/integrations/google-calendar/:tab" component={GoogleCalendarIntegrationCenter} />
+      <Route path="/admin/integrations/google-calendar"      component={GoogleCalendarIntegrationCenter} />
       <Route path="/admin/integrations/secrets"         component={IntegrationSecretsAudit} />
       <Route path="/admin/integrations"                 component={IntegrationHub} />
 

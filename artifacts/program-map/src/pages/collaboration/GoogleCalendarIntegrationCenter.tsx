@@ -936,17 +936,17 @@ export default function GoogleCalendarIntegrationCenter() {
       badge={badge}
       actions={actions}
       tabs={[
-        { id:'overview',       label:'Overview',            path:'/collaboration/calendar',                    icon:Activity,      content:<OverviewTab /> },
-        { id:'account',        label:'Account Config',      path:'/collaboration/calendar/account',            icon:Settings,      content:<AccountConfigTab /> },
-        { id:'registry',       label:'Calendar Registry',   path:'/collaboration/calendar/registry',           icon:CalendarDays,  content:<CalendarRegistryTab /> },
-        { id:'events',         label:'Event Catalog',       path:'/collaboration/calendar/events',             icon:CalendarCheck, content:<EventCatalogTab /> },
-        { id:'program-map',    label:'Program & Cohort',    path:'/collaboration/calendar/program-map',        icon:Layers,        content:<ProgramCohortMappingTab /> },
-        { id:'roles',          label:'Role & People',       path:'/collaboration/calendar/roles',              icon:Users,         content:<RolePeopleMappingTab /> },
-        { id:'penny',          label:'Penny Scheduling',    path:'/collaboration/calendar/penny',              icon:Brain,         content:<PennySchedulingTab /> },
-        { id:'comms',          label:'Comms Mapping',       path:'/collaboration/calendar/comms',              icon:Hash,          content:<CommMappingTab /> },
-        { id:'governance',     label:'Governance',          path:'/collaboration/calendar/governance',         icon:Shield,        content:<GovernanceTab /> },
-        { id:'testing',        label:'Test Suite',          path:'/collaboration/calendar/testing',            icon:FlaskConical,  content:<TestSuiteTab /> },
-        { id:'health',         label:'Health',              path:'/collaboration/calendar/health',             icon:Activity,      content:<HealthTab /> },
+        { id:'overview',       label:'Overview',            path:'/admin/integrations/google-calendar',                    icon:Activity,      content:<OverviewTab /> },
+        { id:'account',        label:'Account Config',      path:'/admin/integrations/google-calendar/account',            icon:Settings,      content:<AccountConfigTab /> },
+        { id:'registry',       label:'Calendar Registry',   path:'/admin/integrations/google-calendar/registry',           icon:CalendarDays,  content:<CalendarRegistryTab /> },
+        { id:'events',         label:'Event Catalog',       path:'/admin/integrations/google-calendar/events',             icon:CalendarCheck, content:<EventCatalogTab /> },
+        { id:'program-map',    label:'Program & Cohort',    path:'/admin/integrations/google-calendar/program-map',        icon:Layers,        content:<ProgramCohortMappingTab /> },
+        { id:'roles',          label:'Role & People',       path:'/admin/integrations/google-calendar/roles',              icon:Users,         content:<RolePeopleMappingTab /> },
+        { id:'penny',          label:'Penny Scheduling',    path:'/admin/integrations/google-calendar/penny',              icon:Brain,         content:<PennySchedulingTab /> },
+        { id:'comms',          label:'Comms Mapping',       path:'/admin/integrations/google-calendar/comms',              icon:Hash,          content:<CommMappingTab /> },
+        { id:'governance',     label:'Governance',          path:'/admin/integrations/google-calendar/governance',         icon:Shield,        content:<GovernanceTab /> },
+        { id:'testing',        label:'Test Suite',          path:'/admin/integrations/google-calendar/testing',            icon:FlaskConical,  content:<TestSuiteTab /> },
+        { id:'health',         label:'Health',              path:'/admin/integrations/google-calendar/health',             icon:Activity,      content:<HealthTab /> },
       ]}
     />
   );
