@@ -68,7 +68,7 @@ function TemplateRow({ t, selected, onSelect }: { t: PromptTemplate; selected: b
 
 // ── Template Detail ────────────────────────────────────────────────────────
 
-function TemplateDetail({ t, onOpenBrief }: { t: PromptTemplate; onOpenBrief: () => void }) {
+function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenBrief: () => void; onEdit: () => void }) {
   const [open, setOpen] = useState<Set<string>>(() => new Set(['purpose','guardrails']));
   function toggle(id: string) {
     setOpen(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -100,7 +100,10 @@ function TemplateDetail({ t, onOpenBrief }: { t: PromptTemplate; onOpenBrief: ()
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Prompt Template · v{t.version}</p>
               <h3 className="text-[16px] font-bold text-foreground leading-snug">{t.name}</h3>
             </div>
-            <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">Brief</button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button onClick={onEdit} className="text-[10px] font-bold text-muted-foreground border border-border rounded-full px-2 py-1 hover:bg-muted/40 transition-colors">Edit</button>
+              <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 transition-colors">Brief</button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${domCls}`}>{t.domain}</span>
@@ -302,7 +305,7 @@ function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplat
 
 // ── Templates View ─────────────────────────────────────────────────────────
 
-function TemplatesView({ onOpenBrief }: { onOpenBrief: (t: PromptTemplate) => void }) {
+function TemplatesView({ onOpenBrief, onEdit }: { onOpenBrief: (t: PromptTemplate) => void; onEdit: (t: PromptTemplate) => void }) {
   const [selectedId, setSelectedId] = useState(promptTemplates[0].id);
   const [search, setSearch]         = useState('');
   const [filterDomain, setFilterDomain]   = useState<PromptDomain | 'all'>('all');
@@ -353,7 +356,7 @@ function TemplatesView({ onOpenBrief }: { onOpenBrief: (t: PromptTemplate) => vo
         </ScrollArea>
       </div>
       <div className="flex-1 overflow-hidden">
-        <TemplateDetail t={selected} onOpenBrief={() => onOpenBrief(selected)} />
+        <TemplateDetail t={selected} onOpenBrief={() => onOpenBrief(selected)} onEdit={() => onEdit(selected)} />
       </div>
     </div>
   );
@@ -1029,6 +1032,26 @@ export default function PennyPromptStudio() {
     setView('templates');
   }
 
+  function handleEditTemplate(t: PromptTemplate) {
+    openActionPanel({
+      title: `Edit: ${t.name}`,
+      objectType: 'Prompt Template',
+      subtitle: 'Update the prompt configuration. Changes are prototype-only and reset on refresh.',
+      slackContext: 'penny',
+      fields: [
+        { id: 'name',         label: 'Template Name',   type: 'text',     required: true, placeholder: t.name },
+        { id: 'domain',       label: 'Domain',           type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
+        { id: 'purpose',      label: 'Purpose',          type: 'textarea', placeholder: t.purpose, rows: 3 },
+        { id: 'promptBody',   label: 'Prompt Body',      type: 'textarea', placeholder: t.promptBody, rows: 5 },
+        { id: 'audience',     label: 'Audience',         type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'] },
+        { id: 'tone',         label: 'Tone & Style',     type: 'text',     placeholder: t.tone },
+        { id: 'guardrails',   label: 'Guardrails',       type: 'textarea', placeholder: t.guardrails.join('\n'), rows: 3 },
+        { id: 'reviewStatus', label: 'Review Status',    type: 'select',   options: ['Draft', 'In Review', 'Approved', 'Needs Revision'] },
+      ],
+      onSaveAndView: () => setView('templates'),
+    });
+  }
+
   function handleNewTemplate() {
     openActionPanel({
       title: 'Request New Prompt Template', objectType: 'Prompt Template',
@@ -1109,7 +1132,7 @@ export default function PennyPromptStudio() {
           </div>
         )}
         {view === 'library'      && <LibraryView onSelectTemplate={handleLibrarySelect} />}
-        {view === 'templates'    && <TemplatesView onOpenBrief={openBrief} />}
+        {view === 'templates'    && <TemplatesView onOpenBrief={openBrief} onEdit={handleEditTemplate} />}
         {view === 'variables'    && <VariablesView />}
         {view === 'source-rules' && <SourceRulesView />}
         {view === 'formats'      && <OutputFormatsView />}
