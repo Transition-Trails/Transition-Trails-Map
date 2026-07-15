@@ -212,6 +212,38 @@ export default function Home() {
           </div>
         )}
 
+        {/* ── POWER+: Domain Health ── */}
+        {!isEveryday && (
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Domain Health</p>
+              <button
+                onClick={() => navigate('/operations/health')}
+                className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+              >
+                Health Indicators <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {domainHealthData.map(d => {
+                const dc = HEALTH_LEVEL_CONFIG[d.level];
+                return (
+                  <button key={d.id}
+                    onClick={() => navigate('/operations/health')}
+                    className="rounded-lg border border-border bg-white px-2.5 py-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
+                      <span className={`text-lg font-bold leading-none ${dc.score}`}>{d.score}</span>
+                    </div>
+                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
+                    <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ── POWER+: Critical & High Priority Actions ── */}
         {!isEveryday && (() => {
           const allItems = [
@@ -410,38 +442,6 @@ export default function Home() {
             )}
           </div>
         </div>
-
-        {/* ── POWER+: Domain Health ── */}
-        {!isEveryday && (
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Domain Health</p>
-              <button
-                onClick={() => navigate('/operations/health')}
-                className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
-              >
-                Health Indicators <ChevronRight className="w-3 h-3" />
-              </button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {domainHealthData.map(d => {
-                const dc = HEALTH_LEVEL_CONFIG[d.level];
-                return (
-                  <button key={d.id}
-                    onClick={() => navigate('/operations/health')}
-                    className="rounded-lg border border-border bg-white px-2.5 py-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
-                      <span className={`text-lg font-bold leading-none ${dc.score}`}>{d.score}</span>
-                    </div>
-                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
-                    <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
       </div>
     </div>
