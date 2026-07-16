@@ -31,6 +31,7 @@ const PAGE_INFO: Array<[string, string, string]> = [
   ['/admin/sf-validation',                 'Administration',         'SF Validation'],
   ['/admin/salesforce-arch',               'Administration',         'Salesforce Architecture'],
   ['/admin/program-resources',             'Administration',         'Program Resources'],
+  ['/admin/program-config',               'Administration',         'Program Config'],
   ['/operations/scorecards',             'Operations',             'Scorecards'],
   ['/operations/trends',                 'Operations',             'Trends & Insights'],
   ['/operations/demand',                 'Operations',             'Demand'],
