@@ -111,7 +111,7 @@ Routing uses `wouter`. The application uses a flat Hub model — all primary sec
 
 ### Data model (Phase 1)
 
-All data is in-memory prototype state initialized in `AppContext`. Edits made in the UI reset on page refresh. The data layer uses typed TypeScript interfaces and constants in `src/data/`, providing a realistic demonstration of production data shapes without live database reads.
+Most data is in-memory prototype state initialized in `AppContext`; edits reset on page refresh. **Exception:** `prompt_templates` and `prompt_variables` are persisted to PostgreSQL via the API server and survive restarts (seeded automatically on first empty-DB load). The broader data layer uses typed TypeScript interfaces and constants in `src/data/`, providing a realistic demonstration of production data shapes.
 
 ---
 
@@ -272,14 +272,14 @@ Each section of Trail OS has a canonical owner. Content and tooling that belongs
 
 ### Lens picker
 
-The Lens picker appears in the Topbar only on `/navigator/program-map`, `/resolve`, and `/trail-os-map`. It offers two lenses:
+The Lens picker is rendered within the Program Map page (`/navigator/program-map`) as a component-level control — it is not a Topbar element and does not appear on other routes. It offers two lenses:
 
 | Lens | Color | Purpose |
 |---|---|---|
 | Executive | Amber | High-level program and health view |
 | Builder | Sky | Technical detail and configuration view |
 
-The active lens is stored as `activeLens` in AppContext (default: `'executive'`).
+The active lens is stored as `activeLens` in AppContext (default: `'builder'`). The `PortfolioPulse` component inside `ProgramMap.tsx` reads `activeLens` to switch its display mode.
 
 ### ContextBar
 
@@ -461,7 +461,7 @@ Admin-only program tooling (SF Validation, Program Resources, Salesforce Archite
 | Intelligence | `/penny/intelligence` | Penny intelligence dashboard |
 | Test Penny | `/penny/test` | Live Gemini smoke-test interface |
 
-`/penny/integration-layer` redirects to `/admin/setup` (removed from Penny hub in Phase 1 UX consolidation).
+`/penny/integration-layer` redirects to `/admin/integrations` (removed from Penny hub in Phase 1 UX consolidation).
 
 Data sources: `src/data/pennyCapabilityData.ts`, `src/data/pennyCapabilities.ts`, `src/data/pennyContentActions.ts`, `src/data/pennyPromptStudioData.ts`.
 
@@ -741,7 +741,7 @@ The Penny-POC repository (separate repo at `github.com/Transition-Trails/Penny-P
 
 - Penny Command Center hub is built in Trail OS (`/penny`) as the **governance and configuration surface** for Penny.
 - The POC test interface (`/penny/test`) provides a live Gemini POC connection for smoke testing.
-- The Phase 1 Integration Layer (`/penny/integration-layer`) documents POC capability status.
+- The former standalone Integration Layer page (`/penny/integration-layer`) was removed in Phase 1 UX consolidation and now redirects to `/admin/integrations`; integration capability status is visible in the Integration Hub.
 - 13 Penny capabilities are catalogued in `pennyCapabilityData.ts` with POC state, Trail OS state, and risk level.
 
 ### Phase 2 incorporation plan
@@ -780,7 +780,7 @@ The following are explicitly out of scope for Trail OS Phase 1 and are not on th
 | Financial / billing management | Not in scope — handled by Salesforce |
 | Video/content hosting | Not in scope — Google Drive and LMS handle content |
 | Org Memory live records | Phase 2 — architecture defined, build deferred |
-| Automated testing | Phase 2 — `p2-vitest-automation` backlog card |
+| Automated testing | ✅ Live — 105 tests across 7 files (api-server + program-map); `p2-vitest-automation` backlog card completed in Phase 1 |
 | Agentforce integration | Phase 2 — `p2-agentforce` backlog card |
 
 ---

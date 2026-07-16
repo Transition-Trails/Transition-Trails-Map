@@ -98,7 +98,7 @@ Trail OS is an internal platform. If you discover a security issue:
 - The Google OAuth client secret is stored as a Replit Secret only.
 - The Google `client_id` is safe to include in code — it is a public identifier.
 - OAuth tokens (access + refresh) are stored server-side only, never sent to the client.
-- The OAuth wizard at `/admin/google-oauth` is restricted to Super Admin tier.
+- The OAuth wizard at `/admin/integrations/google-auth` is restricted to Super Admin tier.
 - Google OAuth app is currently in "Testing" mode — only explicitly added test users can authenticate.
 
 ### Gemini / AI

@@ -69,9 +69,11 @@ artifacts/program-map/src/
 
 | Sidebar Group        | Key Routes                                                                 |
 |----------------------|----------------------------------------------------------------------------|
-| Navigator            | /navigator/program-map, /resolve, /roles, /trail-os-map                   |
+| Navigator            | /navigator/program-map, /trail-os-overview                                |
+|                      | (legacy /resolve → /operations/demand, /roles → /digital-twin,            |
+|                      |  /trail-os-map → /trail-os-overview — all are redirects)                  |
 | Operations Center    | /operations, /operations/health, /operations/demand, /operations/scorecards|
-| Demand Management    | /demand/intake, /demand/cases, /demand/epics, /demand/features, /demand/stories |
+| Demand Management    | /operations/demand (all /demand/* paths redirect here)                    |
 | Penny Command Center | /penny, /penny/capabilities, /penny/prompts, /penny/learners, /penny/test |
 | Knowledge Library    | /knowledge, /knowledge/sources, /knowledge/library, /knowledge/memory     |
 | Collaboration        | /collaboration, /collaboration/gmail, /collaboration/calendar-live,        |
@@ -83,7 +85,7 @@ artifacts/program-map/src/
 ## Architecture decisions
 
 - **Sidebar groups are collapsible** with smooth max-height animation; the active group auto-opens.
-- **Lens picker is Topbar-only** and only shows on `/navigator/program-map`, `/resolve`, `/trail-os-map`. Two lenses: executive (amber) + builder (sky).
+- **Lens picker** is a component-level control rendered inside the Program Map page (`/navigator/program-map`). It is not a Topbar element. Two lenses: executive (amber) + builder (sky). `activeLens` lives in AppContext (default: `'builder'`).
 - **ContextBar is always mounted** — 32px no-context state, 40px active. Never returns null.
 - **HubShell hides the tab bar when only 1 tab is passed** — Everyday users see plain content without tab chrome.
 - **Collaboration Overview is a rule management hub** — configures how each channel (Slack, Gmail, Calendar, Drive) routes signals to Penny and Trail Signals. Not an activity feed.
