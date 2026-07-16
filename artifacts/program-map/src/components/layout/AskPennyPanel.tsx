@@ -414,7 +414,7 @@ export function AskPennyPanel() {
             </div>
 
             {/* ── Messages ── */}
-            <ScrollArea className="flex-1 px-4 py-3">
+            <ScrollArea className="flex-1 min-h-0 px-4 py-3">
               <div className="space-y-3">
                 {messages.map((m, i) => (
                   <div key={i} className={`flex gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
