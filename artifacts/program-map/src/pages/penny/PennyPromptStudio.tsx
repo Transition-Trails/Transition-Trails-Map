@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect, createContext, useContext } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { usePromptTemplates } from '@/hooks/usePromptTemplates';
+import { usePromptVariables } from '@/hooks/usePromptVariables';
 import {
   promptTemplates, promptVariables, outputFormats, versionHistory, qualityReviews,
   PROMPT_STUDIO_SUMMARY, DOMAIN_ORDER, DOMAIN_CLS,
   PROMPT_STATUS_CONFIG, RISK_CONFIG,
   type PromptTemplate, type PromptDomain, type PromptStatus,
+  type PromptVariable, type VariableType, type VariableSource,
 } from '@/data/pennyPromptStudioData';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -14,7 +16,7 @@ import {
   Brain, BookOpen, Layers, ShieldCheck, Database, Search, Filter,
   ChevronDown, ChevronRight, ArrowRight, AlertTriangle, CheckCircle2,
   Zap, Clock, Star, GitBranch, FlaskConical, ClipboardCheck, BarChart3,
-  Play, RotateCcw, Users, FileText, Plus, Hash, Loader2,
+  Play, RotateCcw, Users, FileText, Plus, Hash, Loader2, Pencil,
 } from 'lucide-react';
 
 type StudioView = 'library' | 'templates' | 'variables' | 'source-rules' | 'formats' | 'test-bench' | 'history' | 'quality' | 'create';
@@ -373,43 +375,197 @@ function TemplatesView({ onOpenBrief, onEdit }: { onOpenBrief: (t: PromptTemplat
 
 // ── Variables View ─────────────────────────────────────────────────────────
 
+const SOURCE_CLS: Record<string, string> = {
+  'Salesforce':       'text-blue-700 bg-blue-50 border-blue-200',
+  'LMS':              'text-amber-700 bg-amber-50 border-amber-200',
+  'Calendar':         'text-amber-700 bg-amber-50 border-amber-200',
+  'Standards Studio': 'text-rose-700 bg-rose-50 border-rose-200',
+  'Curriculum Studio':'text-orange-700 bg-orange-50 border-orange-200',
+  'Penny Generated':  'text-secondary border-secondary/20 bg-secondary/10',
+};
+
+const VARIABLE_SOURCES: VariableSource[] = [
+  'Salesforce', 'LMS', 'Calendar', 'User Input',
+  'Standards Studio', 'Curriculum Studio', 'Penny Generated',
+];
+
 function VariablesView() {
+  const { openActionPanel } = useAppContext();
+  const { variables, create, update } = usePromptVariables();
+  const [selectedId, setSelectedId] = useState<string | null>(() => null);
+  const selected = selectedId ? (variables.find(v => v.id === selectedId) ?? null) : null;
+
+  function handleNew() {
+    openActionPanel({
+      title:       'New Variable',
+      objectType:  'Prompt Variable',
+      subtitle:    'Define a new runtime variable Penny can use in prompts. Saved to the database.',
+      slackContext:'penny',
+      fields: [
+        { id: 'name',         label: 'Placeholder',    type: 'text',     required: true,  placeholder: '{{variable_name}}' },
+        { id: 'label',        label: 'Display Label',  type: 'text',     required: true,  placeholder: 'Human-readable label' },
+        { id: 'type',         label: 'Type',           type: 'select',   required: true,  options: ['text','number','list','object','boolean'] },
+        { id: 'source',       label: 'Data Source',    type: 'select',   required: true,  options: VARIABLE_SOURCES },
+        { id: 'description',  label: 'Description',    type: 'textarea', required: true,  placeholder: 'What does this variable represent?', rows: 2 },
+        { id: 'exampleValue', label: 'Example Value',  type: 'text',     placeholder: 'e.g. Jordan Smith' },
+        { id: 'required',     label: 'Required',       type: 'select',   options: ['true','false'] },
+      ],
+      onSaveAndView: (data) => {
+        if (data.name?.trim() && data.label?.trim()) {
+          create({
+            id:              `var-${Date.now()}`,
+            name:            data.name.trim(),
+            label:           data.label.trim(),
+            type:            (data.type as VariableType)     || 'text',
+            source:          (data.source as VariableSource) || 'User Input',
+            description:     data.description  || '',
+            exampleValue:    data.exampleValue || '',
+            required:        data.required === 'true',
+            usedByTemplates: [],
+          });
+        }
+      },
+    });
+  }
+
+  function handleEdit(v: PromptVariable) {
+    openActionPanel({
+      title:       `Edit: ${v.label}`,
+      objectType:  'Prompt Variable',
+      subtitle:    'Update variable configuration. Changes are saved to the database.',
+      slackContext:'penny',
+      fields: [
+        { id: 'label',        label: 'Display Label', type: 'text',     placeholder: v.label },
+        { id: 'type',         label: 'Type',          type: 'select',   options: ['text','number','list','object','boolean'] },
+        { id: 'source',       label: 'Data Source',   type: 'select',   options: VARIABLE_SOURCES },
+        { id: 'description',  label: 'Description',   type: 'textarea', placeholder: v.description, rows: 2 },
+        { id: 'exampleValue', label: 'Example Value', type: 'text',     placeholder: v.exampleValue },
+      ],
+      onSaveAndView: (data) => {
+        update({ id: v.id, updates: {
+          ...(data.label        ? { label:        data.label                     } : {}),
+          ...(data.type         ? { type:         data.type as VariableType      } : {}),
+          ...(data.source       ? { source:       data.source as VariableSource  } : {}),
+          ...(data.description  ? { description:  data.description               } : {}),
+          ...(data.exampleValue ? { exampleValue: data.exampleValue              } : {}),
+        }});
+      },
+    });
+  }
+
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0">
-        <p className="text-[11px] text-muted-foreground">
-          Reusable variables injected into Penny prompts at runtime. Each variable maps to a data source — Salesforce, LMS, Calendar, User Input, or internal Trail OS systems.
-        </p>
-      </div>
-      <ScrollArea className="flex-1">
-        <div className="p-5 space-y-1">
-          <div className="grid grid-cols-[160px_60px_100px_1fr_80px] gap-2 px-3 py-1.5">
-            {['Variable Name','Type','Source','Description','Used By'].map(h => (
-              <p key={h} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{h}</p>
+    <div className="flex h-full overflow-hidden">
+
+      {/* ── List column ───────────────────────────────────── */}
+      <div className="flex flex-col flex-1 min-w-0">
+        {/* Sub-header */}
+        <div className="px-5 py-2.5 border-b border-border bg-white flex-shrink-0 flex items-center justify-between gap-4">
+          <p className="text-[11px] text-muted-foreground leading-snug">
+            Runtime variables injected into Penny prompts. Each maps to a live data source — Salesforce, LMS, Calendar, or User Input.
+          </p>
+          <button
+            onClick={handleNew}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            New Variable
+          </button>
+        </div>
+
+        <ScrollArea className="flex-1">
+          <div className="p-4 space-y-1">
+            {/* Column headers */}
+            <div className="grid grid-cols-[1fr_64px_96px_24px] gap-2 px-3 py-1">
+              {['Variable / Label','Type','Source',''].map((h,i) => (
+                <p key={i} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">{h}</p>
+              ))}
+            </div>
+
+            {variables.map(v => (
+              <button
+                key={v.id}
+                onClick={() => setSelectedId(id => id === v.id ? null : v.id)}
+                className={`w-full text-left grid grid-cols-[1fr_64px_96px_24px] gap-2 px-3 py-2.5 rounded-lg border transition-all items-center ${
+                  selectedId === v.id
+                    ? 'border-foreground bg-foreground/5'
+                    : 'border-border bg-white hover:bg-muted/20'
+                }`}
+              >
+                <div>
+                  <code className="text-[10px] font-mono font-bold text-foreground bg-muted/40 rounded px-1.5 py-0.5">{v.name}</code>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{v.label}</p>
+                </div>
+                <span className="text-[10px] font-semibold text-muted-foreground capitalize">{v.type}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 truncate ${SOURCE_CLS[v.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>
+                  {v.source}
+                </span>
+                <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${selectedId === v.id ? 'rotate-90' : ''}`} />
+              </button>
             ))}
           </div>
-          {promptVariables.map(v => (
-            <div key={v.id} className="grid grid-cols-[160px_60px_100px_1fr_80px] gap-2 px-3 py-3 rounded-lg border border-border bg-white hover:bg-muted/20 transition-colors items-start">
-              <code className="text-[10px] font-mono font-bold text-foreground bg-muted/40 rounded px-1.5 py-0.5 self-start">{v.name}</code>
-              <span className="text-[10px] font-semibold text-muted-foreground capitalize self-start">{v.type}</span>
-              <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 self-start ${
-                v.source === 'Salesforce' ? 'text-blue-700 bg-blue-50 border-blue-200'
-                : v.source === 'LMS' ? 'text-amber-700 bg-amber-50 border-amber-200'
-                : v.source === 'Standards Studio' ? 'text-rose-700 bg-rose-50 border-rose-200'
-                : v.source === 'Curriculum Studio' ? 'text-orange-700 bg-orange-50 border-orange-200'
-                : v.source === 'Penny Generated' ? 'text-secondary border-secondary/20 bg-secondary/10'
-                : v.source === 'Calendar' ? 'text-amber-700 bg-amber-50 border-amber-200'
-                : 'text-slate-600 bg-slate-50 border-slate-200'
-              }`}>{v.source}</span>
-              <div>
-                <p className="text-[11px] text-foreground mb-0.5">{v.description}</p>
-                <p className="text-[10px] text-muted-foreground italic">e.g. {v.exampleValue}</p>
-              </div>
-              <span className="text-[10px] font-semibold text-muted-foreground self-start">{v.usedByTemplates.length} templates</span>
+        </ScrollArea>
+      </div>
+
+      {/* ── Detail panel ──────────────────────────────────── */}
+      {selected && (
+        <div className="w-[280px] flex-shrink-0 border-l border-border flex flex-col bg-white">
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-border flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Variable</p>
+              <p className="text-[13px] font-bold text-foreground leading-tight truncate">{selected.label}</p>
+              <code className="text-[10px] font-mono text-muted-foreground">{selected.name}</code>
             </div>
-          ))}
+            <button
+              onClick={() => handleEdit(selected)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-border text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors shrink-0"
+            >
+              <Pencil className="w-3 h-3" /> Edit
+            </button>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-4">
+              {/* Badges */}
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 text-slate-600 bg-slate-50 border-slate-200 capitalize">{selected.type}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${SOURCE_CLS[selected.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>{selected.source}</span>
+                {selected.required && (
+                  <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 text-rose-700 bg-rose-50 border-rose-200">Required</span>
+                )}
+              </div>
+
+              {/* Description */}
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Description</p>
+                <p className="text-[11px] text-foreground leading-relaxed">{selected.description}</p>
+              </div>
+
+              {/* Example */}
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Example Value</p>
+                <code className="text-[11px] font-mono text-muted-foreground block bg-muted/30 rounded px-2 py-1.5 break-all">{selected.exampleValue || '—'}</code>
+              </div>
+
+              {/* Used by */}
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+                  Used by {selected.usedByTemplates.length} template{selected.usedByTemplates.length !== 1 ? 's' : ''}
+                </p>
+                {selected.usedByTemplates.length > 0 ? (
+                  <div className="space-y-1">
+                    {selected.usedByTemplates.map(tid => (
+                      <p key={tid} className="text-[10px] font-mono text-muted-foreground bg-muted/20 rounded px-2 py-1">{tid}</p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-muted-foreground italic">No templates yet</p>
+                )}
+              </div>
+            </div>
+          </ScrollArea>
         </div>
-      </ScrollArea>
+      )}
     </div>
   );
 }
