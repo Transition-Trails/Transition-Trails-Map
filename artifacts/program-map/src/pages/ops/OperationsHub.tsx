@@ -78,12 +78,18 @@ function HealthIndicators() {
                   )}
                 </div>
 
-                {/* Key next action */}
+                {/* Key next action — clickable to open brief + Penny */}
                 {firstBad && (
-                  <div className="px-3 py-1.5 border-t border-border/40 bg-amber-50/50">
-                    <p className="text-[8px] font-bold uppercase tracking-wide text-amber-700/70 mb-0.5">Next action</p>
-                    <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2">{firstBad.detail}</p>
-                  </div>
+                  <button
+                    onClick={() => setSelectedItem({ type: 'healthIndicator', id: firstBad.id, data: firstBad })}
+                    className="w-full px-3 py-1.5 border-t border-amber-200/60 bg-amber-50/60 hover:bg-amber-100/70 transition-colors text-left group"
+                  >
+                    <p className="text-[8px] font-bold uppercase tracking-wide text-amber-700/70 mb-0.5 flex items-center gap-1">
+                      Next action
+                      <span className="text-amber-500/60 group-hover:text-amber-600 transition-colors">→</span>
+                    </p>
+                    <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2 group-hover:text-amber-900/80 transition-colors">{firstBad.detail}</p>
+                  </button>
                 )}
               </div>
             );

@@ -1864,10 +1864,12 @@ export function ContextPanel() {
       // --- Domain Health ---
       if (isDomain) {
         const lc = HEALTH_LEVEL_CONFIG[data.level as HealthLevel] ?? HEALTH_LEVEL_CONFIG['needs-work'];
-        const q = `Domain Health: "${data.domain}" — score ${data.score}/100\nLevel: ${lc.label}\n${data.summary}\n\nWhat are the highest-priority actions to improve this domain's health for Transition Trails?`;
+        const firstBad = (data.indicators as { id: string; label: string; status: HealthLevel; detail: string }[])
+          ?.find(i => i.status === 'at-risk' || i.status === 'needs-work');
+        const q = `Domain Health: "${data.domain}" — score ${data.score}/100\nLevel: ${lc.label}\n${data.summary}${firstBad ? `\n\nTop next action: ${firstBad.label} — ${firstBad.detail}` : ''}\n\nWhat are the highest-priority actions to improve this domain's health for Transition Trails? Start with the most critical indicator.`;
         return (
           <ScrollArea className="h-full">
-            <div className="p-5 space-y-5">
+            <div className="p-5 space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Domain Health</span>
@@ -1877,11 +1879,21 @@ export function ContextPanel() {
                 <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.domain}</h2>
               </div>
               {data.summary && <p className="text-[12px] text-muted-foreground leading-relaxed">{data.summary}</p>}
+
+              {/* Top next action — surfaced prominently */}
+              {firstBad && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-1">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-amber-700/70">Next Action</p>
+                  <p className="text-[11px] font-semibold text-amber-900/80 leading-snug">{firstBad.label}</p>
+                  <p className="text-[11px] text-amber-800/70 leading-relaxed">{firstBad.detail}</p>
+                </div>
+              )}
+
               {data.indicators?.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Indicators</p>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">All Indicators</p>
                   <div className="space-y-1.5">
-                    {data.indicators.map((ind: { id: string; label: string; status: HealthLevel; detail: string }) => {
+                    {(data.indicators as { id: string; label: string; status: HealthLevel; detail: string }[]).map(ind => {
                       const ic = HEALTH_LEVEL_CONFIG[ind.status] ?? HEALTH_LEVEL_CONFIG['needs-work'];
                       return (
                         <div key={ind.id} className="flex items-start gap-2">
@@ -1897,10 +1909,12 @@ export function ContextPanel() {
                   </div>
                 </div>
               )}
+
               <button
                 onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
-                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
               >
+                <Sparkles className="w-3.5 h-3.5" />
                 Focus with {TERMS.aiAssistant}
               </button>
             </div>
@@ -1909,10 +1923,10 @@ export function ContextPanel() {
       }
       // --- Individual Health Indicator ---
       const ic = HEALTH_LEVEL_CONFIG[data.status as HealthLevel] ?? HEALTH_LEVEL_CONFIG['needs-work'];
-      const q = `Health Indicator: "${data.label}" (${data.domain})\nStatus: ${ic.label}\nSource: ${data.sourceSystem}\n\n${data.detail}\n\nWhat actions should the Transition Trails team take to address this indicator?`;
+      const q = `Health Indicator: "${data.label}" (${data.domain})\nStatus: ${ic.label}\nSource: ${data.sourceSystem}\n\nNext action: ${data.detail}\n\nWhat specific steps should the Transition Trails team take right now to address this indicator? What blockers might they face and how should they prioritise this against other work?`;
       return (
         <ScrollArea className="h-full">
-          <div className="p-5 space-y-5">
+          <div className="p-5 space-y-4">
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">{data.domain}</span>
@@ -1920,17 +1934,27 @@ export function ContextPanel() {
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.label}</h2>
             </div>
-            {data.detail && <p className="text-[12px] text-muted-foreground leading-relaxed">{data.detail}</p>}
+
+            {/* Next action — prominently shown */}
+            {data.detail && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-1">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-amber-700/70">Next Action</p>
+                <p className="text-[12px] text-amber-900/80 leading-relaxed">{data.detail}</p>
+              </div>
+            )}
+
             <div className="rounded-lg border bg-muted/20 p-3">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-muted-foreground">Source system</span>
                 <span className="text-[10px] font-semibold text-foreground">{data.sourceSystem}</span>
               </div>
             </div>
+
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
             >
+              <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
           </div>
