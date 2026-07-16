@@ -614,9 +614,11 @@ export default function ProgramConfiguration() {
     const stripHtml = (v: unknown) =>
       v ? String(v).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
 
-    const sf = (key: string) => {
+    const sf = (key: string, maxChars = 300) => {
       const v = detail[key];
-      return v && String(v) !== 'null' ? stripHtml(v) : '';
+      if (!v || String(v) === 'null') return '';
+      const s = stripHtml(v);
+      return s.length > maxChars ? s.slice(0, maxChars) + '…' : s;
     };
 
     const lines: string[] = [

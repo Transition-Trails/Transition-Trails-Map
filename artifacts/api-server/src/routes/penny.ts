@@ -214,7 +214,7 @@ router.post("/penny/ask", async (req, res) => {
         system_instruction: { parts: [{ text: systemText }] },
         contents,
         generationConfig: {
-          maxOutputTokens: 1024,
+          maxOutputTokens: 4096,
           temperature: 0.7,
         },
       }),
