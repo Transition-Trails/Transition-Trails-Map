@@ -127,45 +127,6 @@ function IntelligenceView() {
     <ScrollArea className="h-full">
       <div className="p-4 space-y-8 max-w-4xl">
 
-        {/* ── Trends & Insights ───────────────────────────────────────────── */}
-        <section>
-          <SectionHeader label="Trends & Insights" />
-          <div className="grid grid-cols-2 gap-2.5">
-            {sortedTrends.map(t => {
-              const tc = TREND_TYPE_CONFIG[t.type];
-              const uc = TREND_URGENCY_CONFIG[t.urgency];
-              const shortDesc = t.description.split('.')[0] + '.';
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setSelectedItem({ type: 'healthIndicator', id: t.id, data: t })}
-                  className={`text-left rounded-lg border border-border border-l-[3px] ${TYPE_BORDER[t.type]} bg-white p-3 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-2`}
-                >
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${tc.cls}`}>{tc.label}</span>
-                    <span className={`text-[9px] ${uc.cls}`}>{uc.label}</span>
-                  </div>
-                  <div>
-                    <p className="text-[12px] font-semibold text-foreground group-hover:text-primary leading-snug">{t.title}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{shortDesc}</p>
-                  </div>
-                  <div className="flex items-end justify-between gap-2 mt-auto">
-                    <div className="flex flex-wrap gap-1">
-                      {t.affectedDomains.slice(0, 3).map(d => (
-                        <span key={d} className="text-[9px] font-medium border border-border rounded-full px-1.5 py-0.5 text-muted-foreground">{d}</span>
-                      ))}
-                      {t.affectedDomains.length > 3 && (
-                        <span className="text-[9px] text-muted-foreground/50">+{t.affectedDomains.length - 3}</span>
-                      )}
-                    </div>
-                    <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0" />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
         {/* ── Scorecards ──────────────────────────────────────────────────── */}
         <section>
           <SectionHeader label="Scorecards" />
@@ -254,6 +215,45 @@ function IntelligenceView() {
                   </div>
                   <span className={`text-[10px] font-semibold shrink-0 ${effort}`}>{r.effort} effort</span>
                   <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── Trends & Insights ───────────────────────────────────────────── */}
+        <section>
+          <SectionHeader label="Trends & Insights" />
+          <div className="grid grid-cols-2 gap-2.5">
+            {sortedTrends.map(t => {
+              const tc = TREND_TYPE_CONFIG[t.type];
+              const uc = TREND_URGENCY_CONFIG[t.urgency];
+              const shortDesc = t.description.split('.')[0] + '.';
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setSelectedItem({ type: 'healthIndicator', id: t.id, data: t })}
+                  className={`text-left rounded-lg border border-border border-l-[3px] ${TYPE_BORDER[t.type]} bg-white p-3 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-2`}
+                >
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${tc.cls}`}>{tc.label}</span>
+                    <span className={`text-[9px] ${uc.cls}`}>{uc.label}</span>
+                  </div>
+                  <div>
+                    <p className="text-[12px] font-semibold text-foreground group-hover:text-primary leading-snug">{t.title}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{shortDesc}</p>
+                  </div>
+                  <div className="flex items-end justify-between gap-2 mt-auto">
+                    <div className="flex flex-wrap gap-1">
+                      {t.affectedDomains.slice(0, 3).map(d => (
+                        <span key={d} className="text-[9px] font-medium border border-border rounded-full px-1.5 py-0.5 text-muted-foreground">{d}</span>
+                      ))}
+                      {t.affectedDomains.length > 3 && (
+                        <span className="text-[9px] text-muted-foreground/50">+{t.affectedDomains.length - 3}</span>
+                      )}
+                    </div>
+                    <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0" />
+                  </div>
                 </button>
               );
             })}
