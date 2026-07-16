@@ -983,10 +983,18 @@ export default function ProgramConfiguration() {
                                             {textRows.map(({ label, key }) => {
                                               const val = sfStr(programDetail[key]);
                                               if (!val) return null;
+                                              const isHtml = /<[a-z][\s\S]*>/i.test(val);
                                               return (
                                                 <div key={key}>
                                                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">{label}</p>
-                                                  <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-wrap">{val}</p>
+                                                  {isHtml ? (
+                                                    <div
+                                                      className="prose prose-sm max-w-none text-[12px] text-foreground [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-0.5 [&_strong]:font-semibold [&_em]:italic [&_p]:mb-1 [&_p:last-child]:mb-0"
+                                                      dangerouslySetInnerHTML={{ __html: val }}
+                                                    />
+                                                  ) : (
+                                                    <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-wrap">{val}</p>
+                                                  )}
                                                 </div>
                                               );
                                             })}
