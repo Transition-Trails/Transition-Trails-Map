@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown,
+  Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown, Sparkles,
 } from 'lucide-react';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,93 +8,199 @@ import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import {
   domainHealthData, recommendations, readinessScorecards, trendInsights,
+  overallHealthScore, overallHealthLevel,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG,
+  type HealthLevel,
 } from '@/data/operationalIntelligenceData';
 import Intake        from '@/pages/demand/Intake';
 
-// ── Health Indicators — compact 2-column grid ─────────────────────────────────
-// UI rule: each card shows domain + score + top 3 checks + one key action.
-// No full-width long cards. Scroll only below the fold.
+// ── Status weight for top-5 sorting ──────────────────────────────────────────
+const STATUS_WEIGHT: Record<HealthLevel, number> = { 'at-risk': 0, 'needs-work': 1, good: 2, strong: 3 };
+
+// ── Health Indicators — overall score + top-5 impact + domain grid ────────────
 function HealthIndicators() {
-  const { setSelectedItem } = useAppContext();
+  const { setSelectedItem, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
+  const oc = HEALTH_LEVEL_CONFIG[overallHealthLevel];
+
+  // Top 5: worst-status first, then lowest domain score
+  const top5 = domainHealthData
+    .flatMap(d => d.indicators
+      .filter(i => i.status === 'at-risk' || i.status === 'needs-work')
+      .map(i => ({ ...i, domainScore: d.score }))
+    )
+    .sort((a, b) =>
+      (STATUS_WEIGHT[a.status] - STATUS_WEIGHT[b.status]) ||
+      (a.domainScore - b.domainScore)
+    )
+    .slice(0, 5);
+
+  // Domain bars sorted worst-first
+  const sortedDomains = [...domainHealthData].sort((a, b) => a.score - b.score);
+
+  const pennyQ = `Trail OS Overall Health Score: ${overallHealthScore}/100 (${oc.label})\n\nDomain breakdown:\n${domainHealthData.map(d => `  • ${d.domain}: ${d.score}/100 (${HEALTH_LEVEL_CONFIG[d.level].label})`).join('\n')}\n\nTop 5 highest-impact items to address:\n${top5.map((i, n) => `  ${n + 1}. [${HEALTH_LEVEL_CONFIG[i.status].label}] ${i.label} (${i.domain}) — ${i.detail}`).join('\n')}\n\nWhat is your recommended action plan to move the Trail OS health score from ${overallHealthScore} to 75+? Prioritise the top 5 items and identify any quick wins.`;
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-4">
-        <div className="grid grid-cols-2 gap-3">
-          {domainHealthData.map(d => {
-            const dc       = HEALTH_LEVEL_CONFIG[d.level];
-            const topInds  = d.indicators.slice(0, 3);
-            const extra    = d.indicators.length - 3;
-            const firstBad = d.indicators.find(i => i.status === 'at-risk' || i.status === 'needs-work');
+      <div className="p-4 space-y-4 max-w-4xl">
 
-            return (
-              <div key={d.id} className="rounded-lg border border-border bg-white overflow-hidden flex flex-col">
+        {/* ── Overall Score Hero ─────────────────────────────────────────── */}
+        <div className="rounded-lg border border-border bg-white overflow-hidden">
+          <div className="px-4 py-3 border-b border-border/40 bg-muted/20 flex items-center justify-between">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Trail OS Platform Health</p>
+              <p className="text-[11px] text-muted-foreground">Composite score across {domainHealthData.length} domains</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-[9px] font-bold border rounded-full px-2 py-0.5 ${oc.cls}`}>{oc.label}</span>
+              <span className={`text-[44px] font-bold leading-none tabular-nums ${oc.score}`}>{overallHealthScore}</span>
+              <span className="text-[18px] text-muted-foreground/40 font-light leading-none">/100</span>
+            </div>
+          </div>
 
-                {/* Card header — clickable to open full detail */}
+          {/* Domain bars */}
+          <div className="px-4 py-3 grid grid-cols-2 gap-x-6 gap-y-2">
+            {sortedDomains.map(d => {
+              const dc  = HEALTH_LEVEL_CONFIG[d.level];
+              const bar = d.score >= 75 ? 'bg-emerald-400' : d.score >= 65 ? 'bg-blue-400' : d.score >= 50 ? 'bg-amber-400' : 'bg-rose-400';
+              return (
                 <button
+                  key={d.id}
                   onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
-                  className="px-3 py-2.5 border-b border-border/50 bg-muted/20 flex items-center justify-between w-full text-left hover:bg-primary/5 transition-colors group"
+                  className="flex items-center gap-2 group hover:opacity-80 transition-opacity"
                 >
-                  <div className="min-w-0 mr-2">
-                    <p className="text-[12px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{d.domain}</p>
-                    <p className="text-[9px] text-muted-foreground truncate">{d.sourceSystem}</p>
+                  <span className="text-[10px] text-foreground w-28 shrink-0 text-left truncate group-hover:text-primary transition-colors">{d.domain}</span>
+                  <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full ${bar} transition-all`} style={{ width: `${d.score}%` }} />
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dc.label}</span>
-                    <span className={`text-[22px] font-bold leading-none ${dc.score}`}>{d.score}</span>
-                  </div>
+                  <span className={`text-[10px] font-bold w-6 text-right shrink-0 ${dc.score}`}>{d.score}</span>
                 </button>
+              );
+            })}
+          </div>
 
-                {/* Indicator rows */}
-                <div className="px-3 py-1.5 flex-1">
-                  {topInds.map(ind => {
-                    const ic  = HEALTH_LEVEL_CONFIG[ind.status];
-                    const dot =
-                      ind.status === 'strong' || ind.status === 'good'
-                        ? 'bg-emerald-400'
-                        : ind.status === 'needs-work'
-                        ? 'bg-amber-400'
-                        : 'bg-rose-400';
-                    return (
+          {/* Focus with Penny */}
+          <div className="px-4 pb-3">
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(pennyQ); }}
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Get {`Penny's`} action plan to improve the score
+            </button>
+          </div>
+        </div>
+
+        {/* ── Top 5 High-Impact Items ────────────────────────────────────── */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 shrink-0">Top 5 High-Impact Items</p>
+            <div className="flex-1 h-px bg-border/50" />
+            <p className="text-[9px] text-muted-foreground shrink-0">Fixing these will move the score most</p>
+          </div>
+          <div className="space-y-1.5">
+            {top5.map((ind, idx) => {
+              const ic = HEALTH_LEVEL_CONFIG[ind.status];
+              return (
+                <button
+                  key={ind.id}
+                  onClick={() => setSelectedItem({ type: 'healthIndicator', id: ind.id, data: ind })}
+                  className="w-full text-left rounded-lg border border-border bg-white px-3 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex items-center gap-3"
+                >
+                  <span className="text-[11px] font-bold text-muted-foreground/30 w-4 shrink-0 text-right">{idx + 1}</span>
+                  <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${ic.cls}`}>{ic.label}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary leading-snug">{ind.label}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{ind.domain} · {ind.detail}</p>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary shrink-0 transition-colors" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Domain Cards ──────────────────────────────────────────────── */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 shrink-0">By Domain</p>
+            <div className="flex-1 h-px bg-border/50" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {domainHealthData.map(d => {
+              const dc       = HEALTH_LEVEL_CONFIG[d.level];
+              const topInds  = d.indicators.slice(0, 3);
+              const extra    = d.indicators.length - 3;
+              const firstBad = d.indicators.find(i => i.status === 'at-risk' || i.status === 'needs-work');
+
+              return (
+                <div key={d.id} className="rounded-lg border border-border bg-white overflow-hidden flex flex-col">
+
+                  {/* Card header */}
+                  <button
+                    onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
+                    className="px-3 py-2.5 border-b border-border/50 bg-muted/20 flex items-center justify-between w-full text-left hover:bg-primary/5 transition-colors group"
+                  >
+                    <div className="min-w-0 mr-2">
+                      <p className="text-[12px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{d.domain}</p>
+                      <p className="text-[9px] text-muted-foreground truncate">{d.sourceSystem}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dc.label}</span>
+                      <span className={`text-[22px] font-bold leading-none ${dc.score}`}>{d.score}</span>
+                    </div>
+                  </button>
+
+                  {/* Indicator rows */}
+                  <div className="px-3 py-1.5 flex-1">
+                    {topInds.map(ind => {
+                      const ic  = HEALTH_LEVEL_CONFIG[ind.status];
+                      const dot =
+                        ind.status === 'strong' || ind.status === 'good'
+                          ? 'bg-emerald-400'
+                          : ind.status === 'needs-work'
+                          ? 'bg-amber-400'
+                          : 'bg-rose-400';
+                      return (
+                        <button
+                          key={ind.id}
+                          onClick={() => setSelectedItem({ type: 'healthIndicator', id: ind.id, data: ind })}
+                          className="w-full flex items-center gap-2 py-[5px] rounded hover:bg-primary/5 transition-colors group text-left"
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-px ${dot}`} />
+                          <span className="text-[10px] text-foreground group-hover:text-primary flex-1 truncate leading-tight">{ind.label}</span>
+                          <span className={`text-[8px] font-bold border rounded-full px-1 py-0.5 shrink-0 leading-tight ${ic.cls}`}>{ic.label}</span>
+                        </button>
+                      );
+                    })}
+                    {extra > 0 && (
                       <button
-                        key={ind.id}
-                        onClick={() => setSelectedItem({ type: 'healthIndicator', id: ind.id, data: ind })}
-                        className="w-full flex items-center gap-2 py-[5px] rounded hover:bg-primary/5 transition-colors group text-left"
+                        onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
+                        className="text-[9px] text-primary hover:underline pl-3.5 mt-0.5 block"
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-px ${dot}`} />
-                        <span className="text-[10px] text-foreground group-hover:text-primary flex-1 truncate leading-tight">{ind.label}</span>
-                        <span className={`text-[8px] font-bold border rounded-full px-1 py-0.5 shrink-0 leading-tight ${ic.cls}`}>{ic.label}</span>
+                        +{extra} more checks
                       </button>
-                    );
-                  })}
-                  {extra > 0 && (
+                    )}
+                  </div>
+
+                  {/* Key next action — clickable to open brief + Penny */}
+                  {firstBad && (
                     <button
-                      onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
-                      className="text-[9px] text-primary hover:underline pl-3.5 mt-0.5 block"
+                      onClick={() => setSelectedItem({ type: 'healthIndicator', id: firstBad.id, data: firstBad })}
+                      className="w-full px-3 py-1.5 border-t border-amber-200/60 bg-amber-50/60 hover:bg-amber-100/70 transition-colors text-left group"
                     >
-                      +{extra} more checks
+                      <p className="text-[8px] font-bold uppercase tracking-wide text-amber-700/70 mb-0.5 flex items-center gap-1">
+                        Next action
+                        <span className="text-amber-500/60 group-hover:text-amber-600 transition-colors">→</span>
+                      </p>
+                      <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2 group-hover:text-amber-900/80 transition-colors">{firstBad.detail}</p>
                     </button>
                   )}
                 </div>
-
-                {/* Key next action — clickable to open brief + Penny */}
-                {firstBad && (
-                  <button
-                    onClick={() => setSelectedItem({ type: 'healthIndicator', id: firstBad.id, data: firstBad })}
-                    className="w-full px-3 py-1.5 border-t border-amber-200/60 bg-amber-50/60 hover:bg-amber-100/70 transition-colors text-left group"
-                  >
-                    <p className="text-[8px] font-bold uppercase tracking-wide text-amber-700/70 mb-0.5 flex items-center gap-1">
-                      Next action
-                      <span className="text-amber-500/60 group-hover:text-amber-600 transition-colors">→</span>
-                    </p>
-                    <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2 group-hover:text-amber-900/80 transition-colors">{firstBad.detail}</p>
-                  </button>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
+
       </div>
     </ScrollArea>
   );
