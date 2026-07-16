@@ -174,7 +174,7 @@ const CASE_PRIORITY_CFG: Record<string, { cls: string; label: string }> = {
 
 function SfCasesStrip() {
   const { data, isLoading, isError, refetch, isFetching } = useSfOpsCases();
-  const { setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery } = useAppContext();
+  const { setSelectedItem } = useAppContext();
   const [focusedCaseId, setFocusedCaseId] = useState<string | null>(null);
   const [sfOpen, setSfOpen] = useState(true);
 
@@ -186,16 +186,15 @@ function SfCasesStrip() {
     ? data.cases.find(c => c.Id === focusedCaseId) ?? null
     : null;
 
-  function handleFocusCase(c: SfCase, contactName: string | null) {
+  function handleSelectCase(c: SfCase, contactName: string | null) {
     const age   = caseAge(c.CreatedDate);
-    const query =
-      `SF Case ${c.CaseNumber ?? c.Id}: "${c.Subject ?? 'No subject'}"\n` +
-      `Priority: ${c.Priority ?? '—'} · Status: ${c.Status ?? '—'} · Contact: ${contactName ?? '—'} · Age: ${age}\n\n` +
-      `Summarise the key risks for this case, recommend the most important next actions for the Transition Trails team, and flag any connections to current program delivery or open demand items.`;
+    const sfUrl = data?.orgBaseUrl ? `${data.orgBaseUrl}/lightning/r/Case/${c.Id}/view` : null;
     setFocusedCaseId(c.Id);
-    setCalendarPanelOpen(false);
-    setAskPennyOpen(true);
-    setPendingPennyQuery(query);
+    setSelectedItem({
+      type: 'sfCase',
+      id: c.Id,
+      data: { ...c, contactName, sfUrl, age },
+    });
   }
 
   return (
@@ -285,7 +284,7 @@ function SfCasesStrip() {
                       return (
                         <tr
                           key={c.Id}
-                          onClick={() => handleFocusCase(c, contactName)}
+                          onClick={() => handleSelectCase(c, contactName)}
                           className={`cursor-pointer transition-colors group border-l-2 ${
                             isFocused
                               ? 'bg-primary/5 border-l-primary'
@@ -340,8 +339,8 @@ function SfCasesStrip() {
                 <div className="flex items-center gap-2 px-3 py-2 border-t border-primary/20 bg-primary/5">
                   <Sparkles className="w-3 h-3 text-primary shrink-0" />
                   <p className="text-[10px] text-primary flex-1 truncate">
-                    <span className="font-semibold">Focused:</span> {focusedCase.CaseNumber} · {focusedCase.Subject ?? 'No subject'}
-                    <span className="text-primary/60 ml-1">— {TERMS.aiAssistant} insights loading in right panel</span>
+                    <span className="font-semibold">Selected:</span> {focusedCase.CaseNumber} · {focusedCase.Subject ?? 'No subject'}
+                    <span className="text-primary/60 ml-1">— brief open in right panel</span>
                   </p>
                   <button onClick={() => setFocusedCaseId(null)} className="text-primary/50 hover:text-primary transition-colors shrink-0" aria-label="Clear focus">
                     <X className="w-3 h-3" />
@@ -349,7 +348,7 @@ function SfCasesStrip() {
                 </div>
               ) : (
                 <div className="px-3 py-1.5 border-t border-border/40">
-                  <p className="text-[9px] text-muted-foreground/40">Click any row to get {TERMS.aiAssistant} insights about that case</p>
+                  <p className="text-[9px] text-muted-foreground/40">Click any row to open the case brief in the right panel</p>
                 </div>
               )}
             </>

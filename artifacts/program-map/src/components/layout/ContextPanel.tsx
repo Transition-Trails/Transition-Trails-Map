@@ -20,7 +20,7 @@ import { useTierFlags } from '@/hooks/useTierFlags';
 import { useSfOrgUrl } from '@/hooks/useSfOrgUrl';
 
 export function ContextPanel() {
-  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel, setPennyPanelTab, rightPanelOpen, setRightPanelOpen } = useAppContext();
+  const { selectedItem, setSelectedItem, trailOsCapabilities, pennyCapabilities, actionPanel, closeActionPanel, slackPanel, closeSlackPanel, openSlackPanel, setPennyPanelTab, rightPanelOpen, setRightPanelOpen, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const [location, setLocation] = useLocation();
   const { isEveryday } = useTierFlags();
   const { data: sfOrgData } = useSfOrgUrl();
@@ -1728,6 +1728,80 @@ export function ContextPanel() {
               <p className="text-[10px] text-primary/80 leading-relaxed">
                 Use the <strong>expand chevron</strong> on the row to reveal quick triage actions — Approve, Defer, Escalate, and more.
               </p>
+            </div>
+
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    if (type === 'sfCase') {
+      const priCls =
+        data.Priority === 'High'   ? 'text-rose-700 bg-rose-50 border-rose-200'
+        : data.Priority === 'Medium' ? 'text-amber-700 bg-amber-50 border-amber-200'
+        : 'text-slate-600 bg-slate-50 border-slate-200';
+
+      function focusWithPenny() {
+        const q =
+          `SF Case ${data.CaseNumber ?? data.Id}: "${data.Subject ?? 'No subject'}"\n` +
+          `Priority: ${data.Priority ?? '—'} · Status: ${data.Status ?? '—'} · Contact: ${data.contactName ?? '—'} · Age: ${data.age}\n\n` +
+          `Summarise the key risks for this case, recommend the most important next actions for the Transition Trails team, and flag any connections to current program delivery or open demand items.`;
+        setAskPennyOpen(true);
+        setPendingPennyQuery(q);
+      }
+
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+
+            {/* Header */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Salesforce Case</span>
+                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCls}`}>
+                  {data.Priority ?? 'Low'}
+                </span>
+                {data.CaseNumber && (
+                  <span className="text-[9px] font-mono text-muted-foreground/60">{data.CaseNumber}</span>
+                )}
+              </div>
+              <h2 className="text-[15px] font-semibold text-foreground leading-snug">
+                {data.Subject ?? '(No subject)'}
+              </h2>
+            </div>
+
+            {/* Meta */}
+            <div className="rounded-lg border bg-muted/20 p-3 space-y-2">
+              {[
+                { label: 'Status',  value: data.Status ?? '—' },
+                { label: 'Contact', value: data.contactName ?? '—' },
+                { label: 'Age',     value: data.age ?? '—' },
+              ].map(row => (
+                <div key={row.label} className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] text-muted-foreground">{row.label}</span>
+                  <span className="text-[10px] font-semibold text-foreground text-right">{row.value}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-2">
+              {data.sfUrl && (
+                <a
+                  href={data.sfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                >
+                  Open in Salesforce ↗
+                </a>
+              )}
+              <button
+                onClick={focusWithPenny}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              >
+                Focus with {TERMS.aiAssistant}
+              </button>
             </div>
 
           </div>

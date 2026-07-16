@@ -18,7 +18,8 @@ export type SelectedItemType =
   | 'curriculumItem' | 'pennyAction' | 'sfMapping' | 'programResource' | 'contentStandard' | 'pennyCapability' | 'knowledgeSource'
   | 'promptTemplate' | 'integration'
   | 'persona' | 'role' | 'roleBlueprint' | 'roleParticipation'
-  | 'healthIndicator' | 'oicRecommendation' | 'trendInsight' | 'twinNode';
+  | 'healthIndicator' | 'oicRecommendation' | 'trendInsight' | 'twinNode'
+  | 'sfCase';
 
 export interface ActiveContext {
   id: string;
