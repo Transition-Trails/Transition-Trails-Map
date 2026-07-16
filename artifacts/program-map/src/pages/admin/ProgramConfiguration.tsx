@@ -457,7 +457,7 @@ export default function ProgramConfiguration() {
     }
   }, [toast]);
 
-  const fetchProgramDetail = useCallback(async (id: string) => {
+  const fetchProgramDetail = useCallback(async (id: string): Promise<Record<string, unknown> | null> => {
     setProgramDetailLoading(true);
     try {
       const resp = await fetch(`/api/programs/${id}`);
@@ -477,8 +477,9 @@ export default function ProgramConfiguration() {
         Problem_Statement__c:    String(p['Problem_Statement__c'] ?? ''),
         Program_Manager__c:      String(p['Program_Manager__c'] ?? ''),
       });
+      return p;
     } catch {
-      // silently ignore — cards already show the summary
+      return null;
     } finally {
       setProgramDetailLoading(false);
     }
@@ -593,12 +594,47 @@ export default function ProgramConfiguration() {
     }
   }
 
-  function handleSelectProgram(p: SfProgram) {
+  async function handleSelectProgram(p: SfProgram) {
     setSelectedProgram(p);
     setEditingProgram(false);
     setProgramDetail(null);
     setCourseForm(prev => ({ ...prev, Program__c: p.Name }));
-    void fetchProgramDetail(p.Id);
+
+    // Seed Penny chat with a loading hint while we fetch
+    setPennyMessages([{
+      role: 'penny',
+      content: `Loading "${p.Name}" details from Salesforce — I'll share recommendations once I have the full picture…`,
+      time: ts(),
+    }]);
+
+    const detail = await fetchProgramDetail(p.Id);
+    if (!detail) return;
+
+    // Strip HTML tags for a clean text prompt
+    const stripHtml = (v: unknown) =>
+      v ? String(v).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+
+    const sf = (key: string) => {
+      const v = detail[key];
+      return v && String(v) !== 'null' ? stripHtml(v) : '';
+    };
+
+    const lines: string[] = [
+      `Program: ${String(detail['Name'] ?? p.Name)}`,
+      sf('pmdm__Status__c')         && `Status: ${sf('pmdm__Status__c')}`,
+      sf('pmdm__TargetPopulation__c') && `Target Population: ${sf('pmdm__TargetPopulation__c')}`,
+      sf('pmdm__ShortSummary__c')   && `Summary: ${sf('pmdm__ShortSummary__c')}`,
+      sf('pmdm__Description__c')    && `Description: ${sf('pmdm__Description__c')}`,
+      sf('Problem_Statement__c')    && `Problem Statement: ${sf('Problem_Statement__c')}`,
+      sf('Program_Goals__c')        && `Program Goals: ${sf('Program_Goals__c')}`,
+      sf('Program_Expected_Outcomes__c') && `Expected Outcomes: ${sf('Program_Expected_Outcomes__c')}`,
+      sf('Program_Target_Audience__c')   && `Target Audience: ${sf('Program_Target_Audience__c')}`,
+      sf('Program_Structure__c')    && `Program Structure: ${sf('Program_Structure__c')}`,
+    ].filter(Boolean) as string[];
+
+    void askPenny(
+      `Based on the following program details, give me 3–4 specific, actionable recommendations to better serve the target audience and strengthen program outcomes. Focus on curriculum design, learner engagement, and measurable impact.\n\n${lines.join('\n')}`
+    );
   }
 
   function handleAdvanceToStep2() {
