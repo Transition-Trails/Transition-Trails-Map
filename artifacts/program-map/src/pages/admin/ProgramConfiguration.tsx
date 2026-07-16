@@ -349,6 +349,7 @@ export default function ProgramConfiguration() {
   const [step, setStep]                     = useState<WizardStep>(1);
   const [programs, setPrograms]             = useState<SfProgram[]>([]);
   const [progSearch, setProgSearch]         = useState('');
+  const [showArchived, setShowArchived]     = useState(false);
   const [programsLoading, setProgramsLoading] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<SfProgram | null>(null);
   const [showProgramForm, setShowProgramForm] = useState(false);
@@ -756,9 +757,12 @@ export default function ProgramConfiguration() {
   }
 
   // ── Filtered programs ─────────────────────────────────────────────────────────
-  const filteredPrograms = progSearch.trim()
-    ? programs.filter(p => p.Name.toLowerCase().includes(progSearch.toLowerCase()))
-    : programs;
+  const ARCHIVED_STATUSES = ['Canceled', 'Completed'];
+  const filteredPrograms = programs.filter(p => {
+    if (!showArchived && ARCHIVED_STATUSES.includes(p.pmdm__Status__c ?? '')) return false;
+    if (progSearch.trim()) return p.Name.toLowerCase().includes(progSearch.toLowerCase());
+    return true;
+  });
 
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
@@ -866,6 +870,16 @@ export default function ProgramConfiguration() {
                       />
                       <button onClick={() => void loadPrograms()} className="text-[11px] text-muted-foreground hover:text-foreground p-1.5 rounded hover:bg-muted/40">
                         <RotateCcw className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setShowArchived(v => !v)}
+                        className={`ml-auto flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg border transition-colors ${
+                          showArchived
+                            ? 'bg-amber-500/10 border-amber-400/40 text-amber-700 dark:text-amber-400'
+                            : 'border-border text-muted-foreground hover:bg-muted/40'
+                        }`}
+                      >
+                        {showArchived ? 'Hide Canceled / Completed' : 'Show Canceled / Completed'}
                       </button>
                     </div>
                     {programsLoading ? (
