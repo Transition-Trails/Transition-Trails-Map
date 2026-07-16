@@ -97,31 +97,39 @@ function StatusBadge({ status }: { status: string | null }) {
 
 // ── Step indicator ────────────────────────────────────────────────────────────
 
-function StepIndicator({ current }: { current: WizardStep }) {
+function StepIndicator({ current, skipCohorts = false }: { current: WizardStep; skipCohorts?: boolean }) {
   const done = current === 'review';
   return (
     <div className="flex items-center gap-0 mb-6">
       {STEP_META.map((s, i) => {
-        const isActive  = current === s.stepNum;
-        const isDone    = done || (typeof current === 'number' && current > s.stepNum);
+        const isSkipped = skipCohorts && s.stepNum === 2;
+        const isActive  = !isSkipped && current === s.stepNum;
+        const isDone    = !isSkipped && (done || (typeof current === 'number' && current > s.stepNum));
         const Icon = s.icon;
         return (
           <div key={s.stepNum} className="flex items-center">
-            <div className={`flex flex-col items-center ${i > 0 ? '' : ''}`}>
+            <div className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${
-                isDone  ? 'bg-primary border-primary text-primary-foreground'
+                isSkipped ? 'bg-muted border-dashed border-border/50 text-muted-foreground/40'
+                : isDone  ? 'bg-primary border-primary text-primary-foreground'
                 : isActive ? 'bg-primary/10 border-primary text-primary'
                 : 'bg-muted border-border text-muted-foreground'
               }`}>
-                {isDone ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
+                {isSkipped ? <span className="text-[10px] font-bold">—</span>
+                  : isDone ? <Check className="w-3.5 h-3.5" />
+                  : <Icon className="w-3.5 h-3.5" />}
               </div>
-              <span className={`text-[10px] mt-1 font-medium ${isActive ? 'text-primary' : isDone ? 'text-foreground' : 'text-muted-foreground'}`}>
+              <span className={`text-[10px] mt-1 font-medium ${
+                isSkipped ? 'text-muted-foreground/40 line-through'
+                : isActive ? 'text-primary' : isDone ? 'text-foreground' : 'text-muted-foreground'
+              }`}>
                 {s.label}
               </span>
             </div>
             {i < STEP_META.length - 1 && (
               <div className={`h-0.5 w-12 mx-1 mb-4 rounded-full transition-colors ${
-                (done || (typeof current === 'number' && current > s.stepNum)) ? 'bg-primary' : 'bg-border'
+                isSkipped ? 'bg-border/30'
+                : (done || (typeof current === 'number' && current > s.stepNum)) ? 'bg-primary' : 'bg-border'
               }`} />
             )}
           </div>
@@ -347,6 +355,7 @@ export default function ProgramConfiguration() {
 
   // ── Wizard state ────────────────────────────────────────────────────────────
   const [step, setStep]                     = useState<WizardStep>(1);
+  const [isCohortBased, setIsCohortBased]   = useState(true);
   const [programs, setPrograms]             = useState<SfProgram[]>([]);
   const [progSearch, setProgSearch]         = useState('');
   const [showArchived, setShowArchived]     = useState(false);
@@ -639,10 +648,14 @@ export default function ProgramConfiguration() {
     );
   }
 
-  function handleAdvanceToStep2() {
+  function handleAdvanceFromStep1() {
     if (!selectedProgram) { toast({ title: 'Select a program first', variant: 'destructive' }); return; }
-    void loadCohorts(selectedProgram.Id);
-    setStep(2);
+    if (isCohortBased) {
+      void loadCohorts(selectedProgram.Id);
+      setStep(2);
+    } else {
+      setStep(3);
+    }
   }
 
   // ── Step 2 actions ────────────────────────────────────────────────────────────
@@ -835,7 +848,7 @@ export default function ProgramConfiguration() {
         <div className="flex flex-col w-[60%] overflow-hidden border-r border-border">
           <ScrollArea className="flex-1 min-h-0">
             <div className="p-6">
-              <StepIndicator current={step} />
+              <StepIndicator current={step} skipCohorts={!isCohortBased} />
 
               {/* ── Step 1: Program ───────────────────────────────────────── */}
               {step === 1 && (
@@ -1102,11 +1115,23 @@ export default function ProgramConfiguration() {
                                     </div>
                                   )}
 
-                                  {/* Next step button */}
-                                  <div className="flex justify-end px-4 py-3 border-t border-border/50">
-                                    <button onClick={handleAdvanceToStep2}
+                                  {/* Cohort toggle + Next */}
+                                  <div className="flex items-center justify-between px-4 py-3 border-t border-border/50">
+                                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                                      <input
+                                        type="checkbox"
+                                        checked={isCohortBased}
+                                        onChange={e => setIsCohortBased(e.target.checked)}
+                                        className="w-3.5 h-3.5 rounded accent-primary"
+                                      />
+                                      <span className="text-[11px] text-muted-foreground">
+                                        {isCohortBased ? 'Cohort-based program' : 'Ongoing / no cohorts'}
+                                      </span>
+                                    </label>
+                                    <button onClick={handleAdvanceFromStep1}
                                       className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[13px] font-semibold hover:bg-primary/90 transition-colors">
-                                      Next: Configure Cohorts <ChevronRight className="w-4 h-4" />
+                                      {isCohortBased ? 'Next: Configure Cohorts' : 'Next: Configure Course'}
+                                      <ChevronRight className="w-4 h-4" />
                                     </button>
                                   </div>
                                 </div>
