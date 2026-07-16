@@ -167,7 +167,7 @@ Phase 1 was defined as: build the complete navigational shell, populate all sect
 | Google Calendar | Live | ✅ Real events via /api/calendar/events |
 | Agentforce | Live POC | ✅ Sessions API · dual-AI coaching on Assessment page |
 | Clerk v6 + Google Sign-In | Live | ✅ Google OAuth · Google Groups auto-tier |
-| Automated test suite | 0 | ❌ Phase 2 |
+| Automated test suite | 105 | ✅ Live — 7 files across api-server + program-map |
 | Metadata-driven readiness cases | 70 | ✅ |
 | Hardcoded content items | ~28 | Classified (12 OK, 11 Phase 2, 5 stale) |
 
@@ -453,7 +453,7 @@ Admin-only program tooling (SF Validation, Program Resources, Salesforce Archite
 |---|---|---|
 | Command Center | `/penny` | Hub overview: live AI status, capability health, RAG coverage, Penny guidance |
 | Capabilities | `/penny/capabilities` | Capability workspace with governance tabs |
-| Prompt Studio | `/penny/prompts` | Prompt management and testing |
+| Prompt Studio | `/penny/prompts` | Prompt management and testing — Templates and Variables tabs are DB-backed (`prompt_templates` + `prompt_variables` PostgreSQL tables); Variables tab is live editable with RailActionPanel create/edit |
 | Learners | `/penny/learners` | Learner engagement and Penny interaction logs |
 | Trail Quests | `/penny/trail-quests` | Trail Quest delivery and progress tracking |
 | Assessments | `/penny/assessments` | Assessment delivery + Agentforce dual-AI coaching (live POC) |
@@ -522,14 +522,14 @@ The Administration hub uses `useLocation` to route between sections without a ta
 |---|---|---|---|
 | `/admin` | Knowledge Management hub | Admin | 11-section home with readiness tiles |
 | `/admin/people-access` | People & Access | Admin | Permission Matrix (11 personas, sortable/filterable) + Access Tiers & Auth (Google Groups mapping, Clerk auth flow, feature capability table) |
-| `/admin/setup` | Setup | Admin | Integration setup wizard |
+| `/admin/integrations` | Integration Hub | Admin | Central integration management — all connectors, health, and config (canonical entry point; `/admin/setup` redirects here) |
+| `/admin/integrations/google-auth` | Google OAuth Wizard | Super Admin | 5-step OAuth flow wizard (old `/admin/google-oauth` redirects here) |
+| `/admin/integrations/secrets` | Secrets Audit | Super Admin | Environment variable audit tool (old `/admin/secrets-audit` redirects here) |
 | `/admin/integration-readiness` | Integration Readiness | Admin | Full integration health dashboard |
 | `/admin/phase1-readiness` | Phase 1 Readiness | Super Admin | Live readiness checklist and system status |
 | `/admin/ux-standards` | UX Standards | Super Admin | Phase 1 UX compliance reference |
 | `/admin/phase2-backlog` | Phase 2 Backlog | Super Admin | 19-card Kanban backlog |
-| `/admin/phase1-audit` | Phase 1 Audit | Super Admin | Full completion audit (42 pages, POC review, verdict) |
-| `/admin/secrets-audit` | Secrets Audit | Super Admin | Environment variable audit tool |
-| `/admin/google-oauth` | Google OAuth Wizard | Super Admin | 5-step OAuth flow wizard |
+| `/admin/phase1-audit` | Phase 1 Audit | Super Admin | Full completion audit (48 pages, POC review, verdict) |
 | `/admin/sf-validation` | SF Validation | Admin | Salesforce object validation center |
 | `/admin/salesforce-arch` | Salesforce Architecture | Admin | SF object mapping and schema |
 | `/admin/program-resources` | Program Resources | Admin | Program resource registry |
@@ -622,37 +622,72 @@ The Integration Readiness dashboard at `/admin/integration-readiness` renders th
 
 ## 13. Testing Strategy
 
-### Phase 1 (current)
+### Automated test suite (active — 105 tests, 7 files)
 
-Trail OS has **no automated test suite** in Phase 1. Testing relies on:
+Trail OS has a Vitest test suite across both workspace packages.
 
-1. **TypeScript compiler** (`pnpm --filter @workspace/program-map run typecheck`) — catches type errors, import issues, and contract violations. Required to pass before any PR merge.
+**api-server tests** (`artifacts/api-server/src/__tests__/`):
 
-2. **Metadata-driven readiness cases** (~70 cases) — expressed as typed data structures in `src/data/readinessState.ts` and `src/data/integrationReadinessData.ts`. These are not executable tests but document expected system behaviour.
+| File | Tests | Coverage |
+|---|---|---|
+| `health.test.ts` | 11 | `/api/healthz` shape, content-type, 404 |
+| `salesforce.test.ts` | ~16 | SF operations summary, cache, validate endpoint |
+| `promptTemplates.test.ts` | 16 | Full CRUD contract: `GET`, `POST`, `/seed`, `PATCH` — 200/201/400/404 |
+| `promptVariables.test.ts` | 16 | Full CRUD contract for `/api/penny/prompt-variables` |
 
-3. **Smoke-test tools** (4 tools available):
-   - Slack message test: `POST /api/slack/validate/test-message`
-   - Salesforce field validation: `GET /api/salesforce/validate`
-   - Google OAuth flow: `/admin/google-oauth`
-   - Gemini test interface: `/penny/test`
+**program-map tests** (`artifacts/program-map/src/__tests__/`):
 
-4. **Visual/manual** — all UX standards verified by screenshot and manual inspection.
+| File | Tests | Coverage |
+|---|---|---|
+| `validationData.test.ts` | ~20 | Slack/Calendar/Drive data integrity (shape, uniqueness, enum values) |
+| `formatSyncAge.test.ts` | ~18 | `formatSyncAge` utility time-bucket logic |
+| `pennyStudioData.test.ts` | 24 | Prompt template + variable data integrity (id/name uniqueness, `VariableType`, `PromptStatus`, `HallucinationRisk`, `PromptDomain`, config map coverage) |
 
-### Phase 2 (planned)
+**DB-mocking pattern:** `vi.hoisted()` creates mock fn references accessible in both the `vi.mock('@workspace/db')` factory and test bodies. This is the required pattern for all DB-backed route tests. See `promptTemplates.test.ts` for the reference implementation.
 
-The `p2-vitest-automation` backlog card tracks the plan to introduce a Vitest test suite covering:
-- Unit tests for data transformation utilities
-- Integration tests for API routes (Slack, Salesforce, Google)
-- Component tests for critical UI patterns (HubShell, ObjectWorkspace, ContextBar)
+**Run commands:**
+
+```bash
+pnpm --filter @workspace/api-server test
+pnpm --filter @workspace/program-map test
+```
+
+### `routes.smoke.ts` — type-checked route manifest
+
+`artifacts/program-map/src/__tests__/routes.smoke.ts` is not a runtime test. It is a typed manifest of every route registered in `App.tsx`, verified by `pnpm --filter @workspace/program-map run typecheck`. Every entry is one of:
+
+- `active` — a real `<Route>` rendering a component
+- `redirect` — a `<Redirect>` (or `useEffect` redirect) to a canonical path
+
+Update `routes.smoke.ts` whenever routes are added, removed, or redirected in `App.tsx`.
+
+### TypeScript compiler (primary quality gate)
+
+`pnpm run typecheck` — must pass with 0 errors before any PR merge. Covers type errors, import issues, missing exports, and route manifest validity.
+
+### Smoke-test tools (manual, in-app)
+
+- Slack message test: `POST /api/slack/validate/test-message`
+- Salesforce field validation: `GET /api/salesforce/validate`
+- Google OAuth flow: `/admin/integrations/google-auth`
+- Gemini / Penny test interface: `/penny/test`
+
+### Phase 2 testing additions (planned)
+
+- Component tests for shared UI (HubShell, ObjectWorkspace, ContextBar)
 - Snapshot tests for the five Overview landing pages
-
-Until automated tests exist, the TypeScript compiler is the primary quality gate.
+- Integration tests for Slack, Google, and Agentforce routes
 
 ---
 
 ## 14. Hardcoded and Demo Data Classification
 
 All data in Trail OS Phase 1 is hardcoded in `src/data/`. This is by design for the prototype. The following classification governs how each item should be treated:
+
+### DB-backed (live, persistent across restarts)
+
+- `prompt_templates` table — Penny Prompt Studio templates; seeded from `pennyData.ts`; editable via `PATCH /api/penny/prompt-templates/:id`
+- `prompt_variables` table — Penny Prompt Studio variables; seeded from `pennyData.ts`; live editable via VariablesView + `PATCH /api/penny/prompt-variables/:id`
 
 ### Phase 1 OK — accurate representation, ready for live data swap
 

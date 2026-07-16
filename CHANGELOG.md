@@ -11,6 +11,50 @@ Changes on `dev` branch not yet merged to `main`.
 
 ---
 
+## [1.2.0] — 2026-07-16 — DB-backed Prompt Studio & Expanded Test Suite
+
+### Added
+
+**Penny Prompt Studio — DB-backed Prompt Templates**
+- `prompt_templates` PostgreSQL table — `id text PK`, `data jsonb`, `created_at`, `updated_at`; Drizzle schema pushed
+- `GET /api/penny/prompt-templates` — list all templates ordered by creation date; maps DB rows to their `.data` field
+- `POST /api/penny/prompt-templates` — create one template; validates `id` + `name`; returns 400 on missing fields
+- `POST /api/penny/prompt-templates/seed` — idempotent bulk insert; skips existing (ON CONFLICT DO NOTHING); returns `{ seeded, total }`
+- `PATCH /api/penny/prompt-templates/:id` — partial merge update; path `id` takes precedence over body; 404 when not found
+- `usePromptTemplates` hook — TanStack Query with optimistic cache updates; auto-seeds from static `promptTemplates` data on first empty-DB load
+- `PennyPromptStudio.tsx` Templates tab wired to `usePromptTemplates` hook
+
+**Penny Prompt Studio — DB-backed Prompt Variables**
+- `prompt_variables` PostgreSQL table — same schema shape as `prompt_templates`; Drizzle schema pushed
+- `GET /api/penny/prompt-variables` — list all variables ordered by creation date
+- `POST /api/penny/prompt-variables` — create one variable; validates `id` + `name`; 400 on missing fields
+- `POST /api/penny/prompt-variables/seed` — idempotent bulk insert; returns `{ seeded, total }`
+- `PATCH /api/penny/prompt-variables/:id` — partial merge update; 404 when not found
+- `usePromptVariables` hook — TanStack Query with optimistic updates; auto-seeds from static `promptVariables` data on first empty-DB load
+- `VariablesView` — upgraded from static read-only list to live editable split panel:
+  - Variable list (left) + detail panel (right, toggled by row click)
+  - "New Variable" button opens `RailActionPanel` with all fields (placeholder, label, type, source, description, example, required)
+  - "Edit" button in detail panel opens `RailActionPanel` pre-filled with current variable values
+  - Both create/update call hook mutations with optimistic UI update + DB persist + cache invalidate
+
+**Test suite expanded (49 → 105 tests across 7 files)**
+- `promptTemplates.test.ts` (api-server, new) — 16 tests: GET shape, row mapping, POST 201/400, seed counts + conflict handling, PATCH 200/404 with id-precedence check; uses `vi.hoisted()` + `vi.mock('@workspace/db')` fluent-builder mock pattern
+- `promptVariables.test.ts` (api-server, new) — 16 tests: identical contract coverage for `/api/penny/prompt-variables` routes
+- `pennyStudioData.test.ts` (program-map, new) — 24 tests: `promptVariables` (id uniqueness, name uniqueness, required fields, valid `VariableType`, non-empty source), `promptTemplates` (id/name uniqueness, valid `PromptStatus`/`HallucinationRisk`/`PromptDomain`, config coverage), `outputFormats`, `versionHistory`, `PROMPT_STATUS_CONFIG`, `RISK_CONFIG`
+- `routes.smoke.ts` (program-map, updated) — comprehensive refresh: 40+ missing redirects added (navigator/*, demand/*, curriculum/*, library/*, communications/*, penny-retired/*, admin-legacy/*); stale active entries corrected; all `admin/integrations/*` and individual `collaboration/*` active routes added
+
+### Changed
+
+- `/admin/setup` now redirects to `/admin/integrations` — the Integration Hub is the canonical admin entry point
+- `/penny/integrations` and `/penny/integration-layer` now redirect to `/admin/integrations` (previously `/admin/setup`)
+- `VariablesView` — replaced static read-only list with live DB-backed editable split panel
+
+### Fixed
+
+- Routes smoke manifest: `/admin/google-oauth` and `/admin/secrets-audit` corrected from `active` to `redirect`; `/penny/integrations` and `/penny/integration-layer` targets corrected from `/admin/setup` to `/admin/integrations`; `/admin/setup` corrected from `active` to `redirect`
+
+---
+
 ## [1.1.0] — 2026-06-18 — Live AI, Gmail, Calendar, Drive, Agentforce & Clerk v6
 
 This release activates all Phase 1 live integrations: Penny/Gemini goes from POC to a production-ready multi-turn AI assistant, Gmail and Google Calendar become fully interactive from the Topbar, Google Drive surfaces Penny's asset corpus, Agentforce adds dual-AI coaching, and Clerk v6 with Google Groups establishes role-gated access for all tiers. Fourteen new pages, three global slide-over panels, five test files, and three live Salesforce data hooks ship in this release.

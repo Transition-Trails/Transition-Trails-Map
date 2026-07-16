@@ -117,8 +117,8 @@ Trail OS is an internal platform. If you discover a security issue:
 ### Database
 
 - `DATABASE_URL` is a Replit Secret — the full connection string (including password) is never in code.
-- In Phase 1, the database is used minimally (the UI prototype is mostly in-memory state).
-- In Phase 2, before storing any personally identifiable information (learner data), a data protection review is required.
+- The database stores platform configuration data: `prompt_templates` and `prompt_variables` tables persist Penny Prompt Studio content. No personally identifiable information (PII) is stored in Phase 1.
+- In Phase 2, before storing any learner data or PII, a data protection review is required.
 
 ---
 
@@ -136,11 +136,12 @@ Trail OS uses a four-tier access model (`everyday`, `power`, `admin`, `superadmi
 
 The following routes must be protected by server-side authentication in production (currently open in Phase 1 prototype):
 
-- `/admin/secrets-audit` — lists environment variable names
-- `/admin/google-oauth` — can initiate OAuth flows
+- `/admin/integrations/secrets` — lists environment variable names (replaces `/admin/secrets-audit`)
+- `/admin/integrations/google-auth` — can initiate OAuth flows (replaces `/admin/google-oauth`)
 - `/api/salesforce/*` — accesses Salesforce data
 - `/api/slack/*` — posts to Slack channels
 - `/api/secrets/*` — manages integration credentials
+- `/api/penny/prompt-templates` and `/api/penny/prompt-variables` — write endpoints for DB-backed prompt configuration
 
 ---
 

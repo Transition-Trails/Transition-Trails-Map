@@ -279,21 +279,50 @@ All new UI must follow the Phase 1 UX standards. The full reference is in the ap
 
 ## Testing Requirements
 
-### Phase 1 (current)
+### Automated test suite (active)
 
-TypeScript must pass clean. No automated tests exist yet. Before merging:
+Trail OS has a Vitest test suite covering API routes and frontend data integrity. Run it with:
 
-1. Run `pnpm run typecheck` — must be 0 errors.
-2. Visually verify your page at the relevant route.
-3. Check at all four tier levels (use the tier switcher in the sidebar footer).
-4. Verify no browser console errors.
+```bash
+# api-server tests (43 tests across 4 files)
+pnpm --filter @workspace/api-server test
 
-### Phase 2 (planned)
+# program-map tests (62 tests across 3 files)
+pnpm --filter @workspace/program-map test
+```
 
-When the `p2-vitest-automation` card is implemented, new code will require:
-- Unit tests for data utilities
-- Component tests for shared components (HubShell, ObjectWorkspace)
-- Integration tests for new API routes
+**Test files:**
+
+| File | Package | Coverage |
+|---|---|---|
+| `health.test.ts` | api-server | `/api/healthz` shape, content-type, 404 |
+| `salesforce.test.ts` | api-server | SF operations summary shape, cache, validate endpoint |
+| `promptTemplates.test.ts` | api-server | Full CRUD contract for `/api/penny/prompt-templates` routes |
+| `promptVariables.test.ts` | api-server | Full CRUD contract for `/api/penny/prompt-variables` routes |
+| `validationData.test.ts` | program-map | Slack/Calendar/Drive data integrity (shape, uniqueness, enum values) |
+| `formatSyncAge.test.ts` | program-map | `formatSyncAge` utility time-bucket logic |
+| `pennyStudioData.test.ts` | program-map | Prompt template + variable data integrity (shape, uniqueness, valid enums) |
+
+**Mocking pattern for DB-backed API tests:** use `vi.hoisted()` to create mock fn references accessible in both `vi.mock()` factory and test bodies. See `promptTemplates.test.ts` for the reference implementation.
+
+### `routes.smoke.ts`
+
+`artifacts/program-map/src/__tests__/routes.smoke.ts` is a type-checked route manifest — not a runtime test. It lists every active route and redirect in `App.tsx`. Verified by `pnpm --filter @workspace/program-map run typecheck`. Update it when adding or removing routes from `App.tsx`.
+
+### Required before every PR
+
+1. `pnpm run typecheck` — must pass with 0 errors.
+2. `pnpm --filter @workspace/api-server test` and `pnpm --filter @workspace/program-map test` — all tests must pass.
+3. Visually verify your page at the relevant route.
+4. Check at all four tier levels (use the tier switcher in the sidebar footer).
+5. Verify no browser console errors.
+
+### When to add tests
+
+- **New API route** → add tests to the relevant test file in `api-server/src/__tests__/`; follow the `vi.hoisted` + `vi.mock('@workspace/db')` pattern for DB-backed routes.
+- **New data file** (static data in `program-map/src/data/`) → add data integrity tests to `program-map/src/__tests__/`; follow the `validationData.test.ts` pattern (non-empty, unique IDs, required fields, valid enum values).
+- **New utility function** → add unit tests alongside the existing utility tests.
+- **New route in `App.tsx`** → add the entry to `routes.smoke.ts`.
 
 ---
 

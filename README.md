@@ -113,11 +113,14 @@ See [TRAIL_OS_SPEC.md](TRAIL_OS_SPEC.md) for the complete technical specificatio
 
 | System | Status | Notes |
 |---|---|---|
-| Salesforce | ✅ Live | REST API — PMM + NPSP confirmed |
-| Slack | ✅ Live POC | @coachconnectbot — post + validate |
-| Google OAuth | ⏳ In Progress | Tokens pending — wizard at `/admin/google-oauth` |
-| Gemini | 📋 Phase 2 | POC at `/penny/test` |
-| Agentforce | 📋 Phase 2 | Coexistence model with Penny |
+| Salesforce | ✅ Live | REST API — PMM + NPSP · 127 Accounts · 129 Contacts |
+| Slack | ✅ Live POC | @coachconnectbot — post + validate confirmed |
+| Google OAuth + Groups | ✅ Live | Clerk v6 · Google Sign-In · 3 Groups auto-tier · wizard at `/admin/integrations/google-auth` |
+| Gmail | ✅ Live | `gmail.readonly` + `gmail.send` · real inbox · Penny draft + send |
+| Google Calendar | ✅ Live | Real events via `/api/calendar/events` · Penny prep briefs per event |
+| Google Drive | ⏳ Phase 2 | OAuth token active · Drive API wiring to knowledge sources is Phase 2 |
+| Gemini / Penny AI | ✅ Live | Gemini 2.5 Flash · `POST /api/penny/ask` · billing active · 22-chunk RAG corpus |
+| Agentforce | ✅ Live POC | Dual-AI coaching on Assessments page · Sessions API confirmed |
 
 ---
 

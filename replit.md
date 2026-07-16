@@ -76,7 +76,9 @@ artifacts/program-map/src/
 | Knowledge Library    | /knowledge, /knowledge/sources, /knowledge/library, /knowledge/memory     |
 | Collaboration        | /collaboration, /collaboration/gmail, /collaboration/calendar-live,        |
 |                      | /collaboration/slack, /collaboration/channels, /collaboration/templates   |
-| Administration       | /admin/setup, /admin/integrations, /admin/phase1-readiness, …             |
+| Administration       | /admin/integrations (hub), /admin/integrations/google-auth,               |
+|                      | /admin/integrations/secrets, /admin/people-access,                        |
+|                      | /admin/phase1-readiness, /admin/phase1-audit, /admin/phase2-backlog       |
 
 ## Architecture decisions
 
@@ -85,11 +87,11 @@ artifacts/program-map/src/
 - **ContextBar is always mounted** — 32px no-context state, 40px active. Never returns null.
 - **HubShell hides the tab bar when only 1 tab is passed** — Everyday users see plain content without tab chrome.
 - **Collaboration Overview is a rule management hub** — configures how each channel (Slack, Gmail, Calendar, Drive) routes signals to Penny and Trail Signals. Not an activity feed.
-- **Admin uses URL-based section routing** via `useLocation`; sidebar links (`/admin/setup` etc.) set the view directly.
+- **Admin uses URL-based section routing** via `useLocation`; sidebar links (`/admin/integrations` etc.) set the view directly. `/admin/setup` redirects to `/admin/integrations`.
 - **Access tiers** (Everyday / Power / Admin) drive what tabs, actions, and sidebar items are visible. Resolved from Google Groups membership via `/api/auth/tier` on every login.
 - **Trail Signals** are system-assigned in Phase 1 — platform selects signals based on tier, role, context, and program ownership.
 - **Penny** uses Gemini 2.5 Flash with a 22-chunk RAG corpus (tier-filtered). `pendingPennyQuery` in AppContext pre-fills the Ask Penny panel from anywhere in the app.
-- **All non-integration data is in-memory prototype** — AppContext holds programs, source docs, resolve phases, Penny caps. Edits reset on refresh. Live data: Salesforce, Gmail, Calendar, Slack bot.
+- **Prompt Studio data is DB-backed** — `prompt_templates` and `prompt_variables` tables persist across restarts; auto-seeded from static data on first empty load. All other non-integration data is in-memory prototype — AppContext holds programs, source docs, resolve phases, Penny caps; edits reset on refresh.
 
 ## Product
 
@@ -109,6 +111,8 @@ _Populate as you build._
 - Wouter navigation: use `const [, navigate] = useLocation()` — there is no `useNavigate`.
 - Never hardcode brand strings — import from `src/config/terminology.ts` (`TERMS`).
 - `readinessState.ts` is the single source of truth for integration health — update it first, then surface changes in Admin pages.
+- `/admin/setup` redirects to `/admin/integrations`; `/admin/google-oauth` → `/admin/integrations/google-auth`; `/admin/secrets-audit` → `/admin/integrations/secrets`. Use the new paths in all links and docs.
+- Test commands: `pnpm --filter @workspace/api-server test` (43 tests) and `pnpm --filter @workspace/program-map test` (62 tests). Both must pass before merging. Add entries to `routes.smoke.ts` whenever `App.tsx` routes change.
 
 ## Pointers
 
