@@ -8,7 +8,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Brain, Sparkles, Send, ChevronRight, Plus, Check,
          AlertCircle, Loader2, RotateCcw, Zap, BookOpen,
-         Layers, Users, GraduationCap, ClipboardList } from 'lucide-react';
+         Layers, Users, GraduationCap, ClipboardList,
+         Pencil, Eye, ExternalLink } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/context/AppContext';
@@ -351,6 +352,9 @@ export default function ProgramConfiguration() {
   const [programsLoading, setProgramsLoading] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<SfProgram | null>(null);
   const [showProgramForm, setShowProgramForm] = useState(false);
+  const [programDetail, setProgramDetail]     = useState<Record<string, unknown> | null>(null);
+  const [programDetailLoading, setProgramDetailLoading] = useState(false);
+  const [editingProgram, setEditingProgram]   = useState(false);
 
   const [cohorts, setCohorts]               = useState<SfCohort[]>([]);
   const [cohortsLoading, setCohortsLoading] = useState(false);
@@ -451,6 +455,33 @@ export default function ProgramConfiguration() {
     }
   }, [toast]);
 
+  const fetchProgramDetail = useCallback(async (id: string) => {
+    setProgramDetailLoading(true);
+    try {
+      const resp = await fetch(`/api/programs/${id}`);
+      if (!resp.ok) throw new Error('Failed to load details');
+      const data = await resp.json() as { program: Record<string, unknown> };
+      const p = data.program;
+      setProgramDetail(p);
+      setProgForm({
+        Name:                    String(p['Name'] ?? ''),
+        pmdm__Status__c:         String(p['pmdm__Status__c'] ?? 'In Discovery'),
+        pmdm__ShortSummary__c:   String(p['pmdm__ShortSummary__c'] ?? ''),
+        pmdm__Description__c:    String(p['pmdm__Description__c'] ?? ''),
+        pmdm__StartDate__c:      String(p['pmdm__StartDate__c'] ?? ''),
+        pmdm__EndDate__c:        String(p['pmdm__EndDate__c'] ?? ''),
+        pmdm__TargetPopulation__c: String(p['pmdm__TargetPopulation__c'] ?? ''),
+        Program_Goals__c:        String(p['Program_Goals__c'] ?? ''),
+        Problem_Statement__c:    String(p['Problem_Statement__c'] ?? ''),
+        Program_Manager__c:      String(p['Program_Manager__c'] ?? ''),
+      });
+    } catch {
+      // silently ignore — cards already show the summary
+    } finally {
+      setProgramDetailLoading(false);
+    }
+  }, []);
+
   useEffect(() => { void loadPrograms(); }, [loadPrograms]);
 
   // ── Penny ask ────────────────────────────────────────────────────────────────
@@ -519,9 +550,47 @@ export default function ProgramConfiguration() {
     }
   }
 
+  async function handleUpdateProgram() {
+    if (!selectedProgram) return;
+    setSaving(true);
+    try {
+      const payload = Object.fromEntries(
+        Object.entries(progForm)
+          .filter(([k, v]) => k !== 'Name' && v !== '' && v !== 'null' && v !== 'undefined')
+      );
+      const resp = await fetch(`/api/programs/${selectedProgram.Id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) {
+        const d = await resp.json() as { error?: string };
+        throw new Error(d.error ?? 'Update failed');
+      }
+      toast({ title: '✓ Program updated in Salesforce' });
+      const updated: SfProgram = {
+        ...selectedProgram,
+        pmdm__Status__c:       progForm.pmdm__Status__c,
+        pmdm__StartDate__c:    progForm.pmdm__StartDate__c || null,
+        pmdm__EndDate__c:      progForm.pmdm__EndDate__c || null,
+        pmdm__ShortSummary__c: progForm.pmdm__ShortSummary__c || null,
+      };
+      setPrograms(prev => prev.map(p => p.Id === selectedProgram.Id ? updated : p));
+      setSelectedProgram(updated);
+      setProgramDetail(prev => prev ? { ...prev, ...payload } : prev);
+      setEditingProgram(false);
+    } catch (e) {
+      toast({ title: 'Failed to update program', description: (e as Error).message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function handleSelectProgram(p: SfProgram) {
     setSelectedProgram(p);
+    setEditingProgram(false);
+    setProgramDetail(null);
     setCourseForm(prev => ({ ...prev, Program__c: p.Name }));
+    void fetchProgramDetail(p.Id);
   }
 
   function handleAdvanceToStep2() {
@@ -814,6 +883,163 @@ export default function ProgramConfiguration() {
                       </div>
                     )}
                   </div>
+
+                  {/* ── Program detail / edit panel ── */}
+                  {selectedProgram && (
+                    <div className="rounded-xl border-2 border-primary/30 bg-card overflow-hidden">
+                      {/* Panel header */}
+                      <div className="flex items-center justify-between px-4 py-3 bg-primary/5 border-b border-primary/20">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-primary" />
+                          <p className="text-[12px] font-semibold text-foreground">{selectedProgram.Name}</p>
+                          <StatusBadge status={selectedProgram.pmdm__Status__c} />
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => setEditingProgram(v => !v)}
+                            className={`flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg border transition-colors ${
+                              editingProgram
+                                ? 'bg-muted border-border text-muted-foreground hover:bg-muted/80'
+                                : 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/20'
+                            }`}
+                          >
+                            {editingProgram ? <><Eye className="w-3 h-3" /> View</> : <><Pencil className="w-3 h-3" /> Edit</>}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Loading state */}
+                      {programDetailLoading && (
+                        <div className="flex items-center gap-2 justify-center py-6 text-muted-foreground">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="text-[12px]">Loading fields from Salesforce…</span>
+                        </div>
+                      )}
+
+                      {/* View mode */}
+                      {!programDetailLoading && !editingProgram && programDetail && (
+                        <div className="p-4 space-y-4">
+                          {/* Core fields grid */}
+                          {(() => {
+                            function sfStr(v: unknown): string | null {
+                              if (v == null) return null;
+                              const s = String(v);
+                              return (s === '' || s === 'null' || s === 'undefined') ? null : s;
+                            }
+                            const rows: { label: string; val: string | null }[] = [
+                              { label: 'Status',            val: sfStr(programDetail['pmdm__Status__c']) },
+                              { label: 'Manager',           val: sfStr(programDetail['Program_Manager__c']) },
+                              { label: 'Start Date',        val: sfStr(programDetail['pmdm__StartDate__c']) },
+                              { label: 'End Date',          val: sfStr(programDetail['pmdm__EndDate__c']) },
+                              { label: 'Target Population', val: sfStr(programDetail['pmdm__TargetPopulation__c']) },
+                              { label: 'Requires Payment',  val: sfStr(programDetail['Requires_Payment__c']) },
+                            ];
+                            const textRows: { label: string; key: string }[] = [
+                              { label: 'Short Summary',            key: 'pmdm__ShortSummary__c' },
+                              { label: 'Description',              key: 'pmdm__Description__c' },
+                              { label: 'Program Goals',            key: 'Program_Goals__c' },
+                              { label: 'Problem Statement',        key: 'Problem_Statement__c' },
+                              { label: 'Target Audience',          key: 'Program_Target_Audience__c' },
+                              { label: 'Expected Outcomes',        key: 'Program_Expected_Outcomes__c' },
+                              { label: 'Program Structure',        key: 'Program_Structure__c' },
+                              { label: 'Implementation Plan',      key: 'Implementation_Plan__c' },
+                              { label: 'Success Metrics',          key: 'Success_Metrics_Evaluation_Plan__c' },
+                              { label: 'Risks & Assumptions',      key: 'Risks_Assumptions__c' },
+                              { label: 'Budget & Resources',       key: 'Budget_Resouces__c' },
+                              { label: 'Funding Strategy',         key: 'Funding_Strategy__c' },
+                              { label: 'Partnership Opportunities',key: 'Partnership_Opportunities__c' },
+                            ];
+                            const driveUrl = sfStr(programDetail['Google_Drive_Folder__c']);
+                            const canvaUrl = sfStr(programDetail['Canva_Folder__c']);
+                            return (
+                              <>
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                                  {rows.map(({ label, val }) => (
+                                    <div key={label}>
+                                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">{label}</p>
+                                      <p className="text-[12px] text-foreground">
+                                        {val ?? <span className="text-muted-foreground/40 italic">—</span>}
+                                      </p>
+                                    </div>
+                                  ))}
+                                </div>
+                                {textRows.map(({ label, key }) => {
+                                  const val = sfStr(programDetail[key]);
+                                  if (!val) return null;
+                                  return (
+                                    <div key={key}>
+                                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">{label}</p>
+                                      <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-wrap">{val}</p>
+                                    </div>
+                                  );
+                                })}
+                                {(driveUrl ?? canvaUrl) && (
+                                  <div className="flex gap-3 pt-1 border-t border-border/50">
+                                    {driveUrl && (
+                                      <a href={driveUrl} target="_blank" rel="noreferrer"
+                                        className="flex items-center gap-1 text-[11px] text-primary hover:underline">
+                                        <ExternalLink className="w-3 h-3" /> Google Drive
+                                      </a>
+                                    )}
+                                    {canvaUrl && (
+                                      <a href={canvaUrl} target="_blank" rel="noreferrer"
+                                        className="flex items-center gap-1 text-[11px] text-primary hover:underline">
+                                        <ExternalLink className="w-3 h-3" /> Canva Folder
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </div>
+                      )}
+
+                      {/* Edit mode */}
+                      {!programDetailLoading && editingProgram && (
+                        <div className="p-4 space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <Field label="Status">
+                              <select className={SELECT_CLS} value={progForm.pmdm__Status__c} onChange={e => setProgForm(p => ({...p, pmdm__Status__c: e.target.value}))}>
+                                {PROGRAM_STATUSES.map(s => <option key={s}>{s}</option>)}
+                              </select>
+                            </Field>
+                            <Field label="Program Manager">
+                              <input className={INPUT_CLS} value={progForm.Program_Manager__c} onChange={e => setProgForm(p => ({...p, Program_Manager__c: e.target.value}))} placeholder="User name or ID" />
+                            </Field>
+                            <Field label="Start Date">
+                              <input type="date" className={INPUT_CLS} value={progForm.pmdm__StartDate__c} onChange={e => setProgForm(p => ({...p, pmdm__StartDate__c: e.target.value}))} />
+                            </Field>
+                            <Field label="End Date">
+                              <input type="date" className={INPUT_CLS} value={progForm.pmdm__EndDate__c} onChange={e => setProgForm(p => ({...p, pmdm__EndDate__c: e.target.value}))} />
+                            </Field>
+                            <Field label="Target Population">
+                              <input className={INPUT_CLS} value={progForm.pmdm__TargetPopulation__c} onChange={e => setProgForm(p => ({...p, pmdm__TargetPopulation__c: e.target.value}))} />
+                            </Field>
+                          </div>
+                          <Field label="Short Summary">
+                            <textarea rows={2} className={TEXTAREA_CLS} value={progForm.pmdm__ShortSummary__c} onChange={e => setProgForm(p => ({...p, pmdm__ShortSummary__c: e.target.value}))} />
+                          </Field>
+                          <Field label="Program Goals">
+                            <textarea rows={3} className={TEXTAREA_CLS} value={progForm.Program_Goals__c} onChange={e => setProgForm(p => ({...p, Program_Goals__c: e.target.value}))} />
+                          </Field>
+                          <Field label="Problem Statement">
+                            <textarea rows={2} className={TEXTAREA_CLS} value={progForm.Problem_Statement__c} onChange={e => setProgForm(p => ({...p, Problem_Statement__c: e.target.value}))} />
+                          </Field>
+                          <div className="flex gap-2 pt-1">
+                            <button onClick={() => void handleUpdateProgram()} disabled={saving}
+                              className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[12px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                              Save Changes to Salesforce
+                            </button>
+                            <button onClick={() => setEditingProgram(false)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {selectedProgram && (
                     <div className="flex justify-end pt-2">
