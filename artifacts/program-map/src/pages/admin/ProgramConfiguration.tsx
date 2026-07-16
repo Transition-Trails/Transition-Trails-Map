@@ -97,31 +97,46 @@ function StatusBadge({ status }: { status: string | null }) {
 
 // ── Step indicator ────────────────────────────────────────────────────────────
 
-function StepIndicator({ current, skipCohorts = false }: { current: WizardStep; skipCohorts?: boolean }) {
+function StepIndicator({ current, skipCohorts = false, onStepClick }: {
+  current: WizardStep;
+  skipCohorts?: boolean;
+  onStepClick?: (step: 1 | 2 | 3 | 4) => void;
+}) {
   const done = current === 'review';
   return (
     <div className="flex items-center gap-0 mb-6">
       {STEP_META.map((s, i) => {
-        const isSkipped = skipCohorts && s.stepNum === 2;
-        const isActive  = !isSkipped && current === s.stepNum;
-        const isDone    = !isSkipped && (done || (typeof current === 'number' && current > s.stepNum));
+        const isSkipped  = skipCohorts && s.stepNum === 2;
+        const isActive   = !isSkipped && current === s.stepNum;
+        const isDone     = !isSkipped && (done || (typeof current === 'number' && current > s.stepNum));
+        const isClickable = !isSkipped && !!onStepClick;
         const Icon = s.icon;
         return (
           <div key={s.stepNum} className="flex items-center">
             <div className="flex flex-col items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${
-                isSkipped ? 'bg-muted border-dashed border-border/50 text-muted-foreground/40'
-                : isDone  ? 'bg-primary border-primary text-primary-foreground'
-                : isActive ? 'bg-primary/10 border-primary text-primary'
-                : 'bg-muted border-border text-muted-foreground'
-              }`}>
+              <div
+                role={isClickable ? 'button' : undefined}
+                tabIndex={isClickable ? 0 : undefined}
+                onClick={() => isClickable && onStepClick(s.stepNum)}
+                onKeyDown={e => isClickable && (e.key === 'Enter' || e.key === ' ') && onStepClick(s.stepNum)}
+                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                  isClickable ? 'cursor-pointer hover:opacity-75' : ''
+                } ${
+                  isSkipped ? 'bg-muted border-dashed border-border/50 text-muted-foreground/40'
+                  : isDone   ? 'bg-primary border-primary text-primary-foreground'
+                  : isActive ? 'bg-primary/10 border-primary text-primary'
+                  : 'bg-muted border-border text-muted-foreground'
+                }`}
+              >
                 {isSkipped ? <span className="text-[10px] font-bold">—</span>
                   : isDone ? <Check className="w-3.5 h-3.5" />
                   : <Icon className="w-3.5 h-3.5" />}
               </div>
               <span className={`text-[10px] mt-1 font-medium ${
-                isSkipped ? 'text-muted-foreground/40 line-through'
-                : isActive ? 'text-primary' : isDone ? 'text-foreground' : 'text-muted-foreground'
+                isSkipped  ? 'text-muted-foreground/40 line-through'
+                : isActive ? 'text-primary'
+                : isDone   ? 'text-foreground'
+                : 'text-muted-foreground'
               }`}>
                 {s.label}
               </span>
@@ -648,12 +663,22 @@ export default function ProgramConfiguration() {
     );
   }
 
+  function goToStep(target: WizardStep) {
+    if (!selectedProgram) { toast({ title: 'Select a program first', variant: 'destructive' }); return; }
+    if (target === 2 && !isCohortBased) return; // cohorts skipped for ongoing programs
+    if (target === 2) void loadCohorts(selectedProgram.Id);
+    if (target === 3) void loadCourses(selectedProgram.Id);
+    if (target === 4 && selectedCourse) void loadModules(selectedCourse.Id);
+    setStep(target);
+  }
+
   function handleAdvanceFromStep1() {
     if (!selectedProgram) { toast({ title: 'Select a program first', variant: 'destructive' }); return; }
     if (isCohortBased) {
       void loadCohorts(selectedProgram.Id);
       setStep(2);
     } else {
+      void loadCourses(selectedProgram.Id);
       setStep(3);
     }
   }
@@ -848,7 +873,11 @@ export default function ProgramConfiguration() {
         <div className="flex flex-col w-[60%] overflow-hidden border-r border-border">
           <ScrollArea className="flex-1 min-h-0">
             <div className="p-6">
-              <StepIndicator current={step} skipCohorts={!isCohortBased} />
+              <StepIndicator
+                current={step}
+                skipCohorts={!isCohortBased}
+                onStepClick={selectedProgram ? goToStep : undefined}
+              />
 
               {/* ── Step 1: Program ───────────────────────────────────────── */}
               {step === 1 && (
@@ -1325,7 +1354,7 @@ export default function ProgramConfiguration() {
                   )}
 
                   <div className="flex items-center justify-between pt-2">
-                    <button onClick={() => setStep(2)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
+                    <button onClick={() => goToStep(isCohortBased ? 2 : 1)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
                     <button onClick={handleAdvanceToStep4}
                       className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[13px] font-semibold hover:bg-primary/90 transition-colors">
                       Next: Add Modules <ChevronRight className="w-4 h-4" />
@@ -1433,78 +1462,148 @@ export default function ProgramConfiguration() {
               )}
 
               {/* ── Review ────────────────────────────────────────────────── */}
-              {step === 'review' && (
-                <div className="space-y-4">
-                  <h2 className="text-sm font-semibold text-foreground">Review Your Configuration</h2>
+              {step === 'review' && (() => {
+                const reviewChecks: { label: string; detail?: string; ok: boolean; required: boolean; step: 1|2|3|4 }[] = [
+                  {
+                    label: 'Program selected',
+                    detail: selectedProgram?.Name,
+                    ok: !!selectedProgram,
+                    required: true,
+                    step: 1,
+                  },
+                  {
+                    label: isCohortBased ? 'Cohorts configured' : 'Ongoing program — no cohorts',
+                    detail: isCohortBased ? `${cohorts.length} cohort${cohorts.length !== 1 ? 's' : ''}` : undefined,
+                    ok: !isCohortBased || cohorts.length > 0,
+                    required: isCohortBased,
+                    step: 2,
+                  },
+                  {
+                    label: 'Course linked',
+                    detail: selectedCourse?.Course_Title__c ?? selectedCourse?.Name,
+                    ok: !!selectedCourse,
+                    required: true,
+                    step: 3,
+                  },
+                  {
+                    label: 'Modules added',
+                    detail: `${modules.length} module${modules.length !== 1 ? 's' : ''}`,
+                    ok: modules.length > 0,
+                    required: false,
+                    step: 4,
+                  },
+                ];
+                const canSave = reviewChecks.filter(c => c.required).every(c => c.ok);
+                return (
+                  <div className="space-y-4">
+                    <h2 className="text-sm font-semibold text-foreground">Review Your Configuration</h2>
 
-                  {/* Summary card */}
-                  <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Program</p>
-                        <p className="text-[14px] font-semibold text-foreground">{selectedProgram?.Name}</p>
-                      </div>
-                      <StatusBadge status={selectedProgram?.pmdm__Status__c ?? null} />
-                    </div>
-                    <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border/60">
-                      <div className="text-center">
-                        <p className="text-xl font-bold text-foreground">{cohorts.length}</p>
-                        <p className="text-[10px] text-muted-foreground">Cohort{cohorts.length !== 1 ? 's' : ''}</p>
-                      </div>
-                      <div className="text-center border-x border-border/60">
-                        <p className="text-[13px] font-semibold text-foreground leading-tight">{selectedCourse?.Course_Title__c ?? selectedCourse?.Name ?? '—'}</p>
-                        {selectedCourse && <StatusBadge status={selectedCourse.Status__c} />}
-                        <p className="text-[10px] text-muted-foreground mt-0.5">Course</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xl font-bold text-foreground">{modules.length}</p>
-                        <p className="text-[10px] text-muted-foreground">Module{modules.length !== 1 ? 's' : ''}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Cohort summary */}
-                  {cohorts.length > 0 && (
-                    <div>
-                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider mb-2">Cohorts</p>
-                      <div className="space-y-1.5">
-                        {cohorts.map(c => (
-                          <div key={c.Id} className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
-                            <p className="text-[12px] font-medium text-foreground">{c.Name}</p>
-                            <StatusBadge status={c.pmdm__Status__c} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Module summary */}
-                  {modules.length > 0 && (
-                    <div>
-                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider mb-2">Modules</p>
-                      <div className="space-y-1.5">
-                        {modules.map((m, idx) => (
-                          <div key={m.Id} className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold text-muted-foreground w-4">{m.Order__c ?? idx + 1}</span>
-                              <p className="text-[12px] font-medium text-foreground">{m.Name}</p>
+                    {/* Validation checklist */}
+                    <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-2.5">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Configuration Checklist</p>
+                      {reviewChecks.map(chk => (
+                        <div key={chk.label} className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center ${
+                              chk.ok
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : chk.required
+                                  ? 'bg-rose-100 text-rose-600'
+                                  : 'bg-amber-100 text-amber-600'
+                            }`}>
+                              {chk.ok
+                                ? <Check className="w-2.5 h-2.5" />
+                                : <span className="text-[9px] font-bold leading-none">!</span>}
                             </div>
-                            <StatusBadge status={m.Status__c} />
+                            <span className="text-[12px] font-medium text-foreground truncate">{chk.label}</span>
+                            {chk.detail && (
+                              <span className="text-[11px] text-muted-foreground truncate">— {chk.detail}</span>
+                            )}
                           </div>
-                        ))}
-                      </div>
+                          {!chk.ok && !(chk.step === 2 && !isCohortBased) && (
+                            <button
+                              onClick={() => goToStep(chk.step)}
+                              className="text-[11px] text-primary hover:underline flex-shrink-0"
+                            >
+                              Fix →
+                            </button>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  )}
 
-                  <div className="flex items-center gap-3 pt-2 border-t border-border">
-                    <button onClick={() => setStep(4)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
-                    <div className="flex-1" />
-                    <p className="text-[11px] text-emerald-600 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" /> All records saved to Salesforce as you went
-                    </p>
+                    {/* Cohort summary */}
+                    {cohorts.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Cohorts</p>
+                          <button onClick={() => goToStep(2)} className="text-[11px] text-primary hover:underline">Edit →</button>
+                        </div>
+                        <div className="space-y-1.5">
+                          {cohorts.map(c => (
+                            <div key={c.Id} className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
+                              <p className="text-[12px] font-medium text-foreground">{c.Name}</p>
+                              <StatusBadge status={c.pmdm__Status__c} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Course summary */}
+                    {selectedCourse && (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Course</p>
+                          <button onClick={() => goToStep(3)} className="text-[11px] text-primary hover:underline">Edit →</button>
+                        </div>
+                        <div className="rounded-lg border border-border/60 bg-card px-3 py-2 flex items-center justify-between">
+                          <p className="text-[12px] font-medium text-foreground">
+                            {selectedCourse.Course_Title__c ?? selectedCourse.Name}
+                          </p>
+                          <StatusBadge status={selectedCourse.Status__c} />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Module summary */}
+                    {modules.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Modules</p>
+                          <button onClick={() => goToStep(4)} className="text-[11px] text-primary hover:underline">Edit →</button>
+                        </div>
+                        <div className="space-y-1.5">
+                          {modules.map((m, idx) => (
+                            <div key={m.Id} className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-muted-foreground w-4">{m.Order__c ?? idx + 1}</span>
+                                <p className="text-[12px] font-medium text-foreground">{m.Name}</p>
+                              </div>
+                              <StatusBadge status={m.Status__c} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 pt-2 border-t border-border">
+                      <button onClick={() => setStep(4)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
+                      <div className="flex-1" />
+                      {canSave ? (
+                        <p className="text-[11px] text-emerald-600 flex items-center gap-1">
+                          <Check className="w-3.5 h-3.5" /> All records saved to Salesforce as you went
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-rose-500 flex items-center gap-1 font-medium">
+                          <span className="w-3.5 h-3.5 rounded-full bg-rose-100 inline-flex items-center justify-center text-[9px] font-bold">!</span>
+                          Fix required items above to complete
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </ScrollArea>
         </div>
