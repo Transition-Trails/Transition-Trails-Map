@@ -45,6 +45,7 @@ import GoogleDriveIntegrationCenter    from "@/pages/collaboration/GoogleDriveIn
 import GoogleCalendarIntegrationCenter from "@/pages/collaboration/GoogleCalendarIntegrationCenter";
 import IntegrationHub            from "@/pages/admin/IntegrationHub";
 import CreateAudit               from "@/pages/admin/CreateAudit";
+import ProgramConfiguration      from "@/pages/admin/ProgramConfiguration";
 
 import Phase1CompletionAudit    from "@/pages/admin/Phase1CompletionAudit";
 
@@ -293,6 +294,7 @@ function Router() {
       <Route path="/admin/create-audit"      component={CreateAudit} />
 
       <Route path="/admin/phase1-audit"     component={Phase1CompletionAudit} />
+      <Route path="/admin/program-config"   component={ProgramConfiguration} />
 
       {/* Integration Hub — unified setup center */}
       <Route path="/admin/integrations/google-auth"          component={GoogleOAuthFlow} />

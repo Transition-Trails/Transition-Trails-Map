@@ -21,6 +21,7 @@ import learnerAuthRouter      from "./learnerAuth";
 import learnerRouter          from "./learner";
 import promptTemplatesRouter  from "./promptTemplates";
 import promptVariablesRouter  from "./promptVariables";
+import programsRouter          from "./programs";
 
 const router: IRouter = Router();
 
@@ -46,5 +47,6 @@ router.use(learnerAuthRouter);
 router.use(learnerRouter);
 router.use(promptTemplatesRouter);
 router.use(promptVariablesRouter);
+router.use(programsRouter);
 
 export default router;

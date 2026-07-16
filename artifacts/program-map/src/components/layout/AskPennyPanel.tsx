@@ -11,6 +11,43 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
 
+// ── Route-link renderer ───────────────────────────────────────────────────────
+// Detects Trail OS route paths in Penny's reply and makes them clickable.
+
+const TRAIL_OS_ROUTE_RE = /(\/(?:admin|operations|penny|knowledge|collaboration|program|digital-twin|trail-os-overview|search|governance|uom|learner|context|navigator)(?:\/[a-z0-9][a-z0-9-]*)*)/g;
+
+function PennyMessageContent({ content, onNavigate }: { content: string; onNavigate: (path: string) => void }) {
+  const segments: Array<{ text: string; isRoute: boolean }> = [];
+  let last = 0;
+  let match: RegExpExecArray | null;
+  TRAIL_OS_ROUTE_RE.lastIndex = 0;
+  while ((match = TRAIL_OS_ROUTE_RE.exec(content)) !== null) {
+    if (match.index > last) segments.push({ text: content.slice(last, match.index), isRoute: false });
+    segments.push({ text: match[0], isRoute: true });
+    last = match.index + match[0].length;
+  }
+  if (last < content.length) segments.push({ text: content.slice(last), isRoute: false });
+
+  return (
+    <p className="text-[13px] leading-relaxed whitespace-pre-wrap">
+      {segments.map((seg, i) =>
+        seg.isRoute ? (
+          <button
+            key={i}
+            onClick={() => onNavigate(seg.text)}
+            className="inline-flex items-center gap-0.5 text-primary hover:text-primary/80 underline underline-offset-2 font-mono text-[12px] transition-colors"
+            title={`Go to ${seg.text}`}
+          >
+            {seg.text}
+          </button>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        )
+      )}
+    </p>
+  );
+}
+
 // ── Page label lookup (compact; matches Topbar PAGE_INFO) ────────────────────
 
 const PAGE_LABELS: Record<string, string> = {
@@ -199,8 +236,13 @@ function buildHistory(msgs: Message[]) {
 
 export function AskPennyPanel() {
   const { askPennyOpen, setAskPennyOpen, userTier, pendingPennyQuery, setPendingPennyQuery } = useAppContext();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const pageLabel  = getPageLabel(location);
+
+  function handleRouteLink(path: string) {
+    setAskPennyOpen(false);
+    navigate(path);
+  }
 
   const [messages, setMessages] = useState<Message[]>(makeSeed);
   const [input, setInput]       = useState('');
@@ -435,7 +477,10 @@ export function AskPennyPanel() {
                             ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm'
                             : 'bg-muted/60 border border-border/60 text-foreground rounded-bl-sm'
                       }`}>
-                        <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                        {m.role === 'penny' && !m.error
+                          ? <PennyMessageContent content={m.content} onNavigate={handleRouteLink} />
+                          : <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                        }
                         {m.time !== '—' && (
                           <p className={`text-[10px] mt-1 ${
                             m.role === 'user' ? 'text-primary-foreground/50 text-right' : 'text-muted-foreground'

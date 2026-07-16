@@ -98,10 +98,11 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/admin',
     extraPrefixes: ['/digital-twin', '/uom', '/governance', '/program/blueprint', '/program/standards'],
     items: [
-      { id: 'admin-integrations',  path: '/admin/integrations',   label: 'Integrations'   },
-      { id: 'admin-people-access', path: '/admin/people-access',  label: 'People & Access' },
-      { id: 'admin-digital-twin',  path: '/digital-twin',         label: 'Digital Twin',   minTier: 'admin' },
-      { id: 'admin-blueprint',     path: '/program/blueprint',    label: 'Blueprint',       minTier: 'admin' },
+      { id: 'admin-integrations',  path: '/admin/integrations',      label: 'Integrations'          },
+      { id: 'admin-people-access', path: '/admin/people-access',     label: 'People & Access'        },
+      { id: 'admin-digital-twin',  path: '/digital-twin',            label: 'Digital Twin',   minTier: 'admin' },
+      { id: 'admin-blueprint',     path: '/program/blueprint',       label: 'Blueprint',       minTier: 'admin' },
+      { id: 'admin-prog-config',   path: '/admin/program-config',    label: 'Program Config',  minTier: 'admin' },
     ],
   },
 ];
