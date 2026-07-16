@@ -8,6 +8,7 @@ import { RailActionPanel } from '@/components/workspace/RailActionPanel';
 import { SlackContextPanel } from '@/components/workspace/SlackContextPanel';
 import { ACTION_CATEGORY_CONFIG, type PennyContentAction } from '@/data/pennyContentActions';
 import { type TrailOsSfMapping, SF_STATUS_CONFIG, type SfMappingStatus, SF_PRODUCT_CONFIG } from '@/data/salesforceArchitectureData';
+import { HEALTH_LEVEL_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG, REC_PRIORITY_CONFIG, type TrendType, type TrendUrgency, type HealthLevel, type RecPriority } from '@/data/operationalIntelligenceData';
 import { type ContentStandard, STANDARD_STATUS_CONFIG, STANDARD_CONFIDENCE_CONFIG, STANDARD_CATEGORY_CONFIG } from '@/data/standardsData';
 import { type PennyCapability, CAPABILITY_READINESS_CONFIG, CAPABILITY_DOMAIN_CONFIG, POC_STATUS_CONFIG } from '@/data/pennyCapabilityData';
 import { type KnowledgeSource, SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, SYNC_STATUS_CONFIG, HEALTH_CONFIG } from '@/data/knowledgeSourceData';
@@ -1804,6 +1805,183 @@ export function ContextPanel() {
               </button>
             </div>
 
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    if (type === 'healthIndicator') {
+      // Three possible variants: TrendInsight (has .title), DomainHealth (has .score), HealthIndicator (has .label)
+      const isTrend  = data.title !== undefined && data.urgency !== undefined;
+      const isDomain = !isTrend && data.score !== undefined;
+      // --- Trend Insight ---
+      if (isTrend) {
+        const tc = TREND_TYPE_CONFIG[data.type as TrendType] ?? { label: data.type, cls: 'text-muted-foreground bg-muted border-border' };
+        const uc = TREND_URGENCY_CONFIG[data.urgency as TrendUrgency] ?? { label: data.urgency, cls: 'text-muted-foreground' };
+        const q = `Trend Insight: "${data.title}"\nType: ${data.type} · Urgency: ${data.urgency}\nAffected domains: ${(data.affectedDomains ?? []).join(', ')}\nAffected programs: ${(data.affectedPrograms ?? []).join(', ')}\n\n${data.description}\n\nWhat should the Transition Trails team prioritise to address this, and what connections exist to current program delivery?`;
+        return (
+          <ScrollArea className="h-full">
+            <div className="p-5 space-y-5">
+              <div className="space-y-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Trend Insight</span>
+                  <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${tc.cls}`}>{tc.label}</span>
+                  <span className={`text-[9px] font-semibold ${uc.cls}`}>{uc.label}</span>
+                </div>
+                <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.title}</h2>
+              </div>
+              <p className="text-[12px] text-muted-foreground leading-relaxed">{data.description}</p>
+              {data.affectedDomains?.length > 0 && (
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Affected Domains</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {data.affectedDomains.map((d: string) => (
+                      <span key={d} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{d}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {data.affectedPrograms?.length > 0 && (
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Affected Programs</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {data.affectedPrograms.map((p: string) => (
+                      <span key={p} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{p}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              >
+                Focus with {TERMS.aiAssistant}
+              </button>
+            </div>
+          </ScrollArea>
+        );
+      }
+      // --- Domain Health ---
+      if (isDomain) {
+        const lc = HEALTH_LEVEL_CONFIG[data.level as HealthLevel] ?? HEALTH_LEVEL_CONFIG['needs-work'];
+        const q = `Domain Health: "${data.domain}" — score ${data.score}/100\nLevel: ${lc.label}\n${data.summary}\n\nWhat are the highest-priority actions to improve this domain's health for Transition Trails?`;
+        return (
+          <ScrollArea className="h-full">
+            <div className="p-5 space-y-5">
+              <div className="space-y-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Domain Health</span>
+                  <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${lc.cls}`}>{lc.label}</span>
+                  <span className={`text-xl font-bold leading-none ${lc.score}`}>{data.score}</span>
+                </div>
+                <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.domain}</h2>
+              </div>
+              {data.summary && <p className="text-[12px] text-muted-foreground leading-relaxed">{data.summary}</p>}
+              {data.indicators?.length > 0 && (
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Indicators</p>
+                  <div className="space-y-1.5">
+                    {data.indicators.map((ind: { id: string; label: string; status: HealthLevel; detail: string }) => {
+                      const ic = HEALTH_LEVEL_CONFIG[ind.status] ?? HEALTH_LEVEL_CONFIG['needs-work'];
+                      return (
+                        <div key={ind.id} className="flex items-start gap-2">
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1 ${ic.dot}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-medium text-foreground">{ind.label}</p>
+                            <p className="text-[10px] text-muted-foreground leading-snug">{ind.detail}</p>
+                          </div>
+                          <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none shrink-0 ${ic.cls}`}>{ic.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              <button
+                onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              >
+                Focus with {TERMS.aiAssistant}
+              </button>
+            </div>
+          </ScrollArea>
+        );
+      }
+      // --- Individual Health Indicator ---
+      const ic = HEALTH_LEVEL_CONFIG[data.status as HealthLevel] ?? HEALTH_LEVEL_CONFIG['needs-work'];
+      const q = `Health Indicator: "${data.label}" (${data.domain})\nStatus: ${ic.label}\nSource: ${data.sourceSystem}\n\n${data.detail}\n\nWhat actions should the Transition Trails team take to address this indicator?`;
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">{data.domain}</span>
+                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${ic.cls}`}>{ic.label}</span>
+              </div>
+              <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.label}</h2>
+            </div>
+            {data.detail && <p className="text-[12px] text-muted-foreground leading-relaxed">{data.detail}</p>}
+            <div className="rounded-lg border bg-muted/20 p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-muted-foreground">Source system</span>
+                <span className="text-[10px] font-semibold text-foreground">{data.sourceSystem}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+            >
+              Focus with {TERMS.aiAssistant}
+            </button>
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    if (type === 'oicRecommendation') {
+      const pc = REC_PRIORITY_CONFIG[data.priority as RecPriority] ?? { label: data.priority, cls: 'text-muted-foreground bg-muted border-border' };
+      const effortCls = { Low: 'text-emerald-600', Medium: 'text-amber-600', High: 'text-rose-600' }[data.effort as string] ?? 'text-muted-foreground';
+      const q = `Recommendation: "${data.action}"\nDomain: ${data.domain} · Priority: ${pc.label} · Effort: ${data.effort}\nSystems: ${(data.systems ?? []).join(', ')}\n\nNext steps: ${(data.nextSteps ?? []).join('; ')}\n\nHow should the Transition Trails team approach this recommendation, and what dependencies or blockers should they watch for?`;
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Recommendation · {data.domain}</span>
+                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${pc.cls}`}>{pc.label}</span>
+                <span className={`text-[9px] font-semibold ${effortCls}`}>{data.effort} effort</span>
+              </div>
+              <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.action}</h2>
+            </div>
+            {data.systems?.length > 0 && (
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Systems</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {data.systems.map((s: string) => (
+                    <span key={s} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {data.nextSteps?.length > 0 && (
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Next Steps</p>
+                <div className="space-y-1.5">
+                  {data.nextSteps.map((step: string, i: number) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="text-[9px] font-bold text-muted-foreground/50 shrink-0 mt-px">{i + 1}.</span>
+                      <p className="text-[11px] text-foreground leading-snug">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+            >
+              Focus with {TERMS.aiAssistant}
+            </button>
           </div>
         </ScrollArea>
       );
