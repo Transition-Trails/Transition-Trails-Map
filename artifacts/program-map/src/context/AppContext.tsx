@@ -12,7 +12,7 @@ import type { ActionPanelConfig, SlackPanelConfig } from '@/types/actionPanel';
 import { type AccessTier, TIER_CONFIG } from '@/config/accessTiers';
 
 export type SelectedItemType =
-  | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'document'
+  | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'demandRequest' | 'document'
   | 'commProvider' | 'commRoute' | 'commTemplate'
   | 'commChannel' | 'commBroadcast' | 'commWeeklyBrief' | 'commNotification' | 'commCalendar'
   | 'curriculumItem' | 'pennyAction' | 'sfMapping' | 'programResource' | 'contentStandard' | 'pennyCapability' | 'knowledgeSource'

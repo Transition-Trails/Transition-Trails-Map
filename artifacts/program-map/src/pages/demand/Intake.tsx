@@ -363,12 +363,14 @@ function SfCasesStrip() {
 // ── RequestRow ────────────────────────────────────────────────────────────────
 
 function RequestRow({
-  req, accentCls, expanded, onToggle, onUpdateStatus, onUpdateRisk, onAskPenny,
+  req, accentCls, expanded, selected, onSelect, onToggle, onUpdateStatus, onUpdateRisk, onAskPenny,
 }: {
   req: DemandRequest;
   accentCls: string;
   expanded: boolean;
-  onToggle: () => void;
+  selected: boolean;
+  onSelect:       () => void;
+  onToggle:       () => void;
   onUpdateStatus: (s: RequestStatus) => void;
   onUpdateRisk:   (r: RiskLevel)     => void;
   onAskPenny:     () => void;
@@ -411,12 +413,13 @@ function RequestRow({
 
   return (
     <div className={`rounded-lg border bg-white overflow-hidden border-l-[3px] ${accentCls} ${
-      expanded ? 'border-primary/30 shadow-sm' : 'border-border hover:border-primary/20'
+      selected ? 'border-primary/50 ring-1 ring-primary/20 shadow-sm' :
+      expanded  ? 'border-primary/30 shadow-sm' : 'border-border hover:border-primary/20'
     } transition-colors`}>
 
       {/* Main row */}
       <div className="flex items-start group">
-        <button onClick={onToggle} className="flex-1 text-left px-3 py-2.5 flex items-start gap-2.5 min-w-0">
+        <button onClick={onSelect} className="flex-1 text-left px-3 py-2.5 flex items-start gap-2.5 min-w-0">
           <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${dot}`} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
@@ -458,7 +461,11 @@ function RequestRow({
           >
             <Sparkles className="w-3 h-3 text-primary/60" />
           </button>
-          <button onClick={onToggle}>
+          <button
+            onClick={e => { e.stopPropagation(); onToggle(); }}
+            title="Expand actions"
+            className="p-1 rounded hover:bg-muted/60 transition-colors"
+          >
             <ChevronDown className={`w-3 h-3 text-muted-foreground/40 transition-transform ${expanded ? 'rotate-180' : ''}`} />
           </button>
         </div>
@@ -502,6 +509,7 @@ function RequestRow({
 
 function GroupSection({
   group, items, collapsed, onToggleCollapse, expandedId, onToggleExpand,
+  onSelectItem, selectedId,
   onUpdateStatus, onUpdateRisk, onAskPenny,
 }: {
   group:           Group;
@@ -510,6 +518,8 @@ function GroupSection({
   onToggleCollapse:() => void;
   expandedId:      string | null;
   onToggleExpand:  (id: string) => void;
+  onSelectItem:    (req: DemandRequest) => void;
+  selectedId:      string | null;
   onUpdateStatus:  (id: string, s: RequestStatus) => void;
   onUpdateRisk:    (id: string, r: RiskLevel)     => void;
   onAskPenny:      (req: DemandRequest) => void;
@@ -547,6 +557,8 @@ function GroupSection({
               req={req}
               accentCls={group.accentCls}
               expanded={expandedId === req.id}
+              selected={selectedId === req.id}
+              onSelect={() => onSelectItem(req)}
               onToggle={() => onToggleExpand(req.id)}
               onUpdateStatus={s => onUpdateStatus(req.id, s)}
               onUpdateRisk={r => onUpdateRisk(req.id, r)}
@@ -679,7 +691,7 @@ const FILTER_OPTS: { key: FilterKey; label: string }[] = [
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function Intake() {
-  const { openActionPanel, setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery } = useAppContext();
+  const { openActionPanel, setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery, setSelectedItem, selectedItem } = useAppContext();
   const { isEveryday } = useTierFlags();
 
   const [requests, setRequests] = useState<DemandRequest[]>([...SEED_REQUESTS]);
@@ -743,6 +755,10 @@ export default function Intake() {
     setCalendarPanelOpen(false);
     setAskPennyOpen(true);
     setPendingPennyQuery(query);
+  }
+
+  function handleSelectItem(req: DemandRequest) {
+    setSelectedItem({ type: 'demandRequest', id: req.id, data: req });
   }
 
   function handleAskPennyQueue() {
@@ -875,6 +891,8 @@ export default function Intake() {
                     onToggleCollapse={() => toggleCollapse(g.key)}
                     expandedId={expandedId}
                     onToggleExpand={toggleExpand}
+                    onSelectItem={handleSelectItem}
+                    selectedId={selectedItem?.type === 'demandRequest' ? selectedItem.id : null}
                     onUpdateStatus={updateStatus}
                     onUpdateRisk={updateRisk}
                     onAskPenny={handleAskPennyAbout}

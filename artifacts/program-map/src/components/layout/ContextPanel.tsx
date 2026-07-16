@@ -1663,6 +1663,78 @@ export function ContextPanel() {
       );
     }
 
+    // ── Demand Request brief ────────────────────────────────────────────────
+    if (type === 'demandRequest') {
+      const riskCls =
+        data.risk === 'high'     ? 'text-rose-700 bg-rose-50 border-rose-200'
+        : data.risk === 'elevated' ? 'text-amber-700 bg-amber-50 border-amber-200'
+        : 'text-muted-foreground bg-muted border-border';
+      const riskLabel =
+        data.risk === 'high'     ? 'P1 · Critical'
+        : data.risk === 'elevated' ? 'P2 · Elevated'
+        : 'P3 · Normal';
+      const statusCls: Record<string, string> = {
+        Triaged:    'text-sky-700 bg-sky-50 border-sky-200',
+        Backlog:    'text-slate-600 bg-slate-50 border-slate-200',
+        'In Review':'text-violet-700 bg-violet-50 border-violet-200',
+        Approved:   'text-emerald-700 bg-emerald-50 border-emerald-200',
+        Completed:  'text-primary bg-primary/5 border-primary/20',
+      };
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-5 space-y-5">
+
+            {/* Header */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[9px] font-mono text-muted-foreground/50">{data.id}</span>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0.5">{data.type}</Badge>
+                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${riskCls}`}>
+                  {riskLabel}
+                </span>
+              </div>
+              <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.subject}</h2>
+            </div>
+
+            {/* Status + Meta */}
+            <div className="rounded-lg border bg-muted/20 overflow-hidden">
+              <div className={`px-3 py-1.5 border-b text-[10px] font-semibold ${statusCls[data.status] ?? 'text-muted-foreground bg-muted border-border'}`}>
+                {data.status}
+              </div>
+              <div className="p-3 space-y-2">
+                {[
+                  { label: 'Program',      value: data.program   },
+                  { label: 'Submitted by', value: data.submitter },
+                  { label: 'Age',          value: `${data.age} ago` },
+                ].map(row => (
+                  <div key={row.label} className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-muted-foreground">{row.label}</span>
+                    <span className="text-[10px] font-semibold text-foreground text-right">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Notes */}
+            {data.notes && (
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Notes</p>
+                <p className="text-[12px] text-muted-foreground leading-relaxed">{data.notes}</p>
+              </div>
+            )}
+
+            {/* Triage hint */}
+            <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
+              <p className="text-[10px] text-primary/80 leading-relaxed">
+                Use the <strong>expand chevron</strong> on the row to reveal quick triage actions — Approve, Defer, Escalate, and more.
+              </p>
+            </div>
+
+          </div>
+        </ScrollArea>
+      );
+    }
+
     // Default rich panel for Program, Penny, Trail OS, Demand
     return (
       <ScrollArea className="h-full">
