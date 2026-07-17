@@ -2187,23 +2187,23 @@ export function ContextPanel() {
       );
     }
 
+    // Source system → in-app route — shared by healthIndicator and oicRecommendation panels.
+    const SOURCE_SYSTEM_ROUTES: Record<string, string> = {
+      'Knowledge Source Registry':       '/knowledge/sources',
+      'Penny Capability Registry':       '/penny/capabilities',
+      'Penny Prompt Studio':             '/penny/prompts',
+      'Curriculum Studio':               '/knowledge/library',
+      'Standards Studio':               '/knowledge/sources',
+      'People & Roles Studio':           '/admin/people-access',
+      'Communications & Collaboration':  '/collaboration',
+      'Integration Readiness Center':    '/admin/integrations',
+      'Salesforce Architecture Mapping': '/admin/integrations',
+    };
+
     if (type === 'healthIndicator') {
       // Three possible variants: TrendInsight (has .title), DomainHealth (has .score), HealthIndicator (has .label)
       const isTrend  = data.title !== undefined && data.urgency !== undefined;
       const isDomain = !isTrend && data.score !== undefined;
-
-      // Source system → in-app route for direct navigation from the Knowledge Brief.
-      const SOURCE_SYSTEM_ROUTES: Record<string, string> = {
-        'Knowledge Source Registry':       '/knowledge/sources',
-        'Penny Capability Registry':       '/penny/capabilities',
-        'Penny Prompt Studio':             '/penny/prompts',
-        'Curriculum Studio':               '/knowledge/library',
-        'Standards Studio':               '/knowledge/sources',
-        'People & Roles Studio':           '/admin/people-access',
-        'Communications & Collaboration':  '/collaboration',
-        'Integration Readiness Center':    '/admin/integrations',
-        'Salesforce Architecture Mapping': '/admin/integrations',
-      };
       // --- Trend Insight ---
       if (isTrend) {
         const tc = TREND_TYPE_CONFIG[data.type as TrendType] ?? { label: data.type, cls: 'text-muted-foreground bg-muted border-border' };
@@ -2392,7 +2392,19 @@ export function ContextPanel() {
     if (type === 'oicRecommendation') {
       const pc = REC_PRIORITY_CONFIG[data.priority as RecPriority] ?? { label: data.priority, cls: 'text-muted-foreground bg-muted border-border' };
       const effortCls = { Low: 'text-emerald-600', Medium: 'text-amber-600', High: 'text-rose-600' }[data.effort as string] ?? 'text-muted-foreground';
-      const q = `Recommendation: "${data.action}"\nDomain: ${data.domain} · Priority: ${pc.label} · Effort: ${data.effort}\nSystems: ${(data.systems ?? []).join(', ')}\n\nNext steps: ${(data.nextSteps ?? []).join('; ')}\n\nHow should the Transition Trails team approach this recommendation, and what dependencies or blockers should they watch for?`;
+      const systems: string[] = data.systems ?? [];
+      const nextSteps: string[] = data.nextSteps ?? [];
+      const firstSystem = systems[0] ?? null;
+      const firstRoute = firstSystem ? (SOURCE_SYSTEM_ROUTES[firstSystem] ?? null) : null;
+      const stepsText = nextSteps.length > 0
+        ? nextSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')
+        : 'No steps defined.';
+      const q = `I need to fulfill this recommendation for Transition Trails: "${data.action}"\n\nDomain: ${data.domain} · Priority: ${pc.label} · Effort: ${data.effort}\nSource systems: ${systems.join(', ')}\n\nExecution steps:\n${stepsText}\n\nPlease help me execute step 1 now: "${nextSteps[0] ?? data.action}". Walk me through exactly what to do, what decisions to make, and what information or people I need to involve.`;
+      const handleFocusWithPenny = () => {
+        if (firstRoute) setLocation(firstRoute);
+        setAskPennyOpen(true);
+        setPendingPennyQuery(q);
+      };
       return (
         <ScrollArea className="h-full">
           <div className="p-5 space-y-5">
@@ -2404,35 +2416,55 @@ export function ContextPanel() {
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.action}</h2>
             </div>
-            {data.systems?.length > 0 && (
-              <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Systems</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {data.systems.map((s: string) => (
-                    <span key={s} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{s}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {data.nextSteps?.length > 0 && (
+
+            {nextSteps.length > 0 && (
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Next Steps</p>
                 <div className="space-y-1.5">
-                  {data.nextSteps.map((step: string, i: number) => (
+                  {nextSteps.map((step: string, i: number) => (
                     <div key={i} className="flex items-start gap-2">
-                      <span className="text-[9px] font-bold text-muted-foreground/50 shrink-0 mt-px">{i + 1}.</span>
-                      <p className="text-[11px] text-foreground leading-snug">{step}</p>
+                      <span className={`text-[9px] font-bold shrink-0 mt-px ${i === 0 ? 'text-primary' : 'text-muted-foreground/50'}`}>{i + 1}.</span>
+                      <p className={`text-[11px] leading-snug ${i === 0 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>{step}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
+            {systems.length > 0 && (
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Systems</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {systems.map((s: string) => {
+                    const route = SOURCE_SYSTEM_ROUTES[s] ?? null;
+                    return route ? (
+                      <button
+                        key={s}
+                        onClick={() => setLocation(route)}
+                        className="text-[10px] border rounded-full px-2 py-0.5 text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+                      >
+                        {s} →
+                      </button>
+                    ) : (
+                      <span key={s} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{s}</span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <button
-              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              onClick={handleFocusWithPenny}
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
             >
+              <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
+            {firstRoute && (
+              <p className="text-center text-[9px] text-muted-foreground/50 -mt-3">
+                Opens {firstSystem} and starts execution
+              </p>
+            )}
           </div>
         </ScrollArea>
       );
