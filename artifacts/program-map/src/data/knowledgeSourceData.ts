@@ -160,7 +160,12 @@ export const SF_KNOWLEDGE_CATEGORIES = [
 
 // ── Knowledge Sources ───────────────────────────────────────────────────────
 
-export const knowledgeSources: KnowledgeSource[] = [
+// Data is now API-backed via GET /api/knowledge/sources.
+// This empty stub keeps compile-time imports valid; runtime data comes from
+// useKnowledgeSources() which fetches from the API.
+export const knowledgeSources: KnowledgeSource[] = [];
+
+const _LEGACY_SOURCES_SENTINEL = [
 
   // ── Salesforce Knowledge ───────────────────────────────────────────────
 

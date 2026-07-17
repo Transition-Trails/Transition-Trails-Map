@@ -142,7 +142,7 @@ function IssueRow({
 export default function KnowledgeOverview() {
   const [, setLocation] = useLocation();
   const { setSelectedItem, selectedItem } = useAppContext();
-  const { sources, summary } = useKnowledgeSources();
+  const { sources, summary, metrics } = useKnowledgeSources();
 
   const stats = useMemo(() => {
     const trustCounts = sources.reduce<Record<TrustLevel, number>>(
@@ -223,6 +223,13 @@ export default function KnowledgeOverview() {
             color="text-primary"
             onClick={() => setLocation('/knowledge/sources')}
           />
+          {metrics?.sfLive && (
+            <>
+              <StatPill value={metrics.sfPrograms ?? '—'} label="SF Programs"  color="text-blue-600" />
+              <StatPill value={metrics.sfContacts ?? '—'} label="SF Contacts"  color="text-blue-600" />
+              <StatPill value={metrics.sfCases    ?? '—'} label="SF Open Cases" color="text-blue-600" />
+            </>
+          )}
         </div>
 
         {/* ── Source health + Trust breakdown ─────────────────────────────── */}

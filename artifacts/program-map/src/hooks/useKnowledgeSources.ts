@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { knowledgeSources as STATIC_SOURCES, SOURCE_TYPE_ORDER } from '@/data/knowledgeSourceData';
+import { SOURCE_TYPE_ORDER } from '@/data/knowledgeSourceData';
 import type { KnowledgeSource, SourceType } from '@/data/knowledgeSourceData';
 
 // ── API response shape ────────────────────────────────────────────────────────
@@ -42,7 +42,7 @@ function computeSummary(sources: KnowledgeSource[]) {
 export type SourceSummary = ReturnType<typeof computeSummary>;
 
 export function useKnowledgeSources() {
-  const { data, isLoading } = useQuery<KnowledgeSourcesResponse>({
+  const { data, isLoading, isError } = useQuery<KnowledgeSourcesResponse>({
     queryKey: ['knowledge-sources'],
     queryFn: async () => {
       const r = await fetch('/api/knowledge/sources');
@@ -54,14 +54,16 @@ export function useKnowledgeSources() {
   });
 
   return useMemo(() => {
-    // API response is the primary source; fall back to static offline data
-    const sources = data?.sources ?? STATIC_SOURCES;
+    // When the API hasn't responded yet or errored, return empty; never fall
+    // back to stale static constants — components must handle loading/error explicitly.
+    const sources: KnowledgeSource[] = data?.sources ?? [];
     return {
       sources,
       summary: computeSummary(sources),
       metrics: data?.metrics ?? null,
       integrationStatus: data?.integrationStatus ?? {},
       isLoading,
+      isError,
     };
-  }, [data, isLoading]);
+  }, [data, isLoading, isError]);
 }

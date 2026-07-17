@@ -1,12 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useContext, createContext } from 'react';
 import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import {
-  knowledgeSources, pennyRetrievalMap, SOURCE_SUMMARY, SF_KNOWLEDGE_CATEGORIES,
+  pennyRetrievalMap, SF_KNOWLEDGE_CATEGORIES,
   SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, SYNC_STATUS_CONFIG, HEALTH_CONFIG,
   SOURCE_TYPE_ORDER,
   type KnowledgeSource, type SourceType, type TrustLevel, type HealthStatus,
 } from '@/data/knowledgeSourceData';
+import { useKnowledgeSources, type SourceSummary } from '@/hooks/useKnowledgeSources';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,6 +18,18 @@ import {
 } from 'lucide-react';
 
 type RegistryView = 'overview' | 'catalog' | 'relationships' | 'retrieval-map' | 'governance' | 'health';
+
+// ── Live-data context ─────────────────────────────────────────────────────────
+// Provided once by the main component from useKnowledgeSources(); consumed by
+// all sub-components so only one network fetch is made per render tree.
+
+interface SourcesCtxShape { sources: KnowledgeSource[]; summary: SourceSummary; }
+const EMPTY_SUMMARY: SourceSummary = {
+  total: 0, available: 0, partial: 0, future: 0,
+  approvedForPenny: 0, healthy: 0, warnings: 0, critical: 0,
+  byType: {} as Record<SourceType, number>,
+};
+const SourcesCtx = createContext<SourcesCtxShape>({ sources: [], summary: EMPTY_SUMMARY });
 
 const TYPE_ICONS: Record<SourceType, typeof Database> = {
   'Salesforce Knowledge': Database,
@@ -250,7 +263,8 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
 // ── Overview View ───────────────────────────────────────────────────────────
 
 function OverviewView() {
-  const P1 = knowledgeSources.filter(s => s.integrationPriority === 'P1');
+  const { sources, summary } = useContext(SourcesCtx);
+  const P1 = sources.filter(s => s.integrationPriority === 'P1');
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-6 max-w-3xl">
@@ -275,10 +289,10 @@ function OverviewView() {
         {/* Stats */}
         <div className="grid grid-cols-4 gap-3">
           {[
-            { label: 'Sources',       value: SOURCE_SUMMARY.total,          sub: 'registered',  cls: 'border-foreground/20 bg-foreground/5' },
-            { label: `${TERMS.aiAssistant} Approved`, value: SOURCE_SUMMARY.approvedForPenny, sub: 'active',    cls: 'border-green-200 bg-green-50' },
-            { label: 'Healthy',       value: SOURCE_SUMMARY.healthy,         sub: 'no issues',   cls: 'border-green-200 bg-green-50' },
-            { label: 'Need Attention', value: SOURCE_SUMMARY.warnings + SOURCE_SUMMARY.critical, sub: 'issues found', cls: 'border-amber-200 bg-amber-50' },
+            { label: 'Sources',       value: summary.total,          sub: 'registered',  cls: 'border-foreground/20 bg-foreground/5' },
+            { label: `${TERMS.aiAssistant} Approved`, value: summary.approvedForPenny, sub: 'active',    cls: 'border-green-200 bg-green-50' },
+            { label: 'Healthy',       value: summary.healthy,         sub: 'no issues',   cls: 'border-green-200 bg-green-50' },
+            { label: 'Need Attention', value: summary.warnings + summary.critical, sub: 'issues found', cls: 'border-amber-200 bg-amber-50' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 text-center ${s.cls}`}>
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
@@ -292,10 +306,10 @@ function OverviewView() {
         <div>
           <h3 className="text-[13px] font-bold text-foreground mb-3">Sources by Type</h3>
           <div className="space-y-1">
-            {SOURCE_TYPE_ORDER.filter(t => SOURCE_SUMMARY.byType[t] > 0).map(type => {
+            {SOURCE_TYPE_ORDER.filter(t => (summary.byType[t] ?? 0) > 0).map(type => {
               const cfg  = SOURCE_TYPE_CONFIG[type];
               const Icon = TYPE_ICONS[type];
-              const srcs = knowledgeSources.filter(s => s.type === type);
+              const srcs = sources.filter(s => s.type === type);
               return (
                 <div key={type} className={`rounded-xl border p-3 ${cfg.cls}`}>
                   <div className="flex items-center gap-2 mb-1">
@@ -324,7 +338,7 @@ function OverviewView() {
           <div className="rounded-xl border border-border bg-white overflow-hidden">
             {(['Authoritative','Trusted','Curated','Unverified'] as TrustLevel[]).map((level, i) => {
               const cfg = TRUST_LEVEL_CONFIG[level];
-              const count = knowledgeSources.filter(s => s.trustLevel === level).length;
+              const count = sources.filter(s => s.trustLevel === level).length;
               return (
                 <div key={level} className={`flex items-center gap-3 px-4 py-3 ${i < 3 ? 'border-b border-border' : ''}`}>
                   <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 shrink-0 w-24 text-center ${cfg.cls}`}>{level}</span>
@@ -381,21 +395,23 @@ function OverviewView() {
 // ── Catalog View ─────────────────────────────────────────────────────────────
 
 function CatalogView({ onOpenBrief }: { onOpenBrief: (src: KnowledgeSource) => void }) {
-  const [selectedId, setSelectedId] = useState(knowledgeSources[0].id);
+  const { sources } = useContext(SourcesCtx);
+  const [selectedId, setSelectedId] = useState('');
   const [search,     setSearch]     = useState('');
   const [filterType, setFilterType] = useState<SourceType | 'all'>('all');
   const [filterTrust, setFilterTrust] = useState<TrustLevel | 'all'>('all');
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return knowledgeSources.filter(s =>
+    return sources.filter(s =>
       (filterType  === 'all' || s.type       === filterType) &&
       (filterTrust === 'all' || s.trustLevel === filterTrust) &&
       (!q || s.name.toLowerCase().includes(q) || s.shortName.toLowerCase().includes(q) || s.purpose.toLowerCase().includes(q))
     );
-  }, [search, filterType, filterTrust]);
+  }, [sources, search, filterType, filterTrust]);
 
-  const selected = knowledgeSources.find(s => s.id === selectedId) ?? knowledgeSources[0];
+  const activeId = selectedId || sources[0]?.id;
+  const selected = sources.find(s => s.id === activeId) ?? sources[0];
 
   const grouped = useMemo(() => {
     const groups: Partial<Record<SourceType, KnowledgeSource[]>> = {};
@@ -428,12 +444,12 @@ function CatalogView({ onOpenBrief }: { onOpenBrief: (src: KnowledgeSource) => v
           <div className="p-2 space-y-1">
             {filtered.length === 0 && <p className="text-[11px] text-center text-muted-foreground py-6">No sources match.</p>}
             {SOURCE_TYPE_ORDER.map(type => {
-              const srcs = grouped[type];
+              const srcs = grouped[type] as KnowledgeSource[] | undefined;
               if (!srcs?.length) return null;
               return (
                 <div key={type}>
                   <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{type}</p>
-                  {srcs.map(s => <SourceRow key={s.id} src={s} selected={selectedId === s.id} onSelect={() => setSelectedId(s.id)} />)}
+                  {srcs.map(s => <SourceRow key={s.id} src={s} selected={activeId === s.id} onSelect={() => setSelectedId(s.id)} />)}
                 </div>
               );
             })}
@@ -451,11 +467,13 @@ function CatalogView({ onOpenBrief }: { onOpenBrief: (src: KnowledgeSource) => v
 // ── Relationships View ────────────────────────────────────────────────────────
 
 function RelationshipsView() {
-  const [selectedId, setSelectedId] = useState(knowledgeSources[0].id);
-  const src = knowledgeSources.find(s => s.id === selectedId)!;
-  const typeCfg = SOURCE_TYPE_CONFIG[src.type];
-  const Icon = TYPE_ICONS[src.type];
-  const related = knowledgeSources.filter(s => src.relatedSources.includes(s.id));
+  const { sources } = useContext(SourcesCtx);
+  const [selectedId, setSelectedId] = useState('');
+  const activeId = (selectedId || sources[0]?.id) ?? '';
+  const src = sources.find(s => s.id === activeId);
+  const typeCfg = src ? SOURCE_TYPE_CONFIG[src.type] : null;
+  const Icon = src ? TYPE_ICONS[src.type] : null;
+  const related = src ? sources.filter(s => src.relatedSources.includes(s.id)) : [];
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -467,7 +485,7 @@ function RelationshipsView() {
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {SOURCE_TYPE_ORDER.map(type => {
-              const srcs = knowledgeSources.filter(s => s.type === type);
+              const srcs = sources.filter(s => s.type === type);
               if (!srcs.length) return null;
               return (
                 <div key={type}>
@@ -475,7 +493,7 @@ function RelationshipsView() {
                   {srcs.map(s => (
                     <button key={s.id} onClick={() => setSelectedId(s.id)}
                       className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-medium transition-all flex items-center gap-1.5 ${
-                        selectedId === s.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
+                        activeId === s.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                       }`}
                     >
                       <HealthDot status={s.healthStatus} />
@@ -492,6 +510,8 @@ function RelationshipsView() {
       {/* Map */}
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-5 max-w-2xl">
+          {!src && <p className="text-[12px] text-muted-foreground py-8 text-center">Loading sources…</p>}
+          {src && typeCfg && Icon && <>
 
           {/* Selected */}
           <div className={`rounded-xl border p-4 ${typeCfg.cls}`}>
@@ -554,6 +574,7 @@ function RelationshipsView() {
               </div>
             </div>
           )}
+          </>}
         </div>
       </ScrollArea>
     </div>
@@ -563,6 +584,7 @@ function RelationshipsView() {
 // ── Penny Retrieval Map View ──────────────────────────────────────────────────
 
 function RetrievalMapView() {
+  const { sources } = useContext(SourcesCtx);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const entry = pennyRetrievalMap[selectedIdx];
 
@@ -625,7 +647,7 @@ function RetrievalMapView() {
           {/* Retrieval steps */}
           <div className="space-y-3">
             {entry.retrievalSteps.map((step) => {
-              const src   = knowledgeSources.find(s => s.id === step.sourceId);
+              const src   = sources.find(s => s.id === step.sourceId);
               if (!src) return null;
               const rCfg  = roleConfig[step.role];
               const SIcon = TYPE_ICONS[src.type];
@@ -664,7 +686,7 @@ function RetrievalMapView() {
             <p className="text-[11px] font-bold text-foreground mb-2">Source Readiness for this Capability</p>
             <div className="space-y-1.5">
               {entry.retrievalSteps.map(step => {
-                const src = knowledgeSources.find(s => s.id === step.sourceId);
+                const src = sources.find(s => s.id === step.sourceId);
                 if (!src) return null;
                 const issues = src.healthIssues.length;
                 return (
@@ -691,18 +713,19 @@ function RetrievalMapView() {
 // ── Governance View ───────────────────────────────────────────────────────────
 
 function GovernanceView() {
+  const { sources, summary } = useContext(SourcesCtx);
   const [filterApproved, setFilterApproved] = useState<'all' | 'yes' | 'no'>('all');
 
-  const filtered = filterApproved === 'all' ? knowledgeSources
-    : filterApproved === 'yes' ? knowledgeSources.filter(s => s.approvedForPenny)
-    : knowledgeSources.filter(s => !s.approvedForPenny);
+  const filtered = filterApproved === 'all' ? sources
+    : filterApproved === 'yes' ? sources.filter(s => s.approvedForPenny)
+    : sources.filter(s => !s.approvedForPenny);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-3 border-b border-border flex items-center gap-3 flex-shrink-0 bg-white">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-1.5">
           <p className="text-[11px] font-semibold text-primary">
-            {SOURCE_SUMMARY.approvedForPenny} approved for {TERMS.aiAssistant} · {SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny} pending or restricted
+            {summary.approvedForPenny} approved for {TERMS.aiAssistant} · {summary.total - summary.approvedForPenny} pending or restricted
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -754,6 +777,8 @@ function GovernanceView() {
 // ── Health View ───────────────────────────────────────────────────────────────
 
 function HealthView() {
+  const { sources, summary } = useContext(SourcesCtx);
+
   type IssueCategory = 'Missing Owner' | 'Stale Review' | 'Disconnected' | 'Unapproved Penny' | 'Missing LMS Link' | 'Unmapped Category' | 'Future Source';
 
   interface FlatIssue {
@@ -766,7 +791,7 @@ function HealthView() {
   }
 
   const issues: FlatIssue[] = [];
-  for (const s of knowledgeSources) {
+  for (const s of sources) {
     for (const issue of s.healthIssues) {
       const severity = s.healthStatus === 'Critical' ? 'Critical' : 'Warning';
       let category: IssueCategory = 'Unapproved Penny';
@@ -811,7 +836,7 @@ function HealthView() {
           {[
             { label: `${issues.filter(i => i.severity === 'Critical').length} Critical`, cls: 'text-rose-700 bg-rose-50 border-rose-200' },
             { label: `${issues.filter(i => i.severity === 'Warning').length} Warnings`,  cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-            { label: `${SOURCE_SUMMARY.healthy} Healthy`,                                cls: 'text-green-700 bg-green-50 border-green-200' },
+            { label: `${summary.healthy} Healthy`,                                cls: 'text-green-700 bg-green-50 border-green-200' },
           ].map(b => (
             <span key={b.label} className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${b.cls}`}>{b.label}</span>
           ))}
@@ -880,8 +905,9 @@ function HealthView() {
 export default function KnowledgeSourceRegistry() {
   const { setSelectedItem, openActionPanel } = useAppContext();
   const [view, setView] = useState<RegistryView>('overview');
+  const { sources, summary } = useKnowledgeSources();
 
-  const totalIssues = knowledgeSources.reduce((acc, s) => acc + s.healthIssues.length, 0);
+  const totalIssues = sources.reduce((acc, s) => acc + s.healthIssues.length, 0);
 
   function openBrief(src: KnowledgeSource) {
     setSelectedItem({ type: 'knowledgeSource', id: src.id, data: src });
@@ -914,7 +940,7 @@ export default function KnowledgeSourceRegistry() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Knowledge Source Registry</h1>
             <p className="text-[12px] text-muted-foreground mt-0.5">
-              Where trusted information comes from — and how {TERMS.aiAssistant} uses it. {SOURCE_SUMMARY.total} sources across {SOURCE_TYPE_ORDER.filter(t => SOURCE_SUMMARY.byType[t] > 0).length} types.
+              Where trusted information comes from — and how {TERMS.aiAssistant} uses it. {summary.total} sources across {SOURCE_TYPE_ORDER.filter(t => (summary.byType[t] ?? 0) > 0).length} types.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -931,14 +957,14 @@ export default function KnowledgeSourceRegistry() {
               </span>
             )}
             <span className="text-[11px] font-semibold text-green-700 border border-green-200 bg-green-50 rounded-full px-3 py-1">
-              {SOURCE_SUMMARY.approvedForPenny} {TERMS.aiAssistant}-approved
+              {summary.approvedForPenny} {TERMS.aiAssistant}-approved
             </span>
           </div>
         </div>
         {/* Tabs */}
         <div className="flex items-center gap-2 mt-3 flex-wrap">
           <ViewTab label="Overview"           icon={Network}    active={view === 'overview'}      onClick={() => setView('overview')} />
-          <ViewTab label="Source Catalog"     icon={Database}   active={view === 'catalog'}       count={SOURCE_SUMMARY.total} onClick={() => setView('catalog')} />
+          <ViewTab label="Source Catalog"     icon={Database}   active={view === 'catalog'}       count={summary.total} onClick={() => setView('catalog')} />
           <ViewTab label="Relationships"      icon={GitBranch}  active={view === 'relationships'} onClick={() => setView('relationships')} />
           <ViewTab label={`${TERMS.aiAssistant} Retrieval Map`} icon={Brain}     active={view === 'retrieval-map'} count={pennyRetrievalMap.length} onClick={() => setView('retrieval-map')} />
           <ViewTab label="Governance"         icon={ShieldCheck}active={view === 'governance'}    onClick={() => setView('governance')} />
@@ -948,12 +974,14 @@ export default function KnowledgeSourceRegistry() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
-        {view === 'overview'       && <OverviewView />}
-        {view === 'catalog'        && <CatalogView onOpenBrief={openBrief} />}
-        {view === 'relationships'  && <RelationshipsView />}
-        {view === 'retrieval-map'  && <RetrievalMapView />}
-        {view === 'governance'     && <GovernanceView />}
-        {view === 'health'         && <HealthView />}
+        <SourcesCtx.Provider value={{ sources, summary }}>
+          {view === 'overview'       && <OverviewView />}
+          {view === 'catalog'        && <CatalogView onOpenBrief={openBrief} />}
+          {view === 'relationships'  && <RelationshipsView />}
+          {view === 'retrieval-map'  && <RetrievalMapView />}
+          {view === 'governance'     && <GovernanceView />}
+          {view === 'health'         && <HealthView />}
+        </SourcesCtx.Provider>
       </div>
     </div>
   );
