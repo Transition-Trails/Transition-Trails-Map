@@ -39,7 +39,7 @@ interface PocItem {
 
 // ── Audit data ────────────────────────────────────────────────────────────────
 
-const AUDIT_DATE = 'Jun 13, 2026';
+const AUDIT_DATE = 'Jul 17, 2026';
 
 const PAGE_AUDITS: PageAudit[] = [
   { path: '/',                              name: 'Home',                            role: 'All',    status: 'pass',  issues: '' },
@@ -87,6 +87,7 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/admin/google-oauth',            name: 'Admin · Google OAuth',            role: 'Admin+', status: 'fixed', issues: 'OAuth flow unblocked: Authorize button changed to target="_blank" (Google blocks OAuth inside iframes); GOOGLE_DRIVE_REFRESH_TOKEN and GOOGLE_CALENDAR_REFRESH_TOKEN obtained and stored in Replit Secrets; Drive + Calendar status updated to live across AdminSetup, readinessState.ts, and PagePennyGuide footer' },
   { path: '/admin/sf-validation',           name: 'Admin · SF Validation',           role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/program-resources',       name: 'Admin · Drive Workspaces',        role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/program-config',          name: 'Admin · Program Configuration',   role: 'Admin+', status: 'fixed', issues: 'Jul 17: 4-step Salesforce program wizard (Program → Cohorts → Course → Modules → Review) with 60/40 Penny guidance panel. Status filter pills (All / Discovery / Active / Completed/Cancelled) replace archived toggle. Free step navigation via clickable step indicator. Review tab: 4-item validation checklist with "Fix →" deep links and canSave gate. Knowledge Brief dormant panel — Penny activates only on explicit "Focus with Penny" click (not auto on card select). Create New always opens blank form. Manager name resolved via SOQL Program_Manager__r.Name relationship traversal.' },
   { path: '/admin/setup',                   name: 'Admin · Phase 2 Backlog',         role: 'Admin+', status: 'fixed', issues: 'Phase 2 backlog page removed — Phase 2 features are now tracked in Salesforce. Sprint 3 completions: Ask Penny Panel, Penny RAG, Trail Signals, Calendar Action Panel. Sprint 4 completions: Trail Quest Live, Penny Assessment, Agentforce Coexistence.' },
   { path: '/penny/trail-quests',            name: 'Penny · Trail Quests',            role: 'Admin+', status: 'fixed', issues: 'Sprint 4: restored from redirect stub to live PennyHub tab — full Trail Quest management page with active quests, catalogue, stats (11 quests, 78% completion, 24 streaks), category filter, and Penny coaching trigger. Redirects from old /penny/trail-quests removed.' },
   { path: '/penny/assessments',             name: 'Penny · Assessments',             role: 'Admin+', status: 'fixed', issues: 'Sprint 4: restored from stub to live PennyHub tab — per-learner result table, filter (all/failed/needs-coaching), assessment catalogue. Dual-AI coaching wired: Coach/Next button fires both Penny (right panel) + Agentforce (Sessions API) in parallel; coaching panel renders Agentforce live response inline. Column header updated to "AI Coach".' },
@@ -111,8 +112,8 @@ const HARDCODED_ITEMS: HardcodedItem[] = [
   { name: 'Slack pending action items',      location: 'workspace/SlackContextPanel.tsx',    classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'CONTEXT_PENDING is hardcoded; P2 = live Slack API events' },
   { name: 'Operations health scores',        location: 'data/operationalIntelligenceData.ts',classification: 'phase2-data', p2Item: 'p2-sf-live-queries',      notes: 'Health metrics and recommendations are prototype data' },
   { name: 'Integration readiness checklist', location: 'data/integrationReadinessData.ts',   classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Status should be calculated from live API probe results' },
-  { name: 'Google Calendar events',          location: 'data/googleCalendarData.ts',         classification: 'phase2-data', p2Item: 'p2-calendar-panel',       notes: 'Mock data; P2 = Calendar API with OAuth refresh token' },
-  { name: 'Google Drive file metadata',      location: 'data/googleDriveData.ts',            classification: 'phase2-data', p2Item: 'p2-gmail-panel',           notes: 'Mock Drive data; P2 = Drive API with OAuth refresh token' },
+  { name: 'Google Calendar events',          location: 'data/googleCalendarData.ts',         classification: 'fixed',       notes: 'Sprint 2: Calendar API live via /api/calendar/events with real OAuth refresh token. Static fallback data file retained but unused in production Calendar panel.' },
+  { name: 'Google Drive file metadata',      location: 'data/googleDriveData.ts',            classification: 'phase2-data', p2Item: 'p2-drive-panel',           notes: 'Mock Drive data; P2 = Drive API with OAuth refresh token for full file listing' },
   { name: 'Slack workspace channel data',    location: 'data/slackIntegrationData.ts',       classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Partial live data; full channel metadata needs channels:read scope' },
   { name: 'Global search index',             location: 'data/globalSearchData.ts',           classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Static index; P2 = dynamic from Salesforce + Drive + Slack queries' },
   { name: 'Context Engine workspace items',  location: 'data/contextEngineData.ts',          classification: 'phase2-data', p2Item: 'p2-ask-penny-panel',      notes: 'Hardcoded; P2 = dynamic from active Salesforce records' },
@@ -366,7 +367,7 @@ export default function Phase1CompletionAudit() {
             icon={<FlaskConical className="w-4 h-4" />}
             title="Test Coverage"
             meta={<>
-              <Badge text="0 automated"     cls="bg-rose-50 border-rose-200 text-rose-700" />
+              <Badge text="105 automated"    cls="bg-emerald-50 border-emerald-200 text-emerald-700" />
               <Badge text="70 metadata cases" cls="bg-amber-50 border-amber-200 text-amber-700" />
               <Badge text="4 smoke-test tools" cls="bg-sky-50 border-sky-200 text-sky-700" />
             </>}
@@ -378,11 +379,11 @@ export default function Phase1CompletionAudit() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   {
-                    title: 'Automated (Vitest/Jest)',
-                    value: '0',
-                    sub: 'No test runner configured — vitest.config.ts and *.test.ts files are absent from the workspace.',
-                    cls: 'border-rose-200 bg-rose-50',
-                    valcls: 'text-rose-600',
+                    title: 'Automated (Vitest)',
+                    value: '105',
+                    sub: '43 API server tests (pnpm --filter @workspace/api-server test) covering routes, Salesforce, Slack, Gemini, and auth. 62 frontend tests (pnpm --filter @workspace/program-map test) covering components, hooks, and the route smoke manifest. Both suites must pass before merging.',
+                    cls: 'border-emerald-200 bg-emerald-50',
+                    valcls: 'text-emerald-600',
                   },
                   {
                     title: 'Metadata-driven validation',
@@ -491,7 +492,7 @@ export default function Phase1CompletionAudit() {
                   Phase 1 UX: {failCount === 0 ? 'No violations' : `${failCount} violations found`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
-                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0–5 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup Gmail card + href fixes, Calendar panel, Agentforce coexistence, SF live cases table, SF case → Penny focus),
+                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0–Jul 17 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup Gmail card + href fixes, Calendar panel, Agentforce coexistence, SF live cases table, SF case → Penny focus, Program Config wizard with Penny guidance panel),
                   {watchCount > 0 ? ` ${watchCount} page(s) have acceptable Phase 2 placeholders` : ' 0 watch items'}. No major violations found.
                 </p>
               </div>
@@ -501,10 +502,10 @@ export default function Phase1CompletionAudit() {
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `${totalPages} routes audited — all Phase 1 UX standards applied.` },
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `${hcOk} hardcoded data sets classified as Phase 1 acceptable — realistic sample data.` },
                   { icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />,  text: `${hcP2} hardcoded items identified as Phase 2 data-connection work — all logged in backlog.` },
-                  { icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />,  text: `No automated test suite. 70 metadata-driven cases + 4 smoke tools cover Phase 1 validation.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `105 automated tests — 43 API server + 62 frontend. Both suites gate merges.` },
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `Gemini API live — powers Penny Insights, Ask Penny panel, and RAG knowledge retrieval.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `5 integrations live: Salesforce, Slack, Google Drive, Google Calendar, Agentforce (Sprint 4).` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `10 Phase 2 backlog items moved to Done (Ask Penny panel, RAG, Trail Signals, Calendar, Trail Quest, Assessment, Agentforce, SF live queries, Vitest automation, SF case → Penny focus).` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `6 integrations live: Salesforce, Slack, Google Drive, Google Calendar, Gmail (Sprint 6), Agentforce (Sprint 4).` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `11 Phase 2 backlog items moved to Done (Ask Penny panel, RAG, Trail Signals, Calendar, Trail Quest, Assessment, Agentforce, SF live queries, Vitest automation, SF case → Penny focus, Program Config wizard).` },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <span className="shrink-0 mt-0.5">{item.icon}</span>
