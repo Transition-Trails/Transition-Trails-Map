@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TERMS } from '@/config/terminology';
+import { useAppContext } from '@/context/AppContext';
 import {
   CheckCircle2, AlertTriangle, XCircle, Clock, Database,
   ChevronDown, ChevronRight,
@@ -195,7 +196,7 @@ function StatusBadge({ status }: { status: ValidationStatus }) {
 // ── Views ──────────────────────────────────────────────────────────────────────
 
 function ReadinessTrackingView() {
-  // Lifted out of map — hook must not be called inside .map()
+  const { setSelectedItem } = useAppContext();
   const [openProduct, setOpenProduct] = useState<string | null>(null);
 
   return (
@@ -207,7 +208,10 @@ function ReadinessTrackingView() {
           return (
             <div key={prod.product} className="rounded-lg border border-border bg-background overflow-hidden">
               <button
-                onClick={() => setOpenProduct(open ? null : prod.product)}
+                onClick={() => {
+                  setOpenProduct(open ? null : prod.product);
+                  setSelectedItem({ type: 'sfProduct', id: prod.product, data: prod });
+                }}
                 className="w-full text-left px-4 py-3 hover:bg-muted/20 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">

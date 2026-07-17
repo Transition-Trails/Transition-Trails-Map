@@ -19,7 +19,7 @@ export type SelectedItemType =
   | 'promptTemplate' | 'integration'
   | 'persona' | 'role' | 'roleBlueprint' | 'roleParticipation'
   | 'healthIndicator' | 'oicRecommendation' | 'trendInsight' | 'twinNode'
-  | 'sfCase' | 'gapReportItem';
+  | 'sfCase' | 'gapReportItem' | 'sfProduct';
 
 export interface ActiveContext {
   id: string;

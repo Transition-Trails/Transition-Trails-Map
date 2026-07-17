@@ -1414,6 +1414,113 @@ export function ContextPanel() {
       );
     }
 
+    // ── SF Product Readiness ───────────────────────────────────────────────
+    if (type === 'sfProduct') {
+      const prod = data as {
+        product: string;
+        description: string;
+        overallStatus: string;
+        score: number;
+        objectsMapped: number;
+        objectsTotal: number;
+        checks: { label: string; status: string; note: string }[];
+      };
+      const statusCls: Record<string, string> = {
+        validated: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        partial:   'bg-blue-100 text-blue-700 border-blue-200',
+        pending:   'bg-amber-100 text-amber-700 border-amber-200',
+        blocked:   'bg-rose-100 text-rose-700 border-rose-200',
+        'n-a':     'bg-muted text-muted-foreground border-border',
+      };
+      const statusLabel: Record<string, string> = {
+        validated: 'Validated', partial: 'Partial', pending: 'Pending', blocked: 'Blocked', 'n-a': 'N/A',
+      };
+      const checkCls = (s: string) => statusCls[s] ?? statusCls['n-a'];
+      const blockers = prod.checks.filter(c => c.status === 'blocked');
+
+      function focusProductWithPenny() {
+        const checkLines = prod.checks.map(c => `- ${c.label}: ${statusLabel[c.status] ?? c.status} — ${c.note}`).join('\n');
+        setPendingPennyQuery(
+          `I'm reviewing the Salesforce ${prod.product} integration readiness for Trail OS.\n\n` +
+          `Overall status: ${statusLabel[prod.overallStatus] ?? prod.overallStatus} (score: ${prod.score}/100)\n` +
+          `${prod.objectsMapped} of ${prod.objectsTotal} object groups mapped.\n\n` +
+          `Checks:\n${checkLines}\n\n` +
+          `What are the most important next steps to advance this integration? Focus on unblocking the highest-priority items first.`
+        );
+        setAskPennyOpen(true);
+      }
+
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{TERMS.knowledgeBrief} — SF Readiness</p>
+              <p className="text-[15px] font-semibold text-foreground leading-snug">{prod.product}</p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCls[prod.overallStatus] ?? statusCls['n-a']}`}>
+                  {statusLabel[prod.overallStatus] ?? prod.overallStatus}
+                </span>
+                <span className={`text-[13px] font-bold ${prod.score >= 60 ? 'text-blue-600' : prod.score >= 30 ? 'text-amber-600' : 'text-rose-600'}`}>
+                  {prod.score}/100
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={focusProductWithPenny}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
+
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Overview</p>
+              <p className="text-[12px] text-foreground leading-relaxed">{prod.description}</p>
+            </div>
+
+            <div className="rounded-lg border border-border bg-muted/20 p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Object Coverage</p>
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex-1 h-1.5 bg-muted rounded-full">
+                  <div
+                    className={`h-1.5 rounded-full ${prod.score >= 60 ? 'bg-blue-400' : prod.score >= 30 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                    style={{ width: `${prod.score}%` }}
+                  />
+                </div>
+                <span className="text-[10px] text-muted-foreground shrink-0">{prod.score}%</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">{prod.objectsMapped} of {prod.objectsTotal} object groups mapped</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Readiness Checks</p>
+              {prod.checks.map(c => (
+                <div key={c.label} className="rounded border border-border/60 bg-background px-3 py-2">
+                  <div className="flex items-center justify-between gap-2 mb-0.5">
+                    <p className="text-[11px] font-semibold text-foreground">{c.label}</p>
+                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${checkCls(c.status)}`}>
+                      {statusLabel[c.status] ?? c.status}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground leading-snug">{c.note}</p>
+                </div>
+              ))}
+            </div>
+
+            {blockers.length > 0 && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
+                <p className="text-[10px] font-bold text-rose-700 uppercase tracking-wider mb-1">{blockers.length} Blocker{blockers.length > 1 ? 's' : ''} — Needs Action</p>
+                {blockers.map(b => (
+                  <p key={b.label} className="text-[11px] text-rose-900 leading-snug mt-1">· {b.note}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      );
+    }
+
     // ── Curriculum Studio item ─────────────────────────────────────────────
     if (type === 'curriculumItem') {
       const d           = data as any;
