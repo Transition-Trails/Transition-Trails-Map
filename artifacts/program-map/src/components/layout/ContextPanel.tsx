@@ -63,7 +63,7 @@ export function ContextPanel() {
           <div className="p-5 space-y-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
+                <Badge variant="outline" className="bg-background uppercase tracking-wider text-[10px]">
                   Document
                 </Badge>
                 <ConfidenceBadge status={data.confidence || 'needs-review'} />
