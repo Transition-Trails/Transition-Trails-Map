@@ -233,9 +233,9 @@ export default function Phase1CompletionAudit() {
         {/* Header */}
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Administration</p>
-          <h1 className="text-[15px] font-semibold text-foreground">Phase 1 Completion Audit</h1>
+          <h1 className="text-[15px] font-semibold text-foreground">Penny Capability Build Audit</h1>
           <p className="text-[12px] text-muted-foreground mt-0.5">
-            Full audit of UX compliance, hardcoded content, test coverage, and Penny POC status — {AUDIT_DATE}
+            Full audit of UX compliance, hardcoded content, test coverage, and Penny capability build status — {AUDIT_DATE}
           </p>
         </div>
 

@@ -25,7 +25,7 @@ const PAGE_INFO: Array<[string, string, string]> = [
   ['/admin/integrations/secrets',          'Administration',         'Secrets Audit'],
   ['/admin/integrations',                  'Administration',         'Integrations'],
   ['/admin/phase1-readiness',              'Administration',         'Phase 1 Readiness'],
-  ['/admin/phase1-audit',                  'Administration',         'Phase 1 Audit'],
+  ['/admin/phase1-audit',                  'Administration',         'Penny Capability Build Audit'],
   ['/admin/ux-standards',                  'Administration',         'UX Standards'],
   ['/admin/create-audit',                  'Administration',         'Create Audit'],
   ['/admin/sf-validation',                 'Administration',         'SF Validation'],

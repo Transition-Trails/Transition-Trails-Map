@@ -80,7 +80,7 @@ const PAGE_LABELS: Record<string, string> = {
   '/admin/setup':                'Administration · Setup',
   '/admin/people-access':        'Administration · People & Access',
   '/admin/phase1-readiness':     'Administration · Phase 1 Readiness',
-  '/admin/phase1-audit':         'Administration · Phase 1 Audit',
+  '/admin/phase1-audit':         'Administration · Penny Capability Build Audit',
   '/search':                     'Global Search',
 };
 

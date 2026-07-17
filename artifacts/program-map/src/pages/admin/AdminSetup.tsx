@@ -214,7 +214,7 @@ const READINESS_LINKS: ReadinessLink[] = [
   },
   {
     id: 'phase1-audit',
-    name: 'Phase 1 Completion Audit',
+    name: 'Penny Capability Build Audit',
     detail: 'UX compliance review, prototype content inventory, Penny POC capability assessment, and test coverage summary.',
     action: 'View Audit',
     href: '/admin/phase1-audit',
