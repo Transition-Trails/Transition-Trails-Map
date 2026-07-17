@@ -31,7 +31,8 @@ A unified internal operating dashboard for Transition Trails Academy. Consolidat
 | Agentforce           | Live (POC)    | Sessions API · dual-AI coaching with Penny on Assessment page         |
 | Google Auth / Groups | Live          | Clerk v6 · Google Sign-In · 3 Google Groups drive access tier         |
 
-Phase 2: Google Chat · Mural · GA4 · Google Drive rule config · full Agentforce context handoff
+Phase 2: live data wiring to dashboards · Google Drive rule config · Calendar cohort scoping · signal automation · Org Memory · full Agentforce context handoff · mobile
+Phase 3: Google Chat · Mural · GA4
 
 ## Where things live
 
@@ -97,7 +98,7 @@ artifacts/program-map/src/
 
 ## Product
 
-Internal operating platform for the Transition Trails Academy team. Phase 1 complete — shell architecture, live integrations (Salesforce, Gmail, Calendar, Slack, Agentforce, Penny/Gemini, Google Auth), and role-gated access are all production-ready. Phase 2 targets live data wiring to dashboards, Google Chat, Mural, and mobile.
+Internal operating platform for the Transition Trails Academy team. Phase 1 complete — shell architecture, live integrations (Salesforce, Gmail, Calendar, Slack, Agentforce, Penny/Gemini, Google Auth), and role-gated access are all production-ready. Phase 2 targets live data wiring to dashboards, signal automation, Org Memory, Drive folder sync, and Agentforce context handoff. Phase 3 targets net-new integrations: Google Chat, Mural, GA4, and mobile.
 
 ## User preferences
 

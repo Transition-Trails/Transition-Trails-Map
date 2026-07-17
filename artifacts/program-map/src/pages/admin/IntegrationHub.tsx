@@ -19,7 +19,7 @@ type Tab = 'connections' | 'capability' | 'config';
 //  CONNECTIONS TAB
 // ══════════════════════════════════════════════════════════════════════════════
 
-type ConnStatus = 'live' | 'live-partial' | 'configured' | 'needs-setup' | 'phase-2';
+type ConnStatus = 'live' | 'live-partial' | 'configured' | 'needs-setup' | 'phase-2' | 'phase-3';
 
 const CONN_STATUS: Record<ConnStatus, { label: string; dot: string; badge: string; cls: string }> = {
   'live':         { label: 'Live',        dot: 'bg-emerald-500', badge: 'text-emerald-700', cls: 'border-emerald-200 bg-emerald-50'   },
@@ -27,6 +27,7 @@ const CONN_STATUS: Record<ConnStatus, { label: string; dot: string; badge: strin
   'configured':   { label: 'Configured',  dot: 'bg-sky-500',     badge: 'text-sky-700',     cls: 'border-sky-200 bg-sky-50'           },
   'needs-setup':  { label: 'Needs Setup', dot: 'bg-amber-500',   badge: 'text-amber-700',   cls: 'border-amber-200 bg-amber-50'       },
   'phase-2':      { label: 'Phase 2',     dot: 'bg-slate-400',   badge: 'text-slate-500',   cls: 'border-slate-200 bg-slate-50'       },
+  'phase-3':      { label: 'Phase 3',     dot: 'bg-zinc-300',    badge: 'text-zinc-400',    cls: 'border-zinc-200 bg-zinc-50/60'      },
 };
 
 interface Connection {
@@ -96,15 +97,14 @@ const CONNECTIONS: Connection[] = [
   },
   {
     id: 'google-chat', name: 'Google Chat', tagline: 'Client & Executive Channel',
-    status: 'needs-setup', icon: MessageCircle, iconCls: 'bg-teal-50 text-teal-700', owner: 'Ops Lead',
-    detail: 'Spaces and webhook model defined. Service account auth not yet configured.',
-    action: 'Integrations', href: '/admin/integrations',
-    needs: 'Configure Google Workspace service account with Chat API scope',
+    status: 'phase-3', icon: MessageCircle, iconCls: 'bg-zinc-50 text-zinc-400', owner: '—',
+    detail: 'Google Chat spaces and DM delivery for programs using Google Workspace. Phase 3 — after Slack adapter MVP is validated.',
+    action: '', href: '',
   },
   {
     id: 'mural', name: 'Mural', tagline: 'Visual Collaboration',
-    status: 'phase-2', icon: LayoutIcon, iconCls: 'bg-slate-50 text-slate-400', owner: '—',
-    detail: 'Whiteboard integration for sprint planning and retrospectives.', action: '', href: '',
+    status: 'phase-3', icon: LayoutIcon, iconCls: 'bg-zinc-50 text-zinc-400', owner: '—',
+    detail: 'Whiteboard integration for sprint planning and retrospectives. Phase 3 — after Drive and collaboration foundations are complete.', action: '', href: '',
   },
   {
     id: 'lms', name: 'LMS', tagline: 'Learning Delivery Platform',
@@ -116,10 +116,10 @@ const CONNECTIONS: Connection[] = [
 function ConnectionCard({ conn: c, navigate }: { conn: Connection; navigate: (href: string) => void }) {
   const cfg = CONN_STATUS[c.status];
   const Icon = c.icon;
-  const isPhase2 = c.status === 'phase-2';
+  const isDeferred = c.status === 'phase-2' || c.status === 'phase-3';
 
   return (
-    <div className={`rounded-lg border p-3.5 bg-white flex flex-col gap-2 ${isPhase2 ? 'opacity-55 border-dashed border-border/60' : 'border-border'}`}>
+    <div className={`rounded-lg border p-3.5 bg-white flex flex-col gap-2 ${isDeferred ? 'opacity-55 border-dashed border-border/60' : 'border-border'}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <div className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 ${c.iconCls}`}>
@@ -147,7 +147,7 @@ function ConnectionCard({ conn: c, navigate }: { conn: Connection; navigate: (hr
 
       <div className="flex items-center justify-between mt-auto pt-0.5">
         <span className="text-[10px] text-muted-foreground/50">{c.owner}</span>
-        {!isPhase2 && c.href && (
+        {!isDeferred && c.href && (
           <button
             onClick={() => navigate(c.href)}
             className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/70 transition-colors"
@@ -155,7 +155,7 @@ function ConnectionCard({ conn: c, navigate }: { conn: Connection; navigate: (hr
             {c.action}<ChevronRight className="w-3 h-3" />
           </button>
         )}
-        {isPhase2 && <span className="text-[10px] text-muted-foreground/40">Phase 2</span>}
+        {isDeferred && <span className="text-[10px] text-muted-foreground/40">{cfg.label}</span>}
       </div>
     </div>
   );
@@ -233,9 +233,10 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
 }
 
 function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
-  const live     = CONNECTIONS.filter(c => ['live', 'live-partial', 'configured'].includes(c.status));
+  const live    = CONNECTIONS.filter(c => ['live', 'live-partial', 'configured'].includes(c.status));
   const needsSet = CONNECTIONS.filter(c => c.status === 'needs-setup');
-  const phase2   = CONNECTIONS.filter(c => c.status === 'phase-2');
+  const phase2  = CONNECTIONS.filter(c => c.status === 'phase-2');
+  const phase3  = CONNECTIONS.filter(c => c.status === 'phase-3');
 
   return (
     <ScrollArea className="h-full">
@@ -267,15 +268,29 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
           </div>
         )}
 
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Clock className="w-3.5 h-3.5 text-slate-400" />
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Phase 2 — Planned</p>
+        {phase2.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Phase 2 — Planned</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2.5">
+              {phase2.map(c => <ConnectionCard key={c.id} conn={c} navigate={navigate} />)}
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-2.5">
-            {phase2.map(c => <ConnectionCard key={c.id} conn={c} navigate={navigate} />)}
+        )}
+
+        {phase3.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Clock className="w-3.5 h-3.5 text-zinc-300" />
+              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Phase 3 — Planned</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2.5">
+              {phase3.map(c => <ConnectionCard key={c.id} conn={c} navigate={navigate} />)}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </ScrollArea>
@@ -373,7 +388,7 @@ const DOMAINS: DomainCard[] = [
       { label: 'Health dashboard',                status: 'live',    note: 'Program health scores, last check-in, coach assignment, and risk flags live at /operations/health',                                  action: '/operations/health',      actionLabel: 'View Health'    },
       { label: 'Demand pipeline (cases + epics)', status: 'live',    note: 'SF Cases live · Demand intake, epics, features, stories, roadmap built · Penny focus on case click',                                action: '/demand/cases',           actionLabel: 'View Cases'     },
       { label: 'Scorecard live data feed',        status: 'partial', note: 'Scorecards built and displaying · direct SF data wiring to scorecard metrics is Phase 2',                                           action: '/operations/scorecards',  actionLabel: 'View Scorecards'},
-      { label: 'Trail Signals auto-assignment',   status: 'partial', note: 'System-assigned by tier, role, context, and program ownership · user-configurable signal selection and GA4 integration Phase 2',   action: '/navigator/program-map',  actionLabel: 'View Signals'   },
+      { label: 'Trail Signals auto-assignment',   status: 'partial', note: 'System-assigned by tier, role, context, and program ownership · user-configurable signal selection Phase 2 · GA4 integration Phase 3',   action: '/navigator/program-map',  actionLabel: 'View Signals'   },
     ],
   },
 ];

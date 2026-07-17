@@ -5,14 +5,18 @@
 //     current platform status, live connection state, blockers, gaps, and next
 //     actions across all 6 readiness domains.
 //
-//   Phase 2 features are tracked in Salesforce (not in-app).
+//   Phase 2 features — live data wiring, signal automation, Org Memory, Drive
+//     folder sync, Calendar cohort scoping — tracked in Salesforce.
+//
+//   Phase 3 features — net-new integrations (Mural, GA4, Google Chat) and
+//     mobile — tracked in Salesforce.
 //
 // All pages that surface integration or phase status should reflect this model.
 // Admin pages may show full detail; Everyday/Power User pages surface only
 // plain-language Penny Insights and Trail Signals — no raw setup language.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type IntegrationHealth = 'live' | 'in-progress' | 'planned' | 'phase-2';
+export type IntegrationHealth = 'live' | 'in-progress' | 'planned' | 'phase-2' | 'phase-3';
 
 export interface IntegrationStatus {
   id: string;
@@ -99,11 +103,11 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
   mural: {
     id: 'mural',
     label: 'Mural',
-    health: 'phase-2',
-    summary: 'Phase 2 — Mural Integration (draft in backlog)',
+    health: 'phase-3',
+    summary: 'Phase 3 — Mural Integration (planned)',
     detail:
-      'Mural OAuth and board embedding deferred to Phase 2. ' +
-      'Mural Integration is tracked in Salesforce as a Phase 2 feature.',
+      'Mural OAuth and board embedding deferred to Phase 3. ' +
+      'Mural Integration is tracked in Salesforce as a Phase 3 feature.',
   },
   agentforce: {
     id: 'agentforce',
@@ -120,9 +124,9 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
   ga4: {
     id: 'ga4',
     label: 'Google Analytics 4',
-    health: 'phase-2',
-    summary: 'Phase 2 — not yet started',
-    detail: 'GA4 analytics integration deferred to Phase 2.',
+    health: 'phase-3',
+    summary: 'Phase 3 — not yet started',
+    detail: 'GA4 analytics integration deferred to Phase 3.',
   },
 };
 
