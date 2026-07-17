@@ -4,9 +4,10 @@ import { BookOpen, Brain, Network, GraduationCap } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
-import { knowledgeSources, SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, HEALTH_CONFIG, type KnowledgeSource } from '@/data/knowledgeSourceData';
+import { SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, HEALTH_CONFIG, type KnowledgeSource } from '@/data/knowledgeSourceData';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
 import { useAppContext } from '@/context/AppContext';
+import { useKnowledgeSources } from '@/hooks/useKnowledgeSources';
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -219,12 +220,13 @@ function HealthTabKS({ src }: { src: KnowledgeSource }) {
 
 export default function KnowledgeWorkspace() {
   const { setSelectedItem, selectedItem } = useAppContext();
+  const { sources } = useKnowledgeSources();
 
   const trustOrder: Record<string, number> = { 'Authoritative': 3, 'Trusted': 2, 'Curated': 1, 'Unverified': 0 };
 
   const sorted = useMemo(() =>
-    [...knowledgeSources].sort((a, b) => (trustOrder[b.trustLevel] ?? 0) - (trustOrder[a.trustLevel] ?? 0)),
-  []);
+    [...sources].sort((a, b) => (trustOrder[b.trustLevel] ?? 0) - (trustOrder[a.trustLevel] ?? 0)),
+  [sources]);
 
   const healthFromTrust = (src: KnowledgeSource): WorkspaceItem['health'] =>
     src.trustLevel === 'Authoritative' || src.trustLevel === 'Trusted' ? 'healthy' :
@@ -244,17 +246,17 @@ export default function KnowledgeWorkspace() {
   })), [sorted]);
 
   const tabs = useMemo<WorkspaceTab[]>(() => [
-    { id: 'overview',      label: 'Overview',                  render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <OverviewTab src={s} />         : null; } },
-    { id: 'governance',    label: 'Governance',                render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <GovernanceTab src={s} />        : null; } },
-    { id: 'programs',      label: 'Programs',                  render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelatedProgramsTab src={s} />   : null; } },
-    { id: 'penny',         label: `${TERMS.aiAssistant} Assets`, render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <PennyAssetsTab src={s} />      : null; } },
-    { id: 'health',        label: 'Health',                    render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <HealthTabKS src={s} />          : null; } },
-    { id: 'relationships', label: 'Relationships',             render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelationshipsTabKS src={s} />   : null; } },
-  ], []);
+    { id: 'overview',      label: 'Overview',                    render: (item) => { const s = sources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <OverviewTab src={s} />         : null; } },
+    { id: 'governance',    label: 'Governance',                  render: (item) => { const s = sources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <GovernanceTab src={s} />        : null; } },
+    { id: 'programs',      label: 'Programs',                    render: (item) => { const s = sources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelatedProgramsTab src={s} />   : null; } },
+    { id: 'penny',         label: `${TERMS.aiAssistant} Assets`, render: (item) => { const s = sources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <PennyAssetsTab src={s} />      : null; } },
+    { id: 'health',        label: 'Health',                      render: (item) => { const s = sources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <HealthTabKS src={s} />          : null; } },
+    { id: 'relationships', label: 'Relationships',               render: (item) => { const s = sources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelationshipsTabKS src={s} />   : null; } },
+  ], [sources]);
 
   // Sync to AppContext so the Knowledge Brief panel reflects the selected source
   function handleItemSelect(item: WorkspaceItem) {
-    const src = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id);
+    const src = sources.find(x => ((x as any).id ?? x.name) === item.id);
     if (src) {
       setSelectedItem({ type: 'knowledgeSource', id: (src as any).id ?? src.name, data: src });
     }

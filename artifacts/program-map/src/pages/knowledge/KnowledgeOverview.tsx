@@ -7,8 +7,9 @@ import {
   XCircle, Shield, ChevronRight, Brain, Clock, Layers,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { knowledgeSources, SOURCE_SUMMARY, TRUST_LEVEL_CONFIG } from '@/data/knowledgeSourceData';
+import { TRUST_LEVEL_CONFIG } from '@/data/knowledgeSourceData';
 import type { TrustLevel, KnowledgeSource } from '@/data/knowledgeSourceData';
+import { useKnowledgeSources } from '@/hooks/useKnowledgeSources';
 
 // ── Penny Insights data ────────────────────────────────────────────────────────
 // Extracted so JSX stays clean; TERMS used throughout — no hardcoded brand strings.
@@ -141,21 +142,22 @@ function IssueRow({
 export default function KnowledgeOverview() {
   const [, setLocation] = useLocation();
   const { setSelectedItem, selectedItem } = useAppContext();
+  const { sources, summary } = useKnowledgeSources();
 
   const stats = useMemo(() => {
-    const trustCounts = knowledgeSources.reduce<Record<TrustLevel, number>>(
+    const trustCounts = sources.reduce<Record<TrustLevel, number>>(
       (acc, s) => { acc[s.trustLevel] = (acc[s.trustLevel] ?? 0) + 1; return acc; },
       { Authoritative: 0, Trusted: 0, Curated: 0, Unverified: 0 },
     );
     const syncCounts = {
-      Live:         knowledgeSources.filter(s => s.syncStatus === 'Live').length,
-      Manual:       knowledgeSources.filter(s => s.syncStatus === 'Manual').length,
-      Disconnected: knowledgeSources.filter(s => s.syncStatus === 'Disconnected').length,
-      Planned:      knowledgeSources.filter(s => s.syncStatus === 'Planned' || s.syncStatus === 'Future').length,
+      Live:         sources.filter(s => s.syncStatus === 'Live').length,
+      Manual:       sources.filter(s => s.syncStatus === 'Manual').length,
+      Disconnected: sources.filter(s => s.syncStatus === 'Disconnected').length,
+      Planned:      sources.filter(s => s.syncStatus === 'Planned' || s.syncStatus === 'Future').length,
     };
-    const needsAttention = knowledgeSources.filter(s => s.healthIssues.length > 0);
+    const needsAttention = sources.filter(s => s.healthIssues.length > 0);
     return { trustCounts, syncCounts, needsAttention };
-  }, []);
+  }, [sources]);
 
   const trustConfig: Array<{ level: TrustLevel; dot: string }> = [
     { level: 'Authoritative', dot: 'bg-violet-500' },
@@ -164,7 +166,7 @@ export default function KnowledgeOverview() {
     { level: 'Unverified',    dot: 'bg-slate-400'  },
   ];
 
-  const insights = buildInsights(SOURCE_SUMMARY.total, SOURCE_SUMMARY.approvedForPenny);
+  const insights = buildInsights(summary.total, summary.approvedForPenny);
 
   function selectSource(source: KnowledgeSource) {
     setSelectedItem({ type: 'knowledgeSource', id: source.id, data: source });
@@ -192,31 +194,31 @@ export default function KnowledgeOverview() {
         {/* ── Summary bar ─────────────────────────────────────────────────── */}
         <div className="flex flex-wrap gap-2">
           <StatPill
-            value={SOURCE_SUMMARY.total}
+            value={summary.total}
             label="Total Sources"
             color="text-foreground"
             onClick={() => setLocation('/knowledge/sources')}
           />
           <StatPill
-            value={SOURCE_SUMMARY.healthy}
+            value={summary.healthy}
             label="Healthy"
             color="text-emerald-600"
             onClick={() => setLocation('/knowledge/sources')}
           />
           <StatPill
-            value={SOURCE_SUMMARY.warnings}
+            value={summary.warnings}
             label="Warnings"
             color="text-amber-600"
             onClick={() => setLocation('/knowledge/sources')}
           />
           <StatPill
-            value={SOURCE_SUMMARY.critical}
+            value={summary.critical}
             label="Critical"
             color="text-rose-600"
             onClick={() => setLocation('/knowledge/sources')}
           />
           <StatPill
-            value={SOURCE_SUMMARY.approvedForPenny}
+            value={summary.approvedForPenny}
             label={`${TERMS.aiAssistant} Ready`}
             color="text-primary"
             onClick={() => setLocation('/knowledge/sources')}
@@ -231,9 +233,9 @@ export default function KnowledgeOverview() {
             <Eyebrow>Source Health</Eyebrow>
             <div className="space-y-2">
               {[
-                { label: 'Healthy',  count: SOURCE_SUMMARY.healthy,  icon: CheckCircle,   iconCls: 'text-emerald-500', barCls: 'bg-emerald-400' },
-                { label: 'Warning',  count: SOURCE_SUMMARY.warnings, icon: AlertTriangle, iconCls: 'text-amber-500',   barCls: 'bg-amber-400'  },
-                { label: 'Critical', count: SOURCE_SUMMARY.critical, icon: XCircle,       iconCls: 'text-rose-500',    barCls: 'bg-rose-400'   },
+                { label: 'Healthy',  count: summary.healthy,  icon: CheckCircle,   iconCls: 'text-emerald-500', barCls: 'bg-emerald-400' },
+                { label: 'Warning',  count: summary.warnings, icon: AlertTriangle, iconCls: 'text-amber-500',   barCls: 'bg-amber-400'  },
+                { label: 'Critical', count: summary.critical, icon: XCircle,       iconCls: 'text-rose-500',    barCls: 'bg-rose-400'   },
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-2.5">
                   <row.icon className={`w-3.5 h-3.5 shrink-0 ${row.iconCls}`} />
@@ -245,7 +247,7 @@ export default function KnowledgeOverview() {
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
                         className={`h-full rounded-full ${row.barCls}`}
-                        style={{ width: `${Math.round((row.count / SOURCE_SUMMARY.total) * 100)}%` }}
+                        style={{ width: `${Math.round((row.count / (summary.total || 1)) * 100)}%` }}
                       />
                     </div>
                   </div>
@@ -322,12 +324,12 @@ export default function KnowledgeOverview() {
             <Eyebrow>{TERMS.aiAssistant} Readiness</Eyebrow>
             <div className="flex items-end gap-6">
               <div>
-                <span className="text-xl font-bold text-primary">{SOURCE_SUMMARY.approvedForPenny}</span>
+                <span className="text-xl font-bold text-primary">{summary.approvedForPenny}</span>
                 <p className="text-[10px] text-muted-foreground">approved for {TERMS.aiAssistant}</p>
               </div>
               <div>
                 <span className="text-xl font-bold text-muted-foreground">
-                  {SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny}
+                  {summary.total - summary.approvedForPenny}
                 </span>
                 <p className="text-[10px] text-muted-foreground">pending review</p>
               </div>
@@ -383,10 +385,10 @@ export default function KnowledgeOverview() {
               title="Sources"
               desc={`Source governance, trust reviews, sync status, and ${TERMS.aiAssistant} activation.`}
               path="/knowledge/sources"
-              badge={SOURCE_SUMMARY.warnings + SOURCE_SUMMARY.critical > 0
-                ? `${SOURCE_SUMMARY.warnings + SOURCE_SUMMARY.critical} issues`
+              badge={summary.warnings + summary.critical > 0
+                ? `${summary.warnings + summary.critical} issues`
                 : 'All clear'}
-              badgeColor={SOURCE_SUMMARY.warnings + SOURCE_SUMMARY.critical > 0
+              badgeColor={summary.warnings + summary.critical > 0
                 ? 'bg-amber-50 text-amber-700 border-amber-200'
                 : 'bg-emerald-50 text-emerald-700 border-emerald-200'}
             />
