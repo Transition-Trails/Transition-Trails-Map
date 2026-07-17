@@ -50,15 +50,23 @@ router.get("/programs", withClient(async (_req, res, client) => {
 router.get("/programs/:id", withClient(async (req, res, client) => {
   const { id } = req.params as { id: string };
   if (!id || !isSfId(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
-  const record = await client.getRecord<Record<string, unknown>>("pmdm__Program__c", id, [
-    "Id","Name","pmdm__Status__c","pmdm__Description__c","pmdm__StartDate__c","pmdm__EndDate__c",
-    "pmdm__ShortSummary__c","pmdm__TargetPopulation__c","Program_Goals__c","Program_Structure__c",
-    "Problem_Statement__c","Program_Expected_Outcomes__c","Implementation_Plan__c",
-    "Budget_Resouces__c","Funding_Strategy__c","Partnership_Opportunities__c",
-    "Risks_Assumptions__c","Success_Metrics_Evaluation_Plan__c","Program_Target_Audience__c",
-    "Program_Manager__c","Google_Drive_Folder__c","Canva_Folder__c","Requires_Payment__c",
-  ]);
-  res.json({ program: record });
+  // Use SOQL so we can traverse the Manager lookup to get the User's Name
+  const result = await client.query<Record<string, unknown>>(
+    `SELECT Id, Name, pmdm__Status__c, pmdm__Description__c, pmdm__StartDate__c, pmdm__EndDate__c,` +
+    ` pmdm__ShortSummary__c, pmdm__TargetPopulation__c, Program_Goals__c, Program_Structure__c,` +
+    ` Problem_Statement__c, Program_Expected_Outcomes__c, Implementation_Plan__c,` +
+    ` Budget_Resouces__c, Funding_Strategy__c, Partnership_Opportunities__c,` +
+    ` Risks_Assumptions__c, Success_Metrics_Evaluation_Plan__c, Program_Target_Audience__c,` +
+    ` Program_Manager__c, Program_Manager__r.Name,` +
+    ` Google_Drive_Folder__c, Canva_Folder__c, Requires_Payment__c` +
+    ` FROM pmdm__Program__c WHERE Id = '${id}' LIMIT 1`
+  );
+  if (!result.records.length) { res.status(404).json({ error: "Program not found" }); return; }
+  const record = result.records[0];
+  // Flatten the relationship object so the frontend can access Program_Manager_Name directly
+  const managerRel = record["Program_Manager__r"] as { Name?: string } | null;
+  const program = { ...record, Program_Manager_Name: managerRel?.Name ?? null };
+  res.json({ program });
 }));
 
 router.post("/programs", withClient(async (req, res, client) => {

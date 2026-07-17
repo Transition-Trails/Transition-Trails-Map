@@ -1174,7 +1174,7 @@ export default function ProgramConfiguration() {
                                         }
                                         const rows: { label: string; val: string | null }[] = [
                                           { label: 'Status',            val: sfStr(programDetail['pmdm__Status__c']) },
-                                          { label: 'Manager',           val: sfStr(programDetail['Program_Manager__c']) },
+                                          { label: 'Manager',           val: sfStr(programDetail['Program_Manager_Name']) ?? sfStr(programDetail['Program_Manager__c']) },
                                           { label: 'Start Date',        val: sfStr(programDetail['pmdm__StartDate__c']) },
                                           { label: 'End Date',          val: sfStr(programDetail['pmdm__EndDate__c']) },
                                           { label: 'Target Population', val: sfStr(programDetail['pmdm__TargetPopulation__c']) },
