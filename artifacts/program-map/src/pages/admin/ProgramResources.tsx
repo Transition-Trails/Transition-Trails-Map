@@ -6,7 +6,7 @@ import {
   programDriveResources, DRIVE_STATUS_CONFIG, PERMISSIONS_CONFIG,
   type ProgramDriveResource, type DriveStatus, type PermissionsModel,
 } from '@/data/programResourcesData';
-import { FolderOpen, ExternalLink, Settings, AlertTriangle, CheckCircle2, Database, Layers } from 'lucide-react';
+import { FolderOpen, ExternalLink, Settings, AlertTriangle, CheckCircle2, Database, Layers, ChevronRight } from 'lucide-react';
 
 // ── Persistence helpers ────────────────────────────────────────────────────────
 
@@ -26,10 +26,43 @@ function persistResources(resources: ProgramDriveResource[]): void {
   } catch {}
 }
 
+// ── Roadmap data ───────────────────────────────────────────────────────────────
+
+const ROADMAP = [
+  {
+    phase: 'Phase 1',
+    label: 'Metadata Management',
+    desc: 'Admin configures folder URLs, owners, permissions model, and descriptions. Displayed in Program Blueprint and Knowledge Brief.',
+    status: 'Complete',
+    cls: 'text-green-700 bg-green-50 border-green-200',
+  },
+  {
+    phase: 'Phase 2',
+    label: 'Salesforce Sync',
+    desc: 'Drive metadata synced to Program_Resource__c in Salesforce org. URL and status visible in SF Program record.',
+    status: 'Planned',
+    cls: 'text-amber-700 bg-amber-50 border-amber-200',
+  },
+  {
+    phase: 'Phase 3',
+    label: 'Google Drive API Integration',
+    desc: `Live folder browsing, file listing, and folder structure display in ${TERMS.platform}. ${TERMS.aiAssistant}-generated content auto-saves draft to Drive.`,
+    status: 'Future',
+    cls: 'text-slate-600 bg-slate-50 border-slate-200',
+  },
+  {
+    phase: 'Phase 4',
+    label: 'Permissions & Sync Automation',
+    desc: 'Automated permissions management — adding a learner to a cohort automatically grants Drive folder access. Bi-directional sync with Salesforce.',
+    status: 'Future',
+    cls: 'text-slate-600 bg-slate-50 border-slate-200',
+  },
+] as const;
+
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function ProgramResources() {
-  useAppContext();
+  const { setSelectedItem, selectedItem } = useAppContext();
   const [resources, setResources] = useState<ProgramDriveResource[]>(loadResources);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<Partial<ProgramDriveResource>>({});
@@ -50,6 +83,10 @@ export default function ProgramResources() {
     persistResources(updated);
     setEditingId(null);
     setEditDraft({});
+  }
+
+  function selectResource(resource: ProgramDriveResource) {
+    setSelectedItem({ type: 'programResource', id: resource.id, data: resource });
   }
 
   const activeCount     = resources.filter(r => r.status === 'active').length;
@@ -84,12 +121,12 @@ export default function ProgramResources() {
                 <p className="text-[12px] font-bold text-foreground">Salesforce</p>
               </div>
               <p className="text-[10px] text-muted-foreground">System of Record</p>
-              <p className="text-[9px] text-blue-700 font-medium border border-blue-200 bg-blue-50 rounded-full px-2 py-0.5 inline-block">Program__c will store Drive metadata</p>
+              <p className="text-[9px] text-blue-700 font-medium border border-blue-200 bg-blue-50 rounded-full px-2 py-0.5 inline-block">Program__c stores Drive metadata</p>
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center justify-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-primary" />
-                <p className="text-[12px] font-bold text-foreground">Trail OS</p>
+                <p className="text-[12px] font-bold text-foreground">{TERMS.platform}</p>
               </div>
               <p className="text-[10px] text-muted-foreground">Operating Layer</p>
               <p className="text-[9px] text-primary font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 inline-block">Displays + manages Drive metadata</p>
@@ -128,37 +165,69 @@ export default function ProgramResources() {
         {/* Program resource list */}
         <div className="space-y-3">
           {resources.map(resource => {
-            const statusCfg = DRIVE_STATUS_CONFIG[resource.status];
-            const isEditing = editingId === resource.id;
+            const statusCfg  = DRIVE_STATUS_CONFIG[resource.status];
+            const permCfg    = PERMISSIONS_CONFIG[resource.permissionsModel];
+            const isEditing  = editingId === resource.id;
+            const isSelected = selectedItem?.id === resource.id && selectedItem?.type === 'programResource';
 
             return (
-              <div key={resource.id} className={`rounded-xl border bg-background overflow-hidden transition-all ${isEditing ? 'border-primary/30 shadow-sm' : 'border-border'}`}>
-
-                {/* Resource header */}
-                <div className="flex items-center gap-3 px-4 py-3">
-                  <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
-                    <FolderOpen className="w-4 h-4 text-green-700" />
+              <div
+                key={resource.id}
+                className={`rounded-xl border bg-background overflow-hidden transition-all ${
+                  isEditing   ? 'border-primary/40 shadow-sm' :
+                  isSelected  ? 'border-primary/30 shadow-sm' :
+                                'border-border'
+                }`}
+              >
+                {/* Card header — clickable to open Knowledge Brief */}
+                <div
+                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-muted/20 transition-colors"
+                  onClick={() => !isEditing && selectResource(resource)}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    resource.status === 'active' ? 'bg-green-100' :
+                    resource.status === 'needs-setup' ? 'bg-amber-100' :
+                    'bg-muted/50'
+                  }`}>
+                    {resource.status === 'needs-setup'
+                      ? <AlertTriangle className="w-4 h-4 text-amber-600" />
+                      : <FolderOpen className={`w-4 h-4 ${resource.status === 'active' ? 'text-green-700' : 'text-muted-foreground'}`} />
+                    }
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[14px] font-bold text-foreground">{resource.programName}</p>
                       <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground">{resource.folderName || 'No folder configured'}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      {resource.folderName || 'No folder configured'}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {resource.folderUrl && (
-                      <a href={resource.folderUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-[10px] font-medium text-primary border border-primary/20 rounded-full px-2 py-1 hover:bg-primary/5">
+                      <a
+                        href={resource.folderUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="flex items-center gap-1 text-[10px] font-medium text-primary border border-primary/20 rounded-full px-2 py-1 hover:bg-primary/5 transition-colors"
+                      >
                         <ExternalLink className="w-3 h-3" /> Open
                       </a>
                     )}
                     <button
-                      onClick={() => isEditing ? cancelEdit() : startEdit(resource)}
-                      className={`flex items-center gap-1 text-[10px] font-medium border rounded-full px-2 py-1 transition-colors ${isEditing ? 'border-red-200 text-red-700 hover:bg-red-50' : 'border-border text-muted-foreground hover:border-secondary/40'}`}
+                      onClick={e => { e.stopPropagation(); isEditing ? cancelEdit() : startEdit(resource); }}
+                      className={`flex items-center gap-1 text-[10px] font-medium border rounded-full px-2 py-1 transition-colors ${
+                        isEditing
+                          ? 'border-red-200 text-red-700 hover:bg-red-50'
+                          : 'border-border text-muted-foreground hover:border-secondary/40'
+                      }`}
                     >
                       <Settings className="w-3 h-3" /> {isEditing ? 'Cancel' : 'Edit'}
                     </button>
+                    {!isEditing && (
+                      <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground/40 transition-transform ${isSelected ? 'text-primary rotate-90' : ''}`} />
+                    )}
                   </div>
                 </div>
 
@@ -260,32 +329,59 @@ export default function ProgramResources() {
                     </div>
 
                     <div className="flex items-center gap-2 pt-1">
-                      <button onClick={saveEdit}
-                        className="flex items-center gap-1.5 text-[12px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-4 py-1.5 hover:bg-primary/90 transition-colors">
+                      <button
+                        onClick={saveEdit}
+                        className="flex items-center gap-1.5 text-[12px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-4 py-1.5 hover:bg-primary/90 transition-colors"
+                      >
                         <CheckCircle2 className="w-3.5 h-3.5" /> Save Changes
                       </button>
-                      <button onClick={cancelEdit}
-                        className="text-[12px] font-medium text-muted-foreground border border-border rounded-full px-4 py-1.5 hover:bg-muted/20 transition-colors">
+                      <button
+                        onClick={cancelEdit}
+                        className="text-[12px] font-medium text-muted-foreground border border-border rounded-full px-4 py-1.5 hover:bg-muted/20 transition-colors"
+                      >
                         Cancel
                       </button>
-                      <p className="text-[10px] text-muted-foreground ml-2 italic">Changes persist across navigation · In production, saves to Salesforce Program_Resource__c.</p>
+                      <p className="text-[10px] text-muted-foreground/60 ml-2 italic">Persists locally · production will sync to Salesforce.</p>
                     </div>
                   </div>
                 )}
 
-                {/* Collapsed details */}
+                {/* Collapsed detail strip */}
                 {!isEditing && (
-                  <div className="border-t border-border/50 px-4 py-2 bg-muted/10">
+                  <div
+                    className="border-t border-border/50 px-4 py-2.5 bg-muted/10 cursor-pointer hover:bg-muted/20 transition-colors"
+                    onClick={() => selectResource(resource)}
+                  >
+                    {/* Description */}
+                    {resource.description && (
+                      <p className="text-[11px] text-muted-foreground leading-snug mb-2 line-clamp-2">{resource.description}</p>
+                    )}
+
+                    {/* Meta row */}
                     <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
                       <span>Owner: <strong className="text-foreground">{resource.owner}</strong></span>
-                      <span>Permissions: <strong className="text-foreground">{PERMISSIONS_CONFIG[resource.permissionsModel].label}</strong></span>
+                      <span>Permissions: <strong className="text-foreground">{permCfg.label}</strong></span>
                       <span>Sync: <strong className="text-foreground capitalize">{resource.syncStatus.replace(/-/g, ' ')}</strong></span>
                       <span>Updated: <strong className="text-foreground">{resource.lastUpdated}</strong></span>
-                      {resource.subFolders.length > 0 && <span><strong className="text-foreground">{resource.subFolders.length}</strong> sub-folders</span>}
-                      {resource.contentTypes.length > 0 && <span><strong className="text-foreground">{resource.contentTypes.length}</strong> content types</span>}
+                      {resource.subFolders.length > 0 && (
+                        <span><strong className="text-foreground">{resource.subFolders.length}</strong> sub-folders</span>
+                      )}
                     </div>
+
+                    {/* Content type pills */}
+                    {resource.contentTypes.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {resource.contentTypes.map(ct => (
+                          <span key={ct} className="text-[9px] font-medium text-muted-foreground border border-border/60 bg-background rounded-full px-1.5 py-0.5">
+                            {ct}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Notes */}
                     {resource.notes && (
-                      <p className="text-[10px] text-amber-700 mt-1 italic">{resource.notes}</p>
+                      <p className="text-[10px] text-muted-foreground/70 mt-1.5 italic">{resource.notes}</p>
                     )}
                   </div>
                 )}
@@ -298,17 +394,15 @@ export default function ProgramResources() {
         <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
           <p className="text-[12px] font-bold text-foreground">Google Drive Integration Roadmap</p>
           <div className="space-y-2">
-            {[
-              { phase: 'Phase 1 — Complete', label: 'Metadata Management', desc: 'Admin configures folder URLs, owners, permissions model, and descriptions. Displayed in Program Blueprint and Knowledge Brief.', status: 'Complete', cls: 'text-green-700 bg-green-50 border-green-200' },
-              { phase: 'Phase 2 — Planned', label: 'Salesforce Sync', desc: 'Drive metadata synced to Program_Resource__c in Salesforce org. URL and status visible in SF Program record.', status: 'Planned', cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-              { phase: 'Phase 3 — Future', label: 'Google Drive API Integration', desc: `Live folder browsing, file listing, and folder structure display in Trail OS. ${TERMS.aiAssistant}-generated content auto-saves draft to Drive.`, status: 'Future', cls: 'text-slate-600 bg-slate-50 border-slate-200' },
-              { phase: 'Phase 4 — Future', label: 'Permissions & Sync Automation', desc: 'Automated permissions management (add learner to cohort = add to Drive folder). Bi-directional sync with Salesforce.', status: 'Future', cls: 'text-slate-600 bg-slate-50 border-slate-200' },
-            ].map(item => (
+            {ROADMAP.map(item => (
               <div key={item.phase} className="flex items-start gap-3">
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 whitespace-nowrap shrink-0 mt-0.5 ${item.cls}`}>{item.status}</span>
-                <div>
-                  <p className="text-[11px] font-bold text-foreground">{item.phase} — {item.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+                <div className="shrink-0 mt-0.5 text-right w-16">
+                  <p className="text-[9px] font-bold text-muted-foreground/60 uppercase">{item.phase}</p>
+                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 inline-block mt-0.5 ${item.cls}`}>{item.status}</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-[11px] font-bold text-foreground">{item.label}</p>
+                  <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">{item.desc}</p>
                 </div>
               </div>
             ))}
