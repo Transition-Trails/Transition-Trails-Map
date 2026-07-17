@@ -523,6 +523,7 @@ export default function ProgramConfiguration() {
   const [pennyMessages, setPennyMessages] = useState<PennyMessage[]>([]);
   const [pennyLoading, setPennyLoading]   = useState(false);
   const [pennyActive, setPennyActive]     = useState(false);
+  const pendingPennyPrompt                = useRef<string | null>(null);
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [progForm, setProgForm] = useState({
@@ -745,19 +746,15 @@ export default function ProgramConfiguration() {
     setSelectedProgram(p);
     setEditingProgram(false);
     setProgramDetail(null);
+    setPennyMessages([]);
+    setPennyActive(false);
+    pendingPennyPrompt.current = null;
     setCourseForm(prev => ({ ...prev, Program__c: p.Name }));
-
-    // Seed Penny chat with a loading hint while we fetch
-    setPennyMessages([{
-      role: 'penny',
-      content: `Loading "${p.Name}" details from Salesforce — I'll share recommendations once I have the full picture…`,
-      time: ts(),
-    }]);
 
     const detail = await fetchProgramDetail(p.Id);
     if (!detail) return;
 
-    // Strip HTML tags for a clean text prompt
+    // Build prompt and store for when user clicks "Focus with Penny"
     const stripHtml = (v: unknown) =>
       v ? String(v).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
 
@@ -770,20 +767,19 @@ export default function ProgramConfiguration() {
 
     const lines: string[] = [
       `Program: ${String(detail['Name'] ?? p.Name)}`,
-      sf('pmdm__Status__c')         && `Status: ${sf('pmdm__Status__c')}`,
-      sf('pmdm__TargetPopulation__c') && `Target Population: ${sf('pmdm__TargetPopulation__c')}`,
-      sf('pmdm__ShortSummary__c')   && `Summary: ${sf('pmdm__ShortSummary__c')}`,
-      sf('pmdm__Description__c')    && `Description: ${sf('pmdm__Description__c')}`,
-      sf('Problem_Statement__c')    && `Problem Statement: ${sf('Problem_Statement__c')}`,
-      sf('Program_Goals__c')        && `Program Goals: ${sf('Program_Goals__c')}`,
+      sf('pmdm__Status__c')              && `Status: ${sf('pmdm__Status__c')}`,
+      sf('pmdm__TargetPopulation__c')    && `Target Population: ${sf('pmdm__TargetPopulation__c')}`,
+      sf('pmdm__ShortSummary__c')        && `Summary: ${sf('pmdm__ShortSummary__c')}`,
+      sf('pmdm__Description__c')         && `Description: ${sf('pmdm__Description__c')}`,
+      sf('Problem_Statement__c')         && `Problem Statement: ${sf('Problem_Statement__c')}`,
+      sf('Program_Goals__c')             && `Program Goals: ${sf('Program_Goals__c')}`,
       sf('Program_Expected_Outcomes__c') && `Expected Outcomes: ${sf('Program_Expected_Outcomes__c')}`,
       sf('Program_Target_Audience__c')   && `Target Audience: ${sf('Program_Target_Audience__c')}`,
-      sf('Program_Structure__c')    && `Program Structure: ${sf('Program_Structure__c')}`,
+      sf('Program_Structure__c')         && `Program Structure: ${sf('Program_Structure__c')}`,
     ].filter(Boolean) as string[];
 
-    void askPenny(
-      `Based on the following program details, give me 3–4 specific, actionable recommendations to better serve the target audience and strengthen program outcomes. Focus on curriculum design, learner engagement, and measurable impact.\n\n${lines.join('\n')}`
-    );
+    pendingPennyPrompt.current =
+      `Based on the following program details, give me 3–4 specific, actionable recommendations to better serve the target audience and strengthen program outcomes. Focus on curriculum design, learner engagement, and measurable impact.\n\n${lines.join('\n')}`;
   }
 
   function goToStep(target: WizardStep) {
@@ -1759,7 +1755,13 @@ export default function ProgramConfiguration() {
             onInvokeAgentforce={step === 'review' ? () => void handleInvokeAgentforce() : undefined}
             agentforceLoading={agentforceLoading}
             active={pennyActive}
-            onActivate={() => setPennyActive(true)}
+            onActivate={() => {
+              setPennyActive(true);
+              if (pendingPennyPrompt.current && pennyMessages.length === 0) {
+                void askPenny(pendingPennyPrompt.current);
+                pendingPennyPrompt.current = null;
+              }
+            }}
           />
         </div>
       </div>
