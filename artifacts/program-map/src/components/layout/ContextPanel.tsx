@@ -2191,6 +2191,19 @@ export function ContextPanel() {
       // Three possible variants: TrendInsight (has .title), DomainHealth (has .score), HealthIndicator (has .label)
       const isTrend  = data.title !== undefined && data.urgency !== undefined;
       const isDomain = !isTrend && data.score !== undefined;
+
+      // Source system → in-app route for direct navigation from the Knowledge Brief.
+      const SOURCE_SYSTEM_ROUTES: Record<string, string> = {
+        'Knowledge Source Registry':       '/knowledge/sources',
+        'Penny Capability Registry':       '/penny/capabilities',
+        'Penny Prompt Studio':             '/penny/prompts',
+        'Curriculum Studio':               '/knowledge/library',
+        'Standards Studio':               '/knowledge/sources',
+        'People & Roles Studio':           '/admin/people-access',
+        'Communications & Collaboration':  '/collaboration',
+        'Integration Readiness Center':    '/admin/integrations',
+        'Salesforce Architecture Mapping': '/admin/integrations',
+      };
       // --- Trend Insight ---
       if (isTrend) {
         const tc = TREND_TYPE_CONFIG[data.type as TrendType] ?? { label: data.type, cls: 'text-muted-foreground bg-muted border-border' };
@@ -2244,6 +2257,7 @@ export function ContextPanel() {
         const firstBad = (data.indicators as { id: string; label: string; status: HealthLevel; detail: string }[])
           ?.find(i => i.status === 'at-risk' || i.status === 'needs-work');
         const q = `Domain Health: "${data.domain}" — score ${data.score}/100\nLevel: ${lc.label}\n${data.summary}${firstBad ? `\n\nTop next action: ${firstBad.label} — ${firstBad.detail}` : ''}\n\nWhat are the highest-priority actions to improve this domain's health for Transition Trails? Start with the most critical indicator.`;
+        const domainRoute = SOURCE_SYSTEM_ROUTES[String(data.sourceSystem ?? '').split(',')[0]?.trim()] ?? null;
         return (
           <ScrollArea className="h-full">
             <div className="p-5 space-y-4">
@@ -2287,6 +2301,24 @@ export function ContextPanel() {
                 </div>
               )}
 
+              {domainRoute && (
+                <button
+                  onClick={() => setLocation(domainRoute)}
+                  className="w-full flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+                >
+                  <div className="text-left">
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Source system</p>
+                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors">
+                      {String(data.sourceSystem ?? '').split(',')[0]?.trim()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0">
+                    <span className="text-[9px] font-semibold">Open</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </div>
+                </button>
+              )}
+
               <button
                 onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
                 className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
@@ -2301,6 +2333,7 @@ export function ContextPanel() {
       // --- Individual Health Indicator ---
       const ic = HEALTH_LEVEL_CONFIG[data.status as HealthLevel] ?? HEALTH_LEVEL_CONFIG['needs-work'];
       const q = `Health Indicator: "${data.label}" (${data.domain})\nStatus: ${ic.label}\nSource: ${data.sourceSystem}\n\nNext action: ${data.detail}\n\nWhat specific steps should the Transition Trails team take right now to address this indicator? What blockers might they face and how should they prioritise this against other work?`;
+      const indRoute = SOURCE_SYSTEM_ROUTES[data.sourceSystem as string] ?? null;
       return (
         <ScrollArea className="h-full">
           <div className="p-5 space-y-4">
@@ -2320,12 +2353,29 @@ export function ContextPanel() {
               </div>
             )}
 
-            <div className="rounded-lg border bg-muted/20 p-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground">Source system</span>
-                <span className="text-[10px] font-semibold text-foreground">{data.sourceSystem}</span>
+            {/* Source system — clickable navigation if a route exists */}
+            {indRoute ? (
+              <button
+                onClick={() => setLocation(indRoute)}
+                className="w-full flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+              >
+                <div className="text-left">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Source system</p>
+                  <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors">{data.sourceSystem}</p>
+                </div>
+                <div className="flex items-center gap-1 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0">
+                  <span className="text-[9px] font-semibold">Open</span>
+                  <ArrowRight className="w-3 h-3" />
+                </div>
+              </button>
+            ) : (
+              <div className="rounded-lg border bg-muted/20 p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground">Source system</span>
+                  <span className="text-[10px] font-semibold text-foreground">{data.sourceSystem}</span>
+                </div>
               </div>
-            </div>
+            )}
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
