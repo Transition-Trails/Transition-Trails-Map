@@ -187,6 +187,11 @@ const INPUT_CLS = "w-full text-[13px] border border-border rounded-lg px-3 py-1.
 const SELECT_CLS = "w-full text-[13px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30";
 const TEXTAREA_CLS = "w-full text-[13px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50 resize-none";
 
+function sfStr(v: unknown): string | null {
+  if (v == null || v === '') return null;
+  return String(v);
+}
+
 // ── Program card ──────────────────────────────────────────────────────────────
 
 function ProgramCard({
@@ -272,103 +277,150 @@ const STEP_BRIEF: Record<WizardStep, { title: string; bullets: string[] }> = {
 };
 
 function PennyGuidancePanel({
-  step, program, onFocusWithPenny,
+  step, program, programDetail, onFocusWithPenny,
   onInvokeAgentforce, agentforceLoading,
 }: {
   step: WizardStep;
   program: SfProgram | null;
+  programDetail: Record<string, unknown> | null;
   onFocusWithPenny: () => void;
   onInvokeAgentforce?: () => void;
   agentforceLoading: boolean;
 }) {
   const brief = STEP_BRIEF[step];
+  const hasProgram = !!program;
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-card border-l border-border">
-      {/* Header */}
-      <div className="flex-shrink-0 px-4 pt-4 pb-3 border-b border-border">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
-          Knowledge Brief
-        </p>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-            <Sparkles className="w-3 h-3 text-primary" />
-          </div>
-          <p className="text-[13px] font-semibold text-foreground">{brief.title}</p>
-        </div>
+      {/* Mode accent line */}
+      <div className="h-[3px] w-full bg-border/60 flex-shrink-0" />
+
+      {/* Header — matches ContextPanel Trail Insights header */}
+      <div className="flex-shrink-0 px-3 py-2.5 border-b border-border flex items-center gap-2">
+        <Layers className="w-4 h-4 text-primary shrink-0" />
+        <h3 className="font-semibold text-sm truncate flex-1">{TERMS.knowledgeBrief}</h3>
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-auto px-4 py-4 space-y-4">
-        {/* Focus with Penny — top of panel */}
-        <div>
-          <button
-            onClick={onFocusWithPenny}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Focus with {TERMS.aiAssistant}
-          </button>
-          <p className="text-[9px] text-muted-foreground/40 text-center mt-1.5">
-            {TERMS.aiAssistant} · Gemini 2.5 Flash · Live
-          </p>
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-4">
+          {hasProgram ? (
+            <>
+              {/* Program identity — badges → title → summary */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border border-border bg-background uppercase tracking-wider">
+                    Program
+                  </span>
+                  {program.pmdm__Status__c && <StatusBadge status={program.pmdm__Status__c} />}
+                </div>
+                <h2 className="text-[15px] font-semibold text-foreground leading-snug">{program.Name}</h2>
+                {program.pmdm__ShortSummary__c && (
+                  <p className="text-xs text-muted-foreground italic leading-snug">{program.pmdm__ShortSummary__c}</p>
+                )}
+              </div>
+
+              {/* Focus with Penny — subtle outline, right after title */}
+              <button
+                onClick={onFocusWithPenny}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Focus with {TERMS.aiAssistant}
+              </button>
+
+              {/* Labeled data sections from programDetail */}
+              {(() => {
+                const fields = programDetail ? [
+                  { label: 'Manager',           val: sfStr(programDetail['Program_Manager_Name']) ?? sfStr(programDetail['Program_Manager__c']) },
+                  { label: 'Start Date',        val: sfStr(programDetail['pmdm__StartDate__c']) ?? sfStr(program.pmdm__StartDate__c) },
+                  { label: 'End Date',          val: sfStr(programDetail['pmdm__EndDate__c']) ?? sfStr(program.pmdm__EndDate__c) },
+                  { label: 'Target Population', val: sfStr(programDetail['pmdm__TargetPopulation__c']) },
+                  { label: 'Requires Payment',  val: sfStr(programDetail['Requires_Payment__c']) },
+                ].filter(f => f.val) : [
+                  { label: 'Start Date', val: sfStr(program.pmdm__StartDate__c) },
+                  { label: 'End Date',   val: sfStr(program.pmdm__EndDate__c) },
+                ].filter(f => f.val);
+
+                if (!fields.length) return null;
+                return (
+                  <div className="space-y-3">
+                    {fields.map(f => (
+                      <div key={f.label}>
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{f.label}</p>
+                        <p className="text-[12px] text-foreground leading-snug">{f.val}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {/* Divider before step guidance */}
+              <div className="border-t border-border/60" />
+
+              {/* Step guidance — compact, secondary */}
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">In this step</p>
+                <ul className="space-y-1.5">
+                  {brief.bullets.map(b => (
+                    <li key={b} className="flex items-start gap-2">
+                      <span className="w-1 h-1 rounded-full bg-primary/40 mt-1.5 flex-shrink-0" />
+                      <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Agentforce — review step only */}
+              {step === 'review' && onInvokeAgentforce && (
+                <div>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Agentforce</p>
+                  <button
+                    onClick={onInvokeAgentforce}
+                    disabled={agentforceLoading}
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-violet-50 hover:bg-violet-100 border border-violet-200 text-violet-700 text-[12px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {agentforceLoading
+                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      : <Zap className="w-3.5 h-3.5" />}
+                    Invoke Agentforce
+                  </button>
+                  <p className="text-[10px] text-muted-foreground/50 mt-1.5 leading-snug">
+                    Orchestrate complex setup tasks across the full configuration.
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {/* No program selected — show step guidance prominently */}
+              <div className="rounded-lg bg-muted/40 border border-border/60 p-3">
+                <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">In this step</p>
+                <ul className="space-y-1.5">
+                  {brief.bullets.map(b => (
+                    <li key={b} className="flex items-start gap-2">
+                      <span className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                      <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button
+                onClick={onFocusWithPenny}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Focus with {TERMS.aiAssistant}
+              </button>
+            </>
+          )}
         </div>
-
-        {/* Step context */}
-        <div className="rounded-lg bg-muted/40 border border-border/60 p-3">
-          <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
-        </div>
-
-        {/* What's covered */}
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
-            In this step
-          </p>
-          <ul className="space-y-1.5">
-            {brief.bullets.map(b => (
-              <li key={b} className="flex items-start gap-2">
-                <span className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Current program */}
-        {program && (
-          <div className="rounded-lg border border-border/60 bg-card p-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
-              Current Program
-            </p>
-            <p className="text-[12px] font-semibold text-foreground mb-1.5">{program.Name}</p>
-            {program.pmdm__Status__c && <StatusBadge status={program.pmdm__Status__c} />}
-          </div>
-        )}
-
-        {/* Agentforce quick action — review step only */}
-        {step === 'review' && onInvokeAgentforce && (
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
-              Agentforce
-            </p>
-            <button
-              onClick={onInvokeAgentforce}
-              disabled={!program || agentforceLoading}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-violet-50 hover:bg-violet-100 border border-violet-200 text-violet-700 text-[12px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {agentforceLoading
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                : <Zap className="w-3.5 h-3.5" />
-              }
-              Invoke Agentforce
-            </button>
-            <p className="text-[10px] text-muted-foreground/50 mt-1.5 leading-snug">
-              Orchestrate complex setup tasks across the full configuration.
-            </p>
-          </div>
-        )}
-      </div>
-
+      </ScrollArea>
     </div>
   );
 }
@@ -1624,6 +1676,7 @@ export default function ProgramConfiguration() {
           <PennyGuidancePanel
             step={step}
             program={selectedProgram}
+            programDetail={programDetail}
             onFocusWithPenny={() => {
               setPendingPennyQuery(
                 pendingPennyPrompt.current ??

@@ -459,7 +459,7 @@ export function ContextPanel() {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Program</Badge>
+                <Badge variant="outline" className="bg-background uppercase tracking-wider text-[10px]">Program</Badge>
                 <ConfidenceBadge status={data.confidence || 'needs-review'} />
                 {opStatus && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
