@@ -157,10 +157,10 @@ export default function ProgramOverview() {
 
         {/* ── Summary bar ─────────────────────────────────────────────────── */}
         <div className="flex flex-wrap gap-2">
-          <StatPill value={programs.length}  label="Total Programs" color="text-foreground"    onClick={() => setLocation('/program/programs')} />
-          <StatPill value={stats.confirmed}  label="Confirmed"      color="text-emerald-600"   onClick={() => setLocation('/program/programs')} />
-          <StatPill value={stats.needsReview} label="Needs Review"  color="text-amber-600"     onClick={() => setLocation('/program/programs')} />
-          <StatPill value={stats.draft}      label="Draft"          color="text-slate-500"     onClick={() => setLocation('/program/programs')} />
+          <StatPill value={programs.length}  label="Total Programs" color="text-foreground"    onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.confirmed}  label="Confirmed"      color="text-emerald-600"   onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.needsReview} label="Needs Review"  color="text-amber-600"     onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.draft}      label="Draft"          color="text-slate-500"     onClick={() => setLocation('/program/config')} />
           <StatPill value={stats.pennyActive} label={`${TERMS.aiAssistant} Active`}  color="text-primary"       onClick={() => setLocation('/penny/capabilities')} />
         </div>
 
@@ -192,10 +192,10 @@ export default function ProgramOverview() {
               })}
             </div>
             <button
-              onClick={() => setLocation('/program/programs')}
+              onClick={() => setLocation('/program/config')}
               className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
             >
-              Open Program workspace <ChevronRight className="w-3 h-3" />
+              Configure programs <ChevronRight className="w-3 h-3" />
             </button>
           </div>
 
@@ -220,7 +220,7 @@ export default function ProgramOverview() {
                   iconCls: 'text-amber-500',
                   barCls: 'bg-amber-400',
                   note: `${stats.needsReview} program${stats.needsReview !== 1 ? 's' : ''} — sprint structure migration may be pending`,
-                  path: '/program/programs',
+                  path: '/program/config',
                 },
                 {
                   label: 'Draft / In Progress',
@@ -229,7 +229,7 @@ export default function ProgramOverview() {
                   iconCls: 'text-slate-400',
                   barCls: 'bg-slate-300',
                   note: `${stats.draft} program${stats.draft !== 1 ? 's' : ''} not yet governed by blueprint`,
-                  path: '/program/programs',
+                  path: '/program/config',
                 },
               ].map(row => (
                 <button
@@ -347,8 +347,8 @@ export default function ProgramOverview() {
             <NavCard
               icon={LayoutGrid}
               title="Programs"
-              desc={`Explore and manage individual programs, curriculum, ${TERMS.aiAssistant} features, and system health.`}
-              path="/program/programs"
+              desc={`Configure and manage individual programs, cohorts, courses, and modules in Salesforce.`}
+              path="/program/config"
               badge={stats.needsReview > 0 ? `${stats.needsReview} need review` : undefined}
               badgeColor="bg-amber-50 text-amber-700 border-amber-200"
             />

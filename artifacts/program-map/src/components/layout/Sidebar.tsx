@@ -42,7 +42,6 @@ const navGroups: NavGroup[] = [
     excludePrefixes: ['/program/blueprint'],
     items: [
       { id: 'prog-overview',   path: '/program',            label: 'Overview',         minTier: 'admin' },
-      { id: 'prog-programs',   path: '/program/programs',   label: 'Programs',         minTier: 'admin' },
       { id: 'prog-standards',  path: '/program/standards',  label: 'Standards Studio', minTier: 'power' },
     ],
   },
