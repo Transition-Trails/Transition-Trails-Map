@@ -79,7 +79,7 @@ function OverviewTab({ p }: { p: Program }) {
             View in Salesforce
           </a>
         )}
-        <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+        <div className="rounded-lg border border-border bg-background divide-y divide-border/40">
           <InfoRow label="Audience"      value={<RichText html={p.audience} />} />
           <InfoRow label="Format"        value={p.format || '—'} />
           <InfoRow label="Duration"      value={p.duration || '—'} />
@@ -221,7 +221,7 @@ function CurriculumTab({ programName }: { programName: string }) {
       <div className="p-5 space-y-5 max-w-3xl">
 
         {/* Course header */}
-        <div className="rounded-lg border border-border bg-white px-4 py-3 space-y-1">
+        <div className="rounded-lg border border-border bg-background px-4 py-3 space-y-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase text-muted-foreground/50 tracking-wide mb-0.5">Course</p>
@@ -286,7 +286,7 @@ function CurriculumTab({ programName }: { programName: string }) {
               {modules.map((m) => {
                 const pct = m.PercentCompleted__c ?? 0;
                 return (
-                  <div key={m.Id} className="rounded-lg border border-border bg-white px-3 py-2.5 space-y-1.5">
+                  <div key={m.Id} className="rounded-lg border border-border bg-background px-3 py-2.5 space-y-1.5">
                     <div className="flex items-start gap-2">
                       <ModuleStatusDot status={m.Status__c} />
                       <span className="text-[12px] text-foreground font-medium flex-1 leading-snug">{m.Name}</span>
@@ -328,7 +328,7 @@ function PennyTab({ p }: { p: Program }) {
           {p.pennyFeatures?.length > 0 ? (
             <div className="space-y-2">
               {p.pennyFeatures.map(f => (
-                <div key={f} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
+                <div key={f} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                   <span className="text-[12px] text-foreground font-medium">{f}</span>
                   <span className="ml-auto text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5">Active</span>
@@ -367,8 +367,8 @@ function SystemsTab({ p }: { p: Program }) {
     { name:'Slack',          status:'Active',    detail:'Cohort and coach channels', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:`${TERMS.aiAssistant}`,  status:'Active',    detail:(p.pennyFeatures ?? []).join(', ') || 'No features activated', cls:'border-primary/20 bg-primary/5', badge:'bg-primary/10 text-primary border-primary/20' },
     { name:'Google Calendar',status:'Active',    detail:'Sprint schedule and cohort events', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { name:'PMM (Salesforce)',status:'Planned',  detail:'Marketing Cloud integration planned for Q3 2025', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
-    { name:'LMS',            status:'Planned',   detail:'Learner progress and content delivery — Q4 2025', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
+    { name:'PMM (Salesforce)',status:'Planned',  detail:'Marketing Cloud integration — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
+    { name:'LMS',            status:'Planned',   detail:'Learner progress and content delivery — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
   ];
   return (
     <ScrollArea className="h-full">
@@ -391,7 +391,7 @@ function HealthTab({ p }: { p: Program }) {
   const isHealthy = p.confidence === 'confirmed';
   const indicators = [
     { label:'Blueprint Compliance',   status: p.confidence === 'confirmed' ? 'healthy' : 'needs-attention', note: p.confidence === 'confirmed' ? 'Fully compliant with Program Blueprint v2' : 'Review required' },
-    { label:'Salesforce Data Quality',status:'healthy',         note:'94% field completion across program records' },
+    { label:'Salesforce Data Quality',status:'healthy',         note:'Program records synced and up to date' },
     { label:`${TERMS.aiAssistant} Integration`,      status: (p.pennyFeatures?.length ?? 0) > 0 ? 'healthy' : 'needs-attention', note: (p.pennyFeatures?.length ?? 0) > 0 ? `${p.pennyFeatures.length} features active` : `No ${TERMS.aiAssistant} features activated` },
     { label:'Knowledge Sources',      status:'healthy',         note:'Knowledge registry linkage confirmed' },
     { label:'Coach Assignment',       status:'healthy',         note:'All active cohorts have assigned coaches' },
@@ -467,7 +467,7 @@ export default function ProgramWorkspace() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-[11px] font-semibold text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-[11px] font-semibold text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-3 h-3 ${isFetching ? 'animate-spin' : ''}`} />
           Retry

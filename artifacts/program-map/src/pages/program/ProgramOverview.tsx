@@ -19,7 +19,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function StatPill({
   value, label, color, onClick,
 }: { value: number | string; label: string; color: string; onClick?: () => void }) {
-  const base = 'flex flex-col items-center px-4 py-2.5 rounded-lg border border-border bg-white min-w-[72px]';
+  const base = 'flex flex-col items-center px-4 py-2.5 rounded-lg border border-border bg-background min-w-[72px]';
   if (onClick) {
     return (
       <button onClick={onClick} className={`${base} hover:border-primary/40 hover:bg-primary/[0.02] transition-colors`}>
@@ -46,7 +46,7 @@ function NavCard({
   return (
     <button
       onClick={() => setLocation(path)}
-      className="group w-full text-left rounded-lg border border-border bg-white p-4 hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+      className="group w-full text-left rounded-lg border border-border bg-background p-4 hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2.5">
@@ -127,7 +127,7 @@ export default function ProgramOverview() {
                   <button
                     key={p.id}
                     onClick={() => openProgram(p)}
-                    className="group w-full text-left rounded-lg border border-border bg-white p-3.5 hover:border-primary/40 transition-colors"
+                    className="group w-full text-left rounded-lg border border-border bg-background p-3.5 hover:border-primary/40 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
