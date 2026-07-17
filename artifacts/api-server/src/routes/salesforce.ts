@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getEffectiveSfToken, makeSfDirectFetch } from "../lib/salesforceOAuth.js";
+import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
 
 const router = Router();
 
@@ -79,14 +79,12 @@ router.get("/salesforce/validate", async (req, res) => {
   const checks: Check[] = [];
 
   // ── 1. Token resolution ────────────────────────────────────────────────────
-  const sfCreds = getEffectiveSfToken(req);
-  let proxyFetch: (url: string, init?: RequestInit) => Promise<Response>;
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     checks.push({ id: "proxy-init", category: "Connection", label: "Salesforce credentials available", status: "fail", detail: "No Salesforce token found. Connect your account at /api/sf/login." });
     return res.status(401).json({ checks, orgInfo: null, objects: [], npspDetected: false, identity: null, durationMs: Date.now() - start, timestamp: new Date().toISOString() });
   }
-  proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
-  checks.push({ id: "proxy-init", category: "Connection", label: "Salesforce credentials available", status: "pass", detail: "Bearer token resolved (session or cached)." });
+  checks.push({ id: "proxy-init", category: "Connection", label: "Salesforce credentials available", status: "pass", detail: "Bearer token resolved (session, env, or connector)." });
 
   // ── 2. Identity check ──────────────────────────────────────────────────────
   let identity: Record<string, unknown> | null = null;
@@ -241,8 +239,8 @@ router.get("/salesforce/validate", async (req, res) => {
 // Shares the same 5-minute in-memory cache as other ops endpoints.
 
 router.get("/salesforce/org-url", async (req, res) => {
-  const sfCreds = getEffectiveSfToken(req);
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login.", orgBaseUrl: "" });
   }
   const cacheNs = req.session.sfUserId ?? "system";
@@ -251,7 +249,6 @@ router.get("/salesforce/org-url", async (req, res) => {
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true });
   }
-  const proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
   const orgBaseUrl = await getOrgBaseUrl(proxyFetch);
   const data = { orgBaseUrl };
   opsCache.set(CACHE_KEY, { data, ts: Date.now() });
@@ -262,8 +259,8 @@ router.get("/salesforce/org-url", async (req, res) => {
 // Live SOQL counts for Operations hub panels. 5-minute in-memory cache.
 
 router.get("/salesforce/operations/summary", async (req, res) => {
-  const sfCreds = getEffectiveSfToken(req);
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
   const cacheNs = req.session.sfUserId ?? "system";
@@ -272,8 +269,6 @@ router.get("/salesforce/operations/summary", async (req, res) => {
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
-
-  const proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
 
   // Run all SOQL counts in parallel — each wrapped so one failure doesn't abort others
   const safe = async (soql: string): Promise<number | null> => {
@@ -318,8 +313,8 @@ router.get("/salesforce/operations/summary", async (req, res) => {
 // Live open Cases from Salesforce for the Operations Demand tab. 5-min cache.
 
 router.get("/salesforce/operations/cases", async (req, res) => {
-  const sfCreds = getEffectiveSfToken(req);
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
   const cacheNs = req.session.sfUserId ?? "system";
@@ -328,8 +323,6 @@ router.get("/salesforce/operations/cases", async (req, res) => {
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
-
-  const proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
 
   const safeCount = async (soql: string): Promise<number | null> => {
     try { return (await sfQuery(proxyFetch, soql)).totalSize; }
@@ -367,8 +360,8 @@ router.get("/salesforce/operations/cases", async (req, res) => {
 // Live PMM program records for the Operations hub. 5-min cache.
 
 router.get("/salesforce/operations/programs", async (req, res) => {
-  const sfCreds = getEffectiveSfToken(req);
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
   const cacheNs = req.session.sfUserId ?? "system";
@@ -377,8 +370,6 @@ router.get("/salesforce/operations/programs", async (req, res) => {
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
-
-  const proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
 
   const safeCount = async (soql: string): Promise<number | null> => {
     try { return (await sfQuery(proxyFetch, soql)).totalSize; }
@@ -416,8 +407,8 @@ router.get("/salesforce/operations/programs", async (req, res) => {
 // Full pmdm__Program__c record list for the Programs workspace. 5-min cache.
 
 router.get("/salesforce/programs/list", async (req, res) => {
-  const sfCreds = getEffectiveSfToken(req);
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
   const cacheNs = req.session.sfUserId ?? "system";
@@ -426,8 +417,6 @@ router.get("/salesforce/programs/list", async (req, res) => {
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
-
-  const proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
 
   const safeCount   = async (soql: string): Promise<number | null> => {
     try { return (await sfQuery(proxyFetch, soql)).totalSize; } catch { return null; }
@@ -466,8 +455,8 @@ router.get("/salesforce/programs/list", async (req, res) => {
 // Pattern: strip articles, split words, join with LIKE wildcards. 5-min cache.
 
 router.get("/salesforce/curriculum/by-program/:programName", async (req, res) => {
-  const sfCreds = getEffectiveSfToken(req);
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
   const raw = decodeURIComponent(req.params.programName);
@@ -477,8 +466,6 @@ router.get("/salesforce/curriculum/by-program/:programName", async (req, res) =>
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true });
   }
-
-  const proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
 
   // Build SOQL LIKE pattern from program name.
   // "The Foundations Trail" → strip "The ", split, filter short words → "%Foundations%Trail%"
@@ -514,8 +501,8 @@ router.get("/salesforce/curriculum/course/:courseId", async (req, res) => {
     return res.status(400).json({ error: "Invalid Salesforce ID" });
   }
 
-  const sfCreds = getEffectiveSfToken(req);
-  if (!sfCreds) {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
   const cacheNs = req.session.sfUserId ?? "system";
@@ -524,8 +511,6 @@ router.get("/salesforce/curriculum/course/:courseId", async (req, res) => {
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true });
   }
-
-  const proxyFetch = makeSfDirectFetch(sfCreds.accessToken, sfCreds.instanceUrl);
 
   try {
     const [courseResult, modulesResult] = await Promise.all([

@@ -4,6 +4,9 @@ import request from 'supertest';
 // Mock with a real class so `new ReplitConnectors()` works correctly in ESM
 vi.mock('@replit/connectors-sdk', () => {
   class ReplitConnectors {
+    getProxyUrl() {
+      return 'https://mock-sf-proxy.replit.test';
+    }
     createProxyFetch(_connectionId: string) {
       return async function mockProxyFetch(
         _url: string,

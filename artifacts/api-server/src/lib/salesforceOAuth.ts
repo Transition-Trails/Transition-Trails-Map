@@ -1,5 +1,6 @@
 import { randomBytes, createHash } from "crypto";
 import type { Request } from "express";
+import { ReplitConnectors } from "@replit/connectors-sdk";
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 
@@ -201,6 +202,47 @@ export function getEffectiveSfToken(req: Request): SfCredentials | null {
   }
 
   return null;
+}
+
+/**
+ * Returns a ready-to-use Salesforce fetch function for this request.
+ *
+ * Priority:
+ *  1. req.session.sfAccessToken + sfInstanceUrl — per-user token from the OAuth flow.
+ *  2. SALESFORCE_ACCESS_TOKEN + SALESFORCE_INSTANCE_URL env vars — explicit shared
+ *     service-account fallback.
+ *  3. Replit Connector proxy ("salesforce") — managed auth, always available when the
+ *     Salesforce integration is connected in the Replit environment.
+ *
+ * Returns null only when all three options are unavailable.
+ */
+export function getEffectiveSfFetch(
+  req: Request
+): ((url: string, init?: RequestInit) => Promise<Response>) | null {
+  // 1. Per-user session token
+  if (req.session.sfAccessToken && req.session.sfInstanceUrl) {
+    return makeSfDirectFetch(req.session.sfAccessToken, req.session.sfInstanceUrl);
+  }
+
+  // 2. Explicit env-var service account
+  const accessToken = process.env["SALESFORCE_ACCESS_TOKEN"];
+  const instanceUrl = process.env["SALESFORCE_INSTANCE_URL"];
+  if (accessToken && instanceUrl) {
+    return makeSfDirectFetch(accessToken, instanceUrl);
+  }
+
+  // 3. Replit Connector proxy — handles token refresh automatically
+  try {
+    const connectors = new ReplitConnectors();
+    const proxyFetch = connectors.createProxyFetch("salesforce");
+    const proxyUrl   = connectors.getProxyUrl();
+    return (path: string, init?: RequestInit): Promise<Response> => {
+      const url = path.startsWith("http") ? path : `${proxyUrl}${path}`;
+      return proxyFetch(url, init);
+    };
+  } catch {
+    return null;
+  }
 }
 
 /**
