@@ -1,67 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-interface SfUser {
+export interface SfUser {
   userId: string;
   username: string;
   email: string;
 }
 
-export interface SalesforceAuthState {
+export interface SalesforceAuthStatus {
   authenticated: boolean;
   contactId: string | null;
   user: SfUser | null;
-  loading: boolean;
 }
 
-interface SfStatusResponse {
-  authenticated: false;
-}
-interface SfStatusAuthenticated {
-  authenticated: true;
-  contactId: string;
-  user: SfUser;
-}
-type SfStatusApiResponse = SfStatusResponse | SfStatusAuthenticated;
+type SfStatusApiResponse =
+  | { authenticated: false }
+  | { authenticated: true; contactId: string; user: SfUser };
 
-export function useSalesforceAuth(): SalesforceAuthState {
-  const [state, setState] = useState<SalesforceAuthState>({
-    authenticated: false,
-    contactId:     null,
-    user:          null,
-    loading:       true,
+const SF_AUTH_KEY = ['sf-auth-status'] as const;
+
+async function fetchSfStatus(): Promise<SalesforceAuthStatus> {
+  const res = await fetch('/api/auth/salesforce/status', { credentials: 'include' });
+  if (!res.ok) throw new Error(`SF status check failed: HTTP ${res.status}`);
+  const data = (await res.json()) as SfStatusApiResponse;
+  if (data.authenticated) {
+    return { authenticated: true, contactId: data.contactId, user: data.user };
+  }
+  return { authenticated: false, contactId: null, user: null };
+}
+
+export function useSalesforceAuth() {
+  const queryClient = useQueryClient();
+
+  const query = useQuery<SalesforceAuthStatus>({
+    queryKey: SF_AUTH_KEY,
+    queryFn: fetchSfStatus,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetch('/api/auth/salesforce/status', { credentials: 'include' })
-      .then(async (resp) => {
-        if (!resp.ok) {
-          throw new Error(`SF status check failed: HTTP ${resp.status}`);
-        }
-        return resp.json() as Promise<SfStatusApiResponse>;
-      })
-      .then((data) => {
-        if (cancelled) return;
-        if (data.authenticated) {
-          setState({
-            authenticated: true,
-            contactId:     data.contactId,
-            user:          data.user,
-            loading:       false,
-          });
-        } else {
-          setState({ authenticated: false, contactId: null, user: null, loading: false });
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setState({ authenticated: false, contactId: null, user: null, loading: false });
-        }
+  const disconnect = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/auth/salesforce/logout', { credentials: 'include' });
+      if (!res.ok) throw new Error(`Logout failed: HTTP ${res.status}`);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData<SalesforceAuthStatus>(SF_AUTH_KEY, {
+        authenticated: false,
+        contactId: null,
+        user: null,
       });
+    },
+  });
 
-    return () => { cancelled = true; };
-  }, []);
+  const status: SalesforceAuthStatus = query.data ?? {
+    authenticated: false,
+    contactId: null,
+    user: null,
+  };
 
-  return state;
+  return {
+    ...status,
+    loading: query.isLoading,
+    error: query.error,
+    refetch: query.refetch,
+    disconnect: disconnect.mutate,
+    disconnecting: disconnect.isPending,
+  };
 }

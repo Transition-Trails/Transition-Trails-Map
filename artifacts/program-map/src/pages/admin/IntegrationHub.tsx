@@ -7,8 +7,9 @@ import {
   MessageCircle, Mail, Layout as LayoutIcon, GraduationCap,
   ChevronRight, ChevronDown, ChevronUp, AlertTriangle, CheckCircle2,
   Clock, Plug, Key, Bot, Activity, BookOpen, Shield,
-  Network,
+  Network, LogIn, LogOut, User, Loader2,
 } from 'lucide-react';
+import { useSalesforceAuth } from '@/hooks/useSalesforceAuth';
 
 // ── Tab state ─────────────────────────────────────────────────────────────────
 
@@ -160,6 +161,77 @@ function ConnectionCard({ conn: c, navigate }: { conn: Connection; navigate: (hr
   );
 }
 
+function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; navigate: (href: string) => void }) {
+  const cfg = CONN_STATUS[c.status];
+  const Icon = c.icon;
+  const { authenticated, user, loading, disconnect, disconnecting } = useSalesforceAuth();
+
+  return (
+    <div className="rounded-lg border border-border p-3.5 bg-white flex flex-col gap-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 ${c.iconCls}`}>
+            <Icon className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[12px] font-bold text-foreground leading-tight">{c.name}</p>
+            <p className="text-[10px] text-muted-foreground">{c.tagline}</p>
+          </div>
+        </div>
+        <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 flex-shrink-0 ${cfg.cls}`}>
+          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
+          <span className={`text-[9px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
+        </div>
+      </div>
+
+      <p className="text-[11px] text-muted-foreground leading-relaxed">{c.detail}</p>
+
+      {loading ? (
+        <div className="flex items-center gap-1.5 rounded-md px-2 py-1.5 bg-slate-50 border border-slate-100">
+          <Loader2 className="w-3 h-3 text-slate-400 animate-spin flex-shrink-0" />
+          <p className="text-[10px] text-slate-500">Checking your Salesforce session…</p>
+        </div>
+      ) : authenticated && user ? (
+        <div className="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 bg-emerald-50 border border-emerald-100">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <User className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold text-emerald-800 truncate">{user.username}</p>
+              <p className="text-[9px] text-emerald-600 truncate">{user.email}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => disconnect()}
+            disabled={disconnecting}
+            className="flex items-center gap-1 text-[10px] font-semibold text-rose-600 hover:text-rose-800 transition-colors flex-shrink-0 disabled:opacity-50"
+          >
+            {disconnecting ? <Loader2 className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
+            Disconnect
+          </button>
+        </div>
+      ) : (
+        <a
+          href="/api/auth/salesforce/login"
+          className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 bg-blue-600 hover:bg-blue-700 transition-colors text-white text-[10px] font-semibold"
+        >
+          <LogIn className="w-3 h-3" />
+          Connect your Salesforce account
+        </a>
+      )}
+
+      <div className="flex items-center justify-between mt-auto pt-0.5">
+        <span className="text-[10px] text-muted-foreground/50">{c.owner}</span>
+        <button
+          onClick={() => navigate(c.href)}
+          className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/70 transition-colors"
+        >
+          {c.action}<ChevronRight className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
   const live     = CONNECTIONS.filter(c => ['live', 'live-partial', 'configured'].includes(c.status));
   const needsSet = CONNECTIONS.filter(c => c.status === 'needs-setup');
@@ -175,7 +247,11 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Live Connections</p>
           </div>
           <div className="grid grid-cols-3 gap-2.5">
-            {live.map(c => <ConnectionCard key={c.id} conn={c} navigate={navigate} />)}
+            {live.map(c =>
+              c.id === 'salesforce'
+                ? <SalesforceConnectionCard key={c.id} conn={c} navigate={navigate} />
+                : <ConnectionCard key={c.id} conn={c} navigate={navigate} />
+            )}
           </div>
         </div>
 
