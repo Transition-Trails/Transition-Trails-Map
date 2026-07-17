@@ -518,14 +518,14 @@ function ConfigTab({ navigate }: { navigate: (href: string) => void }) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'connections', label: 'Connections'   },
-  { id: 'capability',  label: 'Capability Map' },
   { id: 'config',      label: 'Config & Tools' },
+  { id: 'capability',  label: 'Capability Map' },
+  { id: 'connections', label: 'Connections'   },
 ];
 
 export default function IntegrationHub() {
   const [, navigate]   = useLocation();
-  const [activeTab, setActiveTab] = useState<Tab>('connections');
+  const [activeTab, setActiveTab] = useState<Tab>('config');
 
   const liveCount  = CONNECTIONS.filter(c => c.status === 'live' || c.status === 'live-partial').length;
   const needsCount = CONNECTIONS.filter(c => c.status === 'needs-setup' || c.status === 'configured').length;
