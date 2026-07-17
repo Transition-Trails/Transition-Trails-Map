@@ -17,6 +17,15 @@ const router = Router();
 
 type SyncStatus = "Live" | "Manual" | "Disconnected" | "Planned" | "Future";
 
+interface ArchiveDocument {
+  id: string;
+  name: string;
+  categories: string[];   // category ids from DOCUMENT_CATEGORY_TAXONOMY
+  uploadedBy?: string;
+  uploadDate?: string;
+  owner?: string;
+}
+
 interface KnowledgeSource {
   id: string;
   name: string;
@@ -47,6 +56,7 @@ interface KnowledgeSource {
   integrationPriority: "P1" | "P2" | "P3";
   sampleContents?: string[];
   sfCategory?: string;
+  documents?: ArchiveDocument[];
 }
 
 const KNOWLEDGE_SOURCES: KnowledgeSource[] = [
@@ -232,6 +242,23 @@ const KNOWLEDGE_SOURCES: KnowledgeSource[] = [
     futureIntegrationPath: "Q3 2025 — Automated indexing on upload. Standards Studio compliance check before Penny ingestion.",
     integrationPriority: "P2",
     sampleContents: ["Salesforce Certified Admin Study Guide", "Nonprofit Cloud Reference", "Trailhead Module Index Export"],
+    documents: [
+      { id: "sda-001", name: "Salesforce Certified Admin Study Guide",       categories: ["technology"],                        uploadedBy: "Knowledge Lead",   uploadDate: "Mar 2025", owner: "Knowledge Lead"   },
+      { id: "sda-002", name: "Nonprofit Cloud Reference",                    categories: ["technology", "mission-delivery"],    uploadedBy: "Knowledge Lead",   uploadDate: "Mar 2025", owner: "Knowledge Lead"   },
+      { id: "sda-003", name: "Trailhead Module Index Export",                categories: ["technology", "curriculum"],           uploadedBy: "Curriculum Lead",  uploadDate: "Apr 2025", owner: "Curriculum Lead"  },
+      { id: "sda-004", name: "NPSP Configuration Best Practices",            categories: [],                                    uploadedBy: "Knowledge Lead",   uploadDate: "Apr 2025", owner: "Knowledge Lead"   },
+      { id: "sda-005", name: "Volunteer Management Framework",               categories: [],                                    uploadedBy: "Operations Lead",  uploadDate: "Apr 2025", owner: "Operations Lead"  },
+      { id: "sda-006", name: "Coaching Protocol Template Pack",              categories: [],                                    uploadedBy: "Coach Team Lead",  uploadDate: "Apr 2025"                            },
+      { id: "sda-007", name: "Sprint Planning Guide for Cohort Leads",       categories: [],                                    uploadedBy: "Operations Lead",  uploadDate: "May 2025"                            },
+      { id: "sda-008", name: "Assessment Rubric Collection",                 categories: [],                                    uploadedBy: "Curriculum Lead",  uploadDate: "May 2025", owner: "Curriculum Lead"  },
+      { id: "sda-009", name: "Career Pathway Research — Tech Sector 2024",  categories: [],                                    uploadedBy: "Knowledge Lead",   uploadDate: "May 2025"                            },
+      { id: "sda-010", name: "Employer Partner Onboarding Guide",            categories: [],                                    uploadedBy: "Operations Lead",  uploadDate: "May 2025"                            },
+      { id: "sda-011", name: "SF Admin Exam Blueprint v7",                   categories: [],                                    uploadedBy: "Curriculum Lead",  uploadDate: "May 2025", owner: "Curriculum Lead"  },
+      { id: "sda-012", name: "Learning Outcomes Measurement Framework",      categories: [],                                    uploadedBy: "Knowledge Lead",   uploadDate: "May 2025"                            },
+      { id: "sda-013", name: "Coaching Conversation Note Templates",         categories: [],                                    uploadedBy: "Coach Team Lead",  uploadDate: "Jun 2025"                            },
+      { id: "sda-014", name: "Program Budget Template FY25",                 categories: [],                                    uploadedBy: "Operations Lead",  uploadDate: "Jun 2025"                            },
+      { id: "sda-015", name: "Transition Trails Impact Report 2024",         categories: [],                                    uploadedBy: "Knowledge Lead",   uploadDate: "Jun 2025", owner: "Knowledge Lead"   },
+    ],
   },
   {
     id: "src-lms-modules",
@@ -292,6 +319,18 @@ const KNOWLEDGE_SOURCES: KnowledgeSource[] = [
     futureIntegrationPath: "Q3 2025 — Live Salesforce SOQL queries. Penny reads in real-time per coaching interaction.",
     integrationPriority: "P1",
     sampleContents: ["Declarative Automation Assessment", "Data Model Quiz", "Reports & Dashboards Evaluation", "Certification Readiness Check"],
+    documents: [
+      { id: "asmnt-001", name: "Declarative Automation Assessment",   categories: ["assessments", "curriculum"],  uploadedBy: "Curriculum Lead",  uploadDate: "Feb 2025" },
+      { id: "asmnt-002", name: "Data Model Quiz — Sprint 1",          categories: ["assessments", "curriculum"],  uploadedBy: "Curriculum Lead",  uploadDate: "Feb 2025" },
+      { id: "asmnt-003", name: "Reports & Dashboards Evaluation",     categories: ["assessments"],                uploadedBy: "Curriculum Lead",  uploadDate: "Mar 2025" },
+      { id: "asmnt-004", name: "Certification Readiness Check",       categories: ["assessments", "technology"],  uploadedBy: "Curriculum Lead",  uploadDate: "Mar 2025" },
+      { id: "asmnt-005", name: "Flow Builder Practical Assessment",   categories: ["assessments", "curriculum"],  uploadedBy: "Curriculum Lead",  uploadDate: "Mar 2025" },
+      { id: "asmnt-006", name: "Security & Access Quiz",              categories: ["assessments", "technology"],  uploadedBy: "Curriculum Lead",  uploadDate: "Apr 2025" },
+      { id: "asmnt-007", name: "Custom Objects Workshop Evaluation",  categories: [],                             uploadedBy: "Curriculum Lead",  uploadDate: "Apr 2025" },
+      { id: "asmnt-008", name: "Automation Strategy Capstone",        categories: [],                             uploadedBy: "Curriculum Lead",  uploadDate: "May 2025" },
+      { id: "asmnt-009", name: "NPSP Data Migration Assessment",      categories: [],                             uploadedBy: "Curriculum Lead",  uploadDate: "May 2025" },
+      { id: "asmnt-010", name: "Mentor Program Review Rubric",        categories: [],                             uploadedBy: "Coach Team Lead",  uploadDate: "May 2025" },
+    ],
   },
   {
     id: "src-standards-studio",

@@ -75,6 +75,7 @@ export interface KnowledgeSource {
   integrationPriority: 'P1' | 'P2' | 'P3';
   sampleContents?: string[];
   sfCategory?: string;                      // for Salesforce Knowledge sources
+  documents?: SourceDocument[];             // document-level entries for category mapping
 }
 
 export interface PennyRetrievalEntry {
@@ -134,6 +135,32 @@ export const HEALTH_CONFIG: Record<HealthStatus, { cls: string; dotCls: string }
   'Critical': { cls: 'text-rose-700 bg-rose-50 border-rose-200',       dotCls: 'bg-rose-500'   },
   'Future':   { cls: 'text-slate-500 bg-slate-50 border-slate-200',    dotCls: 'bg-slate-300'  },
 };
+
+// ── Document Category Taxonomy ─────────────────────────────────────────────
+// Flat category list used for document-level mapping within sources that
+// contain individual documents (e.g. Google Drive archives, assessment banks).
+
+export interface SourceDocument {
+  id: string;
+  name: string;
+  categories: string[];   // category ids from DOCUMENT_CATEGORY_TAXONOMY
+  uploadedBy?: string;
+  uploadDate?: string;
+  owner?: string;
+}
+
+export const DOCUMENT_CATEGORY_TAXONOMY: {
+  id: string; label: string; color: string;
+}[] = [
+  { id: 'technology',       label: 'Technology',        color: 'bg-blue-50 text-blue-700 border-blue-200'     },
+  { id: 'mission-delivery', label: 'Mission & Delivery', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { id: 'curriculum',       label: 'Curriculum',         color: 'bg-amber-50 text-amber-700 border-amber-200'  },
+  { id: 'assessments',      label: 'Assessments',        color: 'bg-violet-50 text-violet-700 border-violet-200' },
+  { id: 'operations',       label: 'Operations',         color: 'bg-slate-50 text-slate-700 border-slate-200'  },
+  { id: 'research',         label: 'Research',           color: 'bg-rose-50 text-rose-700 border-rose-200'     },
+  { id: 'communications',   label: 'Communications',     color: 'bg-teal-50 text-teal-700 border-teal-200'     },
+  { id: 'resources',        label: 'Resources',          color: 'bg-orange-50 text-orange-700 border-orange-200' },
+];
 
 // ── SF Knowledge Category Taxonomy ─────────────────────────────────────────
 

@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { TERMS } from '@/config/terminology';
-import { BookOpen, Brain, Network, GraduationCap } from 'lucide-react';
+import { BookOpen, Brain, Network, GraduationCap, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
-import { SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, HEALTH_CONFIG, type KnowledgeSource } from '@/data/knowledgeSourceData';
+import { SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, HEALTH_CONFIG, DOCUMENT_CATEGORY_TAXONOMY, type KnowledgeSource } from '@/data/knowledgeSourceData';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
 import { useAppContext } from '@/context/AppContext';
 import { useKnowledgeSources } from '@/hooks/useKnowledgeSources';
@@ -57,6 +57,133 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
   );
 }
 
+function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
+  const docs = src.documents ?? [];
+  if (docs.length === 0) return null;
+
+  const [docCategories, setDocCategories] = useState<Record<string, string[]>>(
+    () => Object.fromEntries(docs.map(d => [d.id, d.categories]))
+  );
+  const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
+
+  const mapped = Object.values(docCategories).filter(cats => cats.length > 0).length;
+  const total  = docs.length;
+  const pct    = total > 0 ? Math.round((mapped / total) * 100) : 0;
+
+  function toggleCategory(docId: string, catId: string) {
+    setDocCategories(prev => {
+      const current = prev[docId] ?? [];
+      const next = current.includes(catId)
+        ? current.filter(c => c !== catId)
+        : [...current, catId];
+      return { ...prev, [docId]: next };
+    });
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-background p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wide">Category Mapping</p>
+        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${mapped === total ? 'text-emerald-700 bg-emerald-50' : 'text-amber-700 bg-amber-50'}`}>
+          {mapped} / {total} mapped
+        </span>
+      </div>
+
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-[9px] text-muted-foreground mb-0.5">
+          <span>{pct}% complete</span>
+          {mapped === total && (
+            <span className="flex items-center gap-1 text-emerald-600 font-semibold">
+              <CheckCircle2 className="w-3 h-3" /> All documents mapped
+            </span>
+          )}
+        </div>
+        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-300 ${mapped === total ? 'bg-emerald-500' : 'bg-amber-400'}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1.5 pt-1">
+        {docs.map(doc => {
+          const cats      = docCategories[doc.id] ?? [];
+          const isExpanded = expandedDoc === doc.id;
+          const isMapped   = cats.length > 0;
+
+          return (
+            <div
+              key={doc.id}
+              className={`rounded-md border transition-colors ${isMapped ? 'border-border bg-background' : 'border-amber-200 bg-amber-50/30'}`}
+            >
+              <button
+                onClick={() => setExpandedDoc(isExpanded ? null : doc.id)}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-left"
+              >
+                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isMapped ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+                <span className="text-[11px] font-medium text-foreground flex-1 truncate">{doc.name}</span>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  {isMapped ? (
+                    <>
+                      {cats.slice(0, 2).map(catId => {
+                        const cat = DOCUMENT_CATEGORY_TAXONOMY.find(c => c.id === catId);
+                        return cat ? (
+                          <span key={catId} className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border ${cat.color}`}>
+                            {cat.label}
+                          </span>
+                        ) : null;
+                      })}
+                      {cats.length > 2 && (
+                        <span className="text-[9px] text-muted-foreground">+{cats.length - 2}</span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-[9px] font-bold text-amber-600">Unassigned</span>
+                  )}
+                </div>
+                <ChevronDown className={`w-3 h-3 text-muted-foreground flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isExpanded && (
+                <div className="px-3 pb-3 border-t border-border/40 pt-2.5 space-y-2.5">
+                  <p className="text-[10px] text-muted-foreground font-medium">Assign categories:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {DOCUMENT_CATEGORY_TAXONOMY.map(cat => {
+                      const active = cats.includes(cat.id);
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => toggleCategory(doc.id, cat.id)}
+                          className={`text-[10px] font-semibold px-2 py-1 rounded-full border transition-all ${
+                            active
+                              ? cat.color
+                              : 'bg-background border-border text-muted-foreground hover:border-muted-foreground/50'
+                          }`}
+                        >
+                          {active && '✓ '}{cat.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {(doc.uploadedBy || doc.uploadDate) && (
+                    <p className="text-[10px] text-muted-foreground/70">
+                      {doc.uploadedBy && `Uploaded by ${doc.uploadedBy}`}
+                      {doc.uploadedBy && doc.uploadDate && ' · '}
+                      {doc.uploadDate}
+                      {doc.owner && ` · Owner: ${doc.owner}`}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function GovernanceTab({ src }: { src: KnowledgeSource }) {
   const isActive = src.syncStatus === 'Live' || src.syncStatus === 'Manual';
   return (
@@ -78,6 +205,7 @@ function GovernanceTab({ src }: { src: KnowledgeSource }) {
             </div>
           ))}
         </div>
+        <CategoryMappingSection src={src} />
         <div className="rounded-lg border border-border bg-background p-4 space-y-2">
           <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Ownership</p>
           <p className="text-[12px] text-foreground">Primary: <strong>Knowledge Manager</strong></p>
