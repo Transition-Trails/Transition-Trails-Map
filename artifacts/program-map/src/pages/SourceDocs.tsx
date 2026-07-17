@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { sourceDocuments as SEED, type SourceDocument, type ConfidenceStatus } from '@/data/sourceDocuments';
+import { programs as PROGRAM_LIST } from '@/data/programs';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { TERMS } from '@/config/terminology';
@@ -83,8 +84,23 @@ function DocForm({
   const inputCls = 'w-full text-[12px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:border-primary';
   const labelCls = 'text-[11px] font-semibold text-muted-foreground block mb-1';
 
+  const PROGRAM_OPTIONS = ['All', ...PROGRAM_LIST.map(p => p.name)];
   function csv(arr?: string[]) { return (arr ?? []).join(', '); }
   function parseArr(val: string) { return val.split(',').map(s => s.trim()).filter(Boolean); }
+
+  function toggleProgram(prog: string) {
+    const current = draft.programs ?? [];
+    if (prog === 'All') {
+      onChange({ programs: current.includes('All') ? [] : ['All'] });
+      return;
+    }
+    const without = current.filter(p => p !== 'All');
+    onChange({
+      programs: without.includes(prog)
+        ? without.filter(p => p !== prog)
+        : [...without, prog],
+    });
+  }
 
   return (
     <div className="border-b border-border bg-muted/10">
@@ -146,14 +162,29 @@ function DocForm({
           {/* Row 3: programs + drive URL */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className={labelCls}>Programs <span className="font-normal text-muted-foreground/60">(comma-separated)</span></label>
-              <input
-                type="text"
-                value={csv(draft.programs)}
-                onChange={e => onChange({ programs: parseArr(e.target.value) })}
-                className={inputCls}
-                placeholder="e.g. Foundations Trail, All"
-              />
+              <label className={labelCls}>Programs</label>
+              <div className="rounded-lg border border-border bg-background p-2 flex flex-wrap gap-1.5">
+                {PROGRAM_OPTIONS.map(prog => {
+                  const selected = (draft.programs ?? []).includes(prog);
+                  return (
+                    <button
+                      key={prog}
+                      type="button"
+                      onClick={() => toggleProgram(prog)}
+                      className={`text-[11px] font-medium px-2.5 py-1 rounded-full border transition-colors ${
+                        selected
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+                      }`}
+                    >
+                      {prog}
+                    </button>
+                  );
+                })}
+              </div>
+              {(draft.programs ?? []).length === 0 && (
+                <p className="text-[10px] text-muted-foreground/60 mt-1">Select one or more programs</p>
+              )}
             </div>
             <div>
               <label className={labelCls}>Google Drive URL <span className="font-normal text-muted-foreground/60">(optional)</span></label>
