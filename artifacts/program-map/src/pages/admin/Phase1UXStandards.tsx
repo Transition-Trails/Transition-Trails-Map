@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   Navigation, Layout, Users, PanelRight, Cpu, Type,
   Monitor, Palette, Smartphone, CheckCircle2, XCircle,
+  ListFilter, Wand2, Database,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -132,10 +133,10 @@ const SECTIONS: Section[] = [
       },
       {
         id: 'role-3',
-        rule: 'Prototype badges, integration status notices, and admin tooling are gated to Admin+ only.',
+        rule: 'Integration status notices and admin tooling are gated to Admin+ only.',
         rationale: 'In-progress status notices ("connecting to Salesforce…") are meaningful to Admins monitoring build progress, not to Everyday Users doing their job.',
-        doExample: 'Wrap <PrototypeBadge /> and integration notice banners in isAdminOrAbove checks.',
-        dontExample: 'Showing "Prototype Data — Salesforce connection pending" to all users.',
+        doExample: 'Wrap integration notice banners in isAdminOrAbove checks.',
+        dontExample: 'Showing "Salesforce connection pending" to all users.',
       },
     ],
   },
@@ -168,13 +169,120 @@ const SECTIONS: Section[] = [
         doExample: 'Clicking a Trail Signal expands the detail inline in the right panel.',
         dontExample: 'Opening a modal to show the full data behind a Penny insight.',
       },
+      {
+        id: 'rp-4',
+        rule: 'Penny panels that are embedded inside a page (not the global slide-over) start in a "Knowledge Brief" dormant state and activate only on explicit user action.',
+        rationale: 'Auto-firing AI analysis when the user selects a record is disruptive and wastes API calls. The Knowledge Brief state shows step context and a "Focus with Penny" CTA — Penny activates when the user is ready.',
+        doExample: 'Program Config wizard: selecting a program loads context silently; the right panel shows a Knowledge Brief until "Focus with Penny" is clicked.',
+        dontExample: 'Automatically sending a Penny prompt and opening the chat panel the moment a user clicks a list item.',
+      },
+    ],
+  },
+  {
+    id: 'wizard',
+    title: 'Wizard & Multi-step Flows',
+    icon: Wand2,
+    color: 'teal',
+    badge: 'Interaction',
+    summary: '60/40 split for guided admin flows — wizard steps on the left, Penny guidance on the right. Steps are freely navigable once prerequisites are met.',
+    standards: [
+      {
+        id: 'wiz-1',
+        rule: 'Admin wizards use a 60/40 split: form steps left, Penny guidance right.',
+        rationale: 'Guided flows benefit from AI assistance alongside the form, not after. The 60/40 split keeps guidance visible without crowding the input area.',
+        doExample: 'Program Config: step panel at 60%, PennyGuidancePanel at 40% with dormant Knowledge Brief state.',
+        dontExample: 'Putting Penny guidance below the form where it is not visible while filling in fields.',
+      },
+      {
+        id: 'wiz-2',
+        rule: 'Step indicators are clickable once the prerequisite step is complete.',
+        rationale: 'Locking users into a linear flow after they have already satisfied the prerequisite is frustrating. Free navigation speeds up review and correction.',
+        doExample: 'StepIndicator circles become clickable buttons after a program is selected; clicking loads the target step\'s data automatically.',
+        dontExample: 'Requiring the user to click "Next" through every preceding step to return to Step 3.',
+      },
+      {
+        id: 'wiz-3',
+        rule: 'Optional steps are visually marked and can be skipped — the step indicator reflects the skipped state.',
+        rationale: 'Not all programs have cohorts. Presenting a mandatory cohort step for ongoing programs adds confusion and blocks progress.',
+        doExample: 'When "isCohortBased" is off, the Cohorts step shows a strikethrough label in the step indicator and is bypassed in the advance logic.',
+        dontExample: 'Hiding the step entirely, leaving users unsure whether they missed something.',
+      },
+      {
+        id: 'wiz-4',
+        rule: 'The Review step is a validation gate, not just a summary.',
+        rationale: 'Allowing a save action before required data is in place creates broken records. The Review step checks each section and surfaces specific "Fix →" links.',
+        doExample: 'Review renders a checklist: Program ✓, Cohorts (skipped), Course ✗. The "Save" button is disabled until all required sections pass. Each failing section has a "Fix →" jump link.',
+        dontExample: 'A "Summary" tab that shows what was entered but allows saving regardless of completeness.',
+      },
+    ],
+  },
+  {
+    id: 'filters',
+    title: 'Filter & Selection Patterns',
+    icon: ListFilter,
+    color: 'indigo',
+    badge: 'Interaction',
+    summary: 'Pill buttons for multi-state filters. Create New always opens a blank form. Selections never pre-populate creation forms.',
+    standards: [
+      {
+        id: 'fil-1',
+        rule: 'Use horizontal pill buttons for filters with 3 or more states.',
+        rationale: 'A boolean toggle can only express 2 states. When a filter has 3+ options (All / Active / Archived / Discovery), pill buttons make all options visible at once and communicate the current selection clearly.',
+        doExample: 'Status filter: [All] [Discovery] [Active] [Completed / Cancelled] — active pill highlighted in primary green.',
+        dontExample: 'A single "Show completed" toggle that hides the full range of status options.',
+      },
+      {
+        id: 'fil-2',
+        rule: '"Create New" always opens with a completely blank form, regardless of what is currently selected.',
+        rationale: 'A creation form pre-populated with another record\'s data misleads the user into thinking they are editing that record, and risks accidentally saving incorrect data to a new entry.',
+        doExample: 'The "+ Create New" button explicitly resets all form fields to empty defaults before opening the form panel.',
+        dontExample: 'Toggling the creation form open while it still contains the selected program\'s name and dates.',
+      },
+      {
+        id: 'fil-3',
+        rule: 'Search and status filters compose — both apply simultaneously.',
+        rationale: 'Users frequently need to search within a filtered subset (e.g. "find active programs with \'Trail\' in the name"). Treating search and filter as separate modes forces extra steps.',
+        doExample: 'Typing in the search box while "Active" is selected shows only active programs matching the search term.',
+        dontExample: 'Clearing the status filter when the user starts typing, or ignoring the search when a filter is active.',
+      },
+    ],
+  },
+  {
+    id: 'live-data',
+    title: 'Live Data Display',
+    icon: Database,
+    color: 'rose',
+    badge: 'Data',
+    summary: 'Always show human-readable values. Never expose raw Salesforce IDs or system keys in the UI.',
+    standards: [
+      {
+        id: 'dat-1',
+        rule: 'Resolve Salesforce lookup IDs to names before rendering.',
+        rationale: 'A Salesforce User ID (e.g. 005Hp00000jVjh8IAC) is meaningless to a user. All lookup fields must be resolved to their human-readable Name at the API layer via SOQL relationship traversal.',
+        doExample: 'SELECT Program_Manager__r.Name FROM pmdm__Program__c — return Program_Manager_Name in the API response; display that field in the UI.',
+        dontExample: 'Rendering the raw Manager ID "005Hp00000jVjh8IAC" in the program detail card.',
+      },
+      {
+        id: 'dat-2',
+        rule: 'Resolve lookups at the API layer, not the frontend.',
+        rationale: 'Fetching a User record on the frontend to resolve a name adds a second round trip and couples the component to Salesforce schema. SOQL relationship traversal does it in one query.',
+        doExample: 'API route uses Program_Manager__r.Name in the SOQL SELECT and flattens it to Program_Manager_Name in the JSON response.',
+        dontExample: 'Frontend component receives a raw ID, then makes a second fetch to /api/users/:id to look up the name.',
+      },
+      {
+        id: 'dat-3',
+        rule: 'Strip HTML tags from Salesforce rich-text fields before rendering in non-rich-text contexts.',
+        rationale: 'Salesforce rich-text fields (Description, Goals, etc.) may contain HTML markup. Rendering raw HTML in a plain text div shows escaped tags to the user.',
+        doExample: 'API or frontend helper: value.replace(/<[^>]*>/g, " ").replace(/\\s+/g, " ").trim() before showing in a plain text element.',
+        dontExample: 'Displaying "Provide &lt;b&gt;members&lt;/b&gt; with support" in a standard text node.',
+      },
     ],
   },
   {
     id: 'infrastructure',
     title: 'Infrastructure vs Visible Tools',
     icon: Cpu,
-    color: 'rose',
+    color: 'orange',
     badge: 'Architecture',
     summary: 'Digital Twin and Context Engine power the experience invisibly for Everyday Users. Admins and Power Users interact with them directly.',
     standards: [
@@ -198,7 +306,7 @@ const SECTIONS: Section[] = [
     id: 'language',
     title: 'Language Standards',
     icon: Type,
-    color: 'teal',
+    color: 'slate',
     badge: 'Copy',
     summary: 'Branded terms live in terminology.ts. Use plain language for Everyday Users. Save technical terms for Power/Admin surfaces.',
     standards: [
@@ -222,7 +330,7 @@ const SECTIONS: Section[] = [
     id: 'responsive',
     title: 'Desktop Responsiveness',
     icon: Monitor,
-    color: 'indigo',
+    color: 'sky',
     badge: 'Layout',
     summary: 'Three desktop breakpoints: full (≥1280px), split (960–1279px), compact (768–959px). Mobile is a separate future experience.',
     standards: [
@@ -235,8 +343,8 @@ const SECTIONS: Section[] = [
       },
       {
         id: 'res-2',
-        rule: 'Mobile is a separate future experience. Do not compromise the desktop UI to serve mobile now.',
-        rationale: 'Phase 1 is a desktop-first internal operating platform. Attempting to make it work on mobile phones with the current architecture will degrade both experiences.',
+        rule: 'Trail OS is a desktop-first internal operating platform. Do not compromise the desktop UI to serve mobile.',
+        rationale: 'Attempting to make the current architecture work on mobile phones will degrade both experiences. A dedicated mobile experience is the correct path.',
         doExample: 'Show a "Mobile experience coming soon" message on screens below 768px.',
         dontExample: 'Adding hamburger menus, bottom nav bars, or touch-sized tap targets to the desktop layout.',
       },
@@ -253,7 +361,7 @@ const SECTIONS: Section[] = [
     id: 'visual',
     title: 'Visual & Styling',
     icon: Palette,
-    color: 'orange',
+    color: 'violet',
     badge: 'Design',
     summary: 'Trail Cream background, shadcn/ui tokens, Tailwind utilities. No custom color values outside the token system.',
     standards: [
@@ -282,18 +390,18 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'mobile',
-    title: 'Mobile — Future Experience',
+    title: 'Mobile — Separate Future Experience',
     icon: Smartphone,
-    color: 'slate',
+    color: 'stone',
     badge: 'Future',
-    summary: 'A dedicated mobile experience will be built separately. Phase 1 desktop design must not be compromised to serve mobile.',
+    summary: 'A dedicated mobile experience will be built separately. The desktop design must not be compromised to serve mobile.',
     standards: [
       {
         id: 'mob-1',
         rule: 'A separate native or responsive-mobile app will be built for mobile users.',
-        rationale: 'The Trail OS desktop platform has a fundamentally different information density, navigation model, and interaction pattern than what works on a phone. Trying to bridge both with CSS breakpoints produces a degraded experience on both.',
-        doExample: 'Phase 1 ships as a desktop-only platform. Mobile users see a "coming soon" screen. A mobile experience is scoped as a separate Phase 2 deliverable.',
-        dontExample: 'Adding @media (max-width: 640px) rules to the desktop shell to "support mobile" while Phase 1 is in progress.',
+        rationale: 'Trail OS has a fundamentally different information density, navigation model, and interaction pattern than what works on a phone. Trying to bridge both with CSS breakpoints produces a degraded experience on both.',
+        doExample: 'Trail OS ships as a desktop-only platform. Mobile users see a "coming soon" screen. A mobile experience is scoped as a separate future deliverable.',
+        dontExample: 'Adding @media (max-width: 640px) rules to the desktop shell to "support mobile".',
       },
       {
         id: 'mob-2',
@@ -306,16 +414,17 @@ const SECTIONS: Section[] = [
   },
 ];
 
-const COLOR_MAP: Record<string, { bg: string; icon: string; badge: string; border: string; accent: string }> = {
-  emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', border: 'border-emerald-200', accent: 'bg-emerald-400' },
-  sky:     { bg: 'bg-sky-50',     icon: 'text-sky-700',     badge: 'bg-sky-100 text-sky-700 border-sky-200',             border: 'border-sky-200',     accent: 'bg-sky-400' },
-  violet:  { bg: 'bg-violet-50',  icon: 'text-violet-700',  badge: 'bg-violet-100 text-violet-700 border-violet-200',    border: 'border-violet-200',  accent: 'bg-violet-400' },
-  amber:   { bg: 'bg-amber-50',   icon: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700 border-amber-200',       border: 'border-amber-200',   accent: 'bg-amber-400' },
-  rose:    { bg: 'bg-rose-50',    icon: 'text-rose-700',    badge: 'bg-rose-100 text-rose-700 border-rose-200',          border: 'border-rose-200',    accent: 'bg-rose-400' },
-  teal:    { bg: 'bg-teal-50',    icon: 'text-teal-700',    badge: 'bg-teal-100 text-teal-700 border-teal-200',          border: 'border-teal-200',    accent: 'bg-teal-400' },
-  indigo:  { bg: 'bg-indigo-50',  icon: 'text-indigo-700',  badge: 'bg-indigo-100 text-indigo-700 border-indigo-200',    border: 'border-indigo-200',  accent: 'bg-indigo-400' },
-  orange:  { bg: 'bg-orange-50',  icon: 'text-orange-700',  badge: 'bg-orange-100 text-orange-700 border-orange-200',    border: 'border-orange-200',  accent: 'bg-orange-400' },
-  slate:   { bg: 'bg-slate-50',   icon: 'text-slate-600',   badge: 'bg-slate-100 text-slate-600 border-slate-200',       border: 'border-slate-200',   accent: 'bg-slate-400' },
+const COLOR_MAP: Record<string, { bg: string; icon: string; badge: string; border: string }> = {
+  emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', border: 'border-emerald-200' },
+  sky:     { bg: 'bg-sky-50',     icon: 'text-sky-700',     badge: 'bg-sky-100 text-sky-700 border-sky-200',             border: 'border-sky-200' },
+  violet:  { bg: 'bg-violet-50',  icon: 'text-violet-700',  badge: 'bg-violet-100 text-violet-700 border-violet-200',    border: 'border-violet-200' },
+  amber:   { bg: 'bg-amber-50',   icon: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700 border-amber-200',       border: 'border-amber-200' },
+  rose:    { bg: 'bg-rose-50',    icon: 'text-rose-700',    badge: 'bg-rose-100 text-rose-700 border-rose-200',          border: 'border-rose-200' },
+  teal:    { bg: 'bg-teal-50',    icon: 'text-teal-700',    badge: 'bg-teal-100 text-teal-700 border-teal-200',          border: 'border-teal-200' },
+  indigo:  { bg: 'bg-indigo-50',  icon: 'text-indigo-700',  badge: 'bg-indigo-100 text-indigo-700 border-indigo-200',    border: 'border-indigo-200' },
+  orange:  { bg: 'bg-orange-50',  icon: 'text-orange-700',  badge: 'bg-orange-100 text-orange-700 border-orange-200',    border: 'border-orange-200' },
+  slate:   { bg: 'bg-slate-50',   icon: 'text-slate-600',   badge: 'bg-slate-100 text-slate-600 border-slate-200',       border: 'border-slate-200' },
+  stone:   { bg: 'bg-stone-50',   icon: 'text-stone-600',   badge: 'bg-stone-100 text-stone-600 border-stone-200',       border: 'border-stone-200' },
 };
 
 function StandardRow({ std }: { std: Standard }) {
@@ -344,7 +453,7 @@ function StandardRow({ std }: { std: Standard }) {
 }
 
 function SectionCard({ section }: { section: Section }) {
-  const c = COLOR_MAP[section.color];
+  const c = COLOR_MAP[section.color] ?? COLOR_MAP['slate'];
   const Icon = section.icon;
   return (
     <div className={`rounded-xl border-2 ${c.border} bg-card overflow-hidden`}>
@@ -383,16 +492,16 @@ export default function Phase1UXStandards() {
           <Layout className="w-4 h-4 text-muted-foreground" />
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-foreground">Phase 1 UX Standards</p>
+              <p className="text-sm font-semibold text-foreground">Trail OS UX Standards</p>
               <Badge variant="secondary" className="text-[10px]">Internal Reference</Badge>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              {SECTIONS.length} sections · {totalRules} rules · Trail OS desktop platform, Phase 1
+              {SECTIONS.length} sections · {totalRules} rules · Trail OS desktop platform
             </p>
           </div>
         </div>
         <div className="text-[11px] text-muted-foreground text-right">
-          <p className="font-semibold">Codified June 2026</p>
+          <p className="font-semibold">Updated Jul 2026</p>
           <p>Apply before shipping any new page or component</p>
         </div>
       </div>
@@ -400,8 +509,8 @@ export default function Phase1UXStandards() {
       {/* Intent strip */}
       <div className="px-5 py-2.5 bg-amber-50 border-b border-amber-100 flex-shrink-0">
         <p className="text-[12px] text-amber-900 leading-relaxed">
-          <span className="font-semibold">Purpose:</span> These standards capture the design decisions made during Phase 1 of the Trail OS build.
-          They exist so that future contributors — and future AI-assisted development — preserve the UX quality established here.
+          <span className="font-semibold">Purpose:</span> These standards capture the design decisions that define how Trail OS looks, behaves, and communicates with its users.
+          They exist so that every contributor — human or AI-assisted — preserves the UX quality and consistency of the platform.
           When adding a new page, component, or navigation item, verify it against these rules before shipping.
         </p>
       </div>
