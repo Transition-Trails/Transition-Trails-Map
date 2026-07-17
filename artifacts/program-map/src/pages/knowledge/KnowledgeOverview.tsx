@@ -1,10 +1,47 @@
 import { useMemo } from 'react';
 import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
-import { Database, BookMarked, GitBranch, Archive, CheckCircle, AlertTriangle, XCircle, Shield, ChevronRight, Brain, Clock } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
+import {
+  Database, BookMarked, GitBranch, Archive, CheckCircle, AlertTriangle,
+  XCircle, Shield, ChevronRight, Brain, Clock, Layers,
+} from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { knowledgeSources, SOURCE_SUMMARY, TRUST_LEVEL_CONFIG } from '@/data/knowledgeSourceData';
-import type { TrustLevel } from '@/data/knowledgeSourceData';
+import type { TrustLevel, KnowledgeSource } from '@/data/knowledgeSourceData';
+
+// ── Penny Insights data ────────────────────────────────────────────────────────
+// Extracted so JSX stays clean; TERMS used throughout — no hardcoded brand strings.
+
+function buildInsights(total: number, approved: number) {
+  const pending = total - approved;
+  return [
+    {
+      priority: '1',
+      action: 'Configure Google Drive folder indexing',
+      why: `The Google Drive API is connected. The next step is configuring folder indexing for the Foundations and Guided Trail program folders so ${TERMS.aiAssistant} can retrieve curriculum content, coach guides, and assessment rubrics.`,
+      tag: 'Action Now',
+      tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
+      path: '/admin/integrations',
+    },
+    {
+      priority: '2',
+      action: 'Complete trust reviews for pending sources',
+      why: `${pending} source${pending !== 1 ? 's' : ''} cannot be used by ${TERMS.aiAssistant} until trust review is complete. Approving these expands ${TERMS.aiAssistant}'s knowledge retrieval surface and improves coaching quality.`,
+      tag: 'Action Now',
+      tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
+      path: '/knowledge/sources',
+    },
+    {
+      priority: '3',
+      action: 'Establish Org Memory records',
+      why: `${TERMS.platform} currently has no institutional memory layer. Capturing key organizational decisions (e.g. why Salesforce is the system of record, why ${TERMS.aiAssistant} supports rather than replaces coaches) would allow ${TERMS.aiAssistant} to provide context-aware answers to strategic questions.`,
+      tag: 'Phase 2',
+      tagColor: 'bg-slate-100 text-slate-600 border-slate-200',
+      path: '/knowledge/memory',
+    },
+  ];
+}
 
 // ── Tiny shared primitives ────────────────────────────────────────────────────
 
@@ -17,11 +54,13 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 function StatPill({
-  value, label, color,
-}: { value: number | string; label: string; color: string }) {
+  value, label, color, onClick,
+}: { value: number | string; label: string; color: string; onClick?: () => void }) {
+  const base = 'flex flex-col items-center px-4 py-2.5 rounded-lg border border-border bg-background min-w-[72px] transition-colors';
+  const interactive = onClick ? 'cursor-pointer hover:border-primary/30 hover:bg-primary/[0.02]' : '';
   return (
-    <div className="flex flex-col items-center px-4 py-2.5 rounded-lg border border-border bg-white min-w-[72px]">
-      <span className={`text-xl font-semibold ${color}`}>{value}</span>
+    <div className={`${base} ${interactive}`} onClick={onClick}>
+      <span className={`text-xl font-bold ${color}`}>{value}</span>
       <span className="text-[10px] text-muted-foreground mt-0.5 text-center leading-tight">{label}</span>
     </div>
   );
@@ -37,12 +76,12 @@ function NavCard({
   return (
     <button
       onClick={() => setLocation(path)}
-      className="group w-full text-left rounded-lg border border-border bg-white p-4 hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+      className="group w-full text-left rounded-lg border border-border bg-background p-4 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-md bg-muted/50 flex items-center justify-center shrink-0">
-            <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+          <div className="w-7 h-7 rounded-md bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+            <Icon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
           <div>
             <p className="text-[12px] font-semibold text-foreground">{title}</p>
@@ -64,22 +103,33 @@ function NavCard({
 
 // ── Health issue row ──────────────────────────────────────────────────────────
 
-function IssueRow({ name, issues, onNavigate }: { name: string; issues: string[]; onNavigate: () => void }) {
+function IssueRow({
+  source, onReview, onSelect,
+}: {
+  source: KnowledgeSource;
+  onReview: () => void;
+  onSelect: () => void;
+}) {
   return (
-    <div className="rounded-lg border border-border bg-white px-3 py-2.5">
+    <div
+      className="rounded-lg border border-border bg-background px-3 py-2.5 cursor-pointer hover:border-primary/30 hover:bg-primary/[0.02] transition-colors"
+      onClick={onSelect}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-semibold text-foreground truncate">{name}</p>
-          <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{issues[0]}</p>
-          {issues.length > 1 && (
-            <p className="text-[10px] text-muted-foreground/60 mt-0.5">+{issues.length - 1} more issue{issues.length > 2 ? 's' : ''}</p>
+          <p className="text-[11px] font-semibold text-foreground truncate">{source.name}</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{source.healthIssues[0]}</p>
+          {source.healthIssues.length > 1 && (
+            <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+              +{source.healthIssues.length - 1} more issue{source.healthIssues.length > 2 ? 's' : ''}
+            </p>
           )}
         </div>
         <button
-          onClick={onNavigate}
+          onClick={e => { e.stopPropagation(); onReview(); }}
           className="text-[10px] font-medium text-primary hover:underline shrink-0 mt-0.5"
         >
-          Review
+          Review →
         </button>
       </div>
     </div>
@@ -90,6 +140,7 @@ function IssueRow({ name, issues, onNavigate }: { name: string; issues: string[]
 
 export default function KnowledgeOverview() {
   const [, setLocation] = useLocation();
+  const { setSelectedItem, selectedItem } = useAppContext();
 
   const stats = useMemo(() => {
     const trustCounts = knowledgeSources.reduce<Record<TrustLevel, number>>(
@@ -103,30 +154,73 @@ export default function KnowledgeOverview() {
       Planned:      knowledgeSources.filter(s => s.syncStatus === 'Planned' || s.syncStatus === 'Future').length,
     };
     const needsAttention = knowledgeSources.filter(s => s.healthIssues.length > 0);
-    const needsReview = knowledgeSources.filter(s =>
-      s.healthIssues.some(i => i.toLowerCase().includes('review')),
-    );
-    return { trustCounts, syncCounts, needsAttention, needsReview };
+    return { trustCounts, syncCounts, needsAttention };
   }, []);
 
-  const trustConfig: Array<{ level: TrustLevel; dot: string; label: string }> = [
-    { level: 'Authoritative', dot: 'bg-violet-500', label: 'Authoritative — primary sources of record' },
-    { level: 'Trusted',       dot: 'bg-sky-500',    label: 'Trusted — reviewed & approved' },
-    { level: 'Curated',       dot: 'bg-indigo-400', label: 'Curated — selected & maintained' },
-    { level: 'Unverified',    dot: 'bg-slate-400',  label: 'Unverified — trust review required' },
+  const trustConfig: Array<{ level: TrustLevel; dot: string }> = [
+    { level: 'Authoritative', dot: 'bg-violet-500' },
+    { level: 'Trusted',       dot: 'bg-sky-500'    },
+    { level: 'Curated',       dot: 'bg-indigo-400' },
+    { level: 'Unverified',    dot: 'bg-slate-400'  },
   ];
+
+  const insights = buildInsights(SOURCE_SUMMARY.total, SOURCE_SUMMARY.approvedForPenny);
+
+  function selectSource(source: KnowledgeSource) {
+    setSelectedItem({ type: 'knowledgeSource', id: source.id, data: source });
+  }
 
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-4xl">
 
+        {/* ── Page header ─────────────────────────────────────────────────── */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+            Knowledge Library
+          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-base font-semibold text-foreground leading-snug">Overview</h1>
+              <p className="text-[12px] text-muted-foreground mt-0.5">
+                Source health, trust governance, and {TERMS.aiAssistant} readiness across all knowledge sources.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* ── Summary bar ─────────────────────────────────────────────────── */}
         <div className="flex flex-wrap gap-2">
-          <StatPill value={SOURCE_SUMMARY.total}        label="Total Sources"   color="text-foreground" />
-          <StatPill value={SOURCE_SUMMARY.healthy}      label="Healthy"         color="text-emerald-600" />
-          <StatPill value={SOURCE_SUMMARY.warnings}     label="Warnings"        color="text-amber-600" />
-          <StatPill value={SOURCE_SUMMARY.critical}     label="Critical"        color="text-rose-600" />
-          <StatPill value={SOURCE_SUMMARY.approvedForPenny} label={`${TERMS.aiAssistant} Ready`} color="text-primary" />
+          <StatPill
+            value={SOURCE_SUMMARY.total}
+            label="Total Sources"
+            color="text-foreground"
+            onClick={() => setLocation('/knowledge/sources')}
+          />
+          <StatPill
+            value={SOURCE_SUMMARY.healthy}
+            label="Healthy"
+            color="text-emerald-600"
+            onClick={() => setLocation('/knowledge/sources')}
+          />
+          <StatPill
+            value={SOURCE_SUMMARY.warnings}
+            label="Warnings"
+            color="text-amber-600"
+            onClick={() => setLocation('/knowledge/sources')}
+          />
+          <StatPill
+            value={SOURCE_SUMMARY.critical}
+            label="Critical"
+            color="text-rose-600"
+            onClick={() => setLocation('/knowledge/sources')}
+          />
+          <StatPill
+            value={SOURCE_SUMMARY.approvedForPenny}
+            label={`${TERMS.aiAssistant} Ready`}
+            color="text-primary"
+            onClick={() => setLocation('/knowledge/sources')}
+          />
         </div>
 
         {/* ── Source health + Trust breakdown ─────────────────────────────── */}
@@ -137,16 +231,16 @@ export default function KnowledgeOverview() {
             <Eyebrow>Source Health</Eyebrow>
             <div className="space-y-2">
               {[
-                { label: 'Healthy',    count: SOURCE_SUMMARY.healthy,   icon: CheckCircle,     iconCls: 'text-emerald-500', barCls: 'bg-emerald-400' },
-                { label: 'Warning',    count: SOURCE_SUMMARY.warnings,  icon: AlertTriangle,   iconCls: 'text-amber-500',   barCls: 'bg-amber-400'  },
-                { label: 'Critical',   count: SOURCE_SUMMARY.critical,  icon: XCircle,         iconCls: 'text-rose-500',    barCls: 'bg-rose-400'   },
+                { label: 'Healthy',  count: SOURCE_SUMMARY.healthy,  icon: CheckCircle,   iconCls: 'text-emerald-500', barCls: 'bg-emerald-400' },
+                { label: 'Warning',  count: SOURCE_SUMMARY.warnings, icon: AlertTriangle, iconCls: 'text-amber-500',   barCls: 'bg-amber-400'  },
+                { label: 'Critical', count: SOURCE_SUMMARY.critical, icon: XCircle,       iconCls: 'text-rose-500',    barCls: 'bg-rose-400'   },
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-2.5">
                   <row.icon className={`w-3.5 h-3.5 shrink-0 ${row.iconCls}`} />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-0.5">
                       <span className="text-[11px] font-medium text-foreground">{row.label}</span>
-                      <span className="text-[11px] font-semibold text-foreground">{row.count}</span>
+                      <span className="text-[11px] font-bold text-foreground">{row.count}</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
@@ -174,8 +268,13 @@ export default function KnowledgeOverview() {
                 <div key={t.level} className="flex items-center gap-2.5">
                   <span className={`w-2 h-2 rounded-full shrink-0 ${t.dot}`} />
                   <div className="flex-1 flex items-center justify-between">
-                    <span className="text-[11px] text-foreground font-medium">{t.level}</span>
-                    <span className="text-[11px] font-semibold text-foreground">{stats.trustCounts[t.level]}</span>
+                    <div>
+                      <span className="text-[11px] text-foreground font-medium">{t.level}</span>
+                      <span className="text-[10px] text-muted-foreground ml-1.5">
+                        — {TRUST_LEVEL_CONFIG[t.level].description}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold text-foreground ml-2 shrink-0">{stats.trustCounts[t.level]}</span>
                   </div>
                 </div>
               ))}
@@ -196,15 +295,15 @@ export default function KnowledgeOverview() {
             <Eyebrow>Sync Coverage</Eyebrow>
             <div className="space-y-1.5">
               {[
-                { label: 'Live',          count: stats.syncCounts.Live,         dot: 'bg-emerald-500', note: 'real-time connection' },
-                { label: 'Manual',        count: stats.syncCounts.Manual,       dot: 'bg-amber-400',   note: 'periodic manual sync' },
-                { label: 'Disconnected',  count: stats.syncCounts.Disconnected, dot: 'bg-rose-500',    note: 'no connection' },
-                { label: 'Planned',       count: stats.syncCounts.Planned,      dot: 'bg-slate-300',   note: 'future integration' },
+                { label: 'Live',         count: stats.syncCounts.Live,         dot: 'bg-emerald-500', note: 'real-time connection' },
+                { label: 'Manual',       count: stats.syncCounts.Manual,       dot: 'bg-amber-400',   note: 'periodic manual sync' },
+                { label: 'Disconnected', count: stats.syncCounts.Disconnected, dot: 'bg-rose-500',    note: 'no connection' },
+                { label: 'Planned',      count: stats.syncCounts.Planned,      dot: 'bg-slate-300',   note: 'future integration' },
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-2">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${row.dot}`} />
                   <span className="text-[11px] text-foreground font-medium w-24 shrink-0">{row.label}</span>
-                  <span className="text-[11px] font-semibold text-foreground w-5">{row.count}</span>
+                  <span className="text-[11px] font-bold text-foreground w-5">{row.count}</span>
                   <span className="text-[10px] text-muted-foreground">{row.note}</span>
                 </div>
               ))}
@@ -221,13 +320,13 @@ export default function KnowledgeOverview() {
           {/* Penny readiness */}
           <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
             <Eyebrow>{TERMS.aiAssistant} Readiness</Eyebrow>
-            <div className="flex items-end gap-4">
+            <div className="flex items-end gap-6">
               <div>
-                <span className="text-xl font-semibold text-primary">{SOURCE_SUMMARY.approvedForPenny}</span>
+                <span className="text-xl font-bold text-primary">{SOURCE_SUMMARY.approvedForPenny}</span>
                 <p className="text-[10px] text-muted-foreground">approved for {TERMS.aiAssistant}</p>
               </div>
               <div>
-                <span className="text-xl font-semibold text-muted-foreground">
+                <span className="text-xl font-bold text-muted-foreground">
                   {SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny}
                 </span>
                 <p className="text-[10px] text-muted-foreground">pending review</p>
@@ -248,14 +347,16 @@ export default function KnowledgeOverview() {
         {/* ── Needs attention ─────────────────────────────────────────────── */}
         {stats.needsAttention.length > 0 && (
           <div className="space-y-2">
-            <Eyebrow>Needs Attention — {stats.needsAttention.length} source{stats.needsAttention.length > 1 ? 's' : ''} with open issues</Eyebrow>
+            <Eyebrow>
+              Needs Attention — {stats.needsAttention.length} source{stats.needsAttention.length > 1 ? 's' : ''} with open issues
+            </Eyebrow>
             <div className="space-y-2">
               {stats.needsAttention.slice(0, 5).map(src => (
                 <IssueRow
                   key={src.id}
-                  name={src.name}
-                  issues={src.healthIssues}
-                  onNavigate={() => setLocation('/knowledge/sources')}
+                  source={src}
+                  onReview={() => setLocation('/knowledge/sources')}
+                  onSelect={() => selectSource(src)}
                 />
               ))}
               {stats.needsAttention.length > 5 && (
@@ -267,6 +368,9 @@ export default function KnowledgeOverview() {
                 </button>
               )}
             </div>
+            <p className="text-[10px] text-muted-foreground/60 italic">
+              Click any row to open the {TERMS.knowledgeBrief ?? 'Knowledge Brief'} panel for that source.
+            </p>
           </div>
         )}
 
@@ -312,33 +416,11 @@ export default function KnowledgeOverview() {
         {/* ── Penny Insights ───────────────────────────────────────────────── */}
         <div className="rounded-lg border border-primary/20 bg-primary/[0.03] p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <Brain className="w-3.5 h-3.5 text-primary" />
+            <Brain className="w-3.5 h-3.5 text-primary shrink-0" />
             <Eyebrow>{TERMS.aiAssistant} — What Would Create the Most Impact</Eyebrow>
           </div>
-          <div className="space-y-2">
-            {[
-              {
-                priority: '1',
-                action: 'Configure Google Drive folder indexing',
-                why: `The Google Drive API is connected. The next step is configuring folder indexing for the Foundations and Guided Trail program folders so ${TERMS.aiAssistant} can retrieve curriculum content, coach guides, and assessment rubrics.`,
-                tag: 'Action Now',
-                tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
-              },
-              {
-                priority: '2',
-                action: 'Complete trust reviews for pending sources',
-                why: `${SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny} source${SOURCE_SUMMARY.total - SOURCE_SUMMARY.approvedForPenny > 1 ? 's' : ''} cannot be used by ${TERMS.aiAssistant} until trust review is complete. Approving these expands ${TERMS.aiAssistant}'s knowledge retrieval surface and improves coaching quality.`,
-                tag: 'Action Now',
-                tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
-              },
-              {
-                priority: '3',
-                action: 'Establish Org Memory records',
-                why: 'Trail OS currently has no institutional memory layer. Capturing key organizational decisions (e.g. why Salesforce is the system of record, why Penny supports rather than replaces coaches) would allow Penny to provide context-aware answers to strategic questions.',
-                tag: 'Phase 2',
-                tagColor: 'bg-slate-100 text-slate-600 border-slate-200',
-              },
-            ].map(item => (
+          <div className="space-y-3">
+            {insights.map(item => (
               <div key={item.priority} className="flex items-start gap-3">
                 <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                   {item.priority}
@@ -351,6 +433,12 @@ export default function KnowledgeOverview() {
                     </span>
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{item.why}</p>
+                  <button
+                    onClick={() => setLocation(item.path)}
+                    className="mt-1 text-[10px] font-medium text-primary hover:underline flex items-center gap-0.5"
+                  >
+                    Go there <ChevronRight className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
             ))}
