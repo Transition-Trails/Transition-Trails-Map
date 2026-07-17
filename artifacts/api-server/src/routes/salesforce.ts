@@ -4,7 +4,8 @@ import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
 const router = Router();
 
 // ── 5-minute in-memory cache ───────────────────────────────────────────────────
-const opsCache = new Map<string, { data: unknown; ts: number }>();
+// Exported for test inspection only — do not mutate from outside this module in production.
+export const opsCache = new Map<string, { data: unknown; ts: number }>();
 const OPS_CACHE_TTL = 5 * 60 * 1000;
 
 /**
