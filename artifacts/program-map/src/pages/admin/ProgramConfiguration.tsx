@@ -1011,7 +1011,20 @@ export default function ProgramConfiguration() {
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-semibold text-foreground">Select or Create a Program</h2>
                     <button
-                      onClick={() => setShowProgramForm(v => !v)}
+                      onClick={() => {
+                        setShowProgramForm(v => {
+                          if (!v) {
+                            // Opening — reset to blank so we never inherit a selected program's data
+                            setProgForm({
+                              Name: '', pmdm__Status__c: 'In Discovery', pmdm__ShortSummary__c: '',
+                              pmdm__Description__c: '', pmdm__StartDate__c: '', pmdm__EndDate__c: '',
+                              pmdm__TargetPopulation__c: '', Program_Goals__c: '', Problem_Statement__c: '',
+                              Program_Manager__c: '',
+                            });
+                          }
+                          return !v;
+                        });
+                      }}
                       className="flex items-center gap-1.5 text-[11px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors"
                     >
                       <Plus className="w-3 h-3" /> Create New
