@@ -236,6 +236,7 @@ function Router() {
       <Route path="/operations/:tab"      component={OperationsHub} />
       <Route path="/operations">          <Redirect to="/operations/health" /></Route>
 
+      <Route path="/program/config/:id"   component={ProgramHub} />
       <Route path="/program/:tab"         component={ProgramHub} />
       <Route path="/program"              component={ProgramHub} />
 

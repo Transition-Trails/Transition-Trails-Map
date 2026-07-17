@@ -198,6 +198,7 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/admin/phase1-audit',          kind: 'active' },
   { path: '/admin/program-config',        kind: 'redirect', target: '/program/config', note: 'Legacy — now a Programs subpage' },
   { path: '/program/config',              kind: 'active',   note: 'Program Configuration — Programs subpage, admin only' },
+  { path: '/program/config/:id',          kind: 'active',   note: 'Program Configuration pre-selected to a specific SF record' },
   // Legacy admin redirects → Integration Hub sub-pages
   { path: '/admin/google-oauth',    kind: 'redirect', target: '/admin/integrations/google-auth' },
   { path: '/admin/secrets-audit',   kind: 'redirect', target: '/admin/integrations/secrets' },
