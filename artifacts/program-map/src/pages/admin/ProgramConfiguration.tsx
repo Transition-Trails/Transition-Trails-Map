@@ -426,6 +426,23 @@ function PennyGuidancePanel({
   );
 }
 
+// ── HTML → plain text (for edit form fields that contain SF rich-text) ────────
+function stripHtmlToText(v: unknown): string {
+  if (!v) return '';
+  const raw = String(v);
+  if (!raw || raw === 'null' || raw === 'undefined') return '';
+  // Preserve list items and paragraphs as line breaks before stripping tags
+  const withBreaks = raw
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ');
+  // Use a temporary div to decode HTML entities and strip remaining tags
+  const div = document.createElement('div');
+  div.innerHTML = withBreaks;
+  return (div.textContent ?? div.innerText ?? '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?: string | null } = {}) {
@@ -561,8 +578,8 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
         pmdm__StartDate__c:      String(p['pmdm__StartDate__c'] ?? ''),
         pmdm__EndDate__c:        String(p['pmdm__EndDate__c'] ?? ''),
         pmdm__TargetPopulation__c: String(p['pmdm__TargetPopulation__c'] ?? ''),
-        Program_Goals__c:        String(p['Program_Goals__c'] ?? ''),
-        Problem_Statement__c:    String(p['Problem_Statement__c'] ?? ''),
+        Program_Goals__c:        stripHtmlToText(p['Program_Goals__c']),
+        Problem_Statement__c:    stripHtmlToText(p['Problem_Statement__c']),
         Program_Manager__c:      String(p['Program_Manager__c'] ?? ''),
       });
       return p;
@@ -977,10 +994,10 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                         <textarea rows={2} className={TEXTAREA_CLS} value={progForm.pmdm__ShortSummary__c} onChange={e => setProgForm(p => ({...p, pmdm__ShortSummary__c: e.target.value}))} placeholder="One-line description" />
                       </Field>
                       <Field label="Program Goals">
-                        <textarea rows={3} className={TEXTAREA_CLS} value={progForm.Program_Goals__c} onChange={e => setProgForm(p => ({...p, Program_Goals__c: e.target.value}))} placeholder="What outcomes does this program aim to achieve?" />
+                        <textarea rows={6} className={TEXTAREA_CLS} value={progForm.Program_Goals__c} onChange={e => setProgForm(p => ({...p, Program_Goals__c: e.target.value}))} placeholder="What outcomes does this program aim to achieve?" />
                       </Field>
                       <Field label="Problem Statement">
-                        <textarea rows={2} className={TEXTAREA_CLS} value={progForm.Problem_Statement__c} onChange={e => setProgForm(p => ({...p, Problem_Statement__c: e.target.value}))} placeholder="What problem is this program solving?" />
+                        <textarea rows={4} className={TEXTAREA_CLS} value={progForm.Problem_Statement__c} onChange={e => setProgForm(p => ({...p, Problem_Statement__c: e.target.value}))} placeholder="What problem is this program solving?" />
                       </Field>
                       <div className="flex gap-2 pt-1">
                         <button onClick={() => void handleCreateProgram()} disabled={saving}
@@ -1198,10 +1215,10 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                         <textarea rows={2} className={TEXTAREA_CLS} value={progForm.pmdm__ShortSummary__c} onChange={e => setProgForm(prev => ({...prev, pmdm__ShortSummary__c: e.target.value}))} />
                                       </Field>
                                       <Field label="Program Goals">
-                                        <textarea rows={3} className={TEXTAREA_CLS} value={progForm.Program_Goals__c} onChange={e => setProgForm(prev => ({...prev, Program_Goals__c: e.target.value}))} />
+                                        <textarea rows={6} className={TEXTAREA_CLS} value={progForm.Program_Goals__c} onChange={e => setProgForm(prev => ({...prev, Program_Goals__c: e.target.value}))} />
                                       </Field>
                                       <Field label="Problem Statement">
-                                        <textarea rows={2} className={TEXTAREA_CLS} value={progForm.Problem_Statement__c} onChange={e => setProgForm(prev => ({...prev, Problem_Statement__c: e.target.value}))} />
+                                        <textarea rows={4} className={TEXTAREA_CLS} value={progForm.Problem_Statement__c} onChange={e => setProgForm(prev => ({...prev, Problem_Statement__c: e.target.value}))} />
                                       </Field>
                                       <div className="flex gap-2 pt-1">
                                         <button onClick={() => void handleUpdateProgram()} disabled={saving}
