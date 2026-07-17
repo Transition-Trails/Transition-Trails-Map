@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown, Sparkles,
 } from 'lucide-react';
+import { useOpsSummary } from '@/hooks/useOpsSummary';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -21,9 +22,46 @@ const STATUS_WEIGHT: Record<HealthLevel, number> = { 'at-risk': 0, 'needs-work':
 function HealthIndicators() {
   const { setSelectedItem, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const oc = HEALTH_LEVEL_CONFIG[overallHealthLevel];
+  const { data: sfData, isLoading: sfLoading } = useOpsSummary();
+
+  // Patch stale indicators with live Salesforce data when available.
+  const enrichedDomains = useMemo(() => {
+    if (!sfData) return domainHealthData;
+    return domainHealthData.map(d => {
+      if (d.id === 'dh-programs') {
+        return {
+          ...d,
+          indicators: d.indicators.map(ind =>
+            ind.id === 'prog-7'
+              ? {
+                  ...ind,
+                  status: 'good' as const,
+                  detail: `${sfData.programs.active ?? '—'} active programs in Salesforce PMM · ${sfData.programs.planning ?? '—'} in planning · ${sfData.engagements.active ?? '—'} active engagements`,
+                }
+              : ind
+          ),
+        };
+      }
+      if (d.id === 'dh-integration') {
+        return {
+          ...d,
+          indicators: d.indicators.map(ind =>
+            ind.id === 'int-1'
+              ? {
+                  ...ind,
+                  status: 'strong' as const,
+                  detail: `Salesforce REST API live · ${sfData.programs.total ?? '—'} programs · ${sfData.contacts.total ?? '—'} contacts · ${sfData.cases.open ?? '—'} open cases`,
+                }
+              : ind
+          ),
+        };
+      }
+      return d;
+    });
+  }, [sfData]);
 
   // Top 5: worst-status first, then lowest domain score
-  const top5 = domainHealthData
+  const top5 = enrichedDomains
     .flatMap(d => d.indicators
       .filter(i => i.status === 'at-risk' || i.status === 'needs-work')
       .map(i => ({ ...i, domainScore: d.score }))
@@ -35,9 +73,9 @@ function HealthIndicators() {
     .slice(0, 5);
 
   // Domain bars sorted worst-first
-  const sortedDomains = [...domainHealthData].sort((a, b) => a.score - b.score);
+  const sortedDomains = [...enrichedDomains].sort((a, b) => a.score - b.score);
 
-  const pennyQ = `Trail OS Overall Health Score: ${overallHealthScore}/100 (${oc.label})\n\nDomain breakdown:\n${domainHealthData.map(d => `  • ${d.domain}: ${d.score}/100 (${HEALTH_LEVEL_CONFIG[d.level].label})`).join('\n')}\n\nTop 5 highest-impact items to address:\n${top5.map((i, n) => `  ${n + 1}. [${HEALTH_LEVEL_CONFIG[i.status].label}] ${i.label} (${i.domain}) — ${i.detail}`).join('\n')}\n\nWhat is your recommended action plan to move the Trail OS health score from ${overallHealthScore} to 75+? Prioritise the top 5 items and identify any quick wins.`;
+  const pennyQ = `Trail OS Overall Health Score: ${overallHealthScore}/100 (${oc.label})\n\nDomain breakdown:\n${enrichedDomains.map(d => `  • ${d.domain}: ${d.score}/100 (${HEALTH_LEVEL_CONFIG[d.level].label})`).join('\n')}\n\nTop 5 highest-impact items to address:\n${top5.map((i, n) => `  ${n + 1}. [${HEALTH_LEVEL_CONFIG[i.status].label}] ${i.label} (${i.domain}) — ${i.detail}`).join('\n')}\n\nWhat is your recommended action plan to move the Trail OS health score from ${overallHealthScore} to 75+? Prioritise the top 5 items and identify any quick wins.`;
 
   return (
     <ScrollArea className="h-full">
@@ -77,6 +115,51 @@ function HealthIndicators() {
               );
             })}
           </div>
+
+          {/* ── Salesforce Live Strip ───────────────────────────────────── */}
+          {sfLoading && (
+            <div className="mx-4 mb-3 border-t border-border/30 pt-3">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-muted animate-pulse shrink-0" />
+                <p className="text-[9px] text-muted-foreground">Loading Salesforce data…</p>
+              </div>
+            </div>
+          )}
+          {sfData && (
+            <div className="mx-4 mb-3 border-t border-border/30 pt-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-700">Salesforce Live</p>
+                {sfData.fromCache && (
+                  <span className="text-[8px] text-muted-foreground/50 ml-auto">
+                    cached · {sfData.cacheAge < 60 ? `${sfData.cacheAge}s` : `${Math.round(sfData.cacheAge / 60)}m`} ago
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-5 gap-2">
+                {([
+                  { label: 'Active Programs',     value: sfData.programs.active,    alert: false },
+                  { label: 'In Planning',         value: sfData.programs.planning,  alert: false },
+                  { label: 'Active Engagements',  value: sfData.engagements.active, alert: false },
+                  { label: 'Open Cases',          value: sfData.cases.open,         alert: (sfData.cases.highPriority ?? 0) > 0, sub: sfData.cases.highPriority != null && sfData.cases.highPriority > 0 ? `${sfData.cases.highPriority} high pri` : undefined },
+                  { label: 'Contacts',            value: sfData.contacts.total,     alert: false },
+                ] as const).map(stat => (
+                  <div
+                    key={stat.label}
+                    className={`rounded-md border px-2 py-1.5 text-center ${stat.alert ? 'border-amber-200 bg-amber-50/60' : 'border-border/40 bg-muted/20'}`}
+                  >
+                    <p className={`text-[15px] font-bold leading-tight tabular-nums ${stat.alert ? 'text-amber-700' : 'text-foreground'}`}>
+                      {stat.value ?? '—'}
+                    </p>
+                    <p className="text-[8px] text-muted-foreground leading-tight mt-0.5">{stat.label}</p>
+                    {'sub' in stat && stat.sub && (
+                      <p className="text-[7px] text-amber-600 font-bold mt-0.5">{stat.sub}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Focus with Penny */}
           <div className="px-4 pb-3">
@@ -126,7 +209,7 @@ function HealthIndicators() {
             <div className="flex-1 h-px bg-border/50" />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {domainHealthData.map(d => {
+            {enrichedDomains.map(d => {
               const dc       = HEALTH_LEVEL_CONFIG[d.level];
               const topInds  = d.indicators.slice(0, 3);
               const extra    = d.indicators.length - 3;
