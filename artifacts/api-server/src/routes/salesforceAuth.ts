@@ -9,6 +9,7 @@ import {
 } from "../lib/salesforceOAuth.js";
 import { logger } from "../lib/logger.js";
 import { setCachedSfToken } from "../lib/sfTokenCache.js";
+import { flushSfCacheForUser } from "./salesforce.js";
 
 const router = Router();
 
@@ -108,6 +109,11 @@ router.get("/callback", async (req, res): Promise<void> => {
       } catch (contactErr) {
         logger.warn({ contactErr }, 'Failed to resolve Contact ID during OAuth — Penny will use fallback');
       }
+
+      // Clear any cached SF data for this user (and all pre-login "system" entries)
+      // so the incoming user always sees their own fresh data, not leftovers from
+      // a previous session or another user who hit the API before anyone logged in.
+      flushSfCacheForUser(identity.userId);
 
       req.session.sfAccessToken  = tokens.accessToken;
       req.session.sfRefreshToken = tokens.refreshToken;

@@ -7,6 +7,23 @@ const router = Router();
 const opsCache = new Map<string, { data: unknown; ts: number }>();
 const OPS_CACHE_TTL = 5 * 60 * 1000;
 
+/**
+ * Flush all cache entries belonging to the given user and all "system" entries
+ * (created before any user authenticated).  Call this from salesforceAuth after
+ * a new user token is written to the session so the incoming user always gets
+ * fresh data instead of stale entries from a previous session or pre-login fetch.
+ *
+ * @param sfUserId  The Salesforce User ID that just authenticated.  If omitted,
+ *                  only "system" (pre-login) entries are removed.
+ */
+export function flushSfCacheForUser(sfUserId?: string): void {
+  for (const key of opsCache.keys()) {
+    if (key.startsWith("system:") || (sfUserId && key.startsWith(`${sfUserId}:`))) {
+      opsCache.delete(key);
+    }
+  }
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 // Get the org base URL from the OAuth Identity endpoint (shared across handlers)
