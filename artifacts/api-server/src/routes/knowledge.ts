@@ -629,6 +629,8 @@ router.patch("/knowledge/documents/:id", async (req, res): Promise<void> => {
       ...(existing.data as SourceDocument),
       ...(req.body as Partial<SourceDocument>),
       id,
+      // Always stamp the display date when a document is saved through Trail OS.
+      lastUpdated: new Date().toLocaleString("default", { month: "short", year: "numeric" }),
     };
     await db
       .update(knowledgeDocumentsTable)
