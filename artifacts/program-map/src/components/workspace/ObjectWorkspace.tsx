@@ -62,6 +62,8 @@ export function ObjectWorkspace({
   defaultTabId,
   emptyTitle = 'Select an object',
   emptyBody  = 'Choose an item from the list to view its workspace.',
+  onItemSelect,
+  initialSelectedId,
 }: {
   icon: ComponentType<{ className?: string }>;
   items: WorkspaceItem[];
@@ -69,8 +71,10 @@ export function ObjectWorkspace({
   defaultTabId?: string;
   emptyTitle?: string;
   emptyBody?: string;
+  onItemSelect?: (item: WorkspaceItem) => void;
+  initialSelectedId?: string | null;
 }) {
-  const [selectedId, setSelectedId]   = useState<string | null>(items[0]?.id ?? null);
+  const [selectedId, setSelectedId]   = useState<string | null>(initialSelectedId !== undefined ? initialSelectedId : (items[0]?.id ?? null));
   const [activeTabId, setActiveTabId] = useState<string>(defaultTabId ?? tabs[0]?.id ?? '');
   const [query, setQuery]             = useState('');
 
@@ -100,7 +104,7 @@ export function ObjectWorkspace({
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Filter objects…"
-              className="w-full text-[11px] border border-border rounded-md pl-7 pr-2.5 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/40"
+              className="w-full text-[11px] border border-border rounded-md pl-7 pr-2.5 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/40"
             />
           </div>
           <p className="text-[9px] text-muted-foreground/50 mt-1.5 font-medium">
@@ -118,7 +122,7 @@ export function ObjectWorkspace({
               return (
                 <button
                   key={item.id}
-                  onClick={() => { setSelectedId(item.id); setActiveTabId(defaultTabId ?? tabs[0]?.id ?? ''); }}
+                  onClick={() => { setSelectedId(item.id); setActiveTabId(defaultTabId ?? tabs[0]?.id ?? ''); onItemSelect?.(item); }}
                   className={`w-full text-left px-3 py-2.5 border-b border-border/30 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary ${
                     isActive
                       ? 'bg-primary text-primary-foreground'

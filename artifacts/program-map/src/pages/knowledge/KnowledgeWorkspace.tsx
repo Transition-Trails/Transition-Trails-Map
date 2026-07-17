@@ -6,6 +6,7 @@ import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspa
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
 import { knowledgeSources, SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, HEALTH_CONFIG, type KnowledgeSource } from '@/data/knowledgeSourceData';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
+import { useAppContext } from '@/context/AppContext';
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -30,7 +31,7 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
             {src.trustLevel}
           </span>
         </div>
-        <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+        <div className="rounded-lg border border-border bg-background divide-y divide-border/40">
           <InfoRow label="Type"         value={src.type} />
           <InfoRow label="Trust Level"  value={src.trustLevel} />
           <InfoRow label="Sync Status"  value={src.syncStatus} />
@@ -42,22 +43,30 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
             <p className="text-[12px] text-rose-800">This source has not passed a trust review. It may not be activated in {TERMS.aiAssistant} without Knowledge Manager approval.</p>
           </div>
         )}
+        {src.healthIssues.length > 0 && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 space-y-1.5">
+            <p className="text-[11px] font-bold text-amber-700">Open Issues</p>
+            {src.healthIssues.map((issue, i) => (
+              <p key={i} className="text-[11px] text-amber-800 leading-snug">· {issue}</p>
+            ))}
+          </div>
+        )}
       </div>
     </ScrollArea>
   );
 }
 
 function GovernanceTab({ src }: { src: KnowledgeSource }) {
-  const isActive = (src as any).syncStatus === 'Live' || (src as any).syncStatus === 'Manual';
+  const isActive = src.syncStatus === 'Live' || src.syncStatus === 'Manual';
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-3xl">
         <div className="space-y-2">
           {[
-            { label:'Trust Review',    status: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel !== 'Unverified' ? 'Trust level assigned' : `Trust review required before ${TERMS.aiAssistant} activation` },
-            { label:`${TERMS.aiAssistant} Activation`,status: isActive ? 'healthy' as const : 'incomplete' as const, note: isActive ? `Source active in ${TERMS.aiAssistant} registry` : `Not yet active in ${TERMS.aiAssistant}` },
-            { label:'Review Cadence',  status:'healthy' as const, note:'Quarterly review scheduled' },
-            { label:'Access Control',  status:'healthy' as const, note:'Access controls documented' },
+            { label: 'Trust Review',           status: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel !== 'Unverified' ? 'Trust level assigned' : `Trust review required before ${TERMS.aiAssistant} activation` },
+            { label: `${TERMS.aiAssistant} Activation`, status: isActive ? 'healthy' as const : 'incomplete' as const, note: isActive ? `Source active in ${TERMS.aiAssistant} registry` : `Not yet active in ${TERMS.aiAssistant}` },
+            { label: 'Review Cadence',          status: 'healthy' as const, note: 'Quarterly review scheduled' },
+            { label: 'Access Control',          status: 'healthy' as const, note: 'Access controls documented' },
           ].map(ind => (
             <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
               <div className="flex items-center gap-2.5">
@@ -68,7 +77,7 @@ function GovernanceTab({ src }: { src: KnowledgeSource }) {
             </div>
           ))}
         </div>
-        <div className="rounded-lg border border-border bg-white p-4 space-y-2">
+        <div className="rounded-lg border border-border bg-background p-4 space-y-2">
           <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Ownership</p>
           <p className="text-[12px] text-foreground">Primary: <strong>Knowledge Manager</strong></p>
           <p className="text-[12px] text-foreground">Secondary: <strong>{TERMS.aiAssistant} Lead</strong></p>
@@ -85,9 +94,9 @@ function GovernanceTab({ src }: { src: KnowledgeSource }) {
 
 function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
   const capMap: Record<string, { name: string; status: string }[]> = {
-    'salesforce-kb':   [{ name:'Resume Review',   status:'Depends on' },{ name:'Learning Coach',  status:'Depends on' },{ name:'Coach Support',   status:'Depends on' }],
-    'resume-guide':    [{ name:'Resume Review',   status:'Primary source' }],
-    'linkedin-guide':  [{ name:'Resume Review',   status:'Supplemental' }],
+    'salesforce-kb':   [{ name: 'Resume Review', status: 'Depends on' }, { name: 'Learning Coach', status: 'Depends on' }, { name: 'Coach Support', status: 'Depends on' }],
+    'resume-guide':    [{ name: 'Resume Review', status: 'Primary source' }],
+    'linkedin-guide':  [{ name: 'Resume Review', status: 'Supplemental' }],
   };
   const caps = capMap[(src as any).id] ?? [];
   return (
@@ -97,7 +106,7 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
         {caps.length > 0 ? (
           <div className="space-y-2">
             {caps.map(c => (
-              <div key={c.name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
+              <div key={c.name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
                 <span className="w-1.5 h-1.5 rounded-full bg-pink-400 shrink-0" />
                 <span className="text-[12px] text-foreground font-medium">{c.name}</span>
                 <span className="ml-auto text-[10px] text-muted-foreground">{c.status}</span>
@@ -106,7 +115,7 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
           </div>
         ) : (
           <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">No {TERMS.aiAssistant} assets currently depend on this source.</p>
+            <p className="text-[12px] text-muted-foreground">No {TERMS.aiAssistant} assets currently mapped to this source. Full capability mapping is a Phase 2 feature.</p>
           </div>
         )}
       </div>
@@ -114,21 +123,26 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
   );
 }
 
-function RelatedProgramsTab({ src }: { src: KnowledgeSource }) {
-  const programs = ['Foundations Trail', 'Guided Trail', "Explorer's Trail"];
+function RelatedProgramsTab({ src: _src }: { src: KnowledgeSource }) {
+  const programs = [
+    { name: "Foundations Trail",  status: 'Referenced', dot: 'bg-emerald-400' },
+    { name: "Guided Trail",       status: 'Referenced', dot: 'bg-emerald-400' },
+    { name: "Explorer's Trail",   status: 'Planned',    dot: 'bg-amber-400' },
+  ];
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
         <p className="text-[12px] text-muted-foreground">Programs that reference this knowledge source in their curriculum or {TERMS.aiAssistant} integration.</p>
         <div className="space-y-2">
           {programs.map(prog => (
-            <div key={prog} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-              <span className="text-[12px] text-foreground font-medium">{prog}</span>
-              <span className="ml-auto text-[10px] font-bold text-emerald-600">Referenced</span>
+            <div key={prog.name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${prog.dot}`} />
+              <span className="text-[12px] text-foreground font-medium">{prog.name}</span>
+              <span className={`ml-auto text-[10px] font-bold ${prog.dot === 'bg-emerald-400' ? 'text-emerald-600' : 'text-amber-600'}`}>{prog.status}</span>
             </div>
           ))}
         </div>
+        <p className="text-[10px] text-muted-foreground/60 italic">Full per-source program mapping is a Phase 2 feature — live Salesforce integration will populate this view.</p>
       </div>
     </ScrollArea>
   );
@@ -136,34 +150,34 @@ function RelatedProgramsTab({ src }: { src: KnowledgeSource }) {
 
 function RelationshipsTabKS({ src }: { src: KnowledgeSource }) {
   const programItems: RelatedItem[] = [
-    { id:'exp',    label:"Explorer's Trail",  statusColor:'bg-emerald-400', href:'/program' },
-    { id:'found',  label:'Foundations Trail', statusColor:'bg-emerald-400', href:'/program' },
-    { id:'guided', label:'Guided Trail',      statusColor:'bg-amber-400',   href:'/program' },
+    { id: 'exp',    label: "Explorer's Trail",  statusColor: 'bg-emerald-400', href: '/program' },
+    { id: 'found',  label: 'Foundations Trail', statusColor: 'bg-emerald-400', href: '/program' },
+    { id: 'guided', label: 'Guided Trail',      statusColor: 'bg-amber-400',   href: '/program' },
   ];
   const capMap: Record<string, RelatedItem[]> = {
-    'salesforce-kb':  [{ id:'rr', label:'Resume Review',  statusColor:'bg-emerald-400', href:'/penny' }, { id:'lc', label:'Learning Coach', statusColor:'bg-emerald-400', href:'/penny' }, { id:'cs', label:'Coach Support', statusColor:'bg-blue-400', href:'/penny' }],
-    'resume-guide':   [{ id:'rr', label:'Resume Review',  statusColor:'bg-emerald-400', href:'/penny' }],
-    'linkedin-guide': [{ id:'rr', label:'Resume Review',  statusColor:'bg-blue-400',   href:'/penny' }],
+    'salesforce-kb':  [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-emerald-400', href: '/penny' }, { id: 'lc', label: 'Learning Coach', statusColor: 'bg-emerald-400', href: '/penny' }, { id: 'cs', label: 'Coach Support', statusColor: 'bg-blue-400', href: '/penny' }],
+    'resume-guide':   [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-emerald-400', href: '/penny' }],
+    'linkedin-guide': [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-blue-400',    href: '/penny' }],
   };
   const dtItems: RelatedItem[] = [
-    { id:'dt-rel', label:'Relationship Graph',  statusColor:'bg-violet-400', href:'/knowledge/relationships' },
-    { id:'dt-kn',  label:'Knowledge Network',   statusColor:'bg-blue-400',   href:'/digital-twin/knowledge'  },
+    { id: 'dt-rel', label: 'Relationship Graph', statusColor: 'bg-violet-400', href: '/knowledge/relationships' },
+    { id: 'dt-kn',  label: 'Knowledge Network',  statusColor: 'bg-blue-400',   href: '/digital-twin/knowledge'  },
   ];
 
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
         <p className="text-[12px] text-muted-foreground">Digital Twin relationships — programs, {TERMS.aiAssistant} capabilities, and graph connections for this source.</p>
-        <RelationshipCard title="Programs"          icon={GraduationCap} items={programItems}                   viewAllHref="/program"          emptyMessage="No programs linked" />
-        <RelationshipCard title={`${TERMS.aiAssistant} Capabilities`} icon={Brain}         items={capMap[(src as any).id] ?? []}  viewAllHref="/penny"            emptyMessage="No capabilities depend on this source" />
-        <RelationshipCard title="Digital Twin"       icon={Network}       items={dtItems}                        viewAllHref="/digital-twin/knowledge" />
+        <RelationshipCard title="Programs"                      icon={GraduationCap} items={programItems}                   viewAllHref="/program"               emptyMessage="No programs linked" />
+        <RelationshipCard title={`${TERMS.aiAssistant} Capabilities`} icon={Brain}  items={capMap[(src as any).id] ?? []}  viewAllHref="/penny"                 emptyMessage="No capabilities depend on this source" />
+        <RelationshipCard title="Digital Twin"                  icon={Network}       items={dtItems}                        viewAllHref="/knowledge/relationships" />
       </div>
     </ScrollArea>
   );
 }
 
 function HealthTabKS({ src }: { src: KnowledgeSource }) {
-  const isActive = (src as any).syncStatus === 'Live' || (src as any).syncStatus === 'Manual';
+  const isActive = src.syncStatus === 'Live' || src.syncStatus === 'Manual';
   const rawHealth = String((src as any).health ?? 'Healthy');
   const healthKey = (rawHealth.charAt(0).toUpperCase() + rawHealth.slice(1)) as keyof typeof HEALTH_CONFIG;
   const cfg = HEALTH_CONFIG[healthKey] ?? HEALTH_CONFIG['Healthy'];
@@ -177,10 +191,10 @@ function HealthTabKS({ src }: { src: KnowledgeSource }) {
           <span className="text-[11px] text-muted-foreground">{(src as any).healthNote ?? 'Source health within acceptable parameters.'}</span>
         </div>
         {[
-          { label:'Trust Review',   health: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel },
-          { label:'Sync Status',    health: isActive ? 'healthy' as const : 'needs-attention' as const, note: src.syncStatus },
-          { label:'Freshness',      health:'healthy' as const, note:'Last reviewed within cadence' },
-          { label:'Coverage',       health:'healthy' as const, note:'Source covers all required topics' },
+          { label: 'Trust Review',  health: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel },
+          { label: 'Sync Status',   health: isActive ? 'healthy' as const : 'needs-attention' as const, note: src.syncStatus },
+          { label: 'Freshness',     health: 'healthy' as const, note: 'Last reviewed within cadence' },
+          { label: 'Coverage',      health: 'healthy' as const, note: 'Source covers all required topics' },
         ].map(ind => (
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
             <div className="flex items-center gap-2.5">
@@ -190,13 +204,23 @@ function HealthTabKS({ src }: { src: KnowledgeSource }) {
             <span className="text-[11px] text-muted-foreground">{ind.note}</span>
           </div>
         ))}
+        {src.healthIssues.length > 0 && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 space-y-1.5">
+            <p className="text-[11px] font-bold text-amber-700">Open Health Issues</p>
+            {src.healthIssues.map((issue, i) => (
+              <p key={i} className="text-[11px] text-amber-800 leading-snug">· {issue}</p>
+            ))}
+          </div>
+        )}
       </div>
     </ScrollArea>
   );
 }
 
 export default function KnowledgeWorkspace() {
-  const trustOrder: Record<string, number> = { 'Authoritative':3,'Trusted':2,'Curated':1,'Unverified':0 };
+  const { setSelectedItem, selectedItem } = useAppContext();
+
+  const trustOrder: Record<string, number> = { 'Authoritative': 3, 'Trusted': 2, 'Curated': 1, 'Unverified': 0 };
 
   const sorted = useMemo(() =>
     [...knowledgeSources].sort((a, b) => (trustOrder[b.trustLevel] ?? 0) - (trustOrder[a.trustLevel] ?? 0)),
@@ -220,13 +244,24 @@ export default function KnowledgeWorkspace() {
   })), [sorted]);
 
   const tabs = useMemo<WorkspaceTab[]>(() => [
-    { id:'overview',   label:'Overview',     render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <OverviewTab src={s} /> : null; } },
-    { id:'governance', label:'Governance',   render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <GovernanceTab src={s} /> : null; } },
-    { id:'programs',   label:'Programs',     render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelatedProgramsTab src={s} /> : null; } },
-    { id:'penny',      label:`${TERMS.aiAssistant} Assets`, render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <PennyAssetsTab src={s} /> : null; } },
-    { id:'health',         label:'Health',        render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <HealthTabKS src={s} /> : null; } },
-    { id:'relationships',  label:'Relationships', render:(item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelationshipsTabKS src={s} /> : null; } },
+    { id: 'overview',      label: 'Overview',                  render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <OverviewTab src={s} />         : null; } },
+    { id: 'governance',    label: 'Governance',                render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <GovernanceTab src={s} />        : null; } },
+    { id: 'programs',      label: 'Programs',                  render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelatedProgramsTab src={s} />   : null; } },
+    { id: 'penny',         label: `${TERMS.aiAssistant} Assets`, render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <PennyAssetsTab src={s} />      : null; } },
+    { id: 'health',        label: 'Health',                    render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <HealthTabKS src={s} />          : null; } },
+    { id: 'relationships', label: 'Relationships',             render: (item) => { const s = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id); return s ? <RelationshipsTabKS src={s} />   : null; } },
   ], []);
+
+  // Sync to AppContext so the Knowledge Brief panel reflects the selected source
+  function handleItemSelect(item: WorkspaceItem) {
+    const src = knowledgeSources.find(x => ((x as any).id ?? x.name) === item.id);
+    if (src) {
+      setSelectedItem({ type: 'knowledgeSource', id: (src as any).id ?? src.name, data: src });
+    }
+  }
+
+  // If AppContext already has a knowledgeSource selected, pre-select it in the list
+  const initialSelectedId = (selectedItem?.type === 'knowledgeSource' ? selectedItem.id : null) ?? items[0]?.id ?? null;
 
   return (
     <ObjectWorkspace
@@ -235,6 +270,8 @@ export default function KnowledgeWorkspace() {
       tabs={tabs}
       emptyTitle="Select a knowledge source"
       emptyBody={`Choose a knowledge source to view its trust governance, program usage, ${TERMS.aiAssistant} dependencies, and health.`}
+      onItemSelect={handleItemSelect}
+      initialSelectedId={initialSelectedId}
     />
   );
 }

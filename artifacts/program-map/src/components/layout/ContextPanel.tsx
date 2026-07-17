@@ -1271,6 +1271,79 @@ export function ContextPanel() {
       );
     }
 
+    // ── Knowledge Source ───────────────────────────────────────────────────
+    if (type === 'knowledgeSource') {
+      const src = data as KnowledgeSource;
+      const typeCfg  = SOURCE_TYPE_CONFIG[src.type];
+      const trustCfg = TRUST_LEVEL_CONFIG[src.trustLevel];
+      const syncCfg  = SYNC_STATUS_CONFIG[src.syncStatus];
+      const isActive = src.syncStatus === 'Live' || src.syncStatus === 'Manual';
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Source</p>
+              <p className="text-[15px] font-semibold text-foreground leading-snug">{src.name}</p>
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${typeCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.type}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${trustCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.trustLevel}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${syncCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.syncStatus}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the knowledge source "${src.name}".\n\nType: ${src.type}\nTrust Level: ${src.trustLevel}\nSync Status: ${src.syncStatus}\nAccess: ${src.accessStatus ?? 'Unknown'}\n${src.healthIssues.length > 0 ? `Health issues:\n${src.healthIssues.map(i => `• ${i}`).join('\n')}\n` : ''}\nWhat governance actions or improvements would strengthen this source for ${TERMS.aiAssistant} retrieval?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
+
+            {src.healthIssues.length > 0 && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 space-y-1">
+                <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide">Open Issues</p>
+                {src.healthIssues.map((issue, i) => (
+                  <p key={i} className="text-[11px] text-amber-800 leading-snug">· {issue}</p>
+                ))}
+              </div>
+            )}
+
+            {src.trustLevel === 'Unverified' && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5">
+                <p className="text-[11px] font-bold text-rose-700">⚠ Unverified</p>
+                <p className="text-[11px] text-rose-800 mt-0.5">Trust review required before {TERMS.aiAssistant} activation.</p>
+              </div>
+            )}
+
+            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Type</span>
+                <span className="font-medium">{src.type}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Trust Level</span>
+                <span className="font-medium">{src.trustLevel}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Sync</span>
+                <span className="font-medium">{src.syncStatus}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Access</span>
+                <span className="font-medium">{src.accessStatus ?? 'Unknown'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{TERMS.aiAssistant} Ready</span>
+                <span className={`font-bold ${isActive ? 'text-emerald-600' : 'text-rose-500'}`}>
+                  {isActive ? 'Yes' : 'Pending review'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      );
+    }
+
     // ── Penny Capability ───────────────────────────────────────────────────
     if (type === 'pennyCapability') {
       const cap     = data as PennyCapability;
