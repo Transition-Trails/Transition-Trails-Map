@@ -76,6 +76,14 @@ export function ContextPanel() {
               </h2>
             </div>
 
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the document "${data.name as string}" (${data.status as string}).\n\nPurpose: ${data.purpose as string}\nSummary: ${data.summary as string}\n\nHow does this document support our program operations, and what gaps or updates should I prioritize?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
+
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground italic leading-relaxed">{data.summary}</p>
               
@@ -158,6 +166,13 @@ export function ContextPanel() {
               <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
               <p className="text-xs text-muted-foreground">{data.tagline}</p>
             </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.name as string} communication provider for Trail OS.\n\nStatus: ${data.status as string}\nPurpose: ${data.purpose as string}\nWhy it matters: ${data.whyItMatters as string}\n\nWhat are the most important next steps to get this communication channel operational?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
             <div>
               <span className="block text-xs font-semibold text-foreground uppercase mb-1">Connection Status</span>
               <p className="text-sm text-muted-foreground">{data.connectionStatus} — {data.futureSetup}</p>
@@ -232,6 +247,13 @@ export function ContextPanel() {
               <h2 className="text-[15px] font-semibold text-foreground">{data.eventType}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">{data.description}</p>
             </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the communication route for "${data.eventType as string}".\n\nTrigger: ${data.trigger as string}\nAudience: ${data.audience as string}\nSlack channel: ${data.slackChannel as string}\nWhy it matters: ${data.whyItMatters as string}\n\nWhat should be configured first to make this route operational?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
             <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
               <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
               <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
@@ -295,6 +317,13 @@ export function ContextPanel() {
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
             </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the message template "${data.name as string}" (${data.status as string}).\n\nProvider: ${data.provider as string}\nTrigger: ${data.triggerEvent as string}\nAudience: ${data.audience as string}\nWhy it matters: ${data.whyItMatters as string}\n\nWhat should be improved or finalized in this template before it goes live?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
             <div className="bg-muted/60 border border-border rounded-md p-3">
               <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5">Message Preview</span>
               <p className="text-sm text-foreground leading-relaxed font-mono text-[12px]">{data.messageSummary}</p>
@@ -360,6 +389,13 @@ export function ContextPanel() {
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.name}</h2>
               <p className="text-[11px] text-muted-foreground">v{data.version} · Score: {data.qualityScore}/100</p>
             </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${TERMS.aiAssistant} prompt template "${data.name as string}".\n\nDomain: ${data.domain as string}\nStatus: ${data.status as string}\nQuality score: ${data.qualityScore as number}/100\nHallucination risk: ${data.hallucinationRisk as string}\nPurpose: ${data.purpose as string}\n\nHow can this prompt template be improved for quality, safety, or effectiveness?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
             <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
               <span className="block text-[10px] font-bold text-primary uppercase mb-1">Purpose</span>
               <p className="text-[12px] text-foreground leading-relaxed">{data.purpose}</p>
@@ -435,6 +471,14 @@ export function ContextPanel() {
               <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
               <p className="text-xs text-muted-foreground italic leading-snug">{data.strategicRole}</p>
             </div>
+
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.name as string} program brief.\n\nStatus: ${statusLabel}\nStrategic role: ${data.strategicRole as string}\n${data.executiveSummary ? `Summary: ${data.executiveSummary as string}\n` : ''}${data.whyItMatters ? `Why it matters: ${data.whyItMatters as string}\n` : ''}\nWhat should the team focus on for this program right now?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
 
             {/* Health snapshot */}
             {opStatus && (
@@ -597,6 +641,14 @@ export function ContextPanel() {
                 <p className="text-xs text-muted-foreground italic leading-snug">{data.description}</p>
               </div>
 
+              <button
+                onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.phase as string} operational mapping in the RESOLVE framework.\n\nTrail OS capability: ${data.trailOs as string}\n${TERMS.aiAssistant} function: ${data.penny as string}\nProgram artifact: ${data.artifact as string}\nDescription: ${data.description as string}\n\nWhat steps should we prioritize to make this operational mapping active and effective?`); }}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Focus with {TERMS.aiAssistant}
+              </button>
+
               <div className="space-y-2">
                 {([
                   { label: 'RESOLVE Phase',     value: data.phase,    cls: 'bg-primary/10 border-primary/20 text-primary' },
@@ -669,6 +721,14 @@ export function ContextPanel() {
                 <h2 className="text-[15px] font-semibold text-foreground">{data.name as string}</h2>
               </div>
 
+              <button
+                onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the active work item "${data.name as string}".\n\nStatus: ${lbl}\nRESOLVE phase: ${data.phase as string}\nProgram: ${data.program as string}\nOwner: ${data.owner as string}\nNext date: ${data.nextDate as string}\n\nWhat should happen next on this work item to keep it moving forward?`); }}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Focus with {TERMS.aiAssistant}
+              </button>
+
               <div className="grid grid-cols-2 gap-3">
                 {([
                   { label: 'RESOLVE Phase', value: data.phase as string },
@@ -718,6 +778,14 @@ export function ContextPanel() {
                 <p className="text-xs text-muted-foreground">{data.note as string}</p>
               </div>
 
+              <button
+                onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the "${data.label as string}" demand signal.\n\nCount: ${data.count as number}\nNote: ${data.note as string}\nDescription: ${data.description as string}\n\nWhat does this metric tell us about program demand and what action should we take?`); }}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Focus with {TERMS.aiAssistant}
+              </button>
+
               <p className="text-sm text-muted-foreground leading-relaxed">{data.description as string}</p>
 
               <div className="bg-muted/40 border border-border rounded-md p-3">
@@ -756,6 +824,14 @@ export function ContextPanel() {
               <h2 className="text-[15px] font-semibold text-foreground">{data.letter} — {data.name}</h2>
               <p className="text-xs text-muted-foreground italic leading-snug">{data.purpose as string}</p>
             </div>
+
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.letter as string} — ${data.name as string} phase of the RESOLVE framework.\n\nPurpose: ${data.purpose as string}\n${data.executiveSummary ? `Overview: ${data.executiveSummary as string}\n` : ''}${data.owner && data.owner !== 'Source mapping needed' ? `Owner: ${data.owner as string}\n` : ''}\nWhat are the highest-impact actions for this phase right now?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
 
             {/* Programs using this phase — drawn from canonical relatedPrograms field */}
             {(data.relatedPrograms as string[])?.length > 0 && (
@@ -910,6 +986,14 @@ export function ContextPanel() {
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{title}</h2>
             </div>
 
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${meta.label}: "${title}".\n\nStatus: ${status}${data.purpose ? `\nPurpose: ${data.purpose as string}` : ''}${data.whyItMatters ? `\nWhy it matters: ${data.whyItMatters as string}` : ''}${data.pennyCapability ? `\n${TERMS.aiAssistant} capability: ${data.pennyCapability as string}` : ''}\n\nWhat configuration or improvements should be prioritized for this item?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
+
             {data.purpose && (
               <div>
                 <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Purpose</span>
@@ -1012,6 +1096,13 @@ export function ContextPanel() {
                 <span className={`text-[10px] font-medium border rounded-full px-2 py-0.5 ${action.status === 'prototype' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{action.status}</span>
               </div>
             </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${TERMS.aiAssistant} action "${action.name}" (${action.category}).\n\nPurpose: ${action.purpose}\nContext: ${action.contextSentence}\nStatus: ${action.status}\nEstimated time: ${action.estimatedTime}\n${action.salesforceMapping ? `Salesforce mapping: ${action.salesforceMapping}\n` : ''}\nWhat should I do next to implement or improve this action?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
             <p className="text-[12px] text-muted-foreground leading-relaxed">{action.purpose}</p>
             <div className="rounded-lg border border-secondary/10 bg-secondary/5 p-3">
               <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">Context</p>
@@ -1086,6 +1177,13 @@ export function ContextPanel() {
                 <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${productCfg.cls}`}>{productCfg.label}</span>
               </div>
             </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the Trail OS ${mapping.trailOsObject} → ${mapping.sfLabel} Salesforce mapping.\n\nSF API name: ${mapping.sfApiName}\nPackage: ${mapping.sfPackageSource}\nStatus: ${statusCfg.label}\nProduct: ${productCfg.label}\nPurpose: ${mapping.purpose}\nCurrent implementation: ${mapping.currentImplementation}\nFuture recommendation: ${mapping.futureRecommendation}\n\nWhat are the next steps to validate and implement this mapping?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
             <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-1">
               <p className="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Maps To</p>
               <p className="text-[14px] font-bold text-blue-900">{mapping.sfLabel}</p>
@@ -1148,6 +1246,13 @@ export function ContextPanel() {
               <p className="text-[15px] font-semibold text-foreground">{res.programName}</p>
               <p className="text-[12px] text-muted-foreground">{res.folderName || 'No folder configured'}</p>
             </div>
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the Google Drive workspace for ${res.programName}.\n\nFolder: ${res.folderName || 'not configured'}\nOwner: ${res.owner}\nPermissions: ${(res.permissionsModel || '').replace(/-/g, ' ')}\nSync status: ${(res.syncStatus || '').replace(/-/g, ' ')}\nDescription: ${res.description}\n\nWhat should be configured or updated for this program workspace?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
             <p className="text-[12px] text-muted-foreground leading-relaxed">{res.description}</p>
             {res.folderUrl && (
               <a href={res.folderUrl} target="_blank" rel="noopener noreferrer"
@@ -1184,6 +1289,14 @@ export function ContextPanel() {
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${pocCfg.cls}`}>{pocCfg.label}</span>
               </div>
             </div>
+
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${TERMS.aiAssistant} capability "${cap.name}".\n\nDomain: ${cap.domain}\nMaturity: ${cap.maturity}\nPOC status: ${pocCfg.label}\nPurpose: ${cap.purpose}\nPOC mapping: ${cap.pocMapping}\nOwner: ${cap.owner}\n${cap.nextSteps.length > 0 ? `Next steps:\n${cap.nextSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n` : ''}\nWhat steps should we take to advance this capability toward full production readiness?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
 
             <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-3">
               <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">Purpose</p>
@@ -1286,6 +1399,14 @@ export function ContextPanel() {
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${confidenceCfg.cls}`}>{confidenceCfg.label}</span>
               </div>
             </div>
+
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the content standard "${std.name}".\n\nCategory: ${std.category}\nStatus: ${statusCfg.label}\nConfidence: ${confidenceCfg.label}\nPurpose: ${std.purpose}\nWhy it matters: ${std.whyItMatters}\nHow ${TERMS.aiAssistant} uses it: ${std.howPennyUsesIt}\nOwner: ${std.owner}\nReview cycle: ${std.reviewCycle}\n\nWhat should be done to improve compliance or advance this content standard?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
 
             <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
               <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Purpose</p>
@@ -1576,6 +1697,14 @@ export function ContextPanel() {
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-tight">{d.name}</h2>
             </div>
+
+            <button
+              onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${objLabel[objType] ?? objType} "${d.name}".\n\nStatus: ${status}\nPurpose: ${d.purpose}\nOwner: ${d.owner || 'unassigned'}${d.program ? `\nProgram: ${d.program}` : ''}${d.sprint ? `\nSprint: ${d.sprint}` : ''}${d.relatedSalesforceObject ? `\nSalesforce object: ${d.relatedSalesforceObject}` : ''}\n\nWhat content actions should I prioritize for this item?`); }}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
 
             {/* Purpose */}
             <div className="space-y-1">
