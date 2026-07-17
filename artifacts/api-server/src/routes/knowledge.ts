@@ -2,50 +2,14 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { knowledgeDocumentsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
+import {
+  fetchSfLiveMetrics,
+  buildIntegrationStatus,
+  SOURCE_INTEGRATION_MAP,
+  filterStaleHealthIssues,
+} from "../lib/integrationHealth.js";
 
 const router = Router();
-
-// ── Integration health (mirrors frontend readinessState.ts) ───────────────────
-const INTEGRATION_HEALTH: Record<string, string> = {
-  salesforce:     "live",
-  googleDrive:    "live",
-  slack:          "live",
-  gemini:         "live",
-  googleCalendar: "live",
-  gmail:          "live",
-  agentforce:     "live",
-  mural:          "phase-2",
-  ga4:            "phase-2",
-};
-
-// ── Source → integration mapping ─────────────────────────────────────────────
-const SOURCE_INTEGRATION: Record<string, string> = {
-  "src-sf-mission-delivery": "salesforce",
-  "src-sf-ops-business":     "salesforce",
-  "src-sf-technology":       "salesforce",
-  "src-coach-notes":         "salesforce",
-  "src-gdrive-foundations":  "googleDrive",
-  "src-gdrive-guided":       "googleDrive",
-  "src-gdrive-source-docs":  "googleDrive",
-  "src-future-slack":        "slack",
-  "src-future-calendar":     "googleCalendar",
-};
-
-const STALE_ISSUE_PHRASES = [
-  "no live salesforce api",
-  "no live google drive",
-  "no live drive api",
-  "source does not exist yet",
-  "pending salesforce",
-  "pending google",
-];
-
-function filterStaleIssues(issues: string[], integration: string): string[] {
-  if (INTEGRATION_HEALTH[integration] !== "live") return issues;
-  return issues.filter(i =>
-    !STALE_ISSUE_PHRASES.some(p => i.toLowerCase().includes(p))
-  );
-}
 
 // ── Static KnowledgeSource registry ──────────────────────────────────────────
 // Governance architecture data — enriched at serve-time with live integration
@@ -510,28 +474,37 @@ const KNOWLEDGE_SOURCES: KnowledgeSource[] = [
   },
 ];
 
-// ── Enrich sources with live integration health ────────────────────────────────
-function enrichSources(): KnowledgeSource[] {
+// ── Enrich sources using live integration status ───────────────────────────────
+function enrichSources(integrationStatus: Record<string, string>): KnowledgeSource[] {
   return KNOWLEDGE_SOURCES.map(src => {
-    const integration = SOURCE_INTEGRATION[src.id];
-    if (!integration) return src;
+    const integrationKey = SOURCE_INTEGRATION_MAP[src.id];
+    if (!integrationKey) return src;
 
-    const health = INTEGRATION_HEALTH[integration];
+    const status = integrationStatus[integrationKey] ?? "error";
     const syncStatus: SyncStatus =
-      health === "live"    ? "Live"   :
-      health === "phase-2" ? "Future" :
+      status === "live"    ? "Live"   :
+      status === "phase-2" ? "Future" :
       src.syncStatus;
 
-    const healthIssues = filterStaleIssues(src.healthIssues, integration);
+    const healthIssues = filterStaleHealthIssues(src.healthIssues, integrationKey, integrationStatus);
     return { ...src, syncStatus, healthIssues };
   });
 }
 
 // ── GET /api/knowledge/sources ────────────────────────────────────────────────
-// Returns full KnowledgeSource[] enriched with live integration health.
+// Returns full KnowledgeSource[] enriched with live SF metrics + integration
+// health derived from actual connectivity checks (not hardcoded constants).
 
-router.get("/knowledge/sources", (_req, res) => {
-  res.json(enrichSources());
+router.get("/knowledge/sources", async (req, res): Promise<void> => {
+  try {
+    const metrics = await fetchSfLiveMetrics();
+    const integrationStatus = buildIntegrationStatus(metrics.sfLive);
+    const sources = enrichSources(integrationStatus);
+    res.json({ sources, metrics, integrationStatus, fetchedAt: new Date().toISOString() });
+  } catch (err) {
+    req.log.error(err, "Failed to build knowledge sources response");
+    res.status(500).json({ error: "Failed to fetch knowledge sources" });
+  }
 });
 
 // ── Document helpers ──────────────────────────────────────────────────────────

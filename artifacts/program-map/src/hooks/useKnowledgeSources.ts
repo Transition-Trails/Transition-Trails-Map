@@ -3,6 +3,22 @@ import { useQuery } from '@tanstack/react-query';
 import { knowledgeSources as STATIC_SOURCES, SOURCE_TYPE_ORDER } from '@/data/knowledgeSourceData';
 import type { KnowledgeSource, SourceType } from '@/data/knowledgeSourceData';
 
+// ── API response shape ────────────────────────────────────────────────────────
+
+export interface SfLiveMetrics {
+  sfPrograms: number | null;
+  sfContacts: number | null;
+  sfCases:    number | null;
+  sfLive:     boolean;
+}
+
+interface KnowledgeSourcesResponse {
+  sources:           KnowledgeSource[];
+  metrics?:          SfLiveMetrics;
+  integrationStatus?: Record<string, string>;
+  fetchedAt?:        string;
+}
+
 // ── Summary helper ────────────────────────────────────────────────────────────
 
 function computeSummary(sources: KnowledgeSource[]) {
@@ -26,22 +42,25 @@ function computeSummary(sources: KnowledgeSource[]) {
 export type SourceSummary = ReturnType<typeof computeSummary>;
 
 export function useKnowledgeSources() {
-  const { data, isLoading } = useQuery<KnowledgeSource[]>({
+  const { data, isLoading } = useQuery<KnowledgeSourcesResponse>({
     queryKey: ['knowledge-sources'],
-    queryFn: () => fetch('/api/knowledge/sources').then(r => {
+    queryFn: async () => {
+      const r = await fetch('/api/knowledge/sources');
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json() as Promise<KnowledgeSource[]>;
-    }),
+      return r.json() as Promise<KnowledgeSourcesResponse>;
+    },
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 
   return useMemo(() => {
-    // API data is the primary source; fall back to static if unavailable
-    const sources = data ?? STATIC_SOURCES;
+    // API response is the primary source; fall back to static offline data
+    const sources = data?.sources ?? STATIC_SOURCES;
     return {
       sources,
       summary: computeSummary(sources),
+      metrics: data?.metrics ?? null,
+      integrationStatus: data?.integrationStatus ?? {},
       isLoading,
     };
   }, [data, isLoading]);

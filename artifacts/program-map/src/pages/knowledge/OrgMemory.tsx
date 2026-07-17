@@ -59,7 +59,7 @@ function PanelCard({ children, className = '' }: { children: React.ReactNode; cl
 function ProgramsPanel() {
   const { data, isLoading, isError } = useQuery<{ programs: SfProgram[]; total: number }>({
     queryKey: ['sf-programs-memory'],
-    queryFn: () => fetch('/api/programs').then(r => r.json()),
+    queryFn: () => fetch('/api/programs').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -116,7 +116,7 @@ function ProgramsPanel() {
 function IntelligencePanel() {
   const { data, isLoading } = useQuery<WeeklyReport[]>({
     queryKey: ['penny-weekly-reports-memory'],
-    queryFn: () => fetch('/api/penny/data/weekly-reports').then(r => r.json()),
+    queryFn: () => fetch('/api/penny/data/weekly-reports').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
     staleTime: 5 * 60 * 1000,
   });
 
@@ -176,7 +176,7 @@ function CasesPanel() {
   const [, setLocation] = useLocation();
   const { data, isLoading, isError } = useQuery<SfCasesResponse>({
     queryKey: ['sf-cases-memory'],
-    queryFn: () => fetch('/api/salesforce/operations/cases').then(r => r.json()),
+    queryFn: () => fetch('/api/salesforce/operations/cases').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
     staleTime: 5 * 60 * 1000,
   });
 
