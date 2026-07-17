@@ -1,4 +1,5 @@
 import { randomBytes, createHash } from "crypto";
+import type { Request } from "express";
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 
@@ -158,6 +159,75 @@ export async function refreshAccessToken(
   return {
     accessToken: data.access_token,
     issuedAt:    data.issued_at,
+  };
+}
+
+// ── Per-user token resolution ─────────────────────────────────────────────────
+
+export interface SfCredentials {
+  accessToken: string;
+  instanceUrl: string;
+}
+
+/**
+ * Returns the best available Salesforce credentials for this request.
+ *
+ * Priority:
+ *  1. req.session.sfAccessToken + sfInstanceUrl — per-user token from the OAuth flow.
+ *  2. SALESFORCE_ACCESS_TOKEN + SALESFORCE_INSTANCE_URL env vars — explicit shared
+ *     service-account fallback (for admin/system calls or legacy deployments).
+ *
+ * NOTE: getCachedSfToken() is deliberately excluded. Falling back to another
+ * user's session-cached token would constitute cross-user token reuse.
+ *
+ * Returns null when no credentials are available so callers can return 401.
+ */
+export function getEffectiveSfToken(req: Request): SfCredentials | null {
+  // 1. Per-user session token — set after the user completes the SF OAuth flow
+  if (req.session.sfAccessToken && req.session.sfInstanceUrl) {
+    return {
+      accessToken: req.session.sfAccessToken,
+      instanceUrl: req.session.sfInstanceUrl,
+    };
+  }
+
+  // 2. Explicit shared-service-account env vars — admin/system fallback only.
+  //    getCachedSfToken() (another user's session) is intentionally NOT included
+  //    here to prevent cross-user token reuse.
+  const accessToken = process.env["SALESFORCE_ACCESS_TOKEN"];
+  const instanceUrl = process.env["SALESFORCE_INSTANCE_URL"];
+  if (accessToken && instanceUrl) {
+    return { accessToken, instanceUrl };
+  }
+
+  return null;
+}
+
+/**
+ * Creates a fetch-compatible function that calls Salesforce directly with the
+ * given Bearer token.  Drop-in replacement for ReplitConnectors.createProxyFetch
+ * — paths starting with "/" are prepended with instanceUrl automatically.
+ */
+export function makeSfDirectFetch(
+  accessToken: string,
+  instanceUrl: string
+): (url: string, init?: RequestInit) => Promise<Response> {
+  return (path: string, init?: RequestInit): Promise<Response> => {
+    const url = path.startsWith("http") ? path : `${instanceUrl}${path}`;
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    const incoming = init?.headers;
+    if (incoming) {
+      if (incoming instanceof Headers) {
+        incoming.forEach((v, k) => { headers[k] = v; });
+      } else if (Array.isArray(incoming)) {
+        for (const [k, v] of incoming) headers[k] = v;
+      } else {
+        Object.assign(headers, incoming);
+      }
+    }
+    return fetch(url, { ...init, headers });
   };
 }
 
