@@ -11,7 +11,7 @@ import {
 import {
   BookCheck, ShieldCheck, ClipboardList, AlertTriangle,
   ChevronDown, ChevronRight, CheckCircle2, XCircle,
-  Layers, BookOpen, Brain, Zap, Search, Filter, Plus,
+  Layers, BookOpen, Brain, Zap, Search, Filter, Plus, Sparkles,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -578,9 +578,10 @@ function ChecklistView() {
 // ── Gap Report View ────────────────────────────────────────────────────────
 
 function GapReportView() {
+  const { setSelectedItem } = useAppContext();
   const [filterType, setFilterType] = useState<GapType | 'all'>('all');
   const [filterSev, setFilterSev] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
 
   const filtered = useMemo(() =>
     gapReportItems.filter(g =>
@@ -593,6 +594,12 @@ function GapReportView() {
     medium: 'text-amber-700 bg-amber-50 border-amber-200',
     low:    'text-slate-600 bg-slate-50 border-slate-200',
   };
+
+  function selectGap(gap: (typeof gapReportItems)[0]) {
+    const std = contentStandards.find(s => s.id === gap.standardId);
+    setFocusedId(gap.id);
+    setSelectedItem({ type: 'gapReportItem', id: gap.id, data: { gap, std } });
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -632,53 +639,36 @@ function GapReportView() {
             </div>
           )}
           {filtered.map(gap => {
-            const typeCfg = GAP_TYPE_CONFIG[gap.gapType];
-            const isOpen  = expanded === gap.id;
-            const std     = contentStandards.find(s => s.id === gap.standardId);
+            const typeCfg   = GAP_TYPE_CONFIG[gap.gapType];
+            const isFocused = focusedId === gap.id;
             return (
-              <div key={gap.id} className={`rounded-xl border overflow-hidden transition-all ${isOpen ? 'border-foreground/20' : 'border-border bg-background hover:border-foreground/15'}`}>
-                <button
-                  onClick={() => setExpanded(isOpen ? null : gap.id)}
-                  className="w-full text-left px-4 py-3 flex items-start gap-3"
-                >
-                  <div className={`text-[16px] shrink-0 mt-0.5`}>{typeCfg.icon}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-[12px] font-bold text-foreground truncate">{gap.objectName}</p>
-                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-muted-foreground font-medium">{gap.objectType}</span>
-                          {gap.sprint && <><span className="text-muted-foreground/40">·</span><span className="text-[10px] text-muted-foreground">{gap.sprint}</span></>}
-                        </div>
+              <button
+                key={gap.id}
+                onClick={() => selectGap(gap)}
+                className={`w-full text-left rounded-xl border overflow-hidden transition-all flex items-start gap-3 px-4 py-3 hover:border-foreground/20 hover:bg-muted/10 ${
+                  isFocused
+                    ? 'border-primary/40 bg-primary/5 border-l-2 border-l-primary'
+                    : 'border-border bg-background'
+                }`}
+              >
+                <div className="text-[16px] shrink-0 mt-0.5">{typeCfg.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-bold text-foreground truncate">{gap.objectName}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        <span className="text-[10px] text-muted-foreground font-medium">{gap.objectType}</span>
+                        {gap.sprint && <><span className="text-muted-foreground/40">·</span><span className="text-[10px] text-muted-foreground">{gap.sprint}</span></>}
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${typeCfg.cls}`}>{typeCfg.label}</span>
-                        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${sevCls[gap.severity]}`}>{gap.severity}</span>
-                        {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
-                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${typeCfg.cls}`}>{typeCfg.label}</span>
+                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${sevCls[gap.severity]}`}>{gap.severity}</span>
+                      {isFocused && <Sparkles className="w-3.5 h-3.5 text-primary" />}
                     </div>
                   </div>
-                </button>
-
-                {isOpen && (
-                  <div className="px-4 pb-4 space-y-3 border-t border-border bg-muted/20 pt-3">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Gap Description</p>
-                      <p className="text-[12px] text-foreground leading-relaxed">{gap.gapDescription}</p>
-                    </div>
-                    <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-                      <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Suggested Action</p>
-                      <p className="text-[11px] text-foreground leading-relaxed">{gap.suggestedAction}</p>
-                    </div>
-                    {std && (
-                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>Standard: <strong className="text-foreground">{std.name}</strong> · Owner: {std.owner} · Review: {std.reviewCycle}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                </div>
+              </button>
             );
           })}
         </div>

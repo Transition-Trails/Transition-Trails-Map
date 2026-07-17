@@ -9,7 +9,7 @@ import { SlackContextPanel } from '@/components/workspace/SlackContextPanel';
 import { ACTION_CATEGORY_CONFIG, type PennyContentAction } from '@/data/pennyContentActions';
 import { type TrailOsSfMapping, SF_STATUS_CONFIG, type SfMappingStatus, SF_PRODUCT_CONFIG } from '@/data/salesforceArchitectureData';
 import { HEALTH_LEVEL_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG, REC_PRIORITY_CONFIG, type TrendType, type TrendUrgency, type HealthLevel, type RecPriority } from '@/data/operationalIntelligenceData';
-import { type ContentStandard, STANDARD_STATUS_CONFIG, STANDARD_CONFIDENCE_CONFIG, STANDARD_CATEGORY_CONFIG } from '@/data/standardsData';
+import { type ContentStandard, type GapReportItem, STANDARD_STATUS_CONFIG, STANDARD_CONFIDENCE_CONFIG, STANDARD_CATEGORY_CONFIG, GAP_TYPE_CONFIG } from '@/data/standardsData';
 import { type PennyCapability, CAPABILITY_READINESS_CONFIG, CAPABILITY_DOMAIN_CONFIG, POC_STATUS_CONFIG } from '@/data/pennyCapabilityData';
 import { type KnowledgeSource, SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, SYNC_STATUS_CONFIG, HEALTH_CONFIG } from '@/data/knowledgeSourceData';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -1341,6 +1341,74 @@ export function ContextPanel() {
               <div><span className="text-muted-foreground">Review cycle</span><span className="font-semibold text-foreground ml-2">{std.reviewCycle}</span></div>
               <div><span className="text-muted-foreground">{TERMS.aiAssistant} checks</span><span className="font-semibold text-foreground ml-2">{std.pennyChecks.length} ({std.pennyChecks.filter(c => c.required).length} required)</span></div>
             </div>
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    // ── Gap Report Item ────────────────────────────────────────────────────
+    if (type === 'gapReportItem') {
+      const { gap, std } = data as { gap: GapReportItem; std: ContentStandard | undefined };
+      const typeCfg = GAP_TYPE_CONFIG[gap.gapType];
+      const sevCls: Record<string, string> = {
+        high:   'text-rose-700 bg-rose-50 border-rose-200',
+        medium: 'text-amber-700 bg-amber-50 border-amber-200',
+        low:    'text-slate-600 bg-slate-50 border-slate-200',
+      };
+      function focusGapWithPenny() {
+        setPendingPennyQuery(
+          `I'm resolving a content gap flagged in the Standards Gap Report.\n\n` +
+          `Object: ${gap.objectName} (${gap.objectType})\n` +
+          `Gap type: ${typeCfg.label}\n` +
+          `Severity: ${gap.severity}\n` +
+          `Description: ${gap.gapDescription}\n` +
+          `Suggested action: ${gap.suggestedAction}` +
+          (std ? `\nRelated standard: ${std.name} · Owner: ${std.owner}` : '') +
+          `\n\nHelp me address this gap. What specific content do I need to create or fix, and what does a compliant version look like?`
+        );
+        setAskPennyOpen(true);
+      }
+      return (
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Gap Report</p>
+              <p className="text-[15px] font-semibold text-foreground leading-snug">{gap.objectName}</p>
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                <span className="text-[10px] font-medium text-muted-foreground border border-border rounded-full px-2 py-0.5">{gap.objectType}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${typeCfg.cls}`}>{typeCfg.label}</span>
+                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${sevCls[gap.severity]}`}>{gap.severity}</span>
+                {gap.sprint && <span className="text-[10px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{gap.sprint}</span>}
+              </div>
+            </div>
+
+            <button
+              onClick={focusGapWithPenny}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Focus with {TERMS.aiAssistant}
+            </button>
+
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Gap Description</p>
+              <p className="text-[12px] text-foreground leading-relaxed">{gap.gapDescription}</p>
+            </div>
+
+            <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
+              <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Suggested Action</p>
+              <p className="text-[11px] text-foreground leading-relaxed">{gap.suggestedAction}</p>
+            </div>
+
+            {std && (
+              <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Standard</p>
+                <div><span className="text-muted-foreground">Standard</span><span className="font-semibold text-foreground ml-2">{std.name}</span></div>
+                <div><span className="text-muted-foreground">Owner</span><span className="font-semibold text-foreground ml-2">{std.owner}</span></div>
+                <div><span className="text-muted-foreground">Review cycle</span><span className="font-semibold text-foreground ml-2">{std.reviewCycle}</span></div>
+                <div><span className="text-muted-foreground">{TERMS.aiAssistant} checks</span><span className="font-semibold text-foreground ml-2">{std.pennyChecks.length} ({std.pennyChecks.filter(c => c.required).length} required)</span></div>
+              </div>
+            )}
           </div>
         </ScrollArea>
       );
