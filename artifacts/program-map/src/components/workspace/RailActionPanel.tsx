@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { X, CheckCircle2, Pencil, Hash, Send } from 'lucide-react';
+import { X, CheckCircle2, Pencil, Hash, Send, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionPanelConfig } from '@/types/actionPanel';
+import { useAppContext } from '@/context/AppContext';
+import { TERMS } from '@/config/terminology';
 
 const SLACK_CHANNELS: Record<string, string[]> = {
   penny:         ['#penny-ops', '#ai-coaching-team', '#capability-reviews'],
@@ -76,6 +78,7 @@ interface RailActionPanelProps {
 export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [saved,  setSaved]  = useState(false);
+  const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
 
   const {
     title, objectType, subtitle, fields,
@@ -85,7 +88,15 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     slackContext,
     onSaveDraft,
     onSaveAndView,
+    pennyPrompt,
   } = config;
+
+  function handleFocusWithPenny() {
+    setPendingPennyQuery(pennyPrompt ?? '');
+    setAskPennyOpen(true);
+    config.onClose?.();
+    onClose();
+  }
 
   function set(id: string, val: string) {
     setValues(prev => ({ ...prev, [id]: val }));
@@ -249,7 +260,16 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-4 py-2.5 border-t border-border/60 bg-white flex-shrink-0 space-y-2">
+      <div className="px-4 py-2.5 border-t border-border/60 bg-background flex-shrink-0 space-y-2">
+        {pennyPrompt && (
+          <button
+            onClick={handleFocusWithPenny}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Focus with {TERMS.aiAssistant}
+          </button>
+        )}
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleClose}

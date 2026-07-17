@@ -21,6 +21,7 @@ export interface ActionPanelConfig {
   onSaveDraft?: (data: Record<string, string>) => void;
   onSaveAndView?: (data: Record<string, string>) => void;
   onClose?: () => void;
+  pennyPrompt?: string;
 }
 
 export type SlackPanelContext =

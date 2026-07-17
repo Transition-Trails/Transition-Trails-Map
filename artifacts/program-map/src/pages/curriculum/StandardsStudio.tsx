@@ -717,6 +717,7 @@ export default function StandardsStudio() {
         { id: 'applies',     label: 'Applies To',        type: 'select',   options: ['All Content', 'Lessons', 'Modules', 'Assessments', 'Penny Prompts', 'Program Overviews'] },
       ],
       onSaveAndView: () => navigateTo('standards'),
+      pennyPrompt: `I'm creating a new content standard for Trail OS — Standards Studio. Help me write it well.\n\nA content standard needs:\n- A clear, actionable rule statement (what must be true for content to pass)\n- A rationale (why this rule exists and what breaks without it)\n- A concrete good example (content that meets the standard)\n- A counter-example (content that violates it)\n- Quality criteria ${TERMS.aiAssistant} can check automatically\n\nAsk me what type of content object I'm writing the standard for (Module, Lesson, Assessment, ${TERMS.aiAssistant} Prompt, Delivery Asset, or Program-level), then guide me through drafting each section.`,
     });
   }
 
