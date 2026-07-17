@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import {
-  Users, Shield, Star, Brain, Lock, Globe, Chrome, Network, Mail,
+  Users, Shield, Star, Brain, Globe, Chrome, Network, Mail,
   CheckCircle2, XCircle, MinusCircle,
   ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronRight,
 } from 'lucide-react';
@@ -24,7 +24,10 @@ type FilterHealth = 'all' | 'healthy' | 'needs-attention' | 'incomplete';
 type SortKey      = 'persona' | 'type' | 'tier' | 'health';
 type SortDir      = 'asc' | 'desc';
 
-// ── Hardcoded persona matrix data (prototype — Phase 2 wires to live data) ───
+// ── Role definition matrix ───────────────────────────────────────────────────
+// These rows are authoritative role archetypes, not per-user records.
+// Health reflects real configuration gaps: missing auth method, unverified SF
+// access, or no Google Group assignment. Update here when onboarding a new role.
 
 interface MatrixRow {
   persona:       string;
@@ -57,10 +60,10 @@ const MATRIX_ROWS: MatrixRow[] = [
   { persona: `${TERMS.aiAssistant} Admin`,         type: 'Admin',     typeCls: 'text-violet-700 bg-violet-50 border-violet-200',       tier: 'power',      tierLabel: 'Power',    tierOrder: 1, tierDot: 'bg-violet-500',  tierBadge: 'bg-violet-50 border-violet-200 text-violet-700',   health: 'needs-attention', healthOrder: 1, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full suite',   knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '— Hidden',  pennyDepth: 'Full — prompt-level, capability registry, quality metrics', sfAccess: 'Knowledge, Case, Integration Log',              authMethod: 'Power group · trailospennyadmin@…' },
   { persona: 'Volunteer',           type: 'Volunteer', typeCls: 'text-violet-700 bg-violet-50 border-violet-200',       tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'needs-attention', healthOrder: 1, navigator: '✓ Limited',      operations: '— Hidden',       demand: '— Hidden',     penny: '✓ Coach briefs', knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — coach briefs only',                           sfAccess: 'Volunteer, Volunteer Job, Volunteer Shift, Contact', authMethod: 'Google Sign-In' },
   { persona: 'Client Sponsor',      type: 'Sponsor',   typeCls: 'text-rose-700 bg-rose-50 border-rose-200',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'incomplete',      healthOrder: 2, navigator: '— Limited',      operations: 'View only',      demand: '— Hidden',     penny: '✓ Exec briefs',  knowledge: '— Hidden',    collaboration: '— Hidden',administration: '— Hidden',  pennyDepth: 'Guided — executive briefs only',                       sfAccess: 'Account, Opportunity, Contact, Report',          authMethod: 'Google Sign-In' },
-  { persona: 'Employer Partner',    type: 'Partner',   typeCls: 'text-amber-700 bg-amber-50 border-amber-200',          tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'incomplete',      healthOrder: 2, navigator: '— Limited',      operations: '— Hidden',       demand: '— Hidden',     penny: '— Phase 2',      knowledge: '— Hidden',    collaboration: '— Hidden',administration: '— Hidden',  pennyDepth: 'None — employer matching planned Phase 2',              sfAccess: 'Account, Opportunity, Job Application, Contact', authMethod: 'Google Sign-In' },
+  { persona: 'Employer Partner',    type: 'Partner',   typeCls: 'text-amber-700 bg-amber-50 border-amber-200',          tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'incomplete',      healthOrder: 2, navigator: '— Limited',      operations: '— Hidden',       demand: '— Hidden',     penny: '— Phase 3',      knowledge: '— Hidden',    collaboration: '— Hidden',administration: '— Hidden',  pennyDepth: 'None — employer matching planned Phase 3',              sfAccess: 'Account, Opportunity, Job Application, Contact', authMethod: 'Google Sign-In' },
   { persona: 'Executive Director',  type: 'Staff',     typeCls: 'text-blue-700 bg-blue-50 border-blue-200',             tier: 'admin',      tierLabel: 'Admin',    tierOrder: 2, tierDot: 'bg-amber-500',   tierBadge: 'bg-amber-50 border-amber-200 text-amber-700',       health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full',         knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ View',    pennyDepth: 'Admin — executive briefs, impact summaries, full context', sfAccess: 'Account, Opportunity, Report, Dashboard',        authMethod: 'Admin group · trailosadmin@…' },
   { persona: 'Salesforce Admin',    type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'admin',      tierLabel: 'Admin',    tierOrder: 2, tierDot: 'bg-amber-500',   tierBadge: 'bg-amber-50 border-amber-200 text-amber-700',       health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full',         knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Admin — SF mapping, data layer, integration governance', sfAccess: 'All objects, Permission Set, Profile, User',     authMethod: 'Admin group · trailosadmin@…' },
-  { persona: 'Platform Admin',      type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'superadmin', tierLabel: 'Super',    tierOrder: 3, tierDot: 'bg-primary',     tierBadge: 'bg-primary/10 border-primary/20 text-primary',      health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Unrestricted', knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Unrestricted — all RAG chunks, system prompts, governance override', sfAccess: 'All objects', authMethod: 'Email whitelist (prototype only)' },
+  { persona: 'Platform Admin',      type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'superadmin', tierLabel: 'Super',    tierOrder: 3, tierDot: 'bg-primary',     tierBadge: 'bg-primary/10 border-primary/20 text-primary',      health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Unrestricted', knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Unrestricted — all RAG chunks, system prompts, governance override', sfAccess: 'All objects', authMethod: 'Dev environment — not assigned via Google Groups' },
 ];
 
 const NAV_COLS: { key: keyof MatrixRow; label: string }[] = [
@@ -574,7 +577,7 @@ function AccessTiersTab({
               className="grid px-4 py-3 text-[12px] items-center bg-primary/5 border-t border-primary/10"
               style={{ gridTemplateColumns: '200px 1fr 200px 1fr' }}
             >
-              <span className="font-mono text-[11px] text-muted-foreground/60">N/A — prototype</span>
+              <span className="font-mono text-[11px] text-muted-foreground/60">Dev environment only</span>
               <span className="font-medium text-foreground">Builder / Super Admin</span>
               <span>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-primary/10 text-primary border-primary/20">
@@ -744,9 +747,9 @@ export default function PeopleAccess() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 pb-3">
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-1">
-              <Lock className="w-3 h-3 text-amber-600" />
-              <span className="text-[11px] font-semibold text-amber-700">Prototype mode</span>
+            <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+              <span className="text-[11px] font-semibold text-emerald-700">Auth live · Clerk + Google Groups</span>
             </div>
           </div>
         </div>
