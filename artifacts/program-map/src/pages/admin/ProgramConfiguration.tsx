@@ -229,9 +229,53 @@ function ProgramCard({
 
 // ── Penny guidance panel ──────────────────────────────────────────────────────
 
+const STEP_BRIEF: Record<WizardStep, { title: string; bullets: string[] }> = {
+  1: {
+    title: 'Select a Program to configure',
+    bullets: [
+      'Browse active Salesforce programs or create a new one',
+      'Penny will analyze the program and surface recommendations',
+      'Required fields, audience, goals, and structure are pre-loaded',
+    ],
+  },
+  2: {
+    title: 'Configure Cohorts',
+    bullets: [
+      'Set capacity limits, dates, and status for each cohort',
+      'Penny can suggest cohort sizing based on program goals',
+      'Ongoing programs can skip this step entirely',
+    ],
+  },
+  3: {
+    title: 'Link or Create a Course',
+    bullets: [
+      'Connect this program to its LMS curriculum',
+      'Create a new course record directly in Salesforce',
+      'Penny will help align learning goals to the program',
+    ],
+  },
+  4: {
+    title: 'Build out Modules',
+    bullets: [
+      'Each module is one focused learning block (trail segment)',
+      'Order, mission brief, and core concepts are configurable',
+      'Penny can recommend a module sequence based on outcomes',
+    ],
+  },
+  review: {
+    title: 'Review & Validate',
+    bullets: [
+      'All required sections must be ✅ before the config is complete',
+      'Records are already saved to Salesforce as you went',
+      'Invoke Agentforce for complex orchestration tasks',
+    ],
+  },
+};
+
 function PennyGuidancePanel({
   step, program, messages, onSend, loading,
   onInvokeAgentforce, agentforceLoading,
+  active, onActivate,
 }: {
   step: WizardStep;
   program: SfProgram | null;
@@ -240,6 +284,8 @@ function PennyGuidancePanel({
   loading: boolean;
   onInvokeAgentforce?: () => void;
   agentforceLoading: boolean;
+  active: boolean;
+  onActivate: () => void;
 }) {
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -255,19 +301,94 @@ function PennyGuidancePanel({
     onSend(t);
   }
 
+  const brief = STEP_BRIEF[step];
+
+  /* ── Dormant: Knowledge Brief ─────────────────────────────────────────── */
+  if (!active) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden bg-card border-l border-border">
+        {/* Header */}
+        <div className="flex-shrink-0 px-4 pt-4 pb-3 border-b border-border">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+            Knowledge Brief
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-3 h-3 text-primary" />
+            </div>
+            <p className="text-[13px] font-semibold text-foreground">{brief.title}</p>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-auto px-4 py-4 space-y-4">
+          {/* Step context */}
+          <div className="rounded-lg bg-muted/40 border border-border/60 p-3">
+            <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
+          </div>
+
+          {/* What's covered */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
+              In this step
+            </p>
+            <ul className="space-y-1.5">
+              {brief.bullets.map(b => (
+                <li key={b} className="flex items-start gap-2">
+                  <span className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                  <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Program context if selected */}
+          {program && (
+            <div className="rounded-lg border border-border/60 bg-card p-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+                Current Program
+              </p>
+              <p className="text-[12px] font-semibold text-foreground">{program.Name}</p>
+              {program.pmdm__Status__c && (
+                <p className="text-[10px] text-muted-foreground mt-0.5">{program.pmdm__Status__c}</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Activate button */}
+        <div className="flex-shrink-0 px-4 pb-4 pt-2 border-t border-border">
+          <button
+            onClick={onActivate}
+            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Focus with {TERMS.aiAssistant}
+          </button>
+          <p className="text-[9px] text-muted-foreground/40 text-center mt-1.5">
+            {TERMS.aiAssistant} · Gemini 2.5 Flash · Live
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Active: Chat ─────────────────────────────────────────────────────── */
   return (
     <div className="flex flex-col h-full overflow-hidden bg-card border-l border-border">
       {/* Header */}
       <div className="flex-shrink-0 px-4 pt-4 pb-3 border-b border-border">
-        <div className="flex items-center gap-2.5 mb-2">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-primary" />
-          </div>
-          <div>
-            <p className="text-[13px] font-semibold text-foreground">{TERMS.aiAssistant} Guide</p>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-[10px] text-muted-foreground">Live · Gemini 2.5 Flash</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-foreground">{TERMS.aiAssistant} Guide</p>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[10px] text-muted-foreground">Live · Gemini 2.5 Flash</span>
+              </div>
             </div>
           </div>
         </div>
@@ -401,6 +522,7 @@ export default function ProgramConfiguration() {
   // ── Penny state ─────────────────────────────────────────────────────────────
   const [pennyMessages, setPennyMessages] = useState<PennyMessage[]>([]);
   const [pennyLoading, setPennyLoading]   = useState(false);
+  const [pennyActive, setPennyActive]     = useState(false);
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [progForm, setProgForm] = useState({
@@ -519,6 +641,7 @@ export default function ProgramConfiguration() {
 
   // ── Penny ask ────────────────────────────────────────────────────────────────
   async function askPenny(userText: string) {
+    setPennyActive(true);
     setPennyMessages(prev => [...prev, { role: 'user', content: userText, time: ts() }]);
     setPennyLoading(true);
     try {
@@ -1618,6 +1741,8 @@ export default function ProgramConfiguration() {
             loading={pennyLoading}
             onInvokeAgentforce={step === 'review' ? () => void handleInvokeAgentforce() : undefined}
             agentforceLoading={agentforceLoading}
+            active={pennyActive}
+            onActivate={() => setPennyActive(true)}
           />
         </div>
       </div>
