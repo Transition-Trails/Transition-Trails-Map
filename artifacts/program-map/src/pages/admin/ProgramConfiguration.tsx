@@ -6,7 +6,7 @@
  * Steps: 1 Program → 2 Cohorts → 3 Course → 4 Modules → Review
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Brain, Sparkles, Send, ChevronRight, Plus, Check,
+import { Sparkles, ChevronRight, Plus, Check,
          AlertCircle, Loader2, RotateCcw, Zap, BookOpen,
          Layers, Users, GraduationCap, ClipboardList,
          Pencil, Eye, ExternalLink } from 'lucide-react';
@@ -39,7 +39,6 @@ interface SfModule {
   Reflection_Prompt__c: string | null; Trail_Talk_Prompts__c: string | null;
   Order__c: number | null; Status__c: string | null;
 }
-interface PennyMessage { role: 'penny' | 'user'; content: string; time: string; }
 
 type WizardStep = 1 | 2 | 3 | 4 | 'review';
 
@@ -273,210 +272,100 @@ const STEP_BRIEF: Record<WizardStep, { title: string; bullets: string[] }> = {
 };
 
 function PennyGuidancePanel({
-  step, program, messages, onSend, loading,
+  step, program, onFocusWithPenny,
   onInvokeAgentforce, agentforceLoading,
-  active, onActivate,
 }: {
   step: WizardStep;
   program: SfProgram | null;
-  messages: PennyMessage[];
-  onSend: (text: string) => void;
-  loading: boolean;
+  onFocusWithPenny: () => void;
   onInvokeAgentforce?: () => void;
   agentforceLoading: boolean;
-  active: boolean;
-  onActivate: () => void;
 }) {
-  const [input, setInput] = useState('');
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
-
-  function handleSend() {
-    const t = input.trim();
-    if (!t || loading) return;
-    setInput('');
-    onSend(t);
-  }
-
   const brief = STEP_BRIEF[step];
 
-  /* ── Dormant: Knowledge Brief ─────────────────────────────────────────── */
-  if (!active) {
-    return (
-      <div className="flex flex-col h-full overflow-hidden bg-card border-l border-border">
-        {/* Header */}
-        <div className="flex-shrink-0 px-4 pt-4 pb-3 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
-            Knowledge Brief
-          </p>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-primary" />
-            </div>
-            <p className="text-[13px] font-semibold text-foreground">{brief.title}</p>
-          </div>
-        </div>
-
-        {/* Body */}
-        <div className="flex-1 overflow-auto px-4 py-4 space-y-4">
-          {/* Step context */}
-          <div className="rounded-lg bg-muted/40 border border-border/60 p-3">
-            <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
-          </div>
-
-          {/* What's covered */}
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
-              In this step
-            </p>
-            <ul className="space-y-1.5">
-              {brief.bullets.map(b => (
-                <li key={b} className="flex items-start gap-2">
-                  <span className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                  <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Program context if selected */}
-          {program && (
-            <div className="rounded-lg border border-border/60 bg-card p-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
-                Current Program
-              </p>
-              <p className="text-[12px] font-semibold text-foreground mb-1.5">{program.Name}</p>
-              {program.pmdm__Status__c && (
-                <StatusBadge status={program.pmdm__Status__c} />
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Activate button */}
-        <div className="flex-shrink-0 px-4 pb-4 pt-2 border-t border-border">
-          <button
-            onClick={onActivate}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Focus with {TERMS.aiAssistant}
-          </button>
-          <p className="text-[9px] text-muted-foreground/40 text-center mt-1.5">
-            {TERMS.aiAssistant} · Gemini 2.5 Flash · Live
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── Active: Chat ─────────────────────────────────────────────────────── */
   return (
     <div className="flex flex-col h-full overflow-hidden bg-card border-l border-border">
       {/* Header */}
       <div className="flex-shrink-0 px-4 pt-4 pb-3 border-b border-border">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-foreground">{TERMS.aiAssistant} Guide</p>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[10px] text-muted-foreground">Live · Gemini 2.5 Flash</span>
-              </div>
-            </div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+          Knowledge Brief
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-3 h-3 text-primary" />
           </div>
-        </div>
-        {/* Step context banner */}
-        <div className="rounded-lg bg-primary/5 border border-primary/20 p-2.5">
-          <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
+          <p className="text-[13px] font-semibold text-foreground">{brief.title}</p>
         </div>
       </div>
 
-      {/* Message thread */}
-      <ScrollArea className="flex-1 min-h-0 px-4 py-3">
-        <div className="space-y-3">
-          {messages.map((m, i) => (
-            <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {m.role === 'penny' && (
-                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Brain className="w-2.5 h-2.5 text-primary" />
-                </div>
-              )}
-              <div className={`rounded-2xl px-3 py-2 max-w-[85%] ${
-                m.role === 'user'
-                  ? 'bg-primary text-primary-foreground rounded-br-sm'
-                  : 'bg-muted/60 border border-border/60 text-foreground rounded-bl-sm'
-              }`}>
-                <p className="text-[12px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
-                <p className={`text-[9px] mt-0.5 ${m.role === 'user' ? 'text-primary-foreground/50 text-right' : 'text-muted-foreground'}`}>
-                  {m.time}
-                </p>
-              </div>
-            </div>
-          ))}
-          {loading && (
-            <div className="flex gap-2 justify-start">
-              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-                <Brain className="w-2.5 h-2.5 text-primary animate-pulse" />
-              </div>
-              <div className="bg-muted/60 border border-border/60 rounded-2xl rounded-bl-sm px-3 py-2">
-                <div className="flex gap-1 items-center h-3.5">
-                  {[0,1,2].map(i => (
-                    <span key={i} className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce"
-                      style={{ animationDelay: `${i * 0.15}s` }} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
+      {/* Body */}
+      <div className="flex-1 overflow-auto px-4 py-4 space-y-4">
+        {/* Step context */}
+        <div className="rounded-lg bg-muted/40 border border-border/60 p-3">
+          <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
         </div>
-      </ScrollArea>
 
-      {/* Agentforce quick action (review step only) */}
-      {step === 'review' && onInvokeAgentforce && (
-        <div className="flex-shrink-0 px-4 py-2 border-t border-border/50">
-          <button
-            onClick={onInvokeAgentforce}
-            disabled={!program || agentforceLoading}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-violet-50 hover:bg-violet-100 border border-violet-200 text-violet-700 text-[12px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {agentforceLoading
-              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              : <Zap className="w-3.5 h-3.5" />
-            }
-            Invoke Agentforce
-          </button>
+        {/* What's covered */}
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
+            In this step
+          </p>
+          <ul className="space-y-1.5">
+            {brief.bullets.map(b => (
+              <li key={b} className="flex items-start gap-2">
+                <span className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
 
-      {/* Input */}
-      <div className="flex-shrink-0 px-4 pb-4 pt-2 border-t border-border bg-card">
-        <div className="flex items-center gap-2">
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            disabled={loading}
-            placeholder={`Ask ${TERMS.aiAssistant}…`}
-            className="flex-1 text-[12px] border border-border rounded-full px-3.5 py-1.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 placeholder:text-muted-foreground/50"
-          />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || loading}
-            className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground disabled:opacity-40 hover:bg-primary/90 transition-colors"
-          >
-            <Send className="w-3 h-3" />
-          </button>
-        </div>
-        <p className="text-[9px] text-muted-foreground/40 mt-1 px-1">
-          Context: {program ? program.Name : 'No program selected'} · Step {typeof step === 'number' ? step : 'Review'}/4
+        {/* Current program */}
+        {program && (
+          <div className="rounded-lg border border-border/60 bg-card p-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+              Current Program
+            </p>
+            <p className="text-[12px] font-semibold text-foreground mb-1.5">{program.Name}</p>
+            {program.pmdm__Status__c && <StatusBadge status={program.pmdm__Status__c} />}
+          </div>
+        )}
+
+        {/* Agentforce quick action — review step only */}
+        {step === 'review' && onInvokeAgentforce && (
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
+              Agentforce
+            </p>
+            <button
+              onClick={onInvokeAgentforce}
+              disabled={!program || agentforceLoading}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-violet-50 hover:bg-violet-100 border border-violet-200 text-violet-700 text-[12px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {agentforceLoading
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : <Zap className="w-3.5 h-3.5" />
+              }
+              Invoke Agentforce
+            </button>
+            <p className="text-[10px] text-muted-foreground/50 mt-1.5 leading-snug">
+              Orchestrate complex setup tasks across the full configuration.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Focus with Penny — global slide-over */}
+      <div className="flex-shrink-0 px-4 pb-4 pt-2 border-t border-border">
+        <button
+          onClick={onFocusWithPenny}
+          className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          Focus with {TERMS.aiAssistant}
+        </button>
+        <p className="text-[9px] text-muted-foreground/40 text-center mt-1.5">
+          {TERMS.aiAssistant} · Gemini 2.5 Flash · Live
         </p>
       </div>
     </div>
@@ -486,7 +375,7 @@ function PennyGuidancePanel({
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ProgramConfiguration() {
-  const { userTier } = useAppContext();
+  const { userTier, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const { toast } = useToast();
 
   // ── Wizard state ────────────────────────────────────────────────────────────
@@ -519,11 +408,7 @@ export default function ProgramConfiguration() {
   const [saving, setSaving]                 = useState(false);
   const [agentforceLoading, setAgentforceLoading] = useState(false);
 
-  // ── Penny state ─────────────────────────────────────────────────────────────
-  const [pennyMessages, setPennyMessages] = useState<PennyMessage[]>([]);
-  const [pennyLoading, setPennyLoading]   = useState(false);
-  const [pennyActive, setPennyActive]     = useState(false);
-  const pendingPennyPrompt                = useRef<string | null>(null);
+  const pendingPennyPrompt = useRef<string | null>(null);
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [progForm, setProgForm] = useState({
@@ -640,39 +525,6 @@ export default function ProgramConfiguration() {
     }
   }, [programDetailLoading, programDetail]);
 
-  // ── Penny ask ────────────────────────────────────────────────────────────────
-  async function askPenny(userText: string) {
-    setPennyActive(true);
-    setPennyMessages(prev => [...prev, { role: 'user', content: userText, time: ts() }]);
-    setPennyLoading(true);
-    try {
-      const resp = await fetch('/api/penny/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: userText,
-          role: userTier,
-          context: `Program Configuration Wizard — Step ${typeof step === 'number' ? step : 'Review'}. ` +
-            `Current program: ${selectedProgram?.Name ?? 'none'}. ` +
-            `You are Penny, the Transition Trails AI guide. The admin is configuring a Salesforce Program ` +
-            `and its related LMS records. Help them think through program design decisions.`,
-        }),
-      });
-      const data = await resp.json() as { reply?: string; error?: string };
-      setPennyMessages(prev => [
-        ...prev,
-        { role: 'penny', content: data.reply ?? data.error ?? 'Something went wrong.', time: ts() },
-      ]);
-    } catch {
-      setPennyMessages(prev => [
-        ...prev,
-        { role: 'penny', content: "Couldn't reach Penny — check your connection.", time: ts() },
-      ]);
-    } finally {
-      setPennyLoading(false);
-    }
-  }
-
   // ── Step 1 actions ────────────────────────────────────────────────────────────
   async function handleCreateProgram() {
     if (!progForm.Name.trim()) {
@@ -746,8 +598,6 @@ export default function ProgramConfiguration() {
     setSelectedProgram(p);
     setEditingProgram(false);
     setProgramDetail(null);
-    setPennyMessages([]);
-    setPennyActive(false);
     pendingPennyPrompt.current = null;
     setCourseForm(prev => ({ ...prev, Program__c: p.Name }));
 
@@ -919,11 +769,7 @@ export default function ProgramConfiguration() {
   async function handleInvokeAgentforce() {
     if (!selectedProgram) { toast({ title: 'No program selected', variant: 'destructive' }); return; }
     setAgentforceLoading(true);
-    setPennyMessages(prev => [...prev, {
-      role: 'penny',
-      content: `Invoking Agentforce for "${selectedProgram.Name}"…`,
-      time: ts(),
-    }]);
+    toast({ title: `Invoking Agentforce for "${selectedProgram.Name}"…` });
     try {
       const resp = await fetch(`/api/programs/${selectedProgram.Id}/agentforce`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -938,11 +784,9 @@ export default function ProgramConfiguration() {
         }),
       });
       const data = await resp.json() as { reply?: string; error?: string };
-      setPennyMessages(prev => [...prev, {
-        role: 'penny',
-        content: data.reply ?? data.error ?? 'No response from Agentforce.',
-        time: ts(),
-      }]);
+      const reply = data.reply ?? data.error ?? 'No response from Agentforce.';
+      setPendingPennyQuery(`Agentforce response for "${selectedProgram.Name}":\n\n${reply}`);
+      setAskPennyOpen(true);
       if (!resp.ok) throw new Error(data.error);
     } catch (e) {
       toast({ title: 'Agentforce error', description: (e as Error).message, variant: 'destructive' });
@@ -1779,19 +1623,16 @@ export default function ProgramConfiguration() {
           <PennyGuidancePanel
             step={step}
             program={selectedProgram}
-            messages={pennyMessages}
-            onSend={text => void askPenny(text)}
-            loading={pennyLoading}
+            onFocusWithPenny={() => {
+              setPendingPennyQuery(
+                pendingPennyPrompt.current ??
+                `I'm configuring the program "${selectedProgram?.Name ?? 'unknown'}". ${STEP_CONTEXT[step]}`
+              );
+              pendingPennyPrompt.current = null;
+              setAskPennyOpen(true);
+            }}
             onInvokeAgentforce={step === 'review' ? () => void handleInvokeAgentforce() : undefined}
             agentforceLoading={agentforceLoading}
-            active={pennyActive}
-            onActivate={() => {
-              setPennyActive(true);
-              if (pendingPennyPrompt.current && pennyMessages.length === 0) {
-                void askPenny(pendingPennyPrompt.current);
-                pendingPennyPrompt.current = null;
-              }
-            }}
           />
         </div>
       </div>
