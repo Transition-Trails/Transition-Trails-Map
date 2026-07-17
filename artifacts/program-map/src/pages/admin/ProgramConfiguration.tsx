@@ -348,9 +348,9 @@ function PennyGuidancePanel({
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
                 Current Program
               </p>
-              <p className="text-[12px] font-semibold text-foreground">{program.Name}</p>
+              <p className="text-[12px] font-semibold text-foreground mb-1.5">{program.Name}</p>
               {program.pmdm__Status__c && (
-                <p className="text-[10px] text-muted-foreground mt-0.5">{program.pmdm__Status__c}</p>
+                <StatusBadge status={program.pmdm__Status__c} />
               )}
             </div>
           )}
@@ -1199,26 +1199,32 @@ export default function ProgramConfiguration() {
                                         const canvaUrl = sfStr(programDetail['Canva_Folder__c']);
                                         return (
                                           <>
-                                            <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                                            {/* Metadata card */}
+                                            <div className="rounded-lg bg-muted/30 border border-border/50 p-4 grid grid-cols-2 gap-x-6 gap-y-4">
                                               {rows.map(({ label, val }) => (
                                                 <div key={label}>
-                                                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">{label}</p>
-                                                  <p className="text-[12px] text-foreground">
-                                                    {val ?? <span className="text-muted-foreground/40 italic">—</span>}
-                                                  </p>
+                                                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">{label}</p>
+                                                  {label === 'Status' ? (
+                                                    <StatusBadge status={val} />
+                                                  ) : (
+                                                    <p className="text-[12px] text-foreground font-medium">
+                                                      {val ?? <span className="text-muted-foreground/40 italic font-normal">—</span>}
+                                                    </p>
+                                                  )}
                                                 </div>
                                               ))}
                                             </div>
+                                            {/* Rich-text content sections */}
                                             {textRows.map(({ label, key }) => {
                                               const val = sfStr(programDetail[key]);
                                               if (!val) return null;
                                               const isHtml = /<[a-z][\s\S]*>/i.test(val);
                                               return (
-                                                <div key={key}>
-                                                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">{label}</p>
+                                                <div key={key} className="pt-3 border-t border-border/40">
+                                                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">{label}</p>
                                                   {isHtml ? (
                                                     <div
-                                                      className="prose prose-sm max-w-none text-[12px] text-foreground [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-0.5 [&_strong]:font-semibold [&_em]:italic [&_p]:mb-1 [&_p:last-child]:mb-0"
+                                                      className="prose prose-sm max-w-none text-[12px] text-foreground [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_li]:text-[12px] [&_strong]:font-semibold [&_em]:italic [&_p]:mb-1.5 [&_p:last-child]:mb-0"
                                                       dangerouslySetInnerHTML={{ __html: val }}
                                                     />
                                                   ) : (
@@ -1294,18 +1300,29 @@ export default function ProgramConfiguration() {
                                   )}
 
                                   {/* Cohort toggle + Next */}
-                                  <div className="flex items-center justify-between px-4 py-3 border-t border-border/50">
-                                    <label className="flex items-center gap-2 cursor-pointer select-none">
-                                      <input
-                                        type="checkbox"
-                                        checked={isCohortBased}
-                                        onChange={e => setIsCohortBased(e.target.checked)}
-                                        className="w-3.5 h-3.5 rounded accent-primary"
-                                      />
-                                      <span className="text-[11px] text-muted-foreground">
-                                        {isCohortBased ? 'Cohort-based program' : 'Ongoing / no cohorts'}
-                                      </span>
-                                    </label>
+                                  <div className="flex items-center justify-between px-4 py-3 border-t border-border/50 bg-muted/20">
+                                    <div className="flex items-center gap-1 rounded-lg border border-border bg-background p-0.5">
+                                      <button
+                                        onClick={() => setIsCohortBased(true)}
+                                        className={`text-[11px] font-medium px-3 py-1 rounded-md transition-all ${
+                                          isCohortBased
+                                            ? 'bg-primary text-primary-foreground shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                        }`}
+                                      >
+                                        Cohort-based
+                                      </button>
+                                      <button
+                                        onClick={() => setIsCohortBased(false)}
+                                        className={`text-[11px] font-medium px-3 py-1 rounded-md transition-all ${
+                                          !isCohortBased
+                                            ? 'bg-primary text-primary-foreground shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                        }`}
+                                      >
+                                        Ongoing
+                                      </button>
+                                    </div>
                                     <button onClick={handleAdvanceFromStep1}
                                       className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[13px] font-semibold hover:bg-primary/90 transition-colors">
                                       {isCohortBased ? 'Next: Configure Cohorts' : 'Next: Configure Course'}
