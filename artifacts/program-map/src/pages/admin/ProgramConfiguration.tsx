@@ -6,10 +6,11 @@
  * Steps: 1 Program → 2 Cohorts → 3 Course → 4 Modules → Review
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'wouter';
 import { Sparkles, ChevronRight, Plus, Check,
          AlertCircle, Loader2, RotateCcw, Zap, BookOpen,
          Layers, Users, GraduationCap, ClipboardList,
-         Pencil, Eye, ExternalLink } from 'lucide-react';
+         Pencil, Eye, ExternalLink, ArrowLeft } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/context/AppContext';
@@ -427,9 +428,10 @@ function PennyGuidancePanel({
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function ProgramConfiguration() {
+export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?: string | null } = {}) {
   const { userTier, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   // ── Wizard state ────────────────────────────────────────────────────────────
   const [step, setStep]                     = useState<WizardStep>(1);
@@ -462,6 +464,7 @@ export default function ProgramConfiguration() {
   const [agentforceLoading, setAgentforceLoading] = useState(false);
 
   const pendingPennyPrompt = useRef<string | null>(null);
+  const autoSelectDoneRef  = useRef(false);
 
   // ── Form state ──────────────────────────────────────────────────────────────
   const [progForm, setProgForm] = useState({
@@ -571,6 +574,17 @@ export default function ProgramConfiguration() {
   }, []);
 
   useEffect(() => { void loadPrograms(); }, [loadPrograms]);
+
+  // Auto-select a program when navigated here from Overview with a pre-selected SF ID
+  useEffect(() => {
+    if (!preSelectSfId || programs.length === 0 || autoSelectDoneRef.current) return;
+    const match = programs.find(p => p.Id === preSelectSfId);
+    if (match) {
+      autoSelectDoneRef.current = true;
+      void handleSelectProgram(match);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [programs, preSelectSfId]);
 
   useEffect(() => {
     if (!programDetailLoading && programDetail && detailPanelRef.current) {
@@ -870,8 +884,14 @@ export default function ProgramConfiguration() {
       <div className="flex-shrink-0 px-6 py-4 border-b border-border bg-card">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
-              Administration
+            <button
+              onClick={() => navigate('/program')}
+              className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-muted-foreground mb-1 transition-colors"
+            >
+              <ArrowLeft className="w-3 h-3" /> Programs
+            </button>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+              Programs
             </p>
             <h1 className="text-base font-semibold text-foreground">Program Configuration</h1>
             <p className="text-[11px] text-muted-foreground mt-0.5">

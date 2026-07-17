@@ -107,10 +107,10 @@ export default function ProgramOverview() {
     return { confirmed, needsReview, draft, pennyActive, blueprintOk, withoutPenny };
   }, [programs]);
 
-  // Navigate to program workspace and open that program's detail panel
+  // Navigate directly to Program Configuration pre-selected to this program
   function openProgram(p: (typeof programs)[number]) {
     setSelectedItem({ type: 'program', id: p.id, data: p });
-    setLocation('/program/programs');
+    setLocation(`/program/config/${p.id}`);
   }
 
   if (isEveryday) {
