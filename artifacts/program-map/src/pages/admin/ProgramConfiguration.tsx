@@ -300,6 +300,20 @@ function PennyGuidancePanel({
 
       {/* Body */}
       <div className="flex-1 overflow-auto px-4 py-4 space-y-4">
+        {/* Focus with Penny — top of panel */}
+        <div>
+          <button
+            onClick={onFocusWithPenny}
+            className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Focus with {TERMS.aiAssistant}
+          </button>
+          <p className="text-[9px] text-muted-foreground/40 text-center mt-1.5">
+            {TERMS.aiAssistant} · Gemini 2.5 Flash · Live
+          </p>
+        </div>
+
         {/* Step context */}
         <div className="rounded-lg bg-muted/40 border border-border/60 p-3">
           <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
@@ -355,19 +369,6 @@ function PennyGuidancePanel({
         )}
       </div>
 
-      {/* Focus with Penny — global slide-over */}
-      <div className="flex-shrink-0 px-4 pb-4 pt-2 border-t border-border">
-        <button
-          onClick={onFocusWithPenny}
-          className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors"
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          Focus with {TERMS.aiAssistant}
-        </button>
-        <p className="text-[9px] text-muted-foreground/40 text-center mt-1.5">
-          {TERMS.aiAssistant} · Gemini 2.5 Flash · Live
-        </p>
-      </div>
     </div>
   );
 }
