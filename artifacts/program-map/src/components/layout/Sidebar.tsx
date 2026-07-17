@@ -39,10 +39,11 @@ const navGroups: NavGroup[] = [
     label: 'Programs',
     icon: GraduationCap,
     pathPrefix: '/program',
-    excludePrefixes: ['/program/blueprint', '/program/standards'],
+    excludePrefixes: ['/program/blueprint'],
     items: [
-      { id: 'prog-overview',  path: '/program',          label: 'Overview',  minTier: 'admin' },
-      { id: 'prog-programs',  path: '/program/programs', label: 'Programs',  minTier: 'admin' },
+      { id: 'prog-overview',   path: '/program',            label: 'Overview',         minTier: 'admin' },
+      { id: 'prog-programs',   path: '/program/programs',   label: 'Programs',         minTier: 'admin' },
+      { id: 'prog-standards',  path: '/program/standards',  label: 'Standards Studio', minTier: 'power' },
     ],
   },
   {
@@ -96,7 +97,7 @@ const navGroups: NavGroup[] = [
     label: 'Administration',
     icon: Settings,
     pathPrefix: '/admin',
-    extraPrefixes: ['/digital-twin', '/uom', '/governance', '/program/blueprint', '/program/standards'],
+    extraPrefixes: ['/digital-twin', '/uom', '/governance', '/program/blueprint'],
     items: [
       { id: 'admin-integrations',  path: '/admin/integrations',      label: 'Integrations'          },
       { id: 'admin-people-access', path: '/admin/people-access',     label: 'People & Access'        },

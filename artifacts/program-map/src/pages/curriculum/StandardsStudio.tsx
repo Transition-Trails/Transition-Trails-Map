@@ -47,7 +47,7 @@ function ViewTab({
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all border ${
         active
           ? 'bg-foreground text-background border-foreground'
-          : 'border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+          : 'border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground'
       }`}
     >
       <Icon className="w-3.5 h-3.5" />
@@ -72,7 +72,7 @@ function StandardRow({
       className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
         selected
           ? 'bg-foreground text-background border-foreground'
-          : 'bg-white border-border hover:border-foreground/20 hover:bg-muted/30'
+          : 'bg-background border-border hover:border-foreground/20 hover:bg-muted/30'
       }`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -130,7 +130,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
               onClick={onOpenBrief}
               className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0"
             >
-              Trail Insights
+              {TERMS.knowledgeBrief}
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -240,7 +240,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
             <span className="text-muted-foreground">Related Objects</span>
             <div className="flex flex-wrap gap-1 mt-0.5">
               {std.relatedContentObjects.map(o => (
-                <span key={o} className="text-[9px] font-medium border border-border bg-white rounded-full px-1.5 py-0.5 text-muted-foreground">{o}</span>
+                <span key={o} className="text-[9px] font-medium border border-border bg-background rounded-full px-1.5 py-0.5 text-muted-foreground">{o}</span>
               ))}
             </div>
           </div>
@@ -262,24 +262,14 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
     <ScrollArea className="h-full">
       <div className="p-5 space-y-6 max-w-3xl">
 
-        {/* Hero */}
-        <div className="rounded-xl border border-primary/15 bg-primary/5 p-5">
-          <div className="flex items-start gap-3">
-            <ShieldCheck className="w-8 h-8 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h2 className="text-[15px] font-bold text-foreground mb-1">What Are Standards?</h2>
-              <p className="text-[12px] text-foreground/80 leading-relaxed mb-3">
-                Standards are the rulebook Penny uses to create, review, and improve Transition Trails curriculum content consistently.
-                Every content object — from a Module to a Calendar Reminder — has a defined standard that specifies required fields,
-                quality criteria, and how Penny uses it.
-              </p>
-              <p className="text-[12px] text-foreground/80 leading-relaxed">
-                The <strong>Program Blueprint</strong> is the design standard — it defines what every program <em>should</em> contain.
-                <strong> Foundations Trail</strong> is the reference implementation — the first program fully built to this standard, showing what <em>does</em> exist.
-                These standards ensure Penny can serve every learner with consistent coaching quality across all programs.
-              </p>
-            </div>
-          </div>
+        {/* Intro strip */}
+        <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+          <ShieldCheck className="w-4 h-4 text-muted-foreground shrink-0" />
+          <p className="text-[12px] text-muted-foreground leading-relaxed">
+            Standards are the rulebook {TERMS.aiAssistant} uses to create, review, and improve curriculum content.
+            The <strong className="text-foreground">Program Blueprint</strong> defines what every program should contain;
+            <strong className="text-foreground"> Foundations Trail</strong> is the reference implementation.
+          </p>
         </div>
 
         {/* Stats */}
@@ -291,7 +281,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
             { label: 'Required Checks', value: STANDARDS_SUMMARY.requiredChecks, sub: 'must-pass', cls: 'border-rose-200 bg-rose-50' },
           ].map(stat => (
             <div key={stat.label} className={`rounded-lg border p-3 text-center ${stat.cls}`}>
-              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              <p className="text-xl font-bold text-foreground">{stat.value}</p>
               <p className="text-[11px] font-semibold text-foreground/80">{stat.label}</p>
               <p className="text-[10px] text-muted-foreground">{stat.sub}</p>
             </div>
@@ -307,7 +297,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
               { step: '2', title: `${TERMS.aiAssistant} audits with checklist`, desc: `Before publishing, ${TERMS.aiAssistant} runs the Standards Checklist against each content object — flagging missing fields and quality issues.` },
               { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps in the reference implementation and all programs, sorted by severity, so teams can prioritise fixes before the next cohort.' },
             ].map(s => (
-              <div key={s.step} className="rounded-lg border border-border bg-white p-3">
+              <div key={s.step} className="rounded-lg border border-border bg-background p-3">
                 <div className="w-6 h-6 rounded-full bg-foreground text-background text-[11px] font-bold flex items-center justify-center mb-2">{s.step}</div>
                 <p className="text-[11px] font-bold text-foreground mb-1">{s.title}</p>
                 <p className="text-[10px] text-muted-foreground leading-relaxed">{s.desc}</p>
@@ -334,7 +324,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
                     <button
                       key={std.id}
                       onClick={() => onNavigate('standards', std.id)}
-                      className="text-left rounded-lg border border-border bg-white hover:border-foreground/20 hover:bg-muted/20 p-3 transition-all"
+                      className="text-left rounded-lg border border-border bg-background hover:border-foreground/20 hover:bg-muted/20 p-3 transition-all"
                     >
                       <div className="flex items-start justify-between mb-1">
                         <p className="text-[12px] font-bold text-foreground">{std.name}</p>
@@ -411,13 +401,13 @@ function StandardsBrowserView({
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search standards…"
-              className="pl-7 h-7 text-[11px] bg-white"
+              className="pl-7 h-7 text-[11px] bg-background"
             />
           </div>
           <select
             value={filterCat}
             onChange={e => setFilterCat(e.target.value as StandardCategory | 'all')}
-            className="w-full h-7 text-[11px] rounded-md border border-input bg-white px-2"
+            className="w-full h-7 text-[11px] rounded-md border border-input bg-background px-2"
           >
             <option value="all">All categories</option>
             {CATEGORY_ORDER.map(c => <option key={c} value={c}>{c}</option>)}
@@ -485,14 +475,14 @@ function ChecklistView() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-white">
+      <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-background">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <span className="text-[11px] text-muted-foreground">Filter:</span>
             <select
               value={filterType}
               onChange={e => { setFilterType(e.target.value); setStates({}); }}
-              className="h-7 text-[11px] rounded-md border border-input bg-white px-2"
+              className="h-7 text-[11px] rounded-md border border-input bg-background px-2"
             >
               <option value="all">All object types</option>
               {objectTypes.map(t => <option key={t} value={t}>{t}</option>)}
@@ -524,7 +514,7 @@ function ChecklistView() {
             const stdPass   = stdChecks.filter(c => states[c.id] === 'pass').length;
             const stdFail   = stdChecks.filter(c => states[c.id] === 'fail').length;
             return (
-              <div key={std.id} className="rounded-xl border border-border bg-white overflow-hidden">
+              <div key={std.id} className="rounded-xl border border-border bg-background overflow-hidden">
                 <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookCheck className="w-4 h-4 text-muted-foreground" />
@@ -551,7 +541,7 @@ function ChecklistView() {
                         <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
                           state === 'pass' ? 'bg-green-500 border-green-500'
                             : state === 'fail' ? 'bg-rose-500 border-rose-500'
-                            : 'bg-white border-muted-foreground/30'
+                            : 'bg-background border-muted-foreground/30'
                         }`}>
                           {state === 'pass' && <CheckCircle2 className="w-3 h-3 text-white" />}
                           {state === 'fail' && <XCircle className="w-3 h-3 text-white" />}
@@ -607,7 +597,7 @@ function GapReportView() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-white">
+      <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 flex-wrap">
           {[
             { label: `${GAP_SUMMARY.bySeverity.high} High`, cls: 'text-rose-700 bg-rose-50 border-rose-200' },
@@ -619,11 +609,11 @@ function GapReportView() {
         </div>
         <div className="flex items-center gap-2 ml-auto">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select value={filterType} onChange={e => setFilterType(e.target.value as GapType | 'all')} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterType} onChange={e => setFilterType(e.target.value as GapType | 'all')} className="h-7 text-[11px] rounded-md border border-input bg-background px-2">
             <option value="all">All gap types</option>
             {(Object.keys(GAP_TYPE_CONFIG) as GapType[]).map(t => <option key={t} value={t}>{GAP_TYPE_CONFIG[t].label}</option>)}
           </select>
-          <select value={filterSev} onChange={e => setFilterSev(e.target.value as 'all' | 'high' | 'medium' | 'low')} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterSev} onChange={e => setFilterSev(e.target.value as 'all' | 'high' | 'medium' | 'low')} className="h-7 text-[11px] rounded-md border border-input bg-background px-2">
             <option value="all">All severities</option>
             <option value="high">High only</option>
             <option value="medium">Medium only</option>
@@ -646,7 +636,7 @@ function GapReportView() {
             const isOpen  = expanded === gap.id;
             const std     = contentStandards.find(s => s.id === gap.standardId);
             return (
-              <div key={gap.id} className={`rounded-xl border overflow-hidden transition-all ${isOpen ? 'border-foreground/20' : 'border-border bg-white hover:border-foreground/15'}`}>
+              <div key={gap.id} className={`rounded-xl border overflow-hidden transition-all ${isOpen ? 'border-foreground/20' : 'border-border bg-background hover:border-foreground/15'}`}>
                 <button
                   onClick={() => setExpanded(isOpen ? null : gap.id)}
                   className="w-full text-left px-4 py-3 flex items-start gap-3"
