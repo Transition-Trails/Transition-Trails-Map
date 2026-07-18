@@ -4,6 +4,7 @@ import {
   Users, Shield, Star, Brain, Globe, Chrome, Network, Mail,
   CheckCircle2, XCircle, MinusCircle,
   ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronRight,
+  Pencil, UserCheck, AlertTriangle, Save,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -15,7 +16,7 @@ import { TERMS } from '@/config/terminology';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type Tab = 'matrix' | 'access';
+type Tab = 'matrix' | 'access' | 'owners';
 
 type TierKey = 'everyday' | 'power' | 'admin' | 'superadmin';
 type FilterTier   = TierKey | 'all';
@@ -720,11 +721,276 @@ function AccessTiersTab({
   );
 }
 
+// ── Role Owners tab ───────────────────────────────────────────────────────────
+
+interface PlatformRole {
+  id:               string;
+  title:            string;
+  domain:           string;
+  description:      string;
+  responsibilities: string[];
+  requiredTier:     'everyday' | 'power' | 'admin' | 'superadmin';
+  owner:            string;
+  ownerEmail:       string;
+}
+
+const TIER_BADGE: Record<string, string> = {
+  everyday:   'bg-emerald-50 text-emerald-700 border-emerald-200',
+  power:      'bg-violet-50 text-violet-700 border-violet-200',
+  admin:      'bg-amber-50 text-amber-700 border-amber-200',
+  superadmin: 'bg-primary/10 text-primary border-primary/20',
+};
+
+const INITIAL_ROLES: PlatformRole[] = [
+  {
+    id: 'penny-admin',
+    title: `${TERMS.aiAssistant} Admin`,
+    domain: 'Penny AI',
+    description: 'Owns prompt governance, source trust management, capability quality monitoring, and RAG pipeline health.',
+    responsibilities: ['Approve and version all prompt templates', 'Review source trust assignments', 'Monitor capability quality metrics', 'Define prompt governance SLA', 'Manage Penny capability registry'],
+    requiredTier: 'power',
+    owner: '',
+    ownerEmail: '',
+  },
+  {
+    id: 'knowledge-manager',
+    title: 'Knowledge Manager',
+    domain: 'Knowledge Library',
+    description: 'Manages knowledge source trust reviews, category mapping, and the review cadence across all sources.',
+    responsibilities: ['Conduct quarterly source trust reviews', 'Approve new sources for Penny ingestion', 'Maintain category mapping completeness', 'Escalate stale or unverified sources'],
+    requiredTier: 'power',
+    owner: '',
+    ownerEmail: '',
+  },
+  {
+    id: 'curriculum-lead',
+    title: 'Curriculum Lead',
+    domain: 'Curriculum Studio',
+    description: 'Owns module and lesson standards, curriculum design decisions, and LMS content governance.',
+    responsibilities: ['Author and update Standards Studio rules', 'Approve module outlines and lesson frameworks', 'Manage Curriculum Studio content', 'Coordinate with Penny Lead on curriculum assets'],
+    requiredTier: 'power',
+    owner: '',
+    ownerEmail: '',
+  },
+  {
+    id: 'standards-lead',
+    title: 'Standards Lead',
+    domain: 'Standards Studio',
+    description: 'Owns Standards Studio quality rules, enforces content standards compliance, and gates Penny output quality.',
+    responsibilities: ['Define and update quality standards', 'Review Penny outputs for standard compliance', 'Escalate standards violations', 'Maintain the Penny Blueprint standard'],
+    requiredTier: 'power',
+    owner: '',
+    ownerEmail: '',
+  },
+  {
+    id: 'salesforce-admin',
+    title: 'Salesforce Admin',
+    domain: 'Operations & Integrations',
+    description: 'Owns Salesforce data model integrity, integration health, and SF-to-Trail-OS object mapping.',
+    responsibilities: ['Maintain SF object and field mapping', 'Monitor Salesforce integration health', 'Manage permission sets and profiles', 'Validate data sync between SF and Trail OS'],
+    requiredTier: 'admin',
+    owner: '',
+    ownerEmail: '',
+  },
+  {
+    id: 'coach-team-lead',
+    title: 'Coach Team Lead',
+    domain: 'Coaching & Delivery',
+    description: 'Owns Coach Notes standard adherence, cohort coaching quality, and escalation protocols.',
+    responsibilities: ['Enforce Coach Notes standard (100% adherence target)', 'Manage coach escalation protocols', 'Review Penny coaching output quality', 'Coordinate with Penny Admin on coaching capabilities'],
+    requiredTier: 'everyday',
+    owner: '',
+    ownerEmail: '',
+  },
+  {
+    id: 'platform-admin',
+    title: 'Platform Admin',
+    domain: 'Administration',
+    description: 'Owns Trail OS configuration, secrets management, integration credentials, and deployment governance.',
+    responsibilities: ['Manage Replit Secrets and environment config', 'Own integration token lifecycle', 'Govern Trail OS phase transitions', 'Manage Google Workspace and Clerk setup'],
+    requiredTier: 'superadmin',
+    owner: '',
+    ownerEmail: '',
+  },
+];
+
+function RoleOwnersTab() {
+  const [roles, setRoles]         = useState<PlatformRole[]>(INITIAL_ROLES);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft]         = useState<{ owner: string; ownerEmail: string }>({ owner: '', ownerEmail: '' });
+
+  const unassigned = roles.filter(r => !r.owner.trim()).length;
+
+  function startEdit(role: PlatformRole) {
+    setEditingId(role.id);
+    setDraft({ owner: role.owner, ownerEmail: role.ownerEmail });
+  }
+
+  function saveEdit(id: string) {
+    setRoles(prev => prev.map(r => r.id === id ? { ...r, ...draft } : r));
+    setEditingId(null);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+  }
+
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-5 max-w-3xl space-y-5">
+
+        {/* Status banner */}
+        <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 ${
+          unassigned === 0
+            ? 'bg-emerald-50/60 border-emerald-200'
+            : 'bg-amber-50/60 border-amber-200'
+        }`}>
+          {unassigned === 0
+            ? <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+            : <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+          }
+          <div>
+            <p className={`text-[12px] font-semibold ${unassigned === 0 ? 'text-emerald-800' : 'text-amber-800'}`}>
+              {unassigned === 0
+                ? 'All platform roles are assigned'
+                : `${unassigned} platform role${unassigned !== 1 ? 's' : ''} unassigned`
+              }
+            </p>
+            <p className={`text-[11px] mt-0.5 ${unassigned === 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
+              {unassigned === 0
+                ? 'Prompt governance, knowledge management, and platform administration all have named owners.'
+                : 'Unassigned roles create governance gaps — Penny quality monitoring, source trust reviews, and prompt governance are ungoverned until owners are set.'
+              }
+            </p>
+          </div>
+        </div>
+
+        {/* Role cards */}
+        <div className="space-y-3">
+          {roles.map(role => {
+            const isEditing  = editingId === role.id;
+            const isAssigned = role.owner.trim().length > 0;
+            const tierLabel  = TIER_CONFIG[role.requiredTier]?.shortLabel ?? role.requiredTier;
+
+            return (
+              <div
+                key={role.id}
+                className={`rounded-lg border bg-background p-4 space-y-3 transition-colors ${
+                  isEditing ? 'border-primary/40 ring-1 ring-primary/20' : 'border-border'
+                }`}
+              >
+                {/* Role header */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="text-[13px] font-semibold text-foreground">{role.title}</span>
+                      <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${TIER_BADGE[role.requiredTier]}`}>
+                        {tierLabel}+
+                      </span>
+                      <span className="text-[9px] text-muted-foreground/60 border border-border rounded px-1.5 py-0.5">
+                        {role.domain}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-snug">{role.description}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    {isAssigned ? (
+                      <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                        <UserCheck className="w-3 h-3" /> Assigned
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                        <AlertTriangle className="w-3 h-3" /> Unassigned
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Responsibilities */}
+                <div className="flex flex-wrap gap-1.5">
+                  {role.responsibilities.map(r => (
+                    <span key={r} className="text-[9px] bg-muted/50 text-muted-foreground rounded px-1.5 py-0.5 border border-border/60">
+                      {r}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Owner block */}
+                {isEditing ? (
+                  <div className="space-y-2 pt-1 border-t border-border/40">
+                    <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Assign Owner</p>
+                    <div className="flex gap-2">
+                      <input
+                        autoFocus
+                        type="text"
+                        placeholder="Full name"
+                        value={draft.owner}
+                        onChange={e => setDraft(d => ({ ...d, owner: e.target.value }))}
+                        className="flex-1 text-[12px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email address"
+                        value={draft.ownerEmail}
+                        onChange={e => setDraft(d => ({ ...d, ownerEmail: e.target.value }))}
+                        className="flex-1 text-[12px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveEdit(role.id)}
+                        className="flex items-center gap-1.5 text-[11px] font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity"
+                      >
+                        <Save className="w-3 h-3" /> Save
+                      </button>
+                      <button
+                        onClick={cancelEdit}
+                        className="text-[11px] text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md border border-border transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between pt-1 border-t border-border/40">
+                    {isAssigned ? (
+                      <div>
+                        <p className="text-[12px] font-semibold text-foreground">{role.owner}</p>
+                        {role.ownerEmail && (
+                          <p className="text-[10px] text-muted-foreground">{role.ownerEmail}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-muted-foreground/60 italic">No owner assigned</p>
+                    )}
+                    <button
+                      onClick={() => startEdit(role)}
+                      className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1.5 hover:border-ring/50 transition-colors"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      {isAssigned ? 'Edit' : 'Assign'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="text-[10px] text-muted-foreground/50 pb-2">
+          Role assignments are stored locally for this session. Database persistence for role owners is a Phase 2 feature.
+        </p>
+      </div>
+    </ScrollArea>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'matrix', label: 'Permission Matrix' },
   { id: 'access', label: 'Access Tiers & Auth' },
+  { id: 'owners', label: 'Role Owners' },
 ];
 
 export default function PeopleAccess() {
@@ -776,6 +1042,7 @@ export default function PeopleAccess() {
       <div className="flex-1 overflow-hidden">
         {activeTab === 'matrix' && <PermissionMatrixTab />}
         {activeTab === 'access' && <AccessTiersTab userTier={userTier} setUserTier={setUserTier} />}
+        {activeTab === 'owners' && <RoleOwnersTab />}
       </div>
 
     </div>
