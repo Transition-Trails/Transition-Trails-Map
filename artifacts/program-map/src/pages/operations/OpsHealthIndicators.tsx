@@ -1,9 +1,11 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
-import { domainHealthData, HEALTH_LEVEL_CONFIG } from '@/data/operationalIntelligenceData';
+import { HEALTH_LEVEL_CONFIG } from '@/data/operationalIntelligenceData';
+import { useHealthScores } from '@/hooks/useHealthScores';
 
 export default function OpsHealthIndicators() {
   const { setSelectedItem } = useAppContext();
+  const { domainHealthData } = useHealthScores();
 
   return (
     <ScrollArea className="h-full">

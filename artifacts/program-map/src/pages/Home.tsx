@@ -12,11 +12,10 @@ import {
 } from 'lucide-react';
 import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
 import {
-  domainHealthData,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG,
-  overallHealthScore, overallHealthLevel,
 } from '@/data/operationalIntelligenceData';
 import { useActionItems } from '@/hooks/useActionItems';
+import { useHealthScores } from '@/hooks/useHealthScores';
 
 // ── Route maps (mirrors OperationsHub) ───────────────────────────────────────
 const REC_ID_ROUTE: Record<string, string> = {
@@ -84,6 +83,7 @@ export default function Home() {
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, navigate] = useLocation();
   const { visibleRecs } = useActionItems();
+  const { domainHealthData, overallHealthScore, overallHealthLevel } = useHealthScores();
 
   const { data: sfData, isLoading: sfLoading, isError: sfError, refetch, isFetching } = useSfOpsSummary();
 

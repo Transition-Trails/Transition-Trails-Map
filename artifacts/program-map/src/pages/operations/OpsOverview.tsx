@@ -3,11 +3,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import {
-  domainHealthData,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG,
-  overallHealthScore, overallHealthLevel,
 } from '@/data/operationalIntelligenceData';
 import { useActionItems } from '@/hooks/useActionItems';
+import { useHealthScores } from '@/hooks/useHealthScores';
 import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
 import { useSfOpsPrograms } from '@/hooks/useSfOpsPrograms';
 
@@ -79,6 +78,7 @@ export default function OpsOverview() {
   const { setSelectedItem } = useAppContext();
   const { isEveryday } = useTierFlags();
   const { visibleRecs } = useActionItems();
+  const { domainHealthData, overallHealthScore, overallHealthLevel } = useHealthScores();
   const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
   const { data: sfPrograms } = useSfOpsPrograms();
 

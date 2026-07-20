@@ -8,11 +8,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import {
-  domainHealthData, readinessScorecards, trendInsights,
-  overallHealthScore, overallHealthLevel,
+  readinessScorecards, trendInsights,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG,
   type HealthLevel,
 } from '@/data/operationalIntelligenceData';
+import { useHealthScores } from '@/hooks/useHealthScores';
 import RecommendationsManager from '@/pages/operations/RecommendationsManager';
 import { useActionItems } from '@/hooks/useActionItems';
 import Intake        from '@/pages/demand/Intake';
@@ -23,13 +23,14 @@ const STATUS_WEIGHT: Record<HealthLevel, number> = { 'at-risk': 0, 'needs-work':
 // ── Health Indicators — overall score + top-5 impact + domain grid ────────────
 function HealthIndicators() {
   const { setSelectedItem, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
+  const { domainHealthData: baseDomains, overallHealthScore, overallHealthLevel } = useHealthScores();
   const oc = HEALTH_LEVEL_CONFIG[overallHealthLevel];
   const { data: sfData, isLoading: sfLoading } = useOpsSummary();
 
-  // Patch stale indicators with live Salesforce data when available.
+  // Layer live Salesforce data on top of the computed base.
   const enrichedDomains = useMemo(() => {
-    if (!sfData) return domainHealthData;
-    return domainHealthData.map(d => {
+    if (!sfData) return baseDomains;
+    return baseDomains.map(d => {
       if (d.id === 'dh-programs') {
         return {
           ...d,
@@ -60,7 +61,7 @@ function HealthIndicators() {
       }
       return d;
     });
-  }, [sfData]);
+  }, [sfData, baseDomains]);
 
   // Top 5: worst-status first, then lowest domain score
   const top5 = enrichedDomains
@@ -88,7 +89,7 @@ function HealthIndicators() {
           <div className="px-4 py-3 border-b border-border/40 bg-muted/20 flex items-center justify-between">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Trail OS Platform Health</p>
-              <p className="text-[11px] text-muted-foreground">Composite score across {domainHealthData.length} domains</p>
+              <p className="text-[11px] text-muted-foreground">Composite score across {baseDomains.length} domains</p>
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-[9px] font-bold border rounded-full px-2 py-0.5 ${oc.cls}`}>{oc.label}</span>

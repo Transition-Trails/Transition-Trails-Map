@@ -68,7 +68,7 @@ export interface Recommendation {
   effort: 'Low' | 'Medium' | 'High';
   systems: string[];
   nextSteps: string[];
-  status: 'open' | 'in-progress' | 'complete';
+  status: 'open' | 'in-progress' | 'complete' | 'done';
 }
 
 // ── READINESS SCORECARD ───────────────────────────────────────────────────────
