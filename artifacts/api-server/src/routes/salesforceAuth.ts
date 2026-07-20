@@ -6,6 +6,7 @@ import {
   exchangeCodeForTokens,
   refreshAccessToken,
   getUserIdentity,
+  getEffectiveSfFetch,
 } from "../lib/salesforceOAuth.js";
 import { logger } from "../lib/logger.js";
 import { setCachedSfToken } from "../lib/sfTokenCache.js";
@@ -179,7 +180,33 @@ router.get("/status", async (req, res): Promise<void> => {
   const { sfAccessToken, sfRefreshToken, sfIssuedAt, sfUserId, sfUsername, sfEmail } = req.session;
 
   if (!sfAccessToken) {
-    res.json({ authenticated: false });
+    // No personal session token — check if the connector / env-var path is live.
+    // getEffectiveSfFetch falls through: session → env vars → Replit connector.
+    const sfFetch = getEffectiveSfFetch(req);
+    if (!sfFetch) {
+      res.json({ authenticated: false });
+      return;
+    }
+    try {
+      const idRes = await sfFetch("/services/oauth2/userinfo", { headers: { Accept: "application/json" } });
+      if (!idRes.ok) {
+        res.json({ authenticated: false });
+        return;
+      }
+      const idData = await idRes.json() as Record<string, unknown>;
+      res.json({
+        authenticated: true,
+        source: "connector",
+        user: {
+          userId:      String(idData["user_id"] ?? ""),
+          username:    String(idData["preferred_username"] ?? ""),
+          email:       String(idData["email"] ?? ""),
+          displayName: String(idData["name"] ?? ""),
+        },
+      });
+    } catch {
+      res.json({ authenticated: false });
+    }
     return;
   }
 
