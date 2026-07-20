@@ -74,6 +74,21 @@ export const CAPABILITY_DOMAIN_CONFIG: Record<CapabilityDomain, { cls: string; d
   'Questing':         { cls: 'text-primary border-primary/20 bg-primary/5',        description: 'Trail Quests, weekly reviews, and challenge-based learning' },
 };
 
+// ── Capability Status (user-configurable) ─────────────────────────────────
+// Three states the team can set per capability to track configuration progress.
+
+export type CapabilityStatus = 'Live' | 'Ready' | 'Partial';
+
+export const CAPABILITY_STATUS_CONFIG: Record<CapabilityStatus, {
+  label: string;
+  badgeCls: string;
+  statusVariant: 'active' | 'planning' | 'draft';
+}> = {
+  'Live':    { label: 'Live',    badgeCls: 'text-emerald-700 bg-emerald-50 border-emerald-200', statusVariant: 'active'   },
+  'Ready':   { label: 'Ready',   badgeCls: 'text-sky-700 bg-sky-50 border-sky-200',            statusVariant: 'active'   },
+  'Partial': { label: 'Partial', badgeCls: 'text-amber-700 bg-amber-50 border-amber-200',      statusVariant: 'planning' },
+};
+
 export const POC_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   exists:  { label: 'Exists in POC',  cls: 'text-green-700 bg-green-50 border-green-200' },
   partial: { label: 'Partial in POC', cls: 'text-amber-700 bg-amber-50 border-amber-200' },

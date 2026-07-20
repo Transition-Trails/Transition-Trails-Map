@@ -1,10 +1,26 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Brain, GraduationCap, BookOpen, Puzzle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace, HealthDot } from '@/components/workspace/ObjectWorkspace';
 import type { WorkspaceItem, WorkspaceTab } from '@/components/workspace/ObjectWorkspace';
-import { pennyCapabilities as STATIC_CAPS, type PennyCapability, CAPABILITY_READINESS_CONFIG, CAPABILITY_DOMAIN_CONFIG } from '@/data/pennyCapabilityData';
+import {
+  pennyCapabilities as STATIC_CAPS,
+  type PennyCapability,
+  CAPABILITY_READINESS_CONFIG,
+  CAPABILITY_DOMAIN_CONFIG,
+  type CapabilityStatus,
+  CAPABILITY_STATUS_CONFIG,
+} from '@/data/pennyCapabilityData';
 import { RelationshipCard, type RelatedItem } from '@/components/workspace/RelationshipCard';
+
+// Default status derived from pocStatus — 'exists' means it's already working
+function defaultStatus(pocStatus: string): CapabilityStatus {
+  return pocStatus === 'exists' ? 'Live' : 'Partial';
+}
+
+const STATUS_ORDER: Record<CapabilityStatus, number> = { 'Live': 2, 'Ready': 1, 'Partial': 0 };
+
+// ── Sub-components ────────────────────────────────────────────────────────────
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -26,30 +42,80 @@ function ChipList({ items }: { items: string[] }) {
   );
 }
 
-function OverviewTab({ cap }: { cap: PennyCapability }) {
-  const readinessCfg = CAPABILITY_READINESS_CONFIG[cap.maturity];
-  const domainCfg    = CAPABILITY_DOMAIN_CONFIG[cap.domain];
+// ── Status Selector ───────────────────────────────────────────────────────────
+
+function StatusSelector({ current, onChange }: { current: CapabilityStatus; onChange: (s: CapabilityStatus) => void }) {
+  const statuses: CapabilityStatus[] = ['Partial', 'Ready', 'Live'];
+  return (
+    <div>
+      <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 mb-1.5">Configure Status</p>
+      <div className="inline-flex rounded-md border border-border overflow-hidden">
+        {statuses.map((s, i) => {
+          const cfg = CAPABILITY_STATUS_CONFIG[s];
+          const isActive = current === s;
+          return (
+            <button
+              key={s}
+              onClick={() => onChange(s)}
+              className={`px-4 py-1.5 text-[11px] font-semibold transition-colors ${i < statuses.length - 1 ? 'border-r border-border' : ''} ${
+                isActive
+                  ? cfg.badgeCls + ' border-0'
+                  : 'bg-white text-muted-foreground hover:bg-muted/50'
+              }`}
+            >
+              {s}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-muted-foreground mt-1.5">
+        {current === 'Partial' && 'This capability is still being configured — not yet ready for use.'}
+        {current === 'Ready'   && 'Fully configured and ready to activate, but not yet serving learners.'}
+        {current === 'Live'    && 'Actively running and serving learners or coaches.'}
+      </p>
+    </div>
+  );
+}
+
+// ── Tab content ───────────────────────────────────────────────────────────────
+
+function OverviewTab({ cap, status, onStatusChange }: { cap: PennyCapability; status: CapabilityStatus; onStatusChange: (s: CapabilityStatus) => void }) {
+  const readinessCfg  = CAPABILITY_READINESS_CONFIG[cap.maturity];
+  const domainCfg     = CAPABILITY_DOMAIN_CONFIG[cap.domain];
+  const statusCfg     = CAPABILITY_STATUS_CONFIG[status];
   const isOperational = cap.maturity === 'Operational' || cap.maturity === 'Integrated';
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-3xl">
+        {/* Badges row */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${readinessCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
-            {cap.maturity}
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${statusCfg.badgeCls}`}>
+            {status}
           </span>
           <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${domainCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
             {cap.domain}
           </span>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${readinessCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
+            {cap.maturity}
+          </span>
         </div>
+
+        {/* Purpose */}
         {cap.purpose && (
           <p className="text-[12px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{cap.purpose}</p>
         )}
+
+        {/* Status selector */}
+        <StatusSelector current={status} onChange={onStatusChange} />
+
+        {/* Detail rows */}
         <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
           <InfoRow label="Short Description" value={cap.shortDescription} />
-          <InfoRow label="Readiness"         value={cap.maturity} />
+          <InfoRow label="Maturity"          value={cap.maturity} />
           <InfoRow label="Domain"            value={cap.domain} />
           {cap.audience?.length > 0 && <InfoRow label="Audience" value={cap.audience.join(', ')} />}
         </div>
+
         {cap.inputs?.length > 0 && (
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 mb-2">Inputs</p>
@@ -193,17 +259,18 @@ function QualityTab({ cap }: { cap: PennyCapability }) {
   );
 }
 
-function HealthTab({ cap }: { cap: PennyCapability }) {
+function HealthTab({ cap, status }: { cap: PennyCapability; status: CapabilityStatus }) {
   const isOp = cap.maturity === 'Operational' || cap.maturity === 'Integrated';
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
         {[
-          { label:'Capability Readiness',  health: isOp ? 'healthy' as const : 'needs-attention' as const, note:cap.maturity },
-          { label:'Prompt Template',       health: isOp ? 'healthy' as const : 'incomplete' as const,      note: isOp ? 'Approved and operational' : 'Pending approval' },
-          { label:'Knowledge Sources',     health:'healthy' as const, note:'Trust reviews current' },
-          { label:'Quality Review',        health: cap.id === 'coach-support' ? 'needs-attention' as const : 'healthy' as const, note: cap.id === 'coach-support' ? 'Quarterly review missed' : 'Last review passed (Q2 2025)' },
-          { label:'Governance Compliance', health:'healthy' as const, note:'Penny Blueprint compliant' },
+          { label:'Capability Status',    health: status === 'Live' ? 'healthy' as const : status === 'Ready' ? 'healthy' as const : 'needs-attention' as const, note: status },
+          { label:'Capability Readiness', health: isOp ? 'healthy' as const : 'needs-attention' as const, note:cap.maturity },
+          { label:'Prompt Template',      health: isOp ? 'healthy' as const : 'incomplete' as const,      note: isOp ? 'Approved and operational' : 'Pending approval' },
+          { label:'Knowledge Sources',    health:'healthy' as const, note:'Trust reviews current' },
+          { label:'Quality Review',       health: cap.id === 'coach-support' ? 'needs-attention' as const : 'healthy' as const, note: cap.id === 'coach-support' ? 'Quarterly review missed' : 'Last review passed (Q2 2025)' },
+          { label:'Governance Compliance',health:'healthy' as const, note:'Penny Blueprint compliant' },
         ].map(ind => (
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
             <div className="flex items-center gap-2.5">
@@ -252,49 +319,92 @@ function RelationshipsTab({ cap }: { cap: PennyCapability }) {
   );
 }
 
-function InfoRowLocal({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 w-28 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[12px] text-foreground flex-1">{value}</span>
-    </div>
-  );
-}
+// ── Main workspace ────────────────────────────────────────────────────────────
 
 export default function PennyWorkspace() {
-  const readinessOrder: Record<string, number> = {
-    'Operational':3,'Integrated':3,'In Development':2,'Planned':1,'Defined':0,'Prototype':0,
-  };
+  // Status is user-configurable per capability; defaults from pocStatus
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, CapabilityStatus>>(
+    () => Object.fromEntries(STATIC_CAPS.map(c => [c.id, defaultStatus(c.pocStatus)]))
+  );
 
-  const sorted = useMemo(() => [...STATIC_CAPS].sort((a, b) =>
-    (readinessOrder[b.maturity] ?? 0) - (readinessOrder[a.maturity] ?? 0)
-  ), []);
+  const statusRef = useRef(statusOverrides);
+  statusRef.current = statusOverrides;
 
-  const healthByReadiness = (r: string): WorkspaceItem['health'] =>
-    r === 'Operational' || r === 'Integrated' ? 'healthy' :
-    r === 'In Development' ? 'needs-attention' : 'incomplete';
+  const setStatusRef = useRef(setStatusOverrides);
+  setStatusRef.current = setStatusOverrides;
 
-  const items = useMemo<WorkspaceItem[]>(() => sorted.map(cap => ({
-    id: cap.id,
-    name: cap.name,
-    typeName: cap.domain,
-    typeColor: 'text-pink-700',
-    typeBg: 'bg-pink-50',
-    status: cap.maturity,
-    statusVariant: (cap.maturity === 'Operational' || cap.maturity === 'Integrated') ? ('active' as const) :
-                   cap.maturity === 'In Development' ? ('planning' as const) : ('draft' as const),
-    health: healthByReadiness(cap.maturity),
-    secondary: cap.shortDescription,
-    owner: 'Penny Lead',
-  })), [sorted]);
+  const sorted = useMemo(() =>
+    [...STATIC_CAPS].sort((a, b) => {
+      const sa = statusRef.current[a.id] ?? 'Partial';
+      const sb = statusRef.current[b.id] ?? 'Partial';
+      const diff = STATUS_ORDER[sb] - STATUS_ORDER[sa];
+      return diff !== 0 ? diff : a.domain.localeCompare(b.domain);
+    }),
+  // Re-sort when overrides change so Live items float to the top
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [statusOverrides]);
 
+  const items = useMemo<WorkspaceItem[]>(() => sorted.map(cap => {
+    const st    = statusOverrides[cap.id] ?? 'Partial';
+    const stCfg = CAPABILITY_STATUS_CONFIG[st];
+    return {
+      id:            cap.id,
+      name:          cap.name,
+      typeName:      cap.domain,
+      typeColor:     'text-pink-700',
+      typeBg:        'bg-pink-50',
+      status:        st,
+      statusVariant: stCfg.statusVariant,
+      health:        st === 'Partial' ? 'needs-attention' as const : 'healthy' as const,
+      secondary:     cap.shortDescription,
+      owner:         cap.owner,
+    };
+  }), [sorted, statusOverrides]);
+
+  // Tabs use refs so closures don't go stale when statusOverrides changes
   const tabs = useMemo<WorkspaceTab[]>(() => [
-    { id:'overview',  label:'Overview',         render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <OverviewTab cap={cap} /> : null; } },
-    { id:'prompts',   label:'Prompts',           render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <PromptsTab cap={cap} /> : null; } },
-    { id:'sources',   label:'Knowledge Sources', render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <SourcesTab cap={cap} /> : null; } },
-    { id:'quality',   label:'Quality',           render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <QualityTab cap={cap} /> : null; } },
-    { id:'health',         label:'Health',        render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <HealthTab cap={cap} /> : null; } },
-    { id:'relationships',  label:'Relationships', render:(item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <RelationshipsTab cap={cap} /> : null; } },
+    {
+      id: 'overview', label: 'Overview',
+      render: (item) => {
+        const cap    = STATIC_CAPS.find(c => c.id === item.id);
+        const status = statusRef.current[item.id] ?? 'Partial';
+        if (!cap) return null;
+        return (
+          <OverviewTab
+            cap={cap}
+            status={status}
+            onStatusChange={(s) =>
+              setStatusRef.current(prev => ({ ...prev, [item.id]: s }))
+            }
+          />
+        );
+      },
+    },
+    {
+      id: 'prompts', label: 'Prompts',
+      render: (item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <PromptsTab cap={cap} /> : null; },
+    },
+    {
+      id: 'sources', label: 'Knowledge Sources',
+      render: (item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <SourcesTab cap={cap} /> : null; },
+    },
+    {
+      id: 'quality', label: 'Quality',
+      render: (item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <QualityTab cap={cap} /> : null; },
+    },
+    {
+      id: 'health', label: 'Health',
+      render: (item) => {
+        const cap    = STATIC_CAPS.find(c => c.id === item.id);
+        const status = statusRef.current[item.id] ?? 'Partial';
+        return cap ? <HealthTab cap={cap} status={status} /> : null;
+      },
+    },
+    {
+      id: 'relationships', label: 'Relationships',
+      render: (item) => { const cap = STATIC_CAPS.find(c => c.id === item.id); return cap ? <RelationshipsTab cap={cap} /> : null; },
+    },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   ], []);
 
   return (
