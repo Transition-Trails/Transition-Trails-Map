@@ -894,9 +894,6 @@ function RoleOwnersTab() {
           })}
         </div>
 
-        <p className="text-[10px] text-muted-foreground/50 pb-2">
-          Role assignments are stored locally for this session. Database persistence for role owners is a Phase 2 feature.
-        </p>
       </div>
     </ScrollArea>
   );
