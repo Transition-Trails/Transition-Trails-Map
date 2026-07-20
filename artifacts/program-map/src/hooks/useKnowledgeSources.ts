@@ -12,11 +12,22 @@ export interface SfLiveMetrics {
   sfLive:     boolean;
 }
 
+export interface DriveEnrichment {
+  pennyAssetFileCount: number | null;
+}
+
+export interface SfKnowledgeEnrichment {
+  totalArticles:      number | null;
+  articlesByCategory: Record<string, number> | null;
+}
+
 interface KnowledgeSourcesResponse {
-  sources:           KnowledgeSource[];
-  metrics?:          SfLiveMetrics;
-  integrationStatus?: Record<string, string>;
-  fetchedAt?:        string;
+  sources:                KnowledgeSource[];
+  metrics?:               SfLiveMetrics;
+  integrationStatus?:     Record<string, string>;
+  driveEnrichment?:       DriveEnrichment;
+  sfKnowledgeEnrichment?: SfKnowledgeEnrichment;
+  fetchedAt?:             string;
 }
 
 // ── Summary helper ────────────────────────────────────────────────────────────
@@ -59,9 +70,11 @@ export function useKnowledgeSources() {
     const sources: KnowledgeSource[] = data?.sources ?? [];
     return {
       sources,
-      summary: computeSummary(sources),
-      metrics: data?.metrics ?? null,
-      integrationStatus: data?.integrationStatus ?? {},
+      summary:              computeSummary(sources),
+      metrics:              data?.metrics              ?? null,
+      integrationStatus:    data?.integrationStatus    ?? {},
+      driveEnrichment:      data?.driveEnrichment      ?? null,
+      sfKnowledgeEnrichment: data?.sfKnowledgeEnrichment ?? null,
       isLoading,
       isError,
     };

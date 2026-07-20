@@ -20,3 +20,4 @@
 export * from "./promptTemplates";
 export * from "./promptVariables";
 export * from "./knowledgeDocuments";
+export * from "./knowledgeSources";

@@ -2,11 +2,13 @@ import { useState, useMemo, useContext, createContext } from 'react';
 import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import {
-  pennyRetrievalMap, SF_KNOWLEDGE_CATEGORIES,
+  SF_KNOWLEDGE_CATEGORIES,
   SOURCE_TYPE_CONFIG, TRUST_LEVEL_CONFIG, SYNC_STATUS_CONFIG, HEALTH_CONFIG,
   SOURCE_TYPE_ORDER,
   type KnowledgeSource, type SourceType, type TrustLevel, type HealthStatus,
+  type PennyRetrievalEntry,
 } from '@/data/knowledgeSourceData';
+import { pennyRetrievalMap } from '@/data/pennyRetrievalData';
 import { useKnowledgeSources, type SourceSummary } from '@/hooks/useKnowledgeSources';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
