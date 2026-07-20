@@ -813,6 +813,23 @@ function RoleOwnersTab() {
   const { platformRoles: roles, setPlatformRoles: setRoles } = useAppContext();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft]         = useState<{ owner: string; ownerEmail: string }>({ owner: '', ownerEmail: '' });
+  const [saving, setSaving]       = useState(false);
+
+  // Load owner assignments from the DB on mount and merge into AppContext state.
+  // This ensures data survives app restarts (no longer localStorage-only).
+  useEffect(() => {
+    fetch('/api/admin/role-owners')
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { owners: Record<string, { owner: string; ownerEmail: string }> } | null) => {
+        if (!data?.owners) return;
+        setRoles(roles.map((r: PlatformRole) => {
+          const saved = data.owners[r.id];
+          return saved ? { ...r, owner: saved.owner, ownerEmail: saved.ownerEmail } : r;
+        }));
+      })
+      .catch(() => { /* silently keep AppContext defaults on network error */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const unassigned = roles.filter(r => !r.owner.trim()).length;
 
@@ -821,9 +838,18 @@ function RoleOwnersTab() {
     setDraft({ owner: role.owner, ownerEmail: role.ownerEmail });
   }
 
-  function saveEdit(id: string) {
+  async function saveEdit(id: string) {
+    setSaving(true);
+    try {
+      await fetch(`/api/admin/role-owners/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft),
+      });
+    } catch { /* fall through — state still updates locally */ }
     setRoles(roles.map((r: PlatformRole) => r.id === id ? { ...r, ...draft } : r));
     setEditingId(null);
+    setSaving(false);
   }
 
   function cancelEdit() {
@@ -933,10 +959,11 @@ function RoleOwnersTab() {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => saveEdit(role.id)}
-                        className="flex items-center gap-1.5 text-[11px] font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity"
+                        onClick={() => { void saveEdit(role.id); }}
+                        disabled={saving}
+                        className="flex items-center gap-1.5 text-[11px] font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity disabled:opacity-60"
                       >
-                        <Save className="w-3 h-3" /> Save
+                        <Save className="w-3 h-3" /> {saving ? 'Saving…' : 'Save'}
                       </button>
                       <button
                         onClick={cancelEdit}

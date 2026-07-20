@@ -23,6 +23,7 @@ import promptTemplatesRouter  from "./promptTemplates";
 import promptVariablesRouter  from "./promptVariables";
 import programsRouter          from "./programs";
 import knowledgeRouter         from "./knowledge";
+import roleOwnersRouter        from "./roleOwners";
 
 const router: IRouter = Router();
 
@@ -50,5 +51,6 @@ router.use(promptTemplatesRouter);
 router.use(promptVariablesRouter);
 router.use(programsRouter);
 router.use(knowledgeRouter);
+router.use(roleOwnersRouter);
 
 export default router;

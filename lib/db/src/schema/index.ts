@@ -22,3 +22,4 @@ export * from "./promptVariables";
 export * from "./knowledgeDocuments";
 export * from "./knowledgeSources";
 export * from "./programPennyConfigs";
+export * from "./platformRoleOwners";
