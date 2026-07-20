@@ -1,6 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export type PennyStatus = 'Active' | 'Planned' | 'Not Planned';
+
+interface PennyConfigRow {
+  programId: string;
+  status: PennyStatus;
+  notes: string | null;
+}
+
+/** Bulk hook — fetches every penny config row from the DB in one request. */
+export function usePennyConfigs() {
+  return useQuery<{ configs: PennyConfigRow[] }>({
+    queryKey: ['penny-configs-bulk'],
+    queryFn: async () => {
+      const res = await fetch('/api/programs/penny-configs');
+      if (!res.ok) throw new Error(`${res.status}`);
+      return res.json() as Promise<{ configs: PennyConfigRow[] }>;
+    },
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+    retry: 1,
+  });
+}
 
 interface UseProgramPennyConfigResult {
   status: PennyStatus;

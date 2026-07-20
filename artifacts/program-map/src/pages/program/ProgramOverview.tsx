@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { TERMS } from '@/config/terminology';
-import { LayoutGrid, CheckCircle, AlertCircle, FileEdit, Brain, ChevronRight, Sparkles, Clock } from 'lucide-react';
+import { LayoutGrid, CheckCircle, AlertCircle, FileEdit, Brain, ChevronRight, Sparkles, BookOpen, Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
+import { usePennyConfigs } from '@/hooks/useProgramPennyConfig';
+import { useSfLmsCourses } from '@/hooks/useSfCurriculum';
 
 // ── Tiny shared primitives ────────────────────────────────────────────────────
 
@@ -80,15 +82,13 @@ const CONFIDENCE_CONFIG = {
   deprecated:   { dot: 'bg-rose-400',    label: 'Deprecated',   textCls: 'text-rose-700',    bgCls: 'bg-rose-50 border-rose-200' },
 } as const;
 
-// ── Standards readiness — Phase 1 static data ────────────────────────────────
-// These reflect the architecture decision at Phase 1 launch; live scoring
-// will be wired in Phase 2 via the Standards Studio data model.
-const STANDARDS_ROWS = [
-  { category: 'Architecture', status: 'Defined', dot: 'bg-emerald-500', note: 'Program + Module + Lesson blueprints active',  path: '/program/standards' },
-  { category: 'Content',      status: 'Partial', dot: 'bg-amber-400',   note: 'Curriculum standards in review',               path: '/program/standards' },
-  { category: TERMS.aiAssistant,        status: 'Defined', dot: 'bg-emerald-500', note: `${TERMS.aiAssistant} Blueprint v1 governs capabilities`,       path: '/penny/capabilities' },
-  { category: 'Delivery',     status: 'Partial', dot: 'bg-amber-400',   note: 'Facilitator standards being finalized',         path: '/program/standards' },
-] as const;
+// ── Penny status display config ───────────────────────────────────────────────
+
+const PENNY_STATUS_CONFIG = {
+  'Active':      { label: 'Active',      textCls: 'text-primary font-medium',   dot: 'text-primary' },
+  'Planned':     { label: 'Planned',     textCls: 'text-amber-600 font-medium', dot: 'text-amber-400' },
+  'Not Planned': { label: 'Not planned', textCls: 'text-muted-foreground',      dot: 'text-muted-foreground/30' },
+} as const;
 
 // ── Main component ────────────────────────────────────────────────────────────
 
@@ -97,15 +97,45 @@ export default function ProgramOverview() {
   const { programs, setSelectedItem } = useAppContext();
   const { isEveryday, isAdminOrAbove } = useTierFlags();
 
+  const { data: pennyConfigsData, isLoading: pennyConfigsLoading } = usePennyConfigs();
+  const { data: lmsData, isLoading: lmsLoading } = useSfLmsCourses();
+
+  // Build a map of programId → penny status from the DB
+  const pennyConfigMap = useMemo(() => {
+    const map = new Map<string, 'Active' | 'Planned' | 'Not Planned'>();
+    for (const row of pennyConfigsData?.configs ?? []) {
+      map.set(row.programId, row.status);
+    }
+    return map;
+  }, [pennyConfigsData]);
+
   const stats = useMemo(() => {
     const confirmed    = programs.filter(p => p.confidence === 'confirmed').length;
     const needsReview  = programs.filter(p => p.confidence === 'needs-review').length;
     const draft        = programs.filter(p => p.confidence === 'draft').length;
-    const pennyActive  = programs.filter(p => p.pennyActive).length;
-    const blueprintOk  = programs.filter(p => p.confidence === 'confirmed').length;
-    const withoutPenny = programs.filter(p => !p.pennyActive).length;
+    const blueprintOk  = confirmed;
+
+    const activePrograms = programs.filter(p => p.confidence !== 'deprecated');
+    const pennyActive  = activePrograms.filter(p => (pennyConfigMap.get(p.id) ?? p.pennyStatus) === 'Active').length;
+    const withoutPenny = activePrograms.filter(p => (pennyConfigMap.get(p.id) ?? p.pennyStatus) !== 'Active').length;
+
     return { confirmed, needsReview, draft, pennyActive, blueprintOk, withoutPenny };
-  }, [programs]);
+  }, [programs, pennyConfigMap]);
+
+  // LMS summary stats
+  const lmsSummary = useMemo(() => {
+    const courses = lmsData?.courses ?? [];
+    const withModules = courses.filter(c => c.modules.length > 0);
+    const totalModules = courses.reduce((sum, c) => sum + c.modules.length, 0);
+    const completedModules = courses.reduce(
+      (sum, c) => sum + c.modules.filter(m => m.Status__c === 'Complete').length,
+      0
+    );
+    const inProgressCourses = courses.filter(c =>
+      c.modules.some(m => m.Status__c === 'In Progress')
+    ).length;
+    return { total: courses.length, withModules: withModules.length, totalModules, completedModules, inProgressCourses };
+  }, [lmsData]);
 
   // Navigate directly to Program Configuration pre-selected to this program
   function openProgram(p: (typeof programs)[number]) {
@@ -123,6 +153,7 @@ export default function ProgramOverview() {
               .filter(p => p.confidence !== 'deprecated')
               .map(p => {
                 const cfg = CONFIDENCE_CONFIG[p.confidence] ?? CONFIDENCE_CONFIG.draft;
+                const pennyStatus = pennyConfigMap.get(p.id) ?? p.pennyStatus;
                 return (
                   <button
                     key={p.id}
@@ -135,9 +166,9 @@ export default function ProgramOverview() {
                         <p className="text-[12px] font-semibold text-foreground">{p.name}</p>
                         <p className="text-[10px] text-muted-foreground truncate">{p.coreOutcome}</p>
                       </div>
-                      {p.pennyActive && (
+                      {pennyStatus === 'Active' && (
                         <span className="text-[9px] font-bold bg-primary/10 text-primary border border-primary/20 rounded px-1.5 py-0.5 shrink-0">
-                          Penny Active
+                          {TERMS.aiAssistant} Active
                         </span>
                       )}
                       <ChevronRight className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary shrink-0" />
@@ -157,17 +188,17 @@ export default function ProgramOverview() {
 
         {/* ── Summary bar ─────────────────────────────────────────────────── */}
         <div className="flex flex-wrap gap-2">
-          <StatPill value={programs.length}  label="Total Programs" color="text-foreground"    onClick={() => setLocation('/program/config')} />
-          <StatPill value={stats.confirmed}  label="Confirmed"      color="text-emerald-600"   onClick={() => setLocation('/program/config')} />
-          <StatPill value={stats.needsReview} label="Needs Review"  color="text-amber-600"     onClick={() => setLocation('/program/config')} />
-          <StatPill value={stats.draft}      label="Draft"          color="text-slate-500"     onClick={() => setLocation('/program/config')} />
-          <StatPill value={stats.pennyActive} label={`${TERMS.aiAssistant} Active`}  color="text-primary"       onClick={() => setLocation('/penny/capabilities')} />
+          <StatPill value={programs.length}   label="Total Programs"              color="text-foreground"  onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.confirmed}   label="Confirmed"                   color="text-emerald-600" onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.needsReview} label="Needs Review"                color="text-amber-600"   onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.draft}       label="Draft"                       color="text-slate-500"   onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.pennyActive} label={`${TERMS.aiAssistant} Active`} color="text-primary"  onClick={() => setLocation('/penny/capabilities')} />
         </div>
 
         {/* ── Program health + Blueprint coverage ─────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-          {/* Program health list — each row navigates to that program's detail */}
+          {/* Program health list */}
           <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
             <Eyebrow>Program Health</Eyebrow>
             <div className="space-y-1">
@@ -199,7 +230,7 @@ export default function ProgramOverview() {
             </button>
           </div>
 
-          {/* Blueprint coverage — each row navigates to blueprint canvas */}
+          {/* Blueprint coverage */}
           <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
             <Eyebrow>Blueprint Coverage</Eyebrow>
             <div className="space-y-2">
@@ -266,77 +297,98 @@ export default function ProgramOverview() {
           </div>
         </div>
 
-        {/* ── Penny coverage + Standards readiness ────────────────────────── */}
+        {/* ── Penny coverage + LMS overview ───────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-          {/* Penny coverage — each row opens that program in Programs workspace */}
+          {/* Penny coverage — reads from DB-backed penny configs */}
           <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
             <Eyebrow>{TERMS.aiAssistant} Coverage</Eyebrow>
-            <div className="space-y-1">
-              {programs.filter(p => p.confidence !== 'deprecated').map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => openProgram(p)}
-                  className="group w-full flex items-center gap-2.5 py-1.5 px-1 rounded hover:bg-primary/[0.04] border-b border-border/30 last:border-0 transition-colors"
-                >
-                  <Sparkles className={`w-3 h-3 shrink-0 ${p.pennyFeatures?.length ? 'text-primary' : 'text-muted-foreground/30'}`} />
-                  <span className="text-[11px] text-foreground flex-1 truncate text-left group-hover:text-primary transition-colors">
-                    {p.name}
-                  </span>
-                  <span className={`text-[10px] shrink-0 ${p.pennyFeatures?.length ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
-                    {p.pennyFeatures?.length
-                      ? `${p.pennyFeatures.length} feature${p.pennyFeatures.length > 1 ? 's' : ''}`
-                      : 'Not mapped'}
-                  </span>
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary shrink-0 transition-colors" />
-                </button>
-              ))}
-            </div>
-            {stats.withoutPenny > 0 && (
+            {pennyConfigsLoading ? (
+              <div className="flex items-center gap-1.5 py-2 text-muted-foreground">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span className="text-[11px]">Loading…</span>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {programs.filter(p => p.confidence !== 'deprecated').map(p => {
+                  const pennyStatus = pennyConfigMap.get(p.id) ?? p.pennyStatus ?? 'Not Planned';
+                  const cfg = PENNY_STATUS_CONFIG[pennyStatus] ?? PENNY_STATUS_CONFIG['Not Planned'];
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => openProgram(p)}
+                      className="group w-full flex items-center gap-2.5 py-1.5 px-1 rounded hover:bg-primary/[0.04] border-b border-border/30 last:border-0 transition-colors"
+                    >
+                      <Sparkles className={`w-3 h-3 shrink-0 ${cfg.dot}`} />
+                      <span className="text-[11px] text-foreground flex-1 truncate text-left group-hover:text-primary transition-colors">
+                        {p.name}
+                      </span>
+                      <span className={`text-[10px] shrink-0 ${cfg.textCls}`}>
+                        {cfg.label}
+                      </span>
+                      <ChevronRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary shrink-0 transition-colors" />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {!pennyConfigsLoading && stats.withoutPenny > 0 && (
               <button
                 onClick={() => setLocation('/penny/capabilities')}
                 className="group w-full text-left rounded border border-amber-200 bg-amber-50 px-2.5 py-1.5 hover:border-amber-400 transition-colors"
               >
                 <p className="text-[10px] text-amber-700 font-medium group-hover:underline">
-                  {stats.withoutPenny} program{stats.withoutPenny > 1 ? 's' : ''} without {TERMS.aiAssistant} features — add mapping in {TERMS.aiAssistant} Capabilities →
+                  {stats.withoutPenny} program{stats.withoutPenny > 1 ? 's' : ''} without {TERMS.aiAssistant} — configure in {TERMS.aiAssistant} Capabilities →
                 </p>
               </button>
             )}
           </div>
 
-          {/* Standards readiness — Phase 1 static; each row links to its area */}
+          {/* LMS overview — live from Salesforce */}
           <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <Eyebrow>Standards Readiness</Eyebrow>
-              <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/40 -mt-2">Phase 1 · Static</span>
-            </div>
-            <div className="space-y-1">
-              {STANDARDS_ROWS.map(row => (
-                <button
-                  key={row.category}
-                  onClick={() => setLocation(row.path)}
-                  className="group w-full flex items-start gap-2.5 rounded-md px-1 py-1.5 hover:bg-primary/[0.04] transition-colors"
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1 ${row.dot}`} />
-                  <div className="flex-1 text-left">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-medium text-foreground group-hover:text-primary transition-colors">{row.category}</span>
-                      <span className={`text-[9px] font-bold ${row.status === 'Defined' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                        {row.status}
-                      </span>
+            <Eyebrow>LMS Overview</Eyebrow>
+            {lmsLoading ? (
+              <div className="flex items-center gap-1.5 py-2 text-muted-foreground">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span className="text-[11px]">Loading from Salesforce…</span>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: 'Courses',          value: lmsSummary.total,            color: 'text-foreground' },
+                    { label: 'With modules',      value: lmsSummary.withModules,      color: 'text-foreground' },
+                    { label: 'Total modules',     value: lmsSummary.totalModules,     color: 'text-foreground' },
+                    { label: 'Modules complete',  value: lmsSummary.completedModules, color: 'text-emerald-600' },
+                  ].map(s => (
+                    <div key={s.label} className="rounded-md bg-background border border-border px-2.5 py-2">
+                      <p className={`text-base font-semibold ${s.color}`}>{s.value}</p>
+                      <p className="text-[10px] text-muted-foreground">{s.label}</p>
                     </div>
-                    <p className="text-[10px] text-muted-foreground">{row.note}</p>
+                  ))}
+                </div>
+                {lmsSummary.totalModules > 0 && (
+                  <div>
+                    <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
+                      <span>Overall module completion</span>
+                      <span>{Math.round((lmsSummary.completedModules / lmsSummary.totalModules) * 100)}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-emerald-400"
+                        style={{ width: `${Math.round((lmsSummary.completedModules / lmsSummary.totalModules) * 100)}%` }}
+                      />
+                    </div>
                   </div>
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary shrink-0 mt-0.5 transition-colors" />
+                )}
+                <button
+                  onClick={() => setLocation('/program/courses')}
+                  className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
+                >
+                  <BookOpen className="w-3 h-3" /> Open Courses &amp; Modules <ChevronRight className="w-3 h-3" />
                 </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setLocation('/program/standards')}
-              className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
-            >
-              Open Standards Studio <ChevronRight className="w-3 h-3" />
-            </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -347,7 +399,7 @@ export default function ProgramOverview() {
             <NavCard
               icon={LayoutGrid}
               title="Programs"
-              desc={`Configure and manage individual programs, cohorts, courses, and modules in Salesforce.`}
+              desc="Configure and manage individual programs, cohorts, courses, and modules in Salesforce."
               path="/program/config"
               badge={stats.needsReview > 0 ? `${stats.needsReview} need review` : undefined}
               badgeColor="bg-amber-50 text-amber-700 border-amber-200"
@@ -375,22 +427,22 @@ export default function ProgramOverview() {
               },
               {
                 priority: '2',
-                action: 'Map Penny features to all active programs',
-                why: `${stats.withoutPenny} program${stats.withoutPenny !== 1 ? 's are' : ' is'} not mapped to Penny capabilities. Mapping enables Penny to proactively surface coaching suggestions, learning signals, and cohort intelligence for every program — not just those already wired up.`,
+                action: `Map ${TERMS.aiAssistant} to all active programs`,
+                why: `${stats.withoutPenny} program${stats.withoutPenny !== 1 ? 's are' : ' is'} not yet mapped to ${TERMS.aiAssistant} capabilities. Mapping enables ${TERMS.aiAssistant} to proactively surface coaching suggestions, learning signals, and cohort intelligence for every program.`,
                 tag: stats.withoutPenny > 0 ? 'Action Now' : 'Complete',
                 tagColor: stats.withoutPenny > 0
                   ? 'bg-amber-50 text-amber-700 border-amber-200'
                   : 'bg-emerald-50 text-emerald-700 border-emerald-200',
                 path: '/penny/capabilities',
               },
-              {
+              ...(lmsSummary.completedModules < lmsSummary.totalModules ? [{
                 priority: '3',
-                action: 'Finalize Content and Delivery standards',
-                why: 'Two of four standards categories are partial. Finalizing these gives coaches and curriculum designers a complete quality rulebook — and allows Penny to flag standards gaps automatically in Phase 2.',
-                tag: 'Phase 2',
-                tagColor: 'bg-slate-100 text-slate-600 border-slate-200',
-                path: '/program/standards',
-              },
+                action: `Progress ${lmsSummary.totalModules - lmsSummary.completedModules} remaining course module${lmsSummary.totalModules - lmsSummary.completedModules !== 1 ? 's' : ''}`,
+                why: `${lmsSummary.completedModules} of ${lmsSummary.totalModules} modules are complete across ${lmsSummary.total} courses. Completing modules unlocks cohort-level reporting and enables ${TERMS.aiAssistant} to surface learning gap signals per trail.`,
+                tag: 'In Progress',
+                tagColor: 'bg-sky-50 text-sky-700 border-sky-200',
+                path: '/program/courses',
+              }] : []),
             ].map(item => (
               <button
                 key={item.priority}
@@ -412,12 +464,6 @@ export default function ProgramOverview() {
                 <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/20 group-hover:text-primary shrink-0 mt-0.5 transition-colors" />
               </button>
             ))}
-          </div>
-          <div className="flex items-center gap-1.5 pt-1 border-t border-primary/10">
-            <Clock className="w-3 h-3 text-muted-foreground/50" />
-            <p className="text-[10px] text-muted-foreground/60">
-              Penny insights are Phase 1 guidance — live impact scoring and cohort signals arrive in Phase 2.
-            </p>
           </div>
         </div>
 

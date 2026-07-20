@@ -50,6 +50,17 @@ router.get("/programs", withClient(async (_req, res, client) => {
   res.json({ programs: result.records, total: result.totalSize });
 }));
 
+/** Bulk fetch — all penny config rows. Must be before /programs/:id to avoid conflict. */
+router.get("/programs/penny-configs", async (_req, res): Promise<void> => {
+  try {
+    const rows = await db.select().from(programPennyConfigsTable);
+    res.json({ configs: rows });
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch penny configs");
+    res.status(500).json({ error: "Failed to fetch penny configs" });
+  }
+});
+
 router.get("/programs/:id", withClient(async (req, res, client) => {
   const { id } = req.params as { id: string };
   if (!id || !isSfId(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
