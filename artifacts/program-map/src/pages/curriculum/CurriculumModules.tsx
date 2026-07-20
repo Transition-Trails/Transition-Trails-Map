@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { curriculumModules, curriculumSprints, curriculumHealthIssues, CONTENT_STATUS_CONFIG, type CurriculumItem } from '@/data/curriculumData';
-import { CheckCircle2, AlertTriangle, ArrowRight, Star } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, ArrowRight, Star, Zap, BookOpen } from 'lucide-react';
+import { useSfLmsCourses, type SfCourseModule, type SfLmsCourse } from '@/hooks/useSfCurriculum';
+
+// ── Prototype view helpers ────────────────────────────────────────────────────
 
 function getRelHealth(m: CurriculumItem) {
   return [
@@ -15,10 +18,87 @@ function getRelHealth(m: CurriculumItem) {
   ];
 }
 
+// ── Live SF view helpers ──────────────────────────────────────────────────────
+
+const SF_MODULE_STATUS: Record<string, { label: string; dot: string; pill: string }> = {
+  Completed:    { label: 'Completed',   dot: 'bg-emerald-500', pill: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+  'In Progress': { label: 'In Progress', dot: 'bg-blue-500',    pill: 'bg-blue-50 text-blue-800 border-blue-200' },
+  'Not Started': { label: 'Not Started', dot: 'bg-slate-300',   pill: 'bg-slate-50 text-slate-600 border-slate-200' },
+};
+
+function SfModuleRow({ mod }: { mod: SfCourseModule }) {
+  const st = SF_MODULE_STATUS[mod.Status__c ?? 'Not Started'] ?? SF_MODULE_STATUS['Not Started'];
+  const pct = mod.PercentCompleted__c ?? 0;
+  return (
+    <div className="flex items-center gap-3 py-2 border-b border-border/40 last:border-0">
+      <span className={`shrink-0 w-2 h-2 rounded-full ${st.dot}`} />
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] font-medium text-foreground truncate">{mod.Name}</p>
+        {pct > 0 && (
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <div className="h-1 w-16 bg-muted/40 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+            </div>
+            <span className="text-[10px] text-muted-foreground">{pct}%</span>
+          </div>
+        )}
+      </div>
+      <span className={`shrink-0 text-[10px] font-semibold border rounded-full px-2 py-0.5 ${st.pill}`}>{st.label}</span>
+    </div>
+  );
+}
+
+function SfCourseBlock({ course }: { course: SfLmsCourse }) {
+  const [expanded, setExpanded] = useState(true);
+  const mods      = course.modules;
+  const completed = mods.filter(m => m.Status__c === 'Completed').length;
+  const pct       = mods.length > 0 ? Math.round((completed / mods.length) * 100) : 0;
+
+  return (
+    <div className="rounded-xl border border-emerald-200/70 bg-white overflow-hidden shadow-sm">
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-muted/20 transition-colors"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <Zap className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="min-w-0">
+            <p className="text-[14px] font-bold text-foreground truncate">{course.Course_Title__c ?? course.Name}</p>
+            <p className="text-[11px] text-muted-foreground">{mods.length} modules · {pct}% complete</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="w-20 h-1.5 bg-muted/40 rounded-full overflow-hidden">
+            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+          </div>
+          <span className="text-[10px] font-semibold text-muted-foreground">{expanded ? '▲' : '▼'}</span>
+        </div>
+      </button>
+
+      {expanded && mods.length > 0 && (
+        <div className="px-5 pb-4">
+          {mods.map(mod => <SfModuleRow key={mod.Id} mod={mod} />)}
+        </div>
+      )}
+      {expanded && mods.length === 0 && (
+        <p className="px-5 pb-4 text-[12px] text-muted-foreground">No modules found.</p>
+      )}
+    </div>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+type ViewMode = 'prototype' | 'live';
+
 export default function CurriculumModules() {
   const { setSelectedItem } = useAppContext();
   const [sprintFilter, setSprintFilter] = useState<string>('all');
+  const [viewMode, setViewMode]         = useState<ViewMode>('live');
 
+  const { data: lmsData, isLoading, isError } = useSfLmsCourses();
+
+  // ── Prototype stats ──
   const filteredModules = sprintFilter === 'all'
     ? curriculumModules
     : curriculumModules.filter(m => m.sprintId === sprintFilter);
@@ -31,8 +111,14 @@ export default function CurriculumModules() {
   const issuesByModule = (moduleId: string) =>
     curriculumHealthIssues.filter(h => h.affectedObjectId === moduleId);
 
-  const totalModules = curriculumModules.length;
-  const fullyConnected = curriculumModules.filter(m => getRelHealth(m).every(r => r.ok)).length;
+  const totalModules    = curriculumModules.length;
+  const fullyConnected  = curriculumModules.filter(m => getRelHealth(m).every(r => r.ok)).length;
+
+  // ── Live stats ──
+  const liveTotal     = lmsData?.courses.reduce((s, c) => s + c.modules.length, 0) ?? 0;
+  const liveCompleted = lmsData?.courses.reduce(
+    (s, c) => s + c.modules.filter(m => m.Status__c === 'Completed').length, 0
+  ) ?? 0;
 
   return (
     <ScrollArea className="h-full">
@@ -47,144 +133,219 @@ export default function CurriculumModules() {
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="flex gap-4 flex-wrap">
-          <div className="rounded-lg border border-border bg-white px-4 py-2">
-            <span className="text-[14px] font-bold text-foreground">{totalModules}</span>
-            <span className="text-[11px] text-muted-foreground ml-1.5">total modules</span>
-          </div>
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-2">
-            <span className="text-[14px] font-bold text-green-800">{fullyConnected}</span>
-            <span className="text-[11px] text-green-700 ml-1.5">fully connected</span>
-          </div>
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2">
-            <span className="text-[14px] font-bold text-red-800">{curriculumHealthIssues.length}</span>
-            <span className="text-[11px] text-red-700 ml-1.5">health issues</span>
-          </div>
-        </div>
-
-        {/* Sprint filter */}
-        <div className="flex gap-2 flex-wrap">
+        {/* View toggle */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setSprintFilter('all')}
-            className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === 'all' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
+            onClick={() => setViewMode('live')}
+            className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
+              viewMode === 'live'
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'border-border text-muted-foreground hover:border-emerald-400'
+            }`}
           >
-            All Sprints
+            <Zap className="w-3 h-3" /> Live from Salesforce
           </button>
-          {curriculumSprints.map(s => (
-            <button
-              key={s.id}
-              onClick={() => setSprintFilter(s.id)}
-              className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === s.id ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
-            >
-              Sprint {s.sprintNumber as number}
-            </button>
-          ))}
+          <button
+            onClick={() => setViewMode('prototype')}
+            className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
+              viewMode === 'prototype'
+                ? 'bg-primary text-white border-primary'
+                : 'border-border text-muted-foreground hover:border-primary/40'
+            }`}
+          >
+            <BookOpen className="w-3 h-3" /> Architecture Model
+          </button>
         </div>
 
-        {/* Standards principle */}
-        <div className="rounded-lg border border-sky-200 bg-sky-50/40 px-4 py-3 text-[12px] text-sky-800">
-          <strong>Relationship Standard:</strong> A fully-connected module has all 6 asset types linked — Lessons, Assessment, Knowledge Articles, Coaching Prompts, Reflection Prompts, and Delivery Activities.
-          The indicators below show coverage at a glance. <strong>Module 2.1 is the reference standard.</strong>
-        </div>
+        {/* ── LIVE VIEW ── */}
+        {viewMode === 'live' && (
+          <div className="space-y-4">
+            {/* Live stats */}
+            {lmsData && (
+              <div className="flex gap-4 flex-wrap">
+                <div className="rounded-lg border border-border bg-white px-4 py-2">
+                  <span className="text-[14px] font-bold text-foreground">{liveTotal}</span>
+                  <span className="text-[11px] text-muted-foreground ml-1.5">total modules</span>
+                </div>
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2">
+                  <span className="text-[14px] font-bold text-emerald-800">{liveCompleted}</span>
+                  <span className="text-[11px] text-emerald-700 ml-1.5">completed</span>
+                </div>
+                <div className="rounded-lg border border-border bg-white px-4 py-2">
+                  <span className="text-[14px] font-bold text-foreground">{lmsData.courses.length}</span>
+                  <span className="text-[11px] text-muted-foreground ml-1.5">courses in Salesforce</span>
+                </div>
+                {lmsData.fromCache && (
+                  <div className="rounded-lg border border-border bg-muted/10 px-4 py-2 flex items-center">
+                    <span className="text-[11px] text-muted-foreground">Cached · refreshes every 5 min</span>
+                  </div>
+                )}
+              </div>
+            )}
 
-        {/* Sprint groups */}
-        {sprintGroups.map(({ sprint, modules }) => (
-          <div key={sprint.id} className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-border" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">
-                {sprint.name} · {sprint.duration as string}
-              </p>
-              <div className="h-px flex-1 bg-border" />
-            </div>
+            {isLoading && (
+              <div className="rounded-lg border border-border bg-muted/10 px-4 py-3 text-[12px] text-muted-foreground">
+                Loading modules from Salesforce…
+              </div>
+            )}
+            {isError && (
+              <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[12px] text-rose-700">
+                Could not load Salesforce data. Check your Salesforce connection.
+              </div>
+            )}
 
-            <div className="grid gap-3">
-              {modules.map(m => {
-                const indicators = getRelHealth(m);
-                const allOk = indicators.every(i => i.ok);
-                const issues = issuesByModule(m.id);
-                const statusCfg = CONTENT_STATUS_CONFIG[m.status];
-                const isFeatured = m.isFeatured as boolean;
+            {lmsData?.courses.map(course => (
+              <SfCourseBlock key={course.Id} course={course} />
+            ))}
 
-                return (
-                  <button
-                    key={m.id}
-                    onClick={() => setSelectedItem({ type: 'curriculumItem', id: m.id, data: m })}
-                    className={`rounded-xl border-2 p-4 text-left transition-all hover:shadow-sm ${isFeatured ? 'border-primary/30 bg-primary/5' : 'border-border bg-white hover:border-primary/20'}`}
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-bold text-muted-foreground/60 bg-border/50 rounded px-1.5 py-0.5 shrink-0">
-                          {m.moduleNumber as string}
-                        </span>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-[14px] font-bold text-foreground">{m.name}</p>
-                            {isFeatured && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-1.5 py-0.5">
-                                <Star className="w-2.5 h-2.5" /> STANDARD
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-muted-foreground">{m.program}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
-                      </div>
-                    </div>
-
-                    {/* Relationship health indicators */}
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      {indicators.map(ind => (
-                        <span
-                          key={ind.label}
-                          className={`inline-flex items-center gap-1 text-[10px] font-medium rounded-full px-2 py-0.5 border ${
-                            ind.ok
-                              ? 'bg-green-50 text-green-800 border-green-200'
-                              : 'bg-red-50 text-red-700 border-red-200'
-                          }`}
-                        >
-                          {ind.ok
-                            ? <CheckCircle2 className="w-2.5 h-2.5" />
-                            : <AlertTriangle className="w-2.5 h-2.5" />
-                          }
-                          {ind.count > 0 ? `${ind.count} ` : ''}{ind.label}
-                        </span>
-                      ))}
-                      {allOk && (
-                        <span className="text-[10px] font-bold text-green-700 border border-green-200 bg-green-50 rounded-full px-2 py-0.5">
-                          ✓ Fully Connected
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Learning objectives count */}
-                    {((m.learningObjectives as string[]) || []).length > 0 && (
-                      <p className="text-[11px] text-muted-foreground">
-                        {((m.learningObjectives as string[])).length} learning objective{((m.learningObjectives as string[])).length !== 1 ? 's' : ''} defined
-                      </p>
-                    )}
-
-                    {/* Health issues */}
-                    {issues.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {issues.map(issue => (
-                          <div key={issue.id} className="flex items-center gap-1.5">
-                            <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-red-500' : issue.severity === 'medium' ? 'text-orange-500' : 'text-amber-500'}`} />
-                            <p className="text-[10px] text-muted-foreground">{issue.name as string}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            {lmsData?.courses.length === 0 && (
+              <div className="rounded-lg border border-border bg-muted/10 px-4 py-3 text-[12px] text-muted-foreground">
+                No Course__c records found in Salesforce.
+              </div>
+            )}
           </div>
-        ))}
+        )}
+
+        {/* ── PROTOTYPE VIEW ── */}
+        {viewMode === 'prototype' && (
+          <div className="space-y-6">
+            {/* Stats */}
+            <div className="flex gap-4 flex-wrap">
+              <div className="rounded-lg border border-border bg-white px-4 py-2">
+                <span className="text-[14px] font-bold text-foreground">{totalModules}</span>
+                <span className="text-[11px] text-muted-foreground ml-1.5">total modules</span>
+              </div>
+              <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-2">
+                <span className="text-[14px] font-bold text-green-800">{fullyConnected}</span>
+                <span className="text-[11px] text-green-700 ml-1.5">fully connected</span>
+              </div>
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2">
+                <span className="text-[14px] font-bold text-red-800">{curriculumHealthIssues.length}</span>
+                <span className="text-[11px] text-red-700 ml-1.5">health issues</span>
+              </div>
+            </div>
+
+            {/* Sprint filter */}
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setSprintFilter('all')}
+                className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === 'all' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
+              >
+                All Sprints
+              </button>
+              {curriculumSprints.map(s => (
+                <button
+                  key={s.id}
+                  onClick={() => setSprintFilter(s.id)}
+                  className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === s.id ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
+                >
+                  Sprint {s.sprintNumber as number}
+                </button>
+              ))}
+            </div>
+
+            {/* Standards principle */}
+            <div className="rounded-lg border border-sky-200 bg-sky-50/40 px-4 py-3 text-[12px] text-sky-800">
+              <strong>Relationship Standard:</strong> A fully-connected module has all 6 asset types linked — Lessons, Assessment, Knowledge Articles, Coaching Prompts, Reflection Prompts, and Delivery Activities.
+              The indicators below show coverage at a glance. <strong>Module 2.1 is the reference standard.</strong>
+            </div>
+
+            {/* Sprint groups */}
+            {sprintGroups.map(({ sprint, modules }) => (
+              <div key={sprint.id} className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">
+                    {sprint.name} · {sprint.duration as string}
+                  </p>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="grid gap-3">
+                  {modules.map(m => {
+                    const indicators = getRelHealth(m);
+                    const allOk      = indicators.every(i => i.ok);
+                    const issues     = issuesByModule(m.id);
+                    const statusCfg  = CONTENT_STATUS_CONFIG[m.status];
+                    const isFeatured = m.isFeatured as boolean;
+
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => setSelectedItem({ type: 'curriculumItem', id: m.id, data: m })}
+                        className={`rounded-xl border-2 p-4 text-left transition-all hover:shadow-sm ${isFeatured ? 'border-primary/30 bg-primary/5' : 'border-border bg-white hover:border-primary/20'}`}
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-bold text-muted-foreground/60 bg-border/50 rounded px-1.5 py-0.5 shrink-0">
+                              {m.moduleNumber as string}
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-[14px] font-bold text-foreground">{m.name}</p>
+                                {isFeatured && (
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-1.5 py-0.5">
+                                    <Star className="w-2.5 h-2.5" /> STANDARD
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-muted-foreground">{m.program}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                            <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5 mb-2">
+                          {indicators.map(ind => (
+                            <span
+                              key={ind.label}
+                              className={`inline-flex items-center gap-1 text-[10px] font-medium rounded-full px-2 py-0.5 border ${
+                                ind.ok
+                                  ? 'bg-green-50 text-green-800 border-green-200'
+                                  : 'bg-red-50 text-red-700 border-red-200'
+                              }`}
+                            >
+                              {ind.ok
+                                ? <CheckCircle2 className="w-2.5 h-2.5" />
+                                : <AlertTriangle className="w-2.5 h-2.5" />
+                              }
+                              {ind.count > 0 ? `${ind.count} ` : ''}{ind.label}
+                            </span>
+                          ))}
+                          {allOk && (
+                            <span className="text-[10px] font-bold text-green-700 border border-green-200 bg-green-50 rounded-full px-2 py-0.5">
+                              ✓ Fully Connected
+                            </span>
+                          )}
+                        </div>
+
+                        {((m.learningObjectives as string[]) || []).length > 0 && (
+                          <p className="text-[11px] text-muted-foreground">
+                            {((m.learningObjectives as string[])).length} learning objective{((m.learningObjectives as string[])).length !== 1 ? 's' : ''} defined
+                          </p>
+                        )}
+
+                        {issues.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {issues.map(issue => (
+                              <div key={issue.id} className="flex items-center gap-1.5">
+                                <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-red-500' : issue.severity === 'medium' ? 'text-orange-500' : 'text-amber-500'}`} />
+                                <p className="text-[10px] text-muted-foreground">{issue.name as string}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </ScrollArea>
   );

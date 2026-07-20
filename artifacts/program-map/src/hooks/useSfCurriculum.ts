@@ -37,6 +37,22 @@ export interface SfCurriculumResponse {
   fromCache: boolean;
 }
 
+export interface SfLmsCourse {
+  Id: string;
+  Name: string;
+  Course_Title__c: string | null;
+  Status__c: string | null;
+  Total_Modules__c: number | null;
+  Estimated_Start_Date__c: string | null;
+  Estimated_End_Date__c: string | null;
+  modules: SfCourseModule[];
+}
+
+export interface SfLmsCoursesResponse {
+  courses: SfLmsCourse[];
+  fromCache: boolean;
+}
+
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 
 /** Look up a Course__c record by program name (name-pattern LIKE match). */
@@ -50,6 +66,21 @@ export function useSfCourseByProgram(programName: string | null) {
       );
       if (!res.ok) throw new Error(`${res.status}`);
       return res.json() as Promise<SfCourseByProgramResponse>;
+    },
+    staleTime:       4 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+    retry: 1,
+  });
+}
+
+/** Fetch all Course__c records with their child Course_Module__c records. */
+export function useSfLmsCourses() {
+  return useQuery<SfLmsCoursesResponse>({
+    queryKey: ['sf-lms-courses'],
+    queryFn: async () => {
+      const res = await fetch('/api/lms/courses');
+      if (!res.ok) throw new Error(`${res.status}`);
+      return res.json() as Promise<SfLmsCoursesResponse>;
     },
     staleTime:       4 * 60 * 1000,
     refetchInterval: 5 * 60 * 1000,

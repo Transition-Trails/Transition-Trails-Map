@@ -536,4 +536,52 @@ router.get("/salesforce/curriculum/course/:courseId", async (req, res) => {
   }
 });
 
+// ── GET /lms/courses ───────────────────────────────────────────────────────────
+// Returns all Course__c records with their child Course_Module__c records.
+// Powers the Curriculum Studio LMS Live view. 5-min cache.
+
+router.get("/lms/courses", async (req, res) => {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
+    return res.status(401).json({ error: "Not connected to Salesforce." });
+  }
+  const cacheNs = req.session.sfUserId ?? "system";
+  const CACHE_KEY = `${cacheNs}:lms-courses`;
+  const cached = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true });
+  }
+
+  try {
+    const coursesResult = await sfQuery(
+      proxyFetch,
+      "SELECT Id, Name, Course_Title__c, Status__c, Total_Modules__c, Estimated_Start_Date__c, Estimated_End_Date__c FROM Course__c ORDER BY Name ASC LIMIT 20"
+    );
+    const courses = coursesResult.records ?? [];
+
+    // Fetch modules for all courses in parallel
+    const coursesWithModules = await Promise.all(
+      courses.map(async (course) => {
+        const courseId = String(course["Id"] ?? "");
+        try {
+          const modulesResult = await sfQuery(
+            proxyFetch,
+            `SELECT Id, Name, Course__c, Order__c, Status__c, PercentCompleted__c FROM Course_Module__c WHERE Course__c = '${courseId}' ORDER BY Order__c ASC LIMIT 50`
+          );
+          return { ...course, modules: modulesResult.records ?? [] };
+        } catch {
+          return { ...course, modules: [] as Record<string, unknown>[] };
+        }
+      })
+    );
+
+    const data = { courses: coursesWithModules };
+    opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+    return res.json({ ...data, fromCache: false });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: "SOQL failed", detail: msg });
+  }
+});
+
 export default router;
