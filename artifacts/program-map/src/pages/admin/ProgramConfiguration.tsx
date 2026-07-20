@@ -10,7 +10,7 @@ import { useLocation } from 'wouter';
 import { Sparkles, ChevronRight, Plus, Check,
          AlertCircle, Loader2, RotateCcw, Zap, BookOpen,
          Layers, Users, GraduationCap, ClipboardList,
-         Pencil, Eye, ExternalLink, ArrowLeft } from 'lucide-react';
+         Pencil, Eye, ExternalLink, ArrowLeft, Link2, Search } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/context/AppContext';
@@ -510,6 +510,10 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<SfCourse | null>(null);
   const [showCourseForm, setShowCourseForm] = useState(false);
+  const [showLinkForm, setShowLinkForm]     = useState(false);
+  const [allLmsCourses, setAllLmsCourses]   = useState<SfCourse[]>([]);
+  const [allLmsLoading, setAllLmsLoading]   = useState(false);
+  const [linkSearch, setLinkSearch]         = useState('');
 
   const [modules, setModules]               = useState<SfModule[]>([]);
   const [modulesLoading, setModulesLoading] = useState(false);
@@ -840,6 +844,43 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
       setShowCourseForm(false);
     } catch (e) {
       toast({ title: 'Failed to create course', description: (e as Error).message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function loadAllLmsCourses() {
+    setAllLmsLoading(true);
+    try {
+      const resp = await fetch('/api/lms/courses');
+      if (!resp.ok) throw new Error('Failed to load courses');
+      const data = await resp.json() as { courses: SfCourse[] };
+      setAllLmsCourses(data.courses ?? []);
+    } catch {
+      toast({ title: 'Could not load all courses', variant: 'destructive' });
+    } finally {
+      setAllLmsLoading(false);
+    }
+  }
+
+  async function handleLinkExistingCourse(course: SfCourse) {
+    if (!selectedProgram) return;
+    setSaving(true);
+    try {
+      const resp = await fetch(`/api/courses/${course.Id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Program__c: selectedProgram.Name }),
+      });
+      if (!resp.ok) throw new Error('Update failed');
+      const linked: SfCourse = { ...course, Program__c: selectedProgram.Name };
+      setCourses(prev => [linked, ...prev.filter(c => c.Id !== course.Id)]);
+      setSelectedCourse(linked);
+      setShowLinkForm(false);
+      setLinkSearch('');
+      toast({ title: `✓ Linked "${course.Course_Title__c ?? course.Name}" to ${selectedProgram.Name}` });
+    } catch (e) {
+      toast({ title: 'Failed to link course', description: (e as Error).message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -1408,16 +1449,88 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
               {/* ── Step 3: Course ────────────────────────────────────────── */}
               {step === 3 && (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="text-sm font-semibold text-foreground">Link or Create Course</h2>
                       <p className="text-[11px] text-muted-foreground mt-0.5">for {selectedProgram?.Name}</p>
                     </div>
-                    <button onClick={() => setShowCourseForm(v => !v)}
-                      className="flex items-center gap-1.5 text-[11px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
-                      <Plus className="w-3 h-3" /> Create New Course
-                    </button>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        onClick={() => {
+                          setShowLinkForm(v => !v);
+                          setShowCourseForm(false);
+                          if (!showLinkForm && allLmsCourses.length === 0) void loadAllLmsCourses();
+                        }}
+                        className="flex items-center gap-1.5 text-[11px] border border-border bg-background text-foreground rounded-lg px-3 py-1.5 hover:border-primary/40 hover:bg-primary/[0.02] transition-colors">
+                        <Link2 className="w-3 h-3" /> Link Existing
+                      </button>
+                      <button
+                        onClick={() => { setShowCourseForm(v => !v); setShowLinkForm(false); }}
+                        className="flex items-center gap-1.5 text-[11px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
+                        <Plus className="w-3 h-3" /> Create New
+                      </button>
+                    </div>
                   </div>
+
+                  {/* ── Link existing course picker ────────────────────────── */}
+                  {showLinkForm && (
+                    <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
+                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Link an Existing Course</p>
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
+                        <input
+                          className="w-full pl-8 pr-3 py-1.5 text-[12px] rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
+                          placeholder="Search courses…"
+                          value={linkSearch}
+                          onChange={e => setLinkSearch(e.target.value)}
+                        />
+                      </div>
+                      {allLmsLoading ? (
+                        <div className="flex items-center gap-2 text-muted-foreground py-3 justify-center">
+                          <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[12px]">Loading all courses…</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-1 max-h-52 overflow-y-auto">
+                          {(() => {
+                            const linkedIds = new Set(courses.map(c => c.Id));
+                            const q = linkSearch.toLowerCase();
+                            const filtered = allLmsCourses.filter(c =>
+                              !linkedIds.has(c.Id) &&
+                              (!q || (c.Course_Title__c ?? c.Name).toLowerCase().includes(q) || c.Name.toLowerCase().includes(q))
+                            );
+                            if (filtered.length === 0) {
+                              return (
+                                <p className="text-[11px] text-muted-foreground text-center py-3">
+                                  {linkSearch ? 'No matches.' : 'All courses are already linked or none available.'}
+                                </p>
+                              );
+                            }
+                            return filtered.map(c => (
+                              <button
+                                key={c.Id}
+                                onClick={() => void handleLinkExistingCourse(c)}
+                                disabled={saving}
+                                className="group w-full text-left flex items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2 hover:border-primary/50 hover:bg-primary/[0.03] transition-colors disabled:opacity-50"
+                              >
+                                <BookOpen className="w-3.5 h-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition-colors" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[12px] font-medium text-foreground truncate">{c.Course_Title__c ?? c.Name}</p>
+                                  {c.Course_Title__c && <p className="text-[10px] text-muted-foreground truncate">{c.Name}</p>}
+                                </div>
+                                {c.Status__c && (
+                                  <span className="text-[9px] font-semibold border rounded px-1.5 py-0.5 shrink-0 bg-muted text-muted-foreground border-border">
+                                    {c.Status__c}
+                                  </span>
+                                )}
+                                <Link2 className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary shrink-0 transition-colors" />
+                              </button>
+                            ));
+                          })()}
+                        </div>
+                      )}
+                      <button onClick={() => { setShowLinkForm(false); setLinkSearch(''); }} className="text-[11px] text-muted-foreground hover:text-foreground">Cancel</button>
+                    </div>
+                  )}
 
                   {showCourseForm && (
                     <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
