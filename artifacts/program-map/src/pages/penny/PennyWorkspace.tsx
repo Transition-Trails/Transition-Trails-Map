@@ -302,6 +302,7 @@ export default function PennyWorkspace() {
       icon={Brain}
       items={items}
       tabs={tabs}
+      initialSelectedId={null}
       emptyTitle="Select a capability"
       emptyBody="Choose a Penny capability from the list to view its prompts, knowledge sources, quality metrics, and health."
     />
