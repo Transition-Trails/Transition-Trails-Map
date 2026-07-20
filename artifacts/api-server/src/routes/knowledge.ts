@@ -660,13 +660,42 @@ function enrichSources(
       }
     }
 
-    // ── SF Knowledge: inject article counts for SF Knowledge sources ─────────
+    // ── SF Knowledge: inject article counts + clean stale health issues ───────
+    // Only applies to sources that map directly to KnowledgeArticleVersion records.
+    // Coach Notes Library is Salesforce-stored but is NOT a KnowledgeArticleVersion source.
+    const SF_ARTICLE_SOURCE_IDS = new Set([
+      "src-sf-mission-delivery",
+      "src-sf-ops-business",
+      "src-sf-technology",
+    ]);
+
     let liveSfArticleCount: number | null = null;
-    if (src.type === "Salesforce Knowledge" && sfKnowledge.totalArticles !== null) {
-      liveSfArticleCount = sfKnowledge.totalArticles;
+    let sfHealthIssues = healthIssues;
+
+    if (SF_ARTICLE_SOURCE_IDS.has(src.id)) {
+      if (sfKnowledge.totalArticles !== null) {
+        // The query succeeded → the live API connection IS working.
+        // Remove the "Sync is manual" seed issue — it's no longer accurate.
+        liveSfArticleCount = sfKnowledge.totalArticles;
+        sfHealthIssues = sfHealthIssues.filter(
+          h => !h.toLowerCase().includes("sync is manual") &&
+               !h.toLowerCase().includes("no live connection")
+        );
+        if (sfKnowledge.totalArticles === 0) {
+          // Connected but no published articles — surface this as the real blocker.
+          sfHealthIssues = [
+            ...sfHealthIssues,
+            "SF Knowledge API connected — 0 published articles found. Create and publish articles in Salesforce Knowledge to populate this source.",
+          ];
+        }
+        // Ensure syncStatus reflects the live connection regardless of integration key.
+        syncStatus = "Live";
+      }
+      // If sfKnowledge.totalArticles === null → query failed (Knowledge not enabled
+      // in org, or auth issue). Keep the original "Sync is manual" issue as-is.
     }
 
-    return { ...src, syncStatus, healthIssues, liveFileCount, liveSfArticleCount };
+    return { ...src, syncStatus, healthIssues: sfHealthIssues, liveFileCount, liveSfArticleCount };
   });
 }
 
