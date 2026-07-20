@@ -72,7 +72,11 @@ app.use(passport.session());
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 app.use(cors({ credentials: true, origin: true }));
-app.use(express.json());
+app.use(express.json({
+  verify: (_req, _res, buf) => {
+    (_req as unknown as { rawBody: Buffer }).rawBody = buf;
+  },
+}));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(

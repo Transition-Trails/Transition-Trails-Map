@@ -1,4 +1,5 @@
 import { Router } from "express";
+import crypto from "crypto";
 
 const router = Router();
 
@@ -461,6 +462,188 @@ router.post("/slack/validate/test-message", async (req, res) => {
     req.log.error("slack test-message network error");
     res.status(500).json({ ok: false, error: "network_error", detail: "Could not reach Slack API." });
   }
+});
+
+// ─── Slack Events Adapter — Penny inbound handler ─────────────────────────────
+
+// ── Event payload types ──────────────────────────────────────────────────────
+
+interface SlackUrlVerification {
+  type: 'url_verification';
+  challenge: string;
+}
+
+interface SlackAppMentionEvent {
+  type: 'app_mention';
+  user: string;
+  text: string;
+  ts: string;
+  channel: string;
+  event_ts: string;
+}
+
+interface SlackEventCallback {
+  type: 'event_callback';
+  event: SlackAppMentionEvent;
+  event_id: string;
+  event_time: number;
+}
+
+type SlackPayload = SlackUrlVerification | SlackEventCallback | { type: string };
+
+// ── Penny system prompt (Slack-tuned) ────────────────────────────────────────
+
+const SLACK_PENNY_SYSTEM = `You are Penny, AI Chief of Staff for Transition Trails Academy — a career development and professional transitions training organisation.
+
+You are responding inside the team's Slack workspace, so keep answers concise and readable:
+- 2–4 sentences for simple questions; use bullet points for lists or multi-part answers.
+- Use the team's language: programs, cohorts, trail quests, learners, capstones, blueprints, RESOLVE phases.
+- If live data is needed, direct the user to the Trail OS platform rather than guessing.
+- Never fabricate data or invent statistics. If uncertain, say so honestly.
+- Do NOT include markdown route paths like "→ /admin/integrations" — users are in Slack, not the app.`;
+
+// ── Gemini call (no SF context for MVP — falls back to base prompt) ──────────
+
+async function callGeminiForSlack(query: string): Promise<string> {
+  const apiKey = process.env['GEMINI_API_KEY'];
+  if (!apiKey) return 'Penny is not configured (GEMINI_API_KEY missing). Contact your admin.';
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: SLACK_PENNY_SYSTEM }] },
+        contents: [{ role: 'user', parts: [{ text: query }] }],
+        generationConfig: { maxOutputTokens: 1024, temperature: 0.7 },
+      }),
+      signal: AbortSignal.timeout(25_000),
+    });
+
+    if (!resp.ok) {
+      return `Penny hit an error (HTTP ${resp.status}). Try again in a moment.`;
+    }
+
+    const body = await resp.json() as {
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+    };
+    return body.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+      ?? 'Penny returned an empty response. Try rephrasing your question.';
+  } catch {
+    return 'Penny timed out. Try a shorter question or check again in a moment.';
+  }
+}
+
+// ── Post a threaded reply to Slack ───────────────────────────────────────────
+
+async function postSlackReply(
+  botToken: string,
+  channel: string,
+  text: string,
+  threadTs: string,
+): Promise<void> {
+  await fetch('https://slack.com/api/chat.postMessage', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${botToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ channel, text, thread_ts: threadTs }),
+  });
+}
+
+// ─── POST /slack/events ───────────────────────────────────────────────────────
+// Receives Slack Events API webhooks (app_mention).
+// Signature verification uses the raw request body — requires the rawBody
+// property set by the express.json verify callback in app.ts.
+
+router.post('/slack/events', async (req, res) => {
+  const signingSecret = process.env['SLACK_SIGNING_SECRET'];
+  const slackSig      = req.headers['x-slack-signature'] as string | undefined;
+  const slackTs       = req.headers['x-slack-request-timestamp'] as string | undefined;
+  const rawBody       = (req as typeof req & { rawBody?: Buffer }).rawBody;
+
+  // ── Config guard ───────────────────────────────────────────────────────────
+  if (!signingSecret) {
+    req.log.warn('Slack events: SLACK_SIGNING_SECRET not configured');
+    res.status(500).json({ error: 'adapter_not_configured' });
+    return;
+  }
+
+  // ── Header guard ──────────────────────────────────────────────────────────
+  if (!slackSig || !slackTs || !rawBody) {
+    res.status(400).json({ error: 'missing_signature_headers' });
+    return;
+  }
+
+  // ── Replay attack guard (5-minute window) ─────────────────────────────────
+  const tsNum = parseInt(slackTs, 10);
+  if (Number.isNaN(tsNum) || Math.abs(Date.now() / 1000 - tsNum) > 300) {
+    res.status(400).json({ error: 'timestamp_expired' });
+    return;
+  }
+
+  // ── HMAC-SHA256 signature verification ────────────────────────────────────
+  const sigBase  = `v0:${slackTs}:${rawBody.toString()}`;
+  const computed = 'v0=' + crypto.createHmac('sha256', signingSecret).update(sigBase).digest('hex');
+  let sigValid = false;
+  try {
+    // timingSafeEqual requires equal-length buffers — pad/truncate risk: compare UTF-8 bytes
+    const a = Buffer.from(computed, 'utf8');
+    const b = Buffer.from(slackSig, 'utf8');
+    sigValid = a.length === b.length && crypto.timingSafeEqual(a, b);
+  } catch {
+    sigValid = false;
+  }
+  if (!sigValid) {
+    res.status(401).json({ error: 'invalid_signature' });
+    return;
+  }
+
+  // ── Parse payload ─────────────────────────────────────────────────────────
+  let payload: SlackPayload;
+  try {
+    payload = JSON.parse(rawBody.toString()) as SlackPayload;
+  } catch {
+    res.status(400).json({ error: 'invalid_json' });
+    return;
+  }
+
+  // ── url_verification challenge (Slack sends this when you first configure the URL) ──
+  if (payload.type === 'url_verification') {
+    res.json({ challenge: (payload as SlackUrlVerification).challenge });
+    return;
+  }
+
+  // ── Acknowledge immediately — Slack requires a 200 within 3 seconds ───────
+  res.status(200).send();
+
+  // ── Process app_mention in the background ─────────────────────────────────
+  if (payload.type !== 'event_callback') return;
+
+  const ep = payload as SlackEventCallback;
+  if (ep.event?.type !== 'app_mention') return;
+
+  const { text, channel, ts: threadTs, user } = ep.event;
+
+  // Strip the @bot mention tag from the query text
+  const query = text.replace(/<@[A-Z0-9]+>/g, '').trim();
+  if (!query) return;
+
+  const botToken = process.env['SLACK_BOT_TOKEN'] ?? process.env['SLACK_BOT_USER_OAUTH_TOKEN'];
+  if (!botToken) {
+    req.log.warn('Slack events: SLACK_BOT_TOKEN not set — cannot reply');
+    return;
+  }
+
+  req.log.info({ channel, user, queryPreview: query.slice(0, 80) }, 'Slack app_mention → Penny');
+
+  callGeminiForSlack(query)
+    .then(reply => postSlackReply(botToken, channel, reply, threadTs))
+    .then(() => req.log.info({ channel, threadTs }, 'Penny reply posted to Slack'))
+    .catch((err: unknown) => req.log.error({ err }, 'Slack adapter: Penny dispatch failed'));
 });
 
 export default router;
