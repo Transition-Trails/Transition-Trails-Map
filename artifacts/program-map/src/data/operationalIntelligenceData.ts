@@ -42,6 +42,8 @@ export interface HealthIndicator {
   status: HealthLevel;
   detail: string;
   sourceSystem: string;
+  actionPath?: string;
+  actionLabel?: string;
 }
 
 // ── DOMAIN HEALTH ─────────────────────────────────────────────────────────────
@@ -108,12 +110,12 @@ export const domainHealthData: DomainHealth[] = [
     summary: 'Five active programs with solid baseline structure. Foundations Trail and Guided Trail have the most complete health profiles. Penny coverage is active on three programs; Trail of Mastery and Digital Compass have it disabled.',
     indicators: [
       { id: 'prog-1', domain: 'Programs', label: 'Standards compliance',        status: 'good',         detail: 'Foundations Trail and Guided Trail meet curriculum standards. Explorer\'s Trail needs standards audit.', sourceSystem: 'Standards Studio' },
-      { id: 'prog-2', domain: 'Programs', label: 'Assessment coverage',          status: 'needs-work',   detail: 'Trail of Mastery and Digital Compass lack complete assessment frameworks.', sourceSystem: 'Curriculum Studio' },
+      { id: 'prog-2', domain: 'Programs', label: 'Assessment coverage',          status: 'needs-work',   detail: 'Trail of Mastery and Digital Compass lack complete assessment frameworks.', sourceSystem: 'Curriculum Studio',            actionPath: '/knowledge/library',    actionLabel: 'Open Curriculum Studio' },
       { id: 'prog-3', domain: 'Programs', label: 'Knowledge source coverage',    status: 'good',         detail: 'Core knowledge sources mapped to all active programs.', sourceSystem: 'Knowledge Source Registry' },
-      { id: 'prog-4', domain: 'Programs', label: 'Penny capability coverage',    status: 'needs-work',   detail: 'Explorer\'s Trail, Foundations Trail, and Guided Trail have active Penny coverage. Trail of Mastery and Digital Compass have Penny disabled.', sourceSystem: 'Penny Capability Registry' },
+      { id: 'prog-4', domain: 'Programs', label: 'Penny capability coverage',    status: 'needs-work',   detail: 'Explorer\'s Trail, Foundations Trail, and Guided Trail have active Penny coverage. Trail of Mastery and Digital Compass have Penny disabled.', sourceSystem: 'Penny Capability Registry', actionPath: '/penny/capabilities',   actionLabel: 'Open Penny Capabilities' },
       { id: 'prog-5', domain: 'Programs', label: 'Communication readiness',      status: 'good',         detail: 'Slack and calendar mapped for active cohort programs.', sourceSystem: 'Communications & Collaboration' },
-      { id: 'prog-6', domain: 'Programs', label: 'Role ownership',              status: 'needs-work',   detail: 'Alumni Learner, Volunteer Mentor, and Employer Partner roles lack owners.', sourceSystem: 'People & Roles Studio' },
-      { id: 'prog-7', domain: 'Programs', label: 'Integration readiness',        status: 'needs-work',   detail: 'Salesforce PMM integration incomplete. Google Drive source mapping in progress.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'prog-6', domain: 'Programs', label: 'Role ownership',              status: 'needs-work',   detail: 'Alumni Learner, Volunteer Mentor, and Employer Partner roles lack owners.', sourceSystem: 'People & Roles Studio',        actionPath: '/admin/people-access',  actionLabel: 'Assign Role Owners' },
+      { id: 'prog-7', domain: 'Programs', label: 'Integration readiness',        status: 'needs-work',   detail: 'Salesforce PMM integration incomplete. Google Drive source mapping in progress.', sourceSystem: 'Integration Readiness Center', actionPath: '/admin/integrations',   actionLabel: 'Open Integration Hub' },
     ],
     sourceSystem: 'Curriculum Studio, Salesforce PMM',
     relatedPrograms: ['Foundations Trail', 'Guided Trail', "Explorer's Trail", 'Trail of Mastery', 'Digital Compass'],
@@ -129,10 +131,10 @@ export const domainHealthData: DomainHealth[] = [
     summary: 'Curriculum Studio has strong content structures for Foundations Trail and Guided Trail. Standards Studio is operational with 12+ standards defined. Key gaps: Explorer\'s Trail blueprint compliance, incomplete knowledge article links, and overdue reviews on 3 standards.',
     indicators: [
       { id: 'curr-1', domain: 'Curriculum', label: 'Blueprint compliance',         status: 'good',       detail: 'Program Canvas (Program Blueprint) design standard is well-defined and referenced.', sourceSystem: 'Standards Studio' },
-      { id: 'curr-2', domain: 'Curriculum', label: 'Missing learning objectives',  status: 'needs-work', detail: 'Explorer\'s Trail is missing learning objectives for Modules 4–6.', sourceSystem: 'Curriculum Studio' },
+      { id: 'curr-2', domain: 'Curriculum', label: 'Missing learning objectives',  status: 'needs-work', detail: 'Explorer\'s Trail is missing learning objectives for Modules 4–6.', sourceSystem: 'Curriculum Studio',          actionPath: '/knowledge/library',   actionLabel: 'Open Curriculum Studio' },
       { id: 'curr-3', domain: 'Curriculum', label: 'Assessment coverage',          status: 'good',       detail: 'Foundations and Guided Trails have full assessment coverage.', sourceSystem: 'Curriculum Studio' },
-      { id: 'curr-4', domain: 'Curriculum', label: 'Knowledge article links',      status: 'needs-work', detail: '8 knowledge articles not yet linked to curriculum modules.', sourceSystem: 'Knowledge Source Registry' },
-      { id: 'curr-5', domain: 'Curriculum', label: 'Overdue standards review',     status: 'needs-work', detail: '3 content standards have not been reviewed in 90+ days.', sourceSystem: 'Standards Studio' },
+      { id: 'curr-4', domain: 'Curriculum', label: 'Knowledge article links',      status: 'needs-work', detail: '8 knowledge articles not yet linked to curriculum modules.', sourceSystem: 'Knowledge Source Registry', actionPath: '/knowledge/sources',   actionLabel: 'Open Knowledge Sources' },
+      { id: 'curr-5', domain: 'Curriculum', label: 'Overdue standards review',     status: 'needs-work', detail: '3 content standards have not been reviewed in 90+ days.', sourceSystem: 'Standards Studio',           actionPath: '/knowledge/sources',   actionLabel: 'Open Knowledge Sources' },
       { id: 'curr-6', domain: 'Curriculum', label: 'Prompt consistency',           status: 'good',       detail: 'Consistency review passed for all active Penny prompts.', sourceSystem: 'Penny Prompt Studio' },
       { id: 'curr-7', domain: 'Curriculum', label: 'Duplicate concept detection',  status: 'strong',     detail: 'No duplicate concepts detected in active modules.', sourceSystem: 'Standards Studio' },
     ],
@@ -149,12 +151,12 @@ export const domainHealthData: DomainHealth[] = [
     level: 'needs-work',
     summary: 'Knowledge Source Registry has 6 sources registered with Penny approval, but trust levels are incomplete for 3 sources, 2 sources are overdue for review, and ownership gaps exist for newer sources.',
     indicators: [
-      { id: 'know-1', domain: 'Knowledge', label: 'Source trust levels',          status: 'needs-work', detail: '3 of 9 sources missing trust level assignment.', sourceSystem: 'Knowledge Source Registry' },
+      { id: 'know-1', domain: 'Knowledge', label: 'Source trust levels',          status: 'needs-work', detail: '3 of 9 sources missing trust level assignment.', sourceSystem: 'Knowledge Source Registry',    actionPath: '/knowledge/sources',  actionLabel: 'Open Knowledge Sources' },
       { id: 'know-2', domain: 'Knowledge', label: 'Penny-approved sources',       status: 'good',       detail: '6 sources Penny-approved. 3 pending approval.', sourceSystem: 'Knowledge Source Registry' },
-      { id: 'know-3', domain: 'Knowledge', label: 'Stale content',                status: 'needs-work', detail: '2 sources not synced in 60+ days.', sourceSystem: 'Knowledge Source Registry' },
-      { id: 'know-4', domain: 'Knowledge', label: 'Ownership coverage',           status: 'needs-work', detail: '2 sources have no assigned owner.', sourceSystem: 'Knowledge Source Registry' },
-      { id: 'know-5', domain: 'Knowledge', label: 'Review cycle compliance',      status: 'needs-work', detail: 'Review cycles defined for 5 of 9 sources only.', sourceSystem: 'Knowledge Source Registry' },
-      { id: 'know-6', domain: 'Knowledge', label: 'Salesforce integration',       status: 'needs-work', detail: 'Salesforce Knowledge (Knowledge__c) not yet synced.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'know-3', domain: 'Knowledge', label: 'Stale content',                status: 'needs-work', detail: '2 sources not synced in 60+ days.', sourceSystem: 'Knowledge Source Registry',          actionPath: '/knowledge/sources',  actionLabel: 'Open Knowledge Sources' },
+      { id: 'know-4', domain: 'Knowledge', label: 'Ownership coverage',           status: 'needs-work', detail: '2 sources have no assigned owner.', sourceSystem: 'Knowledge Source Registry',          actionPath: '/knowledge/sources',  actionLabel: 'Open Knowledge Sources' },
+      { id: 'know-5', domain: 'Knowledge', label: 'Review cycle compliance',      status: 'needs-work', detail: 'Review cycles defined for 5 of 9 sources only.', sourceSystem: 'Knowledge Source Registry',    actionPath: '/knowledge/sources',  actionLabel: 'Open Knowledge Sources' },
+      { id: 'know-6', domain: 'Knowledge', label: 'Salesforce integration',       status: 'needs-work', detail: 'Salesforce Knowledge (Knowledge__c) not yet synced.', sourceSystem: 'Integration Readiness Center', actionPath: '/admin/integrations', actionLabel: 'Open Integration Hub' },
     ],
     sourceSystem: 'Knowledge Source Registry',
     relatedPrograms: ['All programs'],
@@ -171,11 +173,11 @@ export const domainHealthData: DomainHealth[] = [
     indicators: [
       { id: 'penny-1', domain: 'Penny AI', label: 'Capability maturity',         status: 'good',       detail: '14 capabilities defined; Study Coach, Trail Quests, and Consistency Review are active.', sourceSystem: 'Penny Capability Registry' },
       { id: 'penny-2', domain: 'Penny AI', label: 'Prompt readiness',            status: 'good',       detail: 'Prompt Studio operational. 20+ templates defined across domains.', sourceSystem: 'Penny Prompt Studio' },
-      { id: 'penny-3', domain: 'Penny AI', label: 'Governance status',           status: 'at-risk',    detail: 'No formal Penny Admin assigned. Prompt governance SLA not defined.', sourceSystem: 'People & Roles Studio' },
-      { id: 'penny-4', domain: 'Penny AI', label: 'Source coverage',             status: 'needs-work', detail: 'Penny only has access to 6 of 9 registered knowledge sources.', sourceSystem: 'Knowledge Source Registry' },
-      { id: 'penny-5', domain: 'Penny AI', label: 'Hallucination risk',          status: 'needs-work', detail: 'Quality review process in place but not fully automated.', sourceSystem: 'Penny Prompt Studio' },
-      { id: 'penny-6', domain: 'Penny AI', label: 'Integration readiness',       status: 'needs-work', detail: 'Agentforce integration is planned; current Penny is standalone.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'penny-7', domain: 'Penny AI', label: 'Executive/coach briefs',      status: 'at-risk',    detail: 'Executive briefs and Program Lead summaries are planned only, not yet delivered.', sourceSystem: 'Penny Capability Registry' },
+      { id: 'penny-3', domain: 'Penny AI', label: 'Governance status',           status: 'at-risk',    detail: 'No formal Penny Admin assigned. Prompt governance SLA not defined.', sourceSystem: 'People & Roles Studio',       actionPath: '/admin/people-access', actionLabel: 'Assign Penny Admin' },
+      { id: 'penny-4', domain: 'Penny AI', label: 'Source coverage',             status: 'needs-work', detail: 'Penny only has access to 6 of 9 registered knowledge sources.', sourceSystem: 'Knowledge Source Registry',  actionPath: '/knowledge/sources',   actionLabel: 'Open Knowledge Sources' },
+      { id: 'penny-5', domain: 'Penny AI', label: 'Hallucination risk',          status: 'needs-work', detail: 'Quality review process in place but not fully automated.', sourceSystem: 'Penny Prompt Studio',           actionPath: '/penny/prompts',        actionLabel: 'Open Prompt Studio' },
+      { id: 'penny-6', domain: 'Penny AI', label: 'Integration readiness',       status: 'needs-work', detail: 'Agentforce integration is planned; current Penny is standalone.', sourceSystem: 'Integration Readiness Center', actionPath: '/admin/integrations',  actionLabel: 'Open Integration Hub' },
+      { id: 'penny-7', domain: 'Penny AI', label: 'Executive/coach briefs',      status: 'at-risk',    detail: 'Executive briefs and Program Lead summaries are planned only, not yet delivered.', sourceSystem: 'Penny Capability Registry', actionPath: '/penny/capabilities',  actionLabel: 'Open Penny Capabilities' },
     ],
     sourceSystem: 'Penny Capability Registry, Penny Prompt Studio',
     relatedPrograms: ['All programs'],
@@ -190,12 +192,12 @@ export const domainHealthData: DomainHealth[] = [
     level: 'needs-work',
     summary: 'People & Roles Studio defines 11 personas and 14 roles. 5 role blueprints are complete. Critical gaps: 6 roles lack owners, 6 roles lack blueprints, Employer Partner and Nonprofit Partner models are incomplete, and several external personas have no Salesforce record type defined.',
     indicators: [
-      { id: 'people-1', domain: 'People & Roles', label: 'Roles with owners',          status: 'needs-work', detail: '8 of 14 roles have assigned owners. 6 unassigned.', sourceSystem: 'People & Roles Studio' },
-      { id: 'people-2', domain: 'People & Roles', label: 'Blueprints complete',         status: 'needs-work', detail: '5 blueprints complete; 4 drafts; 5 missing.', sourceSystem: 'People & Roles Studio' },
-      { id: 'people-3', domain: 'People & Roles', label: 'Salesforce model coverage',   status: 'needs-work', detail: 'Client Sponsor, Employer Partner, NP Partner: SF record types undefined.', sourceSystem: 'Salesforce Architecture Mapping' },
+      { id: 'people-1', domain: 'People & Roles', label: 'Roles with owners',          status: 'needs-work', detail: '8 of 14 roles have assigned owners. 6 unassigned.', sourceSystem: 'People & Roles Studio',          actionPath: '/admin/people-access', actionLabel: 'Assign Role Owners' },
+      { id: 'people-2', domain: 'People & Roles', label: 'Blueprints complete',         status: 'needs-work', detail: '5 blueprints complete; 4 drafts; 5 missing.', sourceSystem: 'People & Roles Studio',           actionPath: '/admin/people-access', actionLabel: 'Open People & Access' },
+      { id: 'people-3', domain: 'People & Roles', label: 'Salesforce model coverage',   status: 'needs-work', detail: 'Client Sponsor, Employer Partner, NP Partner: SF record types undefined.', sourceSystem: 'Salesforce Architecture Mapping', actionPath: '/admin/integrations',  actionLabel: 'Open Integration Hub' },
       { id: 'people-4', domain: 'People & Roles', label: 'Communication assignments',   status: 'good',       detail: 'Core roles (Learner, Coach, Program Lead, Curriculum Designer, Penny Admin) have comm mappings.', sourceSystem: 'Communications & Collaboration' },
       { id: 'people-5', domain: 'People & Roles', label: 'Penny support coverage',      status: 'good',       detail: 'Active Penny support mapped for 6 roles.', sourceSystem: 'Penny Capability Registry' },
-      { id: 'people-6', domain: 'People & Roles', label: 'Training readiness',          status: 'needs-work', detail: '9 roles without complete blueprints have undefined training paths.', sourceSystem: 'People & Roles Studio' },
+      { id: 'people-6', domain: 'People & Roles', label: 'Training readiness',          status: 'needs-work', detail: '9 roles without complete blueprints have undefined training paths.', sourceSystem: 'People & Roles Studio', actionPath: '/admin/people-access', actionLabel: 'Open People & Access' },
     ],
     sourceSystem: 'People & Roles Studio',
     relatedPrograms: ['All programs'],
@@ -211,7 +213,7 @@ export const domainHealthData: DomainHealth[] = [
     summary: 'Core communication channels are mapped for active roles. Slack integration is live including the Penny adapter. Google Chat mappings are defined but not live. Calendar events are structured. Key gaps: NP Partner and Client Sponsor comms undefined.',
     indicators: [
       { id: 'comm-1', domain: 'Communications', label: 'Slack channel readiness',        status: 'good',       detail: 'Cohort, coach, program-ops, and admin Slack channels mapped.', sourceSystem: 'Communications & Collaboration' },
-      { id: 'comm-2', domain: 'Communications', label: 'Google Chat readiness',          status: 'needs-work', detail: 'Google Chat spaces defined in prototype but not live connections.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'comm-2', domain: 'Communications', label: 'Google Chat readiness',          status: 'needs-work', detail: 'Google Chat spaces defined in prototype but not live connections.', sourceSystem: 'Integration Readiness Center', actionPath: '/admin/integrations', actionLabel: 'Open Integration Hub' },
       { id: 'comm-3', domain: 'Communications', label: 'Calendar coverage',              status: 'good',       detail: 'Calendar events defined for all core program phases.', sourceSystem: 'Communications & Collaboration' },
       { id: 'comm-4', domain: 'Communications', label: 'Penny message integration',      status: 'good',       detail: 'Penny Slack Adapter MVP live — @penny responds to mentions in-thread via Gemini 2.5 Flash.', sourceSystem: 'Integration Readiness Center' },
       { id: 'comm-5', domain: 'Communications', label: 'External partner comms',         status: 'good',       detail: 'Deferred — external partner communication flows will be scoped in a future phase.', sourceSystem: 'People & Roles Studio' },
@@ -231,12 +233,12 @@ export const domainHealthData: DomainHealth[] = [
     summary: 'Integration Readiness Center identifies 9 planned integrations. Salesforce Nonprofit Cloud is the most mature; Google Drive, LMS, Slack, and Agentforce are all in varying stages of readiness.',
     indicators: [
       { id: 'int-1', domain: 'Integrations', label: 'Salesforce Nonprofit Cloud',   status: 'good',       detail: 'Nonprofit Cloud active. Core objects (Contacts, Programs, Engagements, Cases) mapped and live.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'int-2', domain: 'Integrations', label: 'Google Drive integration',     status: 'needs-work', detail: 'Drive as content repository defined in prototype. Live sync not configured.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'int-3', domain: 'Integrations', label: 'LMS integration',              status: 'needs-work', detail: 'LMS object model defined. API auth not configured.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'int-2', domain: 'Integrations', label: 'Google Drive integration',     status: 'needs-work', detail: 'Drive as content repository defined in prototype. Live sync not configured.', sourceSystem: 'Integration Readiness Center', actionPath: '/admin/integrations', actionLabel: 'Open Integration Hub' },
+      { id: 'int-3', domain: 'Integrations', label: 'LMS integration',              status: 'needs-work', detail: 'LMS object model defined. API auth not configured.', sourceSystem: 'Integration Readiness Center',                                             actionPath: '/admin/integrations', actionLabel: 'Open Integration Hub' },
       { id: 'int-4', domain: 'Integrations', label: 'Slack adapter',               status: 'good',       detail: 'Penny Slack Adapter MVP live — POST /api/slack/events, signature verification, @penny responding in-thread.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'int-5', domain: 'Integrations', label: 'Google Chat / Calendar',       status: 'needs-work', detail: 'API endpoints defined. Auth and sync readiness incomplete.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'int-6', domain: 'Integrations', label: 'Agentforce (Penny future)',    status: 'at-risk',    detail: 'No readiness work started. Agentforce context handoff is a future milestone.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'int-7', domain: 'Integrations', label: 'Assessment platform',         status: 'needs-work', detail: 'Assessment data model defined. Live integration not started.', sourceSystem: 'Integration Readiness Center' },
+      { id: 'int-5', domain: 'Integrations', label: 'Google Chat / Calendar',       status: 'needs-work', detail: 'API endpoints defined. Auth and sync readiness incomplete.', sourceSystem: 'Integration Readiness Center',                                        actionPath: '/admin/integrations', actionLabel: 'Open Integration Hub' },
+      { id: 'int-6', domain: 'Integrations', label: 'Agentforce (Penny future)',    status: 'at-risk',    detail: 'No readiness work started. Agentforce context handoff is a future milestone.', sourceSystem: 'Integration Readiness Center',                        actionPath: '/admin/integrations', actionLabel: 'Open Integration Hub' },
+      { id: 'int-7', domain: 'Integrations', label: 'Assessment platform',         status: 'needs-work', detail: 'Assessment data model defined. Live integration not started.', sourceSystem: 'Integration Readiness Center',                                        actionPath: '/admin/integrations', actionLabel: 'Open Integration Hub' },
     ],
     sourceSystem: 'Integration Readiness Center',
     relatedPrograms: ['All programs'],

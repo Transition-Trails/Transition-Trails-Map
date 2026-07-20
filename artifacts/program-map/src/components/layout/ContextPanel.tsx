@@ -2334,6 +2334,8 @@ export function ContextPanel() {
       const ic = HEALTH_LEVEL_CONFIG[data.status as HealthLevel] ?? HEALTH_LEVEL_CONFIG['needs-work'];
       const q = `Health Indicator: "${data.label}" (${data.domain})\nStatus: ${ic.label}\nSource: ${data.sourceSystem}\n\nNext action: ${data.detail}\n\nWhat specific steps should the Transition Trails team take right now to address this indicator? What blockers might they face and how should they prioritise this against other work?`;
       const indRoute = SOURCE_SYSTEM_ROUTES[data.sourceSystem as string] ?? null;
+      const actionPath: string | undefined = data.actionPath;
+      const actionLabel: string = data.actionLabel ?? 'Go resolve this';
       return (
         <ScrollArea className="h-full">
           <div className="p-5 space-y-4">
@@ -2353,8 +2355,19 @@ export function ContextPanel() {
               </div>
             )}
 
-            {/* Source system — clickable navigation if a route exists */}
-            {indRoute ? (
+            {/* Primary resolve CTA — navigates to the exact page where the issue can be addressed */}
+            {actionPath && (
+              <button
+                onClick={() => setLocation(actionPath)}
+                className="w-full flex items-center justify-between rounded-lg border border-primary bg-primary/5 px-3 py-2.5 hover:bg-primary/10 transition-colors group"
+              >
+                <span className="text-[11px] font-semibold text-primary">{actionLabel}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-primary shrink-0" />
+              </button>
+            )}
+
+            {/* Source system — secondary navigation if different from actionPath */}
+            {indRoute && indRoute !== actionPath ? (
               <button
                 onClick={() => setLocation(indRoute)}
                 className="w-full flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group"
@@ -2368,14 +2381,14 @@ export function ContextPanel() {
                   <ArrowRight className="w-3 h-3" />
                 </div>
               </button>
-            ) : (
+            ) : !actionPath ? (
               <div className="rounded-lg border bg-muted/20 p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground">Source system</span>
                   <span className="text-[10px] font-semibold text-foreground">{data.sourceSystem}</span>
                 </div>
               </div>
-            )}
+            ) : null}
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
