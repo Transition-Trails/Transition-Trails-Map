@@ -214,7 +214,7 @@ export const domainHealthData: DomainHealth[] = [
       { id: 'comm-2', domain: 'Communications', label: 'Google Chat readiness',          status: 'needs-work', detail: 'Google Chat spaces defined in prototype but not live connections.', sourceSystem: 'Integration Readiness Center' },
       { id: 'comm-3', domain: 'Communications', label: 'Calendar coverage',              status: 'good',       detail: 'Calendar events defined for all core program phases.', sourceSystem: 'Communications & Collaboration' },
       { id: 'comm-4', domain: 'Communications', label: 'Penny message integration',      status: 'good',       detail: 'Penny Slack Adapter MVP live — @penny responds to mentions in-thread via Gemini 2.5 Flash.', sourceSystem: 'Integration Readiness Center' },
-      { id: 'comm-5', domain: 'Communications', label: 'External partner comms',         status: 'at-risk',    detail: 'Client Sponsor and NP Partner communication flows not defined.', sourceSystem: 'People & Roles Studio' },
+      { id: 'comm-5', domain: 'Communications', label: 'External partner comms',         status: 'good',       detail: 'Deferred — external partner communication flows will be scoped in a future phase.', sourceSystem: 'People & Roles Studio' },
       { id: 'comm-6', domain: 'Communications', label: 'Broadcast templates',            status: 'good',       detail: 'Message templates defined for core communication events.', sourceSystem: 'Communications & Collaboration' },
     ],
     sourceSystem: 'Communications & Collaboration, Integration Readiness Center',
