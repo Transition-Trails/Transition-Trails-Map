@@ -209,7 +209,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [commProviders]     = useState<CommProvider[]>([]);
   const [commRoutes]        = useState<CommRoute[]>([]);
   const [messageTemplates]  = useState<MessageTemplate[]>([]);
-  const [platformRoles, setPlatformRoles] = useState<PlatformRole[]>(INITIAL_PLATFORM_ROLES);
+  const [platformRoles, setPlatformRolesRaw] = useState<PlatformRole[]>(() => {
+    try {
+      const stored = localStorage.getItem('trailos:platformRoles');
+      if (stored) {
+        const parsed: PlatformRole[] = JSON.parse(stored);
+        return INITIAL_PLATFORM_ROLES.map(initial => {
+          const saved = parsed.find(p => p.id === initial.id);
+          return saved ? { ...initial, owner: saved.owner, ownerEmail: saved.ownerEmail } : initial;
+        });
+      }
+    } catch { /* ignore */ }
+    return INITIAL_PLATFORM_ROLES;
+  });
+
+  function setPlatformRoles(roles: PlatformRole[]) {
+    setPlatformRolesRaw(roles);
+    try {
+      localStorage.setItem('trailos:platformRoles', JSON.stringify(
+        roles.map(r => ({ id: r.id, owner: r.owner, ownerEmail: r.ownerEmail }))
+      ));
+    } catch { /* ignore */ }
+  }
 
   function setActiveContext(ctx: ActiveContext | null) {
     setActiveContextRaw(ctx);
