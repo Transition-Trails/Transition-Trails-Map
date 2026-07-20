@@ -840,13 +840,19 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
         Estimated_End_Date__c: courseForm.Estimated_End_Date__c || null,
       };
       setCourses(prev => [newCourse, ...prev]);
-      setSelectedCourse(newCourse);
+      selectCourse(newCourse);
       setShowCourseForm(false);
     } catch (e) {
       toast({ title: 'Failed to create course', description: (e as Error).message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
+  }
+
+  /** Select a course and immediately pre-load its modules. */
+  function selectCourse(course: SfCourse) {
+    setSelectedCourse(course);
+    void loadModules(course.Id);
   }
 
   async function loadAllLmsCourses() {
@@ -875,7 +881,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
       if (!resp.ok) throw new Error('Update failed');
       const linked: SfCourse = { ...course, Program__c: selectedProgram.Name };
       setCourses(prev => [linked, ...prev.filter(c => c.Id !== course.Id)]);
-      setSelectedCourse(linked);
+      selectCourse(linked);
       setShowLinkForm(false);
       setLinkSearch('');
       toast({ title: `✓ Linked "${course.Course_Title__c ?? course.Name}" to ${selectedProgram.Name}` });
@@ -888,7 +894,8 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
 
   function handleAdvanceToStep4() {
     if (!selectedCourse) { toast({ title: 'Select or create a course first', variant: 'destructive' }); return; }
-    void loadModules(selectedCourse.Id);
+    // modules are pre-loaded by selectCourse(); only reload if nothing was fetched yet
+    if (modules.length === 0) void loadModules(selectedCourse.Id);
     setStep(4);
   }
 
@@ -1588,7 +1595,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   ) : (
                     <div className="space-y-2">
                       {courses.map(c => (
-                        <button key={c.Id} onClick={() => setSelectedCourse(c)}
+                        <button key={c.Id} onClick={() => selectCourse(c)}
                           className={`w-full text-left rounded-xl border-2 p-3 transition-all ${
                             selectedCourse?.Id === c.Id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 bg-card'
                           }`}>
