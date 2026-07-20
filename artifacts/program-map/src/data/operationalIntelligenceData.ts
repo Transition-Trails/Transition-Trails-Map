@@ -476,7 +476,7 @@ export const recommendations: Recommendation[] = [
     id: 'rec-12',
     action: 'Formalise Prompt Governance SLA',
     domain: 'Penny AI',
-    priority: 'high',
+    priority: 'medium',
     effort: 'Low',
     systems: ['Penny Prompt Studio', 'People & Roles Studio'],
     nextSteps: ['Define review cycle and approval workflow', 'Document maximum time from draft to approval', 'Create escalation path for blocked prompts', 'Add to Penny Admin role blueprint'],
