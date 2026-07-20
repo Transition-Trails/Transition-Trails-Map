@@ -4,12 +4,16 @@ import ProgramWorkspace     from '@/pages/program/ProgramWorkspace';
 import StandardsStudio      from '@/pages/curriculum/StandardsStudio';
 import ProgramBlueprint     from '@/pages/curriculum/ProgramBlueprint';
 import ProgramConfiguration from '@/pages/admin/ProgramConfiguration';
+import CurriculumPrograms   from '@/pages/curriculum/CurriculumPrograms';
+import CurriculumModules    from '@/pages/curriculum/CurriculumModules';
 
 export default function ProgramHub() {
   const [location] = useLocation();
   if (location.startsWith('/program/blueprint')) return <ProgramBlueprint />;
   if (location.startsWith('/program/standards'))  return <StandardsStudio />;
   if (location.startsWith('/program/programs'))   return <ProgramWorkspace />;
+  if (location.startsWith('/program/courses'))    return <CurriculumPrograms />;
+  if (location.startsWith('/program/modules'))    return <CurriculumModules />;
   if (location.startsWith('/program/config')) {
     const sfId = location.replace('/program/config', '').replace(/^\//, '') || null;
     return <ProgramConfiguration preSelectSfId={sfId} />;
