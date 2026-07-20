@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import {
-  Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown, Sparkles,
+  Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown, Sparkles, ListChecks,
 } from 'lucide-react';
 import { useOpsSummary } from '@/hooks/useOpsSummary';
 import { HubShell } from '@/components/layout/HubShell';
@@ -8,11 +8,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import {
-  domainHealthData, recommendations, readinessScorecards, trendInsights,
+  domainHealthData, readinessScorecards, trendInsights,
   overallHealthScore, overallHealthLevel,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG, TREND_TYPE_CONFIG, TREND_URGENCY_CONFIG,
   type HealthLevel,
 } from '@/data/operationalIntelligenceData';
+import RecommendationsManager from '@/pages/operations/RecommendationsManager';
+import { useActionItems } from '@/hooks/useActionItems';
 import Intake        from '@/pages/demand/Intake';
 
 // ── Status weight for top-5 sorting ──────────────────────────────────────────
@@ -309,6 +311,7 @@ function SectionHeader({ label }: { label: string }) {
 
 function IntelligenceView() {
   const { setSelectedItem } = useAppContext();
+  const { visibleRecs } = useActionItems();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   function toggle(id: string) {
     setExpanded(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -396,7 +399,7 @@ function IntelligenceView() {
         <section>
           <SectionHeader label="Recommendations" />
           <div className="space-y-2">
-            {recommendations.map(r => {
+            {visibleRecs.map(r => {
               const pc     = REC_PRIORITY_CONFIG[r.priority];
               const effort = { Low: 'text-emerald-600', Medium: 'text-amber-600', High: 'text-rose-600' }[r.effort];
               return (
@@ -468,9 +471,10 @@ export default function OperationsHub() {
   const { isEveryday } = useTierFlags();
 
   const TABS = [
-    { id: 'health',        label: 'Health Indicators', path: '/operations/health',        icon: Activity,      content: <HealthIndicators /> },
-    { id: 'demand',        label: 'Demand',            path: '/operations/demand',        icon: GitBranch,     content: <Intake /> },
-    { id: 'intelligence',  label: 'Intelligence',      path: '/operations/intelligence',  icon: TrendingUp,    content: <IntelligenceView /> },
+    { id: 'health',           label: 'Health Indicators', path: '/operations/health',           icon: Activity,     content: <HealthIndicators /> },
+    { id: 'demand',           label: 'Demand',            path: '/operations/demand',           icon: GitBranch,    content: <Intake /> },
+    { id: 'intelligence',     label: 'Intelligence',      path: '/operations/intelligence',     icon: TrendingUp,   content: <IntelligenceView /> },
+    ...(!isEveryday ? [{ id: 'recommendations', label: 'Action Items', path: '/operations/recommendations', icon: ListChecks, content: <RecommendationsManager /> }] : []),
   ];
 
   return (

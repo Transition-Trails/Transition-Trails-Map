@@ -12,6 +12,11 @@ import type { ActionPanelConfig, SlackPanelConfig } from '@/types/actionPanel';
 import { type AccessTier, TIER_CONFIG } from '@/config/accessTiers';
 import { type PlatformRole, INITIAL_PLATFORM_ROLES } from '@/data/platformRoles';
 
+export type RecOverride = {
+  status?: 'open' | 'resolved' | 'dismissed';
+  priority?: 'critical' | 'high' | 'medium' | 'low';
+};
+
 export type SelectedItemType =
   | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'demandRequest' | 'document'
   | 'commProvider' | 'commRoute' | 'commTemplate'
@@ -90,6 +95,9 @@ interface AppState {
   updateTrailOsCapability: (id: string, updates: Partial<TrailOsCapability>) => void;
   platformRoles: PlatformRole[];
   setPlatformRoles: (roles: PlatformRole[]) => void;
+  actionItemOverrides: Record<string, RecOverride>;
+  setActionItemOverride: (id: string, override: RecOverride) => void;
+  resetActionItemOverrides: () => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -232,6 +240,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch { /* ignore */ }
   }
 
+  const [actionItemOverrides, setActionItemOverridesRaw] = useState<Record<string, RecOverride>>(() => {
+    try {
+      const stored = localStorage.getItem('trailos:actionItemOverrides');
+      if (stored) return JSON.parse(stored) as Record<string, RecOverride>;
+    } catch { /* ignore */ }
+    return {};
+  });
+
+  function setActionItemOverride(id: string, override: RecOverride) {
+    setActionItemOverridesRaw(prev => {
+      const next = { ...prev, [id]: override };
+      try { localStorage.setItem('trailos:actionItemOverrides', JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }
+
+  function resetActionItemOverrides() {
+    setActionItemOverridesRaw({});
+    try { localStorage.removeItem('trailos:actionItemOverrides'); } catch { /* ignore */ }
+  }
+
   function setActiveContext(ctx: ActiveContext | null) {
     setActiveContextRaw(ctx);
     if (ctx) {
@@ -291,6 +320,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       updateProgram, updateDocument, updateResolvePhase,
       updatePennyCapability, updateTrailOsCapability,
       platformRoles, setPlatformRoles,
+      actionItemOverrides, setActionItemOverride, resetActionItemOverrides,
     }}>
       {children}
     </AppContext.Provider>

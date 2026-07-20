@@ -3,10 +3,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import {
-  domainHealthData, recommendations,
+  domainHealthData,
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG,
   overallHealthScore, overallHealthLevel,
 } from '@/data/operationalIntelligenceData';
+import { useActionItems } from '@/hooks/useActionItems';
 import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
 import { useSfOpsPrograms } from '@/hooks/useSfOpsPrograms';
 
@@ -75,8 +76,9 @@ function SfLiveStrip() {
 }
 
 export default function OpsOverview() {
-  const { setSelectedItem, platformRoles } = useAppContext();
+  const { setSelectedItem } = useAppContext();
   const { isEveryday } = useTierFlags();
+  const { visibleRecs } = useActionItems();
   const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
   const { data: sfPrograms } = useSfOpsPrograms();
 
@@ -102,19 +104,12 @@ export default function OpsOverview() {
           </div>
           <div className="w-px h-8 bg-border/60 shrink-0" />
           <div className="flex flex-1 items-center gap-2 flex-wrap">
-            {(() => {
-              const pennyAssigned = platformRoles.find(r => r.id === 'penny-admin')?.owner.trim();
-              const unassigned    = platformRoles.filter(r => !r.owner.trim()).length;
-              const activeR = recommendations
-                .filter(r => !(r.id === 'rec-1' && pennyAssigned))
-                .filter(r => !(r.id === 'rec-4' && unassigned === 0));
-              return [
-                { l: 'Critical',        v: activeR.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-                { l: 'High Priority',   v: activeR.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-                { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-                { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
-              ];
-            })().map(s => (
+            {[
+              { l: 'Critical',        v: visibleRecs.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+              { l: 'High Priority',   v: visibleRecs.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
+              { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+              { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
+            ].map(s => (
               <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
                 <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
                 <span className={`text-[9px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>
@@ -150,18 +145,9 @@ export default function OpsOverview() {
         </div>
 
         {(() => {
-          const pennyAdminAssigned = platformRoles.find(r => r.id === 'penny-admin')?.owner.trim();
-          const unassignedCount    = platformRoles.filter(r => !r.owner.trim()).length;
-          const activeRecs = recommendations
-            .filter(r => !(r.id === 'rec-1' && pennyAdminAssigned))
-            .filter(r => !(r.id === 'rec-4' && unassignedCount === 0))
-            .map(r => r.id === 'rec-4'
-              ? { ...r, action: `Assign Owners to ${unassignedCount} Unowned Role${unassignedCount !== 1 ? 's' : ''}` }
-              : r
-            );
           const allItems = [
-            ...activeRecs.filter(r => r.priority === 'critical'),
-            ...activeRecs.filter(r => r.priority === 'high'),
+            ...visibleRecs.filter(r => r.priority === 'critical'),
+            ...visibleRecs.filter(r => r.priority === 'high'),
           ];
           const LIMIT   = 6;
           const visible = allItems.slice(0, LIMIT);
