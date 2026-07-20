@@ -19,10 +19,10 @@ import {
 
 // ── Route maps (mirrors OperationsHub) ───────────────────────────────────────
 const REC_ID_ROUTE: Record<string, string> = {
-  'rec-1':  '/roles',
+  'rec-1':  '/admin/people-access#owners',
   'rec-2':  '/admin/integrations',
   'rec-3':  '/collaboration/slack',
-  'rec-4':  '/roles',
+  'rec-4':  '/admin/people-access#owners',
   'rec-5':  '/penny/capabilities',
   'rec-6':  '/admin/integrations',
   'rec-7':  '/penny/capabilities',
@@ -34,7 +34,7 @@ const REC_ID_ROUTE: Record<string, string> = {
 };
 const REC_DOMAIN_ROUTE: Record<string, string> = {
   [TERMS.aiAssistant]: '/penny/capabilities',
-  'People & Roles': '/roles',
+  'People & Roles': '/admin/people-access#owners',
   'Programs':       '/navigator/program-map',
   'Communications': '/collaboration/slack',
   'Integrations':   '/admin/integrations',
@@ -192,12 +192,19 @@ export default function Home() {
             </div>
             <div className="w-px h-8 bg-border/60 shrink-0" />
             <div className="flex flex-1 items-center gap-2 flex-wrap">
-              {[
-                { l: 'Critical',        v: recommendations.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-                { l: 'High Priority',   v: recommendations.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-                { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-                { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
-              ].map(s => (
+              {(() => {
+                const pennyAssigned = platformRoles.find(r => r.id === 'penny-admin')?.owner.trim();
+                const unassigned    = platformRoles.filter(r => !r.owner.trim()).length;
+                const activeR = recommendations
+                  .filter(r => !(r.id === 'rec-1' && pennyAssigned))
+                  .filter(r => !(r.id === 'rec-4' && unassigned === 0));
+                return [
+                  { l: 'Critical',        v: activeR.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+                  { l: 'High Priority',   v: activeR.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
+                  { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
+                  { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
+                ];
+              })().map(s => (
                 <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
                   <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
                   <span className={`text-[9px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>

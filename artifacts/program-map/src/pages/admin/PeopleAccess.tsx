@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
   Users, Shield, Star, Brain, Globe, Chrome, Network, Mail,
@@ -911,8 +911,19 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 export default function PeopleAccess() {
-  const [activeTab, setActiveTab] = useState<Tab>('matrix');
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    if (hash === '#owners') return 'owners';
+    if (hash === '#access') return 'access';
+    return 'matrix';
+  });
   const { userTier, setUserTier } = useAppContext();
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === '#owners') setActiveTab('owners');
+    else if (hash === '#access') setActiveTab('access');
+  }, []);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
