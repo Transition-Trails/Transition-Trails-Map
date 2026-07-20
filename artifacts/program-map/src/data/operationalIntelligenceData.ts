@@ -423,16 +423,6 @@ export const recommendations: Recommendation[] = [
     status: 'open',
   },
   {
-    id: 'rec-6',
-    action: 'Define External Partner Salesforce Models',
-    domain: 'People & Roles',
-    priority: 'high',
-    effort: 'Medium',
-    systems: ['Salesforce Architecture Mapping', 'People & Roles Studio'],
-    nextSteps: ['Define Account record type for Client Sponsors', 'Define Employer Partner object model', 'Create data sharing agreement template for NP Partners', 'Link to program enrollment pipeline'],
-    status: 'open',
-  },
-  {
     id: 'rec-7',
     action: 'Activate Executive Intelligence Briefs',
     domain: 'Penny AI',
