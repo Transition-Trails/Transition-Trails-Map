@@ -10,6 +10,9 @@ import { buildPennySystemPrompt } from "../lib/pennyPromptBuilder.js";
 import { DEFAULT_TRAIL_CONFIG } from "../lib/defaultTrailConfig.js";
 import type { SalesforceClient } from "../lib/salesforceClient.js";
 import { logger } from "../lib/logger.js";
+import { db } from "@workspace/db";
+import { pennyLogsTable } from "@workspace/db/schema";
+import { desc, gte, sql } from "drizzle-orm";
 
 const router = Router();
 
@@ -236,7 +239,29 @@ router.post("/penny/ask", async (req, res) => {
       return res.status(502).json({ error: "Penny returned an empty response. Try rephrasing your question." });
     }
 
-    // Fire-and-forget interaction log — never blocks the Penny response
+    const durationMs = Date.now() - start;
+    const learnerName = learnerCtx
+      ? `${learnerCtx.firstName} ${learnerCtx.lastName}`.trim()
+      : null;
+
+    // Fire-and-forget: write to DB (always) + Salesforce (when contact known)
+    db.insert(pennyLogsTable).values({
+      sessionId:     req.sessionID ?? null,
+      userTier:      typeof role === 'string' ? role : null,
+      userEmail:     null,
+      userMessage:   query.trim(),
+      pennyResponse: text,
+      promptMode:    "ask",
+      model,
+      durationMs,
+      contextRoute:  null,
+      sfContactId,
+      learnerName,
+      trailId:       trailCfg?.trailId ?? null,
+    }).catch((dbErr: unknown) => {
+      logger.warn({ dbErr }, "Failed to write Penny interaction to DB");
+    });
+
     if (sfClient !== null && sfContactId !== null) {
       logInteraction(sfClient, {
         contactId:     sfContactId,
@@ -252,10 +277,10 @@ router.post("/penny/ask", async (req, res) => {
     return res.json({
       reply: text,
       model,
-      durationMs: Date.now() - start,
+      durationMs,
       contextMeta: {
         contactId:         sfContactId,
-        learnerName:       learnerCtx ? `${learnerCtx.firstName} ${learnerCtx.lastName}` : null,
+        learnerName,
         trailId:           trailCfg?.trailId ?? null,
         trailConfigId:     learnerCtx?.pennyTrailConfigId ?? null,
         currentPhase:      learnerCtx?.currentPhase ?? null,
@@ -272,6 +297,48 @@ router.post("/penny/ask", async (req, res) => {
       ? "Penny took too long to respond (30s timeout). Try a shorter question."
       : `Could not reach Gemini: ${e instanceof Error ? e.message : String(e)}`;
     return res.status(502).json({ error: msg });
+  }
+});
+
+// ── GET /penny/logs ────────────────────────────────────────────────────────────
+
+router.get("/penny/logs", async (req, res): Promise<void> => {
+  try {
+    const limitParam = parseInt(String(req.query["limit"] ?? "50"), 10);
+    const limit = Math.min(Math.max(limitParam, 1), 200);
+
+    const dateParam = req.query["date"] as string | undefined;
+    let rows;
+    if (dateParam) {
+      // Filter to a specific date (YYYY-MM-DD)
+      const dayStart = new Date(`${dateParam}T00:00:00.000Z`);
+      rows = await db
+        .select()
+        .from(pennyLogsTable)
+        .where(gte(pennyLogsTable.createdAt, dayStart))
+        .orderBy(desc(pennyLogsTable.createdAt))
+        .limit(limit);
+    } else {
+      // Default: today (server local midnight)
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      rows = await db
+        .select()
+        .from(pennyLogsTable)
+        .where(gte(pennyLogsTable.createdAt, todayStart))
+        .orderBy(desc(pennyLogsTable.createdAt))
+        .limit(limit);
+    }
+
+    // Also return total lifetime count
+    const [{ count }] = await db
+      .select({ count: sql<number>`COUNT(*)::int` })
+      .from(pennyLogsTable);
+
+    res.json({ logs: rows, total: count });
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch Penny logs");
+    res.status(500).json({ error: "Failed to fetch logs" });
   }
 });
 
