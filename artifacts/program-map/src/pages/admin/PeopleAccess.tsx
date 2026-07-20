@@ -52,6 +52,8 @@ interface MatrixRow {
   pennyDepth:    string;
   sfAccess:      string;
   authMethod:    string;
+  healthIssues?: string[];
+  nextSteps?:    string[];
 }
 
 const MATRIX_ROWS: MatrixRow[] = [
@@ -69,6 +71,40 @@ const MATRIX_ROWS: MatrixRow[] = [
   { persona: 'Salesforce Admin',    type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'admin',      tierLabel: 'Admin',    tierOrder: 2, tierDot: 'bg-amber-500',   tierBadge: 'bg-amber-50 border-amber-200 text-amber-700',       health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full',         knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Admin — SF mapping, data layer, integration governance', sfAccess: 'All objects, Permission Set, Profile, User',     authMethod: 'Admin group · trailosadmin@…' },
   { persona: 'Platform Admin',      type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'superadmin', tierLabel: 'Super',    tierOrder: 3, tierDot: 'bg-primary',     tierBadge: 'bg-primary/10 border-primary/20 text-primary',      health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Unrestricted', knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Unrestricted — all RAG chunks, system prompts, governance override', sfAccess: 'All objects', authMethod: 'Dev environment — not assigned via Google Groups' },
 ];
+
+// ── Per-role health context ───────────────────────────────────────────────────
+// Keyed by persona name. Add entries whenever health is not 'healthy'.
+
+const MATRIX_HEALTH_DETAIL: Record<string, { healthIssues: string[]; nextSteps: string[] }> = {
+  'Coach': {
+    healthIssues: ['Role blueprint not yet complete', 'Volunteer record type mapping not verified in Salesforce'],
+    nextSteps: ['Complete Coach role blueprint in People & Roles Studio', 'Verify Salesforce Contact / Volunteer record mapping for coaches'],
+  },
+  [`${TERMS.aiAssistant} Admin`]: {
+    healthIssues: ['Owner not yet formally assigned', 'Salesforce permission model not defined'],
+    nextSteps: ['Assign Penny Admin owner in the Role Owners tab', 'Define Salesforce permission set for the Penny Admin role'],
+  },
+  'Volunteer': {
+    healthIssues: ['No role blueprint defined', 'NPSP Volunteer record mapping incomplete'],
+    nextSteps: ['Author Volunteer Coach blueprint in People & Roles Studio', 'Complete NPSP Volunteer record type mapping in Salesforce'],
+  },
+  'Volunteer Mentor': {
+    healthIssues: ['No blueprint defined', 'No owner assigned', 'No Salesforce record type defined', 'No Penny support configured'],
+    nextSteps: ['Define Volunteer Mentor blueprint in People & Roles Studio', 'Assign a named owner in the Role Owners tab', 'Create Volunteer Mentor record type in Salesforce (Volunteer Job)', 'Map capability to Penny Coach briefs'],
+  },
+  'Alumni Learner': {
+    healthIssues: ['No Salesforce alumni record type defined', 'No alumni communication flow configured'],
+    nextSteps: ['Define alumni Contact record type in Salesforce', 'Configure alumni communication flow in Collaboration hub'],
+  },
+  'Client Sponsor': {
+    healthIssues: ['No Salesforce Account record type defined for sponsors', 'Communication mapping not configured', 'Outcome reporting flow not set up'],
+    nextSteps: ['Define Account record type for Client Sponsors in Salesforce', 'Configure sponsor communication flow in Collaboration hub', 'Design outcome reporting process and delivery cadence'],
+  },
+  'Employer Partner': {
+    healthIssues: ['Employer Partner object model not yet defined in Salesforce', 'No Penny employer matching capability configured'],
+    nextSteps: ['Define Account record type for Employer Partners in Salesforce', 'Map skill requirements to curriculum standards', 'Configure Penny employer matching — planned Phase 3'],
+  },
+};
 
 const NAV_COLS: { key: keyof MatrixRow; label: string }[] = [
   { key: 'navigator',       label: 'Navigator' },
@@ -428,6 +464,46 @@ function PermissionMatrixTab() {
               </button>
             </div>
             <div className="p-5 space-y-4">
+              {/* Health issues + next steps — shown for any non-healthy row */}
+              {activeRow.health !== 'healthy' && (() => {
+                const detail = MATRIX_HEALTH_DETAIL[activeRow.persona];
+                const isIncomplete = activeRow.health === 'incomplete';
+                const borderCls = isIncomplete ? 'border-rose-200 bg-rose-50/60' : 'border-amber-200 bg-amber-50/60';
+                const labelCls  = isIncomplete ? 'text-rose-600' : 'text-amber-600';
+                const dotCls    = isIncomplete ? 'bg-rose-400' : 'bg-amber-400';
+                if (!detail) return null;
+                return (
+                  <div className={`rounded-lg border p-3 space-y-3 ${borderCls}`}>
+                    {/* Issues */}
+                    <div>
+                      <p className={`text-[10px] font-bold uppercase tracking-wide mb-1.5 ${labelCls}`}>
+                        {isIncomplete ? 'Incomplete — issues' : 'Needs attention — issues'}
+                      </p>
+                      <ul className="space-y-1">
+                        {detail.healthIssues.map(issue => (
+                          <li key={issue} className="flex items-start gap-1.5">
+                            <span className={`w-1.5 h-1.5 rounded-full mt-1 shrink-0 ${dotCls}`} />
+                            <span className="text-[11px] text-foreground leading-snug">{issue}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    {/* Next steps */}
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 mb-1.5">How to resolve</p>
+                      <ol className="space-y-1 list-none">
+                        {detail.nextSteps.map((step, i) => (
+                          <li key={step} className="flex items-start gap-2">
+                            <span className="text-[10px] font-bold text-muted-foreground/50 mt-0.5 w-3 shrink-0">{i + 1}.</span>
+                            <span className="text-[11px] text-foreground leading-snug">{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Auth */}
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/50 mb-1.5">Auth method</p>
