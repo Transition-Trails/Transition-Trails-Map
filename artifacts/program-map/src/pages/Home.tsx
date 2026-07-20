@@ -81,7 +81,7 @@ const PROGRAM_COLORS: Record<string, string> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const { programs } = useAppContext();
+  const { programs, platformRoles } = useAppContext();
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, navigate] = useLocation();
 
@@ -247,9 +247,18 @@ export default function Home() {
 
         {/* ── POWER+: Critical & High Priority Actions ── */}
         {!isEveryday && (() => {
+          const pennyAdminAssigned = platformRoles.find(r => r.id === 'penny-admin')?.owner.trim();
+          const unassignedCount    = platformRoles.filter(r => !r.owner.trim()).length;
+          const activeRecs = recommendations
+            .filter(r => !(r.id === 'rec-1' && pennyAdminAssigned))
+            .filter(r => !(r.id === 'rec-4' && unassignedCount === 0))
+            .map(r => r.id === 'rec-4'
+              ? { ...r, action: `Assign Owners to ${unassignedCount} Unowned Role${unassignedCount !== 1 ? 's' : ''}` }
+              : r
+            );
           const allItems = [
-            ...recommendations.filter(r => r.priority === 'critical'),
-            ...recommendations.filter(r => r.priority === 'high'),
+            ...activeRecs.filter(r => r.priority === 'critical'),
+            ...activeRecs.filter(r => r.priority === 'high'),
           ];
           const LIMIT   = 6;
           const visible = allItems.slice(0, LIMIT);

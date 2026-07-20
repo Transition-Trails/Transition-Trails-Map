@@ -10,6 +10,7 @@ import type { CommRoute } from '@/data/commRouting';
 import type { MessageTemplate } from '@/data/messageTemplates';
 import type { ActionPanelConfig, SlackPanelConfig } from '@/types/actionPanel';
 import { type AccessTier, TIER_CONFIG } from '@/config/accessTiers';
+import { type PlatformRole, INITIAL_PLATFORM_ROLES } from '@/data/platformRoles';
 
 export type SelectedItemType =
   | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'demandRequest' | 'document'
@@ -87,6 +88,8 @@ interface AppState {
   updateResolvePhase: (id: string, updates: Partial<ResolvePhase>) => void;
   updatePennyCapability: (id: string, updates: Partial<PennyCapability>) => void;
   updateTrailOsCapability: (id: string, updates: Partial<TrailOsCapability>) => void;
+  platformRoles: PlatformRole[];
+  setPlatformRoles: (roles: PlatformRole[]) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -206,6 +209,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [commProviders]     = useState<CommProvider[]>([]);
   const [commRoutes]        = useState<CommRoute[]>([]);
   const [messageTemplates]  = useState<MessageTemplate[]>([]);
+  const [platformRoles, setPlatformRoles] = useState<PlatformRole[]>(INITIAL_PLATFORM_ROLES);
 
   function setActiveContext(ctx: ActiveContext | null) {
     setActiveContextRaw(ctx);
@@ -265,6 +269,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setActiveContext,
       updateProgram, updateDocument, updateResolvePhase,
       updatePennyCapability, updateTrailOsCapability,
+      platformRoles, setPlatformRoles,
     }}>
       {children}
     </AppContext.Provider>
