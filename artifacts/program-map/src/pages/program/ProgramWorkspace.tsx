@@ -315,7 +315,8 @@ function CurriculumTab({ programName }: { programName: string }) {
 }
 
 function PennyTab({ p }: { p: Program }) {
-  const { isEveryday } = useTierFlags();
+  const { isEveryday, isPowerOrAbove } = useTierFlags();
+  const { updateProgram } = useAppContext();
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-3xl">
@@ -324,8 +325,31 @@ function PennyTab({ p }: { p: Program }) {
             ? `${TERMS.aiAssistant} features available in this program to help you with coaching, feedback, and learning activities.`
             : `${TERMS.aiAssistant} capabilities that are activated or planned for this program.`}
         </p>
+        {isPowerOrAbove && (
+          <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2">
+            <div>
+              <p className="text-[11px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</p>
+              <p className="text-[10px] text-muted-foreground">{p.pennyActive ? 'Active for this program' : 'Disabled for this program'}</p>
+            </div>
+            <button
+              onClick={() => updateProgram(p.id, { pennyActive: !p.pennyActive })}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
+                p.pennyActive ? 'bg-primary' : 'bg-muted-foreground/30'
+              }`}
+            >
+              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                p.pennyActive ? 'translate-x-4' : 'translate-x-1'
+              }`} />
+            </button>
+          </div>
+        )}
+
         <Section title={isEveryday ? `Available ${TERMS.aiAssistant} Features` : `Active ${TERMS.aiAssistant} Features`}>
-          {p.pennyFeatures?.length > 0 ? (
+          {!p.pennyActive ? (
+            <p className="text-[12px] text-muted-foreground italic">
+              {TERMS.aiAssistant} intelligence is disabled for this program. Enable it above to configure features.
+            </p>
+          ) : p.pennyFeatures?.length > 0 ? (
             <div className="space-y-2">
               {p.pennyFeatures.map(f => (
                 <div key={f} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
@@ -365,7 +389,7 @@ function SystemsTab({ p }: { p: Program }) {
     { name:'Salesforce',     status:'Connected', detail:'Program records, cohort data, learner enrollment', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'Google Drive',   status:'Connected', detail:`${p.name} curriculum folder and sprint resources`, cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'Slack',          status:'Active',    detail:'Cohort and coach channels', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { name:`${TERMS.aiAssistant}`,  status:'Active',    detail:(p.pennyFeatures ?? []).join(', ') || 'No features activated', cls:'border-primary/20 bg-primary/5', badge:'bg-primary/10 text-primary border-primary/20' },
+    { name:`${TERMS.aiAssistant}`,  status: p.pennyActive ? 'Active' : 'Disabled', detail: p.pennyActive ? ((p.pennyFeatures ?? []).join(', ') || 'Enabled — no features mapped yet') : `${TERMS.aiAssistant} intelligence is disabled for this program`, cls: p.pennyActive ? 'border-primary/20 bg-primary/5' : 'border-muted bg-muted/30', badge: p.pennyActive ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-border' },
     { name:'Google Calendar',status:'Active',    detail:'Sprint schedule and cohort events', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'PMM (Salesforce)',status:'Planned',  detail:'Marketing Cloud integration — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
     { name:'LMS',            status:'Planned',   detail:'Learner progress and content delivery — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
@@ -392,7 +416,7 @@ function HealthTab({ p }: { p: Program }) {
   const indicators = [
     { label:'Blueprint Compliance',   status: p.confidence === 'confirmed' ? 'healthy' : 'needs-attention', note: p.confidence === 'confirmed' ? 'Fully compliant with Program Blueprint v2' : 'Review required' },
     { label:'Salesforce Data Quality',status:'healthy',         note:'Program records synced and up to date' },
-    { label:`${TERMS.aiAssistant} Integration`,      status: (p.pennyFeatures?.length ?? 0) > 0 ? 'healthy' : 'needs-attention', note: (p.pennyFeatures?.length ?? 0) > 0 ? `${p.pennyFeatures.length} features active` : `No ${TERMS.aiAssistant} features activated` },
+    { label:`${TERMS.aiAssistant} Integration`,      status: p.pennyActive ? 'healthy' : 'needs-attention', note: p.pennyActive ? `${p.pennyFeatures?.length ?? 0} features active` : `${TERMS.aiAssistant} intelligence disabled for this program` },
     { label:'Knowledge Sources',      status:'healthy',         note:'Knowledge registry linkage confirmed' },
     { label:'Coach Assignment',       status:'healthy',         note:'All active cohorts have assigned coaches' },
     { label:'Org Memory',             status:isHealthy ? 'healthy' : 'incomplete', note: isHealthy ? 'Decisions documented' : 'Missing decision records from last retrospective' },

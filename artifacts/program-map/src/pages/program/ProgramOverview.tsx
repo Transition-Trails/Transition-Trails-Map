@@ -101,9 +101,9 @@ export default function ProgramOverview() {
     const confirmed    = programs.filter(p => p.confidence === 'confirmed').length;
     const needsReview  = programs.filter(p => p.confidence === 'needs-review').length;
     const draft        = programs.filter(p => p.confidence === 'draft').length;
-    const pennyActive  = programs.filter(p => p.pennyFeatures?.length > 0).length;
+    const pennyActive  = programs.filter(p => p.pennyActive).length;
     const blueprintOk  = programs.filter(p => p.confidence === 'confirmed').length;
-    const withoutPenny = programs.filter(p => !p.pennyFeatures?.length).length;
+    const withoutPenny = programs.filter(p => !p.pennyActive).length;
     return { confirmed, needsReview, draft, pennyActive, blueprintOk, withoutPenny };
   }, [programs]);
 
@@ -135,7 +135,7 @@ export default function ProgramOverview() {
                         <p className="text-[12px] font-semibold text-foreground">{p.name}</p>
                         <p className="text-[10px] text-muted-foreground truncate">{p.coreOutcome}</p>
                       </div>
-                      {p.pennyFeatures?.length > 0 && (
+                      {p.pennyActive && (
                         <span className="text-[9px] font-bold bg-primary/10 text-primary border border-primary/20 rounded px-1.5 py-0.5 shrink-0">
                           Penny Active
                         </span>
