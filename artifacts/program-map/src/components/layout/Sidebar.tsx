@@ -41,8 +41,7 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/program',
     items: [
       { id: 'prog-overview',   path: '/program',             label: 'Overview',         minTier: 'admin' },
-      { id: 'prog-courses',    path: '/program/courses',     label: 'Courses',          minTier: 'power' },
-      { id: 'prog-modules',    path: '/program/modules',     label: 'Modules',          minTier: 'power' },
+      { id: 'prog-courses',    path: '/program/courses',     label: 'Courses & Modules', minTier: 'power' },
       { id: 'prog-blueprint',  path: '/program/blueprint',   label: 'Blueprint',        minTier: 'admin' },
       { id: 'prog-standards',  path: '/program/standards',   label: 'Standards Studio', minTier: 'power' },
     ],

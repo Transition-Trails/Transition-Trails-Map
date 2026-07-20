@@ -60,8 +60,8 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   // ── Programs ───────────────────────────────────────────────────────────────
   { path: '/program',      kind: 'active' },
   { path: '/program/:tab', kind: 'active' },
-  { path: '/program/courses',  kind: 'active', note: 'LMS Courses — live Salesforce Course__c data' },
-  { path: '/program/modules',  kind: 'active', note: 'LMS Modules — live Salesforce Course_Module__c data' },
+  { path: '/program/courses',  kind: 'active', note: 'Courses & Modules — live Salesforce Course__c / Course_Module__c split-pane view' },
+  { path: '/program/modules',  kind: 'active', note: 'Alias for /program/courses' },
   { path: '/program/sf-validation', kind: 'redirect', target: '/admin/sf-validation' },
   { path: '/program/resources',     kind: 'redirect', target: '/admin/program-resources' },
   { path: '/program/salesforce',    kind: 'redirect', target: '/admin/salesforce-arch' },
