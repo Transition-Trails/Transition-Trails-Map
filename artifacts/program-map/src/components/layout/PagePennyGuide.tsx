@@ -102,7 +102,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: `Org Memory: 234 ${TERMS.aiAssistant} interactions logged this week`,          meta: '6h ago',  why: `${TERMS.aiAssistant} reads its interaction log to identify knowledge gaps and improve future answers` },
   ],
   collaboration: [
-    { urgent: false, source: 'slack',      text: `@coachconnectbot live in ${TERMS.aiAssistant} AI + Admin channels — delivery pipeline ready to wire`,  meta: '1h ago',  why: `${TERMS.aiAssistant} monitors Slack bot status — Slack is live and ${TERMS.aiAssistant} delivery can now be wired to the live bot` },
+    { urgent: false, source: 'slack',      text: `@penny live in ${TERMS.aiAssistant} AI + Admin channels — delivery pipeline ready to wire`,  meta: '1h ago',  why: `${TERMS.aiAssistant} monitors Slack bot status — Slack is live and ${TERMS.aiAssistant} delivery can now be wired to the live bot` },
     { urgent: false, source: 'calendar',   text: 'Sprint 3 Resume Workshop — Thursday 10am',                     meta: '2h ago',  why: `${TERMS.aiAssistant} reads Calendar to surface upcoming collaborative sessions so you can prepare` },
     { urgent: false, source: 'slack',      text: '#guided-trail-cohort-1: Week 3 message from coach',            meta: '4h ago',  why: `${TERMS.aiAssistant} monitors cohort channels to surface coach communications that may need a follow-up` },
     { urgent: false, source: 'drive',      text: '7 message templates ready for testing',                        meta: '6h ago',  why: `${TERMS.aiAssistant} watches template folders to surface communication assets that are ready to use or review` },
@@ -306,17 +306,17 @@ const CONTENT: Record<PageCtx, PageContent> = {
   collaboration: {
     everydayInsights: [
       'Google Calendar shows your next session: Sprint 3 Resume Workshop — Thursday',
-      `@coachconnectbot is live in Slack — ${TERMS.aiAssistant} can send session reminders once delivery pipeline is wired`,
-      `Message templates ready — wire ${TERMS.aiAssistant} output to @coachconnectbot to activate broadcasts`,
+      `@penny is live in Slack — ${TERMS.aiAssistant} can send session reminders once delivery pipeline is wired`,
+      `Message templates ready — wire ${TERMS.aiAssistant} output to @penny to activate broadcasts`,
     ],
     powerInsights: [
-      `Slack live — @coachconnectbot posting to ${TERMS.aiAssistant} AI + Admin channels`,
+      `Slack live — @penny posting to ${TERMS.aiAssistant} AI + Admin channels`,
       'Google Calendar: connected for timing context',
       `3 communication routes defined — ready to wire ${TERMS.aiAssistant} output to Slack delivery`,
       '7 message templates ready for testing',
     ],
     attentionItems: [
-      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: `Slack live — @coachconnectbot posting to ${TERMS.aiAssistant} AI + Admin` },
+      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: `Slack live — @penny posting to ${TERMS.aiAssistant} AI + Admin` },
       { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Google Calendar connected for session timing' },
     ],
     everydaySteps: [{ label: 'View Google Calendar', path: '/collaboration/calendar' }],
@@ -324,14 +324,14 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Slack integration', path: '/collaboration/slack' },
       { label: 'Message templates', path: '/collaboration/templates' },
     ],
-    everydayCanned: `Google Calendar is connected and shows your upcoming sessions. Slack @coachconnectbot is live — once ${TERMS.aiAssistant}'s output is wired to Slack delivery, reminders and updates will go through there automatically.`,
-    powerCanned:    `Collaboration stack: Slack live (POC confirmed — @coachconnectbot posting). Google Calendar connected. 3 communication routes and 7 message templates defined. Next: wire ${TERMS.aiAssistant} capability output to Slack delivery pipeline.`,
+    everydayCanned: `Google Calendar is connected and shows your upcoming sessions. Slack @penny is live — once ${TERMS.aiAssistant}'s output is wired to Slack delivery, reminders and updates will go through there automatically.`,
+    powerCanned:    `Collaboration stack: Slack live (POC confirmed — @penny posting). Google Calendar connected. 3 communication routes and 7 message templates defined. Next: wire ${TERMS.aiAssistant} capability output to Slack delivery pipeline.`,
   },
   admin: {
     everydayInsights: [],
     powerInsights: [
       'Salesforce live — REST API connected, PMM + NPSP confirmed. Next: wire to dashboard.',
-      'Slack live — @coachconnectbot posting. Next: add channels:read scope.',
+      'Slack live — @penny posting. Next: add channels:read scope.',
       'Google OAuth live — Drive + Calendar refresh tokens obtained and stored in Replit Secrets',
 
     ],
@@ -346,7 +346,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Google OAuth',      path: '/admin/google-oauth' },
     ],
     everydayCanned: "",
-    powerCanned:    "Admin status: Salesforce + Google OAuth live (REST API + PMM, Drive + Calendar tokens stored). Slack POC confirmed (@coachconnectbot). Phase 2 features are tracked in Salesforce.",
+    powerCanned:    "Admin status: Salesforce + Google OAuth live (REST API + PMM, Drive + Calendar tokens stored). Slack POC confirmed (@penny). Phase 2 features are tracked in Salesforce.",
   },
   'digital-twin': {
     everydayInsights: [],

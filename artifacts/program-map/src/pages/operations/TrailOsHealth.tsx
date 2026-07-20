@@ -5,7 +5,7 @@ import { TERMS } from '@/config/terminology';
 
 const integrations = [
   { name: 'Salesforce REST',  status: 'Live',       eta: 'Active',   dot: 'green' as const, note: '127 Accounts · 129 Contacts · NPSP + PMM confirmed via Replit Connector. Live demand cases in Operations.' },
-  { name: 'Slack',            status: 'Live',       eta: 'Active',   dot: 'green' as const, note: '@coachconnectbot posting to Penny AI + Admin channels.' },
+  { name: 'Slack',            status: 'Live',       eta: 'Active',   dot: 'green' as const, note: '@penny posting to Penny AI + Admin channels.' },
   { name: 'Google Drive',     status: 'Live',       eta: 'Active',   dot: 'green' as const, note: 'OAuth refresh token active. Replit connector live. Folder structure defined.' },
   { name: 'Google Calendar',  status: 'Live',       eta: 'Active',   dot: 'green' as const, note: 'OAuth refresh token active. Next 5 events via Calendar Action Panel. Trail Talk branding.' },
   { name: 'Agentforce AI',    status: 'Live · POC', eta: 'Active',   dot: 'green' as const, note: 'Sessions API wired (Sprint 4). Dual-AI coaching confirmed — Assessment page + Slack channel.' },

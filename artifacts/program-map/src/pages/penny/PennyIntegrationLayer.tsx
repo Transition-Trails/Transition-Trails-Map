@@ -104,7 +104,7 @@ const CONNECTIONS: IntegrationConnection[] = [
     from: 'Penny',
     to: 'Slack',
     toIcon: Hash,
-    description: 'Penny broadcasts weekly briefs, learner nudges, cohort health alerts, and coach notifications via Slack channels. POC confirmed: @coachconnectbot posting to Penny AI and Admin channels.',
+    description: 'Penny broadcasts weekly briefs, learner nudges, cohort health alerts, and coach notifications via Slack channels. POC confirmed: @penny posting to Penny AI and Admin channels.',
     status: 'ready',
     phase: 1,
     readiness: 78,

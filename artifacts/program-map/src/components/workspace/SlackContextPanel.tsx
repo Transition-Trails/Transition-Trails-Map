@@ -140,7 +140,7 @@ interface PendingItem {
 const CONTEXT_PENDING: Record<SlackPanelContext, PendingItem[]> = {
   penny: [
     { id:'p1', kind:'ask',       text:'@penny-bot — "Can you resend the Week 6 check-in to Alex?" Awaiting response.', channel:'#penny-qa', channelId:'penny-qa', time:'2h ago', urgent:false },
-    { id:'p2', kind:'alert',     text:'@coachconnectbot live — posting to Penny AI + Admin channels confirmed. Next: wire Penny capability output to Slack delivery pipeline.', channel:'#penny-ai', channelId:'penny-ai', time:'Active', urgent:false },
+    { id:'p2', kind:'alert',     text:'@penny live — posting to Penny AI + Admin channels confirmed. Next: wire Penny capability output to Slack delivery pipeline.', channel:'#penny-ai', channelId:'penny-ai', time:'Active', urgent:false },
     { id:'p3', kind:'reminder',  text:'Prompt template review due: Learning Coach v1.4 QA check.', channel:'#penny-qa', channelId:'penny-qa', time:'Today', urgent:false },
     { id:'p4', kind:'mention',   text:'You were mentioned in #penny-qa: "Capability Registry update needed for Resume Review."', channel:'#penny-qa', channelId:'penny-qa', time:'Yesterday', urgent:false },
   ],
@@ -155,7 +155,7 @@ const CONTEXT_PENDING: Record<SlackPanelContext, PendingItem[]> = {
     { id:'p3', kind:'reminder',  text:'Trail Quest delivery pending: "LinkedIn Profile Sprint 4" — not yet scheduled.', channel:'#foundations-cohort-2', channelId:'foundations-cohort-2', time:'Tomorrow', urgent:false },
   ],
   slack: [
-    { id:'p1', kind:'alert',     text:'Slack bot live — SLACK_BOT_TOKEN configured, @coachconnectbot posting to Penny AI + Admin channels confirmed.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Active', urgent:false },
+    { id:'p1', kind:'alert',     text:'Slack bot live — SLACK_BOT_TOKEN configured, @penny posting to Penny AI + Admin channels confirmed.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Active', urgent:false },
     { id:'p2', kind:'reminder',  text:'Next: add channels:read + groups:read scopes to Slack app to enable channel name resolution in Penny.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Pending', urgent:false },
     { id:'p3', kind:'escalation',text:'3 channels missing governance records — review required.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:false },
     { id:'p4', kind:'mention',   text:'1 unmapped user (U10J) — no Trail OS persona assigned.', time:'Ongoing', urgent:false },
@@ -170,7 +170,7 @@ const CONTEXT_PENDING: Record<SlackPanelContext, PendingItem[]> = {
     { id:'p2', kind:'ask',       text:'Coach requested: "Can Penny send a calendar reminder before Thursday session?"', channel:'#foundations-coaches', channelId:'foundations-coaches', time:'Today', urgent:false },
   ],
   collaboration: [
-    { id:'p1', kind:'alert',     text:'Slack live — @coachconnectbot confirmed. Next: wire Penny capability output to Slack delivery for weekly briefs and learner nudges.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Active', urgent:false },
+    { id:'p1', kind:'alert',     text:'Slack live — @penny confirmed. Next: wire Penny capability output to Slack delivery for weekly briefs and learner nudges.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Active', urgent:false },
     { id:'p2', kind:'reminder',  text:'#guided-trail-general needs channel purpose + governance record.', time:'Overdue', urgent:false },
   ],
   people: [

@@ -191,7 +191,7 @@ export default function CommOverview() {
 
         <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            <strong>Slack live</strong> (@coachconnectbot). Google Calendar connected. Google Chat: Phase 2. Configuration managed in Administration → Integrations.
+            <strong>Slack live</strong> (@penny). Google Calendar connected. Google Chat: Phase 2. Configuration managed in Administration → Integrations.
           </p>
         </div>
 

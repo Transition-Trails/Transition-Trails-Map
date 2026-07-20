@@ -59,7 +59,7 @@ const SOURCES: SignalSource[] = [
     id: 'slack', label: 'Slack', icon: MessageSquare,
     color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200',
     description: 'Channel mentions, bot alerts, and team activity signals',
-    signals: ['Bot alerts (@coachconnectbot)', 'Channel activity digest', 'Attrition threshold alerts'],
+    signals: ['Bot alerts (@penny)', 'Channel activity digest', 'Attrition threshold alerts'],
     required: false,
   },
   {

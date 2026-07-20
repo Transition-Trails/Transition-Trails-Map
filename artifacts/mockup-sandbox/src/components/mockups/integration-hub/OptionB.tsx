@@ -61,7 +61,7 @@ const DOMAINS: DomainCard[] = [
     border: "border-emerald-200",
     headerBg: "bg-emerald-50",
     deps: [
-      { label: "Slack bot (@coachconnectbot)", status: "partial", note: "Posting confirmed to Penny AI + Admin channels · channels:read scope missing — channel names unresolved", action: "/admin/integrations", actionLabel: "Fix" },
+      { label: "Slack bot (@penny)", status: "partial", note: "Posting confirmed to Penny AI + Admin channels · channels:read scope missing — channel names unresolved", action: "/admin/integrations", actionLabel: "Fix" },
       { label: "Gmail read + send", status: "live", note: "gmail.readonly + gmail.send · real inbox · Penny draft + send live", action: "/collaboration/gmail", actionLabel: "Open" },
       { label: "Google Calendar events", status: "live", note: "Real events via /api/calendar/events · Penny prep briefs per event", action: "/collaboration/calendar-live", actionLabel: "Open" },
       { label: "Signal routing rules", status: "partial", note: "Rule hub live at Collaboration Overview · automated Penny routing Phase 2", action: "/collaboration", actionLabel: "Configure" },

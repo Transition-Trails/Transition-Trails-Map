@@ -133,7 +133,7 @@ const POC_ITEMS: PocItem[] = [
   { capability: 'Learning Coach (LLM)',           pocState: 'Live · Gemini API active',  trailOsState: 'PennyHub > Ask Penny ✅',     risk: 'Low',    p2Item: 'p2-penny-live-llm' },
   { capability: 'Prompt Studio',                  pocState: 'Substantially implemented', trailOsState: 'PennyHub > Prompts ✅',        risk: null,     p2Item: null },
   { capability: 'Salesforce Intelligence',        pocState: 'Live API probe confirmed',  trailOsState: 'SF Validation ✅',             risk: 'Low',    p2Item: 'p2-sf-live-queries' },
-  { capability: 'Slack Bot (@coachconnectbot)',    pocState: 'Functional (live POC)',     trailOsState: 'Collaboration > Slack ✅',     risk: 'Low',    p2Item: 'p2-trail-quest-live' },
+  { capability: 'Slack Bot (@penny)',    pocState: 'Functional (live POC)',     trailOsState: 'Collaboration > Slack ✅',     risk: 'Low',    p2Item: 'p2-trail-quest-live' },
   { capability: 'Gemini API route',               pocState: 'Live · Gemini API active',  trailOsState: 'API server route ✅',          risk: 'Low',    p2Item: 'p2-penny-live-llm' },
   { capability: 'Trail Quest delivery',           pocState: 'Live · Sprint 4',           trailOsState: 'PennyHub > Trail Quests ✅',   risk: 'Low',    p2Item: 'p2-trail-quest-live' },
   { capability: 'Assessment / Quiz flow',         pocState: 'Live · Sprint 4',           trailOsState: 'PennyHub > Assessments ✅',    risk: 'Low',    p2Item: 'p2-penny-assessment' },

@@ -79,7 +79,7 @@ const CONNECTIONS: Connection[] = [
   {
     id: 'slack', name: 'Slack', tagline: 'Learner Delivery Channel',
     status: 'live-partial', icon: MessageSquare, iconCls: 'bg-violet-50 text-violet-700', owner: 'Ops Lead',
-    detail: '@coachconnectbot posting live. POC scopes active.',
+    detail: '@penny posting live. POC scopes active.',
     action: 'Slack Config', href: '/collaboration/slack',
     needs: 'channels:read scope not yet approved — bot cannot list channels or members',
   },
@@ -355,7 +355,7 @@ const DOMAINS: DomainCard[] = [
     id: 'channels', icon: MessageSquare, title: 'Channels & Comms', subtitle: `How ${TERMS.aiAssistant} communicates`,
     color: 'text-emerald-700', border: 'border-emerald-200', headerBg: 'bg-emerald-50', iconCls: 'bg-emerald-50 text-emerald-600',
     deps: [
-      { label: 'Slack bot (@coachconnectbot)', status: 'partial', note: 'Bot posting confirmed to Penny AI + Admin channels. Missing: channels:read + groups:read scopes — add to Slack app manifest to resolve channel names.', action: '/collaboration/slack',          actionLabel: 'Slack config'  },
+      { label: 'Slack bot (@penny)', status: 'partial', note: 'Bot posting confirmed to Penny AI + Admin channels. Missing: channels:read + groups:read scopes — add to Slack app manifest to resolve channel names.', action: '/collaboration/slack',          actionLabel: 'Slack config'  },
       { label: 'Gmail read + send',            status: 'live',    note: `gmail.readonly + gmail.send confirmed · Real inbox (15 threads) · ${TERMS.aiAssistant}-assisted draft + send via POST /api/gmail/send live`,                         action: '/collaboration/gmail',          actionLabel: 'Open Gmail'    },
       { label: 'Google Calendar events',       status: 'live',    note: `Real events via /api/calendar/events · ${TERMS.aiAssistant} prep briefs per event · pending invite flags live`,                                                      action: '/collaboration/calendar-live',  actionLabel: 'Open Calendar' },
       { label: 'Signal routing rules',         status: 'partial', note: `Collaboration Overview rule hub live — Slack, Gmail, Calendar, Drive channel rules visible and structured. Automated ${TERMS.aiAssistant} routing is Phase 2.`,      action: '/collaboration',                actionLabel: 'Edit rules'    },

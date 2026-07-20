@@ -75,7 +75,7 @@ const AREAS: ReadinessArea[] = [
       'Trail OS API server running (Express 5, port 8080)',
       'Salesforce REST API live via Replit Connector — 127 Accounts, 129 Contacts, NPSP + PMM (7/8 objects) confirmed',
       'Slack POC: bot token, app token, signing secret, 3 channel IDs, client ID/secret — all configured',
-      'Slack bot (@coachconnectbot) posting live to Penny AI and Admin channels — POC confirmed',
+      'Slack bot (@penny) posting live to Penny AI and Admin channels — POC confirmed',
       'GEMINI_API_KEY validated live — 21 models available (Gemini 2.5 Flash + Pro), auth confirmed',
       'GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET live-validated — format correct, Google APIs reachable in 25ms',
       `GOOGLE_DRIVE_REFRESH_TOKEN obtained — Google Drive OAuth fully live (Jun 13 2026); GOOGLE_DRIVE_PENNY_FOLDER_ID set — ${TERMS.aiAssistant} Asset Library reading real files from Shared Drive (Jun 16 2026)`,
@@ -179,7 +179,7 @@ const AREAS: ReadinessArea[] = [
       `Assessments workspace live — per-learner results, filter, dual-AI coaching: ${TERMS.aiAssistant} + Agentforce in parallel`,
       'Agentforce coexistence confirmed — 8/8 POC steps, live API, POST /api/agentforce/invoke session flow',
       `SF Case → ${TERMS.aiAssistant} focus wired (Sprint 5) — case row click auto-fires rich ${TERMS.aiAssistant} query (case #, subject, priority, status, contact, age)`,
-      'Slack POC: @coachconnectbot posting to Penny AI channel (confirmed working)',
+      'Slack POC: @penny posting to Penny AI channel (confirmed working)',
       'Google OAuth fully live — GOOGLE_DRIVE_REFRESH_TOKEN + GOOGLE_CALENDAR_REFRESH_TOKEN obtained (Jun 13 2026)',
     ],
     gaps: [

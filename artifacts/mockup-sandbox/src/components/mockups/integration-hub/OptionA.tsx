@@ -20,7 +20,7 @@ const PHASES = [
     description: "Data sources & channels",
     items: [
       { id: "drive-folder", label: "Penny Asset Library folder set", status: "live", detail: "GOOGLE_DRIVE_PENNY_FOLDER_ID set · Shared Drive (TT Content → Penny Asset Library) · 6 state subfolders · 38 assets loaded.", action: "/penny/asset-library", actionLabel: "View assets" },
-      { id: "slack-channels", label: "Slack channels linked", status: "partial", detail: "Bot token + @coachconnectbot active · Penny AI + Admin channels confirmed · channels:read scope pending — channel name resolution incomplete.", action: "/admin/integrations", actionLabel: "Add scope" },
+      { id: "slack-channels", label: "Slack channels linked", status: "partial", detail: "Bot token + @penny active · Penny AI + Admin channels confirmed · channels:read scope pending — channel name resolution incomplete.", action: "/admin/integrations", actionLabel: "Add scope" },
       { id: "gmail", label: "Gmail read & send live", status: "live", detail: "gmail.readonly + gmail.send confirmed · Real inbox at /collaboration/gmail · Penny draft + send via POST /api/gmail/send.", action: "/collaboration/gmail", actionLabel: "Open Gmail" },
       { id: "calendar", label: "Google Calendar live", status: "live", detail: "Real events via /api/calendar/events · Penny prep briefs per event · pending invite flags.", action: "/collaboration/calendar-live", actionLabel: "View calendar" },
     ],

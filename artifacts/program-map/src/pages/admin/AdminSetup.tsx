@@ -78,7 +78,7 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     icon: MessageSquare,
     iconCls: 'bg-violet-50 text-violet-700',
     owner: 'Ops Lead',
-    detail: '@coachconnectbot posting live. POC scopes active.',
+    detail: '@penny posting live. POC scopes active.',
     action: 'Manage Integration',
     href: '/collaboration/slack',
     needs: 'channels:read scope not yet approved — bot cannot list channels or members',

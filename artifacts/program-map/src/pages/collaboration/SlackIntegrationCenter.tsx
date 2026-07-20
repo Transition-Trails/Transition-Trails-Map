@@ -1498,23 +1498,23 @@ function PocReadinessTab() {
 
   const pennyChDetail = () => {
     if (!liveChannels) return 'Run Workspace Validation to check.';
-    if (pennyChPass)       return `Channel accessible${pennyMember ? ' — bot is a member ✓' : ' — bot not yet a member. Run /invite @coachconnectbot.'}`;
+    if (pennyChPass)       return `Channel accessible${pennyMember ? ' — bot is a member ✓' : ' — bot not yet a member. Run /invite @penny.'}`;
     if (pennyScopeIssue)   return 'channels:read scope missing. Token is valid — add scope in Slack App → OAuth & Permissions → Bot Token Scopes, then reinstall.';
     return `Channel access failed: ${pennyCh?.error ?? 'unknown error'}. ${pennyCh?.fix ?? ''}`;
   };
   const adminChDetail = () => {
     if (!liveChannels) return 'Run Workspace Validation to check.';
-    if (adminChPass)       return `Channel accessible${adminMember ? ' — bot is a member ✓' : ' — bot not yet a member. Run /invite @coachconnectbot.'}`;
+    if (adminChPass)       return `Channel accessible${adminMember ? ' — bot is a member ✓' : ' — bot not yet a member. Run /invite @penny.'}`;
     if (adminScopeIssue)   return 'channels:read scope missing. Token is valid — add scope in Slack App → OAuth & Permissions → Bot Token Scopes, then reinstall.';
     return `Channel access failed: ${adminCh?.error ?? 'unknown error'}. ${adminCh?.fix ?? ''}`;
   };
 
   const liveItems = [
-    { id:'token',        label:'Bot Token Valid',                    status: liveChecks ? (tokenValid ? 'pass' : 'fail')      : 'pending', detail: liveChecks ? (tokenValid ? 'auth.test confirmed — @coachconnectbot is valid.' : 'auth.test failed. Regenerate the Bot User OAuth Token.') : 'Run Workspace Validation to check.' },
+    { id:'token',        label:'Bot Token Valid',                    status: liveChecks ? (tokenValid ? 'pass' : 'fail')      : 'pending', detail: liveChecks ? (tokenValid ? 'auth.test confirmed — @penny is valid.' : 'auth.test failed. Regenerate the Bot User OAuth Token.') : 'Run Workspace Validation to check.' },
     { id:'penny-ch-id',  label:'Penny Channel ID configured',        status: liveChecks ? (hasPennyCh  ? 'pass' : 'warning')  : 'pending', detail: hasPennyCh  ? 'SLACK_PENNY_CHANNEL_ID is set — Penny AI channel explicitly configured.'   : 'Set SLACK_PENNY_CHANNEL_ID with the Penny AI channel ID from the POC.' },
     { id:'admin-ch-id',  label:'Admin Channel ID configured',        status: liveChecks ? (hasAdminCh  ? 'pass' : 'warning')  : 'pending', detail: hasAdminCh  ? 'SLACK_ADMIN_CHANNEL_ID is set — admin/ops channel explicitly configured.'  : 'Set SLACK_ADMIN_CHANNEL_ID with the admin channel ID from the POC.' },
     { id:'penny-access', label:'Penny AI Channel — Slack API',       status: liveChannels ? (pennyChPass ? 'pass' : pennyScopeIssue ? 'warning' : 'fail') : 'pending', detail: pennyChDetail() },
-    { id:'penny-member', label:'Bot Member of Penny AI Channel',     status: liveChannels ? (pennyMember ? 'pass' : pennyChPass ? 'warning' : pennyScopeIssue ? 'warning' : 'skip') : 'pending', detail: pennyMember ? 'Bot confirmed as member — can receive events and post.' : pennyChPass ? 'Channel accessible but bot is not yet a member. Run /invite @coachconnectbot in the Penny AI channel.' : pennyScopeIssue ? 'Cannot verify until scope is added.' : 'Blocked until channel access is resolved.' },
+    { id:'penny-member', label:'Bot Member of Penny AI Channel',     status: liveChannels ? (pennyMember ? 'pass' : pennyChPass ? 'warning' : pennyScopeIssue ? 'warning' : 'skip') : 'pending', detail: pennyMember ? 'Bot confirmed as member — can receive events and post.' : pennyChPass ? 'Channel accessible but bot is not yet a member. Run /invite @penny in the Penny AI channel.' : pennyScopeIssue ? 'Cannot verify until scope is added.' : 'Blocked until channel access is resolved.' },
     { id:'admin-access', label:'Admin Channel — Slack API',          status: liveChannels ? (adminChPass ? 'pass' : adminScopeIssue ? 'warning' : 'fail') : 'pending', detail: adminChDetail() },
     { id:'admin-member', label:'Bot Member of Admin Channel',        status: liveChannels ? (adminMember ? 'pass' : adminChPass ? 'warning' : adminScopeIssue ? 'warning' : 'skip') : 'pending', detail: adminMember ? 'Bot confirmed as member of admin channel.' : adminChPass ? 'Channel accessible but bot not yet a member.' : adminScopeIssue ? 'Cannot verify until scope is added.' : 'Blocked until admin channel access is resolved.' },
   ];
@@ -1522,12 +1522,12 @@ function PocReadinessTab() {
   const scopeActionNeeded = pennyScopeIssue || adminScopeIssue;
 
   const nextSteps = [
-    { step:'Bot token valid (auth.test)',                         done: tokenValid,                  detail:'@coachconnectbot is active and authenticated.' },
+    { step:'Bot token valid (auth.test)',                         done: tokenValid,                  detail:'@penny is active and authenticated.' },
     { step:'SLACK_PENNY_CHANNEL_ID configured',                   done: hasPennyCh,                  detail:'Penny AI channel ID set in Replit Secrets.' },
     { step:'SLACK_ADMIN_CHANNEL_ID configured',                   done: hasAdminCh,                  detail:'Admin channel ID set in Replit Secrets.' },
     { step:'Add channels:read + groups:read scopes',              done: !scopeActionNeeded && liveChannels !== null, detail:'Required for conversations.info channel discovery. Slack App → OAuth & Permissions → Bot Token Scopes → add channels:read + groups:read → reinstall app.' },
-    { step:'Invite bot to Penny AI channel',                      done: pennyMember,                 detail:'Run /invite @coachconnectbot in the Penny AI Slack channel.' },
-    { step:'Invite bot to Admin channel',                         done: adminMember,                 detail:'Run /invite @coachconnectbot in the admin Slack channel.' },
+    { step:'Invite bot to Penny AI channel',                      done: pennyMember,                 detail:'Run /invite @penny in the Penny AI Slack channel.' },
+    { step:'Invite bot to Admin channel',                         done: adminMember,                 detail:'Run /invite @penny in the admin Slack channel.' },
     { step:'Send test message to Penny AI channel',               done: false,                       detail:'Use "Test → Penny AI" button in Workspace Validation to confirm chat:write works.' },
     { step:'Confirm Penny → Prompt Studio routing',               done: false,                       detail:'Verify assessment quiz templates are wired to the restored Penny AI channel.' },
     { step:'Re-confirm Agentforce integration path',              done: false,                       detail:'Confirm Agentforce (Penny–Transition Trails Assistant) targets the Penny AI channel.' },

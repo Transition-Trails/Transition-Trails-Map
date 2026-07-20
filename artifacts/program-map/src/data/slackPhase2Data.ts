@@ -948,7 +948,7 @@ export const POC_RESTORE_CHECKLIST: PocRestoreItem[] = [
   { step:'Penny AI channel ID configured (SLACK_PENNY_CHANNEL_ID)', note:'SLACK_PENNY_CHANNEL_ID set in Replit Secrets — Penny AI channel explicitly targeted.', done:true, status:'Completed' },
   { step:'Admin channel ID configured (SLACK_ADMIN_CHANNEL_ID)',    note:'SLACK_ADMIN_CHANNEL_ID set in Replit Secrets — admin/ops channel explicitly targeted.', done:true, status:'Completed' },
   { step:'Add channels:read + groups:read scopes to bot token', note:'Required for conversations.info to discover channel names, privacy, and member counts. Add in Slack App → OAuth & Permissions → Bot Token Scopes, then reinstall.', done:false, status:'Action needed — add scopes in Slack App' },
-  { step:'Invite bot to Penny AI channel',                    note:'Run /invite @coachconnectbot inside the Penny AI Slack channel.',          done:false, status:'Pending — confirm bot name first' },
+  { step:'Invite bot to Penny AI channel',                    note:'Run /invite @penny inside the Penny AI Slack channel.',          done:false, status:'Pending — confirm bot name first' },
   { step:'Verify bot membership in Penny AI channel',         note:'conversations.info should return is_member: true for the Penny AI channel.', done:false, status:'Pending scope + invite' },
   { step:'Confirm assessment flow routing in Prompt Studio',  note:'Assessment quiz templates wired to Penny delivery for the restored channel.', done:false, status:'In progress' },
   { step:'Confirm Agentforce integration layer path',         note:'Agentforce integration configured to respond in the restored Penny AI channel.', done:false, status:'In progress' },

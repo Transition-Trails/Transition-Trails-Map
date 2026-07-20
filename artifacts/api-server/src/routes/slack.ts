@@ -365,7 +365,7 @@ router.get("/slack/validate", async (req, res) => {
               isPrivate: Boolean(ch["is_private"]),
               isMember,
               memberCount: Number(ch["num_members"] ?? 0),
-              fix: isMember ? undefined : `Run /invite @coachconnectbot in #${name} to add the bot.`,
+              fix: isMember ? undefined : `Run /invite @penny in #${name} to add the bot.`,
             });
           } else {
             const errCode = String(r["error"] ?? "unknown");
@@ -373,7 +373,7 @@ router.get("/slack/validate", async (req, res) => {
             const fixMap: Record<string, string> = {
               missing_scope:     "Add channels:read (public) and groups:read (private) scopes in Slack App → OAuth & Permissions → Bot Token Scopes, then reinstall the app to the workspace.",
               channel_not_found: "Verify the channel ID in Replit Secrets. Right-click the channel in Slack → View channel details → copy the ID at the bottom.",
-              not_in_channel:    "Invite the bot to this channel: run /invite @coachconnectbot inside the channel.",
+              not_in_channel:    "Invite the bot to this channel: run /invite @penny inside the channel.",
               is_archived:       "Un-archive the channel or use a different active channel.",
             };
             channels.push({
@@ -449,7 +449,7 @@ router.post("/slack/validate/test-message", async (req, res) => {
     }
 
     const errMap: Record<string, string> = {
-      not_in_channel:    `Bot is not a member of the ${targetLabel}. Run /invite @coachconnectbot in that channel.`,
+      not_in_channel:    `Bot is not a member of the ${targetLabel}. Run /invite @penny in that channel.`,
       channel_not_found: "Channel ID is invalid or was not found in this workspace.",
       missing_scope:     "Bot token is missing chat:write scope. Add it in Slack App → OAuth & Permissions and reinstall.",
       invalid_auth:      "Bot token is invalid or revoked.",

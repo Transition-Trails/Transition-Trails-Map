@@ -48,7 +48,7 @@ const POC_CHECKS: CheckItem[] = [
   { label: 'Penny AI Slack channel shared',                    detail: 'Both Penny (Gemini) and Agentforce respond in the same channel',            status: 'confirmed' },
   { label: 'Simultaneous response confirmed',                  detail: 'Screenshot evidence: both AIs responding in same thread',                   status: 'confirmed' },
   { label: 'Assessment quiz flow tested',                      detail: 'Quiz flow triggered via Agentforce in POC channel',                         status: 'confirmed' },
-  { label: 'Trail OS Bot routing operational',                 detail: '@coachconnectbot handling delivery + event logging',                         status: 'confirmed' },
+  { label: 'Trail OS Bot routing operational',                 detail: '@penny handling delivery + event logging',                         status: 'confirmed' },
   { label: 'AGENTFORCE_API_KEY set in Replit Secrets',        detail: 'Agent ID (0Xxan…) set — Salesforce Connector handles auth automatically',   status: 'confirmed' },
   { label: 'Context handoff payload defined',                  detail: 'learnerId + programId passed as Agentforce session variables on every call', status: 'confirmed' },
   { label: 'POST /api/agentforce/invoke route live',          detail: 'Trail OS API server routes messages directly to the Agentforce Sessions API', status: 'confirmed' },
@@ -155,7 +155,7 @@ export default function AgentforceCenter() {
           <p className="text-[11px] text-cyan-800/80 leading-relaxed">
             The Penny AI Slack POC confirmed both <strong>Penny (Gemini)</strong> and <strong>Agentforce (Penny–Transition Trails Assistant)</strong> responding
             simultaneously in the same channel. The assessment quiz flow was triggered via Agentforce, and the Trail OS Bot
-            (@coachconnectbot) handled delivery routing and event logging. All components were confirmed active.
+            (@penny) handled delivery routing and event logging. All components were confirmed active.
           </p>
           <div className="flex items-center gap-2 pt-1">
             <button
