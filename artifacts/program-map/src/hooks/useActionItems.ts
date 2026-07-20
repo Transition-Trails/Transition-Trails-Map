@@ -24,7 +24,7 @@ export function useActionItems() {
   }, [actionItemOverrides, platformRoles]);
 
   const visibleRecs = useMemo(
-    () => mergedRecs.filter(r => r.status !== 'resolved' && r.status !== 'dismissed'),
+    () => mergedRecs.filter(r => r.status !== 'resolved' && r.status !== 'dismissed' && r.status !== 'done'),
     [mergedRecs],
   );
 
