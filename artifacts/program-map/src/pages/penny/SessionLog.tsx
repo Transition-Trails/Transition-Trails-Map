@@ -1,68 +1,422 @@
-import { CalendarDays, Clock, Users, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Clock, Users, CalendarDays, RefreshCw, Plus, X,
+  ChevronDown, ChevronUp, CheckCircle2, AlertCircle, Loader2,
+} from 'lucide-react';
+
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface SessionRecord {
+  id: string;
+  name: string;
+  sessionType: string | null;
+  sessionDate: string | null;
+  coachName: string | null;
+  learnerName: string | null;
+  program: string | null;
+  durationMinutes: number | null;
+  notes: string | null;
+  status: string | null;
+  createdDate: string;
+}
+
+interface CreateForm {
+  sessionType: string;
+  sessionDate: string;
+  coachName: string;
+  learnerName: string;
+  program: string;
+  durationMinutes: string;
+  notes: string;
+  status: string;
+}
+
+// ── Constants ─────────────────────────────────────────────────────────────────
 
 const SESSION_TYPES = [
-  { label: 'Log Office Hours',      icon: Clock        },
-  { label: 'Log Campfire Session',  icon: Users        },
-  { label: 'Log Private Session',   icon: CalendarDays },
+  { value: 'Office Hours',     label: 'Office Hours',     icon: Clock   },
+  { value: 'Campfire Session', label: 'Campfire Session', icon: Users   },
+  { value: 'Private Session',  label: 'Private Session',  icon: CalendarDays },
 ];
 
+const STATUSES = ['Completed', 'No-Show', 'Rescheduled', 'Pending'];
+
+const EMPTY_FORM: CreateForm = {
+  sessionType: '',
+  sessionDate: new Date().toISOString().slice(0, 10),
+  coachName: '',
+  learnerName: '',
+  program: '',
+  durationMinutes: '',
+  notes: '',
+  status: 'Completed',
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function formatDate(d: string | null): string {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function statusColor(s: string | null): string {
+  switch (s?.toLowerCase()) {
+    case 'completed':   return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    case 'no-show':     return 'bg-red-50 text-red-700 border-red-200';
+    case 'rescheduled': return 'bg-amber-50 text-amber-700 border-amber-200';
+    case 'pending':     return 'bg-sky-50 text-sky-700 border-sky-200';
+    default:            return 'bg-muted text-muted-foreground border-border';
+  }
+}
+
+function typeIcon(t: string | null) {
+  if (t === 'Campfire Session') return Users;
+  if (t === 'Private Session')  return CalendarDays;
+  return Clock;
+}
+
+// ── Session row ───────────────────────────────────────────────────────────────
+
+function SessionRow({ session }: { session: SessionRecord }) {
+  const [expanded, setExpanded] = useState(false);
+  const Icon = typeIcon(session.sessionType);
+
+  return (
+    <div className="rounded-lg border border-border bg-card hover:bg-muted/10 transition-colors">
+      <button className="w-full text-left p-3.5" onClick={() => setExpanded(v => !v)}>
+        <div className="flex items-center gap-3">
+          <Icon className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[12px] font-semibold text-foreground">
+                {session.sessionType ?? 'Session'}
+              </span>
+              {session.status && (
+                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${statusColor(session.status)}`}>
+                  {session.status}
+                </span>
+              )}
+              {session.sessionDate && (
+                <span className="text-[11px] text-muted-foreground">{formatDate(session.sessionDate)}</span>
+              )}
+              {session.durationMinutes && (
+                <span className="text-[10px] text-muted-foreground/70">{session.durationMinutes} min</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2 mt-0.5 text-[11px] text-muted-foreground">
+              {session.learnerName && <span>{session.learnerName}</span>}
+              {session.learnerName && session.coachName && <span className="text-muted-foreground/30">·</span>}
+              {session.coachName && <span>Coach: {session.coachName}</span>}
+              {session.program && <><span className="text-muted-foreground/30">·</span><span>{session.program}</span></>}
+            </div>
+          </div>
+          <div className="text-muted-foreground/40 shrink-0">
+            {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </div>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-border/50 px-4 py-3 bg-muted/20 space-y-2">
+          {session.notes ? (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">Notes</p>
+              <p className="text-[12px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{session.notes}</p>
+            </div>
+          ) : (
+            <p className="text-[11px] text-muted-foreground/50 italic">No notes recorded.</p>
+          )}
+          <p className="text-[10px] text-muted-foreground/40">SF ID: {session.id} · Logged {formatDate(session.createdDate)}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Log form ──────────────────────────────────────────────────────────────────
+
+function LogForm({ onSuccess }: { onSuccess: () => void }) {
+  const [form, setForm] = useState<CreateForm>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sfError, setSfError] = useState<unknown>(null);
+
+  function set(k: keyof CreateForm, v: string) {
+    setForm(f => ({ ...f, [k]: v }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.sessionType) { setError('Select a session type.'); return; }
+    if (!form.sessionDate) { setError('Pick a session date.'); return; }
+    setError(null);
+    setSfError(null);
+    setSaving(true);
+    try {
+      const res = await fetch('/api/sessions', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          sessionType:     form.sessionType,
+          sessionDate:     form.sessionDate,
+          coachName:       form.coachName   || undefined,
+          learnerName:     form.learnerName || undefined,
+          program:         form.program     || undefined,
+          durationMinutes: form.durationMinutes ? parseInt(form.durationMinutes, 10) : undefined,
+          notes:           form.notes       || undefined,
+          status:          form.status      || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json() as { error?: string; detail?: unknown };
+        setSfError(data.detail ?? null);
+        setError(data.error ?? `Failed (${res.status})`);
+        return;
+      }
+      setForm(EMPTY_FORM);
+      onSuccess();
+    } catch {
+      setError('Network error — check your connection.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputCls = "w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-[12px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring";
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Session type */}
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Session Type *</p>
+        <div className="flex flex-wrap gap-2">
+          {SESSION_TYPES.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => set('sessionType', value)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-[12px] font-medium border transition-colors
+                ${form.sessionType === value
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'border-border text-muted-foreground hover:bg-muted/40'}`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Date + duration */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Date *</label>
+          <input type="date" value={form.sessionDate} onChange={e => set('sessionDate', e.target.value)} className={inputCls} required />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Duration (min)</label>
+          <input type="number" min="1" max="480" value={form.durationMinutes} onChange={e => set('durationMinutes', e.target.value)} placeholder="60" className={inputCls} />
+        </div>
+      </div>
+
+      {/* Coach + learner */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Coach Name</label>
+          <input value={form.coachName} onChange={e => set('coachName', e.target.value)} placeholder="e.g. Alex Rivera" className={inputCls} />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Learner Name</label>
+          <input value={form.learnerName} onChange={e => set('learnerName', e.target.value)} placeholder="e.g. Jordan Lee" className={inputCls} />
+        </div>
+      </div>
+
+      {/* Program + status */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Program</label>
+          <input value={form.program} onChange={e => set('program', e.target.value)} placeholder="e.g. Explorer's Trail" className={inputCls} />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Outcome</label>
+          <select value={form.status} onChange={e => set('status', e.target.value)} className={inputCls}>
+            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* Notes */}
+      <div>
+        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Notes</label>
+        <textarea
+          value={form.notes}
+          onChange={e => set('notes', e.target.value)}
+          rows={3}
+          placeholder="Key takeaways, next steps, observations…"
+          className={`${inputCls} resize-none`}
+        />
+      </div>
+
+      {/* Errors */}
+      {error && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 space-y-1">
+          <p className="text-[12px] text-red-700 font-medium">{error}</p>
+          {sfError !== null && (
+            <pre className="text-[10px] text-red-600/80 whitespace-pre-wrap break-all font-mono">
+              {typeof sfError === 'string' ? sfError : JSON.stringify(sfError, null, 2)}
+            </pre>
+          )}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={saving}
+        className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60"
+      >
+        {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+        {saving ? 'Saving to Salesforce…' : 'Log Session'}
+      </button>
+    </form>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
+
 export default function SessionLog() {
+  const [sessions, setSessions]   = useState<SessionRecord[]>([]);
+  const [total, setTotal]         = useState(0);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [showForm, setShowForm]   = useState(false);
+  const [success, setSuccess]     = useState(false);
+
+  const fetchSessions = useCallback(async (quiet = false) => {
+    if (!quiet) setLoading(true); else setRefreshing(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/sessions?limit=50');
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const data = await res.json() as { sessions: SessionRecord[]; total: number };
+      setSessions(data.sessions ?? []);
+      setTotal(data.total ?? 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load sessions');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => { void fetchSessions(); }, [fetchSessions]);
+
+  function handleSuccess() {
+    setShowForm(false);
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 4000);
+    void fetchSessions(true);
+  }
+
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-2xl space-y-6">
+      <div className="p-5 max-w-4xl space-y-4">
 
-        {/* Coming-soon banner */}
-        <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-amber-50 border-amber-200 text-amber-700">
-          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-          <span className="text-[11px] font-semibold">
-            Coming soon — Salesforce wiring in progress
-          </span>
-        </div>
-
-        {/* Title + description */}
-        <div>
-          <h1 className="text-base font-semibold text-foreground">Session Log</h1>
-          <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">
-            Log and review coaching sessions — office hours, campfire, and private sessions.
-            This page will connect to Salesforce once the Session Log object is built.
-          </p>
-        </div>
-
-        {/* Log a session card */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-            Log a Session
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {SESSION_TYPES.map(({ label, icon: Icon }) => (
-              <button
-                key={label}
-                disabled
-                className="flex items-center gap-1.5 px-3 py-2 rounded-md text-[12px] font-medium border border-border/50 text-muted-foreground/40 bg-muted/20 cursor-not-allowed select-none"
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-muted-foreground/50">
-            Session logging will be enabled once the Salesforce Session Log object is ready.
-          </p>
-        </div>
-
-        {/* My Sessions empty state */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-            My Sessions
-          </p>
-          <div className="py-10 flex flex-col items-center gap-2 text-center">
-            <CalendarDays className="w-8 h-8 text-muted-foreground/20" />
-            <p className="text-[12px] text-muted-foreground/50 max-w-xs leading-relaxed">
-              Your session history will appear here once the Session Log object is live in Salesforce.
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Session Log</h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {loading ? 'Loading from Salesforce…' : `${sessions.length} sessions · ${total} total in Salesforce`}
             </p>
           </div>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-2 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Salesforce · TT_Session_Log__c
+            </span>
+            <button
+              onClick={() => void fetchSessions(true)}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 text-[11px] border border-border rounded-md px-2.5 py-1.5 hover:bg-muted/40 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+            <button
+              onClick={() => setShowForm(v => !v)}
+              className="flex items-center gap-1.5 text-[11px] font-medium bg-primary text-primary-foreground rounded-md px-3 py-1.5 hover:bg-primary/90 transition-colors"
+            >
+              {showForm ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+              {showForm ? 'Cancel' : 'Log Session'}
+            </button>
+          </div>
         </div>
+
+        {/* Success banner */}
+        {success && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-emerald-50 border-emerald-200 text-emerald-700">
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+            <span className="text-[12px] font-medium">Session logged successfully in Salesforce.</span>
+          </div>
+        )}
+
+        {/* Log form */}
+        {showForm && (
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-4">New Session</p>
+            <LogForm onSuccess={handleSuccess} />
+          </div>
+        )}
+
+        {/* Loading */}
+        {loading && (
+          <div className="space-y-2">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="rounded-lg border border-border bg-card p-4 animate-pulse h-14" />
+            ))}
+          </div>
+        )}
+
+        {/* Error */}
+        {!loading && error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[12px] text-red-700 font-medium">{error}</p>
+              <p className="text-[11px] text-red-600/70 mt-0.5">
+                Verify the SF service token has access to <code className="font-mono">TT_Session_Log__c</code>.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && !error && sessions.length === 0 && !showForm && (
+          <div className="rounded-lg border border-dashed border-border bg-card p-10 text-center space-y-3">
+            <CalendarDays className="w-7 h-7 text-muted-foreground/30 mx-auto" />
+            <p className="text-[12px] font-medium text-muted-foreground">No sessions logged yet.</p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-1.5 text-[12px] font-medium bg-primary text-primary-foreground rounded-md px-3 py-1.5 hover:bg-primary/90 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" /> Log your first session
+            </button>
+          </div>
+        )}
+
+        {/* Session list */}
+        {!loading && !error && sessions.length > 0 && (
+          <div className="space-y-2">
+            {sessions.map(s => <SessionRow key={s.id} session={s} />)}
+            {sessions.length >= 50 && (
+              <p className="text-center text-[11px] text-muted-foreground/60">
+                Showing 50 most recent. Total in Salesforce: {total}.
+              </p>
+            )}
+          </div>
+        )}
 
       </div>
     </ScrollArea>
