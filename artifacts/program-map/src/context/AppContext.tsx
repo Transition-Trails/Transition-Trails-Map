@@ -136,6 +136,7 @@ function mapSfToProgram(sf: SfProgramRecord): Program {
     outcomes:      sf.Program_Expected_Outcomes__c ? [sf.Program_Expected_Outcomes__c] : [],
     whatBreaksIfMissing: sf.Risks_Assumptions__c ?? '',
     dependencies:  sf.Implementation_Plan__c ?? '',
+    pennyStatus:          'Not Planned',
     pennyActive:          false,
     pennyFeatures:        [],
     trailOsCapabilities:  [],

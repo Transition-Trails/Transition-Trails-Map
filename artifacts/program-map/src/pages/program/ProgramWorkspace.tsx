@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
-import { ExternalLink, GraduationCap, RefreshCw, WifiOff } from 'lucide-react';
+import { ExternalLink, GraduationCap, RefreshCw, WifiOff, Loader2 } from 'lucide-react';
+import { useProgramPennyConfig } from '@/hooks/useProgramPennyConfig';
+import type { PennyStatus } from '@/hooks/useProgramPennyConfig';
 import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -314,9 +316,16 @@ function CurriculumTab({ programName }: { programName: string }) {
   );
 }
 
+const PENNY_STATUS_OPTIONS: { value: PennyStatus; label: string; dot: string; badge: string }[] = [
+  { value: 'Active',      label: 'Active',      dot: 'bg-emerald-400', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { value: 'Planned',     label: 'Planned',     dot: 'bg-amber-400',   badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { value: 'Not Planned', label: 'Not Planned', dot: 'bg-muted-foreground/30', badge: 'bg-muted text-muted-foreground border-border' },
+];
+
 function PennyTab({ p }: { p: Program }) {
   const { isEveryday, isPowerOrAbove } = useTierFlags();
-  const { updateProgram } = useAppContext();
+  const { status, setStatus, isSaving } = useProgramPennyConfig(p.id, p.pennyStatus);
+  const isActive = status === 'Active';
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-3xl">
@@ -326,28 +335,40 @@ function PennyTab({ p }: { p: Program }) {
             : `${TERMS.aiAssistant} capabilities that are activated or planned for this program.`}
         </p>
         {isPowerOrAbove && (
-          <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2">
-            <div>
-              <p className="text-[11px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</p>
-              <p className="text-[10px] text-muted-foreground">{p.pennyActive ? 'Active for this program' : 'Disabled for this program'}</p>
+          <div className="rounded-lg border border-border bg-muted/20 px-3 py-2.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</p>
+                <p className="text-[10px] text-muted-foreground">{status} for this program</p>
+              </div>
+              {isSaving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
             </div>
-            <button
-              onClick={() => updateProgram(p.id, { pennyActive: !p.pennyActive })}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
-                p.pennyActive ? 'bg-primary' : 'bg-muted-foreground/30'
-              }`}
-            >
-              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-                p.pennyActive ? 'translate-x-4' : 'translate-x-1'
-              }`} />
-            </button>
+            <div className="flex gap-1.5">
+              {PENNY_STATUS_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setStatus(opt.value)}
+                  disabled={isSaving}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[10px] font-semibold transition-colors focus:outline-none disabled:opacity-50 ${
+                    status === opt.value
+                      ? opt.badge + ' shadow-sm'
+                      : 'bg-background text-muted-foreground border-border hover:border-primary/30'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${opt.dot}`} />
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
         <Section title={isEveryday ? `Available ${TERMS.aiAssistant} Features` : `Active ${TERMS.aiAssistant} Features`}>
-          {!p.pennyActive ? (
+          {!isActive ? (
             <p className="text-[12px] text-muted-foreground italic">
-              {TERMS.aiAssistant} intelligence is disabled for this program. Enable it above to configure features.
+              {status === 'Planned'
+                ? `${TERMS.aiAssistant} intelligence is planned for this program but not yet active.`
+                : `${TERMS.aiAssistant} intelligence is not planned for this program.`}
             </p>
           ) : p.pennyFeatures?.length > 0 ? (
             <div className="space-y-2">
@@ -389,7 +410,7 @@ function SystemsTab({ p }: { p: Program }) {
     { name:'Salesforce',     status:'Connected', detail:'Program records, cohort data, learner enrollment', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'Google Drive',   status:'Connected', detail:`${p.name} curriculum folder and sprint resources`, cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'Slack',          status:'Active',    detail:'Cohort and coach channels', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { name:`${TERMS.aiAssistant}`,  status: p.pennyActive ? 'Active' : 'Disabled', detail: p.pennyActive ? ((p.pennyFeatures ?? []).join(', ') || 'Enabled — no features mapped yet') : `${TERMS.aiAssistant} intelligence is disabled for this program`, cls: p.pennyActive ? 'border-primary/20 bg-primary/5' : 'border-muted bg-muted/30', badge: p.pennyActive ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-border' },
+    { name:`${TERMS.aiAssistant}`,  status: p.pennyStatus ?? (p.pennyActive ? 'Active' : 'Not Planned'), detail: p.pennyActive ? ((p.pennyFeatures ?? []).join(', ') || 'Enabled — no features mapped yet') : p.pennyStatus === 'Planned' ? `${TERMS.aiAssistant} integration is planned for this program` : `${TERMS.aiAssistant} intelligence is not planned for this program`, cls: p.pennyActive ? 'border-primary/20 bg-primary/5' : p.pennyStatus === 'Planned' ? 'border-amber-200 bg-amber-50/30' : 'border-muted bg-muted/30', badge: p.pennyActive ? 'bg-primary/10 text-primary border-primary/20' : p.pennyStatus === 'Planned' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-muted text-muted-foreground border-border' },
     { name:'Google Calendar',status:'Active',    detail:'Sprint schedule and cohort events', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
     { name:'PMM (Salesforce)',status:'Planned',  detail:'Marketing Cloud integration — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
     { name:'LMS',            status:'Planned',   detail:'Learner progress and content delivery — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },

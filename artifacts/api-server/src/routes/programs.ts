@@ -5,6 +5,9 @@ import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
 import type { ISalesforceClient } from "../lib/salesforceClient.js";
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import { logger } from "../lib/logger.js";
+import { db } from "@workspace/db";
+import { programPennyConfigsTable } from "@workspace/db/schema";
+import { eq } from "drizzle-orm";
 
 const router = Router();
 
@@ -174,6 +177,47 @@ router.patch("/modules/:id", withClient(async (req, res, client) => {
   await client.updateRecord("Course_Module__c", id, req.body as Record<string, unknown>);
   res.json({ success: true });
 }));
+
+// ── Penny Config ──────────────────────────────────────────────────────────────
+
+const VALID_PENNY_STATUSES = ["Active", "Planned", "Not Planned"] as const;
+type PennyStatus = typeof VALID_PENNY_STATUSES[number];
+
+router.get("/programs/:id/penny-config", async (req, res): Promise<void> => {
+  const { id } = req.params as { id: string };
+  if (!id) { res.status(400).json({ error: "Program ID required" }); return; }
+  try {
+    const rows = await db.select().from(programPennyConfigsTable).where(eq(programPennyConfigsTable.programId, id));
+    const config = rows[0] ?? { programId: id, status: "Not Planned" as PennyStatus, notes: null };
+    res.json({ config });
+  } catch (err) {
+    logger.error({ err }, "Failed to fetch penny config");
+    res.status(500).json({ error: "Failed to fetch penny config" });
+  }
+});
+
+router.patch("/programs/:id/penny-config", async (req, res): Promise<void> => {
+  const { id } = req.params as { id: string };
+  if (!id) { res.status(400).json({ error: "Program ID required" }); return; }
+  const { status, notes } = req.body as { status?: string; notes?: string };
+  if (!status || !VALID_PENNY_STATUSES.includes(status as PennyStatus)) {
+    res.status(400).json({ error: `status must be one of: ${VALID_PENNY_STATUSES.join(", ")}` });
+    return;
+  }
+  try {
+    await db
+      .insert(programPennyConfigsTable)
+      .values({ programId: id, status, notes: notes ?? null })
+      .onConflictDoUpdate({
+        target: programPennyConfigsTable.programId,
+        set: { status, notes: notes ?? null, updatedAt: new Date() },
+      });
+    res.json({ config: { programId: id, status, notes: notes ?? null } });
+  } catch (err) {
+    logger.error({ err }, "Failed to upsert penny config");
+    res.status(500).json({ error: "Failed to save penny config" });
+  }
+});
 
 // ── Agentforce — Program context invoke ───────────────────────────────────────
 

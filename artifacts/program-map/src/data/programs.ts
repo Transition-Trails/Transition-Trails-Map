@@ -21,7 +21,8 @@ export interface Program {
   outcomes: string[];
   whatBreaksIfMissing: string;
   dependencies: string;
-  pennyActive: boolean;
+  pennyStatus: 'Active' | 'Planned' | 'Not Planned';
+  pennyActive: boolean;  // derived: pennyStatus === 'Active'
   pennyFeatures: string[];
   trailOsCapabilities: string[];
   resolvePhases: string[];
@@ -82,6 +83,7 @@ export const programs: Program[] = [
     outcomes: ["Digital literacy", "Resume basics", "LinkedIn optimization", "Introduction to career tools"],
     whatBreaksIfMissing: "Pipeline to all downstream programs collapses. Without Explorer's Trail, only learners with existing digital skills can access Transition Trails — defeating the equity mission.",
     dependencies: "None — this is the entry point",
+    pennyStatus: 'Active',
     pennyActive: true,
     pennyFeatures: ["Trail Guide", "Learning Coach", "Career Translator"],
     trailOsCapabilities: ["Intake Coordination", "Learner-Client Matching", "Org Readiness"],
@@ -120,6 +122,7 @@ export const programs: Program[] = [
     outcomes: ["Salesforce basics", "Productivity tools", "Professional presence", "Strategic analysis introduction"],
     whatBreaksIfMissing: "Learners cannot progress to Guided Trail without foundational technical competencies. The program sequence breaks and advanced cohorts cannot be filled.",
     dependencies: "Explorer's Trail",
+    pennyStatus: 'Active',
     pennyActive: true,
     pennyFeatures: ["Trail Guide", "Learning Coach", "Exam Coach", "Build Companion"],
     trailOsCapabilities: ["Project Delivery", "Documentation", "Coach Visibility"],
@@ -158,6 +161,7 @@ export const programs: Program[] = [
     outcomes: ["Real-world tool mastery", "Salesforce advanced", "Strategic analysis", "Professional portfolio"],
     whatBreaksIfMissing: "The pathway to employment outcomes collapses. Without Guided Trail, learners plateau at foundational skills and the organization loses its primary value proposition to employers.",
     dependencies: "Foundations Trail",
+    pennyStatus: 'Active',
     pennyActive: true,
     pennyFeatures: ["Trail Guide", "Exam Coach", "Build Companion", "Quest Master", "Career Translator"],
     trailOsCapabilities: ["Project Delivery", "Coach Visibility", "Outcomes Tracking"],
@@ -196,6 +200,7 @@ export const programs: Program[] = [
     outcomes: ["Needs Review"],
     whatBreaksIfMissing: "Advanced practitioners have no pathway within the ecosystem — they exit after Guided Trail with no continuation option.",
     dependencies: "Guided Trail",
+    pennyStatus: 'Planned',
     pennyActive: false,
     pennyFeatures: ["Coach Intelligence Layer"],
     trailOsCapabilities: ["Outcomes Tracking", "Coach Visibility"],
@@ -233,6 +238,7 @@ export const programs: Program[] = [
     outcomes: ["Digital strategy", "Salesforce for nonprofits", "Data literacy", "Change management"],
     whatBreaksIfMissing: "Transition Trails loses its nonprofit client revenue stream and organizational partnership pipeline. The ecosystem becomes individual-learner-only.",
     dependencies: "Independent — connects laterally at Guided Trail level",
+    pennyStatus: 'Not Planned',
     pennyActive: false,
     pennyFeatures: [],
     trailOsCapabilities: ["Intake Coordination", "Org Readiness", "Outcomes Tracking"],
