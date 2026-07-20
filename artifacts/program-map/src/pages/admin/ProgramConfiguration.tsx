@@ -15,6 +15,44 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
+import { useProgramPennyConfig } from '@/hooks/useProgramPennyConfig';
+import type { PennyStatus } from '@/hooks/useProgramPennyConfig';
+
+// ── Penny status row (self-contained, mounts own hook) ────────────────────────
+const PENNY_OPTS: { value: PennyStatus; dot: string; badge: string }[] = [
+  { value: 'Active',      dot: 'bg-emerald-400', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  { value: 'Planned',     dot: 'bg-amber-400',   badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { value: 'Not Planned', dot: 'bg-muted-foreground/30', badge: 'bg-muted text-muted-foreground border-border' },
+];
+function PennyStatusRow({ programId }: { programId: string }) {
+  const { status, setStatus, isSaving } = useProgramPennyConfig(programId);
+  return (
+    <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/40 bg-muted/10">
+      <div className="flex items-center gap-2">
+        <Sparkles className="w-3 h-3 text-primary/60" />
+        <span className="text-[11px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</span>
+        {isSaving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
+      </div>
+      <div className="flex gap-1">
+        {PENNY_OPTS.map(opt => (
+          <button
+            key={opt.value}
+            onClick={() => setStatus(opt.value)}
+            disabled={isSaving}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-semibold transition-colors focus:outline-none disabled:opacity-50 ${
+              status === opt.value
+                ? opt.badge + ' shadow-sm'
+                : 'bg-background text-muted-foreground border-border hover:border-primary/30'
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${opt.dot}`} />
+            {opt.value}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -1232,6 +1270,9 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                       </div>
                                     </div>
                                   )}
+
+                                  {/* Penny status */}
+                                  <PennyStatusRow programId={p.Id} />
 
                                   {/* Cohort toggle + Next */}
                                   <div className="flex items-center justify-between px-4 py-3 border-t border-border/50 bg-muted/20">
