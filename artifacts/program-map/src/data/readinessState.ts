@@ -43,7 +43,7 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
     id: 'slack',
     label: 'Slack',
     health: 'live',
-    summary: '@penny live — posting to Penny AI and Admin channels (POC confirmed)',
+    summary: '@penny live — posting to Penny AI and Admin channels',
     detail:
       'SLACK_BOT_TOKEN, SLACK_APP_TOKEN, and SLACK_SIGNING_SECRET configured. ' +
       'Bot posting confirmed in #penny-ai and #admin channels. ' +

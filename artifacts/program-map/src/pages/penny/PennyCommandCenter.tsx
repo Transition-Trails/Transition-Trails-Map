@@ -83,7 +83,7 @@ export default function PennyCommandCenter() {
 
   const STATUS_PILLS = [
     { label: 'Gemini',      value: 'Live',     color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
-    { label: 'Slack',       value: 'Live POC', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+    { label: 'Slack',       value: 'Live',     color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
     { label: 'Salesforce',  ...sfPill },
   ];
 

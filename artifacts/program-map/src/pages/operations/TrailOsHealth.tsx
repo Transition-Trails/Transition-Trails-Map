@@ -8,7 +8,7 @@ const integrations = [
   { name: 'Slack',            status: 'Live',       eta: 'Active',   dot: 'green' as const, note: '@penny posting to Penny AI + Admin channels.' },
   { name: 'Google Drive',     status: 'Live',       eta: 'Active',   dot: 'green' as const, note: 'OAuth refresh token active. Replit connector live. Folder structure defined.' },
   { name: 'Google Calendar',  status: 'Live',       eta: 'Active',   dot: 'green' as const, note: 'OAuth refresh token active. Next 5 events via Calendar Action Panel. Trail Talk branding.' },
-  { name: 'Agentforce AI',    status: 'Live · POC', eta: 'Active',   dot: 'green' as const, note: 'Sessions API wired (Sprint 4). Dual-AI coaching confirmed — Assessment page + Slack channel.' },
+  { name: 'Agentforce AI',    status: 'Live',       eta: 'Active',   dot: 'green' as const, note: 'Sessions API wired. Dual-AI coaching confirmed — Assessment page + Slack channel.' },
   { name: 'GA4 via Zapier',   status: 'Phase 2',    eta: 'Phase 2',  dot: 'gray' as const,  note: 'Web analytics, goal tracking' },
   { name: 'GitHub Projects',  status: 'Phase 2',    eta: 'Phase 2',  dot: 'gray' as const,  note: 'Epics, features, stories backlog' },
 ];

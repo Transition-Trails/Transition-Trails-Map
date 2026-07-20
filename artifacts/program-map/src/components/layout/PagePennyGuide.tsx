@@ -325,7 +325,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Message templates', path: '/collaboration/templates' },
     ],
     everydayCanned: `Google Calendar is connected and shows your upcoming sessions. Slack @penny is live — once ${TERMS.aiAssistant}'s output is wired to Slack delivery, reminders and updates will go through there automatically.`,
-    powerCanned:    `Collaboration stack: Slack live (POC confirmed — @penny posting). Google Calendar connected. 3 communication routes and 7 message templates defined. Next: wire ${TERMS.aiAssistant} capability output to Slack delivery pipeline.`,
+    powerCanned:    `Collaboration stack: Slack live (@penny posting). Google Calendar connected. 3 communication routes and 7 message templates defined. Next: wire ${TERMS.aiAssistant} capability output to Slack delivery pipeline.`,
   },
   admin: {
     everydayInsights: [],
@@ -346,7 +346,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Google OAuth',      path: '/admin/google-oauth' },
     ],
     everydayCanned: "",
-    powerCanned:    "Admin status: Salesforce + Google OAuth live (REST API + PMM, Drive + Calendar tokens stored). Slack POC confirmed (@penny). Phase 2 features are tracked in Salesforce.",
+    powerCanned:    "Admin status: Salesforce + Google OAuth live (REST API + PMM, Drive + Calendar tokens stored). Slack live (@penny posting). Phase 2 features are tracked in Salesforce.",
   },
   'digital-twin': {
     everydayInsights: [],

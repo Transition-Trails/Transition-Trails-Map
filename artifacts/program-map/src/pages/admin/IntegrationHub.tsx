@@ -23,7 +23,7 @@ type ConnStatus = 'live' | 'live-partial' | 'configured' | 'needs-setup' | 'phas
 
 const CONN_STATUS: Record<ConnStatus, { label: string; dot: string; badge: string; cls: string }> = {
   'live':         { label: 'Live',        dot: 'bg-emerald-500', badge: 'text-emerald-700', cls: 'border-emerald-200 bg-emerald-50'   },
-  'live-partial': { label: 'Live · POC',  dot: 'bg-emerald-400', badge: 'text-emerald-700', cls: 'border-emerald-200 bg-emerald-50'   },
+  'live-partial': { label: 'Live · Active', dot: 'bg-emerald-400', badge: 'text-emerald-700', cls: 'border-emerald-200 bg-emerald-50'   },
   'configured':   { label: 'Configured',  dot: 'bg-sky-500',     badge: 'text-sky-700',     cls: 'border-sky-200 bg-sky-50'           },
   'needs-setup':  { label: 'Needs Setup', dot: 'bg-amber-500',   badge: 'text-amber-700',   cls: 'border-amber-200 bg-amber-50'       },
   'phase-2':      { label: 'Phase 2',     dot: 'bg-slate-400',   badge: 'text-slate-500',   cls: 'border-slate-200 bg-slate-50'       },

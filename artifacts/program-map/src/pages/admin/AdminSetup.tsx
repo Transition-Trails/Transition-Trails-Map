@@ -22,7 +22,7 @@ type SetupStatus =
 
 const STATUS_CONFIG: Record<SetupStatus, { label: string; dot: string; cls: string; badge: string }> = {
   'live':          { label: 'Live',           dot: 'bg-emerald-500', cls: 'bg-emerald-50 border-emerald-200', badge: 'text-emerald-700' },
-  'live-partial':  { label: 'Live · POC',     dot: 'bg-emerald-400', cls: 'bg-emerald-50 border-emerald-200', badge: 'text-emerald-700' },
+  'live-partial':  { label: 'Live · Active',   dot: 'bg-emerald-400', cls: 'bg-emerald-50 border-emerald-200', badge: 'text-emerald-700' },
   'configured':    { label: 'Configured',     dot: 'bg-sky-500',     cls: 'bg-sky-50 border-sky-200',         badge: 'text-sky-700' },
   'needs-auth':    { label: 'Needs Auth',     dot: 'bg-amber-500',   cls: 'bg-amber-50 border-amber-200',     badge: 'text-amber-700' },
   'needs-setup':   { label: 'Needs Setup',    dot: 'bg-amber-400',   cls: 'bg-amber-50 border-amber-200',     badge: 'text-amber-700' },
