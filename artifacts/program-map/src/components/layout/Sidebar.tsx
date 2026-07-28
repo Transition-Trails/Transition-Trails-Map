@@ -61,6 +61,8 @@ const navGroups: NavGroup[] = [
       { id: 'penny-trail-configs', path: '/penny/trail-configs', label: 'Trail Configs',    minTier: 'admin' },
       { id: 'penny-prompts',       path: '/penny/prompts',       label: 'Prompt Studio',    minTier: 'admin' },
       { id: 'penny-capabilities',  path: '/penny/capabilities',  label: 'Capabilities',     minTier: 'admin' },
+      { id: 'penny-create-label',   label: 'Create',              isLabel: true },
+      { id: 'penny-video-prod',    path: '/penny/video-production', label: 'Video Production', minTier: 'admin' },
       { id: 'penny-admin-label',   label: 'Admin',               isLabel: true },
       { id: 'penny-sandbox',       path: '/penny/penny-sandbox', label: 'Penny Sandbox',    minTier: 'admin' },
       { id: 'penny-logs',          path: '/penny/penny-logs',    label: 'Penny Logs',       minTier: 'admin' },

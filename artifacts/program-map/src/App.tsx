@@ -63,6 +63,7 @@ import AgentforceCenter        from "@/pages/penny/AgentforceCenter";
 import PennyHealth             from "@/pages/operations/PennyHealth";
 import PennyAssetLibrary       from "@/pages/penny/PennyAssetLibrary";
 import PennyLogs               from "@/pages/penny/PennyLogs";
+import VideoProduction         from "@/pages/penny/VideoProduction";
 import TestPenny               from "@/pages/penny/TestPenny";
 import LearnerDetail           from "@/pages/penny/LearnerDetail";
 import TrailConfigs            from "@/pages/penny/TrailConfigs";
@@ -255,6 +256,7 @@ function Router() {
       <Route path="/penny/quest-library">      <PennyPageShell><TrailQuests /></PennyPageShell></Route>
       <Route path="/penny/penny-logs">         <PennyPageShell><PennyLogs /></PennyPageShell></Route>
       <Route path="/penny/penny-sandbox">      <PennyPageShell><TestPenny /></PennyPageShell></Route>
+      <Route path="/penny/video-production">   <PennyPageShell><VideoProduction /></PennyPageShell></Route>
       <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
       <Route path="/knowledge/sources" component={KnowledgeWorkspace} />

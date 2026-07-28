@@ -25,6 +25,7 @@ import programsRouter          from "./programs";
 import knowledgeRouter         from "./knowledge";
 import roleOwnersRouter        from "./roleOwners";
 import sessionsRouter           from "./sessions";
+import voiceoverRouter          from "./voiceover";
 
 const router: IRouter = Router();
 
@@ -54,5 +55,6 @@ router.use(programsRouter);
 router.use(knowledgeRouter);
 router.use(roleOwnersRouter);
 router.use(sessionsRouter);
+router.use(voiceoverRouter);
 
 export default router;
