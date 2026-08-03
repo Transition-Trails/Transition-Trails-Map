@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, it, expect } from 'vitest';
 import {
   assemblePrompt,
   layer1Identity,
@@ -8,6 +8,7 @@ import {
   layer5ActiveQuest,
   layer6CareerReview,
   layer7MemoryWindow,
+  type MemoryExchange,
 } from '../lib/pennyPromptAssembler.js';
 import type { TrailConfig, LearnerContext } from '../types/salesforce.js';
 
@@ -278,5 +279,118 @@ describe('assemblePrompt — integration', () => {
       retrievedChunks: [],
     });
     expect(systemPrompt.trim().length).toBeGreaterThan(0);
+  });
+
+  test('memory-window appears in layersPresent when recentExchanges is non-empty', () => {
+    const ex: MemoryExchange = {
+      userMessage: 'What phase am I in?', pennyResponse: 'Explore phase.', createdDate: '2026-08-03T14:00:00.000Z',
+    };
+    const { layersPresent } = assemblePrompt({ recentExchanges: [ex] });
+    expect(layersPresent).toContain('memory-window');
+  });
+
+  test('memory-window is absent from layersPresent when recentExchanges is empty', () => {
+    const { layersPresent } = assemblePrompt({ recentExchanges: [] });
+    expect(layersPresent).not.toContain('memory-window');
+  });
+
+  test('memory-window is absent when recentExchanges is not provided', () => {
+    const { layersPresent } = assemblePrompt({});
+    expect(layersPresent).not.toContain('memory-window');
+  });
+});
+
+// ── Layer 7: Memory Window ────────────────────────────────────────────────────
+
+function makeExchange(
+  userMessage: string,
+  pennyResponse: string,
+  createdDate = '2026-08-03T14:00:00.000Z'
+): MemoryExchange {
+  return { userMessage, pennyResponse, createdDate };
+}
+
+describe('layer7MemoryWindow', () => {
+  it('returns null when called with no argument', () => {
+    expect(layer7MemoryWindow()).toBeNull();
+  });
+
+  it('returns null for an empty array', () => {
+    expect(layer7MemoryWindow([])).toBeNull();
+  });
+
+  it('returns a non-null string for a single exchange', () => {
+    const result = layer7MemoryWindow([makeExchange('Hello Penny', 'Hi there!')]);
+    expect(result).not.toBeNull();
+    expect(result).toContain('Hello Penny');
+    expect(result).toContain('Hi there!');
+  });
+
+  it('includes the date formatted as UTC in the output', () => {
+    const result = layer7MemoryWindow([makeExchange('Q', 'A', '2026-08-03T14:30:00.000Z')]);
+    expect(result).toContain('2026-08-03 14:30 UTC');
+  });
+
+  it('includes "CONVERSATION HISTORY" header', () => {
+    const result = layer7MemoryWindow([makeExchange('Q', 'A')]);
+    expect(result).toContain('CONVERSATION HISTORY');
+  });
+
+  it('truncates user message longer than 500 chars', () => {
+    const longQ = 'Q'.repeat(600);
+    const result = layer7MemoryWindow([makeExchange(longQ, 'A')])!;
+    // The stored question must be shorter than the original
+    expect(result.length).toBeLessThan(longQ.length + 300);
+    expect(result).toContain('…');
+  });
+
+  it('does not truncate user message within 500 chars', () => {
+    const shortQ = 'Short question';
+    const result = layer7MemoryWindow([makeExchange(shortQ, 'A')])!;
+    expect(result).toContain(shortQ);
+    expect(result).not.toContain('…');
+  });
+
+  it('truncates Penny response longer than 800 chars', () => {
+    const longA = 'A'.repeat(900);
+    const result = layer7MemoryWindow([makeExchange('Q', longA)])!;
+    expect(result).toContain('…');
+  });
+
+  it('does not truncate Penny response within 800 chars', () => {
+    const shortA = 'Short answer';
+    const result = layer7MemoryWindow([makeExchange('Q', shortA)])!;
+    expect(result).toContain(shortA);
+  });
+
+  it('caps at 5 exchanges even when more are passed', () => {
+    const exchanges = Array.from({ length: 8 }, (_, i) =>
+      makeExchange(`Question ${i}`, `Answer ${i}`, `2026-08-03T${String(i).padStart(2,'0')}:00:00.000Z`)
+    );
+    const result = layer7MemoryWindow(exchanges)!;
+    expect(result).toContain('Question 0');
+    expect(result).toContain('Question 4');
+    expect(result).not.toContain('Question 5');
+    expect(result).not.toContain('Question 6');
+    expect(result).not.toContain('Question 7');
+  });
+
+  it('outputs exchanges in chronological order (oldest first)', () => {
+    // Input is newest-first (as SF returns them); output should be oldest-first
+    const exchanges = [
+      makeExchange('Second question', 'Second answer', '2026-08-03T15:00:00.000Z'),
+      makeExchange('First question',  'First answer',  '2026-08-03T14:00:00.000Z'),
+    ];
+    const result = layer7MemoryWindow(exchanges)!;
+    const firstIdx  = result.indexOf('First question');
+    const secondIdx = result.indexOf('Second question');
+    expect(firstIdx).toBeGreaterThan(-1);
+    expect(secondIdx).toBeGreaterThan(-1);
+    expect(firstIdx).toBeLessThan(secondIdx);
+  });
+
+  it('handles a single exchange without an ellipsis when content is short', () => {
+    const result = layer7MemoryWindow([makeExchange('Short Q', 'Short A')])!;
+    expect(result).not.toContain('…');
   });
 });

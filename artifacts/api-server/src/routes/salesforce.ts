@@ -871,4 +871,28 @@ router.get("/lms/courses", async (req, res) => {
   }
 });
 
+// ── GET /salesforce/describe/:objectApiName ────────────────────────────────────
+
+router.get("/salesforce/describe/:objectApiName", async (req, res) => {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
+  const { objectApiName } = req.params;
+  try {
+    const describe = await sfGet(proxyFetch, `/sobjects/${objectApiName}/describe`);
+    const fields = ((describe["fields"] ?? []) as Record<string, unknown>[]).map(f => ({
+      name:       f["name"],
+      label:      f["label"],
+      type:       f["type"],
+      length:     f["length"],
+      nillable:   f["nillable"],
+      custom:     f["custom"],
+      referenceTo: f["referenceTo"],
+    }));
+    return res.json({ objectApiName, fields, totalFields: fields.length });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
 export default router;

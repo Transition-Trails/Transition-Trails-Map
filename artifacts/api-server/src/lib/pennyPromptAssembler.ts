@@ -58,6 +58,21 @@ export interface RetrievedChunk {
 }
 
 /**
+ * A single past exchange between the learner and Penny, sourced from
+ * Penny_Interaction_Log__c.  Only the fields needed for the memory-window
+ * prompt are included — SF-specific fields (id, promptMode, source) are
+ * intentionally excluded so the assembler stays decoupled from SF types.
+ */
+export interface MemoryExchange {
+  /** The learner's original question. */
+  userMessage:   string;
+  /** Penny's response. */
+  pennyResponse: string;
+  /** ISO 8601 datetime string (CreatedDate from Salesforce). */
+  createdDate:   string;
+}
+
+/**
  * Everything the assembler needs to build the prompt.
  * Every field is optional — callers pass what they have; absent fields cause
  * the corresponding layer to be silently skipped.
@@ -73,6 +88,8 @@ export interface AssemblerInput {
   learnerContext?:  LearnerContext | null;
   /** Retrieved knowledge chunks — layer 4 source. */
   retrievedChunks?: RetrievedChunk[];
+  /** Recent interaction log records from Salesforce — layer 7 source. */
+  recentExchanges?: MemoryExchange[];
 }
 
 /** What the assembler returns to the caller. */
@@ -296,22 +313,64 @@ export function layer6CareerReview(_reviewData?: unknown): string | null {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Layer 7 — Memory Window  (empty — extension point)
+// Layer 7 — Memory Window
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// A summary of recent conversation context.  The Salesforce interaction log
-// exists but is not yet used as a summarised memory window; no persistence
-// is in place.  Returns null until a memory summary is available.
+// Recent Penny_Interaction_Log__c records for the resolved Contact, formatted
+// as a short chronological conversation summary.  Gives Penny cross-session
+// memory without depending on the browser to re-supply history.
+//
+// Token budget: up to MEMORY_MAX_EXCHANGES exchanges, each question capped at
+// MEMORY_Q_LIMIT chars and each answer at MEMORY_A_LIMIT chars.  Worst case
+// is ~6 500 chars ≈ ~1 600 tokens — acceptable alongside the other layers.
+//
+// Returns null when no exchanges are provided (no contact resolved, or this
+// is the learner's first-ever exchange).
+
+/** Maximum characters per learner question in the memory window prompt. */
+const MEMORY_Q_LIMIT = 500;
+/** Maximum characters per Penny response in the memory window prompt. */
+const MEMORY_A_LIMIT = 800;
+/** Maximum number of past exchanges to include. */
+const MEMORY_MAX_EXCHANGES = 5;
+
+function memTruncate(s: string, limit: number): string {
+  return s.length <= limit ? s : s.slice(0, limit) + '…';
+}
 
 /**
  * Layer 7: Memory Window.
  *
- * Returns null today (no conversation persistence).
- * To fill this layer: pass a memory summary string and return it here.
+ * Formats up to {@link MEMORY_MAX_EXCHANGES} recent interaction records into
+ * a chronological conversation summary.  Callers pass records in reverse-
+ * chronological order (newest first, as returned by Salesforce ORDER BY
+ * CreatedDate DESC); this function reverses them before formatting so Penny
+ * reads oldest-to-newest.
+ *
+ * Messages longer than their respective character caps are truncated with an
+ * ellipsis so the layer stays within a predictable token budget.
+ *
+ * Returns null when exchanges is empty or absent.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function layer7MemoryWindow(_memorySummary?: unknown): string | null {
-  return null; // TODO: inject recent conversation summary when persistence is available
+export function layer7MemoryWindow(exchanges?: MemoryExchange[]): string | null {
+  if (!exchanges || exchanges.length === 0) return null;
+
+  // Cap count and put into chronological order (oldest first)
+  const chronological = exchanges.slice(0, MEMORY_MAX_EXCHANGES).reverse();
+
+  const lines: string[] = [
+    'CONVERSATION HISTORY (recent exchanges from previous sessions — use as context, do not repeat verbatim):',
+  ];
+
+  for (const ex of chronological) {
+    const dateStr = new Date(ex.createdDate).toISOString().slice(0, 16).replace('T', ' ');
+    lines.push(
+      `\n[${dateStr} UTC]\nLearner: ${memTruncate(ex.userMessage, MEMORY_Q_LIMIT)}` +
+      `\nPenny: ${memTruncate(ex.pennyResponse, MEMORY_A_LIMIT)}`
+    );
+  }
+
+  return lines.join('\n');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -327,13 +386,13 @@ export function layer7MemoryWindow(_memorySummary?: unknown): string | null {
  * prompt was built.
  *
  * Current layer content status:
- *   identity       — ✅ internal identity always present; other audiences fall back
- *   trail-context  — ✅ present when trailConfig is provided
+ *   identity        — ✅ internal identity always present; other audiences fall back
+ *   trail-context   — ✅ present when trailConfig is provided
  *   learner-context — ✅ present when learnerContext is provided
- *   knowledge      — ✅ present when retrievedChunks is non-empty
- *   active-quest   — ⬜ empty (Penny_Quest_Submission__c has no data yet)
- *   career-review  — ⬜ empty (Penny_Career_Review__c has no data yet)
- *   memory-window  — ⬜ empty (no conversation persistence yet)
+ *   knowledge       — ✅ present when retrievedChunks is non-empty
+ *   active-quest    — ⬜ empty (Penny_Quest_Submission__c has no data yet)
+ *   career-review   — ⬜ empty (Penny_Career_Review__c has no data yet)
+ *   memory-window   — ✅ present when recentExchanges from Penny_Interaction_Log__c is non-empty
  */
 export function assemblePrompt(input: AssemblerInput): AssemblerResult {
   const audience = input.audience ?? 'internal';
@@ -345,7 +404,7 @@ export function assemblePrompt(input: AssemblerInput): AssemblerResult {
     { name: 'knowledge',       content: layer4Knowledge(input.retrievedChunks) },
     { name: 'active-quest',    content: layer5ActiveQuest() },
     { name: 'career-review',   content: layer6CareerReview() },
-    { name: 'memory-window',   content: layer7MemoryWindow() },
+    { name: 'memory-window',   content: layer7MemoryWindow(input.recentExchanges) },
   ];
 
   const present = candidates.filter(

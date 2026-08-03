@@ -4,11 +4,13 @@ import {
   getLearnerContext,
   getTrailConfig,
   logInteraction,
+  getInteractionHistory,
 } from "../lib/salesforceService.js";
 import {
   assemblePrompt,
   type AssemblerInput,
   type RetrievedChunk,
+  type MemoryExchange,
 } from "../lib/pennyPromptAssembler.js";
 import { DEFAULT_TRAIL_CONFIG } from "../lib/defaultTrailConfig.js";
 import type { SalesforceClient } from "../lib/salesforceClient.js";
@@ -152,15 +154,34 @@ router.post("/penny/ask", async (req, res) => {
     sfClient = null;
   }
 
+  // ── Fetch layer 7: recent interaction history (memory window) ──────────────
+  // Runs after the main SF block so a history failure never degrades layers 2–3.
+  // Returns the last 5 exchanges in reverse-chronological order (newest first);
+  // layer7MemoryWindow reverses them to oldest-first before formatting.
+  let recentExchanges: MemoryExchange[] = [];
+  if (sfClient !== null && sfContactId !== null) {
+    try {
+      const raw = await getInteractionHistory(sfClient, sfContactId, 5);
+      recentExchanges = raw.map(r => ({
+        userMessage:   r.userMessage,
+        pennyResponse: r.pennyResponse,
+        createdDate:   r.createdDate,
+      }));
+    } catch (histErr) {
+      logger.warn({ histErr }, "Failed to fetch interaction history for memory window — proceeding without");
+    }
+  }
+
   // ── Assemble the prompt from all seven layers ──────────────────────────────
   // The Gemini call receives only the finished string; it has no knowledge of
-  // how the prompt was built.  Empty layers (5–7 today) contribute nothing.
+  // how the prompt was built.  Layers with no data contribute nothing.
   const assemblerInput: AssemblerInput = {
     audience:        sfContactId ? 'learner' : 'internal',
     role:            roleStr,
     trailConfig:     trailCfg,
     learnerContext:  learnerCtx,
     retrievedChunks: validChunks,
+    recentExchanges,
   };
   const { systemPrompt, layersPresent } = assemblePrompt(assemblerInput);
 
@@ -238,6 +259,10 @@ router.post("/penny/ask", async (req, res) => {
     });
 
     if (sfClient !== null && sfContactId !== null) {
+      // Fire-and-forget Salesforce write.  Any failure here is caught and
+      // logged but NEVER surfaced to the caller — the user already has their
+      // reply.  The local DB write above is the primary persistence path; this
+      // is supplementary and is allowed to fail silently.
       logInteraction(sfClient, {
         contactId:     sfContactId,
         userMessage:   query.trim(),
@@ -245,7 +270,27 @@ router.post("/penny/ask", async (req, res) => {
         promptMode:    "ask",
         source:        "web",
       }).catch((logErr: unknown) => {
-        logger.warn({ logErr }, "Failed to log Penny interaction to Salesforce");
+        const errMsg = logErr instanceof Error ? logErr.message : String(logErr);
+        const isPermission =
+          errMsg.includes('INSUFFICIENT_ACCESS') ||
+          errMsg.includes('FIELD_INTEGRITY_EXCEPTION') ||
+          errMsg.includes('Required fields are missing') ||
+          errMsg.includes('CREATE_FAILED');
+        if (isPermission) {
+          // Loud error so a new integration user's missing Create permission
+          // is found immediately rather than silently losing records.
+          logger.error(
+            { logErr, object: 'Penny_Interaction_Log__c', sfContactId },
+            'SF WRITE REFUSED — Penny_Interaction_Log__c — Create permission denied. ' +
+            'If the integration user was recently changed, grant Create on ' +
+            'Penny_Interaction_Log__c in the connected permission set.'
+          );
+        } else {
+          logger.warn(
+            { logErr, object: 'Penny_Interaction_Log__c' },
+            'Failed to log Penny interaction to Salesforce'
+          );
+        }
       });
     }
 

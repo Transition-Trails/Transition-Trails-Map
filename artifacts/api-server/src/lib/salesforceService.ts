@@ -211,18 +211,46 @@ export async function getActiveTrailConfigs(
 
 // ── Interaction logs ──────────────────────────────────────────────────────────
 
+// Salesforce field limits for Penny_Interaction_Log__c:
+//   User_Message__c   — textarea, max 32 768 chars
+//   Penny_Response__c — textarea, max 32 768 chars
+//   Prompt_Mode__c    — string,   max 50 chars
+// We apply a conservative limit (10 000 chars) on the two textarea fields so
+// very long exchanges don't push against SF hard limits.  Full text is always
+// in the local DB (pennyLogsTable), which has no such constraint.
+const SF_TEXTAREA_LIMIT = 10_000;
+
+/**
+ * Truncate a string to the SF textarea field limit with an explicit marker.
+ * The marker is important: it tells anyone reading the SF record that the
+ * value was intentionally cut rather than corrupted.
+ */
+function truncateSf(s: string): string {
+  if (s.length <= SF_TEXTAREA_LIMIT) return s;
+  return s.slice(0, SF_TEXTAREA_LIMIT) + ' [truncated — full text in local DB]';
+}
+
 export async function logInteraction(
   client: ISalesforceClient,
   payload: LogInteractionPayload
 ): Promise<{ id: string }> {
+  // NOTE: Penny_Interaction_Log__c.Learner__c is NOT nillable (required).
+  // Records can only be created when a Contact is resolved.  Internal-staff
+  // exchanges (no contactId) are written only to the local DB.
+  //
+  // NOTE: Fields that do not exist in this object's current schema are NOT
+  // written here: model, durationMs, layersPresent, audience, userTier.
+  // Those metadata fields are captured by the local DB (pennyLogsTable).
+  // If they are added to the SF schema in a future sprint, map them here.
+  //
+  // Assignment__c intentionally omitted — always null.
+  // Future LMS integration will populate this field; do not set it here.
   const result = await client.createRecord("Penny_Interaction_Log__c", {
     Learner__c:        payload.contactId,
-    User_Message__c:   payload.userMessage,
-    Penny_Response__c: payload.pennyResponse,
-    Prompt_Mode__c:    payload.promptMode,
+    User_Message__c:   truncateSf(payload.userMessage),
+    Penny_Response__c: truncateSf(payload.pennyResponse),
+    Prompt_Mode__c:    payload.promptMode.slice(0, 50),
     Source__c:         payload.source,
-    // Assignment__c intentionally omitted — always null.
-    // Future LMS integration will populate this field; do not set it here.
   });
   return { id: result.id };
 }
