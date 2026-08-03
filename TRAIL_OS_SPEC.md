@@ -182,44 +182,130 @@ A full Phase 1 Completion Audit page is available in the app at `/admin/phase1-a
 
 ---
 
-## 5. Phase 1 UX Standards
+## 5. UX Standards
 
-All pages must conform to these standards. The authoritative source is `/admin/ux-standards` in the app.
+The Transition Trails design system is the source of truth. This section translates the design system into the specific decisions that govern a dense internal operations tool. When this section conflicts with a pre-system pattern still visible in the codebase, this section wins. The authoritative interactive version is at `/admin/ux-standards` in the app.
+
+### Context
+
+Trail OS was created before the design system existed. The old standard was solving a real problem — Trail OS is a dense internal tool for a small team, and that instinct was right. What changes is the answer. **Density is now achieved by showing fewer things rather than shrinking them.** Prefer fewer columns, progressive disclosure, and a secondary tab over reducing type size. If a screen cannot work at 14 px, the screen is showing too much — that is a layout problem, not a type problem.
 
 ### Typography
 
-| Element | Class |
+The design system is the source of truth for typefaces and sizing. Trail OS sits at the bottom of the brand ranges because it is an internal tool.
+
+| Element | Size | Face | Weight |
+|---|---|---|---|
+| Page title | 28 px | Poppins (`font-serif`) | Semibold |
+| Section title | 22 px | Poppins | Semibold |
+| Card / panel title | 18 px | Poppins | Semibold |
+| Stat value | 28 px | Poppins | Semibold |
+| Body | 16 px | Open Sans (`font-sans`) | Regular |
+| Secondary / metadata | 14 px | Open Sans | Regular |
+| Labels, badges, table headers | 14 px | Open Sans | Semibold |
+
+**Floor: 14 px for all interface text. No exceptions for density.**
+
+Typefaces: Poppins for headings (`font-serif` in Tailwind config — this is correct and intentional; it resolves to Poppins, not a literal serif), Open Sans for all interface text (`font-sans`). Caveat has no role in an operations tool. Fraunces is for outward-facing surfaces only and is not used here.
+
+**Case: sentence case throughout.** The old standard used `text-[10px] font-bold uppercase tracking-widest` for eyebrow labels — that treatment compensated for illegibly small text. At 14 px, uppercase reads as shouting, which conflicts with the brand voice. Title Case applies only to proper programme and trail names.
+
+### Colour
+
+All colour in screen code comes from the token layer — no raw hex values and no Tailwind framework colour utilities (`bg-emerald-100`, `text-sky-700`). Import `STATUS_CLASSES` from `src/config/statusColors` for all status colours.
+
+**Four brand colours:**
+
+| Colour | Value | Intent in Trail OS |
+|---|---|---|
+| Trail Green | `#2F6B3F` | Success, live, active, complete, approved |
+| Deep Teal | `#2F6F7E` | Information, configured, planned, read-only |
+| Trail Light | `#F5F0E8` | Page background |
+| Warm Gray | `#4A4F4D` | Neutral text and dividers |
+
+**Five status roles — only these five:**
+
+| Role | Treatment | States |
+|---|---|---|
+| Success | Trail Green on green tint | Live, active, passing, complete, approved |
+| Information | Deep Teal on teal tint | Configured, planned, by design, read-only |
+| Attention | Dark amber text on lightest amber tint | Needs setup, partial, prototype, warning, needs rework |
+| Critical | Functional red (`#A93F2F`) on red tint (`#FBEAE6`) | Blocked, failed, missing credentials, destructive |
+| Neutral | Warm Gray with Slate text | Not started, deferred, inactive |
+
+The functional red is not a brand colour — it exists because an operations tool must distinguish a blocker from a warning, and the brand book has no red. It is pending a brand book entry and is the only non-brand colour permitted in Trail OS.
+
+**Amber rule:** one amber element per screen (`bg-accent`, `#F5A623`) and it must be the primary action. Amber is never a status fill, never a category colour, never decorative. Attention status uses amber text on a tint.
+
+**Meaning is never colour alone.** Every status indicator carries a text label and an icon alongside the colour.
+
+**No categorical colour.** Programmes, person types, roles, and record types are distinguished by label, not hue. The programme map is the single exception where colour aids spatial navigation.
+
+**Third-party brand marks** keep their own colours and must never be converted in any colour sweep.
+
+### Shape and elevation
+
+| Element | Radius |
 |---|---|
-| Section eyebrow label | `text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50` |
-| Page / section title | `text-[15px] font-semibold` or `text-base font-semibold` |
-| Body text | `text-[12px] text-foreground` or `text-[11px] text-muted-foreground` |
-| Stat value | `text-xl font-semibold` (never `text-2xl` or `text-3xl`) |
-| Badge/tag text | `text-[9px] font-bold` or `text-[10px] font-bold` |
+| Small elements (tags, chips) | 8 px (`rounded`) |
+| Buttons and inputs | 14 px (`rounded-[14px]`) |
+| Cards and panels | 22 px (`rounded-[22px]`) |
+| Badges and status pills | Fully rounded (`rounded-full`) |
 
-**`font-serif` is prohibited everywhere in Trail OS.** Use `font-semibold` or `font-bold` for emphasis.
+Backgrounds: `bg-card` (white) on `bg-background` (Trail Light). Use `bg-[#EDF5F8]` (Sky tint) for nested surfaces inside a card — never a surface that is nearly the same value as the card behind it.
 
-### Layout
+Borders: `border border-border` (1 px Warm Gray) on cards and dividers; `border-[1.5px] border-border` on inputs and secondary buttons.
 
-- Cards: `rounded-lg border border-border bg-white p-4`
-- Section containers: `rounded-lg border border-border bg-muted/20 p-4`
-- Two-column grids: `grid grid-cols-1 md:grid-cols-2 gap-4`
-- No modal or slide-over overlays — use inline panels or tabs instead.
-- No empty default detail panes — all pages must show meaningful content at first render.
-- No hero/intro cards at the top of operational pages.
+Shadows: `shadow-sm` at rest, `shadow-md` on hover lift. No hard drop shadows. Never a shadow on a logo.
+
+### Spacing
+
+Scale: 4, 8, 16, 24, 32, 48, 64 px. Nothing off-scale. For Trail OS density, choose the lower end of the scale rather than inventing values outside it.
 
 ### Interaction
 
-- Hub overview pages use card-based navigation (NavCard pattern) not empty split-panes.
-- Workspace pages (Sources, Programs list) use the `ObjectWorkspace` left-list/right-detail pattern — these are **secondary tabs**, never the default landing.
-- All navigation links use `useLocation` + `setLocation` from wouter, not anchor tags.
-- Tabs use the underline tab style (not pill buttons) wherever HubShell is used.
+- **Focus ring:** `focus:outline-none focus:ring focus:ring-[#2F6B3F]/15` on every interactive element — 3 px Trail Green at 15% opacity.
+- **Card hover:** `-translate-y-0.5 shadow-md` over ~160 ms. Buttons shift colour on hover. Nothing shrinks.
+- **Press:** Darker background or colour. No bounce, no shrink.
+- **Animation:** Only when it carries meaning. 200 ms ease-out for panels and accordions. No decorative animation.
 
-### Role gating at the UX level
+### Layout patterns
+
+- **Overview-first hubs:** populated overview at the base path; never an empty split pane as landing.
+- **List-and-detail** is a secondary tab (`ObjectWorkspace`), never the default landing.
+- **No modals or full-page overlays.** `AskPennyPanel` and `CalendarActionPanel` right-rail slide-overs are the only exceptions.
+- **No empty default detail panes.** No hero or intro cards on operational pages.
+- **Underline tabs,** not pill buttons, wherever `HubShell` is used.
+- **Ask Penny** always in the right rail, never a modal or takeover.
+- All navigation uses `useLocation` + `setLocation` from wouter, not anchor tags.
+
+### Voice
+
+Sentence case. Speak to the user as "you", call the organisation "we". Calm, precise, actionable — no urgency or hype. No emoji in the product or in repository documents; status is icon plus text. Do not adopt Trailhead, Trailblazer, Ohana, Ranger or Expedition as Trail OS vocabulary — referring to the Salesforce platform by its real name is correct; adopting its language as ours is not.
+
+### Role gating
 
 - Everyday users: plain language, single tab, no ActionBar, no governance metadata.
 - Power users and above: operational controls, multi-tab hubs, ActionBar actions.
 - Admin+ only: Administration group, Blueprint canvas, People & Access.
 - Super Admin only: Secrets Audit, Google OAuth wizard, Phase 1/2 audit tools.
+
+### What changed, and why
+
+| Topic | Old rule | New rule | Reason |
+|---|---|---|---|
+| Type sizes | 9–12 px text throughout | 14 px floor everywhere | At 14 px the hierarchy is readable; shrinking text produces illegibility, not compactness |
+| Uppercase labels | `text-[10px] font-bold uppercase tracking-widest` | `text-[14px] font-semibold` sentence case | Uppercase compensated for small text; at 14 px it reads as shouting |
+| Stat values | `text-xl` max (20 px) | 28 px Poppins semibold | Brand type scale; stats should read at a glance |
+| Card radius | `rounded-lg` (8 px) | `rounded-[22px]` | Brand specification; `rounded-lg` was a generic default |
+| Card background | `bg-white` explicit | `bg-card` | On Trail Light, explicit white is indistinguishable from the page; `bg-card` is theme-safe |
+| Colour families | Tailwind `emerald`/`sky`/`violet`/`indigo`/`rose`/`amber` | Five status roles via `STATUS_CLASSES` | Framework utilities couple to implementation values; named roles survive theme changes |
+| Amber usage | Freely used for categories, status fills, decoration | One per screen — primary action only | Amber is the CTA colour; over-use dilutes the signal that a primary action is available |
+| Shadows and hover | No explicit rule | Soft card shadow, 3 px lift on hover | Prevents hard drop shadows and decorative animation from entering the codebase |
+| Focus ring | Browser default | 3 px Trail Green at 15% opacity | Accessibility requirement; brand-consistent |
+| Fonts | `font-sans` only, no type specification | Poppins headings + Open Sans interface text | Trail OS now has a type system; aligns the tool with outward-facing materials |
+
+Density is not lost — it moves from type size to information architecture. A screen that cannot work at 14 px is showing too much, and the fix is progressive disclosure, fewer columns, or a secondary tab.
 
 ---
 
@@ -680,38 +766,96 @@ Update `routes.smoke.ts` whenever routes are added, removed, or redirected in `A
 
 ---
 
-## 14. Hardcoded and Demo Data Classification
+## 14. Data Classification
 
-All data in Trail OS Phase 1 is hardcoded in `src/data/`. This is by design for the prototype. The following classification governs how each item should be treated:
+Every file in `src/data/` is classified below. Consult this table before demonstrating Trail OS to any external audience. `readinessState.ts` is listed first because the rest of this specification describes it as the single source of truth for integration status.
 
-### DB-backed (live, persistent across restarts)
+### Rubric
 
-- `prompt_templates` table — Penny Prompt Studio templates; seeded from `pennyData.ts`; editable via `PATCH /api/penny/prompt-templates/:id`
-- `prompt_variables` table — Penny Prompt Studio variables; seeded from `pennyData.ts`; live editable via VariablesView + `PATCH /api/penny/prompt-variables/:id`
+The previous classification answered two questions at once — is this accurate, and is this wired to a live system — but neither answered the question that matters in a demonstration: **can I say this number out loud and defend it?**
 
-### Phase 1 OK — accurate representation, ready for live data swap
+The four statuses answer that question directly.
 
-- `programs.ts` — 5 programs with full metadata (confirmed by program team)
-- `knowledgeSourceData.ts` — 14 sources with real governance records
-- `resolvePhases.ts` — RESOLVE framework phases (authoritative)
-- `standardsData.ts` — Program, Module, Lesson, Assessment standards (authoritative)
-- `accessTiers.ts` — tier definitions (authoritative)
-- `terminology.ts` — brand labels (authoritative)
+| Status | Meaning | Safe to show | Safe to quote |
+|---|---|---|---|
+| **Live** | Served from a real system at runtime | Yes | Yes |
+| **Real** | Accurate Transition Trails content, hardcoded — not yet wired to a live source | Yes | Yes |
+| **Illustrative** | Plausible, well-shaped, and invented — demonstrates the interface | Yes | **No** |
+| **Stale** | Was accurate once and is now wrong | **No** | **No** |
 
-### Phase 2 data — placeholder shapes, need live data
+#### Why Illustrative is a distinct status
 
-- `operationalIntelligenceData.ts` — health scores and recommendations (to be replaced by live Salesforce queries)
-- `signalCounts.ts` — Trail Signal counts (to be replaced by live aggregation engine)
-- `pennyCapabilityData.ts` — capability activation statuses (to be replaced by live Penny registry)
-- `commData.ts` — Slack channel data (to be replaced by live Slack API)
-- `googleCalendarData.ts` — calendar events (**live** — real events now served via `/api/calendar/events`; this file is a fallback/prototype only)
-- `googleDriveData.ts` — Drive folder structure (to be replaced by Drive API)
+The previous rubric did not distinguish between a file that will eventually be replaced by live data and a file whose numbers are made up. Knowing that a file is a "Phase 2 item" tells you when it gets wired; it tells you nothing about whether the ninety-day placement rate shown on the overview screen is a real Transition Trails figure or an invented one. The Illustrative status is the one the old rubric was missing.
 
-### Stale / needs review
+**Illustrative is different from Real** because the content was invented for the prototype rather than drawn from TT operations, documents, or verified team decisions. It is different from **Stale** because it was never presented as real — it was always a demonstration placeholder. The category is safe to show because it makes the interface feel operational. It is not safe to quote because the number is not ours.
 
-- `universalObjectProfileData.ts` — some profiles reference deprecated architecture
-- `demandStages.ts` — demand pipeline stages may not reflect current intake process
-- `trailOsCapabilities.ts` — some capabilities listed as planned that are now Phase 2
+This distinction is invisible in the UI. An Illustrative health score looks identical to a Real one. This table is the only way to know which is which.
+
+### DB-backed data (not in the table below)
+
+Two data stores live in the database rather than in `src/data/` files:
+
+- **`prompt_templates` table** — Penny Prompt Studio templates; seeded at startup, editable via `PATCH /api/penny/prompt-templates/:id`. Status: **Live**.
+- **`prompt_variables` table** — Penny Prompt Studio variables; seeded at startup, editable via `PATCH /api/penny/prompt-variables/:id`. Status: **Live**.
+
+`src/config/accessTiers.ts` and `src/config/terminology.ts` are also authoritative and safe to quote; they are configuration files, not data files, and are not repeated here.
+
+### All files in `src/data/`
+
+| File | What it holds | Source | Status | What replaces it |
+|---|---|---|---|---|
+| `readinessState.ts` | Integration health records for every system — Salesforce, Slack, Gemini, Google Drive, Google Calendar, Gmail, Agentforce (all live); Mural and GA4 (Phase 3). Single source of truth per § 8 | Verified against live system credentials; last verified June 2026 | **Real** | Nothing — this is the live state; Phase 2 expands the checks it tracks |
+| `programs.ts` | Five programme records — Explorer's Trail, Foundations Trail, Guided Trail, Digital Compass, Trail of Mastery — with strategic role, audience, format, outcomes, and Penny status | Confirmed by programme team; each record cites its source blueprint. The `pricing` field on Foundations Trail reads "Needs Review — not confirmed in source materials" | **Real** | Live Salesforce PMM queries enrich records via `sfId` at runtime; Phase 2 |
+| `resolvePhases.ts` | Seven RESOLVE phases — Recognize, Explore, Select, Outline, Launch, Verify, Evolve — with inputs, outputs, deliverables, and methodology guidance | "Confirmed against Master RESOLVE Methodology Handbook" stated per phase in the file | **Real** | Nothing needed — authoritative framework definition |
+| `pennyCapabilities.ts` | Seven Penny capability definitions — Trail Guide, Learning Coach, Exam Coach, Build Companion, Career Translator, Quest Master, Coach Intelligence Layer | Designed and confirmed capability model; all items carry `confidence: "confirmed"` | **Real** | Nothing needed — authoritative capability registry |
+| `pennyRetrievalData.ts` | Penny knowledge retrieval priority order for five capabilities — which sources load, in what sequence, and why | Designed retrieval architecture aligned to the TT knowledge source model | **Real** | Live RAG wiring when capabilities are activated; Phase 2 |
+| `knowledgeSourceData.ts` | Fourteen knowledge source definitions — Salesforce Knowledge, Google Drive, LMS, Assessments, Standards Studio, Curriculum Studio — with trust levels and review cycles | Confirmed as "14 sources with real governance records" in previous spec review; runtime file counts are injected by the API at serve time | **Real** (file counts shown at runtime are live; source definitions are authoritative) | Live health checks and article counts from connected systems; Phase 2 |
+| `platformRoles.ts` | Seven platform role definitions — Penny Admin, Knowledge Manager, Curriculum Lead, Standards Lead, Salesforce Admin, Coach Team Lead, Platform Admin — with responsibilities and required access tier | Designed role framework for the TT organisation; `owner` and `ownerEmail` fields are blank pending assignment | **Real** (structure is authoritative; individual owner assignments are blank) | Owner assignments configured via People & Access; Phase 2 people wiring |
+| `standardsData.ts` | Content-quality standards and rules Penny applies to programme content — module, lesson, assessment, and coaching standards | Standards authored by TT for content governance; any compliance percentage figures rendered in the UI are illustrative, not measured | **Real** (rules are authoritative; **compliance percentage figures from this file must not be quoted**) | Live compliance tracking from Penny telemetry; Phase 2 |
+| `unifiedObjectModelData.ts` | Core object type definitions, relationship schemas, and governance metadata for the Unified Object Model — 20 object types | Architecture design data; no invented operational figures; defines the object model the system operates against | **Real** (structural architecture; no invented numbers) | Nothing needed for the definitions; live operational data populates profiles at runtime; Phase 2 |
+| `sourceDocuments.ts` | TypeScript interface definitions only — no static data records; all source document records are DB-backed and served via `/api/knowledge/documents` | Runtime data from the database | **Live** | N/A — already DB-backed |
+| `signalCounts.ts` | Trail Signal badge counts by page context — the number shown in the Topbar badge and Context Bar on every page (e.g. "7 on home", "5 on operations") | Invented per-route numbers; not derived from any live aggregation | **Illustrative** | Live aggregation from Salesforce events, Slack activity, and Penny interactions; Phase 2 |
+| `operationalIntelligenceData.ts` | Health scores, readiness percentages, trend lines, and AI-generated recommendations for the Operations hub executive view | Invented prototype scores; not derived from real TT operational data | **Illustrative** | Live Salesforce queries and Penny analysis; Phase 2 |
+| `pennyCapabilityData.ts` | Penny capability activation statuses, readiness percentages, and roadmap phases for the capability registry admin screen | Prototype roadmap; includes Q3 2025 and Q4 2025 delivery targets — both stale | **Illustrative** (stale quarter targets also present) | Live Penny capability registry; Phase 2 |
+| `commData.ts` | Prototype Slack and Google Chat channel data — channel names, member counts, message history, and event logs for the Collaboration hub | Explicitly labelled prototype in the file; invented; Q3 2025 reference present | **Illustrative** | Live Slack API queries; Phase 2 |
+| `googleCalendarData.ts` | Calendar event definitions, cohort schedule data, and integration readiness checks | Prototype; real events are now served by `/api/calendar/events` for the CalendarPanel — this file is a fallback only | **Illustrative** (the CalendarPanel uses live data; any screen still reading this file shows prototype data) | Live Google Calendar API for all calendar screens; Phase 2 |
+| `googleDriveData.ts` | Drive folder structures, file inventories, trust configurations, and permission readiness checks for the Google Drive Integration Center | Prototype; the Penny Asset Library reads real Drive files via API, but this file's folder and file inventory is not a live Drive query | **Illustrative** | Live Drive API queries; Phase 2 |
+| `contextEngineData.ts` | Example workspace contexts for the Context Bar switcher — programme names, cohort numbers, activity dates, and percentage metrics shown when the bar is in demo mode | Invented; includes specific-looking figures such as "13 learners enrolled, Cohort 2 Week 6, 91% pass rate" — these are not real TT operational data | **Illustrative** (the precision of these figures makes them easy to quote accidentally — they look real because they are specific) | Live context constructed from the active Salesforce record or user selection; Phase 2 |
+| `salesforceArchitectureData.ts` | Trail OS to Salesforce object mapping, NPSP and PMM architecture documentation, and readiness percentages for the SF Architecture admin screen | SF object names reflect the real TT org (confirmed by live connection); readiness percentages are invented; Q3 and Q4 2025 targets are stale | **Illustrative** (object names are real; readiness percentages and timeline targets are not) | Live SF schema queries; Phase 2 |
+| `pennyContentActions.ts` | Eleven Penny content and curriculum generation action definitions with prototype sample inputs and outputs for the Content Assistant screen | Architecture and action definitions with invented sample outputs; file explicitly labels contents as prototype | **Illustrative** | Live Penny content generation with real outputs; Phase 2 |
+| `knowledgeGraphData.ts` | Prototype graph nodes and relationships linking programmes, roles, RESOLVE phases, capabilities, channels, and Penny for the Digital Twin map view | Architecture design; graph topology reflects the real relationship model conceptually but is not built from a live org-data query | **Illustrative** | Live graph built from Salesforce, Drive, and Penny data; Phase 2 |
+| `globalSearchData.ts` | Prototype search index across all 20 UOM object types — search results and health scores for the global search feature | Invented search fixtures; health percentages (60%, 91%) are prototype | **Illustrative** | Live search index built from real object data; Phase 2 |
+| `governanceData.ts` | Lifecycle models, ownership records, governance health scores, compliance rates, and review cycles for 20 UOM object types in the Governance hub | Structural governance framework plus illustrative compliance records; the 60% compliance figure is invented | **Illustrative** | Live governance tracking from operations; Phase 2 |
+| `pennyPromptStudioData.ts` | Penny prompt architecture, retrieval behaviour, governance records, and usage analytics for the Prompt Studio admin screen | Architecture definitions plus illustrative analytics; percentage figures (ranging from 4% to 81%) are invented prototype metrics; Q3 2025 reference present | **Illustrative** | Live Penny telemetry and prompt management; Phase 2 |
+| `integrationReadinessData.ts` | Planning and readiness architecture for all integrations — Salesforce, Drive, Slack, Chat, Calendar, LMS, Assessments, and Penny — with readiness percentages for the Integration Readiness Center | Prototype planning data; readiness percentages (e.g. 40%) are invented; Q3 and Q4 2025 targets are stale | **Illustrative** (stale quarter targets also present) | Live integration health checks; Phase 2 |
+| `slackPhase2Data.ts` | Phase 2 Slack validation data — object mappings, routing architecture, flow visualisation, and scenario test fixtures for architecture planning screens | Architecture and prototype validation data; 65% readiness figure is invented | **Illustrative** | Live Phase 2 Slack wiring and validation; Phase 2 |
+| `slackIntegrationData.ts` | Prototype Slack workspace model — workspace statistics, channel registry, user-role mappings, Penny routing configuration, and readiness scorecards for the Slack Integration Center | Prototype; the Slack bot is live but this file's workspace member counts, channel metadata, and readiness scores are invented, not queried from the real workspace | **Illustrative** | Live Slack API workspace queries; Phase 2 |
+| `peopleRolesData.ts` | Persona profiles, participation records, health scores, Penny support configurations, and Salesforce mappings for the People & Roles Studio | Invented persona data; no evidence that named individuals are real TT staff; health and participation scores are prototype | **Illustrative** (health scores attributed to named personas must not be quoted as real staff data) | Real people data from Google Workspace and Salesforce; Phase 2 |
+| `curriculumData.ts` | Full learning architecture — cohorts, sprints, modules, lessons, assessments, delivery records, and completion statistics for Curriculum Studio | Programme names match real TT programmes; lesson counts, cohort numbers, sprint timelines, and completion percentages (75–88%) are prototype. "confirmed" in the `confidence` field is a data-model status label, not TT operational verification | **Illustrative** | Live LMS data and Salesforce PMM cohort records; Phase 2 |
+| `messageTemplates.ts` | Seven Slack message template definitions — Trail Talk reminder, cohort announcement, win celebration, coach nudge, case escalation, facilitator reminder, weekly health digest | Prototype template designs; none are live or automated; `lastReviewed: Jun 2025` | **Illustrative** | Active Slack message automation; Phase 2 |
+| `programResourcesData.ts` | Google Drive workspace configurations per programme — folder structures, permissions models, and sync configurations for the Program Resources screen | Prototype; all `folderUrl` values are placeholders (e.g. `"foundations-trail-placeholder"`), not real Drive links | **Illustrative** | Real Drive folder URLs configured by admin; Phase 2 |
+| `demandStages.ts` | Eight demand pipeline stages — Intake, Triage, Scoring, Backlog, Sprint Planning, Delivery, Verification, Retrospective — with example backlog items and ownership | Prototype; all items carry `confidence: "needs-review"`; backlog items (e.g. "Digital Compass cohort Q3") are invented | **Stale** (all items explicitly tagged needs-review; may not reflect the current TT intake process; stage names need verification) | Live Salesforce demand case data; Phase 2 |
+| `trailOsCapabilities.ts` | Seven Trail OS operational capability descriptions — Intake Coordination, Project Delivery, Documentation, Learner-Client Matching, Org Readiness, Coach Visibility, Outcomes Tracking | Prototype; some capabilities described as current are now Phase 2 scope. "Tracks 90-day placement rates" in the Outcomes Tracking entry describes what the capability will track — it is not a real statistic | **Stale** (phase boundaries have shifted since this was authored; needs reconciliation with current Phase 1/2/3 scope before showing) | Updated capability model; Phase 2 |
+| `commProviders.ts` | Two communication provider definitions — Slack and Google Chat — with connection status, setup requirements, and use cases | Authored when Slack was not yet connected | **Stale** (shows Slack as `status: 'prototype'`, `connectionStatus: 'Not Connected'`, target Q3 2025 — Slack is live; this screen actively misleads if shown) | Update to reflect live Slack connection; **Phase 1 fix needed** |
+| `commRouting.ts` | Eight communication routing rules — event types, triggers, audience, and Slack channel destinations for the automated messaging system | Prototype routing design; all routes show `slackStatus: 'Planned Q3 2025'` | **Stale** (Q3 2025 has passed with no routes live; showing these timelines to a funder is misleading) | Live Slack routing automation; Phase 2 |
+| `universalObjectProfileData.ts` | Universal Object Profile records for all UOM object types — data powering object detail views in the Digital Twin and UOM workspace | Prototype; some profiles reference deprecated architecture, confirmed in previous spec review | **Stale** (deprecated architecture references confirmed; needs reconciliation before showing) | Redesigned profiles aligned to current architecture; Phase 2 |
+
+### Demonstration exposure — Illustrative files
+
+**20 of the 35 files in `src/data/` are Illustrative.** The following screens render figures drawn from them. In any demonstration, these are the screens where specific numbers, percentages, and counts should not be quoted as real Transition Trails data.
+
+- **Every page — Topbar Trail Signal badge** (`signalCounts.ts`): the badge count (e.g. "7 Trail Signals") is a per-route invented number, not a real alert count.
+- **Every page — Context Bar** (`contextEngineData.ts`): when a programme context is active, the bar shows specific-looking figures such as "13 learners enrolled, Cohort 2 Week 6, 91% pass rate". These are the most precision-looking Illustrative numbers in the system and the most likely to be quoted accidentally.
+- **Operations hub** (`operationalIntelligenceData.ts`): every health score, readiness percentage, trend line, and AI recommendation on the Operations overview is invented.
+- **Curriculum Studio** (`curriculumData.ts`): cohort counts, sprint numbers, module and lesson totals, and completion percentages are prototype. Programme names are real; the statistics behind them are not.
+- **People & Roles Studio** (`peopleRolesData.ts`): persona health scores and participation rates are attributed to named individuals who are not confirmed TT staff. These figures must not be quoted in any context.
+- **Penny Prompt Studio** (`pennyPromptStudioData.ts`): all usage analytics, quality percentages, and review metrics on the admin screen are invented.
+- **Integration Readiness Center** (`integrationReadinessData.ts`): readiness percentages are prototype planning figures, not live measurements. The actual integration health is in `readinessState.ts`.
+- **Governance hub** (`governanceData.ts`): compliance percentages and review cycle statuses are illustrative.
+- **Collaboration hub** (`commData.ts`, `slackIntegrationData.ts`): channel member counts, message frequencies, and workspace statistics are prototype. The Slack bot posts in real channels; these counts are not real.
+- **Google Drive Integration Center** (`googleDriveData.ts`): folder inventories and file counts are prototype. Only the Penny Asset Library tab reads real Drive data.
+
+Two files are **Stale** and should not appear in any demonstration until corrected: `commProviders.ts` shows Slack as not connected, and `commRouting.ts` shows Q3 2025 delivery targets that have passed.
 
 ---
 
