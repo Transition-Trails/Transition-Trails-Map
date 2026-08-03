@@ -6,14 +6,34 @@ export type ConfidenceStatus = 'confirmed' | 'needs-review' | 'draft' | 'depreca
 export interface ProgramTrack {
   id: string;
   name: string;
-  description?: string; // leave empty until confirmed in source materials
+  description?: string;
+  duration?: string;            // delivery duration for this track
+  certificationAnchor?: string; // deliberately left empty until all four are confirmed
 }
 
 /** A membership tier within a programme (e.g. Explorer's Trail access tiers) */
 export interface ProgramMembershipTier {
   id: string;
-  name: string;       // leave empty until tier names confirmed in source materials
+  name: string;
+  pricing?: string;      // price as stated in source materials
+  audience?: string;     // who this tier is for
+  coreBenefit?: string;  // what they are buying
+  churnRisk?: string;    // primary churn risk for this tier
   description?: string;
+}
+
+/** One level of the coaching ladder */
+export interface CoachingLadderLevel {
+  id: string;
+  name: string;
+}
+
+/** Coaching ladder configuration — record as a benefit of the membership, not a separate programme */
+export interface CoachingLadderConfig {
+  levels: CoachingLadderLevel[];
+  source: string;        // who the coaches are drawn from
+  solves: string[];      // the three things it solves simultaneously
+  membershipNote: string; // relationship to the alumni tier
 }
 
 /** Cohort delivery model — squad sizes, alternates, constraints */
@@ -44,7 +64,7 @@ export interface Program {
   prerequisite: string;
   format: string;
   duration: string;
-  pricing: string; // kept for sidebar only, not shown on map cards — blank if unconfirmed
+  pricing: string; // kept for sidebar only, not shown on map cards — blank if unconfirmed or tier-based
   coreOutcome: string;
   executiveSummary: string;
   whyItMatters: string;
@@ -60,12 +80,14 @@ export interface Program {
   docs: string[];
   relatedConcepts: Array<{ label: string; type: string; id: string }>;
   // Sub-structure — populated where the Guide defines programme-internal structure
-  tracks?: ProgramTrack[];             // role tracks (Trail of Mastery)
-  membershipTiers?: ProgramMembershipTier[]; // access tiers (Explorer's Trail)
-  cohortStructure?: CohortStructure;   // squad/cohort delivery model (Guided Trail)
-  coachingLadder?: boolean;            // true if a coaching ladder runs across tiers
-  firstCohort?: FirstCohort;           // first scheduled cohort, year only
-  crossProgramme?: boolean;            // true if the programme runs across all others (First Two Weeks)
+  tracks?: ProgramTrack[];
+  trackCompositionRules?: string[];  // rules governing how tracks may be combined
+  membershipTiers?: ProgramMembershipTier[];
+  coachingLadderConfig?: CoachingLadderConfig;
+  earnedMembership?: string;         // how membership can be earned rather than bought
+  cohortStructure?: CohortStructure;
+  firstCohort?: FirstCohort;         // first scheduled cohort, year only
+  crossProgramme?: boolean;          // true if the programme runs across all others
   // Live Salesforce fields (populated when data comes from pmdm__Program__c)
   status?: string | null;
   startDate?: string | null;
@@ -99,7 +121,7 @@ export const programs: Program[] = [
     entityType: "program",
     name: "Explorer's Trail",
     color: "sky-blue",
-    pricingStatus: "subsidized",
+    pricingStatus: "paid",
     confidence: "confirmed",
     sourceDoc: "Explorer's Trail Blueprint",
     strategicRole: "Entry point — removes access barriers and builds foundational digital literacy",
@@ -107,16 +129,18 @@ export const programs: Program[] = [
     prerequisite: "None",
     format: "Cohort-based, online synchronous",
     duration: "4 weeks",
-    pricing: "$0 — subsidized, grant-funded",
+    pricing: "", // tier-based — see membershipTiers for per-tier pricing
     coreOutcome: "Learners gain foundational digital literacy and career readiness tools",
     executiveSummary: "Explorer's Trail is the no-barrier entry program designed for adults new to digital work environments. It removes cost and prerequisite obstacles so that underserved job seekers can access the Transition Trails ecosystem. Success here feeds the entire program pipeline.",
     whyItMatters: "Without Explorer's Trail, there is no accessible entry point for non-technical learners. The entire cohort pipeline depends on this program functioning as a reliable, high-quality on-ramp.",
     keyFacts: [
-      "No cost to the learner (grant-funded)",
+      "Three membership tiers: Community Pass, Full Membership, Full Membership plus Coaching",
+      "Membership can be earned rather than bought — completing Guided Trail earns membership; Guided Trail plus an apprenticeship earns it for life",
+      "Coaching is what the top tier sells — Penny coaches every tier; a human coach is the upgrade",
+      "Coaching ladder drawn from Guided Trail alumni who stayed: Coach's Assistant, Associate Coach, Advanced TT Coach",
       "No prior tech experience required",
       "Online synchronous — maximizes access",
       "Direct feeder into Foundations Trail",
-      "Three membership tiers with a coaching ladder running through them",
       "Facilitator Guide governs delivery"
     ],
     outcomes: ["Digital literacy", "Resume basics", "LinkedIn optimization", "Introduction to career tools"],
@@ -133,13 +157,48 @@ export const programs: Program[] = [
       { label: "Trail Guide", type: "penny", id: "trail-guide" },
       { label: "Intake Coordination", type: "trailOs", id: "intake" }
     ],
-    // Three membership tiers with a coaching ladder — tier names needed from Master Program Guide
     membershipTiers: [
-      { id: "tier-1", name: "" }, // name not confirmed in source materials
-      { id: "tier-2", name: "" }, // name not confirmed in source materials
-      { id: "tier-3", name: "" }, // name not confirmed in source materials
+      {
+        id: "community-pass",
+        name: "Community Pass",
+        pricing: "$27 monthly",
+        audience: "The curious — people deciding whether Salesforce is for them",
+        coreBenefit: "Permission to start: a low-stakes first win inside two weeks and an honest answer about what the career involves",
+        churnRisk: "Month two, having read a lot and built nothing",
+      },
+      {
+        id: "full-membership",
+        name: "Full Membership",
+        pricing: "$97 monthly or $1,164 annually",
+        audience: "Active learners — studying for a certification, or filling gaps their accidental-admin job created",
+        coreBenefit: "A habit and a next step: something new every month at their level, and a visible route into Foundations or Guided Trail",
+        churnRisk: "A mission that is too easy or too hard twice in a row",
+        description: "This is the tier that converts.",
+      },
+      {
+        id: "full-membership-plus-coaching",
+        name: "Full Membership plus Coaching",
+        pricing: "$1,464 annually",
+        audience: "Working alumni — employed and not needing the monthly missions",
+        coreBenefit: "Belonging and standing",
+        churnRisk: "Having nothing to do",
+      },
     ],
-    coachingLadder: true,
+    coachingLadderConfig: {
+      levels: [
+        { id: "coachs-assistant",   name: "Coach's Assistant" },
+        { id: "associate-coach",    name: "Associate Coach" },
+        { id: "advanced-tt-coach",  name: "Advanced TT Coach" },
+      ],
+      source: "People who have completed Guided Trail and stayed in Explorer's Trail",
+      solves: [
+        "Alumni retention",
+        "Delivery capacity for Guided Trail and the apprenticeships",
+        "Founder independence",
+      ],
+      membershipNote: "The alumni tier's core benefit rather than a career perk — record as a benefit of the membership, not as a separate programme",
+    },
+    earnedMembership: "Completing Guided Trail earns membership. Guided Trail plus an apprenticeship earns it for life. Activation should be automatic from the programme record on completion confirmation.",
   },
   {
     id: "foundations-trail",
@@ -203,6 +262,7 @@ export const programs: Program[] = [
       "Two concurrent squads per cohort — 2, 4, or 6 learners each (always even; buddy testing pairs)",
       "Each squad has 2 alternates",
       "Squad cap: 6 learners",
+      "Completion earns Explorer's Trail membership; completion plus an apprenticeship earns it for life",
       "Sprint cadence governed by Guided Trail Sprint Cadence document",
       "RESOLVE framework applied as a course module",
       "Intern Workbook structures learner engagement",
@@ -223,7 +283,6 @@ export const programs: Program[] = [
       { label: "Quest Master", type: "penny", id: "quest-master" },
       { label: "Project Delivery", type: "trailOs", id: "delivery" }
     ],
-    // Two concurrent squads — always even, capped at 6, plus 2 alternates each
     cohortStructure: {
       model: "Two concurrent squads per cohort",
       squadSize: "2, 4, or 6 — always even (buddy testing pairs learners)",
@@ -246,15 +305,17 @@ export const programs: Program[] = [
     duration: "Needs Review — duration not confirmed in source materials",
     pricing: "", // pricing not confirmed in source materials — do not display
     coreOutcome: "Needs Review — outcomes not confirmed beyond proposal stage",
-    executiveSummary: "Trail of Mastery is currently in proposal stage. It delivers through four role tracks (Admin, Product Owner, Business Analyst, Advanced Admin). Cohort 0 is planned for 2027. Full programme details should be confirmed against the Trail of Mastery Proposal before being treated as authoritative.",
-    whyItMatters: "This program would close the loop on the ecosystem by giving the most advanced learners a path toward becoming practitioners, coaches, or organizational consultants — expanding Transition Trails' alumni-to-contributor pipeline.",
+    executiveSummary: "Trail of Mastery delivers through four role tracks (Admin, Product Owner, Business Analyst, Advanced Admin), each defined by the decision it owns and the evidence type it produces. Cohort 0 is planned for 2027. Solution Consultant and Solution Architect were deliberately removed from the role set. Full programme details should be confirmed against the Trail of Mastery Proposal before being treated as authoritative.",
+    whyItMatters: "This program closes the loop on the ecosystem by giving the most advanced learners a path toward becoming practitioners, coaches, or organizational consultants — expanding Transition Trails' alumni-to-contributor pipeline.",
     keyFacts: [
       "Status: Proposal — not yet active",
       "Four role tracks: Admin, Product Owner, Business Analyst, Advanced Admin",
+      "Each role is defined by the decision it owns",
+      "Composition rule: never two owners of the same decision — two roles owning the same decision means one of them is shadowing",
+      "Solution Consultant and Solution Architect deliberately removed — SC collided with Product Owner and Admin; SA collided with Advanced Admin",
       "Cohort 0 planned for 2027",
-      "Primary source: Trail of Mastery Proposal document",
-      "Intended audience: Guided Trail graduates",
-      "Full details require source document review"
+      "Certification anchors not yet confirmed for all four tracks — do not guess",
+      "Primary source: Trail of Mastery Proposal document"
     ],
     outcomes: ["Needs Review"],
     whatBreaksIfMissing: "Advanced practitioners have no pathway within the ecosystem — they exit after Guided Trail with no continuation option.",
@@ -269,14 +330,42 @@ export const programs: Program[] = [
       { label: "Guided Trail", type: "program", id: "guided-trail" },
       { label: "Coach Intelligence Layer", type: "penny", id: "coach-intelligence" }
     ],
-    // Four role tracks — descriptions not confirmed in source materials
     tracks: [
-      { id: "admin",          name: "Admin Track" },
-      { id: "product-owner",  name: "Product Owner Track" },
-      { id: "business-analyst", name: "Business Analyst Track" },
-      { id: "advanced-admin", name: "Advanced Admin Track" },
+      {
+        id: "admin",
+        name: "Admin Track",
+        description: "Evidence is the build — a working configuration. Eight to ten weeks, because competence can be proved inside one delivery cycle.",
+        duration: "8–10 weeks",
+        // certificationAnchor: not yet confirmed — do not fill
+      },
+      {
+        id: "advanced-admin",
+        name: "Advanced Admin Track",
+        description: "Evidence is the build. Eight to ten weeks.",
+        duration: "8–10 weeks",
+        // certificationAnchor: not yet confirmed — do not fill
+      },
+      {
+        id: "business-analyst",
+        name: "Business Analyst Track",
+        description: "Evidence is judgement. Twelve weeks. The Business Analyst finds out what is true; someone else decides what happens because of it. Pairs with a Product Owner, never sits alone, and never pairs with an Admin as the only other role.",
+        duration: "12 weeks",
+        // certificationAnchor: not yet confirmed — do not fill
+      },
+      {
+        id: "product-owner",
+        name: "Product Owner Track",
+        description: "Evidence is judgement. Twelve weeks, because a Product Owner needs a full cycle plus its consequences: a decision defended, shipped, and then lived with.",
+        duration: "12 weeks",
+        // certificationAnchor: not yet confirmed — do not fill
+      },
     ],
-    // Cohort 0 — year only, no quarter or half
+    trackCompositionRules: [
+      "Never two owners of the same decision — two roles owning the same decision means one of them is shadowing",
+      "Business Analyst pairs with a Product Owner; never sits alone; never pairs with an Admin as the only other role",
+      "Solution Consultant removed — collided with Product Owner on one side and Admin on the other",
+      "Solution Architect removed — collided with Advanced Admin",
+    ],
     firstCohort: { label: "Cohort 0", year: "2027" },
   },
   {
@@ -323,32 +412,38 @@ export const programs: Program[] = [
     entityType: "program",
     name: "First Two Weeks",
     color: "warm-gray",
-    pricingStatus: "subsidized",      // bundled with programme — pricingStatus needs confirmation
+    pricingStatus: "subsidized",
     confidence: "draft",
     sourceDoc: "Master Program Guide",
     strategicRole: "Shared onboarding — runs across all programmes at the start of each cohort",
-    audience: "",                      // all programme learners — specific intake details needed
-    prerequisite: "",                  // not yet confirmed in source materials
-    format: "",                        // not yet confirmed in source materials
+    audience: "All programme learners, across Foundations, Guided Trail and the apprenticeships. Cross-programme by definition.",
+    prerequisite: "None — it is day one",
+    format: "Facilitator-led, running inside weeks one and two of the programme itself. Not asynchronous pre-work and not something a learner completes in a gap while waiting for a cohort to form. An apprentice with a day job will not complete a module in a gap; they will complete it when it is week one and someone is expecting it.",
     duration: "2 weeks",
-    pricing: "",                       // pricing not confirmed — do not display
-    coreOutcome: "",                   // not yet confirmed in source materials
-    executiveSummary: "First Two Weeks is a shared onboarding programme that runs across all Transition Trails programmes. It is described in the Master Program Guide as a cross-programme element. Detailed structure, content, and facilitation approach are not yet confirmed.",
-    whyItMatters: "",                  // not yet confirmed in source materials
+    pricing: "", // bundled into every programme — not separately charged
+    coreOutcome: "The learner holds the shared vocabulary and has opened their Decision Log at entry number one.",
+    executiveSummary: "First Two Weeks is a shared onboarding programme that runs across Foundations, Guided Trail and the apprenticeships. It establishes the shared vocabulary, opens the Decision Log, and introduces RESOLVE — teaching Recognize directly in the week the learner is actually recognising something. It is facilitator-led, running inside weeks one and two of the programme itself, not as pre-work.",
+    whyItMatters: "Parity. Same words, same shape, different content. Without it, every programme becomes its own dialect and the cost lands in three places: a learner who has to relearn vocabulary at every transition, a coach who cannot move between programmes, and a funder who cannot compare one cohort to another.",
     keyFacts: [
-      "Shared onboarding — applies to all programmes, not programme-specific",
-      "Duration: 2 weeks",
-      "Source: Master Program Guide",
-      "Detailed structure, content, and delivery format not yet confirmed"
+      "Bundled into every programme — not separately charged",
+      "Facilitator-led: runs inside weeks one and two, not in a gap before cohort start",
+      "Shared vocabulary intended to be published as Salesforce Knowledge articles — learners and coaches read them through External Apps Login, Penny can ground on them, and a change to a definition is versioned rather than silently diverging across three programme guides",
+      "Decision Log opens at entry number one and keeps counting for years",
+      "Definition of Done means the same thing in week two of Foundations as in week nine of an apprenticeship",
     ],
-    outcomes: [],                      // not yet confirmed in source materials
-    whatBreaksIfMissing: "",           // not yet confirmed in source materials
-    dependencies: "",                  // not yet confirmed — runs across programmes
+    outcomes: [
+      "Shared vocabulary taught in week one",
+      "RESOLVE module split across the two weeks — Recognize taught in the week the learner is actually recognising something",
+      "Decision Log opens at number one and keeps counting for years",
+      "Definition of Done means the same thing in week two of Foundations as in week nine of an apprenticeship",
+    ],
+    whatBreaksIfMissing: "Rework rate stops being comparable across cohorts, which makes the number decoration rather than evidence. And a volunteer coach at four to six hours a week cannot learn a new process for every programme.",
+    dependencies: "None — it is the true day-one start",
     pennyStatus: 'Planned',
     pennyActive: false,
-    pennyFeatures: [],                 // not yet confirmed
-    trailOsCapabilities: [],           // not yet confirmed
-    resolvePhases: [],                 // not yet confirmed
+    pennyFeatures: [], // Penny grounds on the shared vocabulary — no specific feature name confirmed yet
+    trailOsCapabilities: ["Intake Coordination", "Documentation"],
+    resolvePhases: ["Recognize", "Explore", "Select", "Outline", "Launch", "Verify", "Evolve"],
     docs: ["Master Program Guide"],
     relatedConcepts: [],
     crossProgramme: true,
