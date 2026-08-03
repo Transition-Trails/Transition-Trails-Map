@@ -6,6 +6,7 @@ import {
   logInteraction,
   getInteractionHistory,
 } from "../lib/salesforceService.js";
+import { resolveExchangeContact } from "../lib/pennyContactResolver.js";
 import {
   assemblePrompt,
   type AssemblerInput,
@@ -116,6 +117,11 @@ router.post("/penny/ask", async (req, res) => {
   // ── Fetch Salesforce context (layers 2 + 3) ────────────────────────────────
   let sfClient: SalesforceClient | null = null;
   let sfContactId: string | null = null;
+  // Tracks whether sfContactId belongs to a learner (session/override) vs the
+  // staff user's own Contact (resolved by email below).  Controls audience in
+  // the prompt assembler — staff users should get the 'internal' identity even
+  // after their own Contact is resolved.
+  let isLearnerContact = false;
   let learnerCtx: Awaited<ReturnType<typeof getLearnerContext>> | null = null;
   let trailCfg:   Awaited<ReturnType<typeof getTrailConfig>> | null   = null;
   let promptPath: 'salesforce' | 'fallback' = 'fallback';
@@ -128,31 +134,47 @@ router.post("/penny/ask", async (req, res) => {
     sfClient    = getSalesforceClient(req);
     sfContactId = contactIdStr ?? req.session.sfContactId ?? null;
 
-    logger.info(
-      {
-        sfContactId,
-        contactIdOverride:  contactIdStr ?? null,
-        sessionContactId:   req.session.sfContactId ?? null,
-        sessionUserId:      req.session.sfUserId ?? null,
-      },
-      'Penny ask — resolved contact ID'
-    );
-
-    if (!sfContactId) throw new Error("No Salesforce contact ID in session");
-
-    if (contactIdStr) {
-      logger.info({ contactIdOverride: contactIdStr, sfContactId }, 'Admin testing Penny as learner override');
+    if (sfContactId) {
+      // Learner path: a Contact is already known from the session or admin
+      // override — fetch the learner's trail config and coaching context.
+      isLearnerContact = true;
+      if (contactIdStr) {
+        logger.info({ contactIdOverride: contactIdStr, sfContactId }, 'Admin testing Penny as learner override');
+      }
+      learnerCtx = await getLearnerContext(sfClient, sfContactId);
+      trailCfg   = learnerCtx.pennyTrailConfigId
+        ? await getTrailConfig(sfClient, learnerCtx.pennyTrailConfigId)
+        : DEFAULT_TRAIL_CONFIG;
     }
-
-    learnerCtx = await getLearnerContext(sfClient, sfContactId);
-    trailCfg   = learnerCtx.pennyTrailConfigId
-      ? await getTrailConfig(sfClient, learnerCtx.pennyTrailConfigId)
-      : DEFAULT_TRAIL_CONFIG;
+    // Staff path: no learner Contact yet — sfClient is preserved so the
+    // resolver below can look up the staff user's own Contact by email.
     promptPath = 'salesforce';
   } catch (err) {
     logger.warn({ err }, "Salesforce context unavailable — assembling from identity + knowledge only");
     sfClient = null;
   }
+
+  // ── Resolve staff user's own Contact when no learner Contact is in play ────
+  // Matches the authenticated user's Salesforce email to their Contact record
+  // so every exchange — learner or internal staff — can be logged to SF and
+  // the memory window works for staff users too.
+  // resolveExchangeContact handles errors internally and always returns a
+  // string | null — never throws.
+  if (sfClient !== null && sfContactId === null) {
+    sfContactId = await resolveExchangeContact(sfClient, null, req.session.sfEmail ?? null);
+  }
+
+  logger.info(
+    {
+      sfContactId,
+      isLearnerContact,
+      resolvedViaEmail:  !isLearnerContact && sfContactId !== null,
+      contactIdOverride: contactIdStr ?? null,
+      sessionContactId:  req.session.sfContactId ?? null,
+      sessionUserId:     req.session.sfUserId ?? null,
+    },
+    'Penny ask — resolved contact ID'
+  );
 
   // ── Fetch layer 7: recent interaction history (memory window) ──────────────
   // Runs after the main SF block so a history failure never degrades layers 2–3.
@@ -176,7 +198,7 @@ router.post("/penny/ask", async (req, res) => {
   // The Gemini call receives only the finished string; it has no knowledge of
   // how the prompt was built.  Layers with no data contribute nothing.
   const assemblerInput: AssemblerInput = {
-    audience:        sfContactId ? 'learner' : 'internal',
+    audience:        isLearnerContact ? 'learner' : 'internal',
     role:            roleStr,
     trailConfig:     trailCfg,
     learnerContext:  learnerCtx,
@@ -244,7 +266,7 @@ router.post("/penny/ask", async (req, res) => {
     db.insert(pennyLogsTable).values({
       sessionId:     req.sessionID ?? null,
       userTier:      typeof role === 'string' ? role : null,
-      userEmail:     null,
+      userEmail:     req.session.sfEmail ?? null,
       userMessage:   query.trim(),
       pennyResponse: text,
       promptMode:    "ask",
