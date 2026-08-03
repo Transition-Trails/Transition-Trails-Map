@@ -226,7 +226,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
   },
   operations: {
     everydayInsights: [
-      'All 5 programs are currently running as planned',
+      '5 of 6 programs currently running as planned',
       'Next major milestone: Guided Trail Sprint 3 on Thursday',
     ],
     powerInsights: [

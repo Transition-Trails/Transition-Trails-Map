@@ -85,7 +85,7 @@ const PULSE: Record<string, Array<{ title: string; rows: string[] }>> = {
   executive: [
     {
       title: 'Portfolio Health',
-      rows: ['3 of 5 programs active', '3 cohorts running', '24 learners · 15 clients', '1 program in discovery'],
+      rows: ['3 of 6 programs active', '3 cohorts running', '24 learners · 15 clients', '2 programs in draft'],
     },
     {
       title: 'Demand Signals',
@@ -139,11 +139,11 @@ const PULSE: Record<string, Array<{ title: string; rows: string[] }>> = {
   architect: [
     {
       title: 'Trail OS Capabilities',
-      rows: ['8 capabilities used', '5 programs mapped', 'Intake · Delivery · Coach Vis', 'Outcomes · Org Readiness'],
+      rows: ['8 capabilities used', '6 programs mapped', 'Intake · Delivery · Coach Vis', 'Outcomes · Org Readiness'],
     },
     {
       title: `${TERMS.aiAssistant} Capabilities`,
-      rows: ['5 capabilities active', 'Trail Guide: all 5 programs', 'Quest Master: Guided only', 'Coach Intelligence: future'],
+      rows: ['5 capabilities active', 'Trail Guide: all 6 programs', 'Quest Master: Guided only', 'Coach Intelligence: future'],
     },
     {
       title: 'Integrations',

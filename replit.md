@@ -1,6 +1,6 @@
 # Trail OS Operating Platform — Transition Trails
 
-A unified internal operating dashboard for Transition Trails Academy. Consolidates Navigator, Operations Center, Demand Management, Penny Command Center, Knowledge Library, Collaboration, and Administration into a single shell with live integrations.
+A unified internal operating platform for Transition Trails. Consolidates Operations, Programs, Penny Command Center, Knowledge, Collaboration, and Administration into a single shell with live integrations.
 
 ## Run & Operate
 
@@ -68,20 +68,16 @@ artifacts/program-map/src/
 
 ## Navigation structure
 
-| Sidebar Group        | Key Routes                                                                 |
-|----------------------|----------------------------------------------------------------------------|
-| Navigator            | /navigator/program-map, /trail-os-overview                                |
-|                      | (legacy /resolve → /operations/demand, /roles → /digital-twin,            |
-|                      |  /trail-os-map → /trail-os-overview — all are redirects)                  |
-| Operations Center    | /operations, /operations/health, /operations/demand, /operations/scorecards|
-| Demand Management    | /operations/demand (all /demand/* paths redirect here)                    |
-| Penny Command Center | /penny, /penny/capabilities, /penny/prompts, /penny/learners, /penny/test |
-| Knowledge Library    | /knowledge, /knowledge/sources, /knowledge/library, /knowledge/memory     |
-| Collaboration        | /collaboration, /collaboration/gmail, /collaboration/calendar-live,        |
-|                      | /collaboration/slack, /collaboration/channels, /collaboration/templates   |
-| Administration       | /admin/integrations (hub), /admin/integrations/google-auth,               |
-|                      | /admin/integrations/secrets, /admin/people-access,                        |
-|                      | /admin/phase1-readiness, /admin/phase1-audit, /admin/phase2-backlog       |
+> Full sidebar specification: [§ 7 of TRAIL_OS_SPEC.md](TRAIL_OS_SPEC.md#7-navigation-architecture). The table below is a quick-reference summary.
+
+| Sidebar group | Base path | Key routes |
+|---|---|---|
+| Operations | `/operations` | `/operations/health` · `/operations/demand` |
+| Programs | `/program` | `/program` · `/program/courses` · `/program/blueprint` · `/program/standards` |
+| Penny | `/penny` | `/penny` · `/penny/capabilities` · `/penny/prompts` · `/penny/learners` · `/penny/trail-quests` |
+| Knowledge | `/knowledge` | `/knowledge` · `/knowledge/sources` · `/knowledge/library` |
+| Collaboration | `/collaboration` | `/collaboration/my-signals` · `/collaboration/calendar-live` · `/collaboration/gmail` · `/collaboration/slack` · `/collaboration/channels` · `/collaboration/templates` |
+| Administration | `/admin` | `/admin/integrations` · `/admin/people-access` · `/digital-twin` |
 
 ## Architecture decisions
 
@@ -98,7 +94,7 @@ artifacts/program-map/src/
 
 ## Product
 
-Internal operating platform for the Transition Trails Academy team. Phase 1 complete — shell architecture, live integrations (Salesforce, Gmail, Calendar, Slack, Agentforce, Penny/Gemini, Google Auth), and role-gated access are all production-ready. Phase 2 targets live data wiring to dashboards, signal automation, Org Memory, Drive folder sync, and Agentforce context handoff. Phase 3 targets net-new integrations: Google Chat, Mural, GA4, and mobile.
+Internal operating platform for the Transition Trails team. Phase 1 complete — shell architecture, live integrations (Salesforce, Gmail, Calendar, Slack, Agentforce, Penny/Gemini, Google Auth), and role-gated access are all production-ready. Phase 2 targets live data wiring to dashboards, signal automation, Org Memory, Drive folder sync, and Agentforce context handoff. Phase 3 targets net-new integrations: Google Chat, Mural, GA4, and mobile.
 
 ## User preferences
 

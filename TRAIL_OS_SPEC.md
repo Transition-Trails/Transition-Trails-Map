@@ -156,19 +156,19 @@ Phase 1 was defined as: build the complete navigational shell, populate all sect
 
 | Category | Count | Status |
 |---|---|---|
-| Pages / routes | 50+ | ✅ All built |
-| Sidebar groups | 7 + global | ✅ Complete |
-| Hub sections with Overview landing | 5 | ✅ Programs, Knowledge, Collaboration, Digital Twin, Operations |
-| UX violations (font-serif) | 6 found → 0 remaining | ✅ Fixed |
-| Salesforce REST API | Live | ✅ 127 Accounts · 129 Contacts · PMM + NPSP |
-| Slack bot | Live POC | ✅ @coachconnectbot posting confirmed |
-| Penny / Gemini AI | Live | ✅ Gemini 2.5 Flash · POST /api/penny/ask · billing active |
-| Gmail integration | Live | ✅ gmail.readonly + gmail.send · real inbox |
-| Google Calendar | Live | ✅ Real events via /api/calendar/events |
-| Agentforce | Live POC | ✅ Sessions API · dual-AI coaching on Assessment page |
-| Clerk v6 + Google Sign-In | Live | ✅ Google OAuth · Google Groups auto-tier |
-| Automated test suite | 105 | ✅ Live — 7 files across api-server + program-map |
-| Metadata-driven readiness cases | 70 | ✅ |
+| Pages / routes | 50+ | Complete — all built |
+| Sidebar groups | 6 + global | Complete |
+| Hub sections with Overview landing | 5 | Complete — Programs, Knowledge, Collaboration, Digital Twin, Operations |
+| UX violations (font-serif) | 6 found → 0 remaining | Fixed |
+| Salesforce REST API | Live | Complete — 127 Accounts · 129 Contacts · PMM + NPSP |
+| Slack bot | Live | Complete — @penny bot · posting confirmed |
+| Penny / Gemini AI | Live | Complete — Gemini 2.5 Flash · POST /api/penny/ask · billing active |
+| Gmail integration | Live | Complete — gmail.readonly + gmail.send · real inbox |
+| Google Calendar | Live | Complete — Real events via /api/calendar/events |
+| Agentforce | Live (POC) | Complete — Sessions API · dual-AI coaching on Assessment page |
+| Clerk v6 + Google Sign-In | Live | Complete — Google OAuth · Google Groups auto-tier |
+| Automated test suite | 105 | Complete — 7 files across api-server + program-map |
+| Metadata-driven readiness cases | 70 | Complete |
 | Hardcoded content items | ~28 | Classified (12 OK, 11 Phase 2, 5 stale) |
 
 ### Phase 1 canonical audit
@@ -337,15 +337,18 @@ Each section of Trail OS has a canonical owner. Content and tooling that belongs
 
 ### Sidebar groups
 
+> Source of truth: `artifacts/program-map/src/components/layout/Sidebar.tsx` (`navGroups` array). Update this table whenever `navGroups` changes.
+
 | Group | Base path | Min tier | Items |
 |---|---|---|---|
-| Digital Twin | `/digital-twin` | power | Explore, Governance |
-| Operations | `/operations` | admin | Executive Overview, Health Indicators, Scorecards, Trends & Insights, Demand |
-| Programs | `/program` | admin | Overview, Programs, Standards, Blueprint |
-| Penny | `/penny` | admin | Capabilities, Prompt Studio, Learners, Intelligence, Test Penny |
-| Knowledge | `/knowledge` | admin | Overview, Sources, Library, Relationships, Org Memory |
-| Collaboration | `/collaboration` | admin | Overview, Slack, Google Drive, Google Calendar, Channels, Templates |
-| Administration | `/admin` | admin | Knowledge Management, People & Access, Setup, Integration Readiness, Phase 1 Readiness, UX Standards, Phase 2 Backlog, Phase 1 Audit |
+| Operations | `/operations` | — | Health Indicators (Admin+) · Demand (Admin+) |
+| Programs | `/program` | — | Overview (Admin+) · Courses & Modules (Power+) · Blueprint (Admin+) · Standards Studio (Power+) |
+| Penny | `/penny` | — | Overview · Learners · Session Log · Trail Quests · Trail Configs · Prompt Studio · Capabilities · Video Production · Penny Sandbox · Penny Logs — all Admin+ |
+| Knowledge | `/knowledge` | — | Overview · Sources · Library — all Admin+ |
+| Collaboration | `/collaboration` | — | My Trail Signals (Power+) · Calendar (Power+) · Gmail (Power+) · Slack (Admin+) · Channels (Admin+) · Templates (Admin+) |
+| Administration | `/admin` | Admin | Integrations · People & Access · Digital Twin — all Admin+. Also highlights for `/digital-twin`, `/uom`, `/governance` paths. |
+
+Groups without a `minTier` are visible at all tiers; their items are individually gated. The Administration group is hidden below Admin tier. Home (`/`) and Search (`/search`) are top-of-sidebar buttons rendered outside the group system.
 
 ### Global nav items (always visible)
 
@@ -656,6 +659,8 @@ The Integration Readiness dashboard at `/admin/integration-readiness` renders th
 
 ## 12. Salesforce / Slack / Google / Gemini Status
 
+> Authoritative status and last-verified dates: `src/data/readinessState.ts`. This section documents implementation detail and configuration notes. For integration health, update `readinessState.ts` first.
+
 ### Salesforce
 
 - **Status**: Live  
@@ -679,7 +684,7 @@ The Integration Readiness dashboard at `/admin/integration-readiness` renders th
 - **OAuth flow**: 5-endpoint route at `/api/google/oauth/*` — initiate, callback, token exchange, refresh, revoke. Wizard at `/admin/integrations/google-auth` (old `/admin/google-oauth` redirects there).  
 - **Gmail**: **Live** — `gmail.readonly` + `gmail.send` scopes active. Real inbox accessible. `GOOGLE_GMAIL_REFRESH_TOKEN` configured. Penny can draft and send email from the Collaboration → Gmail panel.  
 - **Google Calendar**: **Live** — real events via `GET /api/calendar/events`. Penny prep briefs generated per event.  
-- **Google Drive**: Planned (Phase 2) — OAuth refresh token active but Drive API not yet wired to knowledge sources.  
+- **Google Drive**: **Live** — Penny Asset Library reads real Drive files from a Shared Drive via `GET /api/drive/penny-assets`. `GOOGLE_DRIVE_REFRESH_TOKEN` and `GOOGLE_DRIVE_PENNY_FOLDER_ID` configured. Phase 2: program workspace sync and rule configuration in Collaboration Overview.  
 - **Google Groups / DWD**: In progress — requires `GOOGLE_ADMIN_CREDENTIALS` (service account JSON) + `GOOGLE_ADMIN_IMPERSONATE_EMAIL`. DWD must be enabled on the service account in GCP and authorized in Workspace Admin with matching Client ID. Uses `groups/{groupEmail}/members` (member.readonly scope).  
 - **Blocker**: #1 issue is Google OAuth app in "Testing" mode — all test users must be explicitly added in Google Cloud Console.  
 - **Note**: `req.params` needs `as string` cast in Express 5 types.
@@ -911,14 +916,13 @@ The Penny-POC repository (separate repo at `github.com/Transition-Trails/Penny-P
 
 ## 17. Non-Goals and Deferred Features
 
-The following are explicitly out of scope for Trail OS Phase 1 and are not on the Phase 2 backlog unless noted:
+The following are explicitly not in scope, or are deferred to a later phase. Items that shipped in Phase 1 have been removed — see the Phase 1 completion summary (§ 4).
 
-| Feature | Reason deferred |
+| Feature | Position |
 |---|---|
-| Live user authentication (login/logout) | Phase 2 — will use Salesforce SSO or Replit Auth |
 | Multi-tenant or multi-org support | Not applicable — single org (Transition Trails) |
 | LMS integration (lesson delivery, progress tracking) | Phase 2+ — requires LMS selection decision |
-| Public-facing learner portal | Different product — not part of Trail OS internal platform |
+| Coach and Learner views | Planned inside Trail OS, gated by Google Groups membership — not yet designed. Will not be a separate product. |
 | Mobile app | Trail OS is desktop-first; mobile is accessible but not optimised |
 | Real-time collaborative editing | Not planned — async patterns suffice |
 | Custom report builder | Deferred — Phase 2 data queries will enable standard reports |
@@ -926,8 +930,8 @@ The following are explicitly out of scope for Trail OS Phase 1 and are not on th
 | Financial / billing management | Not in scope — handled by Salesforce |
 | Video/content hosting | Not in scope — Google Drive and LMS handle content |
 | Org Memory live records | Phase 2 — architecture defined, build deferred |
-| Automated testing | ✅ Live — 105 tests across 7 files (api-server + program-map); `p2-vitest-automation` backlog card completed in Phase 1 |
-| Agentforce integration | Phase 2 — `p2-agentforce` backlog card |
+
+Items originally in this list that shipped in Phase 1: live user authentication (Clerk v6 + Google Sign-In), Agentforce integration (live POC), and automated testing (105 tests, 7 files).
 
 ---
 

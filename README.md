@@ -51,7 +51,7 @@ pnpm --filter @workspace/api-server run dev
 pnpm run typecheck
 ```
 
-> ⚠️ **Never run `pnpm dev` at the workspace root.** Use the `--filter` flag or the Replit workflow. See [CONTRIBUTING.md](CONTRIBUTING.md) for full development workflow.
+> **Never run `pnpm dev` at the workspace root.** Use the `--filter` flag or the Replit workflow. See [CONTRIBUTING.md](CONTRIBUTING.md) for full development workflow.
 
 ---
 
@@ -86,15 +86,16 @@ See [TRAIL_OS_SPEC.md](TRAIL_OS_SPEC.md) for the complete technical specificatio
 
 ## Navigation at a Glance
 
-| Section | Base path | Purpose |
+| Sidebar group | Base path | Purpose |
 |---|---|---|
-| Digital Twin | `/digital-twin` | Explore object relationships and governance |
 | Operations | `/operations` | Program health, scorecards, demand |
 | Programs | `/program` | Program management, curriculum, standards, blueprints |
 | Penny | `/penny` | AI capability governance and testing |
 | Knowledge | `/knowledge` | Source governance, library, relationships |
-| Collaboration | `/collaboration` | Slack, Drive, Calendar, communications |
-| Administration | `/admin` | Setup, integrations, readiness, audit tooling |
+| Collaboration | `/collaboration` | Trail Signals, Gmail, Calendar, Slack, channels, templates |
+| Administration | `/admin` | Integrations, people and access, Digital Twin |
+
+> Navigation is documented once in the specification. See [Navigation Architecture (§ 7)](TRAIL_OS_SPEC.md#7-navigation-architecture) for the full sidebar definition, tier gates, and legacy redirect map.
 
 ---
 
@@ -111,16 +112,18 @@ See [TRAIL_OS_SPEC.md](TRAIL_OS_SPEC.md) for the complete technical specificatio
 
 ## Integration Status
 
+> Authoritative status and last-verified dates: `src/data/readinessState.ts`. The table below reflects that file.
+
 | System | Status | Notes |
 |---|---|---|
-| Salesforce | ✅ Live | REST API — PMM + NPSP · 127 Accounts · 129 Contacts |
-| Slack | ✅ Live POC | @coachconnectbot — post + validate confirmed |
-| Google OAuth + Groups | ✅ Live | Clerk v6 · Google Sign-In · 3 Groups auto-tier · wizard at `/admin/integrations/google-auth` |
-| Gmail | ✅ Live | `gmail.readonly` + `gmail.send` · real inbox · Penny draft + send |
-| Google Calendar | ✅ Live | Real events via `/api/calendar/events` · Penny prep briefs per event |
-| Google Drive | ⏳ Phase 2 | OAuth token active · Drive API wiring to knowledge sources is Phase 2 |
-| Gemini / Penny AI | ✅ Live | Gemini 2.5 Flash · `POST /api/penny/ask` · billing active · 22-chunk RAG corpus |
-| Agentforce | ✅ Live POC | Dual-AI coaching on Assessments page · Sessions API confirmed |
+| Salesforce | Live | REST API — PMM + NPSP · 127 Accounts · 129 Contacts |
+| Slack | Live | @penny bot — posting to #penny-ai and #admin channels confirmed |
+| Google OAuth + Groups | Live | Clerk v6 · Google Sign-In · 3 Groups auto-tier · wizard at `/admin/integrations/google-auth` |
+| Gmail | Live | `gmail.readonly` + `gmail.send` · real inbox · Penny draft + send |
+| Google Calendar | Live | Real events via `/api/calendar/events` · Penny prep briefs per event |
+| Google Drive | Live | Penny Asset Library reads real Drive files · program workspace sync is Phase 2 |
+| Gemini / Penny AI | Live | Gemini 2.5 Flash · `POST /api/penny/ask` · billing active · 22-chunk RAG corpus |
+| Agentforce | Live (POC) | Dual-AI coaching on Assessments page · Salesforce Sessions API confirmed |
 
 ---
 
