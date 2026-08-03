@@ -115,7 +115,7 @@ function isGroupActive(group: NavGroup, location: string): boolean {
 }
 
 function calcMaxHeight(items: NavItem[]): number {
-  return items.reduce((sum, item) => sum + (item.isLabel ? 28 : 36), 0);
+  return items.reduce((sum, item) => sum + (item.isLabel ? 36 : 40), 0);
 }
 
 export function Sidebar() {
@@ -155,7 +155,7 @@ export function Sidebar() {
   const isSearch = location === '/search';
 
   const topBtnCls = (active: boolean) =>
-    `w-full flex items-center justify-center xl:justify-start gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
+    `w-full flex items-center justify-center xl:justify-start gap-2.5 px-2.5 py-2 rounded-md text-[14px] font-semibold transition-colors text-left ${
       active
         ? 'bg-primary text-primary-foreground'
         : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -219,7 +219,7 @@ export function Sidebar() {
                     if (!isGroupActive(group, location)) setLocation(group.pathPrefix);
                     toggleGroup(group.id);
                   }}
-                  className={`w-full flex items-center justify-center xl:justify-start gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors text-left ${
+                  className={`w-full flex items-center justify-center xl:justify-start gap-2.5 px-2.5 py-2 rounded-md text-[14px] font-semibold transition-colors text-left ${
                     groupActive
                       ? 'text-primary'
                       : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -240,7 +240,7 @@ export function Sidebar() {
                       if (item.isLabel) {
                         return (
                           <div key={`label-${idx}`} className="px-3 pt-2.5 pb-0.5">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">{item.label}</p>
+                            <p className="text-[14px] font-semibold text-muted-foreground/40">{item.label}</p>
                           </div>
                         );
                       }
@@ -250,7 +250,7 @@ export function Sidebar() {
                         <button
                           key={item.id}
                           onClick={() => nav(item.path)}
-                          className={`w-full text-left pl-3 pr-2 py-1.5 text-[12px] rounded-r-md transition-colors ${
+                          className={`w-full text-left pl-3 pr-2 py-1.5 text-[14px] rounded-r-md transition-colors ${
                             isActive
                               ? 'bg-primary text-primary-foreground font-medium'
                               : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -269,7 +269,7 @@ export function Sidebar() {
 
         {/* Footer */}
         <div className="px-1 xl:px-3 py-2 border-t border-sidebar-border flex-shrink-0">
-          <p className="hidden xl:block text-[9px] text-muted-foreground/40">Trail OS v1.0 · Internal</p>
+          <p className="hidden xl:block text-[14px] text-muted-foreground/40">Trail OS v1.0 · Internal</p>
           <div className="xl:hidden flex justify-center py-0.5">
             <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
           </div>

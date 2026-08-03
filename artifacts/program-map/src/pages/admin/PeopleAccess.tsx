@@ -158,18 +158,18 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 
 function CellValue({ value, inverted }: { value: string; inverted?: boolean }) {
   if (value.startsWith('✓')) {
-    return <span className={`text-[11px] font-medium ${inverted ? 'text-[#9FC3AE]' : 'text-[#2F6B3F]'}`}>{value}</span>;
+    return <span className={`text-[14px] font-medium ${inverted ? 'text-[#9FC3AE]' : 'text-[#2F6B3F]'}`}>{value}</span>;
   }
   if (value.startsWith('—')) {
-    return <span className={`text-[11px] ${inverted ? 'text-muted-foreground/40' : 'text-muted-foreground/40'}`}>{value}</span>;
+    return <span className={`text-[14px] ${inverted ? 'text-muted-foreground/40' : 'text-muted-foreground/40'}`}>{value}</span>;
   }
-  return <span className={`text-[11px] ${inverted ? 'text-muted-foreground/60' : 'text-muted-foreground'}`}>{value}</span>;
+  return <span className={`text-[14px] ${inverted ? 'text-muted-foreground/60' : 'text-muted-foreground'}`}>{value}</span>;
 }
 
 function NavCell({ value }: { value: string }) {
   if (value.startsWith('✓')) {
     return (
-      <span className="flex items-start gap-1 text-[11px] text-foreground">
+      <span className="flex items-start gap-1 text-[14px] text-foreground">
         <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
         <span>{value.replace('✓ ', '')}</span>
       </span>
@@ -177,14 +177,14 @@ function NavCell({ value }: { value: string }) {
   }
   if (value.startsWith('—')) {
     return (
-      <span className="flex items-center gap-1 text-[11px] text-muted-foreground/60">
+      <span className="flex items-center gap-1 text-[14px] text-muted-foreground/60">
         <XCircle className="w-3 h-3 flex-shrink-0" />
         <span>{value.replace('— ', '')}</span>
       </span>
     );
   }
   return (
-    <span className="flex items-start gap-1 text-[11px] text-muted-foreground">
+    <span className="flex items-start gap-1 text-[14px] text-muted-foreground">
       <MinusCircle className="w-3 h-3 text-[#CC8400] mt-0.5 flex-shrink-0" />
       <span>{value}</span>
     </span>
@@ -265,17 +265,17 @@ function PermissionMatrixTab() {
               { label: `${hc.needsAttn} needs attention`, dot: 'bg-[#CC8400]',  cls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' },
               { label: `${hc.incomplete} incomplete`,    dot: 'bg-[#FBEAE6]0',   cls: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' },
             ].map(b => (
-              <div key={b.label} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${b.cls}`}>
+              <div key={b.label} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[14px] font-semibold ${b.cls}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${b.dot}`} />{b.label}
               </div>
             ))}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-[14px] text-muted-foreground">
               {shown === total ? `${total} roles` : `${shown} of ${total} roles`}
             </span>
             {hasFilters && (
-              <button onClick={clearFilters} className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground">
+              <button onClick={clearFilters} className="flex items-center gap-1 text-[14px] text-muted-foreground hover:text-foreground">
                 <X className="w-3 h-3" /> Clear all
               </button>
             )}
@@ -292,18 +292,18 @@ function PermissionMatrixTab() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search personas…"
-              className="pl-7 pr-3 py-1.5 text-[12px] rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground/50 outline-none focus:border-ring w-44"
+              className="pl-7 pr-3 py-1.5 text-[14px] rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground/50 outline-none focus:border-ring w-44"
             />
           </div>
 
           {/* Tier pills */}
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/50 mr-1">Tier</span>
+            <span className="text-[14px] font-bold text-muted-foreground/50 mr-1">Tier</span>
             {TIER_FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.key}
                 onClick={() => setFilterTier(opt.key)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-semibold transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[14px] font-semibold transition-all ${
                   filterTier === opt.key
                     ? 'bg-foreground border-foreground text-background'
                     : 'bg-card border-border text-muted-foreground hover:border-ring/50'
@@ -316,11 +316,11 @@ function PermissionMatrixTab() {
 
           {/* Type */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/50">Type</span>
+            <span className="text-[14px] font-bold text-muted-foreground/50">Type</span>
             <select
               value={filterType}
               onChange={e => setFilterType(e.target.value as FilterType)}
-              className="text-[12px] rounded-lg border border-border bg-background text-foreground px-2 py-1.5 outline-none focus:border-ring"
+              className="text-[14px] rounded-lg border border-border bg-background text-foreground px-2 py-1.5 outline-none focus:border-ring"
             >
               {TYPE_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
             </select>
@@ -328,12 +328,12 @@ function PermissionMatrixTab() {
 
           {/* Health pills */}
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/50 mr-1">Health</span>
+            <span className="text-[14px] font-bold text-muted-foreground/50 mr-1">Health</span>
             {HEALTH_FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.key}
                 onClick={() => setFilterHealth(opt.key)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-semibold transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[14px] font-semibold transition-all ${
                   filterHealth === opt.key
                     ? 'bg-foreground border-foreground text-background'
                     : 'bg-card border-border text-muted-foreground hover:border-ring/50'
@@ -352,7 +352,7 @@ function PermissionMatrixTab() {
 
         {/* Table */}
         <div className="flex-1 overflow-auto">
-          <table className="w-full border-collapse text-[12px]">
+          <table className="w-full border-collapse text-[14px]">
             <thead className="bg-card border-b border-border sticky top-0 z-10">
               <tr>
                 {(
@@ -366,23 +366,23 @@ function PermissionMatrixTab() {
                   <th
                     key={col.key}
                     onClick={() => handleSort(col.key)}
-                    className={`text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 cursor-pointer select-none hover:bg-muted/40 ${col.w}`}
+                    className={`text-left px-4 py-3 text-[14px] font-bold text-muted-foreground/70 cursor-pointer select-none hover:bg-muted/40 ${col.w}`}
                   >
                     {col.label}<SortIcon active={sortKey === col.key} dir={sortDir} />
                   </th>
                 ))}
                 {NAV_COLS.map(col => (
-                  <th key={col.key as string} className="text-left px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                  <th key={col.key as string} className="text-left px-3 py-3 text-[14px] font-bold text-muted-foreground/70">
                     {col.label}
                   </th>
                 ))}
-                <th className="text-left px-3 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Penny depth</th>
+                <th className="text-left px-3 py-3 text-[14px] font-bold text-muted-foreground/70">Penny depth</th>
               </tr>
             </thead>
             <tbody>
               {processedRows.length === 0 && (
                 <tr>
-                  <td colSpan={12} className="px-8 py-12 text-center text-[13px] text-muted-foreground">
+                  <td colSpan={12} className="px-8 py-12 text-center text-[14px] text-muted-foreground">
                     No roles match the current filters.{' '}
                     <button onClick={clearFilters} className="underline hover:text-foreground">Clear filters</button>
                   </td>
@@ -411,13 +411,13 @@ function PermissionMatrixTab() {
                     </td>
                     {/* Type */}
                     <td className="px-4 py-2.5">
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${isActive ? 'bg-background/20 border-background/30 text-background' : row.typeCls}`}>
+                      <span className={`text-[14px] font-semibold px-1.5 py-0.5 rounded border ${isActive ? 'bg-background/20 border-background/30 text-background' : row.typeCls}`}>
                         {row.type}
                       </span>
                     </td>
                     {/* Tier */}
                     <td className="px-4 py-2.5">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${isActive ? 'bg-background/20 border-background/30 text-background' : row.tierBadge}`}>
+                      <span className={`text-[14px] font-semibold px-2 py-0.5 rounded-full border ${isActive ? 'bg-background/20 border-background/30 text-background' : row.tierBadge}`}>
                         {row.tierLabel}
                       </span>
                     </td>
@@ -433,7 +433,7 @@ function PermissionMatrixTab() {
                     ))}
                     {/* Penny */}
                     <td className="px-3 py-2.5">
-                      <span className={`text-[11px] ${isActive ? 'text-[#7FAFC6]' : 'text-[#2F6F7E]'}`}>
+                      <span className={`text-[14px] ${isActive ? 'text-[#7FAFC6]' : 'text-[#2F6F7E]'}`}>
                         {row.pennyDepth.split(' — ')[0]}
                       </span>
                     </td>
@@ -451,12 +451,12 @@ function PermissionMatrixTab() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <h2 className="text-[14px] font-bold text-foreground">{activeRow.persona}</h2>
-                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${activeRow.typeCls}`}>{activeRow.type}</span>
+                  <span className={`text-[14px] font-semibold px-1.5 py-0.5 rounded border ${activeRow.typeCls}`}>{activeRow.type}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${activeRow.tierBadge}`}>{activeRow.tierLabel}</span>
+                  <span className={`text-[14px] font-bold px-2 py-0.5 rounded-full border ${activeRow.tierBadge}`}>{activeRow.tierLabel}</span>
                   <span className={`w-2 h-2 rounded-full ${HEALTH_DOT[activeRow.health]}`} />
-                  <span className="text-[10px] text-muted-foreground">{activeRow.health.replace('-', ' ')}</span>
+                  <span className="text-[14px] text-muted-foreground">{activeRow.health.replace('-', ' ')}</span>
                 </div>
               </div>
               <button onClick={() => setSelectedRow(null)} className="text-muted-foreground hover:text-foreground shrink-0 ml-2">
@@ -476,26 +476,26 @@ function PermissionMatrixTab() {
                   <div className={`rounded-lg border p-3 space-y-3 ${borderCls}`}>
                     {/* Issues */}
                     <div>
-                      <p className={`text-[10px] font-bold uppercase tracking-wide mb-1.5 ${labelCls}`}>
+                      <p className={`text-[14px] font-bold mb-1.5 ${labelCls}`}>
                         {isIncomplete ? 'Incomplete — issues' : 'Needs attention — issues'}
                       </p>
                       <ul className="space-y-1">
                         {detail.healthIssues.map(issue => (
                           <li key={issue} className="flex items-start gap-1.5">
                             <span className={`w-1.5 h-1.5 rounded-full mt-1 shrink-0 ${dotCls}`} />
-                            <span className="text-[11px] text-foreground leading-snug">{issue}</span>
+                            <span className="text-[14px] text-foreground leading-snug">{issue}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                     {/* Next steps */}
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 mb-1.5">How to resolve</p>
+                      <p className="text-[14px] font-bold text-muted-foreground/60 mb-1.5">How to resolve</p>
                       <ol className="space-y-1 list-none">
                         {detail.nextSteps.map((step, i) => (
                           <li key={step} className="flex items-start gap-2">
-                            <span className="text-[10px] font-bold text-muted-foreground/50 mt-0.5 w-3 shrink-0">{i + 1}.</span>
-                            <span className="text-[11px] text-foreground leading-snug">{step}</span>
+                            <span className="text-[14px] font-bold text-muted-foreground/50 mt-0.5 w-3 shrink-0">{i + 1}.</span>
+                            <span className="text-[14px] text-foreground leading-snug">{step}</span>
                           </li>
                         ))}
                       </ol>
@@ -506,28 +506,28 @@ function PermissionMatrixTab() {
 
               {/* Auth */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/50 mb-1.5">Auth method</p>
-                <p className="text-[11px] font-mono text-muted-foreground bg-muted/50 rounded px-2.5 py-2 leading-snug">{activeRow.authMethod}</p>
+                <p className="text-[14px] font-bold text-muted-foreground/50 mb-1.5">Auth method</p>
+                <p className="text-[14px] font-mono text-muted-foreground bg-muted/50 rounded px-2.5 py-2 leading-snug">{activeRow.authMethod}</p>
               </div>
               {/* Penny */}
               <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-[#2F6F7E] mb-1">Penny depth</p>
-                <p className="text-[12px] text-[#2F6F7E] leading-snug">{activeRow.pennyDepth}</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E] mb-1">Penny depth</p>
+                <p className="text-[14px] text-[#2F6F7E] leading-snug">{activeRow.pennyDepth}</p>
               </div>
               {/* SF */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/50 mb-1.5">Salesforce access</p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">{activeRow.sfAccess}</p>
+                <p className="text-[14px] font-bold text-muted-foreground/50 mb-1.5">Salesforce access</p>
+                <p className="text-[14px] text-muted-foreground leading-relaxed">{activeRow.sfAccess}</p>
               </div>
               {/* Nav breakdown */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/50 mb-2">Navigation access</p>
+                <p className="text-[14px] font-bold text-muted-foreground/50 mb-2">Navigation access</p>
                 <div className="space-y-1.5">
                   {NAV_COLS.map(col => {
                     const val = activeRow[col.key] as string;
                     return (
                       <div key={col.key as string} className="flex items-center gap-2">
-                        <span className="text-[11px] font-semibold text-muted-foreground/60 w-24 shrink-0">{col.label}</span>
+                        <span className="text-[14px] font-semibold text-muted-foreground/60 w-28 shrink-0">{col.label}</span>
                         <NavCell value={val} />
                       </div>
                     );
@@ -566,7 +566,7 @@ function AccessTiersTab({
         {/* Auth live notice */}
         <div className="flex items-center gap-3 p-3 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
           <CheckCircle2 className="w-4 h-4 text-[#2F6B3F] flex-shrink-0" />
-          <p className="text-[12px] text-[#245531] leading-snug">
+          <p className="text-[14px] text-[#245531] leading-snug">
             <strong>Authentication is live</strong> — Google Sign-In via Clerk is active. Tier is
             auto-assigned from Google Group membership on sign-in. Use "Preview this tier" below
             to simulate a different access level in the current session.
@@ -575,7 +575,7 @@ function AccessTiersTab({
 
         {/* Tier cards */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Access Tiers</p>
+          <p className="text-[14px] font-bold text-muted-foreground/50 mb-3">Access Tiers</p>
           <div className="grid grid-cols-4 gap-3">
             {TIER_ORDER.map(tier => {
               const cfg    = TIER_CONFIG[tier];
@@ -594,21 +594,21 @@ function AccessTiersTab({
                       {TIER_ICONS[tier]}
                     </span>
                     {active && (
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-current bg-current/10 px-1.5 py-0.5 rounded">
+                      <span className="text-[14px] font-bold text-current bg-current/10 px-1.5 py-0.5 rounded">
                         You
                       </span>
                     )}
                   </div>
-                  <p className="text-[13px] font-bold text-foreground mt-2">{cfg.label}</p>
+                  <p className="text-[14px] font-bold text-foreground mt-2">{cfg.label}</p>
                   {tier !== 'superadmin' && (
-                    <p className="text-[10px] text-muted-foreground font-medium mt-0.5">{cfg.groupLabel}</p>
+                    <p className="text-[14px] text-muted-foreground font-medium mt-0.5">{cfg.groupLabel}</p>
                   )}
-                  <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">{cfg.description}</p>
-                  <p className="text-[10px] text-muted-foreground/70 mt-1.5 leading-snug">{cfg.detail}</p>
+                  <p className="text-[14px] text-muted-foreground mt-1.5 leading-snug">{cfg.description}</p>
+                  <p className="text-[14px] text-muted-foreground/70 mt-1.5 leading-snug">{cfg.detail}</p>
                   {tier !== userTier && (
                     <button
                       onClick={() => setUserTier(tier)}
-                      className="mt-3 w-full text-[10px] font-semibold px-2 py-1 rounded-md border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+                      className="mt-3 w-full text-[14px] font-semibold px-2 py-1 rounded-md border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
                     >
                       Preview this tier →
                     </button>
@@ -621,12 +621,12 @@ function AccessTiersTab({
 
         {/* Google Groups mapping */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">
+          <p className="text-[14px] font-bold text-muted-foreground/50 mb-3">
             Google Groups → Trail OS Tier Mapping
           </p>
           <div className="rounded-xl border border-border overflow-hidden">
             <div
-              className="grid bg-muted/40 border-b border-border/60 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 px-4 py-2"
+              className="grid bg-muted/40 border-b border-border/60 text-[14px] font-bold text-muted-foreground/70 px-4 py-2"
               style={{ gridTemplateColumns: '200px 1fr 200px 1fr' }}
             >
               <span>Google Group</span>
@@ -639,13 +639,13 @@ function AccessTiersTab({
               return (
                 <div
                   key={tier}
-                  className={`grid px-4 py-3 text-[12px] items-center ${i % 2 === 0 ? '' : 'bg-muted/20'}`}
+                  className={`grid px-4 py-3 text-[14px] items-center ${i % 2 === 0 ? '' : 'bg-muted/20'}`}
                   style={{ gridTemplateColumns: '200px 1fr 200px 1fr' }}
                 >
-                  <span className="font-mono text-[11px] text-muted-foreground">{cfg.googleGroup.split('@')[0]}@…</span>
+                  <span className="font-mono text-[14px] text-muted-foreground">{cfg.googleGroup.split('@')[0]}@…</span>
                   <span className="font-medium text-foreground">{cfg.groupLabel}</span>
                   <span>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${cfg.badgeClass}`}>
+                    <span className={`text-[14px] font-semibold px-2 py-0.5 rounded-full border ${cfg.badgeClass}`}>
                       {cfg.label}
                     </span>
                   </span>
@@ -654,20 +654,20 @@ function AccessTiersTab({
               );
             })}
             <div
-              className="grid px-4 py-3 text-[12px] items-center bg-primary/5 border-t border-primary/10"
+              className="grid px-4 py-3 text-[14px] items-center bg-primary/5 border-t border-primary/10"
               style={{ gridTemplateColumns: '200px 1fr 200px 1fr' }}
             >
-              <span className="font-mono text-[11px] text-muted-foreground/60">Dev environment only</span>
+              <span className="font-mono text-[14px] text-muted-foreground/60">Dev environment only</span>
               <span className="font-medium text-foreground">Builder / Super Admin</span>
               <span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-primary/10 text-primary border-primary/20">
+                <span className="text-[14px] font-semibold px-2 py-0.5 rounded-full border bg-primary/10 text-primary border-primary/20">
                   Super Admin
                 </span>
               </span>
               <span className="text-muted-foreground">builder</span>
             </div>
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">
+          <p className="text-[14px] text-muted-foreground mt-2">
             Live group addresses:{' '}
             {(['everyday', 'power', 'admin'] as const).map((tier, i, arr) => (
               <span key={tier}>
@@ -681,7 +681,7 @@ function AccessTiersTab({
 
         {/* Google Workspace Authentication */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">
+          <p className="text-[14px] font-bold text-muted-foreground/50 mb-3">
             Google Workspace Authentication
           </p>
           <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA]/40 p-5 space-y-4">
@@ -691,10 +691,10 @@ function AccessTiersTab({
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-[13px] font-semibold text-foreground">Google Sign-In (OAuth 2.0 + OpenID Connect)</p>
-                  <span className="text-[9px] font-bold bg-[#E6F0EA] text-[#2F6B3F] px-1.5 py-0.5 rounded uppercase tracking-wide">Live</span>
+                  <p className="text-[14px] font-semibold text-foreground">Google Sign-In (OAuth 2.0 + OpenID Connect)</p>
+                  <span className="text-[14px] font-bold bg-[#E6F0EA] text-[#2F6B3F] px-1.5 py-0.5 rounded">Live</span>
                 </div>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[14px] text-muted-foreground">
                   Users sign in with their Transition Trails Google account. Tier is auto-assigned from Google Group membership.
                 </p>
               </div>
@@ -723,7 +723,7 @@ function AccessTiersTab({
                 <div key={step.title} className="bg-card border border-border rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     {step.icon}
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                    <span className={`text-[14px] font-bold px-1.5 py-0.5 rounded ${
                       step.status === 'live'
                         ? 'bg-[#E6F0EA] text-[#2F6B3F]'
                         : 'bg-[#FFF3E0] text-[#CC8400]'
@@ -731,12 +731,12 @@ function AccessTiersTab({
                       {step.status === 'live' ? 'Live' : 'Needs Token'}
                     </span>
                   </div>
-                  <p className="text-[11px] font-semibold text-foreground mb-1">{step.title}</p>
-                  <p className="text-[10px] text-muted-foreground leading-snug">{step.body}</p>
+                  <p className="text-[14px] font-semibold text-foreground mb-1">{step.title}</p>
+                  <p className="text-[14px] text-muted-foreground leading-snug">{step.body}</p>
                 </div>
               ))}
             </div>
-            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-[#FFF3E0] border border-[#FFF3E0] rounded-lg px-3 py-2">
+            <div className="flex items-start gap-2 text-[14px] text-muted-foreground bg-[#FFF3E0] border border-[#FFF3E0] rounded-lg px-3 py-2">
               <Mail className="w-3.5 h-3.5 text-[#CC8400] mt-0.5 flex-shrink-0" />
               <span>
                 <strong className="text-[#CC8400]">To enable group-based tier assignment:</strong>{' '}
@@ -750,7 +750,7 @@ function AccessTiersTab({
             </div>
             <button
               onClick={() => setLocation('/admin/integrations/google-auth')}
-              className="flex items-center gap-1.5 text-[11px] font-medium text-primary hover:underline"
+              className="flex items-center gap-1.5 text-[14px] font-medium text-primary hover:underline"
             >
               View Google Auth Setup <ChevronRight className="w-3 h-3" />
             </button>
@@ -759,12 +759,12 @@ function AccessTiersTab({
 
         {/* Feature capabilities (kept from original Permissions tab) */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">
+          <p className="text-[14px] font-bold text-muted-foreground/50 mb-3">
             Feature Capabilities by Tier
           </p>
           <div className="rounded-xl border border-border overflow-hidden">
             <div
-              className="grid bg-muted/40 border-b border-border/60 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
+              className="grid bg-muted/40 border-b border-border/60 text-[14px] font-bold text-muted-foreground/70"
               style={{ gridTemplateColumns: '160px 1fr 1fr 1fr 1fr' }}
             >
               <div className="px-4 py-2">Feature</div>
@@ -784,9 +784,9 @@ function AccessTiersTab({
                 className={`grid items-start ${i % 2 === 0 ? '' : 'bg-muted/20'}`}
                 style={{ gridTemplateColumns: '160px 1fr 1fr 1fr 1fr' }}
               >
-                <div className="px-4 py-3 text-[12px] font-semibold text-foreground">{feature}</div>
+                <div className="px-4 py-3 text-[14px] font-semibold text-foreground">{feature}</div>
                 {TIER_ORDER.map(tier => (
-                  <div key={tier} className="px-3 py-3 text-[11px] text-muted-foreground leading-snug">
+                  <div key={tier} className="px-3 py-3 text-[14px] text-muted-foreground leading-snug">
                     {TIER_FEATURES[feature][tier]}
                   </div>
                 ))}
@@ -871,13 +871,13 @@ function RoleOwnersTab() {
             : <AlertTriangle className="w-4 h-4 text-[#CC8400] mt-0.5 flex-shrink-0" />
           }
           <div>
-            <p className={`text-[12px] font-semibold ${unassigned === 0 ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
+            <p className={`text-[14px] font-semibold ${unassigned === 0 ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
               {unassigned === 0
                 ? 'All platform roles are assigned'
                 : `${unassigned} platform role${unassigned !== 1 ? 's' : ''} unassigned`
               }
             </p>
-            <p className={`text-[11px] mt-0.5 ${unassigned === 0 ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
+            <p className={`text-[14px] mt-0.5 ${unassigned === 0 ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
               {unassigned === 0
                 ? 'Prompt governance, knowledge management, and platform administration all have named owners.'
                 : 'Unassigned roles create governance gaps — Penny quality monitoring, source trust reviews, and prompt governance are ungoverned until owners are set.'
@@ -904,23 +904,23 @@ function RoleOwnersTab() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-[13px] font-semibold text-foreground">{role.title}</span>
-                      <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${TIER_BADGE[role.requiredTier]}`}>
+                      <span className="text-[14px] font-semibold text-foreground">{role.title}</span>
+                      <span className={`text-[14px] font-bold px-1.5 py-0.5 rounded border ${TIER_BADGE[role.requiredTier]}`}>
                         {tierLabel}+
                       </span>
-                      <span className="text-[9px] text-muted-foreground/60 border border-border rounded px-1.5 py-0.5">
+                      <span className="text-[14px] text-muted-foreground/60 border border-border rounded px-1.5 py-0.5">
                         {role.domain}
                       </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground leading-snug">{role.description}</p>
+                    <p className="text-[14px] text-muted-foreground leading-snug">{role.description}</p>
                   </div>
                   <div className="flex-shrink-0">
                     {isAssigned ? (
-                      <span className="flex items-center gap-1 text-[10px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
+                      <span className="flex items-center gap-1 text-[14px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
                         <UserCheck className="w-3 h-3" /> Assigned
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-[10px] font-semibold text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
+                      <span className="flex items-center gap-1 text-[14px] font-semibold text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
                         <AlertTriangle className="w-3 h-3" /> Unassigned
                       </span>
                     )}
@@ -930,7 +930,7 @@ function RoleOwnersTab() {
                 {/* Responsibilities */}
                 <div className="flex flex-wrap gap-1.5">
                   {role.responsibilities.map(r => (
-                    <span key={r} className="text-[9px] bg-muted/50 text-muted-foreground rounded px-1.5 py-0.5 border border-border/60">
+                    <span key={r} className="text-[14px] bg-muted/50 text-muted-foreground rounded px-1.5 py-0.5 border border-border/60">
                       {r}
                     </span>
                   ))}
@@ -939,7 +939,7 @@ function RoleOwnersTab() {
                 {/* Owner block */}
                 {isEditing ? (
                   <div className="space-y-2 pt-1 border-t border-border/40">
-                    <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Assign Owner</p>
+                    <p className="text-[14px] font-bold text-muted-foreground/60">Assign Owner</p>
                     <div className="flex gap-2">
                       <input
                         autoFocus
@@ -947,27 +947,27 @@ function RoleOwnersTab() {
                         placeholder="Full name"
                         value={draft.owner}
                         onChange={e => setDraft(d => ({ ...d, owner: e.target.value }))}
-                        className="flex-1 text-[12px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
+                        className="flex-1 text-[14px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
                       />
                       <input
                         type="email"
                         placeholder="Email address"
                         value={draft.ownerEmail}
                         onChange={e => setDraft(d => ({ ...d, ownerEmail: e.target.value }))}
-                        className="flex-1 text-[12px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
+                        className="flex-1 text-[14px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
                       />
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => { void saveEdit(role.id); }}
                         disabled={saving}
-                        className="flex items-center gap-1.5 text-[11px] font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity disabled:opacity-60"
+                        className="flex items-center gap-1.5 text-[14px] font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity disabled:opacity-60"
                       >
                         <Save className="w-3 h-3" /> {saving ? 'Saving…' : 'Save'}
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="text-[11px] text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md border border-border transition-colors"
+                        className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-md border border-border transition-colors"
                       >
                         Cancel
                       </button>
@@ -977,17 +977,17 @@ function RoleOwnersTab() {
                   <div className="flex items-center justify-between pt-1 border-t border-border/40">
                     {isAssigned ? (
                       <div>
-                        <p className="text-[12px] font-semibold text-foreground">{role.owner}</p>
+                        <p className="text-[14px] font-semibold text-foreground">{role.owner}</p>
                         {role.ownerEmail && (
-                          <p className="text-[10px] text-muted-foreground">{role.ownerEmail}</p>
+                          <p className="text-[14px] text-muted-foreground">{role.ownerEmail}</p>
                         )}
                       </div>
                     ) : (
-                      <p className="text-[11px] text-muted-foreground/60 italic">No owner assigned</p>
+                      <p className="text-[14px] text-muted-foreground/60 italic">No owner assigned</p>
                     )}
                     <button
                       onClick={() => startEdit(role)}
-                      className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1.5 hover:border-ring/50 transition-colors"
+                      className="flex items-center gap-1.5 text-[14px] font-medium text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1.5 hover:border-ring/50 transition-colors"
                     >
                       <Pencil className="w-3 h-3" />
                       {isAssigned ? 'Edit' : 'Assign'}
@@ -1034,18 +1034,18 @@ export default function PeopleAccess() {
       <div className="flex-shrink-0 border-b bg-card">
         <div className="flex items-center justify-between gap-4 px-5 pt-3 pb-0">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+            <p className="text-[14px] font-bold text-muted-foreground/50 mb-0.5">
               Administration · People &amp; Access
             </p>
             <h1 className="text-[15px] font-semibold text-foreground leading-snug">People, Roles &amp; Access</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5 mb-3">
+            <p className="text-[14px] text-muted-foreground mt-0.5 mb-3">
               Sort and filter all {MATRIX_ROWS.length} personas by tier, type, or health. Click a row to inspect its full access profile.
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 pb-3">
             <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
               <CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" />
-              <span className="text-[11px] font-semibold text-[#2F6B3F]">Auth live · Clerk + Google Groups</span>
+              <span className="text-[14px] font-semibold text-[#2F6B3F]">Auth live · Clerk + Google Groups</span>
             </div>
           </div>
         </div>
@@ -1056,7 +1056,7 @@ export default function PeopleAccess() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-[12px] font-semibold border-b-2 transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-[14px] font-semibold border-b-2 transition-all ${
                 activeTab === tab.id
                   ? 'border-primary text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border/60'
