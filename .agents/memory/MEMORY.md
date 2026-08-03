@@ -1,3 +1,4 @@
+- [Google SSO auth](google-sso-auth.md) — per-user Google Sign-In; groups held as set on session; 5-min group cache; Clerk fully removed (was decoration only).
 - [Program health merge pattern](program-health-merge.md) — HEALTH data in ProgramMap.tsx merges into program data at setSelectedItem; ContextPanel gets all fields.
 - [UX shared components](ux-shared-components.md) — ActionBar, RelationshipCard, EmptyState live in src/components/workspace/; HubShell accepts optional `actions` prop to show ActionBar between tab bar and content.
 - [Sidebar nav structure](sidebar-nav.md) — 7 groups + Home/Search/Context; Digital Twin reduced to 4 items (Explore/Map/Impact/Governance); extraPrefixes ['/uom','/governance'] kept so those pages still highlight under Digital Twin.

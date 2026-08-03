@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { useUser, useClerk } from '@clerk/react';
+import { useGoogleAuth, useSignOut } from '@/hooks/useGoogleAuth';
 import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
@@ -174,22 +174,24 @@ function PrefRow({ icon: Icon, label, hint, badge, onClick }: {
 // ── User profile button + panel ───────────────────────────────────────────────
 function UserProfileButton() {
   const { userTier, setUserTier } = useAppContext();
-  const { user: clerkUser }       = useUser();
-  const { signOut }               = useClerk();
+  const { user: googleUser }      = useGoogleAuth();
+  const signOut                   = useSignOut();
   const [open, setOpen]           = useState(false);
   const ref                       = useRef<HTMLDivElement>(null);
 
   const current      = TIER_CONFIG[userTier];
   const isPreviewing = userTier !== 'superadmin';
 
-  // Derive display data from Clerk user
-  const name     = clerkUser?.fullName ?? clerkUser?.firstName ?? 'Trail OS User';
-  const email    = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
-  const initials = clerkUser
-    ? (`${clerkUser.firstName?.[0] ?? ''}${clerkUser.lastName?.[0] ?? ''}`
-        .toUpperCase() || 'TO')
-    : 'TO';
-  const photoUrl = clerkUser?.imageUrl ?? null;
+  // Derive display data from Google session
+  const name     = googleUser?.name ?? 'Trail OS User';
+  const email    = googleUser?.email ?? '';
+  const initials = name
+    .split(' ')
+    .map((p: string) => p[0] ?? '')
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'TO';
+  const photoUrl: string | null = null; // Google profile photos require extra scope
 
   // Close panel on outside click
   useEffect(() => {

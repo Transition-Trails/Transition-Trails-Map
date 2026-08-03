@@ -13,8 +13,6 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@clerk/react": "catalog:",
-    "@clerk/themes": "catalog:",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.4",
     "@radix-ui/react-alert-dialog": "^1.1.7",

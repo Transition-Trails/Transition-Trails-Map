@@ -517,6 +517,18 @@ export default function GoogleOAuthFlow() {
         </p>
       </div>
 
+      {/* ── Service-access notice ─────────────────────────────────────────────── */}
+      <div className="mx-4 mt-3 flex items-start gap-2.5 rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] px-3 py-2.5 shrink-0">
+        <Info className="w-3.5 h-3.5 text-[#2F6F7E] mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="text-[14px] font-semibold text-[#2F6F7E]">This is service-level access — not how people sign in</p>
+          <p className="text-[14px] text-[#2F6F7E]/80 mt-0.5 leading-snug">
+            This wizard grants <strong>Trail OS the application</strong> access to Drive, Calendar, and Gmail so it can read documents and send notifications.
+            It is a one-time administrator task. <strong>Staff sign in to Trail OS using the Google Sign-In button on the login page</strong>, which uses a separate per-user flow backed by Google Group membership.
+          </p>
+        </div>
+      </div>
+
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-muted/20 shrink-0">
         <button onClick={loadInfo} disabled={infoLoading}

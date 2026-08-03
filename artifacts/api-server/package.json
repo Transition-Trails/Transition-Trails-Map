@@ -13,8 +13,6 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@clerk/express": "^2.1.26",
-    "@clerk/shared": "^4.17.1",
     "@replit/connectors-sdk": "^0.4.1",
     "@types/express-session": "^1.19.0",
     "@vitest/coverage-v8": "^4.1.8",

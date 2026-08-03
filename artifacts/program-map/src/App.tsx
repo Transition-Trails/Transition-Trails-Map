@@ -5,28 +5,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider, useAppContext } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
-import { ClerkProvider, useUser, Show } from "@clerk/react";
-import { publishableKeyFromHost } from "@clerk/react/internal";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import SignInPage from "@/pages/SignIn";
-import { type AccessTier } from "@/config/accessTiers";
 import { Map } from "lucide-react";
 
-// Module-level — required by Clerk skill. publishableKeyFromHost resolves the
-// key from the hostname so the same build serves multiple Clerk custom domains.
-const clerkPubKey = publishableKeyFromHost(
-  window.location.hostname,
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
-// Empty in dev (Clerk hits FAPI directly); auto-set in prod by the proxy system.
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
-
-// Strip the Vite base path prefix from Clerk's full-path navigation events.
-function stripBase(path: string): string {
-  return basePath && path.startsWith(basePath)
-    ? path.slice(basePath.length) || "/"
-    : path;
-}
+const basePath = (import.meta.env.BASE_URL as string).replace(/\/$/, "");
 
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
@@ -315,7 +298,7 @@ function Router() {
   );
 }
 
-// ── Learner route guard — checks /api/learner/auth/status ──────────────────────
+// ── Learner route guard ───────────────────────────────────────────────────────
 function LearnerRoute({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<'loading' | 'ok'>('loading');
   const [, navigate]        = useLocation();
@@ -334,32 +317,18 @@ function LearnerRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// ── Tier initializer — auto-sets tier from Google Groups after sign-in ─────────
-function TierInitializer() {
-  const { user, isSignedIn } = useUser();
-  const { setUserTier } = useAppContext();
-
-  useEffect(() => {
-    if (!isSignedIn || !user) return;
-    const email = user.primaryEmailAddress?.emailAddress;
-    if (!email) return;
-    fetch(`/api/auth/tier?email=${encodeURIComponent(email)}`)
-      .then(r => r.json())
-      .then((data: { tier?: string }) => {
-        const VALID: string[] = ['everyday', 'power', 'admin', 'superadmin'];
-        if (data.tier && VALID.includes(data.tier)) {
-          setUserTier(data.tier as AccessTier);
-        }
-      })
-      .catch(() => {});
-  }, [isSignedIn, user?.id]);
-
-  return null;
-}
-
-// ── Sign-in landing for "/" when not authenticated ──────────────────────────────
+// ── Sign-in landing for "/" when not authenticated ────────────────────────────
 function SignInLanding() {
+  const params    = new URLSearchParams(window.location.search);
+  const errorCode  = params.get('sign_in_error');
+  const errorEmail = params.get('email');
   const [, setLocation] = useLocation();
+
+  // Delegate detailed error display to SignInPage if there's an error param
+  if (errorCode) {
+    return <SignInPage />;
+  }
+
   return (
     <div className="min-h-screen bg-[hsl(40_30%_94%)] flex flex-col items-center justify-center gap-6 px-4">
       <div className="text-center space-y-2">
@@ -382,70 +351,71 @@ function SignInLanding() {
   );
 }
 
-// ── Inner app: inside WouterRouter so useLocation is available for ClerkProvider
+// ── Inner app — inside WouterRouter and QueryClientProvider ──────────────────
 function InnerApp() {
-  const [, setLocation] = useLocation();
+  const auth = useGoogleAuth();
+  const { setUserTier } = useAppContext();
+
+  // Apply tier from session on sign-in (server computed it from the group set)
+  useEffect(() => {
+    if (!auth.isLoading && auth.isSignedIn && auth.user) {
+      setUserTier(auth.user.tier);
+    }
+  }, [auth.isLoading, auth.isSignedIn, auth.user?.email]);
+
+  // Full-page loading state while session check is in flight
+  if (auth.isLoading) {
+    return <div className="min-h-screen" style={{ background: '#FAFAF7' }} />;
+  }
 
   return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
-      routerPush={(to: string) => setLocation(stripBase(to))}
-      routerReplace={(to: string) => setLocation(stripBase(to))}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-in`}
-      appearance={{ cssLayerName: 'clerk' }}
-    >
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AppProvider>
-            <Switch>
-              {/* Auth pages — no AppShell */}
-              <Route path="/sign-in/*?" component={SignInPage} />
+    <Switch>
+      {/* Auth page — accessible whether signed in or not */}
+      <Route path="/sign-in/*?" component={SignInPage} />
 
-              {/* Learner surface — no Clerk auth required */}
-              <Route path="/learner/login"    component={LearnerLogin} />
-              <Route path="/learner/dashboard">
-                <LearnerRoute><LearnerDashboard /></LearnerRoute>
-              </Route>
-              <Route path="/learner/penny">
-                <LearnerRoute><LearnerPenny /></LearnerRoute>
-              </Route>
-              <Route path="/learner/quest">
-                <LearnerRoute><LearnerQuest /></LearnerRoute>
-              </Route>
-              <Route path="/learner/progress">
-                <LearnerRoute><LearnerProgress /></LearnerRoute>
-              </Route>
+      {/* Learner surface — no staff auth required */}
+      <Route path="/learner/login"    component={LearnerLogin} />
+      <Route path="/learner/dashboard">
+        <LearnerRoute><LearnerDashboard /></LearnerRoute>
+      </Route>
+      <Route path="/learner/penny">
+        <LearnerRoute><LearnerPenny /></LearnerRoute>
+      </Route>
+      <Route path="/learner/quest">
+        <LearnerRoute><LearnerQuest /></LearnerRoute>
+      </Route>
+      <Route path="/learner/progress">
+        <LearnerRoute><LearnerProgress /></LearnerRoute>
+      </Route>
 
-              {/* Everything else — auth-gated */}
-              <Route>
-                <Show when="signed-in">
-                  <TierInitializer />
-                  <AppShell>
-                    <Router />
-                  </AppShell>
-                </Show>
-                <Show when="signed-out">
-                  <Switch>
-                    <Route path="/" component={SignInLanding} />
-                    <Route component={SignInPage} />
-                  </Switch>
-                </Show>
-              </Route>
-            </Switch>
-          </AppProvider>
-          <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+      {/* Everything else — staff auth gated */}
+      <Route>
+        {auth.isSignedIn ? (
+          <AppShell>
+            <Router />
+          </AppShell>
+        ) : (
+          <Switch>
+            <Route path="/" component={SignInLanding} />
+            <Route component={SignInPage} />
+          </Switch>
+        )}
+      </Route>
+    </Switch>
   );
 }
 
 function App() {
   return (
-    <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-      <InnerApp />
+    <WouterRouter base={basePath}>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AppProvider>
+            <InnerApp />
+          </AppProvider>
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
     </WouterRouter>
   );
 }
