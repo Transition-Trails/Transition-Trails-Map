@@ -148,23 +148,23 @@ const POC_ITEMS: PocItem[] = [
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const STATUS_META: Record<AuditStatus, { label: string; icon: React.ReactNode; row: string; badge: string }> = {
-  pass:  { label: 'Pass',    icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, row: '',                          badge: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-  fixed: { label: 'Fixed ✓', icon: <Wrench       className="w-3.5 h-3.5 text-sky-600" />,     row: 'bg-sky-50/40',              badge: 'bg-sky-50 border-sky-200 text-sky-700' },
-  watch: { label: 'Watch',   icon: <Eye          className="w-3.5 h-3.5 text-amber-500" />,    row: 'bg-amber-50/30',            badge: 'bg-amber-50 border-amber-200 text-amber-700' },
-  fail:  { label: 'Fail',    icon: <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />,    row: 'bg-rose-50/40',             badge: 'bg-rose-50 border-rose-200 text-rose-700' },
+  pass:  { label: 'Pass',    icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, row: '',                          badge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' },
+  fixed: { label: 'Fixed ✓', icon: <Wrench       className="w-3.5 h-3.5 text-[#2F6F7E]" />,     row: 'bg-[#EDF5F8]/40',              badge: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]' },
+  watch: { label: 'Watch',   icon: <Eye          className="w-3.5 h-3.5 text-[#CC8400]" />,    row: 'bg-[#FFF3E0]/30',            badge: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' },
+  fail:  { label: 'Fail',    icon: <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F]" />,    row: 'bg-[#FBEAE6]/40',             badge: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' },
 };
 
 const HC_META: Record<HcClass, { label: string; badge: string }> = {
-  'demo-ok':    { label: 'Phase 1 OK',   badge: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-  'phase2-data':{ label: 'Phase 2 Data', badge: 'bg-amber-50 border-amber-200 text-amber-700' },
-  'stale':      { label: 'Stale',        badge: 'bg-rose-50 border-rose-200 text-rose-700' },
-  'fixed':      { label: 'Fixed',        badge: 'bg-sky-50 border-sky-200 text-sky-700' },
+  'demo-ok':    { label: 'Phase 1 OK',   badge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' },
+  'phase2-data':{ label: 'Phase 2 Data', badge: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' },
+  'stale':      { label: 'Stale',        badge: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' },
+  'fixed':      { label: 'Fixed',        badge: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]' },
 };
 
 const RISK_META: Record<PocRisk, { badge: string }> = {
-  High:   { badge: 'bg-rose-50 border-rose-200 text-rose-700' },
-  Medium: { badge: 'bg-amber-50 border-amber-200 text-amber-700' },
-  Low:    { badge: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+  High:   { badge: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' },
+  Medium: { badge: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' },
+  Low:    { badge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' },
 };
 
 function Badge({ text, cls }: { text: string; cls: string }) {
@@ -243,10 +243,10 @@ export default function Phase1CompletionAudit() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           {[
             { label: 'Pages Audited', value: String(totalPages),    cls: 'border-stone-200 bg-stone-50' },
-            { label: 'UX Pass / Fixed', value: `${passCount} / ${fixedCount}`, cls: 'border-emerald-200 bg-emerald-50' },
-            { label: 'UX Fails',      value: String(failCount),     cls: failCount > 0 ? 'border-rose-200 bg-rose-50' : 'border-emerald-200 bg-emerald-50' },
-            { label: 'Hardcoded (P2)',  value: `${hcP2} items`,     cls: 'border-amber-200 bg-amber-50' },
-            { label: 'POC High Risk',  value: `${pocHigh} items`,   cls: pocHigh > 2 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50' },
+            { label: 'UX Pass / Fixed', value: `${passCount} / ${fixedCount}`, cls: 'border-[#9FC3AE] bg-[#E6F0EA]' },
+            { label: 'UX Fails',      value: String(failCount),     cls: failCount > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#9FC3AE] bg-[#E6F0EA]' },
+            { label: 'Hardcoded (P2)',  value: `${hcP2} items`,     cls: 'border-[#FFD08A] bg-[#FFF3E0]' },
+            { label: 'POC High Risk',  value: `${pocHigh} items`,   cls: pocHigh > 2 ? 'border-[#FFD08A] bg-[#FFF3E0]' : 'border-[#9FC3AE] bg-[#E6F0EA]' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-2.5 ${s.cls}`}>
               <p className="text-[18px] font-bold text-foreground leading-none">{s.value}</p>
@@ -261,10 +261,10 @@ export default function Phase1CompletionAudit() {
             icon={<FileSearch className="w-4 h-4" />}
             title="UX Page Audit"
             meta={<>
-              <Badge text={`${passCount} pass`}  cls="bg-emerald-50 border-emerald-200 text-emerald-700" />
-              {fixedCount > 0 && <Badge text={`${fixedCount} fixed`} cls="bg-sky-50 border-sky-200 text-sky-700" />}
-              {watchCount > 0 && <Badge text={`${watchCount} watch`} cls="bg-amber-50 border-amber-200 text-amber-700" />}
-              {failCount  > 0 && <Badge text={`${failCount} fail`}  cls="bg-rose-50 border-rose-200 text-rose-700" />}
+              <Badge text={`${passCount} pass`}  cls="bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]" />
+              {fixedCount > 0 && <Badge text={`${fixedCount} fixed`} cls="bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]" />}
+              {watchCount > 0 && <Badge text={`${watchCount} watch`} cls="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]" />}
+              {failCount  > 0 && <Badge text={`${failCount} fail`}  cls="bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]" />}
             </>}
             open={open.ux}
             onToggle={() => toggle('ux')}
@@ -316,9 +316,9 @@ export default function Phase1CompletionAudit() {
             icon={<Layers className="w-4 h-4" />}
             title="Hardcoded Content Inventory"
             meta={<>
-              <Badge text={`${hcOk} Phase 1 OK`}   cls="bg-emerald-50 border-emerald-200 text-emerald-700" />
-              <Badge text={`${hcP2} Phase 2 data`}  cls="bg-amber-50 border-amber-200 text-amber-700" />
-              {hcStale > 0 && <Badge text={`${hcStale} stale`} cls="bg-rose-50 border-rose-200 text-rose-700" />}
+              <Badge text={`${hcOk} Phase 1 OK`}   cls="bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]" />
+              <Badge text={`${hcP2} Phase 2 data`}  cls="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]" />
+              {hcStale > 0 && <Badge text={`${hcStale} stale`} cls="bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]" />}
             </>}
             open={open.hc}
             onToggle={() => toggle('hc')}
@@ -367,9 +367,9 @@ export default function Phase1CompletionAudit() {
             icon={<FlaskConical className="w-4 h-4" />}
             title="Test Coverage"
             meta={<>
-              <Badge text="105 automated"    cls="bg-emerald-50 border-emerald-200 text-emerald-700" />
-              <Badge text="70 metadata cases" cls="bg-amber-50 border-amber-200 text-amber-700" />
-              <Badge text="4 smoke-test tools" cls="bg-sky-50 border-sky-200 text-sky-700" />
+              <Badge text="105 automated"    cls="bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]" />
+              <Badge text="70 metadata cases" cls="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]" />
+              <Badge text="4 smoke-test tools" cls="bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]" />
             </>}
             open={open.tests}
             onToggle={() => toggle('tests')}
@@ -382,22 +382,22 @@ export default function Phase1CompletionAudit() {
                     title: 'Automated (Vitest)',
                     value: '105',
                     sub: '43 API server tests (pnpm --filter @workspace/api-server test) covering routes, Salesforce, Slack, Gemini, and auth. 62 frontend tests (pnpm --filter @workspace/program-map test) covering components, hooks, and the route smoke manifest. Both suites must pass before merging.',
-                    cls: 'border-emerald-200 bg-emerald-50',
-                    valcls: 'text-emerald-600',
+                    cls: 'border-[#9FC3AE] bg-[#E6F0EA]',
+                    valcls: 'text-[#2F6B3F]',
                   },
                   {
                     title: 'Metadata-driven validation',
                     value: '70',
                     sub: 'Slack integration: 42 cases (t-11 to t-42) covering user mapping, Penny delivery, governance, performance, and error handling. Calendar: 28 cases (ct-01 to ct-28) covering credentials, access, mapping, and graceful degradation.',
-                    cls: 'border-amber-200 bg-amber-50',
-                    valcls: 'text-amber-600',
+                    cls: 'border-[#FFD08A] bg-[#FFF3E0]',
+                    valcls: 'text-[#CC8400]',
                   },
                   {
                     title: 'Interactive smoke-test tools',
                     value: '4',
                     sub: 'TestPenny (regex chat simulator), Secrets Audit (env-var format & plausibility), Slack Validation Center (live test-message to bot channel), SF Validation Center (live SOQL probe via Replit connector).',
-                    cls: 'border-sky-200 bg-sky-50',
-                    valcls: 'text-sky-600',
+                    cls: 'border-[#7FAFC6] bg-[#EDF5F8]',
+                    valcls: 'text-[#2F6F7E]',
                   },
                 ].map(card => (
                   <div key={card.title} className={`rounded-lg border p-3 ${card.cls}`}>
@@ -407,9 +407,9 @@ export default function Phase1CompletionAudit() {
                   </div>
                 ))}
               </div>
-              <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 flex items-start gap-2">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-                <div className="text-[11px] text-amber-800">
+              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 px-3 py-2.5 flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
+                <div className="text-[11px] text-[#CC8400]">
                   <span className="font-bold">Phase 2 recommendation:</span> add a Vitest test suite. Start by consuming the 70 metadata test cases in{' '}
                   <span className="font-mono">slackIntegrationData.ts</span> and{' '}
                   <span className="font-mono">googleCalendarData.ts</span> as automated assertions. Add the{' '}
@@ -426,8 +426,8 @@ export default function Phase1CompletionAudit() {
             icon={<Zap className="w-4 h-4" />}
             title="Penny POC Capability Review"
             meta={<>
-              <Badge text={`${pocHigh} high risk`}   cls="bg-rose-50 border-rose-200 text-rose-700" />
-              <Badge text={`${pocMedium} medium risk`} cls="bg-amber-50 border-amber-200 text-amber-700" />
+              <Badge text={`${pocHigh} high risk`}   cls="bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]" />
+              <Badge text={`${pocMedium} medium risk`} cls="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]" />
               <Badge text={`${POC_ITEMS.length} reviewed`} cls="bg-stone-50 border-stone-200 text-stone-600" />
             </>}
             open={open.poc}
@@ -462,7 +462,7 @@ export default function Phase1CompletionAudit() {
                         {item.p2Item ? (
                           <span className="font-mono text-[10px] text-muted-foreground">{item.p2Item}</span>
                         ) : (
-                          <span className="text-emerald-600 font-semibold text-[10px]">In Phase 1 ✅</span>
+                          <span className="text-[#2F6B3F] font-semibold text-[10px]">In Phase 1 ✅</span>
                         )}
                       </td>
                     </tr>
@@ -480,15 +480,15 @@ export default function Phase1CompletionAudit() {
             title="Final Verdict"
             meta={<Badge
               text={verdictOk ? 'CONDITIONALLY COMPLETE' : 'NEEDS WORK'}
-              cls={verdictOk ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}
+              cls={verdictOk ? 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' : 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]'}
             />}
             open={open.verdict}
             onToggle={() => toggle('verdict')}
           />
           {open.verdict && (
             <div className="border-t border-border p-4 space-y-3 text-[12px]">
-              <div className={`rounded-lg border px-4 py-3 ${verdictOk ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
-                <p className={`text-[13px] font-bold mb-1 ${verdictOk ? 'text-emerald-800' : 'text-rose-800'}`}>
+              <div className={`rounded-lg border px-4 py-3 ${verdictOk ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#E8B9B4] bg-[#FBEAE6]'}`}>
+                <p className={`text-[13px] font-bold mb-1 ${verdictOk ? 'text-[#245531]' : 'text-[#A93F2F]'}`}>
                   Phase 1 UX: {failCount === 0 ? 'No violations' : `${failCount} violations found`}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
@@ -499,13 +499,13 @@ export default function Phase1CompletionAudit() {
 
               <div className="space-y-2 text-[11px] text-muted-foreground">
                 {[
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `${totalPages} routes audited — all Phase 1 UX standards applied.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `${hcOk} hardcoded data sets classified as Phase 1 acceptable — realistic sample data.` },
-                  { icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />,  text: `${hcP2} hardcoded items identified as Phase 2 data-connection work — all logged in backlog.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `105 automated tests — 43 API server + 62 frontend. Both suites gate merges.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `Gemini API live — powers Penny Insights, Ask Penny panel, and RAG knowledge retrieval.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `6 integrations live: Salesforce, Slack, Google Drive, Google Calendar, Gmail (Sprint 6), Agentforce (Sprint 4).` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />, text: `11 Phase 2 backlog items moved to Done (Ask Penny panel, RAG, Trail Signals, Calendar, Trail Quest, Assessment, Agentforce, SF live queries, Vitest automation, SF case → Penny focus, Program Config wizard).` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `${totalPages} routes audited — all Phase 1 UX standards applied.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `${hcOk} hardcoded data sets classified as Phase 1 acceptable — realistic sample data.` },
+                  { icon: <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />,  text: `${hcP2} hardcoded items identified as Phase 2 data-connection work — all logged in backlog.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `105 automated tests — 43 API server + 62 frontend. Both suites gate merges.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `Gemini API live — powers Penny Insights, Ask Penny panel, and RAG knowledge retrieval.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `6 integrations live: Salesforce, Slack, Google Drive, Google Calendar, Gmail (Sprint 6), Agentforce (Sprint 4).` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `11 Phase 2 backlog items moved to Done (Ask Penny panel, RAG, Trail Signals, Calendar, Trail Quest, Assessment, Agentforce, SF live queries, Vitest automation, SF case → Penny focus, Program Config wizard).` },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <span className="shrink-0 mt-0.5">{item.icon}</span>

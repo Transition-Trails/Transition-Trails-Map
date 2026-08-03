@@ -162,7 +162,7 @@ export default function PennyContentAssistant() {
                         <div className="flex items-center gap-2 mb-1">
                           <p className="text-[13px] font-bold text-foreground">{action.name}</p>
                           <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.chip}`}>{action.category}</span>
-                          <span className="text-[9px] font-bold border border-amber-200 bg-amber-50 text-amber-700 rounded-full px-1.5 py-0.5">Prototype</span>
+                          <span className="text-[9px] font-bold border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400] rounded-full px-1.5 py-0.5">Prototype</span>
                         </div>
                         <p className="text-[11px] text-muted-foreground">{action.contextSentence}</p>
                         <div className="flex flex-wrap gap-1 mt-2">

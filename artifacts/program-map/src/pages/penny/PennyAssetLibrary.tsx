@@ -95,10 +95,10 @@ function formatDate(iso?: string): string {
 }
 
 const KIND_META: Record<FileKind, { icon: React.ElementType; bg: string; text: string }> = {
-  image: { icon: Image,    bg: 'bg-violet-50', text: 'text-violet-600' },
-  audio: { icon: Music,    bg: 'bg-sky-50',    text: 'text-sky-600'    },
-  video: { icon: Video,    bg: 'bg-rose-50',   text: 'text-rose-600'   },
-  doc:   { icon: FileText, bg: 'bg-amber-50',  text: 'text-amber-600'  },
+  image: { icon: Image,    bg: 'bg-[#EDF5F8]', text: 'text-[#2F6F7E]' },
+  audio: { icon: Music,    bg: 'bg-[#EDF5F8]',    text: 'text-[#2F6F7E]'    },
+  video: { icon: Video,    bg: 'bg-[#FBEAE6]',   text: 'text-[#A93F2F]'   },
+  doc:   { icon: FileText, bg: 'bg-[#FFF3E0]',  text: 'text-[#CC8400]'  },
   other: { icon: File,     bg: 'bg-zinc-100',  text: 'text-zinc-500'   },
 };
 
@@ -217,7 +217,7 @@ export default function PennyAssetLibrary() {
       {/* ── Top bar ── */}
       <div className="border-b border-zinc-200 px-5 py-3 flex items-center justify-between bg-white shrink-0">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-violet-500" />
+          <Sparkles className="w-4 h-4 text-[#2F6F7E]" />
           <span className="text-[13px] font-semibold text-zinc-800">Asset Library</span>
           {isLoading && (
             <span className="text-[10px] text-zinc-400 italic ml-1">Loading from Drive…</span>
@@ -226,7 +226,7 @@ export default function PennyAssetLibrary() {
         <div className="flex items-center gap-2">
           {/* Config warning */}
           {driveConnected && !folderConfigured && (
-            <span className="flex items-center gap-1.5 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-1">
+            <span className="flex items-center gap-1.5 text-[10px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2.5 py-1">
               <AlertTriangle className="w-3 h-3" />
               Folder not configured
             </span>
@@ -234,8 +234,8 @@ export default function PennyAssetLibrary() {
           {/* Drive status pill */}
           {!statusLoading && (
             driveConnected
-              ? <span className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              ? <span className="flex items-center gap-1.5 text-[10px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 inline-block" />
                   Drive live
                 </span>
               : <span className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 bg-zinc-100 border border-zinc-200 rounded-full px-2.5 py-1">
@@ -267,9 +267,9 @@ export default function PennyAssetLibrary() {
 
       {/* ── API error notice ── */}
       {(isError || data?.error) && (
-        <div className="flex items-center gap-2 px-5 py-2.5 bg-rose-50 border-b border-rose-100 shrink-0">
-          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-          <p className="text-[11px] text-rose-600">
+        <div className="flex items-center gap-2 px-5 py-2.5 bg-[#FBEAE6] border-b border-[#FBEAE6] shrink-0">
+          <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />
+          <p className="text-[11px] text-[#A93F2F]">
             {data?.error ?? 'Error loading assets from Drive.'}
           </p>
         </div>
@@ -422,8 +422,8 @@ export default function PennyAssetLibrary() {
             {/* Not configured empty state */}
             {driveConnected && !folderConfigured && !data?.configured && (
               <div className="flex flex-col items-center justify-center h-full min-h-[280px] text-center">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-amber-50">
-                  <HardDrive className="w-7 h-7 text-amber-300" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-[#FFF3E0]">
+                  <HardDrive className="w-7 h-7 text-[#CC8400]" />
                 </div>
                 <p className="text-[13px] font-semibold text-zinc-600 mb-2">Penny Assets folder not configured</p>
                 <p className="text-[11px] text-zinc-400 max-w-sm leading-relaxed mb-3">
@@ -467,7 +467,7 @@ export default function PennyAssetLibrary() {
                   <code className="font-mono bg-zinc-100 px-1 rounded text-zinc-500">{active.folderHint}/</code>{' '}
                   inside your Penny Assets Drive folder, then upload images, voice scripts, or media.
                 </p>
-                <div className="mt-4 flex items-center gap-1.5 text-[10px] text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-3 py-1.5">
+                <div className="mt-4 flex items-center gap-1.5 text-[10px] text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-3 py-1.5">
                   <AlertTriangle className="w-3 h-3" />
                   No folder detected in Drive
                 </div>

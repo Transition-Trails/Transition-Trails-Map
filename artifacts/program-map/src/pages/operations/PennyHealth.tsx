@@ -55,10 +55,10 @@ export default function PennyHealth() {
               <h2 className="text-sm font-semibold text-foreground mb-3">Issues Requiring Attention</h2>
               <div className="space-y-2">
                 {issues.map((issue, i) => (
-                  <div key={i} className={`flex gap-3 p-3 rounded-lg border ${issue.severity === 'red' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
+                  <div key={i} className={`flex gap-3 p-3 rounded-lg border ${issue.severity === 'red' ? 'bg-[#FBEAE6] border-[#E8B9B4]' : 'bg-[#FFF3E0] border-[#FFD08A]'}`}>
                     <StatusDot status={issue.severity} />
                     <div className="min-w-0">
-                      <p className={`text-[11px] font-bold uppercase mb-0.5 ${issue.severity === 'red' ? 'text-red-700' : 'text-amber-700'}`}>
+                      <p className={`text-[11px] font-bold uppercase mb-0.5 ${issue.severity === 'red' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>
                         {issue.type}
                       </p>
                       <p className="text-sm text-foreground">{issue.msg}</p>

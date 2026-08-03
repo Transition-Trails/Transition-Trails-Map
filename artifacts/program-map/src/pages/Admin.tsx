@@ -96,8 +96,8 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
       icon: <FileText className="w-5 h-5" />,
       label: 'Source Documents',
       count: sourceDocuments.length,
-      borderColor: 'border-sky-200 hover:border-sky-400',
-      iconBg: 'bg-sky-50 text-sky-700',
+      borderColor: 'border-[#7FAFC6] hover:border-[#7FAFC6]',
+      iconBg: 'bg-[#EDF5F8] text-[#2F6F7E]',
       description: 'Manage document records with source-of-truth mapping, Google Drive links, and key decision influence tracking.',
     },
     {
@@ -105,8 +105,8 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
       icon: <Compass className="w-5 h-5" />,
       label: 'RESOLVE Framework',
       count: resolvePhases.length,
-      borderColor: 'border-teal-200 hover:border-teal-400',
-      iconBg: 'bg-teal-50 text-teal-700',
+      borderColor: 'border-[#9FC3AE] hover:border-teal-400',
+      iconBg: 'bg-[#E6F0EA] text-[#2F6B3F]',
       description: 'Edit the 7 RESOLVE phases — names, purposes, source notes, confidence status, and source document references.',
     },
     {
@@ -114,8 +114,8 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
       icon: <Brain className="w-5 h-5" />,
       label: `${TERMS.aiAssistant} Capability Records`,
       count: pennyCapabilities.length,
-      borderColor: 'border-amber-200 hover:border-amber-400',
-      iconBg: 'bg-amber-50 text-amber-700',
+      borderColor: 'border-[#FFD08A] hover:border-[#CC8400]',
+      iconBg: 'bg-[#FFF3E0] text-[#CC8400]',
       description: `Edit ${TERMS.aiAssistant} AI capability records — purpose, executive summary, key facts, and program connections. Canonical CMS for ${TERMS.aiAssistant} data.`,
     },
     {
@@ -159,7 +159,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 <Layers className="w-3 h-3" />
                 {TERMS.trailSignals}
               </button>
-              <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium px-3 py-1.5 rounded-full">
+              <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] text-[11px] font-medium px-3 py-1.5 rounded-full">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 Prototype — edits reset on refresh
               </div>
@@ -221,10 +221,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setLocation('/admin/people-access')}
-                className="text-left p-4 rounded-lg border bg-card border-indigo-200 hover:border-indigo-400 transition-all duration-150 hover:shadow-sm group"
+                className="text-left p-4 rounded-lg border bg-card border-[#7FAFC6] hover:border-[#7FAFC6] transition-all duration-150 hover:shadow-sm group"
               >
                 <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-indigo-50 text-indigo-700">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-[#EDF5F8] text-[#2F6F7E]">
                     <Users className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">People · Access</Badge>
@@ -260,11 +260,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
               {/* Primary Setup entry — spans full row visually as the command center */}
               <button
                 onClick={() => setLocation('/admin/setup')}
-                className="text-left p-4 rounded-lg border bg-card border-amber-200 hover:border-amber-400 transition-all duration-150 hover:shadow-sm group col-span-3"
+                className="text-left p-4 rounded-lg border bg-card border-[#FFD08A] hover:border-[#CC8400] transition-all duration-150 hover:shadow-sm group col-span-3"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-700">
+                    <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-[#FFF3E0] text-[#CC8400]">
                       <Plug className="w-5 h-5" />
                     </div>
                     <div>
@@ -285,10 +285,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
               <button
                 onClick={() => setLocation('/admin/integration-readiness')}
-                className="text-left p-4 rounded-lg border bg-card border-violet-200 hover:border-violet-400 transition-all duration-150 hover:shadow-sm group"
+                className="text-left p-4 rounded-lg border bg-card border-[#7FAFC6] hover:border-[#7FAFC6] transition-all duration-150 hover:shadow-sm group"
               >
                 <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-violet-50 text-violet-700">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-[#EDF5F8] text-[#2F6F7E]">
                     <Plug className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">17 integrations</Badge>
@@ -304,10 +304,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
               <button
                 onClick={() => setLocation('/admin/salesforce-arch')}
-                className="text-left p-4 rounded-lg border bg-card border-blue-200 hover:border-blue-400 transition-all duration-150 hover:shadow-sm group"
+                className="text-left p-4 rounded-lg border bg-card border-[#7FAFC6] hover:border-blue-400 transition-all duration-150 hover:shadow-sm group"
               >
                 <div className="flex items-start justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-blue-50 text-blue-700">
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-[#EDF5F8] text-[#2F6F7E]">
                     <Database className="w-5 h-5" />
                   </div>
                   <Badge variant="secondary" className="text-xs font-semibold">Mapping</Badge>
@@ -344,8 +344,8 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
             {/* Compact readiness drill-ins */}
             <div className="mt-2.5 grid grid-cols-2 gap-2">
               {[
-                { label: 'Phase 1 Readiness',    badge: 'Phase 1',   href: '/admin/phase1-readiness', cls: 'border-amber-200 hover:border-amber-400'  },
-                { label: 'Phase 1 UX Standards', badge: 'Standards', href: '/admin/ux-standards',     cls: 'border-indigo-200 hover:border-indigo-400' },
+                { label: 'Phase 1 Readiness',    badge: 'Phase 1',   href: '/admin/phase1-readiness', cls: 'border-[#FFD08A] hover:border-[#CC8400]'  },
+                { label: 'Phase 1 UX Standards', badge: 'Standards', href: '/admin/ux-standards',     cls: 'border-[#7FAFC6] hover:border-[#7FAFC6]' },
               ].map(item => (
                 <button
                   key={item.href}
@@ -586,7 +586,7 @@ function FormHeader({
           </span>
         )}
         {dirty && !saved && (
-          <span className="text-[11px] text-amber-600 font-medium">Unsaved changes</span>
+          <span className="text-[11px] text-[#CC8400] font-medium">Unsaved changes</span>
         )}
         <Button variant="outline" size="sm" onClick={onCancel} disabled={!dirty} className="h-7 text-xs">
           <X className="w-3.5 h-3.5 mr-1" />Cancel

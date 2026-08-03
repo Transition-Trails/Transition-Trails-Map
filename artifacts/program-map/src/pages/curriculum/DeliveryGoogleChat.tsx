@@ -24,11 +24,11 @@ export default function DeliveryGoogleChat() {
               <button
                 key={update.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: update.id, data: update })}
-                className="rounded-xl border border-border bg-white p-4 text-left hover:border-blue-200 hover:shadow-sm transition-all"
+                className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#7FAFC6] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-blue-600 shrink-0" />
+                    <MessageSquare className="w-4 h-4 text-[#2F6F7E] shrink-0" />
                     <div>
                       <p className="text-[13px] font-bold text-foreground">{update.name}</p>
                       <p className="text-[11px] text-muted-foreground">{update.channel as string} · {update.timing as string}</p>

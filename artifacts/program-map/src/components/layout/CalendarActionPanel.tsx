@@ -124,32 +124,32 @@ function EventCard({ ev }: { ev: CalEvent }) {
 
   return (
     <div className={`rounded-lg border bg-card overflow-hidden ${
-      ev.isTrailTalk       ? 'border-violet-200' :
-      ev.isPendingResponse ? 'border-amber-200'  :
-      soon                 ? 'border-emerald-200' :
+      ev.isTrailTalk       ? 'border-[#7FAFC6]' :
+      ev.isPendingResponse ? 'border-[#FFD08A]'  :
+      soon                 ? 'border-[#9FC3AE]' :
                              'border-border'
     }`}>
 
       {/* Trail Talk header */}
       {ev.isTrailTalk && (
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-violet-50 border-b border-violet-200">
-          <Star className="w-2.5 h-2.5 text-violet-600" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-violet-700">Trail Talk</span>
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-[#EDF5F8] border-b border-[#7FAFC6]">
+          <Star className="w-2.5 h-2.5 text-[#2F6F7E]" />
+          <span className="text-[9px] font-bold uppercase tracking-wider text-[#2F6F7E]">Trail Talk</span>
         </div>
       )}
 
       {/* Pending response header */}
       {ev.isPendingResponse && !ev.isTrailTalk && (
-        <div className="flex items-center justify-between px-3 py-1 bg-amber-50 border-b border-amber-200">
+        <div className="flex items-center justify-between px-3 py-1 bg-[#FFF3E0] border-b border-[#FFD08A]">
           <div className="flex items-center gap-1.5">
-            <AlertCircle className="w-2.5 h-2.5 text-amber-600" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-amber-700">Response needed</span>
+            <AlertCircle className="w-2.5 h-2.5 text-[#CC8400]" />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-[#CC8400]">Response needed</span>
           </div>
           <a
             href={ev.htmlLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[9px] font-semibold text-amber-700 hover:underline flex items-center gap-0.5"
+            className="text-[9px] font-semibold text-[#CC8400] hover:underline flex items-center gap-0.5"
           >
             Open <ExternalLink className="w-2 h-2" />
           </a>
@@ -158,9 +158,9 @@ function EventCard({ ev }: { ev: CalEvent }) {
 
       {/* Starting soon banner */}
       {soon && !ev.isPendingResponse && !ev.isTrailTalk && (
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border-b border-emerald-200">
-          <Zap className="w-2.5 h-2.5 text-emerald-600" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700">Starting soon</span>
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-[#E6F0EA] border-b border-[#9FC3AE]">
+          <Zap className="w-2.5 h-2.5 text-[#2F6B3F]" />
+          <span className="text-[9px] font-bold uppercase tracking-wider text-[#2F6B3F]">Starting soon</span>
         </div>
       )}
 
@@ -186,7 +186,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
             <CalendarDays className="w-2.5 h-2.5" />
             <span>{formatDate(start)}{ev.start.dateTime ? ` · ${formatTime(start)}` : ''}</span>
           </div>
-          <div className={`flex items-center gap-1 text-[10px] font-semibold ${soon ? 'text-emerald-700' : 'text-primary'}`}>
+          <div className={`flex items-center gap-1 text-[10px] font-semibold ${soon ? 'text-[#2F6B3F]' : 'text-primary'}`}>
             <Clock className="w-2.5 h-2.5" />
             <span>{timeToStart(start)}</span>
           </div>
@@ -243,7 +243,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
           )}
 
           {prep.error && (
-            <div className="flex items-center gap-1 text-[10px] text-rose-600">
+            <div className="flex items-center gap-1 text-[10px] text-[#A93F2F]">
               <AlertCircle className="w-2.5 h-2.5" />
               <span>{prep.error}</span>
             </div>
@@ -324,8 +324,8 @@ export function CalendarActionPanel() {
             {/* Header */}
             <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border flex-shrink-0 bg-card">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                  <CalendarDays className="w-3.5 h-3.5 text-emerald-700" />
+                <div className="w-7 h-7 rounded-lg bg-[#E6F0EA] flex items-center justify-center flex-shrink-0">
+                  <CalendarDays className="w-3.5 h-3.5 text-[#2F6B3F]" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-[13px] font-semibold text-foreground leading-none">Calendar</p>
@@ -340,8 +340,8 @@ export function CalendarActionPanel() {
               </div>
 
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                <div className="flex items-center gap-1 text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
                   <span className="font-semibold">Live</span>
                 </div>
 
@@ -396,17 +396,17 @@ export function CalendarActionPanel() {
 
                 {/* Error */}
                 {!loading && error && (
-                  <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 space-y-2">
+                  <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3 space-y-2">
                     <div className="flex items-start gap-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-[12px] font-semibold text-rose-800">Could not load calendar</p>
-                        <p className="text-[11px] text-rose-700 mt-0.5">{error}</p>
+                        <p className="text-[12px] font-semibold text-[#A93F2F]">Could not load calendar</p>
+                        <p className="text-[11px] text-[#A93F2F] mt-0.5">{error}</p>
                       </div>
                     </div>
                     <button
                       onClick={() => void load()}
-                      className="text-[11px] text-rose-700 border border-rose-200 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+                      className="text-[11px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2.5 py-1 hover:bg-[#FBEAE6] transition-colors"
                     >
                       Try again
                     </button>
@@ -417,8 +417,8 @@ export function CalendarActionPanel() {
                 {!loading && !error && pending.length > 0 && (
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <AlertCircle className="w-3 h-3 text-amber-600" />
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                      <AlertCircle className="w-3 h-3 text-[#CC8400]" />
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]">
                         Needs Response ({pending.length})
                       </p>
                     </div>
@@ -446,7 +446,7 @@ export function CalendarActionPanel() {
                 {/* Zero state */}
                 {!loading && !error && events.length === 0 && (
                   <div className="rounded-xl border border-dashed border-border p-6 text-center mt-4">
-                    <CheckCircle2 className="w-7 h-7 text-emerald-500 mx-auto mb-2" />
+                    <CheckCircle2 className="w-7 h-7 text-[#2F6B3F] mx-auto mb-2" />
                     <p className="text-[13px] font-semibold text-foreground mb-1">All clear</p>
                     <p className="text-[11px] text-muted-foreground">No events in the next 7 days.</p>
                   </div>

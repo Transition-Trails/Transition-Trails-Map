@@ -5,15 +5,15 @@ import { curriculumLessons, curriculumModules, CONTENT_STATUS_CONFIG } from '@/d
 import { ArrowRight, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 const TYPE_COLORS: Record<string, string> = {
-  'Video + Discussion':       'bg-sky-50 text-sky-700 border-sky-200',
-  'Reading + Lab':            'bg-indigo-50 text-indigo-700 border-indigo-200',
-  'Video + Workshop':         'bg-violet-50 text-violet-700 border-violet-200',
-  'Reading + Discussion':     'bg-amber-50 text-amber-700 border-amber-200',
-  'Workshop':                 'bg-orange-50 text-orange-700 border-orange-200',
-  'Workshop + Live Session':  'bg-rose-50 text-rose-700 border-rose-200',
-  'Video + Lab':              'bg-sky-50 text-sky-700 border-sky-200',
-  'Hands-On Lab':             'bg-green-50 text-green-700 border-green-200',
-  'Workshop + Lab':           'bg-amber-50 text-amber-700 border-amber-200',
+  'Video + Discussion':       'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'Reading + Lab':            'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'Video + Workshop':         'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'Reading + Discussion':     'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  'Workshop':                 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  'Workshop + Live Session':  'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
+  'Video + Lab':              'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'Hands-On Lab':             'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
+  'Workshop + Lab':           'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
   'Live Session':             'bg-primary/10 text-primary border-primary/20',
 };
 
@@ -51,7 +51,7 @@ export default function CurriculumLessons() {
               key={m.id}
               onClick={() => setModuleFilter(m.id)}
               className={`text-[11px] font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                moduleFilter === m.id ? 'bg-sky-600 text-white border-sky-600' : 'bg-white border-border text-muted-foreground hover:border-sky-300'
+                moduleFilter === m.id ? 'bg-[#2F6F7E] text-white border-[#2F6F7E]' : 'bg-white border-border text-muted-foreground hover:border-[#7FAFC6]'
               }`}
             >
               {m.moduleNumber as string}
@@ -72,7 +72,7 @@ export default function CurriculumLessons() {
               <button
                 key={lesson.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: lesson.id, data: lesson })}
-                className={`w-full text-left grid grid-cols-[80px_1fr_130px_60px_70px_60px] gap-x-3 items-center px-4 py-3 group hover:bg-amber-50/50 transition-colors ${i < filtered.length - 1 ? 'border-b border-border/30' : ''}`}
+                className={`w-full text-left grid grid-cols-[80px_1fr_130px_60px_70px_60px] gap-x-3 items-center px-4 py-3 group hover:bg-[#FFF3E0]/50 transition-colors ${i < filtered.length - 1 ? 'border-b border-border/30' : ''}`}
               >
                 <p className="text-[11px] font-mono text-muted-foreground">{lesson.lessonNumber as string}</p>
                 <div className="min-w-0">
@@ -85,7 +85,7 @@ export default function CurriculumLessons() {
                 <div className="flex items-center">
                   {lesson.hasPennyPrompt as boolean
                     ? <CheckCircle2 className="w-3.5 h-3.5 text-secondary" />
-                    : <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />}
+                    : <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />}
                 </div>
               </button>
             );

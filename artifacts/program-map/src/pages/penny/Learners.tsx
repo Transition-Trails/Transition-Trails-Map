@@ -184,7 +184,7 @@ export default function Learners() {
               {!loading && error && (
                 <tr>
                   <td colSpan={7} className="px-4 py-6 text-center">
-                    <p className="text-[12px] text-red-600 font-medium">{error}</p>
+                    <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
                     <p className="text-[11px] text-muted-foreground mt-1">
                       Check Salesforce authentication in Admin → Integrations.
                     </p>

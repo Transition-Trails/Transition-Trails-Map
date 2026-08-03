@@ -21,8 +21,8 @@ function getRelHealth(m: CurriculumItem) {
 // ── Live SF view helpers ──────────────────────────────────────────────────────
 
 const SF_MODULE_STATUS: Record<string, { label: string; dot: string; pill: string }> = {
-  Completed:    { label: 'Completed',   dot: 'bg-emerald-500', pill: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
-  'In Progress': { label: 'In Progress', dot: 'bg-blue-500',    pill: 'bg-blue-50 text-blue-800 border-blue-200' },
+  Completed:    { label: 'Completed',   dot: 'bg-[#E6F0EA]0', pill: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]' },
+  'In Progress': { label: 'In Progress', dot: 'bg-[#EDF5F8]0',    pill: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
   'Not Started': { label: 'Not Started', dot: 'bg-slate-300',   pill: 'bg-slate-50 text-slate-600 border-slate-200' },
 };
 
@@ -37,7 +37,7 @@ function SfModuleRow({ mod }: { mod: SfCourseModule }) {
         {pct > 0 && (
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="h-1 w-16 bg-muted/40 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-[#E6F0EA]0 rounded-full" style={{ width: `${pct}%` }} />
             </div>
             <span className="text-[10px] text-muted-foreground">{pct}%</span>
           </div>
@@ -55,13 +55,13 @@ function SfCourseBlock({ course }: { course: SfLmsCourse }) {
   const pct       = mods.length > 0 ? Math.round((completed / mods.length) * 100) : 0;
 
   return (
-    <div className="rounded-xl border border-emerald-200/70 bg-white overflow-hidden shadow-sm">
+    <div className="rounded-xl border border-[#9FC3AE]/70 bg-white overflow-hidden shadow-sm">
       <button
         onClick={() => setExpanded(e => !e)}
         className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-muted/20 transition-colors"
       >
         <div className="flex items-center gap-2 min-w-0">
-          <Zap className="w-4 h-4 text-emerald-600 shrink-0" />
+          <Zap className="w-4 h-4 text-[#2F6B3F] shrink-0" />
           <div className="min-w-0">
             <p className="text-[14px] font-bold text-foreground truncate">{course.Course_Title__c ?? course.Name}</p>
             <p className="text-[11px] text-muted-foreground">{mods.length} modules · {pct}% complete</p>
@@ -69,7 +69,7 @@ function SfCourseBlock({ course }: { course: SfLmsCourse }) {
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <div className="w-20 h-1.5 bg-muted/40 rounded-full overflow-hidden">
-            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-[#E6F0EA]0 rounded-full" style={{ width: `${pct}%` }} />
           </div>
           <span className="text-[10px] font-semibold text-muted-foreground">{expanded ? '▲' : '▼'}</span>
         </div>
@@ -139,8 +139,8 @@ export default function CurriculumModules() {
             onClick={() => setViewMode('live')}
             className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
               viewMode === 'live'
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : 'border-border text-muted-foreground hover:border-emerald-400'
+                ? 'bg-[#2F6B3F] text-white border-[#2F6B3F]'
+                : 'border-border text-muted-foreground hover:border-[#2F6B3F]'
             }`}
           >
             <Zap className="w-3 h-3" /> Live from Salesforce
@@ -167,9 +167,9 @@ export default function CurriculumModules() {
                   <span className="text-[14px] font-bold text-foreground">{liveTotal}</span>
                   <span className="text-[11px] text-muted-foreground ml-1.5">total modules</span>
                 </div>
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2">
-                  <span className="text-[14px] font-bold text-emerald-800">{liveCompleted}</span>
-                  <span className="text-[11px] text-emerald-700 ml-1.5">completed</span>
+                <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-2">
+                  <span className="text-[14px] font-bold text-[#245531]">{liveCompleted}</span>
+                  <span className="text-[11px] text-[#2F6B3F] ml-1.5">completed</span>
                 </div>
                 <div className="rounded-lg border border-border bg-white px-4 py-2">
                   <span className="text-[14px] font-bold text-foreground">{lmsData.courses.length}</span>
@@ -189,7 +189,7 @@ export default function CurriculumModules() {
               </div>
             )}
             {isError && (
-              <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[12px] text-rose-700">
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3 text-[12px] text-[#A93F2F]">
                 Could not load Salesforce data. Check your Salesforce connection.
               </div>
             )}
@@ -215,13 +215,13 @@ export default function CurriculumModules() {
                 <span className="text-[14px] font-bold text-foreground">{totalModules}</span>
                 <span className="text-[11px] text-muted-foreground ml-1.5">total modules</span>
               </div>
-              <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-2">
-                <span className="text-[14px] font-bold text-green-800">{fullyConnected}</span>
-                <span className="text-[11px] text-green-700 ml-1.5">fully connected</span>
+              <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-2">
+                <span className="text-[14px] font-bold text-[#245531]">{fullyConnected}</span>
+                <span className="text-[11px] text-[#2F6B3F] ml-1.5">fully connected</span>
               </div>
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2">
-                <span className="text-[14px] font-bold text-red-800">{curriculumHealthIssues.length}</span>
-                <span className="text-[11px] text-red-700 ml-1.5">health issues</span>
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-2">
+                <span className="text-[14px] font-bold text-[#A93F2F]">{curriculumHealthIssues.length}</span>
+                <span className="text-[11px] text-[#A93F2F] ml-1.5">health issues</span>
               </div>
             </div>
 
@@ -245,7 +245,7 @@ export default function CurriculumModules() {
             </div>
 
             {/* Standards principle */}
-            <div className="rounded-lg border border-sky-200 bg-sky-50/40 px-4 py-3 text-[12px] text-sky-800">
+            <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]/40 px-4 py-3 text-[12px] text-[#2F6F7E]">
               <strong>Relationship Standard:</strong> A fully-connected module has all 6 asset types linked — Lessons, Assessment, Knowledge Articles, Coaching Prompts, Reflection Prompts, and Delivery Activities.
               The indicators below show coverage at a glance. <strong>Module 2.1 is the reference standard.</strong>
             </div>
@@ -304,8 +304,8 @@ export default function CurriculumModules() {
                               key={ind.label}
                               className={`inline-flex items-center gap-1 text-[10px] font-medium rounded-full px-2 py-0.5 border ${
                                 ind.ok
-                                  ? 'bg-green-50 text-green-800 border-green-200'
-                                  : 'bg-red-50 text-red-700 border-red-200'
+                                  ? 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]'
+                                  : 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]'
                               }`}
                             >
                               {ind.ok
@@ -316,7 +316,7 @@ export default function CurriculumModules() {
                             </span>
                           ))}
                           {allOk && (
-                            <span className="text-[10px] font-bold text-green-700 border border-green-200 bg-green-50 rounded-full px-2 py-0.5">
+                            <span className="text-[10px] font-bold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2 py-0.5">
                               ✓ Fully Connected
                             </span>
                           )}
@@ -332,7 +332,7 @@ export default function CurriculumModules() {
                           <div className="mt-2 space-y-1">
                             {issues.map(issue => (
                               <div key={issue.id} className="flex items-center gap-1.5">
-                                <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-red-500' : issue.severity === 'medium' ? 'text-orange-500' : 'text-amber-500'}`} />
+                                <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-[#A93F2F]' : issue.severity === 'medium' ? 'text-[#CC8400]' : 'text-[#CC8400]'}`} />
                                 <p className="text-[10px] text-muted-foreground">{issue.name as string}</p>
                               </div>
                             ))}

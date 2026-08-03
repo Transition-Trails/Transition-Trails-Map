@@ -58,14 +58,14 @@ export default function ContentRequests() {
         </div>
 
         {/* Interim action */}
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4">
-          <p className="text-[12px] font-semibold text-amber-900 mb-1">Interim: Use Submit Change Request</p>
-          <p className="text-[11px] text-amber-800 leading-relaxed mb-3">
+        <div className="rounded-xl border border-[#FFD08A] bg-[#FFF3E0] px-5 py-4">
+          <p className="text-[12px] font-semibold text-[#CC8400] mb-1">Interim: Use Submit Change Request</p>
+          <p className="text-[11px] text-[#CC8400] leading-relaxed mb-3">
             Until Content Requests is connected to Demand Management, submit content change requests through the existing Change Request form. These will be tracked manually by the Operations Lead.
           </p>
           <button
             onClick={() => setLocation('/demand/change-request')}
-            className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-amber-900 hover:underline"
+            className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#CC8400] hover:underline"
           >
             Submit Change Request <ArrowRight className="w-3.5 h-3.5" />
           </button>

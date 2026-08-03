@@ -51,13 +51,13 @@ function formatDate(iso: string): string {
 }
 
 const AVATAR_COLORS = [
-  'bg-violet-100 text-violet-700',
-  'bg-sky-100 text-sky-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-rose-100 text-rose-700',
-  'bg-indigo-100 text-indigo-700',
-  'bg-teal-100 text-teal-700',
+  'bg-[#EDF5F8] text-[#2F6F7E]',
+  'bg-[#EDF5F8] text-[#2F6F7E]',
+  'bg-[#E6F0EA] text-[#2F6B3F]',
+  'bg-[#FFF3E0] text-[#CC8400]',
+  'bg-[#FBEAE6] text-[#A93F2F]',
+  'bg-[#EDF5F8] text-[#2F6F7E]',
+  'bg-[#E6F0EA] text-[#2F6B3F]',
 ];
 
 function initials(name: string): string {
@@ -251,8 +251,8 @@ export function GmailActionPanel() {
             {/* Header */}
             <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border flex-shrink-0 bg-card">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-lg bg-rose-100 flex items-center justify-center shrink-0">
-                  <Mail className="w-3.5 h-3.5 text-rose-600" />
+                <div className="w-7 h-7 rounded-lg bg-[#FBEAE6] flex items-center justify-center shrink-0">
+                  <Mail className="w-3.5 h-3.5 text-[#A93F2F]" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
@@ -278,10 +278,10 @@ export function GmailActionPanel() {
                 {!loading && (
                   <div className={`flex items-center gap-1 text-[9px] rounded-full px-2 py-0.5 mr-0.5 border ${
                     fetchError
-                      ? 'text-rose-700 bg-rose-50 border-rose-200'
-                      : 'text-rose-700 bg-rose-50 border-rose-200'
+                      ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
+                      : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
                   }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${fetchError ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${fetchError ? 'bg-[#FFF3E0]0' : 'bg-[#FBEAE6]0'}`} />
                     <span className="font-semibold">{fetchError ? 'Error' : 'Live'}</span>
                   </div>
                 )}
@@ -351,34 +351,34 @@ export function GmailActionPanel() {
                 {!loading && fetchError && (
                   <div className="p-4">
                     {fetchError.includes('insufficient authentication scopes') ? (
-                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+                      <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3 space-y-2">
                         <div className="flex items-start gap-2">
-                          <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                          <AlertCircle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-[12px] font-semibold text-amber-800">Inbox reading requires app verification</p>
-                            <p className="text-[11px] text-amber-700 mt-0.5 leading-snug">
-                              Reading Gmail inbox requires <code className="font-mono bg-amber-100 px-1 rounded">gmail.readonly</code> — a Google "restricted" scope that needs a formal security review before it works in production. <strong>Compose and send still work</strong> via the button below.
+                            <p className="text-[12px] font-semibold text-[#CC8400]">Inbox reading requires app verification</p>
+                            <p className="text-[11px] text-[#CC8400] mt-0.5 leading-snug">
+                              Reading Gmail inbox requires <code className="font-mono bg-[#FFF3E0] px-1 rounded">gmail.readonly</code> — a Google "restricted" scope that needs a formal security review before it works in production. <strong>Compose and send still work</strong> via the button below.
                             </p>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 space-y-2">
+                      <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3 space-y-2">
                         <div className="flex items-start gap-2">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                          <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-[12px] font-semibold text-rose-800">Could not load inbox</p>
-                            <p className="text-[11px] text-rose-700 mt-0.5">{fetchError}</p>
+                            <p className="text-[12px] font-semibold text-[#A93F2F]">Could not load inbox</p>
+                            <p className="text-[11px] text-[#A93F2F] mt-0.5">{fetchError}</p>
                             {fetchError.includes('GOOGLE_GMAIL_REFRESH_TOKEN') && (
-                              <p className="text-[10px] text-rose-600 mt-1">
-                                Store your Gmail refresh token as <code className="font-mono bg-rose-100 px-1 rounded">GOOGLE_GMAIL_REFRESH_TOKEN</code> in Replit Secrets and restart the API server.
+                              <p className="text-[10px] text-[#A93F2F] mt-1">
+                                Store your Gmail refresh token as <code className="font-mono bg-[#FBEAE6] px-1 rounded">GOOGLE_GMAIL_REFRESH_TOKEN</code> in Replit Secrets and restart the API server.
                               </p>
                             )}
                           </div>
                         </div>
                         <button
                           onClick={() => void load()}
-                          className="text-[11px] text-rose-700 border border-rose-200 rounded-md px-2.5 py-1 hover:bg-rose-100 transition-colors"
+                          className="text-[11px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2.5 py-1 hover:bg-[#FBEAE6] transition-colors"
                         >
                           Try again
                         </button>
@@ -391,8 +391,8 @@ export function GmailActionPanel() {
                 {!loading && !fetchError && actionNeeded.length > 0 && (
                   <div className="px-4 pt-3 pb-1">
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <AlertCircle className="w-3 h-3 text-amber-600" />
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                      <AlertCircle className="w-3 h-3 text-[#CC8400]" />
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]">
                         Needs Response ({actionNeeded.length})
                       </p>
                     </div>
@@ -422,7 +422,7 @@ export function GmailActionPanel() {
                           <span className={`text-[11px] truncate ${t.unread && !sentIds.has(t.id) ? 'font-bold' : 'font-medium text-foreground/80'}`}>
                             {t.from}
                           </span>
-                          {t.starred && <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400 shrink-0" />}
+                          {t.starred && <Star className="w-2.5 h-2.5 text-[#CC8400] fill-[#CC8400] shrink-0" />}
                         </div>
                         <span className="text-[9px] text-muted-foreground shrink-0">{formatDate(t.date)}</span>
                       </div>
@@ -433,12 +433,12 @@ export function GmailActionPanel() {
                       <p className="text-[10px] text-muted-foreground line-clamp-1">{t.snippet}</p>
 
                       {t.needsAction && !sentIds.has(t.id) && (
-                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-1.5 py-0.5">
+                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-1.5 py-0.5">
                           <AlertCircle className="w-2 h-2" /> Reply needed
                         </span>
                       )}
                       {sentIds.has(t.id) && (
-                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5">
+                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">
                           <CheckCircle2 className="w-2 h-2" /> Replied
                         </span>
                       )}
@@ -449,7 +449,7 @@ export function GmailActionPanel() {
                 {/* Zero state */}
                 {!loading && !fetchError && threads.length === 0 && (
                   <div className="p-6 text-center">
-                    <CheckCircle2 className="w-7 h-7 text-emerald-500 mx-auto mb-2" />
+                    <CheckCircle2 className="w-7 h-7 text-[#2F6B3F] mx-auto mb-2" />
                     <p className="text-[13px] font-semibold text-foreground mb-1">Inbox zero</p>
                     <p className="text-[11px] text-muted-foreground">No messages in your inbox.</p>
                   </div>
@@ -529,7 +529,7 @@ export function GmailActionPanel() {
 
                     {/* Penny error */}
                     {pennyError && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-rose-600">
+                      <div className="flex items-center gap-1.5 text-[10px] text-[#A93F2F]">
                         <AlertCircle className="w-3 h-3 shrink-0" />
                         <span>{pennyError}</span>
                       </div>
@@ -554,7 +554,7 @@ export function GmailActionPanel() {
 
                     {/* Send error */}
                     {sendError && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-rose-600">
+                      <div className="flex items-center gap-1.5 text-[10px] text-[#A93F2F]">
                         <AlertCircle className="w-3 h-3 shrink-0" />
                         <span>{sendError}</span>
                       </div>

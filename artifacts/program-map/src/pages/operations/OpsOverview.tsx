@@ -16,10 +16,10 @@ function SfLiveStrip() {
 
   if (isError) {
     return (
-      <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 flex items-center gap-2">
-        <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
-        <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — live counts unavailable.</span>
-        <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
+      <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 flex items-center gap-2">
+        <WifiOff className="w-3 h-3 text-[#A93F2F] shrink-0" />
+        <span className="text-[10px] text-[#A93F2F] flex-1">Salesforce unreachable — live counts unavailable.</span>
+        <button onClick={() => refetch()} className="text-[10px] font-semibold text-[#A93F2F] hover:underline flex items-center gap-1">
           <RefreshCw className="w-2.5 h-2.5" /> Retry
         </button>
       </div>
@@ -30,13 +30,13 @@ function SfLiveStrip() {
   const syncLabel = data ? formatSyncAge(data.lastUpdated) : null;
 
   return (
-    <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
+    <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]/60 px-3 py-2">
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-1.5">
-          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLoading || isFetching ? 'bg-amber-400 animate-pulse' : isStale ? 'bg-amber-400' : 'bg-emerald-500'}`} />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-800">Live from Salesforce</span>
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLoading || isFetching ? 'bg-[#CC8400] animate-pulse' : isStale ? 'bg-[#CC8400]' : 'bg-[#E6F0EA]0'}`} />
+          <span className="text-[9px] font-bold uppercase tracking-wider text-[#245531]">Live from Salesforce</span>
           {data && (
-            <span className={`text-[9px] ${isStale ? 'text-amber-600' : 'text-emerald-600/70'}`}>
+            <span className={`text-[9px] ${isStale ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
               · {isStale ? 'stale · ' : ''}{syncLabel}
             </span>
           )}
@@ -44,7 +44,7 @@ function SfLiveStrip() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="text-[9px] text-emerald-700/60 hover:text-emerald-800 flex items-center gap-0.5 disabled:opacity-40"
+          className="text-[9px] text-[#2F6B3F]/60 hover:text-[#245531] flex items-center gap-0.5 disabled:opacity-40"
         >
           <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
         </button>
@@ -52,7 +52,7 @@ function SfLiveStrip() {
 
       {isLoading ? (
         <div className="flex gap-2">
-          {[1,2,3,4].map(i => <div key={i} className="h-7 flex-1 rounded bg-emerald-100 animate-pulse" />)}
+          {[1,2,3,4].map(i => <div key={i} className="h-7 flex-1 rounded bg-[#E6F0EA] animate-pulse" />)}
         </div>
       ) : data ? (
         <div className="grid grid-cols-4 gap-2">
@@ -62,10 +62,10 @@ function SfLiveStrip() {
             { icon: Activity,       label: 'Deliveries',  value: n(data.serviceDeliveries.last30Days),      sub: 'last 30 days' },
             { icon: AlertTriangle,  label: 'Open Cases',  value: n(data.cases.open),                        sub: `${n(data.cases.highPriority)} high priority` },
           ].map(m => (
-            <div key={m.label} className="rounded bg-white/70 border border-emerald-100 px-2 py-1.5">
-              <p className="text-[9px] font-bold text-emerald-700/60 uppercase tracking-wider mb-0.5">{m.label}</p>
-              <p className="text-[15px] font-bold text-emerald-900 leading-none">{m.value}</p>
-              <p className="text-[9px] text-emerald-700/60 mt-0.5">{m.sub}</p>
+            <div key={m.label} className="rounded bg-white/70 border border-[#E6F0EA] px-2 py-1.5">
+              <p className="text-[9px] font-bold text-[#2F6B3F]/60 uppercase tracking-wider mb-0.5">{m.label}</p>
+              <p className="text-[15px] font-bold text-[#245531] leading-none">{m.value}</p>
+              <p className="text-[9px] text-[#2F6B3F]/60 mt-0.5">{m.sub}</p>
             </div>
           ))}
         </div>
@@ -86,9 +86,9 @@ export default function OpsOverview() {
     <ScrollArea className="h-full">
       <div className="p-4 space-y-3">
         {!isEveryday && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 flex items-center gap-2">
-            <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">Phase 1</span>
-            <span className="text-[10px] text-amber-600">Operations, Health, Demand, Scorecards, and Trends are unified here.</span>
+          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2 flex items-center gap-2">
+            <span className="text-[9px] font-bold text-[#CC8400] uppercase tracking-wider">Phase 1</span>
+            <span className="text-[10px] text-[#CC8400]">Operations, Health, Demand, Scorecards, and Trends are unified here.</span>
           </div>
         )}
 
@@ -105,10 +105,10 @@ export default function OpsOverview() {
           <div className="w-px h-8 bg-border/60 shrink-0" />
           <div className="flex flex-1 items-center gap-2 flex-wrap">
             {[
-              { l: 'Critical',        v: visibleRecs.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-              { l: 'High Priority',   v: visibleRecs.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-              { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-              { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
+              { l: 'Critical',        v: visibleRecs.filter(r => r.priority === 'critical').length, c: 'text-[#A93F2F]',   bg: 'bg-[#FBEAE6] border-[#E8B9B4]'   },
+              { l: 'High Priority',   v: visibleRecs.filter(r => r.priority === 'high').length,     c: 'text-[#CC8400]', bg: 'bg-[#FFF3E0] border-[#FFD08A]' },
+              { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-[#A93F2F]',   bg: 'bg-[#FBEAE6] border-[#E8B9B4]'   },
+              { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-[#CC8400]',  bg: 'bg-[#FFF3E0] border-[#FFD08A]'  },
             ].map(s => (
               <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
                 <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
@@ -134,7 +134,7 @@ export default function OpsOverview() {
                   <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
                   <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
                   {d.id === 'dh-programs' && sfPrograms != null && (
-                    <span className="text-[8px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5 mt-1 inline-block leading-none">
+                    <span className="text-[8px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 mt-1 inline-block leading-none">
                       SF: {sfPrograms.active ?? '?'} active · {sfPrograms.total ?? '?'} total
                     </span>
                   )}

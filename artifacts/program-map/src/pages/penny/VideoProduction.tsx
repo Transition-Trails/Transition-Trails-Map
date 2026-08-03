@@ -71,7 +71,7 @@ function Stepper({ phase, done }: { phase: Phase; done: Phase[] }) {
           <div key={p} className="flex items-center">
             <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${
               isActive ? 'bg-primary text-primary-foreground'
-              : isDone  ? 'bg-emerald-100 text-emerald-700'
+              : isDone  ? 'bg-[#E6F0EA] text-[#2F6B3F]'
               : 'bg-muted text-muted-foreground'
             }`}>
               {isDone && !isActive
@@ -120,7 +120,7 @@ function VoiceCard({
               </span>
             )}
             {voice.accent && (
-              <span className="text-[9px] font-bold bg-blue-50 border border-blue-200 rounded-full px-1.5 py-0.5 text-blue-700 capitalize">
+              <span className="text-[9px] font-bold bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 text-[#2F6F7E] capitalize">
                 {voice.accent}
               </span>
             )}
@@ -495,7 +495,7 @@ export default function VideoProduction() {
                 </span>
               )}
               {rewriteError && (
-                <span className="flex items-center gap-1 text-[11px] text-rose-600">
+                <span className="flex items-center gap-1 text-[11px] text-[#A93F2F]">
                   <AlertCircle className="w-3 h-3" />{rewriteError}
                 </span>
               )}
@@ -503,11 +503,11 @@ export default function VideoProduction() {
 
             {/* Rewritten script */}
             {rewrittenScript && (
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 overflow-hidden">
-                <div className="flex items-center gap-2 px-3 py-2 border-b border-emerald-200/60 bg-emerald-50">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="text-[11px] font-semibold text-emerald-700">Gemini rewrite</span>
-                  <span className="text-[10px] text-emerald-600/70 ml-auto">
+              <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA]/40 overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-[#9FC3AE]/60 bg-[#E6F0EA]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#2F6B3F]" />
+                  <span className="text-[11px] font-semibold text-[#2F6B3F]">Gemini rewrite</span>
+                  <span className="text-[10px] text-[#2F6B3F]/70 ml-auto">
                     {wordCount(rewrittenScript)} words · {estimateDuration(wordCount(rewrittenScript))} spoken
                   </span>
                 </div>
@@ -609,11 +609,11 @@ export default function VideoProduction() {
             )}
 
             {!voicesLoading && voicesError && (
-              <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[12px] font-medium text-rose-700">{voicesError}</p>
-                  <p className="text-[11px] text-rose-600/70 mt-0.5">
+                  <p className="text-[12px] font-medium text-[#A93F2F]">{voicesError}</p>
+                  <p className="text-[11px] text-[#A93F2F]/70 mt-0.5">
                     Make sure ELEVENLABS_API_KEY is set in Admin → Integrations → Secrets.
                   </p>
                 </div>
@@ -636,10 +636,10 @@ export default function VideoProduction() {
             )}
 
             {selectedVoice && (
-              <div className="flex items-center gap-2 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-lg px-3 py-2">
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                 <span>Voice selected: <strong>{selectedVoice.name}</strong></span>
-                {selectedVoice.accent && <span className="text-emerald-600/70">· {capitalize(selectedVoice.accent)}</span>}
+                {selectedVoice.accent && <span className="text-[#2F6B3F]/70">· {capitalize(selectedVoice.accent)}</span>}
               </div>
             )}
 
@@ -715,13 +715,13 @@ export default function VideoProduction() {
             )}
 
             {produceError && (
-              <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[12px] font-medium text-rose-700">{produceError}</p>
+                  <p className="text-[12px] font-medium text-[#A93F2F]">{produceError}</p>
                   <button
                     onClick={() => void handleGenerate()}
-                    className="mt-1.5 text-[11px] text-rose-600 font-medium underline"
+                    className="mt-1.5 text-[11px] text-[#A93F2F] font-medium underline"
                   >
                     Try again
                   </button>
@@ -731,11 +731,11 @@ export default function VideoProduction() {
 
             {audioBase64 && (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-lg px-3 py-2">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>Voiceover generated successfully</span>
                   {generateMs !== null && (
-                    <span className="ml-auto text-emerald-600/70 flex items-center gap-1">
+                    <span className="ml-auto text-[#2F6B3F]/70 flex items-center gap-1">
                       <Zap className="w-3 h-3" />{(generateMs / 1000).toFixed(1)}s
                     </span>
                   )}

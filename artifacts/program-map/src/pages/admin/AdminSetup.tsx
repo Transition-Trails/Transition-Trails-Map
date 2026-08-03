@@ -21,12 +21,12 @@ type SetupStatus =
   | 'phase-2';       // planned for a future phase
 
 const STATUS_CONFIG: Record<SetupStatus, { label: string; dot: string; cls: string; badge: string }> = {
-  'live':          { label: 'Live',           dot: 'bg-emerald-500', cls: 'bg-emerald-50 border-emerald-200', badge: 'text-emerald-700' },
-  'live-partial':  { label: 'Live · Active',   dot: 'bg-emerald-400', cls: 'bg-emerald-50 border-emerald-200', badge: 'text-emerald-700' },
-  'configured':    { label: 'Configured',     dot: 'bg-sky-500',     cls: 'bg-sky-50 border-sky-200',         badge: 'text-sky-700' },
-  'needs-auth':    { label: 'Needs Auth',     dot: 'bg-amber-500',   cls: 'bg-amber-50 border-amber-200',     badge: 'text-amber-700' },
-  'needs-setup':   { label: 'Needs Setup',    dot: 'bg-amber-400',   cls: 'bg-amber-50 border-amber-200',     badge: 'text-amber-700' },
-  'phase-2':       { label: 'Phase 2',        dot: 'bg-slate-400',   cls: 'bg-slate-50 border-slate-200',     badge: 'text-slate-500' },
+  'live':          { label: 'Live',           dot: 'bg-[#E6F0EA]0', cls: 'bg-[#E6F0EA] border-[#9FC3AE]', badge: 'text-[#2F6B3F]' },
+  'live-partial':  { label: 'Live · Active',   dot: 'bg-[#2F6B3F]', cls: 'bg-[#E6F0EA] border-[#9FC3AE]', badge: 'text-[#2F6B3F]' },
+  'configured':    { label: 'Configured',     dot: 'bg-[#EDF5F8]0',     cls: 'bg-[#EDF5F8] border-[#7FAFC6]',         badge: 'text-[#2F6F7E]' },
+  'needs-auth':    { label: 'Needs Auth',     dot: 'bg-[#FFF3E0]0',   cls: 'bg-[#FFF3E0] border-[#FFD08A]',     badge: 'text-[#CC8400]' },
+  'needs-setup':   { label: 'Needs Setup',    dot: 'bg-[#CC8400]',   cls: 'bg-[#FFF3E0] border-[#FFD08A]',     badge: 'text-[#CC8400]' },
+  'phase-2':       { label: 'Phase 2',        dot: 'bg-[#C8CBC6]',   cls: 'bg-slate-50 border-slate-200',     badge: 'text-slate-500' },
 };
 
 interface SetupCard {
@@ -64,7 +64,7 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     tagline: 'System of Record',
     status: 'live',
     icon: Database,
-    iconCls: 'bg-blue-50 text-blue-700',
+    iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]',
     owner: 'Salesforce Admin',
     detail: 'REST API connected. PMM + NPSP confirmed. Active programs and learner records live.',
     action: 'View Architecture',
@@ -76,7 +76,7 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     tagline: 'Learner Delivery Channel',
     status: 'live-partial',
     icon: MessageSquare,
-    iconCls: 'bg-violet-50 text-violet-700',
+    iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]',
     owner: 'Ops Lead',
     detail: '@penny posting live. POC scopes active.',
     action: 'Manage Integration',
@@ -89,7 +89,7 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     tagline: 'Auth Foundation',
     status: 'live',
     icon: Lock,
-    iconCls: 'bg-emerald-50 text-emerald-700',
+    iconCls: 'bg-[#E6F0EA] text-[#2F6B3F]',
     owner: 'IT Admin',
     detail: 'Refresh tokens obtained and stored. Drive + Calendar + Gmail OAuth scopes active. Wizard available if tokens need rotation.',
     action: 'Manage Integrations',
@@ -113,7 +113,7 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     tagline: 'Content Repository',
     status: 'live',
     icon: FolderOpen,
-    iconCls: 'bg-green-50 text-green-700',
+    iconCls: 'bg-[#E6F0EA] text-[#2F6B3F]',
     owner: 'Ops Lead',
     detail: 'OAuth refresh token active. Replit connector live. Penny Assets folder setup and program workspace sync available.',
     action: 'Drive Config',
@@ -125,7 +125,7 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
     tagline: 'Timing & Trigger Layer',
     status: 'live',
     icon: Calendar,
-    iconCls: 'bg-amber-50 text-amber-700',
+    iconCls: 'bg-[#FFF3E0] text-[#CC8400]',
     owner: 'IT Admin',
     detail: 'OAuth refresh token active. Replit connector live. Real events surfaced in the Calendar panel.',
     action: 'Calendar Config',
@@ -153,7 +153,7 @@ const NEEDS_CONFIG: SetupCard[] = [
     tagline: 'Outbound Notifications',
     status: 'configured',
     icon: Mail,
-    iconCls: 'bg-red-50 text-red-700',
+    iconCls: 'bg-[#FBEAE6] text-[#A93F2F]',
     owner: 'Ops Lead',
     detail: 'Replit connector active. Read and send scopes enabled. Outbound routing for cohort updates and Penny digests is Phase 2.',
     action: 'Secrets & Credentials',
@@ -165,7 +165,7 @@ const NEEDS_CONFIG: SetupCard[] = [
     tagline: 'Client & Executive Channel',
     status: 'needs-setup',
     icon: MessageCircle,
-    iconCls: 'bg-teal-50 text-teal-700',
+    iconCls: 'bg-[#E6F0EA] text-[#2F6B3F]',
     owner: 'Ops Lead',
     detail: 'Spaces and webhook model defined. Service account auth and webhook URL not yet configured.',
     action: 'Integrations Hub',
@@ -189,7 +189,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'Open Center',
     href: '/admin/integration-readiness',
     badge: 'Planning',
-    badgeCls: 'bg-amber-50 border-amber-200 text-amber-700',
+    badgeCls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',
     icon: Plug,
   },
   {
@@ -199,7 +199,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'Secrets Audit',
     href: '/admin/integrations/secrets',
     badge: 'Audit tool',
-    badgeCls: 'bg-sky-50 border-sky-200 text-sky-700',
+    badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
     icon: Key,
   },
   {
@@ -209,7 +209,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'View Readiness',
     href: '/admin/phase1-readiness',
     badge: 'Phase 1',
-    badgeCls: 'bg-amber-50 border-amber-200 text-amber-700',
+    badgeCls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',
     icon: CheckCircle2,
   },
   {
@@ -219,7 +219,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'View Audit',
     href: '/admin/phase1-audit',
     badge: 'Audit',
-    badgeCls: 'bg-violet-50 border-violet-200 text-violet-700',
+    badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
     icon: CheckCircle2,
   },
   {
@@ -229,7 +229,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'View Standards',
     href: '/admin/ux-standards',
     badge: 'Standards',
-    badgeCls: 'bg-indigo-50 border-indigo-200 text-indigo-700',
+    badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
     icon: LayoutIcon,
   },
   {
@@ -239,7 +239,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'View Matrix',
     href: '/admin/people-access',
     badge: 'Access tiers',
-    badgeCls: 'bg-indigo-50 border-indigo-200 text-indigo-700',
+    badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
     icon: Lock,
   },
   {
@@ -249,7 +249,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'View Validation',
     href: '/admin/sf-validation',
     badge: 'SF Readiness',
-    badgeCls: 'bg-blue-50 border-blue-200 text-blue-700',
+    badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
     icon: Database,
   },
   {
@@ -259,7 +259,7 @@ const READINESS_LINKS: ReadinessLink[] = [
     action: 'Manage Resources',
     href: '/admin/program-resources',
     badge: 'Drive Config',
-    badgeCls: 'bg-green-50 border-green-200 text-green-700',
+    badgeCls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]',
     icon: FolderOpen,
   },
 ];
@@ -273,7 +273,7 @@ function IntegrationCard({ card, navigate }: { card: SetupCard; navigate: (href:
   const needsAttention = card.status === 'needs-auth' || card.status === 'needs-setup';
 
   return (
-    <div className={`rounded-lg border p-3.5 bg-white flex flex-col gap-2.5 ${needsAttention ? 'border-amber-200' : 'border-border'}`}>
+    <div className={`rounded-lg border p-3.5 bg-white flex flex-col gap-2.5 ${needsAttention ? 'border-[#FFD08A]' : 'border-border'}`}>
       {/* Top row: icon + name + status */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -296,12 +296,12 @@ function IntegrationCard({ card, navigate }: { card: SetupCard; navigate: (href:
 
       {/* Next step */}
       {card.needs && (
-        <div className={`flex items-start gap-1.5 rounded-md px-2.5 py-2 ${isLive ? 'bg-blue-50 border border-blue-100' : 'bg-amber-50 border border-amber-100'}`}>
+        <div className={`flex items-start gap-1.5 rounded-md px-2.5 py-2 ${isLive ? 'bg-[#EDF5F8] border border-[#EDF5F8]' : 'bg-[#FFF3E0] border border-[#FFF3E0]'}`}>
           {isLive
-            ? <ChevronRight className="w-3 h-3 text-blue-500 flex-shrink-0 mt-0.5" />
-            : <AlertTriangle className="w-3 h-3 text-amber-600 flex-shrink-0 mt-0.5" />
+            ? <ChevronRight className="w-3 h-3 text-[#2F6F7E] flex-shrink-0 mt-0.5" />
+            : <AlertTriangle className="w-3 h-3 text-[#CC8400] flex-shrink-0 mt-0.5" />
           }
-          <p className={`text-[10px] leading-snug ${isLive ? 'text-blue-700' : 'text-amber-800'}`}>{card.needs}</p>
+          <p className={`text-[10px] leading-snug ${isLive ? 'text-[#2F6F7E]' : 'text-[#CC8400]'}`}>{card.needs}</p>
         </div>
       )}
 
@@ -375,14 +375,14 @@ export default function AdminSetup() {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-[11px] font-semibold text-emerald-700">{liveCount} live</span>
+          <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
+            <span className="text-[11px] font-semibold text-[#2F6B3F]">{liveCount} live</span>
           </div>
           {(needsCount + partialCount) > 0 && (
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              <span className="text-[11px] font-semibold text-amber-700">{needsCount + partialCount} need action</span>
+            <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2.5 py-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FFF3E0]0" />
+              <span className="text-[11px] font-semibold text-[#CC8400]">{needsCount + partialCount} need action</span>
             </div>
           )}
         </div>
@@ -395,7 +395,7 @@ export default function AdminSetup() {
           {/* ── Section 1: Live Connections ── */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />
               <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Live Connections</p>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
@@ -408,7 +408,7 @@ export default function AdminSetup() {
           {/* ── Section 2: Needs Configuration ── */}
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />
               <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Needs Setup</p>
               <Badge variant="secondary" className="text-[10px] font-semibold">{needsCount} pending</Badge>
             </div>
@@ -428,7 +428,7 @@ export default function AdminSetup() {
             <div className="grid grid-cols-2 gap-2">
               {PHASE_2.map(item => (
                 <div key={item.id} className="rounded-lg border border-dashed border-border/60 bg-muted/10 p-3 flex items-start gap-2.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0 mt-1.5" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#C8CBC6] flex-shrink-0 mt-1.5" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2 mb-0.5">
                       <p className="text-[12px] font-semibold text-muted-foreground/70 leading-tight">{item.name}</p>

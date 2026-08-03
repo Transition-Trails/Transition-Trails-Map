@@ -33,10 +33,10 @@ export interface ProgramDriveResource {
 }
 
 export const DRIVE_STATUS_CONFIG: Record<DriveStatus, { label: string; cls: string; description: string }> = {
-  active:       { label: 'Active',       cls: 'text-green-700 bg-green-50 border-green-200',   description: 'Google Drive folder is configured and accessible.' },
-  'needs-setup':{ label: 'Needs Setup',  cls: 'text-amber-700 bg-amber-50 border-amber-200',  description: 'Program is listed but the Drive folder has not been configured yet.' },
+  active:       { label: 'Active',       cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',   description: 'Google Drive folder is configured and accessible.' },
+  'needs-setup':{ label: 'Needs Setup',  cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',  description: 'Program is listed but the Drive folder has not been configured yet.' },
   archived:     { label: 'Archived',     cls: 'text-slate-600 bg-slate-50 border-slate-200',  description: 'Folder exists but is no longer actively used.' },
-  pending:      { label: 'Pending',      cls: 'text-violet-700 bg-violet-50 border-violet-200', description: 'Setup is in progress.' },
+  pending:      { label: 'Pending',      cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', description: 'Setup is in progress.' },
 };
 
 export const PERMISSIONS_CONFIG: Record<PermissionsModel, { label: string; description: string }> = {

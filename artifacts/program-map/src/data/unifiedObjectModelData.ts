@@ -44,25 +44,25 @@ export interface UOMObjectType {
 }
 
 export const OBJECT_CATEGORIES: { id: ObjectCategory; label: string; color: string; bg: string }[] = [
-  { id: 'program-layer',       label: 'Program Layer',       color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
-  { id: 'knowledge-layer',     label: 'Knowledge Layer',     color: 'text-violet-700',  bg: 'bg-violet-50 border-violet-200' },
-  { id: 'intelligence-layer',  label: 'Intelligence Layer',  color: 'text-pink-700',    bg: 'bg-pink-50 border-pink-200' },
-  { id: 'people-layer',        label: 'People Layer',        color: 'text-blue-700',    bg: 'bg-blue-50 border-blue-200' },
-  { id: 'infrastructure-layer',label: 'Infrastructure Layer',color: 'text-teal-700',    bg: 'bg-teal-50 border-teal-200' },
-  { id: 'governance-layer',    label: 'Governance Layer',    color: 'text-amber-700',   bg: 'bg-amber-50 border-amber-200' },
+  { id: 'program-layer',       label: 'Program Layer',       color: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#9FC3AE]' },
+  { id: 'knowledge-layer',     label: 'Knowledge Layer',     color: 'text-[#2F6F7E]',  bg: 'bg-[#EDF5F8] border-[#7FAFC6]' },
+  { id: 'intelligence-layer',  label: 'Intelligence Layer',  color: 'text-[#A93F2F]',    bg: 'bg-[#FBEAE6] border-[#E8B9B4]' },
+  { id: 'people-layer',        label: 'People Layer',        color: 'text-[#2F6F7E]',    bg: 'bg-[#EDF5F8] border-[#7FAFC6]' },
+  { id: 'infrastructure-layer',label: 'Infrastructure Layer',color: 'text-[#2F6B3F]',    bg: 'bg-[#E6F0EA] border-[#9FC3AE]' },
+  { id: 'governance-layer',    label: 'Governance Layer',    color: 'text-[#CC8400]',   bg: 'bg-[#FFF3E0] border-[#FFD08A]' },
 ];
 
 export const REL_TYPE_CONFIG: Record<RelType, { label: string; color: string }> = {
-  'contains':        { label: 'Contains',        color: 'text-emerald-600' },
-  'governs':         { label: 'Governs',          color: 'text-violet-600'  },
-  'sources':         { label: 'Sources From',     color: 'text-blue-600'    },
-  'maps-to':         { label: 'Maps To',          color: 'text-sky-600'     },
-  'triggers':        { label: 'Triggers',         color: 'text-pink-600'    },
-  'participates-in': { label: 'Participates In',  color: 'text-orange-600'  },
-  'syncs-with':      { label: 'Syncs With',       color: 'text-teal-600'    },
-  'depends-on':      { label: 'Depends On',       color: 'text-rose-600'    },
-  'informs':         { label: 'Informs',          color: 'text-indigo-600'  },
-  'serves':          { label: 'Serves',           color: 'text-amber-600'   },
+  'contains':        { label: 'Contains',        color: 'text-[#2F6B3F]' },
+  'governs':         { label: 'Governs',          color: 'text-[#2F6F7E]'  },
+  'sources':         { label: 'Sources From',     color: 'text-[#2F6F7E]'    },
+  'maps-to':         { label: 'Maps To',          color: 'text-[#2F6F7E]'     },
+  'triggers':        { label: 'Triggers',         color: 'text-[#A93F2F]'    },
+  'participates-in': { label: 'Participates In',  color: 'text-[#CC8400]'  },
+  'syncs-with':      { label: 'Syncs With',       color: 'text-[#2F6B3F]'    },
+  'depends-on':      { label: 'Depends On',       color: 'text-[#A93F2F]'    },
+  'informs':         { label: 'Informs',          color: 'text-[#2F6F7E]'  },
+  'serves':          { label: 'Serves',           color: 'text-[#CC8400]'   },
 };
 
 export const OBJECT_TYPES: UOMObjectType[] = [

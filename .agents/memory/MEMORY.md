@@ -31,3 +31,4 @@
 - [Procedure Builder decisions](procedure-builder-decisions.md) — Drive: Content/Procedures/[slug]/; Google Drive single source for media; public share = lightweight Express HTML page (not React route); learners can view published procedures; Chrome extension = Phase 2.
 - [RESOLVE phase names](resolve-phase-names.md) — 7 phases: Recognize, Explore, Select, Outline, Launch, Verify, Evolve. Execute removed. Old names Evaluate/Solve/Organize/Leverage never use again.
 - [Brand design system](brand-design-system.md) — TT brand tokens live in src/index.css :root Section 1; @theme inline maps them; dark theme untouched. Poppins=headings(font-serif), Open Sans=body(font-sans).
+- [Status colour system](status-color-system.md) — 5-role system in src/config/statusColors.ts; all off-brand Tailwind colours swept from the codebase (except ProgramMap.tsx per-program map colours and toast.tsx destructive styles).

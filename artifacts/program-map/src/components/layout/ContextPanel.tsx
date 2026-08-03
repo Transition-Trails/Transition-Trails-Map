@@ -93,9 +93,9 @@ export function ContextPanel() {
               </div>
 
               {data.quickTake && (
-                <div className="bg-emerald-50 border border-emerald-100 rounded-md p-3">
-                  <span className="block text-[10px] font-bold text-emerald-800 uppercase mb-1">Quick Take</span>
-                  <p className="text-sm text-emerald-900 leading-tight">{data.quickTake}</p>
+                <div className="bg-[#E6F0EA] border border-[#E6F0EA] rounded-md p-3">
+                  <span className="block text-[10px] font-bold text-[#245531] uppercase mb-1">Quick Take</span>
+                  <p className="text-sm text-[#245531] leading-tight">{data.quickTake}</p>
                 </div>
               )}
 
@@ -151,7 +151,7 @@ export function ContextPanel() {
 
     if (type === 'commProvider') {
       const statusBg = data.status === 'prototype'
-        ? 'bg-amber-50 border-amber-200 text-amber-700'
+        ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]'
         : 'bg-muted border-border text-muted-foreground';
       return (
         <ScrollArea className="h-full">
@@ -210,7 +210,7 @@ export function ContextPanel() {
               <div>
                 <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Events</span>
                 <div className="flex flex-wrap gap-1">
-                  {data.relatedDemandEvents.map((e: string) => <Badge key={e} variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">{e}</Badge>)}
+                  {data.relatedDemandEvents.map((e: string) => <Badge key={e} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">{e}</Badge>)}
                 </div>
               </div>
             )}
@@ -242,7 +242,7 @@ export function ContextPanel() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Comm Route</Badge>
-                <Badge variant="outline" className="bg-amber-50 border-amber-200 text-amber-700 text-[10px]">Planned</Badge>
+                <Badge variant="outline" className="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] text-[10px]">Planned</Badge>
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">{data.eventType}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">{data.description}</p>
@@ -274,7 +274,7 @@ export function ContextPanel() {
               <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Slack Channel (Now)</span>
               <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-md px-3 py-2">
                 <span className="font-mono text-sm text-foreground">{data.slackChannel}</span>
-                <span className="text-[10px] text-amber-700 ml-auto">{data.slackStatus}</span>
+                <span className="text-[10px] text-[#CC8400] ml-auto">{data.slackStatus}</span>
               </div>
             </div>
             {data.googleChatSpace && (
@@ -295,7 +295,7 @@ export function ContextPanel() {
             {data.relatedDemandEvent && (
               <div>
                 <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Event</span>
-                <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">{data.relatedDemandEvent}</Badge>
+                <Badge variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">{data.relatedDemandEvent}</Badge>
               </div>
             )}
           </div>
@@ -304,7 +304,7 @@ export function ContextPanel() {
     }
 
     if (type === 'commTemplate') {
-      const statusColor = data.status === 'active' ? 'text-emerald-700' : data.status === 'draft' ? 'text-amber-700' : 'text-muted-foreground';
+      const statusColor = data.status === 'active' ? 'text-[#2F6B3F]' : data.status === 'draft' ? 'text-[#CC8400]' : 'text-muted-foreground';
       return (
         <ScrollArea className="h-full">
           <div className="p-5 space-y-5">
@@ -359,7 +359,7 @@ export function ContextPanel() {
             {data.relatedDemandEvent && (
               <div>
                 <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Event</span>
-                <Badge variant="outline" className="bg-sky-50 text-sky-700 border-sky-200">{data.relatedDemandEvent}</Badge>
+                <Badge variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">{data.relatedDemandEvent}</Badge>
               </div>
             )}
           </div>
@@ -368,15 +368,15 @@ export function ContextPanel() {
     }
 
     if (type === 'promptTemplate') {
-      const statusColor = data.status === 'Approved' ? 'text-green-700'
-        : data.status === 'Review' ? 'text-sky-700'
-        : data.status === 'Draft' ? 'text-amber-700'
+      const statusColor = data.status === 'Approved' ? 'text-[#2F6B3F]'
+        : data.status === 'Review' ? 'text-[#2F6F7E]'
+        : data.status === 'Draft' ? 'text-[#CC8400]'
         : 'text-muted-foreground';
       const riskCls = data.hallucinationRisk === 'Low'
-        ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+        ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
         : data.hallucinationRisk === 'Medium'
-        ? 'text-amber-700 bg-amber-50 border-amber-200'
-        : 'text-rose-700 bg-rose-50 border-rose-200';
+        ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
+        : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]';
       return (
         <ScrollArea className="h-full">
           <div className="p-5 space-y-5">
@@ -420,9 +420,9 @@ export function ContextPanel() {
                 <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Guardrails</span>
                 <div className="space-y-1.5">
                   {data.guardrails.map((g: string, i: number) => (
-                    <div key={i} className="flex items-start gap-1.5 rounded border border-rose-200 bg-rose-50 p-2">
-                      <span className="text-rose-600 shrink-0 mt-0.5 text-[11px]">⚔</span>
-                      <p className="text-[11px] text-rose-900 leading-snug">{g}</p>
+                    <div key={i} className="flex items-start gap-1.5 rounded border border-[#E8B9B4] bg-[#FBEAE6] p-2">
+                      <span className="text-[#A93F2F] shrink-0 mt-0.5 text-[11px]">⚔</span>
+                      <p className="text-[11px] text-[#A93F2F] leading-snug">{g}</p>
                     </div>
                   ))}
                 </div>
@@ -451,7 +451,7 @@ export function ContextPanel() {
 
     if (type === 'program') {
       const opStatus = data.operationalStatus;
-      const statusDot = opStatus === 'active' ? 'bg-emerald-500' : opStatus === 'in-discovery' ? 'bg-sky-400' : 'bg-muted-foreground/50';
+      const statusDot = opStatus === 'active' ? 'bg-[#E6F0EA]0' : opStatus === 'in-discovery' ? 'bg-[#2F6F7E]' : 'bg-muted-foreground/50';
       const statusLabel = opStatus === 'active' ? 'Active' : opStatus === 'in-discovery' ? 'In Discovery' : 'Draft';
       return (
         <ScrollArea className="h-full">
@@ -541,7 +541,7 @@ export function ContextPanel() {
                 <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">RESOLVE Phases</span>
                 <div className="flex flex-wrap gap-1">
                   {data.resolvePhases.map((p: string) => (
-                    <Badge key={p} variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 text-[10px]">{p}</Badge>
+                    <Badge key={p} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6] text-[10px]">{p}</Badge>
                   ))}
                 </div>
               </div>
@@ -565,7 +565,7 @@ export function ContextPanel() {
                 <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Trail OS Capabilities</span>
                 <div className="flex flex-wrap gap-1">
                   {data.trailOsCapabilities.map((c: string) => (
-                    <Badge key={c} variant="outline" className="bg-sky-50 text-sky-700 border-sky-200 text-[10px]">{c}</Badge>
+                    <Badge key={c} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6] text-[10px]">{c}</Badge>
                   ))}
                 </div>
               </div>
@@ -599,17 +599,17 @@ export function ContextPanel() {
 
             {/* What breaks if missing */}
             {data.whatBreaksIfMissing && (
-              <div className="bg-amber-50 border border-amber-100 rounded-md p-3">
-                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">What Breaks If Missing</span>
-                <p className="text-sm text-amber-900 leading-tight">{data.whatBreaksIfMissing}</p>
+              <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md p-3">
+                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">What Breaks If Missing</span>
+                <p className="text-sm text-[#CC8400] leading-tight">{data.whatBreaksIfMissing}</p>
               </div>
             )}
 
             {/* Health note */}
             {data.healthNote && (
-              <div className="bg-amber-100/50 border border-amber-200 rounded-md p-3">
-                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">⚠ Health Flag</span>
-                <p className="text-xs text-amber-900">{data.healthNote}</p>
+              <div className="bg-[#FFF3E0]/50 border border-[#FFD08A] rounded-md p-3">
+                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">⚠ Health Flag</span>
+                <p className="text-xs text-[#CC8400]">{data.healthNote}</p>
               </div>
             )}
 
@@ -617,7 +617,7 @@ export function ContextPanel() {
             <div className="text-[11px] text-muted-foreground border-t border-border/40 pt-3">
               <p><span className="font-semibold text-foreground">Source: </span>{data.sourceDoc}</p>
               {data.confidence === 'needs-review' && (
-                <p className="mt-1 text-amber-700">⚠ Some details require source document review before treating as authoritative.</p>
+                <p className="mt-1 text-[#CC8400]">⚠ Some details require source document review before treating as authoritative.</p>
               )}
               <p className="mt-1 text-muted-foreground/60">Future: Salesforce MCP · Knowledge links</p>
             </div>
@@ -652,8 +652,8 @@ export function ContextPanel() {
               <div className="space-y-2">
                 {([
                   { label: 'RESOLVE Phase',     value: data.phase,    cls: 'bg-primary/10 border-primary/20 text-primary' },
-                  { label: 'Trail OS Capability', value: data.trailOs,  cls: 'bg-sky-50 border-sky-200 text-sky-800' },
-                  { label: `${TERMS.aiAssistant} AI Function`,  value: `⚡ ${data.penny as string}`, cls: 'bg-violet-50 border-violet-200 text-violet-800' },
+                  { label: 'Trail OS Capability', value: data.trailOs,  cls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]' },
+                  { label: `${TERMS.aiAssistant} AI Function`,  value: `⚡ ${data.penny as string}`, cls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]' },
                   { label: 'Program Artifact',   value: data.artifact, cls: 'bg-muted border-border text-foreground' },
                 ] as Array<{ label: string; value: string; cls: string }>).map((row) => (
                   <div key={row.label}>
@@ -698,8 +698,8 @@ export function ContextPanel() {
       // ── Active Work Item ──
       if (kind === 'work') {
         const statusDot: Record<string, string> = {
-          'active': 'bg-emerald-500', 'in-discovery': 'bg-sky-400',
-          'planning': 'bg-amber-400', 'in-progress': 'bg-primary',
+          'active': 'bg-[#E6F0EA]0', 'in-discovery': 'bg-[#2F6F7E]',
+          'planning': 'bg-[#CC8400]', 'in-progress': 'bg-primary',
         };
         const statusLabel: Record<string, string> = {
           'active': 'Active', 'in-discovery': 'In Discovery',
@@ -816,7 +816,7 @@ export function ContextPanel() {
                 <ConfidenceBadge status={data.confidence || 'needs-review'} />
                 {data.status && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
-                    <span className={`w-1.5 h-1.5 rounded-full ${data.status === 'active' ? 'bg-emerald-500' : data.status === 'needs-review' ? 'bg-amber-400' : 'bg-sky-400'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${data.status === 'active' ? 'bg-[#E6F0EA]0' : data.status === 'needs-review' ? 'bg-[#CC8400]' : 'bg-[#2F6F7E]'}`} />
                     <span className="text-muted-foreground">{data.status === 'active' ? 'Active' : data.status === 'needs-review' ? 'Needs Review' : 'Planning'}</span>
                   </span>
                 )}
@@ -877,9 +877,9 @@ export function ContextPanel() {
                   {(data.trailOs as string[]).map((c) => {
                     const cap = trailOsCapabilities.find(t => t.name === c);
                     return (
-                      <div key={c} className="bg-sky-50 border border-sky-100 rounded-md p-2">
-                        <p className="text-[11px] font-semibold text-sky-800">{c}</p>
-                        {cap && <p className="text-[10px] text-sky-600 mt-0.5 leading-snug">{cap.description}</p>}
+                      <div key={c} className="bg-[#EDF5F8] border border-[#EDF5F8] rounded-md p-2">
+                        <p className="text-[11px] font-semibold text-[#2F6F7E]">{c}</p>
+                        {cap && <p className="text-[10px] text-[#2F6F7E] mt-0.5 leading-snug">{cap.description}</p>}
                       </div>
                     );
                   })}
@@ -895,9 +895,9 @@ export function ContextPanel() {
                   {(data.penny as string[]).map((p) => {
                     const cap = (pennyCapabilities as Array<{ name: string; description?: string }>)?.find(c => c.name === p);
                     return (
-                      <div key={p} className="bg-violet-50 border border-violet-100 rounded-md p-2">
-                        <p className="text-[11px] font-semibold text-violet-800">⚡ {p}</p>
-                        {cap?.description && <p className="text-[10px] text-violet-600 mt-0.5 leading-snug">{cap.description}</p>}
+                      <div key={p} className="bg-[#EDF5F8] border border-[#EDF5F8] rounded-md p-2">
+                        <p className="text-[11px] font-semibold text-[#2F6F7E]">⚡ {p}</p>
+                        {cap?.description && <p className="text-[10px] text-[#2F6F7E] mt-0.5 leading-snug">{cap.description}</p>}
                       </div>
                     );
                   })}
@@ -937,8 +937,8 @@ export function ContextPanel() {
               )}
               <p className="text-[11px] text-muted-foreground/60">Salesforce Cases: future · Knowledge Articles: future</p>
               {data.owner === 'Source mapping needed' && (
-                <div className="bg-amber-50 border border-amber-100 rounded-md p-2.5 mt-1">
-                  <p className="text-[11px] text-amber-800">⚠ Owner and operational details require source document review before treating as authoritative.</p>
+                <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md p-2.5 mt-1">
+                  <p className="text-[11px] text-[#CC8400]">⚠ Owner and operational details require source document review before treating as authoritative.</p>
                 </div>
               )}
             </div>
@@ -964,7 +964,7 @@ export function ContextPanel() {
         commBroadcast:    { label: `${TERMS.aiAssistant} Broadcast`,    icon: <Radio className="w-4 h-4 text-secondary" /> },
         commWeeklyBrief:  { label: 'Weekly Brief',       icon: <CalendarDays className="w-4 h-4 text-primary" /> },
         commNotification: { label: 'Notification Rule',  icon: <Bell className="w-4 h-4 text-primary" /> },
-        commCalendar:     { label: 'Calendar Category',  icon: <CalendarDays className="w-4 h-4 text-emerald-700" /> },
+        commCalendar:     { label: 'Calendar Category',  icon: <CalendarDays className="w-4 h-4 text-[#2F6B3F]" /> },
       };
       const meta = TYPE_META[type] || { label: 'Communications', icon: <MessageSquare className="w-4 h-4 text-primary" /> };
 
@@ -1069,9 +1069,9 @@ export function ContextPanel() {
             )}
 
             {data.setupNotes && (
-              <div className="bg-amber-50 border border-amber-100 rounded-md px-3 py-2">
-                <span className="block text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Future Setup</span>
-                <p className="text-[11px] text-amber-900 leading-relaxed">{data.setupNotes}</p>
+              <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md px-3 py-2">
+                <span className="block text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Setup</span>
+                <p className="text-[11px] text-[#CC8400] leading-relaxed">{data.setupNotes}</p>
               </div>
             )}
 
@@ -1093,7 +1093,7 @@ export function ContextPanel() {
               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                 <span className={`inline-block text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg?.chip ?? ''}`}>{action.category}</span>
                 <span className="text-[10px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{action.estimatedTime}</span>
-                <span className={`text-[10px] font-medium border rounded-full px-2 py-0.5 ${action.status === 'prototype' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{action.status}</span>
+                <span className={`text-[10px] font-medium border rounded-full px-2 py-0.5 ${action.status === 'prototype' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{action.status}</span>
               </div>
             </div>
             <button
@@ -1114,7 +1114,7 @@ export function ContextPanel() {
                 <div className="space-y-1.5">
                   {action.inputs.map(inp => (
                     <div key={inp.label} className="flex items-start gap-2">
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${inp.required ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{inp.required ? 'Required' : 'Optional'}</span>
+                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${inp.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{inp.required ? 'Required' : 'Optional'}</span>
                       <div><p className="text-[11px] font-semibold text-foreground">{inp.label}</p><p className="text-[10px] text-muted-foreground">{inp.description}</p></div>
                     </div>
                   ))}
@@ -1145,15 +1145,15 @@ export function ContextPanel() {
               </div>
             )}
             {action.salesforceMapping && (
-              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                <p className="text-[10px] font-bold text-blue-800 uppercase tracking-wider mb-1">Salesforce Mapping</p>
-                <p className="text-[11px] font-semibold text-blue-900">{action.salesforceMapping}</p>
+              <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3">
+                <p className="text-[10px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-1">Salesforce Mapping</p>
+                <p className="text-[11px] font-semibold text-[#2F6F7E]">{action.salesforceMapping}</p>
               </div>
             )}
             {action.notes && (
-              <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-                <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Note</p>
-                <p className="text-[11px] text-amber-900">{action.notes}</p>
+              <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
+                <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Note</p>
+                <p className="text-[11px] text-[#CC8400]">{action.notes}</p>
               </div>
             )}
           </div>
@@ -1184,11 +1184,11 @@ export function ContextPanel() {
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-1">
-              <p className="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Maps To</p>
-              <p className="text-[14px] font-bold text-blue-900">{mapping.sfLabel}</p>
-              <p className="text-[11px] font-mono text-blue-700">{mapping.sfApiName}</p>
-              <p className="text-[11px] text-blue-800">{mapping.sfPackageSource}</p>
+            <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3 space-y-1">
+              <p className="text-[10px] font-bold text-[#2F6F7E] uppercase tracking-wider">Maps To</p>
+              <p className="text-[14px] font-bold text-[#2F6F7E]">{mapping.sfLabel}</p>
+              <p className="text-[11px] font-mono text-[#2F6F7E]">{mapping.sfApiName}</p>
+              <p className="text-[11px] text-[#2F6F7E]">{mapping.sfPackageSource}</p>
             </div>
             {sfOrgData?.orgBaseUrl && (
               <a
@@ -1210,9 +1210,9 @@ export function ContextPanel() {
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Current Implementation</p>
               <p className="text-[11px] text-muted-foreground leading-relaxed">{mapping.currentImplementation}</p>
             </div>
-            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Future Recommendation</p>
-              <p className="text-[11px] text-amber-900 leading-relaxed">{mapping.futureRecommendation}</p>
+            <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
+              <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Recommendation</p>
+              <p className="text-[11px] text-[#CC8400] leading-relaxed">{mapping.futureRecommendation}</p>
             </div>
             <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
               <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">★ Reference Implementation: Foundations Trail</p>
@@ -1225,9 +1225,9 @@ export function ContextPanel() {
               <span>Owner: {mapping.owner}</span>
             </div>
             {mapping.notes && (
-              <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
-                <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider mb-1">Note</p>
-                <p className="text-[11px] text-orange-900">{mapping.notes}</p>
+              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
+                <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Note</p>
+                <p className="text-[11px] text-[#CC8400]">{mapping.notes}</p>
               </div>
             )}
           </div>
@@ -1300,18 +1300,18 @@ export function ContextPanel() {
             </button>
 
             {src.healthIssues.length > 0 && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 space-y-1">
-                <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide">Open Issues</p>
+              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2.5 space-y-1">
+                <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wide">Open Issues</p>
                 {src.healthIssues.map((issue, i) => (
-                  <p key={i} className="text-[11px] text-amber-800 leading-snug">· {issue}</p>
+                  <p key={i} className="text-[11px] text-[#CC8400] leading-snug">· {issue}</p>
                 ))}
               </div>
             )}
 
             {src.trustLevel === 'Unverified' && (
-              <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5">
-                <p className="text-[11px] font-bold text-rose-700">⚠ Unverified</p>
-                <p className="text-[11px] text-rose-800 mt-0.5">Trust review required before {TERMS.aiAssistant} activation.</p>
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2.5">
+                <p className="text-[11px] font-bold text-[#A93F2F]">⚠ Unverified</p>
+                <p className="text-[11px] text-[#A93F2F] mt-0.5">Trust review required before {TERMS.aiAssistant} activation.</p>
               </div>
             )}
 
@@ -1334,7 +1334,7 @@ export function ContextPanel() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{TERMS.aiAssistant} Ready</span>
-                <span className={`font-bold ${isActive ? 'text-emerald-600' : 'text-rose-500'}`}>
+                <span className={`font-bold ${isActive ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>
                   {isActive ? 'Yes' : 'Pending review'}
                 </span>
               </div>
@@ -1397,10 +1397,10 @@ export function ContextPanel() {
             )}
 
             {cap.relatedSfObjects.length > 0 && (
-              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1.5">Salesforce Objects</p>
+              <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3">
+                <p className="text-[10px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-1.5">Salesforce Objects</p>
                 <div className="flex flex-wrap gap-1">
-                  {cap.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-blue-900 bg-white/70 border border-blue-100 rounded-full px-2 py-0.5">{o}</span>)}
+                  {cap.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-[#2F6F7E] bg-white/70 border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)}
                 </div>
               </div>
             )}
@@ -1440,9 +1440,9 @@ export function ContextPanel() {
               </div>
             )}
 
-            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Future Integration</p>
-              <p className="text-[11px] text-amber-900 leading-relaxed">{cap.futureIntegrationStatus}</p>
+            <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
+              <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Integration</p>
+              <p className="text-[11px] text-[#CC8400] leading-relaxed">{cap.futureIntegrationStatus}</p>
             </div>
 
             <div className="rounded-lg border border-border bg-muted/20 p-3 text-[11px] space-y-1">
@@ -1486,9 +1486,9 @@ export function ContextPanel() {
               <p className="text-[12px] text-foreground leading-relaxed">{std.purpose}</p>
             </div>
 
-            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Why It Matters</p>
-              <p className="text-[11px] text-amber-900 leading-relaxed">{std.whyItMatters}</p>
+            <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
+              <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Why It Matters</p>
+              <p className="text-[11px] text-[#CC8400] leading-relaxed">{std.whyItMatters}</p>
             </div>
 
             <div>
@@ -1496,7 +1496,7 @@ export function ContextPanel() {
               <div className="space-y-1">
                 {std.requiredFields.map(f => (
                   <div key={f.field} className="flex items-start gap-1.5">
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{f.required ? 'Req' : 'Opt'}</span>
+                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{f.required ? 'Req' : 'Opt'}</span>
                     <div><p className="text-[11px] font-semibold text-foreground leading-tight">{f.field}</p><p className="text-[10px] text-muted-foreground leading-tight">{f.description}</p></div>
                   </div>
                 ))}
@@ -1515,13 +1515,13 @@ export function ContextPanel() {
             )}
 
             <div className="space-y-2">
-              <div className="rounded-lg border border-blue-200 bg-blue-50 p-2.5">
-                <p className="text-[9px] font-bold text-blue-700 uppercase tracking-wider mb-0.5">Salesforce</p>
-                <p className="text-[11px] text-blue-900">{std.sfMapping}</p>
+              <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
+                <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">Salesforce</p>
+                <p className="text-[11px] text-[#2F6F7E]">{std.sfMapping}</p>
               </div>
-              <div className="rounded-lg border border-violet-200 bg-violet-50 p-2.5">
-                <p className="text-[9px] font-bold text-violet-700 uppercase tracking-wider mb-0.5">LMS</p>
-                <p className="text-[11px] text-violet-900">{std.lmsMapping}</p>
+              <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
+                <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">LMS</p>
+                <p className="text-[11px] text-[#2F6F7E]">{std.lmsMapping}</p>
               </div>
             </div>
 
@@ -1545,8 +1545,8 @@ export function ContextPanel() {
       const { gap, std } = data as { gap: GapReportItem; std: ContentStandard | undefined };
       const typeCfg = GAP_TYPE_CONFIG[gap.gapType];
       const sevCls: Record<string, string> = {
-        high:   'text-rose-700 bg-rose-50 border-rose-200',
-        medium: 'text-amber-700 bg-amber-50 border-amber-200',
+        high:   'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+        medium: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
         low:    'text-slate-600 bg-slate-50 border-slate-200',
       };
       function focusGapWithPenny() {
@@ -1620,10 +1620,10 @@ export function ContextPanel() {
         checks: { label: string; status: string; note: string }[];
       };
       const statusCls: Record<string, string> = {
-        validated: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-        partial:   'bg-blue-100 text-blue-700 border-blue-200',
-        pending:   'bg-amber-100 text-amber-700 border-amber-200',
-        blocked:   'bg-rose-100 text-rose-700 border-rose-200',
+        validated: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
+        partial:   'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+        pending:   'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+        blocked:   'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
         'n-a':     'bg-muted text-muted-foreground border-border',
       };
       const statusLabel: Record<string, string> = {
@@ -1654,7 +1654,7 @@ export function ContextPanel() {
                 <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCls[prod.overallStatus] ?? statusCls['n-a']}`}>
                   {statusLabel[prod.overallStatus] ?? prod.overallStatus}
                 </span>
-                <span className={`text-[13px] font-bold ${prod.score >= 60 ? 'text-blue-600' : prod.score >= 30 ? 'text-amber-600' : 'text-rose-600'}`}>
+                <span className={`text-[13px] font-bold ${prod.score >= 60 ? 'text-[#2F6F7E]' : prod.score >= 30 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
                   {prod.score}/100
                 </span>
               </div>
@@ -1678,7 +1678,7 @@ export function ContextPanel() {
               <div className="flex items-center gap-2 mb-1.5">
                 <div className="flex-1 h-1.5 bg-muted rounded-full">
                   <div
-                    className={`h-1.5 rounded-full ${prod.score >= 60 ? 'bg-blue-400' : prod.score >= 30 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                    className={`h-1.5 rounded-full ${prod.score >= 60 ? 'bg-[#2F6F7E]' : prod.score >= 30 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`}
                     style={{ width: `${prod.score}%` }}
                   />
                 </div>
@@ -1703,10 +1703,10 @@ export function ContextPanel() {
             </div>
 
             {blockers.length > 0 && (
-              <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
-                <p className="text-[10px] font-bold text-rose-700 uppercase tracking-wider mb-1">{blockers.length} Blocker{blockers.length > 1 ? 's' : ''} — Needs Action</p>
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3">
+                <p className="text-[10px] font-bold text-[#A93F2F] uppercase tracking-wider mb-1">{blockers.length} Blocker{blockers.length > 1 ? 's' : ''} — Needs Action</p>
                 {blockers.map(b => (
-                  <p key={b.label} className="text-[11px] text-rose-900 leading-snug mt-1">· {b.note}</p>
+                  <p key={b.label} className="text-[11px] text-[#A93F2F] leading-snug mt-1">· {b.note}</p>
                 ))}
               </div>
             )}
@@ -1721,22 +1721,22 @@ export function ContextPanel() {
       const objType     = d.objectType as string;
       const status      = d.status as string;
       const statusCls: Record<string, string> = {
-        published:      'text-green-700 bg-green-50 border-green-200',
-        draft:          'text-amber-700 bg-amber-50 border-amber-200',
-        'needs-review': 'text-orange-700 bg-orange-50 border-orange-200',
-        missing:        'text-red-700 bg-red-50 border-red-200',
-        prototype:      'text-violet-700 bg-violet-50 border-violet-200',
+        published:      'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
+        draft:          'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+        'needs-review': 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+        missing:        'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+        prototype:      'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
       };
       const objChip: Record<string, string> = {
         program:          'bg-primary/10 text-primary border-primary/20',
-        sprint:           'bg-violet-50 text-violet-800 border-violet-200',
-        module:           'bg-sky-50 text-sky-800 border-sky-200',
-        lesson:           'bg-amber-50 text-amber-800 border-amber-200',
-        assignment:       'bg-orange-50 text-orange-800 border-orange-200',
-        assessment:       'bg-rose-50 text-rose-800 border-rose-200',
-        knowledgeArticle: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+        sprint:           'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+        module:           'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+        lesson:           'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+        assignment:       'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+        assessment:       'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
+        knowledgeArticle: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
         pennyTemplate:    'bg-secondary/10 text-secondary border-secondary/20',
-        healthIssue:      'bg-red-50 text-red-700 border-red-200',
+        healthIssue:      'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
       };
       const objLabel: Record<string, string> = {
         program: 'Program', sprint: 'Sprint', module: 'Module', lesson: 'Lesson',
@@ -1798,13 +1798,13 @@ export function ContextPanel() {
                   )}
                   {d.sprint && (
                     <div className="flex items-center gap-2">
-                      <ArrowRight className="w-3 h-3 text-violet-600 flex-shrink-0" />
+                      <ArrowRight className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
                       <span className="text-[11px] text-foreground">{d.sprint}</span>
                     </div>
                   )}
                   {d.module && (
                     <div className="flex items-center gap-2">
-                      <ArrowRight className="w-3 h-3 text-sky-600 flex-shrink-0" />
+                      <ArrowRight className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
                       <span className="text-[11px] text-foreground">{d.module}</span>
                     </div>
                   )}
@@ -1817,7 +1817,7 @@ export function ContextPanel() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Owner</p>
               {d.owner
                 ? <p className="text-[12px] text-foreground font-medium">{d.owner}</p>
-                : <p className="text-[12px] text-red-600 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> No owner assigned</p>}
+                : <p className="text-[12px] text-[#A93F2F] flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> No owner assigned</p>}
             </div>
 
             {/* Type-specific fields */}
@@ -1825,7 +1825,7 @@ export function ContextPanel() {
             {objType === 'sprint' && d.resolvePhase && (
               <div className="space-y-1">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">RESOLVE Phase</p>
-                <span className="inline-flex text-[11px] font-semibold border border-violet-200 bg-violet-50 text-violet-800 rounded-full px-2.5 py-0.5">{d.resolvePhase}</span>
+                <span className="inline-flex text-[11px] font-semibold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] rounded-full px-2.5 py-0.5">{d.resolvePhase}</span>
               </div>
             )}
 
@@ -1842,7 +1842,7 @@ export function ContextPanel() {
                 <ul className="space-y-1.5">
                   {(d.learningObjectives as string[]).map((obj, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle2 className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
                       <span className="text-[11px] text-foreground leading-snug">{obj}</span>
                     </li>
                   ))}
@@ -1953,7 +1953,7 @@ export function ContextPanel() {
                     <ul className="space-y-1">
                       {(d.affectedItems as string[]).map((item, i) => (
                         <li key={i} className="text-[11px] text-foreground flex items-start gap-1.5">
-                          <AlertTriangle className="w-3 h-3 text-orange-500 mt-0.5 flex-shrink-0" />
+                          <AlertTriangle className="w-3 h-3 text-[#CC8400] mt-0.5 flex-shrink-0" />
                           {item}
                         </li>
                       ))}
@@ -1963,8 +1963,8 @@ export function ContextPanel() {
                 {d.actionRequired && (
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Action Required</p>
-                    <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2">
-                      <p className="text-[11px] text-green-800 leading-relaxed">{d.actionRequired}</p>
+                    <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-2">
+                      <p className="text-[11px] text-[#245531] leading-relaxed">{d.actionRequired}</p>
                     </div>
                   </div>
                 )}
@@ -1996,7 +1996,7 @@ export function ContextPanel() {
                 )}
                 {d.relatedLmsObject && (
                   <div className="flex items-center gap-2">
-                    <Layers className="w-3 h-3 text-sky-600 flex-shrink-0" />
+                    <Layers className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
                     <span className="text-[11px] text-foreground">{d.relatedLmsObject}</span>
                   </div>
                 )}
@@ -2030,9 +2030,9 @@ export function ContextPanel() {
 
             {/* Notes */}
             {d.notes && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-                <p className="text-[10px] font-bold text-amber-900 mb-1">Note</p>
-                <p className="text-[11px] text-amber-800 leading-relaxed">{d.notes}</p>
+              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2">
+                <p className="text-[10px] font-bold text-[#CC8400] mb-1">Note</p>
+                <p className="text-[11px] text-[#CC8400] leading-relaxed">{d.notes}</p>
               </div>
             )}
 
@@ -2044,18 +2044,18 @@ export function ContextPanel() {
     // ── Demand Request brief ────────────────────────────────────────────────
     if (type === 'demandRequest') {
       const riskCls =
-        data.risk === 'high'     ? 'text-rose-700 bg-rose-50 border-rose-200'
-        : data.risk === 'elevated' ? 'text-amber-700 bg-amber-50 border-amber-200'
+        data.risk === 'high'     ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
+        : data.risk === 'elevated' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
         : 'text-muted-foreground bg-muted border-border';
       const riskLabel =
         data.risk === 'high'     ? 'P1 · Critical'
         : data.risk === 'elevated' ? 'P2 · Elevated'
         : 'P3 · Normal';
       const statusCls: Record<string, string> = {
-        Triaged:    'text-sky-700 bg-sky-50 border-sky-200',
+        Triaged:    'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
         Backlog:    'text-slate-600 bg-slate-50 border-slate-200',
-        'In Review':'text-violet-700 bg-violet-50 border-violet-200',
-        Approved:   'text-emerald-700 bg-emerald-50 border-emerald-200',
+        'In Review':'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+        Approved:   'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
         Completed:  'text-primary bg-primary/5 border-primary/20',
       };
       return (
@@ -2115,8 +2115,8 @@ export function ContextPanel() {
 
     if (type === 'sfCase') {
       const priCls =
-        data.Priority === 'High'   ? 'text-rose-700 bg-rose-50 border-rose-200'
-        : data.Priority === 'Medium' ? 'text-amber-700 bg-amber-50 border-amber-200'
+        data.Priority === 'High'   ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
+        : data.Priority === 'Medium' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
         : 'text-slate-600 bg-slate-50 border-slate-200';
 
       function focusWithPenny() {
@@ -2273,10 +2273,10 @@ export function ContextPanel() {
 
               {/* Top next action — surfaced prominently */}
               {firstBad && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-1">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-amber-700/70">Next Action</p>
-                  <p className="text-[11px] font-semibold text-amber-900/80 leading-snug">{firstBad.label}</p>
-                  <p className="text-[11px] text-amber-800/70 leading-relaxed">{firstBad.detail}</p>
+                <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 p-3 space-y-1">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-[#CC8400]/70">Next Action</p>
+                  <p className="text-[11px] font-semibold text-[#CC8400]/80 leading-snug">{firstBad.label}</p>
+                  <p className="text-[11px] text-[#CC8400]/70 leading-relaxed">{firstBad.detail}</p>
                 </div>
               )}
 
@@ -2349,9 +2349,9 @@ export function ContextPanel() {
 
             {/* Next action — prominently shown */}
             {data.detail && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 space-y-1">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-amber-700/70">Next Action</p>
-                <p className="text-[12px] text-amber-900/80 leading-relaxed">{data.detail}</p>
+              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 p-3 space-y-1">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-[#CC8400]/70">Next Action</p>
+                <p className="text-[12px] text-[#CC8400]/80 leading-relaxed">{data.detail}</p>
               </div>
             )}
 
@@ -2404,7 +2404,7 @@ export function ContextPanel() {
 
     if (type === 'oicRecommendation') {
       const pc = REC_PRIORITY_CONFIG[data.priority as RecPriority] ?? { label: data.priority, cls: 'text-muted-foreground bg-muted border-border' };
-      const effortCls = { Low: 'text-emerald-600', Medium: 'text-amber-600', High: 'text-rose-600' }[data.effort as string] ?? 'text-muted-foreground';
+      const effortCls = { Low: 'text-[#2F6B3F]', Medium: 'text-[#CC8400]', High: 'text-[#A93F2F]' }[data.effort as string] ?? 'text-muted-foreground';
       const systems: string[] = data.systems ?? [];
       const nextSteps: string[] = data.nextSteps ?? [];
       const firstSystem = systems[0] ?? null;
@@ -2546,16 +2546,16 @@ export function ContextPanel() {
 
 
             {data.whatBreaksIfMissing && (
-              <div className="bg-amber-50 border border-amber-100 rounded-md p-3">
-                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">What Breaks If Missing</span>
-                <p className="text-sm text-amber-900 leading-tight">{data.whatBreaksIfMissing}</p>
+              <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md p-3">
+                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">What Breaks If Missing</span>
+                <p className="text-sm text-[#CC8400] leading-tight">{data.whatBreaksIfMissing}</p>
               </div>
             )}
 
             {data.confidence === 'needs-review' && (
-              <div className="bg-amber-100/50 border border-amber-200 rounded-md p-3">
-                <span className="block text-[10px] font-bold text-amber-800 uppercase mb-1">Source Mapping Note</span>
-                <p className="text-xs text-amber-900 leading-tight">Some details in this brief require source mapping. Treat operational specifics as preliminary.</p>
+              <div className="bg-[#FFF3E0]/50 border border-[#FFD08A] rounded-md p-3">
+                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">Source Mapping Note</span>
+                <p className="text-xs text-[#CC8400] leading-tight">Some details in this brief require source mapping. Treat operational specifics as preliminary.</p>
               </div>
             )}
 
@@ -2623,7 +2623,7 @@ export function ContextPanel() {
           <div className={`h-[3px] w-full flex-shrink-0 ${
             actionPanel ? 'bg-primary/55'
             : slackPanel ? 'bg-[#4A154B]/55'
-            : !selectedItem ? 'bg-violet-400/70'
+            : !selectedItem ? 'bg-[#2F6F7E]/70'
             : 'bg-border/60'
           }`} />
           <div className={`px-3 py-2.5 border-b z-10 flex items-center gap-2 shrink-0 ${
@@ -2632,7 +2632,7 @@ export function ContextPanel() {
               : slackPanel
               ? 'bg-[#4A154B]/[0.07] border-[#4A154B]/20'
               : !selectedItem
-              ? 'bg-violet-50/60 border-violet-100/80'
+              ? 'bg-[#EDF5F8]/60 border-[#EDF5F8]/80'
               : 'bg-white border-border/60'
           }`}>
             {actionPanel
@@ -2640,7 +2640,7 @@ export function ContextPanel() {
               : slackPanel
               ? <Hash className="w-4 h-4 text-[#4A154B] shrink-0" />
               : !selectedItem
-              ? <Bot className="w-4 h-4 text-violet-600 shrink-0" />
+              ? <Bot className="w-4 h-4 text-[#2F6F7E] shrink-0" />
               : <Layers className="w-4 h-4 text-primary shrink-0" />
             }
             <h3 className="font-semibold text-sm truncate flex-1">
@@ -2675,15 +2675,15 @@ export function ContextPanel() {
             <button
               onClick={isEveryday ? () => setPennyPanelTab('signals') : handleNudgeClick}
               className="group w-full flex items-center gap-2 px-3 py-1.5 border-b shrink-0
-                bg-amber-50/40 border-amber-100/80 hover:bg-amber-50
+                bg-[#FFF3E0]/40 border-[#FFF3E0]/80 hover:bg-[#FFF3E0]
                 transition-colors duration-150"
             >
               <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                nudgeCounts.urgent > 0 ? 'bg-amber-400 animate-pulse' : 'bg-primary/25'
+                nudgeCounts.urgent > 0 ? 'bg-[#CC8400] animate-pulse' : 'bg-primary/25'
               }`} />
               <span className="text-[10px] text-left leading-tight flex-1 min-w-0 text-muted-foreground/80 group-hover:text-foreground transition-colors">
                 {nudgeCounts.urgent > 0 ? (
-                  <><span className="font-semibold text-amber-700">{nudgeCounts.urgent} urgent</span>{' · '}{nudgeCounts.total} {TERMS.trailSignals}</>
+                  <><span className="font-semibold text-[#CC8400]">{nudgeCounts.urgent} urgent</span>{' · '}{nudgeCounts.total} {TERMS.trailSignals}</>
                 ) : (
                   <><span className="font-semibold text-foreground/70">{nudgeCounts.total} {TERMS.trailSignals}</span>{' available'}</>
                 )}
@@ -2861,9 +2861,9 @@ function CommsBriefGuide() {
 
   const MODEL = [
     { role: 'what',  label: 'Knowledge Library', color: 'text-secondary' },
-    { role: 'work',  label: 'Salesforce / Demand', color: 'text-amber-700' },
+    { role: 'work',  label: 'Salesforce / Demand', color: 'text-[#CC8400]' },
     { role: 'who',   label: 'Communications', color: 'text-primary' },
-    { role: 'when',  label: 'Calendar', color: 'text-emerald-700' },
+    { role: 'when',  label: 'Calendar', color: 'text-[#2F6B3F]' },
   ];
 
   return (

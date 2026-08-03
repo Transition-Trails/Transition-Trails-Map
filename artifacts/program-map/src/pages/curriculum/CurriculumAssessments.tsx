@@ -19,8 +19,8 @@ export default function CurriculumAssessments() {
         <div className="grid grid-cols-4 gap-4">
           {[
             { label: 'Total',        value: curriculumAssessments.length, color: 'text-foreground' },
-            { label: 'Published',    value: curriculumAssessments.filter(a => a.status === 'published').length,      color: 'text-green-700' },
-            { label: 'Needs Review', value: curriculumAssessments.filter(a => a.status === 'needs-review').length,  color: 'text-orange-700' },
+            { label: 'Published',    value: curriculumAssessments.filter(a => a.status === 'published').length,      color: 'text-[#2F6B3F]' },
+            { label: 'Needs Review', value: curriculumAssessments.filter(a => a.status === 'needs-review').length,  color: 'text-[#CC8400]' },
             { label: 'Penny Coached',value: curriculumAssessments.filter(a => a.hasPennyCoach as boolean).length,   color: 'text-secondary' },
           ].map(s => (
             <div key={s.label} className="rounded-xl border border-border bg-white p-4 text-center shadow-sm">
@@ -42,7 +42,7 @@ export default function CurriculumAssessments() {
               <button
                 key={asmnt.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: asmnt.id, data: asmnt })}
-                className={`w-full text-left grid grid-cols-[1fr_140px_70px_70px_70px] gap-x-3 items-center px-4 py-3 group hover:bg-rose-50/40 transition-colors ${i < curriculumAssessments.length - 1 ? 'border-b border-border/30' : ''}`}
+                className={`w-full text-left grid grid-cols-[1fr_140px_70px_70px_70px] gap-x-3 items-center px-4 py-3 group hover:bg-[#FBEAE6]/40 transition-colors ${i < curriculumAssessments.length - 1 ? 'border-b border-border/30' : ''}`}
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
@@ -57,16 +57,16 @@ export default function CurriculumAssessments() {
                 <div className="flex items-center">
                   {asmnt.hasPennyCoach as boolean
                     ? <Sparkles className="w-3.5 h-3.5 text-secondary" />
-                    : <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />}
+                    : <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />}
                 </div>
               </button>
             );
           })}
         </div>
 
-        <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 flex items-start gap-3">
-          <AlertTriangle className="w-4 h-4 text-red-700 flex-shrink-0 mt-0.5" />
-          <p className="text-[11px] text-red-800 leading-relaxed">
+        <div className="rounded-xl border border-[#E8B9B4] bg-[#FBEAE6] px-5 py-4 flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-[#A93F2F] flex-shrink-0 mt-0.5" />
+          <p className="text-[11px] text-[#A93F2F] leading-relaxed">
             <strong>Missing assessment:</strong> Module 4.3 (Portfolio & Career Launch) has no assessment. This is a high-severity Content Health issue.
             Use Penny Content Assistant → Create Assessment to generate a portfolio review assessment.
           </p>

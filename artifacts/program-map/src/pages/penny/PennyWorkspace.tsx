@@ -129,9 +129,9 @@ function OverviewTab({ cap, status, onStatusChange }: { cap: PennyCapability; st
           </div>
         )}
         {isOperational && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
-            <p className="text-[11px] font-bold text-emerald-700">Operational</p>
-            <p className="text-[12px] text-emerald-800">This capability is live and serving learners or coaches.</p>
+          <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3">
+            <p className="text-[11px] font-bold text-[#2F6B3F]">Operational</p>
+            <p className="text-[12px] text-[#245531]">This capability is live and serving learners or coaches.</p>
           </div>
         )}
       </div>
@@ -157,7 +157,7 @@ function PromptsTab({ cap }: { cap: PennyCapability }) {
             <div key={prompt} className="rounded-lg border border-border bg-white p-4">
               <p className="text-[12px] font-bold text-foreground">{prompt.split('—')[0].trim()}</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">{prompt.split('—')[1]?.trim() ?? ''}</p>
-              <span className="inline-flex items-center mt-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Operational</span>
+              <span className="inline-flex items-center mt-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#E6F0EA] text-[#2F6B3F] border border-[#9FC3AE]">Operational</span>
             </div>
           ))
         ) : (
@@ -198,11 +198,11 @@ function SourcesTab({ cap }: { cap: PennyCapability }) {
                   <tr key={s.name} className={`border-b border-border/40 ${i % 2 === 0 ? 'bg-white' : 'bg-muted/10'}`}>
                     <td className="px-3 py-2 font-medium text-foreground">{s.name}</td>
                     <td className="px-3 py-2">
-                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${s.trust === 'Authoritative' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${s.trust === 'Authoritative' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'}`}>
                         {s.trust}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-emerald-600 font-semibold">{s.status}</td>
+                    <td className="px-3 py-2 text-[#2F6B3F] font-semibold">{s.status}</td>
                   </tr>
                 ))}
               </tbody>
@@ -222,7 +222,7 @@ function QualityTab({ cap }: { cap: PennyCapability }) {
     'resume-review':87,'learning-coach':89,'trail-quest-runner':84,'coach-support':80,'weekly-brief':91,'knowledge-retrieval':85,
   };
   const score = qualityScoreMap[cap.id] ?? 75;
-  const scoreColor = score >= 85 ? 'text-emerald-600' : score >= 75 ? 'text-amber-600' : 'text-rose-600';
+  const scoreColor = score >= 85 ? 'text-[#2F6B3F]' : score >= 75 ? 'text-[#CC8400]' : 'text-[#A93F2F]';
 
   return (
     <ScrollArea className="h-full">
@@ -237,7 +237,7 @@ function QualityTab({ cap }: { cap: PennyCapability }) {
               </div>
               <div className="flex-1">
                 <div className="h-3 bg-muted rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full ${score >= 85 ? 'bg-emerald-400' : score >= 75 ? 'bg-amber-400' : 'bg-rose-400'}`} style={{ width:`${score}%` }} />
+                  <div className={`h-full rounded-full ${score >= 85 ? 'bg-[#2F6B3F]' : score >= 75 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`} style={{ width:`${score}%` }} />
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1">{score >= 80 ? 'Meets quality threshold' : 'Below threshold — review recommended'}</p>
               </div>
@@ -287,24 +287,24 @@ function HealthTab({ cap, status }: { cap: PennyCapability; status: CapabilitySt
 
 function RelationshipsTab({ cap }: { cap: PennyCapability }) {
   const programMap: Record<string, RelatedItem[]> = {
-    'resume-review':     [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }],
-    'learning-coach':    [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }, { id:'guided', label:'Guided Trail', statusColor:'bg-amber-400' }],
-    'trail-quest-runner':[{ id:'guided',label:'Guided Trail',      statusColor:'bg-amber-400'   }, { id:'mastery', label:'Trail of Mastery', statusColor:'bg-amber-400' }],
-    'weekly-brief':      [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }, { id:'guided', label:'Guided Trail', statusColor:'bg-amber-400' }, { id:'mastery', label:'Trail of Mastery', statusColor:'bg-amber-400' }],
-    'intake-triage':     [{ id:'all',   label:'All Programs',      statusColor:'bg-blue-400'    }],
-    'cohort-health':     [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-emerald-400' }, { id:'found', label:'Foundations Trail', statusColor:'bg-emerald-400' }],
-    'sf-intelligence':   [{ id:'all',   label:'All Programs',      statusColor:'bg-blue-400'    }],
+    'resume-review':     [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-[#2F6B3F]' }, { id:'found', label:'Foundations Trail', statusColor:'bg-[#2F6B3F]' }],
+    'learning-coach':    [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-[#2F6B3F]' }, { id:'found', label:'Foundations Trail', statusColor:'bg-[#2F6B3F]' }, { id:'guided', label:'Guided Trail', statusColor:'bg-[#CC8400]' }],
+    'trail-quest-runner':[{ id:'guided',label:'Guided Trail',      statusColor:'bg-[#CC8400]'   }, { id:'mastery', label:'Trail of Mastery', statusColor:'bg-[#CC8400]' }],
+    'weekly-brief':      [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-[#2F6B3F]' }, { id:'found', label:'Foundations Trail', statusColor:'bg-[#2F6B3F]' }, { id:'guided', label:'Guided Trail', statusColor:'bg-[#CC8400]' }, { id:'mastery', label:'Trail of Mastery', statusColor:'bg-[#CC8400]' }],
+    'intake-triage':     [{ id:'all',   label:'All Programs',      statusColor:'bg-[#2F6F7E]'    }],
+    'cohort-health':     [{ id:'exp',   label:"Explorer's Trail",  statusColor:'bg-[#2F6B3F]' }, { id:'found', label:'Foundations Trail', statusColor:'bg-[#2F6B3F]' }],
+    'sf-intelligence':   [{ id:'all',   label:'All Programs',      statusColor:'bg-[#2F6F7E]'    }],
   };
   const knowledgeMap: Record<string, RelatedItem[]> = {
-    'resume-review':     [{ id:'rg',  label:'Resume Writing Guide',    statusColor:'bg-emerald-400' }, { id:'ats', label:'ATS Guide', statusColor:'bg-emerald-400' }, { id:'sf-kb', label:'Salesforce KB', statusColor:'bg-blue-400' }],
-    'learning-coach':    [{ id:'sf-kb', label:'Salesforce KB',         statusColor:'bg-blue-400'   }, { id:'slo', label:'Sprint Learning Outcomes', statusColor:'bg-blue-400' }],
-    'trail-quest-runner':[{ id:'tql',   label:'Trail Quest Library',   statusColor:'bg-emerald-400' }],
-    'weekly-brief':      [{ id:'scd',   label:'Salesforce Cohort Data',statusColor:'bg-blue-400'   }, { id:'cal', label:'Sprint Calendar', statusColor:'bg-amber-400' }],
+    'resume-review':     [{ id:'rg',  label:'Resume Writing Guide',    statusColor:'bg-[#2F6B3F]' }, { id:'ats', label:'ATS Guide', statusColor:'bg-[#2F6B3F]' }, { id:'sf-kb', label:'Salesforce KB', statusColor:'bg-[#2F6F7E]' }],
+    'learning-coach':    [{ id:'sf-kb', label:'Salesforce KB',         statusColor:'bg-[#2F6F7E]'   }, { id:'slo', label:'Sprint Learning Outcomes', statusColor:'bg-[#2F6F7E]' }],
+    'trail-quest-runner':[{ id:'tql',   label:'Trail Quest Library',   statusColor:'bg-[#2F6B3F]' }],
+    'weekly-brief':      [{ id:'scd',   label:'Salesforce Cohort Data',statusColor:'bg-[#2F6F7E]'   }, { id:'cal', label:'Sprint Calendar', statusColor:'bg-[#CC8400]' }],
   };
   const integrationItems: RelatedItem[] = [
-    { id:'prompt-studio', label:'Prompt Studio',       statusColor:'bg-emerald-400', href:'/penny/prompts' },
-    { id:'cap-reg',       label:'Capability Registry', statusColor:'bg-emerald-400', href:'/penny' },
-    ...((cap.id === 'weekly-brief' || cap.id === 'learning-coach') ? [{ id:'slack', label:'Slack', statusColor:'bg-amber-400' as string }] : []),
+    { id:'prompt-studio', label:'Prompt Studio',       statusColor:'bg-[#2F6B3F]', href:'/penny/prompts' },
+    { id:'cap-reg',       label:'Capability Registry', statusColor:'bg-[#2F6B3F]', href:'/penny' },
+    ...((cap.id === 'weekly-brief' || cap.id === 'learning-coach') ? [{ id:'slack', label:'Slack', statusColor:'bg-[#CC8400]' as string }] : []),
   ];
 
   return (
@@ -351,8 +351,8 @@ export default function PennyWorkspace() {
       id:            cap.id,
       name:          cap.name,
       typeName:      cap.domain,
-      typeColor:     'text-pink-700',
-      typeBg:        'bg-pink-50',
+      typeColor:     'text-[#A93F2F]',
+      typeBg:        'bg-[#FBEAE6]',
       status:        st,
       statusVariant: stCfg.statusVariant,
       health:        st === 'Partial' ? 'needs-attention' as const : 'healthy' as const,

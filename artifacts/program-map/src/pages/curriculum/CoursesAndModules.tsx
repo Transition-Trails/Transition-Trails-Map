@@ -6,22 +6,22 @@ import { useSfLmsCourses, type SfLmsCourse, type SfCourseModule } from '@/hooks/
 // ── Status configs ────────────────────────────────────────────────────────────
 
 const COURSE_STATUS: Record<string, { label: string; cls: string }> = {
-  Completed:    { label: 'Completed',   cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-  'In Progress': { label: 'In Progress', cls: 'text-blue-700 bg-blue-50 border-blue-200' },
-  Discovery:    { label: 'Discovery',   cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+  Completed:    { label: 'Completed',   cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+  'In Progress': { label: 'In Progress', cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]' },
+  Discovery:    { label: 'Discovery',   cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
   Planned:      { label: 'Planned',     cls: 'text-slate-500 bg-slate-50 border-slate-200' },
 };
 
 const MODULE_STATUS: Record<string, { label: string; icon: React.ReactNode; pill: string }> = {
   Completed:    {
     label: 'Completed',
-    icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />,
-    pill: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />,
+    pill: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
   },
   'In Progress': {
     label: 'In Progress',
-    icon: <Clock className="w-3.5 h-3.5 text-blue-500 shrink-0" />,
-    pill: 'bg-blue-50 text-blue-800 border-blue-200',
+    icon: <Clock className="w-3.5 h-3.5 text-[#2F6F7E] shrink-0" />,
+    pill: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
   },
   'Not Started': {
     label: 'Not Started',
@@ -78,7 +78,7 @@ function CourseListItem({
       </div>
       {total > 0 && (
         <div className="mt-1.5 h-1 bg-muted/40 rounded-full overflow-hidden">
-          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+          <div className="h-full bg-[#E6F0EA]0 rounded-full" style={{ width: `${pct}%` }} />
         </div>
       )}
     </button>
@@ -97,7 +97,7 @@ function ModuleRow({ mod, index }: { mod: SfCourseModule; index: number }) {
         {pct > 0 && (
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="h-1 w-20 bg-muted/40 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-[#E6F0EA]0 rounded-full" style={{ width: `${pct}%` }} />
             </div>
             <span className="text-[10px] text-muted-foreground">{pct}%</span>
           </div>
@@ -123,7 +123,7 @@ function CourseDetail({ course }: { course: SfLmsCourse }) {
       <div className="px-6 py-5 border-b border-border bg-white shrink-0">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <Zap className="w-4 h-4 text-[#2F6B3F] shrink-0 mt-0.5" />
             <div>
               <h2 className="text-[17px] font-bold text-foreground leading-tight">
                 {course.Course_Title__c ?? course.Name}
@@ -143,15 +143,15 @@ function CourseDetail({ course }: { course: SfLmsCourse }) {
             <span className="font-semibold">{pct}%</span>
           </div>
           <div className="h-2 bg-muted/40 rounded-full overflow-hidden">
-            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
+            <div className="h-full bg-[#E6F0EA]0 rounded-full transition-all" style={{ width: `${pct}%` }} />
           </div>
         </div>
 
         {/* Stats row */}
         <div className="flex gap-4 flex-wrap">
           {[
-            { label: 'Completed',   val: completed, cls: 'text-emerald-700' },
-            { label: 'In Progress', val: inProg,    cls: 'text-blue-700' },
+            { label: 'Completed',   val: completed, cls: 'text-[#2F6B3F]' },
+            { label: 'In Progress', val: inProg,    cls: 'text-[#2F6F7E]' },
             { label: 'Not Started', val: notStart,  cls: 'text-muted-foreground' },
           ].map(s => (
             <div key={s.label} className="text-center">
@@ -244,7 +244,7 @@ export default function CoursesAndModules() {
                 <p className="text-[10px] text-muted-foreground">modules</p>
               </div>
               <div>
-                <p className="text-[15px] font-bold text-emerald-700">{totalComplete}</p>
+                <p className="text-[15px] font-bold text-[#2F6B3F]">{totalComplete}</p>
                 <p className="text-[10px] text-muted-foreground">completed</p>
               </div>
               {data.fromCache && (
@@ -271,7 +271,7 @@ export default function CoursesAndModules() {
             <p className="px-4 py-4 text-[12px] text-muted-foreground">Loading from Salesforce…</p>
           )}
           {isError && (
-            <p className="px-4 py-4 text-[12px] text-rose-600">Could not load courses.</p>
+            <p className="px-4 py-4 text-[12px] text-[#A93F2F]">Could not load courses.</p>
           )}
 
           <ScrollArea className="flex-1">

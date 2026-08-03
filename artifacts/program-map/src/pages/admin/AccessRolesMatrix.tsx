@@ -28,7 +28,7 @@ function NavCell({ value }: { value: string }) {
   if (value.startsWith('✓')) {
     return (
       <span className="flex items-start gap-1 text-[11px] text-foreground">
-        <CheckCircle2 className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
+        <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
         <span>{value.replace('✓ ', '')}</span>
       </span>
     );
@@ -43,7 +43,7 @@ function NavCell({ value }: { value: string }) {
   }
   return (
     <span className="flex items-start gap-1 text-[11px] text-muted-foreground">
-      <MinusCircle className="w-3 h-3 text-amber-400 mt-0.5 flex-shrink-0" />
+      <MinusCircle className="w-3 h-3 text-[#CC8400] mt-0.5 flex-shrink-0" />
       <span>{value}</span>
     </span>
   );
@@ -79,7 +79,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                 tier switcher in the Topbar to preview any tier.
               </p>
             </div>
-            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-medium px-3 py-1.5 rounded-full flex-shrink-0">
+            <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] text-[11px] font-medium px-3 py-1.5 rounded-full flex-shrink-0">
               <Lock className="w-3.5 h-3.5" />
               Prototype — no auth enforced
             </div>
@@ -282,19 +282,19 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
             <div className="grid grid-cols-3 gap-3">
               {[
                 {
-                  icon: <Globe className="w-4 h-4 text-blue-500" />,
+                  icon: <Globe className="w-4 h-4 text-[#2F6F7E]" />,
                   title: 'Step 1 — Google OAuth App',
                   body: 'Configure OAuth client in Google Cloud Console for the Trail OS domain. Client ID is already set up in /admin/google-oauth for the prototype.',
                   status: 'partial',
                 },
                 {
-                  icon: <Users className="w-4 h-4 text-violet-500" />,
+                  icon: <Users className="w-4 h-4 text-[#2F6F7E]" />,
                   title: 'Step 2 — Google Groups Setup',
                   body: 'Create trail-os-users, trail-power-users, and trail-admins groups in Google Admin. Add members to grant access tiers automatically.',
                   status: 'planned',
                 },
                 {
-                  icon: <Network className="w-4 h-4 text-emerald-500" />,
+                  icon: <Network className="w-4 h-4 text-[#2F6B3F]" />,
                   title: 'Step 3 — Group Membership Check',
                   body: 'On sign-in, Trail OS calls the Google Directory API to check group membership and assign the matching access tier. Tier updates automatically when group membership changes.',
                   status: 'planned',
@@ -305,7 +305,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                     {step.icon}
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
                       step.status === 'partial'
-                        ? 'bg-amber-100 text-amber-700'
+                        ? 'bg-[#FFF3E0] text-[#CC8400]'
                         : 'bg-muted text-muted-foreground'
                     }`}>
                       {step.status === 'partial' ? 'Partial' : 'Planned'}
@@ -317,13 +317,13 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
               ))}
             </div>
 
-            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-sky-50 border border-sky-100 rounded-lg px-3 py-2">
-              <Mail className="w-3.5 h-3.5 text-sky-500 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-[#EDF5F8] border border-[#EDF5F8] rounded-lg px-3 py-2">
+              <Mail className="w-3.5 h-3.5 text-[#2F6F7E] mt-0.5 flex-shrink-0" />
               <span>
-                <span className="font-semibold text-sky-800">Prototype access:</span>{' '}
+                <span className="font-semibold text-[#2F6F7E]">Prototype access:</span>{' '}
                 Use the tier switcher (★ Super button in Topbar) to preview any tier. Google Workspace SSO will
                 replace this when enabled — no code changes needed in components, just wire the auth response to{' '}
-                <code className="bg-sky-100 px-1 rounded">setUserTier()</code> in AppContext.
+                <code className="bg-[#EDF5F8] px-1 rounded">setUserTier()</code> in AppContext.
               </span>
             </div>
 

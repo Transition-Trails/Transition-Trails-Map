@@ -69,16 +69,16 @@ const PROVIDERS = [
     role: 'Operational Timing',
     note: 'Future · Collaboration Source',
     desc: 'Cohort starts, sprint reviews, UAT sessions, brief schedules, office hours',
-    color: 'border-emerald-200 bg-emerald-50 text-emerald-900',
-    noteCls: 'text-emerald-700/70',
+    color: 'border-[#9FC3AE] bg-[#E6F0EA] text-[#245531]',
+    noteCls: 'text-[#2F6B3F]/70',
   },
 ];
 
 const MENTAL_MODEL = [
   { label: 'Knowledge Library', role: 'what', note: `The content — docs, templates, ${TERMS.aiAssistant} context`, color: 'border-secondary/30 bg-secondary/5 text-secondary' },
-  { label: 'Salesforce / Demand', role: 'work', note: 'The cases — intake, epics, features, changes', color: 'border-amber-200 bg-amber-50 text-amber-800' },
+  { label: 'Salesforce / Demand', role: 'work', note: 'The cases — intake, epics, features, changes', color: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]' },
   { label: 'Communications', role: 'who', note: 'The message — who gets what, through which channel', color: 'border-primary/30 bg-primary/5 text-primary' },
-  { label: 'Calendar', role: 'when', note: 'The timing — when communications fire based on events', color: 'border-emerald-200 bg-emerald-50 text-emerald-800' },
+  { label: 'Calendar', role: 'when', note: 'The timing — when communications fire based on events', color: 'border-[#9FC3AE] bg-[#E6F0EA] text-[#245531]' },
 ];
 
 export default function CommOverview() {

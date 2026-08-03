@@ -100,7 +100,7 @@ function OverviewTab({ p }: { p: Program }) {
             {p.expectedOutcomes
               ? <RichText html={p.expectedOutcomes} className="text-foreground" />
               : <ul className="space-y-1">
-                  {p.outcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-emerald-500 mt-0.5">✓</span>{o}</li>)}
+                  {p.outcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-[#2F6B3F] mt-0.5">✓</span>{o}</li>)}
                 </ul>
             }
           </Section>
@@ -121,9 +121,9 @@ function OverviewTab({ p }: { p: Program }) {
           </Section>
         )}
         {!isEveryday && p.whatBreaksIfMissing && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
-            <p className="text-[10px] font-bold text-rose-700 uppercase mb-1">What Breaks if Missing</p>
-            <RichText html={p.whatBreaksIfMissing} className="text-rose-800" />
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
+            <p className="text-[10px] font-bold text-[#A93F2F] uppercase mb-1">What Breaks if Missing</p>
+            <RichText html={p.whatBreaksIfMissing} className="text-[#A93F2F]" />
           </div>
         )}
       </div>
@@ -136,11 +136,11 @@ function BlueprintTab({ p }: { p: Program }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-3xl">
-        <div className={`rounded-lg border px-4 py-3 ${isCompliant ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isCompliant ? 'text-emerald-700' : 'text-amber-700'}`}>
+        <div className={`rounded-lg border px-4 py-3 ${isCompliant ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#FFD08A] bg-[#FFF3E0]'}`}>
+          <p className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isCompliant ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
             Blueprint Compliance — {isCompliant ? 'Confirmed' : 'Needs Review'}
           </p>
-          <p className={`text-[12px] leading-relaxed ${isCompliant ? 'text-emerald-800' : 'text-amber-800'}`}>
+          <p className={`text-[12px] leading-relaxed ${isCompliant ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
             {isCompliant
               ? `${p.name} is confirmed compliant with Program Blueprint v2.`
               : `${p.name} has been flagged for blueprint review. Sprint structure migration may be pending.`}
@@ -171,8 +171,8 @@ function BlueprintTab({ p }: { p: Program }) {
 // ── CurriculumTab ─────────────────────────────────────────────────────────────
 function ModuleStatusDot({ status }: { status: string | null }) {
   const cls =
-    status === 'Completed'   ? 'bg-emerald-500' :
-    status === 'In Progress' ? 'bg-sky-500'     :
+    status === 'Completed'   ? 'bg-[#E6F0EA]0' :
+    status === 'In Progress' ? 'bg-[#EDF5F8]0'     :
     status === 'Not Started' ? 'bg-gray-300'    : 'bg-gray-300';
   return <span className={`inline-block w-2 h-2 rounded-full shrink-0 mt-0.5 ${cls}`} />;
 }
@@ -180,8 +180,8 @@ function ModuleStatusDot({ status }: { status: string | null }) {
 function ModuleStatusLabel({ status }: { status: string | null }) {
   if (!status) return null;
   const cls =
-    status === 'Completed'   ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
-    status === 'In Progress' ? 'text-sky-700 bg-sky-50 border-sky-200'             :
+    status === 'Completed'   ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' :
+    status === 'In Progress' ? 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]'             :
     status === 'Not Started' ? 'text-gray-500 bg-gray-50 border-gray-200'          :
                                'text-gray-500 bg-gray-50 border-gray-200';
   return (
@@ -298,7 +298,7 @@ function CurriculumTab({ programName }: { programName: string }) {
                       <div className="flex items-center gap-2 pl-4">
                         <div className="flex-1 h-1 rounded-full bg-border overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-sky-400 transition-all"
+                            className="h-full rounded-full bg-[#2F6F7E] transition-all"
                             style={{ width: `${Math.min(pct, 100)}%` }}
                           />
                         </div>
@@ -317,8 +317,8 @@ function CurriculumTab({ programName }: { programName: string }) {
 }
 
 const PENNY_STATUS_OPTIONS: { value: PennyStatus; label: string; dot: string; badge: string }[] = [
-  { value: 'Active',      label: 'Active',      dot: 'bg-emerald-400', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  { value: 'Planned',     label: 'Planned',     dot: 'bg-amber-400',   badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { value: 'Active',      label: 'Active',      dot: 'bg-[#2F6B3F]', badge: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+  { value: 'Planned',     label: 'Planned',     dot: 'bg-[#CC8400]',   badge: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' },
   { value: 'Not Planned', label: 'Not Planned', dot: 'bg-muted-foreground/30', badge: 'bg-muted text-muted-foreground border-border' },
 ];
 
@@ -374,9 +374,9 @@ function PennyTab({ p }: { p: Program }) {
             <div className="space-y-2">
               {p.pennyFeatures.map(f => (
                 <div key={f} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F] shrink-0" />
                   <span className="text-[12px] text-foreground font-medium">{f}</span>
-                  <span className="ml-auto text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5">Active</span>
+                  <span className="ml-auto text-[10px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded px-1.5 py-0.5">Active</span>
                 </div>
               ))}
             </div>
@@ -407,11 +407,11 @@ function PennyTab({ p }: { p: Program }) {
 
 function SystemsTab({ p }: { p: Program }) {
   const systems = [
-    { name:'Salesforce',     status:'Connected', detail:'Program records, cohort data, learner enrollment', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { name:'Google Drive',   status:'Connected', detail:`${p.name} curriculum folder and sprint resources`, cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { name:'Slack',          status:'Active',    detail:'Cohort and coach channels', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { name:`${TERMS.aiAssistant}`,  status: p.pennyStatus ?? (p.pennyActive ? 'Active' : 'Not Planned'), detail: p.pennyActive ? ((p.pennyFeatures ?? []).join(', ') || 'Enabled — no features mapped yet') : p.pennyStatus === 'Planned' ? `${TERMS.aiAssistant} integration is planned for this program` : `${TERMS.aiAssistant} intelligence is not planned for this program`, cls: p.pennyActive ? 'border-primary/20 bg-primary/5' : p.pennyStatus === 'Planned' ? 'border-amber-200 bg-amber-50/30' : 'border-muted bg-muted/30', badge: p.pennyActive ? 'bg-primary/10 text-primary border-primary/20' : p.pennyStatus === 'Planned' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-muted text-muted-foreground border-border' },
-    { name:'Google Calendar',status:'Active',    detail:'Sprint schedule and cohort events', cls:'border-emerald-200 bg-emerald-50', badge:'bg-emerald-50 text-emerald-700 border-emerald-200' },
+    { name:'Salesforce',     status:'Connected', detail:'Program records, cohort data, learner enrollment', cls:'border-[#9FC3AE] bg-[#E6F0EA]', badge:'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+    { name:'Google Drive',   status:'Connected', detail:`${p.name} curriculum folder and sprint resources`, cls:'border-[#9FC3AE] bg-[#E6F0EA]', badge:'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+    { name:'Slack',          status:'Active',    detail:'Cohort and coach channels', cls:'border-[#9FC3AE] bg-[#E6F0EA]', badge:'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+    { name:`${TERMS.aiAssistant}`,  status: p.pennyStatus ?? (p.pennyActive ? 'Active' : 'Not Planned'), detail: p.pennyActive ? ((p.pennyFeatures ?? []).join(', ') || 'Enabled — no features mapped yet') : p.pennyStatus === 'Planned' ? `${TERMS.aiAssistant} integration is planned for this program` : `${TERMS.aiAssistant} intelligence is not planned for this program`, cls: p.pennyActive ? 'border-primary/20 bg-primary/5' : p.pennyStatus === 'Planned' ? 'border-[#FFD08A] bg-[#FFF3E0]/30' : 'border-muted bg-muted/30', badge: p.pennyActive ? 'bg-primary/10 text-primary border-primary/20' : p.pennyStatus === 'Planned' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-muted text-muted-foreground border-border' },
+    { name:'Google Calendar',status:'Active',    detail:'Sprint schedule and cohort events', cls:'border-[#9FC3AE] bg-[#E6F0EA]', badge:'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
     { name:'PMM (Salesforce)',status:'Planned',  detail:'Marketing Cloud integration — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
     { name:'LMS',            status:'Planned',   detail:'Learner progress and content delivery — Phase 2', cls:'border-muted bg-muted/30', badge:'bg-muted text-muted-foreground border-border' },
   ];
@@ -474,8 +474,8 @@ export default function ProgramWorkspace() {
     id: p.id,
     name: p.name,
     typeName: 'Program',
-    typeColor: 'text-emerald-700',
-    typeBg: 'bg-emerald-50',
+    typeColor: 'text-[#2F6B3F]',
+    typeBg: 'bg-[#E6F0EA]',
     status: p.status ?? (p.confidence === 'confirmed' ? 'Active' : p.confidence === 'needs-review' ? 'Review' : p.confidence),
     statusVariant: (p.status === 'Active' || p.confidence === 'confirmed') ? ('active' as const) : ('planning' as const),
     secondary: p.status
@@ -502,8 +502,8 @@ export default function ProgramWorkspace() {
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 p-8 text-center">
-        <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
-          <WifiOff className="w-5 h-5 text-rose-500" />
+        <div className="w-10 h-10 rounded-full bg-[#FBEAE6] border border-[#E8B9B4] flex items-center justify-center">
+          <WifiOff className="w-5 h-5 text-[#A93F2F]" />
         </div>
         <div>
           <p className="text-[13px] font-semibold text-foreground mb-1">Could not load programs</p>

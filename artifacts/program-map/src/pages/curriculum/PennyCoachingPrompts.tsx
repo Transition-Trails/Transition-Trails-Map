@@ -52,7 +52,7 @@ export default function PennyCoachingPrompts() {
                   </div>
                 )}
                 {prompt.notes && (
-                  <p className="text-[10px] text-amber-700 mt-2">{prompt.notes}</p>
+                  <p className="text-[10px] text-[#CC8400] mt-2">{prompt.notes}</p>
                 )}
               </button>
             );

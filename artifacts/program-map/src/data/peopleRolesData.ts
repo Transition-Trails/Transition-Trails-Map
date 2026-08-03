@@ -157,32 +157,32 @@ export interface RoleHealthRecord {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const PERSONA_TYPE_CONFIG: Record<PersonaType, { label: string; cls: string }> = {
-  Learner:   { label: 'Learner',   cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-  Staff:     { label: 'Staff',     cls: 'text-blue-700 bg-blue-50 border-blue-200' },
-  Volunteer: { label: 'Volunteer', cls: 'text-violet-700 bg-violet-50 border-violet-200' },
-  Partner:   { label: 'Partner',   cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-  Sponsor:   { label: 'Sponsor',   cls: 'text-rose-700 bg-rose-50 border-rose-200' },
-  Admin:     { label: 'Admin',     cls: 'text-slate-700 bg-slate-100 border-slate-300' },
+  Learner:   { label: 'Learner',   cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+  Staff:     { label: 'Staff',     cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
+  Volunteer: { label: 'Volunteer', cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
+  Partner:   { label: 'Partner',   cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
+  Sponsor:   { label: 'Sponsor',   cls: 'bg-[#E2E4E1] text-[#4A4F4D] border-[#C8CBC6]' },
+  Admin:     { label: 'Admin',     cls: 'bg-[#E2E4E1] text-[#4A4F4D] border-[#C8CBC6]' },
 };
 
 export const HEALTH_STATUS_CONFIG: Record<HealthStatus, { label: string; cls: string; dot: string }> = {
-  healthy:          { label: 'Healthy',          cls: 'text-emerald-700 bg-emerald-50 border-emerald-200', dot: 'bg-emerald-500' },
-  'needs-attention': { label: 'Needs Attention', cls: 'text-amber-700 bg-amber-50 border-amber-200',     dot: 'bg-amber-500' },
-  incomplete:        { label: 'Incomplete',       cls: 'text-rose-700 bg-rose-50 border-rose-200',        dot: 'bg-rose-500' },
+  healthy:           { label: 'Healthy',          cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', dot: 'bg-[#2F6B3F]' },
+  'needs-attention': { label: 'Needs Attention',  cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]', dot: 'bg-[#CC8400]' },
+  incomplete:        { label: 'Incomplete',        cls: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]', dot: 'bg-[#A93F2F]' },
 };
 
 export const BLUEPRINT_STATUS_CONFIG: Record<BlueprintStatus, { label: string; cls: string }> = {
-  complete: { label: 'Complete', cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-  draft:    { label: 'Draft',    cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-  missing:  { label: 'Missing',  cls: 'text-rose-700 bg-rose-50 border-rose-200' },
+  complete: { label: 'Complete', cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+  draft:    { label: 'Draft',    cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
+  missing:  { label: 'Missing',  cls: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' },
 };
 
 export const PARTICIPATION_TYPE_CONFIG: Record<ParticipationType, { label: string; cls: string }> = {
-  Lead:        { label: 'Lead',        cls: 'text-blue-700 bg-blue-50 border-blue-200' },
-  Support:     { label: 'Support',     cls: 'text-violet-700 bg-violet-50 border-violet-200' },
-  Participant: { label: 'Participant', cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-  Observer:    { label: 'Observer',    cls: 'text-slate-600 bg-slate-50 border-slate-200' },
-  Sponsor:     { label: 'Sponsor',     cls: 'text-rose-700 bg-rose-50 border-rose-200' },
+  Lead:        { label: 'Lead',        cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
+  Support:     { label: 'Support',     cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
+  Participant: { label: 'Participant', cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+  Observer:    { label: 'Observer',    cls: 'bg-[#E2E4E1] text-[#4A4F4D] border-[#C8CBC6]' },
+  Sponsor:     { label: 'Sponsor',     cls: 'bg-[#E2E4E1] text-[#4A4F4D] border-[#C8CBC6]' },
 };
 
 // ── PERSONAS ──────────────────────────────────────────────────────────────────
@@ -889,7 +889,7 @@ export const programParticipation: ProgramParticipation[] = [
     programId: 'foundations-trail',
     programName: 'Foundations Trail',
     programShort: 'Foundations',
-    programColorCls: 'text-emerald-700',
+    programColorCls: 'text-[#4A4F4D]',
     description: 'Entry-level 12-week cohort program. Broad role participation — learners, coaches, program lead, curriculum designer, and volunteer coaches all participate.',
     roleParticipation: [
       { roleId: 'role-learner-active',    roleName: 'Active Learner',      personaName: 'Learner',            type: 'Participant', description: 'Primary beneficiary — completes all modules, quests, and assessments.', touchpoints: ['Cohort kickoff', 'Weekly sessions', 'Milestone reviews', 'Graduation'] },
@@ -904,7 +904,7 @@ export const programParticipation: ProgramParticipation[] = [
     programId: 'guided-trail',
     programName: 'Guided Trail',
     programShort: 'Guided',
-    programColorCls: 'text-blue-700',
+    programColorCls: 'text-[#4A4F4D]',
     description: 'Structured coaching-intensive program with employer-linked outcomes. Adds employer partner and client sponsor participation.',
     roleParticipation: [
       { roleId: 'role-learner-active',    roleName: 'Active Learner',    personaName: 'Learner',          type: 'Participant', description: 'Progresses through guided coaching pathway with Penny support.', touchpoints: ['All program sessions', 'Employer matching', 'Mentoring sessions'] },
@@ -919,7 +919,7 @@ export const programParticipation: ProgramParticipation[] = [
     programId: 'explorers-trail',
     programName: "Explorer's Trail",
     programShort: 'Explorer',
-    programColorCls: 'text-violet-700',
+    programColorCls: 'text-[#4A4F4D]',
     description: 'Advanced skills exploration and career pathway program. Employer and curriculum design collaboration central.',
     roleParticipation: [
       { roleId: 'role-learner-active',       roleName: 'Active Learner',      personaName: 'Learner',            type: 'Participant', description: 'Self-directed learner with structured Penny-guided pathway.', touchpoints: ['Module completion', 'Quest submissions', 'Employer sessions'] },
@@ -933,7 +933,7 @@ export const programParticipation: ProgramParticipation[] = [
     programId: 'trail-of-mastery',
     programName: 'Trail of Mastery',
     programShort: 'Mastery',
-    programColorCls: 'text-amber-700',
+    programColorCls: 'text-[#4A4F4D]',
     description: 'Advanced mastery program for experienced learners and coaches. Small cohorts, high-touch employer integration.',
     roleParticipation: [
       { roleId: 'role-learner-active',    roleName: 'Active Learner',    personaName: 'Learner',          type: 'Participant', description: 'Advanced learner — largely self-directed with Penny mentoring support.', touchpoints: ['Mastery assessments', 'Employer meetings', 'Graduation showcase'] },
@@ -947,7 +947,7 @@ export const programParticipation: ProgramParticipation[] = [
     programId: 'digital-compass',
     programName: 'Digital Compass',
     programShort: 'Digital Compass',
-    programColorCls: 'text-rose-700',
+    programColorCls: 'text-[#4A4F4D]',
     description: 'Digital literacy and technology readiness program. Broad community access — Nonprofit Partners play a large referral role.',
     roleParticipation: [
       { roleId: 'role-learner-active',    roleName: 'Active Learner',    personaName: 'Learner',          type: 'Participant', description: 'Community learner building foundational digital skills.', touchpoints: ['Weekly sessions', 'Penny guided quests', 'Certification assessment'] },

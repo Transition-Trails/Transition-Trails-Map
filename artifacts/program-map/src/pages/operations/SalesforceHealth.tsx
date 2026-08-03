@@ -14,9 +14,9 @@ const cases = [
 ];
 
 const priorityStyle: Record<string, string> = {
-  Urgent:   'bg-red-50 text-red-700 border-red-200',
-  High:     'bg-amber-50 text-amber-700 border-amber-200',
-  Normal:   'bg-sky-50 text-sky-700 border-sky-200',
+  Urgent:   'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
+  High:     'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  Normal:   'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
   Low:      'bg-muted text-muted-foreground border-border',
 };
 

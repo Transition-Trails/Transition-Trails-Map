@@ -77,10 +77,10 @@ function buildHistory(messages: Message[]): Array<{ role: 'user' | 'model'; text
 function trailBadgeClass(trail: string | null): string {
   if (!trail) return 'bg-muted/60 text-muted-foreground border-border';
   const t = trail.toLowerCase();
-  if (t.includes('guided'))                              return 'bg-blue-50 text-blue-700 border-blue-200';
-  if (t.includes('explorer'))                            return 'bg-green-50 text-green-700 border-green-200';
-  if (t.includes('mastery'))                             return 'bg-purple-50 text-purple-700 border-purple-200';
-  if (t.includes('community') || t.includes('alumni'))  return 'bg-amber-50 text-amber-700 border-amber-200';
+  if (t.includes('guided'))                              return 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]';
+  if (t.includes('explorer'))                            return 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]';
+  if (t.includes('mastery'))                             return 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]';
+  if (t.includes('community') || t.includes('alumni'))  return 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]';
   return 'bg-muted/60 text-muted-foreground border-border';
 }
 
@@ -231,7 +231,7 @@ export default function TestPenny() {
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Penny Command Center</span>
-              <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 flex items-center gap-1">
+              <Badge variant="outline" className="text-[10px] bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE] flex items-center gap-1">
                 <Zap className="w-2.5 h-2.5" /> Live · Gemini 2.5 Flash
               </Badge>
             </div>
@@ -260,20 +260,20 @@ export default function TestPenny() {
                 <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {m.role === 'penny' && (
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      m.error ? 'bg-rose-100' : m.system ? 'bg-amber-100' : 'bg-primary/10'
+                      m.error ? 'bg-[#FBEAE6]' : m.system ? 'bg-[#FFF3E0]' : 'bg-primary/10'
                     }`}>
                       {m.error
-                        ? <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-                        : <Brain className={`w-3.5 h-3.5 ${m.system ? 'text-amber-600' : 'text-primary'}`} />}
+                        ? <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F]" />
+                        : <Brain className={`w-3.5 h-3.5 ${m.system ? 'text-[#CC8400]' : 'text-primary'}`} />}
                     </div>
                   )}
                   <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${
                     m.role === 'user'
                       ? 'bg-primary text-primary-foreground rounded-br-sm'
                       : m.error
-                        ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm'
+                        ? 'bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F] rounded-bl-sm'
                         : m.system
-                          ? 'bg-amber-50 border border-amber-200 text-amber-800 rounded-bl-sm'
+                          ? 'bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] rounded-bl-sm'
                           : 'bg-card border border-border text-foreground rounded-bl-sm'
                   }`}>
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{m.content}</p>
@@ -320,7 +320,7 @@ export default function TestPenny() {
               {learnersLoading ? (
                 <span className="text-[12px] text-muted-foreground">Loading learners…</span>
               ) : learnersError ? (
-                <span className="text-[12px] text-red-500">Unable to load learners</span>
+                <span className="text-[12px] text-[#A93F2F]">Unable to load learners</span>
               ) : (
                 <div className="relative flex-1">
                   <select
@@ -399,11 +399,11 @@ export default function TestPenny() {
                   <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Prompt Path</span>
                   {contextMeta ? (
                     contextMeta.promptPath === 'salesforce' ? (
-                      <span className="flex items-center gap-1 text-emerald-700 font-medium">
+                      <span className="flex items-center gap-1 text-[#2F6B3F] font-medium">
                         <CheckCircle2 className="w-3 h-3" /> Salesforce
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-amber-600 font-medium">
+                      <span className="flex items-center gap-1 text-[#CC8400] font-medium">
                         <AlertTriangle className="w-3 h-3" /> Fallback
                       </span>
                     )
@@ -443,7 +443,7 @@ export default function TestPenny() {
                   <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Interaction Logged</span>
                   {contextMeta ? (
                     contextMeta.promptPath === 'salesforce' ? (
-                      <span className="flex items-center gap-1 text-emerald-700 font-medium text-[11px]">
+                      <span className="flex items-center gap-1 text-[#2F6B3F] font-medium text-[11px]">
                         <CheckCircle2 className="w-3 h-3" /> Yes
                       </span>
                     ) : (

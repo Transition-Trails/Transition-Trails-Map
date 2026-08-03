@@ -20,12 +20,12 @@ interface DriveStatusResponse {
 // ── Penny subfolder definitions ────────────────────────────────────────────────
 
 const PENNY_STATE_FOLDERS = [
-  { id: 'coaching',           label: 'Coaching',           desc: 'Check-ins, goal setting, avatars',   icon: Sparkles,     color: 'text-violet-600', bg: 'bg-violet-50' },
-  { id: 'trail-talk',         label: 'Trail Talk',         desc: 'Group session slides & media',       icon: Layers,       color: 'text-sky-600',    bg: 'bg-sky-50'    },
-  { id: 'resume-review',      label: 'Resume Review',      desc: 'CV feedback, document scripts',      icon: FileText,     color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { id: 'interview-prep',     label: 'Interview Prep',     desc: 'Mock interview guides & audio',      icon: Key,          color: 'text-rose-600',   bg: 'bg-rose-50'   },
-  { id: 'confidence-builder', label: 'Confidence Builder', desc: 'Affirmations & motivation media',    icon: CheckCircle2, color: 'text-amber-600',  bg: 'bg-amber-50'  },
-  { id: 'quest-debrief',      label: 'Quest Debrief',      desc: 'Completion banners & celebration',   icon: Sparkles,     color: 'text-teal-600',   bg: 'bg-teal-50'   },
+  { id: 'coaching',           label: 'Coaching',           desc: 'Check-ins, goal setting, avatars',   icon: Sparkles,     color: 'text-[#2F6F7E]', bg: 'bg-[#EDF5F8]' },
+  { id: 'trail-talk',         label: 'Trail Talk',         desc: 'Group session slides & media',       icon: Layers,       color: 'text-[#2F6F7E]',    bg: 'bg-[#EDF5F8]'    },
+  { id: 'resume-review',      label: 'Resume Review',      desc: 'CV feedback, document scripts',      icon: FileText,     color: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA]' },
+  { id: 'interview-prep',     label: 'Interview Prep',     desc: 'Mock interview guides & audio',      icon: Key,          color: 'text-[#A93F2F]',   bg: 'bg-[#FBEAE6]'   },
+  { id: 'confidence-builder', label: 'Confidence Builder', desc: 'Affirmations & motivation media',    icon: CheckCircle2, color: 'text-[#CC8400]',  bg: 'bg-[#FFF3E0]'  },
+  { id: 'quest-debrief',      label: 'Quest Debrief',      desc: 'Completion banners & celebration',   icon: Sparkles,     color: 'text-[#2F6B3F]',   bg: 'bg-[#E6F0EA]'   },
 ];
 
 // ── Overview Tab ──────────────────────────────────────────────────────────────
@@ -47,26 +47,26 @@ function OverviewTab() {
         {/* Live status */}
         <div className={`rounded-lg border px-4 py-3 flex items-center justify-between gap-3 ${
           isLoading           ? 'border-border bg-muted/20'
-          : !driveConnected   ? 'border-rose-200 bg-rose-50'
-          : !folderConfigured ? 'border-amber-200 bg-amber-50'
-          : 'border-emerald-200 bg-emerald-50'
+          : !driveConnected   ? 'border-[#E8B9B4] bg-[#FBEAE6]'
+          : !folderConfigured ? 'border-[#FFD08A] bg-[#FFF3E0]'
+          : 'border-[#9FC3AE] bg-[#E6F0EA]'
         }`}>
           <div className="flex items-center gap-2.5">
             {isLoading ? (
               <RefreshCw className="w-4 h-4 text-muted-foreground animate-spin" />
             ) : !driveConnected ? (
-              <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+              <XCircle className="w-4 h-4 text-[#A93F2F] shrink-0" />
             ) : !folderConfigured ? (
-              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-[#CC8400] shrink-0" />
             ) : (
-              <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-[#2F6B3F] shrink-0" />
             )}
             <div>
               <p className={`text-[12px] font-semibold ${
                 isLoading ? 'text-muted-foreground'
-                : !driveConnected ? 'text-rose-700'
-                : !folderConfigured ? 'text-amber-700'
-                : 'text-emerald-700'
+                : !driveConnected ? 'text-[#A93F2F]'
+                : !folderConfigured ? 'text-[#CC8400]'
+                : 'text-[#2F6B3F]'
               }`}>
                 {isLoading
                   ? 'Checking Drive status…'
@@ -77,7 +77,7 @@ function OverviewTab() {
                   : `Drive connected · Penny Assets folder active${status?.pennyFolderId ? ` (${status.pennyFolderId.slice(0, 12)}…)` : ''}`}
               </p>
               {!driveConnected && status?.reason && (
-                <p className="text-[10px] text-rose-600 mt-0.5">{status.reason}</p>
+                <p className="text-[10px] text-[#A93F2F] mt-0.5">{status.reason}</p>
               )}
             </div>
           </div>
@@ -94,24 +94,24 @@ function OverviewTab() {
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Setup Checklist</p>
           <div className="space-y-2">
             <div className="flex gap-2 items-center">
-              <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
               <span className="text-[12px]">Google Drive connected via Replit integration</span>
             </div>
             <div className="flex gap-2 items-center">
-              <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
               <span className="text-[12px]">OAuth refresh token active</span>
             </div>
             <div className="flex gap-2 items-center">
               {folderConfigured
-                ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                : <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+                ? <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
+                : <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />}
               <span className="text-[12px]">
                 <code className="font-mono text-[11px] bg-muted px-1 rounded">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>
                 {' '}— set in Replit Secrets
               </span>
             </div>
             <div className="flex gap-2 items-start">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
               <span className="text-[12px]">Program Drive folders — create one per program and link in Knowledge Sources</span>
             </div>
           </div>
@@ -154,26 +154,26 @@ function PennyAssetsSetupTab() {
         {/* Live status banner */}
         <div className={`rounded-lg border px-4 py-3 flex items-center justify-between gap-3 ${
           isLoading           ? 'border-border bg-muted/20'
-          : !driveConnected   ? 'border-rose-200 bg-rose-50'
-          : !folderConfigured ? 'border-amber-200 bg-amber-50'
-          : 'border-emerald-200 bg-emerald-50'
+          : !driveConnected   ? 'border-[#E8B9B4] bg-[#FBEAE6]'
+          : !folderConfigured ? 'border-[#FFD08A] bg-[#FFF3E0]'
+          : 'border-[#9FC3AE] bg-[#E6F0EA]'
         }`}>
           <div className="flex items-center gap-2.5">
             {isLoading ? (
               <RefreshCw className="w-4 h-4 text-muted-foreground animate-spin" />
             ) : !driveConnected ? (
-              <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+              <XCircle className="w-4 h-4 text-[#A93F2F] shrink-0" />
             ) : !folderConfigured ? (
-              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-[#CC8400] shrink-0" />
             ) : (
-              <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-[#2F6B3F] shrink-0" />
             )}
             <div>
               <p className={`text-[12px] font-semibold ${
                 isLoading ? 'text-muted-foreground'
-                : !driveConnected ? 'text-rose-700'
-                : !folderConfigured ? 'text-amber-700'
-                : 'text-emerald-700'
+                : !driveConnected ? 'text-[#A93F2F]'
+                : !folderConfigured ? 'text-[#CC8400]'
+                : 'text-[#2F6B3F]'
               }`}>
                 {isLoading
                   ? 'Checking Drive status…'
@@ -184,7 +184,7 @@ function PennyAssetsSetupTab() {
                   : `Drive connected · Penny Assets folder active${status?.pennyFolderId ? ` (${status.pennyFolderId.slice(0, 12)}…)` : ''}`}
               </p>
               {!driveConnected && status?.reason && (
-                <p className="text-[10px] text-rose-600 mt-0.5">{status.reason}</p>
+                <p className="text-[10px] text-[#A93F2F] mt-0.5">{status.reason}</p>
               )}
             </div>
           </div>
@@ -237,24 +237,24 @@ function PennyAssetsSetupTab() {
             </div>
 
             {/* Step 3 */}
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">3</div>
+            <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-4 flex gap-3">
+              <div className="w-6 h-6 rounded-full bg-[#FFF3E0] text-[#CC8400] flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">3</div>
               <div className="space-y-2">
-                <p className="text-[13px] font-semibold text-amber-900">Add the secret to Replit</p>
-                <p className="text-[11px] text-amber-800 leading-snug">
+                <p className="text-[13px] font-semibold text-[#CC8400]">Add the secret to Replit</p>
+                <p className="text-[11px] text-[#CC8400] leading-snug">
                   In Replit, open <strong>Tools → Secrets</strong> (padlock icon in the left sidebar). Add a new secret:
                 </p>
-                <div className="rounded border border-amber-300 bg-white px-3 py-2 space-y-1">
+                <div className="rounded border border-[#FFD08A] bg-white px-3 py-2 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase text-amber-700 w-12 shrink-0">Key</span>
+                    <span className="text-[10px] font-bold uppercase text-[#CC8400] w-12 shrink-0">Key</span>
                     <code className="font-mono text-[12px] font-bold text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded select-all">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-[10px] font-bold uppercase text-amber-700 w-12 shrink-0 mt-0.5">Value</span>
+                    <span className="text-[10px] font-bold uppercase text-[#CC8400] w-12 shrink-0 mt-0.5">Value</span>
                     <span className="text-[11px] text-zinc-600">Paste the folder ID you copied in step 2</span>
                   </div>
                 </div>
-                <p className="text-[10px] text-amber-700">
+                <p className="text-[10px] text-[#CC8400]">
                   After saving the secret, the API server picks it up automatically — no restart needed.
                 </p>
               </div>

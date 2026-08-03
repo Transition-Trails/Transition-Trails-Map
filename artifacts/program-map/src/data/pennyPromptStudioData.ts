@@ -108,24 +108,24 @@ export interface QualityReview {
 
 export const PROMPT_STATUS_CONFIG: Record<PromptStatus, { cls: string; order: number }> = {
   Draft:      { cls: 'text-slate-600 bg-slate-50 border-slate-200',     order: 1 },
-  Review:     { cls: 'text-amber-700 bg-amber-50 border-amber-200',     order: 2 },
-  Approved:   { cls: 'text-green-700 bg-green-50 border-green-200',     order: 3 },
-  Deprecated: { cls: 'text-rose-700 bg-rose-50 border-rose-200',        order: 4 },
+  Review:     { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',     order: 2 },
+  Approved:   { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',     order: 3 },
+  Deprecated: { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',        order: 4 },
 };
 
 export const RISK_CONFIG: Record<HallucinationRisk, { cls: string; description: string }> = {
-  Low:    { cls: 'text-green-700 bg-green-50 border-green-200',  description: 'Penny answers from well-structured, single-source data. Drift risk is minimal.' },
-  Medium: { cls: 'text-amber-700 bg-amber-50 border-amber-200', description: 'Multi-source synthesis required. Penny may over-generalise. Human review recommended.' },
-  High:   { cls: 'text-rose-700 bg-rose-50 border-rose-200',    description: 'Open-ended generation. Penny may fabricate details. Mandatory guardrails + human review.' },
+  Low:    { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',  description: 'Penny answers from well-structured, single-source data. Drift risk is minimal.' },
+  Medium: { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', description: 'Multi-source synthesis required. Penny may over-generalise. Human review recommended.' },
+  High:   { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',    description: 'Open-ended generation. Penny may fabricate details. Mandatory guardrails + human review.' },
 };
 
 export const DOMAIN_CLS: Record<PromptDomain, string> = {
   Coaching:       'text-secondary border-secondary/20 bg-secondary/10',
-  Career:         'text-violet-700 bg-violet-50 border-violet-200',
-  Learning:       'text-amber-700 bg-amber-50 border-amber-200',
-  Knowledge:      'text-blue-700 bg-blue-50 border-blue-200',
-  Operations:     'text-rose-700 bg-rose-50 border-rose-200',
-  Communications: 'text-green-700 bg-green-50 border-green-200',
+  Career:         'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+  Learning:       'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+  Knowledge:      'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+  Operations:     'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+  Communications: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
   Questing:       'text-primary border-primary/20 bg-primary/5',
 };
 

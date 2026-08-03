@@ -126,8 +126,8 @@ export default function Assessments() {
           </p>
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
-                <ClipboardCheck className="w-5 h-5 text-rose-600" />
+              <div className="w-9 h-9 rounded-xl bg-[#FBEAE6] flex items-center justify-center shrink-0">
+                <ClipboardCheck className="w-5 h-5 text-[#A93F2F]" />
               </div>
               <div>
                 <h1 className="text-base font-semibold text-foreground">Assessments</h1>
@@ -136,8 +136,8 @@ export default function Assessments() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1 shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               <span className="font-semibold">POC Confirmed</span>
             </div>
           </div>
@@ -147,9 +147,9 @@ export default function Assessments() {
         <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Assessments',    value: curriculumAssessments.length, color: 'text-foreground',  icon: ClipboardCheck },
-            { label: 'Pass Rate',      value: `${Math.round((totalPassed / LEARNER_RESULTS.length) * 100)}%`, color: 'text-emerald-600', icon: TrendingUp },
-            { label: 'Avg Score',      value: `${avgScore}%`,               color: 'text-sky-600',     icon: BarChart2 },
-            { label: 'Needs Coaching', value: needsCoaching,                color: 'text-amber-600',   icon: Brain },
+            { label: 'Pass Rate',      value: `${Math.round((totalPassed / LEARNER_RESULTS.length) * 100)}%`, color: 'text-[#2F6B3F]', icon: TrendingUp },
+            { label: 'Avg Score',      value: `${avgScore}%`,               color: 'text-[#2F6F7E]',     icon: BarChart2 },
+            { label: 'Needs Coaching', value: needsCoaching,                color: 'text-[#CC8400]',   icon: Brain },
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
               <s.icon className={`w-4 h-4 ${s.color} mb-1.5`} />
@@ -191,7 +191,7 @@ export default function Assessments() {
             <div className="bg-card divide-y divide-border">
               {filtered.map(r => {
                 const asmnt    = curriculumAssessments.find(a => a.id === r.assessmentId);
-                const scoreClr = r.score >= 85 ? 'text-emerald-700' : r.score >= 75 ? 'text-sky-700' : 'text-rose-700';
+                const scoreClr = r.score >= 85 ? 'text-[#2F6B3F]' : r.score >= 75 ? 'text-[#2F6F7E]' : 'text-[#A93F2F]';
                 return (
                   <div
                     key={`${r.learner}-${r.assessmentId}`}
@@ -208,14 +208,14 @@ export default function Assessments() {
                     <p className={`text-[12px] font-bold ${scoreClr}`}>{r.score}%</p>
                     <div>
                       {r.passed
-                        ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        : <AlertTriangle className="w-4 h-4 text-rose-500" />
+                        ? <CheckCircle2 className="w-4 h-4 text-[#2F6B3F]" />
+                        : <AlertTriangle className="w-4 h-4 text-[#A93F2F]" />
                       }
                     </div>
                     <p className="text-[11px] text-muted-foreground">{r.attempts}×</p>
                     <div className="flex items-center gap-1">
                       {r.pennyCoached
-                        ? <Sparkles className="w-3.5 h-3.5 text-violet-500" aria-label="Penny coaching active" />
+                        ? <Sparkles className="w-3.5 h-3.5 text-[#2F6F7E]" aria-label="Penny coaching active" />
                         : null
                       }
                       <button
@@ -251,7 +251,7 @@ export default function Assessments() {
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-cyan-200/60 bg-cyan-50">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
-                  <Brain className="w-3.5 h-3.5 text-violet-600" />
+                  <Brain className="w-3.5 h-3.5 text-[#2F6F7E]" />
                   <Bot className="w-3.5 h-3.5 text-cyan-600" />
                 </div>
                 <p className="text-[11px] font-semibold text-foreground">
@@ -271,16 +271,16 @@ export default function Assessments() {
             <div className="divide-y divide-cyan-200/40">
               {/* Penny row */}
               <div className="flex items-start gap-3 px-4 py-3">
-                <div className="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center shrink-0 mt-0.5">
-                  <Brain className="w-3 h-3 text-violet-600" />
+                <div className="w-5 h-5 rounded-full bg-[#EDF5F8] flex items-center justify-center shrink-0 mt-0.5">
+                  <Brain className="w-3 h-3 text-[#2F6F7E]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-violet-600/70 mb-0.5">Penny</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#2F6F7E]/70 mb-0.5">Penny</p>
                   <p className="text-[11px] text-muted-foreground">
                     Panel opened with coaching query — see the Ask Penny panel on the right.
                   </p>
                 </div>
-                <span className="text-[9px] font-semibold bg-violet-100 text-violet-700 rounded-full px-2 py-0.5 shrink-0">Active</span>
+                <span className="text-[9px] font-semibold bg-[#EDF5F8] text-[#2F6F7E] rounded-full px-2 py-0.5 shrink-0">Active</span>
               </div>
 
               {/* Agentforce row */}
@@ -306,8 +306,8 @@ export default function Assessments() {
 
                   {activeCoaching.status === 'error' && (
                     <div className="flex items-start gap-1.5">
-                      <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-amber-700">{activeCoaching.error}</p>
+                      <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-[#CC8400]">{activeCoaching.error}</p>
                     </div>
                   )}
 
@@ -319,8 +319,8 @@ export default function Assessments() {
                 </div>
                 <span className={`text-[9px] font-semibold rounded-full px-2 py-0.5 shrink-0 ${
                   activeCoaching.status === 'loading' ? 'bg-cyan-100 text-cyan-700' :
-                  activeCoaching.status === 'success' ? 'bg-emerald-100 text-emerald-700' :
-                  'bg-amber-100 text-amber-700'
+                  activeCoaching.status === 'success' ? 'bg-[#E6F0EA] text-[#2F6B3F]' :
+                  'bg-[#FFF3E0] text-[#CC8400]'
                 }`}>
                   {activeCoaching.status === 'loading' ? 'Connecting' :
                    activeCoaching.status === 'success' ? 'Responded' : 'Error'}
@@ -382,8 +382,8 @@ export default function Assessments() {
 
         {/* Integration note */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-rose-100 bg-rose-50/50 p-3.5 flex items-start gap-2">
-            <ClipboardCheck className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+          <div className="rounded-lg border border-[#FBEAE6] bg-[#FBEAE6]/50 p-3.5 flex items-start gap-2">
+            <ClipboardCheck className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
               <p className="text-[11px] font-medium text-foreground mb-0.5">Salesforce integration</p>
               <p className="text-[10px] text-muted-foreground leading-snug">
@@ -392,8 +392,8 @@ export default function Assessments() {
               </p>
             </div>
           </div>
-          <div className="rounded-lg border border-violet-100 bg-violet-50/50 p-3.5 flex items-start gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-violet-500 shrink-0 mt-0.5" />
+          <div className="rounded-lg border border-[#EDF5F8] bg-[#EDF5F8]/50 p-3.5 flex items-start gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-[#2F6F7E] shrink-0 mt-0.5" />
             <div>
               <p className="text-[11px] font-medium text-foreground mb-0.5">Penny coaching</p>
               <p className="text-[10px] text-muted-foreground leading-snug">
@@ -405,13 +405,13 @@ export default function Assessments() {
         </div>
 
         {/* Missing assessment alert */}
-        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 flex items-start gap-2">
-          <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+        <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3 flex items-start gap-2">
+          <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
           <div>
-            <p className="text-[11px] font-medium text-rose-800">
+            <p className="text-[11px] font-medium text-[#A93F2F]">
               Missing: Module 4.3 has no linked assessment
             </p>
-            <p className="text-[10px] text-rose-700 mt-0.5 leading-snug">
+            <p className="text-[10px] text-[#A93F2F] mt-0.5 leading-snug">
               Portfolio &amp; Career Launch module is missing a knowledge check. Use Penny Content Assistant to generate one.
             </p>
             <button
@@ -419,7 +419,7 @@ export default function Assessments() {
                 setPendingPennyQuery('Generate an assessment for Module 4.3: Portfolio & Career Launch. It should cover portfolio presentation skills, job search strategy, and interview preparation. Suggest 12–15 questions with a 75% pass threshold.');
                 setAskPennyOpen(true);
               }}
-              className="flex items-center gap-1 mt-1.5 text-[10px] text-rose-700 border border-rose-200 rounded-md px-2 py-1 hover:bg-rose-100 transition-colors"
+              className="flex items-center gap-1 mt-1.5 text-[10px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2 py-1 hover:bg-[#FBEAE6] transition-colors"
             >
               <Zap className="w-2.5 h-2.5" /> Generate with Penny
             </button>

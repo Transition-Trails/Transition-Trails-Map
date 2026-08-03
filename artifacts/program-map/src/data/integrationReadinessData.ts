@@ -112,22 +112,22 @@ export interface DataFlowNode {
 // ── Config ─────────────────────────────────────────────────────────────────
 
 export const STATUS_CONFIG: Record<IntegrationStatus, { cls: string; order: number }> = {
-  'Prototype':             { cls: 'text-violet-700 bg-violet-50 border-violet-200',  order: 1 },
-  'Ready to Configure':    { cls: 'text-green-700 bg-green-50 border-green-200',     order: 2 },
-  'Needs Admin Setup':     { cls: 'text-amber-700 bg-amber-50 border-amber-200',     order: 3 },
-  'Needs Security Review': { cls: 'text-rose-700 bg-rose-50 border-rose-200',        order: 4 },
-  'Blocked':               { cls: 'text-red-800 bg-red-50 border-red-200',           order: 5 },
+  'Prototype':             { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',  order: 1 },
+  'Ready to Configure':    { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',     order: 2 },
+  'Needs Admin Setup':     { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',     order: 3 },
+  'Needs Security Review': { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',        order: 4 },
+  'Blocked':               { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',           order: 5 },
   'Future':                { cls: 'text-slate-500 bg-slate-50 border-slate-200',     order: 6 },
 };
 
 export const DOMAIN_CONFIG: Record<IntegrationDomain, { cls: string; icon: string; tagline: string }> = {
-  'Salesforce':      { cls: 'text-blue-700 bg-blue-50 border-blue-200',       icon: 'database',     tagline: 'System of Record' },
-  'Google Drive':    { cls: 'text-green-700 bg-green-50 border-green-200',    icon: 'folder-open',  tagline: 'Content Repository' },
-  'Slack':           { cls: 'text-violet-700 bg-violet-50 border-violet-200', icon: 'message-square', tagline: 'Learner Delivery Channel' },
-  'Google Chat':     { cls: 'text-teal-700 bg-teal-50 border-teal-200',       icon: 'message-circle', tagline: 'Client & Executive Channel' },
-  'Google Calendar': { cls: 'text-amber-700 bg-amber-50 border-amber-200',    icon: 'calendar',     tagline: 'Timing & Trigger Layer' },
-  'LMS':             { cls: 'text-orange-700 bg-orange-50 border-orange-200', icon: 'graduation-cap', tagline: 'Learning Delivery Platform' },
-  'Assessments':     { cls: 'text-rose-700 bg-rose-50 border-rose-200',       icon: 'check-square', tagline: 'Learner Progress Data' },
+  'Salesforce':      { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',       icon: 'database',     tagline: 'System of Record' },
+  'Google Drive':    { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',    icon: 'folder-open',  tagline: 'Content Repository' },
+  'Slack':           { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', icon: 'message-square', tagline: 'Learner Delivery Channel' },
+  'Google Chat':     { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',       icon: 'message-circle', tagline: 'Client & Executive Channel' },
+  'Google Calendar': { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',    icon: 'calendar',     tagline: 'Timing & Trigger Layer' },
+  'LMS':             { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', icon: 'graduation-cap', tagline: 'Learning Delivery Platform' },
+  'Assessments':     { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',       icon: 'check-square', tagline: 'Learner Progress Data' },
   'Penny Services':  { cls: 'text-secondary border-secondary/20 bg-secondary/10', icon: 'brain',    tagline: 'Intelligence Layer (POC)' },
 };
 
@@ -851,7 +851,7 @@ export const dataFlowNodes: DataFlowNode[] = [
     label: 'Salesforce',
     systemRole: 'System of Record',
     description: 'Source of truth for all learner identity, enrollment, program progress, assessments, and organizational knowledge.',
-    cls: 'border-blue-300 bg-blue-50 text-blue-900',
+    cls: 'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]',
     outbound: [
       { targetId: 'node-trail-os', label: 'PMM, Knowledge, Assessments, Contacts', direction: 'send', note: 'REST API + SOQL. Core data read by Trail OS on every interaction.' },
       { targetId: 'node-penny',    label: 'Learner context + Knowledge articles',  direction: 'send', note: 'Penny queries SF directly for coaching context (SOQL).' },
@@ -862,7 +862,7 @@ export const dataFlowNodes: DataFlowNode[] = [
     label: 'Google Drive',
     systemRole: 'Content Repository',
     description: 'Program materials, coach guides, sprint resources, and source documents not yet in Salesforce.',
-    cls: 'border-green-300 bg-green-50 text-green-900',
+    cls: 'border-green-300 bg-[#E6F0EA] text-[#245531]',
     outbound: [
       { targetId: 'node-trail-os', label: 'Indexed file content',  direction: 'send', note: '6h refresh. Files indexed into Source Document Archive and Penny RAG.' },
       { targetId: 'node-penny',    label: 'Supplementary context', direction: 'send', note: 'Fallback source for edge-case questions not answered by SF Knowledge.' },
@@ -895,7 +895,7 @@ export const dataFlowNodes: DataFlowNode[] = [
     label: 'Communications',
     systemRole: 'Delivery Channels',
     description: 'Slack (learner), Google Chat (client/executive), email. Penny-generated content delivered to the right channel for each audience.',
-    cls: 'border-violet-300 bg-violet-50 text-violet-900',
+    cls: 'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]',
     outbound: [
       { targetId: 'node-penny',   label: 'Learner messages + Reactions', direction: 'send', note: 'Inbound learner messages trigger Penny response pipeline.' },
     ],
@@ -905,7 +905,7 @@ export const dataFlowNodes: DataFlowNode[] = [
     label: 'Calendar',
     systemRole: 'Timing Layer',
     description: 'Google Calendar. Program sessions, sprint schedules, and assessment windows provide Penny with time-aware context for reminders and weekly reviews.',
-    cls: 'border-amber-300 bg-amber-50 text-amber-900',
+    cls: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]',
     outbound: [
       { targetId: 'node-penny',   label: 'Event triggers (24h, 1h, 15min)', direction: 'send', note: 'Calendar proximity events fire Penny reminder and check-in interactions.' },
     ],
@@ -915,7 +915,7 @@ export const dataFlowNodes: DataFlowNode[] = [
     label: 'LMS',
     systemRole: 'Learning Platform',
     description: 'Delivers modules and assessments to learners. Completion events trigger Penny interactions. Content feeds Penny coaching context.',
-    cls: 'border-orange-300 bg-orange-50 text-orange-900',
+    cls: 'border-orange-300 bg-[#FFF3E0] text-[#CC8400]',
     outbound: [
       { targetId: 'node-sf',      label: 'Assessment results (write)',  direction: 'send', note: 'Scores written to SF Training_Plan_Item__c via pipeline.' },
       { targetId: 'node-penny',   label: 'Completion event triggers',   direction: 'send', note: 'Module completion webhooks fire Penny reflection prompts.' },

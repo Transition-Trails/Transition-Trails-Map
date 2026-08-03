@@ -78,12 +78,12 @@ export default function PennyCommandCenter() {
   const sfPill = sfAuthenticated === null
     ? { value: 'Checking…', color: 'text-muted-foreground', bg: 'bg-muted/30 border-border' }
     : sfAuthenticated
-      ? { value: 'Connected',     color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' }
-      : { value: 'Auth Required', color: 'text-amber-700',   bg: 'bg-amber-50 border-amber-200' };
+      ? { value: 'Connected',     color: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#9FC3AE]' }
+      : { value: 'Auth Required', color: 'text-[#CC8400]',   bg: 'bg-[#FFF3E0] border-[#FFD08A]' };
 
   const STATUS_PILLS = [
-    { label: 'Gemini',      value: 'Live',     color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
-    { label: 'Slack',       value: 'Live',     color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+    { label: 'Gemini',      value: 'Live',     color: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#9FC3AE]' },
+    { label: 'Slack',       value: 'Live',     color: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#9FC3AE]' },
     { label: 'Salesforce',  ...sfPill },
   ];
 
@@ -97,24 +97,24 @@ export default function PennyCommandCenter() {
       label:   'Total Learners',
       value:   totalLearners !== null ? String(totalLearners) : '—',
       sub:     totalLearners !== null ? `${onboardedCount ?? '—'} onboarded` : 'Connect Salesforce',
-      iconBg:  'bg-blue-100',
-      iconCls: 'text-blue-600',
+      iconBg:  'bg-[#EDF5F8]',
+      iconCls: 'text-[#2F6F7E]',
     },
     {
       icon:    Brain,
       label:   'Onboarding Rate',
       value:   onboardingRate !== null ? `${onboardingRate}%` : '—',
       sub:     onboardingRate !== null ? 'learners onboarded' : 'Connect Salesforce',
-      iconBg:  'bg-violet-100',
-      iconCls: 'text-violet-600',
+      iconBg:  'bg-[#EDF5F8]',
+      iconCls: 'text-[#2F6F7E]',
     },
     {
       icon:    Map,
       label:   'Active Trails',
       value:   activeTrails !== null ? String(activeTrails) : '—',
       sub:     activeTrails !== null ? 'of 4 configured' : 'Connect Salesforce',
-      iconBg:  'bg-emerald-100',
-      iconCls: 'text-emerald-600',
+      iconBg:  'bg-[#E6F0EA]',
+      iconCls: 'text-[#2F6B3F]',
     },
   ];
 
@@ -197,8 +197,8 @@ export default function PennyCommandCenter() {
             {visibleItems.map(item => (
               <div key={item.id} className="flex items-center gap-2.5 px-3 py-2.5">
                 {item.variant === 'ok'
-                  ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  : <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  ? <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
+                  : <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
                 }
                 <p className="text-[12px] text-foreground">{item.label}</p>
               </div>

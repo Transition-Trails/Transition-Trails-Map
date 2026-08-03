@@ -18,7 +18,7 @@ const COLOR: Record<string, string> = {
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  prototype: 'bg-amber-50 border-amber-200 text-amber-700',
+  prototype: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',
   future:    'bg-muted border-border text-muted-foreground',
 };
 

@@ -53,7 +53,7 @@ function SlackNotifyStub({ context }: { context: string }) {
           disabled={!channel}
           className={`flex items-center gap-1.5 w-full justify-center px-2 py-1.5 rounded text-[10px] font-bold transition-all ${
             sent
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+              ? 'bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]'
               : !channel
               ? 'bg-muted/30 border border-border text-muted-foreground/40 cursor-not-allowed'
               : 'bg-[#4A154B]/5 border border-[#4A154B]/20 text-[#4A154B] hover:bg-[#4A154B]/10'
@@ -122,8 +122,8 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
   if (saved) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 px-4 bg-white">
-        <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+        <div className="w-10 h-10 rounded-full bg-[#E6F0EA] flex items-center justify-center">
+          <CheckCircle2 className="w-5 h-5 text-[#2F6B3F]" />
         </div>
         <p className="text-[13px] font-bold text-foreground text-center">Request Sent to Slack</p>
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
@@ -132,7 +132,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         <p className="text-[10px] text-muted-foreground/60 text-center leading-snug mt-1">
           Changes are session-only and will reset on page refresh.
         </p>
-        <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-700 border border-emerald-200 bg-emerald-50 rounded-full px-2.5 py-1">
+        <span className="text-[9px] font-bold uppercase tracking-widest text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2.5 py-1">
           Saved · Session Only
         </span>
       </div>
@@ -150,7 +150,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
               <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">
                 Action Panel
               </span>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-amber-600 border border-amber-200 bg-amber-50 rounded-full px-1.5 py-0.5">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-1.5 py-0.5">
                 Draft
               </span>
             </div>
@@ -177,9 +177,9 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         <div className="px-4 py-3 space-y-3.5">
 
           {/* Prototype notice */}
-          <div className="rounded border border-amber-200 bg-amber-50/60 px-2.5 py-2 flex items-start gap-1.5">
-            <Pencil className="w-3 h-3 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-[10px] text-amber-900 leading-snug">
+          <div className="rounded border border-[#FFD08A] bg-[#FFF3E0]/60 px-2.5 py-2 flex items-start gap-1.5">
+            <Pencil className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
+            <p className="text-[10px] text-[#CC8400] leading-snug">
               <strong>Prototype:</strong> New items appear immediately but reset on refresh.
             </p>
           </div>
@@ -188,7 +188,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
             <div key={field.id} className="space-y-1">
               <label className="block text-[10px] font-bold text-foreground">
                 {field.label}
-                {field.required && <span className="text-rose-500 ml-0.5">*</span>}
+                {field.required && <span className="text-[#A93F2F] ml-0.5">*</span>}
               </label>
 
               {field.type === 'text' && (

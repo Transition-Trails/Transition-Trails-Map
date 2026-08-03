@@ -177,9 +177,9 @@ export default function ProgramBlueprint() {
               <p className="text-[12px] text-muted-foreground mt-1">{program.purpose}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 shrink-0">
-              <StatPill label="Cohorts" value={cohorts.length} cls="border-teal-200 bg-teal-50" />
-              <StatPill label="Sprints" value={sprints.length} cls="border-violet-200 bg-violet-50" />
-              <StatPill label="Modules" value={modules.length} cls="border-sky-200 bg-sky-50" />
+              <StatPill label="Cohorts" value={cohorts.length} cls="border-[#9FC3AE] bg-[#E6F0EA]" />
+              <StatPill label="Sprints" value={sprints.length} cls="border-[#7FAFC6] bg-[#EDF5F8]" />
+              <StatPill label="Modules" value={modules.length} cls="border-[#7FAFC6] bg-[#EDF5F8]" />
             </div>
           </div>
 
@@ -204,7 +204,7 @@ export default function ProgramBlueprint() {
                 <Icon className="w-3 h-3" />
                 {t.label}
                 {t.id === 'health' && healthIssues.length > 0 && (
-                  <span className="bg-red-500 text-white text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">{healthIssues.length}</span>
+                  <span className="bg-[#FBEAE6]0 text-white text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">{healthIssues.length}</span>
                 )}
               </button>
             );
@@ -227,9 +227,9 @@ export default function ProgramBlueprint() {
               </div>
             </div>
 
-            <SectionCard title="Cohorts" items={cohorts} icon={Users} color="text-teal-600" onSelect={selectItem} />
-            <SectionCard title="Sprints" items={sprints} icon={Layers} color="text-violet-600" onSelect={selectItem} />
-            <SectionCard title="Modules" items={modules} icon={BookOpen} color="text-sky-600" onSelect={selectItem} />
+            <SectionCard title="Cohorts" items={cohorts} icon={Users} color="text-[#2F6B3F]" onSelect={selectItem} />
+            <SectionCard title="Sprints" items={sprints} icon={Layers} color="text-[#2F6F7E]" onSelect={selectItem} />
+            <SectionCard title="Modules" items={modules} icon={BookOpen} color="text-[#2F6F7E]" onSelect={selectItem} />
           </div>
         )}
 
@@ -237,14 +237,14 @@ export default function ProgramBlueprint() {
         {tab === 'learning' && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
-              <StatPill label="Lessons" value={lessons.length} cls="border-amber-200 bg-amber-50" />
-              <StatPill label="Assessments" value={assessments.length} cls="border-rose-200 bg-rose-50" />
-              <StatPill label="KB Articles" value={articles.length} cls="border-indigo-200 bg-indigo-50" />
+              <StatPill label="Lessons" value={lessons.length} cls="border-[#FFD08A] bg-[#FFF3E0]" />
+              <StatPill label="Assessments" value={assessments.length} cls="border-[#E8B9B4] bg-[#FBEAE6]" />
+              <StatPill label="KB Articles" value={articles.length} cls="border-[#7FAFC6] bg-[#EDF5F8]" />
               <StatPill label="Resources" value={resources.length} cls="border-slate-200 bg-slate-50" />
             </div>
-            <SectionCard title="Lessons" items={lessons} icon={BookOpen} color="text-amber-600" onSelect={selectItem} />
-            <SectionCard title="Assessments" items={assessments} icon={CheckCircle2} color="text-rose-600" onSelect={selectItem} />
-            <SectionCard title="Knowledge Articles" items={articles} icon={BookOpen} color="text-indigo-600" onSelect={selectItem} />
+            <SectionCard title="Lessons" items={lessons} icon={BookOpen} color="text-[#CC8400]" onSelect={selectItem} />
+            <SectionCard title="Assessments" items={assessments} icon={CheckCircle2} color="text-[#A93F2F]" onSelect={selectItem} />
+            <SectionCard title="Knowledge Articles" items={articles} icon={BookOpen} color="text-[#2F6F7E]" onSelect={selectItem} />
             <SectionCard title="Resources" items={resources} icon={Layers} color="text-slate-600" onSelect={selectItem} />
           </div>
         )}
@@ -254,13 +254,13 @@ export default function ProgramBlueprint() {
           <div className="space-y-3">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
               <StatPill label="Coaching" value={coaching.length} cls="border-secondary/20 bg-secondary/10" />
-              <StatPill label="Reflection" value={reflection.length} cls="border-purple-200 bg-purple-50" />
-              <StatPill label="Trail Quests" value={quests.length} cls="border-emerald-200 bg-emerald-50" />
+              <StatPill label="Reflection" value={reflection.length} cls="border-[#7FAFC6] bg-[#EDF5F8]" />
+              <StatPill label="Trail Quests" value={quests.length} cls="border-[#9FC3AE] bg-[#E6F0EA]" />
               <StatPill label="Weekly Reviews" value={weeklyRevs.length} cls="border-cyan-200 bg-cyan-50" />
             </div>
             <SectionCard title="Coaching Prompts" items={coaching} icon={Sparkles} color="text-secondary" onSelect={selectItem} />
-            <SectionCard title="Reflection Prompts" items={reflection} icon={MessageCircle} color="text-purple-600" onSelect={selectItem} />
-            <SectionCard title="Trail Quests" items={quests} icon={Star} color="text-emerald-600" onSelect={selectItem} />
+            <SectionCard title="Reflection Prompts" items={reflection} icon={MessageCircle} color="text-[#2F6F7E]" onSelect={selectItem} />
+            <SectionCard title="Trail Quests" items={quests} icon={Star} color="text-[#2F6B3F]" onSelect={selectItem} />
             <SectionCard title="Weekly Reviews" items={weeklyRevs} icon={BarChart2} color="text-cyan-600" onSelect={selectItem} />
           </div>
         )}
@@ -269,27 +269,27 @@ export default function ProgramBlueprint() {
         {tab === 'delivery' && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
-              <StatPill label="Slack" value={slack.length} cls="border-green-200 bg-green-50" />
-              <StatPill label="Google Chat" value={gchat.length} cls="border-blue-200 bg-blue-50" />
-              <StatPill label="Calendar Events" value={calEvents.length} cls="border-orange-200 bg-orange-50" />
-              <StatPill label="Office Hours" value={officeHrs.length} cls="border-pink-200 bg-pink-50" />
+              <StatPill label="Slack" value={slack.length} cls="border-[#9FC3AE] bg-[#E6F0EA]" />
+              <StatPill label="Google Chat" value={gchat.length} cls="border-[#7FAFC6] bg-[#EDF5F8]" />
+              <StatPill label="Calendar Events" value={calEvents.length} cls="border-[#FFD08A] bg-[#FFF3E0]" />
+              <StatPill label="Office Hours" value={officeHrs.length} cls="border-[#E8B9B4] bg-[#FBEAE6]" />
             </div>
-            <SectionCard title="Slack Activities" items={slack} icon={Hash} color="text-green-600" onSelect={selectItem} />
-            <SectionCard title="Google Chat Updates" items={gchat} icon={MessageCircle} color="text-blue-600" onSelect={selectItem} />
-            <SectionCard title="Calendar Events" items={calEvents} icon={Calendar} color="text-orange-600" onSelect={selectItem} />
-            <SectionCard title="Office Hours" items={officeHrs} icon={Clock} color="text-pink-600" onSelect={selectItem} />
+            <SectionCard title="Slack Activities" items={slack} icon={Hash} color="text-[#2F6B3F]" onSelect={selectItem} />
+            <SectionCard title="Google Chat Updates" items={gchat} icon={MessageCircle} color="text-[#2F6F7E]" onSelect={selectItem} />
+            <SectionCard title="Calendar Events" items={calEvents} icon={Calendar} color="text-[#CC8400]" onSelect={selectItem} />
+            <SectionCard title="Office Hours" items={officeHrs} icon={Clock} color="text-[#A93F2F]" onSelect={selectItem} />
           </div>
         )}
 
         {/* ── Salesforce Tab ── */}
         {tab === 'salesforce' && (
           <div className="space-y-3">
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 mb-2">
+            <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3 mb-2">
               <div className="flex items-center gap-2 mb-1">
-                <Database className="w-4 h-4 text-blue-600" />
-                <p className="text-[13px] font-bold text-blue-900">Salesforce — System of Record</p>
+                <Database className="w-4 h-4 text-[#2F6F7E]" />
+                <p className="text-[13px] font-bold text-[#2F6F7E]">Salesforce — System of Record</p>
               </div>
-              <p className="text-[12px] text-blue-800">
+              <p className="text-[12px] text-[#2F6F7E]">
                 Salesforce is the data source of truth. Trail OS visualizes and operates on top of SF data.
                 These mappings show how {programName} objects correspond to your NPSP/PMM/existing objects.
               </p>
@@ -301,7 +301,7 @@ export default function ProgramBlueprint() {
                   <button
                     key={mapping.id}
                     onClick={() => setSelectedItem({ type: 'sfMapping', id: mapping.id, data: mapping })}
-                    className="w-full rounded-xl border border-border bg-white p-3 text-left hover:shadow-sm hover:border-blue-200 transition-all"
+                    className="w-full rounded-xl border border-border bg-white p-3 text-left hover:shadow-sm hover:border-[#7FAFC6] transition-all"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${statusCfg.dot} shrink-0`} />
@@ -309,7 +309,7 @@ export default function ProgramBlueprint() {
                         <div className="flex items-center gap-2">
                           <p className="text-[12px] font-bold text-foreground">{mapping.trailOsObject}</p>
                           <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
-                          <p className="text-[12px] font-semibold text-blue-700">{mapping.sfLabel}</p>
+                          <p className="text-[12px] font-semibold text-[#2F6F7E]">{mapping.sfLabel}</p>
                           <p className="text-[10px] text-muted-foreground font-mono">{mapping.sfApiName}</p>
                         </div>
                         <p className="text-[10px] text-muted-foreground line-clamp-1">{mapping.currentImplementation}</p>
@@ -332,8 +332,8 @@ export default function ProgramBlueprint() {
                 <div className={`rounded-xl border-2 p-5 ${driveStatusCfg?.cls?.replace('text-', 'border-') || 'border-border'} bg-white`}>
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-                        <FolderOpen className="w-5 h-5 text-green-700" />
+                      <div className="w-10 h-10 rounded-xl bg-[#E6F0EA] flex items-center justify-center">
+                        <FolderOpen className="w-5 h-5 text-[#2F6B3F]" />
                       </div>
                       <div>
                         <p className="text-[15px] font-bold text-foreground">{driveResource.folderName}</p>
@@ -391,7 +391,7 @@ export default function ProgramBlueprint() {
                   ) : (
                     <p className="mt-2 text-[10px] text-muted-foreground italic">Shared Drive ID not set — configure in Admin &gt; Program Resources for future API access.</p>
                   )}
-                  {driveResource.notes && <p className="mt-2 text-[10px] text-amber-700 border-t border-border pt-2">{driveResource.notes}</p>}
+                  {driveResource.notes && <p className="mt-2 text-[10px] text-[#CC8400] border-t border-border pt-2">{driveResource.notes}</p>}
                 </div>
               </>
             ) : (
@@ -408,27 +408,27 @@ export default function ProgramBlueprint() {
         {tab === 'health' && (
           <div className="space-y-3">
             <div className="grid grid-cols-3 gap-2 mb-2">
-              <StatPill label="Total Issues" value={healthIssues.length} cls="border-red-200 bg-red-50" />
-              <StatPill label="High Severity" value={healthIssues.filter(h => h.severity === 'high').length} cls="border-red-200 bg-red-50" />
-              <StatPill label="Modules Affected" value={new Set(healthIssues.map(h => h.affectedObjectId)).size} cls="border-amber-200 bg-amber-50" />
+              <StatPill label="Total Issues" value={healthIssues.length} cls="border-[#E8B9B4] bg-[#FBEAE6]" />
+              <StatPill label="High Severity" value={healthIssues.filter(h => h.severity === 'high').length} cls="border-[#E8B9B4] bg-[#FBEAE6]" />
+              <StatPill label="Modules Affected" value={new Set(healthIssues.map(h => h.affectedObjectId)).size} cls="border-[#FFD08A] bg-[#FFF3E0]" />
             </div>
             {healthIssues.length === 0 ? (
-              <div className="rounded-xl border border-green-200 bg-green-50 p-5 text-center">
-                <CheckCircle2 className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <p className="text-[13px] font-semibold text-green-800">All Clear</p>
-                <p className="text-[11px] text-green-700">No content health issues found for {programName}.</p>
+              <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA] p-5 text-center">
+                <CheckCircle2 className="w-6 h-6 text-[#2F6B3F] mx-auto mb-2" />
+                <p className="text-[13px] font-semibold text-[#245531]">All Clear</p>
+                <p className="text-[11px] text-[#2F6B3F]">No content health issues found for {programName}.</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {healthIssues.map(issue => (
                   <button key={issue.id} onClick={() => selectItem(issue)}
-                    className="w-full rounded-xl border border-red-200 bg-red-50/30 p-4 text-left hover:shadow-sm transition-all">
+                    className="w-full rounded-xl border border-[#E8B9B4] bg-[#FBEAE6]/30 p-4 text-left hover:shadow-sm transition-all">
                     <div className="flex items-start gap-2">
-                      <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${issue.severity === 'high' ? 'text-red-500' : 'text-orange-400'}`} />
+                      <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${issue.severity === 'high' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
                       <div className="flex-1">
                         <p className="text-[13px] font-bold text-foreground">{issue.name}</p>
                         <p className="text-[11px] text-muted-foreground">{issue.purpose}</p>
-                        <p className="text-[11px] text-amber-700 mt-1 font-medium">→ {issue.actionRequired as string}</p>
+                        <p className="text-[11px] text-[#CC8400] mt-1 font-medium">→ {issue.actionRequired as string}</p>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
                     </div>

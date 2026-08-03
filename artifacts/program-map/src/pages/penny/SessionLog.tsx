@@ -62,10 +62,10 @@ function formatDate(d: string | null): string {
 
 function statusColor(s: string | null): string {
   switch (s?.toLowerCase()) {
-    case 'completed':   return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    case 'no-show':     return 'bg-red-50 text-red-700 border-red-200';
-    case 'rescheduled': return 'bg-amber-50 text-amber-700 border-amber-200';
-    case 'pending':     return 'bg-sky-50 text-sky-700 border-sky-200';
+    case 'completed':   return 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]';
+    case 'no-show':     return 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]';
+    case 'rescheduled': return 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]';
+    case 'pending':     return 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]';
     default:            return 'bg-muted text-muted-foreground border-border';
   }
 }
@@ -260,10 +260,10 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
 
       {/* Errors */}
       {error && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 space-y-1">
-          <p className="text-[12px] text-red-700 font-medium">{error}</p>
+        <div className="rounded-md border border-[#E8B9B4] bg-[#FBEAE6] p-3 space-y-1">
+          <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
           {sfError !== null && (
-            <pre className="text-[10px] text-red-600/80 whitespace-pre-wrap break-all font-mono">
+            <pre className="text-[10px] text-[#A93F2F]/80 whitespace-pre-wrap break-all font-mono">
               {typeof sfError === 'string' ? sfError : JSON.stringify(sfError, null, 2)}
             </pre>
           )}
@@ -332,8 +332,8 @@ export default function SessionLog() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-2 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="flex items-center gap-1.5 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-md px-2 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               Salesforce · TT_Session_Log__c
             </span>
             <button
@@ -356,7 +356,7 @@ export default function SessionLog() {
 
         {/* Success banner */}
         {success && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-emerald-50 border-emerald-200 text-emerald-700">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
             <span className="text-[12px] font-medium">Session logged successfully in Salesforce.</span>
           </div>
@@ -381,11 +381,11 @@ export default function SessionLog() {
 
         {/* Error */}
         {!loading && error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[12px] text-red-700 font-medium">{error}</p>
-              <p className="text-[11px] text-red-600/70 mt-0.5">
+              <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
+              <p className="text-[11px] text-[#A93F2F]/70 mt-0.5">
                 Verify the SF service token has access to <code className="font-mono">TT_Session_Log__c</code>.
               </p>
             </div>

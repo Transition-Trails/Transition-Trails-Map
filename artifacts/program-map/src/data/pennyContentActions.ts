@@ -577,9 +577,9 @@ export const module21GeneratedOutput: GeneratedModuleOutput = {
 // ── Action Category Colors ─────────────────────────────────────────────────────
 
 export const ACTION_CATEGORY_CONFIG: Record<PennyActionCategory, { chip: string; border: string; bg: string }> = {
-  'Program Architecture': { chip: 'bg-violet-50 text-violet-800 border-violet-200', border: 'border-violet-200 hover:border-violet-400', bg: 'bg-violet-50/50' },
-  'Learning Content':     { chip: 'bg-amber-50 text-amber-800 border-amber-200',    border: 'border-amber-200 hover:border-amber-400',    bg: 'bg-amber-50/50' },
+  'Program Architecture': { chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]', border: 'border-[#7FAFC6] hover:border-[#7FAFC6]', bg: 'bg-[#EDF5F8]/50' },
+  'Learning Content':     { chip: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',    border: 'border-[#FFD08A] hover:border-[#CC8400]',    bg: 'bg-[#FFF3E0]/50' },
   'Penny Assets':         { chip: 'bg-secondary/10 text-secondary border-secondary/20', border: 'border-secondary/30 hover:border-secondary/60', bg: 'bg-secondary/5' },
-  'Delivery Assets':      { chip: 'bg-green-50 text-green-800 border-green-200',    border: 'border-green-200 hover:border-green-400',    bg: 'bg-green-50/50' },
-  'Quality & Standards':  { chip: 'bg-sky-50 text-sky-800 border-sky-200',          border: 'border-sky-200 hover:border-sky-400',          bg: 'bg-sky-50/50' },
+  'Delivery Assets':      { chip: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',    border: 'border-[#9FC3AE] hover:border-green-400',    bg: 'bg-[#E6F0EA]/50' },
+  'Quality & Standards':  { chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',          border: 'border-[#7FAFC6] hover:border-[#7FAFC6]',          bg: 'bg-[#EDF5F8]/50' },
 };

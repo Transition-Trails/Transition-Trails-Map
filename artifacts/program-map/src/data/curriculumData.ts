@@ -48,35 +48,35 @@ export const CURRICULUM_OBJECT_CONFIG: Record<CurriculumObjectType, {
   label: string; pluralLabel: string; chip: string; border: string; group: string;
 }> = {
   program:          { label: 'Program',            pluralLabel: 'Programs',            chip: 'bg-primary/10 text-primary border-primary/20',          border: 'border-primary/20 hover:border-primary/40',         group: 'Program Structure' },
-  cohort:           { label: 'Cohort',             pluralLabel: 'Cohorts',             chip: 'bg-teal-50 text-teal-800 border-teal-200',              border: 'border-teal-100 hover:border-teal-300',             group: 'Program Structure' },
-  sprint:           { label: 'Sprint',             pluralLabel: 'Sprints',             chip: 'bg-violet-50 text-violet-800 border-violet-200',        border: 'border-violet-100 hover:border-violet-300',         group: 'Program Structure' },
-  module:           { label: 'Module',             pluralLabel: 'Modules',             chip: 'bg-sky-50 text-sky-800 border-sky-200',                 border: 'border-sky-100 hover:border-sky-300',               group: 'Program Structure' },
-  lesson:           { label: 'Lesson',             pluralLabel: 'Lessons',             chip: 'bg-amber-50 text-amber-800 border-amber-200',           border: 'border-amber-100 hover:border-amber-300',           group: 'Learning Assets' },
-  assessment:       { label: 'Assessment',         pluralLabel: 'Assessments',         chip: 'bg-rose-50 text-rose-800 border-rose-200',              border: 'border-rose-100 hover:border-rose-300',             group: 'Learning Assets' },
-  knowledgeArticle: { label: 'Knowledge Article',  pluralLabel: 'Knowledge Articles',  chip: 'bg-indigo-50 text-indigo-800 border-indigo-200',        border: 'border-indigo-100 hover:border-indigo-300',         group: 'Learning Assets' },
+  cohort:           { label: 'Cohort',             pluralLabel: 'Cohorts',             chip: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',              border: 'border-[#E6F0EA] hover:border-[#9FC3AE]',             group: 'Program Structure' },
+  sprint:           { label: 'Sprint',             pluralLabel: 'Sprints',             chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',        border: 'border-[#EDF5F8] hover:border-[#7FAFC6]',         group: 'Program Structure' },
+  module:           { label: 'Module',             pluralLabel: 'Modules',             chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',                 border: 'border-[#EDF5F8] hover:border-[#7FAFC6]',               group: 'Program Structure' },
+  lesson:           { label: 'Lesson',             pluralLabel: 'Lessons',             chip: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',           border: 'border-[#FFF3E0] hover:border-[#FFD08A]',           group: 'Learning Assets' },
+  assessment:       { label: 'Assessment',         pluralLabel: 'Assessments',         chip: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',              border: 'border-[#FBEAE6] hover:border-[#E8B9B4]',             group: 'Learning Assets' },
+  knowledgeArticle: { label: 'Knowledge Article',  pluralLabel: 'Knowledge Articles',  chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',        border: 'border-[#EDF5F8] hover:border-[#7FAFC6]',         group: 'Learning Assets' },
   resource:         { label: 'Resource',           pluralLabel: 'Resources',           chip: 'bg-slate-50 text-slate-800 border-slate-200',           border: 'border-slate-100 hover:border-slate-300',           group: 'Learning Assets' },
   coachingPrompt:   { label: 'Coaching Prompt',    pluralLabel: 'Coaching Prompts',    chip: 'bg-secondary/10 text-secondary border-secondary/20',    border: 'border-secondary/20 hover:border-secondary/40',     group: 'Penny Assets' },
-  reflectionPrompt: { label: 'Reflection Prompt',  pluralLabel: 'Reflection Prompts',  chip: 'bg-purple-50 text-purple-800 border-purple-200',        border: 'border-purple-100 hover:border-purple-300',         group: 'Penny Assets' },
-  trailQuest:       { label: 'Trail Quest',        pluralLabel: 'Trail Quests',        chip: 'bg-emerald-50 text-emerald-800 border-emerald-200',     border: 'border-emerald-100 hover:border-emerald-300',       group: 'Penny Assets' },
+  reflectionPrompt: { label: 'Reflection Prompt',  pluralLabel: 'Reflection Prompts',  chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',        border: 'border-[#EDF5F8] hover:border-[#7FAFC6]',         group: 'Penny Assets' },
+  trailQuest:       { label: 'Trail Quest',        pluralLabel: 'Trail Quests',        chip: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',     border: 'border-[#E6F0EA] hover:border-[#9FC3AE]',       group: 'Penny Assets' },
   weeklyReview:     { label: 'Weekly Review',      pluralLabel: 'Weekly Reviews',      chip: 'bg-cyan-50 text-cyan-800 border-cyan-200',              border: 'border-cyan-100 hover:border-cyan-300',             group: 'Penny Assets' },
-  slackActivity:    { label: 'Slack Activity',     pluralLabel: 'Slack Activities',    chip: 'bg-green-50 text-green-800 border-green-200',           border: 'border-green-100 hover:border-green-300',           group: 'Delivery Assets' },
-  googleChatUpdate: { label: 'Google Chat Update', pluralLabel: 'Google Chat Updates', chip: 'bg-blue-50 text-blue-800 border-blue-200',              border: 'border-blue-100 hover:border-blue-300',             group: 'Delivery Assets' },
-  calendarEvent:    { label: 'Calendar Event',     pluralLabel: 'Calendar Events',     chip: 'bg-orange-50 text-orange-800 border-orange-200',        border: 'border-orange-100 hover:border-orange-300',         group: 'Delivery Assets' },
-  officeHours:      { label: 'Office Hours',       pluralLabel: 'Office Hours',        chip: 'bg-pink-50 text-pink-800 border-pink-200',              border: 'border-pink-100 hover:border-pink-300',             group: 'Delivery Assets' },
-  healthIssue:      { label: 'Health Issue',       pluralLabel: 'Health Issues',       chip: 'bg-red-50 text-red-700 border-red-200',                 border: 'border-red-100 hover:border-red-300',               group: 'Content Health' },
+  slackActivity:    { label: 'Slack Activity',     pluralLabel: 'Slack Activities',    chip: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',           border: 'border-[#E6F0EA] hover:border-green-300',           group: 'Delivery Assets' },
+  googleChatUpdate: { label: 'Google Chat Update', pluralLabel: 'Google Chat Updates', chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',              border: 'border-[#EDF5F8] hover:border-[#7FAFC6]',             group: 'Delivery Assets' },
+  calendarEvent:    { label: 'Calendar Event',     pluralLabel: 'Calendar Events',     chip: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',        border: 'border-[#FFF3E0] hover:border-orange-300',         group: 'Delivery Assets' },
+  officeHours:      { label: 'Office Hours',       pluralLabel: 'Office Hours',        chip: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',              border: 'border-[#FBEAE6] hover:border-pink-300',             group: 'Delivery Assets' },
+  healthIssue:      { label: 'Health Issue',       pluralLabel: 'Health Issues',       chip: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',                 border: 'border-[#FBEAE6] hover:border-red-300',               group: 'Content Health' },
 };
 
 export const CONTENT_STATUS_CONFIG: Record<ContentStatus, { label: string; cls: string }> = {
-  published:      { label: 'Published',    cls: 'text-green-700 bg-green-50 border-green-200' },
-  draft:          { label: 'Draft',        cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-  'needs-review': { label: 'Needs Review', cls: 'text-orange-700 bg-orange-50 border-orange-200' },
-  missing:        { label: 'Missing',      cls: 'text-red-700 bg-red-50 border-red-200' },
+  published:      { label: 'Published',    cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+  draft:          { label: 'Draft',        cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+  'needs-review': { label: 'Needs Review', cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+  missing:        { label: 'Missing',      cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
 };
 
 export const SEVERITY_CONFIG: Record<HealthSeverity, { label: string; cls: string }> = {
-  high:   { label: 'High',   cls: 'text-red-700 bg-red-50 border-red-200' },
-  medium: { label: 'Medium', cls: 'text-orange-700 bg-orange-50 border-orange-200' },
-  low:    { label: 'Low',    cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+  high:   { label: 'High',   cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+  medium: { label: 'Medium', cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+  low:    { label: 'Low',    cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
 };
 
 export const HEALTH_CHECK_CONFIG: Record<HealthCheckType, { label: string; description: string }> = {

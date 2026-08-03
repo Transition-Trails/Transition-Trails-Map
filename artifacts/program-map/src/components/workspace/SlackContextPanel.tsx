@@ -344,13 +344,13 @@ const CALENDAR_SIGNALS: Phase2Signal[] = [
 // ── Drive + Phase 2 sub-components ───────────────────────────────────────────
 
 function DriveItemRow({ item }: { item: DriveItem }) {
-  const kindColor = item.kind === 'folder' ? 'text-amber-500' :
-                    item.kind === 'sheet'  ? 'text-emerald-600' :
-                    item.kind === 'slides' ? 'text-orange-500' : 'text-sky-500';
+  const kindColor = item.kind === 'folder' ? 'text-[#CC8400]' :
+                    item.kind === 'sheet'  ? 'text-[#2F6B3F]' :
+                    item.kind === 'slides' ? 'text-[#CC8400]' : 'text-[#2F6F7E]';
   const statusBadge =
-    item.status === 'needs-review' ? <span className="text-[8px] font-bold bg-amber-50 border border-amber-200 text-amber-700 rounded px-1 py-0.5">Review</span> :
-    item.status === 'missing'      ? <span className="text-[8px] font-bold bg-rose-50 border border-rose-200 text-rose-700 rounded px-1 py-0.5">Missing</span> :
-    item.status === 'updated'      ? <span className="text-[8px] font-bold bg-sky-50 border border-sky-200 text-sky-700 rounded px-1 py-0.5">Updated</span> :
+    item.status === 'needs-review' ? <span className="text-[8px] font-bold bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] rounded px-1 py-0.5">Review</span> :
+    item.status === 'missing'      ? <span className="text-[8px] font-bold bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F] rounded px-1 py-0.5">Missing</span> :
+    item.status === 'updated'      ? <span className="text-[8px] font-bold bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] rounded px-1 py-0.5">Updated</span> :
     null;
 
   return (
@@ -391,11 +391,11 @@ function DriveSection({ context }: { context: SlackPanelContext }) {
                 href={DRIVE_FOLDER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-2.5 mx-2 mb-2 rounded-lg bg-amber-50/70 border border-amber-200/60 hover:bg-amber-50 transition-colors"
+                className="flex items-center gap-2 px-3 py-2.5 mx-2 mb-2 rounded-lg bg-[#FFF3E0]/70 border border-[#FFD08A]/60 hover:bg-[#FFF3E0] transition-colors"
               >
-                <Folder className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span className="text-[10px] font-bold text-amber-900 flex-1 truncate">{data.folderName}</span>
-                <ExternalLink className="w-3 h-3 text-amber-500/60 shrink-0" />
+                <Folder className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
+                <span className="text-[10px] font-bold text-[#CC8400] flex-1 truncate">{data.folderName}</span>
+                <ExternalLink className="w-3 h-3 text-[#CC8400]/60 shrink-0" />
               </a>
               {data.items.map(item => <DriveItemRow key={item.id} item={item} />)}
               <div className="px-3 pt-3 pb-1 border-t border-border/30 mt-2 space-y-1.5">
@@ -429,9 +429,9 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
   const isEmail = tool === 'email';
   const signals  = isEmail ? EMAIL_SIGNALS : CALENDAR_SIGNALS;
   const Icon     = isEmail ? Mail : Calendar;
-  const accentCls  = isEmail ? 'text-sky-600'  : 'text-primary';
-  const headerBg   = isEmail ? 'bg-sky-50/60 border-sky-200/60' : 'bg-primary/[0.04] border-primary/15';
-  const headerText = isEmail ? 'text-sky-800'  : 'text-primary/80';
+  const accentCls  = isEmail ? 'text-[#2F6F7E]'  : 'text-primary';
+  const headerBg   = isEmail ? 'bg-[#EDF5F8]/60 border-[#7FAFC6]/60' : 'bg-primary/[0.04] border-primary/15';
+  const headerText = isEmail ? 'text-[#2F6F7E]'  : 'text-primary/80';
   const phaseLabel = isEmail ? 'Email Signals' : 'Calendar Signals';
   const phaseDesc  = isEmail
     ? 'Unanswered messages, draft follow-ups, and escalation emails — surfaced from Gmail.'
@@ -464,7 +464,7 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
               {signals.map((sig, i) => (
                 <div key={i} className="flex items-start gap-2 px-2.5 py-1.5 rounded-lg bg-muted/20 border border-border/30 opacity-60">
                   <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${
-                    sig.urgency === 'high' ? 'bg-rose-400' : sig.urgency === 'medium' ? 'bg-amber-400' : 'bg-muted-foreground/30'
+                    sig.urgency === 'high' ? 'bg-[#A93F2F]' : sig.urgency === 'medium' ? 'bg-[#CC8400]' : 'bg-muted-foreground/30'
                   }`} />
                   <p className="text-[10px] text-foreground leading-snug">{sig.text}</p>
                 </div>
@@ -489,7 +489,7 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
             target="_blank"
             rel="noopener noreferrer"
             className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-semibold transition-colors ${
-              isEmail ? 'border-sky-200/60 bg-sky-50/40 text-sky-800 hover:bg-sky-50' : 'border-primary/20 bg-primary/[0.03] text-primary/80 hover:bg-primary/[0.06]'
+              isEmail ? 'border-[#7FAFC6]/60 bg-[#EDF5F8]/40 text-[#2F6F7E] hover:bg-[#EDF5F8]' : 'border-primary/20 bg-primary/[0.03] text-primary/80 hover:bg-primary/[0.06]'
             }`}
           >
             <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -512,7 +512,7 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 function HealthDotSlack({ health }: { health: SlackChannel['health'] }) {
-  const cls = health === 'healthy' ? 'bg-emerald-500' : health === 'needs-attention' ? 'bg-amber-500' : 'bg-rose-500';
+  const cls = health === 'healthy' ? 'bg-[#E6F0EA]0' : health === 'needs-attention' ? 'bg-[#FFF3E0]0' : 'bg-[#FBEAE6]0';
   return <span className={`inline-block w-1.5 h-1.5 rounded-full shrink-0 mt-1 ${cls}`} />;
 }
 
@@ -520,7 +520,7 @@ function OAuthStatusChip() {
   const ok = SLACK_WORKSPACE.oauthStatus === 'connected';
   return (
     <span className={`text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 border ${
-      ok ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-amber-50 border-amber-200 text-amber-700'
+      ok ? 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' : 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]'
     }`}>
       {ok ? 'OAuth Connected' : 'OAuth Pending'}
     </span>
@@ -558,9 +558,9 @@ function ActivityRow({ ev }: { ev: SlackActivityEvent }) {
                ev.type === 'governance' ? Shield :
                ev.type === 'channel' ? Hash :
                ev.type === 'user' ? Users : Radio;
-  const iconCls = ev.severity === 'success' ? 'text-emerald-500' :
-                  ev.severity === 'warning' ? 'text-amber-500' :
-                  ev.severity === 'error'   ? 'text-rose-500'   : 'text-muted-foreground/40';
+  const iconCls = ev.severity === 'success' ? 'text-[#2F6B3F]' :
+                  ev.severity === 'warning' ? 'text-[#CC8400]' :
+                  ev.severity === 'error'   ? 'text-[#A93F2F]'   : 'text-muted-foreground/40';
   return (
     <div className="flex items-start gap-2 px-2.5 py-1.5 border-b border-border/30 last:border-0">
       <Icon className={`w-3 h-3 shrink-0 mt-0.5 ${iconCls}`} />
@@ -587,11 +587,11 @@ function PendingItemRow({ item }: { item: PendingItem }) {
                item.kind === 'ask'       ? ArrowRight :
                item.kind === 'reminder'  ? Bell :
                item.kind === 'escalation'? AlertTriangle : AlertTriangle;
-  const iconCls = item.urgent ? 'text-rose-500' :
-                  item.kind === 'escalation' ? 'text-amber-500' :
-                  item.kind === 'alert' ? 'text-amber-500' : 'text-muted-foreground/50';
+  const iconCls = item.urgent ? 'text-[#A93F2F]' :
+                  item.kind === 'escalation' ? 'text-[#CC8400]' :
+                  item.kind === 'alert' ? 'text-[#CC8400]' : 'text-muted-foreground/50';
   const bgCls = item.urgent
-    ? 'border-rose-200 bg-rose-50 shadow-sm'
+    ? 'border-[#E8B9B4] bg-[#FBEAE6] shadow-sm'
     : 'border-border/50 bg-white shadow-sm';
 
   return (
@@ -725,10 +725,10 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
         {/* Status strip */}
         {(urgentCount > 0 || SLACK_WORKSPACE.oauthStatus !== 'connected') && (
           <div className={`mt-1.5 rounded-lg border px-2.5 py-1.5 flex items-center gap-1.5 ${
-            urgentCount > 0 ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50/70'
+            urgentCount > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#FFD08A] bg-[#FFF3E0]/70'
           }`}>
-            <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
-            <p className="text-[10px] text-amber-900 leading-snug flex-1">
+            <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0" />
+            <p className="text-[10px] text-[#CC8400] leading-snug flex-1">
               {urgentCount > 0 ? `${urgentCount} urgent action${urgentCount > 1 ? 's' : ''} pending` : ''}
               {urgentCount > 0 && SLACK_WORKSPACE.oauthStatus !== 'connected' ? ' · ' : ''}
               {SLACK_WORKSPACE.oauthStatus !== 'connected' ? 'OAuth not yet connected' : ''}
@@ -754,7 +754,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               <div className="flex items-center gap-0.5">
                 <ToolIcon className="w-3 h-3" />
                 {tool.badge > 0 && !tool.phase2 && (
-                  <span className={`text-[7px] font-bold text-white rounded-full min-w-[13px] text-center leading-[13px] px-0.5 ${tool.urgent ? 'bg-rose-500' : 'bg-muted-foreground/40'}`}>
+                  <span className={`text-[7px] font-bold text-white rounded-full min-w-[13px] text-center leading-[13px] px-0.5 ${tool.urgent ? 'bg-[#FBEAE6]0' : 'bg-muted-foreground/40'}`}>
                     {tool.badge}
                   </span>
                 )}
@@ -803,7 +803,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
             <div className="px-2.5 space-y-2 py-1">
               {pending.length === 0 ? (
                 <div className="flex flex-col items-center py-6 gap-2 text-center">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                  <CheckCircle2 className="w-6 h-6 text-[#2F6B3F]" />
                   <p className="text-[11px] font-semibold text-muted-foreground">No pending actions</p>
                 </div>
               ) : (
@@ -834,9 +834,9 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                       href={slackChannelUrl('trail-os-ops')}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-amber-200/60 bg-white shadow-sm hover:bg-amber-50/50 transition-colors text-[10px] font-semibold text-foreground"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#FFD08A]/60 bg-white shadow-sm hover:bg-[#FFF3E0]/50 transition-colors text-[10px] font-semibold text-foreground"
                     >
-                      <Shield className="w-3 h-3 text-amber-600" />
+                      <Shield className="w-3 h-3 text-[#CC8400]" />
                       Post Governance Alert to #trail-os-ops
                       <ExternalLink className="w-2.5 h-2.5 ml-auto text-muted-foreground/40" />
                     </a>
@@ -873,9 +873,9 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                   <div className="rounded-lg border border-[#4A154B]/15 bg-white shadow-sm px-2.5 py-2 space-y-1">
                     {pennyReadiness.items.slice(0, 4).map((item, i) => (
                       <div key={i} className="flex items-center gap-2">
-                        {item.status === 'pass'    ? <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" /> :
-                         item.status === 'partial' ? <Clock        className="w-3 h-3 text-amber-500  shrink-0" /> :
-                                                     <AlertTriangle className="w-3 h-3 text-rose-500   shrink-0" />}
+                        {item.status === 'pass'    ? <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" /> :
+                         item.status === 'partial' ? <Clock        className="w-3 h-3 text-[#CC8400]  shrink-0" /> :
+                                                     <AlertTriangle className="w-3 h-3 text-[#A93F2F]   shrink-0" />}
                         <span className="text-[10px] text-foreground flex-1 truncate">{item.label}</span>
                       </div>
                     ))}
@@ -897,7 +897,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="flex-1 bg-muted/40 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className={`h-full rounded-full ${workspaceReadiness.score >= 80 ? 'bg-emerald-500' : workspaceReadiness.score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                          className={`h-full rounded-full ${workspaceReadiness.score >= 80 ? 'bg-[#E6F0EA]0' : workspaceReadiness.score >= 50 ? 'bg-[#FFF3E0]0' : 'bg-[#FBEAE6]0'}`}
                           style={{ width: `${workspaceReadiness.score}%` }}
                         />
                       </div>

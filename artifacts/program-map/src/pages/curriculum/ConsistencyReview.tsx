@@ -48,9 +48,9 @@ function computeChecks(m: typeof curriculumModules[0]): CheckResult {
 }
 
 const SCORE_COLOR = (s: number) =>
-  s === 100 ? 'text-green-700 bg-green-50 border-green-200'
-  : s >= 60  ? 'text-amber-700 bg-amber-50 border-amber-200'
-  : 'text-red-700 bg-red-50 border-red-200';
+  s === 100 ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
+  : s >= 60  ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
+  : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]';
 
 export default function ConsistencyReview() {
   const { setSelectedItem } = useAppContext();
@@ -87,15 +87,15 @@ export default function ConsistencyReview() {
             <p className="text-[11px] font-semibold text-primary/70">Average Score</p>
             <p className="text-[10px] text-muted-foreground">Foundations Trail</p>
           </div>
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-            <p className="text-3xl font-bold text-green-700">{passing.length}</p>
-            <p className="text-[11px] font-semibold text-green-700">Fully Compliant</p>
-            <p className="text-[10px] text-green-600">All 5 checks pass</p>
+          <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3">
+            <p className="text-3xl font-bold text-[#2F6B3F]">{passing.length}</p>
+            <p className="text-[11px] font-semibold text-[#2F6B3F]">Fully Compliant</p>
+            <p className="text-[10px] text-[#2F6B3F]">All 5 checks pass</p>
           </div>
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-3xl font-bold text-red-700">{failing.length}</p>
-            <p className="text-[11px] font-semibold text-red-700">Need Attention</p>
-            <p className="text-[10px] text-red-600">One or more gaps</p>
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
+            <p className="text-3xl font-bold text-[#A93F2F]">{failing.length}</p>
+            <p className="text-[11px] font-semibold text-[#A93F2F]">Need Attention</p>
+            <p className="text-[10px] text-[#A93F2F]">One or more gaps</p>
           </div>
           <div className="rounded-lg border border-border bg-white px-4 py-3">
             <p className="text-3xl font-bold text-foreground">{curriculumHealthIssues.length}</p>
@@ -115,7 +115,7 @@ export default function ConsistencyReview() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-[14px] font-bold text-foreground">{reviewAction.name}</p>
-                  <span className="text-[9px] font-bold border border-amber-200 bg-amber-50 text-amber-700 rounded-full px-1.5 py-0.5">Prototype Action</span>
+                  <span className="text-[9px] font-bold border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400] rounded-full px-1.5 py-0.5">Prototype Action</span>
                 </div>
                 <p className="text-[12px] text-muted-foreground">{reviewAction.purpose}</p>
                 <p className="text-[11px] text-secondary mt-1 font-medium">Select to see full action specification in the Knowledge Brief →</p>
@@ -132,10 +132,10 @@ export default function ConsistencyReview() {
             {Object.entries(HEALTH_CHECK_CONFIG).map(([type, cfg]) => {
               const count = issuesByCheck[type] || 0;
               return (
-                <div key={type} className={`rounded-lg border px-3 py-2 ${count > 0 ? 'border-red-200 bg-red-50/50' : 'border-green-200 bg-green-50/50'}`}>
+                <div key={type} className={`rounded-lg border px-3 py-2 ${count > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]/50' : 'border-[#9FC3AE] bg-[#E6F0EA]/50'}`}>
                   <div className="flex items-center gap-1.5">
-                    {count > 0 ? <AlertTriangle className="w-3 h-3 text-red-500" /> : <CheckCircle2 className="w-3 h-3 text-green-600" />}
-                    <p className={`text-[11px] font-bold ${count > 0 ? 'text-red-800' : 'text-green-800'}`}>{count > 0 ? count + ' issue' + (count !== 1 ? 's' : '') : 'Clean'}</p>
+                    {count > 0 ? <AlertTriangle className="w-3 h-3 text-[#A93F2F]" /> : <CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" />}
+                    <p className={`text-[11px] font-bold ${count > 0 ? 'text-[#A93F2F]' : 'text-[#245531]'}`}>{count > 0 ? count + ' issue' + (count !== 1 ? 's' : '') : 'Clean'}</p>
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-0.5">{cfg.label}</p>
                 </div>
@@ -164,7 +164,7 @@ export default function ConsistencyReview() {
                   const mod = curriculumModules.find(m => m.id === result.moduleId);
                   if (mod) setSelectedItem({ type: 'curriculumItem', id: mod.id, data: mod });
                 }}
-                className={`w-full rounded-xl border p-4 text-left transition-all hover:shadow-sm ${result.score === 100 ? 'border-green-200 bg-green-50/30 hover:border-green-400' : 'border-border bg-white hover:border-red-200'}`}
+                className={`w-full rounded-xl border p-4 text-left transition-all hover:shadow-sm ${result.score === 100 ? 'border-[#9FC3AE] bg-[#E6F0EA]/30 hover:border-green-400' : 'border-border bg-white hover:border-[#E8B9B4]'}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -180,7 +180,7 @@ export default function ConsistencyReview() {
                     {result.checks.map(check => (
                       <span
                         key={check.type}
-                        className={`text-[9px] font-medium border rounded-full px-1.5 py-0.5 ${check.pass ? 'border-green-200 bg-green-50 text-green-700' : 'border-red-200 bg-red-50 text-red-700'}`}
+                        className={`text-[9px] font-medium border rounded-full px-1.5 py-0.5 ${check.pass ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]'}`}
                       >
                         {check.pass ? '✓' : '✗'} {check.label}
                       </span>
@@ -191,7 +191,7 @@ export default function ConsistencyReview() {
                   <div className="mt-2 space-y-0.5">
                     {result.issues.map(issue => (
                       <div key={issue.id} className="flex items-center gap-1.5">
-                        <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-red-500' : 'text-orange-400'}`} />
+                        <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
                         <p className="text-[10px] text-muted-foreground">{issue.name as string} — {issue.actionRequired as string}</p>
                       </div>
                     ))}

@@ -58,22 +58,22 @@ export interface TrailOsSfMapping {
 }
 
 export const SF_STATUS_CONFIG: Record<SfMappingStatus, { label: string; cls: string; description: string; dot: string }> = {
-  'existing':                   { label: 'Existing',                  cls: 'text-green-700 bg-green-50 border-green-200',  description: 'Object already exists and is mapped in your Salesforce org.', dot: 'bg-green-500' },
-  'existing-needs-relationship': { label: 'Exists — Needs Wiring',     cls: 'text-amber-700 bg-amber-50 border-amber-200', description: 'Object exists in Salesforce but needs a relationship or configuration to connect to Trail OS.', dot: 'bg-amber-500' },
-  'proposed':                   { label: 'Proposed',                  cls: 'text-violet-700 bg-violet-50 border-violet-200', description: 'Proposed as a new custom object or field extension — needs implementation.', dot: 'bg-violet-500' },
-  'future':                     { label: 'Future Integration',        cls: 'text-slate-600 bg-slate-50 border-slate-200', description: 'Planned for a future development phase. Not yet in scope.', dot: 'bg-slate-400' },
+  'existing':                   { label: 'Existing',                  cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',  description: 'Object already exists and is mapped in your Salesforce org.', dot: 'bg-[#2F6B3F]' },
+  'existing-needs-relationship': { label: 'Exists — Needs Wiring',     cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', description: 'Object exists in Salesforce but needs a relationship or configuration to connect to Trail OS.', dot: 'bg-[#FFF3E0]0' },
+  'proposed':                   { label: 'Proposed',                  cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', description: 'Proposed as a new custom object or field extension — needs implementation.', dot: 'bg-[#EDF5F8]0' },
+  'future':                     { label: 'Future Integration',        cls: 'text-slate-600 bg-slate-50 border-slate-200', description: 'Planned for a future development phase. Not yet in scope.', dot: 'bg-[#C8CBC6]' },
 };
 
 export const SF_PRODUCT_CONFIG: Record<SfProduct, { label: string; cls: string; description: string }> = {
-  'NPSP':                  { label: 'NPSP',                  cls: 'text-blue-800 bg-blue-50 border-blue-200',     description: 'Nonprofit Success Pack — extends Contact & Account for nonprofits.' },
-  'Nonprofit Cloud':       { label: 'Nonprofit Cloud',       cls: 'text-indigo-800 bg-indigo-50 border-indigo-200', description: 'Next-gen nonprofit platform replacing NPSP long-term.' },
-  'PMM':                   { label: 'PMM',                   cls: 'text-violet-800 bg-violet-50 border-violet-200', description: 'Program Management Module — programs, services, engagements.' },
-  'Volunteer Management':  { label: 'Volunteer Mgmt',        cls: 'text-emerald-800 bg-emerald-50 border-emerald-200', description: 'Volunteer Management module for tracking volunteer jobs and hours.' },
-  'Salesforce Knowledge':  { label: 'SF Knowledge',          cls: 'text-amber-800 bg-amber-50 border-amber-200',  description: 'Salesforce Knowledge — Knowledge__kav articles and categories.' },
-  'LMS':                   { label: 'LMS',                   cls: 'text-orange-800 bg-orange-50 border-orange-200', description: 'Existing LMS-related objects in your Salesforce org.' },
-  'Assessments':           { label: 'Assessments',           cls: 'text-rose-800 bg-rose-50 border-rose-200',     description: 'Existing Assessment objects (managed or custom package).' },
-  'Core CRM':              { label: 'Core CRM',              cls: 'text-sky-800 bg-sky-50 border-sky-200',        description: 'Standard Salesforce CRM — Account, Contact, Event, Task.' },
-  'Cases':                 { label: 'Cases',                 cls: 'text-red-800 bg-red-50 border-red-200',        description: 'Standard Case object for support and demand management.' },
+  'NPSP':                  { label: 'NPSP',                  cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',     description: 'Nonprofit Success Pack — extends Contact & Account for nonprofits.' },
+  'Nonprofit Cloud':       { label: 'Nonprofit Cloud',       cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', description: 'Next-gen nonprofit platform replacing NPSP long-term.' },
+  'PMM':                   { label: 'PMM',                   cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', description: 'Program Management Module — programs, services, engagements.' },
+  'Volunteer Management':  { label: 'Volunteer Mgmt',        cls: 'text-[#245531] bg-[#E6F0EA] border-[#9FC3AE]', description: 'Volunteer Management module for tracking volunteer jobs and hours.' },
+  'Salesforce Knowledge':  { label: 'SF Knowledge',          cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',  description: 'Salesforce Knowledge — Knowledge__kav articles and categories.' },
+  'LMS':                   { label: 'LMS',                   cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', description: 'Existing LMS-related objects in your Salesforce org.' },
+  'Assessments':           { label: 'Assessments',           cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',     description: 'Existing Assessment objects (managed or custom package).' },
+  'Core CRM':              { label: 'Core CRM',              cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',        description: 'Standard Salesforce CRM — Account, Contact, Event, Task.' },
+  'Cases':                 { label: 'Cases',                 cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',        description: 'Standard Case object for support and demand management.' },
   'Custom Objects':        { label: 'Custom',                cls: 'text-slate-700 bg-slate-50 border-slate-200',  description: 'Proposed new custom objects to be built in your org.' },
 };
 

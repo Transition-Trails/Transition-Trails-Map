@@ -23,35 +23,35 @@ import {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function CheckIcon({ status }: { status: string }) {
-  if (status === 'pass')    return <CheckCircle className="w-4 h-4 text-green-600" />;
-  if (status === 'fail')    return <XCircle className="w-4 h-4 text-red-500" />;
-  if (status === 'warning') return <AlertTriangle className="w-4 h-4 text-amber-500" />;
-  if (status === 'blocked') return <XCircle className="w-4 h-4 text-red-400 opacity-60" />;
+  if (status === 'pass')    return <CheckCircle className="w-4 h-4 text-[#2F6B3F]" />;
+  if (status === 'fail')    return <XCircle className="w-4 h-4 text-[#A93F2F]" />;
+  if (status === 'warning') return <AlertTriangle className="w-4 h-4 text-[#CC8400]" />;
+  if (status === 'blocked') return <XCircle className="w-4 h-4 text-[#A93F2F] opacity-60" />;
   return <Clock className="w-4 h-4 text-zinc-400" />;
 }
 
 function StatusDot({ status }: { status: string }) {
-  const c = status === 'active' ? 'bg-green-500' : status === 'scheduled' ? 'bg-blue-500' : status === 'in-progress' ? 'bg-emerald-500' : status === 'recurring' ? 'bg-purple-500' : status === 'planning' ? 'bg-amber-400' : status === 'pending' ? 'bg-amber-300' : 'bg-zinc-400';
+  const c = status === 'active' ? 'bg-[#2F6B3F]' : status === 'scheduled' ? 'bg-[#EDF5F8]' : status === 'in-progress' ? 'bg-[#E6F0EA]' : status === 'recurring' ? 'bg-[#2F6F7E]' : status === 'planning' ? 'bg-[#CC8400]' : status === 'pending' ? 'bg-[#FFF3E0]' : 'bg-zinc-400';
   return <span className={`inline-block w-2 h-2 rounded-full ${c} mr-1.5`} />;
 }
 
 function ReadinessBadge({ r }: { r: string }) {
-  const cls = r === 'Ready' ? 'bg-green-100 text-green-700 border-green-200' : r === 'Partial' ? 'bg-amber-100 text-amber-700 border-amber-200' : r === 'Not Ready' ? 'bg-red-100 text-red-600 border-red-200' : 'bg-zinc-100 text-zinc-500 border-zinc-200';
+  const cls = r === 'Ready' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : r === 'Partial' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : r === 'Not Ready' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : 'bg-zinc-100 text-zinc-500 border-zinc-200';
   return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border uppercase ${cls}`}>{r}</span>;
 }
 
 function SeverityBadge({ s }: { s: string }) {
-  const cls = s === 'Critical' ? 'bg-red-100 text-red-700 border-red-200' : s === 'High' ? 'bg-orange-100 text-orange-700 border-orange-200' : s === 'Medium' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-zinc-100 text-zinc-500 border-zinc-200';
+  const cls = s === 'Critical' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : s === 'High' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : s === 'Medium' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-zinc-100 text-zinc-500 border-zinc-200';
   return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold border uppercase ${cls}`}>{s}</span>;
 }
 
 function CalTypeBadge({ t }: { t: string }) {
-  const cls = t === 'Program' ? 'bg-blue-100 text-blue-700 border-blue-200' : t === 'Cohort' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : t === 'Coaching' ? 'bg-orange-100 text-orange-700 border-orange-200' : t === 'Executive' ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : t === 'Client' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : t === 'Office Hours' ? 'bg-purple-100 text-purple-700 border-purple-200' : t === 'Assessment' ? 'bg-cyan-100 text-cyan-700 border-cyan-200' : 'bg-muted text-muted-foreground border-border';
+  const cls = t === 'Program' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Cohort' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Coaching' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : t === 'Executive' ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : t === 'Client' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : t === 'Office Hours' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Assessment' ? 'bg-cyan-100 text-cyan-700 border-cyan-200' : 'bg-muted text-muted-foreground border-border';
   return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border uppercase ${cls}`}>{t}</span>;
 }
 
 function EventTypeBadge({ t }: { t: string }) {
-  const cls = t === 'Cohort Session' ? 'bg-blue-100 text-blue-700 border-blue-200' : t === 'Workshop' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : t === 'Coaching Session' ? 'bg-orange-100 text-orange-700 border-orange-200' : t === 'Office Hours' ? 'bg-purple-100 text-purple-700 border-purple-200' : t === 'Assessment Window' ? 'bg-cyan-100 text-cyan-700 border-cyan-200' : t === 'Leadership Review' ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : t === 'Penny Reminder' ? 'bg-rose-100 text-rose-700 border-rose-200' : t === 'Weekly Brief' ? 'bg-amber-100 text-amber-700 border-amber-200' : t === 'Curriculum Deadline' ? 'bg-red-100 text-red-600 border-red-200' : 'bg-muted text-muted-foreground border-border';
+  const cls = t === 'Cohort Session' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Workshop' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Coaching Session' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : t === 'Office Hours' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Assessment Window' ? 'bg-cyan-100 text-cyan-700 border-cyan-200' : t === 'Leadership Review' ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : t === 'Penny Reminder' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : t === 'Weekly Brief' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : t === 'Curriculum Deadline' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : 'bg-muted text-muted-foreground border-border';
   return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border uppercase ${cls}`}>{t}</span>;
 }
 
@@ -80,10 +80,10 @@ function OverviewTab() {
   const plannedCapCount    = PENNY_SCHEDULING_CAPABILITIES.filter(c => c.status === 'Planned').length;
 
   const stats = [
-    { label:'Calendars Registered', value:`${TRAIL_CALENDARS.length}`,                    sub:`${programCohortCount} program/cohort · ${specializedCount} specialized`, icon:CalendarDays,  color:'text-blue-600' },
-    { label:'Events Catalogued',    value:`${CALENDAR_EVENTS.length}`,                    sub:`${eventTypeCount} types · ${recurringCount} recurring`,                  icon:CalendarCheck, color:'text-emerald-600' },
-    { label:`${TERMS.aiAssistant} Capabilities`,   value:`${PENNY_SCHEDULING_CAPABILITIES.length}`,      sub:`${prototypeCapCount} prototype · ${plannedCapCount} planned`,            icon:Brain,         color:'text-purple-500' },
-    { label:'Calendar Readiness',   value:`${healthAvg}%`, sub:`${testSummary.pass}/${testSummary.total} tests passing`,                                               icon:Activity,      color:'text-amber-500' },
+    { label:'Calendars Registered', value:`${TRAIL_CALENDARS.length}`,                    sub:`${programCohortCount} program/cohort · ${specializedCount} specialized`, icon:CalendarDays,  color:'text-[#2F6F7E]' },
+    { label:'Events Catalogued',    value:`${CALENDAR_EVENTS.length}`,                    sub:`${eventTypeCount} types · ${recurringCount} recurring`,                  icon:CalendarCheck, color:'text-[#2F6B3F]' },
+    { label:`${TERMS.aiAssistant} Capabilities`,   value:`${PENNY_SCHEDULING_CAPABILITIES.length}`,      sub:`${prototypeCapCount} prototype · ${plannedCapCount} planned`,            icon:Brain,         color:'text-[#2F6F7E]' },
+    { label:'Calendar Readiness',   value:`${healthAvg}%`, sub:`${testSummary.pass}/${testSummary.total} tests passing`,                                               icon:Activity,      color:'text-[#CC8400]' },
   ];
 
   const criticals = CAL_GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical' && i.status !== 'Resolved');
@@ -114,14 +114,14 @@ function OverviewTab() {
       </div>
 
       {criticals.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-          <div className="text-[11px] uppercase tracking-wide text-red-600 font-semibold mb-2">Critical Blockers</div>
+        <div className="bg-[#FBEAE6] border border-[#E8B9B4] rounded-lg p-3">
+          <div className="text-[11px] uppercase tracking-wide text-[#A93F2F] font-semibold mb-2">Critical Blockers</div>
           {criticals.map(c => (
             <div key={c.id} className="flex gap-2 items-start mb-2 last:mb-0">
-              <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <XCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
               <div>
-                <div className="text-[12px] font-medium text-red-800">{c.title}</div>
-                <div className="text-[11px] text-red-600">{c.resolution}</div>
+                <div className="text-[12px] font-medium text-[#A93F2F]">{c.title}</div>
+                <div className="text-[11px] text-[#A93F2F]">{c.resolution}</div>
               </div>
             </div>
           ))}
@@ -133,7 +133,7 @@ function OverviewTab() {
         <div className="space-y-2">
           {readinessAreas.map(a => {
             const pct = Math.round((a.score / a.max) * 100);
-            const color = pct >= 70 ? 'bg-green-500' : pct >= 40 ? 'bg-amber-500' : 'bg-red-400';
+            const color = pct >= 70 ? 'bg-[#2F6B3F]' : pct >= 40 ? 'bg-[#FFF3E0]0' : 'bg-[#A93F2F]';
             return (
               <div key={a.label} className="flex items-center gap-3">
                 <div className="text-[12px] text-foreground w-48 shrink-0">{a.label}</div>
@@ -151,7 +151,7 @@ function OverviewTab() {
         <div className="bg-card border border-border rounded-lg p-3">
           <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Validation Status</div>
           <div className="grid grid-cols-4 gap-2">
-            {[{ l:'Pass', v: valSummary.pass, c:'text-green-600' },{ l:'Fail', v: valSummary.fail, c:'text-red-500' },{ l:'Warning', v: valSummary.warning, c:'text-amber-500' },{ l:'Pending', v: valSummary.pending, c:'text-zinc-400' }].map(s => (
+            {[{ l:'Pass', v: valSummary.pass, c:'text-[#2F6B3F]' },{ l:'Fail', v: valSummary.fail, c:'text-[#A93F2F]' },{ l:'Warning', v: valSummary.warning, c:'text-[#CC8400]' },{ l:'Pending', v: valSummary.pending, c:'text-zinc-400' }].map(s => (
               <div key={s.l} className="text-center">
                 <div className={`text-xl font-bold ${s.c}`}>{s.v}</div>
                 <div className="text-[10px] uppercase text-muted-foreground">{s.l}</div>
@@ -162,10 +162,10 @@ function OverviewTab() {
         <div className="bg-card border border-border rounded-lg p-3">
           <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Go-Live Blockers</div>
           <div className="text-[12px] text-foreground space-y-1">
-            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-red-500" /><span>GOOGLE_CLIENT_ID not configured</span></div>
-            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-red-500" /><span>GOOGLE_CLIENT_SECRET not configured</span></div>
-            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-red-500" /><span>GOOGLE_CALENDAR_REFRESH_TOKEN missing</span></div>
-            <div className="flex gap-2 items-center"><AlertTriangle className="w-3.5 h-3.5 text-amber-500" /><span>6 of 11 calendars not connected</span></div>
+            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-[#A93F2F]" /><span>GOOGLE_CLIENT_ID not configured</span></div>
+            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-[#A93F2F]" /><span>GOOGLE_CLIENT_SECRET not configured</span></div>
+            <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-[#A93F2F]" /><span>GOOGLE_CALENDAR_REFRESH_TOKEN missing</span></div>
+            <div className="flex gap-2 items-center"><AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" /><span>6 of 11 calendars not connected</span></div>
           </div>
         </div>
       </div>
@@ -186,7 +186,7 @@ function AccountConfigTab() {
         <div className="p-3 border-b border-border">
           <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Validation Checks</div>
           <div className="grid grid-cols-4 gap-1 text-center">
-            {[{ l:'Pass', v:summary.pass, c:'text-green-600' },{ l:'Fail', v:summary.fail, c:'text-red-500' },{ l:'Warn', v:summary.warning, c:'text-amber-500' },{ l:'Pend', v:summary.pending, c:'text-zinc-400' }].map(s => (
+            {[{ l:'Pass', v:summary.pass, c:'text-[#2F6B3F]' },{ l:'Fail', v:summary.fail, c:'text-[#A93F2F]' },{ l:'Warn', v:summary.warning, c:'text-[#CC8400]' },{ l:'Pend', v:summary.pending, c:'text-zinc-400' }].map(s => (
               <div key={s.l}><div className={`text-base font-bold ${s.c}`}>{s.v}</div><div className="text-[9px] uppercase text-muted-foreground">{s.l}</div></div>
             ))}
           </div>
@@ -224,8 +224,8 @@ function AccountConfigTab() {
               <InfoRow label="Status"     value={<CheckIcon status={selected.status} />} />
               <InfoRow label="Category"   value={selected.category} />
               <InfoRow label="Detail"     value={<span className="text-[12px]">{selected.detail}</span>} />
-              <InfoRow label="Impact"     value={<span className="text-[12px] text-amber-700">{selected.impact}</span>} />
-              {selected.fix && <InfoRow label="Resolution" value={<span className="text-[12px] text-green-700">{selected.fix}</span>} />}
+              <InfoRow label="Impact"     value={<span className="text-[12px] text-[#CC8400]">{selected.impact}</span>} />
+              {selected.fix && <InfoRow label="Resolution" value={<span className="text-[12px] text-[#2F6B3F]">{selected.fix}</span>} />}
             </div>
           </div>
         ) : (
@@ -243,8 +243,8 @@ function CalendarRegistryTab() {
     id: c.id,
     name: c.name,
     typeName: c.calendarType,
-    typeColor: c.calendarType === 'Program' ? 'text-blue-700' : c.calendarType === 'Cohort' ? 'text-indigo-700' : c.calendarType === 'Coaching' ? 'text-orange-700' : c.calendarType === 'Executive' ? 'text-zinc-600' : c.calendarType === 'Client' ? 'text-emerald-700' : c.calendarType === 'Office Hours' ? 'text-purple-700' : 'text-cyan-700',
-    typeBg:    c.calendarType === 'Program' ? 'bg-blue-50' : c.calendarType === 'Cohort' ? 'bg-indigo-50' : c.calendarType === 'Coaching' ? 'bg-orange-50' : c.calendarType === 'Executive' ? 'bg-zinc-100' : c.calendarType === 'Client' ? 'bg-emerald-50' : c.calendarType === 'Office Hours' ? 'bg-purple-50' : 'bg-cyan-50',
+    typeColor: c.calendarType === 'Program' ? 'text-[#2F6F7E]' : c.calendarType === 'Cohort' ? 'text-[#2F6F7E]' : c.calendarType === 'Coaching' ? 'text-[#CC8400]' : c.calendarType === 'Executive' ? 'text-zinc-600' : c.calendarType === 'Client' ? 'text-[#2F6B3F]' : c.calendarType === 'Office Hours' ? 'text-[#2F6F7E]' : 'text-cyan-700',
+    typeBg:    c.calendarType === 'Program' ? 'bg-[#EDF5F8]' : c.calendarType === 'Cohort' ? 'bg-[#EDF5F8]' : c.calendarType === 'Coaching' ? 'bg-[#FFF3E0]' : c.calendarType === 'Executive' ? 'bg-zinc-100' : c.calendarType === 'Client' ? 'bg-[#E6F0EA]' : c.calendarType === 'Office Hours' ? 'bg-[#EDF5F8]' : 'bg-cyan-50',
     status: c.status,
     health: c.readiness === 'Ready' ? 'healthy' : c.readiness === 'Partial' ? 'needs-attention' : 'incomplete',
     secondary: c.owner,
@@ -271,13 +271,13 @@ function CalendarRegistryTab() {
               <InfoRow label="Status"     value={<><StatusDot status={cal.status} />{cal.status}</>} />
               <InfoRow label="Events"     value={`${cal.activeEventCount} active · ${cal.eventCount} total`} />
               <InfoRow label="Programs"   value={cal.programIds.length > 0 ? cal.programIds.join(', ') : 'Cross-program'} />
-              <InfoRow label="Calendar ID" value={cal.googleCalendarId ? <span className="font-mono text-[11px]">{cal.googleCalendarId}</span> : <span className="text-amber-600">Not yet connected</span>} />
+              <InfoRow label="Calendar ID" value={cal.googleCalendarId ? <span className="font-mono text-[11px]">{cal.googleCalendarId}</span> : <span className="text-[#CC8400]">Not yet connected</span>} />
             </div>
             {cal.subCalendars && cal.subCalendars.length > 0 && (
               <div>
                 <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-1.5">Sub-Calendars</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {cal.subCalendars.map(sc => <span key={sc} className="px-2 py-0.5 rounded text-[11px] bg-blue-50 text-blue-700 border border-blue-200">{sc}</span>)}
+                  {cal.subCalendars.map(sc => <span key={sc} className="px-2 py-0.5 rounded text-[11px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">{sc}</span>)}
                 </div>
               </div>
             )}
@@ -307,7 +307,7 @@ function CalendarRegistryTab() {
                   <div className="flex items-center gap-2">
                     <EventTypeBadge t={e.eventType} />
                     <span className="text-[11px] text-muted-foreground">{e.frequency} · {e.duration}</span>
-                    {e.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-50 text-purple-700 border border-purple-200">Penny</span>}
+                    {e.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
                   </div>
                 </div>
               ))
@@ -328,8 +328,8 @@ function EventCatalogTab() {
     id: e.id,
     name: e.title,
     typeName: e.eventType,
-    typeColor: e.eventType === 'Cohort Session' ? 'text-blue-700' : e.eventType === 'Workshop' ? 'text-indigo-700' : e.eventType === 'Coaching Session' ? 'text-orange-700' : e.eventType === 'Penny Reminder' ? 'text-rose-700' : e.eventType === 'Leadership Review' ? 'text-zinc-600' : 'text-muted-foreground',
-    typeBg:    e.eventType === 'Cohort Session' ? 'bg-blue-50' : e.eventType === 'Workshop' ? 'bg-indigo-50' : e.eventType === 'Coaching Session' ? 'bg-orange-50' : e.eventType === 'Penny Reminder' ? 'bg-rose-50' : 'bg-muted',
+    typeColor: e.eventType === 'Cohort Session' ? 'text-[#2F6F7E]' : e.eventType === 'Workshop' ? 'text-[#2F6F7E]' : e.eventType === 'Coaching Session' ? 'text-[#CC8400]' : e.eventType === 'Penny Reminder' ? 'text-[#A93F2F]' : e.eventType === 'Leadership Review' ? 'text-zinc-600' : 'text-muted-foreground',
+    typeBg:    e.eventType === 'Cohort Session' ? 'bg-[#EDF5F8]' : e.eventType === 'Workshop' ? 'bg-[#EDF5F8]' : e.eventType === 'Coaching Session' ? 'bg-[#FFF3E0]' : e.eventType === 'Penny Reminder' ? 'bg-[#FBEAE6]' : 'bg-muted',
     status: e.status,
     health: e.status === 'scheduled' ? 'healthy' : e.status === 'in-progress' ? 'healthy' : e.status === 'recurring' ? 'healthy' : e.status === 'pending' ? 'needs-attention' : 'incomplete',
     secondary: e.programName,
@@ -347,7 +347,7 @@ function EventCatalogTab() {
           <div className="space-y-3 p-1">
             <div className="flex items-center gap-2">
               <EventTypeBadge t={ev.eventType} />
-              {ev.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-50 text-purple-700 border border-purple-200 font-semibold uppercase">{TERMS.aiAssistant} Enabled</span>}
+              {ev.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] font-semibold uppercase">{TERMS.aiAssistant} Enabled</span>}
             </div>
             <div className="bg-card border border-border rounded-lg divide-y divide-border/40">
               <InfoRow label="Program"     value={ev.programName} />
@@ -386,7 +386,7 @@ function EventCatalogTab() {
                 {mapping.assessmentLink      && <div><span className="text-[11px] text-muted-foreground font-medium">Assessment: </span><span className="text-[12px]">{mapping.assessmentLink}</span></div>}
                 {mapping.salesforceObjectLink && <div><span className="text-[11px] text-muted-foreground font-medium">Salesforce: </span><span className="text-[12px]">{mapping.salesforceObjectLink}</span></div>}
                 {mapping.driveResourceLink   && <div><span className="text-[11px] text-muted-foreground font-medium">Drive: </span><span className="text-[12px]">{mapping.driveResourceLink}</span></div>}
-                {mapping.pennyCapabilityLink && <div><span className="text-[11px] text-muted-foreground font-medium">Penny Capability: </span><span className="text-[12px] text-purple-700">{mapping.pennyCapabilityLink}</span></div>}
+                {mapping.pennyCapabilityLink && <div><span className="text-[11px] text-muted-foreground font-medium">Penny Capability: </span><span className="text-[12px] text-[#2F6F7E]">{mapping.pennyCapabilityLink}</span></div>}
                 {mapping.promptTemplateLink  && <div><span className="text-[11px] text-muted-foreground font-medium">Prompt Template: </span><span className="text-[12px]">{mapping.promptTemplateLink}</span></div>}
                 {mapping.slackChannelLink    && <div><span className="text-[11px] text-muted-foreground font-medium">Slack: </span><span className="font-mono text-[12px]">{mapping.slackChannelLink}</span></div>}
                 {mapping.people && mapping.people.length > 0 && (
@@ -463,7 +463,7 @@ function ProgramCohortMappingTab() {
               <div className="text-[14px] font-semibold text-foreground">{eventFull.title}</div>
               <div className="flex items-center gap-2 mt-1">
                 <EventTypeBadge t={eventFull.eventType} />
-                {eventFull.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-50 text-purple-700 border border-purple-200">Penny</span>}
+                {eventFull.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
               </div>
             </div>
             <div className="space-y-1.5">
@@ -473,7 +473,7 @@ function ProgramCohortMappingTab() {
               {event.salesforceObjectLink && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Salesforce</span><span className="text-[12px] text-foreground">{event.salesforceObjectLink}</span></div>}
               {event.driveResourceLink   && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Drive Resource</span><span className="text-[12px] text-foreground">{event.driveResourceLink}</span></div>}
               {event.slackChannelLink    && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Slack Channel</span><span className="font-mono text-[12px] text-foreground">{event.slackChannelLink}</span></div>}
-              {event.pennyCapabilityLink && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Penny Cap.</span><span className="text-[12px] text-purple-700">{event.pennyCapabilityLink}</span></div>}
+              {event.pennyCapabilityLink && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Penny Cap.</span><span className="text-[12px] text-[#2F6F7E]">{event.pennyCapabilityLink}</span></div>}
               {event.promptTemplateLink  && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Prompt Template</span><span className="text-[12px] text-foreground">{event.promptTemplateLink}</span></div>}
               {event.chatSpaceLink       && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Chat Space</span><span className="text-[12px] text-foreground">{event.chatSpaceLink}</span></div>}
             </div>
@@ -556,7 +556,7 @@ function RolePeopleMappingTab() {
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">{TERMS.aiAssistant} Reminder Types</div>
             {selected.reminderTypes.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
-                {selected.reminderTypes.map(r => <span key={r} className="px-2 py-0.5 rounded text-[11px] bg-purple-50 text-purple-700 border border-purple-200">{r}</span>)}
+                {selected.reminderTypes.map(r => <span key={r} className="px-2 py-0.5 rounded text-[11px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">{r}</span>)}
               </div>
             ) : <div className="text-[11px] text-muted-foreground/60">No reminders configured</div>}
           </div>
@@ -579,7 +579,7 @@ function RolePeopleMappingTab() {
 function PennySchedulingTab() {
   const [selected, setSelected] = useState<PennySchedulingCapability>(PENNY_SCHEDULING_CAPABILITIES[0]);
 
-  const triggerColor = (t: string) => t === 'Pre-event' ? 'bg-blue-100 text-blue-700 border-blue-200' : t === 'Post-event' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : t === 'Reminder' ? 'bg-purple-100 text-purple-700 border-purple-200' : t === 'Follow-up' ? 'bg-orange-100 text-orange-700 border-orange-200' : t === 'Digest' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200';
+  const triggerColor = (t: string) => t === 'Pre-event' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Post-event' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Reminder' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Follow-up' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : t === 'Digest' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]';
 
   return (
     <div className="flex h-full">
@@ -591,7 +591,7 @@ function PennySchedulingTab() {
           {PENNY_SCHEDULING_CAPABILITIES.map(cap => (
             <button key={cap.capabilityId} onClick={() => setSelected(cap)}
               className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selected.capabilityId === cap.capabilityId ? 'bg-primary text-primary-foreground' : ''}`}>
-              <Brain className={`w-4 h-4 shrink-0 mt-0.5 ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground' : 'text-purple-500'}`} />
+              <Brain className={`w-4 h-4 shrink-0 mt-0.5 ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground' : 'text-[#2F6F7E]'}`} />
               <div className="min-w-0">
                 <div className={`text-[12px] font-semibold truncate ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground' : 'text-foreground'}`}>{cap.capabilityName}</div>
                 <div className={`text-[11px] ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{cap.triggerType} · {cap.status}</div>
@@ -604,7 +604,7 @@ function PennySchedulingTab() {
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <Brain className="w-5 h-5 text-purple-500 mt-0.5" />
+            <Brain className="w-5 h-5 text-[#2F6F7E] mt-0.5" />
             <div>
               <div className="text-[15px] font-semibold text-foreground">{selected.capabilityName}</div>
               <div className="flex items-center gap-2 mt-1">
@@ -623,9 +623,9 @@ function PennySchedulingTab() {
             {selected.driveSource    && <InfoRow label="Drive Source"   value={selected.driveSource} />}
           </div>
           {selected.blockReason && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <div className="text-[11px] uppercase tracking-wide text-amber-600 font-semibold mb-1">Blocker</div>
-              <div className="text-[12px] text-amber-800">{selected.blockReason}</div>
+            <div className="bg-[#FFF3E0] border border-[#FFD08A] rounded-lg p-3">
+              <div className="text-[11px] uppercase tracking-wide text-[#CC8400] font-semibold mb-1">Blocker</div>
+              <div className="text-[12px] text-[#CC8400]">{selected.blockReason}</div>
             </div>
           )}
           <div className="bg-muted/30 border border-border rounded-lg p-3">
@@ -644,7 +644,7 @@ function CommMappingTab() {
   const [selectedCalId, setSelectedCalId] = useState(CAL_COMM_MAPPINGS[0].calendarId);
   const mapping = CAL_COMM_MAPPINGS.find(m => m.calendarId === selectedCalId);
 
-  const statusColor = (s: string) => s === 'Active' ? 'bg-green-100 text-green-700 border-green-200' : s === 'Planned' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-amber-100 text-amber-700 border-amber-200';
+  const statusColor = (s: string) => s === 'Active' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : s === 'Planned' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]';
 
   return (
     <div className="flex h-full">
@@ -659,7 +659,7 @@ function CommMappingTab() {
             return (
               <button key={m.calendarId} onClick={() => setSelectedCalId(m.calendarId)}
                 className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selectedCalId === m.calendarId ? 'bg-primary text-primary-foreground' : ''}`}>
-                <CalendarDays className={`w-4 h-4 shrink-0 mt-0.5 ${selectedCalId === m.calendarId ? 'text-primary-foreground' : 'text-blue-500'}`} />
+                <CalendarDays className={`w-4 h-4 shrink-0 mt-0.5 ${selectedCalId === m.calendarId ? 'text-primary-foreground' : 'text-[#2F6F7E]'}`} />
                 <div className="min-w-0">
                   <div className={`text-[12px] font-semibold truncate ${selectedCalId === m.calendarId ? 'text-primary-foreground' : 'text-foreground'}`}>{m.calendarName}</div>
                   <div className={`text-[11px] ${selectedCalId === m.calendarId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{channels} channel{channels !== 1 ? 's' : ''} linked</div>
@@ -688,7 +688,7 @@ function CommMappingTab() {
                         <span className="font-mono text-[13px] font-medium text-foreground">{ch.channel}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        {ch.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-50 text-purple-700 border border-purple-200">Penny</span>}
+                        {ch.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
                         <span className={`px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${statusColor(ch.status)}`}>{ch.status}</span>
                       </div>
                     </div>
@@ -738,7 +738,7 @@ function GovernanceTab() {
   return (
     <div className="p-4 space-y-4">
       <div className="grid grid-cols-4 gap-3">
-        {[{ l:'Critical', v:summary.critical, c:'text-red-600 bg-red-50 border-red-200' },{ l:'High', v:summary.high, c:'text-orange-600 bg-orange-50 border-orange-200' },{ l:'Medium', v:summary.medium, c:'text-amber-600 bg-amber-50 border-amber-200' },{ l:'Low', v:summary.low, c:'text-zinc-500 bg-zinc-50 border-zinc-200' }].map(s => (
+        {[{ l:'Critical', v:summary.critical, c:'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },{ l:'High', v:summary.high, c:'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },{ l:'Medium', v:summary.medium, c:'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },{ l:'Low', v:summary.low, c:'text-zinc-500 bg-zinc-50 border-zinc-200' }].map(s => (
           <div key={s.l} className={`rounded-lg border p-3 text-center ${s.c}`}>
             <div className="text-2xl font-bold">{s.v}</div>
             <div className="text-[11px] uppercase font-semibold">{s.l}</div>
@@ -761,7 +761,7 @@ function GovernanceTab() {
                 <span className="text-[13px] font-medium text-foreground">{issue.title}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`text-[11px] font-medium ${issue.status === 'Open' ? 'text-red-500' : issue.status === 'In Progress' ? 'text-amber-600' : 'text-green-600'}`}>{issue.status}</span>
+                <span className={`text-[11px] font-medium ${issue.status === 'Open' ? 'text-[#A93F2F]' : issue.status === 'In Progress' ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`}>{issue.status}</span>
                 <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${selected?.id === issue.id ? 'rotate-90' : ''}`} />
               </div>
             </div>
@@ -771,9 +771,9 @@ function GovernanceTab() {
                 {issue.affectedObjects.length > 0 && (
                   <div><span className="text-[11px] text-muted-foreground font-medium">Affected: </span><span className="text-[11px] text-foreground">{issue.affectedObjects.join(', ')}</span></div>
                 )}
-                <div className="bg-green-50 border border-green-200 rounded p-2">
-                  <span className="text-[11px] font-medium text-green-700">Resolution: </span>
-                  <span className="text-[11px] text-green-600">{issue.resolution}</span>
+                <div className="bg-[#E6F0EA] border border-[#9FC3AE] rounded p-2">
+                  <span className="text-[11px] font-medium text-[#2F6B3F]">Resolution: </span>
+                  <span className="text-[11px] text-[#2F6B3F]">{issue.resolution}</span>
                 </div>
               </div>
             )}
@@ -813,7 +813,7 @@ function TestSuiteTab() {
                   <div className={`text-[12px] font-semibold ${selected.id === suite.id ? 'text-primary-foreground' : 'text-foreground'}`}>{suite.name}</div>
                   <div className={`text-[11px] ${selected.id === suite.id ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{pass}/{suite.tests.length} passing · {pct}%</div>
                   <div className="mt-1 h-1 bg-muted/40 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${selected.id === suite.id ? 'bg-primary-foreground/70' : pct === 100 ? 'bg-green-500' : pct >= 50 ? 'bg-amber-400' : 'bg-red-400'}`} style={{ width:`${pct}%` }} />
+                    <div className={`h-full rounded-full ${selected.id === suite.id ? 'bg-primary-foreground/70' : pct === 100 ? 'bg-[#2F6B3F]' : pct >= 50 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`} style={{ width:`${pct}%` }} />
                   </div>
                 </div>
               </button>
@@ -832,11 +832,11 @@ function TestSuiteTab() {
               <div className="flex items-center gap-2 mb-1">
                 <CheckIcon status={test.status} />
                 <span className="text-[13px] font-medium text-foreground">{test.name}</span>
-                <span className={`ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold uppercase border ${test.status === 'pass' ? 'bg-green-100 text-green-700 border-green-200' : test.status === 'fail' ? 'bg-red-100 text-red-700 border-red-200' : test.status === 'blocked' ? 'bg-red-50 text-red-500 border-red-200 opacity-70' : test.status === 'warning' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}>{test.status}</span>
+                <span className={`ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold uppercase border ${test.status === 'pass' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : test.status === 'fail' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : test.status === 'blocked' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4] opacity-70' : test.status === 'warning' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}>{test.status}</span>
               </div>
               <div className="text-[11px] text-muted-foreground">{test.description}</div>
-              <div className={`mt-1 text-[11px] italic ${test.status === 'pass' ? 'text-green-600' : test.status === 'fail' ? 'text-red-500' : test.status === 'blocked' ? 'text-red-400' : 'text-amber-600'}`}>{test.result}</div>
-              {test.blockedBy && <div className="mt-1 text-[10px] text-red-400">Blocked by: {test.blockedBy}</div>}
+              <div className={`mt-1 text-[11px] italic ${test.status === 'pass' ? 'text-[#2F6B3F]' : test.status === 'fail' ? 'text-[#A93F2F]' : test.status === 'blocked' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>{test.result}</div>
+              {test.blockedBy && <div className="mt-1 text-[10px] text-[#A93F2F]">Blocked by: {test.blockedBy}</div>}
             </div>
           ))}
         </div>
@@ -863,7 +863,7 @@ function HealthTab() {
                 <div className="min-w-0 flex-1">
                   <div className={`text-[12px] font-semibold ${selected.dimension === h.dimension ? 'text-primary-foreground' : 'text-foreground'}`}>{h.label}</div>
                   <div className="mt-1 h-1.5 bg-muted/40 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${selected.dimension === h.dimension ? 'bg-primary-foreground/70' : pct >= 70 ? 'bg-green-500' : pct >= 40 ? 'bg-amber-400' : 'bg-red-400'}`} style={{ width:`${pct}%` }} />
+                    <div className={`h-full rounded-full ${selected.dimension === h.dimension ? 'bg-primary-foreground/70' : pct >= 70 ? 'bg-[#2F6B3F]' : pct >= 40 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`} style={{ width:`${pct}%` }} />
                   </div>
                   <div className={`text-[11px] mt-0.5 ${selected.dimension === h.dimension ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{pct}% — {h.status}</div>
                 </div>
@@ -884,7 +884,7 @@ function HealthTab() {
               <span className="text-[16px] font-bold text-foreground">{selected.score}/{selected.maxScore}</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div className={`h-full rounded-full ${selected.status === 'ready' ? 'bg-green-500' : selected.status === 'partial' ? 'bg-amber-400' : 'bg-red-400'}`} style={{ width:`${(selected.score/selected.maxScore)*100}%` }} />
+              <div className={`h-full rounded-full ${selected.status === 'ready' ? 'bg-[#2F6B3F]' : selected.status === 'partial' ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`} style={{ width:`${(selected.score/selected.maxScore)*100}%` }} />
             </div>
           </div>
           <div className="space-y-2">

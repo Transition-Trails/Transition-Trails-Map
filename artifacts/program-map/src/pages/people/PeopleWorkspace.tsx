@@ -30,20 +30,20 @@ function OverviewTab({ item }: { item: PersonaOrRole }) {
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
               <InfoRow label="Type"        value={p.type} />
               <InfoRow label="Description" value={p.description} />
-              <InfoRow label="Health"      value={<span className={`capitalize ${p.healthStatus === 'healthy' ? 'text-emerald-600' : 'text-amber-600'}`}>{p.healthStatus.replace('-',' ')}</span>} />
+              <InfoRow label="Health"      value={<span className={`capitalize ${p.healthStatus === 'healthy' ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>{p.healthStatus.replace('-',' ')}</span>} />
             </div>
             {p.keyOutcomes?.length > 0 && (
               <div>
                 <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Key Outcomes</p>
                 <ul className="space-y-1">
-                  {p.keyOutcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-emerald-500 mt-0.5">✓</span>{o}</li>)}
+                  {p.keyOutcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-[#2F6B3F] mt-0.5">✓</span>{o}</li>)}
                 </ul>
               </div>
             )}
             {p.healthIssues?.length > 0 && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="text-[10px] font-bold uppercase text-amber-700 mb-2">Health Issues</p>
-                {p.healthIssues.map((issue, i) => <p key={i} className="text-[12px] text-amber-800 leading-relaxed">{issue}</p>)}
+              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
+                <p className="text-[10px] font-bold uppercase text-[#CC8400] mb-2">Health Issues</p>
+                {p.healthIssues.map((issue, i) => <p key={i} className="text-[12px] text-[#CC8400] leading-relaxed">{issue}</p>)}
               </div>
             )}
           </>
@@ -53,15 +53,15 @@ function OverviewTab({ item }: { item: PersonaOrRole }) {
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
               <InfoRow label="Type"             value={r.type} />
               <InfoRow label="Blueprint Status" value={
-                <span className={r.blueprintStatus === 'complete' ? 'text-emerald-600 font-semibold' : r.blueprintStatus === 'draft' ? 'text-amber-600 font-semibold' : 'text-rose-600 font-semibold'}>
+                <span className={r.blueprintStatus === 'complete' ? 'text-[#2F6B3F] font-semibold' : r.blueprintStatus === 'draft' ? 'text-[#CC8400] font-semibold' : 'text-[#A93F2F] font-semibold'}>
                   {r.blueprintStatus.charAt(0).toUpperCase() + r.blueprintStatus.slice(1)}
                 </span>
               } />
-              <InfoRow label="Health"           value={<span className={r.healthStatus === 'healthy' ? 'text-emerald-600' : 'text-amber-600'}>{r.healthStatus.replace('-',' ')}</span>} />
+              <InfoRow label="Health"           value={<span className={r.healthStatus === 'healthy' ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}>{r.healthStatus.replace('-',' ')}</span>} />
             </div>
             {r.healthStatus !== 'healthy' && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                <p className="text-[11px] text-amber-800">This role has health issues. Check the Health tab for details.</p>
+              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
+                <p className="text-[11px] text-[#CC8400]">This role has health issues. Check the Health tab for details.</p>
               </div>
             )}
           </>
@@ -121,9 +121,9 @@ function ProgramsTab({ item }: { item: PersonaOrRole }) {
           <div className="space-y-2">
             {progs.map((prog: string) => (
               <div key={prog} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F] shrink-0" />
                 <span className="text-[12px] text-foreground font-medium">{prog}</span>
-                <span className="ml-auto text-[10px] text-emerald-600 font-bold">Active</span>
+                <span className="ml-auto text-[10px] text-[#2F6B3F] font-bold">Active</span>
               </div>
             ))}
           </div>
@@ -148,7 +148,7 @@ function PennyTabP({ item }: { item: PersonaOrRole }) {
           <div className="space-y-2">
             {caps.map((cap: string) => (
               <div key={cap} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
-                <span className="w-1.5 h-1.5 rounded-full bg-pink-400 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2F6F7E] shrink-0" />
                 <span className="text-[12px] text-foreground font-medium">{cap}</span>
               </div>
             ))}
@@ -187,9 +187,9 @@ function HealthTabP({ item }: { item: PersonaOrRole }) {
           </div>
         ))}
         {isPersona && (p as Persona).healthIssues?.length > 0 && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-1">
-            <p className="text-[10px] font-bold uppercase text-amber-700 mb-1">Open Issues</p>
-            {(p as Persona).healthIssues.map((issue, i) => <p key={i} className="text-[12px] text-amber-800">{issue}</p>)}
+          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3 space-y-1">
+            <p className="text-[10px] font-bold uppercase text-[#CC8400] mb-1">Open Issues</p>
+            {(p as Persona).healthIssues.map((issue, i) => <p key={i} className="text-[12px] text-[#CC8400]">{issue}</p>)}
           </div>
         )}
       </div>
@@ -211,8 +211,8 @@ export default function PeopleWorkspace() {
       id: item.id,
       name: isPersona ? p.name : r.name,
       typeName: isPersona ? p.type : r.type,
-      typeColor: isPersona ? 'text-blue-700' : 'text-indigo-700',
-      typeBg: isPersona ? 'bg-blue-50' : 'bg-indigo-50',
+      typeColor: isPersona ? 'text-[#2F6F7E]' : 'text-[#2F6F7E]',
+      typeBg: isPersona ? 'bg-[#EDF5F8]' : 'bg-[#EDF5F8]',
       status: isPersona ? 'Persona' : 'Role',
       health: health === 'healthy' ? ('healthy' as const) : health === 'needs-attention' ? ('needs-attention' as const) : ('incomplete' as const),
       secondary: isPersona ? (p as any).shortName ?? '' : r.type,

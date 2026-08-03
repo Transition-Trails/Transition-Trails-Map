@@ -103,28 +103,28 @@ function SlackValidationProvider({ children }: { children: React.ReactNode }) {
 
 function ReadinessBadge({ status }: { status: string }) {
   const cls =
-    status === 'ready' || status === 'operational' || status === 'passing' || status === 'pass' || status === 'Active' || status === 'Complete' || status === 'Mapped' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-    status === 'partial' || status === 'in-development' || status === 'warning' || status === 'Partial' || status === 'Configured' || status === 'Partially Ready' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-    status === 'not-ready' || status === 'pending' || status === 'fail' || status === 'Pending' || status === 'Missing' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-    status === 'blocked' || status === 'Blocked' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-    status === 'planned' || status === 'Planned' ? 'bg-sky-50 text-sky-700 border-sky-200' :
+    status === 'ready' || status === 'operational' || status === 'passing' || status === 'pass' || status === 'Active' || status === 'Complete' || status === 'Mapped' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' :
+    status === 'partial' || status === 'in-development' || status === 'warning' || status === 'Partial' || status === 'Configured' || status === 'Partially Ready' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' :
+    status === 'not-ready' || status === 'pending' || status === 'fail' || status === 'Pending' || status === 'Missing' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' :
+    status === 'blocked' || status === 'Blocked' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' :
+    status === 'planned' || status === 'Planned' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' :
     'bg-muted text-muted-foreground border-border';
   return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>{status}</span>;
 }
 
 function SeverityBadge({ sev }: { sev: string }) {
   const cls =
-    sev === 'Critical' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-    sev === 'High'     ? 'bg-orange-50 text-orange-700 border-orange-200' :
-    sev === 'Medium'   ? 'bg-amber-50 text-amber-700 border-amber-200' :
+    sev === 'Critical' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' :
+    sev === 'High'     ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' :
+    sev === 'Medium'   ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' :
                           'bg-muted text-muted-foreground border-border';
   return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>{sev}</span>;
 }
 
 function ScoreBar({ score, max = 100 }: { score: number; max?: number }) {
   const pct = Math.round((score / max) * 100);
-  const barCls = pct >= 70 ? 'bg-emerald-400' : pct >= 40 ? 'bg-amber-400' : 'bg-rose-400';
-  const textCls = pct >= 70 ? 'text-emerald-600' : pct >= 40 ? 'text-amber-600' : 'text-rose-600';
+  const barCls = pct >= 70 ? 'bg-[#2F6B3F]' : pct >= 40 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
+  const textCls = pct >= 70 ? 'text-[#2F6B3F]' : pct >= 40 ? 'text-[#CC8400]' : 'text-[#A93F2F]';
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
@@ -145,25 +145,25 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 function ValidationIcon({ status }: { status: string }) {
-  if (status === 'pass')    return <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
-  if (status === 'fail')    return <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
-  if (status === 'warning') return <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />;
+  if (status === 'pass')    return <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />;
+  if (status === 'fail')    return <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />;
+  if (status === 'warning') return <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />;
   return <span className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 shrink-0 inline-block" />;
 }
 
 const FLOW_NODE_COLORS: Record<FlowNode['type'], string> = {
-  Program:  'bg-emerald-50 border-emerald-200 text-emerald-800',
-  Channel:  'bg-teal-50 border-teal-200 text-teal-800',
-  Penny:    'bg-pink-50 border-pink-200 text-pink-800',
-  Template: 'bg-violet-50 border-violet-200 text-violet-800',
-  Message:  'bg-blue-50 border-blue-200 text-blue-800',
-  Activity: 'bg-amber-50 border-amber-200 text-amber-800',
-  Signal:   'bg-orange-50 border-orange-200 text-orange-800',
+  Program:  'bg-[#E6F0EA] border-[#9FC3AE] text-[#245531]',
+  Channel:  'bg-[#E6F0EA] border-[#9FC3AE] text-[#245531]',
+  Penny:    'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]',
+  Template: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
+  Message:  'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
+  Activity: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',
+  Signal:   'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',
 };
 
 function FlowNodeBox({ node }: { node: FlowNode }) {
   const cls = FLOW_NODE_COLORS[node.type];
-  const dotCls = node.status === 'active' ? 'bg-emerald-400' : node.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400';
+  const dotCls = node.status === 'active' ? 'bg-[#2F6B3F]' : node.status === 'pending' ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
   return (
     <div className={`rounded-lg border px-3 py-2 min-w-[130px] max-w-[160px] shrink-0 ${cls}`}>
       <div className="flex items-center gap-1.5 mb-1">
@@ -208,11 +208,11 @@ function OverviewTab() {
               label: 'Validation Checks',
               value: valState.kind === 'loading' ? '…' : liveChecks ? `${livePass}/${liveTotal}` : '—',
               sub:   valState.kind === 'loading' ? 'checking…' : liveChecks ? `passing · live` : 'run validation',
-              cls:   (liveChecks && (liveFail ?? 0) > 0) ? 'border-rose-200 bg-rose-50' : liveChecks ? 'border-emerald-200 bg-emerald-50' : 'border-border bg-muted/30',
+              cls:   (liveChecks && (liveFail ?? 0) > 0) ? 'border-[#E8B9B4] bg-[#FBEAE6]' : liveChecks ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-border bg-muted/30',
             },
-            { label:'Governance Issues', value:String(govSummary.critical + govSummary.high), sub:`${govSummary.critical} critical`, cls: govSummary.critical > 0 ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50' },
-            { label:'Scenarios Ready',   value:`${scenSummary.ready}/${scenSummary.total}`,   sub:`avg ${scenSummary.avgScore}% ready`,  cls:'border-amber-200 bg-amber-50' },
-            { label:'Tests Passing',     value:`${testSummary.pass}/${testSummary.total}`,    sub:`${testSummary.pct}% overall`,         cls:'border-amber-200 bg-amber-50' },
+            { label:'Governance Issues', value:String(govSummary.critical + govSummary.high), sub:`${govSummary.critical} critical`, cls: govSummary.critical > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#FFD08A] bg-[#FFF3E0]' },
+            { label:'Scenarios Ready',   value:`${scenSummary.ready}/${scenSummary.total}`,   sub:`avg ${scenSummary.avgScore}% ready`,  cls:'border-[#FFD08A] bg-[#FFF3E0]' },
+            { label:'Tests Passing',     value:`${testSummary.pass}/${testSummary.total}`,    sub:`${testSummary.pct}% overall`,         cls:'border-[#FFD08A] bg-[#FFF3E0]' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
               <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wide mb-1">{s.label}</p>
@@ -230,14 +230,14 @@ function OverviewTab() {
           <div className="space-y-2">
             {liveChecks ? (
               liveChecks.filter(c => c.status === 'fail').length === 0 ? (
-                <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-emerald-200 bg-emerald-50">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                  <p className="text-[12px] font-medium text-emerald-700">No live failures — all required secrets and API checks passed.</p>
+                <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
+                  <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
+                  <p className="text-[12px] font-medium text-[#2F6B3F]">No live failures — all required secrets and API checks passed.</p>
                 </div>
               ) : (
                 liveChecks.filter(c => c.status === 'fail').map(c => (
-                  <div key={c.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-rose-200 bg-rose-50">
-                    <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                  <div key={c.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
+                    <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[12px] font-semibold text-foreground">{c.label}</p>
                       <p className="text-[11px] text-muted-foreground">{c.fix ?? c.detail}</p>
@@ -247,8 +247,8 @@ function OverviewTab() {
               )
             ) : (
               GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical').map(issue => (
-                <div key={issue.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-rose-200 bg-rose-50">
-                  <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                <div key={issue.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
+                  <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-semibold text-foreground">{issue.title}</p>
                     <p className="text-[11px] text-muted-foreground">{issue.resolution}</p>
@@ -374,9 +374,9 @@ function WorkspaceValidationTab() {
             onClick={() => sendTestMessage('penny')}
             disabled={testMsgTargets.penny === 'sending'}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-50 ${
-              testMsgTargets.penny === 'sent'  ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
-              testMsgTargets.penny === 'error' ? 'border-rose-300 bg-rose-50 text-rose-700' :
-              'border-pink-200 bg-pink-50 text-pink-700 hover:bg-pink-100'
+              testMsgTargets.penny === 'sent'  ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' :
+              testMsgTargets.penny === 'error' ? 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]' :
+              'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F] hover:bg-[#FBEAE6]'
             }`}
           >
             {testMsgTargets.penny === 'sending' ? '⌛ Sending…' :
@@ -391,9 +391,9 @@ function WorkspaceValidationTab() {
             onClick={() => sendTestMessage('admin')}
             disabled={testMsgTargets.admin === 'sending'}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-50 ${
-              testMsgTargets.admin === 'sent'  ? 'border-emerald-300 bg-emerald-50 text-emerald-700' :
-              testMsgTargets.admin === 'error' ? 'border-rose-300 bg-rose-50 text-rose-700' :
-              'border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100'
+              testMsgTargets.admin === 'sent'  ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' :
+              testMsgTargets.admin === 'error' ? 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]' :
+              'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] hover:bg-[#EDF5F8]'
             }`}
           >
             {testMsgTargets.admin === 'sending' ? '⌛ Sending…' :
@@ -405,8 +405,8 @@ function WorkspaceValidationTab() {
 
         {(testMsgDetails.penny || testMsgDetails.admin) && (
           <div className="flex flex-col gap-0.5">
-            {testMsgDetails.penny && <span className={`text-[11px] ${testMsgTargets.penny === 'sent' ? 'text-emerald-600' : 'text-rose-600'}`}>{testMsgDetails.penny}</span>}
-            {testMsgDetails.admin && <span className={`text-[11px] ${testMsgTargets.admin === 'sent' ? 'text-emerald-600' : 'text-rose-600'}`}>{testMsgDetails.admin}</span>}
+            {testMsgDetails.penny && <span className={`text-[11px] ${testMsgTargets.penny === 'sent' ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>{testMsgDetails.penny}</span>}
+            {testMsgDetails.admin && <span className={`text-[11px] ${testMsgTargets.admin === 'sent' ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>{testMsgDetails.admin}</span>}
           </div>
         )}
 
@@ -425,7 +425,7 @@ function WorkspaceValidationTab() {
       {/* Error state */}
       {state.kind === 'error' && (
         <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
-          <XCircle className="w-8 h-8 text-rose-400 mb-3" />
+          <XCircle className="w-8 h-8 text-[#A93F2F] mb-3" />
           <p className="text-[13px] font-semibold text-foreground mb-1">Could not reach validation endpoint</p>
           <p className="text-[12px] text-muted-foreground">{state.message}</p>
         </div>
@@ -440,10 +440,10 @@ function WorkspaceValidationTab() {
               <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Validation Summary</p>
               <div className="grid grid-cols-4 gap-1.5">
                 {[
-                  { label:'Pass', value:pass,    cls:'text-emerald-600 bg-emerald-50 border-emerald-200' },
-                  { label:'Fail', value:fail,    cls:'text-rose-600 bg-rose-50 border-rose-200' },
-                  { label:'Warn', value:warning, cls:'text-amber-600 bg-amber-50 border-amber-200' },
-                  { label:'Skip', value:skip,    cls:'text-sky-600 bg-sky-50 border-sky-200' },
+                  { label:'Pass', value:pass,    cls:'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+                  { label:'Fail', value:fail,    cls:'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+                  { label:'Warn', value:warning, cls:'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+                  { label:'Skip', value:skip,    cls:'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]' },
                 ].map(s => (
                   <div key={s.label} className={`rounded border text-center py-1.5 ${s.cls}`}>
                     <p className="text-[16px] font-bold leading-none">{isLoading ? '…' : s.value}</p>
@@ -476,7 +476,7 @@ function WorkspaceValidationTab() {
                     <div>
                       <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">Channel Map</p>
                       {channels.map(ch => (
-                        <div key={ch.envVar} className={`px-4 py-2.5 border-b border-border/20 ${ch.scopeIssue ? 'bg-amber-50/60' : ''}`}>
+                        <div key={ch.envVar} className={`px-4 py-2.5 border-b border-border/20 ${ch.scopeIssue ? 'bg-[#FFF3E0]/60' : ''}`}>
                           <div className="flex items-center gap-2.5">
                             <ValidationIcon status={ch.status} />
                             <div className="flex-1 min-w-0">
@@ -484,26 +484,26 @@ function WorkspaceValidationTab() {
                                 {ch.name ? `#${ch.name}` : ch.normalizedId ?? ch.channelId.slice(0, 12)}
                               </p>
                               <p className="text-[10px] text-muted-foreground truncate">{ch.envVar}</p>
-                              {ch.isMember === true  && <p className="text-[10px] text-emerald-600">✓ Bot is member · {ch.memberCount ?? '?'} members{ch.isPrivate ? ' · private' : ' · public'}</p>}
-                              {ch.isMember === false && <p className="text-[10px] text-amber-600">⚠ Bot not a member — {ch.fix}</p>}
+                              {ch.isMember === true  && <p className="text-[10px] text-[#2F6B3F]">✓ Bot is member · {ch.memberCount ?? '?'} members{ch.isPrivate ? ' · private' : ' · public'}</p>}
+                              {ch.isMember === false && <p className="text-[10px] text-[#CC8400]">⚠ Bot not a member — {ch.fix}</p>}
                             </div>
                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border shrink-0 ${
-                              ch.resolvedRole === 'penny'   ? 'bg-pink-50 text-pink-700 border-pink-200' :
-                              ch.resolvedRole === 'admin'   ? 'bg-violet-50 text-violet-700 border-violet-200' :
-                              ch.resolvedRole === 'default' ? 'bg-teal-50 text-teal-700 border-teal-200' :
+                              ch.resolvedRole === 'penny'   ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' :
+                              ch.resolvedRole === 'admin'   ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' :
+                              ch.resolvedRole === 'default' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' :
                               'bg-muted text-muted-foreground border-border'
                             }`}>
                               {ch.resolvedRole === 'penny' ? `${TERMS.aiAssistant} AI` : ch.resolvedRole === 'admin' ? 'Admin' : ch.resolvedRole === 'default' ? 'Default' : 'Unknown'}
                             </span>
                           </div>
                           {ch.scopeIssue && (
-                            <div className="mt-1.5 ml-6 rounded border border-amber-200 bg-amber-50 px-2.5 py-1.5">
-                              <p className="text-[10px] font-bold text-amber-800 mb-0.5">Scope required: channels:read + groups:read</p>
-                              <p className="text-[10px] text-amber-700 leading-snug">{ch.fix}</p>
+                            <div className="mt-1.5 ml-6 rounded border border-[#FFD08A] bg-[#FFF3E0] px-2.5 py-1.5">
+                              <p className="text-[10px] font-bold text-[#CC8400] mb-0.5">Scope required: channels:read + groups:read</p>
+                              <p className="text-[10px] text-[#CC8400] leading-snug">{ch.fix}</p>
                             </div>
                           )}
                           {ch.error && !ch.scopeIssue && (
-                            <p className="mt-1 ml-6 text-[10px] text-rose-600 leading-snug">{ch.fix ?? ch.error}</p>
+                            <p className="mt-1 ml-6 text-[10px] text-[#A93F2F] leading-snug">{ch.fix ?? ch.error}</p>
                           )}
                         </div>
                       ))}
@@ -529,7 +529,7 @@ function WorkspaceValidationTab() {
                   <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
                     <InfoRow label="Detail"     value={selected.detail} />
                     <InfoRow label="Impact"     value={selected.impact} />
-                    {selected.fix && <InfoRow label="Resolution" value={<span className="text-emerald-700">{selected.fix}</span>} />}
+                    {selected.fix && <InfoRow label="Resolution" value={<span className="text-[#2F6B3F]">{selected.fix}</span>} />}
                     {selected.meta && Object.keys(selected.meta).length > 0 && (
                       <InfoRow label="Metadata" value={
                         <div className="flex flex-wrap gap-1.5">
@@ -565,12 +565,12 @@ function ProgramChannelTab() {
   const [selectedProgramId, setSelectedProgramId] = useState<string>(PROGRAM_CHANNEL_MAPS[0].programId);
   const selected = PROGRAM_CHANNEL_MAPS.find(p => p.programId === selectedProgramId) ?? PROGRAM_CHANNEL_MAPS[0];
 
-  const botCls = (s: string) => s === 'Granted' ? 'text-emerald-600' : s === 'Pending' ? 'text-amber-600' : 'text-rose-600';
-  const mapCls = (s: string) => s === 'Mapped' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : s === 'Partial' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+  const botCls = (s: string) => s === 'Granted' ? 'text-[#2F6B3F]' : s === 'Pending' ? 'text-[#CC8400]' : 'text-[#A93F2F]';
+  const mapCls = (s: string) => s === 'Mapped' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : s === 'Partial' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]';
   const purpCls: Record<string, string> = {
-    'Cohort':'bg-teal-50 text-teal-700 border-teal-200','Coaches':'bg-violet-50 text-violet-700 border-violet-200',
-    'Announcements':'bg-blue-50 text-blue-700 border-blue-200','Admin':'bg-muted text-muted-foreground border-border',
-    'Penny Delivery':'bg-pink-50 text-pink-700 border-pink-200','Executive':'bg-orange-50 text-orange-700 border-orange-200',
+    'Cohort':'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]','Coaches':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    'Announcements':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]','Admin':'bg-muted text-muted-foreground border-border',
+    'Penny Delivery':'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]','Executive':'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
   };
 
   return (
@@ -585,7 +585,7 @@ function ProgramChannelTab() {
           {PROGRAM_CHANNEL_MAPS.map(p => {
             const allMapped = p.channels.every(c => c.mappingStatus === 'Mapped');
             const hasMissing = p.channels.some(c => c.mappingStatus === 'Missing');
-            const dotCls = allMapped ? 'bg-emerald-400' : hasMissing ? 'bg-rose-400' : 'bg-amber-400';
+            const dotCls = allMapped ? 'bg-[#2F6B3F]' : hasMissing ? 'bg-[#A93F2F]' : 'bg-[#CC8400]';
             return (
               <button
                 key={p.programId}
@@ -617,7 +617,7 @@ function ProgramChannelTab() {
               {selected.channels.map(ch => (
                 <div key={ch.channelId} className="rounded-lg border border-border bg-white px-4 py-3">
                   <div className="flex items-center gap-3 mb-2">
-                    <Hash className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                    <Hash className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
                     <span className="text-[13px] font-bold text-foreground font-mono">{ch.channelName}</span>
                     <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${mapCls(ch.mappingStatus)}`}>{ch.mappingStatus}</span>
                   </div>
@@ -629,9 +629,9 @@ function ProgramChannelTab() {
                 </div>
               ))}
             </div>
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-              <p className="text-[11px] font-bold text-amber-700 mb-1">Bot Access Required</p>
-              <p className="text-[11px] text-amber-700">After app installation, invite <code className="font-mono bg-amber-100 px-1 rounded">@trail-os-bot</code> to each channel above. Bot access is required before {TERMS.aiAssistant} can deliver messages.</p>
+            <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
+              <p className="text-[11px] font-bold text-[#CC8400] mb-1">Bot Access Required</p>
+              <p className="text-[11px] text-[#CC8400]">After app installation, invite <code className="font-mono bg-[#FFF3E0] px-1 rounded">@trail-os-bot</code> to each channel above. Bot access is required before {TERMS.aiAssistant} can deliver messages.</p>
             </div>
           </div>
         </ScrollArea>
@@ -646,11 +646,11 @@ function RoleUserTab() {
   const [selectedRoleId, setSelectedRoleId] = useState<string>('coach');
   const selected = ROLE_GROUPS.find(r => r.roleId === selectedRoleId) ?? ROLE_GROUPS[0];
 
-  const mapCls = (s: string) => s === 'Complete' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : s === 'Partial' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+  const mapCls = (s: string) => s === 'Complete' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : s === 'Partial' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]';
   const roleColors: Record<string, string> = {
-    'Coach':'bg-violet-100 text-violet-700','Learner':'bg-teal-100 text-teal-700',
-    'Program Lead':'bg-emerald-100 text-emerald-700','Curriculum Designer':'bg-blue-100 text-blue-700',
-    'Volunteer':'bg-amber-100 text-amber-700','Executive':'bg-orange-100 text-orange-700','Admin':'bg-muted text-muted-foreground',
+    'Coach':'bg-[#EDF5F8] text-[#2F6F7E]','Learner':'bg-[#E6F0EA] text-[#2F6B3F]',
+    'Program Lead':'bg-[#E6F0EA] text-[#2F6B3F]','Curriculum Designer':'bg-[#EDF5F8] text-[#2F6F7E]',
+    'Volunteer':'bg-[#FFF3E0] text-[#CC8400]','Executive':'bg-[#FFF3E0] text-[#CC8400]','Admin':'bg-muted text-muted-foreground',
   };
 
   return (
@@ -730,10 +730,10 @@ function PennyDeliveryTab() {
   const selected = PENNY_DELIVERY_MAPS.find(p => p.capabilityId === selectedId) ?? PENNY_DELIVERY_MAPS[0];
 
   const trigCls: Record<string, string> = {
-    'Scheduled':'bg-blue-50 text-blue-700 border-blue-200',
-    'Event-Driven':'bg-teal-50 text-teal-700 border-teal-200',
-    'On-Demand':'bg-violet-50 text-violet-700 border-violet-200',
-    'Escalation':'bg-rose-50 text-rose-700 border-rose-200',
+    'Scheduled':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    'Event-Driven':'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
+    'On-Demand':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    'Escalation':'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
   };
 
   return (
@@ -773,7 +773,7 @@ function PennyDeliveryTab() {
                 {selected.deliveries.map((d, i) => (
                   <div key={i} className="rounded-lg border border-border bg-white px-4 py-3">
                     <div className="flex items-start gap-3">
-                      <Hash className="w-3.5 h-3.5 text-teal-600 mt-0.5 shrink-0" />
+                      <Hash className="w-3.5 h-3.5 text-[#2F6B3F] mt-0.5 shrink-0" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-[13px] font-bold font-mono text-foreground">{d.channelName}</span>
@@ -807,10 +807,10 @@ function FlowExplorerTab() {
   const selected = COMM_FLOWS.find(f => f.id === selectedId) ?? COMM_FLOWS[0];
 
   const statusCls = (s: CommFlow['status']) =>
-    s === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-    s === 'Configured' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-    s === 'Planned' ? 'bg-sky-50 text-sky-700 border-sky-200' :
-    'bg-rose-50 text-rose-700 border-rose-200';
+    s === 'Active' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' :
+    s === 'Configured' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' :
+    s === 'Planned' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' :
+    'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]';
 
   return (
     <div className="flex h-full">
@@ -872,8 +872,8 @@ function FlowExplorerTab() {
               <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Node Detail</p>
               <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
                 {selected.nodes.map(node => {
-                  const dotCls = node.status === 'active' ? 'bg-emerald-400' : node.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400';
-                  const lblCls = node.status === 'active' ? 'text-emerald-700' : node.status === 'pending' ? 'text-amber-700' : 'text-rose-700';
+                  const dotCls = node.status === 'active' ? 'bg-[#2F6B3F]' : node.status === 'pending' ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
+                  const lblCls = node.status === 'active' ? 'text-[#2F6B3F]' : node.status === 'pending' ? 'text-[#CC8400]' : 'text-[#A93F2F]';
                   return (
                     <div key={node.id} className="flex items-center gap-3 px-4 py-2.5">
                       <span className="text-[9px] font-bold uppercase w-20 shrink-0 text-muted-foreground/60">{node.type}</span>
@@ -917,7 +917,7 @@ function ChannelOverview({ ch }: { ch: SlackChannel }) {
           <div>
             <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">{TERMS.aiAssistant} Capabilities</p>
             <div className="flex flex-wrap gap-1.5">
-              {ch.pennyCapabilities.map(c => <span key={c} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-pink-50 border border-pink-200 text-pink-700">{c}</span>)}
+              {ch.pennyCapabilities.map(c => <span key={c} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F]">{c}</span>)}
             </div>
           </div>
         )}
@@ -929,7 +929,7 @@ function ChannelOverview({ ch }: { ch: SlackChannel }) {
 function ChannelRegistry() {
   const items = useMemo<WorkspaceItem[]>(() => SLACK_CHANNELS.map(ch => ({
     id: ch.id, name: ch.name,
-    typeName: ch.purpose, typeColor:'text-teal-700', typeBg:'bg-teal-50',
+    typeName: ch.purpose, typeColor:'text-[#2F6B3F]', typeBg:'bg-[#E6F0EA]',
     status: ch.lifecycle, statusVariant: ch.lifecycle === 'active' ? 'active' as const : 'planning' as const,
     health: ch.health,
     secondary: ch.description,
@@ -987,7 +987,7 @@ function ProfileDetail({ profile }: { profile: typeof SLACK_OBJECT_PROFILES[0] }
           <div>
             <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Programs</p>
             <div className="flex flex-wrap gap-1.5">
-              {profile.programs.map(p => <span key={p} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-700">{p}</span>)}
+              {profile.programs.map(p => <span key={p} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]">{p}</span>)}
             </div>
           </div>
         )}
@@ -1004,8 +1004,8 @@ function ProfileDetail({ profile }: { profile: typeof SLACK_OBJECT_PROFILES[0] }
 function ObjectProfilesTab() {
   const items = useMemo<WorkspaceItem[]>(() => SLACK_OBJECT_PROFILES.map(p => ({
     id: p.id, name: p.name,
-    typeName: p.objectType, typeColor: p.objectType === 'channel' ? 'text-teal-700' : p.objectType === 'usergroup' ? 'text-violet-700' : 'text-blue-700',
-    typeBg: p.objectType === 'channel' ? 'bg-teal-50' : p.objectType === 'usergroup' ? 'bg-violet-50' : 'bg-blue-50',
+    typeName: p.objectType, typeColor: p.objectType === 'channel' ? 'text-[#2F6B3F]' : p.objectType === 'usergroup' ? 'text-[#2F6F7E]' : 'text-[#2F6F7E]',
+    typeBg: p.objectType === 'channel' ? 'bg-[#E6F0EA]' : p.objectType === 'usergroup' ? 'bg-[#EDF5F8]' : 'bg-[#EDF5F8]',
     status: p.status, statusVariant: p.health === 'healthy' ? 'active' as const : 'planning' as const,
     health: p.health, secondary: p.secondary, owner: p.owner,
   })), []);
@@ -1045,16 +1045,16 @@ function ScenariosTab() {
   const summary = getScenarioSummary();
 
   const catCls: Record<string, string> = {
-    'Coaching':'bg-violet-50 text-violet-700 border-violet-200',
-    'Briefing':'bg-blue-50 text-blue-700 border-blue-200',
-    'Escalation':'bg-rose-50 text-rose-700 border-rose-200',
-    'Announcement':'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'Coaching':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    'Briefing':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    'Escalation':'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
+    'Announcement':'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
   };
 
   const stepTypeCls: Record<string, string> = {
-    trigger:'bg-amber-100 text-amber-800',program:'bg-emerald-100 text-emerald-800',
-    channel:'bg-teal-100 text-teal-800',penny:'bg-pink-100 text-pink-800',
-    template:'bg-violet-100 text-violet-800',delivery:'bg-blue-100 text-blue-800',signal:'bg-orange-100 text-orange-800',
+    trigger:'bg-[#FFF3E0] text-[#CC8400]',program:'bg-[#E6F0EA] text-[#245531]',
+    channel:'bg-[#E6F0EA] text-[#245531]',penny:'bg-[#FBEAE6] text-[#A93F2F]',
+    template:'bg-[#EDF5F8] text-[#2F6F7E]',delivery:'bg-[#EDF5F8] text-[#2F6F7E]',signal:'bg-[#FFF3E0] text-[#CC8400]',
   };
 
   return (
@@ -1104,8 +1104,8 @@ function ScenariosTab() {
               <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Scenario Flow</p>
               <div className="space-y-1.5">
                 {selected.flow.map(step => {
-                  const dotCls = step.status === 'ready' ? 'bg-emerald-400' : step.status === 'pending' ? 'bg-amber-400' : 'bg-rose-400';
-                  const rowBg = step.status === 'blocked' ? 'bg-rose-50 border-rose-200' : step.status === 'pending' ? 'bg-amber-50/50 border-amber-200/60' : 'bg-white border-border';
+                  const dotCls = step.status === 'ready' ? 'bg-[#2F6B3F]' : step.status === 'pending' ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
+                  const rowBg = step.status === 'blocked' ? 'bg-[#FBEAE6] border-[#E8B9B4]' : step.status === 'pending' ? 'bg-[#FFF3E0]/50 border-[#FFD08A]/60' : 'bg-white border-border';
                   return (
                     <div key={step.step} className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${rowBg}`}>
                       <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0">{step.step}</span>
@@ -1122,11 +1122,11 @@ function ScenariosTab() {
             </div>
 
             {selected.blockers.length > 0 && (
-              <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
-                <p className="text-[11px] font-bold text-rose-700 mb-1.5">Blockers ({selected.blockers.length})</p>
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
+                <p className="text-[11px] font-bold text-[#A93F2F] mb-1.5">Blockers ({selected.blockers.length})</p>
                 <ul className="space-y-0.5">
                   {selected.blockers.map((b, i) => (
-                    <li key={i} className="flex items-center gap-2 text-[11px] text-rose-700">
+                    <li key={i} className="flex items-center gap-2 text-[11px] text-[#A93F2F]">
                       <XCircle className="w-3 h-3 shrink-0" />
                       {b}
                     </li>
@@ -1150,18 +1150,18 @@ function GovernanceTab() {
   const filtered = filter === 'All' ? GOVERNANCE_ISSUES : GOVERNANCE_ISSUES.filter(i => i.severity === filter);
 
   const catCls: Record<string, string> = {
-    'Ownership':'bg-violet-50 text-violet-700 border-violet-200',
-    'Missing Mapping':'bg-amber-50 text-amber-700 border-amber-200',
-    'Permission':'bg-rose-50 text-rose-700 border-rose-200',
+    'Ownership':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    'Missing Mapping':'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+    'Permission':'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
     'Orphaned':'bg-muted text-muted-foreground border-border',
-    'Inactive':'bg-sky-50 text-sky-700 border-sky-200',
-    'Configuration':'bg-rose-50 text-rose-700 border-rose-200',
+    'Inactive':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    'Configuration':'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
   };
 
   const statusIcon = (s: GovernanceIssue['status']) =>
-    s === 'Resolved' ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> :
-    s === 'In Progress' ? <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" /> :
-    <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
+    s === 'Resolved' ? <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" /> :
+    s === 'In Progress' ? <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" /> :
+    <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />;
 
   return (
     <ScrollArea className="h-full">
@@ -1169,9 +1169,9 @@ function GovernanceTab() {
         {/* Summary */}
         <div className="grid grid-cols-4 gap-3">
           {[
-            { label:'Critical', value:summary.critical, cls:'border-rose-200 bg-rose-50 text-rose-700' },
-            { label:'High',     value:summary.high,     cls:'border-orange-200 bg-orange-50 text-orange-700' },
-            { label:'Medium',   value:summary.medium,   cls:'border-amber-200 bg-amber-50 text-amber-700' },
+            { label:'Critical', value:summary.critical, cls:'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]' },
+            { label:'High',     value:summary.high,     cls:'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]' },
+            { label:'Medium',   value:summary.medium,   cls:'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]' },
             { label:'Low',      value:summary.low,      cls:'border-border bg-muted/30 text-muted-foreground' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border text-center py-2.5 ${s.cls}`}>
@@ -1207,7 +1207,7 @@ function GovernanceTab() {
                   <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">{issue.detail}</p>
                   <div className="flex items-start gap-2">
                     <span className="text-[10px] font-bold uppercase text-muted-foreground/60 shrink-0 mt-0.5">Resolution:</span>
-                    <span className="text-[11px] text-emerald-700">{issue.resolution}</span>
+                    <span className="text-[11px] text-[#2F6B3F]">{issue.resolution}</span>
                   </div>
                   {issue.affectedObjects.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
@@ -1233,10 +1233,10 @@ function TestSuiteTab() {
   const overall = getOverallTestSummary();
 
   const statusIcon = (s: string) => {
-    if (s === 'pass')    return <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
-    if (s === 'fail')    return <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />;
-    if (s === 'warning') return <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />;
-    if (s === 'blocked') return <span className="w-3.5 h-3.5 rounded bg-rose-200 flex items-center justify-center shrink-0"><span className="text-[8px] text-rose-700 font-bold">B</span></span>;
+    if (s === 'pass')    return <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />;
+    if (s === 'fail')    return <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />;
+    if (s === 'warning') return <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />;
+    if (s === 'blocked') return <span className="w-3.5 h-3.5 rounded bg-[#FBEAE6] flex items-center justify-center shrink-0"><span className="text-[8px] text-[#A93F2F] font-bold">B</span></span>;
     return <span className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 shrink-0 inline-block" />;
   };
 
@@ -1283,10 +1283,10 @@ function TestSuiteTab() {
               return (
                 <div className="grid grid-cols-4 gap-2">
                   {[
-                    { label:'Pass',    value:sum.pass,    cls:'text-emerald-600 bg-emerald-50 border-emerald-200' },
-                    { label:'Fail',    value:sum.fail,    cls:'text-rose-600 bg-rose-50 border-rose-200' },
-                    { label:'Blocked', value:sum.blocked, cls:'text-rose-600 bg-rose-50 border-rose-200' },
-                    { label:'Warning', value:sum.warning, cls:'text-amber-600 bg-amber-50 border-amber-200' },
+                    { label:'Pass',    value:sum.pass,    cls:'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+                    { label:'Fail',    value:sum.fail,    cls:'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+                    { label:'Blocked', value:sum.blocked, cls:'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+                    { label:'Warning', value:sum.warning, cls:'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
                   ].map(s => (
                     <div key={s.label} className={`rounded border text-center py-2 ${s.cls}`}>
                       <p className="text-[18px] font-bold leading-none">{s.value}</p>
@@ -1311,7 +1311,7 @@ function TestSuiteTab() {
                   <div className="ml-6">
                     <p className="text-[11px] text-muted-foreground italic">{test.result}</p>
                     {test.blockedBy && (
-                      <p className="text-[10px] text-rose-600 mt-0.5">Blocked by: {test.blockedBy}</p>
+                      <p className="text-[10px] text-[#A93F2F] mt-0.5">Blocked by: {test.blockedBy}</p>
                     )}
                   </div>
                 </div>
@@ -1341,13 +1341,13 @@ function IntegrationHealthTab() {
               </div>
               <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full ${s.status === 'ready' ? 'bg-emerald-400' : s.status === 'partial' ? 'bg-amber-400' : 'bg-rose-400'}`}
+                  className={`h-full rounded-full ${s.status === 'ready' ? 'bg-[#2F6B3F]' : s.status === 'partial' ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`}
                   style={{ width:`${Math.round((s.score / s.maxScore)*100)}%` }}
                 />
               </div>
               {s.items.filter(it => it.status === 'fail').length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
-                  {s.items.filter(it => it.status === 'fail').map(it => <span key={it.label} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-rose-50 border border-rose-200 text-rose-600">{it.label}</span>)}
+                  {s.items.filter(it => it.status === 'fail').map(it => <span key={it.label} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F]">{it.label}</span>)}
                 </div>
               )}
             </div>
@@ -1359,7 +1359,7 @@ function IntegrationHealthTab() {
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {SLACK_HEALTH_SCORES.flatMap(s => s.items.filter(it => it.status !== 'pass')).map((it, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-2.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
                 <span className="text-[12px] text-foreground">{it.label}</span>
                 <span className="ml-auto text-[11px] text-muted-foreground">{it.note}</span>
               </div>
@@ -1377,9 +1377,9 @@ function PocStateTab() {
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5 max-w-4xl">
-        <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3">
-          <p className="text-[11px] font-bold text-teal-800 uppercase mb-1">POC Last Confirmed Working State — Restoration Reference</p>
-          <p className="text-[12px] text-teal-900 leading-relaxed">
+        <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3">
+          <p className="text-[11px] font-bold text-[#245531] uppercase mb-1">POC Last Confirmed Working State — Restoration Reference</p>
+          <p className="text-[12px] text-[#245531] leading-relaxed">
             The Penny AI Slack POC was confirmed working with both Penny (Gemini) and Agentforce (Penny–Transition Trails Assistant) responding in the same channel simultaneously. Assessment quiz flow, connected Agentforce, and both the Penny AI channel and admin channel were tested. This tab is the reference document for restoring and validating that state.
           </p>
         </div>
@@ -1389,14 +1389,14 @@ function PocStateTab() {
           <div className="space-y-2">
             {POC_WORKING_ITEMS.map(item => (
               <div key={item.id} className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${
-                item.status === 'confirmed-working' ? 'border-emerald-200 bg-emerald-50' : 'border-teal-200 bg-teal-50'
+                item.status === 'confirmed-working' ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#9FC3AE] bg-[#E6F0EA]'
               }`}>
-                <CheckCircle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${item.status === 'confirmed-working' ? 'text-emerald-500' : 'text-teal-500'}`} />
+                <CheckCircle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${item.status === 'confirmed-working' ? 'text-[#2F6B3F]' : 'text-[#2F6B3F]'}`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                     <p className="text-[12px] font-semibold text-foreground">{item.capability}</p>
                     <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${
-                      item.status === 'confirmed-working' ? 'border-emerald-200 bg-white text-emerald-700' : 'border-teal-200 bg-white text-teal-700'
+                      item.status === 'confirmed-working' ? 'border-[#9FC3AE] bg-white text-[#2F6B3F]' : 'border-[#9FC3AE] bg-white text-[#2F6B3F]'
                     }`}>{item.status === 'confirmed-working' ? 'Confirmed' : 'Tested'}</span>
                   </div>
                   <p className="text-[11px] text-muted-foreground">{item.note}</p>
@@ -1417,7 +1417,7 @@ function PocStateTab() {
                   <p className="text-[12px] font-semibold text-foreground">{bot.name}</p>
                   <p className="text-[11px] text-muted-foreground">{bot.role}</p>
                 </div>
-                <span className="text-[10px] font-medium text-emerald-600 shrink-0">✓ Confirmed in POC</span>
+                <span className="text-[10px] font-medium text-[#2F6B3F] shrink-0">✓ Confirmed in POC</span>
               </div>
             ))}
           </div>
@@ -1430,18 +1430,18 @@ function PocStateTab() {
           <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Channels Tested in POC</p>
           <div className="grid grid-cols-2 gap-3">
             {POC_CHANNELS_RECORD.map(ch => (
-              <div key={ch.role} className={`rounded-lg border p-4 ${ch.role === 'penny' ? 'border-teal-200 bg-teal-50' : 'border-violet-200 bg-violet-50'}`}>
+              <div key={ch.role} className={`rounded-lg border p-4 ${ch.role === 'penny' ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#7FAFC6] bg-[#EDF5F8]'}`}>
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <Hash className={`w-4 h-4 ${ch.role === 'penny' ? 'text-teal-600' : 'text-violet-600'}`} />
+                  <Hash className={`w-4 h-4 ${ch.role === 'penny' ? 'text-[#2F6B3F]' : 'text-[#2F6F7E]'}`} />
                   <p className="text-[13px] font-bold text-foreground">{ch.channelName}</p>
                   <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${
-                    ch.testedStatus === 'confirmed-working' ? 'border-emerald-200 bg-white text-emerald-700' : 'border-teal-200 bg-white text-teal-700'
+                    ch.testedStatus === 'confirmed-working' ? 'border-[#9FC3AE] bg-white text-[#2F6B3F]' : 'border-[#9FC3AE] bg-white text-[#2F6B3F]'
                   }`}>{ch.testedStatus === 'confirmed-working' ? 'Confirmed' : 'Tested'}</span>
                 </div>
                 <div className="space-y-1 mb-3">
                   {ch.featuresTested.map(f => (
                     <div key={f} className="flex items-center gap-1.5 text-[11px] text-foreground">
-                      <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0" /> {f}
+                      <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0" /> {f}
                     </div>
                   ))}
                 </div>
@@ -1460,14 +1460,14 @@ function PocStateTab() {
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {POC_RESTORE_CHECKLIST.map((item, i) => (
               <div key={i} className="flex items-start gap-3 px-4 py-2.5">
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-[#E6F0EA] text-[#2F6B3F]' : 'bg-muted text-muted-foreground'}`}>
                   {item.done ? '✓' : String(i + 1)}
                 </span>
                 <div className="flex-1">
                   <p className={`text-[12px] font-semibold ${item.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{item.step}</p>
                   <p className="text-[11px] text-muted-foreground">{item.note}</p>
                 </div>
-                <span className={`text-[10px] font-medium shrink-0 ${item.done ? 'text-emerald-600' : 'text-muted-foreground'}`}>{item.status}</span>
+                <span className={`text-[10px] font-medium shrink-0 ${item.done ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>{item.status}</span>
               </div>
             ))}
           </div>
@@ -1570,9 +1570,9 @@ function PocReadinessTab() {
           <div className="grid grid-cols-2 gap-2">
             {POC_INTEGRATION_LINKS.map(link => (
               <div key={link.id} className={`rounded-lg border p-3 ${
-                link.status === 'operational' ? 'border-emerald-200 bg-emerald-50' :
-                link.status === 'partial'     ? 'border-amber-200 bg-amber-50' :
-                                               'border-sky-200 bg-sky-50'
+                link.status === 'operational' ? 'border-[#9FC3AE] bg-[#E6F0EA]' :
+                link.status === 'partial'     ? 'border-[#FFD08A] bg-[#FFF3E0]' :
+                                               'border-[#7FAFC6] bg-[#EDF5F8]'
               }`}>
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <p className="text-[12px] font-semibold text-foreground">{link.label}</p>
@@ -1591,7 +1591,7 @@ function PocReadinessTab() {
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {nextSteps.map((item, i) => (
               <div key={i} className="flex items-start gap-3 px-4 py-2.5">
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-emerald-100 text-emerald-700' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-[#E6F0EA] text-[#2F6B3F]' : 'bg-muted text-muted-foreground'}`}>
                   {item.done ? '✓' : String(i + 1)}
                 </span>
                 <div className="flex-1">

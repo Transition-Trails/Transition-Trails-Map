@@ -30,9 +30,9 @@ const MATRIX: MatrixRow[] = [
 ];
 
 const HANDLER_CFG = {
-  Penny:      { cls: 'bg-violet-50 text-violet-700 border-violet-200',   dot: 'bg-violet-500'   },
+  Penny:      { cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',   dot: 'bg-[#EDF5F8]0'   },
   Agentforce: { cls: 'bg-cyan-50 text-cyan-700 border-cyan-200',         dot: 'bg-cyan-500'     },
-  Both:       { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
+  Both:       { cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', dot: 'bg-[#E6F0EA]0' },
 } as const;
 
 // ── POC Validation checklist ──────────────────────────────────────────────────
@@ -55,9 +55,9 @@ const POC_CHECKS: CheckItem[] = [
 ];
 
 const CHECK_CFG = {
-  confirmed: { icon: CheckCircle2, cls: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100' },
-  pending:   { icon: AlertTriangle, cls: 'text-amber-600',  bg: 'bg-amber-50 border-amber-100'   },
-  blocked:   { icon: AlertTriangle, cls: 'text-rose-600',   bg: 'bg-rose-50 border-rose-100'     },
+  confirmed: { icon: CheckCircle2, cls: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#E6F0EA]' },
+  pending:   { icon: AlertTriangle, cls: 'text-[#CC8400]',  bg: 'bg-[#FFF3E0] border-[#FFF3E0]'   },
+  blocked:   { icon: AlertTriangle, cls: 'text-[#A93F2F]',   bg: 'bg-[#FBEAE6] border-[#FBEAE6]'     },
 } as const;
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -124,8 +124,8 @@ export default function AgentforceCenter() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1 shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               <span className="font-semibold">Live · API Connected</span>
             </div>
           </div>
@@ -134,8 +134,8 @@ export default function AgentforceCenter() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'POC Steps Confirmed', value: confirmed,          color: 'text-emerald-600', icon: CheckCircle2 },
-            { label: 'Pending Config',       value: pending,            color: 'text-amber-600',   icon: AlertTriangle },
+            { label: 'POC Steps Confirmed', value: confirmed,          color: 'text-[#2F6B3F]', icon: CheckCircle2 },
+            { label: 'Pending Config',       value: pending,            color: 'text-[#CC8400]',   icon: AlertTriangle },
             { label: 'Capabilities Shared', value: MATRIX.filter(m => m.handler === 'Both').length, color: 'text-cyan-600', icon: GitMerge },
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
@@ -246,7 +246,7 @@ export default function AgentforceCenter() {
               <Bot className="w-3.5 h-3.5 text-cyan-600" />
               <p className="text-[11px] font-semibold text-foreground">Live Agent Test</p>
             </div>
-            <span className="text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 font-semibold">
+            <span className="text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5 font-semibold">
               POST /api/agentforce/test
             </span>
           </div>
@@ -267,12 +267,12 @@ export default function AgentforceCenter() {
               {testing ? 'Connecting to Agentforce…' : 'Run live test'}
             </button>
             {testResult && testResult.ok && (
-              <span className="flex items-center gap-1 text-[10px] text-emerald-700">
+              <span className="flex items-center gap-1 text-[10px] text-[#2F6B3F]">
                 <CheckCircle2 className="w-3 h-3" /> Session live · agent responded
               </span>
             )}
             {testResult && !testResult.ok && (
-              <span className="flex items-center gap-1 text-[10px] text-rose-600">
+              <span className="flex items-center gap-1 text-[10px] text-[#A93F2F]">
                 <AlertTriangle className="w-3 h-3" /> {testResult.detail?.slice(0, 80) ?? 'Test failed'}
               </span>
             )}
@@ -287,8 +287,8 @@ export default function AgentforceCenter() {
             </div>
           )}
           {testResult && !testResult.ok && testResult.hint && (
-            <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-              <p className="text-[10px] text-amber-800 leading-snug">
+            <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
+              <p className="text-[10px] text-[#CC8400] leading-snug">
                 <span className="font-semibold">Fix: </span>{testResult.hint}
               </p>
             </div>
@@ -299,12 +299,12 @@ export default function AgentforceCenter() {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => setLocation('/admin/setup')}
-            className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-4 text-left hover:bg-emerald-50 transition-colors group"
+            className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]/40 p-4 text-left hover:bg-[#E6F0EA] transition-colors group"
           >
-            <Shield className="w-4 h-4 text-emerald-600 mb-2" />
+            <Shield className="w-4 h-4 text-[#2F6B3F] mb-2" />
             <p className="text-[11px] font-semibold text-foreground">Secrets · Configured</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">AGENTFORCE_API_KEY is set · view all secrets</p>
-            <div className="flex items-center gap-1 mt-2 text-[10px] text-emerald-600">
+            <div className="flex items-center gap-1 mt-2 text-[10px] text-[#2F6B3F]">
               Admin Setup <ArrowRight className="w-3 h-3" />
             </div>
           </button>

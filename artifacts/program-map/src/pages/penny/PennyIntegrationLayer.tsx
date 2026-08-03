@@ -27,11 +27,11 @@ interface IntegrationConnection {
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<IntegrationStatus, { label: string; cls: string; dot: string; icon: LucideIcon }> = {
-  live:        { label: 'Live',        cls: 'bg-emerald-100 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', icon: CheckCircle2 },
-  ready:       { label: 'POC Ready',   cls: 'bg-blue-100 text-blue-700 border-blue-200',          dot: 'bg-blue-500',    icon: CheckCircle2 },
-  'in-progress':{ label: 'In Progress',cls: 'bg-violet-100 text-violet-700 border-violet-200',    dot: 'bg-violet-500',  icon: Zap          },
-  planned:     { label: 'Planned',     cls: 'bg-amber-100 text-amber-700 border-amber-200',        dot: 'bg-amber-500',   icon: Clock        },
-  blocked:     { label: 'Blocked',     cls: 'bg-rose-100 text-rose-700 border-rose-200',           dot: 'bg-rose-500',    icon: XCircle      },
+  live:        { label: 'Live',        cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', dot: 'bg-[#E6F0EA]0', icon: CheckCircle2 },
+  ready:       { label: 'POC Ready',   cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',          dot: 'bg-[#EDF5F8]0',    icon: CheckCircle2 },
+  'in-progress':{ label: 'In Progress',cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',    dot: 'bg-[#EDF5F8]0',  icon: Zap          },
+  planned:     { label: 'Planned',     cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',        dot: 'bg-[#FFF3E0]0',   icon: Clock        },
+  blocked:     { label: 'Blocked',     cls: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',           dot: 'bg-[#FBEAE6]0',    icon: XCircle      },
 };
 
 // ── Integration Data ──────────────────────────────────────────────────────────
@@ -228,13 +228,13 @@ function ConnectionCard({ conn }: { conn: IntegrationConnection }) {
 
         {conn.blockers.length > 0 && (
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-wider text-rose-600/70 mb-1 flex items-center gap-1">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-[#A93F2F]/70 mb-1 flex items-center gap-1">
               <XCircle className="w-2.5 h-2.5" /> Blockers
             </p>
             <div className="space-y-0.5">
               {conn.blockers.map(b => (
                 <div key={b} className="flex items-start gap-1.5">
-                  <div className="w-1 h-1 rounded-full bg-rose-400 mt-1.5 shrink-0" />
+                  <div className="w-1 h-1 rounded-full bg-[#A93F2F] mt-1.5 shrink-0" />
                   <p className="text-[10px] text-foreground">{b}</p>
                 </div>
               ))}
@@ -313,9 +313,9 @@ export default function PennyIntegrationLayer() {
         <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Avg Readiness',   v: `${avgReadiness}%`,  cls: 'text-primary'      },
-            { label: 'POC Ready',        v: readyCount,           cls: 'text-blue-600'     },
-            { label: 'Live',             v: liveCount,            cls: 'text-emerald-600'  },
-            { label: 'Blocked',          v: blockedCount,         cls: 'text-rose-600'     },
+            { label: 'POC Ready',        v: readyCount,           cls: 'text-[#2F6F7E]'     },
+            { label: 'Live',             v: liveCount,            cls: 'text-[#2F6B3F]'  },
+            { label: 'Blocked',          v: blockedCount,         cls: 'text-[#A93F2F]'     },
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-white px-3 py-3 text-center">
               <p className={`text-2xl font-bold ${s.cls}`}>{s.v}</p>

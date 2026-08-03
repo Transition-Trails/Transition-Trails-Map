@@ -19,9 +19,9 @@ import { TERMS } from '@/config/terminology';
 
 function HealthDot({ health, large }: { health?: string; large?: boolean }) {
   const cls =
-    health === 'healthy'         ? 'bg-emerald-400' :
-    health === 'needs-attention' ? 'bg-amber-400'   :
-    health === 'incomplete'      ? 'bg-rose-400'    : 'bg-gray-300';
+    health === 'healthy'         ? 'bg-[#2F6B3F]' :
+    health === 'needs-attention' ? 'bg-[#CC8400]'   :
+    health === 'incomplete'      ? 'bg-[#A93F2F]'    : 'bg-gray-300';
   const sz = large ? 'w-2 h-2' : 'w-1.5 h-1.5';
   return <span className={`inline-block rounded-full shrink-0 ${cls} ${sz}`} />;
 }
@@ -29,9 +29,9 @@ function HealthDot({ health, large }: { health?: string; large?: boolean }) {
 function StatusBadge({ status, variant }: { status?: string; variant?: string }) {
   if (!status) return null;
   const color =
-    variant === 'active'   ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-    variant === 'draft'    ? 'bg-amber-50 text-amber-700 border-amber-200'       :
-    variant === 'planning' ? 'bg-sky-50 text-sky-700 border-sky-200'             :
+    variant === 'active'   ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' :
+    variant === 'draft'    ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]'       :
+    variant === 'planning' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'             :
     variant === 'inactive' ? 'bg-gray-100 text-gray-500 border-gray-200'         :
                              'bg-muted text-muted-foreground border-border';
   return (

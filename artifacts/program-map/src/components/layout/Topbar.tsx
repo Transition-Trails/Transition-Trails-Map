@@ -92,10 +92,10 @@ function SignalsIndicator() {
 
   const sourceDots: Array<{ key: string; color: string; count: number }> = [
     { key: 'slack',      color: 'bg-[#4A154B]/60', count: counts.sources.slack      },
-    { key: 'drive',      color: 'bg-emerald-500',  count: counts.sources.drive      },
-    { key: 'salesforce', color: 'bg-sky-500',       count: counts.sources.salesforce },
-    { key: 'calendar',   color: 'bg-rose-400',      count: counts.sources.calendar   },
-    { key: 'email',      color: 'bg-blue-400',      count: counts.sources.email      },
+    { key: 'drive',      color: 'bg-[#E6F0EA]0',  count: counts.sources.drive      },
+    { key: 'salesforce', color: 'bg-[#EDF5F8]0',       count: counts.sources.salesforce },
+    { key: 'calendar',   color: 'bg-[#A93F2F]',      count: counts.sources.calendar   },
+    { key: 'email',      color: 'bg-[#2F6F7E]',      count: counts.sources.email      },
   ].filter(s => s.count > 0);
 
   return (
@@ -106,7 +106,7 @@ function SignalsIndicator() {
         panelOpen
           ? 'bg-[#4A154B]/10 border-[#4A154B]/25 text-[#4A154B]/80'
           : counts.urgent > 0
-          ? 'bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100 hover:border-amber-300'
+          ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] hover:bg-[#FFF3E0] hover:border-[#FFD08A]'
           : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
@@ -114,7 +114,7 @@ function SignalsIndicator() {
       <Activity className="w-3 h-3 flex-shrink-0" />
       {/* Urgent pulse dot — only when there are urgent signals and panel is closed */}
       {counts.urgent > 0 && !panelOpen && (
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+        <span className="w-1.5 h-1.5 rounded-full bg-[#CC8400] animate-pulse flex-shrink-0" />
       )}
       {/* Text — hidden below sm breakpoint, matching Penny/Calendar pattern */}
       <span className="hidden sm:inline">
@@ -202,9 +202,9 @@ function UserProfileButton() {
 
   // Tier dot color overlay on avatar
   const tierDot: Record<AccessTier, string> = {
-    everyday:   'bg-emerald-500',
-    power:      'bg-violet-500',
-    admin:      'bg-amber-500',
+    everyday:   'bg-[#E6F0EA]0',
+    power:      'bg-[#EDF5F8]0',
+    admin:      'bg-[#FFF3E0]0',
     superadmin: 'bg-primary',
   };
 
@@ -260,7 +260,7 @@ function UserProfileButton() {
               </div>
 
               {/* Google connected badge */}
-              <span className="text-[8px] font-bold uppercase tracking-wide bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded flex-shrink-0">
+              <span className="text-[8px] font-bold uppercase tracking-wide bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded flex-shrink-0">
                 Google
               </span>
             </div>
@@ -338,11 +338,11 @@ function UserProfileButton() {
           {/* ── Google account section ── */}
           <div className="px-4 py-3 border-t border-border bg-muted/10">
             <div className="flex items-start gap-2.5">
-              <Chrome className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+              <Chrome className="w-3.5 h-3.5 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-[11px] font-semibold text-foreground">Google Account</p>
-                  <span className="text-[8px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-wide">
+                  <span className="text-[8px] font-bold bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded uppercase tracking-wide">
                     Connected
                   </span>
                 </div>
@@ -359,8 +359,8 @@ function UserProfileButton() {
               onClick={() => { setOpen(false); void signOut(); }}
               className="w-full flex items-center gap-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors py-1 group"
             >
-              <LogOut className="w-3.5 h-3.5 flex-shrink-0 group-hover:text-rose-500 transition-colors" />
-              <span className="group-hover:text-rose-600 transition-colors">Sign out</span>
+              <LogOut className="w-3.5 h-3.5 flex-shrink-0 group-hover:text-[#A93F2F] transition-colors" />
+              <span className="group-hover:text-[#A93F2F] transition-colors">Sign out</span>
             </button>
           </div>
 
@@ -414,8 +414,8 @@ export function Topbar() {
         <button
           className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
             askPennyOpen
-              ? 'bg-violet-100 border-violet-300 text-violet-700 hover:bg-violet-200'
-              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700'
+              ? 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E] hover:bg-[#EDF5F8]'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#EDF5F8] hover:border-[#7FAFC6] hover:text-[#2F6F7E]'
           }`}
           onClick={() => {
             if (askPennyOpen) {
@@ -435,8 +435,8 @@ export function Topbar() {
         <button
           className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
             calendarPanelOpen
-              ? 'bg-emerald-100 border-emerald-300 text-emerald-700 hover:bg-emerald-200'
-              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700'
+              ? 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F] hover:bg-[#E6F0EA]'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#E6F0EA] hover:border-[#9FC3AE] hover:text-[#2F6B3F]'
           }`}
           onClick={() => {
             if (calendarPanelOpen) {
@@ -457,8 +457,8 @@ export function Topbar() {
         <button
           className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
             gmailPanelOpen
-              ? 'bg-rose-100 border-rose-300 text-rose-700 hover:bg-rose-200'
-              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700'
+              ? 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F] hover:bg-[#FBEAE6]'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#FBEAE6] hover:border-[#E8B9B4] hover:text-[#A93F2F]'
           }`}
           onClick={() => {
             if (gmailPanelOpen) {

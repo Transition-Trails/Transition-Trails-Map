@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Hash, Globe } from 'lucide-react';
 
 function statusBadge(status: CommChannel['status']) {
-  if (status === 'active')  return <Badge className="text-[10px] bg-green-50 text-green-800 border-green-200 border">Active</Badge>;
+  if (status === 'active')  return <Badge className="text-[10px] bg-[#E6F0EA] text-[#245531] border-[#9FC3AE] border">Active</Badge>;
   if (status === 'planned') return <Badge className="text-[10px] bg-primary/10 text-primary border-primary/20 border">Planned</Badge>;
   return <Badge variant="secondary" className="text-[10px]">Future</Badge>;
 }

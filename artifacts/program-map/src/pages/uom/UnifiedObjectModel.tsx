@@ -25,7 +25,7 @@ function CatBadge({ category }: { category: ObjectCategory }) {
 
 function SoTBadge({ sys }: { sys: string }) {
   return (
-    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-teal-50 border border-teal-200 text-teal-700">
+    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]">
       {sys}
     </span>
   );
@@ -46,9 +46,9 @@ function ArchitectureOverview() {
           </p>
         </div>
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-          <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-1">Phase 1 Architecture Capability</p>
-          <p className="text-[12px] text-amber-800 leading-relaxed">
+        <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
+          <p className="text-[11px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Phase 1 Architecture Capability</p>
+          <p className="text-[12px] text-[#CC8400] leading-relaxed">
             The UOM establishes the common language for Universal Object Profiles, Global Search, and future automation.
             Every new page, integration, and Penny capability built after Phase 1 will reference this model.
           </p>
@@ -161,11 +161,11 @@ const REL_ABBREV: Record<string, string> = {
   'depends-on': 'dep', 'informs': 'inf', 'serves': 'srv',
 };
 const REL_CELL_COLOR: Record<string, string> = {
-  'contains': 'bg-emerald-100 text-emerald-800', 'governs': 'bg-violet-100 text-violet-800',
-  'sources': 'bg-blue-100 text-blue-800', 'maps-to': 'bg-sky-100 text-sky-800',
-  'triggers': 'bg-pink-100 text-pink-800', 'participates-in': 'bg-orange-100 text-orange-800',
-  'syncs-with': 'bg-teal-100 text-teal-800', 'depends-on': 'bg-rose-100 text-rose-800',
-  'informs': 'bg-indigo-100 text-indigo-800', 'serves': 'bg-amber-100 text-amber-800',
+  'contains': 'bg-[#E6F0EA] text-[#245531]', 'governs': 'bg-[#EDF5F8] text-[#2F6F7E]',
+  'sources': 'bg-[#EDF5F8] text-[#2F6F7E]', 'maps-to': 'bg-[#EDF5F8] text-[#2F6F7E]',
+  'triggers': 'bg-[#FBEAE6] text-[#A93F2F]', 'participates-in': 'bg-[#FFF3E0] text-[#CC8400]',
+  'syncs-with': 'bg-[#E6F0EA] text-[#245531]', 'depends-on': 'bg-[#FBEAE6] text-[#A93F2F]',
+  'informs': 'bg-[#EDF5F8] text-[#2F6F7E]', 'serves': 'bg-[#FFF3E0] text-[#CC8400]',
 };
 
 function RelationshipMatrix() {
@@ -287,7 +287,7 @@ function SourceOfTruth() {
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {systemGroups.map(g => (
               <div key={g.sys} className="rounded-lg border border-border bg-white p-3">
-                <p className="text-[11px] font-bold text-teal-700 mb-1.5">{g.sys}</p>
+                <p className="text-[11px] font-bold text-[#2F6B3F] mb-1.5">{g.sys}</p>
                 <div className="space-y-0.5">
                   {g.objects.map(o => (
                     <p key={o.id} className="text-[11px] text-foreground">{o.name}</p>
@@ -332,7 +332,7 @@ function Governance() {
               <div className="flex flex-wrap gap-1">
                 {obj.standards.length > 0
                   ? obj.standards.map(s => (
-                    <span key={s} className="text-[9px] bg-violet-50 border border-violet-200 text-violet-700 rounded px-1 py-0.5">{s}</span>
+                    <span key={s} className="text-[9px] bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] rounded px-1 py-0.5">{s}</span>
                   ))
                   : <span className="text-[10px] text-muted-foreground/50">—</span>
                 }
@@ -421,7 +421,7 @@ function ObjectExplorer() {
               {obj.lifecycle.map((stage, i) => (
                 <div key={stage} className="flex items-center gap-0.5">
                   <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full border ${
-                    i === 0 ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                    i === 0 ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]'
                     : i === obj.lifecycle.length - 1 ? 'border-muted text-muted-foreground bg-muted/20'
                     : 'border-border bg-white text-foreground/70'
                   }`}>{stage}</span>
@@ -456,7 +456,7 @@ function ObjectExplorer() {
                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Ownership</p>
                     <div className="flex flex-wrap gap-1.5">
                       {obj.ownership.map(o => (
-                        <span key={o} className="text-[11px] px-2 py-1 rounded-md bg-blue-50 border border-blue-200 text-blue-700 font-medium">{o}</span>
+                        <span key={o} className="text-[11px] px-2 py-1 rounded-md bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] font-medium">{o}</span>
                       ))}
                     </div>
                   </div>
@@ -515,11 +515,11 @@ function ObjectExplorer() {
                   <div>
                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Owner Roles</p>
                     {obj.ownership.map((owner, i) => (
-                      <div key={owner} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-blue-200 bg-blue-50 mb-1.5">
-                        <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-[9px] font-bold text-white shrink-0">{i + 1}</div>
+                      <div key={owner} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] mb-1.5">
+                        <div className="w-5 h-5 rounded-full bg-[#2F6F7E] flex items-center justify-center text-[9px] font-bold text-white shrink-0">{i + 1}</div>
                         <div>
-                          <p className="text-[12px] font-semibold text-blue-900">{owner}</p>
-                          <p className="text-[10px] text-blue-700">{i === 0 ? 'Primary owner — final accountability' : 'Secondary owner — operational responsibility'}</p>
+                          <p className="text-[12px] font-semibold text-[#2F6F7E]">{owner}</p>
+                          <p className="text-[10px] text-[#2F6F7E]">{i === 0 ? 'Primary owner — final accountability' : 'Secondary owner — operational responsibility'}</p>
                         </div>
                       </div>
                     ))}
@@ -542,7 +542,7 @@ function ObjectExplorer() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
                           <p className="text-[12px] font-semibold text-foreground">{h.name}</p>
-                          <span className="text-[9px] bg-teal-50 border border-teal-200 text-teal-700 rounded px-1 py-0.5">{h.source}</span>
+                          <span className="text-[9px] bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] rounded px-1 py-0.5">{h.source}</span>
                         </div>
                         <p className="text-[10px] text-muted-foreground">{h.description}</p>
                       </div>
@@ -556,9 +556,9 @@ function ObjectExplorer() {
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Governing Standards</p>
                   {obj.standards.length > 0 ? (
                     obj.standards.map(s => (
-                      <div key={s} className="px-3 py-2.5 rounded-lg border border-violet-200 bg-violet-50">
-                        <p className="text-[12px] font-semibold text-violet-900">{s}</p>
-                        <p className="text-[10px] text-violet-700 mt-0.5">View full standard in Standards Studio → Program & Curriculum workspace</p>
+                      <div key={s} className="px-3 py-2.5 rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]">
+                        <p className="text-[12px] font-semibold text-[#2F6F7E]">{s}</p>
+                        <p className="text-[10px] text-[#2F6F7E] mt-0.5">View full standard in Standards Studio → Program & Curriculum workspace</p>
                       </div>
                     ))
                   ) : (
@@ -574,9 +574,9 @@ function ObjectExplorer() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Source of Truth</p>
-                    <div className="px-3 py-2.5 rounded-lg border border-teal-200 bg-teal-50">
-                      <p className="text-[13px] font-bold text-teal-900">{obj.sourceOfTruth}</p>
-                      <p className="text-[10px] text-teal-700 mt-0.5">The authoritative system of record for this object type.</p>
+                    <div className="px-3 py-2.5 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
+                      <p className="text-[13px] font-bold text-[#245531]">{obj.sourceOfTruth}</p>
+                      <p className="text-[10px] text-[#2F6B3F] mt-0.5">The authoritative system of record for this object type.</p>
                     </div>
                   </div>
                   <div>
@@ -584,7 +584,7 @@ function ObjectExplorer() {
                     <div className="space-y-1.5">
                       {obj.systems.map(s => (
                         <div key={s} className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border bg-white">
-                          <div className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F] shrink-0" />
                           <span className="text-[12px] text-foreground">{s}</span>
                         </div>
                       ))}

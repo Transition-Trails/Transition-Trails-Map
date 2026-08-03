@@ -39,10 +39,10 @@ export default function OpsHealthIndicators() {
                     const ic  = HEALTH_LEVEL_CONFIG[ind.status];
                     const dot =
                       ind.status === 'strong' || ind.status === 'good'
-                        ? 'bg-emerald-400'
+                        ? 'bg-[#2F6B3F]'
                         : ind.status === 'needs-work'
-                        ? 'bg-amber-400'
-                        : 'bg-rose-400';
+                        ? 'bg-[#CC8400]'
+                        : 'bg-[#A93F2F]';
                     return (
                       <button
                         key={ind.id}
@@ -66,8 +66,8 @@ export default function OpsHealthIndicators() {
                 </div>
 
                 {firstBad && (
-                  <div className="px-3 py-1.5 border-t border-border/40 bg-amber-50/50">
-                    <p className="text-[8px] font-bold uppercase tracking-wide text-amber-700/70 mb-0.5">Next action</p>
+                  <div className="px-3 py-1.5 border-t border-border/40 bg-[#FFF3E0]/50">
+                    <p className="text-[8px] font-bold uppercase tracking-wide text-[#CC8400]/70 mb-0.5">Next action</p>
                     <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2">{firstBad.detail}</p>
                   </div>
                 )}

@@ -39,16 +39,16 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
           <InfoRow label="Access"       value={src.accessStatus ?? 'Unknown'} />
         </div>
         {src.trustLevel === 'Unverified' && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
-            <p className="text-[11px] font-bold text-rose-700 mb-1">⚠ Unverified Source</p>
-            <p className="text-[12px] text-rose-800">This source has not passed a trust review. It may not be activated in {TERMS.aiAssistant} without Knowledge Manager approval.</p>
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
+            <p className="text-[11px] font-bold text-[#A93F2F] mb-1">⚠ Unverified Source</p>
+            <p className="text-[12px] text-[#A93F2F]">This source has not passed a trust review. It may not be activated in {TERMS.aiAssistant} without Knowledge Manager approval.</p>
           </div>
         )}
         {src.healthIssues.length > 0 && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 space-y-1.5">
-            <p className="text-[11px] font-bold text-amber-700">Open Issues</p>
+          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 space-y-1.5">
+            <p className="text-[11px] font-bold text-[#CC8400]">Open Issues</p>
             {src.healthIssues.map((issue, i) => (
-              <p key={i} className="text-[11px] text-amber-800 leading-snug">· {issue}</p>
+              <p key={i} className="text-[11px] text-[#CC8400] leading-snug">· {issue}</p>
             ))}
           </div>
         )}
@@ -84,7 +84,7 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
     <div className="rounded-lg border border-border bg-background p-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wide">Category Mapping</p>
-        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${mapped === total ? 'text-emerald-700 bg-emerald-50' : 'text-amber-700 bg-amber-50'}`}>
+        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${mapped === total ? 'text-[#2F6B3F] bg-[#E6F0EA]' : 'text-[#CC8400] bg-[#FFF3E0]'}`}>
           {mapped} / {total} mapped
         </span>
       </div>
@@ -93,14 +93,14 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
         <div className="flex items-center justify-between text-[9px] text-muted-foreground mb-0.5">
           <span>{pct}% complete</span>
           {mapped === total && (
-            <span className="flex items-center gap-1 text-emerald-600 font-semibold">
+            <span className="flex items-center gap-1 text-[#2F6B3F] font-semibold">
               <CheckCircle2 className="w-3 h-3" /> All documents mapped
             </span>
           )}
         </div>
         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-300 ${mapped === total ? 'bg-emerald-500' : 'bg-amber-400'}`}
+            className={`h-full rounded-full transition-all duration-300 ${mapped === total ? 'bg-[#E6F0EA]0' : 'bg-[#CC8400]'}`}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -115,13 +115,13 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
           return (
             <div
               key={doc.id}
-              className={`rounded-md border transition-colors ${isMapped ? 'border-border bg-background' : 'border-amber-200 bg-amber-50/30'}`}
+              className={`rounded-md border transition-colors ${isMapped ? 'border-border bg-background' : 'border-[#FFD08A] bg-[#FFF3E0]/30'}`}
             >
               <button
                 onClick={() => setExpandedDoc(isExpanded ? null : doc.id)}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-left"
               >
-                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isMapped ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isMapped ? 'bg-[#E6F0EA]0' : 'bg-[#CC8400]'}`} />
                 <span className="text-[11px] font-medium text-foreground flex-1 truncate">{doc.name}</span>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {isMapped ? (
@@ -139,7 +139,7 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
                       )}
                     </>
                   ) : (
-                    <span className="text-[9px] font-bold text-amber-600">Unassigned</span>
+                    <span className="text-[9px] font-bold text-[#CC8400]">Unassigned</span>
                   )}
                 </div>
                 <ChevronDown className={`w-3 h-3 text-muted-foreground flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
@@ -236,7 +236,7 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
           <div className="space-y-2">
             {caps.map(c => (
               <div key={c.name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
-                <span className="w-1.5 h-1.5 rounded-full bg-pink-400 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2F6F7E] shrink-0" />
                 <span className="text-[12px] text-foreground font-medium">{c.name}</span>
                 <span className="ml-auto text-[10px] text-muted-foreground">{c.status}</span>
               </div>
@@ -254,9 +254,9 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
 
 function RelatedProgramsTab({ src: _src }: { src: KnowledgeSource }) {
   const programs = [
-    { name: "Foundations Trail",  status: 'Referenced', dot: 'bg-emerald-400' },
-    { name: "Guided Trail",       status: 'Referenced', dot: 'bg-emerald-400' },
-    { name: "Explorer's Trail",   status: 'Planned',    dot: 'bg-amber-400' },
+    { name: "Foundations Trail",  status: 'Referenced', dot: 'bg-[#2F6B3F]' },
+    { name: "Guided Trail",       status: 'Referenced', dot: 'bg-[#2F6B3F]' },
+    { name: "Explorer's Trail",   status: 'Planned',    dot: 'bg-[#CC8400]' },
   ];
   return (
     <ScrollArea className="h-full">
@@ -267,7 +267,7 @@ function RelatedProgramsTab({ src: _src }: { src: KnowledgeSource }) {
             <div key={prog.name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${prog.dot}`} />
               <span className="text-[12px] text-foreground font-medium">{prog.name}</span>
-              <span className={`ml-auto text-[10px] font-bold ${prog.dot === 'bg-emerald-400' ? 'text-emerald-600' : 'text-amber-600'}`}>{prog.status}</span>
+              <span className={`ml-auto text-[10px] font-bold ${prog.dot === 'bg-[#2F6B3F]' ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>{prog.status}</span>
             </div>
           ))}
         </div>
@@ -279,18 +279,18 @@ function RelatedProgramsTab({ src: _src }: { src: KnowledgeSource }) {
 
 function RelationshipsTabKS({ src }: { src: KnowledgeSource }) {
   const programItems: RelatedItem[] = [
-    { id: 'exp',    label: "Explorer's Trail",  statusColor: 'bg-emerald-400', href: '/program' },
-    { id: 'found',  label: 'Foundations Trail', statusColor: 'bg-emerald-400', href: '/program' },
-    { id: 'guided', label: 'Guided Trail',      statusColor: 'bg-amber-400',   href: '/program' },
+    { id: 'exp',    label: "Explorer's Trail",  statusColor: 'bg-[#2F6B3F]', href: '/program' },
+    { id: 'found',  label: 'Foundations Trail', statusColor: 'bg-[#2F6B3F]', href: '/program' },
+    { id: 'guided', label: 'Guided Trail',      statusColor: 'bg-[#CC8400]',   href: '/program' },
   ];
   const capMap: Record<string, RelatedItem[]> = {
-    'salesforce-kb':  [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-emerald-400', href: '/penny' }, { id: 'lc', label: 'Learning Coach', statusColor: 'bg-emerald-400', href: '/penny' }, { id: 'cs', label: 'Coach Support', statusColor: 'bg-blue-400', href: '/penny' }],
-    'resume-guide':   [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-emerald-400', href: '/penny' }],
-    'linkedin-guide': [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-blue-400',    href: '/penny' }],
+    'salesforce-kb':  [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-[#2F6B3F]', href: '/penny' }, { id: 'lc', label: 'Learning Coach', statusColor: 'bg-[#2F6B3F]', href: '/penny' }, { id: 'cs', label: 'Coach Support', statusColor: 'bg-[#2F6F7E]', href: '/penny' }],
+    'resume-guide':   [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-[#2F6B3F]', href: '/penny' }],
+    'linkedin-guide': [{ id: 'rr', label: 'Resume Review',  statusColor: 'bg-[#2F6F7E]',    href: '/penny' }],
   };
   const dtItems: RelatedItem[] = [
-    { id: 'dt-rel', label: 'Relationship Graph', statusColor: 'bg-violet-400', href: '/knowledge/relationships' },
-    { id: 'dt-kn',  label: 'Knowledge Network',  statusColor: 'bg-blue-400',   href: '/digital-twin/knowledge'  },
+    { id: 'dt-rel', label: 'Relationship Graph', statusColor: 'bg-[#2F6F7E]', href: '/knowledge/relationships' },
+    { id: 'dt-kn',  label: 'Knowledge Network',  statusColor: 'bg-[#2F6F7E]',   href: '/digital-twin/knowledge'  },
   ];
 
   return (
@@ -334,10 +334,10 @@ function HealthTabKS({ src }: { src: KnowledgeSource }) {
           </div>
         ))}
         {src.healthIssues.length > 0 && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 space-y-1.5">
-            <p className="text-[11px] font-bold text-amber-700">Open Health Issues</p>
+          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 space-y-1.5">
+            <p className="text-[11px] font-bold text-[#CC8400]">Open Health Issues</p>
             {src.healthIssues.map((issue, i) => (
-              <p key={i} className="text-[11px] text-amber-800 leading-snug">· {issue}</p>
+              <p key={i} className="text-[11px] text-[#CC8400] leading-snug">· {issue}</p>
             ))}
           </div>
         )}
@@ -364,8 +364,8 @@ export default function KnowledgeWorkspace() {
     id: (src as any).id ?? src.name,
     name: src.name,
     typeName: src.type,
-    typeColor: 'text-violet-700',
-    typeBg: 'bg-violet-50',
+    typeColor: 'text-[#2F6F7E]',
+    typeBg: 'bg-[#EDF5F8]',
     status: src.trustLevel,
     statusVariant: (src.trustLevel === 'Authoritative' || src.trustLevel === 'Trusted') ? ('active' as const) : ('draft' as const),
     health: healthFromTrust(src),

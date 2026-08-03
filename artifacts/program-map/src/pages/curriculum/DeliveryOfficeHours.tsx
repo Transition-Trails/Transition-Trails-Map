@@ -24,11 +24,11 @@ export default function DeliveryOfficeHours() {
               <button
                 key={oh.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: oh.id, data: oh })}
-                className="rounded-xl border border-border bg-white p-4 text-left hover:border-pink-200 hover:shadow-sm transition-all"
+                className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#E8B9B4] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-pink-600 shrink-0" />
+                    <Clock className="w-4 h-4 text-[#A93F2F] shrink-0" />
                     <div>
                       <p className="text-[13px] font-bold text-foreground">{oh.name}</p>
                       <p className="text-[11px] text-muted-foreground">{oh.schedule as string} · {oh.format as string}</p>

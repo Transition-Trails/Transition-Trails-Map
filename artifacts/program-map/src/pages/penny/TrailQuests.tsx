@@ -29,9 +29,9 @@ const QUEST_DELIVERIES: LearnerDelivery[] = [
 ];
 
 const STATUS_CONFIG: Record<LearnerDelivery['status'], { cls: string; dot: string }> = {
-  'Completed':           { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
-  'In Progress':         { cls: 'bg-sky-50 text-sky-700 border-sky-200',             dot: 'bg-sky-500'     },
-  'Pending Acceptance':  { cls: 'bg-amber-50 text-amber-700 border-amber-200',       dot: 'bg-amber-500'   },
+  'Completed':           { cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', dot: 'bg-[#E6F0EA]0' },
+  'In Progress':         { cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',             dot: 'bg-[#EDF5F8]0'     },
+  'Pending Acceptance':  { cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',       dot: 'bg-[#FFF3E0]0'   },
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -92,8 +92,8 @@ export default function TrailQuests() {
           </p>
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-                <Star className="w-5 h-5 text-emerald-600" />
+              <div className="w-9 h-9 rounded-xl bg-[#E6F0EA] flex items-center justify-center shrink-0">
+                <Star className="w-5 h-5 text-[#2F6B3F]" />
               </div>
               <div>
                 <h1 className="text-base font-semibold text-foreground">Trail Quests</h1>
@@ -102,8 +102,8 @@ export default function TrailQuests() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1 shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               <span className="font-semibold">POC Confirmed</span>
             </div>
           </div>
@@ -113,9 +113,9 @@ export default function TrailQuests() {
         <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Total Quests',   value: curriculumTrailQuests.length, color: 'text-foreground', icon: Trophy },
-            { label: 'Active',         value: active.length,                color: 'text-sky-600',     icon: Zap },
-            { label: 'Completed',      value: completed.length,             color: 'text-emerald-600', icon: CheckCircle2 },
-            { label: 'Awaiting',       value: pending.length,               color: 'text-amber-600',   icon: Clock },
+            { label: 'Active',         value: active.length,                color: 'text-[#2F6F7E]',     icon: Zap },
+            { label: 'Completed',      value: completed.length,             color: 'text-[#2F6B3F]', icon: CheckCircle2 },
+            { label: 'Awaiting',       value: pending.length,               color: 'text-[#CC8400]',   icon: Clock },
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
               <s.icon className={`w-4 h-4 ${s.color} mb-1.5`} />
@@ -168,7 +168,7 @@ export default function TrailQuests() {
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <div className="flex-1 bg-muted rounded-full h-1">
                           <div
-                            className="bg-emerald-500 h-1 rounded-full transition-all"
+                            className="bg-[#E6F0EA]0 h-1 rounded-full transition-all"
                             style={{ width: `${(d.completedCriteria / d.totalCriteria) * 100}%` }}
                           />
                         </div>
@@ -177,7 +177,7 @@ export default function TrailQuests() {
                     </div>
                     <div className="flex items-center gap-1">
                       {isSent ? (
-                        <span className="text-[10px] text-emerald-600 font-medium">Sent ✓</span>
+                        <span className="text-[10px] text-[#2F6B3F] font-medium">Sent ✓</span>
                       ) : (
                         <button
                           onClick={() => void deliverViaSlack(d)}
@@ -194,9 +194,9 @@ export default function TrailQuests() {
                       <button
                         onClick={() => openPennyForQuest(quest?.name as string ?? '', d.learner)}
                         title="Penny coaching"
-                        className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-violet-50 transition-colors"
+                        className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-[#EDF5F8] transition-colors"
                       >
-                        <Brain className="w-2.5 h-2.5 text-violet-500" />
+                        <Brain className="w-2.5 h-2.5 text-[#2F6F7E]" />
                       </button>
                     </div>
                   </div>
@@ -233,8 +233,8 @@ export default function TrailQuests() {
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-                        <Star className="w-4 h-4 text-emerald-600" />
+                      <div className="w-8 h-8 rounded-lg bg-[#E6F0EA] flex items-center justify-center shrink-0 mt-0.5">
+                        <Star className="w-4 h-4 text-[#2F6B3F]" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -244,7 +244,7 @@ export default function TrailQuests() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5 font-medium">
+                          <span className="text-[10px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 font-medium">
                             {quest.questType as string}
                           </span>
                           <span className="text-[10px] text-muted-foreground">
@@ -256,12 +256,12 @@ export default function TrailQuests() {
 
                     <div className="flex items-center gap-1.5 shrink-0">
                       {activeCount > 0 && (
-                        <span className="text-[9px] text-sky-700 bg-sky-50 border border-sky-200 rounded-full px-2 py-0.5 font-semibold">
+                        <span className="text-[9px] text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2 py-0.5 font-semibold">
                           {activeCount} active
                         </span>
                       )}
                       {doneCount > 0 && (
-                        <span className="text-[9px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5 font-semibold">
+                        <span className="text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5 font-semibold">
                           {doneCount} done
                         </span>
                       )}
@@ -283,7 +283,7 @@ export default function TrailQuests() {
                       </p>
                       {(quest.criteria as string[]).map((c, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                          <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
                           <p className="text-[11px] text-foreground/80">{c}</p>
                         </div>
                       ))}
@@ -307,7 +307,7 @@ export default function TrailQuests() {
         </div>
 
         {/* Integration note */}
-        <div className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-3.5 flex items-start gap-2">
+        <div className="rounded-lg border border-[#E6F0EA] bg-[#E6F0EA]/50 p-3.5 flex items-start gap-2">
           <Slack className="w-3.5 h-3.5 text-[#4A154B] shrink-0 mt-0.5" />
           <div>
             <p className="text-[11px] font-medium text-foreground mb-0.5">Slack + Salesforce delivery</p>

@@ -915,9 +915,9 @@ export const POC_WORKING_ITEMS: PocWorkingItem[] = [
 ];
 
 export const POC_BOTS_CONFIRMED: PocBot[] = [
-  { id:'bot-penny-gemini', name:'Penny (Gemini)',                    platform:'Gemini / Trail OS',    role:'Learner coaching, assessments, weekly briefs, Trail Quests',                  colorCls:'border-pink-200 bg-pink-50 text-pink-700',       status:'confirmed' },
-  { id:'bot-agentforce',   name:'Penny–Transition Trails Assistant', platform:'Agentforce / Salesforce', role:'Connected agent, Salesforce-backed responses, escalation',               colorCls:'border-sky-200 bg-sky-50 text-sky-700',          status:'confirmed' },
-  { id:'bot-trail-os',     name:'Trail OS Bot',                      platform:'Trail OS / Slack API', role:'Delivery routing, event recording, system notifications, test messages',     colorCls:'border-emerald-200 bg-emerald-50 text-emerald-700', status:'confirmed' },
+  { id:'bot-penny-gemini', name:'Penny (Gemini)',                    platform:'Gemini / Trail OS',    role:'Learner coaching, assessments, weekly briefs, Trail Quests',                  colorCls:'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]',       status:'confirmed' },
+  { id:'bot-agentforce',   name:'Penny–Transition Trails Assistant', platform:'Agentforce / Salesforce', role:'Connected agent, Salesforce-backed responses, escalation',               colorCls:'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]',          status:'confirmed' },
+  { id:'bot-trail-os',     name:'Trail OS Bot',                      platform:'Trail OS / Slack API', role:'Delivery routing, event recording, system notifications, test messages',     colorCls:'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]', status:'confirmed' },
 ];
 
 export const POC_CHANNELS_RECORD: PocChannelRecord[] = [

@@ -25,19 +25,19 @@ const DELIVERY_STEPS: Array<{ step: string; detail: string }> = [
 const ANALYTICS_STATS = [
   { label: 'Active Learners',          value: '48',  note: 'current cohorts',  cls: 'text-primary' },
   { label: 'Programs Running',         value: '3',   note: 'active delivery',  cls: 'text-foreground' },
-  { label: 'Placement Rate (90-day)',  value: '67%', note: 'rolling average',  cls: 'text-emerald-700' },
+  { label: 'Placement Rate (90-day)',  value: '67%', note: 'rolling average',  cls: 'text-[#2F6B3F]' },
   { label: 'Avg Cohort Completion',    value: '82%', note: 'per cohort',       cls: 'text-foreground' },
   { label: 'Coach-to-Learner Ratio',   value: '1:8', note: 'across programs',  cls: 'text-muted-foreground' },
   { label: 'Source Documents Active',  value: '14',  note: 'knowledge base',   cls: 'text-foreground' },
 ];
 
 const PLATFORM_AREAS = [
-  { id: 'intake',    label: 'Intake Coordination', description: 'Structured intake flows for program applications, screening, and cohort placement.',           ring: 'border-sky-200',    bg: 'bg-sky-50/60',    tag: 'text-sky-700'    },
-  { id: 'delivery',  label: 'Project Delivery',    description: 'Sprint-based delivery infrastructure — curriculum, coaching sessions, milestone tracking.',     ring: 'border-emerald-200', bg: 'bg-emerald-50/60', tag: 'text-emerald-700' },
-  { id: 'readiness', label: 'Org Readiness',        description: 'Org capability mapping, readiness scoring, and platform health monitoring.',                  ring: 'border-amber-200',  bg: 'bg-amber-50/60',  tag: 'text-amber-700'  },
-  { id: 'coaching',  label: 'Coach Visibility',     description: 'Coach dashboards, learner health signals, and session support across all programs.',          ring: 'border-violet-200', bg: 'bg-violet-50/60', tag: 'text-violet-700' },
-  { id: 'analytics', label: 'Analytics',            description: `Cross-program metrics, placement rates, ${TERMS.aiAssistant} AI performance, and cohort health indicators.`, ring: 'border-indigo-200', bg: 'bg-indigo-50/60', tag: 'text-indigo-700' },
-  { id: 'loops',     label: 'Delivery Loops',       description: 'Closed feedback loops from intake through alumni engagement for continuous improvement.',     ring: 'border-rose-200',   bg: 'bg-rose-50/60',   tag: 'text-rose-700'   },
+  { id: 'intake',    label: 'Intake Coordination', description: 'Structured intake flows for program applications, screening, and cohort placement.',           ring: 'border-[#7FAFC6]',    bg: 'bg-[#EDF5F8]/60',    tag: 'text-[#2F6F7E]'    },
+  { id: 'delivery',  label: 'Project Delivery',    description: 'Sprint-based delivery infrastructure — curriculum, coaching sessions, milestone tracking.',     ring: 'border-[#9FC3AE]', bg: 'bg-[#E6F0EA]/60', tag: 'text-[#2F6B3F]' },
+  { id: 'readiness', label: 'Org Readiness',        description: 'Org capability mapping, readiness scoring, and platform health monitoring.',                  ring: 'border-[#FFD08A]',  bg: 'bg-[#FFF3E0]/60',  tag: 'text-[#CC8400]'  },
+  { id: 'coaching',  label: 'Coach Visibility',     description: 'Coach dashboards, learner health signals, and session support across all programs.',          ring: 'border-[#7FAFC6]', bg: 'bg-[#EDF5F8]/60', tag: 'text-[#2F6F7E]' },
+  { id: 'analytics', label: 'Analytics',            description: `Cross-program metrics, placement rates, ${TERMS.aiAssistant} AI performance, and cohort health indicators.`, ring: 'border-[#7FAFC6]', bg: 'bg-[#EDF5F8]/60', tag: 'text-[#2F6F7E]' },
+  { id: 'loops',     label: 'Delivery Loops',       description: 'Closed feedback loops from intake through alumni engagement for continuous improvement.',     ring: 'border-[#E8B9B4]',   bg: 'bg-[#FBEAE6]/60',   tag: 'text-[#A93F2F]'   },
 ];
 
 export default function TrailOSOverview() {
@@ -72,7 +72,7 @@ export default function TrailOSOverview() {
             {TERMS.trailSignals}
           </button>
           {isAdminOrAbove && (
-            <span className="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-semibold px-2 py-1 rounded-full">
+            <span className="flex items-center gap-1 bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] text-[10px] font-semibold px-2 py-1 rounded-full">
               <AlertTriangle className="w-3 h-3" />
               Prototype
             </span>

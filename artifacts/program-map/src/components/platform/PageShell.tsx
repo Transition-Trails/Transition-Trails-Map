@@ -9,9 +9,9 @@ import { Building2 } from 'lucide-react';
 
 export function StatusDot({ status }: { status: 'green' | 'amber' | 'red' | 'gray' }) {
   const cls = {
-    green: 'bg-emerald-500',
-    amber: 'bg-amber-400',
-    red:   'bg-red-500',
+    green: 'bg-[#E6F0EA]0',
+    amber: 'bg-[#CC8400]',
+    red:   'bg-[#FBEAE6]0',
     gray:  'bg-muted-foreground/30',
   }[status];
   return <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${cls}`} />;
@@ -27,7 +27,7 @@ export function StatCard({
       <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
       <p className="text-xl font-bold text-foreground leading-none">{value}</p>
       {sub   && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
-      {trend && <p className="text-xs font-medium mt-1 text-emerald-600">{trend}</p>}
+      {trend && <p className="text-xs font-medium mt-1 text-[#2F6B3F]">{trend}</p>}
     </div>
   );
 }
@@ -46,7 +46,7 @@ export function OpsHeader({
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-sm font-semibold text-foreground leading-none">{title}</h1>
             {isAdminOrAbove && (
-              <span className="inline-flex items-center text-[10px] font-semibold border px-1.5 py-0.5 rounded-full bg-amber-50 border-amber-200 text-amber-700 whitespace-nowrap">
+              <span className="inline-flex items-center text-[10px] font-semibold border px-1.5 py-0.5 rounded-full bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] whitespace-nowrap">
                 Prototype Data
               </span>
             )}
@@ -84,8 +84,8 @@ export function OpsHeader({
 /* ─── PageShell — compact header, role-aware prototype/integration notices ─── */
 
 const BADGE_STYLES = {
-  prototype:      'bg-amber-50 border-amber-200 text-amber-700',
-  'future-state': 'bg-sky-50 border-sky-200 text-sky-700',
+  prototype:      'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',
+  'future-state': 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',
   'coming-soon':  'bg-muted border-border text-muted-foreground',
 } as const;
 

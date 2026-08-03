@@ -4,13 +4,13 @@ import { curriculumSprints, CONTENT_STATUS_CONFIG } from '@/data/curriculumData'
 import { Layers, ArrowRight } from 'lucide-react';
 
 const RESOLVE_COLORS: Record<string, string> = {
-  Recognize: 'bg-sky-50 text-sky-800 border-sky-200',
-  Explore:   'bg-violet-50 text-violet-800 border-violet-200',
-  Select:    'bg-amber-50 text-amber-800 border-amber-200',
-  Outline:   'bg-sky-50 text-sky-800 border-sky-200',
-  Launch:    'bg-emerald-50 text-emerald-800 border-emerald-200',
-  Verify:    'bg-emerald-50 text-emerald-800 border-emerald-200',
-  Evolve:    'bg-violet-50 text-violet-800 border-violet-200',
+  Recognize: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  Explore:   'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  Select:    'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  Outline:   'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  Launch:    'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
+  Verify:    'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
+  Evolve:    'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
 };
 
 export default function CurriculumSprints() {
@@ -58,7 +58,7 @@ export default function CurriculumSprints() {
                   <p className="text-[11px] text-primary/70 mt-1 font-medium">Theme: {sprint.theme as string}</p>
                 )}
                 {sprint.notes && (
-                  <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 mt-2">{sprint.notes}</p>
+                  <p className="text-[11px] text-[#CC8400] bg-[#FFF3E0] border border-[#FFF3E0] rounded px-2 py-1 mt-2">{sprint.notes}</p>
                 )}
               </button>
             );

@@ -14,17 +14,18 @@ import {
   type LifecycleModel, type OwnershipEntry, type ComplianceEntry,
   type ReviewCycle, type GovHealthIssue, type GovernancePolicy,
 } from '@/data/governanceData';
+import { STATUS_CLASSES, lifecycleColorClasses } from '@/config/statusColors';
 
 // ── Utility components ────────────────────────────────────────────────────────
 function LayerBadge({ layer }: { layer: string }) {
   const cls =
-    layer === 'Program'       ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-    layer === 'Knowledge'     ? 'bg-violet-50  text-violet-700  border-violet-200'  :
-    layer === 'Intelligence'  ? 'bg-pink-50    text-pink-700    border-pink-200'    :
-    layer === 'People'        ? 'bg-blue-50    text-blue-700    border-blue-200'    :
-    layer === 'Infrastructure'? 'bg-teal-50    text-teal-700    border-teal-200'    :
-    layer === 'Governance'    ? 'bg-orange-50  text-orange-700  border-orange-200'  :
-                                'bg-muted      text-muted-foreground border-border';
+    layer === 'Program'       ? STATUS_CLASSES.success.badge     :
+    layer === 'Knowledge'     ? STATUS_CLASSES.information.badge :
+    layer === 'Intelligence'  ? STATUS_CLASSES.information.badge :
+    layer === 'People'        ? STATUS_CLASSES.neutral.badge     :
+    layer === 'Infrastructure'? STATUS_CLASSES.neutral.badge     :
+    layer === 'Governance'    ? STATUS_CLASSES.attention.badge   :
+                                'bg-muted text-muted-foreground border-border';
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${cls}`}>
       {layer}
@@ -33,17 +34,7 @@ function LayerBadge({ layer }: { layer: string }) {
 }
 
 function StagePill({ label, color, isLast }: { label: string; color: string; isLast: boolean }) {
-  const cls =
-    color === 'sky'     ? 'bg-sky-50    text-sky-700    border-sky-200'    :
-    color === 'indigo'  ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
-    color === 'violet'  ? 'bg-violet-50 text-violet-700 border-violet-200' :
-    color === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-    color === 'amber'   ? 'bg-amber-50  text-amber-700  border-amber-200'  :
-    color === 'teal'    ? 'bg-teal-50   text-teal-700   border-teal-200'   :
-    color === 'blue'    ? 'bg-blue-50   text-blue-700   border-blue-200'   :
-    color === 'rose'    ? 'bg-rose-50   text-rose-700   border-rose-200'   :
-    color === 'pink'    ? 'bg-pink-50   text-pink-700   border-pink-200'   :
-                          'bg-slate-50  text-slate-500  border-slate-200';
+  const cls = lifecycleColorClasses(color).badge;
   return (
     <div className="flex items-center gap-1">
       <span className={`inline-flex items-center px-2 py-1 rounded border text-[10px] font-bold whitespace-nowrap ${cls}`}>
@@ -56,10 +47,10 @@ function StagePill({ label, color, isLast }: { label: string; color: string; isL
 
 function ReviewStatusBadge({ status }: { status: ReviewCycle['status'] }) {
   const cfg =
-    status === 'current'       ? { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Current' }       :
-    status === 'overdue'       ? { cls: 'bg-rose-50 text-rose-700 border-rose-200',          label: 'Overdue' }        :
-    status === 'upcoming'      ? { cls: 'bg-amber-50 text-amber-700 border-amber-200',        label: 'Due Soon' }       :
-                                 { cls: 'bg-muted text-muted-foreground border-border',       label: 'Not Scheduled' };
+    status === 'current'  ? { cls: STATUS_CLASSES.success.badge,     label: 'Current'       } :
+    status === 'overdue'  ? { cls: STATUS_CLASSES.critical.badge,    label: 'Overdue'       } :
+    status === 'upcoming' ? { cls: STATUS_CLASSES.attention.badge,   label: 'Due Soon'      } :
+                            { cls: STATUS_CLASSES.neutral.badge,     label: 'Not Scheduled' };
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${cfg.cls}`}>
       {cfg.label}
@@ -74,10 +65,10 @@ function ComplianceBar({ compliant, partial, nonCompliant, notAssessed, total }:
   const pct = (n: number) => `${Math.round((n / total) * 100)}%`;
   return (
     <div className="flex h-1.5 rounded-full overflow-hidden gap-px">
-      {compliant    > 0 && <div className="bg-emerald-400" style={{ width: pct(compliant) }} />}
-      {partial      > 0 && <div className="bg-amber-400"   style={{ width: pct(partial) }} />}
-      {nonCompliant > 0 && <div className="bg-rose-400"    style={{ width: pct(nonCompliant) }} />}
-      {notAssessed  > 0 && <div className="bg-slate-200"   style={{ width: pct(notAssessed) }} />}
+      {compliant    > 0 && <div className="bg-[#2F6B3F]" style={{ width: pct(compliant) }} />}
+      {partial      > 0 && <div className="bg-[#CC8400]" style={{ width: pct(partial) }} />}
+      {nonCompliant > 0 && <div className="bg-[#A93F2F]" style={{ width: pct(nonCompliant) }} />}
+      {notAssessed  > 0 && <div className="bg-[#E2E4E1]" style={{ width: pct(notAssessed) }} />}
     </div>
   );
 }
@@ -105,9 +96,9 @@ function OverviewTab() {
     <ScrollArea className="h-full">
       <div className="p-6 space-y-6 max-w-4xl">
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-          <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-1">Phase 1 Governance Capability</p>
-          <p className="text-[12px] text-amber-800 leading-relaxed">
+        <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
+          <p className="text-[11px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Phase 1 Governance Capability</p>
+          <p className="text-[12px] text-[#CC8400] leading-relaxed">
             Object Lifecycle & Governance defines how every Trail OS object is created, reviewed, approved, operated, retired, and
             governed. It applies to all 20 Unified Object Model types and is the operational rulebook that ensures clear ownership,
             accountability, review cycles, and retirement paths.
@@ -118,9 +109,9 @@ function OverviewTab() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
             { label:'Object Types Governed', value:'20',              sub:'Across all 6 UOM layers',    cls:'border-primary/20 bg-primary/5' },
-            { label:'Overall Compliance',    value:`${pctCompliant}%`,sub:`${totalCompliant}/${totalObjects} objects`,cls:'border-emerald-200 bg-emerald-50' },
-            { label:'Critical Issues',       value:String(criticalCount), sub:`${warningCount} warnings also open`, cls: criticalCount > 0 ? 'border-rose-200 bg-rose-50' : 'border-emerald-200 bg-emerald-50' },
-            { label:'Overdue Reviews',       value:String(overdueReviews),sub:'Of 20 review cycles',    cls: overdueReviews > 0 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50' },
+            { label:'Overall Compliance',    value:`${pctCompliant}%`,sub:`${totalCompliant}/${totalObjects} objects`,cls:'border-[#9FC3AE] bg-[#E6F0EA]' },
+            { label:'Critical Issues',       value:String(criticalCount), sub:`${warningCount} warnings also open`, cls: criticalCount > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#9FC3AE] bg-[#E6F0EA]' },
+            { label:'Overdue Reviews',       value:String(overdueReviews),sub:'Of 20 review cycles',    cls: overdueReviews > 0 ? 'border-[#FFD08A] bg-[#FFF3E0]' : 'border-[#9FC3AE] bg-[#E6F0EA]' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
@@ -214,7 +205,7 @@ function LifecycleTab() {
             <div>
               <h3 className="text-[15px] font-semibold text-foreground">{model.objectTypeName}</h3>
               <LayerBadge layer={model.layer} />
-              {model.note && <p className="text-[11px] text-amber-700 mt-1">{model.note}</p>}
+              {model.note && <p className="text-[11px] text-[#CC8400] mt-1">{model.note}</p>}
             </div>
           </div>
 
@@ -236,7 +227,7 @@ function LifecycleTab() {
               <div className="flex items-center gap-2">
                 <StagePill label={detail.label} color={detail.color} isLast={true} />
                 {detail.checkpoint && (
-                  <span className="text-[9px] font-bold bg-amber-100 text-amber-700 border border-amber-200 rounded px-1.5 py-0.5 uppercase">
+                  <span className="text-[9px] font-bold bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded px-1.5 py-0.5 uppercase">
                     Checkpoint
                   </span>
                 )}
@@ -244,11 +235,11 @@ function LifecycleTab() {
               <p className="text-[12px] text-foreground leading-relaxed">{detail.description}</p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-[10px] font-bold uppercase text-emerald-600 mb-1.5">Entry Requirements</p>
+                  <p className="text-[10px] font-bold uppercase text-[#2F6B3F] mb-1.5">Entry Requirements</p>
                   <ul className="space-y-0.5">
                     {detail.entry.map((r, i) => (
                       <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
-                        <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>{r}
+                        <span className="text-[#2F6B3F] mt-0.5 shrink-0">✓</span>{r}
                       </li>
                     ))}
                   </ul>
@@ -265,7 +256,7 @@ function LifecycleTab() {
                 </div>
               </div>
               {detail.checkpoint && (
-                <p className="text-[11px] text-amber-700 font-medium">⚠ Governance checkpoint: {detail.checkpoint}</p>
+                <p className="text-[11px] text-[#CC8400] font-medium">⚠ Governance checkpoint: {detail.checkpoint}</p>
               )}
             </div>
           )}
@@ -326,7 +317,7 @@ function OwnershipTab() {
                   <td className="px-3 py-2 text-muted-foreground">{o.approvalAuthority}</td>
                   <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{o.reviewCadence}</td>
                   <td className="px-3 py-2">
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-teal-50 border border-teal-200 text-teal-700">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]">
                       {o.sourceOfTruth}
                     </span>
                   </td>
@@ -423,13 +414,13 @@ function ReviewCyclesTab() {
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4">
         {overdue.length > 0 && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
-            <p className="text-[10px] font-bold text-rose-700 uppercase mb-2">⚠ Overdue Reviews ({overdue.length})</p>
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3">
+            <p className="text-[10px] font-bold text-[#A93F2F] uppercase mb-2">⚠ Overdue Reviews ({overdue.length})</p>
             {overdue.map(r => (
-              <div key={r.objectTypeId} className="flex items-center justify-between py-1.5 border-b border-rose-100 last:border-0">
+              <div key={r.objectTypeId} className="flex items-center justify-between py-1.5 border-b border-[#FBEAE6] last:border-0">
                 <div>
-                  <p className="text-[12px] font-semibold text-rose-800">{r.objectTypeName}</p>
-                  <p className="text-[10px] text-rose-600">Last: {r.lastReview ?? '—'} · Owner: {r.owner}</p>
+                  <p className="text-[12px] font-semibold text-[#A93F2F]">{r.objectTypeName}</p>
+                  <p className="text-[10px] text-[#A93F2F]">Last: {r.lastReview ?? '—'} · Owner: {r.owner}</p>
                 </div>
                 <ReviewStatusBadge status={r.status} />
               </div>
@@ -462,8 +453,8 @@ function ReviewCyclesTab() {
         </div>
         <div className="flex gap-4 text-[10px] text-muted-foreground">
           <span>✓ Current: {current.length}</span>
-          <span className="text-amber-600">⚡ Due soon: {upcoming.length}</span>
-          <span className="text-rose-600">⚠ Overdue: {overdue.length}</span>
+          <span className="text-[#CC8400]">⚡ Due soon: {upcoming.length}</span>
+          <span className="text-[#A93F2F]">⚠ Overdue: {overdue.length}</span>
           <span>— Not scheduled: {notSched.length}</span>
         </div>
       </div>
@@ -500,19 +491,19 @@ function ComplianceTab() {
                     <p className="text-[12px] font-bold text-foreground">{c.objectTypeName}</p>
                     <LayerBadge layer={c.layer} />
                   </div>
-                  <span className={`text-lg font-bold ${pct >= 85 ? 'text-emerald-600' : pct >= 70 ? 'text-amber-600' : 'text-rose-600'}`}>
+                  <span className={`text-lg font-bold ${pct >= 85 ? 'text-[#2F6B3F]' : pct >= 70 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
                     {pct}%
                   </span>
                 </div>
                 <ComplianceBar {...c} />
                 <div className="flex gap-3 text-[10px]">
-                  <span className="text-emerald-600">✓ {c.compliant} compliant</span>
-                  {c.partial > 0 && <span className="text-amber-600">~ {c.partial} partial</span>}
-                  {c.nonCompliant > 0 && <span className="text-rose-600">✗ {c.nonCompliant} non-compliant</span>}
+                  <span className="text-[#2F6B3F]">✓ {c.compliant} compliant</span>
+                  {c.partial > 0 && <span className="text-[#CC8400]">~ {c.partial} partial</span>}
+                  {c.nonCompliant > 0 && <span className="text-[#A93F2F]">✗ {c.nonCompliant} non-compliant</span>}
                   {c.notAssessed > 0 && <span className="text-muted-foreground">? {c.notAssessed} not assessed</span>}
                 </div>
                 {c.topGap && (
-                  <p className="text-[10px] text-amber-700 border-l-2 border-amber-300 pl-2">{c.topGap}</p>
+                  <p className="text-[10px] text-[#CC8400] border-l-2 border-[#FFD08A] pl-2">{c.topGap}</p>
                 )}
                 <p className="text-[9px] text-muted-foreground/60">Last checked: {c.lastChecked}</p>
               </div>
@@ -522,9 +513,9 @@ function ComplianceTab() {
 
         {/* Legend */}
         <div className="flex gap-4 text-[10px] text-muted-foreground pt-1">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />Compliant</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />Partial</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" />Non-compliant</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#2F6B3F] inline-block" />Compliant</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#CC8400] inline-block" />Partial</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#A93F2F] inline-block" />Non-compliant</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-200 inline-block" />Not assessed</span>
         </div>
       </div>
@@ -547,9 +538,9 @@ function HealthTab() {
         <div className="flex gap-3">
           {[
             { key:'all',      label:'All',      count:GOV_HEALTH_ISSUES.length, cls:'border-border bg-muted' },
-            { key:'critical', label:'Critical',  count:critical.length, cls:'border-rose-200 bg-rose-50' },
-            { key:'warning',  label:'Warning',   count:warning.length,  cls:'border-amber-200 bg-amber-50' },
-            { key:'info',     label:'Info',      count:info.length,     cls:'border-sky-200 bg-sky-50' },
+            { key:'critical', label:'Critical',  count:critical.length, cls:'border-[#E8B9B4] bg-[#FBEAE6]' },
+            { key:'warning',  label:'Warning',   count:warning.length,  cls:'border-[#FFD08A] bg-[#FFF3E0]' },
+            { key:'info',     label:'Info',      count:info.length,     cls:'border-[#C5DDE6] bg-[#EDF5F8]' },
           ].map(f => (
             <button
               key={f.key}
@@ -566,9 +557,9 @@ function HealthTab() {
         <div className="space-y-2">
           {shown.map((issue: GovHealthIssue) => {
             const cfg =
-              issue.severity === 'critical' ? { icon: AlertTriangle, cls: 'border-rose-200 bg-rose-50', ic:'text-rose-600', label:'Critical' } :
-              issue.severity === 'warning'  ? { icon: AlertTriangle, cls: 'border-amber-200 bg-amber-50', ic:'text-amber-600', label:'Warning' } :
-                                             { icon: Info, cls: 'border-sky-200 bg-sky-50', ic:'text-sky-600', label:'Info' };
+              issue.severity === 'critical' ? { icon: AlertTriangle, cls: 'border-[#E8B9B4] bg-[#FBEAE6]', ic:'text-[#A93F2F]', label:'Critical' } :
+              issue.severity === 'warning'  ? { icon: AlertTriangle, cls: 'border-[#FFD08A] bg-[#FFF3E0]', ic:'text-[#CC8400]', label:'Warning' } :
+                                             { icon: Info, cls: 'border-[#C5DDE6] bg-[#EDF5F8]', ic:'text-[#2F6F7E]', label:'Info' };
             const IconComp = cfg.icon;
             return (
               <div key={issue.id} className={`rounded-lg border p-4 ${cfg.cls}`}>

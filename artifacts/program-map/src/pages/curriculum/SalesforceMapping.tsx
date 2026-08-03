@@ -46,7 +46,7 @@ export default function SalesforceMapping() {
           </p>
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          <span className="flex items-center gap-1 text-[11px] font-semibold bg-blue-50 border border-blue-200 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap">
+          <span className="flex items-center gap-1 text-[11px] font-semibold bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] px-2 py-1 rounded-full whitespace-nowrap">
             <Database className="w-3 h-3" />Salesforce
           </span>
           <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
@@ -54,7 +54,7 @@ export default function SalesforceMapping() {
             <Layers className="w-3 h-3" />Trail OS
           </span>
           <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
-          <span className="flex items-center gap-1 text-[11px] font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700 px-2 py-1 rounded-full whitespace-nowrap">
+          <span className="flex items-center gap-1 text-[11px] font-semibold bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-2 py-1 rounded-full whitespace-nowrap">
             <ExternalLink className="w-3 h-3" />Drive
           </span>
         </div>

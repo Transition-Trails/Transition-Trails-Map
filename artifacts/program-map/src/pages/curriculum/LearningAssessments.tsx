@@ -18,10 +18,10 @@ export default function LearningAssessments() {
           {curriculumAssessments.map(asmnt => {
             const statusCfg = CONTENT_STATUS_CONFIG[asmnt.status];
             return (
-              <button key={asmnt.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: asmnt.id, data: asmnt })} className="rounded-xl border border-border bg-white p-4 text-left hover:border-rose-200 hover:shadow-sm transition-all">
+              <button key={asmnt.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: asmnt.id, data: asmnt })} className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#E8B9B4] hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-rose-600 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#A93F2F] shrink-0" />
                     <div>
                       <p className="text-[13px] font-bold text-foreground">{asmnt.name}</p>
                       <p className="text-[11px] text-muted-foreground">{asmnt.moduleName as string} · {asmnt.assessmentType as string}</p>
@@ -36,7 +36,7 @@ export default function LearningAssessments() {
                   <div><p className="text-[13px] font-bold text-foreground">{asmnt.questionCount as number}</p><p className="text-[10px] text-muted-foreground">Questions</p></div>
                   <div><p className="text-[13px] font-bold text-foreground">{asmnt.passingScore as number}%</p><p className="text-[10px] text-muted-foreground">Passing Score</p></div>
                   <div><p className="text-[13px] font-bold text-foreground">{asmnt.duration as string}</p><p className="text-[10px] text-muted-foreground">Duration</p></div>
-                  {!!(asmnt.avgScore) && <div><p className="text-[13px] font-bold text-green-700">{asmnt.avgScore as string}</p><p className="text-[10px] text-muted-foreground">Avg Score</p></div>}
+                  {!!(asmnt.avgScore) && <div><p className="text-[13px] font-bold text-[#2F6B3F]">{asmnt.avgScore as string}</p><p className="text-[10px] text-muted-foreground">Avg Score</p></div>}
                   {!!(asmnt.attempts) && <div><p className="text-[13px] font-bold text-foreground">{asmnt.attempts as number}</p><p className="text-[10px] text-muted-foreground">Attempts</p></div>}
                 </div>
               </button>

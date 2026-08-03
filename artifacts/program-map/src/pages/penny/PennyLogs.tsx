@@ -35,10 +35,10 @@ function formatDate(iso: string): string {
 
 function tierColor(tier: string | null): string {
   switch (tier) {
-    case 'superadmin': return 'bg-rose-50 text-rose-700 border-rose-200';
-    case 'admin':      return 'bg-violet-50 text-violet-700 border-violet-200';
-    case 'poweruser':  return 'bg-sky-50 text-sky-700 border-sky-200';
-    case 'everyday':   return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    case 'superadmin': return 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]';
+    case 'admin':      return 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]';
+    case 'poweruser':  return 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]';
+    case 'everyday':   return 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]';
     default:           return 'bg-muted text-muted-foreground border-border';
   }
 }
@@ -212,8 +212,8 @@ export default function PennyLogs() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-2 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="flex items-center gap-1.5 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-md px-2 py-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               Live · DB
             </span>
             <button
@@ -235,9 +235,9 @@ export default function PennyLogs() {
         )}
 
         {!loading && error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center space-y-1">
-            <p className="text-[12px] text-red-700 font-medium">{error}</p>
-            <p className="text-[11px] text-red-600/70">
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 text-center space-y-1">
+            <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
+            <p className="text-[11px] text-[#A93F2F]/70">
               Check the API server — logs are stored in the platform database.
             </p>
           </div>
@@ -278,7 +278,7 @@ export default function PennyLogs() {
                     : '—',
                   sub: 'latency',
                   icon: Zap,
-                  color: 'text-sky-600',
+                  color: 'text-[#2F6F7E]',
                 },
                 {
                   label: 'All time',

@@ -102,7 +102,7 @@ function HealthIndicators() {
           <div className="px-4 py-3 grid grid-cols-2 gap-x-6 gap-y-2">
             {sortedDomains.map(d => {
               const dc  = HEALTH_LEVEL_CONFIG[d.level];
-              const bar = d.score >= 75 ? 'bg-emerald-400' : d.score >= 65 ? 'bg-blue-400' : d.score >= 50 ? 'bg-amber-400' : 'bg-rose-400';
+              const bar = d.score >= 75 ? 'bg-[#2F6B3F]' : d.score >= 65 ? 'bg-[#2F6F7E]' : d.score >= 50 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
               return (
                 <button
                   key={d.id}
@@ -131,8 +131,8 @@ function HealthIndicators() {
           {sfData && (
             <div className="mx-4 mb-3 border-t border-border/30 pt-3">
               <div className="flex items-center gap-1.5 mb-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-700">Salesforce Live</p>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 shrink-0" />
+                <p className="text-[9px] font-bold uppercase tracking-wider text-[#2F6B3F]">Salesforce Live</p>
                 {sfData.fromCache && (
                   <span className="text-[8px] text-muted-foreground/50 ml-auto">
                     cached · {sfData.cacheAge < 60 ? `${sfData.cacheAge}s` : `${Math.round(sfData.cacheAge / 60)}m`} ago
@@ -149,14 +149,14 @@ function HealthIndicators() {
                 ] as const).map(stat => (
                   <div
                     key={stat.label}
-                    className={`rounded-md border px-2 py-1.5 text-center ${stat.alert ? 'border-amber-200 bg-amber-50/60' : 'border-border/40 bg-muted/20'}`}
+                    className={`rounded-md border px-2 py-1.5 text-center ${stat.alert ? 'border-[#FFD08A] bg-[#FFF3E0]/60' : 'border-border/40 bg-muted/20'}`}
                   >
-                    <p className={`text-[15px] font-bold leading-tight tabular-nums ${stat.alert ? 'text-amber-700' : 'text-foreground'}`}>
+                    <p className={`text-[15px] font-bold leading-tight tabular-nums ${stat.alert ? 'text-[#CC8400]' : 'text-foreground'}`}>
                       {stat.value ?? '—'}
                     </p>
                     <p className="text-[8px] text-muted-foreground leading-tight mt-0.5">{stat.label}</p>
                     {'sub' in stat && stat.sub && (
-                      <p className="text-[7px] text-amber-600 font-bold mt-0.5">{stat.sub}</p>
+                      <p className="text-[7px] text-[#CC8400] font-bold mt-0.5">{stat.sub}</p>
                     )}
                   </div>
                 ))}
@@ -242,10 +242,10 @@ function HealthIndicators() {
                       const ic  = HEALTH_LEVEL_CONFIG[ind.status];
                       const dot =
                         ind.status === 'strong' || ind.status === 'good'
-                          ? 'bg-emerald-400'
+                          ? 'bg-[#2F6B3F]'
                           : ind.status === 'needs-work'
-                          ? 'bg-amber-400'
-                          : 'bg-rose-400';
+                          ? 'bg-[#CC8400]'
+                          : 'bg-[#A93F2F]';
                       return (
                         <button
                           key={ind.id}
@@ -272,13 +272,13 @@ function HealthIndicators() {
                   {firstBad && (
                     <button
                       onClick={() => setSelectedItem({ type: 'healthIndicator', id: firstBad.id, data: firstBad })}
-                      className="w-full px-3 py-1.5 border-t border-amber-200/60 bg-amber-50/60 hover:bg-amber-100/70 transition-colors text-left group"
+                      className="w-full px-3 py-1.5 border-t border-[#FFD08A]/60 bg-[#FFF3E0]/60 hover:bg-[#FFF3E0]/70 transition-colors text-left group"
                     >
-                      <p className="text-[8px] font-bold uppercase tracking-wide text-amber-700/70 mb-0.5 flex items-center gap-1">
+                      <p className="text-[8px] font-bold uppercase tracking-wide text-[#CC8400]/70 mb-0.5 flex items-center gap-1">
                         Next action
-                        <span className="text-amber-500/60 group-hover:text-amber-600 transition-colors">→</span>
+                        <span className="text-[#CC8400]/60 group-hover:text-[#CC8400] transition-colors">→</span>
                       </p>
-                      <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2 group-hover:text-amber-900/80 transition-colors">{firstBad.detail}</p>
+                      <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2 group-hover:text-[#CC8400]/80 transition-colors">{firstBad.detail}</p>
                     </button>
                   )}
                 </div>
@@ -296,9 +296,9 @@ function HealthIndicators() {
 const URGENCY_ORDER: Record<string, number> = { immediate: 0, 'near-term': 1, watch: 2 };
 const TYPE_BORDER: Record<string, string> = {
   blocker:     'border-l-orange-400',
-  risk:        'border-l-rose-400',
+  risk:        'border-l-[#A93F2F]',
   gap:         'border-l-amber-400',
-  opportunity: 'border-l-emerald-400',
+  opportunity: 'border-l-[#2F6B3F]',
 };
 
 function SectionHeader({ label }: { label: string }) {
@@ -379,7 +379,7 @@ function IntelligenceView() {
                               </div>
                               <div className="h-1 bg-muted rounded-full mb-0.5">
                                 <div
-                                  className={`h-1 rounded-full ${pct >= 75 ? 'bg-emerald-400' : pct >= 55 ? 'bg-blue-400' : pct >= 40 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                                  className={`h-1 rounded-full ${pct >= 75 ? 'bg-[#2F6B3F]' : pct >= 55 ? 'bg-[#2F6F7E]' : pct >= 40 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`}
                                   style={{ width: `${pct}%` }}
                                 />
                               </div>
@@ -402,7 +402,7 @@ function IntelligenceView() {
           <div className="space-y-2">
             {visibleRecs.map(r => {
               const pc     = REC_PRIORITY_CONFIG[r.priority];
-              const effort = { Low: 'text-emerald-600', Medium: 'text-amber-600', High: 'text-rose-600' }[r.effort];
+              const effort = { Low: 'text-[#2F6B3F]', Medium: 'text-[#CC8400]', High: 'text-[#A93F2F]' }[r.effort];
               return (
                 <button key={r.id}
                   onClick={() => setSelectedItem({ type: 'oicRecommendation', id: r.id, data: r })}

@@ -194,7 +194,7 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
         {/* Penny use */}
         <Section id="penny" label={`${TERMS.aiAssistant} Use`}>
           <div className="flex items-center gap-2 mb-2">
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${src.approvedForPenny ? 'text-green-700 bg-green-50 border-green-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>
+            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${src.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
               {src.approvedForPenny ? `✓ Approved for ${TERMS.aiAssistant}` : `✗ Not Approved for ${TERMS.aiAssistant}`}
             </span>
           </div>
@@ -243,9 +243,9 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
           <Section id="health" label={`Health Issues (${src.healthIssues.length})`}>
             <div className="space-y-1.5">
               {src.healthIssues.map((issue, i) => (
-                <div key={i} className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-2">
-                  <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-amber-900 leading-snug">{issue}</p>
+                <div key={i} className="flex items-start gap-2 rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-2">
+                  <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-[#CC8400] leading-snug">{issue}</p>
                 </div>
               ))}
             </div>
@@ -253,9 +253,9 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
         )}
 
         {/* Future integration */}
-        <div className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-          <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Future Integration Path</p>
-          <p className="text-[11px] text-amber-900 leading-relaxed">{src.futureIntegrationPath}</p>
+        <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
+          <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Integration Path</p>
+          <p className="text-[11px] text-[#CC8400] leading-relaxed">{src.futureIntegrationPath}</p>
         </div>
       </div>
     </ScrollArea>
@@ -292,9 +292,9 @@ function OverviewView() {
         <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Sources',       value: summary.total,          sub: 'registered',  cls: 'border-foreground/20 bg-foreground/5' },
-            { label: `${TERMS.aiAssistant} Approved`, value: summary.approvedForPenny, sub: 'active',    cls: 'border-green-200 bg-green-50' },
-            { label: 'Healthy',       value: summary.healthy,         sub: 'no issues',   cls: 'border-green-200 bg-green-50' },
-            { label: 'Need Attention', value: summary.warnings + summary.critical, sub: 'issues found', cls: 'border-amber-200 bg-amber-50' },
+            { label: `${TERMS.aiAssistant} Approved`, value: summary.approvedForPenny, sub: 'active',    cls: 'border-[#9FC3AE] bg-[#E6F0EA]' },
+            { label: 'Healthy',       value: summary.healthy,         sub: 'no issues',   cls: 'border-[#9FC3AE] bg-[#E6F0EA]' },
+            { label: 'Need Attention', value: summary.warnings + summary.critical, sub: 'issues found', cls: 'border-[#FFD08A] bg-[#FFF3E0]' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 text-center ${s.cls}`}>
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
@@ -357,11 +357,11 @@ function OverviewView() {
           <h3 className="text-[13px] font-bold text-foreground mb-3">Salesforce Knowledge Category Taxonomy</h3>
           <div className="space-y-2">
             {SF_KNOWLEDGE_CATEGORIES.map(cat => (
-              <div key={cat.id} className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-                <p className="text-[12px] font-bold text-blue-900 mb-1">{cat.name}</p>
-                <p className="text-[11px] text-blue-700 mb-2 leading-snug">{cat.description}</p>
+              <div key={cat.id} className="rounded-xl border border-[#7FAFC6] bg-[#EDF5F8] p-4">
+                <p className="text-[12px] font-bold text-[#2F6F7E] mb-1">{cat.name}</p>
+                <p className="text-[11px] text-[#2F6F7E] mb-2 leading-snug">{cat.description}</p>
                 <div className="flex flex-wrap gap-1">
-                  {cat.subcategories.map(s => <span key={s} className="text-[10px] font-medium bg-white/70 border border-blue-100 rounded-full px-2 py-0.5 text-blue-800">{s}</span>)}
+                  {cat.subcategories.map(s => <span key={s} className="text-[10px] font-medium bg-white/70 border border-[#EDF5F8] rounded-full px-2 py-0.5 text-[#2F6F7E]">{s}</span>)}
                 </div>
               </div>
             ))}
@@ -529,9 +529,9 @@ function RelationshipsView() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Related Programs',        items: src.relatedPrograms,           icon: BookOpen,    cls: 'border-primary/20 bg-primary/5 text-primary' },
-              { label: 'SF Objects',              items: src.relatedSfObjects,          icon: Database,    cls: 'border-blue-200 bg-blue-50 text-blue-700' },
-              { label: 'Knowledge Categories',    items: src.relatedKnowledgeCategories,icon: Database,    cls: 'border-amber-200 bg-amber-50 text-amber-700' },
-              { label: 'Standards',               items: src.relatedStandards,          icon: ShieldCheck, cls: 'border-rose-200 bg-rose-50 text-rose-700' },
+              { label: 'SF Objects',              items: src.relatedSfObjects,          icon: Database,    cls: 'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]' },
+              { label: 'Knowledge Categories',    items: src.relatedKnowledgeCategories,icon: Database,    cls: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]' },
+              { label: 'Standards',               items: src.relatedStandards,          icon: ShieldCheck, cls: 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]' },
               { label: `${TERMS.aiAssistant} Capabilities`,      items: src.relatedPennyCapabilities.map(id => id.replace('cap-', '').replace(/-/g, ' ')), icon: Brain, cls: 'border-secondary/20 bg-secondary/5 text-secondary' },
               { label: 'Related Sources',         items: related.map(s => s.shortName), icon: Link2, cls: 'border-slate-200 bg-slate-50 text-slate-600' },
             ].map(({ label, items, icon: I, cls }) => (
@@ -591,15 +591,15 @@ function RetrievalMapView() {
   const entry = pennyRetrievalMap[selectedIdx];
 
   const roleConfig = {
-    Primary:   { cls: 'text-green-700 bg-green-50 border-green-200',    num: 'bg-green-600' },
-    Secondary: { cls: 'text-blue-700 bg-blue-50 border-blue-200',       num: 'bg-blue-600' },
-    Fallback:  { cls: 'text-amber-700 bg-amber-50 border-amber-200',    num: 'bg-amber-600' },
-    Context:   { cls: 'text-violet-700 bg-violet-50 border-violet-200', num: 'bg-violet-600' },
+    Primary:   { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',    num: 'bg-[#2F6B3F]' },
+    Secondary: { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',       num: 'bg-[#2F6F7E]' },
+    Fallback:  { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',    num: 'bg-[#CC8400]' },
+    Context:   { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', num: 'bg-[#2F6F7E]' },
   };
 
   const confidenceConfig = {
-    High:   'text-green-700 bg-green-50 border-green-200',
-    Medium: 'text-amber-700 bg-amber-50 border-amber-200',
+    High:   'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
+    Medium: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
     Low:    'text-slate-600 bg-slate-50 border-slate-200',
   };
 
@@ -673,7 +673,7 @@ function RetrievalMapView() {
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <HealthDot status={src.healthStatus} />
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${src.approvedForPenny ? 'text-green-700 bg-green-50 border-green-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>
+                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${src.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
                         {src.approvedForPenny ? '✓' : '✗'}
                       </span>
                     </div>
@@ -695,7 +695,7 @@ function RetrievalMapView() {
                   <div key={step.sourceId} className="flex items-center gap-2">
                     <span className="text-[10px] font-semibold text-foreground w-28 truncate">{src.shortName}</span>
                     <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
-                      <div className={`h-full rounded-full ${src.healthStatus === 'Healthy' ? 'bg-green-500' : src.healthStatus === 'Warning' ? 'bg-amber-500' : src.healthStatus === 'Critical' ? 'bg-rose-500' : 'bg-slate-300'}`}
+                      <div className={`h-full rounded-full ${src.healthStatus === 'Healthy' ? 'bg-[#2F6B3F]' : src.healthStatus === 'Warning' ? 'bg-[#FFF3E0]0' : src.healthStatus === 'Critical' ? 'bg-[#FBEAE6]0' : 'bg-slate-300'}`}
                         style={{ width: src.healthStatus === 'Healthy' ? '100%' : src.healthStatus === 'Warning' ? '60%' : src.healthStatus === 'Critical' ? '20%' : '5%' }}
                       />
                     </div>
@@ -764,7 +764,7 @@ function GovernanceView() {
                 <p className="text-[11px] text-muted-foreground">{s.lastReviewDate}</p>
                 <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 text-center ${trCfg.cls}`}>{s.trustLevel.slice(0,5)}</span>
                 <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 text-center ${synCfg.cls}`}>{synCfg.label.split(' ')[0]}</span>
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 text-center ${s.approvedForPenny ? 'text-green-700 bg-green-50 border-green-200' : 'text-rose-700 bg-rose-50 border-rose-200'}`}>
+                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 text-center ${s.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
                   {s.approvedForPenny ? '✓ Yes' : '✗ No'}
                 </span>
               </div>
@@ -808,12 +808,12 @@ function HealthView() {
   }
 
   const categoryCls: Record<IssueCategory, string> = {
-    'Missing Owner':     'text-rose-700 bg-rose-50 border-rose-200',
-    'Stale Review':      'text-amber-700 bg-amber-50 border-amber-200',
-    'Disconnected':      'text-rose-700 bg-rose-50 border-rose-200',
-    'Unapproved Penny':  'text-orange-700 bg-orange-50 border-orange-200',
-    'Missing LMS Link':  'text-violet-700 bg-violet-50 border-violet-200',
-    'Unmapped Category': 'text-blue-700 bg-blue-50 border-blue-200',
+    'Missing Owner':     'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+    'Stale Review':      'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+    'Disconnected':      'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+    'Unapproved Penny':  'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+    'Missing LMS Link':  'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+    'Unmapped Category': 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
     'Future Source':     'text-slate-500 bg-slate-50 border-slate-200',
   };
 
@@ -836,9 +836,9 @@ function HealthView() {
       <div className="px-5 py-3 border-b border-border flex items-center gap-3 flex-shrink-0 bg-white flex-wrap">
         <div className="flex items-center gap-2">
           {[
-            { label: `${issues.filter(i => i.severity === 'Critical').length} Critical`, cls: 'text-rose-700 bg-rose-50 border-rose-200' },
-            { label: `${issues.filter(i => i.severity === 'Warning').length} Warnings`,  cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-            { label: `${summary.healthy} Healthy`,                                cls: 'text-green-700 bg-green-50 border-green-200' },
+            { label: `${issues.filter(i => i.severity === 'Critical').length} Critical`, cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+            { label: `${issues.filter(i => i.severity === 'Warning').length} Warnings`,  cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+            { label: `${summary.healthy} Healthy`,                                cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
           ].map(b => (
             <span key={b.label} className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${b.cls}`}>{b.label}</span>
           ))}
@@ -878,9 +878,9 @@ function HealthView() {
             const tCfg = SOURCE_TYPE_CONFIG[issue.sourceType];
             const SIcon = TYPE_ICONS[issue.sourceType];
             return (
-              <div key={i} className={`rounded-xl border p-3 ${issue.severity === 'Critical' ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50'}`}>
+              <div key={i} className={`rounded-xl border p-3 ${issue.severity === 'Critical' ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#FFD08A] bg-[#FFF3E0]'}`}>
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${issue.severity === 'Critical' ? 'text-rose-600' : 'text-amber-600'}`} />
+                  <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${issue.severity === 'Critical' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <div className={`flex items-center gap-1 text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${tCfg.cls}`}>
@@ -888,9 +888,9 @@ function HealthView() {
                         {issue.sourceName}
                       </div>
                       <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${categoryCls[issue.category]}`}>{issue.category}</span>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${issue.severity === 'Critical' ? 'text-rose-700 bg-rose-100 border-rose-200' : 'text-amber-700 bg-amber-100 border-amber-200'}`}>{issue.severity}</span>
+                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${issue.severity === 'Critical' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'}`}>{issue.severity}</span>
                     </div>
-                    <p className={`text-[11px] leading-snug ${issue.severity === 'Critical' ? 'text-rose-900' : 'text-amber-900'}`}>{issue.issue}</p>
+                    <p className={`text-[11px] leading-snug ${issue.severity === 'Critical' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>{issue.issue}</p>
                   </div>
                 </div>
               </div>
@@ -954,11 +954,11 @@ export default function KnowledgeSourceRegistry() {
               Add Source
             </button>
             {totalIssues > 0 && (
-              <span className="text-[11px] font-semibold text-amber-700 border border-amber-200 bg-amber-50 rounded-full px-3 py-1">
+              <span className="text-[11px] font-semibold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-3 py-1">
                 {totalIssues} issues
               </span>
             )}
-            <span className="text-[11px] font-semibold text-green-700 border border-green-200 bg-green-50 rounded-full px-3 py-1">
+            <span className="text-[11px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-3 py-1">
               {summary.approvedForPenny} {TERMS.aiAssistant}-approved
             </span>
           </div>

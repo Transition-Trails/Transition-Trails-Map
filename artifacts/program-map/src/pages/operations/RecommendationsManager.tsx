@@ -8,8 +8,8 @@ import { useTierFlags } from '@/hooks/useTierFlags';
 const PRIORITIES: RecPriority[] = ['critical', 'high', 'medium', 'low'];
 
 const STATUS_CONFIG = {
-  open:      { label: 'Open',     cls: 'text-sky-700 bg-sky-50 border-sky-200',          icon: Circle },
-  resolved:  { label: 'Resolved', cls: 'text-emerald-700 bg-emerald-50 border-emerald-200', icon: CheckCircle2 },
+  open:      { label: 'Open',     cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',          icon: Circle },
+  resolved:  { label: 'Resolved', cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]', icon: CheckCircle2 },
   dismissed: { label: 'Dismissed', cls: 'text-slate-500 bg-slate-50 border-slate-200',   icon: XCircle },
 };
 
@@ -51,7 +51,7 @@ export default function RecommendationsManager() {
                 <span className="text-[10px] text-muted-foreground">Reset all overrides?</span>
                 <button
                   onClick={() => { resetActionItemOverrides(); setConfirmReset(false); }}
-                  className="text-[10px] font-semibold text-rose-600 hover:underline"
+                  className="text-[10px] font-semibold text-[#A93F2F] hover:underline"
                 >
                   Confirm
                 </button>

@@ -5,9 +5,9 @@ import { curriculumModules, curriculumPrograms, curriculumHealthIssues } from '@
 
 const ARCHITECTURE_LAYERS = [
   { id: 'structure', label: 'Program Structure', color: 'border-primary/30 bg-primary/5 text-primary', chipColor: 'bg-primary/10 text-primary border-primary/20', icon: GraduationCap, items: ['Programs', 'Cohorts', 'Sprints', 'Modules'], path: '/curriculum/modules' },
-  { id: 'learning', label: 'Learning Assets', color: 'border-amber-300 bg-amber-50/50 text-amber-800', chipColor: 'bg-amber-50 text-amber-800 border-amber-200', icon: BookOpen, items: ['Lessons', 'Assessments', 'Knowledge Articles', 'Resources'], path: '/curriculum/lessons' },
+  { id: 'learning', label: 'Learning Assets', color: 'border-[#FFD08A] bg-[#FFF3E0]/50 text-[#CC8400]', chipColor: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]', icon: BookOpen, items: ['Lessons', 'Assessments', 'Knowledge Articles', 'Resources'], path: '/curriculum/lessons' },
   { id: 'penny', label: 'Penny Assets', color: 'border-secondary/30 bg-secondary/5 text-secondary', chipColor: 'bg-secondary/10 text-secondary border-secondary/20', icon: Sparkles, items: ['Coaching Prompts', 'Reflection Prompts', 'Trail Quests', 'Weekly Reviews'], path: '/curriculum/coaching-prompts' },
-  { id: 'delivery', label: 'Delivery Assets', color: 'border-green-300 bg-green-50/50 text-green-800', chipColor: 'bg-green-50 text-green-800 border-green-200', icon: Radio, items: ['Slack Activities', 'Google Chat', 'Calendar Events', 'Office Hours'], path: '/curriculum/slack-activities' },
+  { id: 'delivery', label: 'Delivery Assets', color: 'border-green-300 bg-[#E6F0EA]/50 text-[#245531]', chipColor: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]', icon: Radio, items: ['Slack Activities', 'Google Chat', 'Calendar Events', 'Office Hours'], path: '/curriculum/slack-activities' },
 ];
 
 export default function CurriculumOverview() {
@@ -32,9 +32,9 @@ export default function CurriculumOverview() {
           </p>
         </div>
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3">
-          <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-          <p className="text-[12px] text-amber-800">
+        <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-[#CC8400] mt-0.5 shrink-0" />
+          <p className="text-[12px] text-[#CC8400]">
             <strong>Prototype — Content Architecture Layer.</strong> Foundations Trail is the primary fully-connected example.
             All 12 modules model the four-layer relationship architecture. Module 2.1 is the standards reference.
           </p>
@@ -91,8 +91,8 @@ export default function CurriculumOverview() {
               <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Fully-Connected Example</p>
               <span className="text-[10px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5">★ Module 2.1 — Foundations Trail</span>
             </div>
-            <div className="rounded-lg border-2 border-sky-200 bg-sky-50/30 p-4">
-              <p className="text-[13px] font-bold text-sky-900 mb-3">{mod21.name as string} · {mod21.sprint as string}</p>
+            <div className="rounded-lg border-2 border-[#7FAFC6] bg-[#EDF5F8]/30 p-4">
+              <p className="text-[13px] font-bold text-[#2F6F7E] mb-3">{mod21.name as string} · {mod21.sprint as string}</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {[
                   { label: 'Lessons', count: (mod21.lessonIds as string[]).length, path: '/curriculum/lessons' },
@@ -102,13 +102,13 @@ export default function CurriculumOverview() {
                   { label: 'Reflection Prompts', count: (mod21.reflectionPromptIds as string[]).length, path: '/curriculum/reflection-prompts' },
                   { label: 'Delivery Assets', count: (mod21.slackActivityIds as string[]).length + (mod21.calendarEventIds as string[]).length, path: '/curriculum/slack-activities' },
                 ].map(rel => (
-                  <button key={rel.label} onClick={() => setLocation(rel.path)} className="flex items-center gap-2 rounded-md border border-sky-200 bg-white px-3 py-2 text-left hover:border-sky-400 transition-colors">
-                    <CheckCircle2 className="w-3 h-3 text-green-600 shrink-0" />
-                    <span className="text-[11px] font-medium text-sky-800">{rel.count} {rel.label}</span>
+                  <button key={rel.label} onClick={() => setLocation(rel.path)} className="flex items-center gap-2 rounded-md border border-[#7FAFC6] bg-white px-3 py-2 text-left hover:border-[#7FAFC6] transition-colors">
+                    <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
+                    <span className="text-[11px] font-medium text-[#2F6F7E]">{rel.count} {rel.label}</span>
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-sky-700 mt-2 italic">Use Module 2.1 as the content architecture standard — all future modules should reach this level of completeness.</p>
+              <p className="text-[11px] text-[#2F6F7E] mt-2 italic">Use Module 2.1 as the content architecture standard — all future modules should reach this level of completeness.</p>
             </div>
           </div>
         )}
@@ -128,11 +128,11 @@ export default function CurriculumOverview() {
           <div className="space-y-2">
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">High-Priority Health Issues</p>
             {highIssues.map(issue => (
-              <div key={issue.id} className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50/50 px-4 py-3">
-                <AlertTriangle className="w-3.5 h-3.5 text-red-600 mt-0.5 shrink-0" />
+              <div key={issue.id} className="flex items-start gap-3 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]/50 px-4 py-3">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[12px] font-semibold text-red-900">{issue.name as string}</p>
-                  <p className="text-[11px] text-red-700">{issue.actionRequired as string}</p>
+                  <p className="text-[12px] font-semibold text-[#A93F2F]">{issue.name as string}</p>
+                  <p className="text-[11px] text-[#A93F2F]">{issue.actionRequired as string}</p>
                 </div>
               </div>
             ))}

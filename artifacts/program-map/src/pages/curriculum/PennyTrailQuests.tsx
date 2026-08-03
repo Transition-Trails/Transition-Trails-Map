@@ -25,15 +25,15 @@ export default function PennyTrailQuests() {
               <button
                 key={quest.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: quest.id, data: quest })}
-                className="rounded-xl border border-border bg-white p-5 text-left hover:border-emerald-200 hover:shadow-sm transition-all"
+                className="rounded-xl border border-border bg-white p-5 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 text-emerald-600 shrink-0" />
+                    <Star className="w-5 h-5 text-[#2F6B3F] shrink-0" />
                     <div>
                       <p className="text-[14px] font-bold text-foreground">{quest.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] font-medium text-emerald-700 border border-emerald-200 bg-emerald-50 rounded-full px-1.5 py-0.5">{quest.questType as string}</span>
+                        <span className="text-[10px] font-medium text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-1.5 py-0.5">{quest.questType as string}</span>
                         <span className="text-[10px] font-medium text-slate-600">{quest.difficulty as string} · {quest.estimatedTime as string}</span>
                       </div>
                     </div>
@@ -49,7 +49,7 @@ export default function PennyTrailQuests() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Completion Criteria</p>
                     {(quest.criteria as string[]).map((criterion, i) => (
                       <div key={i} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                        <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
                         <p className="text-[11px] text-foreground/80">{criterion}</p>
                       </div>
                     ))}

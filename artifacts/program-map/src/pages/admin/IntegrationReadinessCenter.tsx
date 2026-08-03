@@ -48,7 +48,7 @@ function ViewTab({ label, active, count, onClick }: {
 }
 
 function ReadinessBar({ score, cls }: { score: number; cls?: string }) {
-  const color = score >= 70 ? 'bg-green-500' : score >= 40 ? 'bg-amber-500' : score >= 20 ? 'bg-rose-500' : 'bg-slate-300';
+  const color = score >= 70 ? 'bg-[#2F6B3F]' : score >= 40 ? 'bg-[#FFF3E0]0' : score >= 20 ? 'bg-[#FBEAE6]0' : 'bg-slate-300';
   return (
     <div className="flex items-center gap-2">
       <div className={`flex-1 h-2 rounded-full bg-border overflow-hidden ${cls}`}>
@@ -175,7 +175,7 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
         {i.relatedSfObjects.length > 0 && (
           <Sec id="sf" label={`Salesforce Objects (${i.relatedSfObjects.length})`}>
             <div className="flex flex-wrap gap-1">
-              {i.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-blue-900 bg-blue-50 border border-blue-100 rounded-full px-2 py-0.5">{o}</span>)}
+              {i.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)}
             </div>
           </Sec>
         )}
@@ -183,11 +183,11 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
         {/* Blockers */}
         {i.blockers.length > 0 && (
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-rose-700/80">Blockers ({i.blockers.length})</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#A93F2F]/80">Blockers ({i.blockers.length})</p>
             {i.blockers.map((b, idx) => (
-              <div key={idx} className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-2">
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-rose-900 leading-snug">{b}</p>
+              <div key={idx} className="flex items-start gap-2 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
+                <p className="text-[11px] text-[#A93F2F] leading-snug">{b}</p>
               </div>
             ))}
           </div>
@@ -199,8 +199,8 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
             <div className="space-y-1.5">
               {i.risks.map((r, idx) => (
                 <div key={idx} className="flex items-start gap-1.5">
-                  <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-amber-900 leading-snug">{r}</p>
+                  <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-[#CC8400] leading-snug">{r}</p>
                 </div>
               ))}
             </div>
@@ -235,8 +235,8 @@ function OverviewView() {
           {[
             { label: 'Integrations',  value: IRC_SUMMARY.total,               sub: 'planned',         cls: 'border-foreground/20 bg-foreground/5' },
             { label: 'P1 Priority',   value: IRC_SUMMARY.p1Count,             sub: 'critical path',   cls: 'border-primary/20 bg-primary/5' },
-            { label: 'Open Risks',    value: IRC_SUMMARY.openRisks,           sub: 'need mitigation', cls: 'border-amber-200 bg-amber-50' },
-            { label: 'Avg Readiness', value: `${IRC_SUMMARY.avgReadiness}%`,  sub: 'overall score',   cls: IRC_SUMMARY.avgReadiness >= 50 ? 'border-green-200 bg-green-50' : 'border-rose-200 bg-rose-50' },
+            { label: 'Open Risks',    value: IRC_SUMMARY.openRisks,           sub: 'need mitigation', cls: 'border-[#FFD08A] bg-[#FFF3E0]' },
+            { label: 'Avg Readiness', value: `${IRC_SUMMARY.avgReadiness}%`,  sub: 'overall score',   cls: IRC_SUMMARY.avgReadiness >= 50 ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#E8B9B4] bg-[#FBEAE6]' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 text-center ${s.cls}`}>
               <p className="text-xl font-bold text-foreground">{s.value}</p>
@@ -299,9 +299,9 @@ function OverviewView() {
           <h3 className="text-[12px] font-bold text-foreground mb-2">Launch Phases</h3>
           <div className="space-y-2">
             {launchMilestones.map(ms => {
-              const stsCls = ms.status === 'In Planning' ? 'text-amber-700 bg-amber-50 border-amber-200'
-                           : ms.status === 'In Progress' ? 'text-blue-700 bg-blue-50 border-blue-200'
-                           : ms.status === 'Complete' ? 'text-green-700 bg-green-50 border-green-200'
+              const stsCls = ms.status === 'In Planning' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
+                           : ms.status === 'In Progress' ? 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]'
+                           : ms.status === 'Complete' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
                            : 'text-slate-500 bg-slate-50 border-slate-200';
               return (
                 <div key={ms.id} className="rounded-xl border border-border bg-white p-3 flex items-start gap-3">
@@ -517,9 +517,9 @@ function AuthView() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-4 py-2 border-b border-border bg-amber-50/60 flex-shrink-0 flex items-center gap-2">
-        <Lock className="w-3 h-3 text-rose-600 shrink-0" />
-        <p className="text-[11px] text-rose-800 font-medium">Access planning only — no credentials stored here. Do not enter credentials until security review is complete.</p>
+      <div className="px-4 py-2 border-b border-border bg-[#FFF3E0]/60 flex-shrink-0 flex items-center gap-2">
+        <Lock className="w-3 h-3 text-[#A93F2F] shrink-0" />
+        <p className="text-[11px] text-[#A93F2F] font-medium">Access planning only — no credentials stored here. Do not enter credentials until security review is complete.</p>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-3">
@@ -552,7 +552,7 @@ function AuthView() {
                               <Lock className="w-3 h-3 text-muted-foreground shrink-0 mt-0.5" />
                               <code className="font-mono font-bold text-foreground bg-muted/40 rounded px-1 text-[10px]">{a.scope}</code>
                               <span className="text-muted-foreground flex-1">{a.purpose}</span>
-                              <span className={`text-[9px] font-bold shrink-0 ${a.minimumRequired ? 'text-rose-700' : 'text-slate-500'}`}>
+                              <span className={`text-[9px] font-bold shrink-0 ${a.minimumRequired ? 'text-[#A93F2F]' : 'text-slate-500'}`}>
                                 {a.minimumRequired ? 'Required' : 'Optional'}
                               </span>
                               <span className="text-[10px] text-muted-foreground/60 shrink-0">{a.approver}</span>
@@ -579,9 +579,9 @@ function FieldMappingView() {
   const int = integrations.find(i => i.id === selectedId) ?? integrations[0];
 
   const statusCls = {
-    Confirmed: 'text-green-700 bg-green-50 border-green-200',
-    Proposed:  'text-amber-700 bg-amber-50 border-amber-200',
-    Blocked:   'text-rose-700 bg-rose-50 border-rose-200',
+    Confirmed: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
+    Proposed:  'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+    Blocked:   'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
     TBD:       'text-slate-500 bg-slate-50 border-slate-200',
   };
 
@@ -632,7 +632,7 @@ function FieldMappingView() {
                 </div>
                 {int.fieldMappings.map((fm, i) => (
                   <div key={i} className={`grid grid-cols-[1fr_1fr_100px_80px] gap-2 px-4 py-3 items-start ${i < int.fieldMappings.length - 1 ? 'border-b border-border' : ''}`}>
-                    <code className="text-[10px] font-mono font-bold text-blue-900 bg-blue-50 rounded px-1.5 py-0.5 leading-snug">{fm.sourceField}</code>
+                    <code className="text-[10px] font-mono font-bold text-[#2F6F7E] bg-[#EDF5F8] rounded px-1.5 py-0.5 leading-snug">{fm.sourceField}</code>
                     <code className="text-[10px] font-mono font-bold text-primary bg-primary/10 rounded px-1.5 py-0.5 leading-snug">{fm.targetField}</code>
                     <p className="text-[10px] text-muted-foreground leading-snug">{fm.direction}</p>
                     <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 self-start ${statusCls[fm.status]}`}>{fm.status}</span>
@@ -664,9 +664,9 @@ function SyncReadinessView() {
   const activeInts = integrations.filter(i => i.status !== 'Future');
 
   const checkStatusCls = {
-    Pass:        'text-green-700 bg-green-50 border-green-200',
-    Fail:        'text-rose-700 bg-rose-50 border-rose-200',
-    Partial:     'text-amber-700 bg-amber-50 border-amber-200',
+    Pass:        'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
+    Fail:        'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+    Partial:     'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
     'Not Started': 'text-slate-500 bg-slate-50 border-slate-200',
   };
 
@@ -784,19 +784,19 @@ function TestingChecklistView() {
               return (
                 <button key={key} onClick={() => toggleCheck(key)}
                   className={`w-full text-left rounded-xl border p-3 transition-all ${
-                    done ? 'border-green-200 bg-green-50' : 'border-border bg-white hover:border-foreground/20'
+                    done ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-border bg-white hover:border-foreground/20'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`w-5 h-5 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center transition-all ${
-                      done ? 'bg-green-600 border-green-600' : 'border-border'
+                      done ? 'bg-[#2F6B3F] border-[#2F6B3F]' : 'border-border'
                     }`}>
                       {done && <CheckCircle2 className="w-3 h-3 text-white" />}
                     </div>
                     <div>
-                      <p className={`text-[12px] font-bold ${done ? 'text-green-900 line-through' : 'text-foreground'}`}>{check.check}</p>
-                      <p className={`text-[11px] mt-0.5 ${done ? 'text-green-700' : 'text-muted-foreground'}`}>{check.description}</p>
-                      {check.notes && <p className={`text-[10px] mt-1 font-semibold italic ${done ? 'text-green-700' : 'text-primary/70'}`}>Note: {check.notes}</p>}
+                      <p className={`text-[12px] font-bold ${done ? 'text-[#245531] line-through' : 'text-foreground'}`}>{check.check}</p>
+                      <p className={`text-[11px] mt-0.5 ${done ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>{check.description}</p>
+                      {check.notes && <p className={`text-[10px] mt-1 font-semibold italic ${done ? 'text-[#2F6B3F]' : 'text-primary/70'}`}>Note: {check.notes}</p>}
                     </div>
                   </div>
                 </button>
@@ -817,24 +817,24 @@ function RiskRegisterView() {
   const filtered = filterSeverity === 'all' ? risks : risks.filter(r => r.severity === filterSeverity);
 
   const sevCls = {
-    Critical: 'text-red-800 bg-red-50 border-red-200',
-    High:     'text-rose-700 bg-rose-50 border-rose-200',
-    Medium:   'text-amber-700 bg-amber-50 border-amber-200',
+    Critical: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+    High:     'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+    Medium:   'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
     Low:      'text-slate-600 bg-slate-50 border-slate-200',
   };
   const likelyCls = {
-    Likely:   'text-rose-700 bg-rose-50 border-rose-200',
-    Possible: 'text-amber-700 bg-amber-50 border-amber-200',
+    Likely:   'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+    Possible: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
     Unlikely: 'text-slate-500 bg-slate-50 border-slate-200',
   };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0 flex items-center gap-3">
-        <span className="text-[10px] font-bold text-red-800 border border-red-200 bg-red-50 rounded-full px-2 py-0.5">
+        <span className="text-[10px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-2 py-0.5">
           {risks.filter(r => r.severity === 'Critical' && r.status === 'Open').length} Critical Open
         </span>
-        <span className="text-[10px] font-bold text-amber-700 border border-amber-200 bg-amber-50 rounded-full px-2 py-0.5">
+        <span className="text-[10px] font-bold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-2 py-0.5">
           {risks.filter(r => r.severity === 'High' && r.status === 'Open').length} High Open
         </span>
         <div className="ml-auto flex items-center gap-2">
@@ -848,16 +848,16 @@ function RiskRegisterView() {
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-2">
           {filtered.map(risk => (
-            <div key={risk.id} className={`rounded-xl border p-4 ${risk.severity === 'Critical' ? 'border-red-200 bg-red-50' : risk.severity === 'High' ? 'border-rose-200 bg-rose-50' : 'border-border bg-white'}`}>
+            <div key={risk.id} className={`rounded-xl border p-4 ${risk.severity === 'Critical' ? 'border-[#E8B9B4] bg-[#FBEAE6]' : risk.severity === 'High' ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-border bg-white'}`}>
               <div className="flex items-start gap-2 mb-2">
-                <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${risk.severity === 'Critical' ? 'text-red-700' : risk.severity === 'High' ? 'text-rose-600' : 'text-amber-600'}`} />
+                <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <p className={`text-[13px] font-bold ${risk.severity === 'Critical' ? 'text-red-900' : risk.severity === 'High' ? 'text-rose-900' : 'text-foreground'}`}>{risk.title}</p>
+                    <p className={`text-[13px] font-bold ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-foreground'}`}>{risk.title}</p>
                     <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${sevCls[risk.severity]}`}>{risk.severity}</span>
                     <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${likelyCls[risk.likelihood]}`}>{risk.likelihood}</span>
                   </div>
-                  <p className={`text-[11px] leading-snug ${risk.severity === 'Critical' ? 'text-red-800' : risk.severity === 'High' ? 'text-rose-800' : 'text-muted-foreground'}`}>{risk.description}</p>
+                  <p className={`text-[11px] leading-snug ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-muted-foreground'}`}>{risk.description}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 mt-2">
@@ -868,7 +868,7 @@ function RiskRegisterView() {
                 <div className="rounded-lg border border-white/80 bg-white/60 p-2">
                   <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Owner · Status</p>
                   <p className="text-[11px] text-foreground">{risk.owner}</p>
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${risk.status === 'Open' ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-green-700 bg-green-50 border-green-200'}`}>{risk.status}</span>
+                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${risk.status === 'Open' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'}`}>{risk.status}</span>
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
@@ -893,9 +893,9 @@ function LaunchPlanView() {
 
   const stsCls = {
     'Not Started': 'text-slate-500 bg-slate-50 border-slate-200',
-    'In Planning': 'text-amber-700 bg-amber-50 border-amber-200',
-    'In Progress': 'text-blue-700 bg-blue-50 border-blue-200',
-    'Complete':    'text-green-700 bg-green-50 border-green-200',
+    'In Planning': 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+    'In Progress': 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+    'Complete':    'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
   };
 
   return (
@@ -970,13 +970,13 @@ function LaunchPlanView() {
           </div>
 
           {/* Success criteria */}
-          <div className="rounded-xl border border-green-200 bg-green-50 p-4">
-            <p className="text-[11px] font-bold text-green-800 mb-2">Success Criteria</p>
+          <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA] p-4">
+            <p className="text-[11px] font-bold text-[#245531] mb-2">Success Criteria</p>
             <div className="space-y-1.5">
               {ms.successCriteria.map((sc, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-green-900 leading-snug">{sc}</p>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-[#245531] leading-snug">{sc}</p>
                 </div>
               ))}
             </div>
@@ -1011,7 +1011,7 @@ export default function IntegrationReadinessCenter() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {IRC_SUMMARY.criticalRisks > 0 && (
-              <span className="text-[11px] font-semibold text-red-800 border border-red-200 bg-red-50 rounded-full px-3 py-1">
+              <span className="text-[11px] font-semibold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-3 py-1">
                 {IRC_SUMMARY.criticalRisks} Critical Risks
               </span>
             )}

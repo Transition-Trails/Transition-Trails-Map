@@ -28,19 +28,19 @@ export interface WorkspaceTab {
 
 export function HealthDot({ health }: { health?: WorkspaceHealth }) {
   const cls =
-    health === 'healthy'          ? 'bg-emerald-500' :
-    health === 'needs-attention'  ? 'bg-amber-500'   :
-    health === 'incomplete'       ? 'bg-rose-500'    : 'bg-gray-300';
+    health === 'healthy'          ? 'bg-[#E6F0EA]0' :
+    health === 'needs-attention'  ? 'bg-[#FFF3E0]0'   :
+    health === 'incomplete'       ? 'bg-[#FBEAE6]0'    : 'bg-gray-300';
   return <span className={`inline-block w-1.5 h-1.5 rounded-full shrink-0 ${cls}`} />;
 }
 
 export function StatusBadge({ status, variant }: { status?: string; variant?: string }) {
   if (!status) return null;
   const cls =
-    variant === 'active'   ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+    variant === 'active'   ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' :
     variant === 'inactive' ? 'bg-slate-50 text-slate-500 border-slate-200'       :
-    variant === 'draft'    ? 'bg-sky-50 text-sky-700 border-sky-200'             :
-    variant === 'planning' ? 'bg-indigo-50 text-indigo-700 border-indigo-200'    :
+    variant === 'draft'    ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'             :
+    variant === 'planning' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'    :
                              'bg-muted text-muted-foreground border-border';
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>
@@ -51,7 +51,7 @@ export function StatusBadge({ status, variant }: { status?: string; variant?: st
 
 export function ConfidencePill({ value }: { value?: number }) {
   if (value === undefined) return null;
-  const cls = value >= 85 ? 'text-emerald-600' : value >= 70 ? 'text-amber-600' : 'text-rose-600';
+  const cls = value >= 85 ? 'text-[#2F6B3F]' : value >= 70 ? 'text-[#CC8400]' : 'text-[#A93F2F]';
   return <span className={`text-[10px] font-bold tabular-nums ${cls}`}>{value}%</span>;
 }
 
@@ -136,7 +136,7 @@ export function ObjectWorkspace({
                     <div className="flex items-center gap-1 shrink-0">
                       {item.health && <HealthDot health={item.health} />}
                       {item.confidence !== undefined && (
-                        <span className={`text-[9px] font-bold tabular-nums ${isActive ? 'text-primary-foreground/80' : item.confidence >= 85 ? 'text-emerald-600' : item.confidence >= 70 ? 'text-amber-600' : 'text-rose-600'}`}>
+                        <span className={`text-[9px] font-bold tabular-nums ${isActive ? 'text-primary-foreground/80' : item.confidence >= 85 ? 'text-[#2F6B3F]' : item.confidence >= 70 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
                           {item.confidence}%
                         </span>
                       )}

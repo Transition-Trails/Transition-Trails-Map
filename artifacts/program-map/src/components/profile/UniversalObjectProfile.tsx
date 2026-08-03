@@ -13,34 +13,34 @@ import { PROFILE_MAP } from '@/data/universalObjectProfileData';
 // ── Shared helpers ─────────────────────────────────────────────────────────────
 
 const HEALTH_CONFIG: Record<ProfileHealthStatus, { icon: typeof CheckCircle2; color: string; label: string }> = {
-  'healthy':        { icon: CheckCircle2,   color: 'text-emerald-600', label: 'Healthy'        },
-  'needs-attention':{ icon: AlertTriangle,  color: 'text-amber-600',   label: 'Needs Attention'},
-  'incomplete':     { icon: XCircle,        color: 'text-rose-600',    label: 'Incomplete'     },
+  'healthy':        { icon: CheckCircle2,   color: 'text-[#2F6B3F]', label: 'Healthy'        },
+  'needs-attention':{ icon: AlertTriangle,  color: 'text-[#CC8400]',   label: 'Needs Attention'},
+  'incomplete':     { icon: XCircle,        color: 'text-[#A93F2F]',    label: 'Incomplete'     },
   'unknown':        { icon: HelpCircle,     color: 'text-muted-foreground', label: 'Unknown'   },
 };
 
 const INDICATOR_DOT: Record<string, string> = {
-  'healthy':'bg-emerald-500', 'warning':'bg-amber-500', 'critical':'bg-rose-600', 'unknown':'bg-muted-foreground/40',
+  'healthy':'bg-[#E6F0EA]0', 'warning':'bg-[#FFF3E0]0', 'critical':'bg-[#A93F2F]', 'unknown':'bg-muted-foreground/40',
 };
 
 const ACTIVITY_ICON: Record<string, typeof Clock> = {
   'decision': Shield, 'review': CheckCircle2, 'change': Zap, 'health-event': Activity, 'update': Clock,
 };
 const ACTIVITY_COLOR: Record<string, string> = {
-  'decision':'text-violet-600', 'review':'text-emerald-600', 'change':'text-sky-600', 'health-event':'text-amber-600', 'update':'text-muted-foreground',
+  'decision':'text-[#2F6F7E]', 'review':'text-[#2F6B3F]', 'change':'text-[#2F6F7E]', 'health-event':'text-[#CC8400]', 'update':'text-muted-foreground',
 };
 
 const STATUS_STYLE: Record<string, string> = {
-  'active':'bg-emerald-100 text-emerald-800 border-emerald-200',
+  'active':'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
   'inactive':'bg-muted text-muted-foreground border-border',
-  'draft':'bg-amber-100 text-amber-800 border-amber-200',
-  'planning':'bg-sky-100 text-sky-800 border-sky-200',
+  'draft':'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  'planning':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
 };
 
 const COMPLIANCE_CONFIG: Record<string, { color: string; label: string }> = {
-  'compliant':    { color: 'bg-emerald-100 text-emerald-800 border-emerald-200', label: 'Compliant'     },
-  'partial':      { color: 'bg-amber-100 text-amber-800 border-amber-200',       label: 'Partial'       },
-  'non-compliant':{ color: 'bg-rose-100 text-rose-800 border-rose-200',          label: 'Non-Compliant' },
+  'compliant':    { color: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]', label: 'Compliant'     },
+  'partial':      { color: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',       label: 'Partial'       },
+  'non-compliant':{ color: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',          label: 'Non-Compliant' },
   'not-assessed': { color: 'bg-muted text-muted-foreground border-border',        label: 'Not Assessed'  },
 };
 
@@ -93,7 +93,7 @@ function OverviewTab({ p }: { p: ObjectProfile }) {
         <div>
           <SectionLabel>Owner</SectionLabel>
           <Card>
-            <p className="text-[11px] font-semibold text-blue-700">{p.ownership.primary}</p>
+            <p className="text-[11px] font-semibold text-[#2F6F7E]">{p.ownership.primary}</p>
             {p.ownership.secondary && <p className="text-[10px] text-muted-foreground">{p.ownership.secondary}</p>}
             <p className="text-[10px] text-muted-foreground">{p.ownership.team}</p>
           </Card>
@@ -112,14 +112,14 @@ function OverviewTab({ p }: { p: ObjectProfile }) {
       <div className="grid grid-cols-2 gap-2">
         <div>
           <SectionLabel>Source of Truth</SectionLabel>
-          <Card><span className="text-[11px] font-medium bg-teal-50 border border-teal-200 text-teal-700 px-1.5 py-0.5 rounded">{p.overview.keyFacts.find(f=>f.label.toLowerCase().includes('object') || f.label.toLowerCase().includes('source')) ? 'Salesforce' : 'See Systems tab'}</span></Card>
+          <Card><span className="text-[11px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded">{p.overview.keyFacts.find(f=>f.label.toLowerCase().includes('object') || f.label.toLowerCase().includes('source')) ? 'Salesforce' : 'See Systems tab'}</span></Card>
         </div>
         <div>
           <SectionLabel>Confidence</SectionLabel>
           <Card>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className={`h-full rounded-full ${p.confidence >= 80 ? 'bg-emerald-500' : p.confidence >= 60 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${p.confidence}%` }} />
+                <div className={`h-full rounded-full ${p.confidence >= 80 ? 'bg-[#E6F0EA]0' : p.confidence >= 60 ? 'bg-[#FFF3E0]0' : 'bg-[#FBEAE6]0'}`} style={{ width: `${p.confidence}%` }} />
               </div>
               <span className="text-[11px] font-bold text-foreground">{p.confidence}%</span>
             </div>
@@ -176,11 +176,11 @@ function OwnershipTab({ p }: { p: ObjectProfile }) {
         <SectionLabel>Owner Roles</SectionLabel>
         <div className="space-y-1.5">
           {[p.ownership.primary, p.ownership.secondary].filter(Boolean).map((owner, i) => (
-            <div key={owner} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-blue-200 bg-blue-50">
-              <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-[9px] font-bold text-white shrink-0">{i + 1}</div>
+            <div key={owner} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]">
+              <div className="w-5 h-5 rounded-full bg-[#2F6F7E] flex items-center justify-center text-[9px] font-bold text-white shrink-0">{i + 1}</div>
               <div>
-                <p className="text-[12px] font-semibold text-blue-900">{owner}</p>
-                <p className="text-[10px] text-blue-700">{i === 0 ? 'Primary — final accountability' : 'Secondary — operational responsibility'}</p>
+                <p className="text-[12px] font-semibold text-[#2F6F7E]">{owner}</p>
+                <p className="text-[10px] text-[#2F6F7E]">{i === 0 ? 'Primary — final accountability' : 'Secondary — operational responsibility'}</p>
               </div>
             </div>
           ))}
@@ -201,9 +201,9 @@ function OwnershipTab({ p }: { p: ObjectProfile }) {
           <SectionLabel>Accountability Gaps</SectionLabel>
           <div className="space-y-1">
             {p.ownership.accountabilityGaps.map(g => (
-              <div key={g} className="flex items-start gap-2 px-3 py-2 rounded-lg border border-amber-200 bg-amber-50">
-                <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-amber-900">{g}</p>
+              <div key={g} className="flex items-start gap-2 px-3 py-2 rounded-lg border border-[#FFD08A] bg-[#FFF3E0]">
+                <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
+                <p className="text-[11px] text-[#CC8400]">{g}</p>
               </div>
             ))}
           </div>
@@ -219,9 +219,9 @@ function HealthTab({ p }: { p: ObjectProfile }) {
   return (
     <div className="space-y-4">
       <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${
-        p.health.overall === 'healthy' ? 'border-emerald-200 bg-emerald-50'
-        : p.health.overall === 'needs-attention' ? 'border-amber-200 bg-amber-50'
-        : 'border-rose-200 bg-rose-50'
+        p.health.overall === 'healthy' ? 'border-[#9FC3AE] bg-[#E6F0EA]'
+        : p.health.overall === 'needs-attention' ? 'border-[#FFD08A] bg-[#FFF3E0]'
+        : 'border-[#E8B9B4] bg-[#FBEAE6]'
       }`}>
         <HIcon className={`w-5 h-5 shrink-0 ${hCfg.color}`} />
         <div>
@@ -239,7 +239,7 @@ function HealthTab({ p }: { p: ObjectProfile }) {
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <p className="text-[12px] font-semibold text-foreground">{ind.name}</p>
                   <span className="text-[11px] font-medium text-foreground/70">{ind.value}</span>
-                  <span className="text-[9px] bg-teal-50 border border-teal-200 text-teal-700 rounded px-1">{ind.source}</span>
+                  <span className="text-[9px] bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] rounded px-1">{ind.source}</span>
                 </div>
                 {ind.note && <p className="text-[10px] text-muted-foreground mt-0.5">{ind.note}</p>}
               </div>
@@ -265,7 +265,7 @@ function HistoryTab({ p }: { p: ObjectProfile }) {
                   <span className="text-[9px] text-muted-foreground shrink-0">{d.date}</span>
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{d.description}</p>
-                <p className="text-[10px] text-violet-700 mt-1">Impact: {d.impact}</p>
+                <p className="text-[10px] text-[#2F6F7E] mt-1">Impact: {d.impact}</p>
               </Card>
             ))}
           </div>
@@ -279,7 +279,7 @@ function HistoryTab({ p }: { p: ObjectProfile }) {
               <div key={c.description} className="flex items-start gap-2 px-3 py-1.5 rounded border border-border bg-white">
                 <span className="text-[9px] text-muted-foreground shrink-0 mt-0.5 w-14">{c.date}</span>
                 <div className="flex-1 min-w-0">
-                  <span className="text-[9px] font-bold text-sky-700 uppercase tracking-wide mr-1">{c.type}</span>
+                  <span className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wide mr-1">{c.type}</span>
                   <span className="text-[11px] text-foreground">{c.description}</span>
                   <span className="text-[10px] text-muted-foreground ml-1">— {c.by}</span>
                 </div>
@@ -293,9 +293,9 @@ function HistoryTab({ p }: { p: ObjectProfile }) {
           <SectionLabel>Lessons Learned</SectionLabel>
           <div className="space-y-1">
             {p.history.lessonsLearned.map(l => (
-              <div key={l} className="flex items-start gap-2 px-3 py-2 rounded-lg border border-indigo-200 bg-indigo-50">
-                <span className="text-indigo-500 shrink-0 text-[11px]">💡</span>
-                <p className="text-[11px] text-indigo-900 leading-relaxed">{l}</p>
+              <div key={l} className="flex items-start gap-2 px-3 py-2 rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]">
+                <span className="text-[#2F6F7E] shrink-0 text-[11px]">💡</span>
+                <p className="text-[11px] text-[#2F6F7E] leading-relaxed">{l}</p>
               </div>
             ))}
           </div>
@@ -327,8 +327,8 @@ function StandardsTab({ p }: { p: ObjectProfile }) {
             {s.gaps.length > 0 && (
               <div className="mt-2 space-y-1">
                 {s.gaps.map(g => (
-                  <div key={g} className="flex items-start gap-1.5 text-[10px] text-amber-800">
-                    <AlertTriangle className="w-2.5 h-2.5 text-amber-600 shrink-0 mt-0.5" />
+                  <div key={g} className="flex items-start gap-1.5 text-[10px] text-[#CC8400]">
+                    <AlertTriangle className="w-2.5 h-2.5 text-[#CC8400] shrink-0 mt-0.5" />
                     {g}
                   </div>
                 ))}
@@ -350,10 +350,10 @@ function KnowledgeTab({ p }: { p: ObjectProfile }) {
           <div className="space-y-1.5">
             {p.knowledge.sources.map(s => (
               <div key={s.name} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-white">
-                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.pennyApproved ? 'bg-violet-500' : 'bg-muted-foreground/30'}`} />
+                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.pennyApproved ? 'bg-[#EDF5F8]0' : 'bg-muted-foreground/30'}`} />
                 <p className="text-[12px] text-foreground flex-1">{s.name}</p>
-                <span className="text-[9px] bg-teal-50 border border-teal-200 text-teal-700 rounded px-1">{s.trustLevel}</span>
-                {s.pennyApproved && <span className="text-[9px] bg-violet-50 border border-violet-200 text-violet-700 rounded px-1">{TERMS.aiAssistant} ✓</span>}
+                <span className="text-[9px] bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] rounded px-1">{s.trustLevel}</span>
+                {s.pennyApproved && <span className="text-[9px] bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] rounded px-1">{TERMS.aiAssistant} ✓</span>}
               </div>
             ))}
           </div>
@@ -367,7 +367,7 @@ function KnowledgeTab({ p }: { p: ObjectProfile }) {
               <div key={a.title} className="flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-white">
                 <p className="text-[11px] text-foreground flex-1">{a.title}</p>
                 <span className="text-[9px] text-muted-foreground">{a.type}</span>
-                <span className="text-[9px] text-sky-600">{a.location}</span>
+                <span className="text-[9px] text-[#2F6F7E]">{a.location}</span>
               </div>
             ))}
           </div>
@@ -379,7 +379,7 @@ function KnowledgeTab({ p }: { p: ObjectProfile }) {
           <div className="flex flex-wrap gap-1.5">
             {p.knowledge.driveResources.map(r => (
               <div key={r.name} className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-white text-[11px]">
-                <FolderOpen className="w-3 h-3 text-amber-500 shrink-0" />
+                <FolderOpen className="w-3 h-3 text-[#CC8400] shrink-0" />
                 {r.name}
                 <span className="text-[9px] text-muted-foreground">({r.type})</span>
               </div>
@@ -404,9 +404,9 @@ function PennyTab({ p }: { p: ObjectProfile }) {
             {p.penny.capabilities.map(cap => (
               <Card key={cap.name}>
                 <div className="flex items-center gap-2 mb-0.5">
-                  <Brain className="w-3 h-3 text-pink-600 shrink-0" />
+                  <Brain className="w-3 h-3 text-[#A93F2F] shrink-0" />
                   <p className="text-[12px] font-semibold text-foreground">{cap.name}</p>
-                  <span className="text-[9px] bg-pink-50 border border-pink-200 text-pink-700 rounded px-1">{cap.status}</span>
+                  <span className="text-[9px] bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F] rounded px-1">{cap.status}</span>
                   <span className="text-[9px] text-muted-foreground ml-auto">{cap.quality}</span>
                 </div>
                 <p className="text-[10px] text-muted-foreground">{cap.description}</p>
@@ -423,7 +423,7 @@ function PennyTab({ p }: { p: ObjectProfile }) {
               <div key={t.name} className="flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-white">
                 <p className="text-[11px] text-foreground flex-1">{t.name}</p>
                 <span className="text-[9px] text-muted-foreground">{t.version}</span>
-                <span className={`text-[9px] rounded px-1 ${t.status === 'Approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-muted text-muted-foreground border border-border'}`}>{t.status}</span>
+                <span className={`text-[9px] rounded px-1 ${t.status === 'Approved' ? 'bg-[#E6F0EA] text-[#2F6B3F] border border-[#9FC3AE]' : 'bg-muted text-muted-foreground border border-border'}`}>{t.status}</span>
               </div>
             ))}
           </div>
@@ -434,8 +434,8 @@ function PennyTab({ p }: { p: ObjectProfile }) {
           <SectionLabel>Content Assistant Actions</SectionLabel>
           <div className="space-y-1">
             {p.penny.contentAssistant.map(a => (
-              <div key={a} className="flex items-center gap-2 px-3 py-1.5 rounded border border-violet-200 bg-violet-50 text-[11px] text-violet-900">
-                <Zap className="w-2.5 h-2.5 text-violet-600 shrink-0" />
+              <div key={a} className="flex items-center gap-2 px-3 py-1.5 rounded border border-[#7FAFC6] bg-[#EDF5F8] text-[11px] text-[#2F6F7E]">
+                <Zap className="w-2.5 h-2.5 text-[#2F6F7E] shrink-0" />
                 {a}
               </div>
             ))}
@@ -463,7 +463,7 @@ function SystemsTab({ p }: { p: ObjectProfile }) {
           <div className="space-y-1.5">
             {p.systems.salesforce.map(s => (
               <Card key={s.object}>
-                <p className="text-[11px] font-bold text-sky-700 mb-0.5">{s.object}</p>
+                <p className="text-[11px] font-bold text-[#2F6F7E] mb-0.5">{s.object}</p>
                 {s.note && <p className="text-[10px] text-muted-foreground mb-1">{s.note}</p>}
                 <div className="flex flex-wrap gap-1">
                   {s.fields.map(f => <span key={f} className="text-[9px] bg-muted/30 border border-border/60 rounded px-1 py-0.5 text-foreground/70">{f}</span>)}
@@ -480,7 +480,7 @@ function SystemsTab({ p }: { p: ObjectProfile }) {
               <SectionLabel>Google Drive</SectionLabel>
               {p.systems.googleDrive.map(d => (
                 <div key={d.name} className="flex items-center gap-1.5 text-[11px] py-1">
-                  <FolderOpen className="w-3 h-3 text-amber-500 shrink-0" />
+                  <FolderOpen className="w-3 h-3 text-[#CC8400] shrink-0" />
                   <span className="text-foreground/80">{d.name}</span>
                   <span className="text-[9px] text-muted-foreground truncate">{d.path}</span>
                 </div>
@@ -492,7 +492,7 @@ function SystemsTab({ p }: { p: ObjectProfile }) {
               <SectionLabel>Slack</SectionLabel>
               {p.systems.slack.map(s => (
                 <div key={s.name} className="flex items-center gap-1.5 text-[11px] py-1">
-                  <MessageSquare className="w-3 h-3 text-purple-500 shrink-0" />
+                  <MessageSquare className="w-3 h-3 text-[#2F6F7E] shrink-0" />
                   <span className="text-foreground/80">{s.name}</span>
                   <span className="text-[9px] text-muted-foreground">{s.type}</span>
                 </div>
@@ -504,7 +504,7 @@ function SystemsTab({ p }: { p: ObjectProfile }) {
               <SectionLabel>Google Calendar</SectionLabel>
               {p.systems.googleCalendar.map(c => (
                 <div key={c} className="flex items-center gap-1.5 text-[11px] py-1">
-                  <Calendar className="w-3 h-3 text-blue-500 shrink-0" />
+                  <Calendar className="w-3 h-3 text-[#2F6F7E] shrink-0" />
                   <span className="text-foreground/80">{c}</span>
                 </div>
               ))}

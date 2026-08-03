@@ -99,7 +99,7 @@ export const PROFILES: ObjectProfile[] = [
   {
     id: 'foundations-trail',
     objectTypeId: 'program', objectTypeName: 'Program',
-    category: 'Program Layer', categoryColor: 'text-emerald-700', categoryBg: 'bg-emerald-50 border-emerald-200',
+    category: 'Program Layer', categoryColor: 'text-[#2F6B3F]', categoryBg: 'bg-[#E6F0EA] border-[#9FC3AE]',
     name: 'Foundations Trail', status: 'Active', statusVariant: 'active',
     description: 'An 8-week foundational program for career changers. Covers resume, LinkedIn, interview skills, and job search strategy through cohort-based sprints with Penny coaching.',
     confidence: 91,
@@ -237,7 +237,7 @@ export const PROFILES: ObjectProfile[] = [
   {
     id: 'coach-role',
     objectTypeId: 'role', objectTypeName: 'Role',
-    category: 'People Layer', categoryColor: 'text-blue-700', categoryBg: 'bg-blue-50 border-blue-200',
+    category: 'People Layer', categoryColor: 'text-[#2F6F7E]', categoryBg: 'bg-[#EDF5F8] border-[#7FAFC6]',
     name: 'Coach', status: 'Active', statusVariant: 'active',
     description: 'A Coach guides learners through program content, provides personalised feedback, monitors cohort health, and coordinates with Penny AI for learner support.',
     confidence: 74,
@@ -331,7 +331,7 @@ export const PROFILES: ObjectProfile[] = [
   {
     id: 'resume-review-capability',
     objectTypeId: 'penny-capability', objectTypeName: 'Penny Capability',
-    category: 'Intelligence Layer', categoryColor: 'text-pink-700', categoryBg: 'bg-pink-50 border-pink-200',
+    category: 'Intelligence Layer', categoryColor: 'text-[#A93F2F]', categoryBg: 'bg-[#FBEAE6] border-[#E8B9B4]',
     name: 'Resume Review', status: 'Active', statusVariant: 'active',
     description: 'Penny reviews learner resume drafts in Sprint 3, providing structured, actionable feedback on formatting, narrative, impact language, and alignment with target roles.',
     confidence: 88,
@@ -428,7 +428,7 @@ export const PROFILES: ObjectProfile[] = [
   {
     id: 'program-blueprint-v2',
     objectTypeId: 'program-blueprint', objectTypeName: 'Program Blueprint',
-    category: 'Knowledge Layer', categoryColor: 'text-violet-700', categoryBg: 'bg-violet-50 border-violet-200',
+    category: 'Knowledge Layer', categoryColor: 'text-[#2F6F7E]', categoryBg: 'bg-[#EDF5F8] border-[#7FAFC6]',
     name: 'Program Blueprint v2', status: 'Active', statusVariant: 'active',
     description: 'The architectural standard governing how all Transition Trails programs are designed, structured, and delivered. Defines required components, sprint architecture, Penny integration, and quality standards.',
     confidence: 94,
@@ -523,7 +523,7 @@ export const PROFILES: ObjectProfile[] = [
   {
     id: 'foundations-trail-drive',
     objectTypeId: 'google-drive-resource', objectTypeName: 'Google Drive Resource',
-    category: 'Infrastructure Layer', categoryColor: 'text-teal-700', categoryBg: 'bg-teal-50 border-teal-200',
+    category: 'Infrastructure Layer', categoryColor: 'text-[#2F6B3F]', categoryBg: 'bg-[#E6F0EA] border-[#9FC3AE]',
     name: 'Foundations Trail Drive Folder', status: 'Active', statusVariant: 'active',
     description: 'The Google Drive root folder for all Foundations Trail content — curriculum materials, sprint archives, coach resources, and learner handouts. Linked to the Salesforce Program__c record.',
     confidence: 79,
@@ -611,7 +611,7 @@ export const PROFILES: ObjectProfile[] = [
   {
     id: 'sf-program-engagement',
     objectTypeId: 'salesforce-object', objectTypeName: 'Salesforce Object',
-    category: 'Infrastructure Layer', categoryColor: 'text-teal-700', categoryBg: 'bg-teal-50 border-teal-200',
+    category: 'Infrastructure Layer', categoryColor: 'text-[#2F6B3F]', categoryBg: 'bg-[#E6F0EA] border-[#9FC3AE]',
     name: 'Salesforce Program Engagement', status: 'Active', statusVariant: 'active',
     description: 'The Program_Engagement__c custom object records each learner\'s participation in a specific program cohort — the primary enrollment and progress record linking a Contact to a Program and Cohort.',
     confidence: 86,

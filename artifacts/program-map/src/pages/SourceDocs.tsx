@@ -11,9 +11,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
-  Active:     'bg-emerald-50 text-emerald-700 border-emerald-200',
-  Draft:      'bg-sky-50 text-sky-700 border-sky-200',
-  Deprecated: 'bg-amber-50 text-amber-700 border-amber-200',
+  Active:     'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
+  Draft:      'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  Deprecated: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
   Archived:   'bg-muted text-muted-foreground border-border',
 };
 
@@ -101,7 +101,7 @@ function DocForm({
           {/* Row 1: name + category */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className={labelCls}>Document Name <span className="text-rose-500">*</span></label>
+              <label className={labelCls}>Document Name <span className="text-[#A93F2F]">*</span></label>
               <input
                 type="text"
                 value={draft.name ?? ''}
@@ -470,7 +470,7 @@ export default function SourceDocs() {
                         >
                           <div className="text-[10px] text-muted-foreground/50 font-mono">{doc.id}</div>
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <FileText className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                            <FileText className="w-3.5 h-3.5 text-[#2F6F7E] flex-shrink-0" />
                             <span className="text-[12px] font-medium text-foreground truncate">{doc.name}</span>
                           </div>
                           <div className="text-[11px] text-muted-foreground truncate">{doc.category}</div>
@@ -496,7 +496,7 @@ export default function SourceDocs() {
                                 <button
                                   onClick={e => { e.stopPropagation(); setConfirmDeleteId(doc.id); }}
                                   title="Delete"
-                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600 transition-all"
+                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-[#FBEAE6] text-muted-foreground hover:text-[#A93F2F] transition-all"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </button>
@@ -507,13 +507,13 @@ export default function SourceDocs() {
 
                         {/* Inline delete confirmation */}
                         {isDeleting && (
-                          <div className="px-4 py-2.5 bg-rose-50 border-t border-rose-200 flex items-center gap-3">
-                            <p className="text-[11px] text-rose-700 font-medium flex-1">
+                          <div className="px-4 py-2.5 bg-[#FBEAE6] border-t border-[#E8B9B4] flex items-center gap-3">
+                            <p className="text-[11px] text-[#A93F2F] font-medium flex-1">
                               Delete <strong>{doc.name}</strong>? This cannot be undone.
                             </p>
                             <button
                               onClick={() => deleteDoc(doc.id)}
-                              className="text-[11px] font-bold text-rose-700 border border-rose-300 bg-rose-100 rounded-full px-3 py-1 hover:bg-rose-200 transition-colors"
+                              className="text-[11px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-3 py-1 hover:bg-[#FBEAE6] transition-colors"
                             >
                               Delete
                             </button>

@@ -30,12 +30,12 @@ export interface ExamplePath {
   nodes: { name: string; objectTypeName: string; objectTypeId: string; profileId?: string }[];
 }
 
-const PC = { category: 'Program Layer',       categoryColor: 'text-emerald-700', categoryBg: 'bg-emerald-50 border-emerald-200' };
-const KC = { category: 'Knowledge Layer',     categoryColor: 'text-violet-700',  categoryBg: 'bg-violet-50 border-violet-200'  };
-const IC = { category: 'Intelligence Layer',  categoryColor: 'text-pink-700',    categoryBg: 'bg-pink-50 border-pink-200'     };
-const PE = { category: 'People Layer',        categoryColor: 'text-blue-700',    categoryBg: 'bg-blue-50 border-blue-200'     };
-const IN = { category: 'Infrastructure Layer',categoryColor: 'text-teal-700',    categoryBg: 'bg-teal-50 border-teal-200'    };
-const GV = { category: 'Governance Layer',    categoryColor: 'text-orange-700',  categoryBg: 'bg-orange-50 border-orange-200' };
+const PC = { category: 'Program Layer',       categoryColor: 'text-[#2F6B3F]', categoryBg: 'bg-[#E6F0EA] border-[#9FC3AE]' };
+const KC = { category: 'Knowledge Layer',     categoryColor: 'text-[#2F6F7E]',  categoryBg: 'bg-[#EDF5F8] border-[#7FAFC6]'  };
+const IC = { category: 'Intelligence Layer',  categoryColor: 'text-[#A93F2F]',    categoryBg: 'bg-[#FBEAE6] border-[#E8B9B4]'     };
+const PE = { category: 'People Layer',        categoryColor: 'text-[#2F6F7E]',    categoryBg: 'bg-[#EDF5F8] border-[#7FAFC6]'     };
+const IN = { category: 'Infrastructure Layer',categoryColor: 'text-[#2F6B3F]',    categoryBg: 'bg-[#E6F0EA] border-[#9FC3AE]'    };
+const GV = { category: 'Governance Layer',    categoryColor: 'text-[#CC8400]',  categoryBg: 'bg-[#FFF3E0] border-[#FFD08A]' };
 
 export const SEARCH_INDEX: SearchEntry[] = [
   // ── Program ────────────────────────────────────────────────────────────────

@@ -61,14 +61,14 @@ export function CreatePanel({
   if (saved) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 bg-background">
-        <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-          <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+        <div className="w-12 h-12 rounded-full bg-[#E6F0EA] flex items-center justify-center">
+          <CheckCircle2 className="w-6 h-6 text-[#2F6B3F]" />
         </div>
         <p className="text-[14px] font-bold text-foreground">Saved as Draft</p>
         <p className="text-[12px] text-muted-foreground text-center max-w-xs leading-relaxed">
           Your {objectType} was added in prototype mode. Data resets on page refresh until connected to a live backend.
         </p>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-600 border border-amber-200 bg-amber-50 rounded-full px-2.5 py-1 mt-1">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-2.5 py-1 mt-1">
           Draft · Prototype Only
         </span>
       </div>
@@ -98,7 +98,7 @@ export function CreatePanel({
             )}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-amber-600 border border-amber-200 bg-amber-50 rounded-full px-2 py-0.5">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-2 py-0.5">
               Draft
             </span>
             <span className="text-[9px] text-muted-foreground/50">Prototype only</span>
@@ -111,9 +111,9 @@ export function CreatePanel({
         <div className="p-5 space-y-5 max-w-2xl">
 
           {/* Prototype notice */}
-          <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 flex items-start gap-2">
-            <Pencil className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-amber-900 leading-snug">
+          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 px-3 py-2.5 flex items-start gap-2">
+            <Pencil className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
+            <p className="text-[11px] text-[#CC8400] leading-snug">
               <strong>Prototype mode:</strong> New items appear in the UI immediately but reset on page refresh.
               This create flow captures the right fields so a live backend can be wired in later.
             </p>
@@ -123,7 +123,7 @@ export function CreatePanel({
             <div key={field.id} className="space-y-1">
               <label className="block text-[11px] font-bold text-foreground">
                 {field.label}
-                {field.required && <span className="text-rose-500 ml-0.5">*</span>}
+                {field.required && <span className="text-[#A93F2F] ml-0.5">*</span>}
               </label>
 
               {field.type === 'text' && (

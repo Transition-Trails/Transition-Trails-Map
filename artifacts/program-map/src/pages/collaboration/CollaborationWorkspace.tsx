@@ -41,11 +41,11 @@ const CHANNELS: ChannelConfig[] = [
     icon: MessageSquare,
     status: 'live',
     statusLabel: 'Live',
-    dot: 'bg-emerald-500',
-    iconColor: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    headerBg: 'bg-emerald-50',
+    dot: 'bg-[#E6F0EA]0',
+    iconColor: 'text-[#2F6B3F]',
+    bg: 'bg-[#E6F0EA]',
+    border: 'border-[#9FC3AE]',
+    headerBg: 'bg-[#E6F0EA]',
     managePath: '/collaboration/slack',
     manageLabel: 'Manage Slack Rules',
     pennyRole: 'Monitors 5 channels · Posts digests + alerts · Routes to Trail Signals',
@@ -79,11 +79,11 @@ const CHANNELS: ChannelConfig[] = [
     icon: Mail,
     status: 'live',
     statusLabel: 'Live',
-    dot: 'bg-rose-500',
-    iconColor: 'text-rose-600',
-    bg: 'bg-rose-50',
-    border: 'border-rose-200',
-    headerBg: 'bg-rose-50',
+    dot: 'bg-[#FBEAE6]0',
+    iconColor: 'text-[#A93F2F]',
+    bg: 'bg-[#FBEAE6]',
+    border: 'border-[#E8B9B4]',
+    headerBg: 'bg-[#FBEAE6]',
     managePath: '/collaboration/gmail',
     manageLabel: 'Manage Gmail Rules',
     pennyRole: 'Watches 4 labels · Flags follow-ups · Feeds Trail Signals digest',
@@ -118,11 +118,11 @@ const CHANNELS: ChannelConfig[] = [
     icon: CalendarDays,
     status: 'live',
     statusLabel: 'Live',
-    dot: 'bg-sky-500',
-    iconColor: 'text-sky-600',
-    bg: 'bg-sky-50',
-    border: 'border-sky-200',
-    headerBg: 'bg-sky-50',
+    dot: 'bg-[#EDF5F8]0',
+    iconColor: 'text-[#2F6F7E]',
+    bg: 'bg-[#EDF5F8]',
+    border: 'border-[#7FAFC6]',
+    headerBg: 'bg-[#EDF5F8]',
     managePath: '/collaboration/calendar-live',
     manageLabel: 'Manage Calendar Rules',
     pennyRole: 'Preps meetings on request · Tracks coach cadence · Flags overdue check-ins',
@@ -156,11 +156,11 @@ const CHANNELS: ChannelConfig[] = [
     icon: HardDrive,
     status: 'live',
     statusLabel: 'Live',
-    dot: 'bg-amber-500',
-    iconColor: 'text-amber-600',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    headerBg: 'bg-amber-50',
+    dot: 'bg-[#FFF3E0]0',
+    iconColor: 'text-[#CC8400]',
+    bg: 'bg-[#FFF3E0]',
+    border: 'border-[#FFD08A]',
+    headerBg: 'bg-[#FFF3E0]',
     managePath: null,
     manageLabel: 'Rule config — Phase 2',
     pennyRole: 'File change notifications planned · Rule configuration coming in Phase 2',
@@ -211,9 +211,9 @@ const SIGNAL_DESTINATIONS = [
     label: TERMS.aiAssistant,
     description: 'Receives all flagged signals for synthesis, follow-up, and recommendations',
     icon: Sparkles,
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
-    border: 'border-violet-200',
+    color: 'text-[#2F6F7E]',
+    bg: 'bg-[#EDF5F8]',
+    border: 'border-[#7FAFC6]',
     sources: ['Slack (6 rules)', 'Gmail (6 rules)', 'Calendar (2 rules)'],
     status: 'active' as const,
   },
@@ -222,9 +222,9 @@ const SIGNAL_DESTINATIONS = [
     label: 'Trail Signals',
     description: 'Surfaces urgency-flagged signals as actionable items for the team',
     icon: Zap,
-    color: 'text-amber-600',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
+    color: 'text-[#CC8400]',
+    bg: 'bg-[#FFF3E0]',
+    border: 'border-[#FFD08A]',
     sources: ['Gmail CASE_ALERTS', 'Slack attrition threshold', 'Calendar cadence gaps'],
     status: 'active' as const,
   },
@@ -233,9 +233,9 @@ const SIGNAL_DESTINATIONS = [
     label: 'Notification Rules',
     description: 'Controls who receives what, and at what threshold, across channels',
     icon: Bell,
-    color: 'text-sky-600',
-    bg: 'bg-sky-50',
-    border: 'border-sky-200',
+    color: 'text-[#2F6F7E]',
+    bg: 'bg-[#EDF5F8]',
+    border: 'border-[#7FAFC6]',
     sources: ['Admin DMs', 'Weekly digests', 'Threshold alerts'],
     status: 'active' as const,
   },
@@ -244,9 +244,9 @@ const SIGNAL_DESTINATIONS = [
     label: 'Message Templates',
     description: `${TERMS.aiAssistant} uses approved templates for all outbound Slack + Gmail messages`,
     icon: FileText,
-    color: 'text-teal-600',
-    bg: 'bg-teal-50',
-    border: 'border-teal-200',
+    color: 'text-[#2F6B3F]',
+    bg: 'bg-[#E6F0EA]',
+    border: 'border-[#9FC3AE]',
     sources: ['Slack bot messages', 'Gmail drafts', 'Weekly briefs'],
     status: 'active' as const,
   },
@@ -255,8 +255,8 @@ const SIGNAL_DESTINATIONS = [
 // ── Status badge ───────────────────────────────────────────────────────────────
 
 function RuleStatus({ status }: { status: 'active' | 'pending' | 'phase-2' }) {
-  if (status === 'active')   return <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />;
-  if (status === 'pending')  return <Clock className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />;
+  if (status === 'active')   return <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />;
+  if (status === 'pending')  return <Clock className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />;
   return <Circle className="w-3 h-3 text-zinc-300 shrink-0 mt-0.5" />;
 }
 
@@ -290,7 +290,7 @@ export default function CollaborationWorkspace() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
+            <span className="text-[10px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
               {liveChannels.length} channels live
             </span>
             <span className="text-[10px] font-semibold text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-full px-2.5 py-1">
@@ -452,8 +452,8 @@ export default function CollaborationWorkspace() {
 
         {/* ── Legend ── */}
         <div className="flex items-center gap-6 text-[10px] text-zinc-400 pb-2">
-          <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Active rule</div>
-          <div className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-amber-400" /> Configured, not yet live</div>
+          <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" /> Active rule</div>
+          <div className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-[#CC8400]" /> Configured, not yet live</div>
           <div className="flex items-center gap-1.5"><Circle className="w-3 h-3 text-zinc-300" /> Phase 2 planned</div>
           <div className="flex items-center gap-1.5"><Shield className="w-3 h-3 text-zinc-300" /> Rule config managed per-channel tab</div>
         </div>

@@ -65,7 +65,7 @@ export default function OpsScorecards() {
                             </div>
                             <div className="h-1 bg-muted rounded-full mb-0.5">
                               <div
-                                className={`h-1 rounded-full ${pct >= 75 ? 'bg-emerald-400' : pct >= 55 ? 'bg-blue-400' : pct >= 40 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                                className={`h-1 rounded-full ${pct >= 75 ? 'bg-[#2F6B3F]' : pct >= 55 ? 'bg-[#2F6F7E]' : pct >= 40 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`}
                                 style={{ width: `${pct}%` }}
                               />
                             </div>

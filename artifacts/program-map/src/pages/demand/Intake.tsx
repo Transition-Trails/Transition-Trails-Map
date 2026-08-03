@@ -88,25 +88,25 @@ const SEED_REQUESTS: DemandRequest[] = [
 const STATUS_OPTIONS: RequestStatus[] = ['Triaged', 'In Review', 'Approved', 'Backlog', 'Completed'];
 
 const STATUS_CFG: Record<RequestStatus, { cls: string }> = {
-  Triaged:     { cls: 'bg-sky-50 text-sky-700 border-sky-200' },
-  'In Review': { cls: 'bg-amber-50 text-amber-700 border-amber-200' },
-  Approved:    { cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  Triaged:     { cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' },
+  'In Review': { cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' },
+  Approved:    { cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
   Backlog:     { cls: 'bg-muted text-muted-foreground border-border' },
   Completed:   { cls: 'bg-primary/10 text-primary border-primary/20' },
 };
 
 const RISK_CFG: Record<RiskLevel, { badge: string; cls: string } | null> = {
-  high:     { badge: 'At Risk',  cls: 'text-rose-700 bg-rose-50 border-rose-200' },
-  elevated: { badge: 'Elevated', cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+  high:     { badge: 'At Risk',  cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+  elevated: { badge: 'Elevated', cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
   normal:   null,
 };
 
 const TYPE_DOT: Record<RequestType, string> = {
-  'New Feature':    'bg-violet-400',
-  'Bug / Issue':    'bg-rose-400',
-  'Content Update': 'bg-sky-400',
-  'Change Request': 'bg-amber-400',
-  'Admin':          'bg-slate-400',
+  'New Feature':    'bg-[#2F6F7E]',
+  'Bug / Issue':    'bg-[#A93F2F]',
+  'Content Update': 'bg-[#2F6F7E]',
+  'Change Request': 'bg-[#CC8400]',
+  'Admin':          'bg-[#C8CBC6]',
 };
 
 // ── Group definitions ─────────────────────────────────────────────────────────
@@ -124,23 +124,23 @@ interface Group {
 const GROUPS: Group[] = [
   {
     key: 'critical', label: 'Needs Immediate Action', priority: 'P1',
-    pillCls:    'bg-rose-50 text-rose-700 border-rose-200',
-    accentCls:  'border-l-rose-400',
-    headingCls: 'text-rose-700',
+    pillCls:    'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
+    accentCls:  'border-l-[#A93F2F]',
+    headingCls: 'text-[#A93F2F]',
     filter: r => r.risk === 'high' && r.status !== 'Completed',
   },
   {
     key: 'elevated', label: 'Elevated Priority', priority: 'P2',
-    pillCls:    'bg-amber-50 text-amber-700 border-amber-200',
+    pillCls:    'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
     accentCls:  'border-l-amber-400',
-    headingCls: 'text-amber-700',
+    headingCls: 'text-[#CC8400]',
     filter: r => r.risk === 'elevated' && r.status !== 'Completed',
   },
   {
     key: 'active', label: 'In Progress', priority: 'P3',
-    pillCls:    'bg-sky-50 text-sky-700 border-sky-200',
+    pillCls:    'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
     accentCls:  'border-l-sky-300',
-    headingCls: 'text-sky-700',
+    headingCls: 'text-[#2F6F7E]',
     filter: r => (r.status === 'In Review' || r.status === 'Approved') && r.risk === 'normal',
   },
   {
@@ -152,9 +152,9 @@ const GROUPS: Group[] = [
   },
   {
     key: 'done', label: 'Completed', priority: null,
-    pillCls:    'bg-emerald-50 text-emerald-700 border-emerald-200',
+    pillCls:    'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
     accentCls:  'border-l-emerald-300',
-    headingCls: 'text-emerald-700',
+    headingCls: 'text-[#2F6B3F]',
     filter: r => r.status === 'Completed',
   },
 ];
@@ -167,8 +167,8 @@ function sortGroup(items: DemandRequest[]) {
 // ── Live Salesforce Cases Strip (unchanged) ───────────────────────────────────
 
 const CASE_PRIORITY_CFG: Record<string, { cls: string; label: string }> = {
-  High:   { cls: 'text-rose-700 bg-rose-50 border-rose-200',    label: 'High'   },
-  Medium: { cls: 'text-amber-700 bg-amber-50 border-amber-200', label: 'Medium' },
+  High:   { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',    label: 'High'   },
+  Medium: { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', label: 'Medium' },
   Low:    { cls: 'text-slate-600 bg-slate-50 border-slate-200', label: 'Low'    },
 };
 
@@ -198,40 +198,40 @@ function SfCasesStrip() {
   }
 
   return (
-    <div className="rounded-lg border border-emerald-200 bg-white overflow-hidden">
+    <div className="rounded-lg border border-[#9FC3AE] bg-white overflow-hidden">
 
       {/* Header bar — div with two click zones to avoid nested <button> */}
-      <div className="px-3 py-2 border-b border-emerald-200/80 bg-emerald-50/60 flex items-center justify-between">
+      <div className="px-3 py-2 border-b border-[#9FC3AE]/80 bg-[#E6F0EA]/60 flex items-center justify-between">
         <button
           onClick={() => setSfOpen(v => !v)}
           className="flex items-center gap-1.5 flex-wrap text-left flex-1 min-w-0"
         >
           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-            isLoading || isFetching ? 'bg-amber-400 animate-pulse'
-            : isError  ? 'bg-rose-500'
-            : isStale  ? 'bg-amber-400'
-            : 'bg-emerald-500'
+            isLoading || isFetching ? 'bg-[#CC8400] animate-pulse'
+            : isError  ? 'bg-[#FBEAE6]0'
+            : isStale  ? 'bg-[#CC8400]'
+            : 'bg-[#E6F0EA]0'
           }`} />
-          <Database className="w-2.5 h-2.5 text-emerald-700/60" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-800">
+          <Database className="w-2.5 h-2.5 text-[#2F6B3F]/60" />
+          <span className="text-[9px] font-bold uppercase tracking-wider text-[#245531]">
             Live · Salesforce Cases
           </span>
           {data && (
-            <span className={`text-[9px] ${isStale ? 'text-amber-600' : 'text-emerald-600/70'}`}>
+            <span className={`text-[9px] ${isStale ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
               · {isStale ? 'stale · ' : ''}{syncLabel}
             </span>
           )}
           {data && (
-            <span className="text-[9px] text-emerald-700/60">
+            <span className="text-[9px] text-[#2F6B3F]/60">
               · {n(data.totalOpen)} open · {n(data.highPriority)} high priority
             </span>
           )}
-          <ChevronDown className={`w-3 h-3 text-emerald-700/50 transition-transform ml-1 ${sfOpen ? '' : '-rotate-90'}`} />
+          <ChevronDown className={`w-3 h-3 text-[#2F6B3F]/50 transition-transform ml-1 ${sfOpen ? '' : '-rotate-90'}`} />
         </button>
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="text-[9px] text-emerald-700/60 hover:text-emerald-800 flex items-center gap-0.5 disabled:opacity-40 ml-2 shrink-0"
+          className="text-[9px] text-[#2F6B3F]/60 hover:text-[#245531] flex items-center gap-0.5 disabled:opacity-40 ml-2 shrink-0"
           aria-label="Refresh cases"
         >
           <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
@@ -242,9 +242,9 @@ function SfCasesStrip() {
         <>
           {isError ? (
             <div className="px-4 py-3 flex items-center gap-2">
-              <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
-              <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — cases unavailable.</span>
-              <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
+              <WifiOff className="w-3 h-3 text-[#A93F2F] shrink-0" />
+              <span className="text-[10px] text-[#A93F2F] flex-1">Salesforce unreachable — cases unavailable.</span>
+              <button onClick={() => refetch()} className="text-[10px] font-semibold text-[#A93F2F] hover:underline flex items-center gap-1">
                 <RefreshCw className="w-2.5 h-2.5" /> Retry
               </button>
             </div>
@@ -382,12 +382,12 @@ function RequestRow({
 
   if (req.status === 'Triaged' || req.status === 'Backlog') {
     actions.push(
-      { label: 'Move to Review', icon: ArrowRight,   action: () => onUpdateStatus('In Review'),  cls: 'text-sky-700 bg-sky-50 border-sky-200 hover:bg-sky-100' },
-      { label: 'Approve',        icon: Check,         action: () => onUpdateStatus('Approved'),   cls: 'text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100' },
+      { label: 'Move to Review', icon: ArrowRight,   action: () => onUpdateStatus('In Review'),  cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6] hover:bg-[#EDF5F8]' },
+      { label: 'Approve',        icon: Check,         action: () => onUpdateStatus('Approved'),   cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE] hover:bg-[#E6F0EA]' },
     );
   } else if (req.status === 'In Review') {
     actions.push(
-      { label: 'Approve',  icon: Check,         action: () => onUpdateStatus('Approved'),  cls: 'text-emerald-700 bg-emerald-50 border-emerald-200 hover:bg-emerald-100' },
+      { label: 'Approve',  icon: Check,         action: () => onUpdateStatus('Approved'),  cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE] hover:bg-[#E6F0EA]' },
       { label: 'Complete', icon: CheckCheck,     action: () => onUpdateStatus('Completed'), cls: 'text-primary/80 bg-primary/5 border-primary/20 hover:bg-primary/10' },
       { label: 'Defer',    icon: ChevronsDown,   action: () => onUpdateStatus('Backlog'),   cls: 'text-muted-foreground bg-muted hover:bg-muted/80 border-border' },
     );
@@ -404,7 +404,7 @@ function RequestRow({
 
   if (req.status !== 'Completed') {
     if (req.risk !== 'high') {
-      actions.push({ label: 'Escalate', icon: AlertTriangle, action: () => onUpdateRisk('high'),   cls: 'text-rose-700 bg-rose-50 border-rose-200 hover:bg-rose-100' });
+      actions.push({ label: 'Escalate', icon: AlertTriangle, action: () => onUpdateRisk('high'),   cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4] hover:bg-[#FBEAE6]' });
     } else {
       actions.push({ label: 'De-escalate', icon: TrendingDown, action: () => onUpdateRisk('normal'), cls: 'text-muted-foreground bg-muted hover:bg-muted/80 border-border' });
     }
@@ -600,8 +600,8 @@ function TriageSummary({
         </div>
         <div className="p-3 space-y-2">
           {[
-            { label: 'P1 · Critical',  count: p1.length,             cls: 'bg-rose-500',           text: 'text-rose-700' },
-            { label: 'P2 · Elevated',  count: p2.length,             cls: 'bg-amber-400',           text: 'text-amber-700' },
+            { label: 'P1 · Critical',  count: p1.length,             cls: 'bg-[#FBEAE6]0',           text: 'text-[#A93F2F]' },
+            { label: 'P2 · Elevated',  count: p2.length,             cls: 'bg-[#CC8400]',           text: 'text-[#CC8400]' },
             { label: 'P3 · Normal',    count: open.length - p1.length - p2.length, cls: 'bg-primary/40', text: 'text-muted-foreground' },
           ].map(row => (
             <div key={row.label} className="flex items-center gap-2">
@@ -824,10 +824,10 @@ export default function Intake() {
         <div className="flex items-stretch gap-2 flex-wrap">
           {[
             { label: 'Open',        value: open.length,      cls: 'border-border bg-white',          numCls: 'text-foreground'  },
-            { label: 'P1 Critical', value: p1.length,        cls: 'border-rose-200 bg-rose-50',       numCls: 'text-rose-700'    },
-            { label: 'P2 Elevated', value: p2.length,        cls: 'border-amber-200 bg-amber-50',     numCls: 'text-amber-700'   },
-            { label: 'In Review',   value: inReview.length,  cls: 'border-sky-200 bg-sky-50',         numCls: 'text-sky-800'     },
-            { label: 'Closed 30d',  value: closed30d,        cls: 'border-emerald-200 bg-emerald-50', numCls: 'text-emerald-800' },
+            { label: 'P1 Critical', value: p1.length,        cls: 'border-[#E8B9B4] bg-[#FBEAE6]',       numCls: 'text-[#A93F2F]'    },
+            { label: 'P2 Elevated', value: p2.length,        cls: 'border-[#FFD08A] bg-[#FFF3E0]',     numCls: 'text-[#CC8400]'   },
+            { label: 'In Review',   value: inReview.length,  cls: 'border-[#7FAFC6] bg-[#EDF5F8]',         numCls: 'text-[#2F6F7E]'     },
+            { label: 'Closed 30d',  value: closed30d,        cls: 'border-[#9FC3AE] bg-[#E6F0EA]', numCls: 'text-[#245531]' },
           ].map(m => (
             <div key={m.label} className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${m.cls}`}>
               <span className={`text-[20px] font-bold leading-none ${m.numCls}`}>{m.value}</span>

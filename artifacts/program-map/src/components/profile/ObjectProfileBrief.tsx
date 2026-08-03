@@ -9,14 +9,14 @@ import { PROFILE_MAP } from '@/data/universalObjectProfileData';
 import { OBJECT_MAP } from '@/data/unifiedObjectModelData';
 
 const HEALTH_CONFIG: Record<ProfileHealthStatus, { icon: typeof CheckCircle2; color: string; bg: string; label: string }> = {
-  'healthy':        { icon: CheckCircle2,   color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200', label: 'Healthy'         },
-  'needs-attention':{ icon: AlertTriangle,  color: 'text-amber-600',   bg: 'bg-amber-50 border-amber-200',    label: 'Needs Attention' },
-  'incomplete':     { icon: XCircle,        color: 'text-rose-600',    bg: 'bg-rose-50 border-rose-200',      label: 'Incomplete'      },
+  'healthy':        { icon: CheckCircle2,   color: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#9FC3AE]', label: 'Healthy'         },
+  'needs-attention':{ icon: AlertTriangle,  color: 'text-[#CC8400]',   bg: 'bg-[#FFF3E0] border-[#FFD08A]',    label: 'Needs Attention' },
+  'incomplete':     { icon: XCircle,        color: 'text-[#A93F2F]',    bg: 'bg-[#FBEAE6] border-[#E8B9B4]',      label: 'Incomplete'      },
   'unknown':        { icon: HelpCircle,     color: 'text-muted-foreground', bg: 'bg-muted/30 border-border',  label: 'Unknown'         },
 };
 
 const INDICATOR_DOT: Record<string, string> = {
-  healthy: 'bg-emerald-500', warning: 'bg-amber-500', critical: 'bg-rose-600', unknown: 'bg-muted-foreground/40',
+  healthy: 'bg-[#E6F0EA]0', warning: 'bg-[#FFF3E0]0', critical: 'bg-[#A93F2F]', unknown: 'bg-muted-foreground/40',
 };
 
 // Full UOM profile brief — used when profile instance data exists
@@ -68,7 +68,7 @@ function FullProfileBrief({ profile }: { profile: ObjectProfile }) {
         {/* Ownership */}
         <div>
           <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Owner</p>
-          <p className="text-[11px] font-semibold text-blue-700">{profile.ownership.primary}</p>
+          <p className="text-[11px] font-semibold text-[#2F6F7E]">{profile.ownership.primary}</p>
           <p className="text-[10px] text-muted-foreground">{profile.ownership.team}</p>
         </div>
 
@@ -79,7 +79,7 @@ function FullProfileBrief({ profile }: { profile: ObjectProfile }) {
             <div className="space-y-1">
               {topRels.map((r, i) => (
                 <div key={i} className="flex items-center gap-1.5">
-                  <span className={`text-[8px] px-1 py-0.5 rounded border ${r.direction === 'upstream' ? 'bg-violet-50 border-violet-200 text-violet-700' : 'bg-sky-50 border-sky-200 text-sky-700'}`}>
+                  <span className={`text-[8px] px-1 py-0.5 rounded border ${r.direction === 'upstream' ? 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]' : 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]'}`}>
                     {r.direction === 'upstream' ? '↑' : '↓'}
                   </span>
                   <span className="text-[10px] text-foreground truncate">{r.objectName}</span>
@@ -160,11 +160,11 @@ function UOMTypeBrief({ type, data }: { type: string; data: any }) {
           <>
             <div className="space-y-1">
               <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">Owned By</p>
-              {uomType.ownership.slice(0, 2).map(o => <p key={o} className="text-[11px] font-medium text-blue-700">{o}</p>)}
+              {uomType.ownership.slice(0, 2).map(o => <p key={o} className="text-[11px] font-medium text-[#2F6F7E]">{o}</p>)}
             </div>
             <div className="space-y-1">
               <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">Source of Truth</p>
-              <p className="text-[11px] text-teal-700 font-medium">{uomType.sourceOfTruth}</p>
+              <p className="text-[11px] text-[#2F6B3F] font-medium">{uomType.sourceOfTruth}</p>
             </div>
             <div className="pt-1 border-t border-border/40">
               <button

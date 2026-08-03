@@ -4,10 +4,10 @@ import { curriculumSlackActivities, CONTENT_STATUS_CONFIG } from '@/data/curricu
 import { Hash, ArrowRight } from 'lucide-react';
 
 const ACTIVITY_TYPE_COLORS: Record<string, string> = {
-  'Kickoff':      'bg-green-50 text-green-800 border-green-200',
-  'Lab Share':    'bg-sky-50 text-sky-800 border-sky-200',
-  'Check-In':     'bg-amber-50 text-amber-800 border-amber-200',
-  'Announcement': 'bg-violet-50 text-violet-800 border-violet-200',
+  'Kickoff':      'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
+  'Lab Share':    'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'Check-In':     'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  'Announcement': 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
   'Lab Check-In': 'bg-cyan-50 text-cyan-800 border-cyan-200',
 };
 
@@ -33,11 +33,11 @@ export default function DeliverySlackActivities() {
               <button
                 key={activity.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: activity.id, data: activity })}
-                className="rounded-xl border border-border bg-white p-4 text-left hover:border-green-200 hover:shadow-sm transition-all"
+                className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <Hash className="w-4 h-4 text-green-600 shrink-0" />
+                    <Hash className="w-4 h-4 text-[#2F6B3F] shrink-0" />
                     <div>
                       <p className="text-[13px] font-bold text-foreground">{activity.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">

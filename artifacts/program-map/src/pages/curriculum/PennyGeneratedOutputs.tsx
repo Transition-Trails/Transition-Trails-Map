@@ -111,9 +111,9 @@ export default function PennyGeneratedOutputs() {
               </div>
               <div className="space-y-4">
                 {output.lessonStructure.map((lesson, i) => (
-                  <div key={i} className="rounded-xl border border-amber-200 bg-amber-50/30 p-4">
+                  <div key={i} className="rounded-xl border border-[#FFD08A] bg-[#FFF3E0]/30 p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-bold text-amber-700 border border-amber-200 bg-white rounded px-1.5 py-0.5">{lesson.type}</span>
+                      <span className="text-[10px] font-bold text-[#CC8400] border border-[#FFD08A] bg-white rounded px-1.5 py-0.5">{lesson.type}</span>
                       <span className="text-[10px] text-muted-foreground">{lesson.duration}</span>
                     </div>
                     <p className="text-[13px] font-bold text-foreground mb-1">{lesson.title}</p>
@@ -122,13 +122,13 @@ export default function PennyGeneratedOutputs() {
                       <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Knowledge Checks</p>
                       {lesson.knowledgeChecks.map((kc, j) => (
                         <div key={j} className="flex items-start gap-1.5">
-                          <CheckCircle2 className="w-3 h-3 text-amber-600 mt-0.5 shrink-0" />
+                          <CheckCircle2 className="w-3 h-3 text-[#CC8400] mt-0.5 shrink-0" />
                           <p className="text-[11px] text-foreground/80 italic">"{kc}"</p>
                         </div>
                       ))}
                     </div>
-                    <div className="mt-3 rounded bg-purple-50 border border-purple-100 px-3 py-2">
-                      <p className="text-[10px] font-bold text-purple-600 mb-0.5">REFLECTION PROMPT</p>
+                    <div className="mt-3 rounded bg-[#EDF5F8] border border-[#EDF5F8] px-3 py-2">
+                      <p className="text-[10px] font-bold text-[#2F6F7E] mb-0.5">REFLECTION PROMPT</p>
                       <p className="text-[11px] text-foreground/80 italic">"{lesson.reflectionPrompt}"</p>
                     </div>
                   </div>
@@ -144,7 +144,7 @@ export default function PennyGeneratedOutputs() {
                 <p className="text-[14px] font-bold text-foreground">Assessment Alignment</p>
                 <button onClick={() => showAction('create-assessment-support')} className="ml-auto text-[10px] text-secondary font-medium hover:underline flex items-center gap-1">Create Assessment <ArrowRight className="w-3 h-3" /></button>
               </div>
-              <div className="rounded-lg border border-rose-200 bg-rose-50/30 p-4 mb-4">
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]/30 p-4 mb-4">
                 <p className="text-[13px] font-bold text-foreground">{output.assessmentAlignment.title}</p>
                 <div className="flex flex-wrap gap-3 mt-2">
                   <div><p className="text-[14px] font-bold text-foreground">{output.assessmentAlignment.questionCount}</p><p className="text-[10px] text-muted-foreground">Questions</p></div>
@@ -184,15 +184,15 @@ export default function PennyGeneratedOutputs() {
               </div>
               <div className="space-y-4">
                 {output.knowledgeArticles.map((article, i) => (
-                  <div key={i} className="rounded-xl border border-indigo-200 bg-indigo-50/30 p-4">
+                  <div key={i} className="rounded-xl border border-[#7FAFC6] bg-[#EDF5F8]/30 p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-bold text-indigo-700 border border-indigo-200 bg-white rounded-full px-2 py-0.5">{article.type}</span>
+                      <span className="text-[10px] font-bold text-[#2F6F7E] border border-[#7FAFC6] bg-white rounded-full px-2 py-0.5">{article.type}</span>
                     </div>
                     <p className="text-[13px] font-bold text-foreground mb-2">{article.title}</p>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Key Topics to Cover</p>
                     <div className="flex flex-wrap gap-1">
                       {article.keyTopics.map(topic => (
-                        <span key={topic} className="text-[10px] font-medium border border-indigo-200 bg-white rounded-full px-2 py-0.5 text-indigo-700">{topic}</span>
+                        <span key={topic} className="text-[10px] font-medium border border-[#7FAFC6] bg-white rounded-full px-2 py-0.5 text-[#2F6F7E]">{topic}</span>
                       ))}
                     </div>
                   </div>
@@ -242,12 +242,12 @@ export default function PennyGeneratedOutputs() {
               </div>
               <div className="space-y-4">
                 {output.reflectionPrompts.map((rp, i) => (
-                  <div key={i} className="rounded-xl border border-purple-200 bg-purple-50/30 p-4">
-                    <p className="text-[11px] font-bold text-purple-700 mb-2">After: {rp.lessonTitle}</p>
+                  <div key={i} className="rounded-xl border border-[#7FAFC6] bg-[#EDF5F8]/30 p-4">
+                    <p className="text-[11px] font-bold text-[#2F6F7E] mb-2">After: {rp.lessonTitle}</p>
                     <p className="text-[13px] text-foreground leading-relaxed mb-3">"{rp.prompt}"</p>
-                    <div className="rounded bg-purple-100 px-3 py-2">
-                      <p className="text-[10px] font-bold text-purple-700 mb-0.5">JOURNAL ANCHOR</p>
-                      <p className="text-[11px] text-purple-800">{rp.journalAnchor}</p>
+                    <div className="rounded bg-[#EDF5F8] px-3 py-2">
+                      <p className="text-[10px] font-bold text-[#2F6F7E] mb-0.5">JOURNAL ANCHOR</p>
+                      <p className="text-[11px] text-[#2F6F7E]">{rp.journalAnchor}</p>
                     </div>
                   </div>
                 ))}
@@ -264,9 +264,9 @@ export default function PennyGeneratedOutputs() {
               </div>
               <div className="space-y-4">
                 {output.slackActivities.map((activity, i) => (
-                  <div key={i} className="rounded-xl border border-green-200 bg-green-50/30 p-4">
+                  <div key={i} className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA]/30 p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-bold text-green-700 border border-green-200 bg-white rounded-full px-2 py-0.5">{activity.type}</span>
+                      <span className="text-[10px] font-bold text-[#2F6B3F] border border-[#9FC3AE] bg-white rounded-full px-2 py-0.5">{activity.type}</span>
                       <span className="text-[10px] text-muted-foreground">{activity.timing}</span>
                     </div>
                     <p className="text-[13px] font-bold text-foreground mb-3">{activity.title}</p>
@@ -274,9 +274,9 @@ export default function PennyGeneratedOutputs() {
                       <p className="text-[10px] text-gray-400 mb-1">#ft-cohort-1 · Penny</p>
                       <p className="text-[11px] leading-relaxed whitespace-pre-line">{activity.message}</p>
                     </div>
-                    <div className="rounded bg-green-100 px-3 py-2">
-                      <p className="text-[10px] font-bold text-green-700 mb-0.5">ENGAGEMENT PROMPT</p>
-                      <p className="text-[11px] text-green-800 whitespace-pre-line">{activity.engagementPrompt}</p>
+                    <div className="rounded bg-[#E6F0EA] px-3 py-2">
+                      <p className="text-[10px] font-bold text-[#2F6B3F] mb-0.5">ENGAGEMENT PROMPT</p>
+                      <p className="text-[11px] text-[#245531] whitespace-pre-line">{activity.engagementPrompt}</p>
                     </div>
                   </div>
                 ))}
@@ -293,17 +293,17 @@ export default function PennyGeneratedOutputs() {
               </div>
               <div className="space-y-4">
                 {output.calendarEvents.map((event, i) => (
-                  <div key={i} className="rounded-xl border border-orange-200 bg-orange-50/30 p-4">
+                  <div key={i} className="rounded-xl border border-[#FFD08A] bg-[#FFF3E0]/30 p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-bold text-orange-700 border border-orange-200 bg-white rounded-full px-2 py-0.5">{event.type}</span>
+                      <span className="text-[10px] font-bold text-[#CC8400] border border-[#FFD08A] bg-white rounded-full px-2 py-0.5">{event.type}</span>
                       <span className="text-[10px] text-muted-foreground">{event.timing}</span>
                     </div>
                     <p className="text-[13px] font-bold text-foreground mb-2">{event.title}</p>
                     <p className="text-[12px] text-muted-foreground mb-2">{event.description}</p>
                     <p className="text-[11px] text-muted-foreground mb-3"><strong>Attendees:</strong> {event.attendees}</p>
-                    <div className="rounded bg-orange-100 px-3 py-2">
-                      <p className="text-[10px] font-bold text-orange-700 mb-0.5">PENNY REMINDER MESSAGE</p>
-                      <p className="text-[11px] text-orange-800 italic">"{event.pennyReminder}"</p>
+                    <div className="rounded bg-[#FFF3E0] px-3 py-2">
+                      <p className="text-[10px] font-bold text-[#CC8400] mb-0.5">PENNY REMINDER MESSAGE</p>
+                      <p className="text-[11px] text-[#CC8400] italic">"{event.pennyReminder}"</p>
                     </div>
                   </div>
                 ))}

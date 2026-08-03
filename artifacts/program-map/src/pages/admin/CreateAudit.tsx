@@ -229,9 +229,9 @@ const READ_ONLY: ReadOnlyEntry[] = [
 ];
 
 const STATUS_CFG: Record<AuditStatus, { label: string; cls: string; bg: string; icon: typeof CheckCircle2 }> = {
-  added:     { label: 'Added',      cls: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200', icon: CheckCircle2 },
-  'by-design': { label: 'By Design', cls: 'text-sky-700',    bg: 'bg-sky-50 border-sky-200',         icon: Eye },
-  planned:   { label: 'Planned',    cls: 'text-amber-700',  bg: 'bg-amber-50 border-amber-200',      icon: Plus },
+  added:     { label: 'Added',      cls: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#9FC3AE]', icon: CheckCircle2 },
+  'by-design': { label: 'By Design', cls: 'text-[#2F6F7E]',    bg: 'bg-[#EDF5F8] border-[#7FAFC6]',         icon: Eye },
+  planned:   { label: 'Planned',    cls: 'text-[#CC8400]',  bg: 'bg-[#FFF3E0] border-[#FFD08A]',      icon: Plus },
 };
 
 export default function CreateAudit() {
@@ -253,9 +253,9 @@ export default function CreateAudit() {
           {/* Summary strip */}
           <div className="grid grid-cols-3 gap-2.5 mt-3">
             {[
-              { label: 'Actions Added',          v: addedCount,        cls: 'text-emerald-600' },
+              { label: 'Actions Added',          v: addedCount,        cls: 'text-[#2F6B3F]' },
               { label: 'Workspaces Covered',     v: workspaceCount,    cls: 'text-primary' },
-              { label: 'Read-Only by Design',    v: READ_ONLY.length,  cls: 'text-sky-600' },
+              { label: 'Read-Only by Design',    v: READ_ONLY.length,  cls: 'text-[#2F6F7E]' },
             ].map(s => (
               <div key={s.label} className="rounded-lg border border-border bg-white px-3 py-2.5 text-center">
                 <p className={`text-xl font-bold ${s.cls}`}>{s.v}</p>
@@ -277,7 +277,7 @@ export default function CreateAudit() {
             ].map(p => (
               <div key={p.label} className="rounded-lg border border-border bg-muted/20 px-3 py-2.5">
                 <div className="flex items-start gap-1.5 mb-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
+                  <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mt-0.5 shrink-0" />
                   <p className="text-[11px] font-bold text-foreground leading-snug">{p.label}</p>
                 </div>
                 <p className="text-[10px] text-muted-foreground leading-snug">{p.desc}</p>

@@ -4,9 +4,9 @@ import { curriculumResources, CONTENT_STATUS_CONFIG } from '@/data/curriculumDat
 import { Link, ArrowRight } from 'lucide-react';
 
 const TYPE_COLORS: Record<string, string> = {
-  'External Platform': 'bg-blue-50 text-blue-800 border-blue-200',
+  'External Platform': 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
   'Documentation':     'bg-slate-50 text-slate-800 border-slate-200',
-  'Internal Document': 'bg-amber-50 text-amber-800 border-amber-200',
+  'Internal Document': 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
 };
 
 export default function LearningResources() {

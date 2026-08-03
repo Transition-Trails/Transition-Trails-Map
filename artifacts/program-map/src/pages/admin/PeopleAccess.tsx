@@ -57,18 +57,18 @@ interface MatrixRow {
 }
 
 const MATRIX_ROWS: MatrixRow[] = [
-  { persona: 'Learner',             type: 'Learner',   typeCls: 'text-emerald-700 bg-emerald-50 border-emerald-200',   tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'healthy',         healthOrder: 0, navigator: '✓ Program Map',  operations: '✓ Own programs', demand: 'View only',    penny: '✓ Guided',       knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — coaching prompts, Trail Quests',              sfAccess: 'Contact, Enrollment, Training Plan',             authMethod: 'Google Sign-In' },
-  { persona: 'Coach',               type: 'Staff',     typeCls: 'text-blue-700 bg-blue-50 border-blue-200',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'needs-attention', healthOrder: 1, navigator: '✓ Program Map',  operations: '✓ Own cohorts', demand: 'View only',    penny: '✓ Guided',       knowledge: '✓ Library',   collaboration: '✓ Full',  administration: '— Hidden',  pennyDepth: 'Guided — coach briefs, escalation detection',          sfAccess: 'Contact, Volunteer, Program Engagement',         authMethod: 'Google Sign-In' },
-  { persona: 'Program Lead',        type: 'Staff',     typeCls: 'text-blue-700 bg-blue-50 border-blue-200',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Guided',       knowledge: '✓ Library',   collaboration: '✓ Full',  administration: '— Hidden',  pennyDepth: 'Guided — program health, cohort summaries',            sfAccess: 'Training Plan, Campaign, Account, Report',        authMethod: 'Google Sign-In' },
-  { persona: 'Curriculum Designer', type: 'Staff',     typeCls: 'text-blue-700 bg-blue-50 border-blue-200',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'healthy',         healthOrder: 0, navigator: '✓ Program Map',  operations: 'View only',      demand: '✓ Full',       penny: '✓ Power access', knowledge: '✓ All tabs', collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Power — curriculum generation, prompt governance',     sfAccess: 'Training Plan, Training Plan Item, Knowledge',    authMethod: 'Google Sign-In' },
-  { persona: `${TERMS.aiAssistant} Admin`,         type: 'Admin',     typeCls: 'text-violet-700 bg-violet-50 border-violet-200',       tier: 'power',      tierLabel: 'Power',    tierOrder: 1, tierDot: 'bg-violet-500',  tierBadge: 'bg-violet-50 border-violet-200 text-violet-700',   health: 'needs-attention', healthOrder: 1, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full suite',   knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '— Hidden',  pennyDepth: 'Full — prompt-level, capability registry, quality metrics', sfAccess: 'Knowledge, Case, Integration Log',              authMethod: 'Power group · trailospennyadmin@…' },
-  { persona: 'Volunteer',           type: 'Volunteer', typeCls: 'text-violet-700 bg-violet-50 border-violet-200',       tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'needs-attention', healthOrder: 1, navigator: '✓ Limited',      operations: '— Hidden',       demand: '— Hidden',     penny: '✓ Coach briefs', knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — coach briefs only',                           sfAccess: 'Volunteer, Volunteer Job, Volunteer Shift, Contact', authMethod: 'Google Sign-In' },
-  { persona: 'Volunteer Mentor',    type: 'Volunteer', typeCls: 'text-violet-700 bg-violet-50 border-violet-200',       tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'incomplete',      healthOrder: 2, navigator: '— Hidden',       operations: '— Hidden',       demand: '— Hidden',     penny: '✓ Coach briefs', knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — mentor matching, learner progress briefs',     sfAccess: 'Contact, Volunteer Job, Volunteer Shift',            authMethod: 'Google Sign-In' },
-  { persona: 'Alumni Learner',      type: 'Learner',   typeCls: 'text-emerald-700 bg-emerald-50 border-emerald-200',   tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'needs-attention', healthOrder: 1, navigator: '✓ Program Map',  operations: '— Hidden',       demand: '— Hidden',     penny: '✓ Alumni briefs',knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — alumni engagement, outcomes tracking',         sfAccess: 'Contact, Program Engagement (alumni)',               authMethod: 'Google Sign-In' },
-  { persona: 'Client Sponsor',      type: 'Sponsor',   typeCls: 'text-rose-700 bg-rose-50 border-rose-200',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'incomplete',      healthOrder: 2, navigator: '— Limited',      operations: 'View only',      demand: '— Hidden',     penny: '✓ Exec briefs',  knowledge: '— Hidden',    collaboration: '— Hidden',administration: '— Hidden',  pennyDepth: 'Guided — executive briefs only',                       sfAccess: 'Account, Opportunity, Contact, Report',          authMethod: 'Google Sign-In' },
-  { persona: 'Employer Partner',    type: 'Partner',   typeCls: 'text-amber-700 bg-amber-50 border-amber-200',          tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-emerald-500', tierBadge: 'bg-emerald-50 border-emerald-200 text-emerald-700', health: 'incomplete',      healthOrder: 2, navigator: '— Limited',      operations: '— Hidden',       demand: '— Hidden',     penny: '— Phase 3',      knowledge: '— Hidden',    collaboration: '— Hidden',administration: '— Hidden',  pennyDepth: 'None — employer matching planned Phase 3',              sfAccess: 'Account, Opportunity, Job Application, Contact', authMethod: 'Google Sign-In' },
-  { persona: 'Executive Director',  type: 'Staff',     typeCls: 'text-blue-700 bg-blue-50 border-blue-200',             tier: 'admin',      tierLabel: 'Admin',    tierOrder: 2, tierDot: 'bg-amber-500',   tierBadge: 'bg-amber-50 border-amber-200 text-amber-700',       health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full',         knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ View',    pennyDepth: 'Admin — executive briefs, impact summaries, full context', sfAccess: 'Account, Opportunity, Report, Dashboard',        authMethod: 'Admin group · trailosadmin@…' },
-  { persona: 'Salesforce Admin',    type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'admin',      tierLabel: 'Admin',    tierOrder: 2, tierDot: 'bg-amber-500',   tierBadge: 'bg-amber-50 border-amber-200 text-amber-700',       health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full',         knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Admin — SF mapping, data layer, integration governance', sfAccess: 'All objects, Permission Set, Profile, User',     authMethod: 'Admin group · trailosadmin@…' },
+  { persona: 'Learner',             type: 'Learner',   typeCls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',   tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'healthy',         healthOrder: 0, navigator: '✓ Program Map',  operations: '✓ Own programs', demand: 'View only',    penny: '✓ Guided',       knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — coaching prompts, Trail Quests',              sfAccess: 'Contact, Enrollment, Training Plan',             authMethod: 'Google Sign-In' },
+  { persona: 'Coach',               type: 'Staff',     typeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'needs-attention', healthOrder: 1, navigator: '✓ Program Map',  operations: '✓ Own cohorts', demand: 'View only',    penny: '✓ Guided',       knowledge: '✓ Library',   collaboration: '✓ Full',  administration: '— Hidden',  pennyDepth: 'Guided — coach briefs, escalation detection',          sfAccess: 'Contact, Volunteer, Program Engagement',         authMethod: 'Google Sign-In' },
+  { persona: 'Program Lead',        type: 'Staff',     typeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Guided',       knowledge: '✓ Library',   collaboration: '✓ Full',  administration: '— Hidden',  pennyDepth: 'Guided — program health, cohort summaries',            sfAccess: 'Training Plan, Campaign, Account, Report',        authMethod: 'Google Sign-In' },
+  { persona: 'Curriculum Designer', type: 'Staff',     typeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'healthy',         healthOrder: 0, navigator: '✓ Program Map',  operations: 'View only',      demand: '✓ Full',       penny: '✓ Power access', knowledge: '✓ All tabs', collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Power — curriculum generation, prompt governance',     sfAccess: 'Training Plan, Training Plan Item, Knowledge',    authMethod: 'Google Sign-In' },
+  { persona: `${TERMS.aiAssistant} Admin`,         type: 'Admin',     typeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',       tier: 'power',      tierLabel: 'Power',    tierOrder: 1, tierDot: 'bg-[#EDF5F8]0',  tierBadge: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',   health: 'needs-attention', healthOrder: 1, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full suite',   knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '— Hidden',  pennyDepth: 'Full — prompt-level, capability registry, quality metrics', sfAccess: 'Knowledge, Case, Integration Log',              authMethod: 'Power group · trailospennyadmin@…' },
+  { persona: 'Volunteer',           type: 'Volunteer', typeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',       tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'needs-attention', healthOrder: 1, navigator: '✓ Limited',      operations: '— Hidden',       demand: '— Hidden',     penny: '✓ Coach briefs', knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — coach briefs only',                           sfAccess: 'Volunteer, Volunteer Job, Volunteer Shift, Contact', authMethod: 'Google Sign-In' },
+  { persona: 'Volunteer Mentor',    type: 'Volunteer', typeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',       tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'incomplete',      healthOrder: 2, navigator: '— Hidden',       operations: '— Hidden',       demand: '— Hidden',     penny: '✓ Coach briefs', knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — mentor matching, learner progress briefs',     sfAccess: 'Contact, Volunteer Job, Volunteer Shift',            authMethod: 'Google Sign-In' },
+  { persona: 'Alumni Learner',      type: 'Learner',   typeCls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',   tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'needs-attention', healthOrder: 1, navigator: '✓ Program Map',  operations: '— Hidden',       demand: '— Hidden',     penny: '✓ Alumni briefs',knowledge: '✓ Library',   collaboration: '✓ Core',  administration: '— Hidden',  pennyDepth: 'Guided — alumni engagement, outcomes tracking',         sfAccess: 'Contact, Program Engagement (alumni)',               authMethod: 'Google Sign-In' },
+  { persona: 'Client Sponsor',      type: 'Sponsor',   typeCls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',             tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'incomplete',      healthOrder: 2, navigator: '— Limited',      operations: 'View only',      demand: '— Hidden',     penny: '✓ Exec briefs',  knowledge: '— Hidden',    collaboration: '— Hidden',administration: '— Hidden',  pennyDepth: 'Guided — executive briefs only',                       sfAccess: 'Account, Opportunity, Contact, Report',          authMethod: 'Google Sign-In' },
+  { persona: 'Employer Partner',    type: 'Partner',   typeCls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',          tier: 'everyday',   tierLabel: 'Everyday', tierOrder: 0, tierDot: 'bg-[#E6F0EA]0', tierBadge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', health: 'incomplete',      healthOrder: 2, navigator: '— Limited',      operations: '— Hidden',       demand: '— Hidden',     penny: '— Phase 3',      knowledge: '— Hidden',    collaboration: '— Hidden',administration: '— Hidden',  pennyDepth: 'None — employer matching planned Phase 3',              sfAccess: 'Account, Opportunity, Job Application, Contact', authMethod: 'Google Sign-In' },
+  { persona: 'Executive Director',  type: 'Staff',     typeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',             tier: 'admin',      tierLabel: 'Admin',    tierOrder: 2, tierDot: 'bg-[#FFF3E0]0',   tierBadge: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',       health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full',         knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ View',    pennyDepth: 'Admin — executive briefs, impact summaries, full context', sfAccess: 'Account, Opportunity, Report, Dashboard',        authMethod: 'Admin group · trailosadmin@…' },
+  { persona: 'Salesforce Admin',    type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'admin',      tierLabel: 'Admin',    tierOrder: 2, tierDot: 'bg-[#FFF3E0]0',   tierBadge: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',       health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Full',         knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Admin — SF mapping, data layer, integration governance', sfAccess: 'All objects, Permission Set, Profile, User',     authMethod: 'Admin group · trailosadmin@…' },
   { persona: 'Platform Admin',      type: 'Admin',     typeCls: 'text-slate-700 bg-slate-100 border-slate-300',         tier: 'superadmin', tierLabel: 'Super',    tierOrder: 3, tierDot: 'bg-primary',     tierBadge: 'bg-primary/10 border-primary/20 text-primary',      health: 'healthy',         healthOrder: 0, navigator: '✓ Full',         operations: '✓ Full',         demand: '✓ Full',       penny: '✓ Unrestricted', knowledge: '✓ All tabs', collaboration: '✓ Full',  administration: '✓ Full',    pennyDepth: 'Unrestricted — all RAG chunks, system prompts, governance override', sfAccess: 'All objects', authMethod: 'Dev environment — not assigned via Google Groups' },
 ];
 
@@ -118,9 +118,9 @@ const NAV_COLS: { key: keyof MatrixRow; label: string }[] = [
 
 const TIER_FILTER_OPTIONS: { key: FilterTier; label: string; dot: string }[] = [
   { key: 'all',        label: 'All tiers',   dot: 'bg-muted-foreground/40' },
-  { key: 'everyday',   label: 'Everyday',    dot: 'bg-emerald-500' },
-  { key: 'power',      label: 'Power',       dot: 'bg-violet-500' },
-  { key: 'admin',      label: 'Admin',       dot: 'bg-amber-500' },
+  { key: 'everyday',   label: 'Everyday',    dot: 'bg-[#E6F0EA]0' },
+  { key: 'power',      label: 'Power',       dot: 'bg-[#EDF5F8]0' },
+  { key: 'admin',      label: 'Admin',       dot: 'bg-[#FFF3E0]0' },
   { key: 'superadmin', label: 'Super',       dot: 'bg-primary' },
 ];
 
@@ -136,15 +136,15 @@ const TYPE_OPTIONS: { key: FilterType; label: string }[] = [
 
 const HEALTH_FILTER_OPTIONS: { key: FilterHealth; label: string; dot: string }[] = [
   { key: 'all',             label: 'All',             dot: 'bg-muted-foreground/40' },
-  { key: 'healthy',         label: 'Healthy',         dot: 'bg-emerald-500' },
-  { key: 'needs-attention', label: 'Needs attention', dot: 'bg-amber-400' },
-  { key: 'incomplete',      label: 'Incomplete',      dot: 'bg-rose-500' },
+  { key: 'healthy',         label: 'Healthy',         dot: 'bg-[#E6F0EA]0' },
+  { key: 'needs-attention', label: 'Needs attention', dot: 'bg-[#CC8400]' },
+  { key: 'incomplete',      label: 'Incomplete',      dot: 'bg-[#FBEAE6]0' },
 ];
 
 const HEALTH_DOT: Record<string, string> = {
-  healthy:           'bg-emerald-500',
-  'needs-attention': 'bg-amber-400',
-  incomplete:        'bg-rose-500',
+  healthy:           'bg-[#E6F0EA]0',
+  'needs-attention': 'bg-[#CC8400]',
+  incomplete:        'bg-[#FBEAE6]0',
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -158,7 +158,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 
 function CellValue({ value, inverted }: { value: string; inverted?: boolean }) {
   if (value.startsWith('✓')) {
-    return <span className={`text-[11px] font-medium ${inverted ? 'text-emerald-300' : 'text-emerald-600'}`}>{value}</span>;
+    return <span className={`text-[11px] font-medium ${inverted ? 'text-[#9FC3AE]' : 'text-[#2F6B3F]'}`}>{value}</span>;
   }
   if (value.startsWith('—')) {
     return <span className={`text-[11px] ${inverted ? 'text-muted-foreground/40' : 'text-muted-foreground/40'}`}>{value}</span>;
@@ -170,7 +170,7 @@ function NavCell({ value }: { value: string }) {
   if (value.startsWith('✓')) {
     return (
       <span className="flex items-start gap-1 text-[11px] text-foreground">
-        <CheckCircle2 className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
+        <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
         <span>{value.replace('✓ ', '')}</span>
       </span>
     );
@@ -185,7 +185,7 @@ function NavCell({ value }: { value: string }) {
   }
   return (
     <span className="flex items-start gap-1 text-[11px] text-muted-foreground">
-      <MinusCircle className="w-3 h-3 text-amber-400 mt-0.5 flex-shrink-0" />
+      <MinusCircle className="w-3 h-3 text-[#CC8400] mt-0.5 flex-shrink-0" />
       <span>{value}</span>
     </span>
   );
@@ -261,9 +261,9 @@ function PermissionMatrixTab() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {[
-              { label: `${hc.healthy} healthy`,          dot: 'bg-emerald-500', cls: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-              { label: `${hc.needsAttn} needs attention`, dot: 'bg-amber-400',  cls: 'bg-amber-50 border-amber-200 text-amber-700' },
-              { label: `${hc.incomplete} incomplete`,    dot: 'bg-rose-500',   cls: 'bg-rose-50 border-rose-200 text-rose-700' },
+              { label: `${hc.healthy} healthy`,          dot: 'bg-[#E6F0EA]0', cls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' },
+              { label: `${hc.needsAttn} needs attention`, dot: 'bg-[#CC8400]',  cls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' },
+              { label: `${hc.incomplete} incomplete`,    dot: 'bg-[#FBEAE6]0',   cls: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' },
             ].map(b => (
               <div key={b.label} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${b.cls}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${b.dot}`} />{b.label}
@@ -433,7 +433,7 @@ function PermissionMatrixTab() {
                     ))}
                     {/* Penny */}
                     <td className="px-3 py-2.5">
-                      <span className={`text-[11px] ${isActive ? 'text-violet-300' : 'text-violet-600'}`}>
+                      <span className={`text-[11px] ${isActive ? 'text-[#7FAFC6]' : 'text-[#2F6F7E]'}`}>
                         {row.pennyDepth.split(' — ')[0]}
                       </span>
                     </td>
@@ -468,9 +468,9 @@ function PermissionMatrixTab() {
               {activeRow.health !== 'healthy' && (() => {
                 const detail = MATRIX_HEALTH_DETAIL[activeRow.persona];
                 const isIncomplete = activeRow.health === 'incomplete';
-                const borderCls = isIncomplete ? 'border-rose-200 bg-rose-50/60' : 'border-amber-200 bg-amber-50/60';
-                const labelCls  = isIncomplete ? 'text-rose-600' : 'text-amber-600';
-                const dotCls    = isIncomplete ? 'bg-rose-400' : 'bg-amber-400';
+                const borderCls = isIncomplete ? 'border-[#E8B9B4] bg-[#FBEAE6]/60' : 'border-[#FFD08A] bg-[#FFF3E0]/60';
+                const labelCls  = isIncomplete ? 'text-[#A93F2F]' : 'text-[#CC8400]';
+                const dotCls    = isIncomplete ? 'bg-[#A93F2F]' : 'bg-[#CC8400]';
                 if (!detail) return null;
                 return (
                   <div className={`rounded-lg border p-3 space-y-3 ${borderCls}`}>
@@ -510,9 +510,9 @@ function PermissionMatrixTab() {
                 <p className="text-[11px] font-mono text-muted-foreground bg-muted/50 rounded px-2.5 py-2 leading-snug">{activeRow.authMethod}</p>
               </div>
               {/* Penny */}
-              <div className="rounded-lg border border-violet-200 bg-violet-50/60 p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-violet-500 mb-1">Penny depth</p>
-                <p className="text-[12px] text-violet-800 leading-snug">{activeRow.pennyDepth}</p>
+              <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]/60 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-[#2F6F7E] mb-1">Penny depth</p>
+                <p className="text-[12px] text-[#2F6F7E] leading-snug">{activeRow.pennyDepth}</p>
               </div>
               {/* SF */}
               <div>
@@ -564,9 +564,9 @@ function AccessTiersTab({
       <div className="p-5 space-y-6 max-w-5xl">
 
         {/* Auth live notice */}
-        <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-200 bg-emerald-50">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-          <p className="text-[12px] text-emerald-800 leading-snug">
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
+          <CheckCircle2 className="w-4 h-4 text-[#2F6B3F] flex-shrink-0" />
+          <p className="text-[12px] text-[#245531] leading-snug">
             <strong>Authentication is live</strong> — Google Sign-In via Clerk is active. Tier is
             auto-assigned from Google Group membership on sign-in. Use "Preview this tier" below
             to simulate a different access level in the current session.
@@ -684,15 +684,15 @@ function AccessTiersTab({
           <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">
             Google Workspace Authentication
           </p>
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-5 space-y-4">
+          <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA]/40 p-5 space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white border border-emerald-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-9 h-9 rounded-lg bg-white border border-[#9FC3AE] flex items-center justify-center flex-shrink-0 shadow-sm">
                 <Chrome className="w-5 h-5 text-[#4285F4]" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-0.5">
                   <p className="text-[13px] font-semibold text-foreground">Google Sign-In (OAuth 2.0 + OpenID Connect)</p>
-                  <span className="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-wide">Live</span>
+                  <span className="text-[9px] font-bold bg-[#E6F0EA] text-[#2F6B3F] px-1.5 py-0.5 rounded uppercase tracking-wide">Live</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground">
                   Users sign in with their Transition Trails Google account. Tier is auto-assigned from Google Group membership.
@@ -702,19 +702,19 @@ function AccessTiersTab({
             <div className="grid grid-cols-3 gap-3">
               {[
                 {
-                  icon: <Globe className="w-4 h-4 text-emerald-600" />,
+                  icon: <Globe className="w-4 h-4 text-[#2F6B3F]" />,
                   title: 'Step 1 — Google Sign-In',
                   body: 'Clerk handles Google OAuth. Users sign in with @transitiontrails.org accounts — no separate Trail OS password.',
                   status: 'live',
                 },
                 {
-                  icon: <Users className="w-4 h-4 text-emerald-600" />,
+                  icon: <Users className="w-4 h-4 text-[#2F6B3F]" />,
                   title: 'Step 2 — Google Groups',
                   body: 'Three Trail OS groups defined in Google Workspace Admin: trailosadmin, trailospennyadmin, and trailosusers.',
                   status: 'live',
                 },
                 {
-                  icon: <Network className="w-4 h-4 text-amber-500" />,
+                  icon: <Network className="w-4 h-4 text-[#CC8400]" />,
                   title: 'Step 3 — Auto Tier Assignment',
                   body: 'Requires GOOGLE_ADMIN_CREDENTIALS (service account JSON) + GOOGLE_ADMIN_IMPERSONATE_EMAIL in Replit Secrets. Once set, /api/auth/tier reads group membership and assigns the matching tier on each sign-in.',
                   status: 'needs-token',
@@ -725,8 +725,8 @@ function AccessTiersTab({
                     {step.icon}
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
                       step.status === 'live'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-amber-100 text-amber-700'
+                        ? 'bg-[#E6F0EA] text-[#2F6B3F]'
+                        : 'bg-[#FFF3E0] text-[#CC8400]'
                     }`}>
                       {step.status === 'live' ? 'Live' : 'Needs Token'}
                     </span>
@@ -736,14 +736,14 @@ function AccessTiersTab({
                 </div>
               ))}
             </div>
-            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-              <Mail className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-[#FFF3E0] border border-[#FFF3E0] rounded-lg px-3 py-2">
+              <Mail className="w-3.5 h-3.5 text-[#CC8400] mt-0.5 flex-shrink-0" />
               <span>
-                <strong className="text-amber-800">To enable group-based tier assignment:</strong>{' '}
+                <strong className="text-[#CC8400]">To enable group-based tier assignment:</strong>{' '}
                 Add a GCP service account JSON key as{' '}
-                <code className="bg-amber-100 px-1 rounded">GOOGLE_ADMIN_CREDENTIALS</code>{' '}
+                <code className="bg-[#FFF3E0] px-1 rounded">GOOGLE_ADMIN_CREDENTIALS</code>{' '}
                 and a Workspace admin email as{' '}
-                <code className="bg-amber-100 px-1 rounded">GOOGLE_ADMIN_IMPERSONATE_EMAIL</code>{' '}
+                <code className="bg-[#FFF3E0] px-1 rounded">GOOGLE_ADMIN_IMPERSONATE_EMAIL</code>{' '}
                 in Replit Secrets. See the Secrets Audit for step-by-step setup instructions.
                 Without these, all @transitiontrails.org users default to the Everyday tier.
               </span>
@@ -803,9 +803,9 @@ function AccessTiersTab({
 // ── Role Owners tab ───────────────────────────────────────────────────────────
 
 const TIER_BADGE: Record<string, string> = {
-  everyday:   'bg-emerald-50 text-emerald-700 border-emerald-200',
-  power:      'bg-violet-50 text-violet-700 border-violet-200',
-  admin:      'bg-amber-50 text-amber-700 border-amber-200',
+  everyday:   'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
+  power:      'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  admin:      'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
   superadmin: 'bg-primary/10 text-primary border-primary/20',
 };
 
@@ -863,21 +863,21 @@ function RoleOwnersTab() {
         {/* Status banner */}
         <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 ${
           unassigned === 0
-            ? 'bg-emerald-50/60 border-emerald-200'
-            : 'bg-amber-50/60 border-amber-200'
+            ? 'bg-[#E6F0EA]/60 border-[#9FC3AE]'
+            : 'bg-[#FFF3E0]/60 border-[#FFD08A]'
         }`}>
           {unassigned === 0
-            ? <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-            : <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+            ? <CheckCircle2 className="w-4 h-4 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
+            : <AlertTriangle className="w-4 h-4 text-[#CC8400] mt-0.5 flex-shrink-0" />
           }
           <div>
-            <p className={`text-[12px] font-semibold ${unassigned === 0 ? 'text-emerald-800' : 'text-amber-800'}`}>
+            <p className={`text-[12px] font-semibold ${unassigned === 0 ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
               {unassigned === 0
                 ? 'All platform roles are assigned'
                 : `${unassigned} platform role${unassigned !== 1 ? 's' : ''} unassigned`
               }
             </p>
-            <p className={`text-[11px] mt-0.5 ${unassigned === 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
+            <p className={`text-[11px] mt-0.5 ${unassigned === 0 ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
               {unassigned === 0
                 ? 'Prompt governance, knowledge management, and platform administration all have named owners.'
                 : 'Unassigned roles create governance gaps — Penny quality monitoring, source trust reviews, and prompt governance are ungoverned until owners are set.'
@@ -916,11 +916,11 @@ function RoleOwnersTab() {
                   </div>
                   <div className="flex-shrink-0">
                     {isAssigned ? (
-                      <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                      <span className="flex items-center gap-1 text-[10px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
                         <UserCheck className="w-3 h-3" /> Assigned
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                      <span className="flex items-center gap-1 text-[10px] font-semibold text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
                         <AlertTriangle className="w-3 h-3" /> Unassigned
                       </span>
                     )}
@@ -1043,9 +1043,9 @@ export default function PeopleAccess() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 pb-3">
-            <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-              <span className="text-[11px] font-semibold text-emerald-700">Auth live · Clerk + Google Groups</span>
+            <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+              <CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" />
+              <span className="text-[11px] font-semibold text-[#2F6B3F]">Auth live · Clerk + Google Groups</span>
             </div>
           </div>
         </div>

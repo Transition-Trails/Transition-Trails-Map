@@ -5,9 +5,9 @@ import { GraduationCap, ArrowRight, Zap } from 'lucide-react';
 import { useSfLmsCourses, type SfLmsCourse } from '@/hooks/useSfCurriculum';
 
 const SF_STATUS_CFG: Record<string, { label: string; cls: string }> = {
-  Completed:    { label: 'Completed',   cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-  'In Progress': { label: 'In Progress', cls: 'text-blue-700 bg-blue-50 border-blue-200' },
-  Discovery:    { label: 'Discovery',   cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+  Completed:    { label: 'Completed',   cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+  'In Progress': { label: 'In Progress', cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]' },
+  Discovery:    { label: 'Discovery',   cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
   Planned:      { label: 'Planned',     cls: 'text-slate-600 bg-slate-50 border-slate-200' },
 };
 
@@ -37,7 +37,7 @@ export default function CurriculumPrograms() {
         {/* ── Live from Salesforce ── */}
         <section>
           <div className="flex items-center gap-2 mb-3">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-block w-2 h-2 rounded-full bg-[#E6F0EA]0 animate-pulse" />
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Live from Salesforce · Course__c</p>
             <div className="flex-1 h-px bg-border/50" />
           </div>
@@ -48,7 +48,7 @@ export default function CurriculumPrograms() {
             </div>
           )}
           {isError && (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[12px] text-rose-700">
+            <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3 text-[12px] text-[#A93F2F]">
               Could not load Salesforce LMS data.
             </div>
           )}
@@ -66,10 +66,10 @@ export default function CurriculumPrograms() {
                 const statusCfg = SF_STATUS_CFG[sfStatus] ?? { label: sfStatus, cls: 'text-slate-600 bg-slate-50 border-slate-200' };
                 const { total, completed, inProg, notStart, pct } = moduleStats(course);
                 return (
-                  <div key={course.Id} className="rounded-xl border border-emerald-200/70 bg-white p-5 shadow-sm">
+                  <div key={course.Id} className="rounded-xl border border-[#9FC3AE]/70 bg-white p-5 shadow-sm">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <Zap className="w-4 h-4 text-[#2F6B3F] shrink-0" />
                         <div>
                           <p className="text-[15px] font-bold text-foreground">{course.Course_Title__c ?? course.Name}</p>
                           <p className="text-[11px] text-muted-foreground">
@@ -87,15 +87,15 @@ export default function CurriculumPrograms() {
                         <span className="font-semibold">{pct}%</span>
                       </div>
                       <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-[#E6F0EA]0 rounded-full transition-all" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
 
                     <div className="flex gap-4 flex-wrap text-center">
                       {[
                         { label: 'Total',       value: total,     cls: 'text-foreground' },
-                        { label: 'Completed',   value: completed, cls: 'text-emerald-700' },
-                        { label: 'In Progress', value: inProg,    cls: 'text-blue-700' },
+                        { label: 'Completed',   value: completed, cls: 'text-[#2F6B3F]' },
+                        { label: 'In Progress', value: inProg,    cls: 'text-[#2F6F7E]' },
                         { label: 'Not Started', value: notStart,  cls: 'text-muted-foreground' },
                       ].map(s => (
                         <div key={s.label}>
@@ -171,7 +171,7 @@ export default function CurriculumPrograms() {
                     ))}
                   </div>
                   {prog.notes && (
-                    <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 mt-2">{prog.notes}</p>
+                    <p className="text-[11px] text-[#CC8400] bg-[#FFF3E0] border border-[#FFF3E0] rounded px-2 py-1 mt-2">{prog.notes}</p>
                   )}
                 </button>
               );

@@ -67,30 +67,30 @@ export const NODE_TYPE_CONFIG: Record<KGNodeType, {
   role: {
     label: 'Role',
     pluralLabel: 'Roles',
-    chip: 'bg-amber-50 text-amber-800 border-amber-200',
-    cardBorder: 'border-amber-100 hover:border-amber-300',
-    dotColor: 'bg-amber-500',
+    chip: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+    cardBorder: 'border-[#FFF3E0] hover:border-[#FFD08A]',
+    dotColor: 'bg-[#FFF3E0]0',
   },
   resolvePhase: {
     label: 'RESOLVE Phase',
     pluralLabel: 'RESOLVE',
-    chip: 'bg-violet-50 text-violet-800 border-violet-200',
-    cardBorder: 'border-violet-100 hover:border-violet-300',
-    dotColor: 'bg-violet-500',
+    chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    cardBorder: 'border-[#EDF5F8] hover:border-[#7FAFC6]',
+    dotColor: 'bg-[#EDF5F8]0',
   },
   capability: {
     label: 'Trail OS Capability',
     pluralLabel: 'Capabilities',
-    chip: 'bg-sky-50 text-sky-800 border-sky-200',
-    cardBorder: 'border-sky-100 hover:border-sky-300',
-    dotColor: 'bg-sky-500',
+    chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    cardBorder: 'border-[#EDF5F8] hover:border-[#7FAFC6]',
+    dotColor: 'bg-[#EDF5F8]0',
   },
   channel: {
     label: 'Comm Channel',
     pluralLabel: 'Channels',
-    chip: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    cardBorder: 'border-emerald-100 hover:border-emerald-300',
-    dotColor: 'bg-emerald-500',
+    chip: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
+    cardBorder: 'border-[#E6F0EA] hover:border-[#9FC3AE]',
+    dotColor: 'bg-[#E6F0EA]0',
   },
   pennyCapability: {
     label: 'Penny Capability',
@@ -102,9 +102,9 @@ export const NODE_TYPE_CONFIG: Record<KGNodeType, {
   knowledgeTopic: {
     label: 'Knowledge Topic',
     pluralLabel: 'Knowledge',
-    chip: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-    cardBorder: 'border-indigo-100 hover:border-indigo-300',
-    dotColor: 'bg-indigo-500',
+    chip: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+    cardBorder: 'border-[#EDF5F8] hover:border-[#7FAFC6]',
+    dotColor: 'bg-[#EDF5F8]0',
   },
   salesforceObject: {
     label: 'Salesforce Object',
@@ -116,8 +116,8 @@ export const NODE_TYPE_CONFIG: Record<KGNodeType, {
 };
 
 export const CONFIDENCE_CONFIG: Record<KGConfidence, { label: string; cls: string }> = {
-  confirmed: { label: 'Confirmed',  cls: 'text-green-700 bg-green-50 border-green-200' },
-  prototype: { label: 'Prototype',  cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+  confirmed: { label: 'Confirmed',  cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+  prototype: { label: 'Prototype',  cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
   planned:   { label: 'Planned',    cls: 'text-primary bg-primary/5 border-primary/20' },
   future:    { label: 'Future',     cls: 'text-muted-foreground bg-muted/40 border-border' },
 };

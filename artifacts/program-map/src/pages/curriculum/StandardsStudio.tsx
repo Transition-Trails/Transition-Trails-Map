@@ -147,9 +147,9 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
         </div>
 
         {/* Why it matters */}
-        <div className="rounded-lg border border-amber-100 bg-amber-50/50 p-3">
-          <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">Why It Matters</p>
-          <p className="text-[11px] text-amber-900 leading-relaxed">{std.whyItMatters}</p>
+        <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0]/50 p-3">
+          <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Why It Matters</p>
+          <p className="text-[11px] text-[#CC8400] leading-relaxed">{std.whyItMatters}</p>
         </div>
 
         {/* Required Fields */}
@@ -157,7 +157,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
           <div className="space-y-1.5">
             {std.requiredFields.map(f => (
               <div key={f.field} className="flex items-start gap-2">
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>
+                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>
                   {f.required ? 'Req' : 'Opt'}
                 </span>
                 <div>
@@ -174,7 +174,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
           <div className="space-y-1.5">
             {std.qualityCriteria.map((c, i) => (
               <div key={i} className="flex items-start gap-2">
-                <CheckCircle2 className="w-3 h-3 text-green-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
                 <p className="text-[11px] text-foreground">{c}</p>
               </div>
             ))}
@@ -187,16 +187,16 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
             {std.pennyChecks.map(chk => (
               <div key={chk.id} className="rounded border border-border bg-muted/20 p-2.5 space-y-1">
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${chk.required ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{chk.required ? 'Required' : 'Optional'}</span>
+                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${chk.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{chk.required ? 'Required' : 'Optional'}</span>
                   <p className="text-[11px] font-semibold text-foreground">{chk.check}</p>
                 </div>
                 <div className="grid grid-cols-1 gap-1 pl-1">
                   <div className="flex items-start gap-1.5">
-                    <CheckCircle2 className="w-3 h-3 text-green-500 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
                     <p className="text-[10px] text-muted-foreground">{chk.passing}</p>
                   </div>
                   <div className="flex items-start gap-1.5">
-                    <XCircle className="w-3 h-3 text-rose-400 shrink-0 mt-0.5" />
+                    <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0 mt-0.5" />
                     <p className="text-[10px] text-muted-foreground">{chk.failing}</p>
                   </div>
                 </div>
@@ -220,13 +220,13 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
         {/* Mappings */}
         <Section id="mappings" label="Salesforce & LMS Mapping">
           <div className="space-y-2">
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-2.5">
-              <p className="text-[9px] font-bold text-blue-700 uppercase tracking-wider mb-0.5">Salesforce</p>
-              <p className="text-[11px] text-blue-900">{std.sfMapping}</p>
+            <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
+              <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">Salesforce</p>
+              <p className="text-[11px] text-[#2F6F7E]">{std.sfMapping}</p>
             </div>
-            <div className="rounded-lg border border-violet-200 bg-violet-50 p-2.5">
-              <p className="text-[9px] font-bold text-violet-700 uppercase tracking-wider mb-0.5">LMS</p>
-              <p className="text-[11px] text-violet-900">{std.lmsMapping}</p>
+            <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
+              <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">LMS</p>
+              <p className="text-[11px] text-[#2F6F7E]">{std.lmsMapping}</p>
             </div>
           </div>
         </Section>
@@ -276,9 +276,9 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
         <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Standards', value: STANDARDS_SUMMARY.total, sub: 'defined', cls: 'border-foreground/20 bg-foreground/5' },
-            { label: 'Active',    value: STANDARDS_SUMMARY.byStatus.active, sub: 'live', cls: 'border-green-200 bg-green-50' },
+            { label: 'Active',    value: STANDARDS_SUMMARY.byStatus.active, sub: 'live', cls: 'border-[#9FC3AE] bg-[#E6F0EA]' },
             { label: `${TERMS.aiAssistant} Checks`, value: STANDARDS_SUMMARY.totalChecks, sub: 'total', cls: 'border-secondary/20 bg-secondary/5' },
-            { label: 'Required Checks', value: STANDARDS_SUMMARY.requiredChecks, sub: 'must-pass', cls: 'border-rose-200 bg-rose-50' },
+            { label: 'Required Checks', value: STANDARDS_SUMMARY.requiredChecks, sub: 'must-pass', cls: 'border-[#E8B9B4] bg-[#FBEAE6]' },
           ].map(stat => (
             <div key={stat.label} className={`rounded-lg border p-3 text-center ${stat.cls}`}>
               <p className="text-xl font-bold text-foreground">{stat.value}</p>
@@ -354,9 +354,9 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           </button>
           <button
             onClick={() => onNavigate('gap-report')}
-            className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-left hover:bg-rose-100 transition-colors"
+            className="rounded-xl border border-[#E8B9B4] bg-[#FBEAE6] p-4 text-left hover:bg-[#FBEAE6] transition-colors"
           >
-            <AlertTriangle className="w-5 h-5 text-rose-600 mb-2" />
+            <AlertTriangle className="w-5 h-5 text-[#A93F2F] mb-2" />
             <p className="text-[12px] font-bold text-foreground mb-1">Gap Report</p>
             <p className="text-[11px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps across all programs require attention before the next cohort.</p>
           </button>
@@ -493,11 +493,11 @@ function ChecklistView() {
         <div className="ml-auto flex items-center gap-3">
           {total > 0 && (
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold text-green-700">{passCount} pass</span>
-              <span className="text-[11px] font-semibold text-rose-600">{failCount} fail</span>
+              <span className="text-[11px] font-semibold text-[#2F6B3F]">{passCount} pass</span>
+              <span className="text-[11px] font-semibold text-[#A93F2F]">{failCount} fail</span>
               <span className="text-[11px] text-muted-foreground">{pct}% complete</span>
               <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
-                <div className="h-full rounded-full bg-green-500 transition-all" style={{ width: `${pct}%` }} />
+                <div className="h-full rounded-full bg-[#2F6B3F] transition-all" style={{ width: `${pct}%` }} />
               </div>
             </div>
           )}
@@ -522,8 +522,8 @@ function ChecklistView() {
                     <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{std.category}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {stdPass > 0 && <span className="text-[10px] font-semibold text-green-700">{stdPass} pass</span>}
-                    {stdFail > 0 && <span className="text-[10px] font-semibold text-rose-600">{stdFail} fail</span>}
+                    {stdPass > 0 && <span className="text-[10px] font-semibold text-[#2F6B3F]">{stdPass} pass</span>}
+                    {stdFail > 0 && <span className="text-[10px] font-semibold text-[#A93F2F]">{stdFail} fail</span>}
                     <span className="text-[10px] text-muted-foreground">{stdChecks.length} checks</span>
                   </div>
                 </div>
@@ -535,12 +535,12 @@ function ChecklistView() {
                         key={chk.id}
                         onClick={() => cycle(chk.id)}
                         className={`w-full text-left px-4 py-2.5 flex items-start gap-3 hover:bg-muted/20 transition-colors ${
-                          state === 'pass' ? 'bg-green-50/50' : state === 'fail' ? 'bg-rose-50/50' : ''
+                          state === 'pass' ? 'bg-[#E6F0EA]/50' : state === 'fail' ? 'bg-[#FBEAE6]/50' : ''
                         }`}
                       >
                         <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                          state === 'pass' ? 'bg-green-500 border-green-500'
-                            : state === 'fail' ? 'bg-rose-500 border-rose-500'
+                          state === 'pass' ? 'bg-[#2F6B3F] border-[#2F6B3F]'
+                            : state === 'fail' ? 'bg-[#FBEAE6]0 border-[#FBEAE6]0'
                             : 'bg-background border-muted-foreground/30'
                         }`}>
                           {state === 'pass' && <CheckCircle2 className="w-3 h-3 text-white" />}
@@ -549,15 +549,15 @@ function ChecklistView() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 mb-0.5">
                             <p className="text-[12px] font-semibold text-foreground">{chk.check}</p>
-                            {chk.required && <span className="text-[9px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-full px-1.5 py-0.5">Required</span>}
+                            {chk.required && <span className="text-[9px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Required</span>}
                           </div>
                           <div className="flex items-start gap-4">
                             <div className="flex items-start gap-1">
-                              <span className="text-[9px] font-bold text-green-600 uppercase shrink-0 mt-0.5">✓</span>
+                              <span className="text-[9px] font-bold text-[#2F6B3F] uppercase shrink-0 mt-0.5">✓</span>
                               <p className="text-[10px] text-muted-foreground">{chk.passing}</p>
                             </div>
                             <div className="flex items-start gap-1">
-                              <span className="text-[9px] font-bold text-rose-500 uppercase shrink-0 mt-0.5">✗</span>
+                              <span className="text-[9px] font-bold text-[#A93F2F] uppercase shrink-0 mt-0.5">✗</span>
                               <p className="text-[10px] text-muted-foreground">{chk.failing}</p>
                             </div>
                           </div>
@@ -590,8 +590,8 @@ function GapReportView() {
     ), [filterType, filterSev]);
 
   const sevCls: Record<string, string> = {
-    high:   'text-rose-700 bg-rose-50 border-rose-200',
-    medium: 'text-amber-700 bg-amber-50 border-amber-200',
+    high:   'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+    medium: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
     low:    'text-slate-600 bg-slate-50 border-slate-200',
   };
 
@@ -607,8 +607,8 @@ function GapReportView() {
       <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 flex-wrap">
           {[
-            { label: `${GAP_SUMMARY.bySeverity.high} High`, cls: 'text-rose-700 bg-rose-50 border-rose-200' },
-            { label: `${GAP_SUMMARY.bySeverity.medium} Medium`, cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+            { label: `${GAP_SUMMARY.bySeverity.high} High`, cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+            { label: `${GAP_SUMMARY.bySeverity.medium} Medium`, cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
             { label: `${GAP_SUMMARY.bySeverity.low} Low`, cls: 'text-slate-600 bg-slate-50 border-slate-200' },
           ].map(s => (
             <span key={s.label} className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${s.cls}`}>{s.label}</span>
@@ -634,7 +634,7 @@ function GapReportView() {
         <div className="p-5 space-y-2">
           {filtered.length === 0 && (
             <div className="text-center py-12">
-              <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-2" />
+              <CheckCircle2 className="w-8 h-8 text-[#2F6B3F] mx-auto mb-2" />
               <p className="text-[12px] font-semibold text-foreground">No gaps match the current filters.</p>
             </div>
           )}
@@ -726,9 +726,9 @@ export default function StandardsStudio() {
             </p>
           </div>
           {view === 'gap-report' && (
-            <div className="flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 shrink-0">
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-              <span className="text-[11px] font-bold text-rose-700">{GAP_SUMMARY.bySeverity.high} high-severity gaps</span>
+            <div className="flex items-center gap-1.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 shrink-0">
+              <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F]" />
+              <span className="text-[11px] font-bold text-[#A93F2F]">{GAP_SUMMARY.bySeverity.high} high-severity gaps</span>
             </div>
           )}
           <button

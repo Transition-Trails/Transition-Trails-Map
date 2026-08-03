@@ -49,10 +49,10 @@ export default function Intelligence() {
       <div className="p-6 max-w-3xl space-y-5">
 
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border bg-violet-50 text-violet-700 border-violet-200">
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">
             Future State
           </span>
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border bg-blue-50 text-blue-700 border-blue-200">
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">
             Phase 2 · Sprint 3
           </span>
         </div>
@@ -74,13 +74,13 @@ export default function Intelligence() {
             return (
               <div key={card.id} className="rounded-lg border border-border bg-white p-4 space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-md bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0">
-                    <Icon className="w-4 h-4 text-violet-600" />
+                  <div className="w-8 h-8 rounded-md bg-[#EDF5F8] border border-[#EDF5F8] flex items-center justify-center shrink-0">
+                    <Icon className="w-4 h-4 text-[#2F6F7E]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-0.5">
                       <p className="text-[13px] font-semibold text-foreground">{card.title}</p>
-                      <span className="text-[9px] font-bold uppercase bg-blue-50 border border-blue-200 text-blue-700 rounded px-1.5 py-0.5">
+                      <span className="text-[9px] font-bold uppercase bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] rounded px-1.5 py-0.5">
                         {card.sprint}
                       </span>
                     </div>

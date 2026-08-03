@@ -79,11 +79,11 @@ export default function ProgramHealth() {
               <h2 className="text-sm font-semibold text-foreground mb-3">Alerts</h2>
               <div className="space-y-2">
                 {alerts.map(a => (
-                  <div key={a.prog} className="flex gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
-                    <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300 flex-shrink-0 text-[10px] self-start mt-0.5">
+                  <div key={a.prog} className="flex gap-3 p-3 rounded-lg bg-[#FFF3E0] border border-[#FFD08A]">
+                    <Badge variant="outline" className="bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A] flex-shrink-0 text-[10px] self-start mt-0.5">
                       {a.prog}
                     </Badge>
-                    <p className="text-sm text-amber-900">{a.msg}</p>
+                    <p className="text-sm text-[#CC8400]">{a.msg}</p>
                   </div>
                 ))}
               </div>

@@ -135,9 +135,9 @@ function SkeletonBlock({ lines = 4 }: { lines?: number }) {
 
 function ErrorBox({ message }: { message: string }) {
   return (
-    <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-      <p className="text-[12px] text-red-700 font-medium">{message}</p>
-      <p className="text-[11px] text-red-600/70 mt-1">Check Salesforce authentication in Admin → Integrations.</p>
+    <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 text-center">
+      <p className="text-[12px] text-[#A93F2F] font-medium">{message}</p>
+      <p className="text-[11px] text-[#A93F2F]/70 mt-1">Check Salesforce authentication in Admin → Integrations.</p>
     </div>
   );
 }
@@ -194,8 +194,8 @@ function ProfilePanel({
           <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Onboarding</span>
           <span className="flex items-center gap-1.5">
             {profile.onboardingComplete
-              ? <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /><span className="text-[13px] text-emerald-700">Complete</span></>
-              : <><XCircle       className="w-3.5 h-3.5 text-amber-500"  /><span className="text-[13px] text-amber-700">Pending</span></>
+              ? <><CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" /><span className="text-[13px] text-[#2F6B3F]">Complete</span></>
+              : <><XCircle       className="w-3.5 h-3.5 text-[#CC8400]"  /><span className="text-[13px] text-[#CC8400]">Pending</span></>
             }
           </span>
         </div>
@@ -206,19 +206,19 @@ function ProfilePanel({
         <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50">Scores</p>
         <div>
           <p className="text-[11px] font-medium text-muted-foreground mb-1.5">Confidence</p>
-          <ScoreBar value={profile.confidenceScore} color="bg-violet-500" />
+          <ScoreBar value={profile.confidenceScore} color="bg-[#EDF5F8]0" />
         </div>
         <div>
           <p className="text-[11px] font-medium text-muted-foreground mb-1.5">Skill</p>
-          <ScoreBar value={profile.skillScore} color="bg-sky-500" />
+          <ScoreBar value={profile.skillScore} color="bg-[#EDF5F8]0" />
         </div>
       </div>
 
       {/* Blockers */}
       {profile.currentBlockers && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600/70 mb-1.5">Current Blockers</p>
-          <p className="text-[13px] text-amber-800 leading-relaxed whitespace-pre-line">{profile.currentBlockers}</p>
+        <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-4">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[#CC8400]/70 mb-1.5">Current Blockers</p>
+          <p className="text-[13px] text-[#CC8400] leading-relaxed whitespace-pre-line">{profile.currentBlockers}</p>
         </div>
       )}
     </div>
@@ -259,7 +259,7 @@ function ConversationsPanel({ contactId }: { contactId: string }) {
           {ix.pennyResponse && (
             <div className="flex justify-start">
               <div className="max-w-[75%] bg-card border border-border rounded-2xl rounded-tl-sm px-3 py-2">
-                <p className="text-[10px] font-medium text-violet-600 mb-0.5">Penny</p>
+                <p className="text-[10px] font-medium text-[#2F6F7E] mb-0.5">Penny</p>
                 <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">{ix.pennyResponse}</p>
               </div>
             </div>
@@ -348,7 +348,7 @@ function CareerPanel({ contactId }: { contactId: string }) {
                 <p className="text-[13px] font-semibold text-foreground">{r.targetRole || '—'}</p>
                 <p className="text-[11px] text-muted-foreground">{formatDate(r.reviewedAt)} · {r.reviewMode}</p>
               </div>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-semibold bg-violet-50 border-violet-200 text-violet-700 shrink-0">{r.readinessLabel}</span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-semibold bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E] shrink-0">{r.readinessLabel}</span>
             </div>
             {feedbackParsed !== null ? (
               <div className="space-y-1.5">
@@ -540,8 +540,8 @@ function EditDrawer({
             {/* Header */}
             <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border flex-shrink-0 bg-card">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
-                  <Pencil className="w-3.5 h-3.5 text-violet-600" />
+                <div className="w-7 h-7 rounded-lg bg-[#EDF5F8] flex items-center justify-center shrink-0">
+                  <Pencil className="w-3.5 h-3.5 text-[#2F6F7E]" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] font-bold text-foreground leading-tight truncate">
@@ -601,12 +601,12 @@ function EditDrawer({
                 </div>
 
                 {trailError && (
-                  <p className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded px-2.5 py-1.5">{trailError}</p>
+                  <p className="text-[11px] text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded px-2.5 py-1.5">{trailError}</p>
                 )}
 
                 <div className="flex items-center gap-2 pt-1">
                   {trailSuccess && (
-                    <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                    <span className="flex items-center gap-1 text-[11px] text-[#2F6B3F] font-medium">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Saved
                     </span>
                   )}
@@ -733,12 +733,12 @@ function EditDrawer({
                 </div>
 
                 {coachingError && (
-                  <p className="text-[11px] text-red-600 bg-red-50 border border-red-200 rounded px-2.5 py-1.5">{coachingError}</p>
+                  <p className="text-[11px] text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded px-2.5 py-1.5">{coachingError}</p>
                 )}
 
                 <div className="flex items-center gap-2 pt-1">
                   {coachingSuccess && (
-                    <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                    <span className="flex items-center gap-1 text-[11px] text-[#2F6B3F] font-medium">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Saved
                     </span>
                   )}
@@ -754,9 +754,9 @@ function EditDrawer({
               </div>
 
               {/* Live notice */}
-              <div className="rounded border border-emerald-200 bg-emerald-50/60 px-3 py-2 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 inline-block" />
-                <p className="text-[10px] text-emerald-800 leading-snug">
+              <div className="rounded border border-[#9FC3AE] bg-[#E6F0EA]/60 px-3 py-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 shrink-0 inline-block" />
+                <p className="text-[10px] text-[#245531] leading-snug">
                   <strong>Live · Salesforce.</strong> Changes write directly to the Contact record in production.
                 </p>
               </div>
@@ -839,7 +839,7 @@ export default function LearnerDetail({ params }: { params?: { contactId?: strin
               {profile ? `${profile.firstName} ${profile.lastName}` : 'Learner Profile'}
             </span>
             <div className="ml-auto flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 inline-block" />
               <span className="text-[10px] text-muted-foreground">Live · Salesforce</span>
             </div>
           </div>

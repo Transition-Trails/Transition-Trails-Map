@@ -383,7 +383,7 @@ const SECTIONS: Section[] = [
         id: 'vis-3',
         rule: 'Status colors follow the platform convention: emerald = healthy/complete, amber = warning/at-risk, rose = critical/blocked, sky = informational.',
         rationale: 'Consistent color semantics let users read status at a glance without reading labels.',
-        doExample: 'A critical attention item uses text-rose-600 / bg-rose-50. An on-track item uses text-emerald-600 / bg-emerald-50.',
+        doExample: 'A critical attention item uses text-[#A93F2F] / bg-[#FBEAE6]. An on-track item uses text-[#2F6B3F] / bg-[#E6F0EA].',
         dontExample: 'Using red for some critical states and orange for others, or using blue for both informational and success states.',
       },
     ],
@@ -415,14 +415,14 @@ const SECTIONS: Section[] = [
 ];
 
 const COLOR_MAP: Record<string, { bg: string; icon: string; badge: string; border: string }> = {
-  emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', border: 'border-emerald-200' },
-  sky:     { bg: 'bg-sky-50',     icon: 'text-sky-700',     badge: 'bg-sky-100 text-sky-700 border-sky-200',             border: 'border-sky-200' },
-  violet:  { bg: 'bg-violet-50',  icon: 'text-violet-700',  badge: 'bg-violet-100 text-violet-700 border-violet-200',    border: 'border-violet-200' },
-  amber:   { bg: 'bg-amber-50',   icon: 'text-amber-700',   badge: 'bg-amber-100 text-amber-700 border-amber-200',       border: 'border-amber-200' },
-  rose:    { bg: 'bg-rose-50',    icon: 'text-rose-700',    badge: 'bg-rose-100 text-rose-700 border-rose-200',          border: 'border-rose-200' },
-  teal:    { bg: 'bg-teal-50',    icon: 'text-teal-700',    badge: 'bg-teal-100 text-teal-700 border-teal-200',          border: 'border-teal-200' },
-  indigo:  { bg: 'bg-indigo-50',  icon: 'text-indigo-700',  badge: 'bg-indigo-100 text-indigo-700 border-indigo-200',    border: 'border-indigo-200' },
-  orange:  { bg: 'bg-orange-50',  icon: 'text-orange-700',  badge: 'bg-orange-100 text-orange-700 border-orange-200',    border: 'border-orange-200' },
+  emerald: { bg: 'bg-[#E6F0EA]', icon: 'text-[#2F6B3F]', badge: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', border: 'border-[#9FC3AE]' },
+  sky:     { bg: 'bg-[#EDF5F8]',     icon: 'text-[#2F6F7E]',     badge: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',             border: 'border-[#7FAFC6]' },
+  violet:  { bg: 'bg-[#EDF5F8]',  icon: 'text-[#2F6F7E]',  badge: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',    border: 'border-[#7FAFC6]' },
+  amber:   { bg: 'bg-[#FFF3E0]',   icon: 'text-[#CC8400]',   badge: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',       border: 'border-[#FFD08A]' },
+  rose:    { bg: 'bg-[#FBEAE6]',    icon: 'text-[#A93F2F]',    badge: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',          border: 'border-[#E8B9B4]' },
+  teal:    { bg: 'bg-[#E6F0EA]',    icon: 'text-[#2F6B3F]',    badge: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',          border: 'border-[#9FC3AE]' },
+  indigo:  { bg: 'bg-[#EDF5F8]',  icon: 'text-[#2F6F7E]',  badge: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',    border: 'border-[#7FAFC6]' },
+  orange:  { bg: 'bg-[#FFF3E0]',  icon: 'text-[#CC8400]',  badge: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',    border: 'border-[#FFD08A]' },
   slate:   { bg: 'bg-slate-50',   icon: 'text-slate-600',   badge: 'bg-slate-100 text-slate-600 border-slate-200',       border: 'border-slate-200' },
   stone:   { bg: 'bg-stone-50',   icon: 'text-stone-600',   badge: 'bg-stone-100 text-stone-600 border-stone-200',       border: 'border-stone-200' },
 };
@@ -435,15 +435,15 @@ function StandardRow({ std }: { std: Standard }) {
       {(std.doExample || std.dontExample) && (
         <div className="grid grid-cols-2 gap-2 mt-2">
           {std.doExample && (
-            <div className="flex gap-1.5 rounded-lg bg-emerald-50 border border-emerald-100 px-2.5 py-2">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-              <p className="text-[11px] text-emerald-800 leading-relaxed">{std.doExample}</p>
+            <div className="flex gap-1.5 rounded-lg bg-[#E6F0EA] border border-[#E6F0EA] px-2.5 py-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
+              <p className="text-[11px] text-[#245531] leading-relaxed">{std.doExample}</p>
             </div>
           )}
           {std.dontExample && (
-            <div className="flex gap-1.5 rounded-lg bg-rose-50 border border-rose-100 px-2.5 py-2">
-              <XCircle className="w-3.5 h-3.5 text-rose-600 mt-0.5 flex-shrink-0" />
-              <p className="text-[11px] text-rose-800 leading-relaxed">{std.dontExample}</p>
+            <div className="flex gap-1.5 rounded-lg bg-[#FBEAE6] border border-[#FBEAE6] px-2.5 py-2">
+              <XCircle className="w-3.5 h-3.5 text-[#A93F2F] mt-0.5 flex-shrink-0" />
+              <p className="text-[11px] text-[#A93F2F] leading-relaxed">{std.dontExample}</p>
             </div>
           )}
         </div>
@@ -507,8 +507,8 @@ export default function Phase1UXStandards() {
       </div>
 
       {/* Intent strip */}
-      <div className="px-5 py-2.5 bg-amber-50 border-b border-amber-100 flex-shrink-0">
-        <p className="text-[12px] text-amber-900 leading-relaxed">
+      <div className="px-5 py-2.5 bg-[#FFF3E0] border-b border-[#FFF3E0] flex-shrink-0">
+        <p className="text-[12px] text-[#CC8400] leading-relaxed">
           <span className="font-semibold">Purpose:</span> These standards capture the design decisions that define how Trail OS looks, behaves, and communicates with its users.
           They exist so that every contributor — human or AI-assisted — preserves the UX quality and consistency of the platform.
           When adding a new page, component, or navigation item, verify it against these rules before shipping.

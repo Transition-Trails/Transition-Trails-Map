@@ -69,30 +69,30 @@ export interface GapReportItem {
 // ── Status / confidence config ─────────────────────────────────────────────
 
 export const STANDARD_STATUS_CONFIG: Record<StandardStatus, { label: string; cls: string }> = {
-  active: { label: 'Active',  cls: 'text-green-800 bg-green-50 border-green-200' },
-  review: { label: 'In Review', cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+  active: { label: 'Active',  cls: 'text-[#245531] bg-[#E6F0EA] border-[#9FC3AE]' },
+  review: { label: 'In Review', cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
   draft:  { label: 'Draft',   cls: 'text-slate-600 bg-slate-50 border-slate-200' },
 };
 
 export const STANDARD_CONFIDENCE_CONFIG: Record<StandardConfidence, { label: string; cls: string }> = {
-  high:   { label: 'High Confidence',   cls: 'text-green-800 bg-green-50 border-green-200' },
-  medium: { label: 'Medium Confidence', cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-  low:    { label: 'Low Confidence',    cls: 'text-rose-700 bg-rose-50 border-rose-200' },
+  high:   { label: 'High Confidence',   cls: 'text-[#245531] bg-[#E6F0EA] border-[#9FC3AE]' },
+  medium: { label: 'Medium Confidence', cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+  low:    { label: 'Low Confidence',    cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
 };
 
 export const GAP_TYPE_CONFIG: Record<GapType, { label: string; cls: string; icon: string }> = {
-  'missing-field':     { label: 'Missing Field',      cls: 'text-rose-700 bg-rose-50 border-rose-200',   icon: '⬜' },
-  'missing-alignment': { label: 'Missing Alignment',  cls: 'text-amber-700 bg-amber-50 border-amber-200', icon: '🔗' },
-  'missing-owner':     { label: 'Missing Owner',      cls: 'text-purple-700 bg-purple-50 border-purple-200', icon: '👤' },
-  'duplicate-concept': { label: 'Duplicate Concept',  cls: 'text-blue-700 bg-blue-50 border-blue-200',   icon: '♻️' },
-  'overdue-review':    { label: 'Overdue Review',     cls: 'text-orange-700 bg-orange-50 border-orange-200', icon: '⏰' },
+  'missing-field':     { label: 'Missing Field',      cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',   icon: '⬜' },
+  'missing-alignment': { label: 'Missing Alignment',  cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', icon: '🔗' },
+  'missing-owner':     { label: 'Missing Owner',      cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', icon: '👤' },
+  'duplicate-concept': { label: 'Duplicate Concept',  cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',   icon: '♻️' },
+  'overdue-review':    { label: 'Overdue Review',     cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', icon: '⏰' },
 };
 
 export const STANDARD_CATEGORY_CONFIG: Record<StandardCategory, { cls: string }> = {
-  'Program Architecture': { cls: 'text-violet-800 bg-violet-50 border-violet-200' },
-  'Learning Content':     { cls: 'text-amber-800 bg-amber-50 border-amber-200' },
+  'Program Architecture': { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]' },
+  'Learning Content':     { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
   'Penny Assets':         { cls: 'text-secondary border-secondary/20 bg-secondary/10' },
-  'Delivery Assets':      { cls: 'text-green-800 bg-green-50 border-green-200' },
+  'Delivery Assets':      { cls: 'text-[#245531] bg-[#E6F0EA] border-[#9FC3AE]' },
 };
 
 // ── Content Standards ──────────────────────────────────────────────────────

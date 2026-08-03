@@ -172,7 +172,7 @@ function ConfigCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <p className="text-[13px] font-semibold text-foreground">{config.name}</p>
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${config.isActive ? 'bg-emerald-500' : 'bg-muted-foreground/40'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${config.isActive ? 'bg-[#E6F0EA]0' : 'bg-muted-foreground/40'}`} />
               <span className="text-[9px] text-muted-foreground">{config.isActive ? 'Active' : 'Inactive'}</span>
             </div>
             <code className="text-[9px] font-mono bg-muted/60 border border-border/60 rounded px-1.5 py-0.5 text-muted-foreground">
@@ -191,7 +191,7 @@ function ConfigCard({
               <button
                 onClick={() => void handleReactivate()}
                 disabled={reactivating}
-                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 border border-emerald-300 bg-emerald-50 rounded-full hover:bg-emerald-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full hover:bg-[#E6F0EA] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {reactivating && <Loader2 className="w-3 h-3 animate-spin" />}
                 Reactivate
@@ -214,8 +214,8 @@ function ConfigCard({
         </div>
 
         {!config.isActive && (
-          <div className="mt-2 flex items-start gap-1.5 rounded border border-amber-200 bg-amber-50 px-2 py-1">
-            <span className="text-[10px] text-amber-600 leading-snug">
+          <div className="mt-2 flex items-start gap-1.5 rounded border border-[#FFD08A] bg-[#FFF3E0] px-2 py-1">
+            <span className="text-[10px] text-[#CC8400] leading-snug">
               ⚠ This trail is inactive. Learners on this trail will receive the fallback Penny persona.
             </span>
           </div>
@@ -310,15 +310,15 @@ function ConfigCard({
           </div>
 
           {saveError && (
-            <div className="flex items-start gap-2 rounded border border-red-200 bg-red-50 px-2.5 py-2">
-              <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-              <p className="text-[11px] text-red-700 leading-snug">{saveError}</p>
+            <div className="flex items-start gap-2 rounded border border-[#E8B9B4] bg-[#FBEAE6] px-2.5 py-2">
+              <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
+              <p className="text-[11px] text-[#A93F2F] leading-snug">{saveError}</p>
             </div>
           )}
 
           <div className="flex items-center gap-2 pt-1">
             {saveSuccess && (
-              <span className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+              <span className="flex items-center gap-1 text-[11px] text-[#2F6B3F] font-medium">
                 <CheckCircle2 className="w-3.5 h-3.5" /> Saved
               </span>
             )}
@@ -380,8 +380,8 @@ export default function TrailConfigs() {
               Penny Command Center
             </p>
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
-                <Sliders className="w-3.5 h-3.5 text-violet-600" />
+              <div className="w-7 h-7 rounded-lg bg-[#EDF5F8] flex items-center justify-center shrink-0">
+                <Sliders className="w-3.5 h-3.5 text-[#2F6F7E]" />
               </div>
               <h1 className="text-base font-semibold text-foreground">Trail Configurations</h1>
             </div>
@@ -391,14 +391,14 @@ export default function TrailConfigs() {
             </p>
           </div>
           {!loading && !error && (
-            <div className="shrink-0 flex items-center gap-2 px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50">
+            <div className="shrink-0 flex items-center gap-2 px-2.5 py-1 rounded-full border border-[#9FC3AE] bg-[#E6F0EA]">
               <span className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-                <span className="text-[10px] font-semibold text-emerald-800">{activeCount} active</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 inline-block" />
+                <span className="text-[10px] font-semibold text-[#245531]">{activeCount} active</span>
               </span>
               {inactiveCount > 0 && (
                 <>
-                  <span className="text-[10px] text-emerald-600/50">·</span>
+                  <span className="text-[10px] text-[#2F6B3F]/50">·</span>
                   <span className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 inline-block" />
                     <span className="text-[10px] font-semibold text-muted-foreground">{inactiveCount} inactive</span>
@@ -447,12 +447,12 @@ export default function TrailConfigs() {
         )}
 
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-3">
+            <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[12px] font-semibold text-red-700">Failed to load trail configurations</p>
-              <p className="text-[11px] text-red-600/80 mt-0.5">{error}</p>
-              <p className="text-[11px] text-red-600/60 mt-1">
+              <p className="text-[12px] font-semibold text-[#A93F2F]">Failed to load trail configurations</p>
+              <p className="text-[11px] text-[#A93F2F]/80 mt-0.5">{error}</p>
+              <p className="text-[11px] text-[#A93F2F]/60 mt-1">
                 Check Salesforce authentication in Admin → Integrations.
               </p>
             </div>
@@ -488,10 +488,10 @@ export default function TrailConfigs() {
 
         {/* ── Live data notice ─────────────────────────────────────────── */}
         {!loading && !error && configs.length > 0 && (
-          <div className="rounded border border-emerald-200 bg-emerald-50/60 px-3 py-2 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 inline-block" />
-            <p className="text-[10px] text-emerald-800 leading-snug">
-              <strong>Live · Salesforce.</strong> All edits write directly to <code className="text-[9px] bg-emerald-100 px-1 rounded">Penny_Trail_Config__c</code> records in production.
+          <div className="rounded border border-[#9FC3AE] bg-[#E6F0EA]/60 px-3 py-2 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 shrink-0 inline-block" />
+            <p className="text-[10px] text-[#245531] leading-snug">
+              <strong>Live · Salesforce.</strong> All edits write directly to <code className="text-[9px] bg-[#E6F0EA] px-1 rounded">Penny_Trail_Config__c</code> records in production.
             </p>
           </div>
         )}

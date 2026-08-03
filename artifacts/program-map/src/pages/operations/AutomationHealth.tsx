@@ -83,7 +83,7 @@ export default function AutomationHealth() {
               {zaps.map(z => (
                 <div
                   key={z.name}
-                  className={`rounded-xl border p-4 ${z.status === 'Warning' ? 'border-amber-200 bg-amber-50' : 'border-border bg-card'}`}
+                  className={`rounded-xl border p-4 ${z.status === 'Warning' ? 'border-[#FFD08A] bg-[#FFF3E0]' : 'border-border bg-card'}`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
@@ -94,7 +94,7 @@ export default function AutomationHealth() {
                           {z.trigger} <span className="text-muted-foreground/50 mx-1">→</span> {z.action}
                         </p>
                         {z.note && (
-                          <p className="text-xs text-amber-700 font-medium mt-1">{z.note}</p>
+                          <p className="text-xs text-[#CC8400] font-medium mt-1">{z.note}</p>
                         )}
                       </div>
                     </div>

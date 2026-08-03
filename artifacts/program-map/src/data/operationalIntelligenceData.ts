@@ -8,29 +8,29 @@ export type TrendUrgency = 'immediate' | 'near-term' | 'watch';
 export type ScorecardCat = 'Architecture' | 'Operations' | 'AI' | 'Data';
 
 export const HEALTH_LEVEL_CONFIG: Record<HealthLevel, { label: string; cls: string; dot: string; score: string }> = {
-  strong:       { label: 'Strong',       cls: 'text-emerald-700 bg-emerald-50 border-emerald-200', dot: 'bg-emerald-500', score: 'text-emerald-700' },
-  good:         { label: 'Good',         cls: 'text-blue-700 bg-blue-50 border-blue-200',          dot: 'bg-blue-500',   score: 'text-blue-700' },
-  'needs-work': { label: 'Needs Work',   cls: 'text-amber-700 bg-amber-50 border-amber-200',       dot: 'bg-amber-500',  score: 'text-amber-700' },
-  'at-risk':    { label: 'At Risk',      cls: 'text-rose-700 bg-rose-50 border-rose-200',          dot: 'bg-rose-500',   score: 'text-rose-700' },
+  strong:       { label: 'Strong',       cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]', dot: 'bg-[#E6F0EA]0', score: 'text-[#2F6B3F]' },
+  good:         { label: 'Good',         cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',          dot: 'bg-[#EDF5F8]0',   score: 'text-[#2F6F7E]' },
+  'needs-work': { label: 'Needs Work',   cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',       dot: 'bg-[#FFF3E0]0',  score: 'text-[#CC8400]' },
+  'at-risk':    { label: 'At Risk',      cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',          dot: 'bg-[#FBEAE6]0',   score: 'text-[#A93F2F]' },
 };
 
 export const REC_PRIORITY_CONFIG: Record<RecPriority, { label: string; cls: string }> = {
-  critical: { label: 'Critical', cls: 'text-rose-700 bg-rose-50 border-rose-200' },
-  high:     { label: 'High',     cls: 'text-orange-700 bg-orange-50 border-orange-200' },
-  medium:   { label: 'Medium',   cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+  critical: { label: 'Critical', cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+  high:     { label: 'High',     cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+  medium:   { label: 'Medium',   cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
   low:      { label: 'Low',      cls: 'text-slate-600 bg-slate-50 border-slate-200' },
 };
 
 export const TREND_TYPE_CONFIG: Record<TrendType, { label: string; cls: string }> = {
-  risk:        { label: 'Risk',        cls: 'text-rose-700 bg-rose-50 border-rose-200' },
-  opportunity: { label: 'Opportunity', cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-  gap:         { label: 'Gap',         cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-  blocker:     { label: 'Blocker',     cls: 'text-orange-700 bg-orange-50 border-orange-200' },
+  risk:        { label: 'Risk',        cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+  opportunity: { label: 'Opportunity', cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+  gap:         { label: 'Gap',         cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+  blocker:     { label: 'Blocker',     cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
 };
 
 export const TREND_URGENCY_CONFIG: Record<TrendUrgency, { label: string; cls: string }> = {
-  immediate: { label: 'Immediate', cls: 'text-rose-600 font-bold' },
-  'near-term': { label: 'Near Term', cls: 'text-amber-600 font-semibold' },
+  immediate: { label: 'Immediate', cls: 'text-[#A93F2F] font-bold' },
+  'near-term': { label: 'Near Term', cls: 'text-[#CC8400] font-semibold' },
   watch:     { label: 'Watch',     cls: 'text-slate-500' },
 };
 

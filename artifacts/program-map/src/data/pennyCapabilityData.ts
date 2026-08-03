@@ -56,21 +56,21 @@ export interface CapabilityPocEntry {
 // ── Config ────────────────────────────────────────────────────────────────
 
 export const CAPABILITY_READINESS_CONFIG: Record<CapabilityReadiness, { label: string; cls: string; order: number }> = {
-  'Prototype':       { label: 'Prototype',       cls: 'text-amber-700 bg-amber-50 border-amber-200',     order: 1 },
-  'Defined':         { label: 'Defined',          cls: 'text-blue-700 bg-blue-50 border-blue-200',       order: 2 },
-  'Planned':         { label: 'Planned',          cls: 'text-violet-700 bg-violet-50 border-violet-200', order: 3 },
-  'In Development':  { label: 'In Development',   cls: 'text-orange-700 bg-orange-50 border-orange-200', order: 4 },
+  'Prototype':       { label: 'Prototype',       cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',     order: 1 },
+  'Defined':         { label: 'Defined',          cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',       order: 2 },
+  'Planned':         { label: 'Planned',          cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]', order: 3 },
+  'In Development':  { label: 'In Development',   cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]', order: 4 },
   'Integrated':      { label: 'Integrated',       cls: 'text-cyan-700 bg-cyan-50 border-cyan-200',       order: 5 },
-  'Operational':     { label: 'Operational',      cls: 'text-green-700 bg-green-50 border-green-200',    order: 6 },
+  'Operational':     { label: 'Operational',      cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',    order: 6 },
 };
 
 export const CAPABILITY_DOMAIN_CONFIG: Record<CapabilityDomain, { cls: string; description: string }> = {
   'Coaching':         { cls: 'text-secondary border-secondary/20 bg-secondary/10', description: 'Personalized learner support and coaching conversations' },
-  'Career':           { cls: 'text-violet-700 bg-violet-50 border-violet-200',     description: 'Career readiness, resume, LinkedIn, and interview support' },
-  'Learning':         { cls: 'text-amber-700 bg-amber-50 border-amber-200',        description: 'Study guidance, cohort insights, and progress analysis' },
-  'Knowledge':        { cls: 'text-blue-700 bg-blue-50 border-blue-200',           description: 'Knowledge retrieval and content recommendations' },
-  'Operations':       { cls: 'text-rose-700 bg-rose-50 border-rose-200',           description: 'Escalations, executive briefs, and program operations' },
-  'Communications':   { cls: 'text-green-700 bg-green-50 border-green-200',        description: 'Slack, Google Chat, email, and calendar-aware messaging' },
+  'Career':           { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',     description: 'Career readiness, resume, LinkedIn, and interview support' },
+  'Learning':         { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',        description: 'Study guidance, cohort insights, and progress analysis' },
+  'Knowledge':        { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',           description: 'Knowledge retrieval and content recommendations' },
+  'Operations':       { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',           description: 'Escalations, executive briefs, and program operations' },
+  'Communications':   { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',        description: 'Slack, Google Chat, email, and calendar-aware messaging' },
   'Questing':         { cls: 'text-primary border-primary/20 bg-primary/5',        description: 'Trail Quests, weekly reviews, and challenge-based learning' },
 };
 
@@ -84,15 +84,15 @@ export const CAPABILITY_STATUS_CONFIG: Record<CapabilityStatus, {
   badgeCls: string;
   statusVariant: 'active' | 'planning' | 'draft';
 }> = {
-  'Live':    { label: 'Live',    badgeCls: 'text-emerald-700 bg-emerald-50 border-emerald-200', statusVariant: 'active'   },
-  'Ready':   { label: 'Ready',   badgeCls: 'text-sky-700 bg-sky-50 border-sky-200',            statusVariant: 'active'   },
-  'Partial': { label: 'Partial', badgeCls: 'text-amber-700 bg-amber-50 border-amber-200',      statusVariant: 'planning' },
+  'Live':    { label: 'Live',    badgeCls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]', statusVariant: 'active'   },
+  'Ready':   { label: 'Ready',   badgeCls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',            statusVariant: 'active'   },
+  'Partial': { label: 'Partial', badgeCls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',      statusVariant: 'planning' },
 };
 
 export const POC_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
-  exists:  { label: 'Exists in POC',  cls: 'text-green-700 bg-green-50 border-green-200' },
-  partial: { label: 'Partial in POC', cls: 'text-amber-700 bg-amber-50 border-amber-200' },
-  planned: { label: 'Planned',        cls: 'text-violet-700 bg-violet-50 border-violet-200' },
+  exists:  { label: 'Exists in POC',  cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
+  partial: { label: 'Partial in POC', cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+  planned: { label: 'Planned',        cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]' },
   none:    { label: 'Not in POC',     cls: 'text-slate-600 bg-slate-50 border-slate-200' },
 };
 
@@ -658,25 +658,25 @@ export const PENNY_ARCHITECTURE_LAYERS = [
     layer: 'Salesforce Data Layer',
     description: 'System of record for all learner, program, and organizational data. Penny reads and writes here via Agentforce.',
     components: ['Program__c', 'Program_Engagement__c', 'Training_Plan_Item__c', 'Knowledge__c'],
-    cls: 'border-blue-200 bg-blue-50',
+    cls: 'border-[#7FAFC6] bg-[#EDF5F8]',
   },
   {
     layer: 'Knowledge Layer',
     description: 'The content Penny draws on to answer questions, make recommendations, and coach learners accurately.',
     components: ['Knowledge Library', 'Standards', 'Source Docs', 'Salesforce KB'],
-    cls: 'border-amber-200 bg-amber-50',
+    cls: 'border-[#FFD08A] bg-[#FFF3E0]',
   },
   {
     layer: 'Communications Layer',
     description: 'The channels through which Penny delivers messages, prompts, and activities to learners and coaches.',
     components: ['Slack', 'Google Chat', 'Email', 'Calendar'],
-    cls: 'border-green-200 bg-green-50',
+    cls: 'border-[#9FC3AE] bg-[#E6F0EA]',
   },
   {
     layer: 'Curriculum Layer',
     description: 'The structured learning content Penny uses as context for coaching, quest delivery, and reflection prompts.',
     components: ['Modules', 'Lessons', 'Assessments', 'Penny Assets', 'Delivery Assets'],
-    cls: 'border-violet-200 bg-violet-50',
+    cls: 'border-[#7FAFC6] bg-[#EDF5F8]',
   },
 ];
 

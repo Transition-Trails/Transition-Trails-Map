@@ -34,14 +34,14 @@ const ROADMAP = [
     label: 'Metadata Management',
     desc: 'Admin configures folder URLs, owners, permissions model, and descriptions. Displayed in Program Blueprint and Knowledge Brief.',
     status: 'Complete',
-    cls: 'text-green-700 bg-green-50 border-green-200',
+    cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
   },
   {
     phase: 'Phase 2',
     label: 'Salesforce Sync',
     desc: 'Drive metadata synced to Program_Resource__c in Salesforce org. URL and status visible in SF Program record.',
     status: 'Planned',
-    cls: 'text-amber-700 bg-amber-50 border-amber-200',
+    cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
   },
   {
     phase: 'Phase 3',
@@ -117,11 +117,11 @@ export default function ProgramResources() {
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="space-y-0.5">
               <div className="flex items-center justify-center gap-1.5">
-                <Database className="w-3.5 h-3.5 text-blue-600" />
+                <Database className="w-3.5 h-3.5 text-[#2F6F7E]" />
                 <p className="text-[12px] font-bold text-foreground">Salesforce</p>
               </div>
               <p className="text-[10px] text-muted-foreground">System of Record</p>
-              <p className="text-[9px] text-blue-700 font-medium border border-blue-200 bg-blue-50 rounded-full px-2 py-0.5 inline-block">Program__c stores Drive metadata</p>
+              <p className="text-[9px] text-[#2F6F7E] font-medium border border-[#7FAFC6] bg-[#EDF5F8] rounded-full px-2 py-0.5 inline-block">Program__c stores Drive metadata</p>
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center justify-center gap-1.5">
@@ -133,11 +133,11 @@ export default function ProgramResources() {
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center justify-center gap-1.5">
-                <FolderOpen className="w-3.5 h-3.5 text-green-600" />
+                <FolderOpen className="w-3.5 h-3.5 text-[#2F6B3F]" />
                 <p className="text-[12px] font-bold text-foreground">Google Drive</p>
               </div>
               <p className="text-[10px] text-muted-foreground">Content Repository</p>
-              <p className="text-[9px] text-green-700 font-medium border border-green-200 bg-green-50 rounded-full px-2 py-0.5 inline-block">Authoritative content source</p>
+              <p className="text-[9px] text-[#2F6B3F] font-medium border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2 py-0.5 inline-block">Authoritative content source</p>
             </div>
           </div>
         </div>
@@ -148,17 +148,17 @@ export default function ProgramResources() {
             <p className="text-xl font-bold text-foreground">{resources.length}</p>
             <p className="text-[11px] text-muted-foreground">Programs</p>
           </div>
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-center">
-            <p className="text-xl font-bold text-green-700">{activeCount}</p>
-            <p className="text-[11px] text-green-700">Active Drives</p>
+          <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3 text-center">
+            <p className="text-xl font-bold text-[#2F6B3F]">{activeCount}</p>
+            <p className="text-[11px] text-[#2F6B3F]">Active Drives</p>
           </div>
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center">
-            <p className="text-xl font-bold text-amber-700">{needsSetupCount}</p>
-            <p className="text-[11px] text-amber-700">Needs Setup</p>
+          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 text-center">
+            <p className="text-xl font-bold text-[#CC8400]">{needsSetupCount}</p>
+            <p className="text-[11px] text-[#CC8400]">Needs Setup</p>
           </div>
-          <div className="rounded-lg border border-violet-200 bg-violet-50 px-4 py-3 text-center">
-            <p className="text-xl font-bold text-violet-700">{pendingCount}</p>
-            <p className="text-[11px] text-violet-700">Pending</p>
+          <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] px-4 py-3 text-center">
+            <p className="text-xl font-bold text-[#2F6F7E]">{pendingCount}</p>
+            <p className="text-[11px] text-[#2F6F7E]">Pending</p>
           </div>
         </div>
 
@@ -185,13 +185,13 @@ export default function ProgramResources() {
                   onClick={() => !isEditing && selectResource(resource)}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    resource.status === 'active' ? 'bg-green-100' :
-                    resource.status === 'needs-setup' ? 'bg-amber-100' :
+                    resource.status === 'active' ? 'bg-[#E6F0EA]' :
+                    resource.status === 'needs-setup' ? 'bg-[#FFF3E0]' :
                     'bg-muted/50'
                   }`}>
                     {resource.status === 'needs-setup'
-                      ? <AlertTriangle className="w-4 h-4 text-amber-600" />
-                      : <FolderOpen className={`w-4 h-4 ${resource.status === 'active' ? 'text-green-700' : 'text-muted-foreground'}`} />
+                      ? <AlertTriangle className="w-4 h-4 text-[#CC8400]" />
+                      : <FolderOpen className={`w-4 h-4 ${resource.status === 'active' ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`} />
                     }
                   </div>
                   <div className="flex-1 min-w-0">
@@ -219,7 +219,7 @@ export default function ProgramResources() {
                       onClick={e => { e.stopPropagation(); isEditing ? cancelEdit() : startEdit(resource); }}
                       className={`flex items-center gap-1 text-[10px] font-medium border rounded-full px-2 py-1 transition-colors ${
                         isEditing
-                          ? 'border-red-200 text-red-700 hover:bg-red-50'
+                          ? 'border-[#E8B9B4] text-[#A93F2F] hover:bg-[#FBEAE6]'
                           : 'border-border text-muted-foreground hover:border-secondary/40'
                       }`}
                     >

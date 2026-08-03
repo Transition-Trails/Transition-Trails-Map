@@ -13,6 +13,7 @@ import {
   Inbox, Bell, BellOff, Zap, Clock, MoreHorizontal,
   Reply, Archive, X, RefreshCw, AlertCircle, Send,
 } from 'lucide-react';
+import { STATUS_CLASSES } from '@/config/statusColors';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -66,11 +67,11 @@ const PENNY_ACTIONS: PennyAction[] = [
 ];
 
 const LABEL_BG: Record<string, string> = {
-  violet:  'bg-violet-100  text-violet-700  border-violet-200',
-  sky:     'bg-sky-100     text-sky-700     border-sky-200',
-  emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  red:     'bg-red-100     text-red-700     border-red-200',
-  amber:   'bg-amber-100   text-amber-700   border-amber-200',
+  violet:  STATUS_CLASSES.information.badge,
+  sky:     STATUS_CLASSES.information.badge,
+  emerald: STATUS_CLASSES.success.badge,
+  red:     STATUS_CLASSES.critical.badge,
+  amber:   STATUS_CLASSES.attention.badge,
 };
 
 const DEFAULT_CFG: Record<string, LabelCfg> = {
@@ -100,9 +101,11 @@ function initials(name: string): string {
 }
 
 const AVATAR_COLORS = [
-  'bg-violet-100 text-violet-700', 'bg-sky-100 text-sky-700',
-  'bg-emerald-100 text-emerald-700', 'bg-amber-100 text-amber-700',
-  'bg-rose-100 text-rose-700', 'bg-indigo-100 text-indigo-700',
+  'bg-[#E6F0EA] text-[#245531]',
+  'bg-[#EDF5F8] text-[#2F6F7E]',
+  'bg-[#FFF3E0] text-[#CC8400]',
+  'bg-[#FBEAE6] text-[#A93F2F]',
+  'bg-[#E2E4E1] text-[#4A4F4D]',
 ];
 
 function avatarColor(name: string): string {
@@ -140,7 +143,7 @@ function ThreadRow({
       onClick={onClick}
       className={`px-4 py-3 border-b border-border/50 cursor-pointer transition-all ${
         selected
-          ? 'bg-violet-50 border-l-2 border-l-violet-400'
+          ? 'bg-[#EDF5F8] border-l-2 border-l-[#7FAFC6]'
           : 'hover:bg-muted/40'
       }`}
     >
@@ -161,13 +164,13 @@ function ThreadRow({
         </div>
       </div>
       {badge && (
-        <div className="inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full border mt-1 bg-violet-100 text-violet-700 border-violet-200">
+        <div className="inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full border mt-1 bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">
           <Sparkles className="w-2 h-2" />
           {TERMS.aiAssistant} · {badge}
         </div>
       )}
       {thread.needsAction && !badge && (
-        <div className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full mt-1 bg-amber-50 text-amber-700 border border-amber-200">
+        <div className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A]">
           Needs action
         </div>
       )}
@@ -255,7 +258,7 @@ function ThreadPreview({
           <div className="flex flex-wrap gap-1.5 items-center">
             <span className="text-[10px] text-muted-foreground">{thread.fromEmail}</span>
             {thread.important && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 font-medium">Important</span>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] font-medium">Important</span>
             )}
           </div>
         </div>
@@ -268,12 +271,12 @@ function ThreadPreview({
 
       {/* Penny context bar */}
       {badge && pennyAction && (
-        <div className="px-6 py-2 bg-violet-50 border-b border-violet-100 flex items-center gap-2 shrink-0">
-          <Sparkles className="w-3.5 h-3.5 text-violet-600 shrink-0" />
-          <p className="text-[11px] text-violet-800 flex-1">
+        <div className="px-6 py-2 bg-[#EDF5F8] border-b border-[#C5DDE6] flex items-center gap-2 shrink-0">
+          <Sparkles className="w-3.5 h-3.5 text-[#2F6F7E] shrink-0" />
+          <p className="text-[11px] text-[#2F6F7E] flex-1">
             <strong>{TERMS.aiAssistant}</strong> · {pennyAction.desc}
           </p>
-          <button className="text-[10px] font-semibold text-violet-600 hover:underline flex items-center gap-0.5 shrink-0">
+          <button className="text-[10px] font-semibold text-[#2F6F7E] hover:underline flex items-center gap-0.5 shrink-0">
             Adjust <ChevronRight className="w-3 h-3" />
           </button>
         </div>
@@ -303,19 +306,19 @@ function ThreadPreview({
               onChange={e => setReplyBody(e.target.value)}
             />
             {draftError && (
-              <p className="text-[10px] text-rose-600 mb-2">{draftError}</p>
+              <p className="text-[10px] text-[#A93F2F] mb-2">{draftError}</p>
             )}
             {sendError && (
-              <p className="text-[10px] text-rose-600 mb-2">{sendError}</p>
+              <p className="text-[10px] text-[#A93F2F] mb-2">{sendError}</p>
             )}
             {sendDone && (
-              <p className="text-[10px] text-emerald-600 mb-2">Sent!</p>
+              <p className="text-[10px] text-[#2F6B3F] mb-2">Sent!</p>
             )}
             <div className="flex items-center justify-between pt-2 border-t border-border">
               <button
                 onClick={draftWithPenny}
                 disabled={draftLoading}
-                className="flex items-center gap-1.5 text-[10px] text-violet-600 font-medium hover:underline disabled:opacity-50"
+                className="flex items-center gap-1.5 text-[10px] text-[#2F6F7E] font-medium hover:underline disabled:opacity-50"
               >
                 <Sparkles className="w-3 h-3" />
                 {draftLoading ? 'Drafting…' : `Draft with ${TERMS.aiAssistant}`}
@@ -324,7 +327,7 @@ function ThreadPreview({
                 size="sm"
                 onClick={sendReply}
                 disabled={sendLoading || !replyBody.trim()}
-                className="h-7 px-3 text-[11px] bg-rose-500 hover:bg-rose-600 text-white border-0"
+                className="h-7 px-3 text-[11px] bg-[#A93F2F] hover:bg-[#8B3527] text-white border-0"
               >
                 <Send className="w-3 h-3 mr-1" />
                 {sendLoading ? 'Sending…' : 'Send'}
@@ -352,16 +355,16 @@ function PennyConfigPanel({
 }) {
   const watchedCount = Object.values(labelCfg).filter(c => c.watched).length;
   return (
-    <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-violet-100 px-6 py-4 shrink-0">
+    <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-[#C5DDE6] px-6 py-4 shrink-0">
       <div className="flex items-center gap-2 mb-2">
-        <Sparkles className="w-4 h-4 text-violet-600" />
-        <h3 className="text-[13px] font-semibold text-violet-900">{TERMS.aiAssistant} Label Intelligence</h3>
-        <span className="text-[10px] text-violet-500 bg-violet-100 px-2 py-0.5 rounded-full">{watchedCount} active</span>
-        <button onClick={onClose} className="ml-auto text-violet-400 hover:text-violet-600 transition-colors">
+        <Sparkles className="w-4 h-4 text-[#2F6F7E]" />
+        <h3 className="text-[13px] font-semibold text-[#2F6F7E]">{TERMS.aiAssistant} Label Intelligence</h3>
+        <span className="text-[10px] text-[#2F6F7E] bg-[#EDF5F8] px-2 py-0.5 rounded-full">{watchedCount} active</span>
+        <button onClick={onClose} className="ml-auto text-[#7FAFC6] hover:text-[#2F6F7E] transition-colors">
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
-      <p className="text-[11px] text-violet-700 mb-3 leading-snug max-w-2xl">
+      <p className="text-[11px] text-[#2F6F7E] mb-3 leading-snug max-w-2xl">
         Choose which Gmail labels Penny monitors for insights, alerts, and automated follow-ups. Threads tagged with a watched label are surfaced in Trail Signals.
       </p>
       <div className="grid grid-cols-5 gap-2">
@@ -381,13 +384,13 @@ function PennyConfigPanel({
                 </div>
                 <button onClick={() => onToggle(l.id)} className="shrink-0">
                   {cfg.watched
-                    ? <CheckCircle2 className="w-4 h-4 text-violet-500" />
+                    ? <CheckCircle2 className="w-4 h-4 text-[#2F6F7E]" />
                     : <Circle className="w-4 h-4 text-muted-foreground" />}
                 </button>
               </div>
               {cfg.watched ? (
                 <div>
-                  <div className="text-[9px] text-violet-500 font-semibold uppercase tracking-wide mb-1.5">{TERMS.aiAssistant} action</div>
+                  <div className="text-[9px] text-[#2F6F7E] font-semibold uppercase tracking-wide mb-1.5">{TERMS.aiAssistant} action</div>
                   <div className="space-y-1">
                     {PENNY_ACTIONS.map(action => (
                       <button
@@ -395,7 +398,7 @@ function PennyConfigPanel({
                         onClick={() => onSetAction(l.id, action.id)}
                         className={`w-full text-left flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] transition-colors ${
                           cfg.action === action.id
-                            ? 'bg-violet-100 text-violet-700 font-semibold'
+                            ? 'bg-[#EDF5F8] text-[#2F6F7E] font-semibold'
                             : 'text-muted-foreground hover:bg-muted/50'
                         }`}
                       >
@@ -462,7 +465,7 @@ export default function GmailCenter() {
       {/* ── Header ── */}
       <div className="bg-background border-b border-border px-4 py-1.5 flex items-center gap-3 shrink-0">
         <div className="flex items-center gap-2 shrink-0">
-          <div className="w-5 h-5 rounded bg-rose-500 flex items-center justify-center">
+          <div className="w-5 h-5 rounded bg-[#A93F2F] flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="w-3 h-3 fill-white">
               <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
             </svg>
@@ -499,13 +502,13 @@ export default function GmailCenter() {
             onClick={() => setConfigOpen(v => !v)}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-colors ${
               configOpen
-                ? 'bg-violet-50 border-violet-200 text-violet-700'
+                ? 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]'
                 : 'bg-background border-border text-muted-foreground hover:border-muted-foreground'
             }`}
           >
             <Sparkles className="w-2.5 h-2.5" />
             {TERMS.aiAssistant} Labels
-            <span className="text-[9px] bg-violet-500 text-white rounded-full px-1 ml-0.5">{watchedCount}</span>
+            <span className="text-[9px] bg-[#EDF5F8]0 text-white rounded-full px-1 ml-0.5">{watchedCount}</span>
           </button>
         </div>
       </div>
@@ -541,7 +544,7 @@ export default function GmailCenter() {
 
           {error && !loading && (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 px-6 text-center">
-              <AlertCircle className="w-5 h-5 text-rose-400" />
+              <AlertCircle className="w-5 h-5 text-[#A93F2F]" />
               <p className="text-[11px] text-muted-foreground">{error}</p>
               <button
                 onClick={() => void fetchThreads()}
@@ -584,7 +587,7 @@ export default function GmailCenter() {
         {/* Empty state when nothing selected */}
         {!selectedThread && !loading && !error && filtered.length > 0 && (
           <div className="flex-1 flex flex-col items-center justify-center gap-2 text-muted-foreground">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#FBEAE6] flex items-center justify-center">
               <svg viewBox="0 0 24 24" className="w-5 h-5 fill-rose-400">
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
               </svg>

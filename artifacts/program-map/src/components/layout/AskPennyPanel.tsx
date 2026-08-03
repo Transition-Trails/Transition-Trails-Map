@@ -174,7 +174,7 @@ function SourcesSection({ sources }: { sources: Source[] }) {
                         {sourceTypeLabel(s.sourceType)}
                       </span>
                       {s.confidence === 'draft' && (
-                        <span className="text-[9px] bg-amber-50 border border-amber-200 rounded-full px-1.5 py-0.5 text-amber-700 whitespace-nowrap">Draft</span>
+                        <span className="text-[9px] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-1.5 py-0.5 text-[#CC8400] whitespace-nowrap">Draft</span>
                       )}
                     </div>
                     <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{s.snippet}</p>
@@ -413,7 +413,7 @@ export function AskPennyPanel() {
                   <div>
                     <p className="text-[13px] font-semibold text-foreground leading-none">{TERMS.aiAssistant}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
                       <span className="text-[10px] text-muted-foreground">Live · Gemini 2.5 Flash</span>
                     </div>
                   </div>
@@ -462,10 +462,10 @@ export function AskPennyPanel() {
                   <div key={i} className={`flex gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {m.role === 'penny' && (
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        m.error ? 'bg-rose-100' : 'bg-primary/10'
+                        m.error ? 'bg-[#FBEAE6]' : 'bg-primary/10'
                       }`}>
                         {m.error
-                          ? <AlertCircle className="w-3 h-3 text-rose-600" />
+                          ? <AlertCircle className="w-3 h-3 text-[#A93F2F]" />
                           : <Brain className="w-3 h-3 text-primary" />}
                       </div>
                     )}
@@ -474,7 +474,7 @@ export function AskPennyPanel() {
                         m.role === 'user'
                           ? 'bg-primary text-primary-foreground rounded-br-sm'
                           : m.error
-                            ? 'bg-rose-50 border border-rose-200 text-rose-800 rounded-bl-sm'
+                            ? 'bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F] rounded-bl-sm'
                             : 'bg-muted/60 border border-border/60 text-foreground rounded-bl-sm'
                       }`}>
                         {m.role === 'penny' && !m.error

@@ -30,12 +30,12 @@ export default function CommunicationRouting() {
       subtitle="Maps Trail OS event types to communication channel destinations. Define events once — swap providers later without changing event logic."
       integration="Slack API + Google Chat API (future)"
     >
-      <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 mb-6">
+      <div className="rounded-xl border border-[#7FAFC6] bg-[#EDF5F8] p-4 mb-6">
         <div className="flex items-start gap-3">
-          <Info className="w-4 h-4 text-sky-700 flex-shrink-0 mt-0.5" />
+          <Info className="w-4 h-4 text-[#2F6F7E] flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-sky-900 mb-1">Routing Model</p>
-            <p className="text-xs text-sky-800 leading-relaxed">
+            <p className="text-sm font-semibold text-[#2F6F7E] mb-1">Routing Model</p>
+            <p className="text-xs text-[#2F6F7E] leading-relaxed">
               Each row is an <strong>event type</strong> — a specific trigger that should result in a message.
               Events map to a <em>Slack channel now</em> and optionally a <em>Google Chat space later</em>.
               Changing provider means updating the destination column only.
@@ -65,12 +65,12 @@ export default function CommunicationRouting() {
                 <td className="px-3 py-3">
                   <p className="font-semibold text-foreground text-[13px] leading-snug">{route.eventType}</p>
                   {route.relatedPennyCap && (
-                    <span className="inline-flex items-center text-[10px] bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-1.5 py-0.5 mt-1">
+                    <span className="inline-flex items-center text-[10px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5 mt-1">
                       Penny: {route.relatedPennyCap.split(',')[0]}
                     </span>
                   )}
                   {route.relatedDemandEvent && (
-                    <span className="inline-flex items-center text-[10px] bg-sky-50 text-sky-700 border border-sky-200 rounded-full px-1.5 py-0.5 mt-1">
+                    <span className="inline-flex items-center text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 mt-1">
                       Demand: {route.relatedDemandEvent}
                     </span>
                   )}
@@ -83,7 +83,7 @@ export default function CommunicationRouting() {
                   <p className="font-mono text-[11px] text-foreground">{route.slackChannel}</p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <StatusDot status="amber" />
-                    <span className="text-[10px] text-amber-700">{route.slackStatus}</span>
+                    <span className="text-[10px] text-[#CC8400]">{route.slackStatus}</span>
                   </div>
                 </td>
                 <td className="px-3 py-3">

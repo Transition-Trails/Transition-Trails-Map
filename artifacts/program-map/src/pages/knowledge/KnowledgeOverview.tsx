@@ -22,7 +22,7 @@ function buildInsights(total: number, approved: number) {
       action: 'Configure Google Drive folder indexing',
       why: `The Google Drive API is connected. The next step is configuring folder indexing for the Foundations and Guided Trail program folders so ${TERMS.aiAssistant} can retrieve curriculum content, coach guides, and assessment rubrics.`,
       tag: 'Action Now',
-      tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
+      tagColor: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
       path: '/admin/integrations',
     },
     {
@@ -30,7 +30,7 @@ function buildInsights(total: number, approved: number) {
       action: 'Complete trust reviews for pending sources',
       why: `${pending} source${pending !== 1 ? 's' : ''} cannot be used by ${TERMS.aiAssistant} until trust review is complete. Approving these expands ${TERMS.aiAssistant}'s knowledge retrieval surface and improves coaching quality.`,
       tag: 'Action Now',
-      tagColor: 'bg-amber-50 text-amber-700 border-amber-200',
+      tagColor: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
       path: '/knowledge/sources',
     },
     {
@@ -160,10 +160,10 @@ export default function KnowledgeOverview() {
   }, [sources]);
 
   const trustConfig: Array<{ level: TrustLevel; dot: string }> = [
-    { level: 'Authoritative', dot: 'bg-violet-500' },
-    { level: 'Trusted',       dot: 'bg-sky-500'    },
-    { level: 'Curated',       dot: 'bg-indigo-400' },
-    { level: 'Unverified',    dot: 'bg-slate-400'  },
+    { level: 'Authoritative', dot: 'bg-[#EDF5F8]0' },
+    { level: 'Trusted',       dot: 'bg-[#EDF5F8]0'    },
+    { level: 'Curated',       dot: 'bg-[#2F6F7E]' },
+    { level: 'Unverified',    dot: 'bg-[#C8CBC6]'  },
   ];
 
   const insights = buildInsights(summary.total, summary.approvedForPenny);
@@ -202,19 +202,19 @@ export default function KnowledgeOverview() {
           <StatPill
             value={summary.healthy}
             label="Healthy"
-            color="text-emerald-600"
+            color="text-[#2F6B3F]"
             onClick={() => setLocation('/knowledge/sources')}
           />
           <StatPill
             value={summary.warnings}
             label="Warnings"
-            color="text-amber-600"
+            color="text-[#CC8400]"
             onClick={() => setLocation('/knowledge/sources')}
           />
           <StatPill
             value={summary.critical}
             label="Critical"
-            color="text-rose-600"
+            color="text-[#A93F2F]"
             onClick={() => setLocation('/knowledge/sources')}
           />
           <StatPill
@@ -225,9 +225,9 @@ export default function KnowledgeOverview() {
           />
           {metrics?.sfLive && (
             <>
-              <StatPill value={metrics.sfPrograms ?? '—'} label="SF Programs"  color="text-blue-600" />
-              <StatPill value={metrics.sfContacts ?? '—'} label="SF Contacts"  color="text-blue-600" />
-              <StatPill value={metrics.sfCases    ?? '—'} label="SF Open Cases" color="text-blue-600" />
+              <StatPill value={metrics.sfPrograms ?? '—'} label="SF Programs"  color="text-[#2F6F7E]" />
+              <StatPill value={metrics.sfContacts ?? '—'} label="SF Contacts"  color="text-[#2F6F7E]" />
+              <StatPill value={metrics.sfCases    ?? '—'} label="SF Open Cases" color="text-[#2F6F7E]" />
             </>
           )}
         </div>
@@ -240,9 +240,9 @@ export default function KnowledgeOverview() {
             <Eyebrow>Source Health</Eyebrow>
             <div className="space-y-2">
               {[
-                { label: 'Healthy',  count: summary.healthy,  icon: CheckCircle,   iconCls: 'text-emerald-500', barCls: 'bg-emerald-400' },
-                { label: 'Warning',  count: summary.warnings, icon: AlertTriangle, iconCls: 'text-amber-500',   barCls: 'bg-amber-400'  },
-                { label: 'Critical', count: summary.critical, icon: XCircle,       iconCls: 'text-rose-500',    barCls: 'bg-rose-400'   },
+                { label: 'Healthy',  count: summary.healthy,  icon: CheckCircle,   iconCls: 'text-[#2F6B3F]', barCls: 'bg-[#2F6B3F]' },
+                { label: 'Warning',  count: summary.warnings, icon: AlertTriangle, iconCls: 'text-[#CC8400]',   barCls: 'bg-[#CC8400]'  },
+                { label: 'Critical', count: summary.critical, icon: XCircle,       iconCls: 'text-[#A93F2F]',    barCls: 'bg-[#A93F2F]'   },
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-2.5">
                   <row.icon className={`w-3.5 h-3.5 shrink-0 ${row.iconCls}`} />
@@ -304,9 +304,9 @@ export default function KnowledgeOverview() {
             <Eyebrow>Sync Coverage</Eyebrow>
             <div className="space-y-1.5">
               {[
-                { label: 'Live',         count: stats.syncCounts.Live,         dot: 'bg-emerald-500', note: 'real-time connection' },
-                { label: 'Manual',       count: stats.syncCounts.Manual,       dot: 'bg-amber-400',   note: 'periodic manual sync' },
-                { label: 'Disconnected', count: stats.syncCounts.Disconnected, dot: 'bg-rose-500',    note: 'no connection' },
+                { label: 'Live',         count: stats.syncCounts.Live,         dot: 'bg-[#E6F0EA]0', note: 'real-time connection' },
+                { label: 'Manual',       count: stats.syncCounts.Manual,       dot: 'bg-[#CC8400]',   note: 'periodic manual sync' },
+                { label: 'Disconnected', count: stats.syncCounts.Disconnected, dot: 'bg-[#FBEAE6]0',    note: 'no connection' },
                 { label: 'Planned',      count: stats.syncCounts.Planned,      dot: 'bg-slate-300',   note: 'future integration' },
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-2">
@@ -318,8 +318,8 @@ export default function KnowledgeOverview() {
               ))}
             </div>
             {stats.syncCounts.Disconnected > 0 && (
-              <div className="rounded border border-rose-200 bg-rose-50 px-2.5 py-1.5">
-                <p className="text-[10px] text-rose-700 font-medium">
+              <div className="rounded border border-[#E8B9B4] bg-[#FBEAE6] px-2.5 py-1.5">
+                <p className="text-[10px] text-[#A93F2F] font-medium">
                   {stats.syncCounts.Disconnected} disconnected source{stats.syncCounts.Disconnected > 1 ? 's' : ''} — Google Drive API connection required (Phase 2).
                 </p>
               </div>
@@ -396,8 +396,8 @@ export default function KnowledgeOverview() {
                 ? `${summary.warnings + summary.critical} issues`
                 : 'All clear'}
               badgeColor={summary.warnings + summary.critical > 0
-                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                : 'bg-emerald-50 text-emerald-700 border-emerald-200'}
+                ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]'
+                : 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]'}
             />
             <NavCard
               icon={BookMarked}

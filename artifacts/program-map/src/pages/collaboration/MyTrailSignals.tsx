@@ -50,35 +50,35 @@ interface WatchRule {
 const SOURCES: SignalSource[] = [
   {
     id: 'penny', label: `${TERMS.aiAssistant} AI`, icon: Sparkles,
-    color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200',
+    color: 'text-[#2F6F7E]', bg: 'bg-[#EDF5F8]', border: 'border-[#7FAFC6]',
     description: `${TERMS.aiAssistant} recommendations, insight flags, and coaching nudges`,
     signals: ['Coaching recommendations', 'Attrition risk flags', 'Program health insights'],
     required: true,
   },
   {
     id: 'slack', label: 'Slack', icon: MessageSquare,
-    color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200',
+    color: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA]', border: 'border-[#9FC3AE]',
     description: 'Channel mentions, bot alerts, and team activity signals',
     signals: ['Bot alerts (@penny)', 'Channel activity digest', 'Attrition threshold alerts'],
     required: false,
   },
   {
     id: 'gmail', label: 'Gmail', icon: Mail,
-    color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200',
+    color: 'text-[#A93F2F]', bg: 'bg-[#FBEAE6]', border: 'border-[#E8B9B4]',
     description: 'Flagged threads, follow-up reminders, and label-routed signals',
     signals: ['TRAIL_OS label → Penny queue', 'CASE_ALERTS → urgent signal', '48h no-reply reminders'],
     required: false,
   },
   {
     id: 'calendar', label: 'Google Calendar', icon: CalendarDays,
-    color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-200',
+    color: 'text-[#2F6F7E]', bg: 'bg-[#EDF5F8]', border: 'border-[#7FAFC6]',
     description: 'Meeting prep signals, cadence gaps, and coach check-in tracking',
     signals: ['Cadence gap > 2 weeks', 'Pending meeting invites', 'Coach check-in reminders'],
     required: false,
   },
   {
     id: 'salesforce', label: 'Salesforce', icon: Database,
-    color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200',
+    color: 'text-[#2F6F7E]', bg: 'bg-[#EDF5F8]', border: 'border-[#7FAFC6]',
     description: 'Case updates, contact changes, and program record signals',
     signals: ['High-priority case opened', 'Contact status change', 'Program completion milestone'],
     required: false,
@@ -118,8 +118,8 @@ const ACTIONS       = ['Create signal', 'Alert (real-time)', 'Digest (daily)', '
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 const URGENCY_OPTS: { value: Urgency; label: string; cls: string }[] = [
-  { value: 'high',   label: 'High',   cls: 'bg-rose-50   border-rose-200   text-rose-700'   },
-  { value: 'medium', label: 'Medium', cls: 'bg-amber-50  border-amber-200  text-amber-700'  },
+  { value: 'high',   label: 'High',   cls: 'bg-[#FBEAE6]   border-[#E8B9B4]   text-[#A93F2F]'   },
+  { value: 'medium', label: 'Medium', cls: 'bg-[#FFF3E0]  border-[#FFD08A]  text-[#CC8400]'  },
   { value: 'low',    label: 'Low',    cls: 'bg-zinc-100  border-zinc-200   text-zinc-500'   },
 ];
 
@@ -154,7 +154,7 @@ function DeliveryToggle({
         onClick={() => onChange('realtime')}
         className={`flex items-center gap-1 px-2.5 py-1 transition-colors ${
           value === 'realtime'
-            ? 'bg-sky-50 border-sky-200 text-sky-700'
+            ? 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]'
             : 'bg-white text-zinc-400 hover:bg-zinc-50'
         } disabled:opacity-40 disabled:cursor-not-allowed`}
       >
@@ -165,7 +165,7 @@ function DeliveryToggle({
         onClick={() => onChange('digest')}
         className={`flex items-center gap-1 px-2.5 py-1 transition-colors ${
           value === 'digest'
-            ? 'bg-amber-50 border-amber-200 text-amber-700'
+            ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]'
             : 'bg-white text-zinc-400 hover:bg-zinc-50'
         } disabled:opacity-40 disabled:cursor-not-allowed`}
       >
@@ -264,19 +264,19 @@ export default function MyTrailSignals() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
+            <span className="text-[10px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
               {activeCount} sources active
             </span>
-            <span className="text-[10px] font-semibold text-sky-600 bg-sky-50 border border-sky-200 rounded-full px-2.5 py-1">
+            <span className="text-[10px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2.5 py-1">
               {ruleCount} rules live
             </span>
           </div>
         </div>
 
         {/* ── Required signals notice ── */}
-        <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-          <Info className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-amber-800 leading-snug">
+        <div className="flex items-start gap-2.5 rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
+          <Info className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
+          <p className="text-[11px] text-[#CC8400] leading-snug">
             <span className="font-semibold">Required signals</span> — sources and rules marked with a lock are
             set by your organisation and cannot be paused or removed. They ensure the team always has visibility
             on critical learner and program activity.
@@ -306,7 +306,7 @@ export default function MyTrailSignals() {
                       title={s.required ? 'Required — cannot be disabled' : s.active ? 'Pause this source' : 'Enable this source'}
                       className={`w-8 h-4.5 rounded-full border-2 transition-colors shrink-0 relative ${
                         s.active
-                          ? 'bg-emerald-500 border-emerald-500'
+                          ? 'bg-[#E6F0EA]0 border-[#E6F0EA]0'
                           : 'bg-zinc-200 border-zinc-300'
                       } ${s.required ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
                       style={{ width: 32, height: 18 }}
@@ -366,7 +366,7 @@ export default function MyTrailSignals() {
                         {src.signals.map(sig => (
                           <div key={sig} className="flex items-center gap-2">
                             {s.active
-                              ? <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                              ? <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
                               : <AlertCircle  className="w-3 h-3 text-zinc-300 shrink-0" />}
                             <span className={`text-[11px] leading-snug ${s.active ? 'text-zinc-700' : 'text-zinc-400'}`}>
                               {sig}
@@ -399,8 +399,8 @@ export default function MyTrailSignals() {
 
           {/* Add rule form */}
           {showForm && (
-            <div className="mb-3 rounded-xl border border-sky-200 bg-sky-50 px-5 py-4 space-y-3">
-              <div className="text-[10px] font-semibold text-sky-700 uppercase tracking-wider mb-1">New watch rule</div>
+            <div className="mb-3 rounded-xl border border-[#7FAFC6] bg-[#EDF5F8] px-5 py-4 space-y-3">
+              <div className="text-[10px] font-semibold text-[#2F6F7E] uppercase tracking-wider mb-1">New watch rule</div>
               <div className="grid grid-cols-5 gap-2">
                 {[
                   { label: 'Object',    value: newObj,    set: setNewObj,    opts: OBJECT_TYPES  },
@@ -432,7 +432,7 @@ export default function MyTrailSignals() {
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={addRule}
-                  className="px-3 py-1.5 rounded-lg bg-sky-600 text-white text-[11px] font-semibold hover:bg-sky-700 transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-[#2F6F7E] text-white text-[11px] font-semibold hover:bg-[#225968] transition-colors"
                 >
                   Add rule
                 </button>
@@ -450,14 +450,14 @@ export default function MyTrailSignals() {
           <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden divide-y divide-zinc-100">
             {rules.map(rule => (
               <div key={rule.id} className={`flex items-center gap-3 px-5 py-3 ${rule.paused ? 'opacity-50' : ''}`}>
-                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${rule.paused ? 'bg-zinc-300' : 'bg-emerald-500'}`} />
+                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${rule.paused ? 'bg-zinc-300' : 'bg-[#E6F0EA]0'}`} />
                 <span className="text-[11px] text-zinc-700 flex-1 leading-snug">
                   When <span className="font-semibold">{rule.objectType}</span> {' '}
                   <span className="text-zinc-500">{rule.field}</span> {' '}
                   <span className="font-medium">{rule.condition}</span> {' '}
                   <span className="font-semibold">{rule.threshold}</span>
                   {' → '}
-                  <span className={`font-semibold ${rule.action.includes('Alert') ? 'text-amber-700' : 'text-zinc-700'}`}>
+                  <span className={`font-semibold ${rule.action.includes('Alert') ? 'text-[#CC8400]' : 'text-zinc-700'}`}>
                     {rule.action}
                   </span>
                 </span>
@@ -474,7 +474,7 @@ export default function MyTrailSignals() {
                     <button
                       onClick={() => deleteRule(rule.id)}
                       title="Delete rule"
-                      className="p-1 rounded hover:bg-rose-50 text-zinc-400 hover:text-rose-500 transition-colors"
+                      className="p-1 rounded hover:bg-[#FBEAE6] text-zinc-400 hover:text-[#A93F2F] transition-colors"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>

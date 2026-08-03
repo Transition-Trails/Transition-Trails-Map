@@ -15,9 +15,9 @@ const IDX_COUNTS = {
 
 function HealthDot({ health }: { health?: string }) {
   const cls =
-    health === 'healthy'         ? 'bg-emerald-500' :
-    health === 'needs-attention' ? 'bg-amber-500'   :
-    health === 'incomplete'      ? 'bg-rose-500'    : 'bg-muted-foreground/30';
+    health === 'healthy'         ? 'bg-[#E6F0EA]0' :
+    health === 'needs-attention' ? 'bg-[#FFF3E0]0'   :
+    health === 'incomplete'      ? 'bg-[#FBEAE6]0'    : 'bg-muted-foreground/30';
   return <span className={`inline-block w-2 h-2 rounded-full ${cls}`} />;
 }
 
@@ -93,10 +93,10 @@ function OverviewTab() {
         </div>
 
         {activeContext ? (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 space-y-3">
+          <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]/50 p-4 space-y-3">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-600 mb-1.5">Active Context</p>
+                <p className="text-[9px] font-bold uppercase tracking-widest text-[#2F6B3F] mb-1.5">Active Context</p>
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold border ${activeContext.categoryBg} ${activeContext.categoryColor}`}>
                     {activeContext.objectTypeName}
@@ -117,7 +117,7 @@ function OverviewTab() {
             </div>
             <button
               onClick={() => setActiveContext(null)}
-              className="text-[10px] text-muted-foreground hover:text-rose-600 font-semibold transition-colors"
+              className="text-[10px] text-muted-foreground hover:text-[#A93F2F] font-semibold transition-colors"
             >
               Clear Context
             </button>
@@ -151,10 +151,10 @@ function OverviewTab() {
                 className="flex flex-col items-start gap-1 px-3 py-2.5 rounded-lg border border-border bg-background hover:bg-muted/40 text-left transition-colors"
               >
                 <div className="flex items-center gap-2 w-full">
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ws.filtered ? 'bg-emerald-400' : 'bg-muted-foreground/20'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ws.filtered ? 'bg-[#2F6B3F]' : 'bg-muted-foreground/20'}`} />
                   <span className="text-[12px] text-foreground font-medium flex-1 truncate">{ws.name}</span>
                   {ws.filtered && (
-                    <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded px-1 py-0.5 shrink-0">On</span>
+                    <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded px-1 py-0.5 shrink-0">On</span>
                   )}
                 </div>
                 <p className="text-[10px] text-muted-foreground pl-3.5">
@@ -239,8 +239,8 @@ function RelationshipsTab() {
               <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border/30 last:border-0">
                 <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
                   r.direction === 'up'
-                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'
+                    : 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]'
                 }`}>
                   {r.direction === 'up' ? '↑ upstream' : '↓ downstream'}
                 </span>
@@ -378,13 +378,13 @@ function ImpactTab() {
             key={imp.workspace}
             onClick={() => setLocation(imp.link)}
             className={`w-full text-left rounded-lg border p-3 transition-colors hover:bg-muted/20 ${
-              imp.active ? 'border-emerald-200 bg-emerald-50/40' : 'border-border bg-background'
+              imp.active ? 'border-[#9FC3AE] bg-[#E6F0EA]/40' : 'border-border bg-background'
             }`}
           >
             <div className="flex items-center justify-between gap-2 mb-1">
               <p className="text-[12px] font-semibold text-foreground">{imp.workspace}</p>
               {imp.active ? (
-                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5">Active</span>
+                <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded px-1.5 py-0.5">Active</span>
               ) : (
                 <span className="text-[9px] font-bold text-muted-foreground bg-muted border border-border rounded px-1.5 py-0.5">Phase 2</span>
               )}

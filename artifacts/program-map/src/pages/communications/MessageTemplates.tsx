@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { FileText, ChevronRight } from 'lucide-react';
 
 function statusBadge(s: MessageTemplate['status']) {
-  if (s === 'active')    return <Badge className="text-[10px] bg-green-50 text-green-800 border-green-200 border">Active</Badge>;
+  if (s === 'active')    return <Badge className="text-[10px] bg-[#E6F0EA] text-[#245531] border-[#9FC3AE] border">Active</Badge>;
   if (s === 'approved')  return <Badge className="text-[10px] bg-secondary/10 text-secondary border-secondary/20 border">Approved</Badge>;
   return <Badge variant="secondary" className="text-[10px]">Draft</Badge>;
 }

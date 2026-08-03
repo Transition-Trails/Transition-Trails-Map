@@ -147,7 +147,7 @@ export default function PeopleRolesStudio() {
                 <StatBox label="Personas"        value={personas.length}        sub="across org" />
                 <StatBox label="Roles Defined"   value={roles.length}           sub={`${roles.filter(r=>r.owner).length} with owner`} />
                 <StatBox label="Blueprints"       value={`${blueprintsDone}/${roleBlueprints.length}`} sub="complete" color="text-primary" />
-                <StatBox label="Health Issues"    value={attention + incomplete} sub={`${attention} attention · ${incomplete} incomplete`} color={attention + incomplete > 0 ? 'text-amber-600' : 'text-emerald-600'} />
+                <StatBox label="Health Issues"    value={attention + incomplete} sub={`${attention} attention · ${incomplete} incomplete`} color={attention + incomplete > 0 ? 'text-[#CC8400]' : 'text-[#2F6B3F]'} />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -155,14 +155,14 @@ export default function PeopleRolesStudio() {
                 <div className="col-span-2 rounded-lg border border-border bg-white p-4">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-3">Role Health Overview</p>
                   <div className="flex h-3 rounded-full overflow-hidden mb-2">
-                    <div className="bg-emerald-400 transition-all" style={{ width: `${(healthy / roles.length) * 100}%` }} />
-                    <div className="bg-amber-400 transition-all"   style={{ width: `${(attention / roles.length) * 100}%` }} />
-                    <div className="bg-rose-400 transition-all"    style={{ width: `${(incomplete / roles.length) * 100}%` }} />
+                    <div className="bg-[#2F6B3F] transition-all" style={{ width: `${(healthy / roles.length) * 100}%` }} />
+                    <div className="bg-[#CC8400] transition-all"   style={{ width: `${(attention / roles.length) * 100}%` }} />
+                    <div className="bg-[#A93F2F] transition-all"    style={{ width: `${(incomplete / roles.length) * 100}%` }} />
                   </div>
                   <div className="flex gap-4 text-[10px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />{healthy} Healthy</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />{attention} Needs Attention</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400 inline-block" />{incomplete} Incomplete</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#2F6B3F] inline-block" />{healthy} Healthy</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#CC8400] inline-block" />{attention} Needs Attention</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#A93F2F] inline-block" />{incomplete} Incomplete</span>
                   </div>
                 </div>
 
@@ -274,7 +274,7 @@ export default function PeopleRolesStudio() {
                         <td className="px-3 py-2.5 text-muted-foreground">{r.personaName}</td>
                         <td className="px-3 py-2.5 text-muted-foreground">{r.type}</td>
                         <td className="px-3 py-2.5"><span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${bpCfg.cls}`}>{bpCfg.label}</span></td>
-                        <td className="px-3 py-2.5">{r.owner ?? <span className="text-rose-500 italic">Unassigned</span>}</td>
+                        <td className="px-3 py-2.5">{r.owner ?? <span className="text-[#A93F2F] italic">Unassigned</span>}</td>
                         <td className="px-3 py-2.5"><span className={`flex items-center gap-1 text-[10px] font-semibold ${hlth.cls.split(' ')[0]}`}><HealthDot status={r.healthStatus} />{hlth.label}</span></td>
                         <td className="px-3 py-2.5"><ChevronRight className="w-3 h-3 text-muted-foreground/40" /></td>
                       </tr>
@@ -311,7 +311,7 @@ export default function PeopleRolesStudio() {
                         <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell max-w-xs truncate">{resp.description}</td>
                         <td className="px-3 py-2.5">
                           {resp.required
-                            ? <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-full px-2 py-0.5">Required</span>
+                            ? <span className="text-[10px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-2 py-0.5">Required</span>
                             : <span className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5">Optional</span>}
                         </td>
                         <td className="px-3 py-2.5">{resp.pennySupport
@@ -372,7 +372,7 @@ export default function PeopleRolesStudio() {
                   {roles.filter(r => r.blueprintStatus !== 'complete').map(r => (
                     <span key={r.id}
                       onClick={() => selectRole(r)}
-                      className={`cursor-pointer text-[10px] font-medium border rounded-full px-2 py-0.5 hover:bg-amber-100 transition-colors ${BLUEPRINT_STATUS_CONFIG[r.blueprintStatus].cls}`}>
+                      className={`cursor-pointer text-[10px] font-medium border rounded-full px-2 py-0.5 hover:bg-[#FFF3E0] transition-colors ${BLUEPRINT_STATUS_CONFIG[r.blueprintStatus].cls}`}>
                       {r.name} — {r.blueprintStatus}
                     </span>
                   ))}
@@ -427,27 +427,27 @@ export default function PeopleRolesStudio() {
                         <p className="text-[10px] text-muted-foreground">{cm.personaName}</p>
                       </div>
                       <div className="flex gap-1.5">
-                        {cm.slack.length > 0 && <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-1.5 py-0.5">{cm.slack.length} Slack</span>}
-                        {cm.googleChat.length > 0 && <span className="text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-1.5 py-0.5">{cm.googleChat.length} Chat</span>}
-                        {cm.calendar.length > 0 && <span className="text-[9px] font-bold text-violet-700 bg-violet-50 border border-violet-200 rounded-full px-1.5 py-0.5">{cm.calendar.length} Cal</span>}
+                        {cm.slack.length > 0 && <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">{cm.slack.length} Slack</span>}
+                        {cm.googleChat.length > 0 && <span className="text-[9px] font-bold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5">{cm.googleChat.length} Chat</span>}
+                        {cm.calendar.length > 0 && <span className="text-[9px] font-bold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5">{cm.calendar.length} Cal</span>}
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[10px]">
                       {cm.slack.map(s => (
-                        <div key={s.channel} className="rounded border border-emerald-100 bg-emerald-50/50 px-2 py-1">
-                          <p className="font-semibold text-emerald-800">{s.channel}</p>
+                        <div key={s.channel} className="rounded border border-[#E6F0EA] bg-[#E6F0EA]/50 px-2 py-1">
+                          <p className="font-semibold text-[#245531]">{s.channel}</p>
                           <p className="text-muted-foreground">{s.purpose}</p>
                         </div>
                       ))}
                       {cm.googleChat.map(g => (
-                        <div key={g.space} className="rounded border border-blue-100 bg-blue-50/50 px-2 py-1">
-                          <p className="font-semibold text-blue-800">{g.space}</p>
+                        <div key={g.space} className="rounded border border-[#EDF5F8] bg-[#EDF5F8]/50 px-2 py-1">
+                          <p className="font-semibold text-[#2F6F7E]">{g.space}</p>
                           <p className="text-muted-foreground">{g.purpose}</p>
                         </div>
                       ))}
                       {cm.calendar.map(c => (
-                        <div key={c.event} className="rounded border border-violet-100 bg-violet-50/50 px-2 py-1">
-                          <p className="font-semibold text-violet-800">{c.event}</p>
+                        <div key={c.event} className="rounded border border-[#EDF5F8] bg-[#EDF5F8]/50 px-2 py-1">
+                          <p className="font-semibold text-[#2F6F7E]">{c.event}</p>
                           <p className="text-muted-foreground">{c.cadence} · {c.purpose}</p>
                         </div>
                       ))}
@@ -464,13 +464,13 @@ export default function PeopleRolesStudio() {
               {pennySupportMappings.map(ps => {
                 const role = roles.find(r => r.id === ps.roleId);
                 const STATUS_CLS: Record<string, string> = {
-                  active:    'text-emerald-700 bg-emerald-50 border-emerald-200',
-                  prototype: 'text-amber-700 bg-amber-50 border-amber-200',
+                  active:    'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
+                  prototype: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
                   planned:   'text-slate-600 bg-slate-50 border-slate-200',
                 };
                 const ACCESS_CLS: Record<string, string> = {
                   Full: 'text-primary bg-primary/10 border-primary/20',
-                  Guided: 'text-blue-700 bg-blue-50 border-blue-200',
+                  Guided: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
                   'Read-Only': 'text-slate-600 bg-slate-50 border-slate-200',
                   None: 'text-muted-foreground bg-muted border-border',
                 };
@@ -517,12 +517,12 @@ export default function PeopleRolesStudio() {
                         <p className="text-[12px] font-semibold text-foreground group-hover:text-primary">{sm.roleName}</p>
                         <p className="text-[10px] text-muted-foreground">{sm.personaName} · Primary: <strong>{sm.primaryObject}</strong></p>
                       </div>
-                      <Database className="w-3.5 h-3.5 text-blue-500" />
+                      <Database className="w-3.5 h-3.5 text-[#2F6F7E]" />
                     </div>
                     <div className="space-y-1.5 mb-2">
                       {sm.relatedObjects.map(obj => (
                         <div key={obj.object} className="flex items-start gap-2">
-                          <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 text-blue-700 bg-blue-50 border-blue-200">{obj.relationship}</span>
+                          <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]">{obj.relationship}</span>
                           <div>
                             <p className="text-[11px] font-semibold text-foreground leading-tight">{obj.object}</p>
                             <p className="text-[10px] text-muted-foreground leading-tight">{obj.fields.slice(0, 3).join(', ')}{obj.fields.length > 3 ? '…' : ''}</p>
@@ -531,7 +531,7 @@ export default function PeopleRolesStudio() {
                       ))}
                     </div>
                     <p className="text-[10px] text-muted-foreground/70 italic border-t border-border/50 pt-2">{sm.permissionModel}</p>
-                    {sm.futureNotes && <p className="text-[10px] text-amber-700 italic mt-1">{sm.futureNotes}</p>}
+                    {sm.futureNotes && <p className="text-[10px] text-[#CC8400] italic mt-1">{sm.futureNotes}</p>}
                   </div>
                 );
               })}
@@ -542,9 +542,9 @@ export default function PeopleRolesStudio() {
           {view === 'Role Health' && (
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-3">
-                <StatBox label="Healthy"        value={roleHealthRecords.filter(r=>r.healthStatus==='healthy').length}          color="text-emerald-600" />
-                <StatBox label="Needs Attention" value={roleHealthRecords.filter(r=>r.healthStatus==='needs-attention').length} color="text-amber-600" />
-                <StatBox label="Incomplete"      value={roleHealthRecords.filter(r=>r.healthStatus==='incomplete').length}      color="text-rose-600" />
+                <StatBox label="Healthy"        value={roleHealthRecords.filter(r=>r.healthStatus==='healthy').length}          color="text-[#2F6B3F]" />
+                <StatBox label="Needs Attention" value={roleHealthRecords.filter(r=>r.healthStatus==='needs-attention').length} color="text-[#CC8400]" />
+                <StatBox label="Incomplete"      value={roleHealthRecords.filter(r=>r.healthStatus==='incomplete').length}      color="text-[#A93F2F]" />
               </div>
               <div className="rounded-lg border border-border overflow-hidden">
                 <table className="w-full text-[11px]">
@@ -563,10 +563,10 @@ export default function PeopleRolesStudio() {
                     {roleHealthRecords.sort((a, b) => a.healthScore - b.healthScore).map(rh => {
                       const role = roles.find(r => r.id === rh.roleId);
                       const Icon = rh.healthScore >= 80 ? CheckCircle2 : rh.healthScore >= 50 ? AlertTriangle : XCircle;
-                      const iconCls = rh.healthScore >= 80 ? 'text-emerald-500' : rh.healthScore >= 50 ? 'text-amber-500' : 'text-rose-500';
+                      const iconCls = rh.healthScore >= 80 ? 'text-[#2F6B3F]' : rh.healthScore >= 50 ? 'text-[#CC8400]' : 'text-[#A93F2F]';
                       const check = (ok: boolean) => ok
-                        ? <XCircle className="w-3 h-3 text-rose-400 mx-auto" />
-                        : <CheckCircle2 className="w-3 h-3 text-emerald-400 mx-auto" />;
+                        ? <XCircle className="w-3 h-3 text-[#A93F2F] mx-auto" />
+                        : <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mx-auto" />;
                       return (
                         <tr key={rh.roleId}
                           onClick={() => role && selectRole(role)}

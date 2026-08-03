@@ -155,10 +155,10 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
         <Sec id="sources" label={`Source Rules (${t.sourceRules.length})`}>
           <div className="space-y-1.5">
             {t.sourceRules.map(sr => {
-              const cls = sr.role === 'Required' ? 'text-green-700 bg-green-50 border-green-200'
-                        : sr.role === 'Preferred' ? 'text-blue-700 bg-blue-50 border-blue-200'
-                        : sr.role === 'Optional' ? 'text-amber-700 bg-amber-50 border-amber-200'
-                        : 'text-rose-700 bg-rose-50 border-rose-200';
+              const cls = sr.role === 'Required' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
+                        : sr.role === 'Preferred' ? 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]'
+                        : sr.role === 'Optional' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
+                        : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]';
               return (
                 <div key={sr.sourceId} className="flex items-start gap-2">
                   <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${cls}`}>{sr.role}</span>
@@ -176,9 +176,9 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
         <Sec id="guardrails" label={`Guardrails (${t.guardrails.length})`}>
           <div className="space-y-1.5">
             {t.guardrails.map((g, i) => (
-              <div key={i} className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
-                <p className="text-[11px] text-rose-900 leading-snug">{g}</p>
+              <div key={i} className="flex items-start gap-2 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
+                <p className="text-[11px] text-[#A93F2F] leading-snug">{g}</p>
               </div>
             ))}
           </div>
@@ -197,7 +197,7 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
               <div className="flex flex-wrap gap-1">
                 {t.relatedSfObjects.length === 0
                   ? <span className="text-[10px] italic text-muted-foreground/50">None</span>
-                  : t.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-blue-900 bg-blue-50 border border-blue-100 rounded-full px-2 py-0.5">{o}</span>)
+                  : t.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)
                 }
               </div>
             </div>
@@ -237,8 +237,8 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
             {qr.openFlags.length > 0 && (
               <div className="space-y-1">
                 {qr.openFlags.map((f, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-[10px] text-amber-800">
-                    <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0 mt-0.5" />
+                  <div key={i} className="flex items-start gap-1.5 text-[10px] text-[#CC8400]">
+                    <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
                     {f}
                   </div>
                 ))}
@@ -376,11 +376,11 @@ function TemplatesView({ onOpenBrief, onEdit }: { onOpenBrief: (t: PromptTemplat
 // ── Variables View ─────────────────────────────────────────────────────────
 
 const SOURCE_CLS: Record<string, string> = {
-  'Salesforce':       'text-blue-700 bg-blue-50 border-blue-200',
-  'LMS':              'text-amber-700 bg-amber-50 border-amber-200',
-  'Calendar':         'text-amber-700 bg-amber-50 border-amber-200',
-  'Standards Studio': 'text-rose-700 bg-rose-50 border-rose-200',
-  'Curriculum Studio':'text-orange-700 bg-orange-50 border-orange-200',
+  'Salesforce':       'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+  'LMS':              'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+  'Calendar':         'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+  'Standards Studio': 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
+  'Curriculum Studio':'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
   'Penny Generated':  'text-secondary border-secondary/20 bg-secondary/10',
 };
 
@@ -531,7 +531,7 @@ function VariablesView() {
                 <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 text-slate-600 bg-slate-50 border-slate-200 capitalize">{selected.type}</span>
                 <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${SOURCE_CLS[selected.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>{selected.source}</span>
                 {selected.required && (
-                  <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 text-rose-700 bg-rose-50 border-rose-200">Required</span>
+                  <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]">Required</span>
                 )}
               </div>
 
@@ -578,10 +578,10 @@ function SourceRulesView() {
   const t = templates.find(t => t.id === selectedId) ?? templates[0];
 
   const roleConfig = {
-    Required:  'text-green-700 bg-green-50 border-green-200',
-    Preferred: 'text-blue-700 bg-blue-50 border-blue-200',
-    Optional:  'text-amber-700 bg-amber-50 border-amber-200',
-    Forbidden: 'text-rose-700 bg-rose-50 border-rose-200',
+    Required:  'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
+    Preferred: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+    Optional:  'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+    Forbidden: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
   };
 
   return (
@@ -899,15 +899,15 @@ function TestBenchView() {
             {selectedLearnerId && (
               <div className="mt-1.5">
                 {contextMeta === null ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
                     ⚡ Learner context will load on first run
                   </span>
                 ) : contextMeta.promptPath === 'salesforce' ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
                     ✓ Live Salesforce context active for {learners.find(l => l.id === selectedLearnerId)?.firstName ?? 'learner'}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
                     ⚠ Using fallback prompt — check Salesforce connection
                   </span>
                 )}
@@ -939,7 +939,7 @@ function TestBenchView() {
             <div className="flex flex-wrap gap-1">
               {t.sourceRules.filter(sr => sr.role !== 'Forbidden').map(sr => (
                 <span key={sr.sourceId} className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${
-                  sr.role === 'Required' ? 'text-green-700 bg-green-50 border-green-200' : 'text-slate-600 bg-slate-50 border-slate-200'
+                  sr.role === 'Required' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-slate-600 bg-slate-50 border-slate-200'
                 }`}>{sr.sourceName}</span>
               ))}
             </div>
@@ -971,7 +971,7 @@ function TestBenchView() {
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-secondary" />
                 <p className="text-[12px] font-bold text-foreground">Penny Output</p>
-                <span className="text-[9px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
+                <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
               </div>
               <div className="rounded-lg border border-secondary/20 bg-white p-3 space-y-2">
                 <div className="h-2.5 bg-muted rounded w-full" />
@@ -984,15 +984,15 @@ function TestBenchView() {
 
           {/* Live output */}
           {showOutput && (
-            <div className={`rounded-xl border p-4 space-y-3 ${status === 'error' ? 'border-red-200 bg-red-50/50' : 'border-secondary/20 bg-secondary/5'}`}>
+            <div className={`rounded-xl border p-4 space-y-3 ${status === 'error' ? 'border-[#E8B9B4] bg-[#FBEAE6]/50' : 'border-secondary/20 bg-secondary/5'}`}>
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-secondary" />
                 <p className="text-[12px] font-bold text-foreground">Penny Output</p>
                 {status === 'success' && (
-                  <span className="text-[9px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
+                  <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
                 )}
                 {status === 'error' && (
-                  <span className="text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 rounded-full px-1.5 py-0.5 ml-auto">Error</span>
+                  <span className="text-[9px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5 ml-auto">Error</span>
                 )}
               </div>
 
@@ -1002,9 +1002,9 @@ function TestBenchView() {
                     <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">{liveReply}</p>
                   </div>
                   {liveDurationMs !== null && (
-                    <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                      <p className="text-[10px] font-bold text-green-700 uppercase tracking-wider mb-1">Run Complete</p>
-                      <p className="text-[11px] text-green-900 leading-snug">
+                    <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] p-3">
+                      <p className="text-[10px] font-bold text-[#2F6B3F] uppercase tracking-wider mb-1">Run Complete</p>
+                      <p className="text-[11px] text-[#245531] leading-snug">
                         Completed in {liveDurationMs.toLocaleString()} ms
                       </p>
                       {contextMeta && selectedLearnerId && contextMeta.promptPath === 'salesforce' && (
@@ -1013,7 +1013,7 @@ function TestBenchView() {
                         </p>
                       )}
                       {contextMeta && contextMeta.promptPath === 'fallback' && (
-                        <p className="text-[10px] text-amber-600 mt-1">
+                        <p className="text-[10px] text-[#CC8400] mt-1">
                           Context: Fallback (generic prompt — no learner data)
                         </p>
                       )}
@@ -1023,8 +1023,8 @@ function TestBenchView() {
               )}
 
               {status === 'error' && (
-                <div className="rounded-lg border border-red-200 bg-white p-3">
-                  <p className="text-[12px] text-red-700 leading-relaxed">{errorMsg}</p>
+                <div className="rounded-lg border border-[#E8B9B4] bg-white p-3">
+                  <p className="text-[12px] text-[#A93F2F] leading-relaxed">{errorMsg}</p>
                 </div>
               )}
 
@@ -1049,10 +1049,10 @@ function VersionHistoryView() {
   const entries = versionHistory.filter(v => v.templateId === selectedId).sort((a, b) => b.version.localeCompare(a.version));
 
   const changeTypeCls = {
-    Created:    'text-blue-700 bg-blue-50 border-blue-200',
-    Updated:    'text-amber-700 bg-amber-50 border-amber-200',
-    Approved:   'text-green-700 bg-green-50 border-green-200',
-    Deprecated: 'text-rose-700 bg-rose-50 border-rose-200',
+    Created:    'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
+    Updated:    'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
+    Approved:   'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
+    Deprecated: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
     Reverted:   'text-slate-600 bg-slate-50 border-slate-200',
   };
 
@@ -1105,7 +1105,7 @@ function VersionHistoryView() {
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className="text-[10px] font-mono font-bold bg-muted rounded px-1.5 py-0.5">v{entry.version}</span>
                       <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${changeTypeCls[entry.changeType]}`}>{entry.changeType}</span>
-                      {entry.breaking && <span className="text-[9px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-full px-1.5 py-0.5">Breaking</span>}
+                      {entry.breaking && <span className="text-[9px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Breaking</span>}
                       <span className="text-[10px] text-muted-foreground ml-auto">{entry.date}</span>
                     </div>
                     <p className="text-[11px] text-foreground leading-snug">{entry.summary}</p>
@@ -1131,8 +1131,8 @@ function QualityReviewView() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0 flex items-center gap-3">
-        <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5">
-          <p className="text-[11px] font-semibold text-green-700">
+        <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-1.5">
+          <p className="text-[11px] font-semibold text-[#2F6B3F]">
             {qualityReviews.filter(q => q.reviewStatus === 'Approved').length} Approved · {qualityReviews.filter(q => q.reviewStatus !== 'Approved').length} Pending or flagged
           </p>
         </div>
@@ -1154,16 +1154,16 @@ function QualityReviewView() {
           {filtered.map(qr => {
             const t = templates.find(t => t.id === qr.templateId);
             if (!t) return null;
-            const stsCls = qr.reviewStatus === 'Approved' ? 'text-green-700 bg-green-50 border-green-200'
-                         : qr.reviewStatus === 'In Review' ? 'text-amber-700 bg-amber-50 border-amber-200'
-                         : qr.reviewStatus === 'Rejected' ? 'text-rose-700 bg-rose-50 border-rose-200'
+            const stsCls = qr.reviewStatus === 'Approved' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
+                         : qr.reviewStatus === 'In Review' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
+                         : qr.reviewStatus === 'Rejected' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
                          : 'text-slate-600 bg-slate-50 border-slate-200';
             return (
               <div key={qr.templateId} className="grid grid-cols-[1fr_80px_80px_80px_80px_100px] gap-2 px-3 py-3 rounded-lg border border-border bg-white hover:bg-muted/20 transition-colors items-center">
                 <div>
                   <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
                   <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${DOMAIN_CLS[t.domain]}`}>{t.domain}</span>
-                  {qr.openFlags.length > 0 && <span className="ml-1 text-[9px] font-bold text-amber-700">⚠ {qr.openFlags.length} flag{qr.openFlags.length > 1 ? 's' : ''}</span>}
+                  {qr.openFlags.length > 0 && <span className="ml-1 text-[9px] font-bold text-[#CC8400]">⚠ {qr.openFlags.length} flag{qr.openFlags.length > 1 ? 's' : ''}</span>}
                 </div>
                 {[qr.sourceCoverage, qr.standardsAlignment, qr.usefulnessScore].map((val, i) => (
                   <div key={i}>
@@ -1314,10 +1314,10 @@ export default function PennyPromptStudio() {
               <Plus className="w-3.5 h-3.5" />
               New Template
             </button>
-            <span className="text-[11px] font-semibold text-green-700 border border-green-200 bg-green-50 rounded-full px-3 py-1">
+            <span className="text-[11px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-3 py-1">
               {liveTemplates.filter(t => t.status === 'Approved').length} Approved
             </span>
-            <span className="text-[11px] font-semibold text-amber-700 border border-amber-200 bg-amber-50 rounded-full px-3 py-1">
+            <span className="text-[11px] font-semibold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-3 py-1">
               {liveTemplates.filter(t => t.status === 'Review').length} In Review
             </span>
           </div>

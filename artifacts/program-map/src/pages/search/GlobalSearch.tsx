@@ -63,9 +63,9 @@ const POWER_SUGGESTED    = ['resume review quality', 'source trust', 'learner at
 // ── Shared utility components ─────────────────────────────────────────────────
 function HealthDot({ health }: { health?: string }) {
   const cls =
-    health === 'healthy'         ? 'bg-emerald-500' :
-    health === 'needs-attention' ? 'bg-amber-500'   :
-    health === 'incomplete'      ? 'bg-rose-500'    : 'bg-muted-foreground/30';
+    health === 'healthy'         ? 'bg-[#E6F0EA]0' :
+    health === 'needs-attention' ? 'bg-[#FFF3E0]0'   :
+    health === 'incomplete'      ? 'bg-[#FBEAE6]0'    : 'bg-muted-foreground/30';
   return <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${cls}`} />;
 }
 
@@ -78,7 +78,7 @@ function TypeBadge({ entry }: { entry: SearchEntry }) {
 }
 
 function ConfidenceBar({ value }: { value: number }) {
-  const cls = value >= 85 ? 'bg-emerald-400' : value >= 70 ? 'bg-amber-400' : 'bg-rose-400';
+  const cls = value >= 85 ? 'bg-[#2F6B3F]' : value >= 70 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
   return (
     <div className="flex items-center gap-1.5">
       <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
@@ -260,7 +260,7 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
             <>
               <span>·</span>
               <span className="inline-flex items-center gap-1">
-                SoT: <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-teal-50 border border-teal-200 text-teal-700 ml-1">{entry.sourceOfTruth}</span>
+                SoT: <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] ml-1">{entry.sourceOfTruth}</span>
               </span>
             </>
           )}
@@ -277,7 +277,7 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
                 {entry.relationships.map((r, i) => (
                   <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border/30 last:border-0">
                     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
-                      r.direction === 'up' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      r.direction === 'up' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]'
                     }`}>
                       {r.direction === 'up' ? '↑ upstream' : '↓ downstream'}
                     </span>
@@ -293,9 +293,9 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
 
           {/* Impact summary */}
           {entry.impactSummary && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3">
-              <p className="text-[9px] font-bold text-amber-700 uppercase tracking-widest mb-1">Impact Summary</p>
-              <p className="text-[11px] text-amber-800 leading-relaxed">{entry.impactSummary}</p>
+            <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 p-3">
+              <p className="text-[9px] font-bold text-[#CC8400] uppercase tracking-widest mb-1">Impact Summary</p>
+              <p className="text-[11px] text-[#CC8400] leading-relaxed">{entry.impactSummary}</p>
             </div>
           )}
 

@@ -24,10 +24,10 @@ interface ReadinessArea {
 }
 
 const STATUS_CONFIG: Record<ReadinessStatus, { label: string; cls: string; dot: string; bar: string; icon: LucideIcon }> = {
-  complete: { label: 'Complete',  cls: 'bg-emerald-100 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', bar: 'bg-emerald-400', icon: CheckCircle2 },
-  'on-track': { label: 'On Track', cls: 'bg-blue-100 text-blue-700 border-blue-200',         dot: 'bg-blue-500',    bar: 'bg-blue-400',    icon: CheckCircle2 },
-  'at-risk':  { label: 'At Risk',  cls: 'bg-amber-100 text-amber-700 border-amber-200',       dot: 'bg-amber-500',   bar: 'bg-amber-400',   icon: AlertTriangle },
-  blocked:    { label: 'Blocked',  cls: 'bg-rose-100 text-rose-700 border-rose-200',          dot: 'bg-rose-500',    bar: 'bg-rose-400',    icon: XCircle },
+  complete: { label: 'Complete',  cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', dot: 'bg-[#E6F0EA]0', bar: 'bg-[#2F6B3F]', icon: CheckCircle2 },
+  'on-track': { label: 'On Track', cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',         dot: 'bg-[#EDF5F8]0',    bar: 'bg-[#2F6F7E]',    icon: CheckCircle2 },
+  'at-risk':  { label: 'At Risk',  cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',       dot: 'bg-[#FFF3E0]0',   bar: 'bg-[#CC8400]',   icon: AlertTriangle },
+  blocked:    { label: 'Blocked',  cls: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',          dot: 'bg-[#FBEAE6]0',    bar: 'bg-[#A93F2F]',    icon: XCircle },
 };
 
 const AREAS: ReadinessArea[] = [
@@ -304,7 +304,7 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
             <ProgressBar score={area.score} bar={cfg.bar} />
           </div>
           <div className="text-right shrink-0 ml-4">
-            <p className={`font-bold ${isOverall ? 'text-4xl' : 'text-3xl'} ${area.score >= 70 ? 'text-blue-600' : area.score >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
+            <p className={`font-bold ${isOverall ? 'text-4xl' : 'text-3xl'} ${area.score >= 70 ? 'text-[#2F6F7E]' : area.score >= 50 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
               {area.score}
             </p>
             <p className="text-[9px] text-muted-foreground">/ 100</p>
@@ -324,13 +324,13 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Completed */}
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700/70 mb-2 flex items-center gap-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#2F6B3F]/70 mb-2 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" /> Completed ({area.completed.length})
               </p>
               <div className="space-y-1">
                 {area.completed.map(item => (
                   <div key={item} className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 mt-1.5 shrink-0" />
                     <p className="text-[11px] text-foreground">{item}</p>
                   </div>
                 ))}
@@ -341,13 +341,13 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
             <div className="space-y-3">
               {area.gaps.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700/70 mb-2 flex items-center gap-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]/70 mb-2 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" /> Gaps ({area.gaps.length})
                   </p>
                   <div className="space-y-1">
                     {area.gaps.map(g => (
                       <div key={g} className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#CC8400] mt-1.5 shrink-0" />
                         <p className="text-[11px] text-foreground">{g}</p>
                       </div>
                     ))}
@@ -356,13 +356,13 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
               )}
               {area.blockers.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-rose-700/70 mb-2 flex items-center gap-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#A93F2F]/70 mb-2 flex items-center gap-1">
                     <XCircle className="w-3 h-3" /> Blockers ({area.blockers.length})
                   </p>
                   <div className="space-y-1">
                     {area.blockers.map(b => (
                       <div key={b} className="flex items-start gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#FBEAE6]0 mt-1.5 shrink-0" />
                         <p className="text-[11px] text-foreground font-medium">{b}</p>
                       </div>
                     ))}
@@ -416,10 +416,10 @@ export default function Phase1ReadinessDashboard() {
         {/* Summary strip */}
         <div className="grid grid-cols-4 gap-2.5">
           {[
-            { label: 'Complete',  v: completeCount,  cls: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-200' },
-            { label: 'On Track',  v: onTrackCount,   cls: 'text-blue-600',    bg: 'bg-blue-50 border-blue-200'    },
-            { label: 'At Risk',   v: atRiskCount,    cls: 'text-amber-600',   bg: 'bg-amber-50 border-amber-200'  },
-            { label: 'Blocked',   v: blockedCount,   cls: 'text-rose-600',    bg: 'bg-rose-50 border-rose-200'    },
+            { label: 'Complete',  v: completeCount,  cls: 'text-[#2F6B3F]', bg: 'bg-[#E6F0EA] border-[#9FC3AE]' },
+            { label: 'On Track',  v: onTrackCount,   cls: 'text-[#2F6F7E]',    bg: 'bg-[#EDF5F8] border-[#7FAFC6]'    },
+            { label: 'At Risk',   v: atRiskCount,    cls: 'text-[#CC8400]',   bg: 'bg-[#FFF3E0] border-[#FFD08A]'  },
+            { label: 'Blocked',   v: blockedCount,   cls: 'text-[#A93F2F]',    bg: 'bg-[#FBEAE6] border-[#E8B9B4]'    },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border px-3 py-2.5 text-center ${s.bg}`}>
               <p className={`text-xl font-bold ${s.cls}`}>{s.v}</p>
@@ -449,9 +449,9 @@ export default function Phase1ReadinessDashboard() {
           <div className="space-y-3">
 
             {/* Phase 1 — active model */}
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
+            <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA]/60 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] px-2 py-0.5 rounded-full">
                   Phase 1 · Active
                 </span>
                 <span className="text-[12px] font-bold text-foreground">System-Driven Trail Signals</span>
@@ -467,7 +467,7 @@ export default function Phase1ReadinessDashboard() {
                   { label: 'Page context',              detail: 'Signals surface relevant to the hub or object currently in view' },
                   { label: 'Digital Twin relationships',detail: 'Object connections in the Twin route related signals to the right people' },
                 ].map(f => (
-                  <div key={f.label} className="bg-white/70 border border-emerald-100 rounded-lg px-3 py-2">
+                  <div key={f.label} className="bg-white/70 border border-[#E6F0EA] rounded-lg px-3 py-2">
                     <p className="text-[11px] font-semibold text-foreground">{f.label}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{f.detail}</p>
                   </div>
@@ -480,11 +480,11 @@ export default function Phase1ReadinessDashboard() {
               </p>
               <div className="space-y-1.5">
                 {[
-                  { tier: 'Everyday User',      dot: 'bg-emerald-500', signals: 'Simplified counts + visual health indicators + guided next actions — no source detail required' },
-                  { tier: `${TERMS.aiAssistant} Power User`,   dot: 'bg-violet-500',  signals: `${TERMS.aiAssistant} quality metrics, source trust scores, usage analytics, learner/cohort intelligence, and deeper analytics` },
-                  { tier: 'Admin / Super Admin', dot: 'bg-amber-500',  signals: 'Integration health, governance flags, secrets status, full Digital Twin alerts, and system-level ops signals' },
+                  { tier: 'Everyday User',      dot: 'bg-[#E6F0EA]0', signals: 'Simplified counts + visual health indicators + guided next actions — no source detail required' },
+                  { tier: `${TERMS.aiAssistant} Power User`,   dot: 'bg-[#EDF5F8]0',  signals: `${TERMS.aiAssistant} quality metrics, source trust scores, usage analytics, learner/cohort intelligence, and deeper analytics` },
+                  { tier: 'Admin / Super Admin', dot: 'bg-[#FFF3E0]0',  signals: 'Integration health, governance flags, secrets status, full Digital Twin alerts, and system-level ops signals' },
                 ].map(r => (
-                  <div key={r.tier} className="flex items-start gap-2 bg-white/60 border border-emerald-100 rounded-lg px-3 py-2">
+                  <div key={r.tier} className="flex items-start gap-2 bg-white/60 border border-[#E6F0EA] rounded-lg px-3 py-2">
                     <span className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${r.dot}`} />
                     <div>
                       <span className="text-[11px] font-semibold text-foreground">{r.tier}  </span>
@@ -495,9 +495,9 @@ export default function Phase1ReadinessDashboard() {
               </div>
 
               {/* Required vs Optional note */}
-              <div className="mt-3 bg-emerald-100/60 border border-emerald-200 rounded-lg px-3 py-2">
-                <p className="text-[10px] font-bold text-emerald-800 mb-0.5">Required vs Optional Signals</p>
-                <p className="text-[11px] text-emerald-900 leading-snug">
+              <div className="mt-3 bg-[#E6F0EA]/60 border border-[#9FC3AE] rounded-lg px-3 py-2">
+                <p className="text-[10px] font-bold text-[#245531] mb-0.5">Required vs Optional Signals</p>
+                <p className="text-[11px] text-[#245531] leading-snug">
                   <span className="font-semibold">Required signals</span> come from your role and responsibility — they cannot be hidden because ignoring them would create a blind spot in your accountability area.
                   <span className="font-semibold"> Optional signals</span> are contextual and informational — in Phase 2 users will control these. Phase 1 shows both without distinction.
                 </p>

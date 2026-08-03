@@ -66,8 +66,8 @@ function ProgramsPanel() {
   return (
     <PanelCard>
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-md bg-violet-50 flex items-center justify-center">
-          <BookOpen className="w-3.5 h-3.5 text-violet-500" />
+        <div className="w-6 h-6 rounded-md bg-[#EDF5F8] flex items-center justify-center">
+          <BookOpen className="w-3.5 h-3.5 text-[#2F6F7E]" />
         </div>
         <Eyebrow>Active Programs</Eyebrow>
       </div>
@@ -91,7 +91,7 @@ function ProgramsPanel() {
             {data.programs.slice(0, 6).map(p => (
               <div key={p.Id} className="flex items-center gap-2.5 py-1.5 border-b border-border/40 last:border-0">
                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                  p.pmdm__Status__c === 'Active' ? 'bg-emerald-400' : 'bg-muted-foreground/30'
+                  p.pmdm__Status__c === 'Active' ? 'bg-[#2F6B3F]' : 'bg-muted-foreground/30'
                 }`} />
                 <span className="text-[11px] text-foreground flex-1 truncate">{p.Name}</span>
                 {p.pmdm__Status__c && (
@@ -125,8 +125,8 @@ function IntelligencePanel() {
   return (
     <PanelCard>
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-md bg-sky-50 flex items-center justify-center">
-          <Users className="w-3.5 h-3.5 text-sky-500" />
+        <div className="w-6 h-6 rounded-md bg-[#EDF5F8] flex items-center justify-center">
+          <Users className="w-3.5 h-3.5 text-[#2F6F7E]" />
         </div>
         <Eyebrow>Recent {TERMS.aiAssistant} Intelligence</Eyebrow>
       </div>
@@ -157,7 +157,7 @@ function IntelligencePanel() {
                 )}
                 {r.supportFlags && (
                   <div>
-                    <p className="text-[10px] font-medium text-amber-600 uppercase tracking-wide mb-0.5">Support Flags</p>
+                    <p className="text-[10px] font-medium text-[#CC8400] uppercase tracking-wide mb-0.5">Support Flags</p>
                     <p className="text-[10px] text-foreground/80 leading-snug line-clamp-2">{r.supportFlags}</p>
                   </div>
                 )}
@@ -187,8 +187,8 @@ function CasesPanel() {
   return (
     <PanelCard>
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-md bg-amber-50 flex items-center justify-center">
-          <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+        <div className="w-6 h-6 rounded-md bg-[#FFF3E0] flex items-center justify-center">
+          <AlertCircle className="w-3.5 h-3.5 text-[#CC8400]" />
         </div>
         <Eyebrow>Open Support Cases</Eyebrow>
       </div>
@@ -213,8 +213,8 @@ function CasesPanel() {
               {openCases.map(c => (
                 <div key={c.Id} className="flex items-center gap-2.5 py-1.5 border-b border-border/40 last:border-0">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                    c.Priority === 'High' ? 'bg-rose-400' :
-                    c.Priority === 'Medium' ? 'bg-amber-400' : 'bg-sky-400'
+                    c.Priority === 'High' ? 'bg-[#A93F2F]' :
+                    c.Priority === 'Medium' ? 'bg-[#CC8400]' : 'bg-[#2F6F7E]'
                   }`} />
                   <span className="text-[11px] text-foreground flex-1 truncate">{c.Subject ?? `Case ${c.CaseNumber}`}</span>
                   {c.Status && (

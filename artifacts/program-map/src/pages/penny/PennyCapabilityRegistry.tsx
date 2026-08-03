@@ -15,12 +15,12 @@ const MATURITY_STAGES: CapabilityReadiness[] = [
 ];
 
 const DOMAIN_COLORS: Record<CapabilityDomain, string> = {
-  Coaching:       'bg-violet-100 text-violet-700',
-  Career:         'bg-blue-100 text-blue-700',
-  Learning:       'bg-teal-100 text-teal-700',
-  Knowledge:      'bg-amber-100 text-amber-700',
-  Communications: 'bg-orange-100 text-orange-700',
-  Questing:       'bg-pink-100 text-pink-700',
+  Coaching:       'bg-[#EDF5F8] text-[#2F6F7E]',
+  Career:         'bg-[#EDF5F8] text-[#2F6F7E]',
+  Learning:       'bg-[#E6F0EA] text-[#2F6B3F]',
+  Knowledge:      'bg-[#FFF3E0] text-[#CC8400]',
+  Communications: 'bg-[#FFF3E0] text-[#CC8400]',
+  Questing:       'bg-[#FBEAE6] text-[#A93F2F]',
   Operations:     'bg-gray-100 text-gray-600',
 };
 
@@ -72,8 +72,8 @@ function DomainBadge({ domain }: { domain: CapabilityDomain }) {
 function StatusChip({ pocStatus }: { pocStatus: 'exists' | 'partial' }) {
   const live = pocStatus === 'exists';
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${live ? 'text-emerald-600' : 'text-amber-600'}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${live ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${live ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${live ? 'bg-[#E6F0EA]0' : 'bg-[#CC8400]'}`} />
       {live ? 'Live' : 'Partial'}
     </span>
   );
@@ -177,12 +177,12 @@ function MaturityTrack({
               isCurrent
                 ? 'bg-primary/10 text-primary font-bold'
                 : isDone
-                  ? 'bg-emerald-50 text-emerald-700 cursor-default'
+                  ? 'bg-[#E6F0EA] text-[#2F6B3F] cursor-default'
                   : 'bg-muted/30 text-muted-foreground hover:bg-primary/5 hover:text-primary cursor-pointer'
             }`}
             title={isFuture ? `Promote to ${stage}` : undefined}
           >
-            {isDone && <span className="block text-emerald-500 mb-0.5 text-[8px]">✓</span>}
+            {isDone && <span className="block text-[#2F6B3F] mb-0.5 text-[8px]">✓</span>}
             {stage}
           </button>
         );
@@ -269,7 +269,7 @@ function CapabilityDetail({
             </button>
             <button
               onClick={onDelete}
-              className="p-1.5 rounded-lg border border-border bg-white text-muted-foreground hover:border-rose-300 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              className="p-1.5 rounded-lg border border-border bg-white text-muted-foreground hover:border-[#E8B9B4] hover:text-[#A93F2F] hover:bg-[#FBEAE6] transition-colors"
               aria-label="Delete capability"
             >
               <Trash2 className="w-3.5 h-3.5" />

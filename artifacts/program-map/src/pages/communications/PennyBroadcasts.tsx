@@ -5,11 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Sparkles, Bell, ChevronRight } from 'lucide-react';
 
 const TYPE_COLORS: Record<CommBroadcast['type'], string> = {
-  reminder:     'bg-sky-50 text-sky-800 border-sky-200',
-  prompt:       'bg-purple-50 text-purple-800 border-purple-200',
-  nudge:        'bg-amber-50 text-amber-800 border-amber-200',
-  announcement: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-  celebration:  'bg-pink-50 text-pink-800 border-pink-200',
+  reminder:     'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  prompt:       'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  nudge:        'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  announcement: 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
+  celebration:  'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
 };
 
 const TYPE_LABELS: Record<CommBroadcast['type'], string> = {
@@ -17,7 +17,7 @@ const TYPE_LABELS: Record<CommBroadcast['type'], string> = {
 };
 
 function statusBadge(status: CommBroadcast['status']) {
-  if (status === 'active')  return <Badge className="text-[10px] bg-green-50 text-green-800 border-green-200 border">Active</Badge>;
+  if (status === 'active')  return <Badge className="text-[10px] bg-[#E6F0EA] text-[#245531] border-[#9FC3AE] border">Active</Badge>;
   if (status === 'planned') return <Badge className="text-[10px] bg-primary/10 text-primary border-primary/20 border">Planned</Badge>;
   return <Badge variant="secondary" className="text-[10px]">Draft</Badge>;
 }

@@ -24,11 +24,11 @@ export default function PennyReflectionPrompts() {
               <button
                 key={prompt.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: prompt.id, data: prompt })}
-                className="rounded-xl border border-border bg-white p-4 text-left hover:border-purple-200 hover:shadow-sm transition-all"
+                className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#7FAFC6] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4 text-purple-600 shrink-0" />
+                    <MessageCircle className="w-4 h-4 text-[#2F6F7E] shrink-0" />
                     <div>
                       <p className="text-[13px] font-bold text-foreground">{prompt.name}</p>
                       <p className="text-[11px] text-muted-foreground">

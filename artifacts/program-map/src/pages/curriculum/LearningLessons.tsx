@@ -5,9 +5,9 @@ import { curriculumLessons, curriculumSprints, CONTENT_STATUS_CONFIG } from '@/d
 import { BookOpen, ArrowRight } from 'lucide-react';
 
 const LESSON_TYPE_COLORS: Record<string, string> = {
-  Instruction: 'bg-amber-50 text-amber-800 border-amber-200',
-  Lab:         'bg-sky-50 text-sky-800 border-sky-200',
-  Workshop:    'bg-violet-50 text-violet-800 border-violet-200',
+  Instruction: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  Lab:         'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  Workshop:    'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
 };
 
 export default function LearningLessons() {
@@ -37,10 +37,10 @@ export default function LearningLessons() {
             const statusCfg = CONTENT_STATUS_CONFIG[lesson.status];
             const typeCls = LESSON_TYPE_COLORS[lesson.lessonType as string] || 'bg-slate-50 text-slate-700 border-slate-200';
             return (
-              <button key={lesson.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: lesson.id, data: lesson })} className="rounded-lg border border-border bg-white p-4 text-left hover:border-amber-200 hover:shadow-sm transition-all">
+              <button key={lesson.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: lesson.id, data: lesson })} className="rounded-lg border border-border bg-white p-4 text-left hover:border-[#FFD08A] hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-2">
-                    <BookOpen className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                    <BookOpen className="w-4 h-4 text-[#CC8400] mt-0.5 shrink-0" />
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className="text-[10px] font-bold text-muted-foreground/60">{lesson.lessonNumber as string}</span>

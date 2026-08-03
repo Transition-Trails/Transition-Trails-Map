@@ -50,7 +50,7 @@ export default function OperationsCommunications() {
                   <div className="flex items-center gap-2 mb-2">
                     <StatusDot status={p.status === 'prototype' ? 'amber' : 'gray'} />
                     <span className="text-xs text-muted-foreground">{p.connectionStatus}</span>
-                    <span className={`inline-flex text-[10px] font-semibold border px-2 py-0.5 rounded-full ml-auto ${p.status === 'prototype' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-muted border-border text-muted-foreground'}`}>
+                    <span className={`inline-flex text-[10px] font-semibold border px-2 py-0.5 rounded-full ml-auto ${p.status === 'prototype' ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' : 'bg-muted border-border text-muted-foreground'}`}>
                       {p.status === 'prototype' ? 'Prototype-Ready' : 'Future'}
                     </span>
                   </div>
@@ -94,7 +94,7 @@ export default function OperationsCommunications() {
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-1.5">
                           <StatusDot status="amber" />
-                          <span className="text-[11px] text-amber-700">{r.slackStatus}</span>
+                          <span className="text-[11px] text-[#CC8400]">{r.slackStatus}</span>
                         </div>
                       </td>
                     </tr>

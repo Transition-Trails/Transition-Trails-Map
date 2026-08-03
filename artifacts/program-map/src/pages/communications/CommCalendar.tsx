@@ -35,9 +35,9 @@ export default function CommCalendar() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: 'Knowledge Library', role: 'what', color: 'border-secondary/30 bg-secondary/5', textColor: 'text-secondary' },
-              { label: 'Salesforce / Demand', role: 'work', color: 'border-amber-200 bg-amber-50', textColor: 'text-amber-800' },
+              { label: 'Salesforce / Demand', role: 'work', color: 'border-[#FFD08A] bg-[#FFF3E0]', textColor: 'text-[#CC8400]' },
               { label: 'Communications', role: 'who', color: 'border-primary/30 bg-primary/5', textColor: 'text-primary' },
-              { label: 'Calendar', role: 'when', color: 'border-emerald-200 bg-emerald-50', textColor: 'text-emerald-800' },
+              { label: 'Calendar', role: 'when', color: 'border-[#9FC3AE] bg-[#E6F0EA]', textColor: 'text-[#245531]' },
             ].map(m => (
               <div key={m.role} className={`rounded-lg border px-3 py-2.5 ${m.color}`}>
                 <p className={`text-[10px] font-bold uppercase tracking-wider ${m.textColor}`}>{m.role}</p>

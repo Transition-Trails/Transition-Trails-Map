@@ -76,17 +76,17 @@ function NavCard({
 // ── Confidence dot + label ────────────────────────────────────────────────────
 
 const CONFIDENCE_CONFIG = {
-  confirmed:    { dot: 'bg-emerald-500', label: 'Confirmed',    textCls: 'text-emerald-700', bgCls: 'bg-emerald-50 border-emerald-200' },
-  'needs-review': { dot: 'bg-amber-400', label: 'Needs Review', textCls: 'text-amber-700',   bgCls: 'bg-amber-50 border-amber-200' },
-  draft:        { dot: 'bg-slate-400',   label: 'Draft',        textCls: 'text-slate-600',   bgCls: 'bg-slate-50 border-slate-200' },
-  deprecated:   { dot: 'bg-rose-400',    label: 'Deprecated',   textCls: 'text-rose-700',    bgCls: 'bg-rose-50 border-rose-200' },
+  confirmed:    { dot: 'bg-[#E6F0EA]0', label: 'Confirmed',    textCls: 'text-[#2F6B3F]', bgCls: 'bg-[#E6F0EA] border-[#9FC3AE]' },
+  'needs-review': { dot: 'bg-[#CC8400]', label: 'Needs Review', textCls: 'text-[#CC8400]',   bgCls: 'bg-[#FFF3E0] border-[#FFD08A]' },
+  draft:        { dot: 'bg-[#C8CBC6]',   label: 'Draft',        textCls: 'text-slate-600',   bgCls: 'bg-slate-50 border-slate-200' },
+  deprecated:   { dot: 'bg-[#A93F2F]',    label: 'Deprecated',   textCls: 'text-[#A93F2F]',    bgCls: 'bg-[#FBEAE6] border-[#E8B9B4]' },
 } as const;
 
 // ── Penny status display config ───────────────────────────────────────────────
 
 const PENNY_STATUS_CONFIG = {
   'Active':      { label: 'Active',      textCls: 'text-primary font-medium',   dot: 'text-primary' },
-  'Planned':     { label: 'Planned',     textCls: 'text-amber-600 font-medium', dot: 'text-amber-400' },
+  'Planned':     { label: 'Planned',     textCls: 'text-[#CC8400] font-medium', dot: 'text-[#CC8400]' },
   'Not Planned': { label: 'Not planned', textCls: 'text-muted-foreground',      dot: 'text-muted-foreground/30' },
 } as const;
 
@@ -189,8 +189,8 @@ export default function ProgramOverview() {
         {/* ── Summary bar ─────────────────────────────────────────────────── */}
         <div className="flex flex-wrap gap-2">
           <StatPill value={programs.length}   label="Total Programs"              color="text-foreground"  onClick={() => setLocation('/program/config')} />
-          <StatPill value={stats.confirmed}   label="Confirmed"                   color="text-emerald-600" onClick={() => setLocation('/program/config')} />
-          <StatPill value={stats.needsReview} label="Needs Review"                color="text-amber-600"   onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.confirmed}   label="Confirmed"                   color="text-[#2F6B3F]" onClick={() => setLocation('/program/config')} />
+          <StatPill value={stats.needsReview} label="Needs Review"                color="text-[#CC8400]"   onClick={() => setLocation('/program/config')} />
           <StatPill value={stats.draft}       label="Draft"                       color="text-slate-500"   onClick={() => setLocation('/program/config')} />
           <StatPill value={stats.pennyActive} label={`${TERMS.aiAssistant} Active`} color="text-primary"  onClick={() => setLocation('/penny/capabilities')} />
         </div>
@@ -239,8 +239,8 @@ export default function ProgramOverview() {
                   label: 'Blueprint Compliant',
                   count: stats.blueprintOk,
                   icon: CheckCircle,
-                  iconCls: 'text-emerald-500',
-                  barCls: 'bg-emerald-400',
+                  iconCls: 'text-[#2F6B3F]',
+                  barCls: 'bg-[#2F6B3F]',
                   note: `${stats.blueprintOk} program${stats.blueprintOk !== 1 ? 's' : ''} confirmed against Blueprint v2`,
                   path: '/program/blueprint',
                 },
@@ -248,8 +248,8 @@ export default function ProgramOverview() {
                   label: 'Needs Review',
                   count: stats.needsReview,
                   icon: AlertCircle,
-                  iconCls: 'text-amber-500',
-                  barCls: 'bg-amber-400',
+                  iconCls: 'text-[#CC8400]',
+                  barCls: 'bg-[#CC8400]',
                   note: `${stats.needsReview} program${stats.needsReview !== 1 ? 's' : ''} — sprint structure migration may be pending`,
                   path: '/program/config',
                 },
@@ -335,9 +335,9 @@ export default function ProgramOverview() {
             {!pennyConfigsLoading && stats.withoutPenny > 0 && (
               <button
                 onClick={() => setLocation('/penny/capabilities')}
-                className="group w-full text-left rounded border border-amber-200 bg-amber-50 px-2.5 py-1.5 hover:border-amber-400 transition-colors"
+                className="group w-full text-left rounded border border-[#FFD08A] bg-[#FFF3E0] px-2.5 py-1.5 hover:border-[#CC8400] transition-colors"
               >
-                <p className="text-[10px] text-amber-700 font-medium group-hover:underline">
+                <p className="text-[10px] text-[#CC8400] font-medium group-hover:underline">
                   {stats.withoutPenny} program{stats.withoutPenny > 1 ? 's' : ''} without {TERMS.aiAssistant} — configure in {TERMS.aiAssistant} Capabilities →
                 </p>
               </button>
@@ -359,7 +359,7 @@ export default function ProgramOverview() {
                     { label: 'Courses',          value: lmsSummary.total,            color: 'text-foreground' },
                     { label: 'With modules',      value: lmsSummary.withModules,      color: 'text-foreground' },
                     { label: 'Total modules',     value: lmsSummary.totalModules,     color: 'text-foreground' },
-                    { label: 'Modules complete',  value: lmsSummary.completedModules, color: 'text-emerald-600' },
+                    { label: 'Modules complete',  value: lmsSummary.completedModules, color: 'text-[#2F6B3F]' },
                   ].map(s => (
                     <div key={s.label} className="rounded-md bg-background border border-border px-2.5 py-2">
                       <p className={`text-base font-semibold ${s.color}`}>{s.value}</p>
@@ -375,7 +375,7 @@ export default function ProgramOverview() {
                     </div>
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-emerald-400"
+                        className="h-full rounded-full bg-[#2F6B3F]"
                         style={{ width: `${Math.round((lmsSummary.completedModules / lmsSummary.totalModules) * 100)}%` }}
                       />
                     </div>
@@ -402,7 +402,7 @@ export default function ProgramOverview() {
               desc="Configure and manage individual programs, cohorts, courses, and modules in Salesforce."
               path="/program/config"
               badge={stats.needsReview > 0 ? `${stats.needsReview} need review` : undefined}
-              badgeColor="bg-amber-50 text-amber-700 border-amber-200"
+              badgeColor="bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]"
             />
           </div>
         </div>
@@ -421,8 +421,8 @@ export default function ProgramOverview() {
                 why: `Programs without confirmed blueprints cannot be fully governed by Trail OS standards. Completing blueprint compliance unlocks accurate gap reporting, curriculum readiness scoring, and ${TERMS.aiAssistant} template matching.`,
                 tag: stats.needsReview > 0 ? 'Action Now' : 'Complete',
                 tagColor: stats.needsReview > 0
-                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                  : 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                  ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]'
+                  : 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
                 path: '/program/blueprint',
               },
               {
@@ -431,8 +431,8 @@ export default function ProgramOverview() {
                 why: `${stats.withoutPenny} program${stats.withoutPenny !== 1 ? 's are' : ' is'} not yet mapped to ${TERMS.aiAssistant} capabilities. Mapping enables ${TERMS.aiAssistant} to proactively surface coaching suggestions, learning signals, and cohort intelligence for every program.`,
                 tag: stats.withoutPenny > 0 ? 'Action Now' : 'Complete',
                 tagColor: stats.withoutPenny > 0
-                  ? 'bg-amber-50 text-amber-700 border-amber-200'
-                  : 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                  ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]'
+                  : 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
                 path: '/penny/capabilities',
               },
               ...(lmsSummary.completedModules < lmsSummary.totalModules ? [{
@@ -440,7 +440,7 @@ export default function ProgramOverview() {
                 action: `Progress ${lmsSummary.totalModules - lmsSummary.completedModules} remaining course module${lmsSummary.totalModules - lmsSummary.completedModules !== 1 ? 's' : ''}`,
                 why: `${lmsSummary.completedModules} of ${lmsSummary.totalModules} modules are complete across ${lmsSummary.total} courses. Completing modules unlocks cohort-level reporting and enables ${TERMS.aiAssistant} to surface learning gap signals per trail.`,
                 tag: 'In Progress',
-                tagColor: 'bg-sky-50 text-sky-700 border-sky-200',
+                tagColor: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
                 path: '/program/courses',
               }] : []),
             ].map(item => (

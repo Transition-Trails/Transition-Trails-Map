@@ -51,7 +51,7 @@ export interface ContextDefinition {
 export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
   {
     id:'foundations-trail', objectTypeId:'program', objectTypeName:'Program',
-    category:'Program Layer', categoryColor:'text-emerald-700', categoryBg:'bg-emerald-50 border-emerald-200',
+    category:'Program Layer', categoryColor:'text-[#2F6B3F]', categoryBg:'bg-[#E6F0EA] border-[#9FC3AE]',
     name:'Foundations Trail', status:'Active', statusVariant:'active', health:'healthy', confidence:91,
     owner:'Program Director', workspaceLink:'/program', profileId:'foundations-trail',
     description:'8-week foundational career-change program. Cohort 2 active (Week 6). 13 learners enrolled.',
@@ -74,7 +74,7 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
   },
   {
     id:'coach-role', objectTypeId:'role', objectTypeName:'Role',
-    category:'People Layer', categoryColor:'text-blue-700', categoryBg:'bg-blue-50 border-blue-200',
+    category:'People Layer', categoryColor:'text-[#2F6F7E]', categoryBg:'bg-[#EDF5F8] border-[#7FAFC6]',
     name:'Coach', status:'Active', statusVariant:'active', health:'needs-attention', confidence:74,
     owner:'Program Director', workspaceLink:'/digital-twin/people', profileId:'coach-role',
     description:'Guides learners through program delivery. Role Blueprint 60% complete — coaching responsibilities undocumented.',
@@ -95,7 +95,7 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
   },
   {
     id:'resume-review-capability', objectTypeId:'penny-capability', objectTypeName:'Penny Capability',
-    category:'Intelligence Layer', categoryColor:'text-pink-700', categoryBg:'bg-pink-50 border-pink-200',
+    category:'Intelligence Layer', categoryColor:'text-[#A93F2F]', categoryBg:'bg-[#FBEAE6] border-[#E8B9B4]',
     name:'Resume Review', status:'Active', statusVariant:'active', health:'healthy', confidence:88,
     owner:'Penny Lead', workspaceLink:'/penny', profileId:'resume-review-capability',
     description:'Reviews learner resume drafts in Sprint 3. Quality 87/100. Prompt v2.1. Low hallucination risk.',
@@ -114,7 +114,7 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
   },
   {
     id:'program-blueprint-v2', objectTypeId:'program-blueprint', objectTypeName:'Program Blueprint',
-    category:'Knowledge Layer', categoryColor:'text-violet-700', categoryBg:'bg-violet-50 border-violet-200',
+    category:'Knowledge Layer', categoryColor:'text-[#2F6F7E]', categoryBg:'bg-[#EDF5F8] border-[#7FAFC6]',
     name:'Program Blueprint v2', status:'Active', statusVariant:'active', health:'healthy', confidence:94,
     owner:'Standards Lead', workspaceLink:'/program/blueprint', profileId:'program-blueprint-v2',
     description:'Governing standard for all 5 programs. 4 of 5 fully compliant. Digital Compass migration pending.',
@@ -133,7 +133,7 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
   },
   {
     id:'sf-program-engagement', objectTypeId:'salesforce-object', objectTypeName:'Salesforce Object',
-    category:'Infrastructure Layer', categoryColor:'text-teal-700', categoryBg:'bg-teal-50 border-teal-200',
+    category:'Infrastructure Layer', categoryColor:'text-[#2F6B3F]', categoryBg:'bg-[#E6F0EA] border-[#9FC3AE]',
     name:'Salesforce Program Engagement', status:'Active', statusVariant:'active', health:'healthy', confidence:86,
     owner:'Salesforce Admin', workspaceLink:'/admin/salesforce-arch', profileId:'sf-program-engagement',
     description:'Program_Engagement__c — 247 active records. Primary learner enrollment and progress record.',
@@ -151,7 +151,7 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
   },
   {
     id:'slack-foundations-cohort', objectTypeId:'communication-channel', objectTypeName:'Communication Channel',
-    category:'Infrastructure Layer', categoryColor:'text-teal-700', categoryBg:'bg-teal-50 border-teal-200',
+    category:'Infrastructure Layer', categoryColor:'text-[#2F6B3F]', categoryBg:'bg-[#E6F0EA] border-[#9FC3AE]',
     name:'#foundations-cohort-2', status:'Active', statusVariant:'active', health:'healthy', confidence:86,
     owner:'Comms Lead', workspaceLink:'/collaboration/channels', profileId:undefined,
     description:'Primary Slack channel for FT Cohort 2 learners. 13 members. Penny broadcasts active.',
@@ -169,7 +169,7 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
   },
   {
     id:'foundations-trail-drive', objectTypeId:'google-drive-resource', objectTypeName:'Google Drive Resource',
-    category:'Infrastructure Layer', categoryColor:'text-teal-700', categoryBg:'bg-teal-50 border-teal-200',
+    category:'Infrastructure Layer', categoryColor:'text-[#2F6B3F]', categoryBg:'bg-[#E6F0EA] border-[#9FC3AE]',
     name:'Foundations Trail Drive Folder', status:'Active', statusVariant:'active', health:'needs-attention', confidence:79,
     owner:'Program Manager', workspaceLink:'/program/resources', profileId:'foundations-trail-drive',
     description:'Root Drive folder for FT curriculum. Access review overdue. 2 naming convention violations.',

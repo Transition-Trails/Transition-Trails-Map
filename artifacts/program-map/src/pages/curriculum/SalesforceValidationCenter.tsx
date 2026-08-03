@@ -42,10 +42,10 @@ interface ValidationWorkflow {
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<ValidationStatus, { label: string; cls: string; icon: typeof CheckCircle2 }> = {
-  validated: { label: 'Validated', cls: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: CheckCircle2 },
-  partial:   { label: 'Partial',   cls: 'bg-blue-100 text-blue-700 border-blue-200',          icon: AlertTriangle },
-  pending:   { label: 'Pending',   cls: 'bg-amber-100 text-amber-700 border-amber-200',        icon: Clock        },
-  blocked:   { label: 'Blocked',   cls: 'bg-rose-100 text-rose-700 border-rose-200',           icon: XCircle      },
+  validated: { label: 'Validated', cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', icon: CheckCircle2 },
+  partial:   { label: 'Partial',   cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',          icon: AlertTriangle },
+  pending:   { label: 'Pending',   cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',        icon: Clock        },
+  blocked:   { label: 'Blocked',   cls: 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',           icon: XCircle      },
   'n-a':     { label: 'N/A',       cls: 'bg-muted text-muted-foreground border-border',        icon: Clock        },
 };
 
@@ -218,7 +218,7 @@ function ReadinessTrackingView() {
                   <p className="text-[13px] font-bold text-foreground">{prod.product}</p>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={prod.overallStatus} />
-                    <span className={`text-[15px] font-bold ${prod.score >= 60 ? 'text-blue-600' : prod.score >= 30 ? 'text-amber-600' : 'text-rose-600'}`}>{prod.score}</span>
+                    <span className={`text-[15px] font-bold ${prod.score >= 60 ? 'text-[#2F6F7E]' : prod.score >= 30 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>{prod.score}</span>
                     {open
                       ? <ChevronDown  className="w-3.5 h-3.5 text-muted-foreground" />
                       : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
@@ -227,7 +227,7 @@ function ReadinessTrackingView() {
                 <p className="text-[11px] text-muted-foreground mb-2">{prod.description}</p>
                 <div className="h-1.5 bg-muted rounded-full">
                   <div
-                    className={`h-1.5 rounded-full ${prod.score >= 60 ? 'bg-blue-400' : prod.score >= 30 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                    className={`h-1.5 rounded-full ${prod.score >= 60 ? 'bg-[#2F6F7E]' : prod.score >= 30 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`}
                     style={{ width: `${prod.score}%` }}
                   />
                 </div>
@@ -400,9 +400,9 @@ function GapAnalysisView() {
       <div className="grid grid-cols-4 gap-3">
         {[
           { label: 'Total Mappings',     v: OBJECT_MAPPINGS.length,            cls: 'text-foreground' },
-          { label: 'Blocked',            v: blocked.length,                     cls: 'text-rose-600'   },
-          { label: 'Pending Validation', v: pending.length,                     cls: 'text-amber-600'  },
-          { label: 'Fields Validated',   v: `${validatedFields}/${totalFields}`, cls: 'text-blue-600'  },
+          { label: 'Blocked',            v: blocked.length,                     cls: 'text-[#A93F2F]'   },
+          { label: 'Pending Validation', v: pending.length,                     cls: 'text-[#CC8400]'  },
+          { label: 'Fields Validated',   v: `${validatedFields}/${totalFields}`, cls: 'text-[#2F6F7E]'  },
         ].map(s => (
           <div key={s.label} className="rounded-lg border border-border bg-background px-3 py-3 text-center">
             <p className={`text-xl font-bold ${s.cls}`}>{s.v}</p>
@@ -413,13 +413,13 @@ function GapAnalysisView() {
 
       {/* Critical blockers */}
       {blocked.length > 0 && (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-rose-200">
-            <p className="text-[11px] font-bold text-rose-700">Critical Blockers ({blocked.length} mappings)</p>
+        <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-[#E8B9B4]">
+            <p className="text-[11px] font-bold text-[#A93F2F]">Critical Blockers ({blocked.length} mappings)</p>
           </div>
           {blocked.map(m => (
-            <div key={m.id} className="px-4 py-2.5 border-b border-rose-100 last:border-0 flex items-start gap-2">
-              <XCircle className="w-3.5 h-3.5 text-rose-500 mt-0.5 shrink-0" />
+            <div key={m.id} className="px-4 py-2.5 border-b border-[#FBEAE6] last:border-0 flex items-start gap-2">
+              <XCircle className="w-3.5 h-3.5 text-[#A93F2F] mt-0.5 shrink-0" />
               <div>
                 <p className="text-[11px] font-semibold text-foreground">{m.trailOsObject} → {m.sfObject}</p>
                 <p className="text-[10px] text-muted-foreground">{m.notes}</p>
@@ -431,13 +431,13 @@ function GapAnalysisView() {
 
       {/* Partially mapped */}
       {partial.length > 0 && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-blue-200">
-            <p className="text-[11px] font-bold text-blue-700">Partially Mapped — Needs Completion ({partial.length})</p>
+        <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-[#7FAFC6]">
+            <p className="text-[11px] font-bold text-[#2F6F7E]">Partially Mapped — Needs Completion ({partial.length})</p>
           </div>
           {partial.map(m => (
-            <div key={m.id} className="px-4 py-2.5 border-b border-blue-100 last:border-0 flex items-start gap-2">
-              <AlertTriangle className="w-3.5 h-3.5 text-blue-500 mt-0.5 shrink-0" />
+            <div key={m.id} className="px-4 py-2.5 border-b border-[#EDF5F8] last:border-0 flex items-start gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-[#2F6F7E] mt-0.5 shrink-0" />
               <div>
                 <p className="text-[11px] font-semibold text-foreground">{m.trailOsObject} → {m.sfObject}</p>
                 <p className="text-[10px] text-muted-foreground">{m.validatedFields}/{m.fieldCount} fields · {m.notes}</p>
@@ -498,7 +498,7 @@ export default function SalesforceValidationCenter() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 pt-1">
-            <Database className="w-4 h-4 text-blue-600" />
+            <Database className="w-4 h-4 text-[#2F6F7E]" />
             <div>
               <p className="text-[11px] font-bold text-foreground">{PRODUCT_READINESS.length} SF Products</p>
               <p className="text-[10px] text-muted-foreground">{totalMapped}/{OBJECT_MAPPINGS.length} mapped · {totalValidated} validated</p>

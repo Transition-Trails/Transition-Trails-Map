@@ -20,8 +20,8 @@ import type { PennyStatus } from '@/hooks/useProgramPennyConfig';
 
 // ── Penny status row (self-contained, mounts own hook) ────────────────────────
 const PENNY_OPTS: { value: PennyStatus; dot: string; badge: string }[] = [
-  { value: 'Active',      dot: 'bg-emerald-400', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  { value: 'Planned',     dot: 'bg-amber-400',   badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { value: 'Active',      dot: 'bg-[#2F6B3F]', badge: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' },
+  { value: 'Planned',     dot: 'bg-[#CC8400]',   badge: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' },
   { value: 'Not Planned', dot: 'bg-muted-foreground/30', badge: 'bg-muted text-muted-foreground border-border' },
 ];
 function PennyStatusRow({ programId }: { programId: string }) {
@@ -110,17 +110,17 @@ const STEP_META: { label: string; icon: React.ElementType; stepNum: 1 | 2 | 3 | 
 // ── Status badge ──────────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
-  'Active':       'bg-emerald-50 text-emerald-700 border-emerald-200',
-  'Planned':      'bg-blue-50 text-blue-700 border-blue-200',
-  'In Discovery': 'bg-amber-50 text-amber-700 border-amber-200',
+  'Active':       'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
+  'Planned':      'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'In Discovery': 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
   'Completed':    'bg-gray-100 text-gray-600 border-gray-200',
-  'Canceled':     'bg-rose-50 text-rose-700 border-rose-200',
-  'Cancelled':    'bg-rose-50 text-rose-700 border-rose-200',
-  'In Progress':  'bg-sky-50 text-sky-700 border-sky-200',
-  'In Review':    'bg-violet-50 text-violet-700 border-violet-200',
+  'Canceled':     'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
+  'Cancelled':    'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
+  'In Progress':  'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'In Review':    'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
   'Not Started':  'bg-gray-50 text-gray-500 border-gray-200',
-  'On Hold':      'bg-orange-50 text-orange-700 border-orange-200',
-  'Discovery':    'bg-amber-50 text-amber-700 border-amber-200',
+  'On Hold':      'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  'Discovery':    'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
 };
 
 function StatusBadge({ status }: { status: string | null }) {
@@ -214,7 +214,7 @@ function Field({
   return (
     <div className="flex flex-col gap-1">
       <label className="text-[11px] font-semibold text-foreground/80">
-        {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
+        {label}{required && <span className="text-[#A93F2F] ml-0.5">*</span>}
       </label>
       {children}
       {hint && <p className="text-[10px] text-muted-foreground">{hint}</p>}
@@ -417,7 +417,7 @@ function PennyGuidancePanel({
                   <button
                     onClick={onInvokeAgentforce}
                     disabled={agentforceLoading}
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-violet-50 hover:bg-violet-100 border border-violet-200 text-violet-700 text-[12px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-[#EDF5F8] hover:bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] text-[12px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {agentforceLoading
                       ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1435,8 +1435,8 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                             </div>
                             {c.pmdm__Description__c && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{c.pmdm__Description__c}</p>}
                           </div>
-                          <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                            <Check className="w-3 h-3 text-emerald-600" />
+                          <div className="w-5 h-5 rounded-full bg-[#E6F0EA] flex items-center justify-center flex-shrink-0">
+                            <Check className="w-3 h-3 text-[#2F6B3F]" />
                           </div>
                         </div>
                       ))}
@@ -1767,10 +1767,10 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                           <div className="flex items-center gap-2 min-w-0">
                             <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center ${
                               chk.ok
-                                ? 'bg-emerald-100 text-emerald-600'
+                                ? 'bg-[#E6F0EA] text-[#2F6B3F]'
                                 : chk.required
-                                  ? 'bg-rose-100 text-rose-600'
-                                  : 'bg-amber-100 text-amber-600'
+                                  ? 'bg-[#FBEAE6] text-[#A93F2F]'
+                                  : 'bg-[#FFF3E0] text-[#CC8400]'
                             }`}>
                               {chk.ok
                                 ? <Check className="w-2.5 h-2.5" />
@@ -1852,12 +1852,12 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                       <button onClick={() => setStep(4)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
                       <div className="flex-1" />
                       {canSave ? (
-                        <p className="text-[11px] text-emerald-600 flex items-center gap-1">
+                        <p className="text-[11px] text-[#2F6B3F] flex items-center gap-1">
                           <Check className="w-3.5 h-3.5" /> All records saved to Salesforce as you went
                         </p>
                       ) : (
-                        <p className="text-[11px] text-rose-500 flex items-center gap-1 font-medium">
-                          <span className="w-3.5 h-3.5 rounded-full bg-rose-100 inline-flex items-center justify-center text-[9px] font-bold">!</span>
+                        <p className="text-[11px] text-[#A93F2F] flex items-center gap-1 font-medium">
+                          <span className="w-3.5 h-3.5 rounded-full bg-[#FBEAE6] inline-flex items-center justify-center text-[9px] font-bold">!</span>
                           Fix required items above to complete
                         </p>
                       )}

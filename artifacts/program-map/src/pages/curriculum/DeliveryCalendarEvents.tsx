@@ -4,10 +4,10 @@ import { curriculumCalendarEvents, CONTENT_STATUS_CONFIG } from '@/data/curricul
 import { Calendar, ArrowRight } from 'lucide-react';
 
 const EVENT_TYPE_COLORS: Record<string, string> = {
-  'Office Hours': 'bg-orange-50 text-orange-800 border-orange-200',
-  'Kickoff':      'bg-violet-50 text-violet-800 border-violet-200',
-  'Review':       'bg-sky-50 text-sky-800 border-sky-200',
-  'Workshop':     'bg-amber-50 text-amber-800 border-amber-200',
+  'Office Hours': 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
+  'Kickoff':      'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'Review':       'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
+  'Workshop':     'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',
 };
 
 export default function DeliveryCalendarEvents() {
@@ -32,11 +32,11 @@ export default function DeliveryCalendarEvents() {
               <button
                 key={event.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: event.id, data: event })}
-                className="rounded-xl border border-border bg-white p-4 text-left hover:border-orange-200 hover:shadow-sm transition-all"
+                className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#FFD08A] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-orange-600 shrink-0" />
+                    <Calendar className="w-4 h-4 text-[#CC8400] shrink-0" />
                     <div>
                       <p className="text-[13px] font-bold text-foreground">{event.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">

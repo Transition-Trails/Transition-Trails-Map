@@ -42,11 +42,11 @@ const REC_DOMAIN_ROUTE: Record<string, string> = {
 
 // ── Static prototype data ─────────────────────────────────────────────────────
 const ALL_ACTIVITY = [
-  { id: 'a1', icon: Bot,      catCls: 'bg-violet-100 text-violet-700', cat: TERMS.aiAssistant,    text: "Learning Coach flagged low confidence on Cohort 3 recap",      time: '8m',  minPower: false },
-  { id: 'a2', icon: Inbox,    catCls: 'bg-amber-100 text-amber-700',   cat: 'Demand',   text: "New intake case — Explorer's Trail expansion",                 time: '23m', minPower: true  },
-  { id: 'a3', icon: Users,    catCls: 'bg-sky-100 text-sky-700',       cat: 'Cohort',   text: 'Guided Trail Cohort 1 · Week 3 materials uploaded',            time: '1h',  minPower: false },
-  { id: 'a4', icon: Activity, catCls: 'bg-emerald-100 text-emerald-700',cat:'Programs', text: 'Foundations Trail cohort at 89% capacity',                    time: '2h',  minPower: false },
-  { id: 'a5', icon: FileText, catCls: 'bg-indigo-100 text-indigo-700', cat: 'Knowledge',text: 'Sprint 3 Resume Writing materials updated',                   time: '3h',  minPower: false },
+  { id: 'a1', icon: Bot,      catCls: 'bg-[#EDF5F8] text-[#2F6F7E]', cat: TERMS.aiAssistant,    text: "Learning Coach flagged low confidence on Cohort 3 recap",      time: '8m',  minPower: false },
+  { id: 'a2', icon: Inbox,    catCls: 'bg-[#FFF3E0] text-[#CC8400]',   cat: 'Demand',   text: "New intake case — Explorer's Trail expansion",                 time: '23m', minPower: true  },
+  { id: 'a3', icon: Users,    catCls: 'bg-[#EDF5F8] text-[#2F6F7E]',       cat: 'Cohort',   text: 'Guided Trail Cohort 1 · Week 3 materials uploaded',            time: '1h',  minPower: false },
+  { id: 'a4', icon: Activity, catCls: 'bg-[#E6F0EA] text-[#2F6B3F]',cat:'Programs', text: 'Foundations Trail cohort at 89% capacity',                    time: '2h',  minPower: false },
+  { id: 'a5', icon: FileText, catCls: 'bg-[#EDF5F8] text-[#2F6F7E]', cat: 'Knowledge',text: 'Sprint 3 Resume Writing materials updated',                   time: '3h',  minPower: false },
 ];
 
 const UPCOMING_SESSIONS = [
@@ -69,11 +69,11 @@ const QUICK_LINKS = [
 ];
 
 const PROGRAM_COLORS: Record<string, string> = {
-  'explorers-trail':   'bg-sky-400',
-  'foundations-trail': 'bg-emerald-400',
-  'guided-trail':      'bg-amber-400',
-  'trail-of-mastery':  'bg-purple-400',
-  'digital-compass':   'bg-rose-400',
+  'explorers-trail':   'bg-[#2F6F7E]',
+  'foundations-trail': 'bg-[#2F6B3F]',
+  'guided-trail':      'bg-[#CC8400]',
+  'trail-of-mastery':  'bg-[#2F6F7E]',
+  'digital-compass':   'bg-[#A93F2F]',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,9 +96,9 @@ export default function Home() {
 
   const everydayMetrics = [
     { label: 'My Programs',    value: programs.length.toString(), icon: Activity, cls: 'text-primary' },
-    { label: 'Cohort Learners',value: '47',  icon: Users,  cls: 'text-sky-600'    },
-    { label: 'Upcoming Tasks', value: '3',   icon: Inbox,  cls: 'text-amber-600'  },
-    { label: `${TERMS.aiAssistant} Nudges`,   value: '12',  icon: Brain,  cls: 'text-violet-600' },
+    { label: 'Cohort Learners',value: '47',  icon: Users,  cls: 'text-[#2F6F7E]'    },
+    { label: 'Upcoming Tasks', value: '3',   icon: Inbox,  cls: 'text-[#CC8400]'  },
+    { label: `${TERMS.aiAssistant} Nudges`,   value: '12',  icon: Brain,  cls: 'text-[#2F6F7E]' },
   ];
 
   return (
@@ -135,31 +135,31 @@ export default function Home() {
         {/* ── POWER+: Live Salesforce strip ── */}
         {!isEveryday && (
           sfError ? (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 flex items-center gap-2">
-              <WifiOff className="w-3 h-3 text-rose-500 shrink-0" />
-              <span className="text-[10px] text-rose-600 flex-1">Salesforce unreachable — live counts unavailable.</span>
-              <button onClick={() => refetch()} className="text-[10px] font-semibold text-rose-700 hover:underline flex items-center gap-1">
+            <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 flex items-center gap-2">
+              <WifiOff className="w-3 h-3 text-[#A93F2F] shrink-0" />
+              <span className="text-[10px] text-[#A93F2F] flex-1">Salesforce unreachable — live counts unavailable.</span>
+              <button onClick={() => refetch()} className="text-[10px] font-semibold text-[#A93F2F] hover:underline flex items-center gap-1">
                 <RefreshCw className="w-2.5 h-2.5" /> Retry
               </button>
             </div>
           ) : (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2">
+            <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]/60 px-3 py-2">
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${sfLoading || isFetching ? 'bg-amber-400 animate-pulse' : (sfData && sfData.cacheAge > 300) ? 'bg-amber-400' : 'bg-emerald-500'}`} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-800">Live from Salesforce</span>
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${sfLoading || isFetching ? 'bg-[#CC8400] animate-pulse' : (sfData && sfData.cacheAge > 300) ? 'bg-[#CC8400]' : 'bg-[#E6F0EA]0'}`} />
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#245531]">Live from Salesforce</span>
                   {sfData && (
-                    <span className={`text-[9px] ${sfData.cacheAge > 300 ? 'text-amber-600' : 'text-emerald-600/70'}`}>
+                    <span className={`text-[9px] ${sfData.cacheAge > 300 ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
                       · {sfData.cacheAge > 300 ? 'stale · ' : ''}{formatSyncAge(sfData.lastUpdated)}
                     </span>
                   )}
                 </div>
-                <button onClick={() => refetch()} disabled={isFetching} className="text-[9px] text-emerald-700/60 hover:text-emerald-800 disabled:opacity-40">
+                <button onClick={() => refetch()} disabled={isFetching} className="text-[9px] text-[#2F6B3F]/60 hover:text-[#245531] disabled:opacity-40">
                   <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
                 </button>
               </div>
               {sfLoading ? (
-                <div className="flex gap-2">{[1,2,3,4].map(i => <div key={i} className="h-7 flex-1 rounded bg-emerald-100 animate-pulse" />)}</div>
+                <div className="flex gap-2">{[1,2,3,4].map(i => <div key={i} className="h-7 flex-1 rounded bg-[#E6F0EA] animate-pulse" />)}</div>
               ) : sfData ? (
                 <div className="grid grid-cols-4 gap-2">
                   {[
@@ -168,10 +168,10 @@ export default function Home() {
                     { label: 'Deliveries',  value: n(sfData.serviceDeliveries.last30Days),     sub: 'last 30 days'                                 },
                     { label: 'Open Cases',  value: n(sfData.cases.open),                       sub: `${n(sfData.cases.highPriority)} high priority` },
                   ].map(m => (
-                    <div key={m.label} className="rounded bg-white/70 border border-emerald-100 px-2 py-1.5">
-                      <p className="text-[9px] font-bold text-emerald-700/60 uppercase tracking-wider mb-0.5">{m.label}</p>
-                      <p className="text-[15px] font-bold text-emerald-900 leading-none">{m.value}</p>
-                      <p className="text-[9px] text-emerald-700/60 mt-0.5">{m.sub}</p>
+                    <div key={m.label} className="rounded bg-white/70 border border-[#E6F0EA] px-2 py-1.5">
+                      <p className="text-[9px] font-bold text-[#2F6B3F]/60 uppercase tracking-wider mb-0.5">{m.label}</p>
+                      <p className="text-[15px] font-bold text-[#245531] leading-none">{m.value}</p>
+                      <p className="text-[9px] text-[#2F6B3F]/60 mt-0.5">{m.sub}</p>
                     </div>
                   ))}
                 </div>
@@ -193,10 +193,10 @@ export default function Home() {
             <div className="w-px h-8 bg-border/60 shrink-0" />
             <div className="flex flex-1 items-center gap-2 flex-wrap">
               {[
-                { l: 'Critical',        v: visibleRecs.filter(r => r.priority === 'critical').length, c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-                { l: 'High Priority',   v: visibleRecs.filter(r => r.priority === 'high').length,     c: 'text-orange-600', bg: 'bg-orange-50 border-orange-200' },
-                { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-rose-600',   bg: 'bg-rose-50 border-rose-200'   },
-                { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-amber-600',  bg: 'bg-amber-50 border-amber-200'  },
+                { l: 'Critical',        v: visibleRecs.filter(r => r.priority === 'critical').length, c: 'text-[#A93F2F]',   bg: 'bg-[#FBEAE6] border-[#E8B9B4]'   },
+                { l: 'High Priority',   v: visibleRecs.filter(r => r.priority === 'high').length,     c: 'text-[#CC8400]', bg: 'bg-[#FFF3E0] border-[#FFD08A]' },
+                { l: 'Domains At Risk', v: domainHealthData.filter(d => d.level === 'at-risk').length,    c: 'text-[#A93F2F]',   bg: 'bg-[#FBEAE6] border-[#E8B9B4]'   },
+                { l: 'Needs Work',      v: domainHealthData.filter(d => d.level === 'needs-work').length, c: 'text-[#CC8400]',  bg: 'bg-[#FFF3E0] border-[#FFD08A]'  },
               ].map(s => (
                 <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
                   <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
@@ -335,7 +335,7 @@ export default function Home() {
                   {MY_TASKS.map((t, i) => (
                     <div key={t.label} className={`flex items-center gap-2.5 px-3 py-2 ${i < MY_TASKS.length - 1 ? 'border-b border-border/30' : ''}`}>
                       {t.done
-                        ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                        ? <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] flex-shrink-0" />
                         : <Circle className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
                       }
                       <span className={`text-[11px] flex-1 ${t.done ? 'line-through text-muted-foreground/50' : 'text-foreground'}`}>{t.label}</span>
@@ -350,7 +350,7 @@ export default function Home() {
                       onClick={() => navigate(l.path)}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-muted/30 transition-colors ${i < QUICK_LINKS.length - 1 ? 'border-b border-border/30' : ''}`}
                     >
-                      <FileText className="w-3 h-3 text-indigo-400 flex-shrink-0" />
+                      <FileText className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
                       <span className="text-[11px] text-foreground flex-1 truncate">{l.label}</span>
                       <ArrowRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />
                     </button>
@@ -361,10 +361,10 @@ export default function Home() {
             ) : isPowerOrAbove && !isAdminOrAbove ? (
               <Card label={`${TERMS.aiAssistant} This Week`}>
                 {[
-                  { icon: Brain,         label: 'Interactions',     value: '234', sub: 'this week',  cls: 'text-violet-600', bg: 'bg-violet-50'   },
-                  { icon: Users,         label: 'Learner sessions', value: '12',  sub: 'active now', cls: 'text-sky-600',    bg: 'bg-sky-50'      },
-                  { icon: BarChart3,     label: 'Prompt quality',   value: '87%', sub: 'avg score',  cls: 'text-emerald-600',bg: 'bg-emerald-50'  },
-                  { icon: AlertTriangle, label: 'Knowledge gaps',   value: '3',   sub: 'flagged',    cls: 'text-amber-600',  bg: 'bg-amber-50'    },
+                  { icon: Brain,         label: 'Interactions',     value: '234', sub: 'this week',  cls: 'text-[#2F6F7E]', bg: 'bg-[#EDF5F8]'   },
+                  { icon: Users,         label: 'Learner sessions', value: '12',  sub: 'active now', cls: 'text-[#2F6F7E]',    bg: 'bg-[#EDF5F8]'      },
+                  { icon: BarChart3,     label: 'Prompt quality',   value: '87%', sub: 'avg score',  cls: 'text-[#2F6B3F]',bg: 'bg-[#E6F0EA]'  },
+                  { icon: AlertTriangle, label: 'Knowledge gaps',   value: '3',   sub: 'flagged',    cls: 'text-[#CC8400]',  bg: 'bg-[#FFF3E0]'    },
                 ].map((m, i, arr) => {
                   const Icon = m.icon;
                   return (

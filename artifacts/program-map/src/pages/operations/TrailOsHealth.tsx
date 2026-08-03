@@ -64,7 +64,7 @@ export default function TrailOsHealth() {
                       </div>
                       <p className="text-[11px] text-muted-foreground mt-0.5">{int.note}</p>
                     </div>
-                    <span className={`text-[11px] font-medium flex-shrink-0 ${int.dot === 'green' ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                    <span className={`text-[11px] font-medium flex-shrink-0 ${int.dot === 'green' ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>
                       {int.dot === 'green' ? 'Connected' : 'Not connected'}
                     </span>
                   </div>

@@ -59,7 +59,7 @@ export default function CurriculumAssignments() {
               <button
                 key={asgn.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: asgn.id, data: asgn })}
-                className={`w-full text-left grid grid-cols-[90px_1fr_140px_60px_70px_70px] gap-x-3 items-center px-4 py-3 group hover:bg-orange-50/50 transition-colors ${i < assignments.length - 1 ? 'border-b border-border/30' : ''}`}
+                className={`w-full text-left grid grid-cols-[90px_1fr_140px_60px_70px_70px] gap-x-3 items-center px-4 py-3 group hover:bg-[#FFF3E0]/50 transition-colors ${i < assignments.length - 1 ? 'border-b border-border/30' : ''}`}
               >
                 <p className="text-[11px] font-mono text-muted-foreground">{asgn.assignmentNumber}</p>
                 <div className="min-w-0">
@@ -71,8 +71,8 @@ export default function CurriculumAssignments() {
                 <span className={`inline-flex text-[10px] font-semibold border rounded-full px-2 py-0.5 w-fit ${statusCfg.cls}`}>{statusCfg.label}</span>
                 <div className="flex items-center">
                   {asgn.hasScoringRubric
-                    ? <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                    : <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />}
+                    ? <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />
+                    : <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />}
                 </div>
               </button>
             );

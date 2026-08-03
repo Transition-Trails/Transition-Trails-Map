@@ -4,15 +4,15 @@ import { TERMS } from '@/config/terminology';
 import { PageShell, StatusDot } from '@/components/platform/PageShell';
 
 const STATUS_CONFIG: Record<string, { badge: string; dot: 'green' | 'amber' | 'gray' }> = {
-  active:   { badge: 'bg-emerald-50 border-emerald-200 text-emerald-700', dot: 'green' },
-  approved: { badge: 'bg-sky-50 border-sky-200 text-sky-700',             dot: 'green' },
-  draft:    { badge: 'bg-amber-50 border-amber-200 text-amber-700',       dot: 'amber' },
+  active:   { badge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', dot: 'green' },
+  approved: { badge: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',             dot: 'green' },
+  draft:    { badge: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',       dot: 'amber' },
   planned:  { badge: 'bg-muted border-border text-muted-foreground',      dot: 'gray'  },
 };
 
 const PROVIDER_BADGE: Record<string, string> = {
   slack:        'bg-[#4A154B]/10 text-[#4A154B] border-[#4A154B]/20',
-  'google-chat':'bg-blue-50 text-blue-700 border-blue-200',
+  'google-chat':'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
   any:          'bg-muted text-muted-foreground border-border',
 };
 
@@ -74,12 +74,12 @@ export default function MessageTemplates() {
                   <td className="px-3 py-3">
                     <p className="font-semibold text-foreground text-[13px] leading-snug">{tpl.name}</p>
                     {tpl.relatedPennyCap && (
-                      <span className="inline-flex items-center text-[10px] bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-1.5 py-0.5 mt-1">
+                      <span className="inline-flex items-center text-[10px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5 mt-1">
                         {TERMS.aiAssistant}: {tpl.relatedPennyCap}
                       </span>
                     )}
                     {tpl.relatedDemandEvent && (
-                      <span className="inline-flex items-center text-[10px] bg-sky-50 text-sky-700 border border-sky-200 rounded-full px-1.5 py-0.5 mt-1">
+                      <span className="inline-flex items-center text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 mt-1">
                         Demand: {tpl.relatedDemandEvent}
                       </span>
                     )}

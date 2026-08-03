@@ -67,9 +67,9 @@ function isAllDay(ev: CalendarEvent): boolean { return !ev.start.dateTime; }
 
 function attendeeStatus(status?: string): { cls: string; label: string } {
   switch (status) {
-    case 'accepted':   return { cls: 'text-emerald-600', label: 'Accepted' };
-    case 'declined':   return { cls: 'text-rose-600',    label: 'Declined' };
-    case 'tentative':  return { cls: 'text-amber-600',   label: 'Tentative' };
+    case 'accepted':   return { cls: 'text-[#2F6B3F]', label: 'Accepted' };
+    case 'declined':   return { cls: 'text-[#A93F2F]',    label: 'Declined' };
+    case 'tentative':  return { cls: 'text-[#CC8400]',   label: 'Tentative' };
     default:           return { cls: 'text-muted-foreground', label: 'Awaiting' };
   }
 }
@@ -124,30 +124,30 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
 
   return (
     <div className={`rounded-lg border bg-white overflow-hidden ${
-      ev.isTrailTalk        ? 'border-violet-200 shadow-sm' :
-      ev.isPendingResponse  ? 'border-amber-200' :
+      ev.isTrailTalk        ? 'border-[#7FAFC6] shadow-sm' :
+      ev.isPendingResponse  ? 'border-[#FFD08A]' :
                               'border-border'
     }`}>
       {/* Trail Talk badge */}
       {ev.isTrailTalk && (
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-50 border-b border-violet-200">
-          <Star className="w-3 h-3 text-violet-600" />
-          <span className="text-[10px] font-bold uppercase tracking-wider text-violet-700">Trail Talk</span>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EDF5F8] border-b border-[#7FAFC6]">
+          <Star className="w-3 h-3 text-[#2F6F7E]" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#2F6F7E]">Trail Talk</span>
         </div>
       )}
 
       {/* Pending response banner */}
       {ev.isPendingResponse && !ev.isTrailTalk && (
-        <div className="flex items-center justify-between px-3 py-1.5 bg-amber-50 border-b border-amber-200">
+        <div className="flex items-center justify-between px-3 py-1.5 bg-[#FFF3E0] border-b border-[#FFD08A]">
           <div className="flex items-center gap-1.5">
-            <AlertCircle className="w-3 h-3 text-amber-600" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Response needed</span>
+            <AlertCircle className="w-3 h-3 text-[#CC8400]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]">Response needed</span>
           </div>
           <a
             href={ev.htmlLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] font-semibold text-amber-700 hover:underline flex items-center gap-1"
+            className="text-[10px] font-semibold text-[#CC8400] hover:underline flex items-center gap-1"
           >
             Open in Google Calendar <ExternalLink className="w-2.5 h-2.5" />
           </a>
@@ -240,7 +240,7 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
           )}
 
           {prep.error && (
-            <div className="flex items-center gap-1.5 text-[11px] text-rose-600">
+            <div className="flex items-center gap-1.5 text-[11px] text-[#A93F2F]">
               <AlertCircle className="w-3 h-3" />
               <span>{prep.error}</span>
             </div>
@@ -310,7 +310,7 @@ export default function CalendarPanel() {
 
         {/* Status strip */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
+          <div className="flex items-center gap-1.5 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
             <Zap className="w-3 h-3" />
             <span className="font-semibold">Live · Google Calendar API</span>
           </div>
@@ -326,12 +326,12 @@ export default function CalendarPanel() {
 
         {/* Error */}
         {error && (
-          <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-3">
+            <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[13px] font-semibold text-rose-800 mb-0.5">Could not load calendar</p>
-              <p className="text-[12px] text-rose-700">{error}</p>
-              <Button variant="ghost" size="sm" onClick={() => void load()} className="mt-2 h-7 text-[11px] text-rose-700">
+              <p className="text-[13px] font-semibold text-[#A93F2F] mb-0.5">Could not load calendar</p>
+              <p className="text-[12px] text-[#A93F2F]">{error}</p>
+              <Button variant="ghost" size="sm" onClick={() => void load()} className="mt-2 h-7 text-[11px] text-[#A93F2F]">
                 Try again
               </Button>
             </div>
@@ -354,8 +354,8 @@ export default function CalendarPanel() {
         {!loading && !error && pending.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-              <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700">
+              <AlertCircle className="w-3.5 h-3.5 text-[#CC8400]" />
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#CC8400]">
                 Needs Response ({pending.length})
               </p>
             </div>
@@ -383,7 +383,7 @@ export default function CalendarPanel() {
         {/* Zero state */}
         {!loading && !error && events.length === 0 && (
           <div className="rounded-xl border border-dashed border-border p-8 text-center">
-            <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
+            <CheckCircle2 className="w-8 h-8 text-[#2F6B3F] mx-auto mb-3" />
             <p className="text-sm font-semibold text-foreground mb-1">All clear for the next 7 days</p>
             <p className="text-[12px] text-muted-foreground">No upcoming events found in your primary Google Calendar.</p>
           </div>

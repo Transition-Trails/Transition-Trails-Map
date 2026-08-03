@@ -35,19 +35,19 @@ function deriveCtx(loc: string): PageCtx {
 
 const SOURCE_ICO = {
   slack:      { Icon: Hash,     cls: 'text-[#4A154B]',    bg: 'bg-[#4A154B]/8',  label: 'Slack' },
-  drive:      { Icon: Folder,   cls: 'text-blue-600',     bg: 'bg-blue-50',       label: 'Google Drive' },
-  calendar:   { Icon: Calendar, cls: 'text-emerald-600',  bg: 'bg-emerald-50',    label: 'Google Calendar' },
-  email:      { Icon: Mail,     cls: 'text-amber-600',    bg: 'bg-amber-50',      label: 'Gmail' },
-  salesforce: { Icon: Database, cls: 'text-sky-600',      bg: 'bg-sky-50',        label: 'Salesforce' },
+  drive:      { Icon: Folder,   cls: 'text-[#2F6F7E]',     bg: 'bg-[#EDF5F8]',       label: 'Google Drive' },
+  calendar:   { Icon: Calendar, cls: 'text-[#2F6B3F]',  bg: 'bg-[#E6F0EA]',    label: 'Google Calendar' },
+  email:      { Icon: Mail,     cls: 'text-[#CC8400]',    bg: 'bg-[#FFF3E0]',      label: 'Gmail' },
+  salesforce: { Icon: Database, cls: 'text-[#2F6F7E]',      bg: 'bg-[#EDF5F8]',        label: 'Salesforce' },
 } as const;
 type SigSource = keyof typeof SOURCE_ICO;
 
 const SOURCE_CONNECT: Record<SigSource, { status: string; cls: string; dotCls: string; link?: string }> = {
-  slack:      { status: 'Live',            cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://transitiontrails.slack.com' },
-  drive:      { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://drive.google.com' },
-  calendar:   { status: 'Connected',       cls: 'text-emerald-600',      dotCls: 'bg-emerald-500',         link: 'https://calendar.google.com' },
+  slack:      { status: 'Live',            cls: 'text-[#2F6B3F]',      dotCls: 'bg-[#E6F0EA]0',         link: 'https://transitiontrails.slack.com' },
+  drive:      { status: 'Connected',       cls: 'text-[#2F6B3F]',      dotCls: 'bg-[#E6F0EA]0',         link: 'https://drive.google.com' },
+  calendar:   { status: 'Connected',       cls: 'text-[#2F6B3F]',      dotCls: 'bg-[#E6F0EA]0',         link: 'https://calendar.google.com' },
   email:      { status: 'Phase 2',         cls: 'text-muted-foreground', dotCls: 'bg-muted-foreground/30' },
-  salesforce: { status: 'Live',            cls: 'text-emerald-600',      dotCls: 'bg-emerald-500' },
+  salesforce: { status: 'Live',            cls: 'text-[#2F6B3F]',      dotCls: 'bg-[#E6F0EA]0' },
 };
 
 type SigItem = {
@@ -151,9 +151,9 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Foundations Trail Cohort 2 approaching capacity (89%)',
     ],
     attentionItems: [
-      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: "Explorer's Trail Cohort 3 · 12 of 15 enrolled" },
-      { icon: Lightbulb,     bg: 'bg-sky-50 border-sky-200',          iconCls: 'text-sky-500',     text: 'Sprint 3 Resume Workshop — Thursday, materials ready' },
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: 'Foundations Trail Cohort 2 filling up — 89% capacity' },
+      { icon: CheckCircle2,  bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: "Explorer's Trail Cohort 3 · 12 of 15 enrolled" },
+      { icon: Lightbulb,     bg: 'bg-[#EDF5F8] border-[#7FAFC6]',          iconCls: 'text-[#2F6F7E]',     text: 'Sprint 3 Resume Workshop — Thursday, materials ready' },
+      { icon: AlertTriangle, bg: 'bg-[#FFF3E0] border-[#FFD08A]',       iconCls: 'text-[#CC8400]',   text: 'Foundations Trail Cohort 2 filling up — 89% capacity' },
     ],
     everydaySteps: [
       { label: 'View my programs',        path: '/program' },
@@ -181,8 +181,8 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Salesforce mapping: 6 of 12 objects fully mapped',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: 'Trail of Mastery · Launch phase needs source docs' },
-      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: "Explorer's Trail Cohort 3 · 12 of 15 enrolled" },
+      { icon: AlertTriangle, bg: 'bg-[#FFF3E0] border-[#FFD08A]',       iconCls: 'text-[#CC8400]',   text: 'Trail of Mastery · Launch phase needs source docs' },
+      { icon: CheckCircle2,  bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: "Explorer's Trail Cohort 3 · 12 of 15 enrolled" },
     ],
     everydaySteps: [
       { label: 'Browse all programs',   path: '/program' },
@@ -209,8 +209,8 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Salesforce live — SF Data Intelligence capability can now be wired to real data',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: '1 Learning Coach confidence flag this week' },
-      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: `Ask ${TERMS.aiAssistant} live — Gemini AI connected` },
+      { icon: AlertTriangle, bg: 'bg-[#FFF3E0] border-[#FFD08A]',       iconCls: 'text-[#CC8400]',   text: '1 Learning Coach confidence flag this week' },
+      { icon: CheckCircle2,  bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: `Ask ${TERMS.aiAssistant} live — Gemini AI connected` },
     ],
     everydaySteps: [
       { label: `Ask ${TERMS.aiAssistant}`,           path: '/penny' },
@@ -236,8 +236,8 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Trail of Mastery launch phase needs source documentation before delivery',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',   iconCls: 'text-amber-500', text: 'Launch phase — source documentation needed' },
-      { icon: Lightbulb,     bg: 'bg-sky-50 border-sky-200',        iconCls: 'text-sky-500',   text: 'Schedule Trail of Mastery Q3 sprint review' },
+      { icon: AlertTriangle, bg: 'bg-[#FFF3E0] border-[#FFD08A]',   iconCls: 'text-[#CC8400]', text: 'Launch phase — source documentation needed' },
+      { icon: Lightbulb,     bg: 'bg-[#EDF5F8] border-[#7FAFC6]',        iconCls: 'text-[#2F6F7E]',   text: 'Schedule Trail of Mastery Q3 sprint review' },
     ],
     everydaySteps: [{ label: 'View program status', path: '/operations' }],
     powerSteps: [
@@ -260,9 +260,9 @@ const CONTENT: Record<PageCtx, PageContent> = {
       '7 open items total — 2 high-risk, 2 elevated by age',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-rose-50 border-rose-200',       iconCls: 'text-rose-500',   text: `REQ-030 · ${TERMS.aiAssistant} not responding · 4 days open, no owner` },
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',     iconCls: 'text-amber-500',  text: 'REQ-028 · Trail Quest reminders · 7 days in backlog' },
-      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'REQ-029 approved — Guided Trail pacing update in progress' },
+      { icon: AlertTriangle, bg: 'bg-[#FBEAE6] border-[#E8B9B4]',       iconCls: 'text-[#A93F2F]',   text: `REQ-030 · ${TERMS.aiAssistant} not responding · 4 days open, no owner` },
+      { icon: AlertTriangle, bg: 'bg-[#FFF3E0] border-[#FFD08A]',     iconCls: 'text-[#CC8400]',  text: 'REQ-028 · Trail Quest reminders · 7 days in backlog' },
+      { icon: CheckCircle2,  bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: 'REQ-029 approved — Guided Trail pacing update in progress' },
     ],
     everydaySteps: [
       { label: 'Check request status', path: '/operations/demand' },
@@ -289,8 +289,8 @@ const CONTENT: Record<PageCtx, PageContent> = {
       `Org Memory: 234 ${TERMS.aiAssistant} interactions logged this week`,
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: "12 documents flagged 'needs-review'" },
-      { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Sprint 3 materials updated and ready' },
+      { icon: AlertTriangle, bg: 'bg-[#FFF3E0] border-[#FFD08A]',       iconCls: 'text-[#CC8400]',   text: "12 documents flagged 'needs-review'" },
+      { icon: CheckCircle2,  bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: 'Sprint 3 materials updated and ready' },
     ],
     everydaySteps: [
       { label: 'Open Knowledge Library', path: '/knowledge/library' },
@@ -316,8 +316,8 @@ const CONTENT: Record<PageCtx, PageContent> = {
       '7 message templates ready for testing',
     ],
     attentionItems: [
-      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: `Slack live — @penny posting to ${TERMS.aiAssistant} AI + Admin` },
-      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Google Calendar connected for session timing' },
+      { icon: CheckCircle2, bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: `Slack live — @penny posting to ${TERMS.aiAssistant} AI + Admin` },
+      { icon: CheckCircle2, bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: 'Google Calendar connected for session timing' },
     ],
     everydaySteps: [{ label: 'View Google Calendar', path: '/collaboration/calendar' }],
     powerSteps: [
@@ -336,8 +336,8 @@ const CONTENT: Record<PageCtx, PageContent> = {
 
     ],
     attentionItems: [
-      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Salesforce live — REST API + PMM confirmed' },
-      { icon: CheckCircle2, bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: 'Google OAuth live — Drive + Calendar tokens active' },
+      { icon: CheckCircle2, bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: 'Salesforce live — REST API + PMM confirmed' },
+      { icon: CheckCircle2, bg: 'bg-[#E6F0EA] border-[#9FC3AE]', iconCls: 'text-[#2F6B3F]', text: 'Google OAuth live — Drive + Calendar tokens active' },
     ],
     everydaySteps: [],
     powerSteps: [
@@ -356,7 +356,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Impact analysis shows what depends on each object',
     ],
     attentionItems: [
-      { icon: Lightbulb, bg: 'bg-sky-50 border-sky-200', iconCls: 'text-sky-500', text: 'Select an object to explore its relationships' },
+      { icon: Lightbulb, bg: 'bg-[#EDF5F8] border-[#7FAFC6]', iconCls: 'text-[#2F6F7E]', text: 'Select an object to explore its relationships' },
     ],
     everydaySteps: [],
     powerSteps: [
@@ -393,8 +393,8 @@ function computePriority(item: SigItem): number {
 
 function PriorityBadge({ score }: { score: number }) {
   const cls =
-    score >= 8 ? 'bg-rose-50 border-rose-200 text-rose-700' :
-    score >= 5 ? 'bg-amber-50 border-amber-200 text-amber-700' :
+    score >= 8 ? 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' :
+    score >= 5 ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' :
                  'bg-muted/60 border-border/60 text-muted-foreground';
   return (
     <span className={`inline-flex items-center gap-0.5 text-[8px] font-bold px-1.5 py-0.5 rounded border leading-none ${cls}`}>
@@ -489,7 +489,7 @@ export function PagePennyGuide() {
             onClick={() => setPennyPanelTab(tab)}
             className={`flex-1 px-3 py-2 text-[11px] font-medium border-b-2 transition-all duration-150 ${
               activeTab === tab
-                ? 'border-violet-500 text-violet-700 bg-violet-50/40'
+                ? 'border-[#EDF5F8]0 text-[#2F6F7E] bg-[#EDF5F8]/40'
                 : 'border-transparent text-muted-foreground/60 hover:text-foreground hover:border-border/40'
             }`}
           >
@@ -502,13 +502,13 @@ export function PagePennyGuide() {
       {activeTab === 'penny' && (
         isEveryday && insights.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 text-center p-5 h-full">
-            <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-violet-500" />
+            <div className="w-8 h-8 rounded-full bg-[#EDF5F8] flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-[#2F6F7E]" />
             </div>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
               Ask {TERMS.aiAssistant} a question or select an item to open its brief.
             </p>
-            <button onClick={() => setPennyPanelTab('ask')} className="flex items-center gap-1 text-[10px] font-medium text-violet-600 hover:underline">
+            <button onClick={() => setPennyPanelTab('ask')} className="flex items-center gap-1 text-[10px] font-medium text-[#2F6F7E] hover:underline">
               Ask a question <ArrowRight className="w-2.5 h-2.5" />
             </button>
           </div>
@@ -519,14 +519,14 @@ export function PagePennyGuide() {
               {/* Penny Insights section */}
               {insights.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-2">
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-[#2F6F7E]/70 mb-2">
                     {isEveryday ? `${TERMS.aiAssistant} · Your Learning Coach` : `${TERMS.aiAssistant} · Chief of Staff`}
                   </p>
-                  <div className="rounded-lg border border-violet-100 bg-violet-50/50 p-3 space-y-1.5">
+                  <div className="rounded-lg border border-[#EDF5F8] bg-[#EDF5F8]/50 p-3 space-y-1.5">
                     {insights.map((text, i) => (
                       <div key={i} className="flex items-start gap-1.5">
-                        <span className="text-violet-300 flex-shrink-0 mt-0.5 leading-none text-[10px]">•</span>
-                        <p className="text-[11px] text-violet-900 leading-snug">{text}</p>
+                        <span className="text-[#7FAFC6] flex-shrink-0 mt-0.5 leading-none text-[10px]">•</span>
+                        <p className="text-[11px] text-[#2F6F7E] leading-snug">{text}</p>
                       </div>
                     ))}
                   </div>
@@ -552,13 +552,13 @@ export function PagePennyGuide() {
                         <p className="text-[10px] font-bold text-foreground/80 uppercase tracking-wide">Trail Signals</p>
                         <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full leading-none ${
                           urgentCount > 0
-                            ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                            ? 'bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A]'
                             : 'bg-muted text-muted-foreground border border-border/60'
                         }`}>
                           {totalCount}
                         </span>
                         {urgentCount > 0 && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#CC8400] animate-pulse flex-shrink-0" />
                         )}
                       </div>
                       {!signalsOpen && (
@@ -587,7 +587,7 @@ export function PagePennyGuide() {
                               <SrcIcon className={`w-3 h-3 ${ico.cls} flex-shrink-0`} />
                               <div className="flex-1 min-w-0 flex items-center gap-1.5">
                                 <span className={`text-[10px] font-semibold ${ico.cls}`}>{ico.label}</span>
-                                {hasUrgent && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />}
+                                {hasUrgent && <span className="w-1.5 h-1.5 rounded-full bg-[#CC8400] animate-pulse flex-shrink-0" />}
                                 <span className={`text-[9px] ${conn.cls} ml-0.5`}>· {conn.status}</span>
                               </div>
                               {conn.link && (
@@ -609,15 +609,15 @@ export function PagePennyGuide() {
                               {items.map((item, i) => {
                                 const priority = computePriority(item);
                                 return (
-                                  <div key={i} className={`px-3 py-2 ${item.urgent ? 'bg-amber-50/30' : ''}`}>
+                                  <div key={i} className={`px-3 py-2 ${item.urgent ? 'bg-[#FFF3E0]/30' : ''}`}>
                                     <div className="flex items-start gap-1.5">
                                       {item.urgent
-                                        ? <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+                                        ? <AlertTriangle className="w-3 h-3 text-[#CC8400] flex-shrink-0 mt-0.5" />
                                         : <span className="w-1 h-1 rounded-full bg-muted-foreground/20 flex-shrink-0 mt-1.5" />
                                       }
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-1.5">
-                                          <p className={`text-[11px] leading-snug flex-1 ${item.urgent ? 'font-medium text-amber-900' : 'text-foreground'}`}>
+                                          <p className={`text-[11px] leading-snug flex-1 ${item.urgent ? 'font-medium text-[#CC8400]' : 'text-foreground'}`}>
                                             {item.text}
                                           </p>
                                           <PriorityBadge score={priority} />
@@ -633,7 +633,7 @@ export function PagePennyGuide() {
                                             setPendingPennyQuery(buildSignalQuery(item, ico.label));
                                             setAskPennyOpen(true);
                                           }}
-                                          className="mt-1.5 flex items-center gap-1 text-[9px] font-medium text-violet-600 hover:text-violet-800 hover:underline transition-colors"
+                                          className="mt-1.5 flex items-center gap-1 text-[9px] font-medium text-[#2F6F7E] hover:text-[#2F6F7E] hover:underline transition-colors"
                                         >
                                           <Brain className="w-2.5 h-2.5" />
                                           Ask {TERMS.aiAssistant} about this signal
@@ -721,7 +721,7 @@ export function PagePennyGuide() {
           <div className="p-4 space-y-4">
 
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-violet-600/70 mb-1.5">Ask {TERMS.aiAssistant}</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-[#2F6F7E]/70 mb-1.5">Ask {TERMS.aiAssistant}</p>
               <p className="text-[11px] text-muted-foreground leading-relaxed">
                 {isEveryday
                   ? 'Ask me about your programs, upcoming sessions, or anything in the Knowledge Library. I can also explain any signal.'
@@ -730,21 +730,21 @@ export function PagePennyGuide() {
             </div>
 
             {loading && (
-              <div className="rounded-lg border border-violet-200/60 bg-violet-50/60 p-3 flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 text-violet-500 animate-spin flex-shrink-0" />
-                <span className="text-[11px] text-violet-700">{TERMS.aiAssistant} is thinking…</span>
+              <div className="rounded-lg border border-[#7FAFC6]/60 bg-[#EDF5F8]/60 p-3 flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 text-[#2F6F7E] animate-spin flex-shrink-0" />
+                <span className="text-[11px] text-[#2F6F7E]">{TERMS.aiAssistant} is thinking…</span>
               </div>
             )}
 
             {response && !loading && (
-              <div className={`rounded-lg border p-3 ${isError ? 'border-amber-200 bg-amber-50' : 'border-violet-200 bg-violet-50'}`}>
+              <div className={`rounded-lg border p-3 ${isError ? 'border-[#FFD08A] bg-[#FFF3E0]' : 'border-[#7FAFC6] bg-[#EDF5F8]'}`}>
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 ${isError ? 'bg-amber-500' : 'bg-violet-600'}`}>
+                  <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 ${isError ? 'bg-[#FFF3E0]0' : 'bg-[#2F6F7E]'}`}>
                     {isError
                       ? <AlertTriangle className="w-2 h-2 text-white" />
                       : <Sparkles className="w-2 h-2 text-white" />}
                   </div>
-                  <span className={`text-[9px] font-bold uppercase tracking-wide ${isError ? 'text-amber-700' : 'text-violet-700'}`}>
+                  <span className={`text-[9px] font-bold uppercase tracking-wide ${isError ? 'text-[#CC8400]' : 'text-[#2F6F7E]'}`}>
                     {isError ? 'Error' : `${TERMS.aiAssistant}`}
                   </span>
                   <button
@@ -754,7 +754,7 @@ export function PagePennyGuide() {
                     ✕
                   </button>
                 </div>
-                <p className={`text-[11px] leading-snug whitespace-pre-wrap ${isError ? 'text-amber-900' : 'text-violet-900'}`}>
+                <p className={`text-[11px] leading-snug whitespace-pre-wrap ${isError ? 'text-[#CC8400]' : 'text-[#2F6F7E]'}`}>
                   {response}
                 </p>
               </div>
@@ -768,12 +768,12 @@ export function PagePennyGuide() {
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAsk()}
                   placeholder={`Ask about ${ctx === 'home' ? 'your dashboard' : ctx === 'default' ? 'this page' : ctx}…`}
-                  className="flex-1 text-[11px] bg-white border border-border/70 rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-violet-300 focus:border-violet-300"
+                  className="flex-1 text-[11px] bg-white border border-border/70 rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-[#7FAFC6] focus:border-[#7FAFC6]"
                 />
                 <button
                   onClick={handleAsk}
                   disabled={!query.trim() || loading}
-                  className="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-35 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                  className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#2F6F7E] text-white hover:bg-[#225968] disabled:opacity-35 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                 >
                   {loading
                     ? <Loader2 className="w-3.5 h-3.5 animate-spin" />

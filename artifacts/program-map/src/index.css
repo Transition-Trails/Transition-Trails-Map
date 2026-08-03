@@ -107,6 +107,11 @@
   --brand-amber-medium:    36 100% 77%;  /* #FFD08A */
   --brand-amber-dark:      39 100% 40%;  /* #CC8400 — pressed amber */
 
+  /* Critical / brick red — provisional functional colour (pending brand book entry) */
+  --brand-critical:         8 57% 42%;   /* #A93F2F — critical text / dot fill */
+  --brand-critical-light:  12 72% 94%;   /* #FBEAE6 — critical tinted background */
+  --brand-critical-mid:    15 55% 81%;   /* #E8B9B4 — critical border */
+
   /* Neutrals */
   --brand-trail-light:     60 22% 97%;   /* #FAFAF7 — main page background */
   --brand-warm-gray:      100  5% 89%;   /* #E2E4E1 — all borders & dividers */

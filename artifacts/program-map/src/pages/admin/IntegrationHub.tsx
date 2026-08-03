@@ -22,11 +22,11 @@ type Tab = 'connections' | 'capability' | 'config';
 type ConnStatus = 'live' | 'live-partial' | 'configured' | 'needs-setup' | 'phase-2' | 'phase-3';
 
 const CONN_STATUS: Record<ConnStatus, { label: string; dot: string; badge: string; cls: string }> = {
-  'live':         { label: 'Live',        dot: 'bg-emerald-500', badge: 'text-emerald-700', cls: 'border-emerald-200 bg-emerald-50'   },
-  'live-partial': { label: 'Live · Active', dot: 'bg-emerald-400', badge: 'text-emerald-700', cls: 'border-emerald-200 bg-emerald-50'   },
-  'configured':   { label: 'Configured',  dot: 'bg-sky-500',     badge: 'text-sky-700',     cls: 'border-sky-200 bg-sky-50'           },
-  'needs-setup':  { label: 'Needs Setup', dot: 'bg-amber-500',   badge: 'text-amber-700',   cls: 'border-amber-200 bg-amber-50'       },
-  'phase-2':      { label: 'Phase 2',     dot: 'bg-slate-400',   badge: 'text-slate-500',   cls: 'border-slate-200 bg-slate-50'       },
+  'live':         { label: 'Live',        dot: 'bg-[#E6F0EA]0', badge: 'text-[#2F6B3F]', cls: 'border-[#9FC3AE] bg-[#E6F0EA]'   },
+  'live-partial': { label: 'Live · Active', dot: 'bg-[#2F6B3F]', badge: 'text-[#2F6B3F]', cls: 'border-[#9FC3AE] bg-[#E6F0EA]'   },
+  'configured':   { label: 'Configured',  dot: 'bg-[#EDF5F8]0',     badge: 'text-[#2F6F7E]',     cls: 'border-[#7FAFC6] bg-[#EDF5F8]'           },
+  'needs-setup':  { label: 'Needs Setup', dot: 'bg-[#FFF3E0]0',   badge: 'text-[#CC8400]',   cls: 'border-[#FFD08A] bg-[#FFF3E0]'       },
+  'phase-2':      { label: 'Phase 2',     dot: 'bg-[#C8CBC6]',   badge: 'text-slate-500',   cls: 'border-slate-200 bg-slate-50'       },
   'phase-3':      { label: 'Phase 3',     dot: 'bg-zinc-300',    badge: 'text-zinc-400',    cls: 'border-zinc-200 bg-zinc-50/60'      },
 };
 
@@ -47,38 +47,38 @@ interface Connection {
 const CONNECTIONS: Connection[] = [
   {
     id: 'salesforce', name: 'Salesforce', tagline: 'System of Record',
-    status: 'live', icon: Database, iconCls: 'bg-blue-50 text-blue-700', owner: 'Salesforce Admin',
+    status: 'live', icon: Database, iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]', owner: 'Salesforce Admin',
     detail: 'REST API connected. PMM + NPSP confirmed. Active programs and learner records live.',
     action: 'Architecture', href: '/admin/salesforce-arch',
   },
   {
     id: 'google-oauth', name: 'Google OAuth', tagline: 'Auth Foundation',
-    status: 'live', icon: Lock, iconCls: 'bg-emerald-50 text-emerald-700', owner: 'IT Admin',
+    status: 'live', icon: Lock, iconCls: 'bg-[#E6F0EA] text-[#2F6B3F]', owner: 'IT Admin',
     detail: 'Refresh tokens active. Drive + Calendar + Gmail scopes confirmed. Wizard available for token rotation.',
     action: 'Manage', href: '/admin/integrations/google-auth',
   },
   {
     id: 'gemini', name: 'Gemini AI', tagline: `${TERMS.aiAssistant} Intelligence Layer`,
-    status: 'live', icon: Brain, iconCls: 'bg-violet-50 text-violet-700', owner: 'Admin',
+    status: 'live', icon: Brain, iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]', owner: 'Admin',
     detail: `API key active and validated. Powers ${TERMS.aiAssistant} insights and context generation.`,
     action: 'Secrets', href: '/admin/integrations/secrets',
   },
   {
     id: 'google-drive', name: 'Google Drive', tagline: 'Content Repository',
-    status: 'live', icon: FolderOpen, iconCls: 'bg-green-50 text-green-700', owner: 'Ops Lead',
+    status: 'live', icon: FolderOpen, iconCls: 'bg-[#E6F0EA] text-[#2F6B3F]', owner: 'Ops Lead',
     detail: `OAuth active. ${TERMS.aiAssistant} Assets folder configured. Program workspace sync is Phase 2.`,
     action: 'Drive Config', href: '/admin/integrations/google-drive',
   },
   {
     id: 'google-calendar', name: 'Google Calendar', tagline: 'Timing & Trigger Layer',
-    status: 'live', icon: Calendar, iconCls: 'bg-amber-50 text-amber-700', owner: 'IT Admin',
+    status: 'live', icon: Calendar, iconCls: 'bg-[#FFF3E0] text-[#CC8400]', owner: 'IT Admin',
     detail: 'OAuth active. Real events surfaced in the Calendar panel.',
     action: 'Calendar Config', href: '/admin/integrations/google-calendar',
     needs: 'Set GOOGLE_CALENDAR_ID in Secrets to enable per-program calendar queries',
   },
   {
     id: 'slack', name: 'Slack', tagline: 'Learner Delivery Channel',
-    status: 'live-partial', icon: MessageSquare, iconCls: 'bg-violet-50 text-violet-700', owner: 'Ops Lead',
+    status: 'live-partial', icon: MessageSquare, iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]', owner: 'Ops Lead',
     detail: '@penny posting live. POC scopes active.',
     action: 'Slack Config', href: '/collaboration/slack',
     needs: 'channels:read scope not yet approved — bot cannot list channels or members',
@@ -91,7 +91,7 @@ const CONNECTIONS: Connection[] = [
   },
   {
     id: 'gmail', name: 'Gmail', tagline: 'Outbound Notifications',
-    status: 'configured', icon: Mail, iconCls: 'bg-red-50 text-red-700', owner: 'Ops Lead',
+    status: 'configured', icon: Mail, iconCls: 'bg-[#FBEAE6] text-[#A93F2F]', owner: 'Ops Lead',
     detail: 'Replit connector active. Read and send scopes enabled. Outbound routing is Phase 2.',
     action: 'Secrets', href: '/admin/integrations/secrets',
   },
@@ -139,9 +139,9 @@ function ConnectionCard({ conn: c, navigate }: { conn: Connection; navigate: (hr
       <p className="text-[11px] text-muted-foreground leading-relaxed">{c.detail}</p>
 
       {c.needs && (
-        <div className="flex items-start gap-1.5 rounded-md px-2 py-1.5 bg-amber-50 border border-amber-100">
-          <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-[10px] text-amber-800 leading-snug">{c.needs}</p>
+        <div className="flex items-start gap-1.5 rounded-md px-2 py-1.5 bg-[#FFF3E0] border border-[#FFF3E0]">
+          <AlertTriangle className="w-3 h-3 text-[#CC8400] flex-shrink-0 mt-0.5" />
+          <p className="text-[10px] text-[#CC8400] leading-snug">{c.needs}</p>
         </div>
       )}
 
@@ -192,18 +192,18 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
           <p className="text-[10px] text-slate-500">Checking your Salesforce session…</p>
         </div>
       ) : authenticated && user ? (
-        <div className="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 bg-emerald-50 border border-emerald-100">
+        <div className="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 bg-[#E6F0EA] border border-[#E6F0EA]">
           <div className="flex items-center gap-1.5 min-w-0">
-            <User className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+            <User className="w-3 h-3 text-[#2F6B3F] flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold text-emerald-800 truncate">{user.username}</p>
-              <p className="text-[9px] text-emerald-600 truncate">{user.email}</p>
+              <p className="text-[10px] font-semibold text-[#245531] truncate">{user.username}</p>
+              <p className="text-[9px] text-[#2F6B3F] truncate">{user.email}</p>
             </div>
           </div>
           <button
             onClick={() => disconnect()}
             disabled={disconnecting}
-            className="flex items-center gap-1 text-[10px] font-semibold text-rose-600 hover:text-rose-800 transition-colors flex-shrink-0 disabled:opacity-50"
+            className="flex items-center gap-1 text-[10px] font-semibold text-[#A93F2F] hover:text-[#A93F2F] transition-colors flex-shrink-0 disabled:opacity-50"
           >
             {disconnecting ? <Loader2 className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
             Disconnect
@@ -212,7 +212,7 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
       ) : (
         <a
           href="/api/auth/salesforce/login"
-          className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 bg-blue-600 hover:bg-blue-700 transition-colors text-white text-[10px] font-semibold"
+          className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 bg-[#2F6F7E] hover:bg-[#225968] transition-colors text-white text-[10px] font-semibold"
         >
           <LogIn className="w-3 h-3" />
           Connect your Salesforce account
@@ -244,7 +244,7 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
 
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
             <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Live Connections</p>
           </div>
           <div className="grid grid-cols-3 gap-2.5">
@@ -259,7 +259,7 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
         {needsSet.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />
               <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Needs Setup</p>
             </div>
             <div className="grid grid-cols-3 gap-2.5">
@@ -304,9 +304,9 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
 type DepStatus = 'live' | 'partial' | 'needs-setup' | 'phase-2';
 
 const DEP_STATUS: Record<DepStatus, { dot: string; badge: string; label: string }> = {
-  live:          { dot: 'bg-emerald-500', badge: 'bg-emerald-50 border-emerald-200 text-emerald-700', label: 'Live'        },
-  partial:       { dot: 'bg-amber-400',   badge: 'bg-amber-50 border-amber-200 text-amber-700',       label: 'Partial'     },
-  'needs-setup': { dot: 'bg-rose-500',    badge: 'bg-rose-50 border-rose-200 text-rose-700',           label: 'Needs Setup' },
+  live:          { dot: 'bg-[#E6F0EA]0', badge: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', label: 'Live'        },
+  partial:       { dot: 'bg-[#CC8400]',   badge: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',       label: 'Partial'     },
+  'needs-setup': { dot: 'bg-[#FBEAE6]0',    badge: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]',           label: 'Needs Setup' },
   'phase-2':     { dot: 'bg-zinc-300',    badge: 'bg-zinc-50 border-zinc-200 text-zinc-500',           label: 'Phase 2'     },
 };
 
@@ -333,7 +333,7 @@ interface DomainCard {
 const DOMAINS: DomainCard[] = [
   {
     id: 'ai-core', icon: Brain, title: `${TERMS.aiAssistant} AI Core`, subtitle: `What ${TERMS.aiAssistant} thinks with`,
-    color: 'text-violet-700', border: 'border-violet-200', headerBg: 'bg-violet-50', iconCls: 'bg-violet-50 text-violet-600',
+    color: 'text-[#2F6F7E]', border: 'border-[#7FAFC6]', headerBg: 'bg-[#EDF5F8]', iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]',
     deps: [
       { label: 'Gemini 2.5 Flash key',        status: 'live',    note: 'GEMINI_API_KEY active · billing confirmed · POST /api/penny/ask live · validated via /api/gemini/validate',                                         action: '/admin/integrations/secrets',  actionLabel: 'Secrets audit'     },
       { label: 'RAG knowledge corpus',         status: 'partial', note: `22 chunks active · 3 sources still Unverified — complete trust review in Knowledge Library to activate them in ${TERMS.aiAssistant}`,                              action: '/knowledge/sources',           actionLabel: 'Review sources'    },
@@ -343,7 +343,7 @@ const DOMAINS: DomainCard[] = [
   },
   {
     id: 'data-access', icon: FolderOpen, title: 'Data Access', subtitle: `What ${TERMS.aiAssistant} reads`,
-    color: 'text-sky-700', border: 'border-sky-200', headerBg: 'bg-sky-50', iconCls: 'bg-sky-50 text-sky-600',
+    color: 'text-[#2F6F7E]', border: 'border-[#7FAFC6]', headerBg: 'bg-[#EDF5F8]', iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]',
     deps: [
       { label: 'Salesforce — Accounts, Contacts, Cases', status: 'live',        note: '127 Accounts · 129 Contacts · NPSP + PMM (7/8 objects) · read-only REST API live via Replit connector',                                   action: '/admin/integrations',          actionLabel: 'SF config'       },
       { label: 'Google Drive — Penny Asset Library',     status: 'live',        note: 'GOOGLE_DRIVE_PENNY_FOLDER_ID set · Shared Drive (TT Content → Penny Asset Library) · 6 state folders · 38 assets loaded',                action: '/penny/asset-library',         actionLabel: 'Asset Library'   },
@@ -353,7 +353,7 @@ const DOMAINS: DomainCard[] = [
   },
   {
     id: 'channels', icon: MessageSquare, title: 'Channels & Comms', subtitle: `How ${TERMS.aiAssistant} communicates`,
-    color: 'text-emerald-700', border: 'border-emerald-200', headerBg: 'bg-emerald-50', iconCls: 'bg-emerald-50 text-emerald-600',
+    color: 'text-[#2F6B3F]', border: 'border-[#9FC3AE]', headerBg: 'bg-[#E6F0EA]', iconCls: 'bg-[#E6F0EA] text-[#2F6B3F]',
     deps: [
       { label: 'Slack bot (@penny)', status: 'partial', note: 'Bot posting confirmed to Penny AI + Admin channels. Missing: channels:read + groups:read scopes — add to Slack app manifest to resolve channel names.', action: '/collaboration/slack',          actionLabel: 'Slack config'  },
       { label: 'Gmail read + send',            status: 'live',    note: `gmail.readonly + gmail.send confirmed · Real inbox (15 threads) · ${TERMS.aiAssistant}-assisted draft + send via POST /api/gmail/send live`,                         action: '/collaboration/gmail',          actionLabel: 'Open Gmail'    },
@@ -363,7 +363,7 @@ const DOMAINS: DomainCard[] = [
   },
   {
     id: 'access', icon: Shield, title: 'Access Control', subtitle: `Who ${TERMS.aiAssistant} talks to`,
-    color: 'text-amber-700', border: 'border-amber-200', headerBg: 'bg-amber-50', iconCls: 'bg-amber-50 text-amber-600',
+    color: 'text-[#CC8400]', border: 'border-[#FFD08A]', headerBg: 'bg-[#FFF3E0]', iconCls: 'bg-[#FFF3E0] text-[#CC8400]',
     deps: [
       { label: 'Google Sign-In (Clerk v6)',       status: 'live', note: 'Branded /sign-in · Google OAuth wired · ClerkProvider + proxy configured · signed-in/out gating live across all routes',                  action: '/admin/integrations/google-auth', actionLabel: 'Google Auth'   },
       { label: 'Google Groups auto-tier',         status: 'live', note: '3 Groups → Everyday / Power / Admin tiers · DWD service account configured · real-time group membership on every login via /api/auth/tier', action: '/admin/integrations',             actionLabel: 'View config'   },
@@ -373,7 +373,7 @@ const DOMAINS: DomainCard[] = [
   },
   {
     id: 'content', icon: BookOpen, title: 'Content & Knowledge', subtitle: `What ${TERMS.aiAssistant} knows`,
-    color: 'text-rose-700', border: 'border-rose-200', headerBg: 'bg-rose-50', iconCls: 'bg-rose-50 text-rose-600',
+    color: 'text-[#A93F2F]', border: 'border-[#E8B9B4]', headerBg: 'bg-[#FBEAE6]', iconCls: 'bg-[#FBEAE6] text-[#A93F2F]',
     deps: [
       { label: 'Knowledge source library',    status: 'partial',    note: `Sources, Library, and Org Memory tabs live · 3 sources Unverified — complete trust review for each to activate in ${TERMS.aiAssistant} RAG`,       action: '/knowledge/sources', actionLabel: 'Review sources' },
       { label: `${TERMS.aiAssistant} Asset Library`,         status: 'live',       note: `38 assets across 6 ${TERMS.aiAssistant} states · Drive-backed thumbnails · grid + list views · 3-per-row face-anchored at /penny/asset-library`,   action: '/penny/asset-library', actionLabel: 'Open Library'  },
@@ -416,8 +416,8 @@ function CapabilityTab({ navigate }: { navigate: (href: string) => void }) {
                 const score    = domainScore(d);
                 const Icon     = d.icon;
                 const isActive = selectedDomain === d.id;
-                const barColor = score === 100 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-400' : 'bg-rose-400';
-                const pctColor = score === 100 ? 'text-emerald-600' : score >= 50 ? 'text-amber-600' : 'text-rose-600';
+                const barColor = score === 100 ? 'bg-[#E6F0EA]0' : score >= 50 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
+                const pctColor = score === 100 ? 'text-[#2F6B3F]' : score >= 50 ? 'text-[#CC8400]' : 'text-[#A93F2F]';
                 return (
                   <button
                     key={d.id}
@@ -542,19 +542,19 @@ interface ConfigLink {
 }
 
 const SETUP_PAGES: ConfigLink[] = [
-  { id: 'secrets',       name: 'Secrets & Credentials',  detail: 'Presence and format check plus live API validation for Gemini and Google.', href: '/admin/integrations/secrets',         badge: 'Audit tool',     badgeCls: 'bg-sky-50 border-sky-200 text-sky-700',       icon: Key          },
-  { id: 'google-auth',   name: 'Google OAuth',            detail: 'OAuth wizard for Drive, Calendar, and Gmail refresh tokens.',               href: '/admin/integrations/google-auth',     badge: 'Auth',           badgeCls: 'bg-emerald-50 border-emerald-200 text-emerald-700', icon: Lock     },
-  { id: 'drive',         name: 'Google Drive Config',     detail: `${TERMS.aiAssistant} Asset Library setup and program folder configuration.`,               href: '/admin/integrations/google-drive',    badge: 'Drive Config',   badgeCls: 'bg-green-50 border-green-200 text-green-700',   icon: FolderOpen   },
-  { id: 'calendar',      name: 'Google Calendar Config',  detail: 'Calendar IDs, cohort event mapping, and event-trigger readiness.',          href: '/admin/integrations/google-calendar', badge: 'Calendar',       badgeCls: 'bg-amber-50 border-amber-200 text-amber-700',   icon: Calendar     },
-  { id: 'signal-rules',  name: 'Signal Rules',            detail: `Configure how each channel routes signals to ${TERMS.aiAssistant} and ${TERMS.trailSignals}.`,     href: '/collaboration',                      badge: 'Channel Rules',  badgeCls: 'bg-violet-50 border-violet-200 text-violet-700', icon: MessageSquare },
+  { id: 'secrets',       name: 'Secrets & Credentials',  detail: 'Presence and format check plus live API validation for Gemini and Google.', href: '/admin/integrations/secrets',         badge: 'Audit tool',     badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',       icon: Key          },
+  { id: 'google-auth',   name: 'Google OAuth',            detail: 'OAuth wizard for Drive, Calendar, and Gmail refresh tokens.',               href: '/admin/integrations/google-auth',     badge: 'Auth',           badgeCls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', icon: Lock     },
+  { id: 'drive',         name: 'Google Drive Config',     detail: `${TERMS.aiAssistant} Asset Library setup and program folder configuration.`,               href: '/admin/integrations/google-drive',    badge: 'Drive Config',   badgeCls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]',   icon: FolderOpen   },
+  { id: 'calendar',      name: 'Google Calendar Config',  detail: 'Calendar IDs, cohort event mapping, and event-trigger readiness.',          href: '/admin/integrations/google-calendar', badge: 'Calendar',       badgeCls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',   icon: Calendar     },
+  { id: 'signal-rules',  name: 'Signal Rules',            detail: `Configure how each channel routes signals to ${TERMS.aiAssistant} and ${TERMS.trailSignals}.`,     href: '/collaboration',                      badge: 'Channel Rules',  badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]', icon: MessageSquare },
 ];
 
 const GOVERNANCE_LINKS: ConfigLink[] = [
-  { id: 'irc',              name: 'Integration Readiness Center', detail: 'Full planning workspace — auth, field mapping, sync readiness, and risk register.',                  href: '/admin/integration-readiness', badge: 'Planning',      badgeCls: 'bg-amber-50 border-amber-200 text-amber-700',   icon: Plug         },
-  { id: 'phase1-audit',     name: 'Penny Capability Build Audit', detail: 'UX compliance review, prototype content inventory, and Penny capability build assessment.',           href: '/admin/phase1-audit',          badge: 'Audit',         badgeCls: 'bg-violet-50 border-violet-200 text-violet-700', icon: CheckCircle2 },
-  { id: 'access',           name: 'Access & Roles',              detail: 'Google Groups → Trail OS tier mapping, navigation visibility, and feature capability grid.',          href: '/admin/people-access',         badge: 'Access tiers',  badgeCls: 'bg-indigo-50 border-indigo-200 text-indigo-700', icon: Lock         },
-  { id: 'sf-validation',    name: 'SF Validation Center',        detail: 'Trail OS ↔ Salesforce object mappings, product readiness scores, and field-level validation.',       href: '/admin/sf-validation',         badge: 'SF Readiness',  badgeCls: 'bg-blue-50 border-blue-200 text-blue-700',      icon: Database     },
-  { id: 'program-resources',name: 'Program Drive Workspaces',    detail: 'Google Drive folder URLs, shared drive IDs, permissions, and sync status per program.',               href: '/admin/program-resources',     badge: 'Drive Config',  badgeCls: 'bg-green-50 border-green-200 text-green-700',   icon: FolderOpen   },
+  { id: 'irc',              name: 'Integration Readiness Center', detail: 'Full planning workspace — auth, field mapping, sync readiness, and risk register.',                  href: '/admin/integration-readiness', badge: 'Planning',      badgeCls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]',   icon: Plug         },
+  { id: 'phase1-audit',     name: 'Penny Capability Build Audit', detail: 'UX compliance review, prototype content inventory, and Penny capability build assessment.',           href: '/admin/phase1-audit',          badge: 'Audit',         badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]', icon: CheckCircle2 },
+  { id: 'access',           name: 'Access & Roles',              detail: 'Google Groups → Trail OS tier mapping, navigation visibility, and feature capability grid.',          href: '/admin/people-access',         badge: 'Access tiers',  badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]', icon: Lock         },
+  { id: 'sf-validation',    name: 'SF Validation Center',        detail: 'Trail OS ↔ Salesforce object mappings, product readiness scores, and field-level validation.',       href: '/admin/sf-validation',         badge: 'SF Readiness',  badgeCls: 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]',      icon: Database     },
+  { id: 'program-resources',name: 'Program Drive Workspaces',    detail: 'Google Drive folder URLs, shared drive IDs, permissions, and sync status per program.',               href: '/admin/program-resources',     badge: 'Drive Config',  badgeCls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]',   icon: FolderOpen   },
 ];
 
 function ConfigRow({ link, navigate }: { link: ConfigLink; navigate: (href: string) => void }) {
@@ -636,14 +636,14 @@ export default function IntegrationHub() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 mt-1">
-            <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-[11px] font-semibold text-emerald-700">{liveCount} live</span>
+            <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
+              <span className="text-[11px] font-semibold text-[#2F6B3F]">{liveCount} live</span>
             </div>
             {needsCount > 0 && (
-              <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-2.5 py-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                <span className="text-[11px] font-semibold text-amber-700">{needsCount} need action</span>
+              <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2.5 py-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FFF3E0]0" />
+                <span className="text-[11px] font-semibold text-[#CC8400]">{needsCount} need action</span>
               </div>
             )}
             {partCount > 0 && (
