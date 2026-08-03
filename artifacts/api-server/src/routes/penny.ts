@@ -94,6 +94,30 @@ function buildRetrievedSection(chunks: RetrievedChunk[]): string {
 
 interface HistoryItem { role: 'user' | 'model'; text: string; }
 
+/**
+ * Validates a single conversation-history entry before it is sent to Gemini.
+ *
+ * Rules:
+ *  - Must be a non-null object.
+ *  - role must be exactly 'user' or 'model'  (grouped so the text check
+ *    applies to BOTH roles — the original bug was missing parentheses here).
+ *  - text must be a string AND non-empty after trimming (an empty string is
+ *    just as useless as undefined to Gemini).
+ *
+ * Invalid items are silently dropped by the caller's .filter(); a history
+ * array that is entirely bad degrades to [] and the request still proceeds
+ * with only the current question.
+ */
+export function isValidHistoryItem(h: unknown): h is HistoryItem {
+  return (
+    typeof h === 'object' &&
+    h !== null &&
+    ((h as HistoryItem).role === 'user' || (h as HistoryItem).role === 'model') &&
+    typeof (h as HistoryItem).text === 'string' &&
+    (h as HistoryItem).text.trim().length > 0
+  );
+}
+
 router.post("/penny/ask", async (req, res) => {
   const start = Date.now();
 
@@ -193,11 +217,7 @@ router.post("/penny/ask", async (req, res) => {
 
   // ── Build conversation history for Gemini ────────────────────────────────
   const validHistory: HistoryItem[] = Array.isArray(history)
-    ? (history as unknown[]).filter((h): h is HistoryItem =>
-        typeof h === 'object' && h !== null &&
-        (h as HistoryItem).role === 'user' || (h as HistoryItem).role === 'model' &&
-        typeof (h as HistoryItem).text === 'string'
-      ).slice(-10)   // cap at last 10 turns to control token budget
+    ? (history as unknown[]).filter(isValidHistoryItem).slice(-10)  // cap at last 10 turns to control token budget
     : [];
 
   const contents = [
