@@ -2,7 +2,7 @@ export interface CommProvider {
   id: string;
   name: string;
   slug: 'slack' | 'google-chat';
-  status: 'prototype' | 'future';
+  status: 'live' | 'prototype' | 'future';
   tagline: string;
   purpose: string;
   whyItMatters: string;
@@ -20,11 +20,11 @@ export const commProviders: CommProvider[] = [
     id: 'slack',
     name: 'Slack',
     slug: 'slack',
-    status: 'prototype',
-    tagline: 'Primary channel — Q3 2025',
+    status: 'live',
+    tagline: 'Primary channel — live',
     purpose: 'Deliver automated notifications, coaching nudges, operational alerts, and learner engagement prompts to the Transition Trails team, coaches, and facilitators via Slack.',
     whyItMatters: 'Slack is where the Transition Trails team already operates. Routing Trail OS events into Slack gives the team timely, context-aware prompts without needing to monitor the platform directly.',
-    connectionStatus: 'Not Connected',
+    connectionStatus: 'Connected',
     useCases: [
       'Trail Talk reminders — weekly learner reflection prompts',
       'Cohort announcements — session starts and milestones',
@@ -36,16 +36,16 @@ export const commProviders: CommProvider[] = [
       'Operations Center attention flags and alerts',
     ],
     requiredSetup: [
-      'Create a Slack App in the Trail OS Slack workspace',
-      'Configure incoming webhook URLs per channel destination',
-      'Set up Bot Token with chat:write and channels:read scopes',
-      'Map Trail OS event types to Slack channel destinations in Comm Routing',
-      'Test with a Penny prototype trigger event',
-      'Connect via Zapier webhook or direct Slack API (Agentforce action)',
+      '✓ Slack App created in the Trail OS workspace',
+      '✓ Bot Token configured — SLACK_BOT_TOKEN, SLACK_APP_TOKEN, SLACK_SIGNING_SECRET active',
+      '✓ @penny posting confirmed in #penny-ai and #admin channels',
+      'Pending: add channels:read + groups:read scopes for channel name resolution',
+      'Phase 2: map Trail OS event types to Slack channel destinations in Comm Routing',
+      'Phase 2: automate routing via Penny event triggers',
     ],
     relatedPennyCaps: ['Proactive Nudge', 'At-Risk Detection', 'Trail Quest Prompting'],
     relatedDemandEvents: ['Case Escalation', 'New Case Created', 'Change Request Submitted'],
-    futureSetup: 'Direct Slack API integration via Zapier webhook or Agentforce Slack action. Target: Q3 2025.',
+    futureSetup: 'Bot is live. Phase 2: wire automated routing rules so Trail OS events trigger Slack messages without manual intervention.',
     sourceOwner: 'Trail OS Operations',
   },
   {
@@ -72,7 +72,7 @@ export const commProviders: CommProvider[] = [
     ],
     relatedPennyCaps: ['Proactive Nudge', 'At-Risk Detection'],
     relatedDemandEvents: ['Case Escalation', 'New Case Created'],
-    futureSetup: 'Swap provider adapter in Comm Routing config. Core event logic unchanged. Target: Q4 2025+.',
+    futureSetup: 'Swap provider adapter in Comm Routing config. Core event logic unchanged. Phase 3 — no date set.',
     sourceOwner: 'Trail OS Architecture',
   },
 ];

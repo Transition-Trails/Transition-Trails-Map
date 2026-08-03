@@ -62,7 +62,7 @@ export const trailOsCapabilities: TrailOsCapability[] = [
     description: "Aligns learner skills and interests with client and employer needs",
     executiveSummary: "Learner-Client Matching aligns learner skills, interests, and readiness with employer and client partner needs.",
     whyItMatters: "Placement quality depends on match quality. Poor matching wastes employer relationships and learner potential.",
-    keyFacts: ["Driven by Career Translator outputs", "Connects learner profiles to employer opportunities", "Active at Explorer's Trail exit"],
+    keyFacts: ["Driven by Career Translator outputs", "Connects learner profiles to employer opportunities", "Designed for the Explorer's Trail exit stage"],
     programs: ["Explorer's Trail"],
     penny: ["Career Translator"],
     resolve: ["Launch"]
@@ -83,12 +83,12 @@ export const trailOsCapabilities: TrailOsCapability[] = [
   {
     id: "visibility",
     entityType: "trail-os-capability",
-    confidence: "confirmed",
+    confidence: "needs-review",
     name: "Coach Visibility",
-    description: "Dashboard for coaches to track learner progress, flag risks, and coordinate support",
-    executiveSummary: "Coach Visibility gives coaches a real-time dashboard view of learner progress, engagement, and risk signals.",
+    description: "Dashboard for coaches to track learner progress, flag risks, and coordinate support — requires live Salesforce data wiring (Phase 2)",
+    executiveSummary: "Coach Visibility will give coaches a real-time dashboard view of learner progress, engagement, and risk signals. This is Phase 2 scope — the dashboard design exists but live data connection is not yet wired.",
     whyItMatters: "Coaches can only intervene effectively if they can see where learners are struggling. Visibility makes coaching proactive.",
-    keyFacts: ["Flags at-risk learners", "Tracks session attendance and project progress", "Connects to Coach Intelligence Layer"],
+    keyFacts: ["Will flag at-risk learners", "Will track session attendance and project progress", "Connects to Coach Intelligence Layer — Phase 2"],
     programs: ["Foundations Trail", "Trail of Mastery"],
     penny: ["Learning Coach", "Coach Intelligence Layer"],
     resolve: ["Launch", "Verify"]
@@ -96,12 +96,12 @@ export const trailOsCapabilities: TrailOsCapability[] = [
   {
     id: "outcomes",
     entityType: "trail-os-capability",
-    confidence: "confirmed",
+    confidence: "needs-review",
     name: "Outcomes Tracking",
-    description: "Captures placement rates, skill gains, employer feedback, and program metrics",
-    executiveSummary: "Outcomes Tracking captures placement rates, skill gains, employer feedback, and program metrics for reporting and improvement.",
+    description: "Will capture placement rates, skill gains, employer feedback, and program metrics once wired to live Salesforce data",
+    executiveSummary: "Outcomes Tracking will capture placement rates, skill gains, employer feedback, and program metrics for reporting and improvement. This capability is Phase 2 scope — it requires live Salesforce data wiring before any figures it surfaces can be treated as real.",
     whyItMatters: "Without outcomes data, the organization cannot demonstrate impact to funders or improve programs systematically.",
-    keyFacts: ["Tracks 90-day placement rates", "Captures employer feedback", "Feeds into Evolve phase of RESOLVE"],
+    keyFacts: ["Will track 90-day placement rates", "Will capture employer feedback", "Feeds into Evolve phase of RESOLVE — Phase 2 scope"],
     programs: ["Guided Trail", "Digital Compass"],
     penny: ["Exam Coach"],
     resolve: ["Verify", "Evolve"]
