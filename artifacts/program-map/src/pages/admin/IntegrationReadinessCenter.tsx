@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import {
   integrations, risks, launchMilestones, dataFlowNodes, IRC_SUMMARY,
   DOMAIN_ORDER, DOMAIN_CONFIG, STATUS_CONFIG,
@@ -1004,9 +1005,12 @@ export default function IntegrationReadinessCenter() {
         <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration — Integration Planning</p>
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-[15px] font-semibold text-foreground">Integration Readiness Center</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-[15px] font-semibold text-foreground">Integration Readiness Center</h1>
+              <SampleDataBadge />
+            </div>
             <p className="text-[14px] text-muted-foreground mt-0.5">
-              Plan real integrations without connecting live APIs. {IRC_SUMMARY.total} integrations across {DOMAIN_ORDER.length} domains.
+              Planning workspace — readiness percentages are prototype figures. For live integration health, see the Phase 1 Readiness dashboard.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">

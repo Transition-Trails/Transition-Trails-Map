@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, createContext, useContext } from 'react';
 import { useAppContext } from '@/context/AppContext';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import { usePromptTemplates } from '@/hooks/usePromptTemplates';
 import { usePromptVariables } from '@/hooks/usePromptVariables';
 import {
@@ -1290,7 +1291,10 @@ export default function PennyPromptStudio() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Penny — Prompt Studio</p>
+        <div className="flex items-center gap-2 mb-0.5">
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Penny — Prompt Studio</p>
+          <SampleDataBadge />
+        </div>
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Penny Prompt Studio</h1>

@@ -14,6 +14,7 @@ import type { ActiveContext } from '@/context/AppContext';
 import { EXAMPLE_CONTEXTS } from '@/data/contextEngineData';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { TERMS } from '@/config/terminology';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
@@ -135,6 +136,8 @@ function PowerContextBar() {
         </>
       )}
 
+      <SampleDataBadge className="hidden sm:inline-flex" />
+
       <div className="flex-1" />
 
       {/* Change focus */}
@@ -219,6 +222,8 @@ function AdminContextBar() {
             </span>
           </>
         )}
+
+        <SampleDataBadge className="hidden sm:inline-flex" />
 
         <div className="flex-1" />
 

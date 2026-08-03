@@ -55,8 +55,8 @@ export const TERMS = {
    */
   signalTooltip: (total: number, urgent: number) =>
     urgent > 0
-      ? `${urgent} urgent · ${total} Trail Signals available — click to open`
-      : `${total} Trail Signals available — click to open`,
+      ? `${urgent} urgent · ${total} Trail Signals available — click to open · Count is sample data in this prototype`
+      : `${total} Trail Signals available — click to open · Count is sample data in this prototype`,
 } as const;
 
 export type TermsConfig = typeof TERMS;

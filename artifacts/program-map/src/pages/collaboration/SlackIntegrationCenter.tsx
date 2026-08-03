@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, createContext, useContext } from 'react';
 import { TERMS } from '@/config/terminology';
 import { HubShell } from '@/components/layout/HubShell';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ObjectWorkspace } from '@/components/workspace/ObjectWorkspace';
 import { HealthDot } from '@/components/workspace/ObjectWorkspace';
@@ -202,6 +203,10 @@ function OverviewTab() {
         </div>
 
         {/* Phase 2 stat grid */}
+        <div className="flex items-center gap-2 mb-2">
+          <p className="text-[14px] font-bold  text-muted-foreground/60">Integration Metrics</p>
+          <SampleDataBadge />
+        </div>
         <div className="grid grid-cols-4 gap-3">
           {[
             {
@@ -285,7 +290,10 @@ function OverviewTab() {
 
         {/* Workspace connection status */}
         <div>
-          <p className="text-[14px] font-bold  text-foreground mb-2">Workspace</p>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-[14px] font-bold  text-foreground">Workspace</p>
+            <SampleDataBadge />
+          </div>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             <InfoRow label="Workspace"       value={SLACK_WORKSPACE.displayName} />
             <InfoRow label="Domain"          value={SLACK_WORKSPACE.domain} />

@@ -2,6 +2,7 @@ import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { GraduationCap, BookOpen, Sparkles, Radio, AlertTriangle, ArrowRight, CheckCircle2, Zap, Layers } from 'lucide-react';
 import { curriculumModules, curriculumPrograms, curriculumHealthIssues } from '@/data/curriculumData';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 
 const ARCHITECTURE_LAYERS = [
   { id: 'structure', label: 'Program Structure', color: 'border-primary/30 bg-primary/5 text-primary', chipColor: 'bg-primary/10 text-primary border-primary/20', icon: GraduationCap, items: ['Programs', 'Cohorts', 'Sprints', 'Modules'], path: '/curriculum/modules' },
@@ -24,7 +25,10 @@ export default function CurriculumOverview() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-7">
         <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio</p>
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Curriculum Studio</p>
+            <SampleDataBadge />
+          </div>
           <h1 className="text-3xl font-bold text-foreground">Learning Architecture Workspace</h1>
           <p className="text-[14px] text-muted-foreground mt-2 max-w-2xl">
             Model relationships between Program Structure, Learning Assets, Penny Assets, and Delivery Assets so staff can build

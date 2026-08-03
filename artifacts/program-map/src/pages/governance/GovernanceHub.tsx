@@ -8,6 +8,7 @@ import {
   Shield, GitBranch, Users, CheckSquare, RotateCcw,
   BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight, Plus, Hash,
 } from 'lucide-react';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import {
   LIFECYCLE_MODELS, OWNERSHIP_MATRIX, GOV_HEALTH_ISSUES,
   COMPLIANCE_SUMMARY, APPROVAL_WORKFLOWS, REVIEW_CYCLES, GOV_POLICIES,
@@ -95,6 +96,11 @@ function OverviewTab() {
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-6 max-w-4xl">
+
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-[14px] font-bold  text-muted-foreground/60">Governance</p>
+          <SampleDataBadge />
+        </div>
 
         <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
           <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Phase 1 Governance Capability</p>

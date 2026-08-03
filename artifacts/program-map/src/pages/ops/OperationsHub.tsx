@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import {
   Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown, Sparkles, ListChecks,
 } from 'lucide-react';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import { useOpsSummary } from '@/hooks/useOpsSummary';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -88,7 +89,10 @@ function HealthIndicators() {
         <div className="rounded-lg border border-border bg-white overflow-hidden">
           <div className="px-4 py-3 border-b border-border/40 bg-muted/20 flex items-center justify-between">
             <div>
-              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Trail OS Platform Health</p>
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="text-[14px] font-bold  text-muted-foreground/50">Trail OS Platform Health</p>
+                <SampleDataBadge />
+              </div>
               <p className="text-[14px] text-muted-foreground">Composite score across {baseDomains.length} domains</p>
             </div>
             <div className="flex items-center gap-2">

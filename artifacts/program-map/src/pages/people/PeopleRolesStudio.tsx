@@ -3,6 +3,7 @@ import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 
 import { Users, ChevronRight, Shield, MessageSquare, Sparkles, Database, Activity, BookOpen, Map, Target, CheckCircle2, AlertTriangle, XCircle, User, Plus } from 'lucide-react';
 import {
@@ -99,6 +100,7 @@ export default function PeopleRolesStudio() {
           <Users className="w-4 h-4 text-primary" />
           <h1 className="text-lg font-bold text-foreground">People &amp; Roles Studio</h1>
           <span className="text-[14px] font-semibold  text-muted-foreground/50 ml-1">Human Layer</span>
+          <SampleDataBadge />
           <div className="ml-auto flex items-center gap-2 shrink-0">
             <button
               onClick={handleNewPersona}

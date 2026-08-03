@@ -67,9 +67,9 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     ],
     keyRelationships:['Program Blueprint v2 (governs)','FT Cohort 2 (contains)','Coach — 3 assigned','Resume Review, Learning Coach, Trail Quest (Penny)','SF Program Engagement (maps to)','Foundations Trail Drive Folder'],
     recentActivity:[
-      { date:'Jun 9 2025',  action:'Sprint 3 started (Week 6 of 8)',                by:'Program Manager' },
-      { date:'Jun 4 2025',  action:'Sprint 2 Assessment: 91% pass rate',            by:'Penny AI' },
-      { date:'May 28 2025', action:'Mid-point review completed — on track',         by:'Program Director' },
+      { date:'Sprint 3, Week 1',  action:'Sprint 3 started (Week 6 of 8)',                by:'Program Manager' },
+      { date:'Sprint 2, Week 8',  action:'Sprint 2 Assessment: 91% pass rate',            by:'Penny AI' },
+      { date:'Sprint 2, Week 7',  action:'Mid-point review completed — on track',         by:'Program Director' },
     ],
   },
   {
@@ -88,9 +88,9 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     ],
     keyRelationships:['Foundations Trail (assigned to Cohort 2)','3 active coaches (Person objects)','Coach Support (Penny)','#foundations-coaches (Slack)','Role Blueprint (governs — partial)'],
     recentActivity:[
-      { date:'Jun 9 2025',  action:'Blueprint completeness flag — coaching responsibilities missing', by:'Standards Studio' },
-      { date:'May 15 2025', action:'Coach 3 onboarded — coaching team complete',       by:'Program Director' },
-      { date:'Mar 10 2025', action:'Penny Coach Support capability activated',          by:'Penny Lead' },
+      { date:'Sprint 3, Week 1',  action:'Blueprint completeness flag — coaching responsibilities missing', by:'Standards Studio' },
+      { date:'Sprint 1, Week 7',  action:'Coach 3 onboarded — coaching team complete',       by:'Program Director' },
+      { date:'Pre-cohort',        action:'Penny Coach Support capability activated',          by:'Penny Lead' },
     ],
   },
   {
@@ -107,9 +107,9 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     ],
     keyRelationships:['Resume Review Prompt v2.1 (depends on)','Resume Writing Guide (knowledge source)','Sprint 3 Resume Draft Lesson (triggers)','FT Cohort 2 Learners (serves — 234 interactions/30 days)'],
     recentActivity:[
-      { date:'Jun 2025',  action:'Quarterly review — 87/100 (Pass)',                   by:'Penny Lead' },
-      { date:'Apr 2025',  action:'Upgraded to Prompt v2.1 — quality up 15 points',     by:'Penny Lead' },
-      { date:'Mar 2025',  action:'Resume Writing Guide added as Authoritative source',  by:'Knowledge Manager' },
+      { date:'Quarterly review',  action:'Quarterly review — 87/100 (Pass)',                   by:'Penny Lead' },
+      { date:'Prompt update',     action:'Upgraded to Prompt v2.1 — quality up 15 points',     by:'Penny Lead' },
+      { date:'Pre-cohort',        action:'Resume Writing Guide added as Authoritative source',  by:'Knowledge Manager' },
     ],
   },
   {
@@ -126,9 +126,9 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     ],
     keyRelationships:['Governs all 5 programs','Module Blueprint (contains)','Lesson Blueprint (contains)','Penny Blueprint (contains)','Sprint Structure Adoption decision (informs)'],
     recentActivity:[
-      { date:'Mar 2025', action:'v2.1 released — Penny Integration Requirements added',   by:'Standards Lead' },
-      { date:'Feb 2025', action:'Digital Compass compliance gap identified',              by:'Standards Studio' },
-      { date:'Jan 2025', action:'v2.0 released — Sprint Architecture adopted',           by:'Standards Lead' },
+      { date:'v2.1 release',     action:'v2.1 released — Penny Integration Requirements added',   by:'Standards Lead' },
+      { date:'Standards review', action:'Digital Compass compliance gap identified',              by:'Standards Studio' },
+      { date:'v2.0 release',     action:'v2.0 released — Sprint Architecture adopted',           by:'Standards Lead' },
     ],
   },
   {
@@ -144,9 +144,9 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     ],
     keyRelationships:['Foundations Trail (maps to)','Contact (learner lookup)','Program__c (parent)','LMS sync (planned Q3)','PMM parallel mapping (in progress)'],
     recentActivity:[
-      { date:'Jun 2025',  action:'Quarterly data quality review — 94% completeness (Pass)', by:'Salesforce Admin' },
-      { date:'Mar 2025',  action:'Health_Score__c field added',                               by:'Salesforce Admin' },
-      { date:'Feb 2025',  action:'PMM parallel record gap identified (23 learners)',          by:'Operations Lead' },
+      { date:'Q2 review',         action:'Quarterly data quality review — 94% completeness (Pass)', by:'Salesforce Admin' },
+      { date:'Pre-cohort setup',  action:'Health_Score__c field added',                               by:'Salesforce Admin' },
+      { date:'Pre-cohort',        action:'PMM parallel record gap identified (23 learners)',          by:'Operations Lead' },
     ],
   },
   {
@@ -162,9 +162,9 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     ],
     keyRelationships:['FT Cohort 2 (serves)','Sprint Calendar (triggers broadcasts)','Penny Broadcasts (dependent)','Coach — 3 members'],
     recentActivity:[
-      { date:'Jun 9 2025',  action:'Sprint 3 kick-off message posted',   by:'Program Manager' },
-      { date:'Jun 4 2025',  action:'Sprint 2 results announcement',      by:'Penny AI' },
-      { date:'May 20 2025', action:'Channel created for Cohort 2',       by:'Comms Lead' },
+      { date:'Sprint 3, Week 1',  action:'Sprint 3 kick-off message posted',   by:'Program Manager' },
+      { date:'Sprint 2, Week 8',  action:'Sprint 2 results announcement',      by:'Penny AI' },
+      { date:'Pre-Sprint 1',      action:'Channel created for Cohort 2',       by:'Comms Lead' },
     ],
   },
   {
@@ -180,9 +180,9 @@ export const EXAMPLE_CONTEXTS: ContextDefinition[] = [
     ],
     keyRelationships:['Foundations Trail (sources)','Sprint Archives (sub-folder)','Curriculum (sub-folder)','SF Program__c (linked via URL field)'],
     recentActivity:[
-      { date:'Jun 9 2025',  action:'Access control review flagged as overdue', by:'Standards Studio' },
-      { date:'Jun 2 2025',  action:'Sprint 3 LinkedIn module updated',          by:'Curriculum Lead' },
-      { date:'May 15 2025', action:'Cohort 2 folder created',                   by:'Program Manager' },
+      { date:'Sprint 3, Week 1',  action:'Access control review flagged as overdue', by:'Standards Studio' },
+      { date:'Sprint 3 start',    action:'Sprint 3 LinkedIn module updated',          by:'Curriculum Lead' },
+      { date:'Pre-Sprint 1',      action:'Cohort 2 folder created',                   by:'Program Manager' },
     ],
   },
 ];
