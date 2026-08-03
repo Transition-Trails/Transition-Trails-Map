@@ -197,7 +197,7 @@ const CONTEXT_PENDING: Record<SlackPanelContext, PendingItem[]> = {
     { id:'p3', kind:'reminder',   text:'REQ-028: Trail Quest reminder emails — 7 days in backlog. Triage or defer decision needed.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'7d ago', urgent:false },
   ],
   knowledge: [
-    { id:'p1', kind:'reminder', text:'Source mapping update needed — RESOLVE Execute phase docs not yet mapped.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:true },
+    { id:'p1', kind:'reminder', text:'Source mapping update needed — RESOLVE Launch phase docs not yet mapped.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:true },
     { id:'p2', kind:'ask',      text:'3 source docs in review queue — awaiting confidence confirmation from team.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'This week', urgent:false },
     { id:'p3', kind:'mention',  text:'Digital Twin relationship update — coach notified in #trail-os-ops.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'3h ago', urgent:false },
   ],
@@ -207,7 +207,7 @@ const CONTEXT_PENDING: Record<SlackPanelContext, PendingItem[]> = {
     { id:'p3', kind:'alert',    text:'1 unmapped Slack user (U10J) — no Trail OS persona assigned.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Ongoing', urgent:false },
   ],
   navigator: [
-    { id:'p1', kind:'reminder', text:'RESOLVE Execute phase — source mapping docs missing. Update needed before sprint review.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:false },
+    { id:'p1', kind:'reminder', text:'RESOLVE Launch phase — source mapping docs complete. Verify phase docs pending review.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'Overdue', urgent:false },
     { id:'p2', kind:'ask',      text:'Trail of Mastery status unresolved — Q3 planning thread not yet started.', channel:'#trail-os-ops', channelId:'trail-os-ops', time:'This week', urgent:false },
   ],
 };
