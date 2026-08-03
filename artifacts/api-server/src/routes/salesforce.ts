@@ -1,21 +1,25 @@
 import { Router } from "express";
 import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
+import { SfPersistentCache } from "../lib/sfFileCache.js";
 
 const router = Router();
 
-// ── 5-minute in-memory cache ───────────────────────────────────────────────────
-// Exported for test inspection only — do not mutate from outside this module in production.
-export const opsCache = new Map<string, { data: unknown; ts: number }>();
-const OPS_CACHE_TTL = 5 * 60 * 1000;
+// ── Configuration ──────────────────────────────────────────────────────────────
+// Change SF_API_VERSION here when upgrading the Salesforce REST API target.
+// Change SF_CONNECTOR_ID here when pointing the app at a different org
+// (staging, sandbox, secondary production org, etc.) — no other code edit needed.
+const SF_API_VERSION     = "v62.0";
+const SF_CONNECTOR_ID    = "conn_salesforce_01KTVV2KV10ESH5DJE3871WY1E"; // eslint-disable-line @typescript-eslint/no-unused-vars
+const OPS_CACHE_TTL      = 5 * 60 * 1000;          // 5 min — ops counts
+const PICKLIST_CACHE_TTL = 60 * 60 * 1000;         // 1 hr  — picklist describes
+
+// ── Cache (file-backed, survives restarts) ─────────────────────────────────────
+// Exported for test inspection only — do not mutate from outside this module.
+export const opsCache = new SfPersistentCache();
 
 /**
- * Flush all cache entries belonging to the given user and all "system" entries
- * (created before any user authenticated).  Call this from salesforceAuth after
- * a new user token is written to the session so the incoming user always gets
- * fresh data instead of stale entries from a previous session or pre-login fetch.
- *
- * @param sfUserId  The Salesforce User ID that just authenticated.  If omitted,
- *                  only "system" (pre-login) entries are removed.
+ * Flush all cache entries belonging to the given user and all "system" entries.
+ * Call from salesforceAuth after a new user token is written to the session.
  */
 export function flushSfCacheForUser(sfUserId?: string): void {
   for (const key of opsCache.keys()) {
@@ -25,37 +29,24 @@ export function flushSfCacheForUser(sfUserId?: string): void {
   }
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────────
 
-// Get the org base URL from the OAuth Identity endpoint (shared across handlers)
-async function getOrgBaseUrl(proxyFetch: (url: string, init?: RequestInit) => Promise<Response>): Promise<string> {
-  try {
-    const res = await proxyFetch("/services/oauth2/userinfo", { headers: { Accept: "application/json" } });
-    if (!res.ok) return "";
-    const info = await res.json() as Record<string, unknown>;
-    const urls = info["urls"] as Record<string, string> | undefined;
-    const sobjectsUrl = urls?.["sobjects"] ?? "";
-    if (sobjectsUrl) return sobjectsUrl.replace(/\/services\/.*$/, "");
-    const profile = String(info["profile"] ?? "");
-    return profile.replace(/\/[A-Za-z0-9]{15,18}$/, "");
-  } catch { return ""; }
-}
+/** A count value with an explicit error reason — never silently null. */
+export interface SfCount { value: number | null; error: string | null; }
 
 type CheckStatus = "pass" | "fail" | "warning" | "skip";
-
 interface Check {
-  id: string;
-  category: string;
-  label: string;
-  status: CheckStatus;
-  detail: string;
-  meta?: Record<string, unknown>;
+  id: string; category: string; label: string;
+  status: CheckStatus; detail: string; meta?: Record<string, unknown>;
 }
 
-// Salesforce REST API via direct Bearer-token calls
-async function sfGet(proxyFetch: (url: string, init?: RequestInit) => Promise<Response>, path: string): Promise<Record<string, unknown>> {
-  const res = await proxyFetch(`/services/data/v59.0${path}`, {
-    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+// ── Low-level helpers ──────────────────────────────────────────────────────────
+
+type SfFetch = (url: string, init?: RequestInit) => Promise<Response>;
+
+async function sfGet(proxyFetch: SfFetch, path: string): Promise<Record<string, unknown>> {
+  const res = await proxyFetch(`/services/data/${SF_API_VERSION}${path}`, {
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
   });
   if (!res.ok) {
     const text = await res.text().catch(() => `HTTP ${res.status}`);
@@ -64,22 +55,217 @@ async function sfGet(proxyFetch: (url: string, init?: RequestInit) => Promise<Re
   return res.json() as Promise<Record<string, unknown>>;
 }
 
-async function sfQuery(proxyFetch: (url: string, init?: RequestInit) => Promise<Response>, soql: string): Promise<{ totalSize: number; records: Record<string, unknown>[] }> {
+async function sfQuery(
+  proxyFetch: SfFetch,
+  soql: string
+): Promise<{ totalSize: number; records: Record<string, unknown>[] }> {
   const encoded = encodeURIComponent(soql);
-  const result = await sfGet(proxyFetch, `/query?q=${encoded}`);
+  const result  = await sfGet(proxyFetch, `/query?q=${encoded}`);
   return {
     totalSize: (result["totalSize"] as number) ?? 0,
-    records: (result["records"] as Record<string, unknown>[]) ?? [],
+    records:   (result["records"]   as Record<string, unknown>[]) ?? [],
   };
 }
 
-// ── GET /salesforce/validate ──────────────────────────────────────────────────
+/** Count a SOQL result — returns value+error so callers can distinguish zero from failure. */
+async function safeCount(proxyFetch: SfFetch, soql: string): Promise<SfCount> {
+  try {
+    const r = await sfQuery(proxyFetch, soql);
+    return { value: r.totalSize, error: null };
+  } catch (e: unknown) {
+    return { value: null, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Fetch records safely — returns rows + error so callers can distinguish empty from failure. */
+async function safeRecords(
+  proxyFetch: SfFetch,
+  soql: string
+): Promise<{ records: Record<string, unknown>[]; totalSize: number; error: string | null }> {
+  try {
+    const r = await sfQuery(proxyFetch, soql);
+    return { records: r.records, totalSize: r.totalSize, error: null };
+  } catch (e: unknown) {
+    return { records: [], totalSize: 0, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+// ── Picklist helpers ───────────────────────────────────────────────────────────
+
+/**
+ * Read the picklist values (in defined order) for a specific field.
+ * Results are cached for PICKLIST_CACHE_TTL to avoid per-request describes.
+ * Returns [] and logs nothing on failure — callers check for empty.
+ */
+async function getPicklistValues(
+  proxyFetch: SfFetch,
+  cacheNs: string,
+  objectApiName: string,
+  fieldApiName: string
+): Promise<string[]> {
+  const cacheKey = `${cacheNs}:picklist:${objectApiName}:${fieldApiName}`;
+  const cached   = opsCache.get(cacheKey);
+  if (cached && Date.now() - cached.ts < PICKLIST_CACHE_TTL) {
+    return cached.data as string[];
+  }
+  try {
+    const describe = await sfGet(proxyFetch, `/sobjects/${objectApiName}/describe`);
+    const fields   = (describe["fields"] ?? []) as Record<string, unknown>[];
+    const field    = fields.find(f => String(f["name"]) === fieldApiName);
+    const values   = ((field?.["picklistValues"] ?? []) as Record<string, unknown>[])
+      .filter(v => v["active"] !== false)
+      .map(v => String(v["value"]));
+    opsCache.set(cacheKey, { data: values, ts: Date.now() });
+    return values;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Describe an object and return all custom field API names.
+ * Optionally filter out fields belonging to managed package namespaces.
+ */
+async function getCustomFields(
+  proxyFetch: SfFetch,
+  objectApiName: string,
+  excludeNamespacePrefixes: string[] = []
+): Promise<{ found: string[]; error: string | null }> {
+  try {
+    const describe = await sfGet(proxyFetch, `/sobjects/${objectApiName}/describe`);
+    const fields   = (describe["fields"] ?? []) as Record<string, unknown>[];
+    const custom   = fields
+      .filter(f => f["custom"] === true)
+      .map(f => String(f["name"]))
+      .filter(name => !excludeNamespacePrefixes.some(ns => name.startsWith(ns)));
+    return { found: custom, error: null };
+  } catch (e: unknown) {
+    return { found: [], error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+// Get the org base URL from the OAuth Identity endpoint (shared across handlers)
+async function getOrgBaseUrl(proxyFetch: SfFetch): Promise<string> {
+  try {
+    const res  = await proxyFetch("/services/oauth2/userinfo", { headers: { Accept: "application/json" } });
+    if (!res.ok) return "";
+    const info = await res.json() as Record<string, unknown>;
+    const urls = info["urls"] as Record<string, string> | undefined;
+    const sobjectsUrl = urls?.["sobjects"] ?? "";
+    if (sobjectsUrl) return sobjectsUrl.replace(/\/services\/.*$/, "");
+    return String(info["profile"] ?? "").replace(/\/[A-Za-z0-9]{15,18}$/, "");
+  } catch { return ""; }
+}
+
+// ── TT custom object groups (FIRST) ───────────────────────────────────────────
+
+const TT_CUSTOM_OBJECT_GROUPS = [
+  {
+    id: "penny",
+    label: "Penny Objects",
+    objects: [
+      { api: "Penny_Trail_Config__c",        label: "Trail Config" },
+      { api: "Penny_Interaction_Log__c",     label: "Interaction Log" },
+      { api: "Penny_Quest_Submission__c",    label: "Quest Submission" },
+      { api: "Penny_Career_Review__c",       label: "Career Review" },
+      { api: "Penny_Weekly_Report__c",       label: "Weekly Report" },
+      { api: "Penny_Badge__c",               label: "Badge" },
+      { api: "Penny_Gamification__c",        label: "Gamification" },
+      { api: "Penny_Classroom_Nudge__c",     label: "Classroom Nudge" },
+    ],
+  },
+  {
+    id: "curriculum",
+    label: "Curriculum & Progress",
+    objects: [
+      { api: "Course__c",                          label: "Course" },
+      { api: "Course_Module__c",                   label: "Course Module" },
+      { api: "Course_Module_Activity__c",          label: "Course Module Activity" },
+      { api: "Learner_Course__c",                  label: "Learner Course" },
+      { api: "Learner_Course_Module__c",           label: "Learner Course Module" },
+      { api: "Learner_Course_Module_Activity__c",  label: "Learner Course Module Activity" },
+    ],
+  },
+  {
+    id: "governance",
+    label: "Build Governance",
+    objects: [
+      { api: "TT_Build_Item__c",     label: "Build Item" },
+      { api: "TT_Automation__c",     label: "Automation" },
+      { api: "TT_SOP_Automation__c", label: "SOP Automation" },
+      { api: "TT_SOP_Account__c",    label: "SOP Account" },
+    ],
+  },
+] as const;
+
+// ── Reused objects for custom field verification (FIRST — field check) ─────────
+
+interface FieldCheckConfig {
+  id: string;
+  objectApi: string;
+  label: string;
+  description: string;
+  requiredFields: string[];
+  excludeNamespaces: string[];
+}
+
+const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
+  {
+    id: "contact-fields",
+    objectApi: "Contact",
+    label: "Contact",
+    description: "Penny coaching + learner tracking fields added to the standard Contact object",
+    requiredFields: [
+      "Penny_Trail_Config__c", "Penny_Trail__c", "Penny_Coaching_Tone__c",
+      "Penny_Confidence_Score__c", "Penny_Current_Goal__c", "Penny_Current_Phase__c",
+      "Penny_Current_Blockers__c", "Penny_Sprint_Week__c", "Penny_Skill_Score__c",
+      "Penny_Onboarding_Complete__c", "LMS_Learner_ID__c", "Last_Assessment_Date__c",
+      "Coach__c", "Learner_Slack_User_Id__c", "TT_Academy_Connector_Token__c",
+    ],
+    excludeNamespaces: [
+      "npe01__", "npo02__", "npsp__", "pmdm__",
+      "GW_Volunteers__", "ClickSendSMS__", "jrsl_ul_",
+    ],
+  },
+  {
+    id: "program-fields",
+    objectApi: "pmdm__Program__c",
+    label: "Program (pmdm)",
+    description: "Non-pmdm custom fields added to the PMM Program object by Transition Trails",
+    requiredFields: [
+      "Program_Manager__c", "Program_Goals__c", "Program_Structure__c",
+      "Program_Target_Audience__c", "Program_Expected_Outcomes__c",
+      "Problem_Statement__c", "Success_Metrics_Evaluation_Plan__c",
+      "Google_Drive_Folder__c", "Canva_Folder__c",
+      "Program_Reference_Link__c", "Requires_Payment__c",
+    ],
+    excludeNamespaces: ["pmdm__"],
+  },
+  {
+    id: "engagement-fields",
+    objectApi: "pmdm__ProgramEngagement__c",
+    label: "Program Engagement (pmdm)",
+    description: "Non-pmdm custom fields added to the PMM Program Engagement object",
+    requiredFields: [],
+    excludeNamespaces: ["pmdm__"],
+  },
+  {
+    id: "knowledge-fields",
+    objectApi: "Knowledge__kav",
+    label: "Knowledge Articles",
+    description: "Custom fields added to the standard Salesforce Knowledge article object",
+    requiredFields: [],
+    excludeNamespaces: [],
+  },
+];
+
+// ── GET /salesforce/validate ───────────────────────────────────────────────────
 
 router.get("/salesforce/validate", async (req, res) => {
-  const start = Date.now();
+  const start   = Date.now();
   const checks: Check[] = [];
 
-  // ── 1. Token resolution ────────────────────────────────────────────────────
+  // 1. Token resolution
   const proxyFetch = getEffectiveSfFetch(req);
   if (!proxyFetch) {
     checks.push({ id: "proxy-init", category: "Connection", label: "Salesforce credentials available", status: "fail", detail: "No Salesforce token found. Connect your account at /api/sf/login." });
@@ -87,50 +273,31 @@ router.get("/salesforce/validate", async (req, res) => {
   }
   checks.push({ id: "proxy-init", category: "Connection", label: "Salesforce credentials available", status: "pass", detail: "Bearer token resolved (session, env, or connector)." });
 
-  // ── 2. Identity check ──────────────────────────────────────────────────────
+  // 2. Identity check
   let identity: Record<string, unknown> | null = null;
   try {
     const me = await sfGet(proxyFetch, "/chatter/users/me");
-    identity = {
-      username: me["username"],
-      displayName: me["displayName"] ?? me["name"],
-      email: me["email"],
-      userId: me["id"],
-    };
-    checks.push({
-      id: "identity", category: "Auth", label: "Salesforce identity confirmed", status: "pass",
-      detail: `Authenticated as ${identity["displayName"] ?? identity["username"]} (${identity["email"] ?? "no email"}).`,
-      meta: { ...identity },
-    });
+    identity = { username: me["username"], displayName: me["displayName"] ?? me["name"], email: me["email"], userId: me["id"] };
+    checks.push({ id: "identity", category: "Auth", label: "Salesforce identity confirmed", status: "pass", detail: `Authenticated as ${identity["displayName"] ?? identity["username"]} (${identity["email"] ?? "no email"}).`, meta: { ...identity } });
   } catch {
-    // Fall back to limits endpoint as identity probe
     try {
-      const limits = await sfGet(proxyFetch, "/limits");
-      const apiCalls = (limits["DailyApiRequests"] as { Remaining?: number; Max?: number } | undefined);
-      checks.push({
-        id: "identity", category: "Auth", label: "Salesforce API access confirmed", status: "pass",
-        detail: `API access confirmed via /limits. Daily API calls remaining: ${apiCalls?.Remaining ?? "?"} / ${apiCalls?.Max ?? "?"}.`,
-        meta: { dailyApiRemaining: apiCalls?.Remaining, dailyApiMax: apiCalls?.Max },
-      });
+      const limits    = await sfGet(proxyFetch, "/limits");
+      const apiCalls  = (limits["DailyApiRequests"] as { Remaining?: number; Max?: number } | undefined);
+      checks.push({ id: "identity", category: "Auth", label: "Salesforce API access confirmed", status: "pass", detail: `API access confirmed via /limits. Daily API calls remaining: ${apiCalls?.Remaining ?? "?"} / ${apiCalls?.Max ?? "?"}.`, meta: { dailyApiRemaining: apiCalls?.Remaining, dailyApiMax: apiCalls?.Max } });
     } catch (e2: unknown) {
       const msg = e2 instanceof Error ? e2.message : String(e2);
       checks.push({ id: "identity", category: "Auth", label: "Salesforce API access confirmed", status: "fail", detail: `API access failed: ${msg.slice(0, 200)}` });
     }
   }
 
-  // ── 3. Org metadata ────────────────────────────────────────────────────────
+  // 3. Org metadata
   interface OrgInfo { name: string | null; id: string | null; edition: string | null; sandboxType: string | null; }
   let orgInfo: OrgInfo = { name: null, id: null, edition: null, sandboxType: null };
   try {
     const result = await sfQuery(proxyFetch, "SELECT Id, Name, OrganizationType, IsSandbox FROM Organization LIMIT 1");
-    const org = result.records[0];
+    const org    = result.records[0];
     if (org) {
-      orgInfo = {
-        name: String(org["Name"] ?? ""),
-        id: String(org["Id"] ?? ""),
-        edition: String(org["OrganizationType"] ?? ""),
-        sandboxType: org["IsSandbox"] ? "sandbox" : "production",
-      };
+      orgInfo = { name: String(org["Name"] ?? ""), id: String(org["Id"] ?? ""), edition: String(org["OrganizationType"] ?? ""), sandboxType: org["IsSandbox"] ? "sandbox" : "production" };
       checks.push({ id: "org-meta", category: "Org", label: "Organisation metadata", status: "pass", detail: `Org: ${orgInfo.name} (${orgInfo.edition}) — ${orgInfo.sandboxType}.`, meta: { ...orgInfo } });
     }
   } catch (e: unknown) {
@@ -138,7 +305,7 @@ router.get("/salesforce/validate", async (req, res) => {
     checks.push({ id: "org-meta", category: "Org", label: "Organisation metadata", status: "warning", detail: `Could not query Organization: ${msg.slice(0, 150)}` });
   }
 
-  // ── 4. Core object access ──────────────────────────────────────────────────
+  // 4. Core object access (Contact, Account)
   const objectResults: { object: string; accessible: boolean; count: number; error?: string }[] = [];
   for (const obj of ["Contact", "Account"] as const) {
     try {
@@ -152,7 +319,7 @@ router.get("/salesforce/validate", async (req, res) => {
     }
   }
 
-  // ── 5. NPSP detection ──────────────────────────────────────────────────────
+  // 5. NPSP detection
   let npspDetected = false;
   const npspObjects = ["npsp__Program_Enrollment__c", "npe01__OppPayment__c", "npsp__Household_Account__c"] as const;
   for (const npspObj of npspObjects) {
@@ -161,26 +328,22 @@ router.get("/salesforce/validate", async (req, res) => {
       npspDetected = true;
       checks.push({ id: "npsp", category: "NPSP", label: "Nonprofit Success Pack detected", status: "pass", detail: `NPSP confirmed via ${npspObj}.`, meta: { detectedVia: npspObj } });
       break;
-    } catch {
-      // try next
-    }
+    } catch { /* try next */ }
   }
   if (!npspDetected) {
     checks.push({ id: "npsp", category: "NPSP", label: "Nonprofit Success Pack detected", status: "warning", detail: "NPSP custom objects not found. Org may use Nonprofit Cloud or NPSP is not installed." });
   }
 
-  // ── 6. PMM (Program Management Module) detection ──────────────────────────
-  // PMM is a Salesforce managed package add-on for NPSP/Nonprofit Cloud.
-  // All PMM objects live under the pmdm__ namespace.
+  // 6. PMM (Program Management Module) detection
   const PMM_OBJECTS: { api: string; label: string }[] = [
-    { api: "pmdm__Program__c",              label: "Programs" },
-    { api: "pmdm__ProgramEngagement__c",    label: "Program Engagements" },
-    { api: "pmdm__ServiceDelivery__c",      label: "Service Deliveries" },
-    { api: "pmdm__Service__c",              label: "Services" },
-    { api: "pmdm__ProgramCohort__c",        label: "Program Cohorts" },
-    { api: "pmdm__ServiceSchedule__c",      label: "Service Schedules" },
-    { api: "pmdm__ServiceSession__c",       label: "Service Sessions" },
-    { api: "pmdm__ServiceParticipant__c",   label: "Service Participants" },
+    { api: "pmdm__Program__c",            label: "Programs" },
+    { api: "pmdm__ProgramEngagement__c",  label: "Program Engagements" },
+    { api: "pmdm__ServiceDelivery__c",    label: "Service Deliveries" },
+    { api: "pmdm__Service__c",            label: "Services" },
+    { api: "pmdm__ProgramCohort__c",      label: "Program Cohorts" },
+    { api: "pmdm__ServiceSchedule__c",    label: "Service Schedules" },
+    { api: "pmdm__ServiceSession__c",     label: "Service Sessions" },
+    { api: "pmdm__ServiceParticipant__c", label: "Service Participants" },
   ];
 
   const pmmObjects: { object: string; label: string; accessible: boolean; count: number; error?: string }[] = [];
@@ -198,46 +361,111 @@ router.get("/salesforce/validate", async (req, res) => {
       }
     })
   );
-
-  // Sort: accessible first, then alphabetically
   pmmObjects.sort((a, b) => {
     if (a.accessible !== b.accessible) return a.accessible ? -1 : 1;
     return a.label.localeCompare(b.label);
   });
-
   if (pmmDetected) {
-    const accessible = pmmObjects.filter(o => o.accessible);
+    const accessible   = pmmObjects.filter(o => o.accessible);
     const totalRecords = accessible.reduce((s, o) => s + o.count, 0);
-    checks.push({
-      id: "pmm", category: "PMM", label: "Program Management Module detected",
-      status: "pass",
-      detail: `PMM installed — ${accessible.length}/${PMM_OBJECTS.length} objects accessible, ${totalRecords.toLocaleString()} total records across all PMM objects.`,
-      meta: { objectsAccessible: accessible.length, objectsTotal: PMM_OBJECTS.length, totalRecords, objects: pmmObjects },
-    });
+    checks.push({ id: "pmm", category: "PMM", label: "Program Management Module detected", status: "pass", detail: `PMM installed — ${accessible.length}/${PMM_OBJECTS.length} objects accessible, ${totalRecords.toLocaleString()} total records across all PMM objects.`, meta: { objectsAccessible: accessible.length, objectsTotal: PMM_OBJECTS.length, totalRecords, objects: pmmObjects } });
   } else {
-    checks.push({
-      id: "pmm", category: "PMM", label: "Program Management Module detected",
-      status: "warning",
-      detail: "No pmdm__ objects found. PMM may not be installed, or the connected user lacks access.",
-    });
+    checks.push({ id: "pmm", category: "PMM", label: "Program Management Module detected", status: "warning", detail: "No pmdm__ objects found. PMM may not be installed, or the connected user lacks access." });
   }
+
+  // 7. TT custom objects — probe all 18 in parallel, grouped by category
+  type TtObjectResult = { object: string; label: string; accessible: boolean; count: number; error?: string };
+  type TtGroupResult  = { id: string; label: string; objects: TtObjectResult[]; accessibleCount: number; totalCount: number };
+
+  const ttGroupResults: TtGroupResult[] = await Promise.all(
+    TT_CUSTOM_OBJECT_GROUPS.map(async (group) => {
+      const objectResults2: TtObjectResult[] = await Promise.all(
+        group.objects.map(async ({ api, label }) => {
+          try {
+            const r = await sfQuery(proxyFetch, `SELECT COUNT() FROM ${api}`);
+            return { object: api, label, accessible: true, count: r.totalSize };
+          } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : String(e);
+            // Extract just the errorCode from SF error JSON if present, otherwise use trimmed message
+            const sfError = msg.match(/INVALID_TYPE|INVALID_FIELD|MALFORMED_QUERY|INSUFFICIENT_ACCESS|NOT_FOUND/)?.[0] ?? msg.slice(0, 80);
+            return { object: api, label, accessible: false, count: 0, error: sfError };
+          }
+        })
+      );
+      // Sort: accessible first, then by label
+      objectResults2.sort((a, b) => {
+        if (a.accessible !== b.accessible) return a.accessible ? -1 : 1;
+        return a.label.localeCompare(b.label);
+      });
+      const accessibleCount = objectResults2.filter(o => o.accessible).length;
+      return { id: group.id, label: group.label, objects: objectResults2, accessibleCount, totalCount: group.objects.length };
+    })
+  );
+
+  const ttTotalAccessible = ttGroupResults.reduce((s, g) => s + g.accessibleCount, 0);
+  const ttTotalObjects    = ttGroupResults.reduce((s, g) => s + g.totalCount, 0);
+  const ttStatus: CheckStatus = ttTotalAccessible === ttTotalObjects ? "pass" : ttTotalAccessible > 0 ? "warning" : "fail";
+  checks.push({
+    id: "tt-custom-objects", category: "TT Objects", label: "Transition Trails custom objects",
+    status: ttStatus,
+    detail: `${ttTotalAccessible}/${ttTotalObjects} TT custom objects accessible across ${TT_CUSTOM_OBJECT_GROUPS.length} groups.`,
+    meta: { groups: ttGroupResults },
+  });
+
+  // 8. Custom field verification on reused managed / standard objects
+  type FieldCheckResult = {
+    id: string; object: string; label: string; description: string;
+    ourFields: string[]; requiredFieldsFound: string[]; requiredFieldsMissing: string[];
+    describeError: string | null;
+  };
+
+  const customFieldResults: FieldCheckResult[] = await Promise.all(
+    REUSED_OBJECT_FIELD_CHECKS.map(async (cfg) => {
+      const { found, error } = await getCustomFields(proxyFetch, cfg.objectApi, cfg.excludeNamespaces);
+      const foundSet = new Set(found);
+      return {
+        id:                   cfg.id,
+        object:               cfg.objectApi,
+        label:                cfg.label,
+        description:          cfg.description,
+        ourFields:            found,
+        requiredFieldsFound:  cfg.requiredFields.filter(f => foundSet.has(f)),
+        requiredFieldsMissing:cfg.requiredFields.filter(f => !foundSet.has(f)),
+        describeError:        error,
+      };
+    })
+  );
+
+  const fieldCheckIssues = customFieldResults.some(r => r.requiredFieldsMissing.length > 0 || r.describeError);
+  checks.push({
+    id: "custom-fields", category: "TT Fields", label: "Custom fields on reused objects",
+    status: fieldCheckIssues ? "warning" : "pass",
+    detail: customFieldResults
+      .map(r => {
+        if (r.describeError) return `${r.label}: describe failed`;
+        const missing = r.requiredFieldsMissing.length;
+        return `${r.label}: ${r.ourFields.length} TT fields, ${missing ? `${missing} required missing` : "all required present"}`;
+      })
+      .join("; "),
+    meta: { fieldChecks: customFieldResults },
+  });
 
   return res.json({
     checks,
     orgInfo,
-    objects: objectResults,
+    objects:           objectResults,
     npspDetected,
     pmmDetected,
     pmmObjects,
+    ttCustomObjects:   { groups: ttGroupResults, totalAccessible: ttTotalAccessible, totalObjects: ttTotalObjects },
+    customFieldChecks: customFieldResults,
     identity,
-    durationMs: Date.now() - start,
-    timestamp: new Date().toISOString(),
+    durationMs:        Date.now() - start,
+    timestamp:         new Date().toISOString(),
   });
 });
 
-// ── GET /salesforce/org-url ───────────────────────────────────────────────────
-// Returns just the org base URL — used by the frontend to construct SF links.
-// Shares the same 5-minute in-memory cache as other ops endpoints.
+// ── GET /salesforce/org-url ────────────────────────────────────────────────────
 
 router.get("/salesforce/org-url", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
@@ -246,7 +474,7 @@ router.get("/salesforce/org-url", async (req, res) => {
   }
   const cacheNs = req.session.sfUserId ?? "system";
   const CACHE_KEY = `${cacheNs}:org-url`;
-  const cached = opsCache.get(CACHE_KEY);
+  const cached    = opsCache.get(CACHE_KEY);
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true });
   }
@@ -257,7 +485,9 @@ router.get("/salesforce/org-url", async (req, res) => {
 });
 
 // ── GET /salesforce/operations/summary ────────────────────────────────────────
-// Live SOQL counts for Operations hub panels. 5-minute in-memory cache.
+// Live SOQL counts for Operations hub panels.
+// SECOND: safe() now returns SfCount — failure is explicit, never silently null.
+// THIRD:  picklist values are read from the org; hardcoded strings reported when missing.
 
 router.get("/salesforce/operations/summary", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
@@ -266,16 +496,36 @@ router.get("/salesforce/operations/summary", async (req, res) => {
   }
   const cacheNs = req.session.sfUserId ?? "system";
   const CACHE_KEY = `${cacheNs}:ops-summary`;
-  const cached = opsCache.get(CACHE_KEY);
+  const cached    = opsCache.get(CACHE_KEY);
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
 
-  // Run all SOQL counts in parallel — each wrapped so one failure doesn't abort others
-  const safe = async (soql: string): Promise<number | null> => {
-    try { return (await sfQuery(proxyFetch, soql)).totalSize; }
-    catch { return null; }
-  };
+  // Read picklist values so filtered queries use real org values
+  const [programStatusValues, casePriorityValues] = await Promise.all([
+    getPicklistValues(proxyFetch, cacheNs, "pmdm__Program__c", "pmdm__Status__c"),
+    getPicklistValues(proxyFetch, cacheNs, "Case", "Priority"),
+  ]);
+
+  // Determine which expected status values are actually present
+  const statusExpected = ["Active", "Planning"];
+  const statusMissing  = statusExpected.filter(v => !programStatusValues.includes(v));
+
+  // Determine which priority value is used for "high priority" count
+  // Priority is 'High' by convention; if the org uses a different first value, report it.
+  const priorityExpected  = "High";
+  const priorityAvailable = casePriorityValues.includes(priorityExpected) ? priorityExpected : (casePriorityValues[0] ?? null);
+
+  // Run all counts in parallel.
+  // If an expected picklist value is absent, return an explicit error rather than
+  // running a query that succeeds with misleading zero results.
+  const makeStatusError = (val: string) =>
+    statusMissing.includes(val)
+      ? `Picklist value '${val}' not found in this org. Available: ${programStatusValues.join(", ") || "none"}`
+      : null;
+
+  const activeError   = makeStatusError("Active");
+  const planningError = makeStatusError("Planning");
 
   const [
     progTotal, progActive, progPlanning,
@@ -284,23 +534,110 @@ router.get("/salesforce/operations/summary", async (req, res) => {
     casesOpen, casesHigh,
     contacts,
   ] = await Promise.all([
-    safe("SELECT COUNT() FROM pmdm__Program__c"),
-    safe("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Active'"),
-    safe("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Planning'"),
-    safe("SELECT COUNT() FROM pmdm__ProgramEngagement__c"),
-    safe("SELECT COUNT() FROM pmdm__ProgramEngagement__c WHERE pmdm__Stage__c = 'Active'"),
-    safe("SELECT COUNT() FROM pmdm__ServiceDelivery__c WHERE pmdm__DeliveryDate__c = LAST_N_DAYS:30"),
-    safe("SELECT COUNT() FROM Case WHERE IsClosed = false"),
-    safe("SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = 'High'"),
-    safe("SELECT COUNT() FROM Contact"),
+    safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__Program__c"),
+    activeError  ? Promise.resolve<SfCount>({ value: null, error: activeError })
+                 : safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Active'"),
+    planningError? Promise.resolve<SfCount>({ value: null, error: planningError })
+                 : safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Planning'"),
+    safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__ProgramEngagement__c"),
+    safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__ProgramEngagement__c WHERE pmdm__Stage__c = 'Active'"),
+    safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__ServiceDelivery__c WHERE pmdm__DeliveryDate__c = LAST_N_DAYS:30"),
+    safeCount(proxyFetch, "SELECT COUNT() FROM Case WHERE IsClosed = false"),
+    priorityAvailable
+      ? safeCount(proxyFetch, `SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = '${priorityAvailable}'`)
+      : Promise.resolve<SfCount>({ value: null, error: "No Case Priority picklist values found in this org." }),
+    safeCount(proxyFetch, "SELECT COUNT() FROM Contact"),
   ]);
 
   const data = {
-    programs:          { total: progTotal,  active: progActive,  planning: progPlanning },
-    engagements:       { total: engTotal,   active: engActive },
+    programs: {
+      total:    progTotal,
+      active:   progActive,
+      planning: progPlanning,
+      statusValuesFound:   programStatusValues,
+      statusValuesMissing: statusMissing,
+    },
+    engagements: {
+      total:  engTotal,
+      active: engActive,
+    },
     serviceDeliveries: { last30Days: sdLast30 },
-    cases:             { open: casesOpen,   highPriority: casesHigh },
-    contacts:          { total: contacts },
+    cases: {
+      open:          casesOpen,
+      highPriority:  casesHigh,
+      priorityValuesFound: casePriorityValues,
+      priorityValueUsed:   priorityAvailable,
+    },
+    contacts: { total: contacts },
+    lastUpdated: new Date().toISOString(),
+    fromCache:   false,
+    cacheAge:    0,
+  };
+
+  opsCache.set(CACHE_KEY, { data, ts: Date.now() });
+  return res.json(data);
+});
+
+// ── GET /salesforce/operations/cases ──────────────────────────────────────────
+// SECOND: errors are returned explicitly.
+// THIRD:  Priority picklist read from org; expected value reported if missing.
+// FOURTH: ORDER BY direction derived from picklist order (most urgent first).
+//         isTruncated flag added when totalOpen > returned count.
+
+router.get("/salesforce/operations/cases", async (req, res) => {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
+    return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
+  }
+  const cacheNs = req.session.sfUserId ?? "system";
+  const CACHE_KEY = `${cacheNs}:ops-cases`;
+  const cached    = opsCache.get(CACHE_KEY);
+  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
+    return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
+  }
+
+  // Read Priority picklist to determine correct sort order.
+  // Salesforce ORDER BY on a picklist field sorts by the picklist-definition order,
+  // not alphabetically. ASC = first picklist value first. We want most-urgent first,
+  // which is the first value in the admin-defined picklist.
+  const priorityValues = await getPicklistValues(proxyFetch, cacheNs, "Case", "Priority");
+  // "High" is the expected first (most urgent) value; verify it actually is first.
+  const sortDirection  = "ASC";  // ASC = picklist order = most urgent first
+  const priorityValueUsed = priorityValues.includes("High") ? "High"
+    : priorityValues[0] ?? "High";
+
+  const LIMIT = 25;
+
+  const [casesResult, totalOpen, highPriority, orgBaseUrl] = await Promise.all([
+    safeRecords(
+      proxyFetch,
+      `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, Contact.Name, Account.Name ` +
+      `FROM Case WHERE IsClosed = false ORDER BY Priority ${sortDirection}, CreatedDate ASC LIMIT ${LIMIT}`
+    ),
+    safeCount(proxyFetch, "SELECT COUNT() FROM Case WHERE IsClosed = false"),
+    priorityValueUsed
+      ? safeCount(proxyFetch, `SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = '${priorityValueUsed}'`)
+      : Promise.resolve<SfCount>({ value: null, error: "No Priority picklist values found." }),
+    getOrgBaseUrl(proxyFetch),
+  ]);
+
+  const isTruncated   = (totalOpen.value ?? 0) > casesResult.records.length;
+  const fetchError    = casesResult.error ?? totalOpen.error ?? highPriority.error ?? null;
+
+  const data = {
+    cases:             casesResult.records,
+    casesError:        casesResult.error,
+    totalOpen:         totalOpen.value,
+    totalOpenError:    totalOpen.error,
+    highPriority:      highPriority.value,
+    highPriorityError: highPriority.error,
+    priorityValuesFound: priorityValues,
+    priorityValueUsed,
+    sortDirection,
+    isTruncated,
+    limit:             LIMIT,
+    fetchError,
+    orgBaseUrl,
     lastUpdated:       new Date().toISOString(),
     fromCache:         false,
     cacheAge:          0,
@@ -310,55 +647,10 @@ router.get("/salesforce/operations/summary", async (req, res) => {
   return res.json(data);
 });
 
-// ── GET /salesforce/operations/cases ──────────────────────────────────────────
-// Live open Cases from Salesforce for the Operations Demand tab. 5-min cache.
-
-router.get("/salesforce/operations/cases", async (req, res) => {
-  const proxyFetch = getEffectiveSfFetch(req);
-  if (!proxyFetch) {
-    return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
-  }
-  const cacheNs = req.session.sfUserId ?? "system";
-  const CACHE_KEY = `${cacheNs}:ops-cases`;
-  const cached = opsCache.get(CACHE_KEY);
-  if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
-    return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
-  }
-
-  const safeCount = async (soql: string): Promise<number | null> => {
-    try { return (await sfQuery(proxyFetch, soql)).totalSize; }
-    catch { return null; }
-  };
-  const safeRecords = async (soql: string): Promise<Record<string, unknown>[] | null> => {
-    try { return (await sfQuery(proxyFetch, soql)).records; }
-    catch { return null; }
-  };
-
-  const [cases, totalOpen, highPriority, orgBaseUrl] = await Promise.all([
-    safeRecords(
-      "SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, Contact.Name, Account.Name FROM Case WHERE IsClosed = false ORDER BY Priority DESC, CreatedDate ASC LIMIT 25"
-    ),
-    safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false"),
-    safeCount("SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = 'High'"),
-    getOrgBaseUrl(proxyFetch),
-  ]);
-
-  const data = {
-    cases: cases ?? [],
-    totalOpen,
-    highPriority,
-    orgBaseUrl,
-    lastUpdated: new Date().toISOString(),
-    fromCache: false,
-    cacheAge: 0,
-  };
-
-  opsCache.set(CACHE_KEY, { data, ts: Date.now() });
-  return res.json(data);
-});
-
 // ── GET /salesforce/operations/programs ───────────────────────────────────────
-// Live PMM program records for the Operations hub. 5-min cache.
+// SECOND: count fields are SfCount — error reason included.
+// THIRD:  pmdm__Status__c picklist read from org.
+// FOURTH: isTruncated flag added when total > returned list.
 
 router.get("/salesforce/operations/programs", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
@@ -367,37 +659,50 @@ router.get("/salesforce/operations/programs", async (req, res) => {
   }
   const cacheNs = req.session.sfUserId ?? "system";
   const CACHE_KEY = `${cacheNs}:ops-programs`;
-  const cached = opsCache.get(CACHE_KEY);
+  const cached    = opsCache.get(CACHE_KEY);
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
 
-  const safeCount = async (soql: string): Promise<number | null> => {
-    try { return (await sfQuery(proxyFetch, soql)).totalSize; }
-    catch { return null; }
-  };
-  const safeRecords = async (soql: string): Promise<Record<string, unknown>[] | null> => {
-    try { return (await sfQuery(proxyFetch, soql)).records; }
-    catch { return null; }
-  };
+  const statusValues = await getPicklistValues(proxyFetch, cacheNs, "pmdm__Program__c", "pmdm__Status__c");
+  const makeStatusError = (val: string) =>
+    !statusValues.includes(val) && statusValues.length > 0
+      ? `Picklist value '${val}' not in this org. Available: ${statusValues.join(", ")}`
+      : null;
+
+  const activeError   = makeStatusError("Active");
+  const planningError = makeStatusError("Planning");
+
+  const LIMIT = 50;
 
   const [programs, total, active, planning] = await Promise.all([
     safeRecords(
-      "SELECT Id, Name, pmdm__Status__c, pmdm__StartDate__c, pmdm__EndDate__c FROM pmdm__Program__c ORDER BY pmdm__Status__c, Name LIMIT 50"
+      proxyFetch,
+      `SELECT Id, Name, pmdm__Status__c, pmdm__StartDate__c, pmdm__EndDate__c FROM pmdm__Program__c ORDER BY pmdm__Status__c, Name LIMIT ${LIMIT}`
     ),
-    safeCount("SELECT COUNT() FROM pmdm__Program__c"),
-    safeCount("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Active'"),
-    safeCount("SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Planning'"),
+    safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__Program__c"),
+    activeError
+      ? Promise.resolve<SfCount>({ value: null, error: activeError })
+      : safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Active'"),
+    planningError
+      ? Promise.resolve<SfCount>({ value: null, error: planningError })
+      : safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__Program__c WHERE pmdm__Status__c = 'Planning'"),
   ]);
 
+  const isTruncated = (total.value ?? 0) > programs.records.length;
+
   const data = {
-    programs: programs ?? [],
+    programs:      programs.records,
+    programsError: programs.error,
     total,
     active,
     planning,
-    lastUpdated: new Date().toISOString(),
-    fromCache: false,
-    cacheAge: 0,
+    statusValuesFound: statusValues,
+    isTruncated,
+    limit:             LIMIT,
+    lastUpdated:       new Date().toISOString(),
+    fromCache:         false,
+    cacheAge:          0,
   };
 
   opsCache.set(CACHE_KEY, { data, ts: Date.now() });
@@ -412,35 +717,34 @@ router.get("/salesforce/programs/list", async (req, res) => {
   if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
-  const cacheNs = req.session.sfUserId ?? "system";
+  const cacheNs   = req.session.sfUserId ?? "system";
   const CACHE_KEY = `${cacheNs}:programs-list`;
-  const cached = opsCache.get(CACHE_KEY);
+  const cached    = opsCache.get(CACHE_KEY);
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
 
-  const safeCount   = async (soql: string): Promise<number | null> => {
-    try { return (await sfQuery(proxyFetch, soql)).totalSize; } catch { return null; }
-  };
-  const safeRecords = async (soql: string): Promise<Record<string, unknown>[] | null> => {
-    try { return (await sfQuery(proxyFetch, soql)).records; } catch { return null; }
-  };
-
+  const LIMIT = 200;
   const [programs, total, orgBaseUrl] = await Promise.all([
     safeRecords(
-      "SELECT Id, Name, pmdm__Status__c, pmdm__StartDate__c, pmdm__EndDate__c, pmdm__Description__c, pmdm__ShortSummary__c, pmdm__TargetPopulation__c, pmdm__ProgramIssueArea__c, Program_Manager__c, Program_Goals__c, Program_Structure__c, Program_Target_Audience__c, Program_Expected_Outcomes__c, Problem_Statement__c, Success_Metrics_Evaluation_Plan__c, Risks_Assumptions__c, Budget_Resouces__c, Funding_Strategy__c, Implementation_Plan__c, Partnership_Opportunities__c, Google_Drive_Folder__c, Canva_Folder__c, Program_Reference_Link__c, Requires_Payment__c FROM pmdm__Program__c ORDER BY Name LIMIT 200"
+      proxyFetch,
+      "SELECT Id, Name, pmdm__Status__c, pmdm__StartDate__c, pmdm__EndDate__c, pmdm__Description__c, pmdm__ShortSummary__c, pmdm__TargetPopulation__c, pmdm__ProgramIssueArea__c, Program_Manager__c, Program_Goals__c, Program_Structure__c, Program_Target_Audience__c, Program_Expected_Outcomes__c, Problem_Statement__c, Success_Metrics_Evaluation_Plan__c, Risks_Assumptions__c, Budget_Resouces__c, Funding_Strategy__c, Implementation_Plan__c, Partnership_Opportunities__c, Google_Drive_Folder__c, Canva_Folder__c, Program_Reference_Link__c, Requires_Payment__c FROM pmdm__Program__c ORDER BY Name LIMIT " + LIMIT
     ),
-    safeCount("SELECT COUNT() FROM pmdm__Program__c"),
+    safeCount(proxyFetch, "SELECT COUNT() FROM pmdm__Program__c"),
     getOrgBaseUrl(proxyFetch),
   ]);
 
-  const filtered = (programs ?? []).filter(p =>
-    p['Name'] !== 'TEST PROGRAM' && p['pmdm__Status__c'] !== 'Canceled'
+  const filtered  = programs.records.filter(p =>
+    p["Name"] !== "TEST PROGRAM" && p["pmdm__Status__c"] !== "Canceled"
   );
+  const isTruncated = (total.value ?? 0) > programs.records.length;
 
   const data = {
     programs:    filtered,
-    total,
+    total:       total.value,
+    totalError:  total.error,
+    isTruncated,
+    limit:       LIMIT,
     orgBaseUrl,
     lastUpdated: new Date().toISOString(),
     fromCache:   false,
@@ -452,29 +756,25 @@ router.get("/salesforce/programs/list", async (req, res) => {
 });
 
 // ── GET /salesforce/curriculum/by-program/:programName ────────────────────────
-// Lightweight lookup — finds Course__c whose Name matches the program name.
-// Pattern: strip articles, split words, join with LIKE wildcards. 5-min cache.
 
 router.get("/salesforce/curriculum/by-program/:programName", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
   if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
-  const raw = decodeURIComponent(req.params.programName);
-  const cacheNs = req.session.sfUserId ?? "system";
+  const raw       = decodeURIComponent(req.params.programName);
+  const cacheNs   = req.session.sfUserId ?? "system";
   const CACHE_KEY = `${cacheNs}:curriculum-byprogram-${raw}`;
-  const cached = opsCache.get(CACHE_KEY);
+  const cached    = opsCache.get(CACHE_KEY);
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true });
   }
 
-  // Build SOQL LIKE pattern from program name.
-  // "The Foundations Trail" → strip "The ", split, filter short words → "%Foundations%Trail%"
   const words = raw
     .replace(/^the\s+/i, "")
     .split(/\s+/)
     .filter((w) => w.length > 2)
-    .map((w) => w.replace(/'/g, "''")); // SOQL escaping: single quote → ''
+    .map((w) => w.replace(/'/g, "''"));
   const likePattern = "%" + words.join("%") + "%";
 
   try {
@@ -483,7 +783,7 @@ router.get("/salesforce/curriculum/by-program/:programName", async (req, res) =>
       `SELECT Id, Name, Course_Title__c, Status__c, Total_Modules__c FROM Course__c WHERE Name LIKE '${likePattern}' LIMIT 1`
     );
     const course = (result.records ?? [])[0] ?? null;
-    const data = { course, fromCache: false };
+    const data   = { course, fromCache: false };
     opsCache.set(CACHE_KEY, { data, ts: Date.now() });
     return res.json(data);
   } catch (e: unknown) {
@@ -493,41 +793,31 @@ router.get("/salesforce/curriculum/by-program/:programName", async (req, res) =>
 });
 
 // ── GET /salesforce/curriculum/course/:courseId ────────────────────────────────
-// Full Course__c record + all child Course_Module__c records. 5-min cache.
 
 router.get("/salesforce/curriculum/course/:courseId", async (req, res) => {
   const courseId = req.params.courseId;
-  // Validate Salesforce ID format (15 or 18 alphanumeric chars)
   if (!/^[a-zA-Z0-9]{15,18}$/.test(courseId)) {
     return res.status(400).json({ error: "Invalid Salesforce ID" });
   }
-
   const proxyFetch = getEffectiveSfFetch(req);
   if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce. Connect your account at /api/sf/login." });
   }
-  const cacheNs = req.session.sfUserId ?? "system";
+  const cacheNs   = req.session.sfUserId ?? "system";
   const CACHE_KEY = `${cacheNs}:curriculum-${courseId}`;
-  const cached = opsCache.get(CACHE_KEY);
+  const cached    = opsCache.get(CACHE_KEY);
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true });
   }
 
   try {
     const [courseResult, modulesResult] = await Promise.all([
-      sfQuery(
-        proxyFetch,
-        `SELECT Id, Name, Course_Title__c, Status__c, Estimated_Start_Date__c, Estimated_End_Date__c, Total_Modules__c, Overview__c, Learning_Goals__c, Structure__c, Google_Drive_Folder__c, Canva_Course_Folder__c FROM Course__c WHERE Id = '${courseId}' LIMIT 1`
-      ),
-      sfQuery(
-        proxyFetch,
-        `SELECT Id, Name, Course__c, Order__c, Status__c, PercentCompleted__c FROM Course_Module__c WHERE Course__c = '${courseId}' ORDER BY Order__c ASC LIMIT 50`
-      ),
+      sfQuery(proxyFetch, `SELECT Id, Name, Course_Title__c, Status__c, Estimated_Start_Date__c, Estimated_End_Date__c, Total_Modules__c, Overview__c, Learning_Goals__c, Structure__c, Google_Drive_Folder__c, Canva_Course_Folder__c FROM Course__c WHERE Id = '${courseId}' LIMIT 1`),
+      sfQuery(proxyFetch, `SELECT Id, Name, Course__c, Order__c, Status__c, PercentCompleted__c FROM Course_Module__c WHERE Course__c = '${courseId}' ORDER BY Order__c ASC LIMIT 50`),
     ]);
-
     const course  = (courseResult.records  ?? [])[0] ?? null;
     const modules =  modulesResult.records ?? [];
-    const data = { course, modules, fromCache: false };
+    const data    = { course, modules, fromCache: false };
     opsCache.set(CACHE_KEY, { data, ts: Date.now() });
     return res.json(data);
   } catch (e: unknown) {
@@ -537,17 +827,15 @@ router.get("/salesforce/curriculum/course/:courseId", async (req, res) => {
 });
 
 // ── GET /lms/courses ───────────────────────────────────────────────────────────
-// Returns all Course__c records with their child Course_Module__c records.
-// Powers the Curriculum Studio LMS Live view. 5-min cache.
 
 router.get("/lms/courses", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
   if (!proxyFetch) {
     return res.status(401).json({ error: "Not connected to Salesforce." });
   }
-  const cacheNs = req.session.sfUserId ?? "system";
+  const cacheNs   = req.session.sfUserId ?? "system";
   const CACHE_KEY = `${cacheNs}:lms-courses`;
-  const cached = opsCache.get(CACHE_KEY);
+  const cached    = opsCache.get(CACHE_KEY);
   if (cached && Date.now() - cached.ts < OPS_CACHE_TTL) {
     return res.json({ ...(cached.data as object), fromCache: true });
   }
@@ -559,7 +847,6 @@ router.get("/lms/courses", async (req, res) => {
     );
     const courses = coursesResult.records ?? [];
 
-    // Fetch modules for all courses in parallel
     const coursesWithModules = await Promise.all(
       courses.map(async (course) => {
         const courseId = String(course["Id"] ?? "");

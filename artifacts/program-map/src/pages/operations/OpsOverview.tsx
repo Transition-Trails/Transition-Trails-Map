@@ -7,12 +7,20 @@ import {
 } from '@/data/operationalIntelligenceData';
 import { useActionItems } from '@/hooks/useActionItems';
 import { useHealthScores } from '@/hooks/useHealthScores';
-import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
+import { useSfOpsSummary, formatSyncAge, type SfCount } from '@/hooks/useSfOpsSummary';
 import { useSfOpsPrograms } from '@/hooks/useSfOpsPrograms';
+
+// Render a SfCount as a display string.
+// Errors surface as 'Error' so they are never confused with a genuine zero.
+const nv = (c: SfCount | null | undefined): string => {
+  if (c == null) return '—';
+  if (c.error) return 'Error';
+  if (c.value === null) return '—';
+  return c.value.toLocaleString();
+};
 
 function SfLiveStrip() {
   const { data, isLoading, isError, refetch, isFetching } = useSfOpsSummary();
-  const n = (v: number | null | undefined) => v == null ? '—' : v.toLocaleString();
 
   if (isError) {
     return (
@@ -26,15 +34,15 @@ function SfLiveStrip() {
     );
   }
 
-  const isStale = data && data.cacheAge > 5 * 60;
+  const isStale   = data && data.cacheAge > 5 * 60;
   const syncLabel = data ? formatSyncAge(data.lastUpdated) : null;
 
   return (
     <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]/60 px-3 py-2">
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-1.5">
-          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLoading || isFetching ? 'bg-[#CC8400] animate-pulse' : isStale ? 'bg-[#CC8400]' : 'bg-[#E6F0EA]0'}`} />
-          <span className="text-[14px] font-bold  text-[#245531]">Live from Salesforce</span>
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isLoading || isFetching ? 'bg-[#CC8400] animate-pulse' : isStale ? 'bg-[#CC8400]' : 'bg-[#2F6B3F]'}`} />
+          <span className="text-[14px] font-bold text-[#245531]">Live from Salesforce</span>
           {data && (
             <span className={`text-[14px] ${isStale ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
               · {isStale ? 'stale · ' : ''}{syncLabel}
@@ -56,18 +64,28 @@ function SfLiveStrip() {
         </div>
       ) : data ? (
         <div className="grid grid-cols-4 gap-2">
-          {[
-            { icon: Database,       label: 'Programs',    value: n(data.programs.total),                    sub: `${n(data.programs.active)} active` },
-            { icon: Users,          label: 'Enrollments', value: n(data.engagements.total),                 sub: `${n(data.engagements.active)} active` },
-            { icon: Activity,       label: 'Deliveries',  value: n(data.serviceDeliveries.last30Days),      sub: 'last 30 days' },
-            { icon: AlertTriangle,  label: 'Open Cases',  value: n(data.cases.open),                        sub: `${n(data.cases.highPriority)} high priority` },
-          ].map(m => (
-            <div key={m.label} className="rounded bg-white/70 border border-[#E6F0EA] px-2 py-1.5">
-              <p className="text-[14px] font-bold text-[#2F6B3F]/60  mb-0.5">{m.label}</p>
-              <p className="text-[15px] font-bold text-[#245531] leading-none">{m.value}</p>
-              <p className="text-[14px] text-[#2F6B3F]/60 mt-0.5">{m.sub}</p>
-            </div>
-          ))}
+          {(
+            [
+              { label: 'Programs',    primary: data.programs.total,            sub: `${nv(data.programs.active)} active` },
+              { label: 'Enrollments', primary: data.engagements.total,         sub: `${nv(data.engagements.active)} active` },
+              { label: 'Deliveries',  primary: data.serviceDeliveries.last30Days, sub: 'last 30 days' },
+              { label: 'Open Cases',  primary: data.cases.open,                sub: `${nv(data.cases.highPriority)} high priority` },
+            ] as { label: string; primary: SfCount; sub: string }[]
+          ).map(m => {
+            const hasError = m.primary.error !== null;
+            return (
+              <div key={m.label} className={`rounded border px-2 py-1.5 ${hasError ? 'bg-[#FBEAE6]/70 border-[#E8B9B4]' : 'bg-white/70 border-[#E6F0EA]'}`}>
+                <p className={`text-[14px] font-bold mb-0.5 ${hasError ? 'text-[#A93F2F]/60' : 'text-[#2F6B3F]/60'}`}>{m.label}</p>
+                <p className={`text-[15px] font-bold leading-none ${hasError ? 'text-[#A93F2F]' : 'text-[#245531]'}`}>
+                  {nv(m.primary)}
+                </p>
+                {hasError
+                  ? <p className="text-[14px] text-[#A93F2F]/70 mt-0.5 truncate" title={m.primary.error ?? ''}>{(m.primary.error ?? '').slice(0, 28)}…</p>
+                  : <p className="text-[14px] text-[#2F6B3F]/60 mt-0.5">{m.sub}</p>
+                }
+              </div>
+            );
+          })}
         </div>
       ) : null}
     </div>
@@ -135,7 +153,7 @@ export default function OpsOverview() {
                   <p className="text-[14px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
                   {d.id === 'dh-programs' && sfPrograms != null && (
                     <span className="text-[14px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 mt-1 inline-block leading-none">
-                      SF: {sfPrograms.active ?? '?'} active · {sfPrograms.total ?? '?'} total
+                      SF: {nv(sfPrograms.active)} active · {nv(sfPrograms.total)} total
                     </span>
                   )}
                 </button>

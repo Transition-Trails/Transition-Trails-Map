@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { SfCount } from './useSfOpsSummary';
 
 export interface SfProgram {
   Id: string;
@@ -9,13 +10,17 @@ export interface SfProgram {
 }
 
 export interface SfOpsPrograms {
-  programs: SfProgram[];
-  total: number | null;
-  active: number | null;
-  planning: number | null;
-  lastUpdated: string;
-  fromCache: boolean;
-  cacheAge: number;
+  programs:      SfProgram[];
+  programsError: string | null;
+  total:         SfCount;
+  active:        SfCount;
+  planning:      SfCount;
+  statusValuesFound: string[];
+  isTruncated:   boolean;
+  limit:         number;
+  lastUpdated:   string;
+  fromCache:     boolean;
+  cacheAge:      number;
 }
 
 export function useSfOpsPrograms() {

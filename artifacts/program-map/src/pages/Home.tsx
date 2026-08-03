@@ -10,7 +10,7 @@ import {
   AlertTriangle, Calendar,
   RefreshCw, WifiOff, ChevronRight,
 } from 'lucide-react';
-import { useSfOpsSummary, formatSyncAge } from '@/hooks/useSfOpsSummary';
+import { useSfOpsSummary, formatSyncAge, type SfCount } from '@/hooks/useSfOpsSummary';
 import {
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG,
 } from '@/data/operationalIntelligenceData';
@@ -88,7 +88,15 @@ export default function Home() {
   const { data: sfData, isLoading: sfLoading, isError: sfError, refetch, isFetching } = useSfOpsSummary();
 
   const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
-  const n = (v: number | null | undefined) => v == null ? '—' : v.toLocaleString();
+  const n = (v: SfCount | number | null | undefined): string => {
+   if (v == null) return '—';
+   if (typeof v === 'object') {
+     if (v.error) return 'Error';
+     if (v.value === null) return '—';
+     return v.value.toLocaleString();
+   }
+   return v.toLocaleString();
+ };
 
   const activityItems = isEveryday
     ? ALL_ACTIVITY.filter(a => !a.minPower)

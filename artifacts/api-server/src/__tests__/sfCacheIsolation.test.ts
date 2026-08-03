@@ -13,15 +13,15 @@ vi.stubGlobal(
     text: async () => '',
     headers: new Headers(),
     redirected: false,
-    type: 'basic' as Response['type'],
+    type: 'basic' as const,
     url: '',
-    clone: () => ({ ok: true } as Response),
+    clone: () => ({ ok: true } as unknown as Response),
     arrayBuffer: async () => new ArrayBuffer(0),
     blob: async () => new Blob(),
     formData: async () => new FormData(),
     body: null,
     bodyUsed: false,
-  }) as Response),
+  }) as unknown as Response),
 );
 
 import express, { type Express, type Request, type Response, type NextFunction } from 'express';

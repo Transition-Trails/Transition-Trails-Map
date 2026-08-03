@@ -1,14 +1,33 @@
 import { useQuery } from '@tanstack/react-query';
 
+/** A count value with an explicit error reason — never silently null. */
+export interface SfCount { value: number | null; error: string | null; }
+
 export interface SfOpsSummary {
-  programs:         { total: number | null; active: number | null; planning: number | null };
-  engagements:      { total: number | null; active: number | null };
-  serviceDeliveries:{ last30Days: number | null };
-  cases:            { open: number | null; highPriority: number | null };
-  contacts:         { total: number | null };
-  lastUpdated:      string;
-  fromCache:        boolean;
-  cacheAge:         number;
+  programs: {
+    total:    SfCount;
+    active:   SfCount;
+    planning: SfCount;
+    statusValuesFound:   string[];
+    statusValuesMissing: string[];
+  };
+  engagements: {
+    total:  SfCount;
+    active: SfCount;
+  };
+  serviceDeliveries: {
+    last30Days: SfCount;
+  };
+  cases: {
+    open:          SfCount;
+    highPriority:  SfCount;
+    priorityValuesFound: string[];
+    priorityValueUsed:   string | null;
+  };
+  contacts: { total: SfCount };
+  lastUpdated: string;
+  fromCache:   boolean;
+  cacheAge:    number;
 }
 
 export function useSfOpsSummary() {

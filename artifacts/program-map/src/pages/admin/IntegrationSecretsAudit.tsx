@@ -73,6 +73,24 @@ interface PmmObject {
   object: string; label: string; accessible: boolean; count: number; error?: string;
 }
 
+interface TtObjectResult {
+  object: string; label: string; accessible: boolean; count: number; error?: string;
+}
+
+interface TtGroupResult {
+  id: string; label: string;
+  objects: TtObjectResult[];
+  accessibleCount: number; totalCount: number;
+}
+
+interface FieldCheckResult {
+  id: string; object: string; label: string; description: string;
+  ourFields: string[];
+  requiredFieldsFound: string[];
+  requiredFieldsMissing: string[];
+  describeError: string | null;
+}
+
 interface SalesforceResult {
   checks: SalesforceCheck[];
   orgInfo: { name: string | null; id: string | null; edition: string | null; sandboxType: string | null } | null;
@@ -80,6 +98,8 @@ interface SalesforceResult {
   npspDetected: boolean;
   pmmDetected: boolean;
   pmmObjects: PmmObject[];
+  ttCustomObjects: { groups: TtGroupResult[]; totalAccessible: number; totalObjects: number };
+  customFieldChecks: FieldCheckResult[];
   identity: { username: string | null; displayName: string | null; email: string | null } | null;
   durationMs: number;
   timestamp: string;
@@ -384,6 +404,81 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
                     Total: {result.pmmObjects.filter(o => o.accessible).reduce((s, o) => s + o.count, 0).toLocaleString()} records across {result.pmmObjects.filter(o => o.accessible).length} PMM objects
                   </p>
                 )}
+              </div>
+            )}
+
+            {/* TT custom objects — 3 groups */}
+            {result.ttCustomObjects && result.ttCustomObjects.groups.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[14px] font-bold text-foreground">
+                  Transition Trails Custom Objects
+                  <span className={`ml-1.5 font-normal ${result.ttCustomObjects.totalAccessible === result.ttCustomObjects.totalObjects ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
+                    · {result.ttCustomObjects.totalAccessible}/{result.ttCustomObjects.totalObjects} accessible
+                  </span>
+                </p>
+                {result.ttCustomObjects.groups.map(group => (
+                  <div key={group.id} className={`rounded border px-3 py-2 space-y-1 ${group.accessibleCount === group.totalCount ? 'border-[#9FC3AE] bg-[#E6F0EA]/40' : group.accessibleCount > 0 ? 'border-[#FFD08A] bg-[#FFF3E0]/40' : 'border-[#E8B9B4] bg-[#FBEAE6]/40'}`}>
+                    <p className={`text-[14px] font-semibold ${group.accessibleCount === group.totalCount ? 'text-[#245531]' : group.accessibleCount > 0 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
+                      {group.label}
+                      <span className="font-normal ml-1.5">· {group.accessibleCount}/{group.totalCount}</span>
+                    </p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                      {group.objects.map(o => (
+                        <div key={o.object} className="flex items-start gap-1.5 min-w-0">
+                          {o.accessible
+                            ? <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
+                            : <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0 mt-0.5" />}
+                          <div className="min-w-0 flex-1">
+                            <span className={`text-[14px] font-semibold ${o.accessible ? 'text-foreground' : 'text-[#A93F2F]'}`}>{o.label}</span>
+                            {o.accessible
+                              ? <span className="text-[14px] text-muted-foreground ml-1.5">{o.count.toLocaleString()}</span>
+                              : o.error && <span className="text-[14px] text-[#A93F2F]/70 ml-1 truncate" title={o.error}>{o.error.slice(0, 30)}</span>
+                            }
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Custom field verification on reused objects */}
+            {result.customFieldChecks && result.customFieldChecks.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[14px] font-bold text-foreground">Custom Fields on Reused Objects</p>
+                {result.customFieldChecks.map(fc => {
+                  const allPresent = fc.requiredFieldsMissing.length === 0 && !fc.describeError;
+                  const hasIssue   = fc.requiredFieldsMissing.length > 0 || !!fc.describeError;
+                  return (
+                    <div key={fc.id} className={`rounded border px-3 py-2 ${hasIssue ? 'border-[#FFD08A] bg-[#FFF3E0]/40' : 'border-[#9FC3AE] bg-[#E6F0EA]/40'}`}>
+                      <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                        {allPresent
+                          ? <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0" />
+                          : <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0" />}
+                        <span className="text-[14px] font-semibold text-foreground">{fc.label}</span>
+                        <span className="text-[14px] text-muted-foreground">{fc.description}</span>
+                        <span className={`ml-auto text-[14px] font-semibold ${hasIssue ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`}>
+                          {fc.ourFields.length} TT fields
+                        </span>
+                      </div>
+                      {fc.describeError && (
+                        <p className="text-[14px] text-[#A93F2F] mt-0.5">Describe failed: {fc.describeError.slice(0, 100)}</p>
+                      )}
+                      {fc.requiredFieldsMissing.length > 0 && (
+                        <div className="mt-1">
+                          <span className="text-[14px] text-[#CC8400] font-semibold">Missing required: </span>
+                          <span className="text-[14px] text-[#CC8400] font-mono">{fc.requiredFieldsMissing.join(', ')}</span>
+                        </div>
+                      )}
+                      {fc.requiredFieldsFound.length > 0 && !hasIssue && (
+                        <p className="text-[14px] text-[#2F6B3F]/70 mt-0.5">
+                          All {fc.requiredFieldsFound.length} required fields present.
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
