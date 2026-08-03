@@ -355,7 +355,7 @@ function PennyConfigPanel({
 }) {
   const watchedCount = Object.values(labelCfg).filter(c => c.watched).length;
   return (
-    <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-[#C5DDE6] px-6 py-4 shrink-0">
+    <div className="bg-[#EDF5F8] border-b border-[#C5DDE6] px-6 py-4 shrink-0">
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="w-4 h-4 text-[#2F6F7E]" />
         <h3 className="text-[13px] font-semibold text-[#2F6F7E]">{TERMS.aiAssistant} Label Intelligence</h3>
@@ -374,7 +374,7 @@ function PennyConfigPanel({
             <div
               key={l.id}
               className={`rounded-xl border-2 p-3 transition-all bg-white ${
-                cfg.watched ? 'border-violet-300 shadow-sm shadow-violet-100' : 'border-border opacity-60 hover:opacity-80'
+                cfg.watched ? 'border-[#7FAFC6] shadow-sm shadow-[#EDF5F8]' : 'border-border opacity-60 hover:opacity-80'
               }`}
             >
               <div className="flex items-center justify-between mb-2">

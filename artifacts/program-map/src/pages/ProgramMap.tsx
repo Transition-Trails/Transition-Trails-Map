@@ -161,7 +161,7 @@ const HEADER_COLOR: Record<string, string> = {
   'deep-teal':   'bg-[hsl(188,55%,28%)] text-white',
   'trail-green': 'bg-[hsl(145,40%,32%)] text-white',
   'charcoal':    'bg-[hsl(220,15%,22%)] text-white',
-  'sun-amber':   'bg-[hsl(38,85%,52%)] text-[hsl(220,15%,22%)]',
+  'sun-amber':   'bg-[#9FC3AE] text-[hsl(220,15%,22%)]',
 };
 
 const BORDER_COLOR: Record<string, string> = {
@@ -169,7 +169,7 @@ const BORDER_COLOR: Record<string, string> = {
   'deep-teal':   'border-[hsl(188,55%,20%)]',
   'trail-green': 'border-[hsl(145,40%,24%)]',
   'charcoal':    'border-[hsl(220,15%,14%)]',
-  'sun-amber':   'border-[hsl(38,85%,40%)]',
+  'sun-amber':   'border-[#2F6B3F]',
 };
 
 const STATUS_DOT: Record<string, string> = {

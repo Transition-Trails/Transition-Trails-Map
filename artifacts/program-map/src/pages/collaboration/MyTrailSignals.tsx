@@ -413,7 +413,7 @@ export default function MyTrailSignals() {
                     <select
                       value={sel.value}
                       onChange={e => sel.set(e.target.value)}
-                      className="w-full text-[11px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300"
+                      className="w-full text-[11px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-[#2F6B3F]/15"
                     >
                       {sel.opts.map(o => <option key={o}>{o}</option>)}
                     </select>
@@ -425,7 +425,7 @@ export default function MyTrailSignals() {
                     value={newThresh}
                     onChange={e => setNewThresh(e.target.value)}
                     placeholder="e.g. 14 days"
-                    className="w-full text-[11px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-sky-300"
+                    className="w-full text-[11px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-[#2F6B3F]/15"
                   />
                 </div>
               </div>

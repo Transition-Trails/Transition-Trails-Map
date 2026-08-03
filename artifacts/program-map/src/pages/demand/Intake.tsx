@@ -139,7 +139,7 @@ const GROUPS: Group[] = [
   {
     key: 'active', label: 'In Progress', priority: 'P3',
     pillCls:    'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
-    accentCls:  'border-l-sky-300',
+    accentCls:  'border-l-[#7FAFC6]',
     headingCls: 'text-[#2F6F7E]',
     filter: r => (r.status === 'In Review' || r.status === 'Approved') && r.risk === 'normal',
   },
@@ -153,7 +153,7 @@ const GROUPS: Group[] = [
   {
     key: 'done', label: 'Completed', priority: null,
     pillCls:    'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]',
-    accentCls:  'border-l-emerald-300',
+    accentCls:  'border-l-[#9FC3AE]',
     headingCls: 'text-[#2F6B3F]',
     filter: r => r.status === 'Completed',
   },
