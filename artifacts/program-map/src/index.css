@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap');
+/* Transition Trails brand typefaces — also loaded via <link> in index.html for early paint */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Open+Sans:wght@400;600;700&display=swap');
 @layer theme, base, clerk, components, utilities;
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -6,103 +7,198 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * @theme inline — maps Tailwind utility names to the CSS custom properties
+ * defined in :root below. Do not put brand values here; put them in :root.
+ * ───────────────────────────────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
+  --color-background:             hsl(var(--background));
+  --color-foreground:             hsl(var(--foreground));
+  --color-border:                 hsl(var(--border));
+  --color-input:                  hsl(var(--input));
+  --color-ring:                   hsl(var(--ring));
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-border: hsl(var(--card-border));
+  --color-card:                   hsl(var(--card));
+  --color-card-foreground:        hsl(var(--card-foreground));
+  --color-card-border:            hsl(var(--card-border));
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-popover-border: hsl(var(--popover-border));
+  --color-popover:                hsl(var(--popover));
+  --color-popover-foreground:     hsl(var(--popover-foreground));
+  --color-popover-border:         hsl(var(--popover-border));
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary:                hsl(var(--primary));
+  --color-primary-foreground:     hsl(var(--primary-foreground));
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary:              hsl(var(--secondary));
+  --color-secondary-foreground:   hsl(var(--secondary-foreground));
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted:                  hsl(var(--muted));
+  --color-muted-foreground:       hsl(var(--muted-foreground));
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent:                 hsl(var(--accent));
+  --color-accent-foreground:      hsl(var(--accent-foreground));
 
-  --color-destructive: hsl(var(--destructive));
+  --color-destructive:            hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
 
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
+  --color-chart-1:                hsl(var(--chart-1));
+  --color-chart-2:                hsl(var(--chart-2));
+  --color-chart-3:                hsl(var(--chart-3));
+  --color-chart-4:                hsl(var(--chart-4));
+  --color-chart-5:                hsl(var(--chart-5));
 
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar:                hsl(var(--sidebar));
+  --color-sidebar-foreground:     hsl(var(--sidebar-foreground));
+  --color-sidebar-border:         hsl(var(--sidebar-border));
+  --color-sidebar-primary:        hsl(var(--sidebar-primary));
   --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent:         hsl(var(--sidebar-accent));
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-sidebar-ring:           hsl(var(--sidebar-ring));
 
-  --font-sans: var(--app-font-sans);
+  --font-sans:  var(--app-font-sans);
   --font-serif: var(--app-font-serif);
-  --font-mono: var(--app-font-mono);
+  --font-mono:  var(--app-font-mono);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Brand radius scale — explicit values, not calc() chains */
+  --radius-sm: var(--brand-radius-sm);
+  --radius-md: var(--brand-radius-md);
+  --radius-lg: var(--brand-radius-lg);
+  --radius-xl: var(--brand-radius-xl);
+
+  /* Brand shadows — override Tailwind defaults */
+  --shadow-sm: var(--brand-shadow-sm);
+  --shadow:    var(--brand-shadow-card);
+  --shadow-md: var(--brand-shadow-card);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * :root — TRANSITION TRAILS DESIGN SYSTEM
+ *
+ * SECTION 1: Brand tokens  ← single source of truth; edit values here only
+ * SECTION 2: Semantic tokens  ← reference brand tokens; never use raw values
+ *
+ * Dark theme (.dark) is intentionally left unchanged pending a separate brief.
+ * ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  --background: 40 30% 96%;
-  --foreground: 220 15% 22%;
-  --card: 38 25% 92%;
-  --card-foreground: 220 15% 22%;
-  --card-border: 38 20% 84%;
-  --primary: 145 40% 32%;
-  --primary-foreground: 40 30% 96%;
-  --secondary: 188 55% 28%;
-  --secondary-foreground: 40 30% 96%;
-  --muted: 38 20% 88%;
-  --muted-foreground: 220 12% 45%;
-  --accent: 38 85% 52%;
-  --accent-foreground: 220 15% 22%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 38 20% 84%;
-  --input: 38 20% 84%;
-  --ring: 145 40% 32%;
-  --sidebar: 38 25% 90%;
-  --sidebar-foreground: 220 15% 22%;
-  --sidebar-border: 38 20% 82%;
-  --sidebar-primary: 145 40% 32%;
-  --sidebar-primary-foreground: 40 30% 96%;
-  --sidebar-accent: 38 20% 86%;
-  --sidebar-accent-foreground: 220 15% 22%;
-  --sidebar-ring: 145 40% 32%;
-  --popover: 40 30% 96%;
-  --popover-foreground: 220 15% 22%;
-  --popover-border: 38 20% 84%;
-  --chart-1: 145 40% 32%;
-  --chart-2: 188 55% 28%;
-  --chart-3: 38 85% 52%;
-  --chart-4: 205 65% 52%;
-  --chart-5: 220 12% 45%;
 
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: 'Playfair Display', serif;
-  --app-font-mono: Menlo, monospace;
-  --radius: .5rem;
+  /* ══════════════════════════════════════════════════════════════════════════
+   * SECTION 1 — BRAND TOKENS
+   * All values are H S% L% components for use inside hsl().
+   * Hex references are for human readability only.
+   * ══════════════════════════════════════════════════════════════════════════ */
+
+  /* Trail Green — primary: buttons, links, headings, growth, action */
+  --brand-green:          136 39% 30%;   /* #2F6B3F */
+  --brand-green-light:    145 25% 92%;   /* #E6F0EA — hover tints, light surfaces */
+  --brand-green-medium:   145 23% 69%;   /* #9FC3AE — mid-ramp */
+  --brand-green-dark:     136 40% 24%;   /* #245531 — pressed / active */
+
+  /* Deep Teal — secondary: containers, sidebar, headers, footers, depth */
+  --brand-teal:           191 46% 34%;   /* #2F6F7E */
+
+  /* Sky Blue — surface colour: icons, chips, light containers */
+  --brand-sky:            199 38% 64%;   /* #7FAFC6 */
+  --brand-sky-tint:       196 45% 95%;   /* #EDF5F8 — nested panels, sidebar bg */
+
+  /* Sun Amber — accent: highlights, warnings, calls-to-action */
+  --brand-amber:           37 91% 55%;   /* #F5A623 */
+  --brand-amber-light:     37 100% 94%;  /* #FFF3E0 */
+  --brand-amber-medium:    36 100% 77%;  /* #FFD08A */
+  --brand-amber-dark:      39 100% 40%;  /* #CC8400 — pressed amber */
+
+  /* Neutrals */
+  --brand-trail-light:     60 22% 97%;   /* #FAFAF7 — main page background */
+  --brand-warm-gray:      100  5% 89%;   /* #E2E4E1 — all borders & dividers */
+  --brand-slate:          156  3% 30%;   /* #4A4F4D — body text (warm, green-grey) */
+  --brand-slate-mid:      156  3% 42%;   /* mid-tone for muted/placeholder text */
+  --brand-charcoal:       152  4% 17%;   /* #2A2E2C — headings & icons */
+
+  /* Typography */
+  --app-font-sans:  'Open Sans', system-ui, sans-serif;  /* body, interface, data */
+  --app-font-serif: 'Poppins', system-ui, sans-serif;    /* headings */
+  --app-font-mono:  Menlo, 'Courier New', monospace;     /* code, identifiers */
+
+  /* Radius */
+  --brand-radius-sm: 0.5rem;     /*  8px — tags, small chips */
+  --brand-radius-md: 0.875rem;   /* 14px — buttons, inputs, badges */
+  --brand-radius-lg: 1.375rem;   /* 22px — cards, panels */
+  --brand-radius-xl: 1.375rem;   /* 22px — large cards (same tier) */
+  --radius:          0.875rem;   /* backward-compat for shadcn components */
+
+  /* Shadows — Charcoal #2A2E2C at low opacity */
+  --brand-shadow-sm:   0 6px 16px rgba(42, 46, 44, 0.08);
+  --brand-shadow-card: 0 12px 28px rgba(42, 46, 44, 0.10);
+  --brand-shadow-hover: 0 15px 32px rgba(42, 46, 44, 0.13);
+
+  /* ══════════════════════════════════════════════════════════════════════════
+   * SECTION 2 — SEMANTIC TOKENS
+   * Reference brand tokens above. Never write raw hex or hsl values here.
+   * ══════════════════════════════════════════════════════════════════════════ */
+
+  /* Page surface */
+  --background:              var(--brand-trail-light);
+  --foreground:              var(--brand-slate);
+
+  /* Cards — white surface on Trail Light background */
+  --card:                    0 0% 100%;
+  --card-foreground:         var(--brand-charcoal);
+  --card-border:             var(--brand-warm-gray);
+
+  /* Primary — Trail Green */
+  --primary:                 var(--brand-green);
+  --primary-foreground:      0 0% 100%;
+
+  /* Secondary — Deep Teal */
+  --secondary:               var(--brand-teal);
+  --secondary-foreground:    0 0% 100%;
+
+  /* Muted — Sky tint for nested / secondary surfaces inside cards */
+  --muted:                   var(--brand-sky-tint);
+  --muted-foreground:        var(--brand-slate-mid);
+
+  /* Accent — Sun Amber */
+  --accent:                  var(--brand-amber);
+  --accent-foreground:       var(--brand-charcoal);
+
+  /* Destructive — red, kept at framework default */
+  --destructive:             0 72% 51%;
+  --destructive-foreground:  0 0% 98%;
+
+  /* Borders & inputs */
+  --border:                  var(--brand-warm-gray);
+  --input:                   var(--brand-warm-gray);
+
+  /* Focus ring — Trail Green (opacity applied in base layer below) */
+  --ring:                    var(--brand-green);
+
+  /* Sidebar — Sky tint gives subtle depth over Trail Light page */
+  --sidebar:                 var(--brand-sky-tint);
+  --sidebar-foreground:      var(--brand-charcoal);
+  --sidebar-border:          var(--brand-warm-gray);
+  --sidebar-primary:         var(--brand-green);
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent:          var(--brand-green-light);
+  --sidebar-accent-foreground: var(--brand-charcoal);
+  --sidebar-ring:            var(--brand-green);
+
+  /* Popover */
+  --popover:                 0 0% 100%;
+  --popover-foreground:      var(--brand-charcoal);
+  --popover-border:          var(--brand-warm-gray);
+
+  /* Charts */
+  --chart-1:                 var(--brand-green);
+  --chart-2:                 var(--brand-teal);
+  --chart-3:                 var(--brand-amber);
+  --chart-4:                 var(--brand-sky);
+  --chart-5:                 var(--brand-slate);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * DARK THEME
+ * Not yet specified in the brand brief — intentionally unchanged.
+ * ───────────────────────────────────────────────────────────────────────────── */
 .dark {
   --background: 220 15% 15%;
   --foreground: 40 30% 96%;
@@ -135,16 +231,62 @@
   --popover-border: 220 15% 25%;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * BASE LAYER — global typographic and interaction rules
+ * ───────────────────────────────────────────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
+  /* Headings: Poppins, not Open Sans.
+   * This rule targets all heading elements globally so no heading falls
+   * through to the body font. Component-level font-sans overrides will
+   * still take precedence for any heading that explicitly sets font-sans. */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    color: hsl(var(--brand-charcoal));
+  }
+
+  /* Focus ring — 3 px Trail Green at 15 % opacity.
+   * Replaces the framework default 1 px ring for better brand fidelity
+   * and improved keyboard-navigation accessibility on dense interfaces. */
+  *:focus-visible {
+    outline: 3px solid rgba(47, 107, 63, 0.15);
+    outline-offset: 2px;
+  }
+
+  /* Card surfaces — brand shadow applied to all bg-card elements.
+   * Hover: 3 px upward lift over ~167 ms with gentle ease.
+   * Press: returns to 1 px lift (no bounce, no shrink). */
+  .bg-card {
+    box-shadow: var(--brand-shadow-card);
+    transition:
+      transform 167ms cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 167ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .bg-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--brand-shadow-hover);
+  }
+  .bg-card:active {
+    transform: translateY(-1px);
+    box-shadow: var(--brand-shadow-card);
+  }
+
+  /* Smaller elevated surfaces (popover, tooltip, dropdown) */
+  .bg-popover {
+    box-shadow: var(--brand-shadow-sm);
+  }
 }
 
-/* Quill rich text viewer — matches classes emitted by Salesforce Rich Text Areas */
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Quill rich text viewer — matches classes emitted by Salesforce Rich Text Areas
+ * ───────────────────────────────────────────────────────────────────────────── */
 .ql-quote-block {
   border-left: 3px solid #ccc;
   padding-left: 12px;
