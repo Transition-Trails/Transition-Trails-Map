@@ -126,36 +126,36 @@ function ConnectionCard({ conn: c, navigate }: { conn: Connection; navigate: (hr
             <Icon className="w-4 h-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[12px] font-bold text-foreground leading-tight">{c.name}</p>
-            <p className="text-[10px] text-muted-foreground">{c.tagline}</p>
+            <p className="text-[14px] font-bold text-foreground leading-tight">{c.name}</p>
+            <p className="text-[14px] text-muted-foreground">{c.tagline}</p>
           </div>
         </div>
         <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 flex-shrink-0 ${cfg.cls}`}>
           <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
-          <span className={`text-[9px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
+          <span className={`text-[14px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
         </div>
       </div>
 
-      <p className="text-[11px] text-muted-foreground leading-relaxed">{c.detail}</p>
+      <p className="text-[14px] text-muted-foreground leading-relaxed">{c.detail}</p>
 
       {c.needs && (
         <div className="flex items-start gap-1.5 rounded-md px-2 py-1.5 bg-[#FFF3E0] border border-[#FFF3E0]">
           <AlertTriangle className="w-3 h-3 text-[#CC8400] flex-shrink-0 mt-0.5" />
-          <p className="text-[10px] text-[#CC8400] leading-snug">{c.needs}</p>
+          <p className="text-[14px] text-[#CC8400] leading-snug">{c.needs}</p>
         </div>
       )}
 
       <div className="flex items-center justify-between mt-auto pt-0.5">
-        <span className="text-[10px] text-muted-foreground/50">{c.owner}</span>
+        <span className="text-[14px] text-muted-foreground/50">{c.owner}</span>
         {!isDeferred && c.href && (
           <button
             onClick={() => navigate(c.href)}
-            className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/70 transition-colors"
+            className="flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/70 transition-colors"
           >
             {c.action}<ChevronRight className="w-3 h-3" />
           </button>
         )}
-        {isDeferred && <span className="text-[10px] text-muted-foreground/40">{cfg.label}</span>}
+        {isDeferred && <span className="text-[14px] text-muted-foreground/40">{cfg.label}</span>}
       </div>
     </div>
   );
@@ -174,36 +174,36 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
             <Icon className="w-4 h-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[12px] font-bold text-foreground leading-tight">{c.name}</p>
-            <p className="text-[10px] text-muted-foreground">{c.tagline}</p>
+            <p className="text-[14px] font-bold text-foreground leading-tight">{c.name}</p>
+            <p className="text-[14px] text-muted-foreground">{c.tagline}</p>
           </div>
         </div>
         <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 flex-shrink-0 ${cfg.cls}`}>
           <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
-          <span className={`text-[9px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
+          <span className={`text-[14px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
         </div>
       </div>
 
-      <p className="text-[11px] text-muted-foreground leading-relaxed">{c.detail}</p>
+      <p className="text-[14px] text-muted-foreground leading-relaxed">{c.detail}</p>
 
       {loading ? (
         <div className="flex items-center gap-1.5 rounded-md px-2 py-1.5 bg-slate-50 border border-slate-100">
           <Loader2 className="w-3 h-3 text-slate-400 animate-spin flex-shrink-0" />
-          <p className="text-[10px] text-slate-500">Checking your Salesforce session…</p>
+          <p className="text-[14px] text-slate-500">Checking your Salesforce session…</p>
         </div>
       ) : authenticated && user ? (
         <div className="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 bg-[#E6F0EA] border border-[#E6F0EA]">
           <div className="flex items-center gap-1.5 min-w-0">
             <User className="w-3 h-3 text-[#2F6B3F] flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold text-[#245531] truncate">{user.username}</p>
-              <p className="text-[9px] text-[#2F6B3F] truncate">{user.email}</p>
+              <p className="text-[14px] font-semibold text-[#245531] truncate">{user.username}</p>
+              <p className="text-[14px] text-[#2F6B3F] truncate">{user.email}</p>
             </div>
           </div>
           <button
             onClick={() => disconnect()}
             disabled={disconnecting}
-            className="flex items-center gap-1 text-[10px] font-semibold text-[#A93F2F] hover:text-[#A93F2F] transition-colors flex-shrink-0 disabled:opacity-50"
+            className="flex items-center gap-1 text-[14px] font-semibold text-[#A93F2F] hover:text-[#A93F2F] transition-colors flex-shrink-0 disabled:opacity-50"
           >
             {disconnecting ? <Loader2 className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
             Disconnect
@@ -212,7 +212,7 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
       ) : (
         <a
           href="/api/auth/salesforce/login"
-          className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 bg-[#2F6F7E] hover:bg-[#225968] transition-colors text-white text-[10px] font-semibold"
+          className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 bg-[#2F6F7E] hover:bg-[#225968] transition-colors text-white text-[14px] font-semibold"
         >
           <LogIn className="w-3 h-3" />
           Connect your Salesforce account
@@ -220,10 +220,10 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
       )}
 
       <div className="flex items-center justify-between mt-auto pt-0.5">
-        <span className="text-[10px] text-muted-foreground/50">{c.owner}</span>
+        <span className="text-[14px] text-muted-foreground/50">{c.owner}</span>
         <button
           onClick={() => navigate(c.href)}
-          className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/70 transition-colors"
+          className="flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/70 transition-colors"
         >
           {c.action}<ChevronRight className="w-3 h-3" />
         </button>
@@ -245,7 +245,7 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Live Connections</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Live Connections</p>
           </div>
           <div className="grid grid-cols-3 gap-2.5">
             {live.map(c =>
@@ -260,7 +260,7 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Needs Setup</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Needs Setup</p>
             </div>
             <div className="grid grid-cols-3 gap-2.5">
               {needsSet.map(c => <ConnectionCard key={c.id} conn={c} navigate={navigate} />)}
@@ -272,7 +272,7 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Phase 2 — Planned</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Phase 2 — Planned</p>
             </div>
             <div className="grid grid-cols-3 gap-2.5">
               {phase2.map(c => <ConnectionCard key={c.id} conn={c} navigate={navigate} />)}
@@ -284,7 +284,7 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Clock className="w-3.5 h-3.5 text-zinc-300" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Phase 3 — Planned</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Phase 3 — Planned</p>
             </div>
             <div className="grid grid-cols-3 gap-2.5">
               {phase3.map(c => <ConnectionCard key={c.id} conn={c} navigate={navigate} />)}
@@ -431,9 +431,9 @@ function CapabilityTab({ navigate }: { navigate: (href: string) => void }) {
                         <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${d.iconCls}`}>
                           <Icon className="w-3.5 h-3.5" />
                         </div>
-                        <span className={`text-[12px] font-bold leading-tight ${isActive ? d.color : 'text-foreground'}`}>{d.title}</span>
+                        <span className={`text-[14px] font-bold leading-tight ${isActive ? d.color : 'text-foreground'}`}>{d.title}</span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground ml-8">{d.subtitle}</p>
+                      <p className="text-[14px] text-muted-foreground ml-8">{d.subtitle}</p>
                     </div>
                     <div className="px-3.5 py-2.5 bg-card">
                       <div className="flex items-center justify-between mb-1.5">
@@ -442,13 +442,13 @@ function CapabilityTab({ navigate }: { navigate: (href: string) => void }) {
                             <span key={dep.label} className={`w-2 h-2 rounded-full ${DEP_STATUS[dep.status].dot}`} title={dep.label} />
                           ))}
                         </div>
-                        <span className={`text-[11px] font-bold ${pctColor}`}>{score}%</span>
+                        <span className={`text-[14px] font-bold ${pctColor}`}>{score}%</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                         <div className={`h-full rounded-full ${barColor} transition-all`} style={{ width: `${score}%` }} />
                       </div>
                       {!activeDomain && (
-                        <p className="text-[10px] text-muted-foreground/60 mt-1.5">
+                        <p className="text-[14px] text-muted-foreground/60 mt-1.5">
                           {d.deps.filter(dep => dep.status === 'live').length}/{d.deps.length} ready · click to inspect
                         </p>
                       )}
@@ -470,11 +470,11 @@ function CapabilityTab({ navigate }: { navigate: (href: string) => void }) {
             </div>
             <div>
               <h2 className={`text-[14px] font-bold ${activeDomain.color}`}>{activeDomain.title}</h2>
-              <p className="text-[11px] text-muted-foreground">{activeDomain.subtitle}</p>
+              <p className="text-[14px] text-muted-foreground">{activeDomain.subtitle}</p>
             </div>
             <button
               onClick={() => { setSelectedDomain(null); setExpandedDep(null); }}
-              className="ml-auto text-[11px] text-muted-foreground hover:text-foreground font-medium"
+              className="ml-auto text-[14px] text-muted-foreground hover:text-foreground font-medium"
             >
               ✕ Close
             </button>
@@ -496,8 +496,8 @@ function CapabilityTab({ navigate }: { navigate: (href: string) => void }) {
                       className="w-full text-left px-4 py-3.5 flex items-center gap-3"
                     >
                       <span className={`w-2 h-2 rounded-full shrink-0 ${s.dot}`} />
-                      <span className="flex-1 text-[13px] font-semibold text-foreground">{dep.label}</span>
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${s.badge}`}>{s.label}</span>
+                      <span className="flex-1 text-[14px] font-semibold text-foreground">{dep.label}</span>
+                      <span className={`text-[14px] font-semibold px-2 py-0.5 rounded-full border ${s.badge}`}>{s.label}</span>
                       {isOpen
                         ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
                         : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
@@ -505,11 +505,11 @@ function CapabilityTab({ navigate }: { navigate: (href: string) => void }) {
                     </button>
                     {isOpen && (
                       <div className="px-4 pb-4 pt-2.5 border-t border-border bg-muted/20 space-y-2.5">
-                        <p className="text-[12px] text-muted-foreground leading-relaxed">{dep.note}</p>
+                        <p className="text-[14px] text-muted-foreground leading-relaxed">{dep.note}</p>
                         {dep.action && dep.actionLabel && (
                           <button
                             onClick={() => navigate(dep.action!)}
-                            className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/70 transition-colors"
+                            className="flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/70 transition-colors"
                           >
                             {dep.actionLabel} <ChevronRight className="w-3 h-3" />
                           </button>
@@ -569,10 +569,10 @@ function ConfigRow({ link, navigate }: { link: ConfigLink; navigate: (href: stri
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-0.5">
-          <p className="text-[12px] font-bold text-foreground leading-tight">{link.name}</p>
-          <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 ${link.badgeCls}`}>{link.badge}</span>
+          <p className="text-[14px] font-bold text-foreground leading-tight">{link.name}</p>
+          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 ${link.badgeCls}`}>{link.badge}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-snug">{link.detail}</p>
+        <p className="text-[14px] text-muted-foreground leading-snug">{link.detail}</p>
       </div>
     </button>
   );
@@ -584,14 +584,14 @@ function ConfigTab({ navigate }: { navigate: (href: string) => void }) {
       <div className="p-5 max-w-3xl space-y-6">
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">Setup & Configuration</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-3">Setup & Configuration</p>
           <div className="grid grid-cols-2 gap-2">
             {SETUP_PAGES.map(link => <ConfigRow key={link.id} link={link} navigate={navigate} />)}
           </div>
         </div>
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">Governance & Readiness</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-3">Governance & Readiness</p>
           <div className="grid grid-cols-2 gap-2">
             {GOVERNANCE_LINKS.map(link => <ConfigRow key={link.id} link={link} navigate={navigate} />)}
           </div>
@@ -629,27 +629,27 @@ export default function IntegrationHub() {
       <div className="flex-shrink-0 px-5 pt-3 pb-0 border-b bg-card">
         <div className="flex items-start justify-between gap-4 mb-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration</p>
             <h1 className="text-[15px] font-semibold text-foreground leading-snug">Integrations</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               Connection status, Penny capability readiness, and setup tools.
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 mt-1">
             <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
               <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
-              <span className="text-[11px] font-semibold text-[#2F6B3F]">{liveCount} live</span>
+              <span className="text-[14px] font-semibold text-[#2F6B3F]">{liveCount} live</span>
             </div>
             {needsCount > 0 && (
               <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2.5 py-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#FFF3E0]0" />
-                <span className="text-[11px] font-semibold text-[#CC8400]">{needsCount} need action</span>
+                <span className="text-[14px] font-semibold text-[#CC8400]">{needsCount} need action</span>
               </div>
             )}
             {partCount > 0 && (
               <div className="flex items-center gap-1.5 bg-zinc-50 border border-zinc-200 rounded-full px-2.5 py-1">
                 <Network className="w-3 h-3 text-zinc-500" />
-                <span className="text-[11px] font-semibold text-zinc-600">{partCount} dep gaps</span>
+                <span className="text-[14px] font-semibold text-zinc-600">{partCount} dep gaps</span>
               </div>
             )}
           </div>
@@ -661,7 +661,7 @@ export default function IntegrationHub() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-[12px] font-medium border-b-2 transition-all whitespace-nowrap ${
+              className={`px-4 py-2 text-[14px] font-medium border-b-2 transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-foreground text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'

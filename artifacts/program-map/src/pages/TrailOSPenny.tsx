@@ -68,9 +68,9 @@ export default function TrailOSPenny() {
                     <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{cap.description}</p>
                     <div className="flex flex-wrap gap-1 mt-auto">
                       {cap.programs.slice(0, 2).map(p => (
-                        <Badge key={p} variant="secondary" className="text-[10px]">{p}</Badge>
+                        <Badge key={p} variant="secondary" className="text-[14px]">{p}</Badge>
                       ))}
-                      {cap.programs.length > 2 && <Badge variant="secondary" className="text-[10px]">+{cap.programs.length - 2}</Badge>}
+                      {cap.programs.length > 2 && <Badge variant="secondary" className="text-[14px]">+{cap.programs.length - 2}</Badge>}
                     </div>
                   </CardContent>
                 </Card>
@@ -102,9 +102,9 @@ export default function TrailOSPenny() {
                     <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{cap.purpose}</p>
                     <div className="flex flex-wrap gap-1 mt-auto">
                       {cap.programs.slice(0, 2).map(p => (
-                        <Badge key={p} variant="outline" className="text-[10px] bg-white">{p}</Badge>
+                        <Badge key={p} variant="outline" className="text-[14px] bg-white">{p}</Badge>
                       ))}
-                      {cap.programs.length > 2 && <Badge variant="outline" className="text-[10px] bg-white">+{cap.programs.length - 2}</Badge>}
+                      {cap.programs.length > 2 && <Badge variant="outline" className="text-[14px] bg-white">+{cap.programs.length - 2}</Badge>}
                     </div>
                   </CardContent>
                 </Card>
@@ -149,7 +149,7 @@ export default function TrailOSPenny() {
               ].map(stat => (
                 <Card key={stat.label} className="shadow-sm">
                   <CardContent className="p-6">
-                    <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+                    <span className="text-sm font-medium text-muted-foreground ">{stat.label}</span>
                     <div className={`text-4xl font-bold mt-2 ${stat.color}`}>{stat.value}</div>
                     <div className="h-2 w-full bg-muted/50 rounded-full mt-4 overflow-hidden">
                       <div className="h-full bg-border w-2/3 rounded-full" />

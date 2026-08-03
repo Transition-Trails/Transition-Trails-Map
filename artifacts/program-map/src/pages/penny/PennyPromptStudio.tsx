@@ -28,7 +28,7 @@ function ViewTab({ label, icon: Icon, active, count, onClick }: {
 }) {
   return (
     <button onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all border ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-all border ${
         active ? 'bg-foreground text-background border-foreground'
                : 'border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground'
       }`}
@@ -36,7 +36,7 @@ function ViewTab({ label, icon: Icon, active, count, onClick }: {
       <Icon className="w-3.5 h-3.5" />
       {label}
       {count !== undefined && (
-        <span className={`text-[10px] font-bold rounded-full px-1.5 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
+        <span className={`text-[14px] font-bold rounded-full px-1.5 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
       )}
     </button>
   );
@@ -46,7 +46,7 @@ function ViewTab({ label, icon: Icon, active, count, onClick }: {
 
 function StatusBadge({ status }: { status: PromptStatus }) {
   const cfg = PROMPT_STATUS_CONFIG[status];
-  return <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{status}</span>;
+  return <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{status}</span>;
 }
 
 // ── Template Row ───────────────────────────────────────────────────────────
@@ -60,10 +60,10 @@ function TemplateRow({ t, selected, onSelect }: { t: PromptTemplate; selected: b
                  : 'bg-white border-border hover:border-foreground/20 hover:bg-muted/20'
       }`}
     >
-      <p className={`text-[11px] font-bold leading-snug mb-0.5 ${selected ? 'text-background' : 'text-foreground'}`}>{t.name}</p>
+      <p className={`text-[14px] font-bold leading-snug mb-0.5 ${selected ? 'text-background' : 'text-foreground'}`}>{t.name}</p>
       <div className="flex items-center gap-1">
-        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : domCls}`}>{t.domain}</span>
-        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : PROMPT_STATUS_CONFIG[t.status].cls}`}>{t.status}</span>
+        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : domCls}`}>{t.domain}</span>
+        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : PROMPT_STATUS_CONFIG[t.status].cls}`}>{t.status}</span>
       </div>
     </button>
   );
@@ -81,7 +81,7 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
     return (
       <div className="border border-border rounded-lg overflow-hidden">
         <button onClick={() => toggle(id)} className="w-full flex items-center justify-between px-3 py-2 bg-muted/30 hover:bg-muted/50">
-          <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">{label}</span>
+          <span className="text-[14px] font-bold text-foreground ">{label}</span>
           {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
         </button>
         {isOpen && <div className="p-3">{children}</div>}
@@ -100,26 +100,26 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
         <div>
           <div className="flex items-start justify-between gap-2 mb-2">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Prompt Template · v{t.version}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">Prompt Template · v{t.version}</p>
               <h3 className="text-[16px] font-bold text-foreground leading-snug">{t.name}</h3>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <button onClick={onEdit} className="text-[10px] font-bold text-muted-foreground border border-border rounded-full px-2 py-1 hover:bg-muted/40 transition-colors">Edit</button>
-              <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 transition-colors">Brief</button>
+              <button onClick={onEdit} className="text-[14px] font-bold text-muted-foreground border border-border rounded-full px-2 py-1 hover:bg-muted/40 transition-colors">Edit</button>
+              <button onClick={onOpenBrief} className="text-[14px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 transition-colors">Brief</button>
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${domCls}`}>{t.domain}</span>
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${stsCfg.cls}`}>{t.status}</span>
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${riskCfg.cls}`}>Risk: {t.hallucinationRisk}</span>
-            <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 border-border text-muted-foreground">Score: {t.qualityScore}/100</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${domCls}`}>{t.domain}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${stsCfg.cls}`}>{t.status}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${riskCfg.cls}`}>Risk: {t.hallucinationRisk}</span>
+            <span className="text-[14px] font-bold border rounded-full px-2 py-0.5 border-border text-muted-foreground">Score: {t.qualityScore}/100</span>
           </div>
         </div>
 
         {/* Purpose */}
         <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-          <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Purpose</p>
-          <p className="text-[12px] text-foreground leading-relaxed">{t.purpose}</p>
+          <p className="text-[14px] font-bold text-primary/70  mb-1">Purpose</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{t.purpose}</p>
         </div>
 
         {/* Meta */}
@@ -133,8 +133,8 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
             { label: 'Tone',            value: t.tone.split('.')[0] },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-lg border border-border bg-white p-2">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">{label}</p>
-              <p className="text-[11px] font-semibold text-foreground capitalize">{value}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50">{label}</p>
+              <p className="text-[14px] font-semibold text-foreground capitalize">{value}</p>
             </div>
           ))}
         </div>
@@ -145,7 +145,7 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
             {t.requiredVariables.map(id => {
               const v = promptVariables.find(v => v.id === id);
               return v ? (
-                <span key={id} className="text-[10px] font-mono font-semibold bg-muted border border-border rounded px-1.5 py-0.5 text-foreground">{v.name}</span>
+                <span key={id} className="text-[14px] font-mono font-semibold bg-muted border border-border rounded px-1.5 py-0.5 text-foreground">{v.name}</span>
               ) : null;
             })}
           </div>
@@ -161,10 +161,10 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
                         : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]';
               return (
                 <div key={sr.sourceId} className="flex items-start gap-2">
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${cls}`}>{sr.role}</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${cls}`}>{sr.role}</span>
                   <div>
-                    <p className="text-[11px] font-semibold text-foreground">{sr.sourceName}</p>
-                    <p className="text-[10px] text-muted-foreground">{sr.reasoning}</p>
+                    <p className="text-[14px] font-semibold text-foreground">{sr.sourceName}</p>
+                    <p className="text-[14px] text-muted-foreground">{sr.reasoning}</p>
                   </div>
                 </div>
               );
@@ -178,7 +178,7 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
             {t.guardrails.map((g, i) => (
               <div key={i} className="flex items-start gap-2 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-2">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
-                <p className="text-[11px] text-[#A93F2F] leading-snug">{g}</p>
+                <p className="text-[14px] text-[#A93F2F] leading-snug">{g}</p>
               </div>
             ))}
           </div>
@@ -186,27 +186,27 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
 
         {/* Prompt body */}
         <Sec id="prompt" label="Prompt Body (Annotated)">
-          <pre className="text-[10px] font-mono text-foreground bg-muted/40 rounded-lg p-3 whitespace-pre-wrap leading-relaxed overflow-x-auto">{t.promptBody}</pre>
+          <pre className="text-[14px] font-mono text-foreground bg-muted/40 rounded-lg p-3 whitespace-pre-wrap leading-relaxed overflow-x-auto">{t.promptBody}</pre>
         </Sec>
 
         {/* SF Objects + Standards */}
         <Sec id="related" label="Related Systems">
           <div className="space-y-2">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">Salesforce Objects</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Salesforce Objects</p>
               <div className="flex flex-wrap gap-1">
                 {t.relatedSfObjects.length === 0
-                  ? <span className="text-[10px] italic text-muted-foreground/50">None</span>
-                  : t.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)
+                  ? <span className="text-[14px] italic text-muted-foreground/50">None</span>
+                  : t.relatedSfObjects.map(o => <span key={o} className="text-[14px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)
                 }
               </div>
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">Standards</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Standards</p>
               <div className="flex flex-wrap gap-1">
                 {t.relatedStandards.length === 0
-                  ? <span className="text-[10px] italic text-muted-foreground/50">None defined yet</span>
-                  : t.relatedStandards.map(s => <span key={s} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{s.replace('std-','').replace(/-/g,' ')}</span>)
+                  ? <span className="text-[14px] italic text-muted-foreground/50">None defined yet</span>
+                  : t.relatedStandards.map(s => <span key={s} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{s.replace('std-','').replace(/-/g,' ')}</span>)
                 }
               </div>
             </div>
@@ -216,7 +216,7 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
         {/* Quality */}
         {qr && (
           <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Quality Review</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Quality Review</p>
             <div className="grid grid-cols-2 gap-1.5 mb-2">
               {[
                 { label: 'Source Coverage',    value: qr.sourceCoverage },
@@ -224,12 +224,12 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
                 { label: 'Usefulness',          value: qr.usefulnessScore },
               ].map(({ label, value }) => (
                 <div key={label}>
-                  <p className="text-[9px] text-muted-foreground mb-0.5">{label}</p>
+                  <p className="text-[14px] text-muted-foreground mb-0.5">{label}</p>
                   <div className="flex items-center gap-1.5">
                     <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
                       <div className="h-full bg-foreground rounded-full" style={{ width: `${value}%` }} />
                     </div>
-                    <span className="text-[10px] font-bold">{value}%</span>
+                    <span className="text-[14px] font-bold">{value}%</span>
                   </div>
                 </div>
               ))}
@@ -237,7 +237,7 @@ function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenB
             {qr.openFlags.length > 0 && (
               <div className="space-y-1">
                 {qr.openFlags.map((f, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-[10px] text-[#CC8400]">
+                  <div key={i} className="flex items-start gap-1.5 text-[14px] text-[#CC8400]">
                     <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
                     {f}
                   </div>
@@ -269,7 +269,7 @@ function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplat
             <Brain className="w-7 h-7 text-primary shrink-0 mt-0.5" />
             <div>
               <h2 className="text-[14px] font-bold text-foreground mb-1">Prompt Library</h2>
-              <p className="text-[12px] text-foreground/80 leading-relaxed">
+              <p className="text-[14px] text-foreground/80 leading-relaxed">
                 All Penny prompt templates organized by capability domain. Each template defines how Penny thinks, what it retrieves, and what guardrails govern its output. Staff configure Penny behavior here — no code required.
               </p>
             </div>
@@ -284,8 +284,8 @@ function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplat
             <div key={domain}>
               <div className={`flex items-center gap-2 rounded-xl border p-3 mb-2 ${cls}`}>
                 <Brain className="w-4 h-4" />
-                <p className="text-[13px] font-bold">{domain}</p>
-                <span className="text-[10px] font-bold ml-auto">{domTemplates.length} template{domTemplates.length > 1 ? 's' : ''}</span>
+                <p className="text-[14px] font-bold">{domain}</p>
+                <span className="text-[14px] font-bold ml-auto">{domTemplates.length} template{domTemplates.length > 1 ? 's' : ''}</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {domTemplates.map(t => (
@@ -293,11 +293,11 @@ function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplat
                     className="text-left rounded-xl border border-border bg-white p-3 hover:border-foreground/30 hover:shadow-sm transition-all group"
                   >
                     <div className="flex items-start justify-between gap-1 mb-1.5">
-                      <p className="text-[12px] font-bold text-foreground leading-snug group-hover:text-primary transition-colors">{t.name}</p>
+                      <p className="text-[14px] font-bold text-foreground leading-snug group-hover:text-primary transition-colors">{t.name}</p>
                       <StatusBadge status={t.status} />
                     </div>
-                    <p className="text-[10px] text-muted-foreground leading-snug mb-2">{t.shortDescription}</p>
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                    <p className="text-[14px] text-muted-foreground leading-snug mb-2">{t.shortDescription}</p>
+                    <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
                       <span className={`font-bold border rounded-full px-1.5 py-0.5 ${RISK_CONFIG[t.hallucinationRisk].cls}`}>Risk: {t.hallucinationRisk}</span>
                       <span className="border border-border bg-muted/40 rounded-full px-1.5 py-0.5">v{t.version}</span>
                       <span className="ml-auto font-semibold">{t.qualityScore}/100</span>
@@ -339,26 +339,26 @@ function TemplatesView({ onOpenBrief, onEdit }: { onOpenBrief: (t: PromptTemplat
         <div className="p-2.5 space-y-2 border-b border-border">
           <div className="relative">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates…" className="pl-7 h-7 text-[11px] bg-white" />
+            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates…" className="pl-7 h-7 text-[14px] bg-white" />
           </div>
-          <select value={filterDomain} onChange={e => setFilterDomain(e.target.value as any)} className="w-full h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterDomain} onChange={e => setFilterDomain(e.target.value as any)} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All domains</option>
             {DOMAIN_ORDER.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)} className="w-full h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All statuses</option>
             {(['Approved','Review','Draft','Deprecated'] as PromptStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {filtered.length === 0 && <p className="text-[11px] text-center text-muted-foreground py-6">No templates match.</p>}
+            {filtered.length === 0 && <p className="text-[14px] text-center text-muted-foreground py-6">No templates match.</p>}
             {DOMAIN_ORDER.map(domain => {
               const ts = filtered.filter(t => t.domain === domain);
               if (!ts.length) return null;
               return (
                 <div key={domain}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{domain}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
                   {ts.map(t => <TemplateRow key={t.id} t={t} selected={selectedId === t.id} onSelect={() => setSelectedId(t.id)} />)}
                 </div>
               );
@@ -460,12 +460,12 @@ function VariablesView() {
       <div className="flex flex-col flex-1 min-w-0">
         {/* Sub-header */}
         <div className="px-5 py-2.5 border-b border-border bg-white flex-shrink-0 flex items-center justify-between gap-4">
-          <p className="text-[11px] text-muted-foreground leading-snug">
+          <p className="text-[14px] text-muted-foreground leading-snug">
             Runtime variables injected into Penny prompts. Each maps to a live data source — Salesforce, LMS, Calendar, or User Input.
           </p>
           <button
             onClick={handleNew}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
             New Variable
@@ -477,7 +477,7 @@ function VariablesView() {
             {/* Column headers */}
             <div className="grid grid-cols-[1fr_64px_96px_24px] gap-2 px-3 py-1">
               {['Variable / Label','Type','Source',''].map((h,i) => (
-                <p key={i} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">{h}</p>
+                <p key={i} className="text-[14px] font-bold  text-muted-foreground/50">{h}</p>
               ))}
             </div>
 
@@ -492,11 +492,11 @@ function VariablesView() {
                 }`}
               >
                 <div>
-                  <code className="text-[10px] font-mono font-bold text-foreground bg-muted/40 rounded px-1.5 py-0.5">{v.name}</code>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{v.label}</p>
+                  <code className="text-[14px] font-mono font-bold text-foreground bg-muted/40 rounded px-1.5 py-0.5">{v.name}</code>
+                  <p className="text-[14px] text-muted-foreground mt-0.5">{v.label}</p>
                 </div>
-                <span className="text-[10px] font-semibold text-muted-foreground capitalize">{v.type}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 truncate ${SOURCE_CLS[v.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>
+                <span className="text-[14px] font-semibold text-muted-foreground capitalize">{v.type}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 truncate ${SOURCE_CLS[v.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>
                   {v.source}
                 </span>
                 <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${selectedId === v.id ? 'rotate-90' : ''}`} />
@@ -512,13 +512,13 @@ function VariablesView() {
           {/* Header */}
           <div className="px-4 py-3 border-b border-border flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Variable</p>
-              <p className="text-[13px] font-bold text-foreground leading-tight truncate">{selected.label}</p>
-              <code className="text-[10px] font-mono text-muted-foreground">{selected.name}</code>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Variable</p>
+              <p className="text-[14px] font-bold text-foreground leading-tight truncate">{selected.label}</p>
+              <code className="text-[14px] font-mono text-muted-foreground">{selected.name}</code>
             </div>
             <button
               onClick={() => handleEdit(selected)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-border text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors shrink-0"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-border text-[14px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors shrink-0"
             >
               <Pencil className="w-3 h-3" /> Edit
             </button>
@@ -528,38 +528,38 @@ function VariablesView() {
             <div className="p-4 space-y-4">
               {/* Badges */}
               <div className="flex flex-wrap gap-1.5">
-                <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 text-slate-600 bg-slate-50 border-slate-200 capitalize">{selected.type}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${SOURCE_CLS[selected.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>{selected.source}</span>
+                <span className="text-[14px] font-bold border rounded-full px-2 py-0.5 text-slate-600 bg-slate-50 border-slate-200 capitalize">{selected.type}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${SOURCE_CLS[selected.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>{selected.source}</span>
                 {selected.required && (
-                  <span className="text-[10px] font-bold border rounded-full px-2 py-0.5 text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]">Required</span>
+                  <span className="text-[14px] font-bold border rounded-full px-2 py-0.5 text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]">Required</span>
                 )}
               </div>
 
               {/* Description */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Description</p>
-                <p className="text-[11px] text-foreground leading-relaxed">{selected.description}</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Description</p>
+                <p className="text-[14px] text-foreground leading-relaxed">{selected.description}</p>
               </div>
 
               {/* Example */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Example Value</p>
-                <code className="text-[11px] font-mono text-muted-foreground block bg-muted/30 rounded px-2 py-1.5 break-all">{selected.exampleValue || '—'}</code>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Example Value</p>
+                <code className="text-[14px] font-mono text-muted-foreground block bg-muted/30 rounded px-2 py-1.5 break-all">{selected.exampleValue || '—'}</code>
               </div>
 
               {/* Used by */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">
                   Used by {selected.usedByTemplates.length} template{selected.usedByTemplates.length !== 1 ? 's' : ''}
                 </p>
                 {selected.usedByTemplates.length > 0 ? (
                   <div className="space-y-1">
                     {selected.usedByTemplates.map(tid => (
-                      <p key={tid} className="text-[10px] font-mono text-muted-foreground bg-muted/20 rounded px-2 py-1">{tid}</p>
+                      <p key={tid} className="text-[14px] font-mono text-muted-foreground bg-muted/20 rounded px-2 py-1">{tid}</p>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-muted-foreground italic">No templates yet</p>
+                  <p className="text-[14px] text-muted-foreground italic">No templates yet</p>
                 )}
               </div>
             </div>
@@ -588,7 +588,7 @@ function SourceRulesView() {
     <div className="flex h-full overflow-hidden">
       <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Select Template</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Select Template</p>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
@@ -597,10 +597,10 @@ function SourceRulesView() {
               if (!ts.length) return null;
               return (
                 <div key={domain}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{domain}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
                   {ts.map(pt => (
                     <button key={pt.id} onClick={() => setSelectedId(pt.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
                         selectedId === pt.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                       }`}
                     >{pt.name}</button>
@@ -614,30 +614,30 @@ function SourceRulesView() {
       <ScrollArea className="flex-1">
         <div className="p-5 max-w-2xl space-y-4">
           <div className={`rounded-xl border p-3 ${DOMAIN_CLS[t.domain]}`}>
-            <p className="text-[13px] font-bold">{t.name}</p>
-            <p className="text-[10px] text-muted-foreground">{t.shortDescription}</p>
+            <p className="text-[14px] font-bold">{t.name}</p>
+            <p className="text-[14px] text-muted-foreground">{t.shortDescription}</p>
           </div>
           <div className="rounded-xl border border-border bg-white overflow-hidden">
             <div className="grid grid-cols-[100px_1fr_1fr] gap-2 px-4 py-2 bg-muted/30 border-b border-border">
               {['Role','Source','Reasoning'].map(h => (
-                <p key={h} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{h}</p>
+                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
               ))}
             </div>
             {t.sourceRules.map((sr, i) => (
               <div key={sr.sourceId} className={`grid grid-cols-[100px_1fr_1fr] gap-2 px-4 py-3 items-start ${i < t.sourceRules.length - 1 ? 'border-b border-border' : ''}`}>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 self-start ${roleConfig[sr.role]}`}>{sr.role}</span>
-                <p className="text-[11px] font-semibold text-foreground">{sr.sourceName}</p>
-                <p className="text-[11px] text-muted-foreground leading-snug">{sr.reasoning}</p>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 self-start ${roleConfig[sr.role]}`}>{sr.role}</span>
+                <p className="text-[14px] font-semibold text-foreground">{sr.sourceName}</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">{sr.reasoning}</p>
               </div>
             ))}
           </div>
           <div className="rounded-xl border border-border bg-muted/20 p-4">
-            <p className="text-[11px] font-bold text-foreground mb-2">Source Rule Legend</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Source Rule Legend</p>
             <div className="space-y-1.5">
               {(['Required','Preferred','Optional','Forbidden'] as const).map(role => (
                 <div key={role} className="flex items-center gap-2">
-                  <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 w-20 text-center ${roleConfig[role]}`}>{role}</span>
-                  <p className="text-[11px] text-muted-foreground">
+                  <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 w-20 text-center ${roleConfig[role]}`}>{role}</span>
+                  <p className="text-[14px] text-muted-foreground">
                     {role === 'Required'  ? 'Penny must retrieve from this source. Missing = abort and flag.' : ''}
                     {role === 'Preferred' ? 'Use if available. Penny continues without it but logs the gap.' : ''}
                     {role === 'Optional'  ? 'Enrich context if present. Never required.' : ''}
@@ -663,7 +663,7 @@ function OutputFormatsView() {
     <div className="flex h-full overflow-hidden">
       <div className="w-[190px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Formats ({outputFormats.length})</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Formats ({outputFormats.length})</p>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
@@ -673,8 +673,8 @@ function OutputFormatsView() {
                   selectedId === f.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                 }`}
               >
-                <p className={`text-[11px] font-bold ${selectedId === f.id ? 'text-background' : 'text-foreground'}`}>{f.name}</p>
-                <p className={`text-[10px] ${selectedId === f.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>{f.usedBy.length} template{f.usedBy.length !== 1 ? 's' : ''}</p>
+                <p className={`text-[14px] font-bold ${selectedId === f.id ? 'text-background' : 'text-foreground'}`}>{f.name}</p>
+                <p className={`text-[14px] ${selectedId === f.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>{f.usedBy.length} template{f.usedBy.length !== 1 ? 's' : ''}</p>
               </button>
             ))}
           </div>
@@ -683,44 +683,44 @@ function OutputFormatsView() {
       <ScrollArea className="flex-1">
         <div className="p-5 max-w-2xl space-y-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Output Format</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">Output Format</p>
             <h2 className="text-[18px] font-bold text-foreground">{selected.name}</h2>
           </div>
           <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
-            <p className="text-[11px] font-bold text-primary/70 uppercase tracking-wider mb-1">Description</p>
-            <p className="text-[12px] text-foreground leading-relaxed">{selected.description}</p>
+            <p className="text-[14px] font-bold text-primary/70  mb-1">Description</p>
+            <p className="text-[14px] text-foreground leading-relaxed">{selected.description}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl border border-border bg-white p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5">Length Guidance</p>
-              <p className="text-[11px] text-foreground">{selected.lengthGuidance}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Length Guidance</p>
+              <p className="text-[14px] text-foreground">{selected.lengthGuidance}</p>
             </div>
             <div className="rounded-xl border border-border bg-white p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5">Tone</p>
-              <p className="text-[11px] text-foreground">{selected.tone}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Tone</p>
+              <p className="text-[14px] text-foreground">{selected.tone}</p>
             </div>
           </div>
           <div className="rounded-xl border border-border bg-white p-4">
-            <p className="text-[11px] font-bold text-foreground mb-2">Required Structure</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Required Structure</p>
             <div className="space-y-1.5">
               {selected.structure.map((s, i) => (
                 <div key={i} className="flex items-start gap-2">
-                  <span className="w-5 h-5 rounded-full bg-foreground text-background text-[9px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                  <p className="text-[11px] text-foreground">{s}</p>
+                  <span className="w-5 h-5 rounded-full bg-foreground text-background text-[14px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                  <p className="text-[14px] text-foreground">{s}</p>
                 </div>
               ))}
             </div>
           </div>
           <div className="rounded-xl border border-border bg-muted/20 p-4">
-            <p className="text-[11px] font-bold text-foreground mb-2">Format Example</p>
-            <p className="text-[11px] text-foreground/80 italic leading-relaxed">{selected.example}</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Format Example</p>
+            <p className="text-[14px] text-foreground/80 italic leading-relaxed">{selected.example}</p>
           </div>
           <div>
-            <p className="text-[11px] font-bold text-foreground mb-2">Used by Templates</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Used by Templates</p>
             <div className="flex flex-wrap gap-1">
               {selected.usedBy.map(id => {
                 const t = templates.find(t => t.id === id);
-                return t ? <span key={id} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{t.name}</span> : null;
+                return t ? <span key={id} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{t.name}</span> : null;
               })}
             </div>
           </div>
@@ -839,7 +839,7 @@ function TestBenchView() {
       {/* Template picker */}
       <div className="w-[190px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <div className="flex items-center gap-1.5"><FlaskConical className="w-3.5 h-3.5 text-muted-foreground" /><p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Test Bench</p></div>
+          <div className="flex items-center gap-1.5"><FlaskConical className="w-3.5 h-3.5 text-muted-foreground" /><p className="text-[14px] font-bold  text-muted-foreground/50">Test Bench</p></div>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
@@ -848,10 +848,10 @@ function TestBenchView() {
               if (!ts.length) return null;
               return (
                 <div key={domain}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{domain}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
                   {ts.map(pt => (
                     <button key={pt.id} onClick={() => loadTemplate(pt.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
                         selectedId === pt.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                       }`}
                     >{pt.name}</button>
@@ -867,14 +867,14 @@ function TestBenchView() {
       <ScrollArea className="flex-1">
         <div className="p-5 max-w-2xl space-y-4">
           <div className={`rounded-xl border p-3 ${domCls}`}>
-            <p className="text-[13px] font-bold">{t.name}</p>
-            <p className="text-[10px] text-muted-foreground">{t.shortDescription}</p>
+            <p className="text-[14px] font-bold">{t.name}</p>
+            <p className="text-[14px] text-muted-foreground">{t.shortDescription}</p>
           </div>
 
           {/* Learner selector */}
           <div>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1.5">Test As Learner</p>
-            <p className="text-[10px] text-muted-foreground mb-2">Select a learner to inject their live Salesforce context into this prompt. Leave blank to use the generic fallback prompt.</p>
+            <p className="text-[14px] font-bold text-muted-foreground  mb-1.5">Test As Learner</p>
+            <p className="text-[14px] text-muted-foreground mb-2">Select a learner to inject their live Salesforce context into this prompt. Leave blank to use the generic fallback prompt.</p>
             <select
               value={selectedLearnerId}
               onChange={e => {
@@ -884,7 +884,7 @@ function TestBenchView() {
                 setStatus('idle');
               }}
               disabled={isLoading}
-              className="w-full h-7 rounded-md border border-input bg-white px-2 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-60"
+              className="w-full h-7 rounded-md border border-input bg-white px-2 text-[14px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-60"
             >
               <option value="">No learner — use fallback prompt</option>
               {learnersLoading
@@ -899,15 +899,15 @@ function TestBenchView() {
             {selectedLearnerId && (
               <div className="mt-1.5">
                 {contextMeta === null ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
                     ⚡ Learner context will load on first run
                   </span>
                 ) : contextMeta.promptPath === 'salesforce' ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
                     ✓ Live Salesforce context active for {learners.find(l => l.id === selectedLearnerId)?.firstName ?? 'learner'}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
                     ⚠ Using fallback prompt — check Salesforce connection
                   </span>
                 )}
@@ -917,15 +917,15 @@ function TestBenchView() {
 
           {/* Inputs */}
           <div>
-            <p className="text-[11px] font-bold text-foreground mb-2">Sample Inputs</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Sample Inputs</p>
             <div className="space-y-2">
               {Object.entries(t.testBench.sampleInputs).map(([key]) => (
                 <div key={key}>
-                  <label className="text-[10px] font-mono font-bold text-foreground/70">{`{{${key}}}`}</label>
+                  <label className="text-[14px] font-mono font-bold text-foreground/70">{`{{${key}}}`}</label>
                   <Input
                     value={inputs[key] ?? ''}
                     onChange={e => setInputs(prev => ({ ...prev, [key]: e.target.value }))}
-                    className="mt-0.5 h-7 text-[11px] bg-white"
+                    className="mt-0.5 h-7 text-[14px] bg-white"
                     disabled={isLoading}
                   />
                 </div>
@@ -935,10 +935,10 @@ function TestBenchView() {
 
           {/* Sources that would be queried */}
           <div className="rounded-xl border border-border bg-muted/20 p-3">
-            <p className="text-[11px] font-bold text-foreground mb-1.5">Sources Penny Would Query</p>
+            <p className="text-[14px] font-bold text-foreground mb-1.5">Sources Penny Would Query</p>
             <div className="flex flex-wrap gap-1">
               {t.sourceRules.filter(sr => sr.role !== 'Forbidden').map(sr => (
-                <span key={sr.sourceId} className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${
+                <span key={sr.sourceId} className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${
                   sr.role === 'Required' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-slate-600 bg-slate-50 border-slate-200'
                 }`}>{sr.sourceName}</span>
               ))}
@@ -950,7 +950,7 @@ function TestBenchView() {
             <button
               onClick={runPenny}
               disabled={isLoading}
-              className="flex items-center gap-2 bg-foreground text-background px-4 py-2 rounded-full text-[12px] font-bold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-foreground text-background px-4 py-2 rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading
                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -959,7 +959,7 @@ function TestBenchView() {
               {isLoading ? 'Running…' : 'Run Penny'}
             </button>
             {showOutput && (
-              <button onClick={reset} className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground">
+              <button onClick={reset} className="flex items-center gap-1.5 text-[14px] text-muted-foreground hover:text-foreground">
                 <RotateCcw className="w-3 h-3" />Reset
               </button>
             )}
@@ -970,8 +970,8 @@ function TestBenchView() {
             <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 space-y-3 animate-pulse">
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-secondary" />
-                <p className="text-[12px] font-bold text-foreground">Penny Output</p>
-                <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
+                <p className="text-[14px] font-bold text-foreground">Penny Output</p>
+                <span className="text-[14px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
               </div>
               <div className="rounded-lg border border-secondary/20 bg-white p-3 space-y-2">
                 <div className="h-2.5 bg-muted rounded w-full" />
@@ -987,33 +987,33 @@ function TestBenchView() {
             <div className={`rounded-xl border p-4 space-y-3 ${status === 'error' ? 'border-[#E8B9B4] bg-[#FBEAE6]/50' : 'border-secondary/20 bg-secondary/5'}`}>
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-secondary" />
-                <p className="text-[12px] font-bold text-foreground">Penny Output</p>
+                <p className="text-[14px] font-bold text-foreground">Penny Output</p>
                 {status === 'success' && (
-                  <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
+                  <span className="text-[14px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
                 )}
                 {status === 'error' && (
-                  <span className="text-[9px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5 ml-auto">Error</span>
+                  <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5 ml-auto">Error</span>
                 )}
               </div>
 
               {status === 'success' && (
                 <>
                   <div className="rounded-lg border border-secondary/20 bg-white p-3">
-                    <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">{liveReply}</p>
+                    <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-line">{liveReply}</p>
                   </div>
                   {liveDurationMs !== null && (
                     <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] p-3">
-                      <p className="text-[10px] font-bold text-[#2F6B3F] uppercase tracking-wider mb-1">Run Complete</p>
-                      <p className="text-[11px] text-[#245531] leading-snug">
+                      <p className="text-[14px] font-bold text-[#2F6B3F]  mb-1">Run Complete</p>
+                      <p className="text-[14px] text-[#245531] leading-snug">
                         Completed in {liveDurationMs.toLocaleString()} ms
                       </p>
                       {contextMeta && selectedLearnerId && contextMeta.promptPath === 'salesforce' && (
-                        <p className="text-[10px] text-muted-foreground mt-1">
+                        <p className="text-[14px] text-muted-foreground mt-1">
                           Context: Salesforce ✓ · Trail: {contextMeta.trailId ?? '—'} · Phase: {contextMeta.currentPhase ?? '—'} · Tone: {contextMeta.coachingTone ?? '—'}
                         </p>
                       )}
                       {contextMeta && contextMeta.promptPath === 'fallback' && (
-                        <p className="text-[10px] text-[#CC8400] mt-1">
+                        <p className="text-[14px] text-[#CC8400] mt-1">
                           Context: Fallback (generic prompt — no learner data)
                         </p>
                       )}
@@ -1024,13 +1024,13 @@ function TestBenchView() {
 
               {status === 'error' && (
                 <div className="rounded-lg border border-[#E8B9B4] bg-white p-3">
-                  <p className="text-[12px] text-[#A93F2F] leading-relaxed">{errorMsg}</p>
+                  <p className="text-[14px] text-[#A93F2F] leading-relaxed">{errorMsg}</p>
                 </div>
               )}
 
               <div className="flex items-center gap-3">
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${RISK_CONFIG[t.hallucinationRisk].cls}`}>Hallucination Risk: {t.hallucinationRisk}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${PROMPT_STATUS_CONFIG[t.status].cls}`}>{t.status}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${RISK_CONFIG[t.hallucinationRisk].cls}`}>Hallucination Risk: {t.hallucinationRisk}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${PROMPT_STATUS_CONFIG[t.status].cls}`}>{t.status}</span>
               </div>
             </div>
           )}
@@ -1060,7 +1060,7 @@ function VersionHistoryView() {
     <div className="flex h-full overflow-hidden">
       <div className="w-[190px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Templates</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Templates</p>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
@@ -1069,15 +1069,15 @@ function VersionHistoryView() {
               if (!ts.length) return null;
               return (
                 <div key={domain}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{domain}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
                   {ts.map(pt => (
                     <button key={pt.id} onClick={() => setSelectedId(pt.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
                         selectedId === pt.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                       }`}
                     >
                       <p className="font-bold">{pt.name}</p>
-                      <p className={`text-[9px] mt-0.5 ${selectedId === pt.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>
+                      <p className={`text-[14px] mt-0.5 ${selectedId === pt.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>
                         {versionHistory.filter(v => v.templateId === pt.id).length} change{versionHistory.filter(v => v.templateId === pt.id).length !== 1 ? 's' : ''}
                       </p>
                     </button>
@@ -1091,10 +1091,10 @@ function VersionHistoryView() {
       <ScrollArea className="flex-1">
         <div className="p-5 max-w-xl space-y-4">
           <div className={`rounded-xl border p-3 ${DOMAIN_CLS[t.domain]}`}>
-            <p className="text-[13px] font-bold">{t.name}</p>
-            <p className="text-[10px] text-muted-foreground">Current version: v{t.version} · {entries.length} change{entries.length !== 1 ? 's' : ''}</p>
+            <p className="text-[14px] font-bold">{t.name}</p>
+            <p className="text-[14px] text-muted-foreground">Current version: v{t.version} · {entries.length} change{entries.length !== 1 ? 's' : ''}</p>
           </div>
-          {entries.length === 0 && <p className="text-[12px] text-muted-foreground text-center py-8">No version history yet.</p>}
+          {entries.length === 0 && <p className="text-[14px] text-muted-foreground text-center py-8">No version history yet.</p>}
           <div className="relative">
             <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
             <div className="space-y-3">
@@ -1103,13 +1103,13 @@ function VersionHistoryView() {
                   <div className="absolute left-3 top-2 w-2.5 h-2.5 rounded-full bg-background border-2 border-foreground" />
                   <div className="flex-1 rounded-xl border border-border bg-white p-3">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-[10px] font-mono font-bold bg-muted rounded px-1.5 py-0.5">v{entry.version}</span>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${changeTypeCls[entry.changeType]}`}>{entry.changeType}</span>
-                      {entry.breaking && <span className="text-[9px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Breaking</span>}
-                      <span className="text-[10px] text-muted-foreground ml-auto">{entry.date}</span>
+                      <span className="text-[14px] font-mono font-bold bg-muted rounded px-1.5 py-0.5">v{entry.version}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${changeTypeCls[entry.changeType]}`}>{entry.changeType}</span>
+                      {entry.breaking && <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Breaking</span>}
+                      <span className="text-[14px] text-muted-foreground ml-auto">{entry.date}</span>
                     </div>
-                    <p className="text-[11px] text-foreground leading-snug">{entry.summary}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">by {entry.author}</p>
+                    <p className="text-[14px] text-foreground leading-snug">{entry.summary}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5">by {entry.author}</p>
                   </div>
                 </div>
               ))}
@@ -1132,13 +1132,13 @@ function QualityReviewView() {
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0 flex items-center gap-3">
         <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-1.5">
-          <p className="text-[11px] font-semibold text-[#2F6B3F]">
+          <p className="text-[14px] font-semibold text-[#2F6B3F]">
             {qualityReviews.filter(q => q.reviewStatus === 'Approved').length} Approved · {qualityReviews.filter(q => q.reviewStatus !== 'Approved').length} Pending or flagged
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All statuses</option>
             {['Approved','In Review','Pending','Rejected'].map(s => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -1148,7 +1148,7 @@ function QualityReviewView() {
         <div className="p-5 space-y-1">
           <div className="grid grid-cols-[1fr_80px_80px_80px_80px_100px] gap-2 px-3 py-1.5">
             {['Template','Coverage','Standards','Usefulness','Risk','Status'].map(h => (
-              <p key={h} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{h}</p>
+              <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
             ))}
           </div>
           {filtered.map(qr => {
@@ -1161,9 +1161,9 @@ function QualityReviewView() {
             return (
               <div key={qr.templateId} className="grid grid-cols-[1fr_80px_80px_80px_80px_100px] gap-2 px-3 py-3 rounded-lg border border-border bg-white hover:bg-muted/20 transition-colors items-center">
                 <div>
-                  <p className="text-[12px] font-semibold text-foreground">{t.name}</p>
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${DOMAIN_CLS[t.domain]}`}>{t.domain}</span>
-                  {qr.openFlags.length > 0 && <span className="ml-1 text-[9px] font-bold text-[#CC8400]">⚠ {qr.openFlags.length} flag{qr.openFlags.length > 1 ? 's' : ''}</span>}
+                  <p className="text-[14px] font-semibold text-foreground">{t.name}</p>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${DOMAIN_CLS[t.domain]}`}>{t.domain}</span>
+                  {qr.openFlags.length > 0 && <span className="ml-1 text-[14px] font-bold text-[#CC8400]">⚠ {qr.openFlags.length} flag{qr.openFlags.length > 1 ? 's' : ''}</span>}
                 </div>
                 {[qr.sourceCoverage, qr.standardsAlignment, qr.usefulnessScore].map((val, i) => (
                   <div key={i}>
@@ -1171,12 +1171,12 @@ function QualityReviewView() {
                       <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
                         <div className="h-full bg-foreground rounded-full" style={{ width: `${val}%` }} />
                       </div>
-                      <span className="text-[10px] font-bold">{val}</span>
+                      <span className="text-[14px] font-bold">{val}</span>
                     </div>
                   </div>
                 ))}
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${RISK_CONFIG[qr.hallucinationRisk].cls}`}>{qr.hallucinationRisk}</span>
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${stsCls}`}>{qr.reviewStatus}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${RISK_CONFIG[qr.hallucinationRisk].cls}`}>{qr.hallucinationRisk}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${stsCls}`}>{qr.reviewStatus}</span>
               </div>
             );
           })}
@@ -1290,18 +1290,18 @@ export default function PennyPromptStudio() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Penny — Prompt Studio</p>
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Penny — Prompt Studio</p>
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Penny Prompt Studio</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               The administrative control center for how Penny thinks. Configure prompts, variables, source rules, and output formats — no code required.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => openSlackPanel({ context: 'penny', title: 'Penny Prompt Studio', subtitle: 'Slack channels, pending asks, and bot status for Penny prompt work.' })}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
               title="Open Slack context"
             >
               <Hash className="w-3.5 h-3.5" />
@@ -1309,15 +1309,15 @@ export default function PennyPromptStudio() {
             </button>
             <button
               onClick={handleNewTemplate}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3.5 h-3.5" />
               New Template
             </button>
-            <span className="text-[11px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-3 py-1">
+            <span className="text-[14px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-3 py-1">
               {liveTemplates.filter(t => t.status === 'Approved').length} Approved
             </span>
-            <span className="text-[11px] font-semibold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-3 py-1">
+            <span className="text-[14px] font-semibold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-3 py-1">
               {liveTemplates.filter(t => t.status === 'Review').length} In Review
             </span>
           </div>
@@ -1339,7 +1339,7 @@ export default function PennyPromptStudio() {
         {view === 'create' && (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center text-muted-foreground">
             <p className="text-sm font-semibold mb-1">Use the Action Panel →</p>
-            <p className="text-[12px] leading-relaxed max-w-xs">
+            <p className="text-[14px] leading-relaxed max-w-xs">
               Click <strong>New Template</strong> above. The creation form opens in the right panel so the library stays visible.
             </p>
           </div>

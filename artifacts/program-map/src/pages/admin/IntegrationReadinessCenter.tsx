@@ -33,7 +33,7 @@ function ViewTab({ label, active, count, onClick }: {
 }) {
   return (
     <button onClick={onClick}
-      className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium border-b-2 transition-all whitespace-nowrap ${
+      className={`flex items-center gap-1 px-2.5 py-1.5 text-[14px] font-medium border-b-2 transition-all whitespace-nowrap ${
         active
           ? 'border-foreground text-foreground'
           : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
@@ -41,7 +41,7 @@ function ViewTab({ label, active, count, onClick }: {
     >
       {label}
       {count !== undefined && (
-        <span className={`text-[10px] font-bold rounded-full px-1 leading-none ${active ? 'text-foreground' : 'text-muted-foreground/60'}`}>{count}</span>
+        <span className={`text-[14px] font-bold rounded-full px-1 leading-none ${active ? 'text-foreground' : 'text-muted-foreground/60'}`}>{count}</span>
       )}
     </button>
   );
@@ -54,7 +54,7 @@ function ReadinessBar({ score, cls }: { score: number; cls?: string }) {
       <div className={`flex-1 h-2 rounded-full bg-border overflow-hidden ${cls}`}>
         <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
       </div>
-      <span className="text-[11px] font-bold text-foreground w-8 text-right">{score}%</span>
+      <span className="text-[14px] font-bold text-foreground w-8 text-right">{score}%</span>
     </div>
   );
 }
@@ -71,10 +71,10 @@ function IntegrationRow({ int: i, selected, onSelect }: { int: Integration; sele
                  : 'bg-white border-border hover:border-foreground/20 hover:bg-muted/20'
       }`}
     >
-      <p className={`text-[11px] font-bold leading-snug mb-0.5 ${selected ? 'text-background' : 'text-foreground'}`}>{i.shortName}</p>
+      <p className={`text-[14px] font-bold leading-snug mb-0.5 ${selected ? 'text-background' : 'text-foreground'}`}>{i.shortName}</p>
       <div className="flex items-center gap-1 flex-wrap">
-        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : domCfg.cls}`}>{i.domain}</span>
-        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : stsCfg.cls}`}>{i.status}</span>
+        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : domCfg.cls}`}>{i.domain}</span>
+        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : stsCfg.cls}`}>{i.status}</span>
       </div>
     </button>
   );
@@ -92,7 +92,7 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
     return (
       <div className="border border-border rounded-lg overflow-hidden">
         <button onClick={() => toggle(id)} className="w-full flex items-center justify-between px-3 py-2 bg-muted/30 hover:bg-muted/50">
-          <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">{label}</span>
+          <span className="text-[14px] font-bold text-foreground ">{label}</span>
           {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
         </button>
         {isOpen && <div className="p-3">{children}</div>}
@@ -112,38 +112,38 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
             <div className="flex items-start gap-2">
               <div className={`p-1.5 rounded-lg border ${domCfg.cls} mt-0.5`}><DomIcon className="w-4 h-4" /></div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">{i.domain} · {i.priority}</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">{i.domain} · {i.priority}</p>
                 <h3 className="text-[15px] font-bold text-foreground leading-snug">{i.name}</h3>
               </div>
             </div>
-            <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">Brief</button>
+            <button onClick={onOpenBrief} className="text-[14px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">Brief</button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${stsCfg.cls}`}>{i.status}</span>
-            <span className="text-[10px] font-bold border border-border bg-muted/40 rounded-full px-2 py-0.5 text-muted-foreground">{i.launchPhase}</span>
-            <span className="text-[10px] font-bold border border-border bg-muted/40 rounded-full px-2 py-0.5 text-muted-foreground">{i.syncDirection}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${stsCfg.cls}`}>{i.status}</span>
+            <span className="text-[14px] font-bold border border-border bg-muted/40 rounded-full px-2 py-0.5 text-muted-foreground">{i.launchPhase}</span>
+            <span className="text-[14px] font-bold border border-border bg-muted/40 rounded-full px-2 py-0.5 text-muted-foreground">{i.syncDirection}</span>
           </div>
         </div>
 
         {/* Purpose */}
         <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-          <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Purpose</p>
-          <p className="text-[12px] text-foreground leading-relaxed">{i.purpose}</p>
+          <p className="text-[14px] font-bold text-primary/70  mb-1">Purpose</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{i.purpose}</p>
         </div>
 
         {/* Penny note */}
         {i.pennyNote && (
           <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-3">
-            <p className="text-[10px] font-bold text-secondary/70 uppercase tracking-wider mb-1">{TERMS.aiAssistant} Note</p>
-            <p className="text-[11px] text-foreground leading-relaxed">{i.pennyNote}</p>
+            <p className="text-[14px] font-bold text-secondary/70  mb-1">{TERMS.aiAssistant} Note</p>
+            <p className="text-[14px] text-foreground leading-relaxed">{i.pennyNote}</p>
           </div>
         )}
 
         {/* Readiness */}
         <div className="rounded-lg border border-border bg-white p-3">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-2">Integration Readiness</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">Integration Readiness</p>
           <ReadinessBar score={i.readinessScore} />
-          <p className="text-[10px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             {i.readinessScore >= 70 ? 'Near-ready for configuration.' : i.readinessScore >= 40 ? 'Significant setup work remaining.' : i.readinessScore >= 20 ? 'Early planning stage.' : 'Not yet in scope.'}
           </p>
         </div>
@@ -159,8 +159,8 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
             { label: 'Launch Phase',   value: i.launchPhase },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-lg border border-border bg-white p-2">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">{label}</p>
-              <p className="text-[11px] font-semibold text-foreground">{value}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50">{label}</p>
+              <p className="text-[14px] font-semibold text-foreground">{value}</p>
             </div>
           ))}
         </div>
@@ -168,14 +168,14 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
         {/* Related */}
         <Sec id="related" label="Related Trail OS Modules">
           <div className="flex flex-wrap gap-1">
-            {i.relatedTrailOSModules.map(m => <span key={m} className="text-[10px] font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 text-primary">{m}</span>)}
+            {i.relatedTrailOSModules.map(m => <span key={m} className="text-[14px] font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 text-primary">{m}</span>)}
           </div>
         </Sec>
 
         {i.relatedSfObjects.length > 0 && (
           <Sec id="sf" label={`Salesforce Objects (${i.relatedSfObjects.length})`}>
             <div className="flex flex-wrap gap-1">
-              {i.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)}
+              {i.relatedSfObjects.map(o => <span key={o} className="text-[14px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)}
             </div>
           </Sec>
         )}
@@ -183,11 +183,11 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
         {/* Blockers */}
         {i.blockers.length > 0 && (
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#A93F2F]/80">Blockers ({i.blockers.length})</p>
+            <p className="text-[14px] font-bold  text-[#A93F2F]/80">Blockers ({i.blockers.length})</p>
             {i.blockers.map((b, idx) => (
               <div key={idx} className="flex items-start gap-2 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
-                <p className="text-[11px] text-[#A93F2F] leading-snug">{b}</p>
+                <p className="text-[14px] text-[#A93F2F] leading-snug">{b}</p>
               </div>
             ))}
           </div>
@@ -200,7 +200,7 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
               {i.risks.map((r, idx) => (
                 <div key={idx} className="flex items-start gap-1.5">
                   <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-[#CC8400] leading-snug">{r}</p>
+                  <p className="text-[14px] text-[#CC8400] leading-snug">{r}</p>
                 </div>
               ))}
             </div>
@@ -212,8 +212,8 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
           <div className="space-y-1.5">
             {i.nextSteps.map((step, idx) => (
               <div key={idx} className="flex items-start gap-2">
-                <span className="w-4 h-4 rounded-full bg-foreground text-background text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{idx + 1}</span>
-                <p className="text-[11px] text-foreground leading-snug">{step}</p>
+                <span className="w-4 h-4 rounded-full bg-foreground text-background text-[14px] font-bold flex items-center justify-center shrink-0 mt-0.5">{idx + 1}</span>
+                <p className="text-[14px] text-foreground leading-snug">{step}</p>
               </div>
             ))}
           </div>
@@ -240,15 +240,15 @@ function OverviewView() {
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 text-center ${s.cls}`}>
               <p className="text-xl font-bold text-foreground">{s.value}</p>
-              <p className="text-[11px] font-semibold text-foreground/80">{s.label}</p>
-              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+              <p className="text-[14px] font-semibold text-foreground/80">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground">{s.sub}</p>
             </div>
           ))}
         </div>
 
         {/* Status breakdown */}
         <div>
-          <h3 className="text-[12px] font-bold text-foreground mb-2">Integration Status</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-2">Integration Status</h3>
           <div className="space-y-2">
             {(Object.entries(IRC_SUMMARY.byStatus) as [IntegrationStatus, number][])
               .filter(([,c]) => c > 0)
@@ -256,11 +256,11 @@ function OverviewView() {
                 const cfg = STATUS_CONFIG[status];
                 return (
                   <div key={status} className={`flex items-center gap-3 rounded-xl border p-3 ${cfg.cls}`}>
-                    <span className="text-[11px] font-bold w-40">{status}</span>
+                    <span className="text-[14px] font-bold w-40">{status}</span>
                     <div className="flex-1 h-2 rounded-full bg-white/50 overflow-hidden">
                       <div className="h-full bg-current rounded-full opacity-50" style={{ width: `${(count / IRC_SUMMARY.total) * 100}%` }} />
                     </div>
-                    <span className="text-[11px] font-bold">{count}</span>
+                    <span className="text-[14px] font-bold">{count}</span>
                   </div>
                 );
               })
@@ -270,7 +270,7 @@ function OverviewView() {
 
         {/* Domain readiness */}
         <div>
-          <h3 className="text-[12px] font-bold text-foreground mb-2">Readiness by Domain</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-2">Readiness by Domain</h3>
           <div className="rounded-xl border border-border bg-white overflow-hidden">
             {DOMAIN_ORDER.map((domain, i) => {
               const domInts = integrations.filter(int => int.domain === domain);
@@ -282,8 +282,8 @@ function OverviewView() {
                 <div key={domain} className={`px-4 py-3 flex items-center gap-3 ${i < DOMAIN_ORDER.length - 1 ? 'border-b border-border' : ''}`}>
                   <div className={`p-1.5 rounded-lg border shrink-0 ${cfg.cls}`}><DIcon className="w-3.5 h-3.5" /></div>
                   <div className="w-32 shrink-0">
-                    <p className="text-[11px] font-bold text-foreground">{domain}</p>
-                    <p className="text-[10px] text-muted-foreground">{domInts.length} integration{domInts.length > 1 ? 's' : ''}</p>
+                    <p className="text-[14px] font-bold text-foreground">{domain}</p>
+                    <p className="text-[14px] text-muted-foreground">{domInts.length} integration{domInts.length > 1 ? 's' : ''}</p>
                   </div>
                   <div className="flex-1">
                     <ReadinessBar score={avg} />
@@ -296,7 +296,7 @@ function OverviewView() {
 
         {/* Launch timeline summary */}
         <div>
-          <h3 className="text-[12px] font-bold text-foreground mb-2">Launch Phases</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-2">Launch Phases</h3>
           <div className="space-y-2">
             {launchMilestones.map(ms => {
               const stsCls = ms.status === 'In Planning' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
@@ -306,13 +306,13 @@ function OverviewView() {
               return (
                 <div key={ms.id} className="rounded-xl border border-border bg-white p-3 flex items-start gap-3">
                   <div className="shrink-0">
-                    <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5 border-border text-muted-foreground">{ms.phase}</span>
+                    <span className="text-[14px] font-bold border rounded-full px-1.5 py-0.5 border-border text-muted-foreground">{ms.phase}</span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-[12px] font-bold text-foreground">{ms.title}</p>
-                    <p className="text-[10px] text-muted-foreground">{ms.description}</p>
+                    <p className="text-[14px] font-bold text-foreground">{ms.title}</p>
+                    <p className="text-[14px] text-muted-foreground">{ms.description}</p>
                   </div>
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${stsCls}`}>{ms.status}</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${stsCls}`}>{ms.status}</span>
                 </div>
               );
             })}
@@ -357,26 +357,26 @@ function CatalogView({ onOpenBrief }: { onOpenBrief: (i: Integration) => void })
         <div className="p-2.5 space-y-2 border-b border-border">
           <div className="relative">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" className="pl-7 h-7 text-[11px] bg-white" />
+            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" className="pl-7 h-7 text-[14px] bg-white" />
           </div>
-          <select value={filterDomain} onChange={e => setFilterDomain(e.target.value as any)} className="w-full h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterDomain} onChange={e => setFilterDomain(e.target.value as any)} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All domains</option>
             {DOMAIN_ORDER.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)} className="w-full h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All statuses</option>
             {(['Prototype','Ready to Configure','Needs Admin Setup','Needs Security Review','Blocked','Future'] as IntegrationStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {filtered.length === 0 && <p className="text-[11px] text-center text-muted-foreground py-6">No integrations match.</p>}
+            {filtered.length === 0 && <p className="text-[14px] text-center text-muted-foreground py-6">No integrations match.</p>}
             {DOMAIN_ORDER.map(domain => {
               const ints = grouped[domain];
               if (!ints?.length) return null;
               return (
                 <div key={domain}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{domain}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
                   {ints.map(i => <IntegrationRow key={i.id} int={i} selected={selectedId === i.id} onSelect={() => setSelectedId(i.id)} />)}
                 </div>
               );
@@ -414,9 +414,9 @@ function DataFlowView() {
                       selectedId === id ? 'ring-2 ring-foreground ' : 'hover:border-foreground/30 '
                     }${node.cls}`}
                   >
-                    <p className="text-[12px] font-bold">{node.label}</p>
-                    <p className="text-[10px] font-semibold opacity-70">{node.systemRole}</p>
-                    <p className="text-[10px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
+                    <p className="text-[14px] font-bold">{node.label}</p>
+                    <p className="text-[14px] font-semibold opacity-70">{node.systemRole}</p>
+                    <p className="text-[14px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
                   </button>
                 );
               })}
@@ -434,9 +434,9 @@ function DataFlowView() {
                   <button key={id} onClick={() => setSelectedId(selectedId === id ? null : id)}
                     className={`text-left rounded-xl border p-3 transition-all ${selectedId === id ? 'ring-2 ring-foreground ' : 'hover:border-foreground/30 '}${node.cls}`}
                   >
-                    <p className="text-[12px] font-bold">{node.label}</p>
-                    <p className="text-[10px] font-semibold opacity-70">{node.systemRole}</p>
-                    <p className="text-[10px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
+                    <p className="text-[14px] font-bold">{node.label}</p>
+                    <p className="text-[14px] font-semibold opacity-70">{node.systemRole}</p>
+                    <p className="text-[14px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
                   </button>
                 );
               })}
@@ -452,9 +452,9 @@ function DataFlowView() {
                 <button onClick={() => setSelectedId(selectedId === 'node-penny' ? null : 'node-penny')}
                   className={`text-left rounded-xl border p-3 transition-all ${selectedId === 'node-penny' ? 'ring-2 ring-foreground ' : 'hover:border-foreground/30 '}${node.cls}`}
                 >
-                  <p className="text-[12px] font-bold">{node.label}</p>
-                  <p className="text-[10px] font-semibold opacity-70">{node.systemRole}</p>
-                  <p className="text-[10px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
+                  <p className="text-[14px] font-bold">{node.label}</p>
+                  <p className="text-[14px] font-semibold opacity-70">{node.systemRole}</p>
+                  <p className="text-[14px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
                 </button>
               );
             })()}
@@ -471,9 +471,9 @@ function DataFlowView() {
                   <button key={id} onClick={() => setSelectedId(selectedId === id ? null : id)}
                     className={`text-left rounded-xl border p-3 transition-all ${selectedId === id ? 'ring-2 ring-foreground ' : 'hover:border-foreground/30 '}${node.cls}`}
                   >
-                    <p className="text-[12px] font-bold">{node.label}</p>
-                    <p className="text-[10px] font-semibold opacity-70">{node.systemRole}</p>
-                    <p className="text-[10px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
+                    <p className="text-[14px] font-bold">{node.label}</p>
+                    <p className="text-[14px] font-semibold opacity-70">{node.systemRole}</p>
+                    <p className="text-[14px] opacity-60 leading-snug mt-0.5">{node.description.split('.')[0]}.</p>
                   </button>
                 );
               })}
@@ -484,9 +484,9 @@ function DataFlowView() {
         {/* Selected node detail */}
         {selected && (
           <div className={`rounded-xl border p-4 ${selected.cls}`}>
-            <p className="text-[13px] font-bold mb-1">{selected.label} — {selected.systemRole}</p>
-            <p className="text-[11px] text-foreground/80 leading-relaxed mb-3">{selected.description}</p>
-            <p className="text-[11px] font-bold text-foreground mb-2">Data Flows</p>
+            <p className="text-[14px] font-bold mb-1">{selected.label} — {selected.systemRole}</p>
+            <p className="text-[14px] text-foreground/80 leading-relaxed mb-3">{selected.description}</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Data Flows</p>
             <div className="space-y-2">
               {selected.outbound.map((flow, i) => {
                 const target = dataFlowNodes.find(n => n.id === flow.targetId);
@@ -494,8 +494,8 @@ function DataFlowView() {
                   <div key={i} className="flex items-start gap-2 rounded-lg bg-white/50 border border-white p-2">
                     <ArrowRight className="w-3.5 h-3.5 shrink-0 mt-0.5 text-foreground/60" />
                     <div>
-                      <p className="text-[11px] font-bold text-foreground">{target?.label} ← {flow.label}</p>
-                      <p className="text-[10px] text-foreground/70">{flow.note}</p>
+                      <p className="text-[14px] font-bold text-foreground">{target?.label} ← {flow.label}</p>
+                      <p className="text-[14px] text-foreground/70">{flow.note}</p>
                     </div>
                   </div>
                 );
@@ -519,7 +519,7 @@ function AuthView() {
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-4 py-2 border-b border-border bg-[#FFF3E0]/60 flex-shrink-0 flex items-center gap-2">
         <Lock className="w-3 h-3 text-[#A93F2F] shrink-0" />
-        <p className="text-[11px] text-[#A93F2F] font-medium">Access planning only — no credentials stored here. Do not enter credentials until security review is complete.</p>
+        <p className="text-[14px] text-[#A93F2F] font-medium">Access planning only — no credentials stored here. Do not enter credentials until security review is complete.</p>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-3">
@@ -533,8 +533,8 @@ function AuthView() {
               <div key={domain} className={`rounded-xl border p-4 ${cfg.cls}`}>
                 <div className="flex items-center gap-2 mb-3">
                   <DIcon className="w-4 h-4" />
-                  <p className="text-[13px] font-bold text-foreground">{domain}</p>
-                  <span className="text-[10px] font-bold ml-auto">{intIds.length} integration{intIds.length > 1 ? 's' : ''}</span>
+                  <p className="text-[14px] font-bold text-foreground">{domain}</p>
+                  <span className="text-[14px] font-bold ml-auto">{intIds.length} integration{intIds.length > 1 ? 's' : ''}</span>
                 </div>
                 <div className="space-y-2">
                   {intIds.map(intId => {
@@ -543,19 +543,19 @@ function AuthView() {
                     return (
                       <div key={intId} className="rounded-lg bg-white/60 border border-white p-3">
                         <div className="flex items-center gap-2 mb-2">
-                          <p className="text-[11px] font-bold text-foreground">{int.shortName}</p>
-                          <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5 border-border text-muted-foreground bg-white">{int.authType}</span>
+                          <p className="text-[14px] font-bold text-foreground">{int.shortName}</p>
+                          <span className="text-[14px] font-bold border rounded-full px-1.5 py-0.5 border-border text-muted-foreground bg-white">{int.authType}</span>
                         </div>
                         <div className="space-y-1">
                           {intAuth.map((a, i) => (
-                            <div key={i} className="flex items-start gap-2 text-[11px]">
+                            <div key={i} className="flex items-start gap-2 text-[14px]">
                               <Lock className="w-3 h-3 text-muted-foreground shrink-0 mt-0.5" />
-                              <code className="font-mono font-bold text-foreground bg-muted/40 rounded px-1 text-[10px]">{a.scope}</code>
+                              <code className="font-mono font-bold text-foreground bg-muted/40 rounded px-1 text-[14px]">{a.scope}</code>
                               <span className="text-muted-foreground flex-1">{a.purpose}</span>
-                              <span className={`text-[9px] font-bold shrink-0 ${a.minimumRequired ? 'text-[#A93F2F]' : 'text-slate-500'}`}>
+                              <span className={`text-[14px] font-bold shrink-0 ${a.minimumRequired ? 'text-[#A93F2F]' : 'text-slate-500'}`}>
                                 {a.minimumRequired ? 'Required' : 'Optional'}
                               </span>
-                              <span className="text-[10px] text-muted-foreground/60 shrink-0">{a.approver}</span>
+                              <span className="text-[14px] text-muted-foreground/60 shrink-0">{a.approver}</span>
                             </div>
                           ))}
                         </div>
@@ -589,7 +589,7 @@ function FieldMappingView() {
     <div className="flex h-full overflow-hidden">
       <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Integrations</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Integrations</p>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
@@ -598,15 +598,15 @@ function FieldMappingView() {
               if (!ints.length) return null;
               return (
                 <div key={domain}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{domain}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
                   {ints.map(i => (
                     <button key={i.id} onClick={() => setSelectedId(i.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
                         selectedId === i.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                       }`}
                     >
                       <p className="font-bold">{i.shortName}</p>
-                      <p className={`text-[9px] mt-0.5 ${selectedId === i.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>{i.fieldMappings.length} mappings</p>
+                      <p className={`text-[14px] mt-0.5 ${selectedId === i.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>{i.fieldMappings.length} mappings</p>
                     </button>
                   ))}
                 </div>
@@ -618,34 +618,34 @@ function FieldMappingView() {
       <ScrollArea className="flex-1">
         <div className="p-5 max-w-3xl space-y-4">
           <div className={`rounded-xl border p-3 ${DOMAIN_CONFIG[int.domain].cls}`}>
-            <p className="text-[13px] font-bold">{int.name}</p>
-            <p className="text-[10px] text-muted-foreground">{int.fieldMappings.length} field mapping{int.fieldMappings.length !== 1 ? 's' : ''}</p>
+            <p className="text-[14px] font-bold">{int.name}</p>
+            <p className="text-[14px] text-muted-foreground">{int.fieldMappings.length} field mapping{int.fieldMappings.length !== 1 ? 's' : ''}</p>
           </div>
           {int.fieldMappings.length === 0
-            ? <p className="text-[12px] text-muted-foreground text-center py-8">No field mappings defined for this integration yet.</p>
+            ? <p className="text-[14px] text-muted-foreground text-center py-8">No field mappings defined for this integration yet.</p>
             : (
               <div className="rounded-xl border border-border bg-white overflow-hidden">
                 <div className="grid grid-cols-[1fr_1fr_100px_80px] gap-2 px-4 py-2 bg-muted/30 border-b border-border">
                   {['Source Field','Target Field','Direction','Status'].map(h => (
-                    <p key={h} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{h}</p>
+                    <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
                   ))}
                 </div>
                 {int.fieldMappings.map((fm, i) => (
                   <div key={i} className={`grid grid-cols-[1fr_1fr_100px_80px] gap-2 px-4 py-3 items-start ${i < int.fieldMappings.length - 1 ? 'border-b border-border' : ''}`}>
-                    <code className="text-[10px] font-mono font-bold text-[#2F6F7E] bg-[#EDF5F8] rounded px-1.5 py-0.5 leading-snug">{fm.sourceField}</code>
-                    <code className="text-[10px] font-mono font-bold text-primary bg-primary/10 rounded px-1.5 py-0.5 leading-snug">{fm.targetField}</code>
-                    <p className="text-[10px] text-muted-foreground leading-snug">{fm.direction}</p>
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 self-start ${statusCls[fm.status]}`}>{fm.status}</span>
+                    <code className="text-[14px] font-mono font-bold text-[#2F6F7E] bg-[#EDF5F8] rounded px-1.5 py-0.5 leading-snug">{fm.sourceField}</code>
+                    <code className="text-[14px] font-mono font-bold text-primary bg-primary/10 rounded px-1.5 py-0.5 leading-snug">{fm.targetField}</code>
+                    <p className="text-[14px] text-muted-foreground leading-snug">{fm.direction}</p>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 self-start ${statusCls[fm.status]}`}>{fm.status}</span>
                   </div>
                 ))}
               </div>
             )}
           {int.fieldMappings.some(fm => fm.notes) && (
             <div className="space-y-1.5">
-              <p className="text-[11px] font-bold text-foreground">Mapping Notes</p>
+              <p className="text-[14px] font-bold text-foreground">Mapping Notes</p>
               {int.fieldMappings.filter(fm => fm.notes).map((fm, i) => (
-                <div key={i} className="flex items-start gap-2 text-[11px]">
-                  <code className="font-mono text-[10px] text-foreground/60 shrink-0">{fm.sourceField.split('.').pop()}</code>
+                <div key={i} className="flex items-start gap-2 text-[14px]">
+                  <code className="font-mono text-[14px] text-foreground/60 shrink-0">{fm.sourceField.split('.').pop()}</code>
                   <ArrowRight className="w-3 h-3 text-muted-foreground shrink-0 mt-0.5" />
                   <p className="text-muted-foreground">{fm.notes}</p>
                 </div>
@@ -676,12 +676,12 @@ function SyncReadinessView() {
     <div className="flex flex-col h-full overflow-hidden">
       <ScrollArea className="flex-1">
         <div className="p-4 overflow-x-auto">
-          <table className="w-full text-[10px]">
+          <table className="w-full text-[14px]">
             <thead>
               <tr>
-                <th className="text-left font-bold text-muted-foreground/60 uppercase tracking-wider pb-2 pr-3 w-40">Integration</th>
+                <th className="text-left font-bold text-muted-foreground/60  pb-2 pr-3 w-40">Integration</th>
                 {checkNames.map(name => (
-                  <th key={name} className="text-center font-bold text-muted-foreground/60 uppercase tracking-wider pb-2 px-1 w-20">
+                  <th key={name} className="text-center font-bold text-muted-foreground/60  pb-2 px-1 w-20">
                     {name.split(' ').map((w, i) => <span key={i} className="block">{w}</span>)}
                   </th>
                 ))}
@@ -692,11 +692,11 @@ function SyncReadinessView() {
                 <tr key={int.id} className="border-t border-border">
                   <td className="py-2 pr-3">
                     <p className="font-bold text-foreground">{int.shortName}</p>
-                    <span className={`text-[9px] font-bold border rounded-full px-1 py-0.5 ${STATUS_CONFIG[int.status].cls}`}>{int.status}</span>
+                    <span className={`text-[14px] font-bold border rounded-full px-1 py-0.5 ${STATUS_CONFIG[int.status].cls}`}>{int.status}</span>
                   </td>
                   {int.syncReadiness.map(check => (
                     <td key={check.check} className="py-2 px-1 text-center">
-                      <span className={`inline-block text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${checkStatusCls[check.status]}`}>
+                      <span className={`inline-block text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${checkStatusCls[check.status]}`}>
                         {check.status === 'Pass' ? '✓' : check.status === 'Fail' ? '✗' : check.status === 'Partial' ? '~' : '—'}
                       </span>
                     </td>
@@ -708,8 +708,8 @@ function SyncReadinessView() {
           <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border">
             {([['Pass','✓ Confirmed'],['Partial','~ Partial'],['Not Started','— Not Started'],['Fail','✗ Failed']] as const).map(([s, label]) => (
               <div key={s} className="flex items-center gap-1.5">
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${checkStatusCls[s]}`}>{label.split(' ')[0]}</span>
-                <span className="text-[10px] text-muted-foreground">{label.split(' ').slice(1).join(' ')}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${checkStatusCls[s]}`}>{label.split(' ')[0]}</span>
+                <span className="text-[14px] text-muted-foreground">{label.split(' ').slice(1).join(' ')}</span>
               </div>
             ))}
           </div>
@@ -737,7 +737,7 @@ function TestingChecklistView() {
     <div className="flex h-full overflow-hidden">
       <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Integration</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Integration</p>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
@@ -746,17 +746,17 @@ function TestingChecklistView() {
               if (!ints.length) return null;
               return (
                 <div key={domain}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{domain}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
                   {ints.map(i => {
                     const n = i.syncReadiness.filter((_, idx) => checked.has(`${i.id}-${idx}`)).length;
                     return (
                       <button key={i.id} onClick={() => setSelectedId(i.id)}
-                        className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-medium transition-all ${
+                        className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
                           selectedId === i.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                         }`}
                       >
                         <p className="font-bold">{i.shortName}</p>
-                        <p className={`text-[9px] mt-0.5 ${selectedId === i.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>{n}/{i.syncReadiness.length} complete</p>
+                        <p className={`text-[14px] mt-0.5 ${selectedId === i.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>{n}/{i.syncReadiness.length} complete</p>
                       </button>
                     );
                   })}
@@ -770,8 +770,8 @@ function TestingChecklistView() {
         <div className="p-5 max-w-xl space-y-4">
           <div className={`rounded-xl border p-3 ${DOMAIN_CONFIG[int.domain].cls}`}>
             <div className="flex items-center justify-between">
-              <p className="text-[13px] font-bold">{int.name}</p>
-              <span className="text-[10px] font-bold">{checkedN}/{total}</span>
+              <p className="text-[14px] font-bold">{int.name}</p>
+              <span className="text-[14px] font-bold">{checkedN}/{total}</span>
             </div>
             <div className="mt-2 h-1.5 rounded-full bg-white/40 overflow-hidden">
               <div className="h-full bg-current rounded-full opacity-70 transition-all" style={{ width: `${(checkedN/total) * 100}%` }} />
@@ -794,16 +794,16 @@ function TestingChecklistView() {
                       {done && <CheckCircle2 className="w-3 h-3 text-white" />}
                     </div>
                     <div>
-                      <p className={`text-[12px] font-bold ${done ? 'text-[#245531] line-through' : 'text-foreground'}`}>{check.check}</p>
-                      <p className={`text-[11px] mt-0.5 ${done ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>{check.description}</p>
-                      {check.notes && <p className={`text-[10px] mt-1 font-semibold italic ${done ? 'text-[#2F6B3F]' : 'text-primary/70'}`}>Note: {check.notes}</p>}
+                      <p className={`text-[14px] font-bold ${done ? 'text-[#245531] line-through' : 'text-foreground'}`}>{check.check}</p>
+                      <p className={`text-[14px] mt-0.5 ${done ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>{check.description}</p>
+                      {check.notes && <p className={`text-[14px] mt-1 font-semibold italic ${done ? 'text-[#2F6B3F]' : 'text-primary/70'}`}>Note: {check.notes}</p>}
                     </div>
                   </div>
                 </button>
               );
             })}
           </div>
-          <p className="text-[10px] text-center text-muted-foreground/60">Checklist state is session-only — not persisted.</p>
+          <p className="text-[14px] text-center text-muted-foreground/60">Checklist state is session-only — not persisted.</p>
         </div>
       </ScrollArea>
     </div>
@@ -831,15 +831,15 @@ function RiskRegisterView() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0 flex items-center gap-3">
-        <span className="text-[10px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-2 py-0.5">
+        <span className="text-[14px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-2 py-0.5">
           {risks.filter(r => r.severity === 'Critical' && r.status === 'Open').length} Critical Open
         </span>
-        <span className="text-[10px] font-bold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-2 py-0.5">
+        <span className="text-[14px] font-bold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-2 py-0.5">
           {risks.filter(r => r.severity === 'High' && r.status === 'Open').length} High Open
         </span>
         <div className="ml-auto flex items-center gap-2">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select value={filterSeverity} onChange={e => setFilterSeverity(e.target.value)} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterSeverity} onChange={e => setFilterSeverity(e.target.value)} className="h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All severity</option>
             {['Critical','High','Medium','Low'].map(s => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -853,28 +853,28 @@ function RiskRegisterView() {
                 <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <p className={`text-[13px] font-bold ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-foreground'}`}>{risk.title}</p>
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${sevCls[risk.severity]}`}>{risk.severity}</span>
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${likelyCls[risk.likelihood]}`}>{risk.likelihood}</span>
+                    <p className={`text-[14px] font-bold ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-foreground'}`}>{risk.title}</p>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${sevCls[risk.severity]}`}>{risk.severity}</span>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${likelyCls[risk.likelihood]}`}>{risk.likelihood}</span>
                   </div>
-                  <p className={`text-[11px] leading-snug ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-muted-foreground'}`}>{risk.description}</p>
+                  <p className={`text-[14px] leading-snug ${risk.severity === 'Critical' ? 'text-[#A93F2F]' : risk.severity === 'High' ? 'text-[#A93F2F]' : 'text-muted-foreground'}`}>{risk.description}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 mt-2">
                 <div className="rounded-lg border border-white/80 bg-white/60 p-2">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Mitigation</p>
-                  <p className="text-[11px] text-foreground leading-snug">{risk.mitigation}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Mitigation</p>
+                  <p className="text-[14px] text-foreground leading-snug">{risk.mitigation}</p>
                 </div>
                 <div className="rounded-lg border border-white/80 bg-white/60 p-2">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Owner · Status</p>
-                  <p className="text-[11px] text-foreground">{risk.owner}</p>
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${risk.status === 'Open' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'}`}>{risk.status}</span>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Owner · Status</p>
+                  <p className="text-[14px] text-foreground">{risk.owner}</p>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${risk.status === 'Open' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'}`}>{risk.status}</span>
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
                 {risk.affectedIntegrations.map(id => {
                   const int = integrations.find(i => i.id === id);
-                  return int ? <span key={id} className="text-[9px] font-medium border border-border bg-white/80 rounded-full px-1.5 py-0.5 text-muted-foreground">{int.shortName}</span> : null;
+                  return int ? <span key={id} className="text-[14px] font-medium border border-border bg-white/80 rounded-full px-1.5 py-0.5 text-muted-foreground">{int.shortName}</span> : null;
                 })}
               </div>
             </div>
@@ -902,7 +902,7 @@ function LaunchPlanView() {
     <div className="flex h-full overflow-hidden">
       <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Phases</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Phases</p>
         </div>
         <div className="p-2 space-y-1">
           {launchMilestones.map(m => (
@@ -911,9 +911,9 @@ function LaunchPlanView() {
                 selectedId === m.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
               }`}
             >
-              <p className={`text-[11px] font-bold ${selectedId === m.id ? 'text-background' : 'text-foreground'}`}>{m.title.split('—')[0].trim()}</p>
+              <p className={`text-[14px] font-bold ${selectedId === m.id ? 'text-background' : 'text-foreground'}`}>{m.title.split('—')[0].trim()}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-[9px] font-bold border rounded-full px-1 py-0.5 ${selectedId === m.id ? 'bg-background/20 text-background border-background/30' : 'border-border text-muted-foreground/60'}`}>{m.phase}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1 py-0.5 ${selectedId === m.id ? 'bg-background/20 text-background border-background/30' : 'border-border text-muted-foreground/60'}`}>{m.phase}</span>
               </div>
             </button>
           ))}
@@ -924,28 +924,28 @@ function LaunchPlanView() {
           <div>
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">{ms.phase}</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">{ms.phase}</p>
                 <h2 className="text-[16px] font-bold text-foreground">{ms.title}</h2>
               </div>
-              <span className={`text-[10px] font-bold border rounded-full px-2 py-1 shrink-0 ${stsCls[ms.status]}`}>{ms.status}</span>
+              <span className={`text-[14px] font-bold border rounded-full px-2 py-1 shrink-0 ${stsCls[ms.status]}`}>{ms.status}</span>
             </div>
-            <p className="text-[12px] text-muted-foreground mt-1">{ms.description}</p>
+            <p className="text-[14px] text-muted-foreground mt-1">{ms.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl border border-border bg-white p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5">Estimated Effort</p>
-              <p className="text-[12px] font-semibold text-foreground">{ms.estimatedEffort}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Estimated Effort</p>
+              <p className="text-[14px] font-semibold text-foreground">{ms.estimatedEffort}</p>
             </div>
             <div className="rounded-xl border border-border bg-white p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5">Dependencies</p>
-              <p className="text-[12px] font-semibold text-foreground">{ms.dependencies.length === 0 ? 'None' : ms.dependencies.join(', ')}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Dependencies</p>
+              <p className="text-[14px] font-semibold text-foreground">{ms.dependencies.length === 0 ? 'None' : ms.dependencies.join(', ')}</p>
             </div>
           </div>
 
           {/* Integrations in this phase */}
           <div>
-            <p className="text-[11px] font-bold text-foreground mb-2">Integrations in this Phase ({ms.integrationIds.length})</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Integrations in this Phase ({ms.integrationIds.length})</p>
             <div className="space-y-2">
               {ms.integrationIds.map(id => {
                 const int = integrations.find(i => i.id === id);
@@ -956,11 +956,11 @@ function LaunchPlanView() {
                   <div key={id} className="rounded-xl border border-border bg-white p-3 flex items-center gap-3">
                     <div className={`p-1.5 rounded-lg border ${domCfg.cls}`}><DIcon className="w-3.5 h-3.5" /></div>
                     <div className="flex-1">
-                      <p className="text-[12px] font-bold text-foreground">{int.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{int.domain}</p>
+                      <p className="text-[14px] font-bold text-foreground">{int.name}</p>
+                      <p className="text-[14px] text-muted-foreground">{int.domain}</p>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${STATUS_CONFIG[int.status].cls}`}>{int.status}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${STATUS_CONFIG[int.status].cls}`}>{int.status}</span>
                       <ReadinessBar score={int.readinessScore} cls="w-16" />
                     </div>
                   </div>
@@ -971,12 +971,12 @@ function LaunchPlanView() {
 
           {/* Success criteria */}
           <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA] p-4">
-            <p className="text-[11px] font-bold text-[#245531] mb-2">Success Criteria</p>
+            <p className="text-[14px] font-bold text-[#245531] mb-2">Success Criteria</p>
             <div className="space-y-1.5">
               {ms.successCriteria.map((sc, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-[#245531] leading-snug">{sc}</p>
+                  <p className="text-[14px] text-[#245531] leading-snug">{sc}</p>
                 </div>
               ))}
             </div>
@@ -1001,21 +1001,21 @@ export default function IntegrationReadinessCenter() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-4 pt-3 pb-2.5 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration — Integration Planning</p>
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration — Integration Planning</p>
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-[15px] font-semibold text-foreground">Integration Readiness Center</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               Plan real integrations without connecting live APIs. {IRC_SUMMARY.total} integrations across {DOMAIN_ORDER.length} domains.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {IRC_SUMMARY.criticalRisks > 0 && (
-              <span className="text-[11px] font-semibold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-3 py-1">
+              <span className="text-[14px] font-semibold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-3 py-1">
                 {IRC_SUMMARY.criticalRisks} Critical Risks
               </span>
             )}
-            <span className="text-[11px] font-semibold text-foreground/70 border border-border bg-muted/40 rounded-full px-3 py-1">
+            <span className="text-[14px] font-semibold text-foreground/70 border border-border bg-muted/40 rounded-full px-3 py-1">
               Avg Readiness: {IRC_SUMMARY.avgReadiness}%
             </span>
           </div>
@@ -1028,7 +1028,7 @@ export default function IntegrationReadinessCenter() {
           <ViewTab label={`Risks (${IRC_SUMMARY.openRisks})`} active={view === 'risks'} onClick={() => setView('risks')} />
           <ViewTab label={`Launch (${IRC_SUMMARY.phases})`}  active={view === 'launch'} onClick={() => setView('launch')} />
           <div className="w-px h-4 bg-border mx-1.5 self-center" />
-          <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40 pr-1 self-center">Admin</span>
+          <span className="text-[14px] font-bold  text-muted-foreground/40 pr-1 self-center">Admin</span>
           <ViewTab label="Auth"         active={view === 'auth'}           onClick={() => setView('auth')} />
           <ViewTab label="Fields"       active={view === 'field-mapping'}  onClick={() => setView('field-mapping')} />
           <ViewTab label="Sync"         active={view === 'sync-readiness'} onClick={() => setView('sync-readiness')} />

@@ -283,17 +283,17 @@ export default function CollaborationWorkspace() {
         {/* ── Intro ── */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[13px] text-zinc-600 leading-relaxed max-w-2xl">
+            <p className="text-[14px] text-zinc-600 leading-relaxed max-w-2xl">
               Configure how each connected channel generates signals, routes them to Penny, and surfaces
               actionable insights across Trail OS. These rules define what Penny watches, when it posts,
               and what reaches Trail Signals.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+            <span className="text-[14px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
               {liveChannels.length} channels live
             </span>
-            <span className="text-[10px] font-semibold text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-full px-2.5 py-1">
+            <span className="text-[14px] font-semibold text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-full px-2.5 py-1">
               {phase2Channels.length} phase 2
             </span>
           </div>
@@ -303,7 +303,7 @@ export default function CollaborationWorkspace() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Zap className="w-3.5 h-3.5 text-zinc-400" />
-            <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Where signals go</h2>
+            <h2 className="text-[14px] font-semibold text-zinc-500 ">Where signals go</h2>
           </div>
           <div className="grid grid-cols-4 gap-3">
             {SIGNAL_DESTINATIONS.map(dest => (
@@ -319,17 +319,17 @@ export default function CollaborationWorkspace() {
               >
                 <div className="flex items-center gap-2 mb-2">
                   <dest.icon className={`w-3.5 h-3.5 ${dest.color}`} />
-                  <span className={`text-[11px] font-semibold ${dest.color}`}>{dest.label}</span>
+                  <span className={`text-[14px] font-semibold ${dest.color}`}>{dest.label}</span>
                   {(dest.id === 'notifications' || dest.id === 'templates') && (
                     <ArrowUpRight className={`w-2.5 h-2.5 ${dest.color} ml-auto opacity-60`} />
                   )}
                 </div>
-                <p className="text-[10px] text-zinc-500 leading-snug mb-2">{dest.description}</p>
+                <p className="text-[14px] text-zinc-500 leading-snug mb-2">{dest.description}</p>
                 <div className="space-y-0.5">
                   {dest.sources.map(s => (
                     <div key={s} className="flex items-center gap-1.5">
                       <span className={`w-1 h-1 rounded-full bg-current ${dest.color} opacity-60`} />
-                      <span className="text-[9px] text-zinc-500">{s}</span>
+                      <span className="text-[14px] text-zinc-500">{s}</span>
                     </div>
                   ))}
                 </div>
@@ -342,7 +342,7 @@ export default function CollaborationWorkspace() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Settings2 className="w-3.5 h-3.5 text-zinc-400" />
-            <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Channel signal rules</h2>
+            <h2 className="text-[14px] font-semibold text-zinc-500 ">Channel signal rules</h2>
           </div>
           <div className="space-y-3">
             {CHANNELS.filter(c => c.status !== 'phase-2').map(ch => {
@@ -363,12 +363,12 @@ export default function CollaborationWorkspace() {
                     <ch.icon className={`w-4 h-4 ${ch.iconColor} shrink-0`} />
                     <div className="flex-1 text-left">
                       <div className="flex items-center gap-2">
-                        <span className="text-[13px] font-semibold text-zinc-800">{ch.name}</span>
-                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${ch.bg} ${ch.border} ${ch.iconColor}`}>
+                        <span className="text-[14px] font-semibold text-zinc-800">{ch.name}</span>
+                        <span className={`text-[14px] font-semibold px-1.5 py-0.5 rounded-full border ${ch.bg} ${ch.border} ${ch.iconColor}`}>
                           {ch.statusLabel}
                         </span>
                       </div>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">{ch.pennyRole}</p>
+                      <p className="text-[14px] text-zinc-500 mt-0.5">{ch.pennyRole}</p>
                     </div>
 
                     {/* Stats */}
@@ -376,7 +376,7 @@ export default function CollaborationWorkspace() {
                       {ch.stats.map(s => (
                         <div key={s.label} className="text-center">
                           <div className="text-[14px] font-bold text-zinc-800 leading-none">{s.value}</div>
-                          <div className="text-[9px] text-zinc-400 mt-0.5 whitespace-nowrap">{s.label}</div>
+                          <div className="text-[14px] text-zinc-400 mt-0.5 whitespace-nowrap">{s.label}</div>
                         </div>
                       ))}
                     </div>
@@ -386,14 +386,14 @@ export default function CollaborationWorkspace() {
                       <span
                         role="button"
                         onClick={e => { e.stopPropagation(); navigate(ch.managePath!); }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[10px] font-semibold transition-all hover:shadow-sm shrink-0 ${ch.bg} ${ch.border} ${ch.iconColor}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[14px] font-semibold transition-all hover:shadow-sm shrink-0 ${ch.bg} ${ch.border} ${ch.iconColor}`}
                       >
                         <Settings2 className="w-3 h-3" />
                         {ch.manageLabel}
                         <ChevronRight className="w-3 h-3" />
                       </span>
                     ) : (
-                      <span className="text-[10px] text-zinc-400 font-medium shrink-0 italic">{ch.manageLabel}</span>
+                      <span className="text-[14px] text-zinc-400 font-medium shrink-0 italic">{ch.manageLabel}</span>
                     )}
 
                     {/* Expand chevron */}
@@ -411,18 +411,18 @@ export default function CollaborationWorkspace() {
                     <div className={`border-t border-zinc-100 grid gap-0 ${ch.rules.length > 1 ? 'grid-cols-2 divide-x divide-zinc-100' : 'grid-cols-1'}`}>
                       {ch.rules.map(group => (
                         <div key={group.label} className="px-5 py-3.5">
-                          <div className="text-[9px] font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">{group.label}</div>
+                          <div className="text-[14px] font-semibold text-zinc-400  mb-2.5">{group.label}</div>
                           <div className="space-y-2">
                             {group.items.map(item => (
                               <div key={item.text} className="flex items-start gap-2">
                                 <RuleStatus status={item.status} />
-                                <span className={`text-[11px] leading-snug ${
+                                <span className={`text-[14px] leading-snug ${
                                   item.status === 'phase-2' ? 'text-zinc-400' : 'text-zinc-700'
                                 }`}>
                                   {item.text}
                                 </span>
                                 {item.status === 'phase-2' && (
-                                  <span className="text-[8px] font-semibold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap mt-0.5">
+                                  <span className="text-[14px] font-semibold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap mt-0.5">
                                     Phase 2
                                   </span>
                                 )}
@@ -442,16 +442,16 @@ export default function CollaborationWorkspace() {
               <div key={ch.id} className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-5 py-3.5 flex items-center gap-3 opacity-60">
                 <span className={`w-2 h-2 rounded-full ${ch.dot} shrink-0`} />
                 <ch.icon className="w-4 h-4 text-zinc-400 shrink-0" />
-                <span className="text-[12px] font-semibold text-zinc-500">{ch.name}</span>
-                <span className="text-[10px] text-zinc-400">— {ch.pennyRole}</span>
-                <span className="ml-auto text-[9px] font-semibold text-zinc-400 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-full">Phase 2</span>
+                <span className="text-[14px] font-semibold text-zinc-500">{ch.name}</span>
+                <span className="text-[14px] text-zinc-400">— {ch.pennyRole}</span>
+                <span className="ml-auto text-[14px] font-semibold text-zinc-400 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-full">Phase 2</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* ── Legend ── */}
-        <div className="flex items-center gap-6 text-[10px] text-zinc-400 pb-2">
+        <div className="flex items-center gap-6 text-[14px] text-zinc-400 pb-2">
           <div className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" /> Active rule</div>
           <div className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-[#CC8400]" /> Configured, not yet live</div>
           <div className="flex items-center gap-1.5"><Circle className="w-3 h-3 text-zinc-300" /> Phase 2 planned</div>

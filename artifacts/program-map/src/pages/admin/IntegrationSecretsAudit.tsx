@@ -109,7 +109,7 @@ function TierBar({ tiers }: { tiers: Record<string, boolean | undefined> }) {
         return (
           <div key={step.key} className="flex items-center gap-1">
             {i > 0 && <div className="w-3 h-px bg-border" />}
-            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold ${cls}`}>
+            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[14px] font-bold ${cls}`}>
               <span>{icon}</span>
               <span className="hidden sm:inline">{step.label}</span>
             </div>
@@ -147,45 +147,45 @@ function GeminiCard({ result, loading }: { result: GeminiResult | null; loading:
     <div className="rounded-lg border border-[#7FAFC6] bg-white overflow-hidden">
       <div className="flex items-center gap-2 px-4 py-2.5 bg-[#EDF5F8] border-b border-[#7FAFC6]">
         <Brain className="w-4 h-4 text-[#2F6F7E]" />
-        <span className="text-[12px] font-bold text-[#2F6F7E]">Gemini / {TERMS.aiAssistant} AI</span>
-        <code className="text-[10px] font-mono text-[#2F6F7E] ml-1">GEMINI_API_KEY</code>
+        <span className="text-[14px] font-bold text-[#2F6F7E]">Gemini / {TERMS.aiAssistant} AI</span>
+        <code className="text-[14px] font-mono text-[#2F6F7E] ml-1">GEMINI_API_KEY</code>
         {result && cfg && (
-          <span className={`ml-auto inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${cfg.cls}`}>{cfg.label}</span>
+          <span className={`ml-auto inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border ${cfg.cls}`}>{cfg.label}</span>
         )}
       </div>
       <div className="px-4 py-3 space-y-3">
-        {loading && <p className="text-[11px] text-muted-foreground italic">Calling Generative Language API…</p>}
+        {loading && <p className="text-[14px] text-muted-foreground italic">Calling Generative Language API…</p>}
         {result && (
           <>
             <TierBar tiers={tiers} />
             {result.status === 'valid' && (
               <div className="rounded border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-2">
-                <p className="text-[11px] font-bold text-[#245531] mb-1">
+                <p className="text-[14px] font-bold text-[#245531] mb-1">
                   API key valid — {result.modelCount} models available ({result.durationMs}ms)
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {result.modelSample.map(m => (
-                    <span key={m} className="text-[10px] font-mono bg-white border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded">{m}</span>
+                    <span key={m} className="text-[14px] font-mono bg-white border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded">{m}</span>
                   ))}
                 </div>
               </div>
             )}
             {result.status !== 'valid' && result.errorMessage && (
               <div className="rounded border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2">
-                <p className="text-[10px] font-bold text-[#CC8400] mb-0.5 uppercase">
+                <p className="text-[14px] font-bold text-[#CC8400] mb-0.5 ">
                   {result.errorCode ? `Error ${result.errorCode}` : 'Issue'}
                 </p>
-                <p className="text-[11px] text-[#CC8400]">{result.errorMessage}</p>
+                <p className="text-[14px] text-[#CC8400]">{result.errorMessage}</p>
               </div>
             )}
-            <p className="text-[11px] text-muted-foreground leading-snug">{result.nextStep}</p>
-            <p className="text-[10px] text-muted-foreground/60">
+            <p className="text-[14px] text-muted-foreground leading-snug">{result.nextStep}</p>
+            <p className="text-[14px] text-muted-foreground/60">
               Validated at {new Date(result.timestamp).toLocaleTimeString()} · {result.durationMs}ms
             </p>
           </>
         )}
         {!result && !loading && (
-          <p className="text-[11px] text-muted-foreground italic">Click "Run Live Checks" to validate the Gemini API key.</p>
+          <p className="text-[14px] text-muted-foreground italic">Click "Run Live Checks" to validate the Gemini API key.</p>
         )}
       </div>
     </div>
@@ -209,10 +209,10 @@ function GoogleServiceRow({ name, svc, reachable }: { name: string; svc: Service
   return (
     <div className="border-t border-border/30 px-4 py-2.5">
       <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-        <span className="text-[11px] font-semibold text-foreground w-28 shrink-0">{name}</span>
-        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${tierCls}`}>{svc.label}</span>
+        <span className="text-[14px] font-semibold text-foreground w-28 shrink-0">{name}</span>
+        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${tierCls}`}>{svc.label}</span>
       </div>
-      <p className="text-[11px] text-muted-foreground leading-snug mb-1">{svc.nextStep}</p>
+      <p className="text-[14px] text-muted-foreground leading-snug mb-1">{svc.nextStep}</p>
     </div>
   );
 }
@@ -232,26 +232,26 @@ function GoogleCard({ result, loading }: { result: GoogleResult | null; loading:
     <div className="rounded-lg border border-[#7FAFC6] bg-white overflow-hidden">
       <div className="flex items-center gap-2 px-4 py-2.5 bg-[#EDF5F8] border-b border-[#7FAFC6]">
         <Globe className="w-4 h-4 text-[#2F6F7E]" />
-        <span className="text-[12px] font-bold text-[#2F6F7E]">Google Workspace</span>
-        <span className="text-[10px] text-[#2F6F7E] ml-1">Drive + Calendar</span>
+        <span className="text-[14px] font-bold text-[#2F6F7E]">Google Workspace</span>
+        <span className="text-[14px] text-[#2F6F7E] ml-1">Drive + Calendar</span>
         {result && (
-          <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${result.googleReachable ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
+          <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded text-[14px] font-bold border ${result.googleReachable ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
             {result.googleReachable ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
             {result.googleReachable ? `Reachable ${result.reachabilityMs}ms` : 'Unreachable'}
           </span>
         )}
       </div>
       <div className="px-4 py-3 space-y-2">
-        {loading && <p className="text-[11px] text-muted-foreground italic">Checking Google OAuth credentials…</p>}
+        {loading && <p className="text-[14px] text-muted-foreground italic">Checking Google OAuth credentials…</p>}
         {result && (
           <>
             {/* Shared OAuth tier */}
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-foreground">Shared OAuth Credentials</p>
+              <p className="text-[14px] font-bold  text-foreground">Shared OAuth Credentials</p>
               <TierBar tiers={sharedTiers} />
               <div className={`rounded border px-3 py-2 ${sharedReady ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#FFD08A] bg-[#FFF3E0]'}`}>
-                <p className={`text-[11px] font-semibold mb-0.5 ${sharedReady ? 'text-[#245531]' : 'text-[#CC8400]'}`}>{result.sharedOAuth.label}</p>
-                <p className={`text-[11px] leading-snug ${sharedReady ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>{result.sharedOAuth.details}</p>
+                <p className={`text-[14px] font-semibold mb-0.5 ${sharedReady ? 'text-[#245531]' : 'text-[#CC8400]'}`}>{result.sharedOAuth.label}</p>
+                <p className={`text-[14px] leading-snug ${sharedReady ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>{result.sharedOAuth.details}</p>
               </div>
             </div>
 
@@ -266,10 +266,10 @@ function GoogleCard({ result, loading }: { result: GoogleResult | null; loading:
             {/* Next steps */}
             {result.nextSteps.length > 0 && (
               <div className="rounded border border-[#7FAFC6] bg-[#EDF5F8] px-3 py-2">
-                <p className="text-[10px] font-bold text-[#2F6F7E] mb-1 uppercase">Next steps</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E] mb-1 ">Next steps</p>
                 <ol className="space-y-0.5">
                   {result.nextSteps.map((s, i) => (
-                    <li key={i} className="text-[11px] text-[#2F6F7E] flex gap-1.5">
+                    <li key={i} className="text-[14px] text-[#2F6F7E] flex gap-1.5">
                       <span className="shrink-0 font-bold">{i + 1}.</span>
                       <span className="leading-snug">{s}</span>
                     </li>
@@ -277,13 +277,13 @@ function GoogleCard({ result, loading }: { result: GoogleResult | null; loading:
                 </ol>
               </div>
             )}
-            <p className="text-[10px] text-muted-foreground/60">
+            <p className="text-[14px] text-muted-foreground/60">
               Validated at {new Date(result.timestamp).toLocaleTimeString()} · {result.durationMs}ms
             </p>
           </>
         )}
         {!result && !loading && (
-          <p className="text-[11px] text-muted-foreground italic">Click "Run Live Checks" to validate Google credentials.</p>
+          <p className="text-[14px] text-muted-foreground italic">Click "Run Live Checks" to validate Google credentials.</p>
         )}
       </div>
     </div>
@@ -307,10 +307,10 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
     <div className={`rounded-lg border bg-white overflow-hidden ${connected ? 'border-[#9FC3AE]' : result ? 'border-[#E8B9B4]' : 'border-[#9FC3AE]'}`}>
       <div className={`flex items-center gap-2 px-4 py-2.5 border-b ${headerCls}`}>
         <Database className={`w-4 h-4 ${connected ? 'text-[#2F6B3F]' : 'text-[#2F6B3F]'}`} />
-        <span className={`text-[12px] font-bold ${connected ? 'text-[#245531]' : 'text-[#245531]'}`}>Salesforce</span>
-        <span className="text-[10px] text-[#2F6B3F] ml-1">via Replit Connector</span>
+        <span className={`text-[14px] font-bold ${connected ? 'text-[#245531]' : 'text-[#245531]'}`}>Salesforce</span>
+        <span className="text-[14px] text-[#2F6B3F] ml-1">via Replit Connector</span>
         {result && (
-          <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
+          <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded text-[14px] font-bold border ${
             connected
               ? 'border-[#9FC3AE] bg-white text-[#2F6B3F]'
               : 'border-[#E8B9B4] bg-white text-[#A93F2F]'
@@ -322,35 +322,35 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
       </div>
 
       <div className="px-4 py-3 space-y-3">
-        {loading && <p className="text-[11px] text-muted-foreground italic">Calling Salesforce REST API via Replit Connector…</p>}
+        {loading && <p className="text-[14px] text-muted-foreground italic">Calling Salesforce REST API via Replit Connector…</p>}
 
         {result && connected && (
           <>
             {/* Org + identity banner */}
             <div className="rounded border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-2 space-y-1">
-              <p className="text-[11px] font-bold text-[#245531]">
+              <p className="text-[14px] font-bold text-[#245531]">
                 {result.orgInfo?.name ?? 'Org'} · {result.orgInfo?.edition} · {result.orgInfo?.sandboxType}
               </p>
               {result.identity && (
-                <p className="text-[11px] text-[#2F6B3F]">
+                <p className="text-[14px] text-[#2F6B3F]">
                   Authenticated as <strong>{result.identity.displayName ?? result.identity.username}</strong>
                   {result.identity.email ? ` (${result.identity.email})` : ''}
                 </p>
               )}
               <div className="flex items-center gap-3 pt-0.5 flex-wrap">
                 {result.objects.map(o => (
-                  <span key={o.object} className={`inline-flex items-center gap-1 text-[10px] font-bold ${o.accessible ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
+                  <span key={o.object} className={`inline-flex items-center gap-1 text-[14px] font-bold ${o.accessible ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
                     {o.accessible ? <CheckCircle className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
                     {o.object}: {o.accessible ? `${o.count.toLocaleString()} records` : 'no access'}
                   </span>
                 ))}
                 {result.npspDetected && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#2F6B3F]">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-bold text-[#2F6B3F]">
                     <CheckCircle className="w-3 h-3" /> NPSP
                   </span>
                 )}
                 {result.pmmDetected && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#2F6F7E]">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-bold text-[#2F6F7E]">
                     <CheckCircle className="w-3 h-3" /> PMM
                   </span>
                 )}
@@ -360,7 +360,7 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
             {/* PMM object breakdown */}
             {result.pmmObjects && result.pmmObjects.length > 0 && (
               <div className="rounded border border-[#7FAFC6] bg-[#EDF5F8] px-3 py-2 space-y-1.5">
-                <p className="text-[11px] font-bold text-[#2F6F7E]">
+                <p className="text-[14px] font-bold text-[#2F6F7E]">
                   Program Management Module (PMM)
                   {result.pmmDetected
                     ? ` · ${result.pmmObjects.filter(o => o.accessible).length}/${result.pmmObjects.length} objects accessible`
@@ -372,15 +372,15 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
                       {o.accessible
                         ? <CheckCircle className="w-3 h-3 text-[#2F6F7E] shrink-0" />
                         : <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0" />}
-                      <span className={`text-[10px] font-semibold ${o.accessible ? 'text-[#2F6F7E]' : 'text-[#A93F2F]'}`}>{o.label}</span>
+                      <span className={`text-[14px] font-semibold ${o.accessible ? 'text-[#2F6F7E]' : 'text-[#A93F2F]'}`}>{o.label}</span>
                       {o.accessible && (
-                        <span className="text-[10px] text-[#2F6F7E] ml-auto">{o.count.toLocaleString()}</span>
+                        <span className="text-[14px] text-[#2F6F7E] ml-auto">{o.count.toLocaleString()}</span>
                       )}
                     </div>
                   ))}
                 </div>
                 {result.pmmDetected && (
-                  <p className="text-[10px] text-[#2F6F7E] pt-0.5">
+                  <p className="text-[14px] text-[#2F6F7E] pt-0.5">
                     Total: {result.pmmObjects.filter(o => o.accessible).reduce((s, o) => s + o.count, 0).toLocaleString()} records across {result.pmmObjects.filter(o => o.accessible).length} PMM objects
                   </p>
                 )}
@@ -399,8 +399,8 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
                   <div key={c.id} className="flex items-start gap-2">
                     {icon}
                     <div>
-                      <span className="text-[11px] font-semibold text-foreground">{c.label}</span>
-                      <span className="text-[10px] text-muted-foreground ml-1.5 leading-snug">{c.detail.slice(0, 120)}</span>
+                      <span className="text-[14px] font-semibold text-foreground">{c.label}</span>
+                      <span className="text-[14px] text-muted-foreground ml-1.5 leading-snug">{c.detail.slice(0, 120)}</span>
                     </div>
                   </div>
                 );
@@ -408,10 +408,10 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
             </div>
 
             <div className="flex items-center gap-3 pt-1">
-              <span className="text-[10px] text-muted-foreground/60">
+              <span className="text-[14px] text-muted-foreground/60">
                 {passCount}/{totalChecks} checks passed · {warnCount} warnings · {result.durationMs}ms
               </span>
-              <span className="text-[10px] text-muted-foreground/60">
+              <span className="text-[14px] text-muted-foreground/60">
                 Validated at {new Date(result.timestamp).toLocaleTimeString()}
               </span>
             </div>
@@ -421,13 +421,13 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
         {result && !connected && (
           <div className="rounded border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 space-y-1">
             {result.checks.filter(c => c.status === 'fail').map(c => (
-              <p key={c.id} className="text-[11px] text-[#A93F2F]"><strong>{c.label}:</strong> {c.detail.slice(0, 150)}</p>
+              <p key={c.id} className="text-[14px] text-[#A93F2F]"><strong>{c.label}:</strong> {c.detail.slice(0, 150)}</p>
             ))}
           </div>
         )}
 
         {!result && !loading && (
-          <p className="text-[11px] text-muted-foreground italic">
+          <p className="text-[14px] text-muted-foreground italic">
             Click "Run Live Checks" to test the Salesforce connector (Replit Connector — no API keys needed).
           </p>
         )}
@@ -440,38 +440,38 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
 
 function StatusBadge({ status }: { status: SecretStatus }) {
   if (status === 'present') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[14px] font-bold border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]">
       <CheckCircle className="w-3 h-3" /> PRESENT
     </span>
   );
   if (status === 'found-alternate') return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[14px] font-bold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]">
       <CheckCircle className="w-3 h-3" /> ALT NAME
     </span>
   );
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[14px] font-bold border border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]">
       <XCircle className="w-3 h-3" /> MISSING
     </span>
   );
 }
 
 function FormatBadge({ format }: { format: FormatResult }) {
-  if (!format.checked) return <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border border-border bg-muted text-muted-foreground">UNCHECKED</span>;
-  if (format.plausible) return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]"><CheckCircle className="w-3 h-3" /> FORMAT ✓</span>;
-  return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]"><AlertTriangle className="w-3 h-3" /> FORMAT ?</span>;
+  if (!format.checked) return <span className="inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border border-border bg-muted text-muted-foreground">UNCHECKED</span>;
+  if (format.plausible) return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[14px] font-bold border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]"><CheckCircle className="w-3 h-3" /> FORMAT ✓</span>;
+  return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[14px] font-bold border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]"><AlertTriangle className="w-3 h-3" /> FORMAT ?</span>;
 }
 
 function RequiredBadge({ required }: { required: boolean }) {
   return required
-    ? <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border border-[#FBEAE6] bg-[#FBEAE6] text-[#A93F2F] uppercase">Required</span>
-    : <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border border-border bg-muted text-muted-foreground uppercase">Optional</span>;
+    ? <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border border-[#FBEAE6] bg-[#FBEAE6] text-[#A93F2F] ">Required</span>
+    : <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border border-border bg-muted text-muted-foreground ">Optional</span>;
 }
 
 function IntegrationStatusBadge({ status }: { status: IntegrationSummary['overallStatus'] }) {
   const cfg = { configured: 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]', ready: 'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]', partial: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]', missing: 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]' }[status];
   const label = { configured: 'Configured', ready: 'Partial', partial: 'Partial', missing: 'Missing' }[status];
-  return <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${cfg}`}>{label}</span>;
+  return <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border  ${cfg}`}>{label}</span>;
 }
 
 // ── Secret Row ────────────────────────────────────────────────────────────────
@@ -488,11 +488,11 @@ function SecretRow({ entry }: { entry: SecretEntry }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-            <code className="text-[12px] font-mono font-semibold text-foreground">{entry.name}</code>
-            {hasAlternate && entry.foundName && <span className="text-[10px] text-[#2F6F7E] font-mono">→ found as {entry.foundName}</span>}
+            <code className="text-[14px] font-mono font-semibold text-foreground">{entry.name}</code>
+            {hasAlternate && entry.foundName && <span className="text-[14px] text-[#2F6F7E] font-mono">→ found as {entry.foundName}</span>}
             <RequiredBadge required={entry.required} />
           </div>
-          <p className="text-[11px] text-muted-foreground truncate pr-4">{entry.purpose}</p>
+          <p className="text-[14px] text-muted-foreground truncate pr-4">{entry.purpose}</p>
         </div>
         <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
           <StatusBadge status={entry.status} />
@@ -502,7 +502,7 @@ function SecretRow({ entry }: { entry: SecretEntry }) {
       </button>
       {expanded && (
         <div className="px-4 pb-3 ml-7 space-y-2">
-          <div className="rounded-lg border border-border bg-white p-3 space-y-1.5 text-[11px]">
+          <div className="rounded-lg border border-border bg-white p-3 space-y-1.5 text-[14px]">
             <div className="flex gap-2"><span className="text-muted-foreground w-28 shrink-0">Category</span><span className="font-medium">{entry.category}</span></div>
             <div className="flex gap-2"><span className="text-muted-foreground w-28 shrink-0">Primary name</span><code className="font-mono">{entry.name}</code></div>
             {entry.alternateNames.length > 0 && (
@@ -515,15 +515,15 @@ function SecretRow({ entry }: { entry: SecretEntry }) {
             <div className="flex gap-2"><span className="text-muted-foreground w-28 shrink-0">Purpose</span><span className="leading-snug">{entry.purpose}</span></div>
             {entry.status === 'missing' && entry.nextFix && (
               <div className="mt-1 rounded border border-[#FFD08A] bg-[#FFF3E0] px-2.5 py-1.5">
-                <p className="text-[10px] font-bold text-[#CC8400] mb-0.5 uppercase">Next fix</p>
-                <p className="text-[11px] text-[#CC8400] leading-snug">{entry.nextFix}</p>
+                <p className="text-[14px] font-bold text-[#CC8400] mb-0.5 ">Next fix</p>
+                <p className="text-[14px] text-[#CC8400] leading-snug">{entry.nextFix}</p>
               </div>
             )}
             {hasFormatIssue && (
               <div className="mt-1 rounded border border-[#FFD08A] bg-[#FFF3E0] px-2.5 py-1.5">
-                <p className="text-[10px] font-bold text-[#CC8400] mb-0.5 uppercase">Format warning</p>
-                <p className="text-[11px] text-[#CC8400] leading-snug">{entry.format.hint}</p>
-                {entry.nextFix && <p className="text-[11px] text-[#CC8400] mt-0.5 leading-snug">{entry.nextFix}</p>}
+                <p className="text-[14px] font-bold text-[#CC8400] mb-0.5 ">Format warning</p>
+                <p className="text-[14px] text-[#CC8400] leading-snug">{entry.format.hint}</p>
+                {entry.nextFix && <p className="text-[14px] text-[#CC8400] mt-0.5 leading-snug">{entry.nextFix}</p>}
               </div>
             )}
           </div>
@@ -542,10 +542,10 @@ function IntegrationGroup({ summary, entries }: { summary: IntegrationSummary; e
     <div className="rounded-lg border border-border bg-white overflow-hidden">
       <button onClick={() => setOpen(o => !o)} className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/20 transition-colors">
         <div className="flex-1 flex items-center gap-2 flex-wrap">
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 ${summary.colorCls}`}>{summary.label}</span>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border shrink-0 ${summary.colorCls}`}>{summary.label}</span>
           <IntegrationStatusBadge status={summary.overallStatus} />
-          <span className="text-[11px] text-muted-foreground">{present}/{entries.length} secrets present</span>
-          {summary.missingRequired > 0 && <span className="text-[11px] font-semibold text-[#A93F2F]">{summary.missingRequired} required missing</span>}
+          <span className="text-[14px] text-muted-foreground">{present}/{entries.length} secrets present</span>
+          {summary.missingRequired > 0 && <span className="text-[14px] font-semibold text-[#A93F2F]">{summary.missingRequired} required missing</span>}
         </div>
         {open ? <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
       </button>
@@ -603,9 +603,9 @@ export default function IntegrationSecretsAudit() {
         <div className="flex items-center gap-2 mb-0.5">
           <Shield className="w-4 h-4 text-primary" />
           <h1 className="text-[15px] font-semibold text-foreground">Integration Secrets Audit</h1>
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border border-primary/20 bg-primary/5 text-primary uppercase">Live</span>
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border border-primary/20 bg-primary/5 text-primary ">Live</span>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
+        <p className="text-[14px] text-muted-foreground leading-relaxed">
           Two-layer audit: <strong>Presence &amp; Format</strong> (instant, all integrations) and <strong>Live Validation</strong> (on-demand API calls to Gemini and Google). Secret <strong>values are never transmitted</strong>.
         </p>
       </div>
@@ -613,31 +613,31 @@ export default function IntegrationSecretsAudit() {
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-muted/20 shrink-0 flex-wrap">
         <button onClick={runAudit} disabled={auditLoading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
           <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} />
           {auditLoading ? 'Auditing…' : 'Refresh Audit'}
         </button>
 
         <button onClick={runLiveChecks} disabled={liveStatus === 'loading'}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] hover:bg-[#EDF5F8] disabled:opacity-50">
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[14px] font-semibold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] hover:bg-[#EDF5F8] disabled:opacity-50">
           <Zap className={`w-3.5 h-3.5 ${liveStatus === 'loading' ? 'animate-pulse' : ''}`} />
           {liveStatus === 'loading' ? 'Calling APIs…' : 'Run Live Checks'}
         </button>
 
         {auditData && (
           <>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#9FC3AE] bg-[#E6F0EA] text-[11px] font-semibold text-[#2F6B3F]">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#9FC3AE] bg-[#E6F0EA] text-[14px] font-semibold text-[#2F6B3F]">
               <CheckCircle className="w-3.5 h-3.5" />{auditData.summary.totalPresent} present
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#E8B9B4] bg-[#FBEAE6] text-[11px] font-semibold text-[#A93F2F]">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#E8B9B4] bg-[#FBEAE6] text-[14px] font-semibold text-[#A93F2F]">
               <XCircle className="w-3.5 h-3.5" />{auditData.summary.missingRequired} required missing
             </div>
             {auditData.summary.formatIssues > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#FFD08A] bg-[#FFF3E0] text-[11px] font-semibold text-[#CC8400]">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-[#FFD08A] bg-[#FFF3E0] text-[14px] font-semibold text-[#CC8400]">
                 <AlertTriangle className="w-3.5 h-3.5" />{auditData.summary.formatIssues} format {auditData.summary.formatIssues === 1 ? 'issue' : 'issues'}
               </div>
             )}
-            <span className="ml-auto text-[11px] text-muted-foreground">Last checked {new Date(auditData.timestamp).toLocaleTimeString()}</span>
+            <span className="ml-auto text-[14px] text-muted-foreground">Last checked {new Date(auditData.timestamp).toLocaleTimeString()}</span>
           </>
         )}
       </div>
@@ -649,8 +649,8 @@ export default function IntegrationSecretsAudit() {
           <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3 flex gap-3">
             <Lock className="w-4 h-4 text-[#2F6B3F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[11px] font-bold text-[#245531] mb-0.5">Security — No Secret Values Exposed</p>
-              <p className="text-[12px] text-[#245531] leading-relaxed">
+              <p className="text-[14px] font-bold text-[#245531] mb-0.5">Security — No Secret Values Exposed</p>
+              <p className="text-[14px] text-[#245531] leading-relaxed">
                 Presence checks and format checks run server-side (no value ever sent to the client).
                 Live validation calls external APIs using secrets held only in server memory — the
                 API response (model list, error code) is what's returned, never the key itself.
@@ -662,8 +662,8 @@ export default function IntegrationSecretsAudit() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Zap className="w-4 h-4 text-[#2F6F7E]" />
-              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Live API Validation</p>
-              <span className="text-[10px] text-muted-foreground">— 5-tier readiness: Secret present → Format valid → API reachable → Auth valid → Integration ready</span>
+              <p className="text-[14px] font-bold  text-foreground">Live API Validation</p>
+              <span className="text-[14px] text-muted-foreground">— 5-tier readiness: Secret present → Format valid → API reachable → Auth valid → Integration ready</span>
             </div>
             <div className="grid grid-cols-1 gap-3">
               <SalesforceCard result={salesforceResult} loading={liveStatus === 'loading'} />
@@ -671,7 +671,7 @@ export default function IntegrationSecretsAudit() {
               <GoogleCard result={googleResult} loading={liveStatus === 'loading'} />
             </div>
             {liveStatus === 'error' && (
-              <p className="mt-2 text-[11px] text-[#A93F2F]">Live check failed — ensure the API server is running and try again.</p>
+              <p className="mt-2 text-[14px] text-[#A93F2F]">Live check failed — ensure the API server is running and try again.</p>
             )}
           </div>
 
@@ -679,13 +679,13 @@ export default function IntegrationSecretsAudit() {
           {(auditLoading && !auditData) && (
             <div className="rounded-lg border border-border bg-white p-8 text-center">
               <RefreshCw className="w-6 h-6 text-muted-foreground/40 animate-spin mx-auto mb-2" />
-              <p className="text-[13px] text-muted-foreground">Running secrets audit…</p>
+              <p className="text-[14px] text-muted-foreground">Running secrets audit…</p>
             </div>
           )}
           {auditError && (
             <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
-              <p className="text-[12px] font-semibold text-[#A93F2F]">Audit failed: {auditError}</p>
-              <p className="text-[11px] text-[#A93F2F] mt-0.5">Check the API server is running, then click Refresh Audit.</p>
+              <p className="text-[14px] font-semibold text-[#A93F2F]">Audit failed: {auditError}</p>
+              <p className="text-[14px] text-[#A93F2F] mt-0.5">Check the API server is running, then click Refresh Audit.</p>
             </div>
           )}
 
@@ -693,17 +693,17 @@ export default function IntegrationSecretsAudit() {
             <>
               {/* Overview grid */}
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Integration Overview — Presence &amp; Format</p>
+                <p className="text-[14px] font-bold  text-foreground mb-2">Integration Overview — Presence &amp; Format</p>
                 <div className="grid grid-cols-2 gap-2">
                   {auditData.summaries.map(s => {
                     const bg = { configured: 'border-[#9FC3AE] bg-[#E6F0EA]', ready: 'border-[#7FAFC6] bg-[#EDF5F8]', partial: 'border-[#FFD08A] bg-[#FFF3E0]', missing: 'border-[#E8B9B4] bg-[#FBEAE6]' }[s.overallStatus];
                     return (
                       <div key={s.id} className={`rounded-lg border p-3 ${bg}`}>
                         <div className="flex items-center justify-between gap-2 mb-1.5">
-                          <p className="text-[12px] font-bold text-foreground">{s.label}</p>
+                          <p className="text-[14px] font-bold text-foreground">{s.label}</p>
                           <IntegrationStatusBadge status={s.overallStatus} />
                         </div>
-                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
                           <span className="font-semibold text-foreground">{s.presentCount}</span>
                           <span>present</span>
                           {s.missingRequired > 0 && <span className="ml-1 font-semibold text-[#A93F2F]">· {s.missingRequired} required missing</span>}
@@ -716,7 +716,7 @@ export default function IntegrationSecretsAudit() {
 
               {/* Per-integration detail */}
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Secret Detail by Integration</p>
+                <p className="text-[14px] font-bold  text-foreground mb-2">Secret Detail by Integration</p>
                 <div className="space-y-2">
                   {integrations.map(intg => {
                     const summary = auditData.summaries.find(s => s.label === intg)!;
@@ -729,17 +729,17 @@ export default function IntegrationSecretsAudit() {
               {/* Priority actions */}
               {auditData.summary.missingRequired > 0 && (
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Highest Priority Missing Secrets</p>
+                  <p className="text-[14px] font-bold  text-foreground mb-2">Highest Priority Missing Secrets</p>
                   <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
                     {auditData.entries.filter(e => e.required && e.status === 'missing').map(e => (
                       <div key={e.id} className="flex items-start gap-3 px-4 py-2.5">
                         <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                            <code className="text-[12px] font-mono font-semibold text-foreground">{e.name}</code>
-                            <span className="text-[10px] text-muted-foreground">({e.integration})</span>
+                            <code className="text-[14px] font-mono font-semibold text-foreground">{e.name}</code>
+                            <span className="text-[14px] text-muted-foreground">({e.integration})</span>
                           </div>
-                          <p className="text-[11px] text-muted-foreground">{e.nextFix}</p>
+                          <p className="text-[14px] text-muted-foreground">{e.nextFix}</p>
                         </div>
                       </div>
                     ))}
@@ -754,20 +754,20 @@ export default function IntegrationSecretsAudit() {
                     <Globe className="w-4 h-4 text-[#2F6F7E] shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 flex-wrap mb-2">
-                        <p className="text-[12px] font-bold text-[#2F6F7E]">Google OAuth — Authorization Flow Available</p>
+                        <p className="text-[14px] font-bold text-[#2F6F7E]">Google OAuth — Authorization Flow Available</p>
                         {auditData.entries.filter(e => e.integration === 'Google' && e.status !== 'missing').length >= 2 && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[14px] font-bold border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]">
                             <CheckCircle className="w-3 h-3" /> Client credentials ready
                           </span>
                         )}
                       </div>
-                      <p className="text-[12px] text-[#2F6F7E] leading-relaxed mb-3">
+                      <p className="text-[14px] text-[#2F6F7E] leading-relaxed mb-3">
                         GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are configured. The built-in OAuth flow will authorize Drive, Calendar, and Gmail together,
                         display the refresh token once for copying into Replit Secrets as three separate secret names, and guide you through every step.
                       </p>
                       <button
                         onClick={() => navigate('/admin/google-oauth')}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-bold bg-[#2F6F7E] text-white hover:bg-[#225968] transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[14px] font-bold bg-[#2F6F7E] text-white hover:bg-[#225968] transition-colors"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         Open Google Authorization Flow
@@ -792,20 +792,20 @@ export default function IntegrationSecretsAudit() {
                     <div className="flex-1">
                       {presentCount === 3 ? (
                         <>
-                          <p className="text-[12px] font-bold text-[#245531]">Google Drive + Calendar + Gmail: All refresh tokens configured</p>
-                          <p className="text-[11px] text-[#2F6B3F] mt-0.5">Run Live Checks above to confirm the tokens are valid and API-ready.</p>
+                          <p className="text-[14px] font-bold text-[#245531]">Google Drive + Calendar + Gmail: All refresh tokens configured</p>
+                          <p className="text-[14px] text-[#2F6B3F] mt-0.5">Run Live Checks above to confirm the tokens are valid and API-ready.</p>
                         </>
                       ) : (
                         <>
-                          <p className="text-[12px] font-bold text-[#CC8400]">Google OAuth: {presentCount}/3 refresh tokens configured</p>
-                          <p className="text-[11px] text-[#CC8400] mt-0.5">
+                          <p className="text-[14px] font-bold text-[#CC8400]">Google OAuth: {presentCount}/3 refresh tokens configured</p>
+                          <p className="text-[14px] text-[#CC8400] mt-0.5">
                             {missingGmail ? 'GOOGLE_GMAIL_REFRESH_TOKEN is missing — re-run the OAuth wizard and save the token under all three secret names.' : 'Re-run the OAuth wizard to authorize all three services.'}
                           </p>
                         </>
                       )}
                     </div>
                     <button onClick={() => navigate('/admin/integrations/google-auth')}
-                      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded border text-[11px] font-semibold ${presentCount === 3 ? 'border-[#9FC3AE] bg-white text-[#2F6B3F] hover:bg-[#E6F0EA]' : 'border-[#FFD08A] bg-white text-[#CC8400] hover:bg-[#FFF3E0]'}`}>
+                      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded border text-[14px] font-semibold ${presentCount === 3 ? 'border-[#9FC3AE] bg-white text-[#2F6B3F] hover:bg-[#E6F0EA]' : 'border-[#FFD08A] bg-white text-[#CC8400] hover:bg-[#FFF3E0]'}`}>
                       Re-authorize <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>

@@ -136,7 +136,7 @@ export default function Learners() {
             { label: 'Onboarded',      value: loading ? '—' : String(onboarded) },
           ].map(s => (
             <div key={s.label} className="rounded-xl border border-border bg-card p-4">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">{s.label}</p>
+              <p className="text-[14px] font-semibold text-muted-foreground  mb-2">{s.label}</p>
               <p className="text-xl font-bold text-foreground">{s.value}</p>
             </div>
           ))}
@@ -150,7 +150,7 @@ export default function Learners() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name or email…"
-            className="w-full pl-8 pr-3 py-2 text-[12px] rounded-lg border border-border bg-card focus:outline-none focus:ring-1 focus:ring-primary/40"
+            className="w-full pl-8 pr-3 py-2 text-[14px] rounded-lg border border-border bg-card focus:outline-none focus:ring-1 focus:ring-primary/40"
           />
         </div>
 
@@ -163,7 +163,7 @@ export default function Learners() {
                   <th
                     key={col.key}
                     onClick={() => handleSort(col.key)}
-                    className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground select-none"
+                    className="text-left px-4 py-2.5 text-[14px] font-semibold text-muted-foreground  cursor-pointer hover:text-foreground select-none"
                   >
                     {col.label}
                     <SortIcon col={col.key} />
@@ -184,8 +184,8 @@ export default function Learners() {
               {!loading && error && (
                 <tr>
                   <td colSpan={7} className="px-4 py-6 text-center">
-                    <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
-                    <p className="text-[11px] text-muted-foreground mt-1">
+                    <p className="text-[14px] text-[#A93F2F] font-medium">{error}</p>
+                    <p className="text-[14px] text-muted-foreground mt-1">
                       Check Salesforce authentication in Admin → Integrations.
                     </p>
                   </td>
@@ -195,7 +195,7 @@ export default function Learners() {
               {!loading && !error && sorted.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center">
-                    <p className="text-[12px] text-muted-foreground">
+                    <p className="text-[14px] text-muted-foreground">
                       {search ? 'No learners match your search.' : 'No learners assigned to a Penny trail yet.'}
                     </p>
                   </td>
@@ -207,28 +207,28 @@ export default function Learners() {
                   <td className="px-4 py-3">
                     <button
                       onClick={() => navigate(`/penny/learner/${l.id}`)}
-                      className="text-[13px] font-medium text-primary hover:underline text-left"
+                      className="text-[14px] font-medium text-primary hover:underline text-left"
                     >
                       {l.firstName} {l.lastName}
                     </button>
-                    <p className="text-[10px] text-muted-foreground/70">{l.email}</p>
+                    <p className="text-[14px] text-muted-foreground/70">{l.email}</p>
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                  <td className="px-4 py-3 text-[14px] text-muted-foreground">
                     {l.pennyTrail ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                  <td className="px-4 py-3 text-[14px] text-muted-foreground">
                     {l.currentPhase ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                  <td className="px-4 py-3 text-[14px] text-muted-foreground">
                     {l.confidenceScore !== null ? `${l.confidenceScore}/10` : '—'}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                  <td className="px-4 py-3 text-[14px] text-muted-foreground">
                     {l.skillScore !== null ? `${l.skillScore}/10` : '—'}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                  <td className="px-4 py-3 text-[14px] text-muted-foreground">
                     {l.sprintWeek !== null ? `Week ${l.sprintWeek}` : '—'}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-muted-foreground">
+                  <td className="px-4 py-3 text-[14px] text-muted-foreground">
                     {relativeTime(l.lastInteraction)}
                   </td>
                 </tr>

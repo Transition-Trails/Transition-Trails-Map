@@ -29,13 +29,13 @@ function PennyMessageContent({ content, onNavigate }: { content: string; onNavig
   if (last < content.length) segments.push({ text: content.slice(last), isRoute: false });
 
   return (
-    <p className="text-[13px] leading-relaxed whitespace-pre-wrap">
+    <p className="text-[14px] leading-relaxed whitespace-pre-wrap">
       {segments.map((seg, i) =>
         seg.isRoute ? (
           <button
             key={i}
             onClick={() => onNavigate(seg.text)}
-            className="inline-flex items-center gap-0.5 text-primary hover:text-primary/80 underline underline-offset-2 font-mono text-[12px] transition-colors"
+            className="inline-flex items-center gap-0.5 text-primary hover:text-primary/80 underline underline-offset-2 font-mono text-[14px] transition-colors"
             title={`Go to ${seg.text}`}
           >
             {seg.text}
@@ -144,7 +144,7 @@ function SourcesSection({ sources }: { sources: Source[] }) {
     <div className="mt-2 border border-border/50 rounded-xl overflow-hidden bg-background/60">
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors gap-2"
+        className="w-full flex items-center justify-between px-3 py-1.5 text-[14px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors gap-2"
       >
         <span className="flex items-center gap-1.5">
           <BookOpen className="w-3 h-3" />
@@ -169,21 +169,21 @@ function SourcesSection({ sources }: { sources: Source[] }) {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[11px] font-medium text-foreground leading-tight">{s.name}</span>
-                      <span className="text-[9px] bg-muted/60 border border-border/60 rounded-full px-1.5 py-0.5 text-muted-foreground whitespace-nowrap">
+                      <span className="text-[14px] font-medium text-foreground leading-tight">{s.name}</span>
+                      <span className="text-[14px] bg-muted/60 border border-border/60 rounded-full px-1.5 py-0.5 text-muted-foreground whitespace-nowrap">
                         {sourceTypeLabel(s.sourceType)}
                       </span>
                       {s.confidence === 'draft' && (
-                        <span className="text-[9px] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-1.5 py-0.5 text-[#CC8400] whitespace-nowrap">Draft</span>
+                        <span className="text-[14px] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-1.5 py-0.5 text-[#CC8400] whitespace-nowrap">Draft</span>
                       )}
                     </div>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{s.snippet}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{s.snippet}</p>
                     {s.driveUrl && (
                       <a
                         href={s.driveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[9px] text-primary/70 hover:text-primary mt-0.5 inline-block"
+                        className="text-[14px] text-primary/70 hover:text-primary mt-0.5 inline-block"
                       >
                         Open in Drive →
                       </a>
@@ -411,10 +411,10 @@ export function AskPennyPanel() {
                     <Sparkles className="w-3.5 h-3.5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-[13px] font-semibold text-foreground leading-none">{TERMS.aiAssistant}</p>
+                    <p className="text-[14px] font-semibold text-foreground leading-none">{TERMS.aiAssistant}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
-                      <span className="text-[10px] text-muted-foreground">Live · Gemini 2.5 Flash</span>
+                      <span className="text-[14px] text-muted-foreground">Live · Gemini 2.5 Flash</span>
                     </div>
                   </div>
                 </div>
@@ -440,14 +440,14 @@ export function AskPennyPanel() {
 
               {/* Page context chip */}
               <div className="px-4 pb-2.5 flex items-center gap-2">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                <span className="text-[14px] font-bold  text-muted-foreground/50">
                   Viewing
                 </span>
-                <span className="text-[10px] text-muted-foreground bg-muted/50 border border-border/60 rounded-full px-2 py-0.5 font-medium truncate max-w-[260px]">
+                <span className="text-[14px] text-muted-foreground bg-muted/50 border border-border/60 rounded-full px-2 py-0.5 font-medium truncate max-w-[260px]">
                   {pageLabel}
                 </span>
                 {userCount > 0 && (
-                  <span className="text-[9px] text-muted-foreground/40 ml-auto flex-shrink-0">
+                  <span className="text-[14px] text-muted-foreground/40 ml-auto flex-shrink-0">
                     {userCount} {userCount === 1 ? 'msg' : 'msgs'}
                     {lastMs !== null && ` · ${(lastMs / 1000).toFixed(1)}s`}
                   </span>
@@ -479,10 +479,10 @@ export function AskPennyPanel() {
                       }`}>
                         {m.role === 'penny' && !m.error
                           ? <PennyMessageContent content={m.content} onNavigate={handleRouteLink} />
-                          : <p className="text-[13px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                          : <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
                         }
                         {m.time !== '—' && (
-                          <p className={`text-[10px] mt-1 ${
+                          <p className={`text-[14px] mt-1 ${
                             m.role === 'user' ? 'text-primary-foreground/50 text-right' : 'text-muted-foreground'
                           }`}>
                             {m.time}
@@ -528,13 +528,13 @@ export function AskPennyPanel() {
             {/* ── Starters (shown before first message) ── */}
             {showStarters && (
               <div className="flex-shrink-0 px-4 pb-2">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Try asking</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Try asking</p>
                 <div className="flex flex-wrap gap-1.5">
                   {STARTERS.slice(0, 4).map(q => (
                     <button
                       key={q}
                       onClick={() => setInput(q)}
-                      className="text-[11px] text-muted-foreground bg-muted/50 hover:bg-primary/10 hover:text-primary border border-border/60 rounded-full px-2.5 py-1 transition-colors text-left"
+                      className="text-[14px] text-muted-foreground bg-muted/50 hover:bg-primary/10 hover:text-primary border border-border/60 rounded-full px-2.5 py-1 transition-colors text-left"
                     >
                       {q}
                     </button>
@@ -554,7 +554,7 @@ export function AskPennyPanel() {
                     onKeyDown={handleKey}
                     disabled={loading}
                     placeholder={`Ask ${TERMS.aiAssistant} anything…`}
-                    className="w-full text-[13px] border border-border rounded-full px-4 py-2 pr-10 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 placeholder:text-muted-foreground/50"
+                    className="w-full text-[14px] border border-border rounded-full px-4 py-2 pr-10 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 placeholder:text-muted-foreground/50"
                   />
                 </div>
                 <button
@@ -566,10 +566,10 @@ export function AskPennyPanel() {
                 </button>
               </div>
               <div className="flex items-center justify-between mt-1.5 px-1">
-                <span className="text-[9px] text-muted-foreground/40">
+                <span className="text-[14px] text-muted-foreground/40">
                   {ROLE_LABELS[userTier] ?? userTier} · Enter to send
                 </span>
-                <span className="text-[9px] text-muted-foreground/40 flex items-center gap-1">
+                <span className="text-[14px] text-muted-foreground/40 flex items-center gap-1">
                   <Zap className="w-2.5 h-2.5" /> Gemini 2.5 Flash
                 </span>
               </div>

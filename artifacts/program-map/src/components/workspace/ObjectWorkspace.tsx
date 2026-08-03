@@ -43,7 +43,7 @@ export function StatusBadge({ status, variant }: { status?: string; variant?: st
     variant === 'planning' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'    :
                              'bg-muted text-muted-foreground border-border';
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${cls}`}>
       {status}
     </span>
   );
@@ -52,7 +52,7 @@ export function StatusBadge({ status, variant }: { status?: string; variant?: st
 export function ConfidencePill({ value }: { value?: number }) {
   if (value === undefined) return null;
   const cls = value >= 85 ? 'text-[#2F6B3F]' : value >= 70 ? 'text-[#CC8400]' : 'text-[#A93F2F]';
-  return <span className={`text-[10px] font-bold tabular-nums ${cls}`}>{value}%</span>;
+  return <span className={`text-[14px] font-bold tabular-nums ${cls}`}>{value}%</span>;
 }
 
 export function ObjectWorkspace({
@@ -104,10 +104,10 @@ export function ObjectWorkspace({
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Filter objects…"
-              className="w-full text-[11px] border border-border rounded-md pl-7 pr-2.5 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/40"
+              className="w-full text-[14px] border border-border rounded-md pl-7 pr-2.5 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/40"
             />
           </div>
-          <p className="text-[9px] text-muted-foreground/50 mt-1.5 font-medium">
+          <p className="text-[14px] text-muted-foreground/50 mt-1.5 font-medium">
             {filtered.length} object{filtered.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -115,7 +115,7 @@ export function ObjectWorkspace({
         {/* Items */}
         <div className="flex-1 overflow-y-auto">
           {filtered.length === 0 ? (
-            <div className="p-4 text-[11px] text-muted-foreground text-center">No results</div>
+            <div className="p-4 text-[14px] text-muted-foreground text-center">No results</div>
           ) : (
             filtered.map(item => {
               const isActive = selectedId === item.id;
@@ -130,13 +130,13 @@ export function ObjectWorkspace({
                   }`}
                 >
                   <div className="flex items-center justify-between gap-1.5 mb-0.5">
-                    <span className={`text-[12px] font-semibold leading-snug truncate ${isActive ? 'text-primary-foreground' : 'text-foreground'}`}>
+                    <span className={`text-[14px] font-semibold leading-snug truncate ${isActive ? 'text-primary-foreground' : 'text-foreground'}`}>
                       {item.name}
                     </span>
                     <div className="flex items-center gap-1 shrink-0">
                       {item.health && <HealthDot health={item.health} />}
                       {item.confidence !== undefined && (
-                        <span className={`text-[9px] font-bold tabular-nums ${isActive ? 'text-primary-foreground/80' : item.confidence >= 85 ? 'text-[#2F6B3F]' : item.confidence >= 70 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
+                        <span className={`text-[14px] font-bold tabular-nums ${isActive ? 'text-primary-foreground/80' : item.confidence >= 85 ? 'text-[#2F6B3F]' : item.confidence >= 70 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
                           {item.confidence}%
                         </span>
                       )}
@@ -145,20 +145,20 @@ export function ObjectWorkspace({
 
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {item.typeName && (
-                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${
                         isActive ? 'bg-primary-foreground/10 text-primary-foreground/80 border-primary-foreground/20' : (item.typeBg ?? 'bg-muted') + ' ' + (item.typeColor ?? 'text-muted-foreground') + ' border-border'
                       }`}>
                         {item.typeName}
                       </span>
                     )}
                     {item.status && (
-                      <span className={`text-[9px] ${isActive ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                      <span className={`text-[14px] ${isActive ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                         {item.status}
                       </span>
                     )}
                   </div>
                   {item.secondary && (
-                    <p className={`text-[10px] mt-0.5 truncate ${isActive ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>
+                    <p className={`text-[14px] mt-0.5 truncate ${isActive ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>
                       {item.secondary}
                     </p>
                   )}
@@ -186,7 +186,7 @@ export function ObjectWorkspace({
                     </h1>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       {selected.typeName && (
-                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${selected.typeBg ?? 'bg-muted'} ${selected.typeColor ?? 'text-muted-foreground'} border-border`}>
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${selected.typeBg ?? 'bg-muted'} ${selected.typeColor ?? 'text-muted-foreground'} border-border`}>
                           {selected.typeName}
                         </span>
                       )}
@@ -196,19 +196,19 @@ export function ObjectWorkspace({
                       {selected.health && (
                         <>
                           <HealthDot health={selected.health} />
-                          <span className="text-[10px] text-muted-foreground">{selected.health.replace('-', ' ')}</span>
+                          <span className="text-[14px] text-muted-foreground">{selected.health.replace('-', ' ')}</span>
                         </>
                       )}
                       {selected.confidence !== undefined && (
-                        <span className="text-[10px] text-muted-foreground">· <ConfidencePill value={selected.confidence} /></span>
+                        <span className="text-[14px] text-muted-foreground">· <ConfidencePill value={selected.confidence} /></span>
                       )}
                     </div>
                   </div>
                 </div>
                 {selected.owner && (
                   <div className="shrink-0 text-right">
-                    <p className="text-[9px] font-bold uppercase text-muted-foreground/50">Owner</p>
-                    <p className="text-[11px] text-foreground font-medium">{selected.owner}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/50">Owner</p>
+                    <p className="text-[14px] text-foreground font-medium">{selected.owner}</p>
                   </div>
                 )}
               </div>
@@ -219,7 +219,7 @@ export function ObjectWorkspace({
                   <button
                     key={tab.id}
                     onClick={() => setActiveTabId(tab.id)}
-                    className={`px-3 py-2 text-[11px] font-semibold whitespace-nowrap border-b-2 transition-colors focus-visible:outline-none ${
+                    className={`px-3 py-2 text-[14px] font-semibold whitespace-nowrap border-b-2 transition-colors focus-visible:outline-none ${
                       activeTab?.id === tab.id
                         ? 'border-primary text-primary'
                         : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
@@ -242,7 +242,7 @@ export function ObjectWorkspace({
               <Icon className="w-8 h-8 text-primary/30" />
             </div>
             <p className="text-sm font-semibold text-foreground mb-1">{emptyTitle}</p>
-            <p className="text-xs max-w-xs">{emptyBody}</p>
+            <p className="text-sm max-w-xs">{emptyBody}</p>
           </div>
         )}
       </div>

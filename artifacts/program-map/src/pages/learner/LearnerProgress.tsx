@@ -53,7 +53,7 @@ export default function LearnerProgress() {
 
         {/* ── Points card ───────────────────────────────────────────────── */}
         <div className="rounded-xl p-5 text-white" style={{ background: '#2F6B3F' }}>
-          <p className="text-[11px] uppercase font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          <p className="text-[14px]  font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
             ⚡ My Points
           </p>
           {loading ? (
@@ -61,7 +61,7 @@ export default function LearnerProgress() {
           ) : (
             <p className="text-5xl font-bold mt-1">{points}</p>
           )}
-          <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>personal progress</p>
+          <p className="text-[14px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>personal progress</p>
         </div>
 
         {/* ── Trail info ────────────────────────────────────────────────── */}
@@ -69,7 +69,7 @@ export default function LearnerProgress() {
           className="rounded-xl border p-4 space-y-3"
           style={{ background: 'white', borderColor: '#E2E4E1' }}
         >
-          <p className="text-[10px] font-bold uppercase" style={{ color: '#4A4F4D' }}>My Trail</p>
+          <p className="text-[14px] font-bold " style={{ color: '#4A4F4D' }}>My Trail</p>
 
           {loading ? (
             <div className="space-y-2 animate-pulse">
@@ -82,17 +82,17 @@ export default function LearnerProgress() {
                 {trail ?? '—'}
               </p>
               {phase && (
-                <p className="text-[13px]" style={{ color: '#4A4F4D' }}>Phase: {phase}</p>
+                <p className="text-[14px]" style={{ color: '#4A4F4D' }}>Phase: {phase}</p>
               )}
               {goal && (
-                <p className="text-[13px]" style={{ color: '#4A4F4D' }}>Goal: {goal}</p>
+                <p className="text-[14px]" style={{ color: '#4A4F4D' }}>Goal: {goal}</p>
               )}
 
               {/* Confidence score bar */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-[11px]" style={{ color: '#4A4F4D' }}>Confidence score</p>
-                  <p className="text-[11px] font-semibold" style={{ color: '#2F6B3F' }}>{confidence}/10</p>
+                  <p className="text-[14px]" style={{ color: '#4A4F4D' }}>Confidence score</p>
+                  <p className="text-[14px] font-semibold" style={{ color: '#2F6B3F' }}>{confidence}/10</p>
                 </div>
                 <div className="rounded-full h-2" style={{ background: '#E2E4E1' }}>
                   <div
@@ -113,7 +113,7 @@ export default function LearnerProgress() {
           >
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <p className="text-[13px]" style={{ color: '#2A2E2C' }}>
+          <p className="text-[14px]" style={{ color: '#2A2E2C' }}>
             Keep going{firstName ? `, ${firstName}` : ''}!
             {points >= 50
               ? ` You've earned ${points} points — you're building real momentum on your ${trail ?? 'trail'}.`

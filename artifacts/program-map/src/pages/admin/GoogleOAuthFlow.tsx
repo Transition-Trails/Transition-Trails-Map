@@ -56,7 +56,7 @@ const TIER_CONFIG: Record<AuthTier, { label: string; cls: string }> = {
 
 function TierBadge({ tier }: { tier: AuthTier }) {
   const { label, cls } = TIER_CONFIG[tier];
-  return <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${cls}`}>{label}</span>;
+  return <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border  ${cls}`}>{label}</span>;
 }
 
 // ── 5-step readiness ladder ───────────────────────────────────────────────────
@@ -86,10 +86,10 @@ function ReadinessLadder({ step }: { step: number }) {
               <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${cls}`}>
                 {done ? <CheckCircle className="w-4 h-4" /> : s.icon}
               </div>
-              <span className={`text-[9px] font-bold text-center leading-tight uppercase tracking-wide ${done ? 'text-[#2F6B3F]' : active ? 'text-foreground' : 'text-muted-foreground'}`}>
+              <span className={`text-[14px] font-bold text-center leading-tight  ${done ? 'text-[#2F6B3F]' : active ? 'text-foreground' : 'text-muted-foreground'}`}>
                 {s.label}
               </span>
-              <span className="text-[8px] text-muted-foreground/70 text-center leading-tight hidden sm:block px-0.5">
+              <span className="text-[14px] text-muted-foreground/70 text-center leading-tight hidden sm:block px-0.5">
                 {s.sub}
               </span>
             </div>
@@ -112,7 +112,7 @@ function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) 
   };
   return (
     <button onClick={doCopy}
-      className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold border transition-colors ${copied ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-border bg-white text-muted-foreground hover:bg-muted/40'}`}>
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[14px] font-semibold border transition-colors ${copied ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-border bg-white text-muted-foreground hover:bg-muted/40'}`}>
       {copied ? <CheckCircle className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
       {copied ? 'Copied!' : label}
     </button>
@@ -127,23 +127,23 @@ function TokenRow({ label, secretName, value }: { label: string; secretName: str
     <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3 space-y-2">
       <div className="flex items-center gap-2 flex-wrap">
         <Key className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
-        <span className="text-[11px] font-bold text-[#CC8400]">{label}</span>
-        <code className="text-[10px] font-mono bg-white border border-[#FFD08A] text-[#CC8400] px-1.5 py-0.5 rounded ml-auto">{secretName}</code>
+        <span className="text-[14px] font-bold text-[#CC8400]">{label}</span>
+        <code className="text-[14px] font-mono bg-white border border-[#FFD08A] text-[#CC8400] px-1.5 py-0.5 rounded ml-auto">{secretName}</code>
       </div>
       <div className="flex items-center gap-2">
-        <code className="flex-1 text-[11px] font-mono bg-white border-2 border-[#FFD08A] rounded px-2 py-2 break-all select-all">
+        <code className="flex-1 text-[14px] font-mono bg-white border-2 border-[#FFD08A] rounded px-2 py-2 break-all select-all">
           {revealed ? value : '•'.repeat(Math.min(value.length, 48))}
         </code>
         <div className="flex flex-col gap-1 shrink-0">
           <CopyButton text={value} label="Copy" />
           <button onClick={() => setRevealed(r => !r)}
-            className="flex items-center gap-1 px-2 py-1.5 rounded border border-[#FFD08A] bg-white text-[10px] font-semibold text-[#CC8400] hover:bg-[#FFF3E0]">
+            className="flex items-center gap-1 px-2 py-1.5 rounded border border-[#FFD08A] bg-white text-[14px] font-semibold text-[#CC8400] hover:bg-[#FFF3E0]">
             {revealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
             {revealed ? 'Hide' : 'Show'}
           </button>
         </div>
       </div>
-      <p className="text-[10px] text-[#CC8400] leading-snug font-medium">
+      <p className="text-[14px] text-[#CC8400] leading-snug font-medium">
         ① Click <strong>Copy</strong> above &nbsp;②&nbsp; Open Replit Secrets (🔒 lock in left sidebar) &nbsp;③&nbsp; Add secret name <strong>{secretName}</strong> and paste the value.
       </p>
     </div>
@@ -187,23 +187,23 @@ function UrlInspector({ authUrl }: { authUrl: string }) {
         className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-slate-100 transition-colors"
       >
         <Search className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-        <span className="text-[11px] font-bold text-slate-700 flex-1">Inspect Authorization URL</span>
+        <span className="text-[14px] font-bold text-slate-700 flex-1">Inspect Authorization URL</span>
         {allOk
-          ? <span className="text-[10px] font-semibold text-[#2F6B3F] flex items-center gap-1"><CheckCircle className="w-3 h-3" /> All parameters correct</span>
-          : <span className="text-[10px] font-semibold text-[#A93F2F] flex items-center gap-1"><XCircle className="w-3 h-3" /> Parameter issue detected</span>
+          ? <span className="text-[14px] font-semibold text-[#2F6B3F] flex items-center gap-1"><CheckCircle className="w-3 h-3" /> All parameters correct</span>
+          : <span className="text-[14px] font-semibold text-[#A93F2F] flex items-center gap-1"><XCircle className="w-3 h-3" /> Parameter issue detected</span>
         }
         <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${open ? '' : '-rotate-90'}`} />
       </button>
 
       {open && (
         <div className="border-t border-slate-200 px-4 py-3 space-y-2">
-          <p className="text-[11px] text-slate-600 leading-snug mb-2">
+          <p className="text-[14px] text-slate-600 leading-snug mb-2">
             Verifying that the generated URL includes all required parameters for offline access and refresh token issuance.
             <span className="ml-1 text-slate-500">(client_id is public — it is safe to share; client_secret is never in the URL)</span>
           </p>
           <div className="space-y-1">
             {checks.map(c => (
-              <div key={c.key} className="flex items-center gap-2 px-3 py-1.5 rounded border border-slate-200 bg-white text-[11px]">
+              <div key={c.key} className="flex items-center gap-2 px-3 py-1.5 rounded border border-slate-200 bg-white text-[14px]">
                 {c.ok
                   ? <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
                   : <XCircle    className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />}
@@ -215,7 +215,7 @@ function UrlInspector({ authUrl }: { authUrl: string }) {
           </div>
           {!allOk && (
             <div className="rounded border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 mt-1">
-              <p className="text-[11px] text-[#A93F2F] leading-snug">
+              <p className="text-[14px] text-[#A93F2F] leading-snug">
                 One or more URL parameters are missing or incorrect. This can cause the flow to fail or not return a refresh token.
                 Click <strong>Refresh Status</strong> above to reload, or contact support if the issue persists.
               </p>
@@ -239,7 +239,7 @@ function AccessDeniedPanel({ forceOpen = false }: { forceOpen?: boolean }) {
       title: 'OAuth app is in "Testing" mode — your account must be a Test User',
       severity: 'critical' as const,
       detail: (
-        <div className="space-y-2 text-[11px] text-slate-700 leading-snug">
+        <div className="space-y-2 text-[14px] text-slate-700 leading-snug">
           <p>
             <strong>This is the most common cause of "We're sorry, you do not have access."</strong>{' '}
             When the OAuth consent screen is in <em>Testing</em> publishing status, only Google accounts
@@ -272,7 +272,7 @@ function AccessDeniedPanel({ forceOpen = false }: { forceOpen?: boolean }) {
       title: 'Google Drive API or Calendar API not enabled in the project',
       severity: 'critical' as const,
       detail: (
-        <div className="space-y-2 text-[11px] text-slate-700 leading-snug">
+        <div className="space-y-2 text-[14px] text-slate-700 leading-snug">
           <p>
             Even if the OAuth client is configured, the APIs themselves must be enabled in the same GCP project.
             Missing API enablement can cause 403 access errors or silent failures after authorization.
@@ -304,7 +304,7 @@ function AccessDeniedPanel({ forceOpen = false }: { forceOpen?: boolean }) {
       title: 'Redirect URI not registered — causes redirect_uri_mismatch',
       severity: 'warning' as const,
       detail: (
-        <div className="space-y-1 text-[11px] text-slate-700 leading-snug">
+        <div className="space-y-1 text-[14px] text-slate-700 leading-snug">
           <p>
             The exact redirect URI shown in Step 2 below must be registered under <em>Authorized redirect URIs</em> on your OAuth 2.0 Client ID.
             Even a trailing slash difference will cause a mismatch error.
@@ -326,7 +326,7 @@ function AccessDeniedPanel({ forceOpen = false }: { forceOpen?: boolean }) {
       title: 'OAuth client is in the wrong GCP project or a different Google account',
       severity: 'warning' as const,
       detail: (
-        <div className="space-y-1 text-[11px] text-slate-700 leading-snug">
+        <div className="space-y-1 text-[14px] text-slate-700 leading-snug">
           <p>
             The GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET stored in Replit Secrets must belong to the same GCP project that has
             Drive and Calendar APIs enabled. If you recently created a new OAuth client in a different project, update both secrets.
@@ -344,7 +344,7 @@ function AccessDeniedPanel({ forceOpen = false }: { forceOpen?: boolean }) {
       title: 'Google Workspace admin has restricted third-party OAuth apps',
       severity: 'info' as const,
       detail: (
-        <div className="space-y-1 text-[11px] text-slate-700 leading-snug">
+        <div className="space-y-1 text-[14px] text-slate-700 leading-snug">
           <p>
             Some Google Workspace organizations block OAuth authorization for unverified or non-allowlisted apps.
             If your Google account is a <em>@yourcompany.com</em> Workspace account, your admin may need to allowlist
@@ -377,16 +377,16 @@ function AccessDeniedPanel({ forceOpen = false }: { forceOpen?: boolean }) {
       >
         <TriangleAlert className={`w-4 h-4 shrink-0 ${forceOpen ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
         <div className="flex-1">
-          <p className={`text-[12px] font-bold ${forceOpen ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>
+          <p className={`text-[14px] font-bold ${forceOpen ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>
             {forceOpen ? '403 Access Denied — Troubleshooting Checklist' : 'Pre-flight: Common 403 Causes — Review Before Authorizing'}
           </p>
           {forceOpen && (
-            <p className="text-[11px] text-[#A93F2F] mt-0.5">
+            <p className="text-[14px] text-[#A93F2F] mt-0.5">
               Google returned "We're sorry, you do not have access." Check each item below — the most common cause is #1.
             </p>
           )}
         </div>
-        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${severityStyle.critical.badge}`}>{items.filter(i => i.severity === 'critical').length} Critical</span>
+        <span className={`text-[14px] font-bold px-1.5 py-0.5 rounded border ${severityStyle.critical.badge}`}>{items.filter(i => i.severity === 'critical').length} Critical</span>
         <ChevronDown className={`w-3.5 h-3.5 shrink-0 text-[#CC8400] transition-transform ${open ? '' : '-rotate-90'}`} />
       </button>
 
@@ -423,8 +423,8 @@ function ItemAccordion({
         className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/30 transition-colors">
         <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${severityStyle[item.severity].dot}`} />
         <span className="text-slate-500 shrink-0">{item.icon}</span>
-        <span className="text-[11px] font-semibold text-slate-800 flex-1 text-left leading-snug">{item.title}</span>
-        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase shrink-0 ${severityStyle[item.severity].badge}`}>
+        <span className="text-[14px] font-semibold text-slate-800 flex-1 text-left leading-snug">{item.title}</span>
+        <span className={`text-[14px] font-bold px-1.5 py-0.5 rounded border  shrink-0 ${severityStyle[item.severity].badge}`}>
           {item.severity}
         </span>
         <ChevronDown className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform ${open ? '' : '-rotate-90'}`} />
@@ -501,7 +501,7 @@ export default function GoogleOAuthFlow() {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border bg-white shrink-0">
-        <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-1.5">
+        <div className="flex items-center gap-2 text-[14px] text-muted-foreground mb-1.5">
           <button onClick={() => navigate('/admin/integrations/secrets')} className="hover:text-foreground">Integration Secrets Audit</button>
           <ChevronRight className="w-3 h-3" />
           <span className="text-foreground font-semibold">Google Authorization</span>
@@ -511,7 +511,7 @@ export default function GoogleOAuthFlow() {
           <h1 className="text-[15px] font-semibold text-foreground">Google OAuth Authorization</h1>
           <TierBadge tier={tier} />
         </div>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
+        <p className="text-[14px] text-muted-foreground leading-relaxed">
           Authorize Trail OS to access Google Drive and Google Calendar on behalf of your workspace.
           This generates a <strong>refresh token</strong> you'll store in Replit Secrets — no token values are ever logged or stored server-side.
         </p>
@@ -520,16 +520,16 @@ export default function GoogleOAuthFlow() {
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-muted/20 shrink-0">
         <button onClick={loadInfo} disabled={infoLoading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
           <RefreshCw className={`w-3.5 h-3.5 ${infoLoading ? 'animate-spin' : ''}`} />
           {infoLoading ? 'Checking…' : 'Refresh Status'}
         </button>
         <button onClick={() => navigate('/admin/integrations/secrets')}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-medium border border-border bg-white hover:bg-muted/30">
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[14px] font-medium border border-border bg-white hover:bg-muted/30">
           ← Back to Secrets Audit
         </button>
         {info && (
-          <div className={`ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-semibold ${info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]'}`}>
+          <div className={`ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded border text-[14px] font-semibold ${info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]'}`}>
             {info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? <CheckCircle className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
             Drive: {info.tokens.drive ? '✓' : '✗'} · Calendar: {info.tokens.calendar ? '✓' : '✗'} · Gmail: {info.tokens.gmail ? '✓' : '✗'}
           </div>
@@ -541,7 +541,7 @@ export default function GoogleOAuthFlow() {
 
           {/* 5-step readiness ladder */}
           <div className="rounded-lg border border-border bg-white p-5 overflow-x-auto">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-4">Authorization Progress</p>
+            <p className="text-[14px] font-bold  text-foreground mb-4">Authorization Progress</p>
             <ReadinessLadder step={step} />
           </div>
 
@@ -551,16 +551,16 @@ export default function GoogleOAuthFlow() {
               <div className="flex gap-3">
                 <XCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[12px] font-bold text-[#A93F2F] mb-1">Authorization Failed</p>
-                  <code className="text-[11px] font-mono text-[#A93F2F] leading-snug break-all block bg-white border border-[#E8B9B4] rounded px-2 py-1">
+                  <p className="text-[14px] font-bold text-[#A93F2F] mb-1">Authorization Failed</p>
+                  <code className="text-[14px] font-mono text-[#A93F2F] leading-snug break-all block bg-white border border-[#E8B9B4] rounded px-2 py-1">
                     {decodeURIComponent(urlError)}
                   </code>
                 </div>
               </div>
               {is403 && (
                 <div className="rounded border border-[#E8B9B4] bg-white px-3 py-2 space-y-1">
-                  <p className="text-[11px] font-bold text-[#A93F2F]">This is a Google 403 "access denied" error — the troubleshooting checklist below covers the exact causes.</p>
-                  <p className="text-[11px] text-[#A93F2F] leading-snug">
+                  <p className="text-[14px] font-bold text-[#A93F2F]">This is a Google 403 "access denied" error — the troubleshooting checklist below covers the exact causes.</p>
+                  <p className="text-[14px] text-[#A93F2F] leading-snug">
                     Scroll to the <strong>403 Access Denied Troubleshooting</strong> panel below (already expanded).
                     Fix #1 (Test User) first — it resolves the vast majority of these errors in under 2 minutes.
                   </p>
@@ -574,33 +574,33 @@ export default function GoogleOAuthFlow() {
             <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3 space-y-3">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-[#2F6B3F]" />
-                <p className="text-[13px] font-bold text-[#245531]">Authorization Successful</p>
-                {tokenSession && <span className="text-[11px] text-[#2F6B3F]">· Authorized as {tokenSession.email}</span>}
+                <p className="text-[14px] font-bold text-[#245531]">Authorization Successful</p>
+                {tokenSession && <span className="text-[14px] text-[#2F6B3F]">· Authorized as {tokenSession.email}</span>}
               </div>
 
               {sessionLoading && (
-                <p className="text-[12px] text-[#2F6B3F] italic">Retrieving refresh token (one-time)…</p>
+                <p className="text-[14px] text-[#2F6B3F] italic">Retrieving refresh token (one-time)…</p>
               )}
               {sessionError && (
                 <div className="rounded border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2">
-                  <p className="text-[11px] font-bold text-[#CC8400] mb-0.5">Token retrieval failed</p>
-                  <p className="text-[11px] text-[#CC8400]">{sessionError}</p>
+                  <p className="text-[14px] font-bold text-[#CC8400] mb-0.5">Token retrieval failed</p>
+                  <p className="text-[14px] text-[#CC8400]">{sessionError}</p>
                 </div>
               )}
 
               {tokenSession && (
                 <div className="space-y-3">
                   <div className="rounded border border-[#9FC3AE] bg-white px-3 py-2">
-                    <p className="text-[10px] font-bold text-[#245531] mb-0.5">Scopes granted by Google</p>
-                    <p className="text-[11px] font-mono text-foreground break-all leading-snug">{tokenSession.scopesGranted}</p>
+                    <p className="text-[14px] font-bold text-[#245531] mb-0.5">Scopes granted by Google</p>
+                    <p className="text-[14px] font-mono text-foreground break-all leading-snug">{tokenSession.scopesGranted}</p>
                   </div>
 
                   <div className="rounded-lg border border-[#FFD08A] bg-white p-4 space-y-3">
                     <div className="flex items-center gap-2 mb-1">
                       <AlertTriangle className="w-4 h-4 text-[#CC8400]" />
-                      <p className="text-[12px] font-bold text-[#CC8400]">One Refresh Token — Add to Three Secrets</p>
+                      <p className="text-[14px] font-bold text-[#CC8400]">One Refresh Token — Add to Three Secrets</p>
                     </div>
-                    <p className="text-[11px] text-[#CC8400] leading-snug">
+                    <p className="text-[14px] text-[#CC8400] leading-snug">
                       Google issued a single refresh token covering all authorized scopes (Drive, Calendar, <strong>Gmail</strong>).
                       Add the <strong>same value</strong> to all three secret names below in Replit Secrets.
                     </p>
@@ -610,7 +610,7 @@ export default function GoogleOAuthFlow() {
                   </div>
 
                   <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-4 space-y-2">
-                    <p className="text-[12px] font-bold text-[#2F6F7E]">Next Steps — Store &amp; Activate</p>
+                    <p className="text-[14px] font-bold text-[#2F6F7E]">Next Steps — Store &amp; Activate</p>
                     <ol className="space-y-2">
                       {[
                         'Open the Replit Secrets panel (🔒 lock icon in the left sidebar of your Repl).',
@@ -620,7 +620,7 @@ export default function GoogleOAuthFlow() {
                         'Restart the API server workflow so the new secrets load into the environment.',
                         'Return here and click Refresh Status — Drive, Calendar, and Gmail should all show as authorized.',
                       ].map((text, n) => (
-                        <li key={n} className="flex gap-2 text-[11px] text-[#2F6F7E] leading-snug">
+                        <li key={n} className="flex gap-2 text-[14px] text-[#2F6F7E] leading-snug">
                           <span className="font-bold shrink-0 w-4">{n + 1}.</span>
                           <span>{text}</span>
                         </li>
@@ -628,7 +628,7 @@ export default function GoogleOAuthFlow() {
                     </ol>
                   </div>
 
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-[14px] text-muted-foreground">
                     This token is only shown once and has already been cleared from server memory. If you need to get a new token, use "Authorize with Google" again.
                   </p>
                 </div>
@@ -639,12 +639,12 @@ export default function GoogleOAuthFlow() {
           {/* ── STEP 1: Credential check ───────────────────────────────────── */}
           <div className="rounded-lg border border-border bg-white overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-muted/20 border-b border-border">
-              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0">1</div>
-              <span className="text-[12px] font-bold text-foreground">Verify OAuth Client Credentials</span>
+              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold shrink-0">1</div>
+              <span className="text-[14px] font-bold text-foreground">Verify OAuth Client Credentials</span>
               {info && (
                 info.credentials.ok
-                  ? <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-[#2F6B3F]"><CheckCircle className="w-3.5 h-3.5" /> Both configured</span>
-                  : <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-[#A93F2F]"><XCircle className="w-3.5 h-3.5" /> Missing credentials</span>
+                  ? <span className="ml-auto flex items-center gap-1 text-[14px] font-semibold text-[#2F6B3F]"><CheckCircle className="w-3.5 h-3.5" /> Both configured</span>
+                  : <span className="ml-auto flex items-center gap-1 text-[14px] font-semibold text-[#A93F2F]"><XCircle className="w-3.5 h-3.5" /> Missing credentials</span>
               )}
             </div>
             <div className="px-4 py-3 space-y-2">
@@ -657,8 +657,8 @@ export default function GoogleOAuthFlow() {
                     <div key={c.key} className={`rounded border px-3 py-2 flex items-center gap-2 ${c.ok ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#E8B9B4] bg-[#FBEAE6]'}`}>
                       {c.ok ? <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F]" /> : <XCircle className="w-3.5 h-3.5 text-[#A93F2F]" />}
                       <div>
-                        <p className="text-[10px] font-bold text-foreground">{c.name}</p>
-                        <p className="text-[10px] text-muted-foreground">{c.ok ? 'Present + format valid' : 'Missing — set in Replit Secrets'}</p>
+                        <p className="text-[14px] font-bold text-foreground">{c.name}</p>
+                        <p className="text-[14px] text-muted-foreground">{c.ok ? 'Present + format valid' : 'Missing — set in Replit Secrets'}</p>
                       </div>
                     </div>
                   ))}
@@ -666,7 +666,7 @@ export default function GoogleOAuthFlow() {
               )}
               {info && !info.credentials.ok && (
                 <div className="rounded border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2">
-                  <p className="text-[11px] text-[#A93F2F] leading-snug">
+                  <p className="text-[14px] text-[#A93F2F] leading-snug">
                     Configure OAuth 2.0 credentials in{' '}
                     <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="font-semibold underline">
                       Google Cloud Console → APIs &amp; Services → Credentials
@@ -681,20 +681,20 @@ export default function GoogleOAuthFlow() {
           {/* ── STEP 2: Redirect URI ──────────────────────────────────────── */}
           <div className="rounded-lg border border-border bg-white overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-muted/20 border-b border-border">
-              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0">2</div>
-              <span className="text-[12px] font-bold text-foreground">Add Redirect URI to Google Cloud Console</span>
+              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold shrink-0">2</div>
+              <span className="text-[14px] font-bold text-foreground">Add Redirect URI to Google Cloud Console</span>
             </div>
             <div className="px-4 py-3 space-y-3">
-              <p className="text-[12px] text-muted-foreground leading-relaxed">
+              <p className="text-[14px] text-muted-foreground leading-relaxed">
                 Google requires the <strong>exact redirect URI</strong> to be pre-registered. If this URI is not registered,
-                you'll get a <code className="font-mono text-[11px]">redirect_uri_mismatch</code> error.
+                you'll get a <code className="font-mono text-[14px]">redirect_uri_mismatch</code> error.
               </p>
 
               {info ? (
                 <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-primary mb-1.5">Redirect URI — add this exactly to GCP Console</p>
+                  <p className="text-[14px] font-bold  text-primary mb-1.5">Redirect URI — add this exactly to GCP Console</p>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 text-[12px] font-mono font-semibold text-foreground bg-white border border-border rounded px-3 py-2 break-all">
+                    <code className="flex-1 text-[14px] font-mono font-semibold text-foreground bg-white border border-border rounded px-3 py-2 break-all">
                       {info.redirectUri}
                     </code>
                     <CopyButton text={info.redirectUri} label="Copy URI" />
@@ -705,7 +705,7 @@ export default function GoogleOAuthFlow() {
               )}
 
               <div className="rounded border border-[#7FAFC6] bg-[#EDF5F8] px-3 py-2 space-y-1.5">
-                <p className="text-[11px] font-bold text-[#2F6F7E]">How to register it</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E]">How to register it</p>
                 <ol className="space-y-0.5">
                   {[
                     'Go to Google Cloud Console → APIs & Services → Credentials',
@@ -714,14 +714,14 @@ export default function GoogleOAuthFlow() {
                     'Paste the exact URI above and click Save',
                     'Wait ~30 seconds for the change to propagate, then proceed',
                   ].map((s, i) => (
-                    <li key={i} className="flex gap-1.5 text-[11px] text-[#2F6F7E]">
+                    <li key={i} className="flex gap-1.5 text-[14px] text-[#2F6F7E]">
                       <span className="font-bold shrink-0">{i + 1}.</span>
                       <span className="leading-snug">{s}</span>
                     </li>
                   ))}
                 </ol>
                 <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 mt-1 text-[11px] font-semibold text-[#2F6F7E] hover:text-[#2F6F7E]">
+                  className="inline-flex items-center gap-1 mt-1 text-[14px] font-semibold text-[#2F6F7E] hover:text-[#2F6F7E]">
                   Open Google Cloud Console → Credentials <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -731,11 +731,11 @@ export default function GoogleOAuthFlow() {
           {/* ── STEP 3: Scopes ────────────────────────────────────────────── */}
           <div className="rounded-lg border border-border bg-white overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-muted/20 border-b border-border">
-              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0">3</div>
-              <span className="text-[12px] font-bold text-foreground">Scopes Requested</span>
+              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold shrink-0">3</div>
+              <span className="text-[14px] font-bold text-foreground">Scopes Requested</span>
             </div>
             <div className="px-4 py-3 space-y-2">
-              <p className="text-[12px] text-muted-foreground">
+              <p className="text-[14px] text-muted-foreground">
                 Drive, Calendar, and Gmail are all authorized in one flow. All scopes below must be added to your OAuth Consent Screen in Google Cloud Console.
               </p>
               <div className="grid grid-cols-1 gap-1.5">
@@ -747,15 +747,15 @@ export default function GoogleOAuthFlow() {
                     return (
                       <div key={s} className="flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-muted/20">
                         <span className="text-muted-foreground">{meta?.icon ?? <Shield className="w-3.5 h-3.5" />}</span>
-                        <code className="text-[11px] font-mono text-foreground w-36 shrink-0">{short}</code>
-                        <span className="text-[11px] text-muted-foreground">{meta?.label ?? ''}</span>
+                        <code className="text-[14px] font-mono text-foreground w-36 shrink-0">{short}</code>
+                        <span className="text-[14px] text-muted-foreground">{meta?.label ?? ''}</span>
                       </div>
                     );
                   })}
               </div>
               <div className="flex items-start gap-2 rounded border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2 mt-1">
                 <Info className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-                <p className="text-[11px] text-[#CC8400] leading-snug">
+                <p className="text-[14px] text-[#CC8400] leading-snug">
                   <strong>Drive and Calendar scopes must be added to your OAuth Consent Screen.</strong> <code className="font-mono bg-[#FFF3E0] px-1 rounded">gmail.send</code> is a sensitive scope that works in Testing mode.
                   Note: <code className="font-mono bg-[#FFF3E0] px-1 rounded">gmail.readonly</code> (inbox reading) is a <em>restricted</em> scope — Google requires a formal app security review before it works. Inbox reading is disabled in development; compose &amp; send work now.
                 </p>
@@ -769,8 +769,8 @@ export default function GoogleOAuthFlow() {
           {/* ── STEP 4: Authorize ─────────────────────────────────────────── */}
           <div className={`rounded-lg border bg-white overflow-hidden ${info?.credentials.ok ? 'border-primary/30' : 'border-border opacity-60'}`}>
             <div className="flex items-center gap-2 px-4 py-3 bg-muted/20 border-b border-border">
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${info?.credentials.ok ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>4</div>
-              <span className="text-[12px] font-bold text-foreground">Authorize Access</span>
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0 ${info?.credentials.ok ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>4</div>
+              <span className="text-[14px] font-bold text-foreground">Authorize Access</span>
             </div>
             <div className="px-4 py-4 space-y-3">
 
@@ -781,14 +781,14 @@ export default function GoogleOAuthFlow() {
                     {info.tokens.drive && info.tokens.calendar && info.tokens.gmail
                       ? <CheckCircle className="w-4 h-4 text-[#2F6B3F] shrink-0" />
                       : <AlertTriangle className="w-4 h-4 text-[#CC8400] shrink-0" />}
-                    <p className={`text-[12px] font-bold ${info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
+                    <p className={`text-[14px] font-bold ${info.tokens.drive && info.tokens.calendar && info.tokens.gmail ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
                       {info.tokens.drive && info.tokens.calendar && info.tokens.gmail
                         ? 'All three refresh tokens configured (Drive · Calendar · Gmail)'
                         : `${[info.tokens.drive && 'Drive', info.tokens.calendar && 'Calendar', info.tokens.gmail && 'Gmail'].filter(Boolean).join(' · ')} configured — ${[!info.tokens.drive && 'Drive', !info.tokens.calendar && 'Calendar', !info.tokens.gmail && 'Gmail'].filter(Boolean).join(' + ')} missing`}
                     </p>
                   </div>
                   {!(info.tokens.drive && info.tokens.calendar && info.tokens.gmail) && (
-                    <p className="text-[11px] text-[#CC8400] ml-6">
+                    <p className="text-[14px] text-[#CC8400] ml-6">
                       Re-authorize below to get a token covering all three services. On the success screen, save the value as all three secret names.
                     </p>
                   )}
@@ -796,7 +796,7 @@ export default function GoogleOAuthFlow() {
               )}
 
               {/* Always-visible authorize button */}
-              <p className="text-[12px] text-muted-foreground leading-relaxed">
+              <p className="text-[14px] text-muted-foreground leading-relaxed">
                 {info?.tokens.drive || info?.tokens.calendar || info?.tokens.gmail
                   ? 'Re-authorize to issue a fresh token. The success screen will show all three secret names to fill in. Accept every Google permission prompt — including the Gmail screen.'
                   : "Clicking the button below opens Google's consent screen. After approving, you'll be redirected back here with a refresh token to copy into Replit Secrets. Make sure you've completed Steps 2–3 before proceeding."}
@@ -806,19 +806,19 @@ export default function GoogleOAuthFlow() {
                   href="/api/google/oauth/start"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-bold transition-colors ${info?.credentials.ok ? 'bg-[#2F6F7E] text-white hover:bg-[#225968]' : 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'}`}
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[14px] font-bold transition-colors ${info?.credentials.ok ? 'bg-[#2F6F7E] text-white hover:bg-[#225968]' : 'bg-muted text-muted-foreground cursor-not-allowed pointer-events-none'}`}
                 >
                   <Globe className="w-4 h-4" />
                   {info?.tokens.drive || info?.tokens.calendar || info?.tokens.gmail ? 'Re-authorize with Google' : 'Authorize with Google'}
                   <ArrowRight className="w-4 h-4" />
                 </a>
-                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
                   <Lock className="w-3 h-3" />
                   <span>Redirects to accounts.google.com — consent on Google's domain</span>
                 </div>
               </div>
               {!info?.credentials.ok && (
-                <p className="text-[11px] text-[#A93F2F] flex items-center gap-1">
+                <p className="text-[14px] text-[#A93F2F] flex items-center gap-1">
                   <XCircle className="w-3 h-3" /> Configure client credentials first (Step 1).
                 </p>
               )}
@@ -833,8 +833,8 @@ export default function GoogleOAuthFlow() {
           {/* ── STEP 5: Token status ──────────────────────────────────────── */}
           <div className="rounded-lg border border-border bg-white overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-muted/20 border-b border-border">
-              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0">5</div>
-              <span className="text-[12px] font-bold text-foreground">Token Status — After Storing in Secrets</span>
+              <div className="w-5 h-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold shrink-0">5</div>
+              <span className="text-[14px] font-bold text-foreground">Token Status — After Storing in Secrets</span>
             </div>
             <div className="px-4 py-3 space-y-2">
               <div className="grid grid-cols-2 gap-2">
@@ -846,9 +846,9 @@ export default function GoogleOAuthFlow() {
                   <div key={t.name} className={`rounded border px-3 py-2.5 flex items-start gap-2 ${t.present ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#FBEAE6] bg-[#FBEAE6]/60'}`}>
                     <span className={t.present ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}>{t.icon}</span>
                     <div>
-                      <p className="text-[10px] font-bold text-foreground">{t.service}</p>
-                      <code className="text-[9px] font-mono text-muted-foreground break-all">{t.name}</code>
-                      <p className={`text-[10px] font-semibold mt-0.5 ${t.present ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>
+                      <p className="text-[14px] font-bold text-foreground">{t.service}</p>
+                      <code className="text-[14px] font-mono text-muted-foreground break-all">{t.name}</code>
+                      <p className={`text-[14px] font-semibold mt-0.5 ${t.present ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>
                         {t.present ? '✓ Present — API calls enabled' : '✗ Missing — complete OAuth + store token'}
                       </p>
                     </div>
@@ -859,7 +859,7 @@ export default function GoogleOAuthFlow() {
               {info && (!info.tokens.drive || !info.tokens.calendar) && (
                 <div className="flex items-start gap-2 rounded border border-[#7FAFC6] bg-[#EDF5F8] px-3 py-2">
                   <Info className="w-3.5 h-3.5 text-[#2F6F7E] shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-[#2F6F7E] leading-snug">
+                  <p className="text-[14px] text-[#2F6F7E] leading-snug">
                     After storing the tokens in Replit Secrets, restart the API server workflow. Then click "Refresh Status" above — the tokens should show as Present.
                     If they still show missing, verify the secret names are spelled exactly as shown.
                   </p>
@@ -869,7 +869,7 @@ export default function GoogleOAuthFlow() {
               {info?.tokens.drive && info?.tokens.calendar && (
                 <div className="flex items-start gap-2 rounded border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-2">
                   <Zap className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-[#245531] leading-snug">
+                  <p className="text-[14px] text-[#245531] leading-snug">
                     Both tokens are configured. Go to <strong>Integration Secrets Audit → Run Live Checks</strong> to confirm Drive and Calendar are fully authenticated.
                   </p>
                 </div>

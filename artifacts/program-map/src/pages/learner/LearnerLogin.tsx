@@ -30,7 +30,7 @@ export default function LearnerLogin() {
         Welcome back.
       </h1>
       <p
-        className="text-[13px] text-center mt-2 max-w-xs"
+        className="text-[14px] text-center mt-2 max-w-xs"
         style={{ color: '#4A4F4D' }}
       >
         Sign in with your Google account to access your trail, daily quests, and Penny.
@@ -39,7 +39,7 @@ export default function LearnerLogin() {
       {/* Error callout */}
       {error === 'not_enrolled' && (
         <div
-          className="mt-4 w-full max-w-xs rounded-lg px-4 py-3 border text-[12px] text-center"
+          className="mt-4 w-full max-w-xs rounded-lg px-4 py-3 border text-[14px] text-center"
           style={{ background: '#FFFBEB', borderColor: '#FCD34D', color: '#92400E' }}
         >
           We couldn't find your enrollment. Contact your program coordinator.
@@ -47,7 +47,7 @@ export default function LearnerLogin() {
       )}
       {error === 'oauth_failed' && (
         <div
-          className="mt-4 w-full max-w-xs rounded-lg px-4 py-3 border text-[12px] text-center"
+          className="mt-4 w-full max-w-xs rounded-lg px-4 py-3 border text-[14px] text-center"
           style={{ background: '#FEF2F2', borderColor: '#FCA5A5', color: '#991B1B' }}
         >
           Sign-in failed — please try again.
@@ -57,7 +57,7 @@ export default function LearnerLogin() {
       {/* Google sign-in button */}
       <button
         onClick={() => { window.location.href = '/api/learner/auth/google'; }}
-        className="mt-6 w-full max-w-xs h-11 rounded-lg border flex items-center justify-center gap-3 text-[13px] font-medium shadow-sm transition-colors"
+        className="mt-6 w-full max-w-xs h-11 rounded-lg border flex items-center justify-center gap-3 text-[14px] font-medium shadow-sm transition-colors"
         style={{
           background:   'white',
           borderColor:  '#E2E4E1',
@@ -77,7 +77,7 @@ export default function LearnerLogin() {
       </button>
 
       {/* Footer */}
-      <p className="mt-8 text-[10px]" style={{ color: 'rgba(74,79,77,0.4)' }}>
+      <p className="mt-8 text-[14px]" style={{ color: 'rgba(74,79,77,0.4)' }}>
         Powered by Penny AI · Transition Trails Academy
       </p>
     </div>

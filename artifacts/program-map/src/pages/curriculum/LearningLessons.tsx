@@ -22,14 +22,14 @@ export default function LearningLessons() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
           <h1 className="text-3xl font-bold text-foreground">Lessons</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">Individual learning units inside each module. Each lesson has one objective, an instructional sequence, and linked Penny prompts. Select a lesson to see its full asset connections.</p>
+          <p className="text-[14px] text-muted-foreground mt-1">Individual learning units inside each module. Each lesson has one objective, an instructional sequence, and linked Penny prompts. Select a lesson to see its full asset connections.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => setSprintFilter('all')} className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === 'all' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>All</button>
+          <button onClick={() => setSprintFilter('all')} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === 'all' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>All</button>
           {curriculumSprints.map(s => (
-            <button key={s.id} onClick={() => setSprintFilter(s.id)} className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === s.id ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>Sprint {s.sprintNumber as number}</button>
+            <button key={s.id} onClick={() => setSprintFilter(s.id)} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === s.id ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>Sprint {s.sprintNumber as number}</button>
           ))}
         </div>
         <div className="grid gap-2">
@@ -43,16 +43,16 @@ export default function LearningLessons() {
                     <BookOpen className="w-4 h-4 text-[#CC8400] mt-0.5 shrink-0" />
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[10px] font-bold text-muted-foreground/60">{lesson.lessonNumber as string}</span>
-                        <p className="text-[13px] font-bold text-foreground">{lesson.name}</p>
+                        <span className="text-[14px] font-bold text-muted-foreground/60">{lesson.lessonNumber as string}</span>
+                        <p className="text-[14px] font-bold text-foreground">{lesson.name}</p>
                       </div>
-                      <p className="text-[11px] text-muted-foreground">{lesson.moduleName as string} · {lesson.duration as string}</p>
-                      <p className="text-[11px] text-muted-foreground/80 mt-0.5 italic">{lesson.learningObjective as string}</p>
+                      <p className="text-[14px] text-muted-foreground">{lesson.moduleName as string} · {lesson.duration as string}</p>
+                      <p className="text-[14px] text-muted-foreground/80 mt-0.5 italic">{lesson.learningObjective as string}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-medium border rounded-full px-1.5 py-0.5 ${typeCls}`}>{lesson.lessonType as string}</span>
-                    <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                    <span className={`text-[14px] font-medium border rounded-full px-1.5 py-0.5 ${typeCls}`}>{lesson.lessonType as string}</span>
+                    <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                 </div>

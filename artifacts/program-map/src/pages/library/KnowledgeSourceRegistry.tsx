@@ -54,7 +54,7 @@ function ViewTab({ label, icon: Icon, active, count, onClick }: {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all border ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-all border ${
         active
           ? 'bg-foreground text-background border-foreground'
           : 'border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground'
@@ -63,7 +63,7 @@ function ViewTab({ label, icon: Icon, active, count, onClick }: {
       <Icon className="w-3.5 h-3.5" />
       {label}
       {count !== undefined && (
-        <span className={`text-[10px] font-bold rounded-full px-1.5 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
+        <span className={`text-[14px] font-bold rounded-full px-1.5 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
       )}
     </button>
   );
@@ -94,10 +94,10 @@ function SourceRow({ src, selected, onSelect }: {
       <div className="flex items-start gap-2">
         <HealthDot status={src.healthStatus} />
         <div className="flex-1 min-w-0">
-          <p className={`text-[11px] font-bold leading-snug ${selected ? 'text-background' : 'text-foreground'}`}>{src.shortName}</p>
-          <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 mt-0.5 inline-block ${selected ? 'bg-background/20 text-background border-background/30' : typeCfg.cls}`}>{src.type}</span>
+          <p className={`text-[14px] font-bold leading-snug ${selected ? 'text-background' : 'text-foreground'}`}>{src.shortName}</p>
+          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 mt-0.5 inline-block ${selected ? 'bg-background/20 text-background border-background/30' : typeCfg.cls}`}>{src.type}</span>
         </div>
-        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${selected ? 'bg-background/20 text-background border-background/30' : trustCfg.cls}`}>{src.trustLevel.slice(0,4)}</span>
+        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${selected ? 'bg-background/20 text-background border-background/30' : trustCfg.cls}`}>{src.trustLevel.slice(0,4)}</span>
       </div>
     </button>
   );
@@ -122,7 +122,7 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
     return (
       <div className="border border-border rounded-lg overflow-hidden">
         <button onClick={() => toggle(id)} className="w-full flex items-center justify-between px-3 py-2 bg-muted/30 hover:bg-muted/50 transition-colors">
-          <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">{label}</span>
+          <span className="text-[14px] font-bold text-foreground ">{label}</span>
           {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
         </button>
         {isOpen && <div className="p-3">{children}</div>}
@@ -133,8 +133,8 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
   const Chips = ({ items, cls }: { items: string[]; cls?: string }) => (
     <div className="flex flex-wrap gap-1">
       {items.length === 0
-        ? <span className="text-[10px] text-muted-foreground/50 italic">None</span>
-        : items.map(i => <span key={i} className={`text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground ${cls ?? ''}`}>{i}</span>)
+        ? <span className="text-[14px] text-muted-foreground/50 italic">None</span>
+        : items.map(i => <span key={i} className={`text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground ${cls ?? ''}`}>{i}</span>)
       }
     </div>
   );
@@ -150,19 +150,19 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
                 <Icon className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Knowledge Source</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">Knowledge Source</p>
                 <h3 className="text-[15px] font-bold text-foreground leading-snug">{src.name}</h3>
               </div>
             </div>
-            <button onClick={onOpenBrief} className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">
+            <button onClick={onOpenBrief} className="text-[14px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0">
               Trail Insights
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${typeCfg.cls}`}>{src.type}</span>
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${trustCfg.cls}`}>{src.trustLevel}</span>
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${syncCfg.cls}`}>{syncCfg.label}</span>
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 flex items-center gap-1 ${hlthCfg.cls}`}>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${typeCfg.cls}`}>{src.type}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${trustCfg.cls}`}>{src.trustLevel}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${syncCfg.cls}`}>{syncCfg.label}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 flex items-center gap-1 ${hlthCfg.cls}`}>
               <HealthDot status={src.healthStatus} />{src.healthStatus}
             </span>
           </div>
@@ -170,8 +170,8 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
 
         {/* Purpose */}
         <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-          <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Purpose</p>
-          <p className="text-[12px] text-foreground leading-relaxed">{src.purpose}</p>
+          <p className="text-[14px] font-bold text-primary/70  mb-1">Purpose</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{src.purpose}</p>
         </div>
 
         {/* Meta row */}
@@ -185,8 +185,8 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
             { label: 'Availability',      value: src.availability },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-lg border border-border bg-white p-2">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">{label}</p>
-              <p className="text-[11px] font-semibold text-foreground">{value}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50">{label}</p>
+              <p className="text-[14px] font-semibold text-foreground">{value}</p>
             </div>
           ))}
         </div>
@@ -194,11 +194,11 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
         {/* Penny use */}
         <Section id="penny" label={`${TERMS.aiAssistant} Use`}>
           <div className="flex items-center gap-2 mb-2">
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${src.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${src.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
               {src.approvedForPenny ? `✓ Approved for ${TERMS.aiAssistant}` : `✗ Not Approved for ${TERMS.aiAssistant}`}
             </span>
           </div>
-          <p className="text-[11px] text-foreground leading-relaxed">{src.pennyUseDescription}</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{src.pennyUseDescription}</p>
         </Section>
 
         {/* Related systems */}
@@ -212,11 +212,11 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
               { label: `${TERMS.aiAssistant} Capabilities`,  items: src.relatedPennyCapabilities.map(id => id.replace('cap-', '').replace(/-/g, ' ')), icon: Brain },
             ].map(({ label, items, icon: I }) => (
               <div key={label}>
-                <div className="flex items-center gap-1.5 mb-1"><I className="w-3 h-3 text-muted-foreground/60" /><p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{label}</p></div>
+                <div className="flex items-center gap-1.5 mb-1"><I className="w-3 h-3 text-muted-foreground/60" /><p className="text-[14px] font-bold  text-muted-foreground/60">{label}</p></div>
                 <div className="flex flex-wrap gap-1">
                   {items.length === 0
-                    ? <span className="text-[10px] italic text-muted-foreground/50">None</span>
-                    : items.map(i => <span key={i} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{i}</span>)
+                    ? <span className="text-[14px] italic text-muted-foreground/50">None</span>
+                    : items.map(i => <span key={i} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{i}</span>)
                   }
                 </div>
               </div>
@@ -231,7 +231,7 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
               {src.sampleContents.map(s => (
                 <div key={s} className="flex items-center gap-1.5">
                   <ArrowRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />
-                  <p className="text-[11px] text-foreground">{s}</p>
+                  <p className="text-[14px] text-foreground">{s}</p>
                 </div>
               ))}
             </div>
@@ -245,7 +245,7 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
               {src.healthIssues.map((issue, i) => (
                 <div key={i} className="flex items-start gap-2 rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-2">
                   <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-[#CC8400] leading-snug">{issue}</p>
+                  <p className="text-[14px] text-[#CC8400] leading-snug">{issue}</p>
                 </div>
               ))}
             </div>
@@ -254,8 +254,8 @@ function SourceDetail({ src, onOpenBrief }: { src: KnowledgeSource; onOpenBrief:
 
         {/* Future integration */}
         <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
-          <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Integration Path</p>
-          <p className="text-[11px] text-[#CC8400] leading-relaxed">{src.futureIntegrationPath}</p>
+          <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Future Integration Path</p>
+          <p className="text-[14px] text-[#CC8400] leading-relaxed">{src.futureIntegrationPath}</p>
         </div>
       </div>
     </ScrollArea>
@@ -277,11 +277,11 @@ function OverviewView() {
             <Network className="w-8 h-8 text-primary shrink-0 mt-0.5" />
             <div>
               <h2 className="text-[15px] font-bold text-foreground mb-1">Knowledge Source Registry</h2>
-              <p className="text-[12px] text-foreground/80 leading-relaxed mb-2">
+              <p className="text-[14px] text-foreground/80 leading-relaxed mb-2">
                 The central place where Trail OS understands <em>where trusted information comes from</em> and how {TERMS.aiAssistant} should use it.
                 Every source {TERMS.aiAssistant} can draw on — Salesforce Knowledge, Google Drive, LMS content, assessments, standards, curriculum, and future communication data — is registered, governed, and mapped here.
               </p>
-              <p className="text-[12px] text-foreground/80 leading-relaxed">
+              <p className="text-[14px] text-foreground/80 leading-relaxed">
                 This is architecture and governance, not live integration. No APIs are connected yet. This registry defines the <strong>source-of-truth model</strong> Transition Trails will build toward.
               </p>
             </div>
@@ -298,15 +298,15 @@ function OverviewView() {
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 text-center ${s.cls}`}>
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
-              <p className="text-[11px] font-semibold text-foreground/80">{s.label}</p>
-              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+              <p className="text-[14px] font-semibold text-foreground/80">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground">{s.sub}</p>
             </div>
           ))}
         </div>
 
         {/* Source type breakdown */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">Sources by Type</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-3">Sources by Type</h3>
           <div className="space-y-1">
             {SOURCE_TYPE_ORDER.filter(t => (summary.byType[t] ?? 0) > 0).map(type => {
               const cfg  = SOURCE_TYPE_CONFIG[type];
@@ -316,13 +316,13 @@ function OverviewView() {
                 <div key={type} className={`rounded-xl border p-3 ${cfg.cls}`}>
                   <div className="flex items-center gap-2 mb-1">
                     <Icon className="w-4 h-4" />
-                    <p className="text-[12px] font-bold text-foreground">{type}</p>
-                    <span className="text-[10px] font-bold ml-auto">{srcs.length}</span>
+                    <p className="text-[14px] font-bold text-foreground">{type}</p>
+                    <span className="text-[14px] font-bold ml-auto">{srcs.length}</span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground mb-1.5 leading-snug">{cfg.description}</p>
+                  <p className="text-[14px] text-muted-foreground mb-1.5 leading-snug">{cfg.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {srcs.map(s => (
-                      <div key={s.id} className="flex items-center gap-1 text-[9px] font-medium bg-white/60 border border-white/80 rounded-full px-1.5 py-0.5 text-foreground/70">
+                      <div key={s.id} className="flex items-center gap-1 text-[14px] font-medium bg-white/60 border border-white/80 rounded-full px-1.5 py-0.5 text-foreground/70">
                         <HealthDot status={s.healthStatus} />
                         {s.shortName}
                       </div>
@@ -336,16 +336,16 @@ function OverviewView() {
 
         {/* Trust level model */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">Trust Level Model</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-3">Trust Level Model</h3>
           <div className="rounded-xl border border-border bg-white overflow-hidden">
             {(['Authoritative','Trusted','Curated','Unverified'] as TrustLevel[]).map((level, i) => {
               const cfg = TRUST_LEVEL_CONFIG[level];
               const count = sources.filter(s => s.trustLevel === level).length;
               return (
                 <div key={level} className={`flex items-center gap-3 px-4 py-3 ${i < 3 ? 'border-b border-border' : ''}`}>
-                  <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 shrink-0 w-24 text-center ${cfg.cls}`}>{level}</span>
-                  <p className="text-[11px] text-muted-foreground flex-1">{cfg.description}</p>
-                  <span className="text-[11px] font-bold text-foreground shrink-0">{count}</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 shrink-0 w-24 text-center ${cfg.cls}`}>{level}</span>
+                  <p className="text-[14px] text-muted-foreground flex-1">{cfg.description}</p>
+                  <span className="text-[14px] font-bold text-foreground shrink-0">{count}</span>
                 </div>
               );
             })}
@@ -354,14 +354,14 @@ function OverviewView() {
 
         {/* SF Knowledge taxonomy */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">Salesforce Knowledge Category Taxonomy</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-3">Salesforce Knowledge Category Taxonomy</h3>
           <div className="space-y-2">
             {SF_KNOWLEDGE_CATEGORIES.map(cat => (
               <div key={cat.id} className="rounded-xl border border-[#7FAFC6] bg-[#EDF5F8] p-4">
-                <p className="text-[12px] font-bold text-[#2F6F7E] mb-1">{cat.name}</p>
-                <p className="text-[11px] text-[#2F6F7E] mb-2 leading-snug">{cat.description}</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E] mb-1">{cat.name}</p>
+                <p className="text-[14px] text-[#2F6F7E] mb-2 leading-snug">{cat.description}</p>
                 <div className="flex flex-wrap gap-1">
-                  {cat.subcategories.map(s => <span key={s} className="text-[10px] font-medium bg-white/70 border border-[#EDF5F8] rounded-full px-2 py-0.5 text-[#2F6F7E]">{s}</span>)}
+                  {cat.subcategories.map(s => <span key={s} className="text-[14px] font-medium bg-white/70 border border-[#EDF5F8] rounded-full px-2 py-0.5 text-[#2F6F7E]">{s}</span>)}
                 </div>
               </div>
             ))}
@@ -370,7 +370,7 @@ function OverviewView() {
 
         {/* P1 integration priorities */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">P1 Integration Priorities</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-3">P1 Integration Priorities</h3>
           <div className="space-y-2">
             {P1.map(s => {
               const tCfg = SOURCE_TYPE_CONFIG[s.type];
@@ -379,8 +379,8 @@ function OverviewView() {
                 <div key={s.id} className="rounded-xl border border-border bg-white p-3 flex items-center gap-3">
                   <div className={`p-1.5 rounded-lg border ${tCfg.cls}`}><Icon className="w-3.5 h-3.5" /></div>
                   <div className="flex-1">
-                    <p className="text-[12px] font-bold text-foreground">{s.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{s.futureIntegrationPath.split('—')[0].trim()}</p>
+                    <p className="text-[14px] font-bold text-foreground">{s.name}</p>
+                    <p className="text-[14px] text-muted-foreground">{s.futureIntegrationPath.split('—')[0].trim()}</p>
                   </div>
                   <HealthDot status={s.healthStatus} />
                 </div>
@@ -431,26 +431,26 @@ function CatalogView({ onOpenBrief }: { onOpenBrief: (src: KnowledgeSource) => v
         <div className="p-2.5 space-y-2 border-b border-border">
           <div className="relative">
             <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search sources…" className="pl-7 h-7 text-[11px] bg-white" />
+            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search sources…" className="pl-7 h-7 text-[14px] bg-white" />
           </div>
-          <select value={filterType} onChange={e => setFilterType(e.target.value as SourceType | 'all')} className="w-full h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterType} onChange={e => setFilterType(e.target.value as SourceType | 'all')} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All source types</option>
             {SOURCE_TYPE_ORDER.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
-          <select value={filterTrust} onChange={e => setFilterTrust(e.target.value as TrustLevel | 'all')} className="w-full h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterTrust} onChange={e => setFilterTrust(e.target.value as TrustLevel | 'all')} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All trust levels</option>
             {(['Authoritative','Trusted','Curated','Unverified'] as TrustLevel[]).map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {filtered.length === 0 && <p className="text-[11px] text-center text-muted-foreground py-6">No sources match.</p>}
+            {filtered.length === 0 && <p className="text-[14px] text-center text-muted-foreground py-6">No sources match.</p>}
             {SOURCE_TYPE_ORDER.map(type => {
               const srcs = grouped[type] as KnowledgeSource[] | undefined;
               if (!srcs?.length) return null;
               return (
                 <div key={type}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{type}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{type}</p>
                   {srcs.map(s => <SourceRow key={s.id} src={s} selected={activeId === s.id} onSelect={() => setSelectedId(s.id)} />)}
                 </div>
               );
@@ -482,7 +482,7 @@ function RelationshipsView() {
       {/* Picker */}
       <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Select Source</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Select Source</p>
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
@@ -491,10 +491,10 @@ function RelationshipsView() {
               if (!srcs.length) return null;
               return (
                 <div key={type}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{type}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{type}</p>
                   {srcs.map(s => (
                     <button key={s.id} onClick={() => setSelectedId(s.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-medium transition-all flex items-center gap-1.5 ${
+                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all flex items-center gap-1.5 ${
                         activeId === s.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
                       }`}
                     >
@@ -512,17 +512,17 @@ function RelationshipsView() {
       {/* Map */}
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-5 max-w-2xl">
-          {!src && <p className="text-[12px] text-muted-foreground py-8 text-center">Loading sources…</p>}
+          {!src && <p className="text-[14px] text-muted-foreground py-8 text-center">Loading sources…</p>}
           {src && typeCfg && Icon && <>
 
           {/* Selected */}
           <div className={`rounded-xl border p-4 ${typeCfg.cls}`}>
             <div className="flex items-center gap-2 mb-1">
               <Icon className="w-4 h-4" />
-              <p className="text-[13px] font-bold text-foreground">{src.name}</p>
-              <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ml-auto ${TRUST_LEVEL_CONFIG[src.trustLevel].cls}`}>{src.trustLevel}</span>
+              <p className="text-[14px] font-bold text-foreground">{src.name}</p>
+              <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ml-auto ${TRUST_LEVEL_CONFIG[src.trustLevel].cls}`}>{src.trustLevel}</span>
             </div>
-            <p className="text-[11px] text-muted-foreground">{src.description}</p>
+            <p className="text-[14px] text-muted-foreground">{src.description}</p>
           </div>
 
           {/* Relationship groups */}
@@ -538,13 +538,13 @@ function RelationshipsView() {
               <div key={label} className={`rounded-xl border p-3 ${cls.split(' ').filter(c => !c.startsWith('text-')).join(' ')}`}>
                 <div className={`flex items-center gap-1.5 mb-2 ${cls.split(' ').find(c => c.startsWith('text-'))}`}>
                   <I className="w-3.5 h-3.5" />
-                  <p className="text-[10px] font-bold uppercase tracking-wider">{label}</p>
-                  <span className="ml-auto text-[9px] font-bold">{items.length}</span>
+                  <p className="text-[14px] font-bold ">{label}</p>
+                  <span className="ml-auto text-[14px] font-bold">{items.length}</span>
                 </div>
                 {items.length === 0
-                  ? <p className="text-[10px] text-muted-foreground/50 italic">None</p>
+                  ? <p className="text-[14px] text-muted-foreground/50 italic">None</p>
                   : <div className="flex flex-wrap gap-1">
-                      {items.map(item => <span key={item} className="text-[10px] font-medium bg-white/70 border border-white rounded-full px-2 py-0.5 text-foreground/80 capitalize">{item}</span>)}
+                      {items.map(item => <span key={item} className="text-[14px] font-medium bg-white/70 border border-white rounded-full px-2 py-0.5 text-foreground/80 capitalize">{item}</span>)}
                     </div>
                 }
               </div>
@@ -554,7 +554,7 @@ function RelationshipsView() {
           {/* Related source cards */}
           {related.length > 0 && (
             <div>
-              <p className="text-[11px] font-bold text-foreground mb-2">Connected Sources</p>
+              <p className="text-[14px] font-bold text-foreground mb-2">Connected Sources</p>
               <div className="space-y-2">
                 {related.map(r => {
                   const rCfg = SOURCE_TYPE_CONFIG[r.type];
@@ -563,12 +563,12 @@ function RelationshipsView() {
                     <div key={r.id} className="rounded-xl border border-border bg-white p-3 flex items-center gap-3">
                       <div className={`p-1.5 rounded-lg border ${rCfg.cls}`}><RIcon className="w-3.5 h-3.5" /></div>
                       <div className="flex-1">
-                        <p className="text-[12px] font-bold text-foreground">{r.shortName}</p>
-                        <p className="text-[10px] text-muted-foreground">{r.type}</p>
+                        <p className="text-[14px] font-bold text-foreground">{r.shortName}</p>
+                        <p className="text-[14px] text-muted-foreground">{r.type}</p>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <HealthDot status={r.healthStatus} />
-                        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${TRUST_LEVEL_CONFIG[r.trustLevel].cls}`}>{r.trustLevel}</span>
+                        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${TRUST_LEVEL_CONFIG[r.trustLevel].cls}`}>{r.trustLevel}</span>
                       </div>
                     </div>
                   );
@@ -608,17 +608,17 @@ function RetrievalMapView() {
       {/* Capability picker */}
       <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
         <div className="p-2.5 border-b border-border">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">{TERMS.aiAssistant} Capability</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">{TERMS.aiAssistant} Capability</p>
         </div>
         <div className="p-2 space-y-1">
           {pennyRetrievalMap.map((e, i) => (
             <button key={e.capabilityId} onClick={() => setSelectedIdx(i)}
-              className={`w-full text-left px-2.5 py-2.5 rounded-lg text-[11px] font-medium transition-all ${
+              className={`w-full text-left px-2.5 py-2.5 rounded-lg text-[14px] font-medium transition-all ${
                 selectedIdx === i ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
               }`}
             >
               <p className="font-bold">{e.capabilityName}</p>
-              <p className={`text-[9px] mt-0.5 ${selectedIdx === i ? 'text-background/60' : 'text-muted-foreground/60'}`}>{e.capabilityDomain}</p>
+              <p className={`text-[14px] mt-0.5 ${selectedIdx === i ? 'text-background/60' : 'text-muted-foreground/60'}`}>{e.capabilityDomain}</p>
             </button>
           ))}
         </div>
@@ -632,18 +632,18 @@ function RetrievalMapView() {
           <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">
             <div className="flex items-center gap-2 mb-1">
               <Brain className="w-4 h-4 text-secondary" />
-              <p className="text-[13px] font-bold text-foreground">{entry.capabilityName}</p>
-              <span className="text-[10px] font-bold text-secondary border border-secondary/20 rounded-full px-2 py-0.5 ml-auto">{entry.capabilityDomain}</span>
+              <p className="text-[14px] font-bold text-foreground">{entry.capabilityName}</p>
+              <span className="text-[14px] font-bold text-secondary border border-secondary/20 rounded-full px-2 py-0.5 ml-auto">{entry.capabilityDomain}</span>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">{entry.retrievalNote}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed">{entry.retrievalNote}</p>
           </div>
 
           {/* Role legend */}
           <div className="flex items-center gap-2 flex-wrap">
             {(['Primary','Secondary','Context','Fallback'] as const).map(role => (
-              <span key={role} className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${roleConfig[role].cls}`}>{role}</span>
+              <span key={role} className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${roleConfig[role].cls}`}>{role}</span>
             ))}
-            <span className="text-[10px] text-muted-foreground ml-1">— retrieval role</span>
+            <span className="text-[14px] text-muted-foreground ml-1">— retrieval role</span>
           </div>
 
           {/* Retrieval steps */}
@@ -659,21 +659,21 @@ function RetrievalMapView() {
                 <div key={step.sourceId} className="rounded-xl border border-border bg-white p-4">
                   <div className="flex items-start gap-3">
                     {/* Step number */}
-                    <span className={`w-6 h-6 rounded-full ${rCfg.num} text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5`}>{step.order}</span>
+                    <span className={`w-6 h-6 rounded-full ${rCfg.num} text-white text-[14px] font-bold flex items-center justify-center shrink-0 mt-0.5`}>{step.order}</span>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <div className={`flex items-center gap-1 text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${tCfg.cls}`}>
+                        <div className={`flex items-center gap-1 text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${tCfg.cls}`}>
                           <SIcon className="w-3 h-3" />
                           {src.shortName}
                         </div>
-                        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${rCfg.cls}`}>{step.role}</span>
-                        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${cCfg}`}>Confidence: {step.confidenceImpact}</span>
+                        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${rCfg.cls}`}>{step.role}</span>
+                        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${cCfg}`}>Confidence: {step.confidenceImpact}</span>
                       </div>
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">{step.reasoning}</p>
+                      <p className="text-[14px] text-muted-foreground leading-relaxed">{step.reasoning}</p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <HealthDot status={src.healthStatus} />
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${src.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${src.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
                         {src.approvedForPenny ? '✓' : '✗'}
                       </span>
                     </div>
@@ -685,7 +685,7 @@ function RetrievalMapView() {
 
           {/* Source readiness summary */}
           <div className="rounded-xl border border-border bg-muted/20 p-4">
-            <p className="text-[11px] font-bold text-foreground mb-2">Source Readiness for this Capability</p>
+            <p className="text-[14px] font-bold text-foreground mb-2">Source Readiness for this Capability</p>
             <div className="space-y-1.5">
               {entry.retrievalSteps.map(step => {
                 const src = sources.find(s => s.id === step.sourceId);
@@ -693,13 +693,13 @@ function RetrievalMapView() {
                 const issues = src.healthIssues.length;
                 return (
                   <div key={step.sourceId} className="flex items-center gap-2">
-                    <span className="text-[10px] font-semibold text-foreground w-28 truncate">{src.shortName}</span>
+                    <span className="text-[14px] font-semibold text-foreground w-28 truncate">{src.shortName}</span>
                     <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
                       <div className={`h-full rounded-full ${src.healthStatus === 'Healthy' ? 'bg-[#2F6B3F]' : src.healthStatus === 'Warning' ? 'bg-[#FFF3E0]0' : src.healthStatus === 'Critical' ? 'bg-[#FBEAE6]0' : 'bg-slate-300'}`}
                         style={{ width: src.healthStatus === 'Healthy' ? '100%' : src.healthStatus === 'Warning' ? '60%' : src.healthStatus === 'Critical' ? '20%' : '5%' }}
                       />
                     </div>
-                    <span className="text-[9px] text-muted-foreground w-20 text-right">{issues > 0 ? `${issues} issue${issues > 1 ? 's' : ''}` : 'No issues'}</span>
+                    <span className="text-[14px] text-muted-foreground w-20 text-right">{issues > 0 ? `${issues} issue${issues > 1 ? 's' : ''}` : 'No issues'}</span>
                   </div>
                 );
               })}
@@ -726,13 +726,13 @@ function GovernanceView() {
     <div className="flex flex-col h-full overflow-hidden">
       <div className="px-5 py-3 border-b border-border flex items-center gap-3 flex-shrink-0 bg-white">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-1.5">
-          <p className="text-[11px] font-semibold text-primary">
+          <p className="text-[14px] font-semibold text-primary">
             {summary.approvedForPenny} approved for {TERMS.aiAssistant} · {summary.total - summary.approvedForPenny} pending or restricted
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select value={filterApproved} onChange={e => setFilterApproved(e.target.value as any)} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterApproved} onChange={e => setFilterApproved(e.target.value as any)} className="h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All sources</option>
             <option value="yes">{TERMS.aiAssistant} approved</option>
             <option value="no">Not approved</option>
@@ -744,7 +744,7 @@ function GovernanceView() {
           {/* Header */}
           <div className="grid grid-cols-[1fr_100px_100px_80px_80px_80px] gap-2 px-3 py-1.5">
             {['Source', 'Owner', 'Last Review', 'Trust', 'Sync', TERMS.aiAssistant].map(h => (
-              <p key={h} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{h}</p>
+              <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
             ))}
           </div>
           {filtered.map(s => {
@@ -756,15 +756,15 @@ function GovernanceView() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <HealthDot status={s.healthStatus} />
-                    <p className="text-[12px] font-semibold text-foreground truncate">{s.shortName}</p>
+                    <p className="text-[14px] font-semibold text-foreground truncate">{s.shortName}</p>
                   </div>
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${tCfg.cls}`}>{s.type}</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${tCfg.cls}`}>{s.type}</span>
                 </div>
-                <p className="text-[11px] text-muted-foreground truncate">{s.owner}</p>
-                <p className="text-[11px] text-muted-foreground">{s.lastReviewDate}</p>
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 text-center ${trCfg.cls}`}>{s.trustLevel.slice(0,5)}</span>
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 text-center ${synCfg.cls}`}>{synCfg.label.split(' ')[0]}</span>
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 text-center ${s.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
+                <p className="text-[14px] text-muted-foreground truncate">{s.owner}</p>
+                <p className="text-[14px] text-muted-foreground">{s.lastReviewDate}</p>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 text-center ${trCfg.cls}`}>{s.trustLevel.slice(0,5)}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 text-center ${synCfg.cls}`}>{synCfg.label.split(' ')[0]}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 text-center ${s.approvedForPenny ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'}`}>
                   {s.approvedForPenny ? '✓ Yes' : '✗ No'}
                 </span>
               </div>
@@ -840,16 +840,16 @@ function HealthView() {
             { label: `${issues.filter(i => i.severity === 'Warning').length} Warnings`,  cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
             { label: `${summary.healthy} Healthy`,                                cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
           ].map(b => (
-            <span key={b.label} className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${b.cls}`}>{b.label}</span>
+            <span key={b.label} className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${b.cls}`}>{b.label}</span>
           ))}
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select value={filterCat} onChange={e => setFilterCat(e.target.value as any)} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterCat} onChange={e => setFilterCat(e.target.value as any)} className="h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All categories</option>
             {Object.entries(categoryCounts).map(([cat, count]) => <option key={cat} value={cat}>{cat} ({count})</option>)}
           </select>
-          <select value={filterSev} onChange={e => setFilterSev(e.target.value as any)} className="h-7 text-[11px] rounded-md border border-input bg-white px-2">
+          <select value={filterSev} onChange={e => setFilterSev(e.target.value as any)} className="h-7 text-[14px] rounded-md border border-input bg-white px-2">
             <option value="all">All severity</option>
             <option value="Critical">Critical</option>
             <option value="Warning">Warning</option>
@@ -867,12 +867,12 @@ function HealthView() {
                 className={`rounded-lg border p-2.5 text-left transition-all ${filterCat === cat ? 'ring-2 ring-foreground' : ''} ${categoryCls[cat]}`}
               >
                 <p className="text-xl font-bold">{count}</p>
-                <p className="text-[10px] font-semibold">{cat}</p>
+                <p className="text-[14px] font-semibold">{cat}</p>
               </button>
             ))}
           </div>
 
-          {filtered.length === 0 && <p className="text-center text-muted-foreground text-[12px] py-8">No issues match the filter.</p>}
+          {filtered.length === 0 && <p className="text-center text-muted-foreground text-[14px] py-8">No issues match the filter.</p>}
 
           {filtered.map((issue, i) => {
             const tCfg = SOURCE_TYPE_CONFIG[issue.sourceType];
@@ -883,14 +883,14 @@ function HealthView() {
                   <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${issue.severity === 'Critical' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <div className={`flex items-center gap-1 text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${tCfg.cls}`}>
+                      <div className={`flex items-center gap-1 text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${tCfg.cls}`}>
                         <SIcon className="w-3 h-3" />
                         {issue.sourceName}
                       </div>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${categoryCls[issue.category]}`}>{issue.category}</span>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${issue.severity === 'Critical' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'}`}>{issue.severity}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${categoryCls[issue.category]}`}>{issue.category}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${issue.severity === 'Critical' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'}`}>{issue.severity}</span>
                     </div>
-                    <p className={`text-[11px] leading-snug ${issue.severity === 'Critical' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>{issue.issue}</p>
+                    <p className={`text-[14px] leading-snug ${issue.severity === 'Critical' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>{issue.issue}</p>
                   </div>
                 </div>
               </div>
@@ -935,30 +935,30 @@ export default function KnowledgeSourceRegistry() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">
           Knowledge Library — Source Registry
         </p>
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Knowledge Source Registry</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               Where trusted information comes from — and how {TERMS.aiAssistant} uses it. {summary.total} sources across {SOURCE_TYPE_ORDER.filter(t => (summary.byType[t] ?? 0) > 0).length} types.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handleAddSource}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Source
             </button>
             {totalIssues > 0 && (
-              <span className="text-[11px] font-semibold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-3 py-1">
+              <span className="text-[14px] font-semibold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-3 py-1">
                 {totalIssues} issues
               </span>
             )}
-            <span className="text-[11px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-3 py-1">
+            <span className="text-[14px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-3 py-1">
               {summary.approvedForPenny} {TERMS.aiAssistant}-approved
             </span>
           </div>

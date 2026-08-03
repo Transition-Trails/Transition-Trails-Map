@@ -24,10 +24,10 @@ export function StatCard({
 }) {
   return (
     <div className="bg-card border border-border rounded-xl p-3">
-      <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">{label}</p>
+      <p className="text-[14px] font-semibold text-muted-foreground  mb-1.5">{label}</p>
       <p className="text-xl font-bold text-foreground leading-none">{value}</p>
-      {sub   && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
-      {trend && <p className="text-xs font-medium mt-1 text-[#2F6B3F]">{trend}</p>}
+      {sub   && <p className="text-sm text-muted-foreground mt-1">{sub}</p>}
+      {trend && <p className="text-sm font-medium mt-1 text-[#2F6B3F]">{trend}</p>}
     </div>
   );
 }
@@ -46,25 +46,25 @@ export function OpsHeader({
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-sm font-semibold text-foreground leading-none">{title}</h1>
             {isAdminOrAbove && (
-              <span className="inline-flex items-center text-[10px] font-semibold border px-1.5 py-0.5 rounded-full bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] whitespace-nowrap">
+              <span className="inline-flex items-center text-[14px] font-semibold border px-1.5 py-0.5 rounded-full bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] whitespace-nowrap">
                 Prototype Data
               </span>
             )}
             {subtitle && (
-              <span className="text-[11px] text-muted-foreground line-clamp-1 hidden sm:block">{subtitle}</span>
+              <span className="text-[14px] text-muted-foreground line-clamp-1 hidden sm:block">{subtitle}</span>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => openSlackPanel({ context: 'operations', title, subtitle: TERMS.signalSubtitle(title) })}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[14px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors whitespace-nowrap"
           >
             <Layers className="w-3 h-3" />
             {TERMS.trailSignals}
           </button>
           {isAdminOrAbove && (
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
               <Clock className="w-3.5 h-3.5" />
               Not live
             </div>
@@ -72,7 +72,7 @@ export function OpsHeader({
         </div>
       </div>
       {integration && isAdminOrAbove && (
-        <div className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] text-muted-foreground/70">
+        <div className="mt-1.5 inline-flex items-center gap-1.5 text-[14px] text-muted-foreground/70">
           <Plug className="w-3 h-3 flex-shrink-0" />
           Future: {integration}
         </div>
@@ -110,19 +110,19 @@ export function PageShell({ section, title, subtitle, badge, integration, childr
     <div className="h-full flex flex-col overflow-hidden">
       <div className="flex-shrink-0 px-4 py-2 border-b bg-card">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 hidden sm:block">{section} ·</span>
+          <span className="text-[14px] font-bold  text-muted-foreground/60 hidden sm:block">{section} ·</span>
           <h1 className="text-sm font-semibold text-foreground leading-none">{title}</h1>
           {badge && isAdminOrAbove && (
-            <span className={`inline-flex items-center text-[10px] font-semibold border px-1.5 py-0.5 rounded-full whitespace-nowrap ${BADGE_STYLES[badge]}`}>
+            <span className={`inline-flex items-center text-[14px] font-semibold border px-1.5 py-0.5 rounded-full whitespace-nowrap ${BADGE_STYLES[badge]}`}>
               {BADGE_LABELS[badge]}
             </span>
           )}
           {subtitle && (
-            <span className="text-[11px] text-muted-foreground line-clamp-1 hidden sm:block">{subtitle}</span>
+            <span className="text-[14px] text-muted-foreground line-clamp-1 hidden sm:block">{subtitle}</span>
           )}
         </div>
         {integration && isAdminOrAbove && (
-          <div className="mt-1 inline-flex items-center gap-1.5 text-[10px] text-muted-foreground/70">
+          <div className="mt-1 inline-flex items-center gap-1.5 text-[14px] text-muted-foreground/70">
             <Plug className="w-3 h-3 flex-shrink-0" />
             Future: {integration}
           </div>
@@ -149,7 +149,7 @@ function EmptyState({ title }: { title: string }) {
         <Building2 className="w-6 h-6 text-muted-foreground" />
       </div>
       <p className="text-sm font-medium text-foreground mb-1.5">{title}</p>
-      <p className="text-xs text-muted-foreground max-w-[280px] leading-relaxed">
+      <p className="text-sm text-muted-foreground max-w-[280px] leading-relaxed">
         This section is being built. Content and integrations will be added in a future sprint.
       </p>
     </div>

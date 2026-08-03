@@ -348,9 +348,9 @@ function DriveItemRow({ item }: { item: DriveItem }) {
                     item.kind === 'sheet'  ? 'text-[#2F6B3F]' :
                     item.kind === 'slides' ? 'text-[#CC8400]' : 'text-[#2F6F7E]';
   const statusBadge =
-    item.status === 'needs-review' ? <span className="text-[8px] font-bold bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] rounded px-1 py-0.5">Review</span> :
-    item.status === 'missing'      ? <span className="text-[8px] font-bold bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F] rounded px-1 py-0.5">Missing</span> :
-    item.status === 'updated'      ? <span className="text-[8px] font-bold bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] rounded px-1 py-0.5">Updated</span> :
+    item.status === 'needs-review' ? <span className="text-[14px] font-bold bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] rounded px-1 py-0.5">Review</span> :
+    item.status === 'missing'      ? <span className="text-[14px] font-bold bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F] rounded px-1 py-0.5">Missing</span> :
+    item.status === 'updated'      ? <span className="text-[14px] font-bold bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] rounded px-1 py-0.5">Updated</span> :
     null;
 
   return (
@@ -363,10 +363,10 @@ function DriveItemRow({ item }: { item: DriveItem }) {
       <FileText className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${kindColor}`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[10px] font-semibold text-foreground group-hover:text-primary truncate transition-colors">{item.name}</span>
+          <span className="text-[14px] font-semibold text-foreground group-hover:text-primary truncate transition-colors">{item.name}</span>
           {statusBadge}
         </div>
-        {item.note && <p className="text-[9px] text-muted-foreground/60 mt-0.5">{item.note}</p>}
+        {item.note && <p className="text-[14px] text-muted-foreground/60 mt-0.5">{item.note}</p>}
       </div>
       <ExternalLink className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary/50 shrink-0 mt-0.5 transition-colors" />
     </a>
@@ -379,7 +379,7 @@ function DriveSection({ context }: { context: SlackPanelContext }) {
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="px-3 py-2 border-b border-border/40 bg-muted/20 flex items-start gap-1.5 flex-shrink-0">
         <Info className="w-3 h-3 text-muted-foreground/40 shrink-0 mt-0.5" />
-        <p className="text-[9px] text-muted-foreground/60 leading-snug">
+        <p className="text-[14px] text-muted-foreground/60 leading-snug">
           No live Drive connection yet. Links open your Google Drive — items are contextual placeholders.
         </p>
       </div>
@@ -394,19 +394,19 @@ function DriveSection({ context }: { context: SlackPanelContext }) {
                 className="flex items-center gap-2 px-3 py-2.5 mx-2 mb-2 rounded-lg bg-[#FFF3E0]/70 border border-[#FFD08A]/60 hover:bg-[#FFF3E0] transition-colors"
               >
                 <Folder className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
-                <span className="text-[10px] font-bold text-[#CC8400] flex-1 truncate">{data.folderName}</span>
+                <span className="text-[14px] font-bold text-[#CC8400] flex-1 truncate">{data.folderName}</span>
                 <ExternalLink className="w-3 h-3 text-[#CC8400]/60 shrink-0" />
               </a>
               {data.items.map(item => <DriveItemRow key={item.id} item={item} />)}
               <div className="px-3 pt-3 pb-1 border-t border-border/30 mt-2 space-y-1.5">
-                <p className="text-[9px] text-muted-foreground/50 leading-snug">
+                <p className="text-[14px] text-muted-foreground/50 leading-snug">
                   Connect Google Drive in Phase 2 for real-time doc signals, review queue sync, and change detection.
                 </p>
                 <a
                   href="https://drive.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[9px] text-primary/70 hover:text-primary transition-colors"
+                  className="inline-flex items-center gap-1 text-[14px] text-primary/70 hover:text-primary transition-colors"
                 >
                   <ExternalLink className="w-2.5 h-2.5" />
                   Open Google Drive
@@ -416,7 +416,7 @@ function DriveSection({ context }: { context: SlackPanelContext }) {
           ) : (
             <div className="flex flex-col items-center py-8 gap-2 text-center px-4">
               <Folder className="w-6 h-6 text-muted-foreground/30" />
-              <p className="text-[11px] text-muted-foreground">No Drive data mapped for this context.</p>
+              <p className="text-[14px] text-muted-foreground">No Drive data mapped for this context.</p>
             </div>
           )}
         </div>
@@ -450,14 +450,14 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
           <div className={`rounded-lg border px-3 py-2.5 ${headerBg}`}>
             <div className="flex items-center gap-2 mb-1.5">
               <Icon className={`w-3.5 h-3.5 shrink-0 ${accentCls}`} />
-              <span className={`text-[10px] font-bold ${headerText}`}>{phaseLabel}</span>
-              <span className="ml-auto text-[7px] font-bold bg-muted border border-border rounded-full px-2 py-0.5 text-muted-foreground">Phase 2</span>
+              <span className={`text-[14px] font-bold ${headerText}`}>{phaseLabel}</span>
+              <span className="ml-auto text-[14px] font-bold bg-muted border border-border rounded-full px-2 py-0.5 text-muted-foreground">Phase 2</span>
             </div>
-            <p className={`text-[10px] leading-snug ${headerText} opacity-80`}>{phaseDesc}</p>
+            <p className={`text-[14px] leading-snug ${headerText} opacity-80`}>{phaseDesc}</p>
           </div>
 
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1.5 px-0.5">
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5 px-0.5">
               Preview — signals that will surface here
             </p>
             <div className="space-y-1">
@@ -466,17 +466,17 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
                   <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${
                     sig.urgency === 'high' ? 'bg-[#A93F2F]' : sig.urgency === 'medium' ? 'bg-[#CC8400]' : 'bg-muted-foreground/30'
                   }`} />
-                  <p className="text-[10px] text-foreground leading-snug">{sig.text}</p>
+                  <p className="text-[14px] text-foreground leading-snug">{sig.text}</p>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="rounded-lg border border-border/40 bg-white px-3 py-2.5">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-2">Planned capabilities</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">Planned capabilities</p>
             <ul className="space-y-1.5">
               {planned.map((item, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-[10px] text-muted-foreground">
+                <li key={i} className="flex items-start gap-1.5 text-[14px] text-muted-foreground">
                   <CheckCircle2 className="w-3 h-3 text-muted-foreground/30 shrink-0 mt-0.5" />
                   {item}
                 </li>
@@ -488,7 +488,7 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
             href={openUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-semibold transition-colors ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-[14px] font-semibold transition-colors ${
               isEmail ? 'border-[#7FAFC6]/60 bg-[#EDF5F8]/40 text-[#2F6F7E] hover:bg-[#EDF5F8]' : 'border-primary/20 bg-primary/[0.03] text-primary/80 hover:bg-primary/[0.06]'
             }`}
           >
@@ -499,7 +499,7 @@ function Phase2Section({ tool }: { tool: 'email' | 'calendar' }) {
 
           <div className="rounded border border-border/40 bg-muted/20 px-2.5 py-2 flex items-start gap-1.5">
             <Lock className="w-3 h-3 text-muted-foreground/30 shrink-0 mt-0.5" />
-            <p className="text-[9px] text-muted-foreground/60 leading-snug">
+            <p className="text-[14px] text-muted-foreground/60 leading-snug">
               <strong>Phase 2 — Google Auth</strong>: Sign-In with Google will connect Drive, Gmail, and Calendar without separate credentials.
             </p>
           </div>
@@ -519,7 +519,7 @@ function HealthDotSlack({ health }: { health: SlackChannel['health'] }) {
 function OAuthStatusChip() {
   const ok = SLACK_WORKSPACE.oauthStatus === 'connected';
   return (
-    <span className={`text-[9px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 border ${
+    <span className={`text-[14px] font-bold  rounded-full px-2 py-0.5 border ${
       ok ? 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' : 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]'
     }`}>
       {ok ? 'OAuth Connected' : 'OAuth Pending'}
@@ -538,15 +538,15 @@ function ChannelRow({ ch, showProgram }: { ch: SlackChannel; showProgram?: boole
       <HealthDotSlack health={ch.health} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[11px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{ch.name}</span>
+          <span className="text-[14px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{ch.name}</span>
           {ch.pennyEnabled && (
-            <span className="text-[8px] font-bold bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-1.5 py-0.5 shrink-0">{TERMS.aiAssistant}</span>
+            <span className="text-[14px] font-bold bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-1.5 py-0.5 shrink-0">{TERMS.aiAssistant}</span>
           )}
         </div>
         {showProgram && ch.relatedProgram && (
-          <p className="text-[10px] text-muted-foreground/70 truncate">{ch.relatedProgram}{ch.relatedCohort ? ` · ${ch.relatedCohort}` : ''}</p>
+          <p className="text-[14px] text-muted-foreground/70 truncate">{ch.relatedProgram}{ch.relatedCohort ? ` · ${ch.relatedCohort}` : ''}</p>
         )}
-        <p className="text-[9px] text-muted-foreground/50 mt-0.5">{ch.memberCount} members · {ch.messageFrequency} activity</p>
+        <p className="text-[14px] text-muted-foreground/50 mt-0.5">{ch.memberCount} members · {ch.messageFrequency} activity</p>
       </div>
       <ExternalLink className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary/60 transition-colors shrink-0 mt-0.5" />
     </a>
@@ -565,19 +565,19 @@ function ActivityRow({ ev }: { ev: SlackActivityEvent }) {
     <div className="flex items-start gap-2 px-2.5 py-1.5 border-b border-border/30 last:border-0">
       <Icon className={`w-3 h-3 shrink-0 mt-0.5 ${iconCls}`} />
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] text-foreground leading-snug">{ev.summary}</p>
+        <p className="text-[14px] text-foreground leading-snug">{ev.summary}</p>
         {ev.channel && (
           <a
             href={slackChannelUrl(ev.channel.replace('#', ''))}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[9px] text-primary/70 hover:text-primary transition-colors"
+            className="text-[14px] text-primary/70 hover:text-primary transition-colors"
           >
             {ev.channel}
           </a>
         )}
       </div>
-      <span className="text-[9px] text-muted-foreground/40 shrink-0 mt-0.5 whitespace-nowrap">{ev.timestamp}</span>
+      <span className="text-[14px] text-muted-foreground/40 shrink-0 mt-0.5 whitespace-nowrap">{ev.timestamp}</span>
     </div>
   );
 }
@@ -599,19 +599,19 @@ function PendingItemRow({ item }: { item: PendingItem }) {
       <div className="flex items-start gap-2">
         <Icon className={`w-3 h-3 shrink-0 mt-0.5 ${iconCls}`} />
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-foreground leading-snug">{item.text}</p>
+          <p className="text-[14px] text-foreground leading-snug">{item.text}</p>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             {item.channel && (
               <a
                 href={item.channelId ? slackChannelUrl(item.channelId) : '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[9px] text-primary/70 hover:text-primary transition-colors flex items-center gap-0.5"
+                className="text-[14px] text-primary/70 hover:text-primary transition-colors flex items-center gap-0.5"
               >
                 {item.channel} <ExternalLink className="w-2.5 h-2.5 inline" />
               </a>
             )}
-            {item.time && <span className="text-[9px] text-muted-foreground/40">{item.time}</span>}
+            {item.time && <span className="text-[14px] text-muted-foreground/40">{item.time}</span>}
           </div>
         </div>
       </div>
@@ -690,15 +690,15 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
         <div className="flex items-start justify-between gap-2 mb-1.5">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#4A154B]/60">{TERMS.trailSignals}</span>
-              <span className="text-[9px] font-bold text-[#4A154B] border border-[#4A154B]/20 bg-[#4A154B]/5 rounded-full px-1.5 py-0.5">
+              <span className="text-[14px] font-bold  text-[#4A154B]/60">{TERMS.trailSignals}</span>
+              <span className="text-[14px] font-bold text-[#4A154B] border border-[#4A154B]/20 bg-[#4A154B]/5 rounded-full px-1.5 py-0.5">
                 {meta.label}
               </span>
               <OAuthStatusChip />
             </div>
             <h2 className="text-[14px] font-bold text-foreground leading-tight">{config.title}</h2>
             {config.subtitle && (
-              <p className="text-[10px] text-muted-foreground/70 leading-snug mt-0.5">{config.subtitle}</p>
+              <p className="text-[14px] text-muted-foreground/70 leading-snug mt-0.5">{config.subtitle}</p>
             )}
           </div>
           <button
@@ -715,7 +715,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
           href={WORKSPACE_WEB}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 w-full px-2.5 py-1.5 rounded-lg bg-[#4A154B] text-white text-[10px] font-bold hover:bg-[#3D0F3E] transition-colors"
+          className="flex items-center gap-1.5 w-full px-2.5 py-1.5 rounded-lg bg-[#4A154B] text-white text-[14px] font-bold hover:bg-[#3D0F3E] transition-colors"
         >
           <Hash className="w-3 h-3" />
           Open Transition Trails Workspace
@@ -728,7 +728,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
             urgentCount > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#FFD08A] bg-[#FFF3E0]/70'
           }`}>
             <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0" />
-            <p className="text-[10px] text-[#CC8400] leading-snug flex-1">
+            <p className="text-[14px] text-[#CC8400] leading-snug flex-1">
               {urgentCount > 0 ? `${urgentCount} urgent action${urgentCount > 1 ? 's' : ''} pending` : ''}
               {urgentCount > 0 && SLACK_WORKSPACE.oauthStatus !== 'connected' ? ' · ' : ''}
               {SLACK_WORKSPACE.oauthStatus !== 'connected' ? 'OAuth not yet connected' : ''}
@@ -745,7 +745,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
             <button
               key={tool.id}
               onClick={() => setActiveTool(tool.id)}
-              className={`flex-1 flex flex-col items-center gap-0.5 px-1 py-1.5 text-[9px] font-bold uppercase tracking-wide transition-colors border-b-2 rounded-t ${
+              className={`flex-1 flex flex-col items-center gap-0.5 px-1 py-1.5 text-[14px] font-bold  transition-colors border-b-2 rounded-t ${
                 activeTool === tool.id
                   ? 'border-[#4A154B] text-[#4A154B]'
                   : 'border-transparent text-muted-foreground/50 hover:text-foreground/70'
@@ -754,12 +754,12 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               <div className="flex items-center gap-0.5">
                 <ToolIcon className="w-3 h-3" />
                 {tool.badge > 0 && !tool.phase2 && (
-                  <span className={`text-[7px] font-bold text-white rounded-full min-w-[13px] text-center leading-[13px] px-0.5 ${tool.urgent ? 'bg-[#FBEAE6]0' : 'bg-muted-foreground/40'}`}>
+                  <span className={`text-[14px] font-bold text-white rounded-full min-w-[13px] text-center leading-[13px] px-0.5 ${tool.urgent ? 'bg-[#FBEAE6]0' : 'bg-muted-foreground/40'}`}>
                     {tool.badge}
                   </span>
                 )}
                 {tool.phase2 && (
-                  <span className="text-[6px] font-bold bg-muted text-muted-foreground/50 rounded px-0.5">P2</span>
+                  <span className="text-[14px] font-bold bg-muted text-muted-foreground/50 rounded px-0.5">P2</span>
                 )}
               </div>
               {tool.label}
@@ -776,7 +776,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-1 py-2 text-[10px] font-semibold transition-colors border-b-2 ${
+            className={`flex-1 flex items-center justify-center gap-1 py-2 text-[14px] font-semibold transition-colors border-b-2 ${
               activeTab === tab.id
                 ? 'border-[#4A154B] text-[#4A154B]'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -784,7 +784,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
+              <span className={`rounded-full px-1.5 py-0.5 text-[14px] font-bold ${
                 activeTab === tab.id ? 'bg-[#4A154B]/10 text-[#4A154B]' : 'bg-muted/60 text-muted-foreground/60'
               }`}>
                 {tab.count}
@@ -804,7 +804,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               {pending.length === 0 ? (
                 <div className="flex flex-col items-center py-6 gap-2 text-center">
                   <CheckCircle2 className="w-6 h-6 text-[#2F6B3F]" />
-                  <p className="text-[11px] font-semibold text-muted-foreground">No pending actions</p>
+                  <p className="text-[14px] font-semibold text-muted-foreground">No pending actions</p>
                 </div>
               ) : (
                 <>
@@ -814,7 +814,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
 
               {/* Context-specific quick actions */}
               <div className="pt-2 border-t border-border/40">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 px-0.5 mb-1.5">Quick Actions</p>
+                <p className="text-[14px] font-bold  text-[#4A154B]/60 px-0.5 mb-1.5">Quick Actions</p>
                 <div className="space-y-1">
                   {(config.context === 'penny' || config.context === 'program' || config.context === 'cohort') && (
                     <a
@@ -822,7 +822,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                         ? slackChannelUrl('foundations-cohort-2') : WORKSPACE_WEB}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#4A154B]/20 bg-white shadow-sm hover:bg-[#4A154B]/[0.05] transition-colors text-[10px] font-semibold text-foreground"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#4A154B]/20 bg-white shadow-sm hover:bg-[#4A154B]/[0.05] transition-colors text-[14px] font-semibold text-foreground"
                     >
                       <Send className="w-3 h-3 text-[#4A154B]" />
                       Send Test Message via {TERMS.aiAssistant}
@@ -834,7 +834,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                       href={slackChannelUrl('trail-os-ops')}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#FFD08A]/60 bg-white shadow-sm hover:bg-[#FFF3E0]/50 transition-colors text-[10px] font-semibold text-foreground"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#FFD08A]/60 bg-white shadow-sm hover:bg-[#FFF3E0]/50 transition-colors text-[14px] font-semibold text-foreground"
                     >
                       <Shield className="w-3 h-3 text-[#CC8400]" />
                       Post Governance Alert to #trail-os-ops
@@ -846,7 +846,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                       href={slackChannelUrl('foundations-cohort-2')}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-primary/20 bg-white shadow-sm hover:bg-primary/[0.04] transition-colors text-[10px] font-semibold text-foreground"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-primary/20 bg-white shadow-sm hover:bg-primary/[0.04] transition-colors text-[14px] font-semibold text-foreground"
                     >
                       <Calendar className="w-3 h-3 text-primary" />
                       Send Calendar Reminder to Cohort
@@ -857,7 +857,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                     href={slackChannelUrl('trail-os-ops')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-white shadow-sm hover:bg-muted/30 transition-colors text-[10px] font-semibold text-foreground"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border/50 bg-white shadow-sm hover:bg-muted/30 transition-colors text-[14px] font-semibold text-foreground"
                   >
                     <Radio className="w-3 h-3 text-muted-foreground/60" />
                     Open #trail-os-ops in Slack
@@ -869,19 +869,19 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               {/* Penny / workspace status for Penny context */}
               {config.context === 'penny' && pennyReadiness && (
                 <div className="pt-2 border-t border-border/40">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 px-0.5 mb-1.5">{TERMS.aiAssistant} Slack Status</p>
+                  <p className="text-[14px] font-bold  text-[#4A154B]/60 px-0.5 mb-1.5">{TERMS.aiAssistant} Slack Status</p>
                   <div className="rounded-lg border border-[#4A154B]/15 bg-white shadow-sm px-2.5 py-2 space-y-1">
                     {pennyReadiness.items.slice(0, 4).map((item, i) => (
                       <div key={i} className="flex items-center gap-2">
                         {item.status === 'pass'    ? <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" /> :
                          item.status === 'partial' ? <Clock        className="w-3 h-3 text-[#CC8400]  shrink-0" /> :
                                                      <AlertTriangle className="w-3 h-3 text-[#A93F2F]   shrink-0" />}
-                        <span className="text-[10px] text-foreground flex-1 truncate">{item.label}</span>
+                        <span className="text-[14px] text-foreground flex-1 truncate">{item.label}</span>
                       </div>
                     ))}
                     <a
                       href="/collaboration/slack"
-                      className="text-[9px] text-primary/70 hover:text-primary flex items-center gap-1 mt-0.5"
+                      className="text-[14px] text-primary/70 hover:text-primary flex items-center gap-1 mt-0.5"
                     >
                       View full integration status <ChevronRight className="w-3 h-3" />
                     </a>
@@ -892,7 +892,7 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               {/* Workspace readiness for slack context */}
               {(config.context === 'slack' || config.context === 'collaboration') && workspaceReadiness && (
                 <div className="pt-2 border-t border-border/40">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 px-0.5 mb-1.5">Workspace Health</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-0.5 mb-1.5">Workspace Health</p>
                   <div className="rounded-lg border border-border/50 bg-white shadow-sm px-2.5 py-2">
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="flex-1 bg-muted/40 rounded-full h-1.5 overflow-hidden">
@@ -901,12 +901,12 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                           style={{ width: `${workspaceReadiness.score}%` }}
                         />
                       </div>
-                      <span className="text-[10px] font-bold text-foreground">{workspaceReadiness.score}%</span>
+                      <span className="text-[14px] font-bold text-foreground">{workspaceReadiness.score}%</span>
                     </div>
-                    <p className="text-[10px] text-muted-foreground/70 leading-snug">{workspaceReadiness.note}</p>
+                    <p className="text-[14px] text-muted-foreground/70 leading-snug">{workspaceReadiness.note}</p>
                     <a
                       href="/collaboration/slack"
-                      className="text-[9px] text-primary/70 hover:text-primary flex items-center gap-1 mt-1"
+                      className="text-[14px] text-primary/70 hover:text-primary flex items-center gap-1 mt-1"
                     >
                       Configure in Slack Integration Center <ChevronRight className="w-3 h-3" />
                     </a>
@@ -922,8 +922,8 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
               {relevantChannels.length === 0 ? (
                 <div className="flex flex-col items-center py-6 gap-2 text-center px-4">
                   <Hash className="w-6 h-6 text-muted-foreground/30" />
-                  <p className="text-[11px] text-muted-foreground">No channels mapped for this context.</p>
-                  <a href="/collaboration/slack" className="text-[10px] text-primary hover:underline">Open Slack Integration Center</a>
+                  <p className="text-[14px] text-muted-foreground">No channels mapped for this context.</p>
+                  <a href="/collaboration/slack" className="text-[14px] text-primary hover:underline">Open Slack Integration Center</a>
                 </div>
               ) : (
                 <div className="pt-1">
@@ -937,14 +937,14 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
                   href={WORKSPACE_WEB}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-[10px] text-[#4A154B] font-semibold hover:opacity-70 transition-opacity"
+                  className="flex items-center gap-1.5 text-[14px] text-[#4A154B] font-semibold hover:opacity-70 transition-opacity"
                 >
                   <ExternalLink className="w-3 h-3" />
                   Browse all channels in Slack
                 </a>
                 <a
                   href="/collaboration/slack"
-                  className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors mt-1"
+                  className="flex items-center gap-1.5 text-[14px] text-muted-foreground/70 hover:text-foreground transition-colors mt-1"
                 >
                   <Settings className="w-3 h-3" />
                   Manage channel mappings
@@ -956,12 +956,12 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
           {/* Activity tab */}
           {activeTab === 'activity' && (
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 px-4 py-1.5">Recent Slack Activity</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 px-4 py-1.5">Recent Slack Activity</p>
               {relevantActivity.map(ev => <ActivityRow key={ev.id} ev={ev} />)}
               <div className="px-4 pt-2 pb-1 border-t border-[#4A154B]/10 mt-1">
                 <a
                   href="/collaboration/slack"
-                  className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 text-[14px] text-muted-foreground/70 hover:text-foreground transition-colors"
                 >
                   <ArrowRight className="w-3 h-3" />
                   View full activity feed
@@ -984,15 +984,15 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
       <div className="px-3 pt-2 pb-2.5 border-t border-[#4A154B]/15 flex-shrink-0 bg-white space-y-1.5">
         {/* Phase 1 system-driven notice */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[8px] font-bold uppercase tracking-wider text-[#4A154B]/40 bg-[#4A154B]/5 border border-[#4A154B]/10 px-1.5 py-0.5 rounded-full">
+          <span className="text-[14px] font-bold  text-[#4A154B]/40 bg-[#4A154B]/5 border border-[#4A154B]/10 px-1.5 py-0.5 rounded-full">
             Phase 1
           </span>
-          <span className="text-[9px] text-muted-foreground/50">
+          <span className="text-[14px] text-muted-foreground/50">
             Signals are system-driven — assigned by tier, role &amp; page context.
           </span>
           <a
             href="/admin/phase1-readiness"
-            className="text-[9px] text-[#4A154B]/50 hover:text-[#4A154B] transition-colors ml-auto flex-shrink-0 underline underline-offset-2"
+            className="text-[14px] text-[#4A154B]/50 hover:text-[#4A154B] transition-colors ml-auto flex-shrink-0 underline underline-offset-2"
           >
             Phase 2 roadmap →
           </a>
@@ -1001,13 +1001,13 @@ export function SlackContextPanel({ config, onClose }: SlackContextPanelProps) {
         <div className="flex items-center gap-2">
           <a
             href="/collaboration/slack"
-            className="text-[9px] text-muted-foreground/50 hover:text-foreground transition-colors flex items-center gap-1"
+            className="text-[14px] text-muted-foreground/50 hover:text-foreground transition-colors flex items-center gap-1"
           >
             <Settings className="w-2.5 h-2.5" />
             Slack Integration Center
           </a>
-          <span className="text-muted-foreground/20 text-[9px]">·</span>
-          <span className="text-[9px] text-muted-foreground/40">
+          <span className="text-muted-foreground/20 text-[14px]">·</span>
+          <span className="text-[14px] text-muted-foreground/40">
             {SLACK_WORKSPACE.memberCount} members · {SLACK_WORKSPACE.channelCount} channels
           </span>
         </div>

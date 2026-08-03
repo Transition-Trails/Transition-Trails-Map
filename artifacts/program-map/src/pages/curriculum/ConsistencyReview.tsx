@@ -71,9 +71,9 @@ export default function ConsistencyReview() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-6">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Penny Content Assistant</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Penny Content Assistant</p>
           <h1 className="text-3xl font-bold text-foreground">Consistency Review</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             Standards-based relationship audit for Foundations Trail. Each module is checked against the Learning Architecture Standard —
             objectives, assessment, knowledge articles, Penny prompts, and delivery activities. This is what Penny's
             "Review for Consistency" action generates.
@@ -84,23 +84,23 @@ export default function ConsistencyReview() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="rounded-lg border-2 border-primary/20 bg-primary/5 px-4 py-3">
             <p className="text-3xl font-bold text-primary">{avgScore}%</p>
-            <p className="text-[11px] font-semibold text-primary/70">Average Score</p>
-            <p className="text-[10px] text-muted-foreground">Foundations Trail</p>
+            <p className="text-[14px] font-semibold text-primary/70">Average Score</p>
+            <p className="text-[14px] text-muted-foreground">Foundations Trail</p>
           </div>
           <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3">
             <p className="text-3xl font-bold text-[#2F6B3F]">{passing.length}</p>
-            <p className="text-[11px] font-semibold text-[#2F6B3F]">Fully Compliant</p>
-            <p className="text-[10px] text-[#2F6B3F]">All 5 checks pass</p>
+            <p className="text-[14px] font-semibold text-[#2F6B3F]">Fully Compliant</p>
+            <p className="text-[14px] text-[#2F6B3F]">All 5 checks pass</p>
           </div>
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
             <p className="text-3xl font-bold text-[#A93F2F]">{failing.length}</p>
-            <p className="text-[11px] font-semibold text-[#A93F2F]">Need Attention</p>
-            <p className="text-[10px] text-[#A93F2F]">One or more gaps</p>
+            <p className="text-[14px] font-semibold text-[#A93F2F]">Need Attention</p>
+            <p className="text-[14px] text-[#A93F2F]">One or more gaps</p>
           </div>
           <div className="rounded-lg border border-border bg-white px-4 py-3">
             <p className="text-3xl font-bold text-foreground">{curriculumHealthIssues.length}</p>
-            <p className="text-[11px] font-semibold text-foreground/70">Total Issues</p>
-            <p className="text-[10px] text-muted-foreground">Across all checks</p>
+            <p className="text-[14px] font-semibold text-foreground/70">Total Issues</p>
+            <p className="text-[14px] text-muted-foreground">Across all checks</p>
           </div>
         </div>
 
@@ -115,10 +115,10 @@ export default function ConsistencyReview() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-[14px] font-bold text-foreground">{reviewAction.name}</p>
-                  <span className="text-[9px] font-bold border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400] rounded-full px-1.5 py-0.5">Prototype Action</span>
+                  <span className="text-[14px] font-bold border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400] rounded-full px-1.5 py-0.5">Prototype Action</span>
                 </div>
-                <p className="text-[12px] text-muted-foreground">{reviewAction.purpose}</p>
-                <p className="text-[11px] text-secondary mt-1 font-medium">Select to see full action specification in the Knowledge Brief →</p>
+                <p className="text-[14px] text-muted-foreground">{reviewAction.purpose}</p>
+                <p className="text-[14px] text-secondary mt-1 font-medium">Select to see full action specification in the Knowledge Brief →</p>
               </div>
             </div>
             <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1" />
@@ -127,7 +127,7 @@ export default function ConsistencyReview() {
 
         {/* Issue type breakdown */}
         <div className="space-y-2">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Issues by Check Type</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60">Issues by Check Type</p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {Object.entries(HEALTH_CHECK_CONFIG).map(([type, cfg]) => {
               const count = issuesByCheck[type] || 0;
@@ -135,9 +135,9 @@ export default function ConsistencyReview() {
                 <div key={type} className={`rounded-lg border px-3 py-2 ${count > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]/50' : 'border-[#9FC3AE] bg-[#E6F0EA]/50'}`}>
                   <div className="flex items-center gap-1.5">
                     {count > 0 ? <AlertTriangle className="w-3 h-3 text-[#A93F2F]" /> : <CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" />}
-                    <p className={`text-[11px] font-bold ${count > 0 ? 'text-[#A93F2F]' : 'text-[#245531]'}`}>{count > 0 ? count + ' issue' + (count !== 1 ? 's' : '') : 'Clean'}</p>
+                    <p className={`text-[14px] font-bold ${count > 0 ? 'text-[#A93F2F]' : 'text-[#245531]'}`}>{count > 0 ? count + ' issue' + (count !== 1 ? 's' : '') : 'Clean'}</p>
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{cfg.label}</p>
+                  <p className="text-[14px] text-muted-foreground mt-0.5">{cfg.label}</p>
                 </div>
               );
             })}
@@ -147,10 +147,10 @@ export default function ConsistencyReview() {
         {/* Module-by-module results */}
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Module Results — Foundations Trail</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Module Results — Foundations Trail</p>
             <button
               onClick={() => setShowPassing(!showPassing)}
-              className="text-[10px] text-primary font-medium hover:underline"
+              className="text-[14px] text-primary font-medium hover:underline"
             >
               {showPassing ? 'Hide' : 'Show'} passing modules
             </button>
@@ -168,19 +168,19 @@ export default function ConsistencyReview() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <span className={`text-[12px] font-bold border rounded-lg px-2 py-1 ${SCORE_COLOR(result.score)}`}>
+                    <span className={`text-[14px] font-bold border rounded-lg px-2 py-1 ${SCORE_COLOR(result.score)}`}>
                       {result.score}%
                     </span>
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">{result.moduleNumber} — {result.moduleName}</p>
-                      <p className="text-[10px] text-muted-foreground">{result.sprint}</p>
+                      <p className="text-[14px] font-bold text-foreground">{result.moduleNumber} — {result.moduleName}</p>
+                      <p className="text-[14px] text-muted-foreground">{result.sprint}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1 justify-end">
                     {result.checks.map(check => (
                       <span
                         key={check.type}
-                        className={`text-[9px] font-medium border rounded-full px-1.5 py-0.5 ${check.pass ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]'}`}
+                        className={`text-[14px] font-medium border rounded-full px-1.5 py-0.5 ${check.pass ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' : 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]'}`}
                       >
                         {check.pass ? '✓' : '✗'} {check.label}
                       </span>
@@ -192,7 +192,7 @@ export default function ConsistencyReview() {
                     {result.issues.map(issue => (
                       <div key={issue.id} className="flex items-center gap-1.5">
                         <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
-                        <p className="text-[10px] text-muted-foreground">{issue.name as string} — {issue.actionRequired as string}</p>
+                        <p className="text-[14px] text-muted-foreground">{issue.name as string} — {issue.actionRequired as string}</p>
                       </div>
                     ))}
                   </div>

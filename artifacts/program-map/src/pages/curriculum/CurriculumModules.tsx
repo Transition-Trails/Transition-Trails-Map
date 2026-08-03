@@ -33,17 +33,17 @@ function SfModuleRow({ mod }: { mod: SfCourseModule }) {
     <div className="flex items-center gap-3 py-2 border-b border-border/40 last:border-0">
       <span className={`shrink-0 w-2 h-2 rounded-full ${st.dot}`} />
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-medium text-foreground truncate">{mod.Name}</p>
+        <p className="text-[14px] font-medium text-foreground truncate">{mod.Name}</p>
         {pct > 0 && (
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="h-1 w-16 bg-muted/40 rounded-full overflow-hidden">
               <div className="h-full bg-[#E6F0EA]0 rounded-full" style={{ width: `${pct}%` }} />
             </div>
-            <span className="text-[10px] text-muted-foreground">{pct}%</span>
+            <span className="text-[14px] text-muted-foreground">{pct}%</span>
           </div>
         )}
       </div>
-      <span className={`shrink-0 text-[10px] font-semibold border rounded-full px-2 py-0.5 ${st.pill}`}>{st.label}</span>
+      <span className={`shrink-0 text-[14px] font-semibold border rounded-full px-2 py-0.5 ${st.pill}`}>{st.label}</span>
     </div>
   );
 }
@@ -64,14 +64,14 @@ function SfCourseBlock({ course }: { course: SfLmsCourse }) {
           <Zap className="w-4 h-4 text-[#2F6B3F] shrink-0" />
           <div className="min-w-0">
             <p className="text-[14px] font-bold text-foreground truncate">{course.Course_Title__c ?? course.Name}</p>
-            <p className="text-[11px] text-muted-foreground">{mods.length} modules · {pct}% complete</p>
+            <p className="text-[14px] text-muted-foreground">{mods.length} modules · {pct}% complete</p>
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           <div className="w-20 h-1.5 bg-muted/40 rounded-full overflow-hidden">
             <div className="h-full bg-[#E6F0EA]0 rounded-full" style={{ width: `${pct}%` }} />
           </div>
-          <span className="text-[10px] font-semibold text-muted-foreground">{expanded ? '▲' : '▼'}</span>
+          <span className="text-[14px] font-semibold text-muted-foreground">{expanded ? '▲' : '▼'}</span>
         </div>
       </button>
 
@@ -81,7 +81,7 @@ function SfCourseBlock({ course }: { course: SfLmsCourse }) {
         </div>
       )}
       {expanded && mods.length === 0 && (
-        <p className="px-5 pb-4 text-[12px] text-muted-foreground">No modules found.</p>
+        <p className="px-5 pb-4 text-[14px] text-muted-foreground">No modules found.</p>
       )}
     </div>
   );
@@ -125,9 +125,9 @@ export default function CurriculumModules() {
       <div className="p-6 max-w-5xl space-y-6">
         {/* Header */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
           <h1 className="text-3xl font-bold text-foreground">Modules</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             Module is the central connective node in the learning architecture. Each module links Learning Assets, Penny Assets,
             and Delivery Assets. Select a module to see its full relationship map in the Knowledge Brief.
           </p>
@@ -137,7 +137,7 @@ export default function CurriculumModules() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setViewMode('live')}
-            className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
+            className={`inline-flex items-center gap-1.5 text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
               viewMode === 'live'
                 ? 'bg-[#2F6B3F] text-white border-[#2F6B3F]'
                 : 'border-border text-muted-foreground hover:border-[#2F6B3F]'
@@ -147,7 +147,7 @@ export default function CurriculumModules() {
           </button>
           <button
             onClick={() => setViewMode('prototype')}
-            className={`inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
+            className={`inline-flex items-center gap-1.5 text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
               viewMode === 'prototype'
                 ? 'bg-primary text-white border-primary'
                 : 'border-border text-muted-foreground hover:border-primary/40'
@@ -165,31 +165,31 @@ export default function CurriculumModules() {
               <div className="flex gap-4 flex-wrap">
                 <div className="rounded-lg border border-border bg-white px-4 py-2">
                   <span className="text-[14px] font-bold text-foreground">{liveTotal}</span>
-                  <span className="text-[11px] text-muted-foreground ml-1.5">total modules</span>
+                  <span className="text-[14px] text-muted-foreground ml-1.5">total modules</span>
                 </div>
                 <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-2">
                   <span className="text-[14px] font-bold text-[#245531]">{liveCompleted}</span>
-                  <span className="text-[11px] text-[#2F6B3F] ml-1.5">completed</span>
+                  <span className="text-[14px] text-[#2F6B3F] ml-1.5">completed</span>
                 </div>
                 <div className="rounded-lg border border-border bg-white px-4 py-2">
                   <span className="text-[14px] font-bold text-foreground">{lmsData.courses.length}</span>
-                  <span className="text-[11px] text-muted-foreground ml-1.5">courses in Salesforce</span>
+                  <span className="text-[14px] text-muted-foreground ml-1.5">courses in Salesforce</span>
                 </div>
                 {lmsData.fromCache && (
                   <div className="rounded-lg border border-border bg-muted/10 px-4 py-2 flex items-center">
-                    <span className="text-[11px] text-muted-foreground">Cached · refreshes every 5 min</span>
+                    <span className="text-[14px] text-muted-foreground">Cached · refreshes every 5 min</span>
                   </div>
                 )}
               </div>
             )}
 
             {isLoading && (
-              <div className="rounded-lg border border-border bg-muted/10 px-4 py-3 text-[12px] text-muted-foreground">
+              <div className="rounded-lg border border-border bg-muted/10 px-4 py-3 text-[14px] text-muted-foreground">
                 Loading modules from Salesforce…
               </div>
             )}
             {isError && (
-              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3 text-[12px] text-[#A93F2F]">
+              <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3 text-[14px] text-[#A93F2F]">
                 Could not load Salesforce data. Check your Salesforce connection.
               </div>
             )}
@@ -199,7 +199,7 @@ export default function CurriculumModules() {
             ))}
 
             {lmsData?.courses.length === 0 && (
-              <div className="rounded-lg border border-border bg-muted/10 px-4 py-3 text-[12px] text-muted-foreground">
+              <div className="rounded-lg border border-border bg-muted/10 px-4 py-3 text-[14px] text-muted-foreground">
                 No Course__c records found in Salesforce.
               </div>
             )}
@@ -213,15 +213,15 @@ export default function CurriculumModules() {
             <div className="flex gap-4 flex-wrap">
               <div className="rounded-lg border border-border bg-white px-4 py-2">
                 <span className="text-[14px] font-bold text-foreground">{totalModules}</span>
-                <span className="text-[11px] text-muted-foreground ml-1.5">total modules</span>
+                <span className="text-[14px] text-muted-foreground ml-1.5">total modules</span>
               </div>
               <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-2">
                 <span className="text-[14px] font-bold text-[#245531]">{fullyConnected}</span>
-                <span className="text-[11px] text-[#2F6B3F] ml-1.5">fully connected</span>
+                <span className="text-[14px] text-[#2F6B3F] ml-1.5">fully connected</span>
               </div>
               <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-2">
                 <span className="text-[14px] font-bold text-[#A93F2F]">{curriculumHealthIssues.length}</span>
-                <span className="text-[11px] text-[#A93F2F] ml-1.5">health issues</span>
+                <span className="text-[14px] text-[#A93F2F] ml-1.5">health issues</span>
               </div>
             </div>
 
@@ -229,7 +229,7 @@ export default function CurriculumModules() {
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setSprintFilter('all')}
-                className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === 'all' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
+                className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === 'all' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
               >
                 All Sprints
               </button>
@@ -237,7 +237,7 @@ export default function CurriculumModules() {
                 <button
                   key={s.id}
                   onClick={() => setSprintFilter(s.id)}
-                  className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === s.id ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
+                  className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === s.id ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}
                 >
                   Sprint {s.sprintNumber as number}
                 </button>
@@ -245,7 +245,7 @@ export default function CurriculumModules() {
             </div>
 
             {/* Standards principle */}
-            <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]/40 px-4 py-3 text-[12px] text-[#2F6F7E]">
+            <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8]/40 px-4 py-3 text-[14px] text-[#2F6F7E]">
               <strong>Relationship Standard:</strong> A fully-connected module has all 6 asset types linked — Lessons, Assessment, Knowledge Articles, Coaching Prompts, Reflection Prompts, and Delivery Activities.
               The indicators below show coverage at a glance. <strong>Module 2.1 is the reference standard.</strong>
             </div>
@@ -255,7 +255,7 @@ export default function CurriculumModules() {
               <div key={sprint.id} className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="h-px flex-1 bg-border" />
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/70 whitespace-nowrap">
+                  <p className="text-[14px] font-bold  text-muted-foreground/70 whitespace-nowrap">
                     {sprint.name} · {sprint.duration as string}
                   </p>
                   <div className="h-px flex-1 bg-border" />
@@ -277,23 +277,23 @@ export default function CurriculumModules() {
                       >
                         <div className="flex items-start justify-between gap-3 mb-3">
                           <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-bold text-muted-foreground/60 bg-border/50 rounded px-1.5 py-0.5 shrink-0">
+                            <span className="text-[14px] font-bold text-muted-foreground/60 bg-border/50 rounded px-1.5 py-0.5 shrink-0">
                               {m.moduleNumber as string}
                             </span>
                             <div>
                               <div className="flex items-center gap-1.5">
                                 <p className="text-[14px] font-bold text-foreground">{m.name}</p>
                                 {isFeatured && (
-                                  <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-1.5 py-0.5">
+                                  <span className="inline-flex items-center gap-0.5 text-[14px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-1.5 py-0.5">
                                     <Star className="w-2.5 h-2.5" /> STANDARD
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-muted-foreground">{m.program}</p>
+                              <p className="text-[14px] text-muted-foreground">{m.program}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                            <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                             <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                           </div>
                         </div>
@@ -302,7 +302,7 @@ export default function CurriculumModules() {
                           {indicators.map(ind => (
                             <span
                               key={ind.label}
-                              className={`inline-flex items-center gap-1 text-[10px] font-medium rounded-full px-2 py-0.5 border ${
+                              className={`inline-flex items-center gap-1 text-[14px] font-medium rounded-full px-2 py-0.5 border ${
                                 ind.ok
                                   ? 'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]'
                                   : 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]'
@@ -316,14 +316,14 @@ export default function CurriculumModules() {
                             </span>
                           ))}
                           {allOk && (
-                            <span className="text-[10px] font-bold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2 py-0.5">
+                            <span className="text-[14px] font-bold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2 py-0.5">
                               ✓ Fully Connected
                             </span>
                           )}
                         </div>
 
                         {((m.learningObjectives as string[]) || []).length > 0 && (
-                          <p className="text-[11px] text-muted-foreground">
+                          <p className="text-[14px] text-muted-foreground">
                             {((m.learningObjectives as string[])).length} learning objective{((m.learningObjectives as string[])).length !== 1 ? 's' : ''} defined
                           </p>
                         )}
@@ -333,7 +333,7 @@ export default function CurriculumModules() {
                             {issues.map(issue => (
                               <div key={issue.id} className="flex items-center gap-1.5">
                                 <AlertTriangle className={`w-3 h-3 shrink-0 ${issue.severity === 'high' ? 'text-[#A93F2F]' : issue.severity === 'medium' ? 'text-[#CC8400]' : 'text-[#CC8400]'}`} />
-                                <p className="text-[10px] text-muted-foreground">{issue.name as string}</p>
+                                <p className="text-[14px] text-muted-foreground">{issue.name as string}</p>
                               </div>
                             ))}
                           </div>

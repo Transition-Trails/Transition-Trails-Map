@@ -21,7 +21,7 @@ export function ConfidenceBadge({ status }: { status: ConfidenceStatus }) {
   const cls   = CONFIDENCE_CLASSES[status] ?? CONFIDENCE_CLASSES['needs-review'];
   const label = CONFIDENCE_LABELS[status] ?? status;
   return (
-    <Badge variant="outline" className={`text-[10px] uppercase tracking-wider font-semibold ${cls}`}>
+    <Badge variant="outline" className={`text-[14px]  font-semibold ${cls}`}>
       {label}
     </Badge>
   );

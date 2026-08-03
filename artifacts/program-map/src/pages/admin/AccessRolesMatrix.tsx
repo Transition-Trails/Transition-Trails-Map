@@ -27,7 +27,7 @@ const TIER_ICONS: Record<AccessTier, React.ReactNode> = {
 function NavCell({ value }: { value: string }) {
   if (value.startsWith('✓')) {
     return (
-      <span className="flex items-start gap-1 text-[11px] text-foreground">
+      <span className="flex items-start gap-1 text-[14px] text-foreground">
         <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
         <span>{value.replace('✓ ', '')}</span>
       </span>
@@ -35,14 +35,14 @@ function NavCell({ value }: { value: string }) {
   }
   if (value.startsWith('—')) {
     return (
-      <span className="flex items-center gap-1 text-[11px] text-muted-foreground/60">
+      <span className="flex items-center gap-1 text-[14px] text-muted-foreground/60">
         <XCircle className="w-3 h-3 flex-shrink-0" />
         <span>{value.replace('— ', '')}</span>
       </span>
     );
   }
   return (
-    <span className="flex items-start gap-1 text-[11px] text-muted-foreground">
+    <span className="flex items-start gap-1 text-[14px] text-muted-foreground">
       <MinusCircle className="w-3 h-3 text-[#CC8400] mt-0.5 flex-shrink-0" />
       <span>{value}</span>
     </span>
@@ -65,7 +65,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
         <div>
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground mb-3 transition-colors"
+            className="flex items-center gap-1.5 text-[14px] text-muted-foreground hover:text-foreground mb-3 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Back to Administration
@@ -79,7 +79,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                 tier switcher in the Topbar to preview any tier.
               </p>
             </div>
-            <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] text-[11px] font-medium px-3 py-1.5 rounded-full flex-shrink-0">
+            <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] text-[14px] font-medium px-3 py-1.5 rounded-full flex-shrink-0">
               <Lock className="w-3.5 h-3.5" />
               Prototype — no auth enforced
             </div>
@@ -88,7 +88,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
 
         {/* ── Tier cards ─────────────────────────────────────────────── */}
         <div>
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">
+          <h2 className="text-[14px] font-bold  text-muted-foreground/60 mb-3">
             Access Tiers
           </h2>
           <div className="grid grid-cols-4 gap-3">
@@ -109,22 +109,22 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                       {TIER_ICONS[tier]}
                     </span>
                     {active && (
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-current bg-current/10 px-1.5 py-0.5 rounded">
+                      <span className="text-[14px] font-bold  text-current bg-current/10 px-1.5 py-0.5 rounded">
                         You
                       </span>
                     )}
                   </div>
-                  <p className="text-[13px] font-bold text-foreground mt-2">{cfg.label}</p>
+                  <p className="text-[14px] font-bold text-foreground mt-2">{cfg.label}</p>
                   {tier !== 'superadmin' && (
-                    <p className="text-[10px] text-muted-foreground font-medium mt-0.5">{cfg.groupLabel}</p>
+                    <p className="text-[14px] text-muted-foreground font-medium mt-0.5">{cfg.groupLabel}</p>
                   )}
-                  <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">{cfg.description}</p>
+                  <p className="text-[14px] text-muted-foreground mt-1.5 leading-snug">{cfg.description}</p>
 
                   {/* Preview button */}
                   {tier !== userTier && (
                     <button
                       onClick={() => setUserTier(tier)}
-                      className="mt-3 w-full text-[10px] font-semibold px-2 py-1 rounded-md border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+                      className="mt-3 w-full text-[14px] font-semibold px-2 py-1 rounded-md border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
                     >
                       Preview this tier →
                     </button>
@@ -137,11 +137,11 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
 
         {/* ── Google Groups mapping ──────────────────────────────────── */}
         <div>
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">
+          <h2 className="text-[14px] font-bold  text-muted-foreground/60 mb-3">
             Google Groups → Trail OS Role Mapping
           </h2>
           <div className="rounded-xl border border-border overflow-hidden">
-            <div className="grid grid-cols-[200px_1fr_200px_1fr] bg-muted/40 border-b border-border/60 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 px-4 py-2">
+            <div className="grid grid-cols-[200px_1fr_200px_1fr] bg-muted/40 border-b border-border/60 text-[14px] font-bold  text-muted-foreground/70 px-4 py-2">
               <span>Google Group</span>
               <span>Trail OS Role</span>
               <span>Tier</span>
@@ -152,14 +152,14 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
               return (
                 <div
                   key={tier}
-                  className={`grid grid-cols-[200px_1fr_200px_1fr] px-4 py-3 text-[12px] items-center ${
+                  className={`grid grid-cols-[200px_1fr_200px_1fr] px-4 py-3 text-[14px] items-center ${
                     i % 2 === 0 ? '' : 'bg-muted/20'
                   }`}
                 >
-                  <span className="font-mono text-[11px] text-muted-foreground">{cfg.googleGroup.split('@')[0]}@…</span>
+                  <span className="font-mono text-[14px] text-muted-foreground">{cfg.googleGroup.split('@')[0]}@…</span>
                   <span className="font-medium text-foreground">{cfg.groupLabel}</span>
                   <span>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${cfg.badgeClass}`}>
+                    <span className={`text-[14px] font-semibold px-2 py-0.5 rounded-full border ${cfg.badgeClass}`}>
                       {cfg.label}
                     </span>
                   </span>
@@ -167,18 +167,18 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                 </div>
               );
             })}
-            <div className="grid grid-cols-[200px_1fr_200px_1fr] px-4 py-3 text-[12px] items-center bg-primary/5 border-t border-primary/10">
-              <span className="font-mono text-[11px] text-muted-foreground/60">N/A — prototype</span>
+            <div className="grid grid-cols-[200px_1fr_200px_1fr] px-4 py-3 text-[14px] items-center bg-primary/5 border-t border-primary/10">
+              <span className="font-mono text-[14px] text-muted-foreground/60">N/A — prototype</span>
               <span className="font-medium text-foreground">Builder / Super Admin</span>
               <span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border bg-primary/10 text-primary border-primary/20">
+                <span className="text-[14px] font-semibold px-2 py-0.5 rounded-full border bg-primary/10 text-primary border-primary/20">
                   Super Admin
                 </span>
               </span>
               <span className="text-muted-foreground">builder</span>
             </div>
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2">
+          <p className="text-[14px] text-muted-foreground mt-2">
             Full group addresses: <span className="font-mono">trail-os-users@transitiontrails.org</span>,{' '}
             <span className="font-mono">trail-power-users@…</span>,{' '}
             <span className="font-mono">trail-admins@…</span> — update in <code>src/config/accessTiers.ts</code> when your Google Workspace domain is finalized.
@@ -187,12 +187,12 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
 
         {/* ── Navigation visibility matrix ───────────────────────────── */}
         <div>
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">
+          <h2 className="text-[14px] font-bold  text-muted-foreground/60 mb-3">
             Navigation Visibility
           </h2>
           <div className="rounded-xl border border-border overflow-hidden">
             {/* Header */}
-            <div className="grid bg-muted/40 border-b border-border/60 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
+            <div className="grid bg-muted/40 border-b border-border/60 text-[14px] font-bold  text-muted-foreground/70"
               style={{ gridTemplateColumns: '140px 1fr 1fr 1fr 1fr' }}
             >
               <div className="px-4 py-2">Section</div>
@@ -213,7 +213,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                 className={`grid items-start ${i % 2 === 0 ? '' : 'bg-muted/20'}`}
                 style={{ gridTemplateColumns: '140px 1fr 1fr 1fr 1fr' }}
               >
-                <div className="px-4 py-3 text-[12px] font-semibold text-foreground">{section}</div>
+                <div className="px-4 py-3 text-[14px] font-semibold text-foreground">{section}</div>
                 {TIER_ORDER.map(tier => (
                   <div key={tier} className="px-3 py-3">
                     <NavCell value={TIER_NAV_SUMMARY[tier][section] ?? '—'} />
@@ -226,11 +226,11 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
 
         {/* ── Feature capabilities ───────────────────────────────────── */}
         <div>
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">
+          <h2 className="text-[14px] font-bold  text-muted-foreground/60 mb-3">
             Feature Capabilities
           </h2>
           <div className="rounded-xl border border-border overflow-hidden">
-            <div className="grid bg-muted/40 border-b border-border/60 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
+            <div className="grid bg-muted/40 border-b border-border/60 text-[14px] font-bold  text-muted-foreground/70"
               style={{ gridTemplateColumns: '160px 1fr 1fr 1fr 1fr' }}
             >
               <div className="px-4 py-2">Feature</div>
@@ -250,9 +250,9 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                 className={`grid items-start ${i % 2 === 0 ? '' : 'bg-muted/20'}`}
                 style={{ gridTemplateColumns: '160px 1fr 1fr 1fr 1fr' }}
               >
-                <div className="px-4 py-3 text-[12px] font-semibold text-foreground">{feature}</div>
+                <div className="px-4 py-3 text-[14px] font-semibold text-foreground">{feature}</div>
                 {TIER_ORDER.map(tier => (
-                  <div key={tier} className="px-3 py-3 text-[11px] text-muted-foreground leading-snug">
+                  <div key={tier} className="px-3 py-3 text-[14px] text-muted-foreground leading-snug">
                     {TIER_FEATURES[feature][tier]}
                   </div>
                 ))}
@@ -263,7 +263,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
 
         {/* ── Google Sign-In placeholder ─────────────────────────────── */}
         <div>
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-3">
+          <h2 className="text-[14px] font-bold  text-muted-foreground/60 mb-3">
             Future: Google Workspace Authentication
           </h2>
           <div className="rounded-xl border border-dashed border-border bg-muted/10 p-5 space-y-4">
@@ -272,8 +272,8 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                 <Chrome className="w-5 h-5 text-[#4285F4]" />
               </div>
               <div>
-                <p className="text-[13px] font-semibold text-foreground">Google Sign-In (OAuth 2.0 + OpenID Connect)</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
+                <p className="text-[14px] font-semibold text-foreground">Google Sign-In (OAuth 2.0 + OpenID Connect)</p>
+                <p className="text-[14px] text-muted-foreground mt-0.5">
                   Users will sign in with their Transition Trails Google account. No separate Trail OS password required.
                 </p>
               </div>
@@ -303,7 +303,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                 <div key={step.title} className="bg-white border border-border rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     {step.icon}
-                    <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                    <span className={`text-[14px] font-bold  px-1.5 py-0.5 rounded ${
                       step.status === 'partial'
                         ? 'bg-[#FFF3E0] text-[#CC8400]'
                         : 'bg-muted text-muted-foreground'
@@ -311,13 +311,13 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
                       {step.status === 'partial' ? 'Partial' : 'Planned'}
                     </span>
                   </div>
-                  <p className="text-[11px] font-semibold text-foreground mb-1">{step.title}</p>
-                  <p className="text-[10px] text-muted-foreground leading-snug">{step.body}</p>
+                  <p className="text-[14px] font-semibold text-foreground mb-1">{step.title}</p>
+                  <p className="text-[14px] text-muted-foreground leading-snug">{step.body}</p>
                 </div>
               ))}
             </div>
 
-            <div className="flex items-start gap-2 text-[11px] text-muted-foreground bg-[#EDF5F8] border border-[#EDF5F8] rounded-lg px-3 py-2">
+            <div className="flex items-start gap-2 text-[14px] text-muted-foreground bg-[#EDF5F8] border border-[#EDF5F8] rounded-lg px-3 py-2">
               <Mail className="w-3.5 h-3.5 text-[#2F6F7E] mt-0.5 flex-shrink-0" />
               <span>
                 <span className="font-semibold text-[#2F6F7E]">Prototype access:</span>{' '}
@@ -329,7 +329,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
 
             <button
               onClick={() => setLocation('/admin/google-oauth')}
-              className="flex items-center gap-1.5 text-[11px] font-medium text-primary hover:underline"
+              className="flex items-center gap-1.5 text-[14px] font-medium text-primary hover:underline"
             >
               View Google Auth Setup
               <ChevronRight className="w-3 h-3" />

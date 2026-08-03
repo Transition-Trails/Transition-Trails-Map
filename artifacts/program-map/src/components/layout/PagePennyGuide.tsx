@@ -397,7 +397,7 @@ function PriorityBadge({ score }: { score: number }) {
     score >= 5 ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' :
                  'bg-muted/60 border-border/60 text-muted-foreground';
   return (
-    <span className={`inline-flex items-center gap-0.5 text-[8px] font-bold px-1.5 py-0.5 rounded border leading-none ${cls}`}>
+    <span className={`inline-flex items-center gap-0.5 text-[14px] font-bold px-1.5 py-0.5 rounded border leading-none ${cls}`}>
       P{score}
     </span>
   );
@@ -487,7 +487,7 @@ export function PagePennyGuide() {
           <button
             key={tab}
             onClick={() => setPennyPanelTab(tab)}
-            className={`flex-1 px-3 py-2 text-[11px] font-medium border-b-2 transition-all duration-150 ${
+            className={`flex-1 px-3 py-2 text-[14px] font-medium border-b-2 transition-all duration-150 ${
               activeTab === tab
                 ? 'border-[#EDF5F8]0 text-[#2F6F7E] bg-[#EDF5F8]/40'
                 : 'border-transparent text-muted-foreground/60 hover:text-foreground hover:border-border/40'
@@ -505,10 +505,10 @@ export function PagePennyGuide() {
             <div className="w-8 h-8 rounded-full bg-[#EDF5F8] flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-[#2F6F7E]" />
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <p className="text-[14px] text-muted-foreground leading-relaxed">
               Ask {TERMS.aiAssistant} a question or select an item to open its brief.
             </p>
-            <button onClick={() => setPennyPanelTab('ask')} className="flex items-center gap-1 text-[10px] font-medium text-[#2F6F7E] hover:underline">
+            <button onClick={() => setPennyPanelTab('ask')} className="flex items-center gap-1 text-[14px] font-medium text-[#2F6F7E] hover:underline">
               Ask a question <ArrowRight className="w-2.5 h-2.5" />
             </button>
           </div>
@@ -519,14 +519,14 @@ export function PagePennyGuide() {
               {/* Penny Insights section */}
               {insights.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-[#2F6F7E]/70 mb-2">
+                  <p className="text-[14px] font-bold  text-[#2F6F7E]/70 mb-2">
                     {isEveryday ? `${TERMS.aiAssistant} · Your Learning Coach` : `${TERMS.aiAssistant} · Chief of Staff`}
                   </p>
                   <div className="rounded-lg border border-[#EDF5F8] bg-[#EDF5F8]/50 p-3 space-y-1.5">
                     {insights.map((text, i) => (
                       <div key={i} className="flex items-start gap-1.5">
-                        <span className="text-[#7FAFC6] flex-shrink-0 mt-0.5 leading-none text-[10px]">•</span>
-                        <p className="text-[11px] text-[#2F6F7E] leading-snug">{text}</p>
+                        <span className="text-[#7FAFC6] flex-shrink-0 mt-0.5 leading-none text-[14px]">•</span>
+                        <p className="text-[14px] text-[#2F6F7E] leading-snug">{text}</p>
                       </div>
                     ))}
                   </div>
@@ -549,8 +549,8 @@ export function PagePennyGuide() {
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-[10px] font-bold text-foreground/80 uppercase tracking-wide">Trail Signals</p>
-                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full leading-none ${
+                        <p className="text-[14px] font-bold text-foreground/80 ">Trail Signals</p>
+                        <span className={`text-[14px] font-semibold px-1.5 py-0.5 rounded-full leading-none ${
                           urgentCount > 0
                             ? 'bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A]'
                             : 'bg-muted text-muted-foreground border border-border/60'
@@ -562,7 +562,7 @@ export function PagePennyGuide() {
                         )}
                       </div>
                       {!signalsOpen && (
-                        <p className="text-[9px] text-muted-foreground/50 mt-0.5 leading-snug">
+                        <p className="text-[14px] text-muted-foreground/50 mt-0.5 leading-snug">
                           {presentSources.length} source{presentSources.length !== 1 ? 's' : ''} · {urgentCount > 0 ? `${urgentCount} urgent · ` : ''}tap to see the data behind these insights
                         </p>
                       )}
@@ -586,9 +586,9 @@ export function PagePennyGuide() {
                             <div className={`flex items-center gap-2 px-3 py-1.5 ${ico.bg}`}>
                               <SrcIcon className={`w-3 h-3 ${ico.cls} flex-shrink-0`} />
                               <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                                <span className={`text-[10px] font-semibold ${ico.cls}`}>{ico.label}</span>
+                                <span className={`text-[14px] font-semibold ${ico.cls}`}>{ico.label}</span>
                                 {hasUrgent && <span className="w-1.5 h-1.5 rounded-full bg-[#CC8400] animate-pulse flex-shrink-0" />}
-                                <span className={`text-[9px] ${conn.cls} ml-0.5`}>· {conn.status}</span>
+                                <span className={`text-[14px] ${conn.cls} ml-0.5`}>· {conn.status}</span>
                               </div>
                               {conn.link && (
                                 <a
@@ -617,15 +617,15 @@ export function PagePennyGuide() {
                                       }
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between gap-1.5">
-                                          <p className={`text-[11px] leading-snug flex-1 ${item.urgent ? 'font-medium text-[#CC8400]' : 'text-foreground'}`}>
+                                          <p className={`text-[14px] leading-snug flex-1 ${item.urgent ? 'font-medium text-[#CC8400]' : 'text-foreground'}`}>
                                             {item.text}
                                           </p>
                                           <PriorityBadge score={priority} />
                                         </div>
                                         {item.meta && (
-                                          <p className="text-[9px] text-muted-foreground/40 mt-0.5">{item.meta}</p>
+                                          <p className="text-[14px] text-muted-foreground/40 mt-0.5">{item.meta}</p>
                                         )}
-                                        <p className="text-[9px] text-muted-foreground/50 italic leading-snug mt-1 border-l-2 border-border/40 pl-1.5">
+                                        <p className="text-[14px] text-muted-foreground/50 italic leading-snug mt-1 border-l-2 border-border/40 pl-1.5">
                                           {item.why}
                                         </p>
                                         <button
@@ -633,7 +633,7 @@ export function PagePennyGuide() {
                                             setPendingPennyQuery(buildSignalQuery(item, ico.label));
                                             setAskPennyOpen(true);
                                           }}
-                                          className="mt-1.5 flex items-center gap-1 text-[9px] font-medium text-[#2F6F7E] hover:text-[#2F6F7E] hover:underline transition-colors"
+                                          className="mt-1.5 flex items-center gap-1 text-[14px] font-medium text-[#2F6F7E] hover:text-[#2F6F7E] hover:underline transition-colors"
                                         >
                                           <Brain className="w-2.5 h-2.5" />
                                           Ask {TERMS.aiAssistant} about this signal
@@ -650,12 +650,12 @@ export function PagePennyGuide() {
 
                       {/* Footer — close + context note */}
                       <div className="px-3 py-2 bg-muted/20 flex items-center justify-between gap-2">
-                        <p className="text-[9px] text-muted-foreground/40 leading-snug">
+                        <p className="text-[14px] text-muted-foreground/40 leading-snug">
                           Phase 1 · Salesforce · Slack · Google Drive · Google Calendar live
                         </p>
                         <button
                           onClick={toggleSignals}
-                          className="text-[9px] text-muted-foreground/50 hover:text-foreground font-medium whitespace-nowrap transition-colors"
+                          className="text-[14px] text-muted-foreground/50 hover:text-foreground font-medium whitespace-nowrap transition-colors"
                         >
                           Hide ▴
                         </button>
@@ -668,12 +668,12 @@ export function PagePennyGuide() {
               {/* Attention */}
               {content.attentionItems.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Attention</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Attention</p>
                   <div className="space-y-1.5">
                     {content.attentionItems.map((item, i) => {
                       const Icon = item.icon;
                       return (
-                        <div key={i} className={`flex items-start gap-2 px-2.5 py-2 rounded-lg border text-[10px] ${item.bg}`}>
+                        <div key={i} className={`flex items-start gap-2 px-2.5 py-2 rounded-lg border text-[14px] ${item.bg}`}>
                           <Icon className={`w-3 h-3 flex-shrink-0 mt-0.5 ${item.iconCls}`} />
                           <span className="text-foreground leading-snug">{item.text}</span>
                         </div>
@@ -686,7 +686,7 @@ export function PagePennyGuide() {
               {/* Quick actions */}
               {steps.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5">
+                  <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">
                     {isEveryday ? 'Quick Actions' : 'Next Steps'}
                   </p>
                   <div className="space-y-0.5">
@@ -695,7 +695,7 @@ export function PagePennyGuide() {
                         className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left hover:bg-muted/40 transition-colors group"
                       >
                         <ArrowRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-colors flex-shrink-0" />
-                        <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">{step.label}</span>
+                        <span className="text-[14px] text-muted-foreground group-hover:text-foreground transition-colors">{step.label}</span>
                       </button>
                     ))}
                   </div>
@@ -704,7 +704,7 @@ export function PagePennyGuide() {
 
               {isPowerOrAbove && (
                 <div className="rounded-md bg-muted/30 border border-border/50 p-2.5">
-                  <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+                  <p className="text-[14px] text-muted-foreground/55 leading-relaxed">
                     <span className="font-semibold text-muted-foreground/70">Salesforce · Slack · Google Drive · Google Calendar live.</span> Agentforce + GA4: Phase 2. Select any item to open its Trail Insights.
                   </p>
                 </div>
@@ -721,8 +721,8 @@ export function PagePennyGuide() {
           <div className="p-4 space-y-4">
 
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[#2F6F7E]/70 mb-1.5">Ask {TERMS.aiAssistant}</p>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
+              <p className="text-[14px] font-bold  text-[#2F6F7E]/70 mb-1.5">Ask {TERMS.aiAssistant}</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">
                 {isEveryday
                   ? 'Ask me about your programs, upcoming sessions, or anything in the Knowledge Library. I can also explain any signal.'
                   : 'Ask me about this page, system relationships, or operational context. I can explain any Trail Signal or insight.'}
@@ -732,7 +732,7 @@ export function PagePennyGuide() {
             {loading && (
               <div className="rounded-lg border border-[#7FAFC6]/60 bg-[#EDF5F8]/60 p-3 flex items-center gap-2">
                 <Loader2 className="w-3.5 h-3.5 text-[#2F6F7E] animate-spin flex-shrink-0" />
-                <span className="text-[11px] text-[#2F6F7E]">{TERMS.aiAssistant} is thinking…</span>
+                <span className="text-[14px] text-[#2F6F7E]">{TERMS.aiAssistant} is thinking…</span>
               </div>
             )}
 
@@ -744,17 +744,17 @@ export function PagePennyGuide() {
                       ? <AlertTriangle className="w-2 h-2 text-white" />
                       : <Sparkles className="w-2 h-2 text-white" />}
                   </div>
-                  <span className={`text-[9px] font-bold uppercase tracking-wide ${isError ? 'text-[#CC8400]' : 'text-[#2F6F7E]'}`}>
+                  <span className={`text-[14px] font-bold  ${isError ? 'text-[#CC8400]' : 'text-[#2F6F7E]'}`}>
                     {isError ? 'Error' : `${TERMS.aiAssistant}`}
                   </span>
                   <button
                     onClick={() => { setResponse(null); setIsError(false); }}
-                    className="ml-auto text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                    className="ml-auto text-[14px] text-muted-foreground/50 hover:text-muted-foreground transition-colors"
                   >
                     ✕
                   </button>
                 </div>
-                <p className={`text-[11px] leading-snug whitespace-pre-wrap ${isError ? 'text-[#CC8400]' : 'text-[#2F6F7E]'}`}>
+                <p className={`text-[14px] leading-snug whitespace-pre-wrap ${isError ? 'text-[#CC8400]' : 'text-[#2F6F7E]'}`}>
                   {response}
                 </p>
               </div>
@@ -768,7 +768,7 @@ export function PagePennyGuide() {
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAsk()}
                   placeholder={`Ask about ${ctx === 'home' ? 'your dashboard' : ctx === 'default' ? 'this page' : ctx}…`}
-                  className="flex-1 text-[11px] bg-white border border-border/70 rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-[#7FAFC6] focus:border-[#7FAFC6]"
+                  className="flex-1 text-[14px] bg-white border border-border/70 rounded-lg px-3 py-2 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-[#7FAFC6] focus:border-[#7FAFC6]"
                 />
                 <button
                   onClick={handleAsk}
@@ -780,14 +780,14 @@ export function PagePennyGuide() {
                     : <Send className="w-3.5 h-3.5" />}
                 </button>
               </div>
-              <p className="text-[9px] text-muted-foreground/40 leading-snug">
+              <p className="text-[14px] text-muted-foreground/40 leading-snug">
                 Live · Gemini API · Agentforce upgrade: Phase 2
               </p>
             </div>
 
             {!response && (
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Try asking</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Try asking</p>
                 <div className="space-y-1">
                   {(isEveryday
                     ? ["What's happening with my programs?", `Why did ${TERMS.aiAssistant} flag the Learning Coach?`, "Find Sprint 3 materials"]
@@ -796,7 +796,7 @@ export function PagePennyGuide() {
                     <button
                       key={i}
                       onClick={() => { setQuery(suggestion); inputRef.current?.focus(); }}
-                      className="w-full text-left text-[10px] text-muted-foreground px-2.5 py-1.5 rounded-md hover:bg-muted/40 hover:text-foreground transition-colors"
+                      className="w-full text-left text-[14px] text-muted-foreground px-2.5 py-1.5 rounded-md hover:bg-muted/40 hover:text-foreground transition-colors"
                     >
                       "{suggestion}"
                     </button>

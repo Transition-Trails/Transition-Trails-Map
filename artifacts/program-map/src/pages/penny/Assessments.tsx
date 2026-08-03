@@ -121,7 +121,7 @@ export default function Assessments() {
 
         {/* Header */}
         <div className="space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+          <p className="text-[14px] font-bold  text-muted-foreground/50">
             Penny Command Center
           </p>
           <div className="flex items-center justify-between gap-3">
@@ -131,12 +131,12 @@ export default function Assessments() {
               </div>
               <div>
                 <h1 className="text-base font-semibold text-foreground">Assessments</h1>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[14px] text-muted-foreground">
                   Competency assessments administered by Penny — results stored in Salesforce, coaching delivered in-platform.
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
+            <div className="flex items-center gap-1 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               <span className="font-semibold">POC Confirmed</span>
             </div>
@@ -154,7 +154,7 @@ export default function Assessments() {
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
               <s.icon className={`w-4 h-4 ${s.color} mb-1.5`} />
               <p className={`text-xl font-semibold ${s.color}`}>{s.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -162,7 +162,7 @@ export default function Assessments() {
         {/* Learner results */}
         <div>
           <div className="flex items-center justify-between mb-2.5 gap-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <p className="text-[14px] font-bold  text-muted-foreground/60">
               Learner Results
             </p>
             <div className="flex items-center gap-1.5">
@@ -170,7 +170,7 @@ export default function Assessments() {
                 <button
                   key={f}
                   onClick={() => setFilterStatus(f)}
-                  className={`text-[10px] font-medium px-2.5 py-1 rounded-full border transition-colors ${
+                  className={`text-[14px] font-medium px-2.5 py-1 rounded-full border transition-colors ${
                     filterStatus === f
                       ? 'bg-primary text-primary-foreground border-primary'
                       : 'bg-card border-border text-muted-foreground hover:border-primary/40'
@@ -185,7 +185,7 @@ export default function Assessments() {
           <div className="rounded-xl border border-border overflow-hidden">
             <div className="grid grid-cols-[1fr_180px_70px_70px_80px_80px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
               {['Learner', 'Assessment', 'Score', 'Passed', 'Attempts', 'AI Coach'].map(h => (
-                <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
+                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
               ))}
             </div>
             <div className="bg-card divide-y divide-border">
@@ -198,21 +198,21 @@ export default function Assessments() {
                     className="grid grid-cols-[1fr_180px_70px_70px_80px_80px] gap-x-3 items-center px-4 py-3 hover:bg-muted/20 transition-colors"
                   >
                     <div>
-                      <p className="text-[12px] font-semibold text-foreground">{r.learner}</p>
-                      <p className="text-[10px] text-muted-foreground">{r.program}</p>
+                      <p className="text-[14px] font-semibold text-foreground">{r.learner}</p>
+                      <p className="text-[14px] text-muted-foreground">{r.program}</p>
                     </div>
                     <div>
-                      <p className="text-[11px] text-foreground truncate">{asmnt?.name ?? r.assessmentId}</p>
-                      <p className="text-[10px] text-muted-foreground">{r.date}</p>
+                      <p className="text-[14px] text-foreground truncate">{asmnt?.name ?? r.assessmentId}</p>
+                      <p className="text-[14px] text-muted-foreground">{r.date}</p>
                     </div>
-                    <p className={`text-[12px] font-bold ${scoreClr}`}>{r.score}%</p>
+                    <p className={`text-[14px] font-bold ${scoreClr}`}>{r.score}%</p>
                     <div>
                       {r.passed
                         ? <CheckCircle2 className="w-4 h-4 text-[#2F6B3F]" />
                         : <AlertTriangle className="w-4 h-4 text-[#A93F2F]" />
                       }
                     </div>
-                    <p className="text-[11px] text-muted-foreground">{r.attempts}×</p>
+                    <p className="text-[14px] text-muted-foreground">{r.attempts}×</p>
                     <div className="flex items-center gap-1">
                       {r.pennyCoached
                         ? <Sparkles className="w-3.5 h-3.5 text-[#2F6F7E]" aria-label="Penny coaching active" />
@@ -220,7 +220,7 @@ export default function Assessments() {
                       }
                       <button
                         onClick={() => void coachWithBothAIs(r.learner, r.assessmentId, r.score, r.passed)}
-                        className={`flex items-center gap-0.5 text-[10px] border rounded-md px-1.5 py-0.5 transition-colors ${
+                        className={`flex items-center gap-0.5 text-[14px] border rounded-md px-1.5 py-0.5 transition-colors ${
                           activeCoaching?.key === `${r.learner}-${r.assessmentId}` && activeCoaching.status === 'loading'
                             ? 'text-cyan-700 border-cyan-300 bg-cyan-50'
                             : 'text-primary border-primary/20 hover:bg-primary/5'
@@ -237,7 +237,7 @@ export default function Assessments() {
                 );
               })}
               {filtered.length === 0 && (
-                <div className="px-4 py-8 text-center text-[12px] text-muted-foreground">
+                <div className="px-4 py-8 text-center text-[14px] text-muted-foreground">
                   No results match this filter.
                 </div>
               )}
@@ -254,10 +254,10 @@ export default function Assessments() {
                   <Brain className="w-3.5 h-3.5 text-[#2F6F7E]" />
                   <Bot className="w-3.5 h-3.5 text-cyan-600" />
                 </div>
-                <p className="text-[11px] font-semibold text-foreground">
+                <p className="text-[14px] font-semibold text-foreground">
                   Dual-AI Coaching — {activeCoaching.learner}
                 </p>
-                <span className="text-[10px] text-muted-foreground">· {activeCoaching.assessmentName}</span>
+                <span className="text-[14px] text-muted-foreground">· {activeCoaching.assessmentName}</span>
               </div>
               <button
                 onClick={() => setActiveCoaching(null)}
@@ -275,12 +275,12 @@ export default function Assessments() {
                   <Brain className="w-3 h-3 text-[#2F6F7E]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#2F6F7E]/70 mb-0.5">Penny</p>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[14px] font-bold  text-[#2F6F7E]/70 mb-0.5">Penny</p>
+                  <p className="text-[14px] text-muted-foreground">
                     Panel opened with coaching query — see the Ask Penny panel on the right.
                   </p>
                 </div>
-                <span className="text-[9px] font-semibold bg-[#EDF5F8] text-[#2F6F7E] rounded-full px-2 py-0.5 shrink-0">Active</span>
+                <span className="text-[14px] font-semibold bg-[#EDF5F8] text-[#2F6F7E] rounded-full px-2 py-0.5 shrink-0">Active</span>
               </div>
 
               {/* Agentforce row */}
@@ -289,17 +289,17 @@ export default function Assessments() {
                   <Bot className="w-3 h-3 text-cyan-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-600/70 mb-0.5">Agentforce</p>
+                  <p className="text-[14px] font-bold  text-cyan-600/70 mb-0.5">Agentforce</p>
 
                   {activeCoaching.status === 'loading' && (
-                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
                       <RefreshCw className="w-3 h-3 animate-spin text-cyan-500" />
                       <span>Connecting to Penny–Transition Trails Assistant…</span>
                     </div>
                   )}
 
                   {activeCoaching.status === 'success' && (
-                    <p className="text-[11px] text-foreground leading-relaxed whitespace-pre-wrap">
+                    <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-wrap">
                       {activeCoaching.response}
                     </p>
                   )}
@@ -307,17 +307,17 @@ export default function Assessments() {
                   {activeCoaching.status === 'error' && (
                     <div className="flex items-start gap-1.5">
                       <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-[#CC8400]">{activeCoaching.error}</p>
+                      <p className="text-[14px] text-[#CC8400]">{activeCoaching.error}</p>
                     </div>
                   )}
 
                   {activeCoaching.sessionId && (
-                    <p className="text-[9px] text-muted-foreground/50 mt-1 font-mono">
+                    <p className="text-[14px] text-muted-foreground/50 mt-1 font-mono">
                       Session {activeCoaching.sessionId.slice(0, 16)}…
                     </p>
                   )}
                 </div>
-                <span className={`text-[9px] font-semibold rounded-full px-2 py-0.5 shrink-0 ${
+                <span className={`text-[14px] font-semibold rounded-full px-2 py-0.5 shrink-0 ${
                   activeCoaching.status === 'loading' ? 'bg-cyan-100 text-cyan-700' :
                   activeCoaching.status === 'success' ? 'bg-[#E6F0EA] text-[#2F6B3F]' :
                   'bg-[#FFF3E0] text-[#CC8400]'
@@ -333,12 +333,12 @@ export default function Assessments() {
         {/* Assessment catalogue summary */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <p className="text-[14px] font-bold  text-muted-foreground/60">
               Assessment Catalogue · Foundations Trail
             </p>
             <button
               onClick={() => setLocation('/program/curriculum')}
-              className="flex items-center gap-1 text-[10px] text-primary hover:underline"
+              className="flex items-center gap-1 text-[14px] text-primary hover:underline"
             >
               Edit in Curriculum Studio <ChevronRight className="w-3 h-3" />
             </button>
@@ -347,7 +347,7 @@ export default function Assessments() {
           <div className="rounded-xl border border-border overflow-hidden">
             <div className="grid grid-cols-[1fr_130px_60px_70px_60px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
               {['Assessment', 'Type', 'Qs', 'Pass %', 'Avg'].map(h => (
-                <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
+                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
               ))}
             </div>
             <div className="bg-card divide-y divide-border">
@@ -362,17 +362,17 @@ export default function Assessments() {
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <p className="text-[11px] font-medium text-foreground truncate">{a.name as string}</p>
-                        <span className={`text-[9px] font-semibold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>
+                        <p className="text-[14px] font-medium text-foreground truncate">{a.name as string}</p>
+                        <span className={`text-[14px] font-semibold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>
                           {statusCfg.label}
                         </span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground truncate">{a.moduleName as string}</p>
+                      <p className="text-[14px] text-muted-foreground truncate">{a.moduleName as string}</p>
                     </div>
-                    <p className="text-[10px] text-muted-foreground">{a.assessmentType as string}</p>
-                    <p className="text-[11px] text-foreground">{a.questionCount as number}</p>
-                    <p className="text-[11px] text-foreground">{a.passingScore as number}%</p>
-                    <p className="text-[11px] text-foreground font-medium">{(a.avgScore as string) ?? '—'}</p>
+                    <p className="text-[14px] text-muted-foreground">{a.assessmentType as string}</p>
+                    <p className="text-[14px] text-foreground">{a.questionCount as number}</p>
+                    <p className="text-[14px] text-foreground">{a.passingScore as number}%</p>
+                    <p className="text-[14px] text-foreground font-medium">{(a.avgScore as string) ?? '—'}</p>
                   </div>
                 );
               })}
@@ -385,9 +385,9 @@ export default function Assessments() {
           <div className="rounded-lg border border-[#FBEAE6] bg-[#FBEAE6]/50 p-3.5 flex items-start gap-2">
             <ClipboardCheck className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[11px] font-medium text-foreground mb-0.5">Salesforce integration</p>
-              <p className="text-[10px] text-muted-foreground leading-snug">
-                Pass/fail results and scores write to <span className="font-mono text-[9px]">Assessment__c</span> in Salesforce.
+              <p className="text-[14px] font-medium text-foreground mb-0.5">Salesforce integration</p>
+              <p className="text-[14px] text-muted-foreground leading-snug">
+                Pass/fail results and scores write to <span className="font-mono text-[14px]">Assessment__c</span> in Salesforce.
                 Retake rules are enforced via Service Delivery records.
               </p>
             </div>
@@ -395,8 +395,8 @@ export default function Assessments() {
           <div className="rounded-lg border border-[#EDF5F8] bg-[#EDF5F8]/50 p-3.5 flex items-start gap-2">
             <Sparkles className="w-3.5 h-3.5 text-[#2F6F7E] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[11px] font-medium text-foreground mb-0.5">Penny coaching</p>
-              <p className="text-[10px] text-muted-foreground leading-snug">
+              <p className="text-[14px] font-medium text-foreground mb-0.5">Penny coaching</p>
+              <p className="text-[14px] text-muted-foreground leading-snug">
                 Penny provides personalised feedback on failure and suggests remediation resources.
                 Use the Coach button per learner to generate coaching advice.
               </p>
@@ -408,10 +408,10 @@ export default function Assessments() {
         <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3 flex items-start gap-2">
           <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
           <div>
-            <p className="text-[11px] font-medium text-[#A93F2F]">
+            <p className="text-[14px] font-medium text-[#A93F2F]">
               Missing: Module 4.3 has no linked assessment
             </p>
-            <p className="text-[10px] text-[#A93F2F] mt-0.5 leading-snug">
+            <p className="text-[14px] text-[#A93F2F] mt-0.5 leading-snug">
               Portfolio &amp; Career Launch module is missing a knowledge check. Use Penny Content Assistant to generate one.
             </p>
             <button
@@ -419,7 +419,7 @@ export default function Assessments() {
                 setPendingPennyQuery('Generate an assessment for Module 4.3: Portfolio & Career Launch. It should cover portfolio presentation skills, job search strategy, and interview preparation. Suggest 12–15 questions with a 75% pass threshold.');
                 setAskPennyOpen(true);
               }}
-              className="flex items-center gap-1 mt-1.5 text-[10px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2 py-1 hover:bg-[#FBEAE6] transition-colors"
+              className="flex items-center gap-1 mt-1.5 text-[14px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2 py-1 hover:bg-[#FBEAE6] transition-colors"
             >
               <Zap className="w-2.5 h-2.5" /> Generate with Penny
             </button>

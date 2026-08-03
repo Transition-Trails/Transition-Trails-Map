@@ -135,7 +135,7 @@ export default function LearnerPenny() {
               <div key={i} className="flex items-end gap-2">
                 <PennyAvatar />
                 <div
-                  className="rounded-2xl rounded-tl-sm border px-3 py-2 max-w-[85%] text-[13px]"
+                  className="rounded-2xl rounded-tl-sm border px-3 py-2 max-w-[85%] text-[14px]"
                   style={{ background: 'white', borderColor: '#E2E4E1', color: '#2A2E2C' }}
                 >
                   {msg.text}
@@ -144,7 +144,7 @@ export default function LearnerPenny() {
             ) : (
               <div key={i} className="flex justify-end">
                 <div
-                  className="rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] text-[13px] text-white"
+                  className="rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] text-[14px] text-white"
                   style={{ background: '#2F6B3F' }}
                 >
                   {msg.text}
@@ -169,7 +169,7 @@ export default function LearnerPenny() {
             disabled={sending || greeting}
             placeholder="Ask Penny anything about your trail…"
             rows={1}
-            className="flex-1 resize-none rounded-xl border px-3 py-2 text-[13px] min-h-[40px] max-h-[120px] focus:outline-none focus:ring-1"
+            className="flex-1 resize-none rounded-xl border px-3 py-2 text-[14px] min-h-[40px] max-h-[120px] focus:outline-none focus:ring-1"
             style={{
               borderColor: '#E2E4E1',
               '--tw-ring-color': '#2F6B3F',

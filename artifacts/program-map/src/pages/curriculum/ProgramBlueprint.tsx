@@ -39,7 +39,7 @@ function StatPill({ label, value, cls = '' }: { label: string; value: number | s
   return (
     <div className={`rounded-lg border px-3 py-2 text-center ${cls}`}>
       <p className="text-xl font-bold text-foreground">{value}</p>
-      <p className="text-[10px] text-muted-foreground">{label}</p>
+      <p className="text-[14px] text-muted-foreground">{label}</p>
     </div>
   );
 }
@@ -59,8 +59,8 @@ function SectionCard({ title, items, icon: Icon, color, onSelect }: {
         className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/20 transition-colors"
       >
         <Icon className={`w-4 h-4 shrink-0 ${color}`} />
-        <p className="text-[13px] font-bold text-foreground flex-1">{title}</p>
-        <span className="text-[10px] font-bold text-muted-foreground border border-border rounded-full px-1.5 py-0.5">{items.length}</span>
+        <p className="text-[14px] font-bold text-foreground flex-1">{title}</p>
+        <span className="text-[14px] font-bold text-muted-foreground border border-border rounded-full px-1.5 py-0.5">{items.length}</span>
         <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${open ? '' : '-rotate-90'}`} />
       </button>
       {open && (
@@ -70,15 +70,15 @@ function SectionCard({ title, items, icon: Icon, color, onSelect }: {
             return (
               <button key={item.id} onClick={() => onSelect(item)}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-muted/20 transition-colors">
-                <p className="text-[12px] font-medium text-foreground flex-1 truncate">{item.name}</p>
-                <span className={`text-[9px] font-semibold border rounded-full px-1.5 py-0.5 shrink-0 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                <p className="text-[14px] font-medium text-foreground flex-1 truncate">{item.name}</p>
+                <span className={`text-[14px] font-semibold border rounded-full px-1.5 py-0.5 shrink-0 ${statusCfg.cls}`}>{statusCfg.label}</span>
                 <ArrowRight className="w-3 h-3 text-muted-foreground shrink-0" />
               </button>
             );
           })}
           {items.length === 0 && (
             <div className="px-4 py-3">
-              <p className="text-[11px] text-muted-foreground/60 italic">No items yet</p>
+              <p className="text-[14px] text-muted-foreground/60 italic">No items yet</p>
             </div>
           )}
         </div>
@@ -127,9 +127,9 @@ export default function ProgramBlueprint() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Programs · Blueprint Canvas</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Programs · Blueprint Canvas</p>
             <h1 className="text-[15px] font-semibold text-foreground leading-snug">Program Canvas</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               What actually exists — structure, curriculum, {TERMS.aiAssistant} assets, delivery, and content health.
               {isFoundations && <span className="ml-1 text-primary font-medium">Foundations Trail is the reference implementation.</span>}
             </p>
@@ -137,11 +137,11 @@ export default function ProgramBlueprint() {
 
           {/* Program selector */}
           <div className="flex flex-col gap-1">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Program</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Program</p>
             <select
               value={selectedProgramId}
               onChange={e => setSelectedProgramId(e.target.value)}
-              className="text-[12px] font-semibold border border-border rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-primary"
+              className="text-[14px] font-semibold border border-border rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-primary"
             >
               {curriculumPrograms.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
@@ -153,7 +153,7 @@ export default function ProgramBlueprint() {
         {/* Blueprint vs program helper */}
         <div className="rounded-lg border border-border bg-muted/30 px-4 py-2.5 flex items-start gap-3">
           <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 mt-1.5 shrink-0" />
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             <span className="font-semibold text-foreground">This is what exists.</span>{' '}
             The <span className="font-semibold text-foreground">Program Blueprint</span> standard in Standards Studio defines what every program should contain.
             This canvas shows what has actually been built for the selected program.
@@ -168,13 +168,13 @@ export default function ProgramBlueprint() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                {isFoundations && <span className="text-[10px] font-bold text-primary border border-primary/20 bg-white rounded-full px-2 py-0.5">★ Reference Implementation</span>}
-                <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${CONTENT_STATUS_CONFIG[program.status].cls}`}>
+                {isFoundations && <span className="text-[14px] font-bold text-primary border border-primary/20 bg-white rounded-full px-2 py-0.5">★ Reference Implementation</span>}
+                <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${CONTENT_STATUS_CONFIG[program.status].cls}`}>
                   {CONTENT_STATUS_CONFIG[program.status].label}
                 </span>
               </div>
               <p className="text-[20px] font-bold text-foreground">{program.name}</p>
-              <p className="text-[12px] text-muted-foreground mt-1">{program.purpose}</p>
+              <p className="text-[14px] text-muted-foreground mt-1">{program.purpose}</p>
             </div>
             <div className="grid grid-cols-3 gap-2 shrink-0">
               <StatPill label="Cohorts" value={cohorts.length} cls="border-[#9FC3AE] bg-[#E6F0EA]" />
@@ -187,8 +187,8 @@ export default function ProgramBlueprint() {
           {driveResource && (
             <div className={`mt-3 flex items-center gap-2 rounded-lg border px-3 py-2 ${driveStatusCfg?.cls || ''}`}>
               <FolderOpen className="w-3.5 h-3.5 shrink-0" />
-              <p className="text-[11px] font-semibold">{driveResource.folderName}</p>
-              <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ml-auto ${driveStatusCfg?.cls}`}>{driveStatusCfg?.label}</span>
+              <p className="text-[14px] font-semibold">{driveResource.folderName}</p>
+              <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ml-auto ${driveStatusCfg?.cls}`}>{driveStatusCfg?.label}</span>
               {driveResource.folderUrl && <ExternalLink className="w-3 h-3 shrink-0" />}
             </div>
           )}
@@ -200,11 +200,11 @@ export default function ProgramBlueprint() {
             const Icon = t.icon;
             return (
               <button key={t.id} onClick={() => setTab(t.id)}
-                className={`flex items-center gap-1.5 text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${tab === t.id ? 'bg-secondary text-white border-secondary' : 'border-border text-muted-foreground hover:border-secondary/40'}`}>
+                className={`flex items-center gap-1.5 text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${tab === t.id ? 'bg-secondary text-white border-secondary' : 'border-border text-muted-foreground hover:border-secondary/40'}`}>
                 <Icon className="w-3 h-3" />
                 {t.label}
                 {t.id === 'health' && healthIssues.length > 0 && (
-                  <span className="bg-[#FBEAE6]0 text-white text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">{healthIssues.length}</span>
+                  <span className="bg-[#FBEAE6]0 text-white text-[14px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">{healthIssues.length}</span>
                 )}
               </button>
             );
@@ -216,11 +216,11 @@ export default function ProgramBlueprint() {
           <div className="space-y-3">
             {/* Relationship chain header */}
             <div className="rounded-lg border border-border bg-white p-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Full Relationship Chain</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Full Relationship Chain</p>
               <div className="flex items-center gap-2 flex-wrap">
                 {['Program', 'Cohorts', 'Sprints', 'Modules', 'Lessons', 'Assessments', 'Knowledge Articles', `${TERMS.aiAssistant} Assets`, 'Delivery Assets', 'Salesforce Objects'].map((step, i, arr) => (
                   <div key={step} className="flex items-center gap-1">
-                    <span className="text-[11px] font-semibold text-foreground bg-muted/50 rounded px-2 py-0.5">{step}</span>
+                    <span className="text-[14px] font-semibold text-foreground bg-muted/50 rounded px-2 py-0.5">{step}</span>
                     {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-muted-foreground/40" />}
                   </div>
                 ))}
@@ -287,9 +287,9 @@ export default function ProgramBlueprint() {
             <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3 mb-2">
               <div className="flex items-center gap-2 mb-1">
                 <Database className="w-4 h-4 text-[#2F6F7E]" />
-                <p className="text-[13px] font-bold text-[#2F6F7E]">Salesforce — System of Record</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E]">Salesforce — System of Record</p>
               </div>
-              <p className="text-[12px] text-[#2F6F7E]">
+              <p className="text-[14px] text-[#2F6F7E]">
                 Salesforce is the data source of truth. Trail OS visualizes and operates on top of SF data.
                 These mappings show how {programName} objects correspond to your NPSP/PMM/existing objects.
               </p>
@@ -307,14 +307,14 @@ export default function ProgramBlueprint() {
                       <div className={`w-2 h-2 rounded-full ${statusCfg.dot} shrink-0`} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="text-[12px] font-bold text-foreground">{mapping.trailOsObject}</p>
+                          <p className="text-[14px] font-bold text-foreground">{mapping.trailOsObject}</p>
                           <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
-                          <p className="text-[12px] font-semibold text-[#2F6F7E]">{mapping.sfLabel}</p>
-                          <p className="text-[10px] text-muted-foreground font-mono">{mapping.sfApiName}</p>
+                          <p className="text-[14px] font-semibold text-[#2F6F7E]">{mapping.sfLabel}</p>
+                          <p className="text-[14px] text-muted-foreground font-mono">{mapping.sfApiName}</p>
                         </div>
-                        <p className="text-[10px] text-muted-foreground line-clamp-1">{mapping.currentImplementation}</p>
+                        <p className="text-[14px] text-muted-foreground line-clamp-1">{mapping.currentImplementation}</p>
                       </div>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${statusCfg.cls}`}>{statusCfg.label}</span>
                       <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                     </div>
                   </button>
@@ -338,38 +338,38 @@ export default function ProgramBlueprint() {
                       <div>
                         <p className="text-[15px] font-bold text-foreground">{driveResource.folderName}</p>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${driveStatusCfg?.cls}`}>{driveStatusCfg?.label}</span>
-                          <span className="text-[10px] text-muted-foreground">Owner: {driveResource.owner}</span>
+                          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${driveStatusCfg?.cls}`}>{driveStatusCfg?.label}</span>
+                          <span className="text-[14px] text-muted-foreground">Owner: {driveResource.owner}</span>
                         </div>
                       </div>
                     </div>
                     {driveResource.folderUrl ? (
                       <a href={driveResource.folderUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-[11px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-full px-3 py-1.5 hover:bg-primary/10 transition-colors">
+                        className="flex items-center gap-1.5 text-[14px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-full px-3 py-1.5 hover:bg-primary/10 transition-colors">
                         Open Drive <ExternalLink className="w-3 h-3" />
                       </a>
                     ) : (
-                      <span className="text-[11px] text-muted-foreground border border-border rounded-full px-3 py-1.5">No URL configured</span>
+                      <span className="text-[14px] text-muted-foreground border border-border rounded-full px-3 py-1.5">No URL configured</span>
                     )}
                   </div>
-                  <p className="text-[12px] text-muted-foreground mb-3">{driveResource.description}</p>
+                  <p className="text-[14px] text-muted-foreground mb-3">{driveResource.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {driveResource.contentTypes.map(ct => (
-                      <span key={ct} className="text-[10px] font-medium border border-border bg-muted/30 rounded-full px-2 py-0.5 text-muted-foreground">{ct}</span>
+                      <span key={ct} className="text-[14px] font-medium border border-border bg-muted/30 rounded-full px-2 py-0.5 text-muted-foreground">{ct}</span>
                     ))}
                   </div>
                 </div>
 
                 {driveResource.subFolders.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Sub-Folders</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Sub-Folders</p>
                     <div className="space-y-1.5">
                       {driveResource.subFolders.map((sf, i) => (
                         <div key={i} className="flex items-center gap-3 rounded-lg border border-border bg-white px-3 py-2.5">
                           <FolderOpen className="w-4 h-4 text-muted-foreground shrink-0" />
                           <div className="flex-1">
-                            <p className="text-[12px] font-semibold text-foreground">{sf.name}</p>
-                            <p className="text-[10px] text-muted-foreground">{sf.description}</p>
+                            <p className="text-[14px] font-semibold text-foreground">{sf.name}</p>
+                            <p className="text-[14px] text-muted-foreground">{sf.description}</p>
                           </div>
                           {sf.url && <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
                         </div>
@@ -379,26 +379,26 @@ export default function ProgramBlueprint() {
                 )}
 
                 <div className="rounded-lg border border-border bg-slate-50 p-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Configuration Details</p>
-                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Configuration Details</p>
+                  <div className="grid grid-cols-2 gap-2 text-[14px]">
                     <div><span className="text-muted-foreground">Permissions Model:</span> <span className="font-medium text-foreground">{driveResource.permissionsModel.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span></div>
                     <div><span className="text-muted-foreground">Sync Status:</span> <span className="font-medium text-foreground capitalize">{driveResource.syncStatus.replace(/-/g, ' ')}</span></div>
                     <div><span className="text-muted-foreground">Last Updated:</span> <span className="font-medium text-foreground">{driveResource.lastUpdated}</span></div>
                     <div><span className="text-muted-foreground">Created By:</span> <span className="font-medium text-foreground">{driveResource.createdBy}</span></div>
                   </div>
                   {driveResource.sharedDriveId ? (
-                    <div className="mt-2 text-[11px]"><span className="text-muted-foreground">Shared Drive ID:</span> <span className="font-mono font-medium text-foreground">{driveResource.sharedDriveId}</span></div>
+                    <div className="mt-2 text-[14px]"><span className="text-muted-foreground">Shared Drive ID:</span> <span className="font-mono font-medium text-foreground">{driveResource.sharedDriveId}</span></div>
                   ) : (
-                    <p className="mt-2 text-[10px] text-muted-foreground italic">Shared Drive ID not set — configure in Admin &gt; Program Resources for future API access.</p>
+                    <p className="mt-2 text-[14px] text-muted-foreground italic">Shared Drive ID not set — configure in Admin &gt; Program Resources for future API access.</p>
                   )}
-                  {driveResource.notes && <p className="mt-2 text-[10px] text-[#CC8400] border-t border-border pt-2">{driveResource.notes}</p>}
+                  {driveResource.notes && <p className="mt-2 text-[14px] text-[#CC8400] border-t border-border pt-2">{driveResource.notes}</p>}
                 </div>
               </>
             ) : (
               <div className="rounded-xl border-2 border-dashed border-border p-8 text-center">
                 <FolderOpen className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-[13px] font-semibold text-muted-foreground mb-1">No Google Drive configured</p>
-                <p className="text-[11px] text-muted-foreground">Set up a Google Drive workspace for {programName} in Admin &gt; Program Resources.</p>
+                <p className="text-[14px] font-semibold text-muted-foreground mb-1">No Google Drive configured</p>
+                <p className="text-[14px] text-muted-foreground">Set up a Google Drive workspace for {programName} in Admin &gt; Program Resources.</p>
               </div>
             )}
           </div>
@@ -415,8 +415,8 @@ export default function ProgramBlueprint() {
             {healthIssues.length === 0 ? (
               <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA] p-5 text-center">
                 <CheckCircle2 className="w-6 h-6 text-[#2F6B3F] mx-auto mb-2" />
-                <p className="text-[13px] font-semibold text-[#245531]">All Clear</p>
-                <p className="text-[11px] text-[#2F6B3F]">No content health issues found for {programName}.</p>
+                <p className="text-[14px] font-semibold text-[#245531]">All Clear</p>
+                <p className="text-[14px] text-[#2F6B3F]">No content health issues found for {programName}.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -426,9 +426,9 @@ export default function ProgramBlueprint() {
                     <div className="flex items-start gap-2">
                       <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${issue.severity === 'high' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`} />
                       <div className="flex-1">
-                        <p className="text-[13px] font-bold text-foreground">{issue.name}</p>
-                        <p className="text-[11px] text-muted-foreground">{issue.purpose}</p>
-                        <p className="text-[11px] text-[#CC8400] mt-1 font-medium">→ {issue.actionRequired as string}</p>
+                        <p className="text-[14px] font-bold text-foreground">{issue.name}</p>
+                        <p className="text-[14px] text-muted-foreground">{issue.purpose}</p>
+                        <p className="text-[14px] text-[#CC8400] mt-1 font-medium">→ {issue.actionRequired as string}</p>
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
                     </div>

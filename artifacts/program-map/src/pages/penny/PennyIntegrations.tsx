@@ -26,7 +26,7 @@ export default function PennyIntegrations() {
             <Brain className="w-4 h-4 text-[#CC8400] flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold text-[#CC8400] mb-1">Penny's Role in Communication</p>
-              <p className="text-xs text-[#CC8400] leading-relaxed">
+              <p className="text-sm text-[#CC8400] leading-relaxed">
                 Penny triggers several of the Trail OS communication events — at-risk learner alerts,
                 coaching nudges, Trail Talk reminders, and Trail Win prompts. When Penny detects a flag,
                 it fires an event that the Comm Routing model delivers to the configured Slack channel or
@@ -49,26 +49,26 @@ export default function PennyIntegrations() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-foreground text-sm">{route.eventType}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{route.description}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{route.description}</p>
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      <span className="inline-flex items-center text-[10px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5">
+                      <span className="inline-flex items-center text-[14px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5">
                         Penny: {route.relatedPennyCap}
                       </span>
-                      <span className="text-[11px] text-muted-foreground">Trigger: {route.trigger}</span>
+                      <span className="text-[14px] text-muted-foreground">Trigger: {route.trigger}</span>
                     </div>
                   </div>
                   <div className="flex-shrink-0 text-right">
                     <div className="flex items-center gap-1.5 justify-end">
                       <Hash className="w-3.5 h-3.5 text-[#4A154B]" />
-                      <span className="font-mono text-[11px] text-foreground">{route.slackChannel}</span>
+                      <span className="font-mono text-[14px] text-foreground">{route.slackChannel}</span>
                     </div>
                     <div className="flex items-center gap-1 mt-1 justify-end">
                       <StatusDot status="amber" />
-                      <span className="text-[10px] text-[#CC8400]">{route.slackStatus}</span>
+                      <span className="text-[14px] text-[#CC8400]">{route.slackStatus}</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-[10px] text-primary font-medium mt-2 group-hover:underline">Open Trail Insights →</p>
+                <p className="text-[14px] text-primary font-medium mt-2 group-hover:underline">Open Trail Insights →</p>
               </button>
             ))}
           </div>
@@ -89,11 +89,11 @@ export default function PennyIntegrations() {
                     {p.slug === 'slack' ? <Hash className="w-3.5 h-3.5 text-white" /> : <MessageCircle className="w-3.5 h-3.5 text-white" />}
                   </div>
                   <p className="text-sm font-semibold text-foreground">{p.name}</p>
-                  <span className={`inline-flex text-[10px] font-semibold border px-1.5 py-0.5 rounded-full ml-auto ${p.status === 'prototype' ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' : 'bg-muted border-border text-muted-foreground'}`}>
+                  <span className={`inline-flex text-[14px] font-semibold border px-1.5 py-0.5 rounded-full ml-auto ${p.status === 'prototype' ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' : 'bg-muted border-border text-muted-foreground'}`}>
                     {p.status === 'prototype' ? 'Q3 2025' : 'Future'}
                   </span>
                 </div>
-                <p className="text-[11px] text-muted-foreground line-clamp-2">{p.futureSetup}</p>
+                <p className="text-[14px] text-muted-foreground line-clamp-2">{p.futureSetup}</p>
               </button>
             ))}
           </div>
@@ -113,9 +113,9 @@ export default function PennyIntegrations() {
                 <StatusDot status="gray" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground">{int.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{int.desc}</p>
+                  <p className="text-[14px] text-muted-foreground">{int.desc}</p>
                 </div>
-                <span className="text-[11px] font-medium text-muted-foreground flex-shrink-0">{int.eta}</span>
+                <span className="text-[14px] font-medium text-muted-foreground flex-shrink-0">{int.eta}</span>
               </div>
             ))}
           </div>
@@ -124,7 +124,7 @@ export default function PennyIntegrations() {
         <div className="pt-2 flex justify-center">
           <button
             onClick={() => setLocation('/admin/comm-channels')}
-            className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+            className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
             Manage Communication Channels <ArrowRight className="w-3.5 h-3.5" />
           </button>

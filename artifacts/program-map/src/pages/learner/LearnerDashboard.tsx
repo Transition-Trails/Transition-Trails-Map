@@ -117,14 +117,14 @@ export default function LearnerDashboard() {
             </h1>
             {trail && (
               <span
-                className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full mt-1"
+                className="inline-block text-[14px] font-semibold px-2.5 py-1 rounded-full mt-1"
                 style={{ background: '#EAF4EC', color: '#2F6B3F' }}
               >
                 {trail}
               </span>
             )}
             {phase && (
-              <p className="text-[12px] mt-0.5" style={{ color: '#4A4F4D' }}>
+              <p className="text-[14px] mt-0.5" style={{ color: '#4A4F4D' }}>
                 Phase: {phase}
               </p>
             )}
@@ -138,7 +138,7 @@ export default function LearnerDashboard() {
         >
           <div>
             <p className="font-bold text-lg text-white">⚡ {points} points</p>
-            <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.7)' }}>personal best</p>
+            <p className="text-[14px]" style={{ color: 'rgba(255,255,255,0.7)' }}>personal best</p>
           </div>
           <Sparkles className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.5)' }} />
         </div>
@@ -157,11 +157,11 @@ export default function LearnerDashboard() {
           ) : dailyQuest ? (
             <>
               <div className="flex items-center gap-2 mb-1">
-                <p className="text-[10px] font-bold uppercase" style={{ color: '#4A4F4D' }}>
+                <p className="text-[14px] font-bold " style={{ color: '#4A4F4D' }}>
                   Today's Quest
                 </p>
                 <span
-                  className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                  className="text-[14px] font-bold px-1.5 py-0.5 rounded-full"
                   style={{ background: diffClrs.bg, color: diffClrs.text }}
                 >
                   {dailyQuest.difficulty}
@@ -170,12 +170,12 @@ export default function LearnerDashboard() {
               <p className="text-[15px] font-semibold mt-1" style={{ color: '#2A2E2C' }}>
                 {dailyQuest.title}
               </p>
-              <p className="text-[11px] font-medium mt-0.5" style={{ color: '#2F6B3F' }}>
+              <p className="text-[14px] font-medium mt-0.5" style={{ color: '#2F6B3F' }}>
                 Worth {dailyQuest.pointValue} points
               </p>
               <button
                 onClick={() => navigate('/learner/quest')}
-                className="mt-3 px-4 py-2 rounded-lg text-[12px] font-semibold text-white transition-opacity hover:opacity-90"
+                className="mt-3 px-4 py-2 rounded-lg text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
                 style={{ background: '#2F6B3F' }}
               >
                 Accept Today's Quest →
@@ -184,7 +184,7 @@ export default function LearnerDashboard() {
           ) : (
             <div className="text-center py-4">
               <Sparkles className="w-6 h-6 mx-auto mb-2" style={{ color: '#2F6B3F' }} />
-              <p className="text-[13px]" style={{ color: '#4A4F4D' }}>
+              <p className="text-[14px]" style={{ color: '#4A4F4D' }}>
                 Penny is preparing today's quest — check back soon.
               </p>
             </div>
@@ -193,7 +193,7 @@ export default function LearnerDashboard() {
 
         {/* ── This Week's Assignments ───────────────────────────────────── */}
         <div>
-          <p className="text-[13px] font-bold mb-2" style={{ color: '#2A2E2C' }}>This Week</p>
+          <p className="text-[14px] font-bold mb-2" style={{ color: '#2A2E2C' }}>This Week</p>
           {loading ? (
             <div className="space-y-2">
               {[0,1,2].map(i => (
@@ -202,7 +202,7 @@ export default function LearnerDashboard() {
             </div>
           ) : assignments.length === 0 ? (
             <div
-              className="rounded-lg border p-3 text-center text-[12px]"
+              className="rounded-lg border p-3 text-center text-[14px]"
               style={{ borderColor: '#E2E4E1', color: '#4A4F4D' }}
             >
               No assignments this week — check Google Classroom.
@@ -216,13 +216,13 @@ export default function LearnerDashboard() {
                   style={{ background: 'white', borderColor: '#E2E4E1' }}
                 >
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium truncate" style={{ color: '#2A2E2C' }}>{a.Name}</p>
+                    <p className="text-[14px] font-medium truncate" style={{ color: '#2A2E2C' }}>{a.Name}</p>
                     {(a.Course_Module__r?.Name) && (
-                      <p className="text-[11px]" style={{ color: '#4A4F4D' }}>{a.Course_Module__r.Name}</p>
+                      <p className="text-[14px]" style={{ color: '#4A4F4D' }}>{a.Course_Module__r.Name}</p>
                     )}
                   </div>
                   {a.Due_Date__c && (
-                    <p className="text-[11px] shrink-0 ml-2" style={{ color: '#4A4F4D' }}>
+                    <p className="text-[14px] shrink-0 ml-2" style={{ color: '#4A4F4D' }}>
                       {formatDate(a.Due_Date__c)}
                     </p>
                   )}
@@ -234,7 +234,7 @@ export default function LearnerDashboard() {
           {/* Google Classroom button */}
           <button
             onClick={() => window.open('https://classroom.google.com', '_blank')}
-            className="mt-2 w-full h-10 rounded-lg border flex items-center justify-center gap-2 text-[12px] font-medium transition-colors"
+            className="mt-2 w-full h-10 rounded-lg border flex items-center justify-center gap-2 text-[14px] font-medium transition-colors"
             style={{ background: 'white', borderColor: '#E2E4E1', color: '#2A2E2C' }}
             onMouseEnter={e => (e.currentTarget.style.background = '#F5FAF6')}
             onMouseLeave={e => (e.currentTarget.style.background = 'white')}

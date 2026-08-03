@@ -39,22 +39,22 @@ export default function SalesforceMapping() {
       {/* ── Compact admin header ── */}
       <div className="flex-shrink-0 flex items-center justify-between gap-4 px-5 pt-3 pb-2.5 border-b bg-card">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration · Integrations</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration · Integrations</p>
           <h1 className="text-[15px] font-semibold text-foreground leading-snug">Salesforce Architecture</h1>
-          <p className="text-[12px] text-muted-foreground mt-0.5">
+          <p className="text-[14px] text-muted-foreground mt-0.5">
             Object-level mapping between Trail OS, Salesforce (NPSP · PMM · Nonprofit Cloud), and Google Drive.
           </p>
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          <span className="flex items-center gap-1 text-[11px] font-semibold bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] px-2 py-1 rounded-full whitespace-nowrap">
+          <span className="flex items-center gap-1 text-[14px] font-semibold bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] px-2 py-1 rounded-full whitespace-nowrap">
             <Database className="w-3 h-3" />Salesforce
           </span>
           <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
-          <span className="flex items-center gap-1 text-[11px] font-semibold bg-primary/5 border border-primary/20 text-primary px-2 py-1 rounded-full whitespace-nowrap">
+          <span className="flex items-center gap-1 text-[14px] font-semibold bg-primary/5 border border-primary/20 text-primary px-2 py-1 rounded-full whitespace-nowrap">
             <Layers className="w-3 h-3" />Trail OS
           </span>
           <ArrowRight className="w-3 h-3 text-muted-foreground/40" />
-          <span className="flex items-center gap-1 text-[11px] font-semibold bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-2 py-1 rounded-full whitespace-nowrap">
+          <span className="flex items-center gap-1 text-[14px] font-semibold bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-2 py-1 rounded-full whitespace-nowrap">
             <ExternalLink className="w-3 h-3" />Drive
           </span>
         </div>
@@ -70,7 +70,7 @@ export default function SalesforceMapping() {
             <button
               key={s}
               onClick={() => setStatusFilter(statusFilter === s ? 'all' : s)}
-              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
+              className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[14px] font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
                 statusFilter === s ? 'ring-1 ring-foreground/20 shadow-sm' : ''
               } ${cfg.cls}`}
             >
@@ -87,7 +87,7 @@ export default function SalesforceMapping() {
           <button
             key={v}
             onClick={() => setView(v)}
-            className={`text-[11px] font-semibold rounded-full px-3 py-1 border transition-colors flex-shrink-0 ${
+            className={`text-[14px] font-semibold rounded-full px-3 py-1 border transition-colors flex-shrink-0 ${
               view === v
                 ? 'bg-foreground text-background border-foreground'
                 : 'border-border text-muted-foreground hover:border-foreground/30'
@@ -101,7 +101,7 @@ export default function SalesforceMapping() {
         <select
           value={productFilter}
           onChange={e => setProductFilter(e.target.value as SfProduct | 'all')}
-          className="text-[11px] border border-border rounded-full px-2.5 py-1 bg-white text-muted-foreground flex-shrink-0"
+          className="text-[14px] border border-border rounded-full px-2.5 py-1 bg-white text-muted-foreground flex-shrink-0"
         >
           <option value="all">All Products</option>
           {ALL_PRODUCTS.map(p => <option key={p} value={p}>{SF_PRODUCT_CONFIG[p].label}</option>)}
@@ -120,7 +120,7 @@ export default function SalesforceMapping() {
                 if (groupMappings.length === 0) return null;
                 return (
                   <div key={group}>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">{group}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">{group}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {groupMappings.map(mapping => {
                         const statusCfg  = SF_STATUS_CONFIG[mapping.status];
@@ -135,9 +135,9 @@ export default function SalesforceMapping() {
                             <div className="flex items-center justify-between gap-2 mb-1.5">
                               <div className="flex items-center gap-1.5 min-w-0">
                                 <div className="w-1.5 h-1.5 rounded-full bg-primary/40 flex-shrink-0" />
-                                <p className="text-[12px] font-bold text-foreground leading-tight truncate">{mapping.trailOsObject}</p>
+                                <p className="text-[14px] font-bold text-foreground leading-tight truncate">{mapping.trailOsObject}</p>
                               </div>
-                              <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 whitespace-nowrap ${statusCfg.cls}`}>
+                              <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 whitespace-nowrap ${statusCfg.cls}`}>
                                 {statusCfg.label}
                               </span>
                             </div>
@@ -145,10 +145,10 @@ export default function SalesforceMapping() {
                             <div className="flex items-center gap-1.5 pl-3">
                               <ArrowRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />
                               <div className="min-w-0 flex-1">
-                                <p className="text-[11px] font-semibold text-foreground truncate">{mapping.sfLabel}</p>
-                                <p className="text-[10px] text-muted-foreground font-mono truncate">{mapping.sfApiName}</p>
+                                <p className="text-[14px] font-semibold text-foreground truncate">{mapping.sfLabel}</p>
+                                <p className="text-[14px] text-muted-foreground font-mono truncate">{mapping.sfApiName}</p>
                               </div>
-                              <span className={`text-[8px] font-semibold border rounded-full px-1.5 py-0.5 flex-shrink-0 whitespace-nowrap ${productCfg.cls}`}>
+                              <span className={`text-[14px] font-semibold border rounded-full px-1.5 py-0.5 flex-shrink-0 whitespace-nowrap ${productCfg.cls}`}>
                                 {productCfg.label}
                               </span>
                             </div>
@@ -165,14 +165,14 @@ export default function SalesforceMapping() {
           {/* ── Mapping Table ── */}
           {view === 'table' && (
             <div className="rounded-xl border border-border overflow-hidden">
-              <table className="w-full text-[12px]">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="bg-muted/50 border-b border-border">
-                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[11px]">Trail OS Object</th>
-                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[11px]">SF Object</th>
-                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[11px]">Product</th>
-                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[11px]">Status</th>
-                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[11px]">Relationship</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[14px]">Trail OS Object</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[14px]">SF Object</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[14px]">Product</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[14px]">Status</th>
+                    <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground text-[14px]">Relationship</th>
                     <th className="px-3 py-2.5" />
                   </tr>
                 </thead>
@@ -188,20 +188,20 @@ export default function SalesforceMapping() {
                       >
                         <td className="px-4 py-2.5">
                           <p className="font-semibold text-foreground">{mapping.trailOsObject}</p>
-                          <p className="text-[10px] text-muted-foreground">{mapping.trailOsGroup}</p>
+                          <p className="text-[14px] text-muted-foreground">{mapping.trailOsGroup}</p>
                         </td>
                         <td className="px-4 py-2.5">
                           <p className="font-medium text-foreground">{mapping.sfLabel}</p>
-                          <p className="text-[10px] text-muted-foreground font-mono">{mapping.sfApiName}</p>
+                          <p className="text-[14px] text-muted-foreground font-mono">{mapping.sfApiName}</p>
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${productCfg.cls}`}>{productCfg.label}</span>
+                          <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${productCfg.cls}`}>{productCfg.label}</span>
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                          <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className="text-[10px] text-muted-foreground capitalize">{mapping.relationshipType}</span>
+                          <span className="text-[14px] text-muted-foreground capitalize">{mapping.relationshipType}</span>
                         </td>
                         <td className="px-3 py-2.5">
                           <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
@@ -224,8 +224,8 @@ export default function SalesforceMapping() {
                 return (
                   <div key={product}>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-[11px] font-bold border rounded-full px-2.5 py-1 ${productCfg.cls}`}>{productCfg.label}</span>
-                      <p className="text-[11px] text-muted-foreground">{productCfg.description}</p>
+                      <span className={`text-[14px] font-bold border rounded-full px-2.5 py-1 ${productCfg.cls}`}>{productCfg.label}</span>
+                      <p className="text-[14px] text-muted-foreground">{productCfg.description}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {productMappings.map(mapping => {
@@ -237,11 +237,11 @@ export default function SalesforceMapping() {
                             className="rounded-lg border border-border bg-white p-3 text-left hover:shadow-sm hover:border-primary/30 transition-all"
                           >
                             <div className="flex items-start justify-between gap-2 mb-1">
-                              <p className="text-[12px] font-bold text-foreground leading-tight">{mapping.sfLabel}</p>
-                              <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                              <p className="text-[14px] font-bold text-foreground leading-tight">{mapping.sfLabel}</p>
+                              <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 ${statusCfg.cls}`}>{statusCfg.label}</span>
                             </div>
-                            <p className="text-[10px] text-muted-foreground font-mono mb-1">{mapping.sfApiName}</p>
-                            <p className="text-[10px] text-muted-foreground">← Trail OS: <strong>{mapping.trailOsObject}</strong></p>
+                            <p className="text-[14px] text-muted-foreground font-mono mb-1">{mapping.sfApiName}</p>
+                            <p className="text-[14px] text-muted-foreground">← Trail OS: <strong>{mapping.trailOsObject}</strong></p>
                           </button>
                         );
                       })}
@@ -255,14 +255,14 @@ export default function SalesforceMapping() {
           {/* ── Foundations Trail example — compact ── */}
           <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-bold text-primary border border-primary/20 bg-white rounded-full px-2 py-0.5 flex-shrink-0">
+              <span className="text-[14px] font-bold text-primary border border-primary/20 bg-white rounded-full px-2 py-0.5 flex-shrink-0">
                 ★ Foundations Trail Example
               </span>
               {sfMappings.filter(m => m.foundationsTrailExample).slice(0, 5).map(m => (
                 <button
                   key={m.id}
                   onClick={() => handleSelect(m)}
-                  className="text-[10px] font-medium border border-primary/20 bg-white text-primary rounded-full px-2.5 py-0.5 hover:bg-primary/10 transition-colors"
+                  className="text-[14px] font-medium border border-primary/20 bg-white text-primary rounded-full px-2.5 py-0.5 hover:bg-primary/10 transition-colors"
                 >
                   {m.trailOsObject} →
                 </button>

@@ -63,11 +63,11 @@ export function ContextPanel() {
           <div className="p-5 space-y-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-background uppercase tracking-wider text-[10px]">
+                <Badge variant="outline" className="bg-background  text-[14px]">
                   Document
                 </Badge>
                 <ConfidenceBadge status={data.confidence || 'needs-review'} />
-                <Badge variant={data.status === 'Active' ? 'default' : 'secondary'} className="text-[10px]">
+                <Badge variant={data.status === 'Active' ? 'default' : 'secondary'} className="text-[14px]">
                   {data.status}
                 </Badge>
               </div>
@@ -78,7 +78,7 @@ export function ContextPanel() {
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the document "${data.name as string}" (${data.status as string}).\n\nPurpose: ${data.purpose as string}\nSummary: ${data.summary as string}\n\nHow does this document support our program operations, and what gaps or updates should I prioritize?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
@@ -88,20 +88,20 @@ export function ContextPanel() {
               <p className="text-sm text-muted-foreground italic leading-relaxed">{data.summary}</p>
               
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Purpose</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Purpose</span>
                 <p className="text-sm text-muted-foreground">{data.purpose}</p>
               </div>
 
               {data.quickTake && (
                 <div className="bg-[#E6F0EA] border border-[#E6F0EA] rounded-md p-3">
-                  <span className="block text-[10px] font-bold text-[#245531] uppercase mb-1">Quick Take</span>
+                  <span className="block text-[14px] font-bold text-[#245531]  mb-1">Quick Take</span>
                   <p className="text-sm text-[#245531] leading-tight">{data.quickTake}</p>
                 </div>
               )}
 
               {data.sourceOfTruthFor && data.sourceOfTruthFor.length > 0 && (
                 <div className="space-y-1">
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-1">Source of Truth For</span>
+                  <span className="block text-sm font-semibold text-foreground  mb-1">Source of Truth For</span>
                   <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
                     {data.sourceOfTruthFor.map((item: string, i: number) => <li key={i}>{item}</li>)}
                   </ul>
@@ -110,7 +110,7 @@ export function ContextPanel() {
 
               {data.notSourceOfTruthFor && data.notSourceOfTruthFor.length > 0 && (
                 <div className="space-y-1">
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-1">Not Source of Truth For</span>
+                  <span className="block text-sm font-semibold text-foreground  mb-1">Not Source of Truth For</span>
                   <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
                     {data.notSourceOfTruthFor.map((item: string, i: number) => <li key={i}>{item}</li>)}
                   </ul>
@@ -119,7 +119,7 @@ export function ContextPanel() {
 
               {data.keyDecisionsInfluenced && data.keyDecisionsInfluenced.length > 0 && (
                 <div className="space-y-1">
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-1">Key Decisions Influenced</span>
+                  <span className="block text-sm font-semibold text-foreground  mb-1">Key Decisions Influenced</span>
                   <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
                     {data.keyDecisionsInfluenced.map((item: string, i: number) => <li key={i}>{item}</li>)}
                   </ul>
@@ -128,7 +128,7 @@ export function ContextPanel() {
 
               {data.programs && data.programs.length > 0 && (
                 <div className="space-y-2">
-                  <span className="block text-xs font-semibold text-foreground uppercase">Programs Affected</span>
+                  <span className="block text-sm font-semibold text-foreground ">Programs Affected</span>
                   <div className="flex flex-wrap gap-1">
                     {data.programs.map((p: string) => <Badge key={p} variant="secondary">{p}</Badge>)}
                   </div>
@@ -137,7 +137,7 @@ export function ContextPanel() {
 
               {data.relatedDocuments && data.relatedDocuments.length > 0 && (
                 <div className="space-y-2">
-                  <span className="block text-xs font-semibold text-foreground uppercase">Related Documents</span>
+                  <span className="block text-sm font-semibold text-foreground ">Related Documents</span>
                   <div className="flex flex-wrap gap-1">
                     {data.relatedDocuments.map((d: string) => <Badge key={d} variant="outline" className="bg-muted text-muted-foreground">{d}</Badge>)}
                   </div>
@@ -158,36 +158,36 @@ export function ContextPanel() {
           <div className="p-5 space-y-5">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Comm Provider</Badge>
-                <span className={`inline-flex items-center text-[10px] font-semibold border px-2 py-0.5 rounded-full ${statusBg}`}>
+                <Badge variant="outline" className="bg-white  text-[14px]">Comm Provider</Badge>
+                <span className={`inline-flex items-center text-[14px] font-semibold border px-2 py-0.5 rounded-full ${statusBg}`}>
                   {data.status === 'prototype' ? 'Prototype-Ready' : 'Future'}
                 </span>
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
-              <p className="text-xs text-muted-foreground">{data.tagline}</p>
+              <p className="text-sm text-muted-foreground">{data.tagline}</p>
             </div>
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.name as string} communication provider for Trail OS.\n\nStatus: ${data.status as string}\nPurpose: ${data.purpose as string}\nWhy it matters: ${data.whyItMatters as string}\n\nWhat are the most important next steps to get this communication channel operational?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
             <div>
-              <span className="block text-xs font-semibold text-foreground uppercase mb-1">Connection Status</span>
+              <span className="block text-sm font-semibold text-foreground  mb-1">Connection Status</span>
               <p className="text-sm text-muted-foreground">{data.connectionStatus} — {data.futureSetup}</p>
             </div>
             <div>
-              <span className="block text-xs font-semibold text-foreground uppercase mb-1">Purpose</span>
+              <span className="block text-sm font-semibold text-foreground  mb-1">Purpose</span>
               <p className="text-sm text-muted-foreground leading-relaxed">{data.purpose}</p>
             </div>
             <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
-              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+              <span className="block text-[14px] font-bold text-primary  mb-1">Why It Matters</span>
               <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
             </div>
             {data.useCases?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Use Cases</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Use Cases</span>
                 <ul className="space-y-1">
                   {data.useCases.map((uc: string, i: number) => (
                     <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -200,7 +200,7 @@ export function ContextPanel() {
             )}
             {data.relatedPennyCaps?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capabilities</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Related {TERMS.aiAssistant} Capabilities</span>
                 <div className="flex flex-wrap gap-1">
                   {data.relatedPennyCaps.map((c: string) => <Badge key={c} variant="secondary">{c}</Badge>)}
                 </div>
@@ -208,7 +208,7 @@ export function ContextPanel() {
             )}
             {data.relatedDemandEvents?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Events</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Related Demand Events</span>
                 <div className="flex flex-wrap gap-1">
                   {data.relatedDemandEvents.map((e: string) => <Badge key={e} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">{e}</Badge>)}
                 </div>
@@ -216,18 +216,18 @@ export function ContextPanel() {
             )}
             {data.requiredSetup?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Required Setup</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Required Setup</span>
                 <ol className="space-y-1">
                   {data.requiredSetup.map((step: string, i: number) => (
                     <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
-                      <span className="text-[10px] font-bold text-muted-foreground/60 mt-0.5 w-3 flex-shrink-0">{i + 1}.</span>
+                      <span className="text-[14px] font-bold text-muted-foreground/60 mt-0.5 w-3 flex-shrink-0">{i + 1}.</span>
                       {step}
                     </li>
                   ))}
                 </ol>
               </div>
             )}
-            <div className="text-[11px] text-muted-foreground">
+            <div className="text-[14px] text-muted-foreground">
               <span className="font-semibold text-foreground">Source / Owner: </span>{data.sourceOwner}
             </div>
           </div>
@@ -241,21 +241,21 @@ export function ContextPanel() {
           <div className="p-5 space-y-5">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Comm Route</Badge>
-                <Badge variant="outline" className="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] text-[10px]">Planned</Badge>
+                <Badge variant="outline" className="bg-white  text-[14px]">Comm Route</Badge>
+                <Badge variant="outline" className="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] text-[14px]">Planned</Badge>
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">{data.eventType}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">{data.description}</p>
             </div>
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the communication route for "${data.eventType as string}".\n\nTrigger: ${data.trigger as string}\nAudience: ${data.audience as string}\nSlack channel: ${data.slackChannel as string}\nWhy it matters: ${data.whyItMatters as string}\n\nWhat should be configured first to make this route operational?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
             <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
-              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+              <span className="block text-[14px] font-bold text-primary  mb-1">Why It Matters</span>
               <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -265,36 +265,36 @@ export function ContextPanel() {
                 { label: 'Owner',    value: data.owner },
               ].map(f => (
                 <div key={f.label}>
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-0.5">{f.label}</span>
+                  <span className="block text-sm font-semibold text-foreground  mb-0.5">{f.label}</span>
                   <p className="text-sm text-muted-foreground">{f.value}</p>
                 </div>
               ))}
             </div>
             <div>
-              <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Slack Channel (Now)</span>
+              <span className="block text-sm font-semibold text-foreground  mb-1.5">Slack Channel (Now)</span>
               <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-md px-3 py-2">
                 <span className="font-mono text-sm text-foreground">{data.slackChannel}</span>
-                <span className="text-[10px] text-[#CC8400] ml-auto">{data.slackStatus}</span>
+                <span className="text-[14px] text-[#CC8400] ml-auto">{data.slackStatus}</span>
               </div>
             </div>
             {data.googleChatSpace && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Google Chat (Future)</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Google Chat (Future)</span>
                 <div className="flex items-center gap-2 bg-muted/30 border border-border/50 rounded-md px-3 py-2">
                   <span className="text-sm text-muted-foreground">{data.googleChatSpace}</span>
-                  <span className="text-[10px] text-muted-foreground ml-auto">{data.googleChatStatus}</span>
+                  <span className="text-[14px] text-muted-foreground ml-auto">{data.googleChatStatus}</span>
                 </div>
               </div>
             )}
             {data.relatedPennyCap && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capability</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Related {TERMS.aiAssistant} Capability</span>
                 <Badge variant="secondary">{data.relatedPennyCap}</Badge>
               </div>
             )}
             {data.relatedDemandEvent && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Event</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Related Demand Event</span>
                 <Badge variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">{data.relatedDemandEvent}</Badge>
               </div>
             )}
@@ -310,8 +310,8 @@ export function ContextPanel() {
           <div className="p-5 space-y-5">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Message Template</Badge>
-                <Badge variant="outline" className={`text-[10px] ${statusColor} bg-white`}>
+                <Badge variant="outline" className="bg-white  text-[14px]">Message Template</Badge>
+                <Badge variant="outline" className={`text-[14px] ${statusColor} bg-white`}>
                   {data.status?.charAt(0).toUpperCase() + data.status?.slice(1)}
                 </Badge>
               </div>
@@ -319,17 +319,17 @@ export function ContextPanel() {
             </div>
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the message template "${data.name as string}" (${data.status as string}).\n\nProvider: ${data.provider as string}\nTrigger: ${data.triggerEvent as string}\nAudience: ${data.audience as string}\nWhy it matters: ${data.whyItMatters as string}\n\nWhat should be improved or finalized in this template before it goes live?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
             <div className="bg-muted/60 border border-border rounded-md p-3">
-              <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5">Message Preview</span>
-              <p className="text-sm text-foreground leading-relaxed font-mono text-[12px]">{data.messageSummary}</p>
+              <span className="block text-[14px] font-bold text-muted-foreground  mb-1.5">Message Preview</span>
+              <p className="text-sm text-foreground leading-relaxed font-mono text-[14px]">{data.messageSummary}</p>
             </div>
             <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
-              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+              <span className="block text-[14px] font-bold text-primary  mb-1">Why It Matters</span>
               <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -341,24 +341,24 @@ export function ContextPanel() {
                 { label: 'Reviewed',    value: data.lastReviewed },
               ].map(f => (
                 <div key={f.label}>
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-0.5">{f.label}</span>
-                  <p className="text-sm text-muted-foreground font-mono text-[12px]">{f.value}</p>
+                  <span className="block text-sm font-semibold text-foreground  mb-0.5">{f.label}</span>
+                  <p className="text-sm text-muted-foreground font-mono text-[14px]">{f.value}</p>
                 </div>
               ))}
             </div>
             <div>
-              <span className="block text-xs font-semibold text-foreground uppercase mb-1">Trigger Event</span>
+              <span className="block text-sm font-semibold text-foreground  mb-1">Trigger Event</span>
               <p className="text-sm text-muted-foreground">{data.triggerEvent}</p>
             </div>
             {data.relatedPennyCap && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capability</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Related {TERMS.aiAssistant} Capability</span>
                 <Badge variant="secondary">{data.relatedPennyCap}</Badge>
               </div>
             )}
             {data.relatedDemandEvent && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related Demand Event</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Related Demand Event</span>
                 <Badge variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">{data.relatedDemandEvent}</Badge>
               </div>
             )}
@@ -382,23 +382,23 @@ export function ContextPanel() {
           <div className="p-5 space-y-5">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Prompt Template</Badge>
-                <Badge variant="outline" className={`text-[10px] ${statusColor} bg-white`}>{data.status}</Badge>
-                <Badge variant="outline" className={`text-[10px] ${riskCls}`}>Risk: {data.hallucinationRisk}</Badge>
+                <Badge variant="outline" className="bg-white  text-[14px]">Prompt Template</Badge>
+                <Badge variant="outline" className={`text-[14px] ${statusColor} bg-white`}>{data.status}</Badge>
+                <Badge variant="outline" className={`text-[14px] ${riskCls}`}>Risk: {data.hallucinationRisk}</Badge>
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.name}</h2>
-              <p className="text-[11px] text-muted-foreground">v{data.version} · Score: {data.qualityScore}/100</p>
+              <p className="text-[14px] text-muted-foreground">v{data.version} · Score: {data.qualityScore}/100</p>
             </div>
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${TERMS.aiAssistant} prompt template "${data.name as string}".\n\nDomain: ${data.domain as string}\nStatus: ${data.status as string}\nQuality score: ${data.qualityScore as number}/100\nHallucination risk: ${data.hallucinationRisk as string}\nPurpose: ${data.purpose as string}\n\nHow can this prompt template be improved for quality, safety, or effectiveness?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
             <div className="bg-primary/5 border border-primary/20 rounded-md p-3">
-              <span className="block text-[10px] font-bold text-primary uppercase mb-1">Purpose</span>
-              <p className="text-[12px] text-foreground leading-relaxed">{data.purpose}</p>
+              <span className="block text-[14px] font-bold text-primary  mb-1">Purpose</span>
+              <p className="text-[14px] text-foreground leading-relaxed">{data.purpose}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {[
@@ -410,19 +410,19 @@ export function ContextPanel() {
                 { label: 'Reviewed', value: data.lastReviewed },
               ].map((f: { label: string; value: string }) => (
                 <div key={f.label}>
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-0.5">{f.label}</span>
-                  <p className="text-[12px] text-muted-foreground font-mono">{f.value}</p>
+                  <span className="block text-sm font-semibold text-foreground  mb-0.5">{f.label}</span>
+                  <p className="text-[14px] text-muted-foreground font-mono">{f.value}</p>
                 </div>
               ))}
             </div>
             {Array.isArray(data.guardrails) && data.guardrails.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Guardrails</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Guardrails</span>
                 <div className="space-y-1.5">
                   {data.guardrails.map((g: string, i: number) => (
                     <div key={i} className="flex items-start gap-1.5 rounded border border-[#E8B9B4] bg-[#FBEAE6] p-2">
-                      <span className="text-[#A93F2F] shrink-0 mt-0.5 text-[11px]">⚔</span>
-                      <p className="text-[11px] text-[#A93F2F] leading-snug">{g}</p>
+                      <span className="text-[#A93F2F] shrink-0 mt-0.5 text-[14px]">⚔</span>
+                      <p className="text-[14px] text-[#A93F2F] leading-snug">{g}</p>
                     </div>
                   ))}
                 </div>
@@ -430,7 +430,7 @@ export function ContextPanel() {
             )}
             {data.capabilityId && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Related {TERMS.aiAssistant} Capability</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Related {TERMS.aiAssistant} Capability</span>
                 <Badge variant="secondary" className="capitalize">
                   {String(data.capabilityId).replace('cap-', '').replace(/-/g, ' ')}
                 </Badge>
@@ -438,8 +438,8 @@ export function ContextPanel() {
             )}
             {data.promptBody && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Prompt Body</span>
-                <pre className="text-[10px] font-mono text-foreground bg-muted/40 rounded-lg p-3 whitespace-pre-wrap leading-relaxed overflow-x-auto">
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Prompt Body</span>
+                <pre className="text-[14px] font-mono text-foreground bg-muted/40 rounded-lg p-3 whitespace-pre-wrap leading-relaxed overflow-x-auto">
                   {data.promptBody}
                 </pre>
               </div>
@@ -459,22 +459,22 @@ export function ContextPanel() {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-background uppercase tracking-wider text-[10px]">Program</Badge>
+                <Badge variant="outline" className="bg-background  text-[14px]">Program</Badge>
                 <ConfidenceBadge status={data.confidence || 'needs-review'} />
                 {opStatus && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold">
                     <span className={`w-1.5 h-1.5 rounded-full ${statusDot}`} />
                     <span className="text-muted-foreground">{statusLabel}</span>
                   </span>
                 )}
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">{data.name}</h2>
-              <p className="text-xs text-muted-foreground italic leading-snug">{data.strategicRole}</p>
+              <p className="text-sm text-muted-foreground italic leading-snug">{data.strategicRole}</p>
             </div>
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.name as string} program brief.\n\nStatus: ${statusLabel}\nStrategic role: ${data.strategicRole as string}\n${data.executiveSummary ? `Summary: ${data.executiveSummary as string}\n` : ''}${data.whyItMatters ? `Why it matters: ${data.whyItMatters as string}\n` : ''}\nWhat should the team focus on for this program right now?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
@@ -490,7 +490,7 @@ export function ContextPanel() {
                 ].map(s => (
                   <div key={s.lbl} className="rounded-lg bg-muted/40 border border-border p-2 text-center">
                     <p className="text-base font-bold text-foreground">{String(s.val)}</p>
-                    <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{s.lbl}</p>
+                    <p className="text-[14px] text-muted-foreground leading-none mt-0.5">{s.lbl}</p>
                   </div>
                 ))}
               </div>
@@ -501,8 +501,8 @@ export function ContextPanel() {
               <div className="flex items-start gap-2 bg-primary/5 border border-primary/15 rounded-md p-3">
                 <Calendar className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[10px] font-bold text-primary uppercase mb-0.5">Next · {data.nextDate}</p>
-                  <p className="text-xs text-foreground leading-snug">{data.nextEvent}</p>
+                  <p className="text-[14px] font-bold text-primary  mb-0.5">Next · {data.nextDate}</p>
+                  <p className="text-sm text-foreground leading-snug">{data.nextEvent}</p>
                 </div>
               </div>
             )}
@@ -515,7 +515,7 @@ export function ContextPanel() {
             {/* Why it matters */}
             {data.whyItMatters && (
               <div className="bg-primary/5 border border-primary/15 rounded-md p-3">
-                <span className="block text-[10px] font-bold text-primary uppercase mb-1">Why It Matters</span>
+                <span className="block text-[14px] font-bold text-primary  mb-1">Why It Matters</span>
                 <p className="text-sm text-foreground leading-snug">{data.whyItMatters}</p>
               </div>
             )}
@@ -523,7 +523,7 @@ export function ContextPanel() {
             {/* Key facts */}
             {data.keyFacts?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Key Facts</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Key Facts</span>
                 <ul className="space-y-1">
                   {data.keyFacts.map((f: string, i: number) => (
                     <li key={i} className="flex items-start gap-1.5 text-sm text-muted-foreground">
@@ -538,10 +538,10 @@ export function ContextPanel() {
             {/* RESOLVE phases */}
             {data.resolvePhases?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">RESOLVE Phases</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">RESOLVE Phases</span>
                 <div className="flex flex-wrap gap-1">
                   {data.resolvePhases.map((p: string) => (
-                    <Badge key={p} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6] text-[10px]">{p}</Badge>
+                    <Badge key={p} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6] text-[14px]">{p}</Badge>
                   ))}
                 </div>
               </div>
@@ -550,10 +550,10 @@ export function ContextPanel() {
             {/* Penny capabilities */}
             {data.pennyFeatures?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">{TERMS.aiAssistant} Capabilities</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">{TERMS.aiAssistant} Capabilities</span>
                 <div className="flex flex-wrap gap-1">
                   {data.pennyFeatures.map((f: string) => (
-                    <Badge key={f} variant="secondary" className="text-[10px]">{f}</Badge>
+                    <Badge key={f} variant="secondary" className="text-[14px]">{f}</Badge>
                   ))}
                 </div>
               </div>
@@ -562,10 +562,10 @@ export function ContextPanel() {
             {/* Trail OS capabilities */}
             {data.trailOsCapabilities?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Trail OS Capabilities</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Trail OS Capabilities</span>
                 <div className="flex flex-wrap gap-1">
                   {data.trailOsCapabilities.map((c: string) => (
-                    <Badge key={c} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6] text-[10px]">{c}</Badge>
+                    <Badge key={c} variant="outline" className="bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6] text-[14px]">{c}</Badge>
                   ))}
                 </div>
               </div>
@@ -574,12 +574,12 @@ export function ContextPanel() {
             {/* Slack channels */}
             {data.commChannels?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">
                   Slack Channels <span className="text-muted-foreground/50 normal-case font-normal">(Live — @penny active)</span>
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {data.commChannels.map((c: string) => (
-                    <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">{c}</Badge>
+                    <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[14px]">{c}</Badge>
                   ))}
                 </div>
               </div>
@@ -588,10 +588,10 @@ export function ContextPanel() {
             {/* Source documents */}
             {data.docs?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Source Documents</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Source Documents</span>
                 <div className="flex flex-wrap gap-1">
                   {data.docs.map((d: string) => (
-                    <Badge key={d} variant="outline" className="bg-muted text-muted-foreground text-[10px]">{d}</Badge>
+                    <Badge key={d} variant="outline" className="bg-muted text-muted-foreground text-[14px]">{d}</Badge>
                   ))}
                 </div>
               </div>
@@ -600,7 +600,7 @@ export function ContextPanel() {
             {/* What breaks if missing */}
             {data.whatBreaksIfMissing && (
               <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md p-3">
-                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">What Breaks If Missing</span>
+                <span className="block text-[14px] font-bold text-[#CC8400]  mb-1">What Breaks If Missing</span>
                 <p className="text-sm text-[#CC8400] leading-tight">{data.whatBreaksIfMissing}</p>
               </div>
             )}
@@ -608,13 +608,13 @@ export function ContextPanel() {
             {/* Health note */}
             {data.healthNote && (
               <div className="bg-[#FFF3E0]/50 border border-[#FFD08A] rounded-md p-3">
-                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">⚠ Health Flag</span>
-                <p className="text-xs text-[#CC8400]">{data.healthNote}</p>
+                <span className="block text-[14px] font-bold text-[#CC8400]  mb-1">⚠ Health Flag</span>
+                <p className="text-sm text-[#CC8400]">{data.healthNote}</p>
               </div>
             )}
 
             {/* Source + confidence */}
-            <div className="text-[11px] text-muted-foreground border-t border-border/40 pt-3">
+            <div className="text-[14px] text-muted-foreground border-t border-border/40 pt-3">
               <p><span className="font-semibold text-foreground">Source: </span>{data.sourceDoc}</p>
               {data.confidence === 'needs-review' && (
                 <p className="mt-1 text-[#CC8400]">⚠ Some details require source document review before treating as authoritative.</p>
@@ -636,14 +636,14 @@ export function ContextPanel() {
           <ScrollArea className="h-full">
             <div className="p-5 space-y-5">
               <div className="space-y-2">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Operational Mapping</Badge>
+                <Badge variant="outline" className="bg-white  text-[14px]">Operational Mapping</Badge>
                 <h2 className="text-[15px] font-semibold text-foreground">{data.phase}</h2>
-                <p className="text-xs text-muted-foreground italic leading-snug">{data.description}</p>
+                <p className="text-sm text-muted-foreground italic leading-snug">{data.description}</p>
               </div>
 
               <button
                 onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.phase as string} operational mapping in the RESOLVE framework.\n\nTrail OS capability: ${data.trailOs as string}\n${TERMS.aiAssistant} function: ${data.penny as string}\nProgram artifact: ${data.artifact as string}\nDescription: ${data.description as string}\n\nWhat steps should we prioritize to make this operational mapping active and effective?`); }}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 Focus with {TERMS.aiAssistant}
@@ -657,39 +657,39 @@ export function ContextPanel() {
                   { label: 'Program Artifact',   value: data.artifact, cls: 'bg-muted border-border text-foreground' },
                 ] as Array<{ label: string; value: string; cls: string }>).map((row) => (
                   <div key={row.label}>
-                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">{row.label}</p>
-                    <span className={`inline-flex text-xs font-medium border px-2 py-1 rounded-md ${row.cls}`}>{row.value}</span>
+                    <p className="text-[14px] font-bold  text-muted-foreground mb-0.5">{row.label}</p>
+                    <span className={`inline-flex text-sm font-medium border px-2 py-1 rounded-md ${row.cls}`}>{row.value}</span>
                   </div>
                 ))}
               </div>
 
               {(data.commChannels as string[])?.length > 0 && (
                 <div>
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
+                  <span className="block text-sm font-semibold text-foreground  mb-1.5">
                     Slack Channels{' '}
                     <span className="normal-case text-muted-foreground/50 font-normal">(Live — @penny active)</span>
                   </span>
                   <div className="flex flex-wrap gap-1">
                     {(data.commChannels as string[]).map((c) => (
-                      <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">{c}</Badge>
+                      <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[14px]">{c}</Badge>
                     ))}
                   </div>
-                  <p className="mt-1.5 text-[10px] text-muted-foreground">Google Chat: Q4 2025+ · Same routing model, channel-agnostic</p>
+                  <p className="mt-1.5 text-[14px] text-muted-foreground">Google Chat: Q4 2025+ · Same routing model, channel-agnostic</p>
                 </div>
               )}
 
               {(data.sources as string[])?.length > 0 && (
                 <div>
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Sources</span>
+                  <span className="block text-sm font-semibold text-foreground  mb-1.5">Sources</span>
                   <div className="flex flex-wrap gap-1">
                     {(data.sources as string[]).map((s) => (
-                      <Badge key={s} variant="outline" className="bg-muted text-muted-foreground text-[10px]">{s}</Badge>
+                      <Badge key={s} variant="outline" className="bg-muted text-muted-foreground text-[14px]">{s}</Badge>
                     ))}
                   </div>
                 </div>
               )}
 
-              <p className="text-[11px] text-muted-foreground/50">Salesforce REST API live · Future: Salesforce MCP · Knowledge links</p>
+              <p className="text-[14px] text-muted-foreground/50">Salesforce REST API live · Future: Salesforce MCP · Knowledge links</p>
             </div>
           </ScrollArea>
         );
@@ -712,8 +712,8 @@ export function ContextPanel() {
             <div className="p-5 space-y-5">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Active Work</Badge>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
+                  <Badge variant="outline" className="bg-white  text-[14px]">Active Work</Badge>
+                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold">
                     <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
                     <span className="text-muted-foreground">{lbl}</span>
                   </span>
@@ -723,7 +723,7 @@ export function ContextPanel() {
 
               <button
                 onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the active work item "${data.name as string}".\n\nStatus: ${lbl}\nRESOLVE phase: ${data.phase as string}\nProgram: ${data.program as string}\nOwner: ${data.owner as string}\nNext date: ${data.nextDate as string}\n\nWhat should happen next on this work item to keep it moving forward?`); }}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 Focus with {TERMS.aiAssistant}
@@ -737,7 +737,7 @@ export function ContextPanel() {
                   { label: 'Next Date',     value: data.nextDate as string },
                 ] as Array<{ label: string; value: string }>).map((r) => (
                   <div key={r.label}>
-                    <p className="text-[9px] font-bold uppercase text-muted-foreground mb-0.5">{r.label}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground mb-0.5">{r.label}</p>
                     <p className="text-sm text-foreground font-medium">{r.value}</p>
                   </div>
                 ))}
@@ -745,20 +745,20 @@ export function ContextPanel() {
 
               {(data.commChannels as string[])?.length > 0 && (
                 <div>
-                  <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">
+                  <span className="block text-sm font-semibold text-foreground  mb-1.5">
                     Slack Channels{' '}
                     <span className="normal-case text-muted-foreground/50 font-normal">(Planned)</span>
                   </span>
                   <div className="flex flex-wrap gap-1">
                     {(data.commChannels as string[]).map((c) => (
-                      <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">{c}</Badge>
+                      <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[14px]">{c}</Badge>
                     ))}
                   </div>
-                  <p className="mt-1.5 text-[10px] text-muted-foreground">Google Chat: Q4 2025+ · Reminders, alerts, digests</p>
+                  <p className="mt-1.5 text-[14px] text-muted-foreground">Google Chat: Q4 2025+ · Reminders, alerts, digests</p>
                 </div>
               )}
 
-              <p className="text-[11px] text-muted-foreground/50">Prototype data · Future: Salesforce Cases live sync</p>
+              <p className="text-[14px] text-muted-foreground/50">Prototype data · Future: Salesforce Cases live sync</p>
             </div>
           </ScrollArea>
         );
@@ -770,17 +770,17 @@ export function ContextPanel() {
           <ScrollArea className="h-full">
             <div className="p-5 space-y-5">
               <div className="space-y-2">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">Demand Signal</Badge>
+                <Badge variant="outline" className="bg-white  text-[14px]">Demand Signal</Badge>
                 <div className="flex items-baseline gap-3">
                   <p className="text-5xl font-bold text-foreground leading-none">{data.count as number}</p>
                   <h2 className="text-[15px] font-semibold text-foreground">{data.label as string}</h2>
                 </div>
-                <p className="text-xs text-muted-foreground">{data.note as string}</p>
+                <p className="text-sm text-muted-foreground">{data.note as string}</p>
               </div>
 
               <button
                 onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the "${data.label as string}" demand signal.\n\nCount: ${data.count as number}\nNote: ${data.note as string}\nDescription: ${data.description as string}\n\nWhat does this metric tell us about program demand and what action should we take?`); }}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 Focus with {TERMS.aiAssistant}
@@ -789,16 +789,16 @@ export function ContextPanel() {
               <p className="text-sm text-muted-foreground leading-relaxed">{data.description as string}</p>
 
               <div className="bg-muted/40 border border-border rounded-md p-3">
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Pipeline Stage</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1">Pipeline Stage</span>
                 <p className="text-sm text-foreground font-medium">{data.label as string}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{data.note as string}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">{data.note as string}</p>
               </div>
 
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Sources</span>
-                <p className="text-[11px] text-muted-foreground/60">Prototype data · Future: Salesforce Cases live sync</p>
-                <p className="text-[11px] text-muted-foreground/60">Knowledge Articles: not yet mapped · Owner: Program Lead</p>
-                <p className="text-[11px] text-muted-foreground/60">Confidence: Prototype only — do not treat as authoritative</p>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Sources</span>
+                <p className="text-[14px] text-muted-foreground/60">Prototype data · Future: Salesforce Cases live sync</p>
+                <p className="text-[14px] text-muted-foreground/60">Knowledge Articles: not yet mapped · Owner: Program Lead</p>
+                <p className="text-[14px] text-muted-foreground/60">Confidence: Prototype only — do not treat as authoritative</p>
               </div>
             </div>
           </ScrollArea>
@@ -812,22 +812,22 @@ export function ContextPanel() {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">RESOLVE Phase</Badge>
+                <Badge variant="outline" className="bg-white  text-[14px]">RESOLVE Phase</Badge>
                 <ConfidenceBadge status={data.confidence || 'needs-review'} />
                 {data.status && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-semibold">
                     <span className={`w-1.5 h-1.5 rounded-full ${data.status === 'active' ? 'bg-[#E6F0EA]0' : data.status === 'needs-review' ? 'bg-[#CC8400]' : 'bg-[#2F6F7E]'}`} />
                     <span className="text-muted-foreground">{data.status === 'active' ? 'Active' : data.status === 'needs-review' ? 'Needs Review' : 'Planning'}</span>
                   </span>
                 )}
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">{data.letter} — {data.name}</h2>
-              <p className="text-xs text-muted-foreground italic leading-snug">{data.purpose as string}</p>
+              <p className="text-sm text-muted-foreground italic leading-snug">{data.purpose as string}</p>
             </div>
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${data.letter as string} — ${data.name as string} phase of the RESOLVE framework.\n\nPurpose: ${data.purpose as string}\n${data.executiveSummary ? `Overview: ${data.executiveSummary as string}\n` : ''}${data.owner && data.owner !== 'Source mapping needed' ? `Owner: ${data.owner as string}\n` : ''}\nWhat are the highest-impact actions for this phase right now?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
@@ -836,12 +836,12 @@ export function ContextPanel() {
             {/* Programs using this phase — drawn from canonical relatedPrograms field */}
             {(data.relatedPrograms as string[])?.length > 0 && (
               <div>
-                <span className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">
+                <span className="block text-[14px] font-bold  text-muted-foreground mb-1">
                   Programs Using This Phase
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {(data.relatedPrograms as string[]).map((p: string) => (
-                    <Badge key={p} variant="secondary" className="text-[10px]">{p}</Badge>
+                    <Badge key={p} variant="secondary" className="text-[14px]">{p}</Badge>
                   ))}
                 </div>
               </div>
@@ -850,21 +850,21 @@ export function ContextPanel() {
             {/* Overview */}
             {data.executiveSummary && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Overview</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Overview</span>
                 <p className="text-sm text-muted-foreground italic leading-relaxed">{data.executiveSummary as string}</p>
               </div>
             )}
 
             {data.owner && data.owner !== 'Source mapping needed' && (
               <div className="bg-muted/30 border border-border rounded-md p-2.5">
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase mb-0.5">Owner</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-0.5">Owner</span>
                 <p className="text-sm font-medium text-foreground">{data.owner as string}</p>
               </div>
             )}
 
             {data.whyItMatters && data.whyItMatters !== 'Source mapping needed' && (
               <div className="bg-primary/5 border border-primary/15 rounded-md p-3">
-                <span className="block text-[10px] font-bold text-primary/80 uppercase mb-1">Why It Matters</span>
+                <span className="block text-[14px] font-bold text-primary/80  mb-1">Why It Matters</span>
                 <p className="text-sm text-foreground leading-snug">{data.whyItMatters as string}</p>
               </div>
             )}
@@ -872,14 +872,14 @@ export function ContextPanel() {
             {/* Trail OS section */}
             {(data.trailOs as string[])?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Trail OS Capabilities</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">Trail OS Capabilities</span>
                 <div className="space-y-1.5">
                   {(data.trailOs as string[]).map((c) => {
                     const cap = trailOsCapabilities.find(t => t.name === c);
                     return (
                       <div key={c} className="bg-[#EDF5F8] border border-[#EDF5F8] rounded-md p-2">
-                        <p className="text-[11px] font-semibold text-[#2F6F7E]">{c}</p>
-                        {cap && <p className="text-[10px] text-[#2F6F7E] mt-0.5 leading-snug">{cap.description}</p>}
+                        <p className="text-[14px] font-semibold text-[#2F6F7E]">{c}</p>
+                        {cap && <p className="text-[14px] text-[#2F6F7E] mt-0.5 leading-snug">{cap.description}</p>}
                       </div>
                     );
                   })}
@@ -890,14 +890,14 @@ export function ContextPanel() {
             {/* Penny section */}
             {(data.penny as string[])?.length > 0 && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">{TERMS.aiAssistant} Capabilities</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1.5">{TERMS.aiAssistant} Capabilities</span>
                 <div className="space-y-1.5">
                   {(data.penny as string[]).map((p) => {
                     const cap = (pennyCapabilities as Array<{ name: string; description?: string }>)?.find(c => c.name === p);
                     return (
                       <div key={p} className="bg-[#EDF5F8] border border-[#EDF5F8] rounded-md p-2">
-                        <p className="text-[11px] font-semibold text-[#2F6F7E]">⚡ {p}</p>
-                        {cap?.description && <p className="text-[10px] text-[#2F6F7E] mt-0.5 leading-snug">{cap.description}</p>}
+                        <p className="text-[14px] font-semibold text-[#2F6F7E]">⚡ {p}</p>
+                        {cap?.description && <p className="text-[14px] text-[#2F6F7E] mt-0.5 leading-snug">{cap.description}</p>}
                       </div>
                     );
                   })}
@@ -907,45 +907,45 @@ export function ContextPanel() {
 
             {/* Communications section */}
             <div>
-              <span className="block text-xs font-semibold text-foreground uppercase mb-1.5">Communications</span>
+              <span className="block text-sm font-semibold text-foreground  mb-1.5">Communications</span>
               {(data.commChannels as string[])?.length > 0 ? (
                 <div className="space-y-2">
                   <div>
-                    <p className="text-[9px] font-bold uppercase tracking-wider text-[#4A154B]/60 mb-1">Slack (Live — @penny active)</p>
+                    <p className="text-[14px] font-bold  text-[#4A154B]/60 mb-1">Slack (Live — @penny active)</p>
                     <div className="flex flex-wrap gap-1">
                       {(data.commChannels as string[]).map((c) => (
-                        <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[10px]">#{c.replace(/^#/, '')}</Badge>
+                        <Badge key={c} variant="outline" className="bg-[#4A154B]/5 text-[#4A154B] border-[#4A154B]/20 font-mono text-[14px]">#{c.replace(/^#/, '')}</Badge>
                       ))}
                     </div>
                   </div>
-                  <p className="text-[10px] text-muted-foreground">Google Chat: Q4 2025+ · Reminders, alerts, digests · channel-agnostic model</p>
+                  <p className="text-[14px] text-muted-foreground">Google Chat: Q4 2025+ · Reminders, alerts, digests · channel-agnostic model</p>
                 </div>
               ) : (
-                <p className="text-[11px] text-muted-foreground/60">No channels configured · Slack live (@penny) · Google Chat: Phase 2</p>
+                <p className="text-[14px] text-muted-foreground/60">No channels configured · Slack live (@penny) · Google Chat: Phase 2</p>
               )}
             </div>
 
             {/* Sources section */}
             <div className="space-y-1.5">
-              <span className="block text-xs font-semibold text-foreground uppercase">Sources</span>
+              <span className="block text-sm font-semibold text-foreground ">Sources</span>
               {(data.docs as string[])?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {(data.docs as string[]).map((d) => (
-                    <Badge key={d} variant="outline" className="bg-muted text-muted-foreground text-[10px]">{d}</Badge>
+                    <Badge key={d} variant="outline" className="bg-muted text-muted-foreground text-[14px]">{d}</Badge>
                   ))}
                 </div>
               )}
-              <p className="text-[11px] text-muted-foreground/60">Salesforce Cases: future · Knowledge Articles: future</p>
+              <p className="text-[14px] text-muted-foreground/60">Salesforce Cases: future · Knowledge Articles: future</p>
               {data.owner === 'Source mapping needed' && (
                 <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md p-2.5 mt-1">
-                  <p className="text-[11px] text-[#CC8400]">⚠ Owner and operational details require source document review before treating as authoritative.</p>
+                  <p className="text-[14px] text-[#CC8400]">⚠ Owner and operational details require source document review before treating as authoritative.</p>
                 </div>
               )}
             </div>
 
             {/* Source note footer */}
             {data.sourceNote && (
-              <p className="text-[11px] text-muted-foreground/50 border-t border-border/40 pt-3 leading-snug">{data.sourceNote as string}</p>
+              <p className="text-[14px] text-muted-foreground/50 border-t border-border/40 pt-3 leading-snug">{data.sourceNote as string}</p>
             )}
           </div>
         </ScrollArea>
@@ -977,18 +977,18 @@ export function ContextPanel() {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px] flex items-center gap-1">
+                <Badge variant="outline" className="bg-white  text-[14px] flex items-center gap-1">
                   {meta.icon}
                   {meta.label}
                 </Badge>
-                <Badge variant="secondary" className="text-[10px]">{status}</Badge>
+                <Badge variant="secondary" className="text-[14px]">{status}</Badge>
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{title}</h2>
             </div>
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${meta.label}: "${title}".\n\nStatus: ${status}${data.purpose ? `\nPurpose: ${data.purpose as string}` : ''}${data.whyItMatters ? `\nWhy it matters: ${data.whyItMatters as string}` : ''}${data.pennyCapability ? `\n${TERMS.aiAssistant} capability: ${data.pennyCapability as string}` : ''}\n\nWhat configuration or improvements should be prioritized for this item?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
@@ -996,21 +996,21 @@ export function ContextPanel() {
 
             {data.purpose && (
               <div>
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Purpose</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1">Purpose</span>
                 <p className="text-sm text-foreground leading-relaxed">{data.purpose}</p>
               </div>
             )}
 
             {data.whyItMatters && (
               <div>
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Why It Matters</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1">Why It Matters</span>
                 <p className="text-sm text-muted-foreground leading-relaxed">{data.whyItMatters}</p>
               </div>
             )}
 
             {data.pennyCapability && (
               <div className="rounded-md bg-secondary/5 border border-secondary/20 px-3 py-2">
-                <span className="block text-[10px] font-bold text-secondary/80 uppercase tracking-wider mb-1 flex items-center gap-1">
+                <span className="block text-[14px] font-bold text-secondary/80  mb-1 flex items-center gap-1">
                   <Sparkles className="w-3 h-3" /> {TERMS.aiAssistant} Capability
                 </span>
                 <p className="text-sm font-medium text-foreground">{data.pennyCapability}</p>
@@ -1019,14 +1019,14 @@ export function ContextPanel() {
 
             {(data.relatedDemandEvent || data.demandEvent) && (
               <div>
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Related Demand Event</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1">Related Demand Event</span>
                 <p className="text-sm text-foreground">{data.relatedDemandEvent || data.demandEvent}</p>
               </div>
             )}
 
             {(data.relatedProgram || data.audience) && (
               <div>
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1">
                   {data.relatedProgram ? 'Related Program' : 'Audience'}
                 </span>
                 <p className="text-sm text-foreground">{data.relatedProgram || data.audience}</p>
@@ -1035,27 +1035,27 @@ export function ContextPanel() {
 
             {data.owner && (
               <div>
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Owner</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1">Owner</span>
                 <p className="text-sm text-foreground">{data.owner}</p>
               </div>
             )}
 
             {data.capabilities && data.capabilities.length > 0 && (
               <div>
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Capabilities</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1.5">Capabilities</span>
                 <div className="flex flex-wrap gap-1">
-                  {data.capabilities.map((c: string) => <Badge key={c} variant="secondary" className="text-[10px]">{c}</Badge>)}
+                  {data.capabilities.map((c: string) => <Badge key={c} variant="secondary" className="text-[14px]">{c}</Badge>)}
                 </div>
               </div>
             )}
 
             {data.sections && data.sections.length > 0 && (
               <div>
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Brief Sections</span>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1.5">Brief Sections</span>
                 <ul className="list-disc pl-4 space-y-1">
                   {data.sections.map((s: string) => {
                     const [title] = s.split(' — ');
-                    return <li key={s} className="text-[11px] text-muted-foreground">{title}</li>;
+                    return <li key={s} className="text-[14px] text-muted-foreground">{title}</li>;
                   })}
                 </ul>
               </div>
@@ -1063,15 +1063,15 @@ export function ContextPanel() {
 
             {data.example && (
               <div className="bg-muted/50 rounded-md px-3 py-2 border border-border/40">
-                <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Example Message</span>
-                <p className="text-[11px] text-muted-foreground leading-relaxed italic">{data.example}</p>
+                <span className="block text-[14px] font-bold text-muted-foreground  mb-1">Example Message</span>
+                <p className="text-[14px] text-muted-foreground leading-relaxed italic">{data.example}</p>
               </div>
             )}
 
             {data.setupNotes && (
               <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md px-3 py-2">
-                <span className="block text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Setup</span>
-                <p className="text-[11px] text-[#CC8400] leading-relaxed">{data.setupNotes}</p>
+                <span className="block text-[14px] font-bold text-[#CC8400]  mb-1">Future Setup</span>
+                <p className="text-[14px] text-[#CC8400] leading-relaxed">{data.setupNotes}</p>
               </div>
             )}
 
@@ -1088,34 +1088,34 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{TERMS.aiAssistant} Action</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">{TERMS.aiAssistant} Action</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{action.name}</p>
               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                <span className={`inline-block text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg?.chip ?? ''}`}>{action.category}</span>
-                <span className="text-[10px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{action.estimatedTime}</span>
-                <span className={`text-[10px] font-medium border rounded-full px-2 py-0.5 ${action.status === 'prototype' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{action.status}</span>
+                <span className={`inline-block text-[14px] font-bold border rounded-full px-2 py-0.5 ${catCfg?.chip ?? ''}`}>{action.category}</span>
+                <span className="text-[14px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{action.estimatedTime}</span>
+                <span className={`text-[14px] font-medium border rounded-full px-2 py-0.5 ${action.status === 'prototype' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{action.status}</span>
               </div>
             </div>
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${TERMS.aiAssistant} action "${action.name}" (${action.category}).\n\nPurpose: ${action.purpose}\nContext: ${action.contextSentence}\nStatus: ${action.status}\nEstimated time: ${action.estimatedTime}\n${action.salesforceMapping ? `Salesforce mapping: ${action.salesforceMapping}\n` : ''}\nWhat should I do next to implement or improve this action?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
-            <p className="text-[12px] text-muted-foreground leading-relaxed">{action.purpose}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed">{action.purpose}</p>
             <div className="rounded-lg border border-secondary/10 bg-secondary/5 p-3">
-              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">Context</p>
-              <p className="text-[11px] text-foreground/80 italic leading-relaxed">{action.contextSentence}</p>
+              <p className="text-[14px] font-bold text-secondary/60  mb-1">Context</p>
+              <p className="text-[14px] text-foreground/80 italic leading-relaxed">{action.contextSentence}</p>
             </div>
             {action.inputs.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Inputs Required</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Inputs Required</p>
                 <div className="space-y-1.5">
                   {action.inputs.map(inp => (
                     <div key={inp.label} className="flex items-start gap-2">
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${inp.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{inp.required ? 'Required' : 'Optional'}</span>
-                      <div><p className="text-[11px] font-semibold text-foreground">{inp.label}</p><p className="text-[10px] text-muted-foreground">{inp.description}</p></div>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${inp.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-600 bg-slate-50 border-slate-200'}`}>{inp.required ? 'Required' : 'Optional'}</span>
+                      <div><p className="text-[14px] font-semibold text-foreground">{inp.label}</p><p className="text-[14px] text-muted-foreground">{inp.description}</p></div>
                     </div>
                   ))}
                 </div>
@@ -1123,12 +1123,12 @@ export function ContextPanel() {
             )}
             {action.generates.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Generates</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Generates</p>
                 <div className="space-y-1">
                   {action.generates.map(g => (
                     <div key={g.label} className="flex items-start gap-2">
                       <Sparkles className="w-3 h-3 text-secondary shrink-0 mt-0.5" />
-                      <div><p className="text-[11px] font-semibold text-foreground">{g.label}</p><p className="text-[10px] text-muted-foreground">{g.description}</p></div>
+                      <div><p className="text-[14px] font-semibold text-foreground">{g.label}</p><p className="text-[14px] text-muted-foreground">{g.description}</p></div>
                     </div>
                   ))}
                 </div>
@@ -1136,24 +1136,24 @@ export function ContextPanel() {
             )}
             {action.applicableTo.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Applies To</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Applies To</p>
                 <div className="flex flex-wrap gap-1">
                   {action.applicableTo.map(obj => (
-                    <span key={obj} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{obj}</span>
+                    <span key={obj} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{obj}</span>
                   ))}
                 </div>
               </div>
             )}
             {action.salesforceMapping && (
               <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3">
-                <p className="text-[10px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-1">Salesforce Mapping</p>
-                <p className="text-[11px] font-semibold text-[#2F6F7E]">{action.salesforceMapping}</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E]  mb-1">Salesforce Mapping</p>
+                <p className="text-[14px] font-semibold text-[#2F6F7E]">{action.salesforceMapping}</p>
               </div>
             )}
             {action.notes && (
               <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
-                <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Note</p>
-                <p className="text-[11px] text-[#CC8400]">{action.notes}</p>
+                <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Note</p>
+                <p className="text-[14px] text-[#CC8400]">{action.notes}</p>
               </div>
             )}
           </div>
@@ -1170,32 +1170,32 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — SF Architecture</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Knowledge Brief — SF Architecture</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{mapping.trailOsObject}</p>
               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${productCfg.cls}`}>{productCfg.label}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${productCfg.cls}`}>{productCfg.label}</span>
               </div>
             </div>
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the Trail OS ${mapping.trailOsObject} → ${mapping.sfLabel} Salesforce mapping.\n\nSF API name: ${mapping.sfApiName}\nPackage: ${mapping.sfPackageSource}\nStatus: ${statusCfg.label}\nProduct: ${productCfg.label}\nPurpose: ${mapping.purpose}\nCurrent implementation: ${mapping.currentImplementation}\nFuture recommendation: ${mapping.futureRecommendation}\n\nWhat are the next steps to validate and implement this mapping?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
             <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3 space-y-1">
-              <p className="text-[10px] font-bold text-[#2F6F7E] uppercase tracking-wider">Maps To</p>
+              <p className="text-[14px] font-bold text-[#2F6F7E] ">Maps To</p>
               <p className="text-[14px] font-bold text-[#2F6F7E]">{mapping.sfLabel}</p>
-              <p className="text-[11px] font-mono text-[#2F6F7E]">{mapping.sfApiName}</p>
-              <p className="text-[11px] text-[#2F6F7E]">{mapping.sfPackageSource}</p>
+              <p className="text-[14px] font-mono text-[#2F6F7E]">{mapping.sfApiName}</p>
+              <p className="text-[14px] text-[#2F6F7E]">{mapping.sfPackageSource}</p>
             </div>
             {sfOrgData?.orgBaseUrl && (
               <a
                 href={`${sfOrgData.orgBaseUrl}/lightning/setup/ObjectManager/${mapping.sfApiName}/view`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[12px] font-semibold text-[#0070d2] border border-[#0070d2]/25 bg-[#0070d2]/5 rounded-lg px-3 py-2 hover:bg-[#0070d2]/10 transition-colors"
+                className="flex items-center gap-2 text-[14px] font-semibold text-[#0070d2] border border-[#0070d2]/25 bg-[#0070d2]/5 rounded-lg px-3 py-2 hover:bg-[#0070d2]/10 transition-colors"
               >
                 <Database className="w-3.5 h-3.5 shrink-0" />
                 <span className="flex-1">Open in Salesforce Object Manager</span>
@@ -1203,22 +1203,22 @@ export function ContextPanel() {
               </a>
             )}
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Purpose</p>
-              <p className="text-[12px] text-foreground leading-relaxed">{mapping.purpose}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Purpose</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{mapping.purpose}</p>
             </div>
             <div className="rounded-lg border border-border bg-muted/20 p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Current Implementation</p>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">{mapping.currentImplementation}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Current Implementation</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{mapping.currentImplementation}</p>
             </div>
             <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
-              <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Recommendation</p>
-              <p className="text-[11px] text-[#CC8400] leading-relaxed">{mapping.futureRecommendation}</p>
+              <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Future Recommendation</p>
+              <p className="text-[14px] text-[#CC8400] leading-relaxed">{mapping.futureRecommendation}</p>
             </div>
             <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-              <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">★ Reference Implementation: Foundations Trail</p>
-              <p className="text-[11px] text-foreground leading-relaxed italic">{mapping.foundationsTrailExample}</p>
+              <p className="text-[14px] font-bold text-primary  mb-1">★ Reference Implementation: Foundations Trail</p>
+              <p className="text-[14px] text-foreground leading-relaxed italic">{mapping.foundationsTrailExample}</p>
             </div>
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
               <Link2 className="w-3 h-3" />
               <span className="capitalize">{mapping.relationshipType} relationship</span>
               <span>·</span>
@@ -1226,8 +1226,8 @@ export function ContextPanel() {
             </div>
             {mapping.notes && (
               <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
-                <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Note</p>
-                <p className="text-[11px] text-[#CC8400]">{mapping.notes}</p>
+                <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Note</p>
+                <p className="text-[14px] text-[#CC8400]">{mapping.notes}</p>
               </div>
             )}
           </div>
@@ -1242,26 +1242,26 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Program Resource</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Knowledge Brief — Program Resource</p>
               <p className="text-[15px] font-semibold text-foreground">{res.programName}</p>
-              <p className="text-[12px] text-muted-foreground">{res.folderName || 'No folder configured'}</p>
+              <p className="text-[14px] text-muted-foreground">{res.folderName || 'No folder configured'}</p>
             </div>
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the Google Drive workspace for ${res.programName}.\n\nFolder: ${res.folderName || 'not configured'}\nOwner: ${res.owner}\nPermissions: ${(res.permissionsModel || '').replace(/-/g, ' ')}\nSync status: ${(res.syncStatus || '').replace(/-/g, ' ')}\nDescription: ${res.description}\n\nWhat should be configured or updated for this program workspace?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
-            <p className="text-[12px] text-muted-foreground leading-relaxed">{res.description}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed">{res.description}</p>
             {res.folderUrl && (
               <a href={res.folderUrl} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[12px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-lg px-3 py-2 hover:bg-primary/10 transition-colors">
+                className="flex items-center gap-2 text-[14px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-lg px-3 py-2 hover:bg-primary/10 transition-colors">
                 Open Google Drive folder
                 <Shield className="w-3.5 h-3.5" />
               </a>
             )}
-            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
+            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[14px]">
               <div><span className="text-muted-foreground">Owner:</span> <span className="font-medium">{res.owner}</span></div>
               <div><span className="text-muted-foreground">Permissions:</span> <span className="font-medium capitalize">{(res.permissionsModel || '').replace(/-/g, ' ')}</span></div>
               <div><span className="text-muted-foreground">Sync:</span> <span className="font-medium capitalize">{(res.syncStatus || '').replace(/-/g, ' ')}</span></div>
@@ -1282,18 +1282,18 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Source</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Knowledge Brief — Source</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{src.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-1.5">
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${typeCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.type}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${trustCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.trustLevel}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${syncCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.syncStatus}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${typeCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.type}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${trustCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.trustLevel}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${syncCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>{src.syncStatus}</span>
               </div>
             </div>
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the knowledge source "${src.name}".\n\nType: ${src.type}\nTrust Level: ${src.trustLevel}\nSync Status: ${src.syncStatus}\nAccess: ${src.accessStatus ?? 'Unknown'}\n${src.healthIssues.length > 0 ? `Health issues:\n${src.healthIssues.map(i => `• ${i}`).join('\n')}\n` : ''}\nWhat governance actions or improvements would strengthen this source for ${TERMS.aiAssistant} retrieval?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
@@ -1301,21 +1301,21 @@ export function ContextPanel() {
 
             {src.healthIssues.length > 0 && (
               <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2.5 space-y-1">
-                <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wide">Open Issues</p>
+                <p className="text-[14px] font-bold text-[#CC8400] ">Open Issues</p>
                 {src.healthIssues.map((issue, i) => (
-                  <p key={i} className="text-[11px] text-[#CC8400] leading-snug">· {issue}</p>
+                  <p key={i} className="text-[14px] text-[#CC8400] leading-snug">· {issue}</p>
                 ))}
               </div>
             )}
 
             {src.trustLevel === 'Unverified' && (
               <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2.5">
-                <p className="text-[11px] font-bold text-[#A93F2F]">⚠ Unverified</p>
-                <p className="text-[11px] text-[#A93F2F] mt-0.5">Trust review required before {TERMS.aiAssistant} activation.</p>
+                <p className="text-[14px] font-bold text-[#A93F2F]">⚠ Unverified</p>
+                <p className="text-[14px] text-[#A93F2F] mt-0.5">Trust review required before {TERMS.aiAssistant} activation.</p>
               </div>
             )}
 
-            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
+            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[14px]">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Type</span>
                 <span className="font-medium">{src.type}</span>
@@ -1354,34 +1354,34 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — {TERMS.aiAssistant} Capability</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Knowledge Brief — {TERMS.aiAssistant} Capability</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{cap.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-1">
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${domCfg.cls}`}>{cap.domain}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${matCfg.cls}`}>{cap.maturity}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${pocCfg.cls}`}>{pocCfg.label}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${domCfg.cls}`}>{cap.domain}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${matCfg.cls}`}>{cap.maturity}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${pocCfg.cls}`}>{pocCfg.label}</span>
               </div>
             </div>
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${TERMS.aiAssistant} capability "${cap.name}".\n\nDomain: ${cap.domain}\nMaturity: ${cap.maturity}\nPOC status: ${pocCfg.label}\nPurpose: ${cap.purpose}\nPOC mapping: ${cap.pocMapping}\nOwner: ${cap.owner}\n${cap.nextSteps.length > 0 ? `Next steps:\n${cap.nextSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n` : ''}\nWhat steps should we take to advance this capability toward full production readiness?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
 
             <div className="rounded-lg border border-secondary/20 bg-secondary/5 p-3">
-              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">Purpose</p>
-              <p className="text-[12px] text-foreground leading-relaxed">{cap.purpose}</p>
+              <p className="text-[14px] font-bold text-secondary/60  mb-1">Purpose</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{cap.purpose}</p>
             </div>
 
             {cap.dependencies.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Dependencies</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Dependencies</p>
                 <div className="flex flex-wrap gap-1">
                   {cap.dependencies.map(depId => (
-                    <span key={depId} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{depId.replace('cap-', '').replace(/-/g, ' ')}</span>
+                    <span key={depId} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground capitalize">{depId.replace('cap-', '').replace(/-/g, ' ')}</span>
                   ))}
                 </div>
               </div>
@@ -1389,44 +1389,44 @@ export function ContextPanel() {
 
             {cap.relatedPrograms.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Programs</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Related Programs</p>
                 <div className="flex flex-wrap gap-1">
-                  {cap.relatedPrograms.map(p => <span key={p} className="text-[10px] font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 text-primary">{p}</span>)}
+                  {cap.relatedPrograms.map(p => <span key={p} className="text-[14px] font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 text-primary">{p}</span>)}
                 </div>
               </div>
             )}
 
             {cap.relatedSfObjects.length > 0 && (
               <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-3">
-                <p className="text-[10px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-1.5">Salesforce Objects</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E]  mb-1.5">Salesforce Objects</p>
                 <div className="flex flex-wrap gap-1">
-                  {cap.relatedSfObjects.map(o => <span key={o} className="text-[10px] font-semibold text-[#2F6F7E] bg-white/70 border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)}
+                  {cap.relatedSfObjects.map(o => <span key={o} className="text-[14px] font-semibold text-[#2F6F7E] bg-white/70 border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)}
                 </div>
               </div>
             )}
 
             {cap.relatedStandards.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Standards</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Related Standards</p>
                 <div className="flex flex-wrap gap-1">
-                  {cap.relatedStandards.map(s => <span key={s} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{s.replace('std-', '').replace(/-/g, ' ')}</span>)}
+                  {cap.relatedStandards.map(s => <span key={s} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{s.replace('std-', '').replace(/-/g, ' ')}</span>)}
                 </div>
               </div>
             )}
 
             <div className="rounded-lg border border-secondary/10 bg-secondary/5 p-3">
-              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">POC Mapping</p>
-              <p className="text-[11px] text-foreground/80 leading-relaxed">{cap.pocMapping}</p>
+              <p className="text-[14px] font-bold text-secondary/60  mb-1">POC Mapping</p>
+              <p className="text-[14px] text-foreground/80 leading-relaxed">{cap.pocMapping}</p>
             </div>
 
             {cap.nextSteps.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Next Steps</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Next Steps</p>
                 <div className="space-y-1.5">
                   {cap.nextSteps.map((step, i) => (
                     <div key={i} className="flex items-start gap-2">
-                      <span className="w-4 h-4 rounded-full bg-foreground text-background text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                      <p className="text-[11px] text-foreground leading-snug">{step}</p>
+                      <span className="w-4 h-4 rounded-full bg-foreground text-background text-[14px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                      <p className="text-[14px] text-foreground leading-snug">{step}</p>
                     </div>
                   ))}
                 </div>
@@ -1435,17 +1435,17 @@ export function ContextPanel() {
 
             {cap.foundationsTrailExample && (
               <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-                <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">★ Reference Implementation: Foundations Trail</p>
-                <p className="text-[11px] text-foreground italic leading-relaxed">{cap.foundationsTrailExample}</p>
+                <p className="text-[14px] font-bold text-primary/70  mb-1">★ Reference Implementation: Foundations Trail</p>
+                <p className="text-[14px] text-foreground italic leading-relaxed">{cap.foundationsTrailExample}</p>
               </div>
             )}
 
             <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
-              <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Future Integration</p>
-              <p className="text-[11px] text-[#CC8400] leading-relaxed">{cap.futureIntegrationStatus}</p>
+              <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Future Integration</p>
+              <p className="text-[14px] text-[#CC8400] leading-relaxed">{cap.futureIntegrationStatus}</p>
             </div>
 
-            <div className="rounded-lg border border-border bg-muted/20 p-3 text-[11px] space-y-1">
+            <div className="rounded-lg border border-border bg-muted/20 p-3 text-[14px] space-y-1">
               <div><span className="text-muted-foreground">Owner</span><span className="font-semibold text-foreground ml-2">{cap.owner}</span></div>
               <div><span className="text-muted-foreground">Audience</span><span className="font-semibold text-foreground ml-2">{cap.audience.join(', ')}</span></div>
             </div>
@@ -1464,40 +1464,40 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Content Standard</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Knowledge Brief — Content Standard</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{std.name}</p>
               <div className="flex flex-wrap gap-1.5 mt-1">
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg.cls}`}>{std.category}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${confidenceCfg.cls}`}>{confidenceCfg.label}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${catCfg.cls}`}>{std.category}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${confidenceCfg.cls}`}>{confidenceCfg.label}</span>
               </div>
             </div>
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the content standard "${std.name}".\n\nCategory: ${std.category}\nStatus: ${statusCfg.label}\nConfidence: ${confidenceCfg.label}\nPurpose: ${std.purpose}\nWhy it matters: ${std.whyItMatters}\nHow ${TERMS.aiAssistant} uses it: ${std.howPennyUsesIt}\nOwner: ${std.owner}\nReview cycle: ${std.reviewCycle}\n\nWhat should be done to improve compliance or advance this content standard?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
 
             <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-              <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Purpose</p>
-              <p className="text-[12px] text-foreground leading-relaxed">{std.purpose}</p>
+              <p className="text-[14px] font-bold text-primary/70  mb-1">Purpose</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{std.purpose}</p>
             </div>
 
             <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
-              <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Why It Matters</p>
-              <p className="text-[11px] text-[#CC8400] leading-relaxed">{std.whyItMatters}</p>
+              <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Why It Matters</p>
+              <p className="text-[14px] text-[#CC8400] leading-relaxed">{std.whyItMatters}</p>
             </div>
 
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Required Fields ({std.requiredFields.filter(f => f.required).length} required)</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Required Fields ({std.requiredFields.filter(f => f.required).length} required)</p>
               <div className="space-y-1">
                 {std.requiredFields.map(f => (
                   <div key={f.field} className="flex items-start gap-1.5">
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{f.required ? 'Req' : 'Opt'}</span>
-                    <div><p className="text-[11px] font-semibold text-foreground leading-tight">{f.field}</p><p className="text-[10px] text-muted-foreground leading-tight">{f.description}</p></div>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{f.required ? 'Req' : 'Opt'}</span>
+                    <div><p className="text-[14px] font-semibold text-foreground leading-tight">{f.field}</p><p className="text-[14px] text-muted-foreground leading-tight">{f.description}</p></div>
                   </div>
                 ))}
               </div>
@@ -1505,10 +1505,10 @@ export function ContextPanel() {
 
             {std.relatedContentObjects.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Content Objects</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Related Content Objects</p>
                 <div className="flex flex-wrap gap-1">
                   {std.relatedContentObjects.map(o => (
-                    <span key={o} className="text-[10px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{o}</span>
+                    <span key={o} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{o}</span>
                   ))}
                 </div>
               </div>
@@ -1516,21 +1516,21 @@ export function ContextPanel() {
 
             <div className="space-y-2">
               <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
-                <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">Salesforce</p>
-                <p className="text-[11px] text-[#2F6F7E]">{std.sfMapping}</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E]  mb-0.5">Salesforce</p>
+                <p className="text-[14px] text-[#2F6F7E]">{std.sfMapping}</p>
               </div>
               <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
-                <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">LMS</p>
-                <p className="text-[11px] text-[#2F6F7E]">{std.lmsMapping}</p>
+                <p className="text-[14px] font-bold text-[#2F6F7E]  mb-0.5">LMS</p>
+                <p className="text-[14px] text-[#2F6F7E]">{std.lmsMapping}</p>
               </div>
             </div>
 
             <div className="rounded-lg border border-secondary/15 bg-secondary/5 p-3">
-              <p className="text-[10px] font-bold text-secondary/60 uppercase tracking-wider mb-1">How {TERMS.aiAssistant} Uses This</p>
-              <p className="text-[11px] text-foreground/80 leading-relaxed">{std.howPennyUsesIt}</p>
+              <p className="text-[14px] font-bold text-secondary/60  mb-1">How {TERMS.aiAssistant} Uses This</p>
+              <p className="text-[14px] text-foreground/80 leading-relaxed">{std.howPennyUsesIt}</p>
             </div>
 
-            <div className="rounded-lg border border-border bg-muted/20 p-3 text-[11px] space-y-1.5">
+            <div className="rounded-lg border border-border bg-muted/20 p-3 text-[14px] space-y-1.5">
               <div><span className="text-muted-foreground">Owner</span><span className="font-semibold text-foreground ml-2">{std.owner}</span></div>
               <div><span className="text-muted-foreground">Review cycle</span><span className="font-semibold text-foreground ml-2">{std.reviewCycle}</span></div>
               <div><span className="text-muted-foreground">{TERMS.aiAssistant} checks</span><span className="font-semibold text-foreground ml-2">{std.pennyChecks.length} ({std.pennyChecks.filter(c => c.required).length} required)</span></div>
@@ -1566,37 +1566,37 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Knowledge Brief — Gap Report</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Knowledge Brief — Gap Report</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{gap.objectName}</p>
               <div className="flex flex-wrap gap-1.5 mt-1.5">
-                <span className="text-[10px] font-medium text-muted-foreground border border-border rounded-full px-2 py-0.5">{gap.objectType}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${typeCfg.cls}`}>{typeCfg.label}</span>
-                <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${sevCls[gap.severity]}`}>{gap.severity}</span>
-                {gap.sprint && <span className="text-[10px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{gap.sprint}</span>}
+                <span className="text-[14px] font-medium text-muted-foreground border border-border rounded-full px-2 py-0.5">{gap.objectType}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${typeCfg.cls}`}>{typeCfg.label}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${sevCls[gap.severity]}`}>{gap.severity}</span>
+                {gap.sprint && <span className="text-[14px] text-muted-foreground border border-border rounded-full px-2 py-0.5">{gap.sprint}</span>}
               </div>
             </div>
 
             <button
               onClick={focusGapWithPenny}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
 
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Gap Description</p>
-              <p className="text-[12px] text-foreground leading-relaxed">{gap.gapDescription}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Gap Description</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{gap.gapDescription}</p>
             </div>
 
             <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-              <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Suggested Action</p>
-              <p className="text-[11px] text-foreground leading-relaxed">{gap.suggestedAction}</p>
+              <p className="text-[14px] font-bold text-primary/70  mb-1">Suggested Action</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{gap.suggestedAction}</p>
             </div>
 
             {std && (
-              <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">Related Standard</p>
+              <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[14px]">
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Related Standard</p>
                 <div><span className="text-muted-foreground">Standard</span><span className="font-semibold text-foreground ml-2">{std.name}</span></div>
                 <div><span className="text-muted-foreground">Owner</span><span className="font-semibold text-foreground ml-2">{std.owner}</span></div>
                 <div><span className="text-muted-foreground">Review cycle</span><span className="font-semibold text-foreground ml-2">{std.reviewCycle}</span></div>
@@ -1648,13 +1648,13 @@ export function ContextPanel() {
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{TERMS.knowledgeBrief} — SF Readiness</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">{TERMS.knowledgeBrief} — SF Readiness</p>
               <p className="text-[15px] font-semibold text-foreground leading-snug">{prod.product}</p>
               <div className="flex items-center gap-2 mt-1.5">
-                <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCls[prod.overallStatus] ?? statusCls['n-a']}`}>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${statusCls[prod.overallStatus] ?? statusCls['n-a']}`}>
                   {statusLabel[prod.overallStatus] ?? prod.overallStatus}
                 </span>
-                <span className={`text-[13px] font-bold ${prod.score >= 60 ? 'text-[#2F6F7E]' : prod.score >= 30 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
+                <span className={`text-[14px] font-bold ${prod.score >= 60 ? 'text-[#2F6F7E]' : prod.score >= 30 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
                   {prod.score}/100
                 </span>
               </div>
@@ -1662,19 +1662,19 @@ export function ContextPanel() {
 
             <button
               onClick={focusProductWithPenny}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
 
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Overview</p>
-              <p className="text-[12px] text-foreground leading-relaxed">{prod.description}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Overview</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{prod.description}</p>
             </div>
 
             <div className="rounded-lg border border-border bg-muted/20 p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Object Coverage</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Object Coverage</p>
               <div className="flex items-center gap-2 mb-1.5">
                 <div className="flex-1 h-1.5 bg-muted rounded-full">
                   <div
@@ -1682,31 +1682,31 @@ export function ContextPanel() {
                     style={{ width: `${prod.score}%` }}
                   />
                 </div>
-                <span className="text-[10px] text-muted-foreground shrink-0">{prod.score}%</span>
+                <span className="text-[14px] text-muted-foreground shrink-0">{prod.score}%</span>
               </div>
-              <p className="text-[11px] text-muted-foreground">{prod.objectsMapped} of {prod.objectsTotal} object groups mapped</p>
+              <p className="text-[14px] text-muted-foreground">{prod.objectsMapped} of {prod.objectsTotal} object groups mapped</p>
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Readiness Checks</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Readiness Checks</p>
               {prod.checks.map(c => (
                 <div key={c.label} className="rounded border border-border/60 bg-background px-3 py-2">
                   <div className="flex items-center justify-between gap-2 mb-0.5">
-                    <p className="text-[11px] font-semibold text-foreground">{c.label}</p>
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${checkCls(c.status)}`}>
+                    <p className="text-[14px] font-semibold text-foreground">{c.label}</p>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${checkCls(c.status)}`}>
                       {statusLabel[c.status] ?? c.status}
                     </span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground leading-snug">{c.note}</p>
+                  <p className="text-[14px] text-muted-foreground leading-snug">{c.note}</p>
                 </div>
               ))}
             </div>
 
             {blockers.length > 0 && (
               <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3">
-                <p className="text-[10px] font-bold text-[#A93F2F] uppercase tracking-wider mb-1">{blockers.length} Blocker{blockers.length > 1 ? 's' : ''} — Needs Action</p>
+                <p className="text-[14px] font-bold text-[#A93F2F]  mb-1">{blockers.length} Blocker{blockers.length > 1 ? 's' : ''} — Needs Action</p>
                 {blockers.map(b => (
-                  <p key={b.label} className="text-[11px] text-[#A93F2F] leading-snug mt-1">· {b.note}</p>
+                  <p key={b.label} className="text-[14px] text-[#A93F2F] leading-snug mt-1">· {b.note}</p>
                 ))}
               </div>
             )}
@@ -1755,15 +1755,15 @@ export function ContextPanel() {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className={`inline-flex items-center text-[10px] font-bold uppercase tracking-wider border rounded-full px-2 py-0.5 ${objChip[objType] ?? 'bg-muted text-muted-foreground border-border'}`}>
+                <span className={`inline-flex items-center text-[14px] font-bold  border rounded-full px-2 py-0.5 ${objChip[objType] ?? 'bg-muted text-muted-foreground border-border'}`}>
                   <ObjIcon className="w-3 h-3 mr-1" />
                   {objLabel[objType] ?? objType}
                 </span>
-                <span className={`inline-flex text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCls[status] ?? 'bg-muted text-muted-foreground border-border'}`}>
+                <span className={`inline-flex text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCls[status] ?? 'bg-muted text-muted-foreground border-border'}`}>
                   {status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}
                 </span>
                 {d.confidence && (
-                  <span className="inline-flex text-[10px] font-semibold border border-border bg-muted/40 text-muted-foreground rounded-full px-2 py-0.5">
+                  <span className="inline-flex text-[14px] font-semibold border border-border bg-muted/40 text-muted-foreground rounded-full px-2 py-0.5">
                     {d.confidence}
                   </span>
                 )}
@@ -1773,7 +1773,7 @@ export function ContextPanel() {
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(`I'm reviewing the ${objLabel[objType] ?? objType} "${d.name}".\n\nStatus: ${status}\nPurpose: ${d.purpose}\nOwner: ${d.owner || 'unassigned'}${d.program ? `\nProgram: ${d.program}` : ''}${d.sprint ? `\nSprint: ${d.sprint}` : ''}${d.relatedSalesforceObject ? `\nSalesforce object: ${d.relatedSalesforceObject}` : ''}\n\nWhat content actions should I prioritize for this item?`); }}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
@@ -1781,31 +1781,31 @@ export function ContextPanel() {
 
             {/* Purpose */}
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Purpose</p>
-              <p className="text-[12px] text-foreground leading-relaxed">{d.purpose}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Purpose</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{d.purpose}</p>
             </div>
 
             {/* Context — program / sprint / module chain */}
             {(d.program || d.sprint || d.module) && (
               <div className="space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Context</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60">Context</p>
                 <div className="space-y-1">
                   {d.program && (
                     <div className="flex items-center gap-2">
                       <GraduationCap className="w-3 h-3 text-primary flex-shrink-0" />
-                      <span className="text-[11px] text-foreground">{d.program}</span>
+                      <span className="text-[14px] text-foreground">{d.program}</span>
                     </div>
                   )}
                   {d.sprint && (
                     <div className="flex items-center gap-2">
                       <ArrowRight className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
-                      <span className="text-[11px] text-foreground">{d.sprint}</span>
+                      <span className="text-[14px] text-foreground">{d.sprint}</span>
                     </div>
                   )}
                   {d.module && (
                     <div className="flex items-center gap-2">
                       <ArrowRight className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
-                      <span className="text-[11px] text-foreground">{d.module}</span>
+                      <span className="text-[14px] text-foreground">{d.module}</span>
                     </div>
                   )}
                 </div>
@@ -1814,36 +1814,36 @@ export function ContextPanel() {
 
             {/* Ownership */}
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Owner</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Owner</p>
               {d.owner
-                ? <p className="text-[12px] text-foreground font-medium">{d.owner}</p>
-                : <p className="text-[12px] text-[#A93F2F] flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> No owner assigned</p>}
+                ? <p className="text-[14px] text-foreground font-medium">{d.owner}</p>
+                : <p className="text-[14px] text-[#A93F2F] flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> No owner assigned</p>}
             </div>
 
             {/* Type-specific fields */}
 
             {objType === 'sprint' && d.resolvePhase && (
               <div className="space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">RESOLVE Phase</p>
-                <span className="inline-flex text-[11px] font-semibold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] rounded-full px-2.5 py-0.5">{d.resolvePhase}</span>
+                <p className="text-[14px] font-bold  text-muted-foreground/60">RESOLVE Phase</p>
+                <span className="inline-flex text-[14px] font-semibold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] rounded-full px-2.5 py-0.5">{d.resolvePhase}</span>
               </div>
             )}
 
             {objType === 'sprint' && d.theme && (
               <div className="space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Theme</p>
-                <p className="text-[12px] text-foreground">{d.theme}</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60">Theme</p>
+                <p className="text-[14px] text-foreground">{d.theme}</p>
               </div>
             )}
 
             {objType === 'module' && Array.isArray(d.learningObjectives) && d.learningObjectives.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Learning Objectives</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60">Learning Objectives</p>
                 <ul className="space-y-1.5">
                   {(d.learningObjectives as string[]).map((obj, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
-                      <span className="text-[11px] text-foreground leading-snug">{obj}</span>
+                      <span className="text-[14px] text-foreground leading-snug">{obj}</span>
                     </li>
                   ))}
                 </ul>
@@ -1852,8 +1852,8 @@ export function ContextPanel() {
 
             {objType === 'lesson' && d.learningObjective && (
               <div className="space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Learning Objective</p>
-                <p className="text-[12px] text-foreground leading-relaxed">{d.learningObjective}</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60">Learning Objective</p>
+                <p className="text-[14px] text-foreground leading-relaxed">{d.learningObjective}</p>
               </div>
             )}
 
@@ -1861,14 +1861,14 @@ export function ContextPanel() {
               <div className="grid grid-cols-2 gap-3">
                 {d.lessonType && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Type</p>
-                    <p className="text-[12px] text-foreground">{d.lessonType}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Type</p>
+                    <p className="text-[14px] text-foreground">{d.lessonType}</p>
                   </div>
                 )}
                 {d.duration && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Duration</p>
-                    <p className="text-[12px] text-foreground">{d.duration}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Duration</p>
+                    <p className="text-[14px] text-foreground">{d.duration}</p>
                   </div>
                 )}
               </div>
@@ -1878,14 +1878,14 @@ export function ContextPanel() {
               <div className="grid grid-cols-2 gap-3">
                 {d.questionCount !== undefined && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Questions</p>
-                    <p className="text-[12px] text-foreground font-semibold">{d.questionCount}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Questions</p>
+                    <p className="text-[14px] text-foreground font-semibold">{d.questionCount}</p>
                   </div>
                 )}
                 {d.passingScore !== undefined && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Passing Score</p>
-                    <p className="text-[12px] text-foreground font-semibold">{d.passingScore}%</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Passing Score</p>
+                    <p className="text-[14px] text-foreground font-semibold">{d.passingScore}%</p>
                   </div>
                 )}
               </div>
@@ -1895,20 +1895,20 @@ export function ContextPanel() {
               <div className="grid grid-cols-2 gap-3">
                 {d.articleType && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Article Type</p>
-                    <p className="text-[12px] text-foreground">{d.articleType}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Article Type</p>
+                    <p className="text-[14px] text-foreground">{d.articleType}</p>
                   </div>
                 )}
                 {d.wordCount && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Word Count</p>
-                    <p className="text-[12px] text-foreground">{d.wordCount}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Word Count</p>
+                    <p className="text-[14px] text-foreground">{d.wordCount}</p>
                   </div>
                 )}
                 {d.lastReviewed && (
                   <div className="col-span-2">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Last Reviewed</p>
-                    <p className="text-[12px] text-foreground">{d.lastReviewed}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Last Reviewed</p>
+                    <p className="text-[14px] text-foreground">{d.lastReviewed}</p>
                   </div>
                 )}
               </div>
@@ -1917,28 +1917,28 @@ export function ContextPanel() {
             {objType === 'pennyTemplate' && d.triggerContext && (
               <div className="space-y-3">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Trigger Context</p>
-                  <p className="text-[12px] text-foreground">{d.triggerContext}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Trigger Context</p>
+                  <p className="text-[14px] text-foreground">{d.triggerContext}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {d.targetAudience && (
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Audience</p>
-                      <p className="text-[12px] text-foreground">{d.targetAudience}</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Audience</p>
+                      <p className="text-[14px] text-foreground">{d.targetAudience}</p>
                     </div>
                   )}
                   {d.tone && (
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Tone</p>
-                      <p className="text-[12px] text-foreground italic">{d.tone}</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Tone</p>
+                      <p className="text-[14px] text-foreground italic">{d.tone}</p>
                     </div>
                   )}
                 </div>
                 {d.sampleOutput && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Sample Output</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Sample Output</p>
                     <div className="rounded-lg border border-secondary/20 bg-secondary/5 px-3 py-2">
-                      <p className="text-[11px] text-foreground leading-relaxed italic">{d.sampleOutput}</p>
+                      <p className="text-[14px] text-foreground leading-relaxed italic">{d.sampleOutput}</p>
                     </div>
                   </div>
                 )}
@@ -1949,10 +1949,10 @@ export function ContextPanel() {
               <div className="space-y-3">
                 {Array.isArray(d.affectedItems) && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Affected Items</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Affected Items</p>
                     <ul className="space-y-1">
                       {(d.affectedItems as string[]).map((item, i) => (
-                        <li key={i} className="text-[11px] text-foreground flex items-start gap-1.5">
+                        <li key={i} className="text-[14px] text-foreground flex items-start gap-1.5">
                           <AlertTriangle className="w-3 h-3 text-[#CC8400] mt-0.5 flex-shrink-0" />
                           {item}
                         </li>
@@ -1962,9 +1962,9 @@ export function ContextPanel() {
                 )}
                 {d.actionRequired && (
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Action Required</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Action Required</p>
                     <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-2">
-                      <p className="text-[11px] text-[#245531] leading-relaxed">{d.actionRequired}</p>
+                      <p className="text-[14px] text-[#245531] leading-relaxed">{d.actionRequired}</p>
                     </div>
                   </div>
                 )}
@@ -1973,7 +1973,7 @@ export function ContextPanel() {
 
             {/* Salesforce / LMS mapping */}
             <div className="space-y-2 pt-1 border-t border-border/40">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Object Mapping</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Object Mapping</p>
               <div className="space-y-1.5">
                 {d.relatedSalesforceObject && (
                   sfOrgData?.orgBaseUrl ? (
@@ -1984,20 +1984,20 @@ export function ContextPanel() {
                       className="flex items-center gap-2 group w-full"
                     >
                       <Database className="w-3 h-3 text-[#0070d2] flex-shrink-0" />
-                      <span className="text-[11px] text-[#0070d2] font-medium group-hover:underline flex-1">{d.relatedSalesforceObject}</span>
+                      <span className="text-[14px] text-[#0070d2] font-medium group-hover:underline flex-1">{d.relatedSalesforceObject}</span>
                       <ExternalLink className="w-2.5 h-2.5 text-[#0070d2]/60 flex-shrink-0" />
                     </a>
                   ) : (
                     <div className="flex items-center gap-2">
                       <Database className="w-3 h-3 text-primary flex-shrink-0" />
-                      <span className="text-[11px] text-foreground">{d.relatedSalesforceObject}</span>
+                      <span className="text-[14px] text-foreground">{d.relatedSalesforceObject}</span>
                     </div>
                   )
                 )}
                 {d.relatedLmsObject && (
                   <div className="flex items-center gap-2">
                     <Layers className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
-                    <span className="text-[11px] text-foreground">{d.relatedLmsObject}</span>
+                    <span className="text-[14px] text-foreground">{d.relatedLmsObject}</span>
                   </div>
                 )}
               </div>
@@ -2006,33 +2006,33 @@ export function ContextPanel() {
             {/* Penny generation actions */}
             {Array.isArray(d.pennyActions) && d.pennyActions.length > 0 && (
               <div className="space-y-2 pt-1 border-t border-border/40">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{TERMS.aiAssistant} Generation</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60">{TERMS.aiAssistant} Generation</p>
                 <div className="flex flex-wrap gap-1">
                   {(d.pennyActions as string[]).map(action => (
-                    <span key={action} className="inline-flex items-center gap-1 text-[10px] font-medium text-secondary border border-secondary/20 bg-secondary/5 rounded-full px-2 py-0.5">
+                    <span key={action} className="inline-flex items-center gap-1 text-[14px] font-medium text-secondary border border-secondary/20 bg-secondary/5 rounded-full px-2 py-0.5">
                       <Zap className="w-2.5 h-2.5" />
                       {action}
                     </span>
                   ))}
                 </div>
-                <p className="text-[10px] text-muted-foreground/60">Future state — requires {TERMS.aiAssistant} Content Assistant integration</p>
+                <p className="text-[14px] text-muted-foreground/60">Future state — requires {TERMS.aiAssistant} Content Assistant integration</p>
               </div>
             )}
 
             {/* Future demand link */}
             {d.futureDemandLink && (
               <div className="pt-1 border-t border-border/40">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1.5">Demand Management</p>
-                <p className="text-[11px] text-muted-foreground">{d.futureDemandLink}</p>
-                <p className="text-[10px] text-muted-foreground/60 mt-0.5">Governance workflows planned for Q3–Q4 2025</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Demand Management</p>
+                <p className="text-[14px] text-muted-foreground">{d.futureDemandLink}</p>
+                <p className="text-[14px] text-muted-foreground/60 mt-0.5">Governance workflows planned for Q3–Q4 2025</p>
               </div>
             )}
 
             {/* Notes */}
             {d.notes && (
               <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2">
-                <p className="text-[10px] font-bold text-[#CC8400] mb-1">Note</p>
-                <p className="text-[11px] text-[#CC8400] leading-relaxed">{d.notes}</p>
+                <p className="text-[14px] font-bold text-[#CC8400] mb-1">Note</p>
+                <p className="text-[14px] text-[#CC8400] leading-relaxed">{d.notes}</p>
               </div>
             )}
 
@@ -2065,9 +2065,9 @@ export function ContextPanel() {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[9px] font-mono text-muted-foreground/50">{data.id}</span>
-                <Badge variant="outline" className="text-[9px] px-1.5 py-0.5">{data.type}</Badge>
-                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${riskCls}`}>
+                <span className="text-[14px] font-mono text-muted-foreground/50">{data.id}</span>
+                <Badge variant="outline" className="text-[14px] px-1.5 py-0.5">{data.type}</Badge>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${riskCls}`}>
                   {riskLabel}
                 </span>
               </div>
@@ -2076,7 +2076,7 @@ export function ContextPanel() {
 
             {/* Status + Meta */}
             <div className="rounded-lg border bg-muted/20 overflow-hidden">
-              <div className={`px-3 py-1.5 border-b text-[10px] font-semibold ${statusCls[data.status] ?? 'text-muted-foreground bg-muted border-border'}`}>
+              <div className={`px-3 py-1.5 border-b text-[14px] font-semibold ${statusCls[data.status] ?? 'text-muted-foreground bg-muted border-border'}`}>
                 {data.status}
               </div>
               <div className="p-3 space-y-2">
@@ -2086,8 +2086,8 @@ export function ContextPanel() {
                   { label: 'Age',          value: `${data.age} ago` },
                 ].map(row => (
                   <div key={row.label} className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] text-muted-foreground">{row.label}</span>
-                    <span className="text-[10px] font-semibold text-foreground text-right">{row.value}</span>
+                    <span className="text-[14px] text-muted-foreground">{row.label}</span>
+                    <span className="text-[14px] font-semibold text-foreground text-right">{row.value}</span>
                   </div>
                 ))}
               </div>
@@ -2096,14 +2096,14 @@ export function ContextPanel() {
             {/* Notes */}
             {data.notes && (
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Notes</p>
-                <p className="text-[12px] text-muted-foreground leading-relaxed">{data.notes}</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Notes</p>
+                <p className="text-[14px] text-muted-foreground leading-relaxed">{data.notes}</p>
               </div>
             )}
 
             {/* Triage hint */}
             <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2.5">
-              <p className="text-[10px] text-primary/80 leading-relaxed">
+              <p className="text-[14px] text-primary/80 leading-relaxed">
                 Use the <strong>expand chevron</strong> on the row to reveal quick triage actions — Approve, Defer, Escalate, and more.
               </p>
             </div>
@@ -2135,12 +2135,12 @@ export function ContextPanel() {
             {/* Header */}
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Salesforce Case</span>
-                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCls}`}>
+                <span className="text-[14px] font-bold  text-muted-foreground/40">Salesforce Case</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCls}`}>
                   {data.Priority ?? 'Low'}
                 </span>
                 {data.CaseNumber && (
-                  <span className="text-[9px] font-mono text-muted-foreground/60">{data.CaseNumber}</span>
+                  <span className="text-[14px] font-mono text-muted-foreground/60">{data.CaseNumber}</span>
                 )}
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">
@@ -2156,8 +2156,8 @@ export function ContextPanel() {
                 { label: 'Age',     value: data.age ?? '—' },
               ].map(row => (
                 <div key={row.label} className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-muted-foreground">{row.label}</span>
-                  <span className="text-[10px] font-semibold text-foreground text-right">{row.value}</span>
+                  <span className="text-[14px] text-muted-foreground">{row.label}</span>
+                  <span className="text-[14px] font-semibold text-foreground text-right">{row.value}</span>
                 </div>
               ))}
             </div>
@@ -2169,14 +2169,14 @@ export function ContextPanel() {
                   href={data.sfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-[11px] font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+                  className="flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-[14px] font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
                 >
                   Open in Salesforce ↗
                 </a>
               )}
               <button
                 onClick={focusWithPenny}
-                className="flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[14px] font-semibold text-primary hover:bg-primary/10 transition-colors"
               >
                 Focus with {TERMS.aiAssistant}
               </button>
@@ -2214,36 +2214,36 @@ export function ContextPanel() {
             <div className="p-5 space-y-5">
               <div className="space-y-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Trend Insight</span>
-                  <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${tc.cls}`}>{tc.label}</span>
-                  <span className={`text-[9px] font-semibold ${uc.cls}`}>{uc.label}</span>
+                  <span className="text-[14px] font-bold  text-muted-foreground/40">Trend Insight</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${tc.cls}`}>{tc.label}</span>
+                  <span className={`text-[14px] font-semibold ${uc.cls}`}>{uc.label}</span>
                 </div>
                 <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.title}</h2>
               </div>
-              <p className="text-[12px] text-muted-foreground leading-relaxed">{data.description}</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{data.description}</p>
               {data.affectedDomains?.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Affected Domains</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Affected Domains</p>
                   <div className="flex flex-wrap gap-1.5">
                     {data.affectedDomains.map((d: string) => (
-                      <span key={d} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{d}</span>
+                      <span key={d} className="text-[14px] border rounded-full px-2 py-0.5 text-muted-foreground">{d}</span>
                     ))}
                   </div>
                 </div>
               )}
               {data.affectedPrograms?.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Affected Programs</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Affected Programs</p>
                   <div className="flex flex-wrap gap-1.5">
                     {data.affectedPrograms.map((p: string) => (
-                      <span key={p} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{p}</span>
+                      <span key={p} className="text-[14px] border rounded-full px-2 py-0.5 text-muted-foreground">{p}</span>
                     ))}
                   </div>
                 </div>
               )}
               <button
                 onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
-                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[14px] font-semibold text-primary hover:bg-primary/10 transition-colors"
               >
                 Focus with {TERMS.aiAssistant}
               </button>
@@ -2263,26 +2263,26 @@ export function ContextPanel() {
             <div className="p-5 space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Domain Health</span>
-                  <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${lc.cls}`}>{lc.label}</span>
+                  <span className="text-[14px] font-bold  text-muted-foreground/40">Domain Health</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${lc.cls}`}>{lc.label}</span>
                   <span className={`text-xl font-bold leading-none ${lc.score}`}>{data.score}</span>
                 </div>
                 <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.domain}</h2>
               </div>
-              {data.summary && <p className="text-[12px] text-muted-foreground leading-relaxed">{data.summary}</p>}
+              {data.summary && <p className="text-[14px] text-muted-foreground leading-relaxed">{data.summary}</p>}
 
               {/* Top next action — surfaced prominently */}
               {firstBad && (
                 <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 p-3 space-y-1">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-[#CC8400]/70">Next Action</p>
-                  <p className="text-[11px] font-semibold text-[#CC8400]/80 leading-snug">{firstBad.label}</p>
-                  <p className="text-[11px] text-[#CC8400]/70 leading-relaxed">{firstBad.detail}</p>
+                  <p className="text-[14px] font-bold  text-[#CC8400]/70">Next Action</p>
+                  <p className="text-[14px] font-semibold text-[#CC8400]/80 leading-snug">{firstBad.label}</p>
+                  <p className="text-[14px] text-[#CC8400]/70 leading-relaxed">{firstBad.detail}</p>
                 </div>
               )}
 
               {data.indicators?.length > 0 && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">All Indicators</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">All Indicators</p>
                   <div className="space-y-1.5">
                     {(data.indicators as { id: string; label: string; status: HealthLevel; detail: string }[]).map(ind => {
                       const ic = HEALTH_LEVEL_CONFIG[ind.status] ?? HEALTH_LEVEL_CONFIG['needs-work'];
@@ -2290,10 +2290,10 @@ export function ContextPanel() {
                         <div key={ind.id} className="flex items-start gap-2">
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1 ${ic.dot}`} />
                           <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-medium text-foreground">{ind.label}</p>
-                            <p className="text-[10px] text-muted-foreground leading-snug">{ind.detail}</p>
+                            <p className="text-[14px] font-medium text-foreground">{ind.label}</p>
+                            <p className="text-[14px] text-muted-foreground leading-snug">{ind.detail}</p>
                           </div>
-                          <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none shrink-0 ${ic.cls}`}>{ic.label}</span>
+                          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none shrink-0 ${ic.cls}`}>{ic.label}</span>
                         </div>
                       );
                     })}
@@ -2307,13 +2307,13 @@ export function ContextPanel() {
                   className="w-full flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group"
                 >
                   <div className="text-left">
-                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Source system</p>
-                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors">
+                    <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Source system</p>
+                    <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">
                       {String(data.sourceSystem ?? '').split(',')[0]?.trim()}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0">
-                    <span className="text-[9px] font-semibold">Open</span>
+                    <span className="text-[14px] font-semibold">Open</span>
                     <ArrowRight className="w-3 h-3" />
                   </div>
                 </button>
@@ -2321,7 +2321,7 @@ export function ContextPanel() {
 
               <button
                 onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
-                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[14px] font-semibold text-primary hover:bg-primary/10 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 Focus with {TERMS.aiAssistant}
@@ -2341,8 +2341,8 @@ export function ContextPanel() {
           <div className="p-5 space-y-4">
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">{data.domain}</span>
-                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${ic.cls}`}>{ic.label}</span>
+                <span className="text-[14px] font-bold  text-muted-foreground/40">{data.domain}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${ic.cls}`}>{ic.label}</span>
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.label}</h2>
             </div>
@@ -2350,8 +2350,8 @@ export function ContextPanel() {
             {/* Next action — prominently shown */}
             {data.detail && (
               <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 p-3 space-y-1">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-[#CC8400]/70">Next Action</p>
-                <p className="text-[12px] text-[#CC8400]/80 leading-relaxed">{data.detail}</p>
+                <p className="text-[14px] font-bold  text-[#CC8400]/70">Next Action</p>
+                <p className="text-[14px] text-[#CC8400]/80 leading-relaxed">{data.detail}</p>
               </div>
             )}
 
@@ -2361,7 +2361,7 @@ export function ContextPanel() {
                 onClick={() => setLocation(actionPath)}
                 className="w-full flex items-center justify-between rounded-lg border border-primary bg-primary/5 px-3 py-2.5 hover:bg-primary/10 transition-colors group"
               >
-                <span className="text-[11px] font-semibold text-primary">{actionLabel}</span>
+                <span className="text-[14px] font-semibold text-primary">{actionLabel}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-primary shrink-0" />
               </button>
             )}
@@ -2373,26 +2373,26 @@ export function ContextPanel() {
                 className="w-full flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group"
               >
                 <div className="text-left">
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Source system</p>
-                  <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors">{data.sourceSystem}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Source system</p>
+                  <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">{data.sourceSystem}</p>
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0">
-                  <span className="text-[9px] font-semibold">Open</span>
+                  <span className="text-[14px] font-semibold">Open</span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
               </button>
             ) : !actionPath ? (
               <div className="rounded-lg border bg-muted/20 p-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground">Source system</span>
-                  <span className="text-[10px] font-semibold text-foreground">{data.sourceSystem}</span>
+                  <span className="text-[14px] text-muted-foreground">Source system</span>
+                  <span className="text-[14px] font-semibold text-foreground">{data.sourceSystem}</span>
                 </div>
               </div>
             ) : null}
 
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(q); }}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[14px] font-semibold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
@@ -2423,21 +2423,21 @@ export function ContextPanel() {
           <div className="p-5 space-y-5">
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">Recommendation · {data.domain}</span>
-                <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${pc.cls}`}>{pc.label}</span>
-                <span className={`text-[9px] font-semibold ${effortCls}`}>{data.effort} effort</span>
+                <span className="text-[14px] font-bold  text-muted-foreground/40">Recommendation · {data.domain}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${pc.cls}`}>{pc.label}</span>
+                <span className={`text-[14px] font-semibold ${effortCls}`}>{data.effort} effort</span>
               </div>
               <h2 className="text-[15px] font-semibold text-foreground leading-snug">{data.action}</h2>
             </div>
 
             {nextSteps.length > 0 && (
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Next Steps</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">Next Steps</p>
                 <div className="space-y-1.5">
                   {nextSteps.map((step: string, i: number) => (
                     <div key={i} className="flex items-start gap-2">
-                      <span className={`text-[9px] font-bold shrink-0 mt-px ${i === 0 ? 'text-primary' : 'text-muted-foreground/50'}`}>{i + 1}.</span>
-                      <p className={`text-[11px] leading-snug ${i === 0 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>{step}</p>
+                      <span className={`text-[14px] font-bold shrink-0 mt-px ${i === 0 ? 'text-primary' : 'text-muted-foreground/50'}`}>{i + 1}.</span>
+                      <p className={`text-[14px] leading-snug ${i === 0 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>{step}</p>
                     </div>
                   ))}
                 </div>
@@ -2446,7 +2446,7 @@ export function ContextPanel() {
 
             {systems.length > 0 && (
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1.5">Systems</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Systems</p>
                 <div className="flex flex-wrap gap-1.5">
                   {systems.map((s: string) => {
                     const route = SOURCE_SYSTEM_ROUTES[s] ?? null;
@@ -2454,12 +2454,12 @@ export function ContextPanel() {
                       <button
                         key={s}
                         onClick={() => setLocation(route)}
-                        className="text-[10px] border rounded-full px-2 py-0.5 text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+                        className="text-[14px] border rounded-full px-2 py-0.5 text-primary border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
                       >
                         {s} →
                       </button>
                     ) : (
-                      <span key={s} className="text-[10px] border rounded-full px-2 py-0.5 text-muted-foreground">{s}</span>
+                      <span key={s} className="text-[14px] border rounded-full px-2 py-0.5 text-muted-foreground">{s}</span>
                     );
                   })}
                 </div>
@@ -2468,13 +2468,13 @@ export function ContextPanel() {
 
             <button
               onClick={handleFocusWithPenny}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2.5 text-[14px] font-semibold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Focus with {TERMS.aiAssistant}
             </button>
             {firstRoute && (
-              <p className="text-center text-[9px] text-muted-foreground/50 -mt-3">
+              <p className="text-center text-[14px] text-muted-foreground/50 -mt-3">
                 Opens {firstSystem} and starts execution
               </p>
             )}
@@ -2489,7 +2489,7 @@ export function ContextPanel() {
         <div className="p-5 space-y-6">
           <div className="space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline" className="bg-white uppercase tracking-wider text-[10px]">
+              <Badge variant="outline" className="bg-white  text-[14px]">
                 {type === 'penny' && `${TERMS.aiAssistant} Capability`}
                 {type === 'trailOs' && 'Trail OS Capability'}
                 {type === 'demand' && 'Demand Stage'}
@@ -2508,14 +2508,14 @@ export function ContextPanel() {
 
             {data.whyItMatters && (
               <div>
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Why It Matters</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Why It Matters</span>
                 <p className="text-sm text-foreground">{data.whyItMatters}</p>
               </div>
             )}
 
             {data.keyFacts && data.keyFacts.length > 0 && (
               <div className="space-y-1">
-                <span className="block text-xs font-semibold text-foreground uppercase mb-1">Key Facts</span>
+                <span className="block text-sm font-semibold text-foreground  mb-1">Key Facts</span>
                 <ul className="list-disc pl-4 space-y-1 text-sm text-muted-foreground">
                   {data.keyFacts.map((fact: string, i: number) => <li key={i}>{fact}</li>)}
                 </ul>
@@ -2524,7 +2524,7 @@ export function ContextPanel() {
 
             {data.programs && data.programs.length > 0 && (
               <div className="space-y-2">
-                <span className="block text-xs font-semibold text-foreground uppercase">Programs Impacted</span>
+                <span className="block text-sm font-semibold text-foreground ">Programs Impacted</span>
                 <div className="flex flex-wrap gap-1">
                   {data.programs.map((p: string) => <Badge key={p} variant="secondary">{p}</Badge>)}
                 </div>
@@ -2533,10 +2533,10 @@ export function ContextPanel() {
 
             {data.relatedConcepts && data.relatedConcepts.length > 0 && (
               <div className="space-y-2">
-                <span className="block text-xs font-semibold text-foreground uppercase">Related Concepts</span>
+                <span className="block text-sm font-semibold text-foreground ">Related Concepts</span>
                 <div className="flex flex-wrap gap-1">
                   {data.relatedConcepts.map((c: any, i: number) => (
-                    <Badge key={i} variant="outline" className="bg-white border-primary/20 text-xs">
+                    <Badge key={i} variant="outline" className="bg-white border-primary/20 text-sm">
                       {c.label}
                     </Badge>
                   ))}
@@ -2547,15 +2547,15 @@ export function ContextPanel() {
 
             {data.whatBreaksIfMissing && (
               <div className="bg-[#FFF3E0] border border-[#FFF3E0] rounded-md p-3">
-                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">What Breaks If Missing</span>
+                <span className="block text-[14px] font-bold text-[#CC8400]  mb-1">What Breaks If Missing</span>
                 <p className="text-sm text-[#CC8400] leading-tight">{data.whatBreaksIfMissing}</p>
               </div>
             )}
 
             {data.confidence === 'needs-review' && (
               <div className="bg-[#FFF3E0]/50 border border-[#FFD08A] rounded-md p-3">
-                <span className="block text-[10px] font-bold text-[#CC8400] uppercase mb-1">Source Mapping Note</span>
-                <p className="text-xs text-[#CC8400] leading-tight">Some details in this brief require source mapping. Treat operational specifics as preliminary.</p>
+                <span className="block text-[14px] font-bold text-[#CC8400]  mb-1">Source Mapping Note</span>
+                <p className="text-sm text-[#CC8400] leading-tight">Some details in this brief require source mapping. Treat operational specifics as preliminary.</p>
               </div>
             )}
 
@@ -2605,7 +2605,7 @@ export function ContextPanel() {
           {/* Icon + label */}
           <Layers className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary/70 transition-colors duration-200" />
           <span
-            className="text-[9px] font-bold tracking-widest uppercase select-none transition-colors duration-200
+            className="text-[14px] font-bold  select-none transition-colors duration-200
               text-muted-foreground/40 group-hover:text-primary/70"
             style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
@@ -2681,7 +2681,7 @@ export function ContextPanel() {
               <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
                 nudgeCounts.urgent > 0 ? 'bg-[#CC8400] animate-pulse' : 'bg-primary/25'
               }`} />
-              <span className="text-[10px] text-left leading-tight flex-1 min-w-0 text-muted-foreground/80 group-hover:text-foreground transition-colors">
+              <span className="text-[14px] text-left leading-tight flex-1 min-w-0 text-muted-foreground/80 group-hover:text-foreground transition-colors">
                 {nudgeCounts.urgent > 0 ? (
                   <><span className="font-semibold text-[#CC8400]">{nudgeCounts.urgent} urgent</span>{' · '}{nudgeCounts.total} {TERMS.trailSignals}</>
                 ) : (
@@ -2781,10 +2781,10 @@ function HomeWelcomeGuide() {
       <div className="p-4 space-y-3">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">
             How to use Trail OS
           </p>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Select a section to see what lives there.
           </p>
         </div>
@@ -2806,7 +2806,7 @@ function HomeWelcomeGuide() {
                   onClick={() => setOpen(isOpen ? null : s.label)}
                   className="w-full flex items-center justify-between px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                 >
-                  <span className={`text-[11px] font-semibold ${isOpen ? 'text-primary' : 'text-foreground'}`}>
+                  <span className={`text-[14px] font-semibold ${isOpen ? 'text-primary' : 'text-foreground'}`}>
                     {s.label}
                   </span>
                   <ChevronRight
@@ -2817,10 +2817,10 @@ function HomeWelcomeGuide() {
                 </button>
                 {isOpen && (
                   <div className="px-3 pb-2.5 space-y-2">
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">{s.body}</p>
+                    <p className="text-[14px] text-muted-foreground leading-relaxed">{s.body}</p>
                     <button
                       onClick={() => setLocation(s.path)}
-                      className="flex items-center gap-1 text-[10px] font-medium text-primary hover:underline"
+                      className="flex items-center gap-1 text-[14px] font-medium text-primary hover:underline"
                     >
                       {s.pathLabel}
                       <ArrowRight className="w-2.5 h-2.5" />
@@ -2833,7 +2833,7 @@ function HomeWelcomeGuide() {
         </div>
 
         <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             <strong>Salesforce live</strong> (REST API + PMM confirmed). Agentforce + GA4: Phase 2.
           </p>
         </div>
@@ -2871,22 +2871,22 @@ function CommsBriefGuide() {
       <div className="p-4 space-y-4">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">
             Communications & Collaboration
           </p>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Trail OS and {TERMS.aiAssistant}'s messaging and timing layer. Select any item on the page to open its brief here.
           </p>
         </div>
 
         {/* Operating model */}
         <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">The Operating Model</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60">The Operating Model</p>
           <div className="space-y-1">
             {MODEL.map(m => (
               <div key={m.role} className="flex items-baseline gap-1.5">
-                <span className={`text-[9px] font-bold uppercase tracking-wider w-8 shrink-0 ${m.color}`}>{m.role}</span>
-                <span className="text-[10px] text-muted-foreground">{m.label}</span>
+                <span className={`text-[14px] font-bold  w-8 shrink-0 ${m.color}`}>{m.role}</span>
+                <span className="text-[14px] text-muted-foreground">{m.label}</span>
               </div>
             ))}
           </div>
@@ -2903,8 +2903,8 @@ function CommsBriefGuide() {
               >
                 <Icon className="w-3.5 h-3.5 text-muted-foreground/60 mt-0.5 shrink-0 group-hover:text-primary transition-colors" />
                 <div>
-                  <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors">{p.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{p.desc}</p>
+                  <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">{p.label}</p>
+                  <p className="text-[14px] text-muted-foreground">{p.desc}</p>
                 </div>
               </button>
             );
@@ -2912,7 +2912,7 @@ function CommsBriefGuide() {
         </div>
 
         <div className="rounded-md bg-muted/40 border border-border/60 p-2.5">
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             <strong>Slack live</strong> (@penny active). Google Calendar + Drive OAuth in progress. Google Chat: Phase 2.
           </p>
         </div>
@@ -2934,10 +2934,10 @@ function TrailOSCapabilityGuide() {
       <div className="p-4 space-y-4">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">
             Trail OS Capability Map
           </p>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Select any capability card to open its brief here.
           </p>
         </div>
@@ -2946,10 +2946,10 @@ function TrailOSCapabilityGuide() {
         <div className="rounded-lg border border-border/60 bg-white/70 p-3 space-y-1.5">
           <div className="flex items-center gap-1.5">
             <Database className="w-3.5 h-3.5 text-primary shrink-0" />
-            <p className="text-[11px] font-bold text-foreground">Trail OS</p>
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Infrastructure Layer</span>
+            <p className="text-[14px] font-bold text-foreground">Trail OS</p>
+            <span className="text-[14px] font-semibold  text-muted-foreground/50 ml-1">Infrastructure Layer</span>
           </div>
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             The operational technology foundation coordinating intake, project delivery, documentation, learner-client matching, org readiness, coach visibility, and outcomes measurement across all programs.
           </p>
         </div>
@@ -2958,23 +2958,23 @@ function TrailOSCapabilityGuide() {
         <div className="rounded-lg border border-border/60 bg-white/70 p-3 space-y-1.5">
           <div className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-secondary shrink-0" />
-            <p className="text-[11px] font-bold text-foreground">{TERMS.aiAssistant}</p>
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Intelligence Layer</span>
+            <p className="text-[14px] font-bold text-foreground">{TERMS.aiAssistant}</p>
+            <span className="text-[14px] font-semibold  text-muted-foreground/50 ml-1">Intelligence Layer</span>
           </div>
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             The AI learning and guidance layer embedded across all programs, providing personalised coaching, skill translation, and learning intelligence at every stage of the learner journey.
           </p>
         </div>
 
         {/* Architecture flow */}
         <div className="rounded-lg border border-border/60 bg-muted/30 p-3 space-y-2">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">Ecosystem Architecture</p>
-          <div className="flex items-center gap-1.5 text-[10px] font-medium flex-wrap">
+          <p className="text-[14px] font-bold  text-muted-foreground/50">Ecosystem Architecture</p>
+          <div className="flex items-center gap-1.5 text-[14px] font-medium flex-wrap">
             <span className="flex items-center gap-1 text-primary"><Database className="w-3 h-3" />Trail OS</span>
-            <span className="text-muted-foreground/40 italic text-[9px]">powers</span>
+            <span className="text-muted-foreground/40 italic text-[14px]">powers</span>
             <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
             <span className="flex items-center gap-1 text-secondary"><Sparkles className="w-3 h-3" />{TERMS.aiAssistant}</span>
-            <span className="text-muted-foreground/40 italic text-[9px]">guides</span>
+            <span className="text-muted-foreground/40 italic text-[14px]">guides</span>
             <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
             <span className="flex items-center gap-1 text-foreground/70"><Layers className="w-3 h-3" />Programs</span>
           </div>
@@ -2984,7 +2984,7 @@ function TrailOSCapabilityGuide() {
         <div className="space-y-1.5">
           <button
             onClick={() => setLocation('/navigator/knowledge-relationships')}
-            className="flex items-center gap-1 text-[10px] font-medium text-primary hover:underline w-full text-left"
+            className="flex items-center gap-1 text-[14px] font-medium text-primary hover:underline w-full text-left"
           >
             View full Knowledge Relationships map
             <ArrowRight className="w-2.5 h-2.5" />

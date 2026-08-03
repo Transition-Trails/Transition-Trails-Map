@@ -281,18 +281,18 @@ function IntegrationCard({ card, navigate }: { card: SetupCard; navigate: (href:
             <Icon className="w-4 h-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-bold text-foreground leading-tight">{card.name}</p>
-            <p className="text-[10px] text-muted-foreground leading-tight">{card.tagline}</p>
+            <p className="text-[14px] font-bold text-foreground leading-tight">{card.name}</p>
+            <p className="text-[14px] text-muted-foreground leading-tight">{card.tagline}</p>
           </div>
         </div>
         <div className={`flex items-center gap-1.5 border rounded-full px-2 py-0.5 flex-shrink-0 ${cfg.cls}`}>
           <div className={`w-1.5 h-1.5 rounded-full ${cfg.dot} flex-shrink-0`} />
-          <span className={`text-[10px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
+          <span className={`text-[14px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
         </div>
       </div>
 
       {/* Detail */}
-      <p className="text-[11px] text-muted-foreground leading-relaxed">{card.detail}</p>
+      <p className="text-[14px] text-muted-foreground leading-relaxed">{card.detail}</p>
 
       {/* Next step */}
       {card.needs && (
@@ -301,13 +301,13 @@ function IntegrationCard({ card, navigate }: { card: SetupCard; navigate: (href:
             ? <ChevronRight className="w-3 h-3 text-[#2F6F7E] flex-shrink-0 mt-0.5" />
             : <AlertTriangle className="w-3 h-3 text-[#CC8400] flex-shrink-0 mt-0.5" />
           }
-          <p className={`text-[10px] leading-snug ${isLive ? 'text-[#2F6F7E]' : 'text-[#CC8400]'}`}>{card.needs}</p>
+          <p className={`text-[14px] leading-snug ${isLive ? 'text-[#2F6F7E]' : 'text-[#CC8400]'}`}>{card.needs}</p>
         </div>
       )}
 
       {/* Footer: owner + last check + action */}
       <div className="flex items-center justify-between gap-2 mt-auto pt-0.5">
-        <div className="flex items-center gap-2 text-[10px] text-muted-foreground/70">
+        <div className="flex items-center gap-2 text-[14px] text-muted-foreground/70">
           <span>{card.owner}</span>
           {card.lastCheck && (
             <>
@@ -320,7 +320,7 @@ function IntegrationCard({ card, navigate }: { card: SetupCard; navigate: (href:
         </div>
         <button
           onClick={() => navigate(card.href)}
-          className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors flex-shrink-0"
+          className="flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/80 transition-colors flex-shrink-0"
         >
           {card.action}<ChevronRight className="w-3 h-3" />
         </button>
@@ -341,12 +341,12 @@ function ReadinessRow({ link, navigate }: { link: ReadinessLink; navigate: (href
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-0.5">
-          <p className="text-[12px] font-bold text-foreground leading-tight">{link.name}</p>
-          <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 ${link.badgeCls}`}>{link.badge}</span>
+          <p className="text-[14px] font-bold text-foreground leading-tight">{link.name}</p>
+          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 flex-shrink-0 ${link.badgeCls}`}>{link.badge}</span>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-snug line-clamp-2">{link.detail}</p>
+        <p className="text-[14px] text-muted-foreground leading-snug line-clamp-2">{link.detail}</p>
       </div>
-      <div className="flex items-center gap-1 text-[11px] font-semibold text-primary flex-shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1 text-[14px] font-semibold text-primary flex-shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
         {link.action}<ChevronRight className="w-3 h-3" />
       </div>
     </button>
@@ -368,21 +368,21 @@ export default function AdminSetup() {
       {/* ── Compact admin header ── */}
       <div className="flex-shrink-0 flex items-center justify-between gap-4 px-5 pt-3 pb-2.5 border-b bg-card">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration · Setup</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration · Setup</p>
           <h1 className="text-[15px] font-semibold text-foreground leading-snug">Integration & Readiness</h1>
-          <p className="text-[12px] text-muted-foreground mt-0.5">
+          <p className="text-[14px] text-muted-foreground mt-0.5">
             One view of every integration, configuration requirement, and readiness workspace.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
             <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
-            <span className="text-[11px] font-semibold text-[#2F6B3F]">{liveCount} live</span>
+            <span className="text-[14px] font-semibold text-[#2F6B3F]">{liveCount} live</span>
           </div>
           {(needsCount + partialCount) > 0 && (
             <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2.5 py-1">
               <div className="w-1.5 h-1.5 rounded-full bg-[#FFF3E0]0" />
-              <span className="text-[11px] font-semibold text-[#CC8400]">{needsCount + partialCount} need action</span>
+              <span className="text-[14px] font-semibold text-[#CC8400]">{needsCount + partialCount} need action</span>
             </div>
           )}
         </div>
@@ -396,7 +396,7 @@ export default function AdminSetup() {
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Live Connections</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Live Connections</p>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               {LIVE_INTEGRATIONS.map(card => (
@@ -409,8 +409,8 @@ export default function AdminSetup() {
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Needs Setup</p>
-              <Badge variant="secondary" className="text-[10px] font-semibold">{needsCount} pending</Badge>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Needs Setup</p>
+              <Badge variant="secondary" className="text-[14px] font-semibold">{needsCount} pending</Badge>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               {NEEDS_CONFIG.map(card => (
@@ -423,7 +423,7 @@ export default function AdminSetup() {
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <Clock className="w-3.5 h-3.5 text-slate-500" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Phase 2 — Planned</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Phase 2 — Planned</p>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {PHASE_2.map(item => (
@@ -431,10 +431,10 @@ export default function AdminSetup() {
                   <div className="w-1.5 h-1.5 rounded-full bg-[#C8CBC6] flex-shrink-0 mt-1.5" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2 mb-0.5">
-                      <p className="text-[12px] font-semibold text-muted-foreground/70 leading-tight">{item.name}</p>
-                      <span className="text-[9px] font-bold bg-slate-100 border border-slate-200 text-slate-500 rounded-full px-1.5 py-0.5 flex-shrink-0 whitespace-nowrap">{item.phase}</span>
+                      <p className="text-[14px] font-semibold text-muted-foreground/70 leading-tight">{item.name}</p>
+                      <span className="text-[14px] font-bold bg-slate-100 border border-slate-200 text-slate-500 rounded-full px-1.5 py-0.5 flex-shrink-0 whitespace-nowrap">{item.phase}</span>
                     </div>
-                    <p className="text-[10px] text-muted-foreground/60 leading-snug">{item.tagline} — {item.detail}</p>
+                    <p className="text-[14px] text-muted-foreground/60 leading-snug">{item.tagline} — {item.detail}</p>
                   </div>
                 </div>
               ))}
@@ -445,7 +445,7 @@ export default function AdminSetup() {
           <div>
             <div className="flex items-center gap-2 mb-2.5">
               <Plug className="w-3.5 h-3.5 text-muted-foreground/60" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Platform Readiness & Governance</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Platform Readiness & Governance</p>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {READINESS_LINKS.map(link => (

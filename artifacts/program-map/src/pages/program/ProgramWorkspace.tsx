@@ -14,10 +14,10 @@ import type { Program } from '@/data/programs';
 
 // ── Shared utilities ───────────────────────────────────────────────────────────
 function RichText({ html, className }: { html: string | null | undefined; className?: string }) {
-  if (!html) return <span className="text-[12px] text-muted-foreground">—</span>;
+  if (!html) return <span className="text-[14px] text-muted-foreground">—</span>;
   return (
     <div
-      className={`text-[12px] leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:mb-2 [&_li]:mb-0.5 [&_strong]:font-semibold [&_em]:italic [&_br]:block [&_br]:mb-1 ${className ?? ''}`}
+      className={`text-[14px] leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:mb-2 [&_li]:mb-0.5 [&_strong]:font-semibold [&_em]:italic [&_br]:block [&_br]:mb-1 ${className ?? ''}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
@@ -26,8 +26,8 @@ function RichText({ html, className }: { html: string | null | undefined; classN
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 w-28 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[12px] text-foreground flex-1">{value}</span>
+      <span className="text-[14px] font-bold  text-muted-foreground/60 w-28 shrink-0 mt-0.5">{label}</span>
+      <span className="text-[14px] text-foreground flex-1">{value}</span>
     </div>
   );
 }
@@ -35,18 +35,18 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">{title}</p>
+      <p className="text-[14px] font-bold  text-muted-foreground/60">{title}</p>
       {children}
     </div>
   );
 }
 
 function ChipList({ items }: { items: string[] }) {
-  if (!items?.length) return <p className="text-[11px] text-muted-foreground">—</p>;
+  if (!items?.length) return <p className="text-[14px] text-muted-foreground">—</p>;
   return (
     <div className="flex flex-wrap gap-1">
       {items.map(item => (
-        <span key={item} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-foreground">
+        <span key={item} className="inline-flex items-center px-2 py-0.5 rounded text-[14px] bg-muted border border-border text-foreground">
           {item}
         </span>
       ))}
@@ -68,14 +68,14 @@ function OverviewTab({ p }: { p: Program }) {
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-3xl">
         {p.executiveSummary && (
-          <div className="text-[13px] text-muted-foreground italic leading-relaxed border-l-4 border-primary/20 pl-4 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-0.5 [&_strong]:font-semibold" dangerouslySetInnerHTML={{ __html: p.executiveSummary }} />
+          <div className="text-[14px] text-muted-foreground italic leading-relaxed border-l-4 border-primary/20 pl-4 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-0.5 [&_strong]:font-semibold" dangerouslySetInnerHTML={{ __html: p.executiveSummary }} />
         )}
         {sfUrl && (
           <a
             href={sfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-primary hover:underline"
           >
             <ExternalLink className="w-3 h-3" />
             View in Salesforce
@@ -100,7 +100,7 @@ function OverviewTab({ p }: { p: Program }) {
             {p.expectedOutcomes
               ? <RichText html={p.expectedOutcomes} className="text-foreground" />
               : <ul className="space-y-1">
-                  {p.outcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-[#2F6B3F] mt-0.5">✓</span>{o}</li>)}
+                  {p.outcomes.map((o, i) => <li key={i} className="text-[14px] text-foreground flex items-start gap-2"><span className="text-[#2F6B3F] mt-0.5">✓</span>{o}</li>)}
                 </ul>
             }
           </Section>
@@ -122,7 +122,7 @@ function OverviewTab({ p }: { p: Program }) {
         )}
         {!isEveryday && p.whatBreaksIfMissing && (
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
-            <p className="text-[10px] font-bold text-[#A93F2F] uppercase mb-1">What Breaks if Missing</p>
+            <p className="text-[14px] font-bold text-[#A93F2F]  mb-1">What Breaks if Missing</p>
             <RichText html={p.whatBreaksIfMissing} className="text-[#A93F2F]" />
           </div>
         )}
@@ -137,10 +137,10 @@ function BlueprintTab({ p }: { p: Program }) {
     <ScrollArea className="h-full">
       <div className="p-5 space-y-5 max-w-3xl">
         <div className={`rounded-lg border px-4 py-3 ${isCompliant ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#FFD08A] bg-[#FFF3E0]'}`}>
-          <p className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isCompliant ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
+          <p className={`text-[14px] font-bold  mb-1 ${isCompliant ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
             Blueprint Compliance — {isCompliant ? 'Confirmed' : 'Needs Review'}
           </p>
-          <p className={`text-[12px] leading-relaxed ${isCompliant ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
+          <p className={`text-[14px] leading-relaxed ${isCompliant ? 'text-[#245531]' : 'text-[#CC8400]'}`}>
             {isCompliant
               ? `${p.name} is confirmed compliant with Program Blueprint v2.`
               : `${p.name} has been flagged for blueprint review. Sprint structure migration may be pending.`}
@@ -185,7 +185,7 @@ function ModuleStatusLabel({ status }: { status: string | null }) {
     status === 'Not Started' ? 'text-gray-500 bg-gray-50 border-gray-200'          :
                                'text-gray-500 bg-gray-50 border-gray-200';
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border shrink-0 ${cls}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border shrink-0 ${cls}`}>
       {status}
     </span>
   );
@@ -204,7 +204,7 @@ function CurriculumTab({ programName }: { programName: string }) {
     return (
       <div className="flex items-center justify-center h-full gap-2">
         <RefreshCw className="w-4 h-4 text-primary/40 animate-spin" />
-        <span className="text-[11px] text-muted-foreground">Loading curriculum from Salesforce…</span>
+        <span className="text-[14px] text-muted-foreground">Loading curriculum from Salesforce…</span>
       </div>
     );
   }
@@ -213,7 +213,7 @@ function CurriculumTab({ programName }: { programName: string }) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-2 p-8 text-center">
         <GraduationCap className="w-8 h-8 text-muted-foreground/30" />
-        <p className="text-[12px] text-muted-foreground">No curriculum found for this program in Salesforce.</p>
+        <p className="text-[14px] text-muted-foreground">No curriculum found for this program in Salesforce.</p>
       </div>
     );
   }
@@ -226,37 +226,37 @@ function CurriculumTab({ programName }: { programName: string }) {
         <div className="rounded-lg border border-border bg-background px-4 py-3 space-y-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase text-muted-foreground/50 tracking-wide mb-0.5">Course</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 tracking-wide mb-0.5">Course</p>
               <h2 className="text-[14px] font-bold text-foreground leading-tight">
                 {course?.Course_Title__c ?? byProgram.data.course.Course_Title__c ?? byProgram.data.course.Name}
               </h2>
             </div>
             {(course?.Status__c ?? byProgram.data.course.Status__c) && (
-              <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border bg-muted text-muted-foreground border-border mt-1">
+              <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold  border bg-muted text-muted-foreground border-border mt-1">
                 {course?.Status__c ?? byProgram.data.course.Status__c}
               </span>
             )}
           </div>
           {(course?.Estimated_Start_Date__c || course?.Estimated_End_Date__c) && (
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[14px] text-muted-foreground">
               {course.Estimated_Start_Date__c ?? '?'} → {course.Estimated_End_Date__c ?? '?'}
             </p>
           )}
           {course?.Total_Modules__c != null && (
-            <p className="text-[11px] text-muted-foreground">{course.Total_Modules__c} modules</p>
+            <p className="text-[14px] text-muted-foreground">{course.Total_Modules__c} modules</p>
           )}
           {/* External links */}
           {(course?.Google_Drive_Folder__c || course?.Canva_Course_Folder__c) && (
             <div className="flex items-center gap-3 pt-1">
               {course.Google_Drive_Folder__c && (
                 <a href={course.Google_Drive_Folder__c} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline">
+                   className="flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline">
                   <ExternalLink className="w-3 h-3" /> Google Drive
                 </a>
               )}
               {course.Canva_Course_Folder__c && (
                 <a href={course.Canva_Course_Folder__c} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline">
+                   className="flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline">
                   <ExternalLink className="w-3 h-3" /> Canva Folder
                 </a>
               )}
@@ -291,7 +291,7 @@ function CurriculumTab({ programName }: { programName: string }) {
                   <div key={m.Id} className="rounded-lg border border-border bg-background px-3 py-2.5 space-y-1.5">
                     <div className="flex items-start gap-2">
                       <ModuleStatusDot status={m.Status__c} />
-                      <span className="text-[12px] text-foreground font-medium flex-1 leading-snug">{m.Name}</span>
+                      <span className="text-[14px] text-foreground font-medium flex-1 leading-snug">{m.Name}</span>
                       <ModuleStatusLabel status={m.Status__c} />
                     </div>
                     {pct > 0 && (
@@ -302,7 +302,7 @@ function CurriculumTab({ programName }: { programName: string }) {
                             style={{ width: `${Math.min(pct, 100)}%` }}
                           />
                         </div>
-                        <span className="text-[9px] font-bold tabular-nums text-muted-foreground">{Math.round(pct)}%</span>
+                        <span className="text-[14px] font-bold tabular-nums text-muted-foreground">{Math.round(pct)}%</span>
                       </div>
                     )}
                   </div>
@@ -329,7 +329,7 @@ function PennyTab({ p }: { p: Program }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">
+        <p className="text-[14px] text-muted-foreground">
           {isEveryday
             ? `${TERMS.aiAssistant} features available in this program to help you with coaching, feedback, and learning activities.`
             : `${TERMS.aiAssistant} capabilities that are activated or planned for this program.`}
@@ -338,8 +338,8 @@ function PennyTab({ p }: { p: Program }) {
           <div className="rounded-lg border border-border bg-muted/20 px-3 py-2.5 space-y-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</p>
-                <p className="text-[10px] text-muted-foreground">{status} for this program</p>
+                <p className="text-[14px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</p>
+                <p className="text-[14px] text-muted-foreground">{status} for this program</p>
               </div>
               {isSaving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
             </div>
@@ -349,7 +349,7 @@ function PennyTab({ p }: { p: Program }) {
                   key={opt.value}
                   onClick={() => setStatus(opt.value)}
                   disabled={isSaving}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[10px] font-semibold transition-colors focus:outline-none disabled:opacity-50 ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[14px] font-semibold transition-colors focus:outline-none disabled:opacity-50 ${
                     status === opt.value
                       ? opt.badge + ' shadow-sm'
                       : 'bg-background text-muted-foreground border-border hover:border-primary/30'
@@ -365,7 +365,7 @@ function PennyTab({ p }: { p: Program }) {
 
         <Section title={isEveryday ? `Available ${TERMS.aiAssistant} Features` : `Active ${TERMS.aiAssistant} Features`}>
           {!isActive ? (
-            <p className="text-[12px] text-muted-foreground italic">
+            <p className="text-[14px] text-muted-foreground italic">
               {status === 'Planned'
                 ? `${TERMS.aiAssistant} intelligence is planned for this program but not yet active.`
                 : `${TERMS.aiAssistant} intelligence is not planned for this program.`}
@@ -375,13 +375,13 @@ function PennyTab({ p }: { p: Program }) {
               {p.pennyFeatures.map(f => (
                 <div key={f} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F] shrink-0" />
-                  <span className="text-[12px] text-foreground font-medium">{f}</span>
-                  <span className="ml-auto text-[10px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded px-1.5 py-0.5">Active</span>
+                  <span className="text-[14px] text-foreground font-medium">{f}</span>
+                  <span className="ml-auto text-[14px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded px-1.5 py-0.5">Active</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-[12px] text-muted-foreground">No {TERMS.aiAssistant} features mapped yet.</p>
+            <p className="text-[14px] text-muted-foreground">No {TERMS.aiAssistant} features mapped yet.</p>
           )}
         </Section>
         {!isEveryday && (
@@ -389,14 +389,14 @@ function PennyTab({ p }: { p: Program }) {
             {p.relatedConcepts?.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {p.relatedConcepts.map((rc, i) => (
-                  <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-foreground">
+                  <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-[14px] bg-muted border border-border text-foreground">
                     {rc.label}
                     <span className="ml-1 text-muted-foreground/60">{rc.type}</span>
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-[12px] text-muted-foreground">No related concepts mapped.</p>
+              <p className="text-[14px] text-muted-foreground">No related concepts mapped.</p>
             )}
           </Section>
         )}
@@ -421,10 +421,10 @@ function SystemsTab({ p }: { p: Program }) {
         {systems.map(s => (
           <div key={s.name} className={`rounded-lg border p-3 ${s.cls}`}>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[12px] font-bold text-foreground">{s.name}</span>
-              <span className={`text-[9px] font-bold border rounded px-1.5 py-0.5 ${s.badge}`}>{s.status}</span>
+              <span className="text-[14px] font-bold text-foreground">{s.name}</span>
+              <span className={`text-[14px] font-bold border rounded px-1.5 py-0.5 ${s.badge}`}>{s.status}</span>
             </div>
-            <p className="text-[11px] text-muted-foreground">{s.detail}</p>
+            <p className="text-[14px] text-muted-foreground">{s.detail}</p>
           </div>
         ))}
       </div>
@@ -449,15 +449,15 @@ function HealthTab({ p }: { p: Program }) {
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
             <div className="flex items-center gap-2.5">
               <HealthDot health={ind.status} />
-              <span className="text-[12px] font-medium text-foreground">{ind.label}</span>
+              <span className="text-[14px] font-medium text-foreground">{ind.label}</span>
             </div>
-            <span className="text-[11px] text-muted-foreground text-right max-w-xs">{ind.note}</span>
+            <span className="text-[14px] text-muted-foreground text-right max-w-xs">{ind.note}</span>
           </div>
         ))}
         <div className="rounded-lg border border-muted p-3 mt-2">
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1">Source of Truth</p>
-          <p className="text-[12px] text-foreground">{p.sourceDoc}</p>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Authoritative record: Salesforce</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Source of Truth</p>
+          <p className="text-[14px] text-foreground">{p.sourceDoc}</p>
+          <p className="text-[14px] text-muted-foreground mt-0.5">Authoritative record: Salesforce</p>
         </div>
       </div>
     </ScrollArea>
@@ -506,13 +506,13 @@ export default function ProgramWorkspace() {
           <WifiOff className="w-5 h-5 text-[#A93F2F]" />
         </div>
         <div>
-          <p className="text-[13px] font-semibold text-foreground mb-1">Could not load programs</p>
-          <p className="text-[11px] text-muted-foreground">Salesforce is unreachable. Check your connection and try again.</p>
+          <p className="text-[14px] font-semibold text-foreground mb-1">Could not load programs</p>
+          <p className="text-[14px] text-muted-foreground">Salesforce is unreachable. Check your connection and try again.</p>
         </div>
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-[11px] font-semibold text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-[14px] font-semibold text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-3 h-3 ${isFetching ? 'animate-spin' : ''}`} />
           Retry
@@ -525,7 +525,7 @@ export default function ProgramWorkspace() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-2">
         <RefreshCw className="w-5 h-5 text-primary/40 animate-spin" />
-        <p className="text-[11px] text-muted-foreground">Loading programs from Salesforce…</p>
+        <p className="text-[14px] text-muted-foreground">Loading programs from Salesforce…</p>
       </div>
     );
   }

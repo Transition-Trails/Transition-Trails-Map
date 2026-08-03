@@ -83,7 +83,7 @@ function LogRow({ log }: { log: PennyLogRow }) {
         <div className="flex items-start gap-3">
           {/* Time */}
           <div className="shrink-0 text-right w-[72px] pt-0.5">
-            <p className="text-[11px] font-mono text-muted-foreground">{formatTime(log.createdAt)}</p>
+            <p className="text-[14px] font-mono text-muted-foreground">{formatTime(log.createdAt)}</p>
           </div>
 
           {/* Spark dot */}
@@ -93,25 +93,25 @@ function LogRow({ log }: { log: PennyLogRow }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               {log.learnerName && (
-                <span className="text-[12px] font-semibold text-foreground">{log.learnerName}</span>
+                <span className="text-[14px] font-semibold text-foreground">{log.learnerName}</span>
               )}
               {log.userTier && (
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${tierColor(log.userTier)}`}>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${tierColor(log.userTier)}`}>
                   {tierLabel(log.userTier)}
                 </span>
               )}
               {log.durationMs !== null && (
-                <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                <span className="flex items-center gap-0.5 text-[14px] text-muted-foreground">
                   <Zap className="w-2.5 h-2.5" />{log.durationMs}ms
                 </span>
               )}
               {log.model && (
-                <span className="text-[10px] text-muted-foreground font-mono truncate">
+                <span className="text-[14px] text-muted-foreground font-mono truncate">
                   {log.model.replace('models/', '')}
                 </span>
               )}
             </div>
-            <p className="text-[12px] text-foreground font-medium leading-snug line-clamp-2">
+            <p className="text-[14px] text-foreground font-medium leading-snug line-clamp-2">
               {log.userMessage}
             </p>
           </div>
@@ -126,27 +126,27 @@ function LogRow({ log }: { log: PennyLogRow }) {
       {expanded && (
         <div className="border-t border-border/50 px-4 py-3 space-y-3 bg-muted/20">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">Query</p>
-            <p className="text-[12px] text-foreground leading-relaxed">{log.userMessage}</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Query</p>
+            <p className="text-[14px] text-foreground leading-relaxed">{log.userMessage}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">
               {TERMS.aiAssistant} Response
             </p>
-            <p className="text-[12px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{log.pennyResponse}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{log.pennyResponse}</p>
           </div>
           {(log.sfContactId || log.trailId || log.contextRoute) && (
             <div className="flex flex-wrap gap-3 pt-1 border-t border-border/30">
               {log.sfContactId && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase text-muted-foreground/50">SF Contact</p>
-                  <p className="text-[11px] font-mono text-muted-foreground">{log.sfContactId}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50">SF Contact</p>
+                  <p className="text-[14px] font-mono text-muted-foreground">{log.sfContactId}</p>
                 </div>
               )}
               {log.trailId && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase text-muted-foreground/50">Trail</p>
-                  <p className="text-[11px] text-muted-foreground">{log.trailId}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50">Trail</p>
+                  <p className="text-[14px] text-muted-foreground">{log.trailId}</p>
                 </div>
               )}
             </div>
@@ -200,7 +200,7 @@ export default function PennyLogs() {
               <Brain className="w-4 h-4 text-primary" />
               <h2 className="text-sm font-semibold text-foreground">{TERMS.aiAssistant} Interaction Log</h2>
             </div>
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
               <CalendarDays className="w-3 h-3" />
               <span>{today}</span>
               {!loading && (
@@ -212,14 +212,14 @@ export default function PennyLogs() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-md px-2 py-1">
+            <span className="flex items-center gap-1.5 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-md px-2 py-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               Live · DB
             </span>
             <button
               onClick={() => void fetchLogs(true)}
               disabled={refreshing}
-              className="flex items-center gap-1.5 text-[11px] border border-border rounded-md px-2.5 py-1.5 hover:bg-muted/40 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 text-[14px] border border-border rounded-md px-2.5 py-1.5 hover:bg-muted/40 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
@@ -236,8 +236,8 @@ export default function PennyLogs() {
 
         {!loading && error && (
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 text-center space-y-1">
-            <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
-            <p className="text-[11px] text-[#A93F2F]/70">
+            <p className="text-[14px] text-[#A93F2F] font-medium">{error}</p>
+            <p className="text-[14px] text-[#A93F2F]/70">
               Check the API server — logs are stored in the platform database.
             </p>
           </div>
@@ -246,13 +246,13 @@ export default function PennyLogs() {
         {!loading && !error && logs.length === 0 && (
           <div className="rounded-lg border border-dashed border-border bg-card p-10 text-center space-y-2">
             <Sparkles className="w-6 h-6 text-muted-foreground/30 mx-auto" />
-            <p className="text-[12px] font-medium text-muted-foreground">No interactions logged today yet.</p>
-            <p className="text-[11px] text-muted-foreground/60">
+            <p className="text-[14px] font-medium text-muted-foreground">No interactions logged today yet.</p>
+            <p className="text-[14px] text-muted-foreground/60">
               Every query sent to {TERMS.aiAssistant} will appear here automatically.
             </p>
             <button
               onClick={() => navigate('/penny')}
-              className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-primary hover:underline"
+              className="mt-2 inline-flex items-center gap-1.5 text-[14px] font-medium text-primary hover:underline"
             >
               <Sparkles className="w-3 h-3" /> Ask {TERMS.aiAssistant} something →
             </button>
@@ -292,7 +292,7 @@ export default function PennyLogs() {
                   <s.icon className={`w-4 h-4 shrink-0 ${s.color}`} />
                   <div>
                     <p className={`text-base font-semibold ${s.color}`}>{s.value}</p>
-                    <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+                    <p className="text-[14px] text-muted-foreground">{s.sub}</p>
                   </div>
                 </div>
               ))}
@@ -304,7 +304,7 @@ export default function PennyLogs() {
             </div>
 
             {logs.length >= 100 && (
-              <p className="text-center text-[11px] text-muted-foreground/60 pb-2">
+              <p className="text-center text-[14px] text-muted-foreground/60 pb-2">
                 Showing 100 most recent today. All-time total: {total}.
               </p>
             )}

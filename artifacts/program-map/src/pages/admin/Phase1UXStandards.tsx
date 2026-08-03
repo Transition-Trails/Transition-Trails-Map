@@ -430,20 +430,20 @@ const COLOR_MAP: Record<string, { bg: string; icon: string; badge: string; borde
 function StandardRow({ std }: { std: Standard }) {
   return (
     <div className="py-3.5 border-b last:border-0">
-      <p className="text-[13px] font-semibold text-foreground leading-snug mb-1">{std.rule}</p>
-      <p className="text-[12px] text-muted-foreground leading-relaxed mb-2">{std.rationale}</p>
+      <p className="text-[14px] font-semibold text-foreground leading-snug mb-1">{std.rule}</p>
+      <p className="text-[14px] text-muted-foreground leading-relaxed mb-2">{std.rationale}</p>
       {(std.doExample || std.dontExample) && (
         <div className="grid grid-cols-2 gap-2 mt-2">
           {std.doExample && (
             <div className="flex gap-1.5 rounded-lg bg-[#E6F0EA] border border-[#E6F0EA] px-2.5 py-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
-              <p className="text-[11px] text-[#245531] leading-relaxed">{std.doExample}</p>
+              <p className="text-[14px] text-[#245531] leading-relaxed">{std.doExample}</p>
             </div>
           )}
           {std.dontExample && (
             <div className="flex gap-1.5 rounded-lg bg-[#FBEAE6] border border-[#FBEAE6] px-2.5 py-2">
               <XCircle className="w-3.5 h-3.5 text-[#A93F2F] mt-0.5 flex-shrink-0" />
-              <p className="text-[11px] text-[#A93F2F] leading-relaxed">{std.dontExample}</p>
+              <p className="text-[14px] text-[#A93F2F] leading-relaxed">{std.dontExample}</p>
             </div>
           )}
         </div>
@@ -463,12 +463,12 @@ function SectionCard({ section }: { section: Section }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <p className="text-[13px] font-bold text-foreground">{section.title}</p>
-            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${c.badge}`}>{section.badge}</span>
+            <p className="text-[14px] font-bold text-foreground">{section.title}</p>
+            <span className={`text-[14px] font-semibold px-1.5 py-0.5 rounded border ${c.badge}`}>{section.badge}</span>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-snug">{section.summary}</p>
+          <p className="text-[14px] text-muted-foreground leading-snug">{section.summary}</p>
         </div>
-        <div className="text-[11px] font-semibold text-muted-foreground flex-shrink-0 pt-0.5">
+        <div className="text-[14px] font-semibold text-muted-foreground flex-shrink-0 pt-0.5">
           {section.standards.length} rule{section.standards.length !== 1 ? 's' : ''}
         </div>
       </div>
@@ -493,14 +493,14 @@ export default function Phase1UXStandards() {
           <div>
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-foreground">Trail OS UX Standards</p>
-              <Badge variant="secondary" className="text-[10px]">Internal Reference</Badge>
+              <Badge variant="secondary" className="text-[14px]">Internal Reference</Badge>
             </div>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[14px] text-muted-foreground">
               {SECTIONS.length} sections · {totalRules} rules · Trail OS desktop platform
             </p>
           </div>
         </div>
-        <div className="text-[11px] text-muted-foreground text-right">
+        <div className="text-[14px] text-muted-foreground text-right">
           <p className="font-semibold">Updated Jul 2026</p>
           <p>Apply before shipping any new page or component</p>
         </div>
@@ -508,7 +508,7 @@ export default function Phase1UXStandards() {
 
       {/* Intent strip */}
       <div className="px-5 py-2.5 bg-[#FFF3E0] border-b border-[#FFF3E0] flex-shrink-0">
-        <p className="text-[12px] text-[#CC8400] leading-relaxed">
+        <p className="text-[14px] text-[#CC8400] leading-relaxed">
           <span className="font-semibold">Purpose:</span> These standards capture the design decisions that define how Trail OS looks, behaves, and communicates with its users.
           They exist so that every contributor — human or AI-assisted — preserves the UX quality and consistency of the platform.
           When adding a new page, component, or navigation item, verify it against these rules before shipping.
@@ -523,9 +523,9 @@ export default function Phase1UXStandards() {
 
           {/* Footer note */}
           <div className="rounded-xl border bg-card px-5 py-4 text-center">
-            <p className="text-[12px] text-muted-foreground leading-relaxed">
+            <p className="text-[14px] text-muted-foreground leading-relaxed">
               These standards are maintained in{' '}
-              <code className="text-[11px] bg-muted px-1.5 py-0.5 rounded font-mono">
+              <code className="text-[14px] bg-muted px-1.5 py-0.5 rounded font-mono">
                 src/pages/admin/Phase1UXStandards.tsx
               </code>{' '}
               alongside the app code.

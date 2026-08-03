@@ -27,7 +27,7 @@ function LayerBadge({ layer }: { layer: string }) {
     layer === 'Governance'    ? STATUS_CLASSES.attention.badge   :
                                 'bg-muted text-muted-foreground border-border';
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${cls}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${cls}`}>
       {layer}
     </span>
   );
@@ -37,7 +37,7 @@ function StagePill({ label, color, isLast }: { label: string; color: string; isL
   const cls = lifecycleColorClasses(color).badge;
   return (
     <div className="flex items-center gap-1">
-      <span className={`inline-flex items-center px-2 py-1 rounded border text-[10px] font-bold whitespace-nowrap ${cls}`}>
+      <span className={`inline-flex items-center px-2 py-1 rounded border text-[14px] font-bold whitespace-nowrap ${cls}`}>
         {label}
       </span>
       {!isLast && <ArrowRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />}
@@ -52,7 +52,7 @@ function ReviewStatusBadge({ status }: { status: ReviewCycle['status'] }) {
     status === 'upcoming' ? { cls: STATUS_CLASSES.attention.badge,   label: 'Due Soon'      } :
                             { cls: STATUS_CLASSES.neutral.badge,     label: 'Not Scheduled' };
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${cfg.cls}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${cfg.cls}`}>
       {cfg.label}
     </span>
   );
@@ -97,8 +97,8 @@ function OverviewTab() {
       <div className="p-6 space-y-6 max-w-4xl">
 
         <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
-          <p className="text-[11px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Phase 1 Governance Capability</p>
-          <p className="text-[12px] text-[#CC8400] leading-relaxed">
+          <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Phase 1 Governance Capability</p>
+          <p className="text-[14px] text-[#CC8400] leading-relaxed">
             Object Lifecycle & Governance defines how every Trail OS object is created, reviewed, approved, operated, retired, and
             governed. It applies to all 20 Unified Object Model types and is the operational rulebook that ensures clear ownership,
             accountability, review cycles, and retirement paths.
@@ -115,24 +115,24 @@ function OverviewTab() {
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
-              <p className="text-[11px] font-semibold text-foreground mt-0.5">{s.label}</p>
-              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+              <p className="text-[14px] font-semibold text-foreground mt-0.5">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground">{s.sub}</p>
             </div>
           ))}
         </div>
 
         {/* Framework */}
         <div>
-          <p className="text-[11px] font-bold text-foreground uppercase tracking-wide mb-3">Governance Framework</p>
+          <p className="text-[14px] font-bold text-foreground  mb-3">Governance Framework</p>
           <div className="flex items-center gap-2 flex-wrap mb-3">
             {['Lifecycle', 'Ownership', 'Approval', 'Review', 'Compliance', 'Retirement'].map((step, i, arr) => (
               <div key={step} className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-foreground bg-muted border border-border rounded px-2.5 py-1">{step}</span>
+                <span className="text-[14px] font-bold text-foreground bg-muted border border-border rounded px-2.5 py-1">{step}</span>
                 {i < arr.length - 1 && <ChevronRight className="w-3 h-3 text-muted-foreground/40" />}
               </div>
             ))}
           </div>
-          <p className="text-[12px] text-muted-foreground leading-relaxed max-w-2xl">
+          <p className="text-[14px] text-muted-foreground leading-relaxed max-w-2xl">
             Each of the 20 UOM object types has a defined lifecycle (stages with entry/exit requirements), an ownership matrix
             (primary owner, team, approval authority), a review cadence, and retirement criteria. All objects must satisfy these
             requirements before reaching Active or Operational status.
@@ -141,12 +141,12 @@ function OverviewTab() {
 
         {/* Core principles */}
         <div>
-          <p className="text-[11px] font-bold text-foreground uppercase tracking-wide mb-3">Core Principles</p>
+          <p className="text-[14px] font-bold text-foreground  mb-3">Core Principles</p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {PRINCIPLES.map(p => (
               <div key={p.title} className="rounded-lg border border-border bg-white px-4 py-3">
-                <p className="text-[12px] font-bold text-foreground mb-0.5">{p.icon} {p.title}</p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">{p.body}</p>
+                <p className="text-[14px] font-bold text-foreground mb-0.5">{p.icon} {p.title}</p>
+                <p className="text-[14px] text-muted-foreground leading-relaxed">{p.body}</p>
               </div>
             ))}
           </div>
@@ -154,14 +154,14 @@ function OverviewTab() {
 
         {/* Layers coverage */}
         <div>
-          <p className="text-[11px] font-bold text-foreground uppercase tracking-wide mb-3">Coverage by Layer</p>
+          <p className="text-[14px] font-bold text-foreground  mb-3">Coverage by Layer</p>
           {(['Program', 'Knowledge', 'Intelligence', 'People', 'Infrastructure', 'Governance'] as const).map(layer => {
             const types = OWNERSHIP_MATRIX.filter(o => o.layer === layer);
             return (
               <div key={layer} className="flex items-center gap-3 py-2 border-b border-border/40 last:border-0">
                 <LayerBadge layer={layer} />
-                <p className="text-[11px] text-foreground flex-1">{types.map(t => t.objectTypeName).join(', ')}</p>
-                <span className="text-[10px] text-muted-foreground shrink-0">{types.length} types</span>
+                <p className="text-[14px] text-foreground flex-1">{types.map(t => t.objectTypeName).join(', ')}</p>
+                <span className="text-[14px] text-muted-foreground shrink-0">{types.length} types</span>
               </div>
             );
           })}
@@ -188,7 +188,7 @@ function LifecycleTab() {
             <button
               key={m.objectTypeId}
               onClick={() => { setSelectedType(m.objectTypeId); setActiveStage(null); }}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-colors ${
+              className={`px-2.5 py-1 rounded-full text-[14px] font-semibold border transition-colors ${
                 selectedType === m.objectTypeId
                   ? 'bg-foreground text-background border-foreground'
                   : 'bg-white border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
@@ -205,13 +205,13 @@ function LifecycleTab() {
             <div>
               <h3 className="text-[15px] font-semibold text-foreground">{model.objectTypeName}</h3>
               <LayerBadge layer={model.layer} />
-              {model.note && <p className="text-[11px] text-[#CC8400] mt-1">{model.note}</p>}
+              {model.note && <p className="text-[14px] text-[#CC8400] mt-1">{model.note}</p>}
             </div>
           </div>
 
           {/* Stage flow */}
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Lifecycle Stages — click to inspect</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Lifecycle Stages — click to inspect</p>
             <div className="flex items-center gap-1.5 flex-wrap">
               {model.stages.map((stage, i) => (
                 <button key={stage.id} onClick={() => setActiveStage(activeStage === stage.id ? null : stage.id)}>
@@ -227,28 +227,28 @@ function LifecycleTab() {
               <div className="flex items-center gap-2">
                 <StagePill label={detail.label} color={detail.color} isLast={true} />
                 {detail.checkpoint && (
-                  <span className="text-[9px] font-bold bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded px-1.5 py-0.5 uppercase">
+                  <span className="text-[14px] font-bold bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded px-1.5 py-0.5 ">
                     Checkpoint
                   </span>
                 )}
               </div>
-              <p className="text-[12px] text-foreground leading-relaxed">{detail.description}</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{detail.description}</p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-[10px] font-bold uppercase text-[#2F6B3F] mb-1.5">Entry Requirements</p>
+                  <p className="text-[14px] font-bold  text-[#2F6B3F] mb-1.5">Entry Requirements</p>
                   <ul className="space-y-0.5">
                     {detail.entry.map((r, i) => (
-                      <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                      <li key={i} className="text-[14px] text-muted-foreground flex items-start gap-1.5">
                         <span className="text-[#2F6B3F] mt-0.5 shrink-0">✓</span>{r}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase text-primary mb-1.5">Exit Requirements</p>
+                  <p className="text-[14px] font-bold  text-primary mb-1.5">Exit Requirements</p>
                   <ul className="space-y-0.5">
                     {detail.exit.map((r, i) => (
-                      <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                      <li key={i} className="text-[14px] text-muted-foreground flex items-start gap-1.5">
                         <span className="text-primary mt-0.5 shrink-0">→</span>{r}
                       </li>
                     ))}
@@ -256,17 +256,17 @@ function LifecycleTab() {
                 </div>
               </div>
               {detail.checkpoint && (
-                <p className="text-[11px] text-[#CC8400] font-medium">⚠ Governance checkpoint: {detail.checkpoint}</p>
+                <p className="text-[14px] text-[#CC8400] font-medium">⚠ Governance checkpoint: {detail.checkpoint}</p>
               )}
             </div>
           )}
 
           {/* Retirement criteria */}
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-            <p className="text-[10px] font-bold uppercase text-slate-600 mb-1.5">Retirement Criteria</p>
+            <p className="text-[14px] font-bold  text-slate-600 mb-1.5">Retirement Criteria</p>
             <ul className="space-y-0.5">
               {model.retirementCriteria.map((c, i) => (
-                <li key={i} className="text-[11px] text-slate-700 flex items-start gap-1.5">
+                <li key={i} className="text-[14px] text-slate-700 flex items-start gap-1.5">
                   <span className="text-slate-400 mt-0.5 shrink-0">·</span>{c}
                 </li>
               ))}
@@ -292,18 +292,18 @@ function OwnershipTab() {
         <div className="flex items-center gap-2 flex-wrap">
           {layers.map(l => (
             <button key={l} onClick={() => setLayerFilter(l)}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-colors ${
+              className={`px-2.5 py-1 rounded-full text-[14px] font-semibold border transition-colors ${
                 layerFilter === l ? 'bg-foreground text-background border-foreground' : 'bg-white border-border text-muted-foreground hover:border-foreground/30'
               }`}
             >{l}</button>
           ))}
         </div>
         <div className="rounded-lg border border-border overflow-hidden">
-          <table className="w-full text-[11px]">
+          <table className="w-full text-[14px]">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
                 {['Object Type', 'Layer', 'Primary Owner', 'Team', 'Approval Authority', 'Review Cadence', 'Source of Truth'].map(h => (
-                  <th key={h} className="text-left px-3 py-2 text-[9px] font-bold uppercase tracking-wide text-muted-foreground">{h}</th>
+                  <th key={h} className="text-left px-3 py-2 text-[14px] font-bold  text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -317,7 +317,7 @@ function OwnershipTab() {
                   <td className="px-3 py-2 text-muted-foreground">{o.approvalAuthority}</td>
                   <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{o.reviewCadence}</td>
                   <td className="px-3 py-2">
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]">
                       {o.sourceOfTruth}
                     </span>
                   </td>
@@ -326,7 +326,7 @@ function OwnershipTab() {
             </tbody>
           </table>
         </div>
-        <p className="text-[10px] text-muted-foreground">{filtered.length} object type{filtered.length !== 1 ? 's' : ''} displayed</p>
+        <p className="text-[14px] text-muted-foreground">{filtered.length} object type{filtered.length !== 1 ? 's' : ''} displayed</p>
       </div>
     </ScrollArea>
   );
@@ -340,7 +340,7 @@ function ApprovalsTab() {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3">
-        <p className="text-[12px] text-muted-foreground">
+        <p className="text-[14px] text-muted-foreground">
           Formal approval workflows govern stage transitions for high-impact object types.
           Click any workflow to see the full approval path.
         </p>
@@ -355,23 +355,23 @@ function ApprovalsTab() {
                 <div className="flex items-center gap-3">
                   <LayerBadge layer={OWNERSHIP_MATRIX.find(o => o.objectTypeId === w.objectTypeId)?.layer ?? 'Program'} />
                   <div>
-                    <p className="text-[12px] font-bold text-foreground">{w.objectTypeName} Approval</p>
-                    <p className="text-[11px] text-muted-foreground">{w.trigger}</p>
+                    <p className="text-[14px] font-bold text-foreground">{w.objectTypeName} Approval</p>
+                    <p className="text-[14px] text-muted-foreground">{w.trigger}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-[10px] text-muted-foreground">SLA: {w.sla}</span>
+                  <span className="text-[14px] text-muted-foreground">SLA: {w.sla}</span>
                   <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground/50 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
                 </div>
               </button>
               {isOpen && wf && (
                 <div className="px-4 pb-4 space-y-3 border-t border-border/40 pt-3">
                   <div>
-                    <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Approval Steps</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Approval Steps</p>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {wf.steps.map((step, i) => (
                         <div key={step} className="flex items-center gap-1">
-                          <span className="text-[10px] font-semibold text-foreground bg-white border border-border rounded px-2 py-0.5">
+                          <span className="text-[14px] font-semibold text-foreground bg-white border border-border rounded px-2 py-0.5">
                             {i + 1}. {step}
                           </span>
                           {i < wf.steps.length - 1 && <ArrowRight className="w-3 h-3 text-muted-foreground/40" />}
@@ -381,16 +381,16 @@ function ApprovalsTab() {
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <div>
-                      <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1">Approvers</p>
-                      {wf.approvers.map(a => <p key={a} className="text-[11px] text-foreground">{a}</p>)}
+                      <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Approvers</p>
+                      {wf.approvers.map(a => <p key={a} className="text-[14px] text-foreground">{a}</p>)}
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1">SLA</p>
-                      <p className="text-[11px] text-foreground">{wf.sla}</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">SLA</p>
+                      <p className="text-[14px] text-foreground">{wf.sla}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1">Escalation</p>
-                      <p className="text-[11px] text-muted-foreground">{wf.escalation}</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Escalation</p>
+                      <p className="text-[14px] text-muted-foreground">{wf.escalation}</p>
                     </div>
                   </div>
                 </div>
@@ -415,12 +415,12 @@ function ReviewCyclesTab() {
       <div className="p-5 space-y-4">
         {overdue.length > 0 && (
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3">
-            <p className="text-[10px] font-bold text-[#A93F2F] uppercase mb-2">⚠ Overdue Reviews ({overdue.length})</p>
+            <p className="text-[14px] font-bold text-[#A93F2F]  mb-2">⚠ Overdue Reviews ({overdue.length})</p>
             {overdue.map(r => (
               <div key={r.objectTypeId} className="flex items-center justify-between py-1.5 border-b border-[#FBEAE6] last:border-0">
                 <div>
-                  <p className="text-[12px] font-semibold text-[#A93F2F]">{r.objectTypeName}</p>
-                  <p className="text-[10px] text-[#A93F2F]">Last: {r.lastReview ?? '—'} · Owner: {r.owner}</p>
+                  <p className="text-[14px] font-semibold text-[#A93F2F]">{r.objectTypeName}</p>
+                  <p className="text-[14px] text-[#A93F2F]">Last: {r.lastReview ?? '—'} · Owner: {r.owner}</p>
                 </div>
                 <ReviewStatusBadge status={r.status} />
               </div>
@@ -429,11 +429,11 @@ function ReviewCyclesTab() {
         )}
 
         <div className="rounded-lg border border-border overflow-hidden">
-          <table className="w-full text-[11px]">
+          <table className="w-full text-[14px]">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
                 {['Object Type', 'Cadence', 'Owner', 'Last Review', 'Next Review', 'Status'].map(h => (
-                  <th key={h} className="text-left px-3 py-2 text-[9px] font-bold uppercase tracking-wide text-muted-foreground">{h}</th>
+                  <th key={h} className="text-left px-3 py-2 text-[14px] font-bold  text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -451,7 +451,7 @@ function ReviewCyclesTab() {
             </tbody>
           </table>
         </div>
-        <div className="flex gap-4 text-[10px] text-muted-foreground">
+        <div className="flex gap-4 text-[14px] text-muted-foreground">
           <span>✓ Current: {current.length}</span>
           <span className="text-[#CC8400]">⚡ Due soon: {upcoming.length}</span>
           <span className="text-[#A93F2F]">⚠ Overdue: {overdue.length}</span>
@@ -474,7 +474,7 @@ function ComplianceTab() {
         <div className="flex items-center gap-2 flex-wrap">
           {layers.map(l => (
             <button key={l} onClick={() => setLayerFilter(l)}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-colors ${
+              className={`px-2.5 py-1 rounded-full text-[14px] font-semibold border transition-colors ${
                 layerFilter === l ? 'bg-foreground text-background border-foreground' : 'bg-white border-border text-muted-foreground hover:border-foreground/30'
               }`}
             >{l}</button>
@@ -488,7 +488,7 @@ function ComplianceTab() {
               <div key={c.objectTypeId} className="rounded-lg border border-border bg-white p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-[12px] font-bold text-foreground">{c.objectTypeName}</p>
+                    <p className="text-[14px] font-bold text-foreground">{c.objectTypeName}</p>
                     <LayerBadge layer={c.layer} />
                   </div>
                   <span className={`text-lg font-bold ${pct >= 85 ? 'text-[#2F6B3F]' : pct >= 70 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
@@ -496,23 +496,23 @@ function ComplianceTab() {
                   </span>
                 </div>
                 <ComplianceBar {...c} />
-                <div className="flex gap-3 text-[10px]">
+                <div className="flex gap-3 text-[14px]">
                   <span className="text-[#2F6B3F]">✓ {c.compliant} compliant</span>
                   {c.partial > 0 && <span className="text-[#CC8400]">~ {c.partial} partial</span>}
                   {c.nonCompliant > 0 && <span className="text-[#A93F2F]">✗ {c.nonCompliant} non-compliant</span>}
                   {c.notAssessed > 0 && <span className="text-muted-foreground">? {c.notAssessed} not assessed</span>}
                 </div>
                 {c.topGap && (
-                  <p className="text-[10px] text-[#CC8400] border-l-2 border-[#FFD08A] pl-2">{c.topGap}</p>
+                  <p className="text-[14px] text-[#CC8400] border-l-2 border-[#FFD08A] pl-2">{c.topGap}</p>
                 )}
-                <p className="text-[9px] text-muted-foreground/60">Last checked: {c.lastChecked}</p>
+                <p className="text-[14px] text-muted-foreground/60">Last checked: {c.lastChecked}</p>
               </div>
             );
           })}
         </div>
 
         {/* Legend */}
-        <div className="flex gap-4 text-[10px] text-muted-foreground pt-1">
+        <div className="flex gap-4 text-[14px] text-muted-foreground pt-1">
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#2F6B3F] inline-block" />Compliant</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#CC8400] inline-block" />Partial</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#A93F2F] inline-block" />Non-compliant</span>
@@ -548,7 +548,7 @@ function HealthTab() {
               className={`flex-1 rounded-lg border p-2.5 text-center transition-all ${f.cls} ${filter === f.key ? 'ring-2 ring-foreground ring-offset-1' : ''}`}
             >
               <p className="text-xl font-bold text-foreground">{f.count}</p>
-              <p className="text-[10px] font-semibold text-foreground/70">{f.label}</p>
+              <p className="text-[14px] font-semibold text-foreground/70">{f.label}</p>
             </button>
           ))}
         </div>
@@ -568,20 +568,20 @@ function HealthTab() {
                   <div className="flex-1 space-y-1.5">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="text-[12px] font-bold text-foreground">{issue.issue}</p>
+                        <p className="text-[14px] font-bold text-foreground">{issue.issue}</p>
                         {issue.objectName && (
-                          <p className="text-[10px] text-muted-foreground">Object: {issue.objectName} ({issue.objectType})</p>
+                          <p className="text-[14px] text-muted-foreground">Object: {issue.objectName} ({issue.objectType})</p>
                         )}
                         {!issue.objectName && (
-                          <p className="text-[10px] text-muted-foreground">Type: {issue.objectType}</p>
+                          <p className="text-[14px] text-muted-foreground">Type: {issue.objectType}</p>
                         )}
                       </div>
                       {issue.dueDate && (
-                        <span className="text-[9px] font-bold text-foreground/60 whitespace-nowrap shrink-0">Due: {issue.dueDate}</span>
+                        <span className="text-[14px] font-bold text-foreground/60 whitespace-nowrap shrink-0">Due: {issue.dueDate}</span>
                       )}
                     </div>
-                    <p className="text-[11px] text-foreground/70"><strong>Impact:</strong> {issue.impact}</p>
-                    <p className="text-[11px] text-foreground font-medium">→ {issue.action}</p>
+                    <p className="text-[14px] text-foreground/70"><strong>Impact:</strong> {issue.impact}</p>
+                    <p className="text-[14px] text-foreground font-medium">→ {issue.action}</p>
                   </div>
                 </div>
               </div>
@@ -605,7 +605,7 @@ function PoliciesTab() {
         <div className="flex items-center gap-2 flex-wrap">
           {categories.map(c => (
             <button key={c} onClick={() => setCatFilter(c)}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-colors ${
+              className={`px-2.5 py-1 rounded-full text-[14px] font-semibold border transition-colors ${
                 catFilter === c ? 'bg-foreground text-background border-foreground' : 'bg-white border-border text-muted-foreground hover:border-foreground/30'
               }`}
             >{c}</button>
@@ -616,22 +616,22 @@ function PoliciesTab() {
             <div key={p.id} className="rounded-lg border border-border bg-white p-4 space-y-1.5">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold bg-muted border border-border text-muted-foreground mb-1.5">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold bg-muted border border-border text-muted-foreground mb-1.5">
                     {p.category}
                   </span>
-                  <p className="text-[12px] font-bold text-foreground">{p.title}</p>
+                  <p className="text-[14px] font-bold text-foreground">{p.title}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-[9px] text-muted-foreground/60">Effective {p.effective}</p>
-                  <p className="text-[9px] text-muted-foreground/60">Owner: {p.owner}</p>
+                  <p className="text-[14px] text-muted-foreground/60">Effective {p.effective}</p>
+                  <p className="text-[14px] text-muted-foreground/60">Owner: {p.owner}</p>
                 </div>
               </div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">{p.body}</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{p.body}</p>
               {p.appliesTo.length > 0 && p.appliesTo[0] !== 'All' && (
                 <div className="flex items-center gap-1.5 flex-wrap mt-1">
-                  <span className="text-[9px] text-muted-foreground/60">Applies to:</span>
+                  <span className="text-[14px] text-muted-foreground/60">Applies to:</span>
                   {p.appliesTo.map(a => (
-                    <span key={a} className="text-[9px] font-semibold bg-muted border border-border rounded px-1.5 py-0.5 text-foreground">{a}</span>
+                    <span key={a} className="text-[14px] font-semibold bg-muted border border-border rounded px-1.5 py-0.5 text-foreground">{a}</span>
                   ))}
                 </div>
               )}

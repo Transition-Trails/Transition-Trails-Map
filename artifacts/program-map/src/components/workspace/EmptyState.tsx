@@ -27,14 +27,14 @@ export function EmptyState({
       </div>
       <p className={`font-semibold text-foreground mb-1 ${compact ? 'text-sm' : 'text-base'}`}>{title}</p>
       {body && (
-        <p className={`text-muted-foreground leading-relaxed max-w-xs ${compact ? 'text-xs' : 'text-sm'}`}>{body}</p>
+        <p className={`text-muted-foreground leading-relaxed max-w-xs ${compact ? 'text-sm' : 'text-sm'}`}>{body}</p>
       )}
       {(action || secondaryAction) && (
         <div className="flex items-center gap-3 mt-4">
           {action && (
             <button
               onClick={action.onClick}
-              className={`font-semibold text-primary hover:underline ${compact ? 'text-xs' : 'text-sm'}`}
+              className={`font-semibold text-primary hover:underline ${compact ? 'text-sm' : 'text-sm'}`}
             >
               {action.label}
             </button>
@@ -42,7 +42,7 @@ export function EmptyState({
           {secondaryAction && (
             <button
               onClick={secondaryAction.onClick}
-              className={`font-medium text-muted-foreground hover:text-foreground hover:underline ${compact ? 'text-xs' : 'text-sm'}`}
+              className={`font-medium text-muted-foreground hover:text-foreground hover:underline ${compact ? 'text-sm' : 'text-sm'}`}
             >
               {secondaryAction.label}
             </button>

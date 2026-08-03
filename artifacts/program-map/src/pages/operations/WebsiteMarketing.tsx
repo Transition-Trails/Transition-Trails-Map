@@ -43,10 +43,10 @@ export default function WebsiteMarketing() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
-                      <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Page</th>
-                      <th className="text-right px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Sessions</th>
-                      <th className="text-right px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Avg Time</th>
-                      <th className="text-right px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Bounce</th>
+                      <th className="text-left px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Page</th>
+                      <th className="text-right px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Sessions</th>
+                      <th className="text-right px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Avg Time</th>
+                      <th className="text-right px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Bounce</th>
                     </tr>
                   </thead>
                   <tbody className="bg-card divide-y divide-border">
@@ -54,7 +54,7 @@ export default function WebsiteMarketing() {
                       <tr key={p.page} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-2.5">
                           <span className="font-medium text-foreground">{p.label}</span>
-                          <span className="block text-[11px] text-muted-foreground font-mono">{p.page}</span>
+                          <span className="block text-[14px] text-muted-foreground font-mono">{p.page}</span>
                         </td>
                         <td className="px-4 py-2.5 text-right text-muted-foreground">{p.sessions.toLocaleString()}</td>
                         <td className="px-4 py-2.5 text-right text-muted-foreground">{p.avgTime}</td>
@@ -81,7 +81,7 @@ export default function WebsiteMarketing() {
                         style={{ width: s.pct }}
                       />
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">{s.sessions.toLocaleString()} sessions</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5">{s.sessions.toLocaleString()} sessions</p>
                   </div>
                 ))}
               </div>

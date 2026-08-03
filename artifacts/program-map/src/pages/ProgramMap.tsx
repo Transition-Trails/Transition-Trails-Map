@@ -206,7 +206,7 @@ export default function ProgramMap() {
     <div className="h-full w-full flex flex-col p-4 overflow-hidden">
       <div className="mb-3 flex-shrink-0 flex items-baseline gap-2">
         <h1 className="text-2xl font-bold text-foreground leading-tight">Program Ecosystem</h1>
-        <span className="text-[10px] font-semibold text-muted-foreground/60 bg-muted/60 border border-border px-1.5 py-0.5 rounded flex-shrink-0">
+        <span className="text-[14px] font-semibold text-muted-foreground/60 bg-muted/60 border border-border px-1.5 py-0.5 rounded flex-shrink-0">
           Prototype Data
         </span>
       </div>
@@ -216,7 +216,7 @@ export default function ProgramMap() {
 
       <div className="flex-1 min-h-0 rounded-xl border border-border/60 bg-white/60 shadow-sm flex flex-col p-4 overflow-hidden">
 
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground text-center mb-3 flex-shrink-0">
+        <p className="text-[14px] font-semibold  text-muted-foreground text-center mb-3 flex-shrink-0">
           — The Transition Trail —
         </p>
 
@@ -238,7 +238,7 @@ export default function ProgramMap() {
           <div className="flex-shrink-0">
             <div className="flex items-center gap-2 mt-1 mb-2">
               <div className="flex-1 h-px border-t-2 border-dashed border-amber-300/50" />
-              <span className="text-[9px] font-bold uppercase tracking-widest text-amber-700/80 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+              <span className="text-[14px] font-bold  text-amber-700/80 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
                 Parallel Program · Nonprofit Client Track
               </span>
               <div className="flex-1 h-px border-t-2 border-dashed border-amber-300/50" />
@@ -323,10 +323,10 @@ function ProgramNode({
         <div className="flex items-start gap-1 min-w-0">
           <div className="flex-1 min-w-0">
             <p className="font-bold text-[14px] leading-tight line-clamp-2">{program.name}</p>
-            <p className="text-[10px] opacity-75 leading-tight line-clamp-1 mt-0.5">{program.strategicRole}</p>
+            <p className="text-[14px] opacity-75 leading-tight line-clamp-1 mt-0.5">{program.strategicRole}</p>
           </div>
           {program.confidence === 'draft' && (
-            <span className="flex-shrink-0 text-[8px] font-bold uppercase bg-white/25 px-1 py-0.5 rounded mt-0.5">
+            <span className="flex-shrink-0 text-[14px] font-bold  bg-white/25 px-1 py-0.5 rounded mt-0.5">
               DRAFT
             </span>
           )}
@@ -336,18 +336,18 @@ function ProgramNode({
       {/* White body */}
       <div className="px-3 py-2 bg-white flex flex-col gap-1.5 border-x border-b border-border/40 rounded-b-xl overflow-hidden min-w-0">
 
-        <p className="text-[12px] font-medium text-foreground leading-snug line-clamp-2 min-w-0">
+        <p className="text-[14px] font-medium text-foreground leading-snug line-clamp-2 min-w-0">
           {program.coreOutcome}
         </p>
 
         {showAudience && (
-          <p className="text-[11px] text-muted-foreground line-clamp-1 min-w-0">
+          <p className="text-[14px] text-muted-foreground line-clamp-1 min-w-0">
             <span className="font-semibold text-foreground/80">For: </span>
             {program.audience.split(';')[0].trim()}
           </p>
         )}
         {showDeps && (
-          <p className="text-[11px] text-muted-foreground line-clamp-1 min-w-0">
+          <p className="text-[14px] text-muted-foreground line-clamp-1 min-w-0">
             <span className="font-semibold text-foreground/80">Requires: </span>
             {program.dependencies}
           </p>
@@ -356,12 +356,12 @@ function ProgramNode({
         {/* Health row */}
         <div className="flex items-center gap-1 flex-wrap min-w-0 overflow-hidden">
           <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotCls}`} />
-          <span className="text-[10px] font-semibold text-muted-foreground">{statusLbl}</span>
+          <span className="text-[14px] font-semibold text-muted-foreground">{statusLbl}</span>
           {health?.activeCohorts > 0 && (
-            <span className="text-[10px] text-muted-foreground truncate">· {health.cohortLabel}</span>
+            <span className="text-[14px] text-muted-foreground truncate">· {health.cohortLabel}</span>
           )}
           {health?.learnerCount > 0 && (
-            <span className="text-[10px] text-muted-foreground truncate">· {health.learnerCount} {health.learnerLabel}</span>
+            <span className="text-[14px] text-muted-foreground truncate">· {health.learnerCount} {health.learnerLabel}</span>
           )}
         </div>
 
@@ -369,12 +369,12 @@ function ProgramNode({
         {(health?.applicants || health?.waitlist) && (
           <div className="flex gap-1 flex-wrap min-w-0">
             {health.applicants ? (
-              <span className="text-[10px] font-semibold bg-sky-50 border border-sky-200 text-sky-700 px-1.5 py-0.5 rounded-full">
+              <span className="text-[14px] font-semibold bg-sky-50 border border-sky-200 text-sky-700 px-1.5 py-0.5 rounded-full">
                 {health.applicants} applied
               </span>
             ) : null}
             {health.waitlist ? (
-              <span className="text-[10px] font-semibold bg-violet-50 border border-violet-200 text-violet-700 px-1.5 py-0.5 rounded-full">
+              <span className="text-[14px] font-semibold bg-violet-50 border border-violet-200 text-violet-700 px-1.5 py-0.5 rounded-full">
                 {health.waitlist} waitlist
               </span>
             ) : null}
@@ -385,7 +385,7 @@ function ProgramNode({
         <div className="pt-1 border-t border-border/40 flex items-center justify-between gap-1 min-w-0 overflow-hidden">
           <ConfidenceBadge status={program.confidence ?? 'needs-review'} />
           {showDate && health?.nextDate && (
-            <span className="text-[10px] text-muted-foreground flex items-center gap-0.5 flex-shrink-0">
+            <span className="text-[14px] text-muted-foreground flex items-center gap-0.5 flex-shrink-0">
               <Calendar className="w-2.5 h-2.5" />
               {health.nextDate}
             </span>
@@ -404,18 +404,18 @@ function PortfolioPulse({ lens }: { lens: string }) {
     <div className="flex-shrink-0 mt-3 pt-3 border-t border-border/40">
       <div className="flex items-center gap-1.5 mb-2">
         <div className="w-1 h-3.5 rounded-full bg-primary/30 flex-shrink-0" />
-        <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+        <p className="text-[14px] font-bold  text-muted-foreground">
           Portfolio Pulse — {lens.charAt(0).toUpperCase() + lens.slice(1)} View
         </p>
-        <span className="text-[8px] text-muted-foreground/40 ml-auto">Prototype data</span>
+        <span className="text-[14px] text-muted-foreground/40 ml-auto">Prototype data</span>
       </div>
       <div className="grid grid-cols-4 gap-3">
         {columns.map((col, i) => (
           <div key={i}>
-            <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">{col.title}</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">{col.title}</p>
             <div className="space-y-0.5">
               {col.rows.map((row, j) => (
-                <p key={j} className="text-[11px] text-foreground/80 leading-snug">{row}</p>
+                <p key={j} className="text-[14px] text-foreground/80 leading-snug">{row}</p>
               ))}
             </div>
           </div>

@@ -30,28 +30,28 @@ function SlackNotifyStub({ context }: { context: string }) {
     <div className="rounded-lg border border-[#4A154B]/20 bg-[#4A154B]/[0.03] overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 border-b border-[#4A154B]/15 bg-[#4A154B]/[0.05]">
         <Hash className="w-3 h-3 text-[#4A154B]" />
-        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">Notify via Slack</p>
-        <span className="ml-auto text-[9px] text-muted-foreground/40 font-medium">Prototype</span>
+        <p className="text-[14px] font-bold  text-muted-foreground/70">Notify via Slack</p>
+        <span className="ml-auto text-[14px] text-muted-foreground/40 font-medium">Prototype</span>
       </div>
       <div className="p-3 space-y-2">
         <div className="space-y-1">
-          <label className="text-[10px] font-semibold text-muted-foreground/70">Channel</label>
+          <label className="text-[14px] font-semibold text-muted-foreground/70">Channel</label>
           <select
             value={channel}
             onChange={e => setChannel(e.target.value)}
-            className="w-full h-7 rounded border border-input bg-white px-2 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+            className="w-full h-7 rounded border border-input bg-white px-2 text-[14px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
           >
             <option value="">Select channel…</option>
             {channels.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
-        <p className="text-[10px] text-muted-foreground/60 leading-snug">
+        <p className="text-[14px] text-muted-foreground/60 leading-snug">
           Sends a draft-created notification to the selected channel.
         </p>
         <button
           onClick={sendTest}
           disabled={!channel}
-          className={`flex items-center gap-1.5 w-full justify-center px-2 py-1.5 rounded text-[10px] font-bold transition-all ${
+          className={`flex items-center gap-1.5 w-full justify-center px-2 py-1.5 rounded text-[14px] font-bold transition-all ${
             sent
               ? 'bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]'
               : !channel
@@ -125,14 +125,14 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         <div className="w-10 h-10 rounded-full bg-[#E6F0EA] flex items-center justify-center">
           <CheckCircle2 className="w-5 h-5 text-[#2F6B3F]" />
         </div>
-        <p className="text-[13px] font-bold text-foreground text-center">Request Sent to Slack</p>
-        <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
+        <p className="text-[14px] font-bold text-foreground text-center">Request Sent to Slack</p>
+        <p className="text-[14px] text-muted-foreground text-center leading-relaxed">
           Your {objectType} has been saved to the list and a notification sent to the team channel.
         </p>
-        <p className="text-[10px] text-muted-foreground/60 text-center leading-snug mt-1">
+        <p className="text-[14px] text-muted-foreground/60 text-center leading-snug mt-1">
           Changes are session-only and will reset on page refresh.
         </p>
-        <span className="text-[9px] font-bold uppercase tracking-widest text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2.5 py-1">
+        <span className="text-[14px] font-bold  text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2.5 py-1">
           Saved · Session Only
         </span>
       </div>
@@ -147,15 +147,15 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         <div className="flex items-start justify-between gap-2 mb-1">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">
+              <span className="text-[14px] font-bold  text-muted-foreground/50">
                 Action Panel
               </span>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-1.5 py-0.5">
+              <span className="text-[14px] font-bold  text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-1.5 py-0.5">
                 Draft
               </span>
             </div>
             <h2 className="text-[15px] font-bold text-foreground leading-tight">{title}</h2>
-            <p className="text-[9px] font-semibold text-muted-foreground/60 uppercase tracking-wide mt-0.5">
+            <p className="text-[14px] font-semibold text-muted-foreground/60  mt-0.5">
               {objectType}
             </p>
           </div>
@@ -168,7 +168,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
           </button>
         </div>
         {subtitle && (
-          <p className="text-[10px] text-muted-foreground leading-snug mt-1">{subtitle}</p>
+          <p className="text-[14px] text-muted-foreground leading-snug mt-1">{subtitle}</p>
         )}
       </div>
 
@@ -179,14 +179,14 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
           {/* Prototype notice */}
           <div className="rounded border border-[#FFD08A] bg-[#FFF3E0]/60 px-2.5 py-2 flex items-start gap-1.5">
             <Pencil className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
-            <p className="text-[10px] text-[#CC8400] leading-snug">
+            <p className="text-[14px] text-[#CC8400] leading-snug">
               <strong>Prototype:</strong> New items appear immediately but reset on refresh.
             </p>
           </div>
 
           {fields.map(field => (
             <div key={field.id} className="space-y-1">
-              <label className="block text-[10px] font-bold text-foreground">
+              <label className="block text-[14px] font-bold text-foreground">
                 {field.label}
                 {field.required && <span className="text-[#A93F2F] ml-0.5">*</span>}
               </label>
@@ -196,7 +196,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
                   value={values[field.id] ?? ''}
                   onChange={e => set(field.id, e.target.value)}
                   placeholder={field.placeholder ?? `Enter ${field.label.toLowerCase()}…`}
-                  className="h-7 text-[11px] bg-white"
+                  className="h-7 text-[14px] bg-white"
                 />
               )}
 
@@ -206,7 +206,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
                   onChange={e => set(field.id, e.target.value)}
                   placeholder={field.placeholder ?? `Enter ${field.label.toLowerCase()}…`}
                   rows={field.rows ?? 3}
-                  className="w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y min-h-[60px]"
+                  className="w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y min-h-[60px]"
                 />
               )}
 
@@ -214,7 +214,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
                 <select
                   value={values[field.id] ?? ''}
                   onChange={e => set(field.id, e.target.value)}
-                  className="w-full h-7 rounded-md border border-input bg-white px-2 text-[11px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-full h-7 rounded-md border border-input bg-white px-2 text-[14px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                 >
                   <option value="">Select…</option>
                   {field.options.map(opt => (
@@ -224,7 +224,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
               )}
 
               {field.hint && (
-                <p className="text-[10px] text-muted-foreground leading-snug">{field.hint}</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">{field.hint}</p>
               )}
             </div>
           ))}
@@ -232,23 +232,23 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
           {/* Owner */}
           {showOwner && (
             <div className="space-y-1">
-              <label className="block text-[10px] font-bold text-foreground">{ownerLabel}</label>
+              <label className="block text-[14px] font-bold text-foreground">{ownerLabel}</label>
               <Input
                 value={values['_owner'] ?? ''}
                 onChange={e => set('_owner', e.target.value)}
                 placeholder="e.g. Program Director"
-                className="h-7 text-[11px] bg-white"
+                className="h-7 text-[14px] bg-white"
               />
               {ownerHint && (
-                <p className="text-[10px] text-muted-foreground leading-snug">{ownerHint}</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">{ownerHint}</p>
               )}
             </div>
           )}
 
           {/* Auto-assigned strip */}
           <div className="rounded border border-border/50 bg-muted/20 px-2.5 py-2">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">Auto-assigned</p>
-            <div className="flex gap-3 text-[10px] text-foreground flex-wrap">
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Auto-assigned</p>
+            <div className="flex gap-3 text-[14px] text-foreground flex-wrap">
               <span>Status: <strong>Draft</strong></span>
               <span>Created: <strong>Today</strong></span>
               <span>Source: <strong>Trail OS</strong></span>
@@ -264,7 +264,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         {pennyPrompt && (
           <button
             onClick={handleFocusWithPenny}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
           >
             <Sparkles className="w-3.5 h-3.5" />
             Focus with {TERMS.aiAssistant}
@@ -273,19 +273,19 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleClose}
-            className="px-2.5 py-1.5 text-[10px] font-semibold text-muted-foreground border border-border rounded-full hover:bg-muted/40 transition-colors"
+            className="px-2.5 py-1.5 text-[14px] font-semibold text-muted-foreground border border-border rounded-full hover:bg-muted/40 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSendRequest}
-            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity"
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[14px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity"
           >
             <Send className="w-3 h-3" />
             Save &amp; Notify Slack
           </button>
         </div>
-        <p className="text-[9px] text-muted-foreground/40 text-center leading-snug">
+        <p className="text-[14px] text-muted-foreground/40 text-center leading-snug">
           Create from the right panel · workspace stays focused
         </p>
       </div>

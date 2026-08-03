@@ -134,7 +134,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
       {ev.isTrailTalk && (
         <div className="flex items-center gap-1.5 px-3 py-1 bg-[#EDF5F8] border-b border-[#7FAFC6]">
           <Star className="w-2.5 h-2.5 text-[#2F6F7E]" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-[#2F6F7E]">Trail Talk</span>
+          <span className="text-[14px] font-bold  text-[#2F6F7E]">Trail Talk</span>
         </div>
       )}
 
@@ -143,13 +143,13 @@ function EventCard({ ev }: { ev: CalEvent }) {
         <div className="flex items-center justify-between px-3 py-1 bg-[#FFF3E0] border-b border-[#FFD08A]">
           <div className="flex items-center gap-1.5">
             <AlertCircle className="w-2.5 h-2.5 text-[#CC8400]" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#CC8400]">Response needed</span>
+            <span className="text-[14px] font-bold  text-[#CC8400]">Response needed</span>
           </div>
           <a
             href={ev.htmlLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[9px] font-semibold text-[#CC8400] hover:underline flex items-center gap-0.5"
+            className="text-[14px] font-semibold text-[#CC8400] hover:underline flex items-center gap-0.5"
           >
             Open <ExternalLink className="w-2 h-2" />
           </a>
@@ -160,7 +160,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
       {soon && !ev.isPendingResponse && !ev.isTrailTalk && (
         <div className="flex items-center gap-1.5 px-3 py-1 bg-[#E6F0EA] border-b border-[#9FC3AE]">
           <Zap className="w-2.5 h-2.5 text-[#2F6B3F]" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-[#2F6B3F]">Starting soon</span>
+          <span className="text-[14px] font-bold  text-[#2F6B3F]">Starting soon</span>
         </div>
       )}
 
@@ -168,7 +168,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
 
         {/* Title + open link */}
         <div className="flex items-start justify-between gap-2">
-          <p className="text-[12px] font-semibold text-foreground leading-snug">{ev.summary}</p>
+          <p className="text-[14px] font-semibold text-foreground leading-snug">{ev.summary}</p>
           <a
             href={ev.htmlLink}
             target="_blank"
@@ -182,11 +182,11 @@ function EventCard({ ev }: { ev: CalEvent }) {
 
         {/* Date + countdown */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
             <CalendarDays className="w-2.5 h-2.5" />
             <span>{formatDate(start)}{ev.start.dateTime ? ` · ${formatTime(start)}` : ''}</span>
           </div>
-          <div className={`flex items-center gap-1 text-[10px] font-semibold ${soon ? 'text-[#2F6B3F]' : 'text-primary'}`}>
+          <div className={`flex items-center gap-1 text-[14px] font-semibold ${soon ? 'text-[#2F6B3F]' : 'text-primary'}`}>
             <Clock className="w-2.5 h-2.5" />
             <span>{timeToStart(start)}</span>
           </div>
@@ -194,16 +194,16 @@ function EventCard({ ev }: { ev: CalEvent }) {
 
         {/* Attendees (compact) */}
         {ev.attendeeCount > 0 && (
-          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
             <Users className="w-2.5 h-2.5" />
             <span>{ev.attendeeCount}</span>
             {ev.attendees.slice(0, 2).map(a => (
-              <span key={a.email} className="bg-muted rounded-full px-1.5 py-0.5 text-[9px] truncate max-w-[70px]">
+              <span key={a.email} className="bg-muted rounded-full px-1.5 py-0.5 text-[14px] truncate max-w-[70px]">
                 {a.displayName ?? a.email.split('@')[0]}
               </span>
             ))}
             {ev.attendeeCount > 2 && (
-              <span className="text-[9px] text-muted-foreground">+{ev.attendeeCount - 2}</span>
+              <span className="text-[14px] text-muted-foreground">+{ev.attendeeCount - 2}</span>
             )}
           </div>
         )}
@@ -213,14 +213,14 @@ function EventCard({ ev }: { ev: CalEvent }) {
           {!prep.reply && !prep.loading && !prep.error && (
             <button
               onClick={() => void requestPrep()}
-              className="flex items-center gap-1 text-[10px] text-primary border border-primary/20 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
+              className="flex items-center gap-1 text-[14px] text-primary border border-primary/20 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
             >
               <Brain className="w-2.5 h-2.5" /> {TERMS.aiAssistant} prep brief
             </button>
           )}
 
           {prep.loading && (
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
               <Brain className="w-2.5 h-2.5 text-primary animate-pulse" />
               <span>Generating brief…</span>
             </div>
@@ -230,12 +230,12 @@ function EventCard({ ev }: { ev: CalEvent }) {
             <div className="rounded-md border border-primary/20 bg-primary/5 p-2 space-y-1">
               <div className="flex items-center gap-1 mb-0.5">
                 <Brain className="w-2.5 h-2.5 text-primary" />
-                <span className="text-[9px] font-bold uppercase tracking-wider text-primary">{TERMS.aiAssistant} Prep Brief</span>
+                <span className="text-[14px] font-bold  text-primary">{TERMS.aiAssistant} Prep Brief</span>
               </div>
-              <p className="text-[11px] text-foreground leading-relaxed whitespace-pre-wrap">{prep.reply}</p>
+              <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-wrap">{prep.reply}</p>
               <button
                 onClick={() => setPrep({ loading: false, reply: null, error: null })}
-                className="text-[9px] text-muted-foreground hover:text-foreground transition-colors mt-0.5"
+                className="text-[14px] text-muted-foreground hover:text-foreground transition-colors mt-0.5"
               >
                 Dismiss
               </button>
@@ -243,7 +243,7 @@ function EventCard({ ev }: { ev: CalEvent }) {
           )}
 
           {prep.error && (
-            <div className="flex items-center gap-1 text-[10px] text-[#A93F2F]">
+            <div className="flex items-center gap-1 text-[14px] text-[#A93F2F]">
               <AlertCircle className="w-2.5 h-2.5" />
               <span>{prep.error}</span>
             </div>
@@ -328,8 +328,8 @@ export function CalendarActionPanel() {
                   <CalendarDays className="w-3.5 h-3.5 text-[#2F6B3F]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[13px] font-semibold text-foreground leading-none">Calendar</p>
-                  <p className="text-[9px] text-muted-foreground mt-0.5">
+                  <p className="text-[14px] font-semibold text-foreground leading-none">Calendar</p>
+                  <p className="text-[14px] text-muted-foreground mt-0.5">
                     {loading
                       ? 'Loading…'
                       : error
@@ -340,7 +340,7 @@ export function CalendarActionPanel() {
               </div>
 
               <div className="flex items-center gap-1.5 flex-shrink-0">
-                <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
+                <div className="flex items-center gap-1 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
                   <span className="font-semibold">Live</span>
                 </div>
@@ -366,12 +366,12 @@ export function CalendarActionPanel() {
             {/* Updated strip + full-view link */}
             {fetchedAt && !loading && (
               <div className="flex items-center justify-between px-4 py-1.5 bg-muted/20 border-b border-border/50 flex-shrink-0">
-                <span className="text-[9px] text-muted-foreground/60">
+                <span className="text-[14px] text-muted-foreground/60">
                   Updated {new Date(fetchedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
                 <button
                   onClick={() => { setCalendarPanelOpen(false); setLocation('/collaboration/calendar-live'); }}
-                  className="flex items-center gap-0.5 text-[9px] text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-0.5 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
                 >
                   View full Calendar <ArrowRight className="w-2.5 h-2.5" />
                 </button>
@@ -400,13 +400,13 @@ export function CalendarActionPanel() {
                     <div className="flex items-start gap-2">
                       <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-[12px] font-semibold text-[#A93F2F]">Could not load calendar</p>
-                        <p className="text-[11px] text-[#A93F2F] mt-0.5">{error}</p>
+                        <p className="text-[14px] font-semibold text-[#A93F2F]">Could not load calendar</p>
+                        <p className="text-[14px] text-[#A93F2F] mt-0.5">{error}</p>
                       </div>
                     </div>
                     <button
                       onClick={() => void load()}
-                      className="text-[11px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2.5 py-1 hover:bg-[#FBEAE6] transition-colors"
+                      className="text-[14px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2.5 py-1 hover:bg-[#FBEAE6] transition-colors"
                     >
                       Try again
                     </button>
@@ -418,7 +418,7 @@ export function CalendarActionPanel() {
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <AlertCircle className="w-3 h-3 text-[#CC8400]" />
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]">
+                      <p className="text-[14px] font-bold  text-[#CC8400]">
                         Needs Response ({pending.length})
                       </p>
                     </div>
@@ -433,7 +433,7 @@ export function CalendarActionPanel() {
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <CalendarDays className="w-3 h-3 text-muted-foreground" />
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                      <p className="text-[14px] font-bold  text-muted-foreground/70">
                         Upcoming
                       </p>
                     </div>
@@ -447,8 +447,8 @@ export function CalendarActionPanel() {
                 {!loading && !error && events.length === 0 && (
                   <div className="rounded-xl border border-dashed border-border p-6 text-center mt-4">
                     <CheckCircle2 className="w-7 h-7 text-[#2F6B3F] mx-auto mb-2" />
-                    <p className="text-[13px] font-semibold text-foreground mb-1">All clear</p>
-                    <p className="text-[11px] text-muted-foreground">No events in the next 7 days.</p>
+                    <p className="text-[14px] font-semibold text-foreground mb-1">All clear</p>
+                    <p className="text-[14px] text-muted-foreground">No events in the next 7 days.</p>
                   </div>
                 )}
 
@@ -458,7 +458,7 @@ export function CalendarActionPanel() {
             {/* Footer */}
             {!loading && !error && events.length > 0 && (
               <div className="px-4 py-2.5 border-t border-border flex-shrink-0 bg-muted/20">
-                <p className="text-[9px] text-muted-foreground/50 text-center leading-snug">
+                <p className="text-[14px] text-muted-foreground/50 text-center leading-snug">
                   Read-only · no calendar writes without your action · {TERMS.aiAssistant} prep by Gemini 2.5 Flash
                 </p>
               </div>

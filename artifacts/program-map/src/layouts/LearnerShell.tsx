@@ -43,15 +43,15 @@ export default function LearnerShell({ children }: LearnerShellProps) {
       <div className="h-12 flex items-center justify-between px-4 shrink-0" style={{ background: '#2F6B3F' }}>
         <div className="flex items-center gap-2">
           <span className="text-white font-bold text-[15px] tracking-tight">TT</span>
-          <span className="text-white/70 text-[12px] font-medium">Trail OS</span>
+          <span className="text-white/70 text-[14px] font-medium">Trail OS</span>
         </div>
         <div className="flex items-center gap-2">
           {auth.name && (
-            <span className="text-white text-[12px]">{auth.name}</span>
+            <span className="text-white text-[14px]">{auth.name}</span>
           )}
           {auth.trail && (
             <span
-              className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+              className="text-[14px] font-semibold px-2 py-0.5 rounded-full"
               style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}
             >
               {auth.trail}
@@ -80,7 +80,7 @@ export default function LearnerShell({ children }: LearnerShellProps) {
                   style={{ color: isActive ? '#2F6B3F' : 'rgba(74,79,77,0.5)' }}
                 />
                 <span
-                  className="text-[10px]"
+                  className="text-[14px]"
                   style={{
                     color:      isActive ? '#2F6B3F' : 'rgba(74,79,77,0.5)',
                     fontWeight: isActive ? 600 : 400,

@@ -44,7 +44,7 @@ export default function TrailOsHealth() {
               <StatusDot status="green" />
               <span className="text-sm font-semibold text-foreground">Trail OS is operational · integrations live</span>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               All navigation, knowledge brief, admin management, and RESOLVE framework features are active.
               Salesforce, Slack, Google Drive, Google Calendar, and Agentforce wired. Gemini AI active. GA4: Phase 2.
             </p>
@@ -60,11 +60,11 @@ export default function TrailOsHealth() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium text-foreground">{int.name}</p>
-                        <Badge variant="outline" className="text-[10px] text-muted-foreground flex-shrink-0">{int.eta}</Badge>
+                        <Badge variant="outline" className="text-[14px] text-muted-foreground flex-shrink-0">{int.eta}</Badge>
                       </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{int.note}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5">{int.note}</p>
                     </div>
-                    <span className={`text-[11px] font-medium flex-shrink-0 ${int.dot === 'green' ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>
+                    <span className={`text-[14px] font-medium flex-shrink-0 ${int.dot === 'green' ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>
                       {int.dot === 'green' ? 'Connected' : 'Not connected'}
                     </span>
                   </div>
@@ -84,8 +84,8 @@ export default function TrailOsHealth() {
               </div>
 
               <div className="mt-4 p-4 rounded-xl border border-border bg-card">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Build Governance</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <h3 className="text-sm font-semibold text-muted-foreground  mb-2">Build Governance</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Trail OS uses a source-of-truth confidence model. All knowledge items carry a confidence status
                   (Confirmed / Needs Review / Draft / Deprecated). Admin edits update in-session state.
                   Persistent storage will be connected in a future sprint.

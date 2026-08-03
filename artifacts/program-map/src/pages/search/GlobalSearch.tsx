@@ -71,7 +71,7 @@ function HealthDot({ health }: { health?: string }) {
 
 function TypeBadge({ entry }: { entry: SearchEntry }) {
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${entry.categoryBg} ${entry.categoryColor}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${entry.categoryBg} ${entry.categoryColor}`}>
       {entry.objectTypeName}
     </span>
   );
@@ -84,7 +84,7 @@ function ConfidenceBar({ value }: { value: number }) {
       <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
         <div className={`h-full ${cls} rounded-full`} style={{ width: `${value}%` }} />
       </div>
-      <span className="text-[9px] tabular-nums text-muted-foreground">{value}%</span>
+      <span className="text-[14px] tabular-nums text-muted-foreground">{value}%</span>
     </div>
   );
 }
@@ -100,11 +100,11 @@ function EverydayResultCard({ entry, selected, onSelect }: { entry: SearchEntry;
     >
       <div className="flex items-center gap-2 mb-1">
         <HealthDot health={selected ? 'unknown' : entry.health} />
-        <p className={`text-[12px] font-bold leading-tight truncate flex-1 ${selected ? 'text-primary-foreground' : 'text-foreground'}`}>
+        <p className={`text-[14px] font-bold leading-tight truncate flex-1 ${selected ? 'text-primary-foreground' : 'text-foreground'}`}>
           {entry.name}
         </p>
       </div>
-      <p className={`text-[10px] pl-4 leading-snug line-clamp-2 ${selected ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+      <p className={`text-[14px] pl-4 leading-snug line-clamp-2 ${selected ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
         {entry.description}
       </p>
     </button>
@@ -122,22 +122,22 @@ function EverydayDetailPanel({ entry, onSetContext }: { entry: SearchEntry; onSe
       <div className="px-5 pt-4 pb-3 border-b border-border space-y-1.5">
         <div className="flex items-center gap-2">
           <HealthDot health={entry.health} />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">{friendlyType}</span>
+          <span className="text-[14px] font-bold  text-muted-foreground/50">{friendlyType}</span>
           {entry.status && (
             <>
               <span className="text-muted-foreground/30">·</span>
-              <span className="text-[10px] text-muted-foreground">{entry.status}</span>
+              <span className="text-[14px] text-muted-foreground">{entry.status}</span>
             </>
           )}
         </div>
         <h2 className="text-base font-semibold text-foreground leading-tight">{entry.name}</h2>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">{entry.description}</p>
+        <p className="text-[14px] text-muted-foreground leading-relaxed">{entry.description}</p>
       </div>
 
       {/* Next step */}
       <div className="px-5 py-3 bg-primary/5 border-b border-primary/10">
-        <p className="text-[9px] font-bold uppercase tracking-widest text-primary/60 mb-1">Next step</p>
-        <p className="text-[12px] text-foreground leading-snug">{nextStep}</p>
+        <p className="text-[14px] font-bold  text-primary/60 mb-1">Next step</p>
+        <p className="text-[14px] text-foreground leading-snug">{nextStep}</p>
       </div>
 
       <div className="flex-1" />
@@ -146,14 +146,14 @@ function EverydayDetailPanel({ entry, onSetContext }: { entry: SearchEntry; onSe
       <div className="px-5 py-3 border-t border-border flex items-center gap-2 flex-wrap">
         <button
           onClick={() => setLocation(entry.workspaceLink)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[11px] font-semibold hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[14px] font-semibold hover:bg-primary/90 transition-colors"
         >
           Open
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={() => onSetContext(entry)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-[11px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-[14px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
         >
           <Target className="w-3.5 h-3.5" />
           Set as Context
@@ -167,12 +167,12 @@ function EverydayEmptyState({ onSuggest }: { onSuggest: (s: string) => void }) {
   return (
     <div className="p-5 space-y-4">
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Find anything</p>
-        <p className="text-[13px] font-semibold text-foreground mb-0.5">What are you looking for?</p>
-        <p className="text-[11px] text-muted-foreground">Find programs, sessions, team members, and learning materials.</p>
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Find anything</p>
+        <p className="text-[14px] font-semibold text-foreground mb-0.5">What are you looking for?</p>
+        <p className="text-[14px] text-muted-foreground">Find programs, sessions, team members, and learning materials.</p>
       </div>
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2.5">Quick searches</p>
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2.5">Quick searches</p>
         <div className="grid grid-cols-2 gap-2">
           {[
             { emoji: '📋', label: 'My programs',     q: 'foundations' },
@@ -188,7 +188,7 @@ function EverydayEmptyState({ onSuggest }: { onSuggest: (s: string) => void }) {
               className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border bg-background hover:bg-muted/40 transition-colors text-left"
             >
               <span className="text-[15px] leading-none">{item.emoji}</span>
-              <span className="text-[11px] text-foreground font-medium">{item.label}</span>
+              <span className="text-[14px] text-foreground font-medium">{item.label}</span>
             </button>
           ))}
         </div>
@@ -207,7 +207,7 @@ function ResultCard({ entry, selected, onSelect }: { entry: SearchEntry; selecte
       }`}
     >
       <div className="flex items-start justify-between gap-1.5 mb-1">
-        <p className={`text-[12px] font-bold leading-tight truncate ${selected ? 'text-primary-foreground' : 'text-foreground'}`}>
+        <p className={`text-[14px] font-bold leading-tight truncate ${selected ? 'text-primary-foreground' : 'text-foreground'}`}>
           {entry.name}
         </p>
         <div className="flex items-center gap-1 shrink-0 mt-0.5">
@@ -215,12 +215,12 @@ function ResultCard({ entry, selected, onSelect }: { entry: SearchEntry; selecte
         </div>
       </div>
       <div className="flex items-center gap-1.5 flex-wrap">
-        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border ${
+        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${
           selected ? 'bg-primary-foreground/10 text-primary-foreground/80 border-primary-foreground/20' : `${entry.categoryBg} ${entry.categoryColor} border-border`
         }`}>
           {entry.objectTypeName}
         </span>
-        <span className={`text-[9px] ${selected ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{entry.status}</span>
+        <span className={`text-[14px] ${selected ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{entry.status}</span>
       </div>
     </button>
   );
@@ -236,23 +236,23 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <TypeBadge entry={entry} />
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border bg-muted text-muted-foreground border-border">
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border bg-muted text-muted-foreground border-border">
                 {entry.status}
               </span>
               <div className="flex items-center gap-1">
                 <HealthDot health={entry.health} />
-                <span className="text-[9px] text-muted-foreground capitalize">{entry.health?.replace('-', ' ')}</span>
+                <span className="text-[14px] text-muted-foreground capitalize">{entry.health?.replace('-', ' ')}</span>
               </div>
             </div>
             <h2 className="text-base font-semibold text-foreground leading-tight">{entry.name}</h2>
           </div>
           <div className="text-right shrink-0">
             <ConfidenceBar value={entry.confidence} />
-            <p className="text-[9px] text-muted-foreground mt-0.5">confidence</p>
+            <p className="text-[14px] text-muted-foreground mt-0.5">confidence</p>
           </div>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">{entry.description}</p>
-        <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
+        <p className="text-[14px] text-muted-foreground leading-relaxed">{entry.description}</p>
+        <div className="flex items-center gap-3 text-[14px] text-muted-foreground flex-wrap">
           {entry.owner && (
             <span>Owner: <strong className="text-foreground">{entry.owner}</strong></span>
           )}
@@ -260,7 +260,7 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
             <>
               <span>·</span>
               <span className="inline-flex items-center gap-1">
-                SoT: <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] ml-1">{entry.sourceOfTruth}</span>
+                SoT: <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-medium bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] ml-1">{entry.sourceOfTruth}</span>
               </span>
             </>
           )}
@@ -271,41 +271,41 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
         <div className="p-4 space-y-4">
           {/* Relationships */}
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Relationships</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">Relationships</p>
             {entry.relationships.length > 0 ? (
               <div className="space-y-1">
                 {entry.relationships.map((r, i) => (
                   <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border/30 last:border-0">
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
+                    <span className={`text-[14px] font-bold px-1.5 py-0.5 rounded border shrink-0 ${
                       r.direction === 'up' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]'
                     }`}>
                       {r.direction === 'up' ? '↑ upstream' : '↓ downstream'}
                     </span>
-                    <span className="text-[11px] text-foreground font-medium flex-1 truncate">{r.name}</span>
-                    <span className="text-[9px] text-muted-foreground shrink-0">{r.type}</span>
+                    <span className="text-[14px] text-foreground font-medium flex-1 truncate">{r.name}</span>
+                    <span className="text-[14px] text-muted-foreground shrink-0">{r.type}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-[11px] text-muted-foreground">No relationships mapped yet.</p>
+              <p className="text-[14px] text-muted-foreground">No relationships mapped yet.</p>
             )}
           </div>
 
           {/* Impact summary */}
           {entry.impactSummary && (
             <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 p-3">
-              <p className="text-[9px] font-bold text-[#CC8400] uppercase tracking-widest mb-1">Impact Summary</p>
-              <p className="text-[11px] text-[#CC8400] leading-relaxed">{entry.impactSummary}</p>
+              <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Impact Summary</p>
+              <p className="text-[14px] text-[#CC8400] leading-relaxed">{entry.impactSummary}</p>
             </div>
           )}
 
           {/* Tags */}
           {entry.tags.length > 0 && (
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Tags</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">Tags</p>
               <div className="flex flex-wrap gap-1">
                 {entry.tags.map(t => (
-                  <span key={t} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] bg-muted border border-border text-muted-foreground">
+                  <span key={t} className="inline-flex items-center px-2 py-0.5 rounded-full text-[14px] bg-muted border border-border text-muted-foreground">
                     {t}
                   </span>
                 ))}
@@ -319,14 +319,14 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
       <div className="px-4 py-3 border-t border-border shrink-0 flex items-center gap-2 flex-wrap">
         <button
           onClick={() => onSetContext(entry)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[11px] font-semibold hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[14px] font-semibold hover:bg-primary/90 transition-colors"
         >
           <Target className="w-3.5 h-3.5" />
           Set as Context
         </button>
         <button
           onClick={() => setLocation(entry.workspaceLink)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-[11px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-[14px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           Open Workspace
@@ -334,7 +334,7 @@ function ExplorerPanel({ entry, onSetContext }: { entry: SearchEntry; onSetConte
         {entry.profileId && (
           <button
             onClick={() => setLocation(`/uom/profile/${entry.profileId}`)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-[11px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border bg-background text-[14px] font-semibold text-foreground hover:bg-muted/40 transition-colors"
           >
             View Profile
           </button>
@@ -348,24 +348,24 @@ function ExamplePaths({ onNodeClick }: { onNodeClick: (name: string) => void }) 
   return (
     <div className="p-5 space-y-4">
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Relationship Explorer</p>
-        <p className="text-[13px] font-semibold text-foreground mb-0.5">Select a result to explore</p>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Relationship Explorer</p>
+        <p className="text-[14px] font-semibold text-foreground mb-0.5">Select a result to explore</p>
+        <p className="text-[14px] text-muted-foreground leading-relaxed">
           Search for any object, then select it to see its relationships, ownership, health, and impact across Trail OS.
         </p>
       </div>
       <div className="space-y-2.5">
-        <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">Example paths</p>
+        <p className="text-[14px] font-bold  text-muted-foreground/50">Example paths</p>
         {EXAMPLE_PATHS.map(path => (
           <div key={path.label} className="rounded-lg border border-border bg-background p-3 space-y-2">
-            <p className="text-[12px] font-semibold text-foreground">{path.label}</p>
-            <p className="text-[11px] text-muted-foreground">{path.description}</p>
+            <p className="text-[14px] font-semibold text-foreground">{path.label}</p>
+            <p className="text-[14px] text-muted-foreground">{path.description}</p>
             <div className="flex items-center gap-1.5 flex-wrap">
               {path.nodes.map((node, i) => (
                 <div key={node.name} className="flex items-center gap-1">
                   <button
                     onClick={() => onNodeClick(node.name)}
-                    className="text-[10px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded px-2 py-0.5 hover:bg-primary/10 transition-colors"
+                    className="text-[14px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded px-2 py-0.5 hover:bg-primary/10 transition-colors"
                   >
                     {node.name}
                   </button>
@@ -475,7 +475,7 @@ export default function GlobalSearch() {
 
       {/* Search header */}
       <div className="px-5 pt-4 pb-3 border-b border-border shrink-0">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">
           {isAdminOrAbove ? 'Global Search & Relationship Explorer' : 'Search'}
         </p>
         <h1 className="text-base font-semibold text-foreground mb-3">
@@ -490,7 +490,7 @@ export default function GlobalSearch() {
             onChange={e => { setQuery(e.target.value); setSelectedId(null); setFilterGroup('all'); }}
             placeholder={searchPlaceholder}
             autoFocus
-            className="w-full text-[13px] border border-border rounded-lg pl-10 pr-8 py-2.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40"
+            className="w-full text-[14px] border border-border rounded-lg pl-10 pr-8 py-2.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40"
           />
           {query && (
             <button
@@ -506,14 +506,14 @@ export default function GlobalSearch() {
         {/* Suggested / example searches */}
         {!query && (
           <div className="flex items-center gap-2 mt-2.5 flex-wrap">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">
+            <span className="text-[14px] font-bold  text-muted-foreground/40">
               {isEveryday ? 'Try:' : 'Explore:'}
             </span>
             {suggested.map(s => (
               <button
                 key={s}
                 onClick={() => { setQuery(s); setSelectedId(null); }}
-                className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="text-[14px] font-medium px-2 py-0.5 rounded-full border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
               >
                 {s}
               </button>
@@ -523,12 +523,12 @@ export default function GlobalSearch() {
 
         {/* Active context banner */}
         {activeContext && (
-          <div className="mt-2.5 flex items-center gap-2 text-[11px] text-primary bg-primary/5 border border-primary/15 rounded-md px-3 py-1.5">
+          <div className="mt-2.5 flex items-center gap-2 text-[14px] text-primary bg-primary/5 border border-primary/15 rounded-md px-3 py-1.5">
             <Target className="w-3.5 h-3.5 shrink-0" />
             <span>Active context: <strong>{activeContext.name}</strong> · {activeContext.objectTypeName}</span>
             <button
               onClick={() => setActiveContext(null)}
-              className="ml-auto text-[9px] text-muted-foreground hover:text-foreground transition-colors"
+              className="ml-auto text-[14px] text-muted-foreground hover:text-foreground transition-colors"
             >
               Clear
             </button>
@@ -543,7 +543,7 @@ export default function GlobalSearch() {
             <button
               key={fg.id}
               onClick={() => { setFilterGroup(fg.id); setSelectedId(null); }}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+              className={`px-2.5 py-1 rounded-full text-[14px] font-semibold border whitespace-nowrap transition-colors ${
                 filterGroup === fg.id
                   ? 'bg-foreground text-background border-foreground'
                   : 'bg-background border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
@@ -562,7 +562,7 @@ export default function GlobalSearch() {
             <button
               key={t}
               onClick={() => { setFilterGroup(t); setSelectedId(null); }}
-              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border whitespace-nowrap transition-colors ${
+              className={`px-2.5 py-1 rounded-full text-[14px] font-semibold border whitespace-nowrap transition-colors ${
                 filterGroup === t
                   ? 'bg-foreground text-background border-foreground'
                   : 'bg-background border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
@@ -587,11 +587,11 @@ export default function GlobalSearch() {
           {results.length === 0 ? (
             <div className="p-6 text-center space-y-2">
               <SearchIcon className="w-7 h-7 mx-auto text-muted-foreground/20" />
-              <p className="text-[12px] font-semibold text-foreground">No results for "{query}"</p>
-              <p className="text-[11px] text-muted-foreground">Try a different term or clear the filter.</p>
+              <p className="text-[14px] font-semibold text-foreground">No results for "{query}"</p>
+              <p className="text-[14px] text-muted-foreground">Try a different term or clear the filter.</p>
               <button
                 onClick={clearSearch}
-                className="text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors"
+                className="text-[14px] font-semibold text-primary hover:text-primary/80 transition-colors"
               >
                 Clear search
               </button>
@@ -599,13 +599,13 @@ export default function GlobalSearch() {
           ) : (
             <>
               <div className="px-3 py-2 border-b border-border/40 bg-muted/20 flex items-center justify-between">
-                <p className="text-[10px] font-bold text-muted-foreground/60">
+                <p className="text-[14px] font-bold text-muted-foreground/60">
                   {results.length} result{results.length !== 1 ? 's' : ''}{query ? ` for "${query}"` : ''}
                 </p>
                 {selectedId && (
                   <button
                     onClick={() => setSelectedId(null)}
-                    className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                    className="text-[14px] text-muted-foreground/50 hover:text-muted-foreground transition-colors"
                   >
                     Deselect
                   </button>
@@ -624,7 +624,7 @@ export default function GlobalSearch() {
                 Array.from(grouped.entries()).map(([typeName, entries]) => (
                   <div key={typeName}>
                     <div className="px-3 py-1.5 bg-muted/20 border-b border-border/30">
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">{typeName}</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground/50">{typeName}</p>
                     </div>
                     {entries.map(entry => (
                       <ResultCard

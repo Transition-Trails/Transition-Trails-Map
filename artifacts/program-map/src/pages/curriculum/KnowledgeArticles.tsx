@@ -15,13 +15,13 @@ export default function KnowledgeArticles() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
           <h1 className="text-3xl font-bold text-foreground">Knowledge Articles</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">Reference articles, concept guides, and decision frameworks linked to modules and lessons. Select an article to view its module connections in the Knowledge Brief.</p>
+          <p className="text-[14px] text-muted-foreground mt-1">Reference articles, concept guides, and decision frameworks linked to modules and lessons. Select an article to view its module connections in the Knowledge Brief.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           {articleTypes.map(t => (
-            <button key={t} onClick={() => setTypeFilter(t)} className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors capitalize ${typeFilter === t ? 'bg-[#2F6F7E] text-white border-[#2F6F7E]' : 'border-border text-muted-foreground hover:border-[#7FAFC6]'}`}>
+            <button key={t} onClick={() => setTypeFilter(t)} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors capitalize ${typeFilter === t ? 'bg-[#2F6F7E] text-white border-[#2F6F7E]' : 'border-border text-muted-foreground hover:border-[#7FAFC6]'}`}>
               {t === 'all' ? 'All Types' : t}
             </button>
           ))}
@@ -35,20 +35,20 @@ export default function KnowledgeArticles() {
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-[#2F6F7E] shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">{article.name}</p>
+                      <p className="text-[14px] font-bold text-foreground">{article.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] font-medium text-[#2F6F7E] border border-[#7FAFC6] bg-[#EDF5F8] rounded-full px-1.5 py-0.5">{article.articleType as string}</span>
-                        <span className="text-[10px] text-muted-foreground">{article.wordCount as number} words · Reviewed {article.lastReviewed as string}</span>
+                        <span className="text-[14px] font-medium text-[#2F6F7E] border border-[#7FAFC6] bg-[#EDF5F8] rounded-full px-1.5 py-0.5">{article.articleType as string}</span>
+                        <span className="text-[14px] text-muted-foreground">{article.wordCount as number} words · Reviewed {article.lastReviewed as string}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                    <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                 </div>
-                <p className="text-[12px] text-muted-foreground">{article.purpose}</p>
-                <p className="text-[10px] text-[#2F6F7E] mt-1">
+                <p className="text-[14px] text-muted-foreground">{article.purpose}</p>
+                <p className="text-[14px] text-[#2F6F7E] mt-1">
                   Linked modules: {((article.moduleIds as string[]) || []).length > 0 ? `${(article.moduleIds as string[]).length} module(s)` : 'No modules linked'}
                 </p>
               </button>

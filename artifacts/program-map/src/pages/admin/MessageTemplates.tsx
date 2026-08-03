@@ -44,7 +44,7 @@ export default function MessageTemplates() {
           <div key={s.label} className="rounded-xl border border-border bg-card p-4">
             <div className="flex items-center gap-2 mb-2">
               <StatusDot status={s.dot} />
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{s.label}</p>
+              <p className="text-[14px] font-semibold text-muted-foreground ">{s.label}</p>
             </div>
             <p className="text-xl font-bold text-foreground">{s.value}</p>
           </div>
@@ -56,7 +56,7 @@ export default function MessageTemplates() {
           <thead>
             <tr className="bg-muted/50 border-b border-border">
               {['Template', 'Provider', 'Destination', 'Trigger Event', 'Audience', 'Status', 'Owner', 'Reviewed'].map(h => (
-                <th key={h} className="text-left px-3 py-2.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                <th key={h} className="text-left px-3 py-2.5 text-[14px] font-bold  text-muted-foreground whitespace-nowrap">
                   {h}
                 </th>
               ))}
@@ -72,45 +72,45 @@ export default function MessageTemplates() {
                   className="hover:bg-primary/5 cursor-pointer transition-colors"
                 >
                   <td className="px-3 py-3">
-                    <p className="font-semibold text-foreground text-[13px] leading-snug">{tpl.name}</p>
+                    <p className="font-semibold text-foreground text-[14px] leading-snug">{tpl.name}</p>
                     {tpl.relatedPennyCap && (
-                      <span className="inline-flex items-center text-[10px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5 mt-1">
+                      <span className="inline-flex items-center text-[14px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5 mt-1">
                         {TERMS.aiAssistant}: {tpl.relatedPennyCap}
                       </span>
                     )}
                     {tpl.relatedDemandEvent && (
-                      <span className="inline-flex items-center text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 mt-1">
+                      <span className="inline-flex items-center text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 mt-1">
                         Demand: {tpl.relatedDemandEvent}
                       </span>
                     )}
                   </td>
                   <td className="px-3 py-3">
-                    <span className={`inline-flex items-center text-[10px] font-semibold border px-2 py-0.5 rounded-full ${PROVIDER_BADGE[tpl.provider]}`}>
+                    <span className={`inline-flex items-center text-[14px] font-semibold border px-2 py-0.5 rounded-full ${PROVIDER_BADGE[tpl.provider]}`}>
                       {tpl.provider}
                     </span>
                   </td>
-                  <td className="px-3 py-3 font-mono text-[11px] text-muted-foreground">{tpl.destination}</td>
-                  <td className="px-3 py-3 text-[12px] text-muted-foreground max-w-[130px]">
+                  <td className="px-3 py-3 font-mono text-[14px] text-muted-foreground">{tpl.destination}</td>
+                  <td className="px-3 py-3 text-[14px] text-muted-foreground max-w-[130px]">
                     <span className="line-clamp-2">{tpl.triggerEvent}</span>
                   </td>
-                  <td className="px-3 py-3 text-[12px] text-muted-foreground">{tpl.audience}</td>
+                  <td className="px-3 py-3 text-[14px] text-muted-foreground">{tpl.audience}</td>
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-1.5">
                       <StatusDot status={sc.dot} />
-                      <span className={`text-[10px] font-semibold border px-1.5 py-0.5 rounded-full ${sc.badge}`}>
+                      <span className={`text-[14px] font-semibold border px-1.5 py-0.5 rounded-full ${sc.badge}`}>
                         {tpl.status.charAt(0).toUpperCase() + tpl.status.slice(1)}
                       </span>
                     </div>
                   </td>
-                  <td className="px-3 py-3 text-[12px] text-muted-foreground">{tpl.owner}</td>
-                  <td className="px-3 py-3 text-[12px] text-muted-foreground">{tpl.lastReviewed}</td>
+                  <td className="px-3 py-3 text-[14px] text-muted-foreground">{tpl.owner}</td>
+                  <td className="px-3 py-3 text-[14px] text-muted-foreground">{tpl.lastReviewed}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-      <p className="text-[11px] text-muted-foreground mt-3 text-center">
+      <p className="text-[14px] text-muted-foreground mt-3 text-center">
         Click any row to open its Knowledge Brief. Variables in {'{curly braces}'} are filled at send time.
       </p>
     </PageShell>

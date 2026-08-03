@@ -43,9 +43,9 @@ export default function PennyHealth() {
               <div className="space-y-2">
                 {topQueries.map((q, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border">
-                    <span className="text-[11px] font-bold text-muted-foreground w-4 flex-shrink-0">{i + 1}</span>
+                    <span className="text-[14px] font-bold text-muted-foreground w-4 flex-shrink-0">{i + 1}</span>
                     <p className="flex-1 text-sm text-foreground">{q.query}</p>
-                    <span className="text-xs font-semibold text-muted-foreground flex-shrink-0">{q.count}×</span>
+                    <span className="text-sm font-semibold text-muted-foreground flex-shrink-0">{q.count}×</span>
                   </div>
                 ))}
               </div>
@@ -58,7 +58,7 @@ export default function PennyHealth() {
                   <div key={i} className={`flex gap-3 p-3 rounded-lg border ${issue.severity === 'red' ? 'bg-[#FBEAE6] border-[#E8B9B4]' : 'bg-[#FFF3E0] border-[#FFD08A]'}`}>
                     <StatusDot status={issue.severity} />
                     <div className="min-w-0">
-                      <p className={`text-[11px] font-bold uppercase mb-0.5 ${issue.severity === 'red' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>
+                      <p className={`text-[14px] font-bold  mb-0.5 ${issue.severity === 'red' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>
                         {issue.type}
                       </p>
                       <p className="text-sm text-foreground">{issue.msg}</p>

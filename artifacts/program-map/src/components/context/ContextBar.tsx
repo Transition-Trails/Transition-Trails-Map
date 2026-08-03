@@ -35,7 +35,7 @@ function StatusBadge({ status, variant }: { status?: string; variant?: string })
     variant === 'inactive' ? 'bg-gray-100 text-gray-500 border-gray-200'         :
                              'bg-muted text-muted-foreground border-border';
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border shrink-0 ${color}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border shrink-0 ${color}`}>
       {status}
     </span>
   );
@@ -80,11 +80,11 @@ function EverydayContextBar() {
   const { label, hint, icon: SectionIcon } = deriveEverydaySection(location);
 
   return (
-    <div className="h-[32px] flex items-center gap-2 px-4 bg-muted/15 border-b border-border/30 text-[11px] shrink-0">
+    <div className="h-[32px] flex items-center gap-2 px-4 bg-muted/15 border-b border-border/30 text-[14px] shrink-0">
       <SectionIcon className="w-3 h-3 text-primary/40 shrink-0" />
       <span className="font-medium text-foreground/70 leading-none">{label}</span>
       <span className="hidden sm:block text-muted-foreground/30 ml-1">·</span>
-      <span className="hidden sm:block text-[10px] text-muted-foreground/45 leading-none truncate">{hint}</span>
+      <span className="hidden sm:block text-[14px] text-muted-foreground/45 leading-none truncate">{hint}</span>
     </div>
   );
 }
@@ -99,13 +99,13 @@ function PowerContextBar() {
 
   if (!activeContext) {
     return (
-      <div className="h-[32px] flex items-center gap-2 px-4 bg-muted/15 border-b border-border/30 text-[11px] shrink-0">
+      <div className="h-[32px] flex items-center gap-2 px-4 bg-muted/15 border-b border-border/30 text-[14px] shrink-0">
         <Target className="w-3 h-3 text-muted-foreground/35 shrink-0" />
         <span className="text-muted-foreground/50">No current focus</span>
         <div className="flex-1" />
         <button
           onClick={() => setLocation('/context')}
-          className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors"
+          className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/80 transition-colors"
         >
           <Plus className="w-3 h-3" />
           Set Focus
@@ -115,9 +115,9 @@ function PowerContextBar() {
   }
 
   return (
-    <div className="h-[40px] flex items-center gap-2 px-4 bg-primary/8 border-b border-primary/15 text-[11px] shrink-0">
+    <div className="h-[40px] flex items-center gap-2 px-4 bg-primary/8 border-b border-primary/15 text-[14px] shrink-0">
       {/* Type badge */}
-      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border shrink-0 ${activeContext.categoryBg} ${activeContext.categoryColor}`}>
+      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border shrink-0 ${activeContext.categoryBg} ${activeContext.categoryColor}`}>
         {activeContext.objectTypeName}
       </span>
 
@@ -142,7 +142,7 @@ function PowerContextBar() {
         onClick={() => setLocation('/context')}
         className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-muted/50 hidden sm:flex"
       >
-        <span className="text-[10px]">Change</span>
+        <span className="text-[14px]">Change</span>
       </button>
 
       {/* Clear */}
@@ -172,13 +172,13 @@ function AdminContextBar() {
 
   if (!activeContext) {
     return (
-      <div className="h-[32px] flex items-center gap-2 px-4 bg-muted/20 border-b border-border/40 text-[11px] shrink-0">
+      <div className="h-[32px] flex items-center gap-2 px-4 bg-muted/20 border-b border-border/40 text-[14px] shrink-0">
         <Target className="w-3 h-3 text-muted-foreground/40 shrink-0" />
         <span className="text-muted-foreground/50">No workspace context</span>
         <div className="flex-1" />
         <button
           onClick={() => setLocation('/context')}
-          className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors"
+          className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/80 transition-colors"
         >
           <Plus className="w-3 h-3" />
           Set Context
@@ -189,9 +189,9 @@ function AdminContextBar() {
 
   return (
     <div className="relative shrink-0">
-      <div className="h-[40px] flex items-center gap-2 px-4 bg-primary/8 border-b border-primary/15 text-[11px]">
+      <div className="h-[40px] flex items-center gap-2 px-4 bg-primary/8 border-b border-primary/15 text-[14px]">
 
-        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border shrink-0 ${activeContext.categoryBg} ${activeContext.categoryColor}`}>
+        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border shrink-0 ${activeContext.categoryBg} ${activeContext.categoryColor}`}>
           {activeContext.objectTypeName}
         </span>
 
@@ -227,7 +227,7 @@ function AdminContextBar() {
           className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-muted/50"
         >
           <Clock className="w-3 h-3" />
-          <span className="hidden sm:inline text-[10px]">Switch</span>
+          <span className="hidden sm:inline text-[14px]">Switch</span>
           <ChevronDown className={`w-3 h-3 transition-transform ${showSwitcher ? 'rotate-180' : ''}`} />
         </button>
 
@@ -236,7 +236,7 @@ function AdminContextBar() {
           className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors px-2 py-1 rounded hover:bg-primary/10"
         >
           <ExternalLink className="w-3 h-3" />
-          <span className="hidden sm:inline text-[10px] font-semibold">Open</span>
+          <span className="hidden sm:inline text-[14px] font-semibold">Open</span>
         </button>
 
         <button
@@ -251,7 +251,7 @@ function AdminContextBar() {
       {showSwitcher && (
         <div className="absolute top-full left-0 right-0 z-50 bg-card border-b border-border shadow-md">
           <div className="px-4 py-2 border-b border-border/50">
-            <p className="text-[9px] font-bold uppercase text-muted-foreground/60">
+            <p className="text-[14px] font-bold  text-muted-foreground/60">
               {recentContexts.length > 0 ? 'Recent Contexts' : 'Available Contexts'}
             </p>
           </div>
@@ -262,10 +262,10 @@ function AdminContextBar() {
                 onClick={() => handleSwitch(ctx)}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 text-left border-b border-border/30 transition-colors"
               >
-                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border shrink-0 ${ctx.categoryBg} ${ctx.categoryColor}`}>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border shrink-0 ${ctx.categoryBg} ${ctx.categoryColor}`}>
                   {ctx.objectTypeName}
                 </span>
-                <span className="text-[12px] font-semibold text-foreground truncate flex-1">{ctx.name}</span>
+                <span className="text-[14px] font-semibold text-foreground truncate flex-1">{ctx.name}</span>
                 <HealthDot health={ctx.health} />
                 {ctx.status && <StatusBadge status={ctx.status} variant={ctx.statusVariant} />}
               </button>
@@ -293,20 +293,20 @@ function AdminContextBar() {
                   })}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 text-left border-b border-border/30 transition-colors"
                 >
-                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase border shrink-0 ${ctx.categoryBg} ${ctx.categoryColor}`}>
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border shrink-0 ${ctx.categoryBg} ${ctx.categoryColor}`}>
                     {ctx.objectTypeName}
                   </span>
-                  <span className="text-[12px] font-semibold text-foreground truncate flex-1">{ctx.name}</span>
+                  <span className="text-[14px] font-semibold text-foreground truncate flex-1">{ctx.name}</span>
                   <HealthDot health={ctx.health} />
                   {ctx.status && <StatusBadge status={ctx.status} variant={ctx.statusVariant} />}
                 </button>
               ))}
           </div>
           <div className="px-4 py-2 border-t border-border/50 flex items-center justify-between">
-            <p className="text-[10px] text-muted-foreground">Set context from Global Search or any Object Profile.</p>
+            <p className="text-[14px] text-muted-foreground">Set context from Global Search or any Object Profile.</p>
             <button
               onClick={() => { setShowSwitcher(false); setLocation('/context'); }}
-              className="text-[10px] font-semibold text-primary hover:underline"
+              className="text-[14px] font-semibold text-primary hover:underline"
             >
               Context Engine →
             </button>

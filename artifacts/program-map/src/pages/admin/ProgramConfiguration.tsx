@@ -30,7 +30,7 @@ function PennyStatusRow({ programId }: { programId: string }) {
     <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/40 bg-muted/10">
       <div className="flex items-center gap-2">
         <Sparkles className="w-3 h-3 text-primary/60" />
-        <span className="text-[11px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</span>
+        <span className="text-[14px] font-semibold text-foreground">{TERMS.aiAssistant} Intelligence</span>
         {isSaving && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
       </div>
       <div className="flex gap-1">
@@ -39,7 +39,7 @@ function PennyStatusRow({ programId }: { programId: string }) {
             key={opt.value}
             onClick={() => setStatus(opt.value)}
             disabled={isSaving}
-            className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] font-semibold transition-colors focus:outline-none disabled:opacity-50 ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[14px] font-semibold transition-colors focus:outline-none disabled:opacity-50 ${
               status === opt.value
                 ? opt.badge + ' shadow-sm'
                 : 'bg-background text-muted-foreground border-border hover:border-primary/30'
@@ -127,7 +127,7 @@ function StatusBadge({ status }: { status: string | null }) {
   const s = status ?? 'Unknown';
   const cls = STATUS_COLORS[s] ?? 'bg-gray-50 text-gray-500 border-gray-200';
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${cls}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[14px] font-semibold border ${cls}`}>
       {s}
     </span>
   );
@@ -166,11 +166,11 @@ function StepIndicator({ current, skipCohorts = false, onStepClick }: {
                   : 'bg-muted border-border text-muted-foreground'
                 }`}
               >
-                {isSkipped ? <span className="text-[10px] font-bold">—</span>
+                {isSkipped ? <span className="text-[14px] font-bold">—</span>
                   : isDone ? <Check className="w-3.5 h-3.5" />
                   : <Icon className="w-3.5 h-3.5" />}
               </div>
-              <span className={`text-[10px] mt-1 font-medium ${
+              <span className={`text-[14px] mt-1 font-medium ${
                 isSkipped  ? 'text-muted-foreground/40 line-through'
                 : isActive ? 'text-primary'
                 : isDone   ? 'text-foreground'
@@ -197,7 +197,7 @@ function StepIndicator({ current, skipCohorts = false, onStepClick }: {
           }`}>
             {done ? <Check className="w-3.5 h-3.5" /> : <ClipboardList className="w-3.5 h-3.5" />}
           </div>
-          <span className={`text-[10px] mt-1 font-medium ${done ? 'text-primary' : 'text-muted-foreground'}`}>Review</span>
+          <span className={`text-[14px] mt-1 font-medium ${done ? 'text-primary' : 'text-muted-foreground'}`}>Review</span>
         </div>
       </div>
     </div>
@@ -213,18 +213,18 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[11px] font-semibold text-foreground/80">
+      <label className="text-[14px] font-semibold text-foreground/80">
         {label}{required && <span className="text-[#A93F2F] ml-0.5">*</span>}
       </label>
       {children}
-      {hint && <p className="text-[10px] text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-[14px] text-muted-foreground">{hint}</p>}
     </div>
   );
 }
 
-const INPUT_CLS = "w-full text-[13px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50";
-const SELECT_CLS = "w-full text-[13px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30";
-const TEXTAREA_CLS = "w-full text-[13px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50 resize-none";
+const INPUT_CLS = "w-full text-[14px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50";
+const SELECT_CLS = "w-full text-[14px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30";
+const TEXTAREA_CLS = "w-full text-[14px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50 resize-none";
 
 function sfStr(v: unknown): string | null {
   if (v == null || v === '') return null;
@@ -246,24 +246,24 @@ function ProgramCard({
       }`}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-[13px] font-semibold text-foreground leading-tight">{p.Name}</p>
+        <p className="text-[14px] font-semibold text-foreground leading-tight">{p.Name}</p>
         <StatusBadge status={p.pmdm__Status__c} />
       </div>
       {p.pmdm__ShortSummary__c && (
-        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{p.pmdm__ShortSummary__c}</p>
+        <p className="text-[14px] text-muted-foreground mt-1 line-clamp-2">{p.pmdm__ShortSummary__c}</p>
       )}
       <div className="flex gap-3 mt-1.5">
         {p.pmdm__StartDate__c && (
-          <span className="text-[10px] text-muted-foreground">Start: {p.pmdm__StartDate__c}</span>
+          <span className="text-[14px] text-muted-foreground">Start: {p.pmdm__StartDate__c}</span>
         )}
         {p.pmdm__EndDate__c && (
-          <span className="text-[10px] text-muted-foreground">End: {p.pmdm__EndDate__c}</span>
+          <span className="text-[14px] text-muted-foreground">End: {p.pmdm__EndDate__c}</span>
         )}
       </div>
       {selected && (
         <div className="flex items-center gap-1 mt-1.5 text-primary">
           <Check className="w-3 h-3" />
-          <span className="text-[10px] font-semibold">Selected</span>
+          <span className="text-[14px] font-semibold">Selected</span>
         </div>
       )}
     </button>
@@ -348,21 +348,21 @@ function PennyGuidancePanel({
               {/* Program identity — badges → title → summary */}
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border border-border bg-background uppercase tracking-wider">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[14px] font-semibold border border-border bg-background ">
                     Program
                   </span>
                   {program.pmdm__Status__c && <StatusBadge status={program.pmdm__Status__c} />}
                 </div>
                 <h2 className="text-[15px] font-semibold text-foreground leading-snug">{program.Name}</h2>
                 {program.pmdm__ShortSummary__c && (
-                  <p className="text-xs text-muted-foreground italic leading-snug">{program.pmdm__ShortSummary__c}</p>
+                  <p className="text-sm text-muted-foreground italic leading-snug">{program.pmdm__ShortSummary__c}</p>
                 )}
               </div>
 
               {/* Focus with Penny — subtle outline, right after title */}
               <button
                 onClick={onFocusWithPenny}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 Focus with {TERMS.aiAssistant}
@@ -386,8 +386,8 @@ function PennyGuidancePanel({
                   <div className="space-y-3">
                     {fields.map(f => (
                       <div key={f.label}>
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{f.label}</p>
-                        <p className="text-[12px] text-foreground leading-snug">{f.val}</p>
+                        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">{f.label}</p>
+                        <p className="text-[14px] text-foreground leading-snug">{f.val}</p>
                       </div>
                     ))}
                   </div>
@@ -399,12 +399,12 @@ function PennyGuidancePanel({
 
               {/* Step guidance — compact, secondary */}
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">In this step</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">In this step</p>
                 <ul className="space-y-1.5">
                   {brief.bullets.map(b => (
                     <li key={b} className="flex items-start gap-2">
                       <span className="w-1 h-1 rounded-full bg-primary/40 mt-1.5 flex-shrink-0" />
-                      <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
+                      <span className="text-[14px] text-muted-foreground leading-relaxed">{b}</span>
                     </li>
                   ))}
                 </ul>
@@ -413,18 +413,18 @@ function PennyGuidancePanel({
               {/* Agentforce — review step only */}
               {step === 'review' && onInvokeAgentforce && (
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">Agentforce</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">Agentforce</p>
                   <button
                     onClick={onInvokeAgentforce}
                     disabled={agentforceLoading}
-                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-[#EDF5F8] hover:bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] text-[12px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-[#EDF5F8] hover:bg-[#EDF5F8] border border-[#7FAFC6] text-[#2F6F7E] text-[14px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {agentforceLoading
                       ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       : <Zap className="w-3.5 h-3.5" />}
                     Invoke Agentforce
                   </button>
-                  <p className="text-[10px] text-muted-foreground/50 mt-1.5 leading-snug">
+                  <p className="text-[14px] text-muted-foreground/50 mt-1.5 leading-snug">
                     Orchestrate complex setup tasks across the full configuration.
                   </p>
                 </div>
@@ -434,16 +434,16 @@ function PennyGuidancePanel({
             <>
               {/* No program selected — show step guidance prominently */}
               <div className="rounded-lg bg-muted/40 border border-border/60 p-3">
-                <p className="text-[11px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
+                <p className="text-[14px] text-foreground/80 leading-relaxed">{STEP_CONTEXT[step]}</p>
               </div>
 
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">In this step</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">In this step</p>
                 <ul className="space-y-1.5">
                   {brief.bullets.map(b => (
                     <li key={b} className="flex items-start gap-2">
                       <span className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                      <span className="text-[11px] text-muted-foreground leading-relaxed">{b}</span>
+                      <span className="text-[14px] text-muted-foreground leading-relaxed">{b}</span>
                     </li>
                   ))}
                 </ul>
@@ -451,7 +451,7 @@ function PennyGuidancePanel({
 
               <button
                 onClick={onFocusWithPenny}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[11px] font-bold text-primary hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-[14px] font-bold text-primary hover:bg-primary/10 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 Focus with {TERMS.aiAssistant}
@@ -989,22 +989,22 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
           <div>
             <button
               onClick={() => navigate('/program')}
-              className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-muted-foreground mb-1 transition-colors"
+              className="flex items-center gap-1 text-[14px] text-muted-foreground/60 hover:text-muted-foreground mb-1 transition-colors"
             >
               <ArrowLeft className="w-3 h-3" /> Programs
             </button>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">
               Programs
             </p>
             <h1 className="text-base font-semibold text-foreground">Program Configuration</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               Configure Salesforce Programs, Cohorts, Courses &amp; Modules — guided by {TERMS.aiAssistant}
             </p>
           </div>
           {step !== 1 && (
             <button
               onClick={() => { setStep(1); setSelectedProgram(null); setCohorts([]); setCourses([]); setModules([]); setSelectedCourse(null); }}
-              className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-1.5 hover:bg-muted/40 transition-colors"
+              className="flex items-center gap-1.5 text-[14px] text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-1.5 hover:bg-muted/40 transition-colors"
             >
               <RotateCcw className="w-3 h-3" /> Start over
             </button>
@@ -1045,7 +1045,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                           return !v;
                         });
                       }}
-                      className="flex items-center gap-1.5 text-[11px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors"
+                      className="flex items-center gap-1.5 text-[14px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors"
                     >
                       <Plus className="w-3 h-3" /> Create New
                     </button>
@@ -1053,7 +1053,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
 
                   {showProgramForm && (
                     <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
-                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">New Program</p>
+                      <p className="text-[14px] font-semibold text-foreground/70 ">New Program</p>
                       <div className="grid grid-cols-2 gap-3">
                         <Field label="Program Name" required>
                           <input className={INPUT_CLS} value={progForm.Name} onChange={e => setProgForm(p => ({...p, Name: e.target.value}))} placeholder="e.g. The Guided Trail 2026" />
@@ -1087,11 +1087,11 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                       </Field>
                       <div className="flex gap-2 pt-1">
                         <button onClick={() => void handleCreateProgram()} disabled={saving}
-                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[12px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[14px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
                           {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                           Save to Salesforce
                         </button>
-                        <button onClick={() => setShowProgramForm(false)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">
+                        <button onClick={() => setShowProgramForm(false)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">
                           Cancel
                         </button>
                       </div>
@@ -1107,7 +1107,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                         value={progSearch}
                         onChange={e => setProgSearch(e.target.value)}
                       />
-                      <button onClick={() => void loadPrograms()} className="text-[11px] text-muted-foreground hover:text-foreground p-1.5 rounded hover:bg-muted/40">
+                      <button onClick={() => void loadPrograms()} className="text-[14px] text-muted-foreground hover:text-foreground p-1.5 rounded hover:bg-muted/40">
                         <RotateCcw className="w-3.5 h-3.5" />
                       </button>
                       <div className="ml-auto flex items-center gap-1">
@@ -1120,7 +1120,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                           <button
                             key={f.key}
                             onClick={() => setStatusFilter(f.key)}
-                            className={`text-[11px] px-2.5 py-1 rounded-lg border transition-colors ${
+                            className={`text-[14px] px-2.5 py-1 rounded-lg border transition-colors ${
                               statusFilter === f.key
                                 ? 'bg-primary text-primary-foreground border-primary'
                                 : 'border-border text-muted-foreground hover:bg-muted/40'
@@ -1134,12 +1134,12 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                     {programsLoading ? (
                       <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span className="text-[12px]">Loading from Salesforce…</span>
+                        <span className="text-[14px]">Loading from Salesforce…</span>
                       </div>
                     ) : filteredPrograms.length === 0 ? (
                       <div className="text-center py-8 border border-dashed border-border rounded-xl">
                         <AlertCircle className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-[12px] text-muted-foreground">No programs found. Create one above or check your Salesforce connection.</p>
+                        <p className="text-[14px] text-muted-foreground">No programs found. Create one above or check your Salesforce connection.</p>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-2">
@@ -1160,12 +1160,12 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                   <div className="flex items-center justify-between px-4 py-2.5 bg-primary/5 border-b border-primary/20">
                                     <div className="flex items-center gap-2">
                                       <span className="w-2 h-2 rounded-full bg-primary" />
-                                      <p className="text-[12px] font-semibold text-foreground">{p.Name}</p>
+                                      <p className="text-[14px] font-semibold text-foreground">{p.Name}</p>
                                       <StatusBadge status={p.pmdm__Status__c} />
                                     </div>
                                     <button
                                       onClick={() => setEditingProgram(v => !v)}
-                                      className={`flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg border transition-colors ${
+                                      className={`flex items-center gap-1.5 text-[14px] px-2.5 py-1 rounded-lg border transition-colors ${
                                         editingProgram
                                           ? 'bg-muted border-border text-muted-foreground hover:bg-muted/80'
                                           : 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/20'
@@ -1179,7 +1179,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                   {programDetailLoading && (
                                     <div className="flex items-center gap-2 justify-center py-5 text-muted-foreground">
                                       <Loader2 className="w-4 h-4 animate-spin" />
-                                      <span className="text-[12px]">Loading fields from Salesforce…</span>
+                                      <span className="text-[14px]">Loading fields from Salesforce…</span>
                                     </div>
                                   )}
 
@@ -1223,11 +1223,11 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                             <div className="rounded-lg bg-muted/30 border border-border/50 p-4 grid grid-cols-2 gap-x-6 gap-y-4">
                                               {rows.map(({ label, val }) => (
                                                 <div key={label}>
-                                                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">{label}</p>
+                                                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">{label}</p>
                                                   {label === 'Status' ? (
                                                     <StatusBadge status={val} />
                                                   ) : (
-                                                    <p className="text-[12px] text-foreground font-medium">
+                                                    <p className="text-[14px] text-foreground font-medium">
                                                       {val ?? <span className="text-muted-foreground/40 italic font-normal">—</span>}
                                                     </p>
                                                   )}
@@ -1241,14 +1241,14 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                               const isHtml = /<[a-z][\s\S]*>/i.test(val);
                                               return (
                                                 <div key={key} className="pt-3 border-t border-border/40">
-                                                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">{label}</p>
+                                                  <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">{label}</p>
                                                   {isHtml ? (
                                                     <div
-                                                      className="prose prose-sm max-w-none text-[12px] text-foreground [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_li]:text-[12px] [&_strong]:font-semibold [&_em]:italic [&_p]:mb-1.5 [&_p:last-child]:mb-0"
+                                                      className="prose prose-sm max-w-none text-[14px] text-foreground [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1 [&_li]:text-[14px] [&_strong]:font-semibold [&_em]:italic [&_p]:mb-1.5 [&_p:last-child]:mb-0"
                                                       dangerouslySetInnerHTML={{ __html: val }}
                                                     />
                                                   ) : (
-                                                    <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-wrap">{val}</p>
+                                                    <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-wrap">{val}</p>
                                                   )}
                                                 </div>
                                               );
@@ -1257,13 +1257,13 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                               <div className="flex gap-3 pt-1 border-t border-border/50">
                                                 {driveUrl && (
                                                   <a href={driveUrl} target="_blank" rel="noreferrer"
-                                                    className="flex items-center gap-1 text-[11px] text-primary hover:underline">
+                                                    className="flex items-center gap-1 text-[14px] text-primary hover:underline">
                                                     <ExternalLink className="w-3 h-3" /> Google Drive
                                                   </a>
                                                 )}
                                                 {canvaUrl && (
                                                   <a href={canvaUrl} target="_blank" rel="noreferrer"
-                                                    className="flex items-center gap-1 text-[11px] text-primary hover:underline">
+                                                    className="flex items-center gap-1 text-[14px] text-primary hover:underline">
                                                     <ExternalLink className="w-3 h-3" /> Canva Folder
                                                   </a>
                                                 )}
@@ -1308,11 +1308,11 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                       </Field>
                                       <div className="flex gap-2 pt-1">
                                         <button onClick={() => void handleUpdateProgram()} disabled={saving}
-                                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[12px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[14px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
                                           {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                                           Save Changes to Salesforce
                                         </button>
-                                        <button onClick={() => setEditingProgram(false)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">
+                                        <button onClick={() => setEditingProgram(false)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">
                                           Cancel
                                         </button>
                                       </div>
@@ -1327,7 +1327,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                     <div className="flex items-center gap-1 rounded-lg border border-border bg-background p-0.5">
                                       <button
                                         onClick={() => setIsCohortBased(true)}
-                                        className={`text-[11px] font-medium px-3 py-1 rounded-md transition-all ${
+                                        className={`text-[14px] font-medium px-3 py-1 rounded-md transition-all ${
                                           isCohortBased
                                             ? 'bg-primary text-primary-foreground shadow-sm'
                                             : 'text-muted-foreground hover:text-foreground'
@@ -1337,7 +1337,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                       </button>
                                       <button
                                         onClick={() => setIsCohortBased(false)}
-                                        className={`text-[11px] font-medium px-3 py-1 rounded-md transition-all ${
+                                        className={`text-[14px] font-medium px-3 py-1 rounded-md transition-all ${
                                           !isCohortBased
                                             ? 'bg-primary text-primary-foreground shadow-sm'
                                             : 'text-muted-foreground hover:text-foreground'
@@ -1347,7 +1347,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                                       </button>
                                     </div>
                                     <button onClick={handleAdvanceFromStep1}
-                                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[13px] font-semibold hover:bg-primary/90 transition-colors">
+                                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[14px] font-semibold hover:bg-primary/90 transition-colors">
                                       {isCohortBased ? 'Next: Configure Cohorts' : 'Next: Configure Course'}
                                       <ChevronRight className="w-4 h-4" />
                                     </button>
@@ -1369,17 +1369,17 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-sm font-semibold text-foreground">Cohorts</h2>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">for {selectedProgram?.Name}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5">for {selectedProgram?.Name}</p>
                     </div>
                     <button onClick={() => setShowCohortForm(v => !v)}
-                      className="flex items-center gap-1.5 text-[11px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
+                      className="flex items-center gap-1.5 text-[14px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
                       <Plus className="w-3 h-3" /> Add Cohort
                     </button>
                   </div>
 
                   {showCohortForm && (
                     <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
-                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">New Cohort</p>
+                      <p className="text-[14px] font-semibold text-foreground/70 ">New Cohort</p>
                       <div className="grid grid-cols-2 gap-3">
                         <Field label="Cohort Name" required>
                           <input className={INPUT_CLS} value={cohortForm.Name} onChange={e => setCohortForm(p => ({...p, Name: e.target.value}))} placeholder="e.g. Fall 2026 Cohort" />
@@ -1404,36 +1404,36 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                       </Field>
                       <div className="flex gap-2 pt-1">
                         <button onClick={() => void handleCreateCohort()} disabled={saving}
-                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[12px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[14px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
                           {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                           Save Cohort
                         </button>
-                        <button onClick={() => setShowCohortForm(false)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">Cancel</button>
+                        <button onClick={() => setShowCohortForm(false)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">Cancel</button>
                       </div>
                     </div>
                   )}
 
                   {cohortsLoading ? (
                     <div className="flex items-center gap-2 text-muted-foreground py-6 justify-center">
-                      <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[12px]">Loading cohorts…</span>
+                      <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[14px]">Loading cohorts…</span>
                     </div>
                   ) : cohorts.length === 0 ? (
                     <div className="text-center py-6 border border-dashed border-border rounded-xl">
-                      <p className="text-[12px] text-muted-foreground">No cohorts yet. Add one above.</p>
+                      <p className="text-[14px] text-muted-foreground">No cohorts yet. Add one above.</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {cohorts.map(c => (
                         <div key={c.Id} className="rounded-lg border border-border bg-card p-3 flex items-start justify-between gap-3">
                           <div>
-                            <p className="text-[13px] font-semibold text-foreground">{c.Name}</p>
+                            <p className="text-[14px] font-semibold text-foreground">{c.Name}</p>
                             <div className="flex gap-2 mt-1 flex-wrap">
                               <StatusBadge status={c.pmdm__Status__c} />
-                              {c.pmdm__StartDate__c && <span className="text-[10px] text-muted-foreground">Start: {c.pmdm__StartDate__c}</span>}
-                              {c.pmdm__EndDate__c && <span className="text-[10px] text-muted-foreground">End: {c.pmdm__EndDate__c}</span>}
-                              {c.Cohort_Capacity__c !== null && <span className="text-[10px] text-muted-foreground">Cap: {c.Cohort_Capacity__c}</span>}
+                              {c.pmdm__StartDate__c && <span className="text-[14px] text-muted-foreground">Start: {c.pmdm__StartDate__c}</span>}
+                              {c.pmdm__EndDate__c && <span className="text-[14px] text-muted-foreground">End: {c.pmdm__EndDate__c}</span>}
+                              {c.Cohort_Capacity__c !== null && <span className="text-[14px] text-muted-foreground">Cap: {c.Cohort_Capacity__c}</span>}
                             </div>
-                            {c.pmdm__Description__c && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{c.pmdm__Description__c}</p>}
+                            {c.pmdm__Description__c && <p className="text-[14px] text-muted-foreground mt-1 line-clamp-2">{c.pmdm__Description__c}</p>}
                           </div>
                           <div className="w-5 h-5 rounded-full bg-[#E6F0EA] flex items-center justify-center flex-shrink-0">
                             <Check className="w-3 h-3 text-[#2F6B3F]" />
@@ -1444,9 +1444,9 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   )}
 
                   <div className="flex items-center justify-between pt-2">
-                    <button onClick={() => setStep(1)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
+                    <button onClick={() => setStep(1)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
                     <button onClick={handleAdvanceToStep3}
-                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[13px] font-semibold hover:bg-primary/90 transition-colors">
+                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[14px] font-semibold hover:bg-primary/90 transition-colors">
                       Next: Link Course <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -1459,7 +1459,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="text-sm font-semibold text-foreground">Link or Create Course</h2>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">for {selectedProgram?.Name}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5">for {selectedProgram?.Name}</p>
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <button
@@ -1468,12 +1468,12 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                           setShowCourseForm(false);
                           if (!showLinkForm && allLmsCourses.length === 0) void loadAllLmsCourses();
                         }}
-                        className="flex items-center gap-1.5 text-[11px] border border-border bg-background text-foreground rounded-lg px-3 py-1.5 hover:border-primary/40 hover:bg-primary/[0.02] transition-colors">
+                        className="flex items-center gap-1.5 text-[14px] border border-border bg-background text-foreground rounded-lg px-3 py-1.5 hover:border-primary/40 hover:bg-primary/[0.02] transition-colors">
                         <Link2 className="w-3 h-3" /> Link Existing
                       </button>
                       <button
                         onClick={() => { setShowCourseForm(v => !v); setShowLinkForm(false); }}
-                        className="flex items-center gap-1.5 text-[11px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
+                        className="flex items-center gap-1.5 text-[14px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
                         <Plus className="w-3 h-3" /> Create New
                       </button>
                     </div>
@@ -1482,11 +1482,11 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   {/* ── Link existing course picker ────────────────────────── */}
                   {showLinkForm && (
                     <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
-                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Link an Existing Course</p>
+                      <p className="text-[14px] font-semibold text-foreground/70 ">Link an Existing Course</p>
                       <div className="relative">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
                         <input
-                          className="w-full pl-8 pr-3 py-1.5 text-[12px] rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
+                          className="w-full pl-8 pr-3 py-1.5 text-[14px] rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
                           placeholder="Search courses…"
                           value={linkSearch}
                           onChange={e => setLinkSearch(e.target.value)}
@@ -1494,7 +1494,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                       </div>
                       {allLmsLoading ? (
                         <div className="flex items-center gap-2 text-muted-foreground py-3 justify-center">
-                          <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[12px]">Loading all courses…</span>
+                          <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[14px]">Loading all courses…</span>
                         </div>
                       ) : (
                         <div className="space-y-1 max-h-52 overflow-y-auto">
@@ -1507,7 +1507,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                             );
                             if (filtered.length === 0) {
                               return (
-                                <p className="text-[11px] text-muted-foreground text-center py-3">
+                                <p className="text-[14px] text-muted-foreground text-center py-3">
                                   {linkSearch ? 'No matches.' : 'All courses are already linked or none available.'}
                                 </p>
                               );
@@ -1521,11 +1521,11 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                               >
                                 <BookOpen className="w-3.5 h-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[12px] font-medium text-foreground truncate">{c.Course_Title__c ?? c.Name}</p>
-                                  {c.Course_Title__c && <p className="text-[10px] text-muted-foreground truncate">{c.Name}</p>}
+                                  <p className="text-[14px] font-medium text-foreground truncate">{c.Course_Title__c ?? c.Name}</p>
+                                  {c.Course_Title__c && <p className="text-[14px] text-muted-foreground truncate">{c.Name}</p>}
                                 </div>
                                 {c.Status__c && (
-                                  <span className="text-[9px] font-semibold border rounded px-1.5 py-0.5 shrink-0 bg-muted text-muted-foreground border-border">
+                                  <span className="text-[14px] font-semibold border rounded px-1.5 py-0.5 shrink-0 bg-muted text-muted-foreground border-border">
                                     {c.Status__c}
                                   </span>
                                 )}
@@ -1535,13 +1535,13 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                           })()}
                         </div>
                       )}
-                      <button onClick={() => { setShowLinkForm(false); setLinkSearch(''); }} className="text-[11px] text-muted-foreground hover:text-foreground">Cancel</button>
+                      <button onClick={() => { setShowLinkForm(false); setLinkSearch(''); }} className="text-[14px] text-muted-foreground hover:text-foreground">Cancel</button>
                     </div>
                   )}
 
                   {showCourseForm && (
                     <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
-                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">New Course</p>
+                      <p className="text-[14px] font-semibold text-foreground/70 ">New Course</p>
                       <div className="grid grid-cols-2 gap-3">
                         <Field label="Course Name (API)" required>
                           <input className={INPUT_CLS} value={courseForm.Name} onChange={e => setCourseForm(p => ({...p, Name: e.target.value}))} placeholder="e.g. GuidedTrail_2026_Core" />
@@ -1575,22 +1575,22 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                       </Field>
                       <div className="flex gap-2 pt-1">
                         <button onClick={() => void handleCreateCourse()} disabled={saving}
-                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[12px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[14px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
                           {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                           Save Course
                         </button>
-                        <button onClick={() => setShowCourseForm(false)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">Cancel</button>
+                        <button onClick={() => setShowCourseForm(false)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">Cancel</button>
                       </div>
                     </div>
                   )}
 
                   {coursesLoading ? (
                     <div className="flex items-center gap-2 text-muted-foreground py-6 justify-center">
-                      <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[12px]">Loading courses…</span>
+                      <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[14px]">Loading courses…</span>
                     </div>
                   ) : courses.length === 0 ? (
                     <div className="text-center py-6 border border-dashed border-border rounded-xl">
-                      <p className="text-[12px] text-muted-foreground">No linked courses found. Create one above.</p>
+                      <p className="text-[14px] text-muted-foreground">No linked courses found. Create one above.</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -1600,13 +1600,13 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                             selectedCourse?.Id === c.Id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 bg-card'
                           }`}>
                           <div className="flex items-start justify-between gap-2">
-                            <p className="text-[13px] font-semibold text-foreground">{c.Course_Title__c ?? c.Name}</p>
+                            <p className="text-[14px] font-semibold text-foreground">{c.Course_Title__c ?? c.Name}</p>
                             <StatusBadge status={c.Status__c} />
                           </div>
-                          {c.Overview__c && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{c.Overview__c}</p>}
+                          {c.Overview__c && <p className="text-[14px] text-muted-foreground mt-1 line-clamp-2">{c.Overview__c}</p>}
                           {selectedCourse?.Id === c.Id && (
                             <div className="flex items-center gap-1 mt-1.5 text-primary">
-                              <Check className="w-3 h-3" /><span className="text-[10px] font-semibold">Selected</span>
+                              <Check className="w-3 h-3" /><span className="text-[14px] font-semibold">Selected</span>
                             </div>
                           )}
                         </button>
@@ -1615,9 +1615,9 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   )}
 
                   <div className="flex items-center justify-between pt-2">
-                    <button onClick={() => goToStep(isCohortBased ? 2 : 1)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
+                    <button onClick={() => goToStep(isCohortBased ? 2 : 1)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
                     <button onClick={handleAdvanceToStep4}
-                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[13px] font-semibold hover:bg-primary/90 transition-colors">
+                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[14px] font-semibold hover:bg-primary/90 transition-colors">
                       Next: Add Modules <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -1630,17 +1630,17 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-sm font-semibold text-foreground">Modules</h2>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">for {selectedCourse?.Course_Title__c ?? selectedCourse?.Name}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5">for {selectedCourse?.Course_Title__c ?? selectedCourse?.Name}</p>
                     </div>
                     <button onClick={() => setShowModuleForm(v => !v)}
-                      className="flex items-center gap-1.5 text-[11px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
+                      className="flex items-center gap-1.5 text-[14px] bg-primary text-primary-foreground rounded-lg px-3 py-1.5 hover:bg-primary/90 transition-colors">
                       <Plus className="w-3 h-3" /> Add Module
                     </button>
                   </div>
 
                   {showModuleForm && (
                     <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
-                      <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">New Module</p>
+                      <p className="text-[14px] font-semibold text-foreground/70 ">New Module</p>
                       <div className="grid grid-cols-2 gap-3">
                         <Field label="Module Name" required>
                           <input className={INPUT_CLS} value={moduleForm.Name} onChange={e => setModuleForm(p => ({...p, Name: e.target.value}))} placeholder="e.g. Module 1: Career Clarity" />
@@ -1671,22 +1671,22 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                       </Field>
                       <div className="flex gap-2 pt-1">
                         <button onClick={() => void handleCreateModule()} disabled={saving}
-                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[12px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                          className="flex items-center gap-1.5 bg-primary text-primary-foreground text-[14px] font-semibold rounded-lg px-4 py-2 hover:bg-primary/90 disabled:opacity-50 transition-colors">
                           {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                           Save Module
                         </button>
-                        <button onClick={() => setShowModuleForm(false)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">Cancel</button>
+                        <button onClick={() => setShowModuleForm(false)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">Cancel</button>
                       </div>
                     </div>
                   )}
 
                   {modulesLoading ? (
                     <div className="flex items-center gap-2 text-muted-foreground py-6 justify-center">
-                      <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[12px]">Loading modules…</span>
+                      <Loader2 className="w-4 h-4 animate-spin" /><span className="text-[14px]">Loading modules…</span>
                     </div>
                   ) : modules.length === 0 ? (
                     <div className="text-center py-6 border border-dashed border-border rounded-xl">
-                      <p className="text-[12px] text-muted-foreground">No modules yet. Add your first module above.</p>
+                      <p className="text-[14px] text-muted-foreground">No modules yet. Add your first module above.</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -1694,18 +1694,18 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                         <div key={m.Id} className="rounded-lg border border-border bg-card p-3">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                              <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[14px] font-bold flex-shrink-0">
                                 {m.Order__c ?? idx + 1}
                               </span>
-                              <p className="text-[13px] font-semibold text-foreground">{m.Name}</p>
+                              <p className="text-[14px] font-semibold text-foreground">{m.Name}</p>
                             </div>
                             <StatusBadge status={m.Status__c} />
                           </div>
                           {m.Mission_Brief__c && (
-                            <p className="text-[11px] text-muted-foreground mt-1.5 ml-7 line-clamp-2">{m.Mission_Brief__c}</p>
+                            <p className="text-[14px] text-muted-foreground mt-1.5 ml-7 line-clamp-2">{m.Mission_Brief__c}</p>
                           )}
                           {m.Core_Concepts__c && (
-                            <p className="text-[10px] text-muted-foreground/70 mt-0.5 ml-7 line-clamp-1">Concepts: {m.Core_Concepts__c}</p>
+                            <p className="text-[14px] text-muted-foreground/70 mt-0.5 ml-7 line-clamp-1">Concepts: {m.Core_Concepts__c}</p>
                           )}
                         </div>
                       ))}
@@ -1713,9 +1713,9 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                   )}
 
                   <div className="flex items-center justify-between pt-2">
-                    <button onClick={() => setStep(3)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
+                    <button onClick={() => setStep(3)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
                     <button onClick={() => setStep('review')}
-                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[13px] font-semibold hover:bg-primary/90 transition-colors">
+                      className="flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-[14px] font-semibold hover:bg-primary/90 transition-colors">
                       Review &amp; Save <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -1761,7 +1761,7 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
 
                     {/* Validation checklist */}
                     <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-2.5">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Configuration Checklist</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground/50 mb-3">Configuration Checklist</p>
                       {reviewChecks.map(chk => (
                         <div key={chk.label} className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
@@ -1774,17 +1774,17 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                             }`}>
                               {chk.ok
                                 ? <Check className="w-2.5 h-2.5" />
-                                : <span className="text-[9px] font-bold leading-none">!</span>}
+                                : <span className="text-[14px] font-bold leading-none">!</span>}
                             </div>
-                            <span className="text-[12px] font-medium text-foreground truncate">{chk.label}</span>
+                            <span className="text-[14px] font-medium text-foreground truncate">{chk.label}</span>
                             {chk.detail && (
-                              <span className="text-[11px] text-muted-foreground truncate">— {chk.detail}</span>
+                              <span className="text-[14px] text-muted-foreground truncate">— {chk.detail}</span>
                             )}
                           </div>
                           {!chk.ok && !(chk.step === 2 && !isCohortBased) && (
                             <button
                               onClick={() => goToStep(chk.step)}
-                              className="text-[11px] text-primary hover:underline flex-shrink-0"
+                              className="text-[14px] text-primary hover:underline flex-shrink-0"
                             >
                               Fix →
                             </button>
@@ -1797,13 +1797,13 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                     {cohorts.length > 0 && (
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Cohorts</p>
-                          <button onClick={() => goToStep(2)} className="text-[11px] text-primary hover:underline">Edit →</button>
+                          <p className="text-[14px] font-semibold text-foreground/70 ">Cohorts</p>
+                          <button onClick={() => goToStep(2)} className="text-[14px] text-primary hover:underline">Edit →</button>
                         </div>
                         <div className="space-y-1.5">
                           {cohorts.map(c => (
                             <div key={c.Id} className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
-                              <p className="text-[12px] font-medium text-foreground">{c.Name}</p>
+                              <p className="text-[14px] font-medium text-foreground">{c.Name}</p>
                               <StatusBadge status={c.pmdm__Status__c} />
                             </div>
                           ))}
@@ -1815,11 +1815,11 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                     {selectedCourse && (
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Course</p>
-                          <button onClick={() => goToStep(3)} className="text-[11px] text-primary hover:underline">Edit →</button>
+                          <p className="text-[14px] font-semibold text-foreground/70 ">Course</p>
+                          <button onClick={() => goToStep(3)} className="text-[14px] text-primary hover:underline">Edit →</button>
                         </div>
                         <div className="rounded-lg border border-border/60 bg-card px-3 py-2 flex items-center justify-between">
-                          <p className="text-[12px] font-medium text-foreground">
+                          <p className="text-[14px] font-medium text-foreground">
                             {selectedCourse.Course_Title__c ?? selectedCourse.Name}
                           </p>
                           <StatusBadge status={selectedCourse.Status__c} />
@@ -1831,15 +1831,15 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                     {modules.length > 0 && (
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider">Modules</p>
-                          <button onClick={() => goToStep(4)} className="text-[11px] text-primary hover:underline">Edit →</button>
+                          <p className="text-[14px] font-semibold text-foreground/70 ">Modules</p>
+                          <button onClick={() => goToStep(4)} className="text-[14px] text-primary hover:underline">Edit →</button>
                         </div>
                         <div className="space-y-1.5">
                           {modules.map((m, idx) => (
                             <div key={m.Id} className="flex items-center justify-between rounded-lg border border-border/60 bg-card px-3 py-2">
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-muted-foreground w-4">{m.Order__c ?? idx + 1}</span>
-                                <p className="text-[12px] font-medium text-foreground">{m.Name}</p>
+                                <span className="text-[14px] font-bold text-muted-foreground w-4">{m.Order__c ?? idx + 1}</span>
+                                <p className="text-[14px] font-medium text-foreground">{m.Name}</p>
                               </div>
                               <StatusBadge status={m.Status__c} />
                             </div>
@@ -1849,15 +1849,15 @@ export default function ProgramConfiguration({ preSelectSfId }: { preSelectSfId?
                     )}
 
                     <div className="flex items-center gap-3 pt-2 border-t border-border">
-                      <button onClick={() => setStep(4)} className="text-[12px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
+                      <button onClick={() => setStep(4)} className="text-[14px] text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">← Back</button>
                       <div className="flex-1" />
                       {canSave ? (
-                        <p className="text-[11px] text-[#2F6B3F] flex items-center gap-1">
+                        <p className="text-[14px] text-[#2F6B3F] flex items-center gap-1">
                           <Check className="w-3.5 h-3.5" /> All records saved to Salesforce as you went
                         </p>
                       ) : (
-                        <p className="text-[11px] text-[#A93F2F] flex items-center gap-1 font-medium">
-                          <span className="w-3.5 h-3.5 rounded-full bg-[#FBEAE6] inline-flex items-center justify-center text-[9px] font-bold">!</span>
+                        <p className="text-[14px] text-[#A93F2F] flex items-center gap-1 font-medium">
+                          <span className="w-3.5 h-3.5 rounded-full bg-[#FBEAE6] inline-flex items-center justify-center text-[14px] font-bold">!</span>
                           Fix required items above to complete
                         </p>
                       )}

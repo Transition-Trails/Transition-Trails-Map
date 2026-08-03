@@ -256,14 +256,14 @@ export function GmailActionPanel() {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <p className="text-[13px] font-semibold text-foreground leading-none">Mail</p>
+                    <p className="text-[14px] font-semibold text-foreground leading-none">Mail</p>
                     {unreadCount > 0 && (
-                      <Badge variant="secondary" className="h-4 text-[9px] px-1.5 bg-primary/10 text-primary border-0">
+                      <Badge variant="secondary" className="h-4 text-[14px] px-1.5 bg-primary/10 text-primary border-0">
                         {unreadCount} unread
                       </Badge>
                     )}
                   </div>
-                  <p className="text-[9px] text-muted-foreground mt-0.5">
+                  <p className="text-[14px] text-muted-foreground mt-0.5">
                     {loading
                       ? 'Loading…'
                       : fetchError
@@ -276,7 +276,7 @@ export function GmailActionPanel() {
               <div className="flex items-center gap-1 flex-shrink-0">
                 {/* Live / error badge */}
                 {!loading && (
-                  <div className={`flex items-center gap-1 text-[9px] rounded-full px-2 py-0.5 mr-0.5 border ${
+                  <div className={`flex items-center gap-1 text-[14px] rounded-full px-2 py-0.5 mr-0.5 border ${
                     fetchError
                       ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
                       : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
@@ -288,7 +288,7 @@ export function GmailActionPanel() {
 
                 <button
                   onClick={startNew}
-                  className="flex items-center gap-1 text-[10px] font-semibold text-primary border border-primary/30 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
+                  className="flex items-center gap-1 text-[14px] font-semibold text-primary border border-primary/30 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
                   title="Compose new message"
                 >
                   <Pencil className="w-2.5 h-2.5" /> Compose
@@ -313,14 +313,14 @@ export function GmailActionPanel() {
             {/* Updated strip */}
             {fetchedAt && !loading && !fetchError && (
               <div className="flex items-center justify-between px-4 py-1.5 bg-muted/20 border-b border-border/50 flex-shrink-0">
-                <span className="text-[9px] text-muted-foreground/60">
+                <span className="text-[14px] text-muted-foreground/60">
                   Updated {new Date(fetchedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
                 <a
                   href="https://mail.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-0.5 text-[9px] text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-0.5 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Open Gmail <ArrowRight className="w-2.5 h-2.5" />
                 </a>
@@ -355,8 +355,8 @@ export function GmailActionPanel() {
                         <div className="flex items-start gap-2">
                           <AlertCircle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-[12px] font-semibold text-[#CC8400]">Inbox reading requires app verification</p>
-                            <p className="text-[11px] text-[#CC8400] mt-0.5 leading-snug">
+                            <p className="text-[14px] font-semibold text-[#CC8400]">Inbox reading requires app verification</p>
+                            <p className="text-[14px] text-[#CC8400] mt-0.5 leading-snug">
                               Reading Gmail inbox requires <code className="font-mono bg-[#FFF3E0] px-1 rounded">gmail.readonly</code> — a Google "restricted" scope that needs a formal security review before it works in production. <strong>Compose and send still work</strong> via the button below.
                             </p>
                           </div>
@@ -367,10 +367,10 @@ export function GmailActionPanel() {
                         <div className="flex items-start gap-2">
                           <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-[12px] font-semibold text-[#A93F2F]">Could not load inbox</p>
-                            <p className="text-[11px] text-[#A93F2F] mt-0.5">{fetchError}</p>
+                            <p className="text-[14px] font-semibold text-[#A93F2F]">Could not load inbox</p>
+                            <p className="text-[14px] text-[#A93F2F] mt-0.5">{fetchError}</p>
                             {fetchError.includes('GOOGLE_GMAIL_REFRESH_TOKEN') && (
-                              <p className="text-[10px] text-[#A93F2F] mt-1">
+                              <p className="text-[14px] text-[#A93F2F] mt-1">
                                 Store your Gmail refresh token as <code className="font-mono bg-[#FBEAE6] px-1 rounded">GOOGLE_GMAIL_REFRESH_TOKEN</code> in Replit Secrets and restart the API server.
                               </p>
                             )}
@@ -378,7 +378,7 @@ export function GmailActionPanel() {
                         </div>
                         <button
                           onClick={() => void load()}
-                          className="text-[11px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2.5 py-1 hover:bg-[#FBEAE6] transition-colors"
+                          className="text-[14px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2.5 py-1 hover:bg-[#FBEAE6] transition-colors"
                         >
                           Try again
                         </button>
@@ -392,7 +392,7 @@ export function GmailActionPanel() {
                   <div className="px-4 pt-3 pb-1">
                     <div className="flex items-center gap-1.5 mb-1.5">
                       <AlertCircle className="w-3 h-3 text-[#CC8400]" />
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]">
+                      <p className="text-[14px] font-bold  text-[#CC8400]">
                         Needs Response ({actionNeeded.length})
                       </p>
                     </div>
@@ -409,7 +409,7 @@ export function GmailActionPanel() {
                     } ${sentIds.has(t.id) ? 'opacity-50' : ''}`}
                   >
                     {/* Avatar */}
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${avatarColor(t.fromEmail)}`}>
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5 ${avatarColor(t.fromEmail)}`}>
                       {initials(t.from)}
                     </div>
 
@@ -419,26 +419,26 @@ export function GmailActionPanel() {
                           {t.unread && !sentIds.has(t.id) && (
                             <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                           )}
-                          <span className={`text-[11px] truncate ${t.unread && !sentIds.has(t.id) ? 'font-bold' : 'font-medium text-foreground/80'}`}>
+                          <span className={`text-[14px] truncate ${t.unread && !sentIds.has(t.id) ? 'font-bold' : 'font-medium text-foreground/80'}`}>
                             {t.from}
                           </span>
                           {t.starred && <Star className="w-2.5 h-2.5 text-[#CC8400] fill-[#CC8400] shrink-0" />}
                         </div>
-                        <span className="text-[9px] text-muted-foreground shrink-0">{formatDate(t.date)}</span>
+                        <span className="text-[14px] text-muted-foreground shrink-0">{formatDate(t.date)}</span>
                       </div>
 
-                      <p className={`text-[11px] truncate mb-0.5 ${t.unread && !sentIds.has(t.id) ? 'font-semibold' : 'text-foreground/70'}`}>
+                      <p className={`text-[14px] truncate mb-0.5 ${t.unread && !sentIds.has(t.id) ? 'font-semibold' : 'text-foreground/70'}`}>
                         {t.subject}
                       </p>
-                      <p className="text-[10px] text-muted-foreground line-clamp-1">{t.snippet}</p>
+                      <p className="text-[14px] text-muted-foreground line-clamp-1">{t.snippet}</p>
 
                       {t.needsAction && !sentIds.has(t.id) && (
-                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-1.5 py-0.5">
+                        <span className="inline-flex items-center gap-1 mt-1 text-[14px] font-semibold text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-1.5 py-0.5">
                           <AlertCircle className="w-2 h-2" /> Reply needed
                         </span>
                       )}
                       {sentIds.has(t.id) && (
-                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">
+                        <span className="inline-flex items-center gap-1 mt-1 text-[14px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">
                           <CheckCircle2 className="w-2 h-2" /> Replied
                         </span>
                       )}
@@ -450,8 +450,8 @@ export function GmailActionPanel() {
                 {!loading && !fetchError && threads.length === 0 && (
                   <div className="p-6 text-center">
                     <CheckCircle2 className="w-7 h-7 text-[#2F6B3F] mx-auto mb-2" />
-                    <p className="text-[13px] font-semibold text-foreground mb-1">Inbox zero</p>
-                    <p className="text-[11px] text-muted-foreground">No messages in your inbox.</p>
+                    <p className="text-[14px] font-semibold text-foreground mb-1">Inbox zero</p>
+                    <p className="text-[14px] text-muted-foreground">No messages in your inbox.</p>
                   </div>
                 )}
 
@@ -469,7 +469,7 @@ export function GmailActionPanel() {
                       ? <Reply className="w-3 h-3 text-primary" />
                       : <Pencil className="w-3 h-3 text-primary" />
                     }
-                    <span className="text-[11px] font-semibold text-foreground">
+                    <span className="text-[14px] font-semibold text-foreground">
                       {composeMode === 'reply' && selectedThread
                         ? `Reply to ${selectedThread.from.split(' ')[0]}`
                         : 'New Message'}
@@ -496,12 +496,12 @@ export function GmailActionPanel() {
 
                     {/* To field */}
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-muted-foreground font-medium w-8 shrink-0">To</span>
+                      <span className="text-[14px] text-muted-foreground font-medium w-8 shrink-0">To</span>
                       <input
                         value={to}
                         onChange={e => setTo(e.target.value)}
                         placeholder="recipient@example.com"
-                        className="flex-1 text-[11px] text-foreground bg-muted/30 border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40"
+                        className="flex-1 text-[14px] text-foreground bg-muted/30 border border-border rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40"
                       />
                     </div>
 
@@ -510,12 +510,12 @@ export function GmailActionPanel() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => void handlePenny()}
-                          className="flex items-center gap-1.5 text-[10px] font-semibold text-primary border border-primary/30 rounded-md px-2.5 py-1.5 hover:bg-primary/5 transition-colors"
+                          className="flex items-center gap-1.5 text-[14px] font-semibold text-primary border border-primary/30 rounded-md px-2.5 py-1.5 hover:bg-primary/5 transition-colors"
                         >
                           <Sparkles className="w-3 h-3" />
                           Ask {TERMS.aiAssistant} to draft
                         </button>
-                        <span className="text-[9px] text-muted-foreground">or write below</span>
+                        <span className="text-[14px] text-muted-foreground">or write below</span>
                       </div>
                     )}
 
@@ -523,13 +523,13 @@ export function GmailActionPanel() {
                     {generating && (
                       <div className="flex items-center gap-2 py-0.5">
                         <Brain className="w-3.5 h-3.5 text-primary animate-pulse" />
-                        <span className="text-[10px] text-muted-foreground">{TERMS.aiAssistant} is drafting…</span>
+                        <span className="text-[14px] text-muted-foreground">{TERMS.aiAssistant} is drafting…</span>
                       </div>
                     )}
 
                     {/* Penny error */}
                     {pennyError && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-[#A93F2F]">
+                      <div className="flex items-center gap-1.5 text-[14px] text-[#A93F2F]">
                         <AlertCircle className="w-3 h-3 shrink-0" />
                         <span>{pennyError}</span>
                       </div>
@@ -542,10 +542,10 @@ export function GmailActionPanel() {
                         onChange={e => setBody(e.target.value)}
                         placeholder={composeMode === 'reply' ? 'Write a reply…' : 'Write your message…'}
                         rows={5}
-                        className="w-full text-[11px] text-foreground bg-muted/30 border border-border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none leading-relaxed"
+                        className="w-full text-[14px] text-foreground bg-muted/30 border border-border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/30 resize-none leading-relaxed"
                       />
                       {pennyDone && (
-                        <div className="absolute top-2 right-2 flex items-center gap-1 text-[9px] text-primary opacity-70">
+                        <div className="absolute top-2 right-2 flex items-center gap-1 text-[14px] text-primary opacity-70">
                           <Sparkles className="w-2.5 h-2.5" />
                           <span>{TERMS.aiAssistant} draft</span>
                         </div>
@@ -554,7 +554,7 @@ export function GmailActionPanel() {
 
                     {/* Send error */}
                     {sendError && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-[#A93F2F]">
+                      <div className="flex items-center gap-1.5 text-[14px] text-[#A93F2F]">
                         <AlertCircle className="w-3 h-3 shrink-0" />
                         <span>{sendError}</span>
                       </div>
@@ -565,7 +565,7 @@ export function GmailActionPanel() {
                       <button
                         onClick={() => void handleSend()}
                         disabled={!body.trim() || !to.trim() || sending}
-                        className="flex items-center gap-1.5 text-[11px] font-semibold text-primary-foreground bg-primary rounded-md px-3 py-1.5 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="flex items-center gap-1.5 text-[14px] font-semibold text-primary-foreground bg-primary rounded-md px-3 py-1.5 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         <Send className={`w-3 h-3 ${sending ? 'animate-pulse' : ''}`} />
                         {sending ? 'Sending…' : composeMode === 'reply' ? 'Send Reply' : 'Send'}
@@ -585,7 +585,7 @@ export function GmailActionPanel() {
                       </button>
                     </div>
 
-                    <p className="text-[9px] text-muted-foreground/40 text-center">
+                    <p className="text-[14px] text-muted-foreground/40 text-center">
                       Sends via Gmail · {TERMS.aiAssistant} draft by Gemini 2.5 Flash · no auto-send
                     </p>
                   </div>
@@ -596,12 +596,12 @@ export function GmailActionPanel() {
             {/* Compose button — always available when token is present, even if inbox reading is blocked */}
             {!loading && composeMode === 'hidden' && (
               <div className="px-4 py-2 border-t border-border flex-shrink-0 bg-muted/20 flex items-center justify-between gap-2">
-                <p className="text-[9px] text-muted-foreground/50">
+                <p className="text-[14px] text-muted-foreground/50">
                   {fetchError?.includes('insufficient') ? 'Send-only mode · inbox reading requires app verification' : `gmail.send · ${TERMS.aiAssistant} draft by Gemini 2.5 Flash`}
                 </p>
                 <button
                   onClick={() => setComposeMode('new')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[11px] font-semibold hover:opacity-90 transition-opacity shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[14px] font-semibold hover:opacity-90 transition-opacity shrink-0"
                 >
                   <Pencil className="w-3 h-3" /> Compose
                 </button>

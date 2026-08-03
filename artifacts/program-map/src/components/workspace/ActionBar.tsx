@@ -40,7 +40,7 @@ export function ActionBar({ actions, note, className = '' }: ActionBarProps) {
             onClick={() => handleClick(action)}
             disabled={isDisabled}
             title={isDisabled ? (action.disabledReason ?? 'Not available') : action.label}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-colors
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[14px] font-semibold whitespace-nowrap transition-colors
               ${isPrimary
                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                 : 'bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-card'
@@ -54,7 +54,7 @@ export function ActionBar({ actions, note, className = '' }: ActionBarProps) {
         );
       })}
       {note && (
-        <span className="ml-auto text-[10px] text-muted-foreground/60 italic">{note}</span>
+        <span className="ml-auto text-[14px] text-muted-foreground/60 italic">{note}</span>
       )}
     </div>
   );

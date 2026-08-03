@@ -48,7 +48,7 @@ function buildInsights(total: number, approved: number) {
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
+    <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">
       {children}
     </p>
   );
@@ -62,7 +62,7 @@ function StatPill({
   return (
     <div className={`${base} ${interactive}`} onClick={onClick}>
       <span className={`text-xl font-bold ${color}`}>{value}</span>
-      <span className="text-[10px] text-muted-foreground mt-0.5 text-center leading-tight">{label}</span>
+      <span className="text-[14px] text-muted-foreground mt-0.5 text-center leading-tight">{label}</span>
     </div>
   );
 }
@@ -85,13 +85,13 @@ function NavCard({
             <Icon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
           <div>
-            <p className="text-[12px] font-semibold text-foreground">{title}</p>
-            <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">{desc}</p>
+            <p className="text-[14px] font-semibold text-foreground">{title}</p>
+            <p className="text-[14px] text-muted-foreground leading-snug mt-0.5">{desc}</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {badge && (
-            <span className={`text-[9px] font-bold border rounded px-1.5 py-0.5 ${badgeColor ?? 'bg-muted text-muted-foreground border-border'}`}>
+            <span className={`text-[14px] font-bold border rounded px-1.5 py-0.5 ${badgeColor ?? 'bg-muted text-muted-foreground border-border'}`}>
               {badge}
             </span>
           )}
@@ -118,17 +118,17 @@ function IssueRow({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-semibold text-foreground truncate">{source.name}</p>
-          <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{source.healthIssues[0]}</p>
+          <p className="text-[14px] font-semibold text-foreground truncate">{source.name}</p>
+          <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{source.healthIssues[0]}</p>
           {source.healthIssues.length > 1 && (
-            <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+            <p className="text-[14px] text-muted-foreground/60 mt-0.5">
               +{source.healthIssues.length - 1} more issue{source.healthIssues.length > 2 ? 's' : ''}
             </p>
           )}
         </div>
         <button
           onClick={e => { e.stopPropagation(); onReview(); }}
-          className="text-[10px] font-medium text-primary hover:underline shrink-0 mt-0.5"
+          className="text-[14px] font-medium text-primary hover:underline shrink-0 mt-0.5"
         >
           Review →
         </button>
@@ -178,13 +178,13 @@ export default function KnowledgeOverview() {
 
         {/* ── Page header ─────────────────────────────────────────────────── */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">
             Knowledge Library
           </p>
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-base font-semibold text-foreground leading-snug">Overview</h1>
-              <p className="text-[12px] text-muted-foreground mt-0.5">
+              <p className="text-[14px] text-muted-foreground mt-0.5">
                 Source health, trust governance, and {TERMS.aiAssistant} readiness across all knowledge sources.
               </p>
             </div>
@@ -248,8 +248,8 @@ export default function KnowledgeOverview() {
                   <row.icon className={`w-3.5 h-3.5 shrink-0 ${row.iconCls}`} />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-[11px] font-medium text-foreground">{row.label}</span>
-                      <span className="text-[11px] font-bold text-foreground">{row.count}</span>
+                      <span className="text-[14px] font-medium text-foreground">{row.label}</span>
+                      <span className="text-[14px] font-bold text-foreground">{row.count}</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
@@ -263,7 +263,7 @@ export default function KnowledgeOverview() {
             </div>
             <button
               onClick={() => setLocation('/knowledge/sources')}
-              className="mt-1 text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
+              className="mt-1 text-[14px] font-medium text-primary hover:underline flex items-center gap-0.5"
             >
               Manage sources <ChevronRight className="w-3 h-3" />
             </button>
@@ -278,17 +278,17 @@ export default function KnowledgeOverview() {
                   <span className={`w-2 h-2 rounded-full shrink-0 ${t.dot}`} />
                   <div className="flex-1 flex items-center justify-between">
                     <div>
-                      <span className="text-[11px] text-foreground font-medium">{t.level}</span>
-                      <span className="text-[10px] text-muted-foreground ml-1.5">
+                      <span className="text-[14px] text-foreground font-medium">{t.level}</span>
+                      <span className="text-[14px] text-muted-foreground ml-1.5">
                         — {TRUST_LEVEL_CONFIG[t.level].description}
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold text-foreground ml-2 shrink-0">{stats.trustCounts[t.level]}</span>
+                    <span className="text-[14px] font-bold text-foreground ml-2 shrink-0">{stats.trustCounts[t.level]}</span>
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">
+            <p className="text-[14px] text-muted-foreground leading-relaxed">
               {stats.trustCounts.Unverified > 0
                 ? `${stats.trustCounts.Unverified} source${stats.trustCounts.Unverified > 1 ? 's' : ''} require trust review before ${TERMS.aiAssistant} activation.`
                 : 'All sources have a trust level assigned.'}
@@ -311,15 +311,15 @@ export default function KnowledgeOverview() {
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-2">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${row.dot}`} />
-                  <span className="text-[11px] text-foreground font-medium w-24 shrink-0">{row.label}</span>
-                  <span className="text-[11px] font-bold text-foreground w-5">{row.count}</span>
-                  <span className="text-[10px] text-muted-foreground">{row.note}</span>
+                  <span className="text-[14px] text-foreground font-medium w-24 shrink-0">{row.label}</span>
+                  <span className="text-[14px] font-bold text-foreground w-5">{row.count}</span>
+                  <span className="text-[14px] text-muted-foreground">{row.note}</span>
                 </div>
               ))}
             </div>
             {stats.syncCounts.Disconnected > 0 && (
               <div className="rounded border border-[#E8B9B4] bg-[#FBEAE6] px-2.5 py-1.5">
-                <p className="text-[10px] text-[#A93F2F] font-medium">
+                <p className="text-[14px] text-[#A93F2F] font-medium">
                   {stats.syncCounts.Disconnected} disconnected source{stats.syncCounts.Disconnected > 1 ? 's' : ''} — Google Drive API connection required (Phase 2).
                 </p>
               </div>
@@ -332,21 +332,21 @@ export default function KnowledgeOverview() {
             <div className="flex items-end gap-6">
               <div>
                 <span className="text-xl font-bold text-primary">{summary.approvedForPenny}</span>
-                <p className="text-[10px] text-muted-foreground">approved for {TERMS.aiAssistant}</p>
+                <p className="text-[14px] text-muted-foreground">approved for {TERMS.aiAssistant}</p>
               </div>
               <div>
                 <span className="text-xl font-bold text-muted-foreground">
                   {summary.total - summary.approvedForPenny}
                 </span>
-                <p className="text-[10px] text-muted-foreground">pending review</p>
+                <p className="text-[14px] text-muted-foreground">pending review</p>
               </div>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
+            <p className="text-[14px] text-muted-foreground leading-relaxed">
               Sources must pass trust review before {TERMS.aiAssistant} can retrieve from them. Governance records are managed in the Sources workspace.
             </p>
             <button
               onClick={() => setLocation('/knowledge/sources')}
-              className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
+              className="text-[14px] font-medium text-primary hover:underline flex items-center gap-0.5"
             >
               Review governance <ChevronRight className="w-3 h-3" />
             </button>
@@ -371,13 +371,13 @@ export default function KnowledgeOverview() {
               {stats.needsAttention.length > 5 && (
                 <button
                   onClick={() => setLocation('/knowledge/sources')}
-                  className="text-[11px] font-medium text-primary hover:underline"
+                  className="text-[14px] font-medium text-primary hover:underline"
                 >
                   View {stats.needsAttention.length - 5} more in Sources workspace →
                 </button>
               )}
             </div>
-            <p className="text-[10px] text-muted-foreground/60 italic">
+            <p className="text-[14px] text-muted-foreground/60 italic">
               Click any row to open the {TERMS.knowledgeBrief ?? 'Knowledge Brief'} panel for that source.
             </p>
           </div>
@@ -431,20 +431,20 @@ export default function KnowledgeOverview() {
           <div className="space-y-3">
             {insights.map(item => (
               <div key={item.priority} className="flex items-start gap-3">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[14px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                   {item.priority}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-[12px] font-semibold text-foreground">{item.action}</p>
-                    <span className={`text-[9px] font-bold border rounded px-1.5 py-0.5 ${item.tagColor}`}>
+                    <p className="text-[14px] font-semibold text-foreground">{item.action}</p>
+                    <span className={`text-[14px] font-bold border rounded px-1.5 py-0.5 ${item.tagColor}`}>
                       {item.tag}
                     </span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{item.why}</p>
+                  <p className="text-[14px] text-muted-foreground mt-0.5 leading-relaxed">{item.why}</p>
                   <button
                     onClick={() => setLocation(item.path)}
-                    className="mt-1 text-[10px] font-medium text-primary hover:underline flex items-center gap-0.5"
+                    className="mt-1 text-[14px] font-medium text-primary hover:underline flex items-center gap-0.5"
                   >
                     Go there <ChevronRight className="w-3 h-3" />
                   </button>
@@ -454,7 +454,7 @@ export default function KnowledgeOverview() {
           </div>
           <div className="flex items-center gap-1.5 pt-1 border-t border-primary/10">
             <Clock className="w-3 h-3 text-muted-foreground/50" />
-            <p className="text-[10px] text-muted-foreground/60">
+            <p className="text-[14px] text-muted-foreground/60">
               {TERMS.aiAssistant} insights reflect current source health — live impact scoring is a Phase 2 capability.
             </p>
           </div>

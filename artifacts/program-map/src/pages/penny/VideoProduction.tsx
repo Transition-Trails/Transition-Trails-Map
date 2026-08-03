@@ -69,14 +69,14 @@ function Stepper({ phase, done }: { phase: Phase; done: Phase[] }) {
         const isDone   = done.includes(p);
         return (
           <div key={p} className="flex items-center">
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-colors ${
               isActive ? 'bg-primary text-primary-foreground'
               : isDone  ? 'bg-[#E6F0EA] text-[#2F6B3F]'
               : 'bg-muted text-muted-foreground'
             }`}>
               {isDone && !isActive
                 ? <CheckCircle2 className="w-3 h-3" />
-                : <span className="w-3.5 h-3.5 flex items-center justify-center text-[10px] font-bold">{p}</span>
+                : <span className="w-3.5 h-3.5 flex items-center justify-center text-[14px] font-bold">{p}</span>
               }
               {PHASE_LABELS[p]}
             </div>
@@ -113,28 +113,28 @@ function VoiceCard({
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[12px] font-semibold text-foreground">{voice.name}</span>
+            <span className="text-[14px] font-semibold text-foreground">{voice.name}</span>
             {voice.gender && (
-              <span className="text-[9px] font-bold bg-muted border border-border rounded-full px-1.5 py-0.5 text-muted-foreground capitalize">
+              <span className="text-[14px] font-bold bg-muted border border-border rounded-full px-1.5 py-0.5 text-muted-foreground capitalize">
                 {voice.gender}
               </span>
             )}
             {voice.accent && (
-              <span className="text-[9px] font-bold bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 text-[#2F6F7E] capitalize">
+              <span className="text-[14px] font-bold bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 text-[#2F6F7E] capitalize">
                 {voice.accent}
               </span>
             )}
             {voice.age && (
-              <span className="text-[9px] font-bold bg-muted border border-border rounded-full px-1.5 py-0.5 text-muted-foreground capitalize">
+              <span className="text-[14px] font-bold bg-muted border border-border rounded-full px-1.5 py-0.5 text-muted-foreground capitalize">
                 {voice.age}
               </span>
             )}
           </div>
           {voice.description && (
-            <p className="text-[10px] text-muted-foreground mt-0.5 capitalize">{voice.description}</p>
+            <p className="text-[14px] text-muted-foreground mt-0.5 capitalize">{voice.description}</p>
           )}
           {voice.useCase && (
-            <p className="text-[10px] text-muted-foreground/60 mt-0.5 capitalize">{voice.useCase}</p>
+            <p className="text-[14px] text-muted-foreground/60 mt-0.5 capitalize">{voice.useCase}</p>
           )}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
@@ -241,7 +241,7 @@ function AudioPlayer({ audioBase64, filename }: { audioBase64: string; filename:
             onChange={handleSeek}
             className="w-full h-1.5 appearance-none bg-muted rounded-full cursor-pointer accent-primary"
           />
-          <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
+          <div className="flex justify-between text-[14px] text-muted-foreground font-mono">
             <span>{fmtTime(progress)}</span>
             <span>{fmtTime(duration)}</span>
           </div>
@@ -252,7 +252,7 @@ function AudioPlayer({ audioBase64, filename }: { audioBase64: string; filename:
       {/* Download */}
       <button
         onClick={handleDownload}
-        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-border text-[12px] font-medium text-foreground hover:bg-muted/40 transition-colors"
+        className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-border text-[14px] font-medium text-foreground hover:bg-muted/40 transition-colors"
       >
         <Download className="w-3.5 h-3.5" />
         Download MP3 · {filename}
@@ -413,7 +413,7 @@ export default function VideoProduction() {
               <Mic className="w-4 h-4 text-primary" />
               <h1 className="text-base font-semibold text-foreground">Build with Me · Video Production</h1>
             </div>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[14px] text-muted-foreground">
               Rewrite any content into a voiced narration — powered by Gemini + ElevenLabs
             </p>
           </div>
@@ -431,24 +431,24 @@ export default function VideoProduction() {
             {/* Program name + style */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+                <label className="block text-[14px] font-bold  text-muted-foreground/60 mb-1.5">
                   Program name <span className="font-normal">(optional)</span>
                 </label>
                 <input
                   value={programName}
                   onChange={e => setProgramName(e.target.value)}
                   placeholder="e.g. Guided Trail — Sprint 3"
-                  className="w-full text-[12px] border border-border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full text-[14px] border border-border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+                <label className="block text-[14px] font-bold  text-muted-foreground/60 mb-1.5">
                   Script style
                 </label>
                 <select
                   value={scriptStyle}
                   onChange={e => setScriptStyle(e.target.value as ScriptStyle)}
-                  className="w-full text-[12px] border border-border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full text-[14px] border border-border rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   {STYLE_OPTIONS.map(s => (
                     <option key={s.value} value={s.value}>{s.label} — {s.desc}</option>
@@ -460,10 +460,10 @@ export default function VideoProduction() {
             {/* Raw script input */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                <label className="text-[14px] font-bold  text-muted-foreground/60">
                   Raw content
                 </label>
-                <span className="text-[10px] text-muted-foreground font-mono">
+                <span className="text-[14px] text-muted-foreground font-mono">
                   {wordCount(rawScript)} words
                 </span>
               </div>
@@ -472,7 +472,7 @@ export default function VideoProduction() {
                 onChange={e => { setRawScript(e.target.value); setActiveScript('raw'); }}
                 placeholder="Paste lesson content, program description, learning objectives, or any text you want to turn into a voiced narration…"
                 rows={8}
-                className="w-full text-[12px] border border-border rounded-lg px-3 py-2.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
+                className="w-full text-[14px] border border-border rounded-lg px-3 py-2.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none leading-relaxed"
               />
             </div>
 
@@ -481,7 +481,7 @@ export default function VideoProduction() {
               <button
                 onClick={() => void handleRewrite()}
                 disabled={!rawScript.trim() || rewriting}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {rewriting
                   ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -490,12 +490,12 @@ export default function VideoProduction() {
                 {rewriting ? 'Rewriting…' : 'Rewrite with Gemini'}
               </button>
               {rewriteMs !== null && (
-                <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span className="flex items-center gap-1 text-[14px] text-muted-foreground">
                   <Zap className="w-3 h-3" />{(rewriteMs / 1000).toFixed(1)}s
                 </span>
               )}
               {rewriteError && (
-                <span className="flex items-center gap-1 text-[11px] text-[#A93F2F]">
+                <span className="flex items-center gap-1 text-[14px] text-[#A93F2F]">
                   <AlertCircle className="w-3 h-3" />{rewriteError}
                 </span>
               )}
@@ -506,8 +506,8 @@ export default function VideoProduction() {
               <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA]/40 overflow-hidden">
                 <div className="flex items-center gap-2 px-3 py-2 border-b border-[#9FC3AE]/60 bg-[#E6F0EA]">
                   <Sparkles className="w-3.5 h-3.5 text-[#2F6B3F]" />
-                  <span className="text-[11px] font-semibold text-[#2F6B3F]">Gemini rewrite</span>
-                  <span className="text-[10px] text-[#2F6B3F]/70 ml-auto">
+                  <span className="text-[14px] font-semibold text-[#2F6B3F]">Gemini rewrite</span>
+                  <span className="text-[14px] text-[#2F6B3F]/70 ml-auto">
                     {wordCount(rewrittenScript)} words · {estimateDuration(wordCount(rewrittenScript))} spoken
                   </span>
                 </div>
@@ -516,7 +516,7 @@ export default function VideoProduction() {
                     value={rewrittenScript}
                     onChange={e => setRewrittenScript(e.target.value)}
                     rows={8}
-                    className="w-full text-[12px] bg-transparent border-none focus:outline-none resize-none leading-relaxed text-foreground"
+                    className="w-full text-[14px] bg-transparent border-none focus:outline-none resize-none leading-relaxed text-foreground"
                     onClick={() => setActiveScript('rewritten')}
                   />
                 </div>
@@ -525,7 +525,7 @@ export default function VideoProduction() {
                     <button
                       key={v}
                       onClick={() => setActiveScript(v)}
-                      className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
+                      className={`text-[14px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
                         activeScript === v
                           ? 'bg-primary text-primary-foreground border-primary'
                           : 'border-border text-muted-foreground hover:border-primary/40'
@@ -540,7 +540,7 @@ export default function VideoProduction() {
 
             {/* Script summary */}
             {currentScript.trim() && (
-              <div className="flex items-center gap-3 text-[11px] text-muted-foreground border border-border rounded-lg px-3 py-2 bg-muted/20">
+              <div className="flex items-center gap-3 text-[14px] text-muted-foreground border border-border rounded-lg px-3 py-2 bg-muted/20">
                 <FileText className="w-3.5 h-3.5 shrink-0" />
                 <span>Using <strong>{activeScript === 'rewritten' && rewrittenScript ? 'rewritten' : 'original'}</strong> script</span>
                 <span>·</span>
@@ -555,7 +555,7 @@ export default function VideoProduction() {
             <button
               onClick={handlePhase1Continue}
               disabled={!canP1}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground text-[14px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Choose a voice <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -569,12 +569,12 @@ export default function VideoProduction() {
           <div className="space-y-4">
 
             {/* Script summary chip */}
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground border border-border rounded-lg px-3 py-2 bg-muted/20">
+            <div className="flex items-center gap-2 text-[14px] text-muted-foreground border border-border rounded-lg px-3 py-2 bg-muted/20">
               <FileText className="w-3 h-3 shrink-0" />
               <span className="truncate max-w-xs">{currentScript.slice(0, 80)}…</span>
               <button
                 onClick={() => setPhase(1)}
-                className="ml-auto shrink-0 text-primary text-[10px] font-medium hover:underline"
+                className="ml-auto shrink-0 text-primary text-[14px] font-medium hover:underline"
               >
                 Edit script
               </button>
@@ -587,7 +587,7 @@ export default function VideoProduction() {
                   <button
                     key={cat}
                     onClick={() => setCategoryFilter(cat)}
-                    className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-colors capitalize ${
+                    className={`text-[14px] font-semibold px-2.5 py-1 rounded-full border transition-colors capitalize ${
                       categoryFilter === cat
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'border-border text-muted-foreground hover:border-primary/40'
@@ -612,8 +612,8 @@ export default function VideoProduction() {
               <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[12px] font-medium text-[#A93F2F]">{voicesError}</p>
-                  <p className="text-[11px] text-[#A93F2F]/70 mt-0.5">
+                  <p className="text-[14px] font-medium text-[#A93F2F]">{voicesError}</p>
+                  <p className="text-[14px] text-[#A93F2F]/70 mt-0.5">
                     Make sure ELEVENLABS_API_KEY is set in Admin → Integrations → Secrets.
                   </p>
                 </div>
@@ -636,7 +636,7 @@ export default function VideoProduction() {
             )}
 
             {selectedVoice && (
-              <div className="flex items-center gap-2 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-lg px-3 py-2">
                 <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                 <span>Voice selected: <strong>{selectedVoice.name}</strong></span>
                 {selectedVoice.accent && <span className="text-[#2F6B3F]/70">· {capitalize(selectedVoice.accent)}</span>}
@@ -646,14 +646,14 @@ export default function VideoProduction() {
             <div className="flex gap-2">
               <button
                 onClick={() => setPhase(1)}
-                className="px-4 py-2.5 rounded-lg border border-border text-[12px] font-medium text-foreground hover:bg-muted/40 transition-colors"
+                className="px-4 py-2.5 rounded-lg border border-border text-[14px] font-medium text-foreground hover:bg-muted/40 transition-colors"
               >
                 Back
               </button>
               <button
                 onClick={handlePhase2Continue}
                 disabled={!canP2}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground text-[14px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Generate audio <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -670,14 +670,14 @@ export default function VideoProduction() {
             {/* Summary strip */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-border bg-card p-3">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Script</p>
-                <p className="text-[11px] font-medium text-foreground truncate">{currentScript.slice(0, 60)}…</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{wc} words · {estimateDuration(wc)}</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Script</p>
+                <p className="text-[14px] font-medium text-foreground truncate">{currentScript.slice(0, 60)}…</p>
+                <p className="text-[14px] text-muted-foreground mt-0.5">{wc} words · {estimateDuration(wc)}</p>
               </div>
               <div className="rounded-lg border border-border bg-card p-3">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-0.5">Voice</p>
-                <p className="text-[11px] font-medium text-foreground">{selectedVoice?.name ?? '—'}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 capitalize">
+                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Voice</p>
+                <p className="text-[14px] font-medium text-foreground">{selectedVoice?.name ?? '—'}</p>
+                <p className="text-[14px] text-muted-foreground mt-0.5 capitalize">
                   {selectedVoice?.gender ?? ''}{selectedVoice?.accent ? ` · ${selectedVoice.accent}` : ''}
                 </p>
               </div>
@@ -688,7 +688,7 @@ export default function VideoProduction() {
               <button
                 onClick={() => void handleGenerate()}
                 disabled={generating}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground text-[14px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {generating ? (
                   <>
@@ -708,8 +708,8 @@ export default function VideoProduction() {
               <div className="rounded-lg border border-border bg-muted/20 p-4 flex items-center gap-3">
                 <RefreshCw className="w-4 h-4 text-primary animate-spin shrink-0" />
                 <div>
-                  <p className="text-[12px] font-medium text-foreground">Generating audio with ElevenLabs…</p>
-                  <p className="text-[10px] text-muted-foreground">This takes 10–30 seconds depending on script length.</p>
+                  <p className="text-[14px] font-medium text-foreground">Generating audio with ElevenLabs…</p>
+                  <p className="text-[14px] text-muted-foreground">This takes 10–30 seconds depending on script length.</p>
                 </div>
               </div>
             )}
@@ -718,10 +718,10 @@ export default function VideoProduction() {
               <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[12px] font-medium text-[#A93F2F]">{produceError}</p>
+                  <p className="text-[14px] font-medium text-[#A93F2F]">{produceError}</p>
                   <button
                     onClick={() => void handleGenerate()}
-                    className="mt-1.5 text-[11px] text-[#A93F2F] font-medium underline"
+                    className="mt-1.5 text-[14px] text-[#A93F2F] font-medium underline"
                   >
                     Try again
                   </button>
@@ -731,7 +731,7 @@ export default function VideoProduction() {
 
             {audioBase64 && (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-lg px-3 py-2">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                   <span>Voiceover generated successfully</span>
                   {generateMs !== null && (
@@ -745,7 +745,7 @@ export default function VideoProduction() {
 
                 <button
                   onClick={() => void handleGenerate()}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-border text-[12px] font-medium text-foreground hover:bg-muted/40 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg border border-border text-[14px] font-medium text-foreground hover:bg-muted/40 transition-colors"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   Regenerate
@@ -756,13 +756,13 @@ export default function VideoProduction() {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={() => setPhase(2)}
-                className="px-4 py-2.5 rounded-lg border border-border text-[12px] font-medium text-foreground hover:bg-muted/40 transition-colors"
+                className="px-4 py-2.5 rounded-lg border border-border text-[14px] font-medium text-foreground hover:bg-muted/40 transition-colors"
               >
                 Change voice
               </button>
               <button
                 onClick={() => { setPhase(1); setAudioBase64(null); setRewrittenScript(''); setDone([]); }}
-                className="px-4 py-2.5 rounded-lg border border-border text-[12px] font-medium text-foreground hover:bg-muted/40 transition-colors"
+                className="px-4 py-2.5 rounded-lg border border-border text-[14px] font-medium text-foreground hover:bg-muted/40 transition-colors"
               >
                 New script
               </button>

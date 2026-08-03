@@ -90,17 +90,17 @@ export default function AutomationHealth() {
                       <StatusDot status={z.dot} />
                       <div className="min-w-0">
                         <p className="font-medium text-sm text-foreground truncate">{z.name}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p className="text-sm text-muted-foreground mt-0.5">
                           {z.trigger} <span className="text-muted-foreground/50 mx-1">→</span> {z.action}
                         </p>
                         {z.note && (
-                          <p className="text-xs text-[#CC8400] font-medium mt-1">{z.note}</p>
+                          <p className="text-sm text-[#CC8400] font-medium mt-1">{z.note}</p>
                         )}
                       </div>
                     </div>
                     <div className="flex-shrink-0 text-right">
-                      <p className="text-xs font-medium text-foreground">{z.runs}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">Last: {z.lastRun}</p>
+                      <p className="text-sm font-medium text-foreground">{z.runs}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5">Last: {z.lastRun}</p>
                     </div>
                   </div>
                 </div>

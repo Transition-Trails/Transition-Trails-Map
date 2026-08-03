@@ -109,7 +109,7 @@ function ReadinessBadge({ status }: { status: string }) {
     status === 'blocked' || status === 'Blocked' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' :
     status === 'planned' || status === 'Planned' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' :
     'bg-muted text-muted-foreground border-border';
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>{status}</span>;
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${cls}`}>{status}</span>;
 }
 
 function SeverityBadge({ sev }: { sev: string }) {
@@ -118,7 +118,7 @@ function SeverityBadge({ sev }: { sev: string }) {
     sev === 'High'     ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' :
     sev === 'Medium'   ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' :
                           'bg-muted text-muted-foreground border-border';
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${cls}`}>{sev}</span>;
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${cls}`}>{sev}</span>;
 }
 
 function ScoreBar({ score, max = 100 }: { score: number; max?: number }) {
@@ -130,7 +130,7 @@ function ScoreBar({ score, max = 100 }: { score: number; max?: number }) {
       <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${barCls}`} style={{ width:`${pct}%` }} />
       </div>
-      <span className={`text-[11px] font-bold tabular-nums shrink-0 ${textCls}`}>{pct}%</span>
+      <span className={`text-[14px] font-bold tabular-nums shrink-0 ${textCls}`}>{pct}%</span>
     </div>
   );
 }
@@ -138,8 +138,8 @@ function ScoreBar({ score, max = 100 }: { score: number; max?: number }) {
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 w-32 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[12px] text-foreground flex-1">{value}</span>
+      <span className="text-[14px] font-bold  text-muted-foreground/60 w-32 shrink-0 mt-0.5">{label}</span>
+      <span className="text-[14px] text-foreground flex-1">{value}</span>
     </div>
   );
 }
@@ -168,10 +168,10 @@ function FlowNodeBox({ node }: { node: FlowNode }) {
     <div className={`rounded-lg border px-3 py-2 min-w-[130px] max-w-[160px] shrink-0 ${cls}`}>
       <div className="flex items-center gap-1.5 mb-1">
         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotCls}`} />
-        <span className="text-[8px] font-bold uppercase tracking-wide opacity-60">{node.type}</span>
+        <span className="text-[14px] font-bold  opacity-60">{node.type}</span>
       </div>
-      <p className="text-[11px] font-semibold leading-tight mb-0.5">{node.label}</p>
-      <p className="text-[10px] opacity-60 leading-tight">{node.detail}</p>
+      <p className="text-[14px] font-semibold leading-tight mb-0.5">{node.label}</p>
+      <p className="text-[14px] opacity-60 leading-tight">{node.detail}</p>
     </div>
   );
 }
@@ -195,7 +195,7 @@ function OverviewTab() {
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5 max-w-4xl">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-          <p className="text-[12px] text-foreground leading-relaxed">
+          <p className="text-[14px] text-foreground leading-relaxed">
             Program-to-channel mapping, role-to-user routing, {TERMS.aiAssistant} delivery mapping, and end-to-end flow validation are all configured.
             Workspace Validation runs live against your Replit secrets — see the Workspace Validation tab for real-time results.
           </p>
@@ -215,16 +215,16 @@ function OverviewTab() {
             { label:'Tests Passing',     value:`${testSummary.pass}/${testSummary.total}`,    sub:`${testSummary.pct}% overall`,         cls:'border-[#FFD08A] bg-[#FFF3E0]' },
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
-              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wide mb-1">{s.label}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground tracking-wide mb-1">{s.label}</p>
               <p className="text-[22px] font-bold text-foreground leading-none">{s.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-1">{s.sub}</p>
+              <p className="text-[14px] text-muted-foreground mt-1">{s.sub}</p>
             </div>
           ))}
         </div>
 
         {/* Critical blockers — live failures when available, else static governance */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">
+          <p className="text-[14px] font-bold  text-foreground mb-2">
             {liveChecks ? 'Live Validation Failures' : 'Critical Blockers to Go Live'}
           </p>
           <div className="space-y-2">
@@ -232,15 +232,15 @@ function OverviewTab() {
               liveChecks.filter(c => c.status === 'fail').length === 0 ? (
                 <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
                   <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
-                  <p className="text-[12px] font-medium text-[#2F6B3F]">No live failures — all required secrets and API checks passed.</p>
+                  <p className="text-[14px] font-medium text-[#2F6B3F]">No live failures — all required secrets and API checks passed.</p>
                 </div>
               ) : (
                 liveChecks.filter(c => c.status === 'fail').map(c => (
                   <div key={c.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
                     <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-semibold text-foreground">{c.label}</p>
-                      <p className="text-[11px] text-muted-foreground">{c.fix ?? c.detail}</p>
+                      <p className="text-[14px] font-semibold text-foreground">{c.label}</p>
+                      <p className="text-[14px] text-muted-foreground">{c.fix ?? c.detail}</p>
                     </div>
                   </div>
                 ))
@@ -250,8 +250,8 @@ function OverviewTab() {
                 <div key={issue.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
                   <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold text-foreground">{issue.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{issue.resolution}</p>
+                    <p className="text-[14px] font-semibold text-foreground">{issue.title}</p>
+                    <p className="text-[14px] text-muted-foreground">{issue.resolution}</p>
                   </div>
                 </div>
               ))
@@ -261,7 +261,7 @@ function OverviewTab() {
 
         {/* Phase 2 readiness by area */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Integration Readiness by Area</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Integration Readiness by Area</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {[
               { area:'Program-to-Channel Mapping', pct:72, note:'5 programs mapped · 8 channels · 3 missing bot access' },
@@ -274,8 +274,8 @@ function OverviewTab() {
             ].map(r => (
               <div key={r.area} className="px-4 py-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[12px] font-medium text-foreground">{r.area}</span>
-                  <span className="text-[11px] text-muted-foreground">{r.note}</span>
+                  <span className="text-[14px] font-medium text-foreground">{r.area}</span>
+                  <span className="text-[14px] text-muted-foreground">{r.note}</span>
                 </div>
                 <ScoreBar score={r.pct} />
               </div>
@@ -285,7 +285,7 @@ function OverviewTab() {
 
         {/* Workspace connection status */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Workspace</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Workspace</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             <InfoRow label="Workspace"       value={SLACK_WORKSPACE.displayName} />
             <InfoRow label="Domain"          value={SLACK_WORKSPACE.domain} />
@@ -361,7 +361,7 @@ function WorkspaceValidationTab() {
         <button
           onClick={runValidation}
           disabled={isLoading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[14px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           {isLoading
             ? <><span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin inline-block" /> Running…</>
@@ -373,7 +373,7 @@ function WorkspaceValidationTab() {
           <button
             onClick={() => sendTestMessage('penny')}
             disabled={testMsgTargets.penny === 'sending'}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-50 ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[14px] font-semibold border transition-colors disabled:opacity-50 ${
               testMsgTargets.penny === 'sent'  ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' :
               testMsgTargets.penny === 'error' ? 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]' :
               'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F] hover:bg-[#FBEAE6]'
@@ -390,7 +390,7 @@ function WorkspaceValidationTab() {
           <button
             onClick={() => sendTestMessage('admin')}
             disabled={testMsgTargets.admin === 'sending'}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-50 ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[14px] font-semibold border transition-colors disabled:opacity-50 ${
               testMsgTargets.admin === 'sent'  ? 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' :
               testMsgTargets.admin === 'error' ? 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]' :
               'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] hover:bg-[#EDF5F8]'
@@ -405,20 +405,20 @@ function WorkspaceValidationTab() {
 
         {(testMsgDetails.penny || testMsgDetails.admin) && (
           <div className="flex flex-col gap-0.5">
-            {testMsgDetails.penny && <span className={`text-[11px] ${testMsgTargets.penny === 'sent' ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>{testMsgDetails.penny}</span>}
-            {testMsgDetails.admin && <span className={`text-[11px] ${testMsgTargets.admin === 'sent' ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>{testMsgDetails.admin}</span>}
+            {testMsgDetails.penny && <span className={`text-[14px] ${testMsgTargets.penny === 'sent' ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>{testMsgDetails.penny}</span>}
+            {testMsgDetails.admin && <span className={`text-[14px] ${testMsgTargets.admin === 'sent' ? 'text-[#2F6B3F]' : 'text-[#A93F2F]'}`}>{testMsgDetails.admin}</span>}
           </div>
         )}
 
-        {lastRun && <span className="ml-auto text-[11px] text-muted-foreground">Last run {lastRun}</span>}
+        {lastRun && <span className="ml-auto text-[14px] text-muted-foreground">Last run {lastRun}</span>}
       </div>
 
       {/* Idle state */}
       {state.kind === 'idle' && (
         <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
           <Key className="w-8 h-8 text-muted-foreground/30 mb-3" />
-          <p className="text-[13px] font-semibold text-foreground mb-1">Ready to validate</p>
-          <p className="text-[12px] text-muted-foreground">Click Run Validation to test your Slack secrets against the live API.</p>
+          <p className="text-[14px] font-semibold text-foreground mb-1">Ready to validate</p>
+          <p className="text-[14px] text-muted-foreground">Click Run Validation to test your Slack secrets against the live API.</p>
         </div>
       )}
 
@@ -426,8 +426,8 @@ function WorkspaceValidationTab() {
       {state.kind === 'error' && (
         <div className="flex flex-col items-center justify-center flex-1 text-center px-8">
           <XCircle className="w-8 h-8 text-[#A93F2F] mb-3" />
-          <p className="text-[13px] font-semibold text-foreground mb-1">Could not reach validation endpoint</p>
-          <p className="text-[12px] text-muted-foreground">{state.message}</p>
+          <p className="text-[14px] font-semibold text-foreground mb-1">Could not reach validation endpoint</p>
+          <p className="text-[14px] text-muted-foreground">{state.message}</p>
         </div>
       )}
 
@@ -437,7 +437,7 @@ function WorkspaceValidationTab() {
           {/* Left: check list */}
           <div className="w-80 shrink-0 border-r border-border flex flex-col">
             <div className="px-4 py-3 border-b border-border bg-muted/30">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Validation Summary</p>
+              <p className="text-[14px] font-bold  text-foreground mb-2">Validation Summary</p>
               <div className="grid grid-cols-4 gap-1.5">
                 {[
                   { label:'Pass', value:pass,    cls:'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' },
@@ -447,19 +447,19 @@ function WorkspaceValidationTab() {
                 ].map(s => (
                   <div key={s.label} className={`rounded border text-center py-1.5 ${s.cls}`}>
                     <p className="text-[16px] font-bold leading-none">{isLoading ? '…' : s.value}</p>
-                    <p className="text-[9px] font-bold uppercase mt-0.5">{s.label}</p>
+                    <p className="text-[14px] font-bold  mt-0.5">{s.label}</p>
                   </div>
                 ))}
               </div>
             </div>
             <ScrollArea className="flex-1">
               {isLoading ? (
-                <div className="px-4 py-6 text-center text-[12px] text-muted-foreground">Checking secrets and calling Slack API…</div>
+                <div className="px-4 py-6 text-center text-[14px] text-muted-foreground">Checking secrets and calling Slack API…</div>
               ) : (
                 <>
                   {categories.map(cat => (
                     <div key={cat}>
-                      <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">{cat}</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">{cat}</p>
                       {checks.filter(c => c.category === cat).map(check => (
                         <button
                           key={check.id}
@@ -467,27 +467,27 @@ function WorkspaceValidationTab() {
                           className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/40 border-b border-border/20 transition-colors ${selected?.id === check.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
                         >
                           <ValidationIcon status={check.status} />
-                          <span className="text-[12px] text-foreground font-medium flex-1 leading-tight">{check.label}</span>
+                          <span className="text-[14px] text-foreground font-medium flex-1 leading-tight">{check.label}</span>
                         </button>
                       ))}
                     </div>
                   ))}
                   {channels.length > 0 && (
                     <div>
-                      <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">Channel Map</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground px-4 py-2 border-b border-border/40 bg-muted/20">Channel Map</p>
                       {channels.map(ch => (
                         <div key={ch.envVar} className={`px-4 py-2.5 border-b border-border/20 ${ch.scopeIssue ? 'bg-[#FFF3E0]/60' : ''}`}>
                           <div className="flex items-center gap-2.5">
                             <ValidationIcon status={ch.status} />
                             <div className="flex-1 min-w-0">
-                              <p className="text-[12px] font-medium text-foreground truncate">
+                              <p className="text-[14px] font-medium text-foreground truncate">
                                 {ch.name ? `#${ch.name}` : ch.normalizedId ?? ch.channelId.slice(0, 12)}
                               </p>
-                              <p className="text-[10px] text-muted-foreground truncate">{ch.envVar}</p>
-                              {ch.isMember === true  && <p className="text-[10px] text-[#2F6B3F]">✓ Bot is member · {ch.memberCount ?? '?'} members{ch.isPrivate ? ' · private' : ' · public'}</p>}
-                              {ch.isMember === false && <p className="text-[10px] text-[#CC8400]">⚠ Bot not a member — {ch.fix}</p>}
+                              <p className="text-[14px] text-muted-foreground truncate">{ch.envVar}</p>
+                              {ch.isMember === true  && <p className="text-[14px] text-[#2F6B3F]">✓ Bot is member · {ch.memberCount ?? '?'} members{ch.isPrivate ? ' · private' : ' · public'}</p>}
+                              {ch.isMember === false && <p className="text-[14px] text-[#CC8400]">⚠ Bot not a member — {ch.fix}</p>}
                             </div>
-                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border shrink-0 ${
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border shrink-0 ${
                               ch.resolvedRole === 'penny'   ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' :
                               ch.resolvedRole === 'admin'   ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' :
                               ch.resolvedRole === 'default' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' :
@@ -498,12 +498,12 @@ function WorkspaceValidationTab() {
                           </div>
                           {ch.scopeIssue && (
                             <div className="mt-1.5 ml-6 rounded border border-[#FFD08A] bg-[#FFF3E0] px-2.5 py-1.5">
-                              <p className="text-[10px] font-bold text-[#CC8400] mb-0.5">Scope required: channels:read + groups:read</p>
-                              <p className="text-[10px] text-[#CC8400] leading-snug">{ch.fix}</p>
+                              <p className="text-[14px] font-bold text-[#CC8400] mb-0.5">Scope required: channels:read + groups:read</p>
+                              <p className="text-[14px] text-[#CC8400] leading-snug">{ch.fix}</p>
                             </div>
                           )}
                           {ch.error && !ch.scopeIssue && (
-                            <p className="mt-1 ml-6 text-[10px] text-[#A93F2F] leading-snug">{ch.fix ?? ch.error}</p>
+                            <p className="mt-1 ml-6 text-[14px] text-[#A93F2F] leading-snug">{ch.fix ?? ch.error}</p>
                           )}
                         </div>
                       ))}
@@ -523,7 +523,7 @@ function WorkspaceValidationTab() {
                     <ValidationIcon status={selected.status} />
                     <div>
                       <h3 className="text-[14px] font-bold text-foreground">{selected.label}</h3>
-                      <p className="text-[11px] text-muted-foreground">{selected.category} · <ReadinessBadge status={selected.status} /></p>
+                      <p className="text-[14px] text-muted-foreground">{selected.category} · <ReadinessBadge status={selected.status} /></p>
                     </div>
                   </div>
                   <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
@@ -534,7 +534,7 @@ function WorkspaceValidationTab() {
                       <InfoRow label="Metadata" value={
                         <div className="flex flex-wrap gap-1.5">
                           {Object.entries(selected.meta).map(([k, v]) => (
-                            <span key={k} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-muted border border-border">
+                            <span key={k} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[14px] bg-muted border border-border">
                               <span className="text-muted-foreground">{k}:</span>
                               <span className="font-medium text-foreground">{String(v)}</span>
                             </span>
@@ -548,8 +548,8 @@ function WorkspaceValidationTab() {
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center px-8">
                 <Key className="w-8 h-8 text-muted-foreground/30 mb-3" />
-                <p className="text-[13px] font-semibold text-foreground mb-1">Select a validation check</p>
-                <p className="text-[12px] text-muted-foreground">View the live detail, impact, and resolution for each check.</p>
+                <p className="text-[14px] font-semibold text-foreground mb-1">Select a validation check</p>
+                <p className="text-[14px] text-muted-foreground">View the live detail, impact, and resolution for each check.</p>
               </div>
             )}
           </div>
@@ -578,8 +578,8 @@ function ProgramChannelTab() {
       {/* Left: program list */}
       <div className="w-56 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Programs</p>
-          <p className="text-[10px] text-muted-foreground">{PROGRAM_CHANNEL_MAPS.length} programs mapped</p>
+          <p className="text-[14px] font-bold  text-foreground">Programs</p>
+          <p className="text-[14px] text-muted-foreground">{PROGRAM_CHANNEL_MAPS.length} programs mapped</p>
         </div>
         <ScrollArea className="flex-1">
           {PROGRAM_CHANNEL_MAPS.map(p => {
@@ -594,9 +594,9 @@ function ProgramChannelTab() {
               >
                 <span className={`w-2 h-2 rounded-full mt-1 shrink-0 ${dotCls}`} />
                 <div>
-                  <p className="text-[12px] font-semibold text-foreground leading-tight">{p.programName}</p>
-                  <p className="text-[10px] text-muted-foreground">{p.channels.length} channels</p>
-                  {p.cohort && <p className="text-[10px] text-muted-foreground">{p.cohort}</p>}
+                  <p className="text-[14px] font-semibold text-foreground leading-tight">{p.programName}</p>
+                  <p className="text-[14px] text-muted-foreground">{p.channels.length} channels</p>
+                  {p.cohort && <p className="text-[14px] text-muted-foreground">{p.cohort}</p>}
                 </div>
               </button>
             );
@@ -610,7 +610,7 @@ function ProgramChannelTab() {
             <div className="flex items-center gap-3">
               <div>
                 <h3 className="text-[14px] font-bold text-foreground">{selected.programName}</h3>
-                <p className="text-[11px] text-muted-foreground">{selected.cohort ?? 'Planning phase'} · <ReadinessBadge status={selected.status} /></p>
+                <p className="text-[14px] text-muted-foreground">{selected.cohort ?? 'Planning phase'} · <ReadinessBadge status={selected.status} /></p>
               </div>
             </div>
             <div className="space-y-2">
@@ -618,11 +618,11 @@ function ProgramChannelTab() {
                 <div key={ch.channelId} className="rounded-lg border border-border bg-white px-4 py-3">
                   <div className="flex items-center gap-3 mb-2">
                     <Hash className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
-                    <span className="text-[13px] font-bold text-foreground font-mono">{ch.channelName}</span>
-                    <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${mapCls(ch.mappingStatus)}`}>{ch.mappingStatus}</span>
+                    <span className="text-[14px] font-bold text-foreground font-mono">{ch.channelName}</span>
+                    <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${mapCls(ch.mappingStatus)}`}>{ch.mappingStatus}</span>
                   </div>
-                  <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
-                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${purpCls[ch.purpose] ?? 'bg-muted border-border text-muted-foreground'}`}>{ch.purpose}</span>
+                  <div className="flex items-center gap-4 text-[14px] text-muted-foreground">
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${purpCls[ch.purpose] ?? 'bg-muted border-border text-muted-foreground'}`}>{ch.purpose}</span>
                     <span>Bot Access: <span className={`font-semibold ${botCls(ch.botAccess)}`}>{ch.botAccess}</span></span>
                     {ch.memberCount !== undefined && <span>{ch.memberCount} members</span>}
                   </div>
@@ -630,8 +630,8 @@ function ProgramChannelTab() {
               ))}
             </div>
             <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
-              <p className="text-[11px] font-bold text-[#CC8400] mb-1">Bot Access Required</p>
-              <p className="text-[11px] text-[#CC8400]">After app installation, invite <code className="font-mono bg-[#FFF3E0] px-1 rounded">@trail-os-bot</code> to each channel above. Bot access is required before {TERMS.aiAssistant} can deliver messages.</p>
+              <p className="text-[14px] font-bold text-[#CC8400] mb-1">Bot Access Required</p>
+              <p className="text-[14px] text-[#CC8400]">After app installation, invite <code className="font-mono bg-[#FFF3E0] px-1 rounded">@trail-os-bot</code> to each channel above. Bot access is required before {TERMS.aiAssistant} can deliver messages.</p>
             </div>
           </div>
         </ScrollArea>
@@ -657,8 +657,8 @@ function RoleUserTab() {
     <div className="flex h-full">
       <div className="w-56 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Role Groups</p>
-          <p className="text-[10px] text-muted-foreground">{ROLE_GROUPS.length} roles · {ROLE_GROUPS.reduce((s,r)=>s+r.count,0)} total people</p>
+          <p className="text-[14px] font-bold  text-foreground">Role Groups</p>
+          <p className="text-[14px] text-muted-foreground">{ROLE_GROUPS.length} roles · {ROLE_GROUPS.reduce((s,r)=>s+r.count,0)} total people</p>
         </div>
         <ScrollArea className="flex-1">
           {ROLE_GROUPS.map(r => (
@@ -669,10 +669,10 @@ function RoleUserTab() {
             >
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <p className="text-[12px] font-semibold text-foreground">{r.roleName}</p>
-                  <span className={`inline-flex px-1 rounded text-[9px] font-bold ${mapCls(r.mappingStatus)}`}>{r.mappingStatus}</span>
+                  <p className="text-[14px] font-semibold text-foreground">{r.roleName}</p>
+                  <span className={`inline-flex px-1 rounded text-[14px] font-bold ${mapCls(r.mappingStatus)}`}>{r.mappingStatus}</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">{r.count} {r.count === 1 ? 'person' : 'people'}</p>
+                <p className="text-[14px] text-muted-foreground">{r.count} {r.count === 1 ? 'person' : 'people'}</p>
               </div>
             </button>
           ))}
@@ -682,7 +682,7 @@ function RoleUserTab() {
         <ScrollArea className="h-full">
           <div className="p-5 space-y-4 max-w-2xl">
             <div className="flex items-center gap-3">
-              <span className={`inline-flex items-center px-2 py-1 rounded text-[11px] font-bold ${roleColors[selected.roleType] ?? 'bg-muted'}`}>{selected.roleType}</span>
+              <span className={`inline-flex items-center px-2 py-1 rounded text-[14px] font-bold ${roleColors[selected.roleType] ?? 'bg-muted'}`}>{selected.roleType}</span>
               <h3 className="text-[14px] font-bold text-foreground">{selected.roleName}</h3>
               <ReadinessBadge status={selected.mappingStatus} />
             </div>
@@ -695,16 +695,16 @@ function RoleUserTab() {
             </div>
             {selected.slackUsers.length > 0 ? (
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Mapped Slack Users</p>
+                <p className="text-[14px] font-bold  text-foreground mb-2">Mapped Slack Users</p>
                 <div className="space-y-2">
                   {selected.slackUsers.map(u => (
                     <div key={u.slackHandle} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
-                      <span className="w-7 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center shrink-0">
+                      <span className="w-7 h-7 rounded-full bg-primary/10 text-primary text-[14px] font-bold flex items-center justify-center shrink-0">
                         {u.displayName[0]}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-semibold text-foreground">{u.displayName}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{u.slackHandle} · {u.role}</p>
+                        <p className="text-[14px] font-semibold text-foreground">{u.displayName}</p>
+                        <p className="text-[14px] text-muted-foreground font-mono">{u.slackHandle} · {u.role}</p>
                       </div>
                       <ReadinessBadge status={u.pennyEnabled ? 'Active' : 'Pending'} />
                     </div>
@@ -713,7 +713,7 @@ function RoleUserTab() {
               </div>
             ) : (
               <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-                <p className="text-[12px] text-muted-foreground">No individual users mapped — using user group <code className="font-mono">{selected.slackUserGroups[0] ?? '@group-pending'}</code> for delivery routing.</p>
+                <p className="text-[14px] text-muted-foreground">No individual users mapped — using user group <code className="font-mono">{selected.slackUserGroups[0] ?? '@group-pending'}</code> for delivery routing.</p>
               </div>
             )}
           </div>
@@ -740,8 +740,8 @@ function PennyDeliveryTab() {
     <div className="flex h-full">
       <div className="w-56 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">{TERMS.aiAssistant} Capabilities</p>
-          <p className="text-[10px] text-muted-foreground">{PENNY_DELIVERY_MAPS.length} capabilities mapped</p>
+          <p className="text-[14px] font-bold  text-foreground">{TERMS.aiAssistant} Capabilities</p>
+          <p className="text-[14px] text-muted-foreground">{PENNY_DELIVERY_MAPS.length} capabilities mapped</p>
         </div>
         <ScrollArea className="flex-1">
           {PENNY_DELIVERY_MAPS.map(p => (
@@ -751,8 +751,8 @@ function PennyDeliveryTab() {
               className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedId === p.capabilityId ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
             >
               <div className="flex-1">
-                <p className="text-[12px] font-semibold text-foreground leading-tight">{p.capabilityName}</p>
-                <p className="text-[10px] text-muted-foreground">{p.domain} · {p.deliveries.length} routes</p>
+                <p className="text-[14px] font-semibold text-foreground leading-tight">{p.capabilityName}</p>
+                <p className="text-[14px] text-muted-foreground">{p.domain} · {p.deliveries.length} routes</p>
                 <ReadinessBadge status={p.overallStatus} />
               </div>
             </button>
@@ -764,11 +764,11 @@ function PennyDeliveryTab() {
           <div className="p-5 space-y-4 max-w-2xl">
             <div>
               <h3 className="text-[14px] font-bold text-foreground">{selected.capabilityName}</h3>
-              <p className="text-[11px] text-muted-foreground mb-1">{selected.domain} domain · <ReadinessBadge status={selected.maturity} /> <ReadinessBadge status={selected.overallStatus} /></p>
-              <p className="text-[12px] text-muted-foreground leading-relaxed">{selected.description}</p>
+              <p className="text-[14px] text-muted-foreground mb-1">{selected.domain} domain · <ReadinessBadge status={selected.maturity} /> <ReadinessBadge status={selected.overallStatus} /></p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{selected.description}</p>
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Delivery Routes</p>
+              <p className="text-[14px] font-bold  text-foreground mb-2">Delivery Routes</p>
               <div className="space-y-3">
                 {selected.deliveries.map((d, i) => (
                   <div key={i} className="rounded-lg border border-border bg-white px-4 py-3">
@@ -776,16 +776,16 @@ function PennyDeliveryTab() {
                       <Hash className="w-3.5 h-3.5 text-[#2F6B3F] mt-0.5 shrink-0" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[13px] font-bold font-mono text-foreground">{d.channelName}</span>
+                          <span className="text-[14px] font-bold font-mono text-foreground">{d.channelName}</span>
                           <ReadinessBadge status={d.deliveryStatus} />
                         </div>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[14px] text-muted-foreground">
                           <span>Template: <span className="font-medium text-foreground">{d.templateName}</span></span>
                           <span>Audience: <span className="font-medium text-foreground">{d.audience}</span></span>
                           {d.frequency && <span>Frequency: <span className="font-medium text-foreground">{d.frequency}</span></span>}
                         </div>
                         <div className="mt-1.5">
-                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${trigCls[d.triggerType] ?? 'bg-muted border-border'}`}>{d.triggerType}</span>
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${trigCls[d.triggerType] ?? 'bg-muted border-border'}`}>{d.triggerType}</span>
                         </div>
                       </div>
                     </div>
@@ -817,7 +817,7 @@ function FlowExplorerTab() {
       {/* Left: flow list */}
       <div className="w-52 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Communication Flows</p>
+          <p className="text-[14px] font-bold  text-foreground">Communication Flows</p>
         </div>
         <ScrollArea className="flex-1">
           {COMM_FLOWS.map(f => (
@@ -827,8 +827,8 @@ function FlowExplorerTab() {
               className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedId === f.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
             >
               <div className="flex-1">
-                <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">{f.name}</p>
-                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${statusCls(f.status)}`}>{f.status}</span>
+                <p className="text-[14px] font-semibold text-foreground leading-tight mb-1">{f.name}</p>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${statusCls(f.status)}`}>{f.status}</span>
               </div>
             </button>
           ))}
@@ -840,19 +840,19 @@ function FlowExplorerTab() {
           <div className="p-5 space-y-5">
             <div>
               <h3 className="text-[14px] font-bold text-foreground mb-1">{selected.name}</h3>
-              <p className="text-[12px] text-muted-foreground leading-relaxed mb-3">{selected.description}</p>
-              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+              <p className="text-[14px] text-muted-foreground leading-relaxed mb-3">{selected.description}</p>
+              <div className="flex items-center gap-3 text-[14px] text-muted-foreground">
                 <span>Trigger: <span className="font-medium text-foreground">{selected.trigger}</span></span>
                 <span>·</span>
                 <span>Cadence: <span className="font-medium text-foreground">{selected.cadence}</span></span>
                 <span>·</span>
-                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${statusCls(selected.status)}`}>{selected.status}</span>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${statusCls(selected.status)}`}>{selected.status}</span>
               </div>
             </div>
 
             {/* Flow diagram */}
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-3">End-to-End Flow</p>
+              <p className="text-[14px] font-bold  text-foreground mb-3">End-to-End Flow</p>
               <div className="overflow-x-auto pb-2">
                 <div className="flex items-start gap-2 min-w-max">
                   {selected.nodes.map((node, i) => (
@@ -869,19 +869,19 @@ function FlowExplorerTab() {
 
             {/* Node detail table */}
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Node Detail</p>
+              <p className="text-[14px] font-bold  text-foreground mb-2">Node Detail</p>
               <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
                 {selected.nodes.map(node => {
                   const dotCls = node.status === 'active' ? 'bg-[#2F6B3F]' : node.status === 'pending' ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
                   const lblCls = node.status === 'active' ? 'text-[#2F6B3F]' : node.status === 'pending' ? 'text-[#CC8400]' : 'text-[#A93F2F]';
                   return (
                     <div key={node.id} className="flex items-center gap-3 px-4 py-2.5">
-                      <span className="text-[9px] font-bold uppercase w-20 shrink-0 text-muted-foreground/60">{node.type}</span>
-                      <span className="text-[12px] font-medium text-foreground flex-1">{node.label}</span>
-                      <span className="text-[11px] text-muted-foreground flex-1">{node.detail}</span>
+                      <span className="text-[14px] font-bold  w-20 shrink-0 text-muted-foreground/60">{node.type}</span>
+                      <span className="text-[14px] font-medium text-foreground flex-1">{node.label}</span>
+                      <span className="text-[14px] text-muted-foreground flex-1">{node.detail}</span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <span className={`w-1.5 h-1.5 rounded-full ${dotCls}`} />
-                        <span className={`text-[10px] font-semibold ${lblCls}`}>{node.status}</span>
+                        <span className={`text-[14px] font-semibold ${lblCls}`}>{node.status}</span>
                       </div>
                     </div>
                   );
@@ -889,7 +889,7 @@ function FlowExplorerTab() {
               </div>
             </div>
 
-            <div className="text-[11px] text-muted-foreground italic px-1">
+            <div className="text-[14px] text-muted-foreground italic px-1">
               Programs: {selected.programs.join(', ')}
             </div>
           </div>
@@ -912,12 +912,12 @@ function ChannelOverview({ ch }: { ch: SlackChannel }) {
           <InfoRow label="UOM Object"   value={ch.uomObjectId ?? '—'} />
           <InfoRow label="Governance"   value={ch.governanceStatus} />
         </div>
-        <p className="text-[12px] text-muted-foreground leading-relaxed">{ch.description}</p>
+        <p className="text-[14px] text-muted-foreground leading-relaxed">{ch.description}</p>
         {ch.pennyCapabilities.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">{TERMS.aiAssistant} Capabilities</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">{TERMS.aiAssistant} Capabilities</p>
             <div className="flex flex-wrap gap-1.5">
-              {ch.pennyCapabilities.map(c => <span key={c} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F]">{c}</span>)}
+              {ch.pennyCapabilities.map(c => <span key={c} className="inline-flex items-center px-2 py-0.5 rounded text-[14px] bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F]">{c}</span>)}
             </div>
           </div>
         )}
@@ -950,8 +950,8 @@ function ChannelRegistry() {
               { label:'UOM Mapping',        health:(ch.uomObjectId ? 'healthy' : 'needs-attention') as any,                                                                                                                                 note:ch.uomObjectId ?? 'No UOM object ID' },
             ].map(ind => (
               <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[12px] font-medium">{ind.label}</span></div>
-                <span className="text-[11px] text-muted-foreground">{ind.note}</span>
+                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[14px] font-medium">{ind.label}</span></div>
+                <span className="text-[14px] text-muted-foreground">{ind.note}</span>
               </div>
             ))}
           </div></ScrollArea>
@@ -980,20 +980,20 @@ function ProfileDetail({ profile }: { profile: typeof SLACK_OBJECT_PROFILES[0] }
           {profile.lastActivity && <InfoRow label="Last Activity" value={profile.lastActivity} />}
         </div>
         <div>
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Purpose</p>
-          <p className="text-[12px] text-muted-foreground leading-relaxed">{profile.purpose}</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Purpose</p>
+          <p className="text-[14px] text-muted-foreground leading-relaxed">{profile.purpose}</p>
         </div>
         {profile.programs.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1.5">Programs</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Programs</p>
             <div className="flex flex-wrap gap-1.5">
-              {profile.programs.map(p => <span key={p} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]">{p}</span>)}
+              {profile.programs.map(p => <span key={p} className="inline-flex items-center px-2 py-0.5 rounded text-[14px] bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F]">{p}</span>)}
             </div>
           </div>
         )}
         {profile.notes && (
           <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
-            <p className="text-[11px] text-muted-foreground italic">{profile.notes}</p>
+            <p className="text-[14px] text-muted-foreground italic">{profile.notes}</p>
           </div>
         )}
       </div>
@@ -1024,8 +1024,8 @@ function ObjectProfilesTab() {
               { label:'Program Mapped',   health:(p.programs.length > 0 ? 'healthy' : 'needs-attention') as any,                                                                   note:p.programs.length > 0 ? p.programs.join(', ') : 'No program mapping' },
             ].map(ind => (
               <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
-                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[12px] font-medium">{ind.label}</span></div>
-                <span className="text-[11px] text-muted-foreground">{ind.note}</span>
+                <div className="flex items-center gap-2.5"><HealthDot health={ind.health} /><span className="text-[14px] font-medium">{ind.label}</span></div>
+                <span className="text-[14px] text-muted-foreground">{ind.note}</span>
               </div>
             ))}
           </div></ScrollArea>
@@ -1061,8 +1061,8 @@ function ScenariosTab() {
     <div className="flex h-full">
       <div className="w-56 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Scenarios</p>
-          <p className="text-[10px] text-muted-foreground">{summary.partial} partial · {summary.blocked} blocked · avg {summary.avgScore}%</p>
+          <p className="text-[14px] font-bold  text-foreground">Scenarios</p>
+          <p className="text-[14px] text-muted-foreground">{summary.partial} partial · {summary.blocked} blocked · avg {summary.avgScore}%</p>
         </div>
         <ScrollArea className="flex-1">
           {OPERATIONAL_SCENARIOS.map(s => (
@@ -1072,7 +1072,7 @@ function ScenariosTab() {
               className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedId === s.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
             >
               <div className="flex-1">
-                <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">{s.name}</p>
+                <p className="text-[14px] font-semibold text-foreground leading-tight mb-1">{s.name}</p>
                 <ReadinessBadge status={s.status} />
               </div>
             </button>
@@ -1084,35 +1084,35 @@ function ScenariosTab() {
           <div className="p-5 space-y-4 max-w-2xl">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${catCls[selected.category] ?? 'bg-muted border-border'}`}>{selected.category}</span>
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${catCls[selected.category] ?? 'bg-muted border-border'}`}>{selected.category}</span>
                 <h3 className="text-[14px] font-bold text-foreground">{selected.name}</h3>
               </div>
-              <p className="text-[12px] text-muted-foreground leading-relaxed">{selected.description}</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{selected.description}</p>
             </div>
 
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
               <InfoRow label="Trigger"         value={selected.trigger} />
               <InfoRow label="Programs"        value={selected.programs.join(', ')} />
               <InfoRow label={TERMS.aiAssistant}           value={selected.pennyCapability} />
-              <InfoRow label="Destination"     value={<code className="font-mono text-[11px]">{selected.destination}</code>} />
+              <InfoRow label="Destination"     value={<code className="font-mono text-[14px]">{selected.destination}</code>} />
               <InfoRow label="Status"          value={<ReadinessBadge status={selected.status} />} />
               <InfoRow label="Readiness"       value={<ScoreBar score={selected.readinessScore} />} />
             </div>
 
             {/* Step flow */}
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Scenario Flow</p>
+              <p className="text-[14px] font-bold  text-foreground mb-2">Scenario Flow</p>
               <div className="space-y-1.5">
                 {selected.flow.map(step => {
                   const dotCls = step.status === 'ready' ? 'bg-[#2F6B3F]' : step.status === 'pending' ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
                   const rowBg = step.status === 'blocked' ? 'bg-[#FBEAE6] border-[#E8B9B4]' : step.status === 'pending' ? 'bg-[#FFF3E0]/50 border-[#FFD08A]/60' : 'bg-white border-border';
                   return (
                     <div key={step.step} className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${rowBg}`}>
-                      <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0">{step.step}</span>
-                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold shrink-0 mt-0.5 ${stepTypeCls[step.type] ?? 'bg-muted'}`}>{step.type}</span>
+                      <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[14px] font-bold text-muted-foreground shrink-0">{step.step}</span>
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold shrink-0 mt-0.5 ${stepTypeCls[step.type] ?? 'bg-muted'}`}>{step.type}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-semibold text-foreground">{step.label}</p>
-                        <p className="text-[11px] text-muted-foreground">{step.detail}</p>
+                        <p className="text-[14px] font-semibold text-foreground">{step.label}</p>
+                        <p className="text-[14px] text-muted-foreground">{step.detail}</p>
                       </div>
                       <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${dotCls}`} />
                     </div>
@@ -1123,10 +1123,10 @@ function ScenariosTab() {
 
             {selected.blockers.length > 0 && (
               <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
-                <p className="text-[11px] font-bold text-[#A93F2F] mb-1.5">Blockers ({selected.blockers.length})</p>
+                <p className="text-[14px] font-bold text-[#A93F2F] mb-1.5">Blockers ({selected.blockers.length})</p>
                 <ul className="space-y-0.5">
                   {selected.blockers.map((b, i) => (
-                    <li key={i} className="flex items-center gap-2 text-[11px] text-[#A93F2F]">
+                    <li key={i} className="flex items-center gap-2 text-[14px] text-[#A93F2F]">
                       <XCircle className="w-3 h-3 shrink-0" />
                       {b}
                     </li>
@@ -1176,7 +1176,7 @@ function GovernanceTab() {
           ].map(s => (
             <div key={s.label} className={`rounded-lg border text-center py-2.5 ${s.cls}`}>
               <p className="text-[22px] font-bold leading-none">{s.value}</p>
-              <p className="text-[10px] font-bold uppercase mt-0.5">{s.label}</p>
+              <p className="text-[14px] font-bold  mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -1187,7 +1187,7 @@ function GovernanceTab() {
             <button
               key={s}
               onClick={() => setFilter(s)}
-              className={`px-3 py-1 rounded text-[11px] font-semibold border transition-colors ${filter === s ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-foreground border-border hover:bg-muted/40'}`}
+              className={`px-3 py-1 rounded text-[14px] font-semibold border transition-colors ${filter === s ? 'bg-primary text-primary-foreground border-primary' : 'bg-white text-foreground border-border hover:bg-muted/40'}`}
             >{s}</button>
           ))}
         </div>
@@ -1201,17 +1201,17 @@ function GovernanceTab() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <SeverityBadge sev={issue.severity} />
-                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${catCls[issue.category] ?? 'bg-muted border-border'}`}>{issue.category}</span>
-                    <span className="text-[12px] font-semibold text-foreground">{issue.title}</span>
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${catCls[issue.category] ?? 'bg-muted border-border'}`}>{issue.category}</span>
+                    <span className="text-[14px] font-semibold text-foreground">{issue.title}</span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">{issue.detail}</p>
+                  <p className="text-[14px] text-muted-foreground leading-relaxed mb-2">{issue.detail}</p>
                   <div className="flex items-start gap-2">
-                    <span className="text-[10px] font-bold uppercase text-muted-foreground/60 shrink-0 mt-0.5">Resolution:</span>
-                    <span className="text-[11px] text-[#2F6B3F]">{issue.resolution}</span>
+                    <span className="text-[14px] font-bold  text-muted-foreground/60 shrink-0 mt-0.5">Resolution:</span>
+                    <span className="text-[14px] text-[#2F6B3F]">{issue.resolution}</span>
                   </div>
                   {issue.affectedObjects.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
-                      {issue.affectedObjects.map(o => <span key={o} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-muted border border-border text-muted-foreground font-mono">{o}</span>)}
+                      {issue.affectedObjects.map(o => <span key={o} className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] bg-muted border border-border text-muted-foreground font-mono">{o}</span>)}
                     </div>
                   )}
                 </div>
@@ -1236,7 +1236,7 @@ function TestSuiteTab() {
     if (s === 'pass')    return <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />;
     if (s === 'fail')    return <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />;
     if (s === 'warning') return <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />;
-    if (s === 'blocked') return <span className="w-3.5 h-3.5 rounded bg-[#FBEAE6] flex items-center justify-center shrink-0"><span className="text-[8px] text-[#A93F2F] font-bold">B</span></span>;
+    if (s === 'blocked') return <span className="w-3.5 h-3.5 rounded bg-[#FBEAE6] flex items-center justify-center shrink-0"><span className="text-[14px] text-[#A93F2F] font-bold">B</span></span>;
     return <span className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 shrink-0 inline-block" />;
   };
 
@@ -1245,8 +1245,8 @@ function TestSuiteTab() {
       {/* Left: suite list */}
       <div className="w-52 shrink-0 border-r border-border flex flex-col">
         <div className="px-4 py-3 border-b border-border bg-muted/30">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Test Suites</p>
-          <p className="text-[10px] text-muted-foreground">{overall.pass}/{overall.total} passing · {overall.pct}%</p>
+          <p className="text-[14px] font-bold  text-foreground">Test Suites</p>
+          <p className="text-[14px] text-muted-foreground">{overall.pass}/{overall.total} passing · {overall.pct}%</p>
         </div>
         <ScrollArea className="flex-1">
           {TEST_SUITES.map(suite => {
@@ -1258,11 +1258,11 @@ function TestSuiteTab() {
                 className={`w-full flex items-start gap-2.5 px-4 py-3 text-left hover:bg-muted/40 border-b border-border/20 ${selectedSuiteId === suite.id ? 'bg-primary/5 border-l-2 border-l-primary' : ''}`}
               >
                 <div className="flex-1">
-                  <p className="text-[12px] font-semibold text-foreground leading-tight mb-1">{suite.name}</p>
+                  <p className="text-[14px] font-semibold text-foreground leading-tight mb-1">{suite.name}</p>
                   <div className="flex items-center gap-2">
                     <ScoreBar score={sum.pct} />
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{sum.pass}/{sum.total} passing</p>
+                  <p className="text-[14px] text-muted-foreground mt-0.5">{sum.pass}/{sum.total} passing</p>
                 </div>
               </button>
             );
@@ -1275,7 +1275,7 @@ function TestSuiteTab() {
           <div className="p-5 space-y-4 max-w-2xl">
             <div>
               <h3 className="text-[14px] font-bold text-foreground mb-1">{selectedSuite.name}</h3>
-              <p className="text-[12px] text-muted-foreground leading-relaxed">{selectedSuite.description}</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{selectedSuite.description}</p>
             </div>
             {/* Suite stats */}
             {(() => {
@@ -1290,7 +1290,7 @@ function TestSuiteTab() {
                   ].map(s => (
                     <div key={s.label} className={`rounded border text-center py-2 ${s.cls}`}>
                       <p className="text-[18px] font-bold leading-none">{s.value}</p>
-                      <p className="text-[9px] font-bold uppercase mt-0.5">{s.label}</p>
+                      <p className="text-[14px] font-bold  mt-0.5">{s.label}</p>
                     </div>
                   ))}
                 </div>
@@ -1303,15 +1303,15 @@ function TestSuiteTab() {
                   <div className="flex items-start gap-2.5 mb-1.5">
                     {statusIcon(test.status)}
                     <div className="flex-1">
-                      <p className="text-[12px] font-semibold text-foreground">{test.name}</p>
-                      <p className="text-[11px] text-muted-foreground">{test.description}</p>
+                      <p className="text-[14px] font-semibold text-foreground">{test.name}</p>
+                      <p className="text-[14px] text-muted-foreground">{test.description}</p>
                     </div>
                     <ReadinessBadge status={test.status} />
                   </div>
                   <div className="ml-6">
-                    <p className="text-[11px] text-muted-foreground italic">{test.result}</p>
+                    <p className="text-[14px] text-muted-foreground italic">{test.result}</p>
                     {test.blockedBy && (
-                      <p className="text-[10px] text-[#A93F2F] mt-0.5">Blocked by: {test.blockedBy}</p>
+                      <p className="text-[14px] text-[#A93F2F] mt-0.5">Blocked by: {test.blockedBy}</p>
                     )}
                   </div>
                 </div>
@@ -1330,13 +1330,13 @@ function IntegrationHealthTab() {
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-4 max-w-3xl">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Health Scorecard</p>
+        <p className="text-[14px] font-bold  text-foreground">Health Scorecard</p>
         <div className="space-y-3">
           {SLACK_HEALTH_SCORES.map(s => (
             <div key={s.dimension} className="rounded-lg border border-border bg-white px-4 py-3">
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-[12px] font-bold text-foreground capitalize">{s.dimension}</span>
-                <span className="ml-auto text-[11px] font-bold tabular-nums">{s.score}/{s.maxScore}</span>
+                <span className="text-[14px] font-bold text-foreground capitalize">{s.dimension}</span>
+                <span className="ml-auto text-[14px] font-bold tabular-nums">{s.score}/{s.maxScore}</span>
                 <ReadinessBadge status={s.status} />
               </div>
               <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -1347,7 +1347,7 @@ function IntegrationHealthTab() {
               </div>
               {s.items.filter(it => it.status === 'fail').length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
-                  {s.items.filter(it => it.status === 'fail').map(it => <span key={it.label} className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F]">{it.label}</span>)}
+                  {s.items.filter(it => it.status === 'fail').map(it => <span key={it.label} className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] bg-[#FBEAE6] border border-[#E8B9B4] text-[#A93F2F]">{it.label}</span>)}
                 </div>
               )}
             </div>
@@ -1355,13 +1355,13 @@ function IntegrationHealthTab() {
         </div>
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Dimension Detail</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Dimension Detail</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {SLACK_HEALTH_SCORES.flatMap(s => s.items.filter(it => it.status !== 'pass')).map((it, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-2.5">
                 <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
-                <span className="text-[12px] text-foreground">{it.label}</span>
-                <span className="ml-auto text-[11px] text-muted-foreground">{it.note}</span>
+                <span className="text-[14px] text-foreground">{it.label}</span>
+                <span className="ml-auto text-[14px] text-muted-foreground">{it.note}</span>
               </div>
             ))}
           </div>
@@ -1378,14 +1378,14 @@ function PocStateTab() {
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5 max-w-4xl">
         <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3">
-          <p className="text-[11px] font-bold text-[#245531] uppercase mb-1">POC Last Confirmed Working State — Restoration Reference</p>
-          <p className="text-[12px] text-[#245531] leading-relaxed">
+          <p className="text-[14px] font-bold text-[#245531]  mb-1">POC Last Confirmed Working State — Restoration Reference</p>
+          <p className="text-[14px] text-[#245531] leading-relaxed">
             The Penny AI Slack POC was confirmed working with both Penny (Gemini) and Agentforce (Penny–Transition Trails Assistant) responding in the same channel simultaneously. Assessment quiz flow, connected Agentforce, and both the Penny AI channel and admin channel were tested. This tab is the reference document for restoring and validating that state.
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Confirmed Working — POC State</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Confirmed Working — POC State</p>
           <div className="space-y-2">
             {POC_WORKING_ITEMS.map(item => (
               <div key={item.id} className={`flex items-start gap-3 px-3 py-2.5 rounded-lg border ${
@@ -1394,13 +1394,13 @@ function PocStateTab() {
                 <CheckCircle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${item.status === 'confirmed-working' ? 'text-[#2F6B3F]' : 'text-[#2F6B3F]'}`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <p className="text-[12px] font-semibold text-foreground">{item.capability}</p>
-                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${
+                    <p className="text-[14px] font-semibold text-foreground">{item.capability}</p>
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${
                       item.status === 'confirmed-working' ? 'border-[#9FC3AE] bg-white text-[#2F6B3F]' : 'border-[#9FC3AE] bg-white text-[#2F6B3F]'
                     }`}>{item.status === 'confirmed-working' ? 'Confirmed' : 'Tested'}</span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground">{item.note}</p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-0.5">Channel: {item.channel} · {item.testedDate}</p>
+                  <p className="text-[14px] text-muted-foreground">{item.note}</p>
+                  <p className="text-[14px] text-muted-foreground/60 mt-0.5">Channel: {item.channel} · {item.testedDate}</p>
                 </div>
               </div>
             ))}
@@ -1408,47 +1408,47 @@ function PocStateTab() {
         </div>
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Bots Confirmed Active — Penny AI Channel</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Bots Confirmed Active — Penny AI Channel</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {POC_BOTS_CONFIRMED.map(bot => (
               <div key={bot.id} className="flex items-center gap-3 px-4 py-2.5">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold border shrink-0 ${bot.colorCls}`}>{bot.platform}</span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border shrink-0 ${bot.colorCls}`}>{bot.platform}</span>
                 <div className="flex-1">
-                  <p className="text-[12px] font-semibold text-foreground">{bot.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{bot.role}</p>
+                  <p className="text-[14px] font-semibold text-foreground">{bot.name}</p>
+                  <p className="text-[14px] text-muted-foreground">{bot.role}</p>
                 </div>
-                <span className="text-[10px] font-medium text-[#2F6B3F] shrink-0">✓ Confirmed in POC</span>
+                <span className="text-[14px] font-medium text-[#2F6B3F] shrink-0">✓ Confirmed in POC</span>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+          <p className="text-[14px] text-muted-foreground mt-1.5 leading-relaxed">
             Both Penny (Gemini) and Agentforce were observed responding in the same Penny AI channel — confirmed via screenshot showing simultaneous active responses. The Trail OS Bot handled delivery routing, test messages, and event logging.
           </p>
         </div>
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Channels Tested in POC</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Channels Tested in POC</p>
           <div className="grid grid-cols-2 gap-3">
             {POC_CHANNELS_RECORD.map(ch => (
               <div key={ch.role} className={`rounded-lg border p-4 ${ch.role === 'penny' ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#7FAFC6] bg-[#EDF5F8]'}`}>
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <Hash className={`w-4 h-4 ${ch.role === 'penny' ? 'text-[#2F6B3F]' : 'text-[#2F6F7E]'}`} />
-                  <p className="text-[13px] font-bold text-foreground">{ch.channelName}</p>
-                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${
+                  <p className="text-[14px] font-bold text-foreground">{ch.channelName}</p>
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  border ${
                     ch.testedStatus === 'confirmed-working' ? 'border-[#9FC3AE] bg-white text-[#2F6B3F]' : 'border-[#9FC3AE] bg-white text-[#2F6B3F]'
                   }`}>{ch.testedStatus === 'confirmed-working' ? 'Confirmed' : 'Tested'}</span>
                 </div>
                 <div className="space-y-1 mb-3">
                   {ch.featuresTested.map(f => (
-                    <div key={f} className="flex items-center gap-1.5 text-[11px] text-foreground">
+                    <div key={f} className="flex items-center gap-1.5 text-[14px] text-foreground">
                       <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0" /> {f}
                     </div>
                   ))}
                 </div>
                 <div className="pt-2 border-t border-border/30">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase mb-0.5">Recommended Env Var</p>
-                  <code className="text-[10px] font-mono text-muted-foreground">{ch.recommendedEnvVar}</code>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 italic leading-snug">{ch.envVarHint}</p>
+                  <p className="text-[14px] font-bold text-muted-foreground  mb-0.5">Recommended Env Var</p>
+                  <code className="text-[14px] font-mono text-muted-foreground">{ch.recommendedEnvVar}</code>
+                  <p className="text-[14px] text-muted-foreground mt-0.5 italic leading-snug">{ch.envVarHint}</p>
                 </div>
               </div>
             ))}
@@ -1456,18 +1456,18 @@ function PocStateTab() {
         </div>
 
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Restore Checklist</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Restore Checklist</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {POC_RESTORE_CHECKLIST.map((item, i) => (
               <div key={i} className="flex items-start gap-3 px-4 py-2.5">
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-[#E6F0EA] text-[#2F6B3F]' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-[#E6F0EA] text-[#2F6B3F]' : 'bg-muted text-muted-foreground'}`}>
                   {item.done ? '✓' : String(i + 1)}
                 </span>
                 <div className="flex-1">
-                  <p className={`text-[12px] font-semibold ${item.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{item.step}</p>
-                  <p className="text-[11px] text-muted-foreground">{item.note}</p>
+                  <p className={`text-[14px] font-semibold ${item.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{item.step}</p>
+                  <p className="text-[14px] text-muted-foreground">{item.note}</p>
                 </div>
-                <span className={`text-[10px] font-medium shrink-0 ${item.done ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>{item.status}</span>
+                <span className={`text-[14px] font-medium shrink-0 ${item.done ? 'text-[#2F6B3F]' : 'text-muted-foreground'}`}>{item.status}</span>
               </div>
             ))}
           </div>
@@ -1538,8 +1538,8 @@ function PocReadinessTab() {
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5 max-w-4xl">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-          <p className="text-[11px] font-bold text-primary uppercase mb-1">POC Integration Readiness</p>
-          <p className="text-[12px] text-foreground leading-relaxed">
+          <p className="text-[14px] font-bold text-primary  mb-1">POC Integration Readiness</p>
+          <p className="text-[14px] text-foreground leading-relaxed">
             Live readiness across all systems required to restore the confirmed-working POC state: Slack channels, Penny/Gemini, Agentforce, Assessment, Prompt Studio, and Trail OS event recording. Slack checks update automatically when Workspace Validation runs.
           </p>
         </div>
@@ -1547,16 +1547,16 @@ function PocReadinessTab() {
         {/* Live Slack readiness */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-foreground">Live Slack Readiness</p>
-            {liveChecks === null && <span className="text-[10px] text-muted-foreground italic">— run Workspace Validation to populate</span>}
+            <p className="text-[14px] font-bold  text-foreground">Live Slack Readiness</p>
+            {liveChecks === null && <span className="text-[14px] text-muted-foreground italic">— run Workspace Validation to populate</span>}
           </div>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {liveItems.map(item => (
               <div key={item.id} className="flex items-start gap-3 px-4 py-2.5">
                 <ValidationIcon status={item.status} />
                 <div className="flex-1">
-                  <p className="text-[12px] font-semibold text-foreground">{item.label}</p>
-                  <p className="text-[11px] text-muted-foreground">{item.detail}</p>
+                  <p className="text-[14px] font-semibold text-foreground">{item.label}</p>
+                  <p className="text-[14px] text-muted-foreground">{item.detail}</p>
                 </div>
                 <ReadinessBadge status={item.status} />
               </div>
@@ -1566,7 +1566,7 @@ function PocReadinessTab() {
 
         {/* Integration components */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Integration Components</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Integration Components</p>
           <div className="grid grid-cols-2 gap-2">
             {POC_INTEGRATION_LINKS.map(link => (
               <div key={link.id} className={`rounded-lg border p-3 ${
@@ -1575,11 +1575,11 @@ function PocReadinessTab() {
                                                'border-[#7FAFC6] bg-[#EDF5F8]'
               }`}>
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <p className="text-[12px] font-semibold text-foreground">{link.label}</p>
+                  <p className="text-[14px] font-semibold text-foreground">{link.label}</p>
                   <ReadinessBadge status={link.status} />
                 </div>
-                <p className="text-[11px] text-muted-foreground leading-snug mb-2">{link.description}</p>
-                <code className="text-[10px] font-mono text-muted-foreground/60">{link.route}</code>
+                <p className="text-[14px] text-muted-foreground leading-snug mb-2">{link.description}</p>
+                <code className="text-[14px] font-mono text-muted-foreground/60">{link.route}</code>
               </div>
             ))}
           </div>
@@ -1587,16 +1587,16 @@ function PocReadinessTab() {
 
         {/* Next steps to restore POC */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-2">Restore Path — What Needs to Happen Next</p>
+          <p className="text-[14px] font-bold  text-foreground mb-2">Restore Path — What Needs to Happen Next</p>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
             {nextSteps.map((item, i) => (
               <div key={i} className="flex items-start gap-3 px-4 py-2.5">
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-[#E6F0EA] text-[#2F6B3F]' : 'bg-muted text-muted-foreground'}`}>
+                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5 ${item.done ? 'bg-[#E6F0EA] text-[#2F6B3F]' : 'bg-muted text-muted-foreground'}`}>
                   {item.done ? '✓' : String(i + 1)}
                 </span>
                 <div className="flex-1">
-                  <p className={`text-[12px] font-semibold ${item.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{item.step}</p>
-                  <p className="text-[11px] text-muted-foreground">{item.detail}</p>
+                  <p className={`text-[14px] font-semibold ${item.done ? 'text-muted-foreground line-through' : 'text-foreground'}`}>{item.step}</p>
+                  <p className="text-[14px] text-muted-foreground">{item.detail}</p>
                 </div>
                 {item.done && <ReadinessBadge status="pass" />}
               </div>

@@ -18,9 +18,9 @@ export default function DeliverySlackActivities() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
           <h1 className="text-3xl font-bold text-foreground">Slack Activities</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             Penny-posted Slack threads, lab shares, and cohort engagement activities linked to modules and lessons.
             Each activity has a defined trigger timing and channel target. Select an activity to view its full script and Knowledge Brief.
           </p>
@@ -39,23 +39,23 @@ export default function DeliverySlackActivities() {
                   <div className="flex items-center gap-2">
                     <Hash className="w-4 h-4 text-[#2F6B3F] shrink-0" />
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">{activity.name}</p>
+                      <p className="text-[14px] font-bold text-foreground">{activity.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[10px] font-medium border rounded-full px-1.5 py-0.5 ${typeCls}`}>{activity.activityType as string}</span>
-                        <span className="text-[10px] text-muted-foreground">{activity.channel as string} · {activity.timing as string}</span>
+                        <span className={`text-[14px] font-medium border rounded-full px-1.5 py-0.5 ${typeCls}`}>{activity.activityType as string}</span>
+                        <span className="text-[14px] text-muted-foreground">{activity.channel as string} · {activity.timing as string}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                    <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                 </div>
-                <p className="text-[12px] text-muted-foreground">{activity.purpose}</p>
+                <p className="text-[14px] text-muted-foreground">{activity.purpose}</p>
                 {!!(activity.sampleOutput) && (
                   <div className="mt-2 rounded bg-gray-900 text-white px-3 py-2 font-mono">
-                    <p className="text-[10px] text-gray-400 mb-0.5">Sample message</p>
-                    <p className="text-[11px] leading-relaxed line-clamp-2 italic">{activity.sampleOutput as string}</p>
+                    <p className="text-[14px] text-gray-400 mb-0.5">Sample message</p>
+                    <p className="text-[14px] leading-relaxed line-clamp-2 italic">{activity.sampleOutput as string}</p>
                   </div>
                 )}
               </button>

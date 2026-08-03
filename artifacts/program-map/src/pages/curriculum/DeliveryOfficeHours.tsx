@@ -10,9 +10,9 @@ export default function DeliveryOfficeHours() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
           <h1 className="text-3xl font-bold text-foreground">Office Hours</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             Recurring and module-specific office hours sessions. Penny reminds learners before each session and coaches
             prepare using the linked module context. Select a session to view prep notes in the Knowledge Brief.
           </p>
@@ -30,16 +30,16 @@ export default function DeliveryOfficeHours() {
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-[#A93F2F] shrink-0" />
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">{oh.name}</p>
-                      <p className="text-[11px] text-muted-foreground">{oh.schedule as string} · {oh.format as string}</p>
+                      <p className="text-[14px] font-bold text-foreground">{oh.name}</p>
+                      <p className="text-[14px] text-muted-foreground">{oh.schedule as string} · {oh.format as string}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                    <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                 </div>
-                <p className="text-[12px] text-muted-foreground">{oh.purpose}</p>
+                <p className="text-[14px] text-muted-foreground">{oh.purpose}</p>
               </button>
             );
           })}

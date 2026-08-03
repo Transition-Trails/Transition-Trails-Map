@@ -26,9 +26,9 @@ export default function ContentHealth() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-6">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio</p>
           <h1 className="text-3xl font-bold text-foreground">Content Health</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             Standards-based health checks across all Foundations Trail modules. Issues are flagged when modules don't meet the
             Learning Architecture standard — missing objectives, assessments, articles, prompts, or delivery assets.
           </p>
@@ -38,16 +38,16 @@ export default function ContentHealth() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="rounded-lg border border-border bg-white px-4 py-3">
             <p className="text-2xl font-bold text-foreground">{healthScore}%</p>
-            <p className="text-[11px] font-semibold text-muted-foreground">Health Score</p>
-            <p className="text-[10px] text-muted-foreground">Foundations Trail</p>
+            <p className="text-[14px] font-semibold text-muted-foreground">Health Score</p>
+            <p className="text-[14px] text-muted-foreground">Foundations Trail</p>
           </div>
           {(['high', 'medium', 'low'] as HealthSeverity[]).map(sev => {
             const cfg = SEVERITY_CONFIG[sev];
             return (
               <div key={sev} className={`rounded-lg border px-4 py-3 ${cfg.cls}`}>
                 <p className="text-2xl font-bold">{counts[sev]}</p>
-                <p className="text-[11px] font-semibold capitalize">{sev} Priority</p>
-                <p className="text-[10px] opacity-70">health issues</p>
+                <p className="text-[14px] font-semibold capitalize">{sev} Priority</p>
+                <p className="text-[14px] opacity-70">health issues</p>
               </div>
             );
           })}
@@ -57,10 +57,10 @@ export default function ContentHealth() {
         <div className="rounded-lg border border-secondary/30 bg-secondary/5 px-4 py-3 flex items-center gap-3">
           <Shield className="w-4 h-4 text-secondary shrink-0" />
           <div className="flex-1">
-            <p className="text-[12px] font-semibold text-foreground">Run a full Consistency Review in Penny Content Assistant</p>
-            <p className="text-[11px] text-muted-foreground">Penny can analyze any program, sprint, or module and generate a prioritized gap report with suggested actions.</p>
+            <p className="text-[14px] font-semibold text-foreground">Run a full Consistency Review in Penny Content Assistant</p>
+            <p className="text-[14px] text-muted-foreground">Penny can analyze any program, sprint, or module and generate a prioritized gap report with suggested actions.</p>
           </div>
-          <a href="#" onClick={e => { e.preventDefault(); }} className="text-[11px] font-semibold text-secondary border border-secondary/30 rounded-full px-3 py-1.5 whitespace-nowrap hover:bg-secondary/10 transition-colors">
+          <a href="#" onClick={e => { e.preventDefault(); }} className="text-[14px] font-semibold text-secondary border border-secondary/30 rounded-full px-3 py-1.5 whitespace-nowrap hover:bg-secondary/10 transition-colors">
             Consistency Review →
           </a>
         </div>
@@ -71,7 +71,7 @@ export default function ContentHealth() {
             <button
               key={sev}
               onClick={() => setSeverityFilter(sev)}
-              className={`text-[11px] font-semibold rounded-full px-3 py-1.5 border transition-colors capitalize ${
+              className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors capitalize ${
                 severityFilter === sev
                   ? sev === 'all' ? 'bg-primary text-white border-primary'
                     : sev === 'high' ? 'bg-[#A93F2F] text-white border-[#A93F2F]'
@@ -100,30 +100,30 @@ export default function ContentHealth() {
                   <div className="flex items-center gap-2">
                     <AlertTriangle className={`w-4 h-4 shrink-0 ${issue.severity === 'high' ? 'text-[#A93F2F]' : issue.severity === 'medium' ? 'text-[#CC8400]' : 'text-[#CC8400]'}`} />
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">{issue.name as string}</p>
-                      <p className="text-[11px] text-muted-foreground">Affects: <strong>{issue.affectedObjectName as string}</strong></p>
+                      <p className="text-[14px] font-bold text-foreground">{issue.name as string}</p>
+                      <p className="text-[14px] text-muted-foreground">Affects: <strong>{issue.affectedObjectName as string}</strong></p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${sevCfg.cls}`}>{sevCfg.label}</span>
+                    <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${sevCfg.cls}`}>{sevCfg.label}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                 </div>
                 {checkCfg && (
-                  <p className="text-[11px] text-muted-foreground mb-1">
+                  <p className="text-[14px] text-muted-foreground mb-1">
                     <span className="font-medium">Check Type:</span> {checkCfg.label} — {checkCfg.description}
                   </p>
                 )}
                 {((issue.affectedItems as string[]) || []).length > 0 && (
                   <div className="mt-1 space-y-0.5">
                     {(issue.affectedItems as string[]).map((item, i) => (
-                      <p key={i} className="text-[11px] text-[#A93F2F]">• {item}</p>
+                      <p key={i} className="text-[14px] text-[#A93F2F]">• {item}</p>
                     ))}
                   </div>
                 )}
-                <p className="text-[11px] font-medium text-primary mt-2">Action: {issue.actionRequired as string}</p>
+                <p className="text-[14px] font-medium text-primary mt-2">Action: {issue.actionRequired as string}</p>
                 {((issue.pennyActions as string[]) || []).length > 0 && (
-                  <p className="text-[10px] text-secondary mt-1">
+                  <p className="text-[14px] text-secondary mt-1">
                     Penny can help: {(issue.pennyActions as string[]).join(' · ')}
                   </p>
                 )}
@@ -136,7 +136,7 @@ export default function ContentHealth() {
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <CheckCircle2 className="w-10 h-10 text-[#2F6B3F] mb-3" />
             <p className="text-[14px] font-semibold text-foreground">No issues at this severity level</p>
-            <p className="text-[12px] text-muted-foreground">Select a different filter to see other health issues.</p>
+            <p className="text-[14px] text-muted-foreground">Select a different filter to see other health issues.</p>
           </div>
         )}
       </div>

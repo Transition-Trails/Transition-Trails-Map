@@ -35,7 +35,7 @@ export default function CommunicationRouting() {
           <Info className="w-4 h-4 text-[#2F6F7E] flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-[#2F6F7E] mb-1">Routing Model</p>
-            <p className="text-xs text-[#2F6F7E] leading-relaxed">
+            <p className="text-sm text-[#2F6F7E] leading-relaxed">
               Each row is an <strong>event type</strong> — a specific trigger that should result in a message.
               Events map to a <em>Slack channel now</em> and optionally a <em>Google Chat space later</em>.
               Changing provider means updating the destination column only.
@@ -49,7 +49,7 @@ export default function CommunicationRouting() {
           <thead>
             <tr className="bg-muted/50 border-b border-border">
               {['Event Type', 'Trigger', 'Audience', 'Slack Channel', 'Google Chat', 'Owner'].map(h => (
-                <th key={h} className="text-left px-3 py-2.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                <th key={h} className="text-left px-3 py-2.5 text-[14px] font-bold  text-muted-foreground whitespace-nowrap">
                   {h}
                 </th>
               ))}
@@ -63,50 +63,50 @@ export default function CommunicationRouting() {
                 className="hover:bg-primary/5 cursor-pointer transition-colors"
               >
                 <td className="px-3 py-3">
-                  <p className="font-semibold text-foreground text-[13px] leading-snug">{route.eventType}</p>
+                  <p className="font-semibold text-foreground text-[14px] leading-snug">{route.eventType}</p>
                   {route.relatedPennyCap && (
-                    <span className="inline-flex items-center text-[10px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5 mt-1">
+                    <span className="inline-flex items-center text-[14px] bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] rounded-full px-1.5 py-0.5 mt-1">
                       Penny: {route.relatedPennyCap.split(',')[0]}
                     </span>
                   )}
                   {route.relatedDemandEvent && (
-                    <span className="inline-flex items-center text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 mt-1">
+                    <span className="inline-flex items-center text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] rounded-full px-1.5 py-0.5 mt-1">
                       Demand: {route.relatedDemandEvent}
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-3 text-[12px] text-muted-foreground max-w-[120px]">
+                <td className="px-3 py-3 text-[14px] text-muted-foreground max-w-[120px]">
                   <span className="line-clamp-2">{route.trigger}</span>
                 </td>
-                <td className="px-3 py-3 text-[12px] text-muted-foreground whitespace-nowrap">{route.audience}</td>
+                <td className="px-3 py-3 text-[14px] text-muted-foreground whitespace-nowrap">{route.audience}</td>
                 <td className="px-3 py-3">
-                  <p className="font-mono text-[11px] text-foreground">{route.slackChannel}</p>
+                  <p className="font-mono text-[14px] text-foreground">{route.slackChannel}</p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <StatusDot status="amber" />
-                    <span className="text-[10px] text-[#CC8400]">{route.slackStatus}</span>
+                    <span className="text-[14px] text-[#CC8400]">{route.slackStatus}</span>
                   </div>
                 </td>
                 <td className="px-3 py-3">
                   {route.googleChatSpace ? (
                     <>
-                      <p className="text-[11px] text-muted-foreground">{route.googleChatSpace}</p>
+                      <p className="text-[14px] text-muted-foreground">{route.googleChatSpace}</p>
                       <div className="flex items-center gap-1 mt-0.5">
                         <StatusDot status="gray" />
-                        <span className="text-[10px] text-muted-foreground">{route.googleChatStatus}</span>
+                        <span className="text-[14px] text-muted-foreground">{route.googleChatStatus}</span>
                       </div>
                     </>
                   ) : (
-                    <span className="text-[11px] text-muted-foreground/50">—</span>
+                    <span className="text-[14px] text-muted-foreground/50">—</span>
                   )}
                 </td>
-                <td className="px-3 py-3 text-[12px] text-muted-foreground whitespace-nowrap">{route.owner}</td>
+                <td className="px-3 py-3 text-[14px] text-muted-foreground whitespace-nowrap">{route.owner}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <p className="text-[11px] text-muted-foreground mt-3 text-center">
+      <p className="text-[14px] text-muted-foreground mt-3 text-center">
         Click any row to open its Knowledge Brief. {commRoutes.length} routes defined — all planned, none yet connected.
       </p>
     </PageShell>

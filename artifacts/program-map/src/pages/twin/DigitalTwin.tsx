@@ -340,7 +340,7 @@ const IMPACT_CATALOG: Record<ObjectKind, { headline: string; areas: ImpactArea[]
 function StatusBadge({ status }: { status: SelectedObject['status'] }) {
   const { label, cls, dot } = STATUS_CONFIG[status];
   return (
-    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9px] font-bold uppercase ${cls}`}>
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[14px] font-bold  ${cls}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
       {label}
     </span>
@@ -426,19 +426,19 @@ function FocusedMap({ selected, onNavigate }: { selected: SelectedObject; onNavi
           <div className="p-4 space-y-3 overflow-y-auto h-full">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: hovered.color }} />
-              <p className="text-[13px] font-bold text-foreground">{hovered.system}</p>
+              <p className="text-[14px] font-bold text-foreground">{hovered.system}</p>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">{hovered.detail}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed">{hovered.detail}</p>
             <div className="space-y-1">
               {hovered.items.slice(0, 5).map(item => (
-                <div key={item.id} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                <div key={item.id} className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
                   {item.statusColor && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${item.statusColor}`} />}
                   {item.label}
                 </div>
               ))}
             </div>
             <button onClick={() => onNavigate(hovered.href)}
-              className="w-full text-[11px] font-semibold text-primary border border-primary/30 rounded-md px-2 py-1.5 hover:bg-primary/5 transition-colors">
+              className="w-full text-[14px] font-semibold text-primary border border-primary/30 rounded-md px-2 py-1.5 hover:bg-primary/5 transition-colors">
               Open workspace →
             </button>
           </div>
@@ -454,18 +454,18 @@ function ObjectHeader({ obj, onClear, onSwitch }: { obj: SelectedObject; onClear
   const cfg = CATALOG[obj.kind];
   return (
     <div className={`flex items-center gap-3 px-4 py-2.5 border-b border-border ${cfg.bg} shrink-0`}>
-      <span className={`text-[10px] font-bold uppercase tracking-widest ${cfg.accent} opacity-70`}>{cfg.label}</span>
+      <span className={`text-[14px] font-bold  ${cfg.accent} opacity-70`}>{cfg.label}</span>
       <span className={`w-1 h-1 rounded-full ${cfg.border} bg-current opacity-40`} />
-      <span className="text-[13px] font-bold text-foreground">{obj.name}</span>
-      <span className="text-[11px] text-muted-foreground">{obj.subtitle}</span>
+      <span className="text-[14px] font-bold text-foreground">{obj.name}</span>
+      <span className="text-[14px] text-muted-foreground">{obj.subtitle}</span>
       <StatusBadge status={obj.status} />
       <div className="ml-auto flex items-center gap-2">
         <button onClick={onSwitch}
-          className="text-[10px] font-semibold text-muted-foreground hover:text-foreground border border-border rounded px-2 py-1 bg-white hover:bg-muted/30 transition-colors flex items-center gap-1">
+          className="text-[14px] font-semibold text-muted-foreground hover:text-foreground border border-border rounded px-2 py-1 bg-white hover:bg-muted/30 transition-colors flex items-center gap-1">
           <Search className="w-3 h-3" /> Switch object
         </button>
         <button onClick={onClear}
-          className="text-[10px] font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1">
+          className="text-[14px] font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1">
           <X className="w-3.5 h-3.5" /> Clear
         </button>
       </div>
@@ -495,7 +495,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
       <div className="flex gap-0 border-b border-border bg-white shrink-0 px-4 overflow-x-auto">
         {WS_TABS.map(t => (
           <button key={t.id} onClick={() => setWsTab(t.id)}
-            className={`px-3 py-2 text-[11px] font-semibold whitespace-nowrap border-b-2 transition-colors ${
+            className={`px-3 py-2 text-[14px] font-semibold whitespace-nowrap border-b-2 transition-colors ${
               wsTab === t.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}>
             {t.label}
@@ -508,12 +508,12 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
           {wsTab === 'overview' && (
             <div className="space-y-4">
               <div className={`rounded-lg border ${cfg.border} ${cfg.bg} p-4`}>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-foreground mb-1.5">{cfg.question}</p>
-                <p className="text-[13px] text-foreground leading-relaxed">{cfg.description}</p>
+                <p className="text-[14px] font-bold  text-foreground mb-1.5">{cfg.question}</p>
+                <p className="text-[14px] text-foreground leading-relaxed">{cfg.description}</p>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {cfg.connections.map(c => (
                     <button key={c.system} onClick={() => onNavigate(c.href)}
-                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-white text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors">
+                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-white text-[14px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors">
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c.color }} />
                       {c.system} · {c.label}
                     </button>
@@ -521,24 +521,24 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
                 </div>
               </div>
               <div className="rounded-lg border border-border bg-white p-4">
-                <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground mb-2">Quick impact preview</p>
+                <p className="text-[14px] font-bold  text-muted-foreground mb-2">Quick impact preview</p>
                 <div className="space-y-1">
                   {IMPACT_CATALOG[obj.kind].areas.slice(0, 3).map(a => (
-                    <div key={a.area} className="flex items-start gap-2 text-[11px]">
+                    <div key={a.area} className="flex items-start gap-2 text-[14px]">
                       <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${SEV_CONFIG[a.severity].dot}`} />
                       <span><strong>{a.area}</strong> — {a.items[0]}</span>
                     </div>
                   ))}
                 </div>
                 <button onClick={() => setWsTab('actions')}
-                  className="mt-2 text-[10px] font-semibold text-primary hover:underline">View full impact →</button>
+                  className="mt-2 text-[14px] font-semibold text-primary hover:underline">View full impact →</button>
               </div>
             </div>
           )}
 
           {wsTab === 'relationships' && (
             <div className="space-y-3">
-              <p className="text-[11px] text-muted-foreground">Every system this object connects to. Click a tag to navigate to that workspace.</p>
+              <p className="text-[14px] text-muted-foreground">Every system this object connects to. Click a tag to navigate to that workspace.</p>
               {cfg.connections.map(c => (
                 <RelationshipCard key={c.system} title={c.system} items={c.items}
                   viewAllHref={c.href} defaultOpen={true} />
@@ -557,13 +557,13 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
               ].map(h => (
                 <div key={h.label} className="rounded-lg border border-border bg-white p-3 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-semibold text-foreground">{h.label}</span>
-                    <span className="text-[12px] font-bold tabular-nums text-foreground">{h.pct}%</span>
+                    <span className="text-[14px] font-semibold text-foreground">{h.label}</span>
+                    <span className="text-[14px] font-bold tabular-nums text-foreground">{h.pct}%</span>
                   </div>
                   <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                     <div className={`h-full rounded-full transition-all ${h.color}`} style={{ width: `${h.pct}%` }} />
                   </div>
-                  <p className="text-[10px] text-muted-foreground">{h.note}</p>
+                  <p className="text-[14px] text-muted-foreground">{h.note}</p>
                 </div>
               ))}
             </div>
@@ -583,15 +583,15 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-[11px] font-bold text-foreground">{o.name}</p>
-                      <span className={`text-[9px] font-bold px-1 py-0.5 rounded border ${STATUS_CONFIG[o.status].cls}`}>{o.role}</span>
+                      <p className="text-[14px] font-bold text-foreground">{o.name}</p>
+                      <span className={`text-[14px] font-bold px-1 py-0.5 rounded border ${STATUS_CONFIG[o.status].cls}`}>{o.role}</span>
                     </div>
-                    <p className="text-[10px] text-muted-foreground">{o.detail}</p>
+                    <p className="text-[14px] text-muted-foreground">{o.detail}</p>
                   </div>
                 </div>
               ))}
               <div className="rounded border border-border bg-muted/20 px-3 py-2">
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[14px] text-muted-foreground">
                   Full ownership matrix at{' '}
                   <button onClick={() => onNavigate('/digital-twin/governance')}
                     className="font-semibold text-primary hover:underline">
@@ -615,8 +615,8 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
                 <div key={i} className="flex items-start gap-3 rounded border border-border bg-white px-3 py-2.5">
                   <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${a.color}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-foreground leading-snug">{a.action}</p>
-                    <p className="text-[10px] text-muted-foreground">{a.actor} · {a.date}</p>
+                    <p className="text-[14px] text-foreground leading-snug">{a.action}</p>
+                    <p className="text-[14px] text-muted-foreground">{a.actor} · {a.date}</p>
                   </div>
                 </div>
               ))}
@@ -625,7 +625,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
 
           {wsTab === 'actions' && (
             <div className="space-y-3">
-              <p className="text-[11px] text-muted-foreground">Suggested next actions based on this object's current state and connections.</p>
+              <p className="text-[14px] text-muted-foreground">Suggested next actions based on this object's current state and connections.</p>
               {[
                 { label: 'Open in Salesforce',        desc: 'Review the primary record and related data',           href: '/admin/salesforce-arch', icon: <Database className="w-4 h-4" />, variant: 'primary' as const },
                 { label: 'Review Knowledge Sources',  desc: '2 sources are flagged for currency review',            href: '/knowledge',          icon: <BookOpen  className="w-4 h-4" />, variant: 'secondary' as const },
@@ -637,8 +637,8 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
                   className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border transition-all hover:shadow-sm group ${a.variant === 'primary' ? 'border-primary/30 bg-primary/5 hover:bg-primary/10' : 'border-border bg-white hover:border-primary/30'}`}>
                   <span className={`shrink-0 ${a.variant === 'primary' ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`}>{a.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-[12px] font-semibold ${a.variant === 'primary' ? 'text-primary' : 'text-foreground'}`}>{a.label}</p>
-                    <p className="text-[10px] text-muted-foreground">{a.desc}</p>
+                    <p className={`text-[14px] font-semibold ${a.variant === 'primary' ? 'text-primary' : 'text-foreground'}`}>{a.label}</p>
+                    <p className="text-[14px] text-muted-foreground">{a.desc}</p>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
                 </button>
@@ -663,8 +663,8 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
       <div className="p-4 max-w-3xl">
         {/* Framing */}
         <div className="mb-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Explore</p>
-          <p className="text-[11px] text-muted-foreground">Pick an object to see what it touches — relationships, health, ownership, and change impact.</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Explore</p>
+          <p className="text-[14px] text-muted-foreground">Pick an object to see what it touches — relationships, health, ownership, and change impact.</p>
         </div>
 
         {/* Entry tiles */}
@@ -683,8 +683,8 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
                       <span className="scale-75">{cfg.icon}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] font-bold text-foreground leading-tight">{cfg.verb}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{cfg.description}</p>
+                      <p className="text-[14px] font-bold text-foreground leading-tight">{cfg.verb}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{cfg.description}</p>
                     </div>
                   </div>
                   {/* Quick example pills — always visible */}
@@ -692,12 +692,12 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
                     {cfg.examples.slice(0, 3).map(ex => (
                       <button key={ex.id}
                         onClick={e => { e.stopPropagation(); onSelect({ kind, ...ex }); }}
-                        className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border transition-colors hover:opacity-80 ${cfg.bg} ${cfg.border} ${cfg.accent}`}>
+                        className={`text-[14px] font-semibold px-1.5 py-0.5 rounded-full border transition-colors hover:opacity-80 ${cfg.bg} ${cfg.border} ${cfg.accent}`}>
                         {ex.name}
                       </button>
                     ))}
                     {cfg.examples.length > 3 && (
-                      <span className="text-[9px] text-muted-foreground px-1 py-0.5">+{cfg.examples.length - 3}</span>
+                      <span className="text-[14px] text-muted-foreground px-1 py-0.5">+{cfg.examples.length - 3}</span>
                     )}
                   </div>
                 </div>
@@ -709,8 +709,8 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
                         onClick={e => { e.stopPropagation(); onSelect({ kind, ...ex }); }}
                         className="w-full text-left px-3 py-2 flex items-center gap-2.5 hover:bg-white/50 transition-colors group">
                         <div className="flex-1 min-w-0">
-                          <p className={`text-[11px] font-semibold ${cfg.accent}`}>{ex.name}</p>
-                          <p className="text-[9px] text-muted-foreground">{ex.subtitle}</p>
+                          <p className={`text-[14px] font-semibold ${cfg.accent}`}>{ex.name}</p>
+                          <p className="text-[14px] text-muted-foreground">{ex.subtitle}</p>
                         </div>
                         <StatusBadge status={ex.status} />
                         <ChevronRight className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
@@ -726,7 +726,7 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
         {/* Guidance footer */}
         <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-border bg-muted/20 px-3 py-2">
           <Info className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0 mt-0.5" />
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             Selecting an object opens a workspace with <strong>relationships</strong>, <strong>health</strong>, <strong>ownership</strong>, and <strong>recommended actions</strong>. Use <strong>Map</strong> for a visual graph or <strong>Impact</strong> to trace change cascades.
           </p>
         </div>
@@ -765,13 +765,13 @@ function MapTab({ selected, onSelect, onNavigate }: {
           <div className="text-center max-w-md">
             <MapPin className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
             <p className="text-[15px] font-semibold text-foreground mb-1.5">No object selected</p>
-            <p className="text-[12px] text-muted-foreground leading-relaxed">
+            <p className="text-[14px] text-muted-foreground leading-relaxed">
               Select an object in <strong>Explore</strong> to see its focused relationship map — what it connects to, how many links, and how to navigate to each.
             </p>
           </div>
           {/* Quick pick */}
           <div className="w-full max-w-lg">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2 text-center">Quick start — pick an example</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2 text-center">Quick start — pick an example</p>
             <div className="grid grid-cols-3 gap-2">
               {([
                 { kind: 'program' as ObjectKind, ex: { id: 'guided-trail', name: 'Guided Trail', subtitle: 'Cohort-based coaching', status: 'active' as const } },
@@ -785,8 +785,8 @@ function MapTab({ selected, onSelect, onNavigate }: {
                 return (
                   <button key={ex.id} onClick={() => onSelect({ kind, ...ex })}
                     className={`text-left p-3 rounded-lg border-2 ${cfg.border} ${cfg.bg} hover:shadow-sm transition-all`}>
-                    <div className={`text-[10px] font-bold uppercase tracking-wide mb-0.5 ${cfg.accent}`}>{cfg.label}</div>
-                    <div className="text-[11px] font-semibold text-foreground leading-tight">{ex.name}</div>
+                    <div className={`text-[14px] font-bold  mb-0.5 ${cfg.accent}`}>{cfg.label}</div>
+                    <div className="text-[14px] font-semibold text-foreground leading-tight">{ex.name}</div>
                   </button>
                 );
               })}
@@ -821,12 +821,12 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
         <div className="text-center max-w-md">
           <Zap className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-[15px] font-semibold text-foreground mb-1.5">Select an object to trace impact</p>
-          <p className="text-[12px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             Impact Analysis answers: <em>"What changes if this object changes?"</em> — across programs, curriculum, {TERMS.aiAssistant}, Salesforce, communication channels, and team ownership.
           </p>
         </div>
         <button onClick={() => onNavigate('/digital-twin')}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors">
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-[14px] font-semibold hover:bg-primary/90 transition-colors">
           <ArrowRight className="w-4 h-4" /> Go to Explore to select an object
         </button>
       </div>
@@ -842,11 +842,11 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
       <ObjectHeader obj={selected} onClear={() => onSelect(null as unknown as SelectedObject)} onSwitch={() => onSelect(null as unknown as SelectedObject)} />
       <div className="flex items-center gap-3 px-5 py-2 border-b border-border bg-muted/20 shrink-0">
         <Zap className="w-3.5 h-3.5 text-muted-foreground" />
-        <p className="text-[12px] font-semibold text-foreground flex-1">{impact.headline}</p>
+        <p className="text-[14px] font-semibold text-foreground flex-1">{impact.headline}</p>
         <div className="flex items-center gap-1">
           {(['all', 'high', 'medium', 'low'] as const).map(sev => (
             <button key={sev} onClick={() => setFilterSev(sev)}
-              className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${
+              className={`px-2 py-0.5 rounded text-[14px] font-bold border transition-colors ${
                 filterSev === sev
                   ? sev === 'all' ? 'bg-foreground text-background border-foreground'
                     : sev === 'high' ? SEV_CONFIG.high.cls : sev === 'medium' ? SEV_CONFIG.medium.cls : SEV_CONFIG.low.cls
@@ -863,14 +863,14 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
             <div key={area.area} className="rounded-lg border border-border bg-white overflow-hidden">
               <div className={`flex items-center gap-2.5 px-4 py-2.5 border-b border-border ${SEV_CONFIG[area.severity].cls}`}>
                 <span className={`w-2 h-2 rounded-full shrink-0 ${SEV_CONFIG[area.severity].dot}`} />
-                <span className="text-[12px] font-bold">{area.area}</span>
-                <span className={`ml-auto text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${SEV_CONFIG[area.severity].cls}`}>
+                <span className="text-[14px] font-bold">{area.area}</span>
+                <span className={`ml-auto text-[14px] font-bold  px-1.5 py-0.5 rounded border ${SEV_CONFIG[area.severity].cls}`}>
                   {area.severity} impact
                 </span>
               </div>
               <ul className="px-4 py-3 space-y-1.5">
                 {area.items.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[11px] text-foreground">
+                  <li key={i} className="flex items-start gap-2 text-[14px] text-foreground">
                     <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0 mt-0.5" />
                     {item}
                   </li>
@@ -879,7 +879,7 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
             </div>
           ))}
           {areas.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-[12px]">No {filterSev} severity impacts for this object.</div>
+            <div className="text-center py-8 text-muted-foreground text-[14px]">No {filterSev} severity impacts for this object.</div>
           )}
         </div>
       </ScrollArea>
@@ -895,8 +895,8 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
       <div className="p-4 max-w-3xl space-y-4">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Governance</p>
-          <p className="text-[11px] text-muted-foreground">Manage the {TERMS.platform} object model, lifecycle compliance, and ownership structure.</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Governance</p>
+          <p className="text-[14px] text-muted-foreground">Manage the {TERMS.platform} object model, lifecycle compliance, and ownership structure.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
@@ -947,10 +947,10 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
               <div className={`w-7 h-7 rounded-md flex items-center justify-center mb-2 ${item.bg} ${item.accent}`}>
                 {item.icon}
               </div>
-              <p className="text-[12px] font-bold text-foreground mb-0.5">{item.title}</p>
-              <p className={`text-[9px] font-semibold uppercase tracking-wide mb-1.5 ${item.accent}`}>{item.subtitle}</p>
-              <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">{item.desc}</p>
-              <div className="flex items-center gap-1 mt-2 text-[10px] text-muted-foreground group-hover:text-primary transition-colors">
+              <p className="text-[14px] font-bold text-foreground mb-0.5">{item.title}</p>
+              <p className={`text-[14px] font-semibold  mb-1.5 ${item.accent}`}>{item.subtitle}</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed line-clamp-2">{item.desc}</p>
+              <div className="flex items-center gap-1 mt-2 text-[14px] text-muted-foreground group-hover:text-primary transition-colors">
                 <span>Open</span><ChevronRight className="w-3 h-3" />
               </div>
             </button>
@@ -959,7 +959,7 @@ function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
 
         <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 flex items-start gap-2.5">
           <Shield className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0 mt-0.5" />
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             These tools define the shared vocabulary for Universal Object Profiles, Global Search, and {TERMS.aiAssistant} context loading.
             Coordinate with the Operations Lead before making structural changes.
           </p>

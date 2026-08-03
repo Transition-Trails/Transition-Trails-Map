@@ -213,16 +213,16 @@ function SfCasesStrip() {
             : 'bg-[#E6F0EA]0'
           }`} />
           <Database className="w-2.5 h-2.5 text-[#2F6B3F]/60" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-[#245531]">
+          <span className="text-[14px] font-bold  text-[#245531]">
             Live · Salesforce Cases
           </span>
           {data && (
-            <span className={`text-[9px] ${isStale ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
+            <span className={`text-[14px] ${isStale ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
               · {isStale ? 'stale · ' : ''}{syncLabel}
             </span>
           )}
           {data && (
-            <span className="text-[9px] text-[#2F6B3F]/60">
+            <span className="text-[14px] text-[#2F6B3F]/60">
               · {n(data.totalOpen)} open · {n(data.highPriority)} high priority
             </span>
           )}
@@ -231,7 +231,7 @@ function SfCasesStrip() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="text-[9px] text-[#2F6B3F]/60 hover:text-[#245531] flex items-center gap-0.5 disabled:opacity-40 ml-2 shrink-0"
+          className="text-[14px] text-[#2F6B3F]/60 hover:text-[#245531] flex items-center gap-0.5 disabled:opacity-40 ml-2 shrink-0"
           aria-label="Refresh cases"
         >
           <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
@@ -243,8 +243,8 @@ function SfCasesStrip() {
           {isError ? (
             <div className="px-4 py-3 flex items-center gap-2">
               <WifiOff className="w-3 h-3 text-[#A93F2F] shrink-0" />
-              <span className="text-[10px] text-[#A93F2F] flex-1">Salesforce unreachable — cases unavailable.</span>
-              <button onClick={() => refetch()} className="text-[10px] font-semibold text-[#A93F2F] hover:underline flex items-center gap-1">
+              <span className="text-[14px] text-[#A93F2F] flex-1">Salesforce unreachable — cases unavailable.</span>
+              <button onClick={() => refetch()} className="text-[14px] font-semibold text-[#A93F2F] hover:underline flex items-center gap-1">
                 <RefreshCw className="w-2.5 h-2.5" /> Retry
               </button>
             </div>
@@ -254,7 +254,7 @@ function SfCasesStrip() {
             </div>
           ) : data && data.cases.length === 0 ? (
             <div className="px-4 py-4 text-center">
-              <p className="text-[11px] text-muted-foreground">No open cases in Salesforce.</p>
+              <p className="text-[14px] text-muted-foreground">No open cases in Salesforce.</p>
             </div>
           ) : data ? (
             <>
@@ -262,12 +262,12 @@ function SfCasesStrip() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-border bg-muted/30">
-                      <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[80px]">Priority</th>
-                      <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[90px]">Case #</th>
-                      <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">Subject</th>
-                      <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[100px]">Status</th>
-                      <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[140px] hidden md:table-cell">Contact</th>
-                      <th className="px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 whitespace-nowrap w-[52px] text-right">Age</th>
+                      <th className="px-3 py-2 text-[14px] font-bold  text-muted-foreground/60 whitespace-nowrap w-[80px]">Priority</th>
+                      <th className="px-3 py-2 text-[14px] font-bold  text-muted-foreground/60 whitespace-nowrap w-[90px]">Case #</th>
+                      <th className="px-3 py-2 text-[14px] font-bold  text-muted-foreground/60">Subject</th>
+                      <th className="px-3 py-2 text-[14px] font-bold  text-muted-foreground/60 whitespace-nowrap w-[100px]">Status</th>
+                      <th className="px-3 py-2 text-[14px] font-bold  text-muted-foreground/60 whitespace-nowrap w-[140px] hidden md:table-cell">Contact</th>
+                      <th className="px-3 py-2 text-[14px] font-bold  text-muted-foreground/60 whitespace-nowrap w-[52px] text-right">Age</th>
                       <th className="px-2 py-2 w-[32px]" title={`Click any row to get ${TERMS.aiAssistant} insights`}>
                         <Sparkles className="w-3 h-3 text-muted-foreground/30 mx-auto" />
                       </th>
@@ -292,7 +292,7 @@ function SfCasesStrip() {
                           }`}
                         >
                           <td className="px-3 py-2 whitespace-nowrap">
-                            <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCfg.cls}`}>
+                            <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${priCfg.cls}`}>
                               {priCfg.label}
                             </span>
                           </td>
@@ -300,28 +300,28 @@ function SfCasesStrip() {
                             {sfUrl ? (
                               <a href={sfUrl} target="_blank" rel="noopener noreferrer"
                                 onClick={e => e.stopPropagation()}
-                                className="text-[10px] font-mono font-semibold text-primary hover:underline">
+                                className="text-[14px] font-mono font-semibold text-primary hover:underline">
                                 {c.CaseNumber ?? c.Id.slice(0, 8)}
                               </a>
                             ) : (
-                              <span className="text-[10px] font-mono text-muted-foreground/60">
+                              <span className="text-[14px] font-mono text-muted-foreground/60">
                                 {c.CaseNumber ?? '—'}
                               </span>
                             )}
                           </td>
                           <td className="px-3 py-2 max-w-0">
-                            <p className="text-[11px] font-medium text-foreground truncate leading-snug">
+                            <p className="text-[14px] font-medium text-foreground truncate leading-snug">
                               {c.Subject ?? '(No subject)'}
                             </p>
                           </td>
                           <td className="px-3 py-2 whitespace-nowrap">
-                            <span className="text-[10px] text-muted-foreground">{c.Status ?? '—'}</span>
+                            <span className="text-[14px] text-muted-foreground">{c.Status ?? '—'}</span>
                           </td>
                           <td className="px-3 py-2 whitespace-nowrap hidden md:table-cell">
-                            <span className="text-[10px] text-muted-foreground/70">{contactName ?? '—'}</span>
+                            <span className="text-[14px] text-muted-foreground/70">{contactName ?? '—'}</span>
                           </td>
                           <td className="px-3 py-2 whitespace-nowrap text-right">
-                            <span className="text-[10px] text-muted-foreground/50">{caseAge(c.CreatedDate)}</span>
+                            <span className="text-[14px] text-muted-foreground/50">{caseAge(c.CreatedDate)}</span>
                           </td>
                           <td className="px-2 py-2 whitespace-nowrap text-center">
                             <Sparkles className={`w-3 h-3 mx-auto transition-colors ${
@@ -338,7 +338,7 @@ function SfCasesStrip() {
               {focusedCase ? (
                 <div className="flex items-center gap-2 px-3 py-2 border-t border-primary/20 bg-primary/5">
                   <Sparkles className="w-3 h-3 text-primary shrink-0" />
-                  <p className="text-[10px] text-primary flex-1 truncate">
+                  <p className="text-[14px] text-primary flex-1 truncate">
                     <span className="font-semibold">Selected:</span> {focusedCase.CaseNumber} · {focusedCase.Subject ?? 'No subject'}
                     <span className="text-primary/60 ml-1">— brief open in right panel</span>
                   </p>
@@ -348,7 +348,7 @@ function SfCasesStrip() {
                 </div>
               ) : (
                 <div className="px-3 py-1.5 border-t border-border/40">
-                  <p className="text-[9px] text-muted-foreground/40">Click any row to open the case brief in the right panel</p>
+                  <p className="text-[14px] text-muted-foreground/40">Click any row to open the case brief in the right panel</p>
                 </div>
               )}
             </>
@@ -422,23 +422,23 @@ function RequestRow({
           <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${dot}`} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-              <span className="text-[9px] font-mono text-muted-foreground/60">{req.id}</span>
-              <span className="text-[9px] text-muted-foreground">{req.type}</span>
+              <span className="text-[14px] font-mono text-muted-foreground/60">{req.id}</span>
+              <span className="text-[14px] text-muted-foreground">{req.type}</span>
               {risk && (
-                <span className={`text-[8px] font-bold border rounded-full px-1 py-0.5 leading-none ${risk.cls}`}>
+                <span className={`text-[14px] font-bold border rounded-full px-1 py-0.5 leading-none ${risk.cls}`}>
                   {risk.badge}
                 </span>
               )}
             </div>
-            <p className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-1">
+            <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-1">
               {req.subject}
             </p>
             <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-              <span className="text-[10px] text-muted-foreground">{req.program}</span>
-              <span className="text-muted-foreground/30 text-[9px]">·</span>
-              <span className="text-[10px] text-muted-foreground">{req.submitter}</span>
-              <span className="text-muted-foreground/30 text-[9px]">·</span>
-              <span className="text-[10px] text-muted-foreground">{req.age} ago</span>
+              <span className="text-[14px] text-muted-foreground">{req.program}</span>
+              <span className="text-muted-foreground/30 text-[14px]">·</span>
+              <span className="text-[14px] text-muted-foreground">{req.submitter}</span>
+              <span className="text-muted-foreground/30 text-[14px]">·</span>
+              <span className="text-[14px] text-muted-foreground">{req.age} ago</span>
             </div>
           </div>
         </button>
@@ -449,7 +449,7 @@ function RequestRow({
             value={req.status}
             onChange={e => onUpdateStatus(e.target.value as RequestStatus)}
             onClick={e => e.stopPropagation()}
-            className={`text-[9px] font-semibold border rounded-full px-1.5 py-0.5 bg-transparent cursor-pointer focus:outline-none ${STATUS_CFG[req.status].cls}`}
+            className={`text-[14px] font-semibold border rounded-full px-1.5 py-0.5 bg-transparent cursor-pointer focus:outline-none ${STATUS_CFG[req.status].cls}`}
           >
             {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -475,8 +475,8 @@ function RequestRow({
         <div className="border-t border-border/40 bg-muted/10">
           {req.notes && (
             <div className="px-3 py-2.5">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Notes</p>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">{req.notes}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Notes</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{req.notes}</p>
             </div>
           )}
           <div className="flex items-center gap-1.5 flex-wrap px-3 pb-2.5 pt-1 border-t border-border/30">
@@ -484,7 +484,7 @@ function RequestRow({
               <button
                 key={a.label}
                 onClick={e => { e.stopPropagation(); a.action(); }}
-                className={`flex items-center gap-1 text-[10px] font-semibold border rounded-full px-2 py-1 transition-colors ${a.cls}`}
+                className={`flex items-center gap-1 text-[14px] font-semibold border rounded-full px-2 py-1 transition-colors ${a.cls}`}
               >
                 <a.icon className="w-2.5 h-2.5" />
                 {a.label}
@@ -492,7 +492,7 @@ function RequestRow({
             ))}
             <button
               onClick={e => { e.stopPropagation(); onAskPenny(); }}
-              className="flex items-center gap-1 text-[10px] font-semibold border rounded-full px-2 py-1 text-primary bg-primary/5 border-primary/20 hover:bg-primary/10 transition-colors ml-auto"
+              className="flex items-center gap-1 text-[14px] font-semibold border rounded-full px-2 py-1 text-primary bg-primary/5 border-primary/20 hover:bg-primary/10 transition-colors ml-auto"
             >
               <Sparkles className="w-2.5 h-2.5" />
               Ask {TERMS.aiAssistant}
@@ -533,15 +533,15 @@ function GroupSection({
         className="w-full flex items-center gap-2 mb-2 group"
       >
         {group.priority && (
-          <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${group.pillCls}`}>
+          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${group.pillCls}`}>
             {group.priority}
           </span>
         )}
-        <span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${group.headingCls}`}>
+        <span className={`text-[14px] font-bold  shrink-0 ${group.headingCls}`}>
           {group.label}
         </span>
         <div className="flex-1 h-px bg-border" />
-        <span className="text-[9px] text-muted-foreground/50 shrink-0">
+        <span className="text-[14px] text-muted-foreground/50 shrink-0">
           {items.length} item{items.length !== 1 ? 's' : ''}
         </span>
         <ChevronDown className={`w-3 h-3 text-muted-foreground/40 shrink-0 transition-transform ${collapsed ? '-rotate-90' : ''}`} />
@@ -596,7 +596,7 @@ function TriageSummary({
       {/* Priority breakdown */}
       <div className="rounded-lg border border-border bg-white overflow-hidden">
         <div className="px-3 py-2 border-b border-border/50 bg-muted/20">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">Priority Breakdown</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60">Priority Breakdown</p>
         </div>
         <div className="p-3 space-y-2">
           {[
@@ -605,7 +605,7 @@ function TriageSummary({
             { label: 'P3 · Normal',    count: open.length - p1.length - p2.length, cls: 'bg-primary/40', text: 'text-muted-foreground' },
           ].map(row => (
             <div key={row.label} className="flex items-center gap-2">
-              <span className={`text-[10px] font-medium text-muted-foreground flex-1 truncate`}>{row.label}</span>
+              <span className={`text-[14px] font-medium text-muted-foreground flex-1 truncate`}>{row.label}</span>
               <div className="flex items-center gap-1.5">
                 <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
@@ -613,7 +613,7 @@ function TriageSummary({
                     style={{ width: totalOpen > 0 ? `${(row.count / totalOpen) * 100}%` : '0%' }}
                   />
                 </div>
-                <span className={`text-[11px] font-bold w-4 text-right ${row.text}`}>{row.count}</span>
+                <span className={`text-[14px] font-bold w-4 text-right ${row.text}`}>{row.count}</span>
               </div>
             </div>
           ))}
@@ -624,14 +624,14 @@ function TriageSummary({
       {byType.length > 0 && (
         <div className="rounded-lg border border-border bg-white overflow-hidden">
           <div className="px-3 py-2 border-b border-border/50 bg-muted/20">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">By Type</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">By Type</p>
           </div>
           <div className="p-3 space-y-1.5">
             {byType.map(t => (
               <div key={t.type} className="flex items-center gap-2">
                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${t.dot}`} />
-                <span className="text-[10px] text-muted-foreground flex-1 truncate">{t.type}</span>
-                <span className="text-[11px] font-bold text-foreground">{t.count}</span>
+                <span className="text-[14px] text-muted-foreground flex-1 truncate">{t.type}</span>
+                <span className="text-[14px] font-bold text-foreground">{t.count}</span>
               </div>
             ))}
           </div>
@@ -642,15 +642,15 @@ function TriageSummary({
       {programs.length > 0 && (
         <div className="rounded-lg border border-border bg-white overflow-hidden">
           <div className="px-3 py-2 border-b border-border/50 bg-muted/20">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">By Program</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">By Program</p>
           </div>
           <div className="p-3 space-y-1.5">
             {programs.map(prog => {
               const count = open.filter(r => r.program === prog).length;
               return (
                 <div key={prog} className="flex items-center gap-2">
-                  <span className="text-[10px] text-muted-foreground flex-1 truncate">{prog}</span>
-                  <span className="text-[11px] font-bold text-foreground">{count}</span>
+                  <span className="text-[14px] text-muted-foreground flex-1 truncate">{prog}</span>
+                  <span className="text-[14px] font-bold text-foreground">{count}</span>
                 </div>
               );
             })}
@@ -666,8 +666,8 @@ function TriageSummary({
         <div className="flex items-center gap-2">
           <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
           <div className="text-left">
-            <p className="text-[11px] font-semibold text-primary">Analyze with {TERMS.aiAssistant}</p>
-            <p className="text-[9px] text-primary/60">Prioritize and flag risks across all open requests</p>
+            <p className="text-[14px] font-semibold text-primary">Analyze with {TERMS.aiAssistant}</p>
+            <p className="text-[14px] text-primary/60">Prioritize and flag risks across all open requests</p>
           </div>
         </div>
         <ChevronRight className="w-3 h-3 text-primary/40 group-hover:text-primary transition-colors shrink-0" />
@@ -800,19 +800,19 @@ export default function Intake() {
         {/* ── Header ────────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5 flex items-center gap-1.5">
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5 flex items-center gap-1.5">
               <GitBranch className="w-2.5 h-2.5" />
               Operations · Demand
             </p>
             <h1 className="text-[15px] font-semibold text-foreground leading-snug">Demand Queue</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed max-w-sm">
+            <p className="text-[14px] text-muted-foreground mt-0.5 leading-relaxed max-w-sm">
               Triage, prioritize, and move work forward. Click any item to take action.
             </p>
           </div>
           {!isEveryday && (
             <button
               onClick={handleNewRequest}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-85 transition-opacity shrink-0 mt-1"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-85 transition-opacity shrink-0 mt-1"
             >
               <Plus className="w-3 h-3" />
               New Request
@@ -831,7 +831,7 @@ export default function Intake() {
           ].map(m => (
             <div key={m.label} className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${m.cls}`}>
               <span className={`text-[20px] font-bold leading-none ${m.numCls}`}>{m.value}</span>
-              <span className="text-[9px] font-medium text-muted-foreground leading-tight max-w-[52px]">{m.label}</span>
+              <span className="text-[14px] font-medium text-muted-foreground leading-tight max-w-[52px]">{m.label}</span>
             </div>
           ))}
         </div>
@@ -853,14 +853,14 @@ export default function Intake() {
                   <button
                     key={f.key}
                     onClick={() => setFilter(f.key)}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors border ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[14px] font-semibold transition-colors border ${
                       filter === f.key
                         ? 'bg-foreground text-background border-foreground'
                         : 'border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
                     }`}
                   >
                     {f.label}
-                    <span className={`text-[9px] rounded-full px-1 leading-none ${filter === f.key ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'}`}>
+                    <span className={`text-[14px] rounded-full px-1 leading-none ${filter === f.key ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'}`}>
                       {count}
                     </span>
                   </button>
@@ -872,8 +872,8 @@ export default function Intake() {
             <div>
               {filteredGroups.every(g => g.items.length === 0) ? (
                 <div className="rounded-lg border border-border bg-white/60 px-4 py-8 text-center">
-                  <p className="text-[12px] font-semibold text-foreground mb-1">No items in this view</p>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[14px] font-semibold text-foreground mb-1">No items in this view</p>
+                  <p className="text-[14px] text-muted-foreground">
                     {filter === 'action' ? 'No requests currently flagged as at-risk or elevated.' :
                      filter === 'active' ? 'No items currently in review or approved.' :
                      filter === 'backlog' ? 'The backlog is clear.' :

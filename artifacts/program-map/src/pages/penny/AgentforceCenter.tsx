@@ -109,7 +109,7 @@ export default function AgentforceCenter() {
 
         {/* Header */}
         <div className="space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+          <p className="text-[14px] font-bold  text-muted-foreground/50">
             Penny Command Center
           </p>
           <div className="flex items-center justify-between gap-3">
@@ -119,12 +119,12 @@ export default function AgentforceCenter() {
               </div>
               <div>
                 <h1 className="text-base font-semibold text-foreground">Agentforce</h1>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[14px] text-muted-foreground">
                   Salesforce-native AI coexisting with Penny — confirmed working in the Trail OS POC.
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
+            <div className="flex items-center gap-1 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               <span className="font-semibold">Live · API Connected</span>
             </div>
@@ -141,7 +141,7 @@ export default function AgentforceCenter() {
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
               <s.icon className={`w-4 h-4 ${s.color} mb-1.5`} />
               <p className={`text-xl font-semibold ${s.color}`}>{s.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -150,9 +150,9 @@ export default function AgentforceCenter() {
         <div className="rounded-lg border border-cyan-200 bg-cyan-50/60 p-4 space-y-2">
           <div className="flex items-center gap-2 mb-1">
             <Zap className="w-3.5 h-3.5 text-cyan-600" />
-            <p className="text-[11px] font-semibold text-foreground">POC Evidence</p>
+            <p className="text-[14px] font-semibold text-foreground">POC Evidence</p>
           </div>
-          <p className="text-[11px] text-cyan-800/80 leading-relaxed">
+          <p className="text-[14px] text-cyan-800/80 leading-relaxed">
             The Penny AI Slack POC confirmed both <strong>Penny (Gemini)</strong> and <strong>Agentforce (Penny–Transition Trails Assistant)</strong> responding
             simultaneously in the same channel. The assessment quiz flow was triggered via Agentforce, and the Trail OS Bot
             (@penny) handled delivery routing and event logging. All components were confirmed active.
@@ -160,13 +160,13 @@ export default function AgentforceCenter() {
           <div className="flex items-center gap-2 pt-1">
             <button
               onClick={() => setLocation('/collaboration/slack')}
-              className="flex items-center gap-1 text-[10px] text-cyan-700 border border-cyan-200 rounded-md px-2.5 py-1 hover:bg-cyan-100 transition-colors"
+              className="flex items-center gap-1 text-[14px] text-cyan-700 border border-cyan-200 rounded-md px-2.5 py-1 hover:bg-cyan-100 transition-colors"
             >
               <Slack className="w-2.5 h-2.5" /> View Slack POC documentation <ChevronRight className="w-2.5 h-2.5" />
             </button>
             <button
               onClick={askPennyAboutHandoff}
-              className="flex items-center gap-1 text-[10px] text-primary border border-primary/20 rounded-md px-2.5 py-1 hover:bg-primary/5 transition-colors"
+              className="flex items-center gap-1 text-[14px] text-primary border border-primary/20 rounded-md px-2.5 py-1 hover:bg-primary/5 transition-colors"
             >
               <Brain className="w-2.5 h-2.5" /> Ask Penny about the handoff model
             </button>
@@ -176,14 +176,14 @@ export default function AgentforceCenter() {
         {/* Coexistence decision matrix */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <p className="text-[14px] font-bold  text-muted-foreground/60">
               Coexistence Decision Matrix
             </p>
             <div className="flex items-center gap-2">
               {(['Penny', 'Agentforce', 'Both'] as const).map(h => (
                 <div key={h} className="flex items-center gap-1">
                   <span className={`w-1.5 h-1.5 rounded-full ${HANDLER_CFG[h].dot}`} />
-                  <span className="text-[9px] text-muted-foreground">{h}</span>
+                  <span className="text-[14px] text-muted-foreground">{h}</span>
                 </div>
               ))}
             </div>
@@ -192,7 +192,7 @@ export default function AgentforceCenter() {
           <div className="rounded-xl border border-border overflow-hidden">
             <div className="grid grid-cols-[1fr_130px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
               {['Capability', 'Handled by'].map(h => (
-                <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
+                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
               ))}
             </div>
             <div className="bg-card divide-y divide-border">
@@ -201,10 +201,10 @@ export default function AgentforceCenter() {
                 return (
                   <div key={row.capability} className="grid grid-cols-[1fr_130px] gap-x-3 items-start px-4 py-3">
                     <div>
-                      <p className="text-[12px] font-medium text-foreground">{row.capability}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{row.rationale}</p>
+                      <p className="text-[14px] font-medium text-foreground">{row.capability}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug">{row.rationale}</p>
                     </div>
-                    <span className={`inline-flex items-center gap-1 text-[9px] font-semibold border rounded-full px-2 py-0.5 w-fit mt-0.5 ${cfg.cls}`}>
+                    <span className={`inline-flex items-center gap-1 text-[14px] font-semibold border rounded-full px-2 py-0.5 w-fit mt-0.5 ${cfg.cls}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
                       {row.handler}
                     </span>
@@ -217,7 +217,7 @@ export default function AgentforceCenter() {
 
         {/* POC Validation checklist */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2.5">
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2.5">
             Restoration Checklist
           </p>
           <div className="space-y-2">
@@ -227,10 +227,10 @@ export default function AgentforceCenter() {
                 <div key={item.label} className={`flex items-start gap-3 rounded-lg border p-3 ${cfg.bg}`}>
                   <cfg.icon className={`w-3.5 h-3.5 ${cfg.cls} shrink-0 mt-0.5`} />
                   <div className="min-w-0">
-                    <p className="text-[11px] font-semibold text-foreground">{item.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{item.detail}</p>
+                    <p className="text-[14px] font-semibold text-foreground">{item.label}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5">{item.detail}</p>
                   </div>
-                  <span className={`text-[9px] font-bold uppercase tracking-wider shrink-0 ${cfg.cls}`}>
+                  <span className={`text-[14px] font-bold  shrink-0 ${cfg.cls}`}>
                     {item.status}
                   </span>
                 </div>
@@ -244,13 +244,13 @@ export default function AgentforceCenter() {
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Bot className="w-3.5 h-3.5 text-cyan-600" />
-              <p className="text-[11px] font-semibold text-foreground">Live Agent Test</p>
+              <p className="text-[14px] font-semibold text-foreground">Live Agent Test</p>
             </div>
-            <span className="text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5 font-semibold">
+            <span className="text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5 font-semibold">
               POST /api/agentforce/test
             </span>
           </div>
-          <p className="text-[10px] text-muted-foreground leading-snug">
+          <p className="text-[14px] text-muted-foreground leading-snug">
             Creates a real Agentforce session, sends a greeting to the Penny–Transition Trails Assistant,
             and returns the response. Uses the Salesforce Connector for auth — no separate token needed.
           </p>
@@ -258,7 +258,7 @@ export default function AgentforceCenter() {
             <button
               onClick={() => void runAgentforceTest()}
               disabled={testing}
-              className="flex items-center gap-1.5 text-[11px] text-cyan-700 border border-cyan-200 rounded-md px-3 py-1.5 hover:bg-cyan-50 transition-colors disabled:opacity-40"
+              className="flex items-center gap-1.5 text-[14px] text-cyan-700 border border-cyan-200 rounded-md px-3 py-1.5 hover:bg-cyan-50 transition-colors disabled:opacity-40"
             >
               {testing
                 ? <RefreshCw className="w-3 h-3 animate-spin" />
@@ -267,28 +267,28 @@ export default function AgentforceCenter() {
               {testing ? 'Connecting to Agentforce…' : 'Run live test'}
             </button>
             {testResult && testResult.ok && (
-              <span className="flex items-center gap-1 text-[10px] text-[#2F6B3F]">
+              <span className="flex items-center gap-1 text-[14px] text-[#2F6B3F]">
                 <CheckCircle2 className="w-3 h-3" /> Session live · agent responded
               </span>
             )}
             {testResult && !testResult.ok && (
-              <span className="flex items-center gap-1 text-[10px] text-[#A93F2F]">
+              <span className="flex items-center gap-1 text-[14px] text-[#A93F2F]">
                 <AlertTriangle className="w-3 h-3" /> {testResult.detail?.slice(0, 80) ?? 'Test failed'}
               </span>
             )}
           </div>
           {testResult?.ok && testResult.responsePreview && (
             <div className="rounded-lg border border-cyan-100 bg-cyan-50/60 p-3 space-y-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-cyan-600/60">Agentforce Response</p>
-              <p className="text-[11px] text-foreground leading-relaxed">{testResult.responsePreview}</p>
+              <p className="text-[14px] font-bold  text-cyan-600/60">Agentforce Response</p>
+              <p className="text-[14px] text-foreground leading-relaxed">{testResult.responsePreview}</p>
               {testResult.sessionId && (
-                <p className="text-[9px] text-muted-foreground font-mono">session: {testResult.sessionId}</p>
+                <p className="text-[14px] text-muted-foreground font-mono">session: {testResult.sessionId}</p>
               )}
             </div>
           )}
           {testResult && !testResult.ok && testResult.hint && (
             <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0] p-3">
-              <p className="text-[10px] text-[#CC8400] leading-snug">
+              <p className="text-[14px] text-[#CC8400] leading-snug">
                 <span className="font-semibold">Fix: </span>{testResult.hint}
               </p>
             </div>
@@ -302,9 +302,9 @@ export default function AgentforceCenter() {
             className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]/40 p-4 text-left hover:bg-[#E6F0EA] transition-colors group"
           >
             <Shield className="w-4 h-4 text-[#2F6B3F] mb-2" />
-            <p className="text-[11px] font-semibold text-foreground">Secrets · Configured</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">AGENTFORCE_API_KEY is set · view all secrets</p>
-            <div className="flex items-center gap-1 mt-2 text-[10px] text-[#2F6B3F]">
+            <p className="text-[14px] font-semibold text-foreground">Secrets · Configured</p>
+            <p className="text-[14px] text-muted-foreground mt-0.5">AGENTFORCE_API_KEY is set · view all secrets</p>
+            <div className="flex items-center gap-1 mt-2 text-[14px] text-[#2F6B3F]">
               Admin Setup <ArrowRight className="w-3 h-3" />
             </div>
           </button>
@@ -313,9 +313,9 @@ export default function AgentforceCenter() {
             className="rounded-lg border border-border bg-card p-4 text-left hover:border-[#4A154B]/30 hover:bg-[#4A154B]/5 transition-colors group"
           >
             <Slack className="w-4 h-4 text-[#4A154B] mb-2" />
-            <p className="text-[11px] font-semibold text-foreground">Slack Integration Center</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Full POC documentation + channel validation</p>
-            <div className="flex items-center gap-1 mt-2 text-[10px] text-[#4A154B]/70">
+            <p className="text-[14px] font-semibold text-foreground">Slack Integration Center</p>
+            <p className="text-[14px] text-muted-foreground mt-0.5">Full POC documentation + channel validation</p>
+            <div className="flex items-center gap-1 mt-2 text-[14px] text-[#4A154B]/70">
               View POC docs <ArrowRight className="w-3 h-3" />
             </div>
           </button>

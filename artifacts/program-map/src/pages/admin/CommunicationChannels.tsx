@@ -39,7 +39,7 @@ export default function CommunicationChannels() {
           <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-foreground mb-1">Channel-Agnostic Architecture</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Events (Trail Talk reminders, case escalations, {TERMS.aiAssistant} nudges) are defined once in the{' '}
               <strong>Comm Routing</strong> model. Each event maps to a <em>provider + destination</em> pair.
               Switching from Slack to Google Chat means updating the destination adapter only — no changes to
@@ -62,33 +62,33 @@ export default function CommunicationChannels() {
               {ICON[provider.slug]}
               <div>
                 <p className="text-white font-bold text-sm leading-none">{provider.name}</p>
-                <p className="text-white/70 text-[11px] mt-0.5">{provider.tagline}</p>
+                <p className="text-white/70 text-[14px] mt-0.5">{provider.tagline}</p>
               </div>
             </div>
             <div className="p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <StatusDot status={provider.status === 'prototype' ? 'amber' : 'gray'} />
-                <span className="text-xs text-muted-foreground">{provider.connectionStatus}</span>
-                <span className={`inline-flex items-center text-[10px] font-semibold border px-2 py-0.5 rounded-full ml-auto ${STATUS_BADGE[provider.status]}`}>
+                <span className="text-sm text-muted-foreground">{provider.connectionStatus}</span>
+                <span className={`inline-flex items-center text-[14px] font-semibold border px-2 py-0.5 rounded-full ml-auto ${STATUS_BADGE[provider.status]}`}>
                   {provider.status === 'prototype' ? 'Prototype-Ready' : 'Future'}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{provider.purpose}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{provider.purpose}</p>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-foreground mb-1.5">Use Cases</p>
+                <p className="text-[14px] font-bold  text-foreground mb-1.5">Use Cases</p>
                 <ul className="space-y-1">
                   {provider.useCases.slice(0, 4).map((uc, i) => (
-                    <li key={i} className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                    <li key={i} className="flex items-start gap-1.5 text-[14px] text-muted-foreground">
                       <span className="w-1 h-1 rounded-full bg-muted-foreground/40 flex-shrink-0 mt-1.5" />
                       {uc}
                     </li>
                   ))}
                   {provider.useCases.length > 4 && (
-                    <li className="text-[11px] text-primary">+{provider.useCases.length - 4} more</li>
+                    <li className="text-[14px] text-primary">+{provider.useCases.length - 4} more</li>
                   )}
                 </ul>
               </div>
-              <p className="text-[10px] text-primary font-medium group-hover:underline">Click to open Trail Insights →</p>
+              <p className="text-[14px] text-primary font-medium group-hover:underline">Click to open Trail Insights →</p>
             </div>
           </button>
         ))}
@@ -99,7 +99,7 @@ export default function CommunicationChannels() {
             <Plus className="w-4 h-4 text-muted-foreground" />
           </div>
           <p className="text-sm font-medium text-muted-foreground mb-1">Future Provider</p>
-          <p className="text-xs text-muted-foreground/60 max-w-[140px] leading-relaxed">
+          <p className="text-sm text-muted-foreground/60 max-w-[140px] leading-relaxed">
             Teams, Email, SMS — add via provider adapter with no routing changes
           </p>
         </div>
@@ -129,10 +129,10 @@ export default function CommunicationChannels() {
           >
             <div className="flex items-center justify-between mb-1">
               <p className="text-sm font-semibold text-foreground">{link.label}</p>
-              <span className="text-[11px] font-bold bg-primary/10 text-primary rounded-full px-2 py-0.5">{link.count}</span>
+              <span className="text-[14px] font-bold bg-primary/10 text-primary rounded-full px-2 py-0.5">{link.count}</span>
             </div>
-            <p className="text-xs text-muted-foreground mb-2">{link.desc}</p>
-            <div className="flex items-center gap-1 text-[11px] text-primary font-medium group-hover:gap-2 transition-all">
+            <p className="text-sm text-muted-foreground mb-2">{link.desc}</p>
+            <div className="flex items-center gap-1 text-[14px] text-primary font-medium group-hover:gap-2 transition-all">
               <span>Configure</span><ArrowRight className="w-3 h-3" />
             </div>
           </button>

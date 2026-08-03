@@ -11,8 +11,8 @@ type PersonaOrRole = (Persona & { _kind: 'persona' }) | (Role & { _kind: 'role' 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 w-28 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[12px] text-foreground flex-1">{value}</span>
+      <span className="text-[14px] font-bold  text-muted-foreground/60 w-28 shrink-0 mt-0.5">{label}</span>
+      <span className="text-[14px] text-foreground flex-1">{value}</span>
     </div>
   );
 }
@@ -26,7 +26,7 @@ function OverviewTab({ item }: { item: PersonaOrRole }) {
       <div className="p-5 space-y-4 max-w-3xl">
         {isPersona ? (
           <>
-            <p className="text-[12px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{p.purpose}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{p.purpose}</p>
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
               <InfoRow label="Type"        value={p.type} />
               <InfoRow label="Description" value={p.description} />
@@ -34,22 +34,22 @@ function OverviewTab({ item }: { item: PersonaOrRole }) {
             </div>
             {p.keyOutcomes?.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Key Outcomes</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Key Outcomes</p>
                 <ul className="space-y-1">
-                  {p.keyOutcomes.map((o, i) => <li key={i} className="text-[12px] text-foreground flex items-start gap-2"><span className="text-[#2F6B3F] mt-0.5">✓</span>{o}</li>)}
+                  {p.keyOutcomes.map((o, i) => <li key={i} className="text-[14px] text-foreground flex items-start gap-2"><span className="text-[#2F6B3F] mt-0.5">✓</span>{o}</li>)}
                 </ul>
               </div>
             )}
             {p.healthIssues?.length > 0 && (
               <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
-                <p className="text-[10px] font-bold uppercase text-[#CC8400] mb-2">Health Issues</p>
-                {p.healthIssues.map((issue, i) => <p key={i} className="text-[12px] text-[#CC8400] leading-relaxed">{issue}</p>)}
+                <p className="text-[14px] font-bold  text-[#CC8400] mb-2">Health Issues</p>
+                {p.healthIssues.map((issue, i) => <p key={i} className="text-[14px] text-[#CC8400] leading-relaxed">{issue}</p>)}
               </div>
             )}
           </>
         ) : (
           <>
-            <p className="text-[12px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{r.description}</p>
+            <p className="text-[14px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{r.description}</p>
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
               <InfoRow label="Type"             value={r.type} />
               <InfoRow label="Blueprint Status" value={
@@ -61,7 +61,7 @@ function OverviewTab({ item }: { item: PersonaOrRole }) {
             </div>
             {r.healthStatus !== 'healthy' && (
               <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
-                <p className="text-[11px] text-[#CC8400]">This role has health issues. Check the Health tab for details.</p>
+                <p className="text-[14px] text-[#CC8400]">This role has health issues. Check the Health tab for details.</p>
               </div>
             )}
           </>
@@ -83,22 +83,22 @@ function ResponsibilitiesTab({ item }: { item: PersonaOrRole }) {
           <ul className="space-y-2">
             {responsibilities.map((resp: string, i: number) => (
               <li key={i} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0">{i+1}</span>
-                <span className="text-[12px] text-foreground">{resp}</span>
+                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[14px] font-bold flex items-center justify-center shrink-0">{i+1}</span>
+                <span className="text-[14px] text-foreground">{resp}</span>
               </li>
             ))}
           </ul>
         ) : (
           <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">Responsibilities not yet documented for this persona/role.</p>
+            <p className="text-[14px] text-muted-foreground">Responsibilities not yet documented for this persona/role.</p>
           </div>
         )}
         {isPersona && (p as Persona).setupSteps?.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-2">Setup Steps</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Setup Steps</p>
             <ul className="space-y-1">
               {(p as Persona).setupSteps.map((step, i) => (
-                <li key={i} className="text-[12px] text-muted-foreground flex items-start gap-2"><span className="text-primary mt-0.5">{i+1}.</span>{step}</li>
+                <li key={i} className="text-[14px] text-muted-foreground flex items-start gap-2"><span className="text-primary mt-0.5">{i+1}.</span>{step}</li>
               ))}
             </ul>
           </div>
@@ -116,19 +116,19 @@ function ProgramsTab({ item }: { item: PersonaOrRole }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Programs this {isPersona ? 'persona' : 'role'} participates in or is related to.</p>
+        <p className="text-[14px] text-muted-foreground">Programs this {isPersona ? 'persona' : 'role'} participates in or is related to.</p>
         {progs.length > 0 ? (
           <div className="space-y-2">
             {progs.map((prog: string) => (
               <div key={prog} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F] shrink-0" />
-                <span className="text-[12px] text-foreground font-medium">{prog}</span>
-                <span className="ml-auto text-[10px] text-[#2F6B3F] font-bold">Active</span>
+                <span className="text-[14px] text-foreground font-medium">{prog}</span>
+                <span className="ml-auto text-[14px] text-[#2F6B3F] font-bold">Active</span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-[12px] text-muted-foreground">No programs mapped yet.</p>
+          <p className="text-[14px] text-muted-foreground">No programs mapped yet.</p>
         )}
       </div>
     </ScrollArea>
@@ -143,18 +143,18 @@ function PennyTabP({ item }: { item: PersonaOrRole }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">{TERMS.aiAssistant} capabilities linked to this {isPersona ? 'persona' : 'role'}.</p>
+        <p className="text-[14px] text-muted-foreground">{TERMS.aiAssistant} capabilities linked to this {isPersona ? 'persona' : 'role'}.</p>
         {caps.length > 0 ? (
           <div className="space-y-2">
             {caps.map((cap: string) => (
               <div key={cap} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-white">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2F6F7E] shrink-0" />
-                <span className="text-[12px] text-foreground font-medium">{cap}</span>
+                <span className="text-[14px] text-foreground font-medium">{cap}</span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-[12px] text-muted-foreground">No Penny capabilities linked to this {isPersona ? 'persona' : 'role'} yet.</p>
+          <p className="text-[14px] text-muted-foreground">No Penny capabilities linked to this {isPersona ? 'persona' : 'role'} yet.</p>
         )}
       </div>
     </ScrollArea>
@@ -181,15 +181,15 @@ function HealthTabP({ item }: { item: PersonaOrRole }) {
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
             <div className="flex items-center gap-2.5">
               <HealthDot health={ind.health} />
-              <span className="text-[12px] font-medium text-foreground">{ind.label}</span>
+              <span className="text-[14px] font-medium text-foreground">{ind.label}</span>
             </div>
-            <span className="text-[11px] text-muted-foreground">{ind.note}</span>
+            <span className="text-[14px] text-muted-foreground">{ind.note}</span>
           </div>
         ))}
         {isPersona && (p as Persona).healthIssues?.length > 0 && (
           <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3 space-y-1">
-            <p className="text-[10px] font-bold uppercase text-[#CC8400] mb-1">Open Issues</p>
-            {(p as Persona).healthIssues.map((issue, i) => <p key={i} className="text-[12px] text-[#CC8400]">{issue}</p>)}
+            <p className="text-[14px] font-bold  text-[#CC8400] mb-1">Open Issues</p>
+            {(p as Persona).healthIssues.map((issue, i) => <p key={i} className="text-[14px] text-[#CC8400]">{issue}</p>)}
           </div>
         )}
       </div>

@@ -124,7 +124,7 @@ export default function Home() {
                   <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${m.cls}`} />
                   <div>
                     <p className="text-base font-bold text-foreground leading-none">{m.value}</p>
-                    <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{m.label}</p>
+                    <p className="text-[14px] text-muted-foreground leading-none mt-0.5">{m.label}</p>
                   </div>
                 </div>
               );
@@ -137,8 +137,8 @@ export default function Home() {
           sfError ? (
             <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 flex items-center gap-2">
               <WifiOff className="w-3 h-3 text-[#A93F2F] shrink-0" />
-              <span className="text-[10px] text-[#A93F2F] flex-1">Salesforce unreachable — live counts unavailable.</span>
-              <button onClick={() => refetch()} className="text-[10px] font-semibold text-[#A93F2F] hover:underline flex items-center gap-1">
+              <span className="text-[14px] text-[#A93F2F] flex-1">Salesforce unreachable — live counts unavailable.</span>
+              <button onClick={() => refetch()} className="text-[14px] font-semibold text-[#A93F2F] hover:underline flex items-center gap-1">
                 <RefreshCw className="w-2.5 h-2.5" /> Retry
               </button>
             </div>
@@ -147,14 +147,14 @@ export default function Home() {
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-1.5">
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${sfLoading || isFetching ? 'bg-[#CC8400] animate-pulse' : (sfData && sfData.cacheAge > 300) ? 'bg-[#CC8400]' : 'bg-[#E6F0EA]0'}`} />
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-[#245531]">Live from Salesforce</span>
+                  <span className="text-[14px] font-bold  text-[#245531]">Live from Salesforce</span>
                   {sfData && (
-                    <span className={`text-[9px] ${sfData.cacheAge > 300 ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
+                    <span className={`text-[14px] ${sfData.cacheAge > 300 ? 'text-[#CC8400]' : 'text-[#2F6B3F]/70'}`}>
                       · {sfData.cacheAge > 300 ? 'stale · ' : ''}{formatSyncAge(sfData.lastUpdated)}
                     </span>
                   )}
                 </div>
-                <button onClick={() => refetch()} disabled={isFetching} className="text-[9px] text-[#2F6B3F]/60 hover:text-[#245531] disabled:opacity-40">
+                <button onClick={() => refetch()} disabled={isFetching} className="text-[14px] text-[#2F6B3F]/60 hover:text-[#245531] disabled:opacity-40">
                   <RefreshCw className={`w-2.5 h-2.5 ${isFetching ? 'animate-spin' : ''}`} />
                 </button>
               </div>
@@ -169,9 +169,9 @@ export default function Home() {
                     { label: 'Open Cases',  value: n(sfData.cases.open),                       sub: `${n(sfData.cases.highPriority)} high priority` },
                   ].map(m => (
                     <div key={m.label} className="rounded bg-white/70 border border-[#E6F0EA] px-2 py-1.5">
-                      <p className="text-[9px] font-bold text-[#2F6B3F]/60 uppercase tracking-wider mb-0.5">{m.label}</p>
+                      <p className="text-[14px] font-bold text-[#2F6B3F]/60  mb-0.5">{m.label}</p>
                       <p className="text-[15px] font-bold text-[#245531] leading-none">{m.value}</p>
-                      <p className="text-[9px] text-[#2F6B3F]/60 mt-0.5">{m.sub}</p>
+                      <p className="text-[14px] text-[#2F6B3F]/60 mt-0.5">{m.sub}</p>
                     </div>
                   ))}
                 </div>
@@ -186,8 +186,8 @@ export default function Home() {
             <div className="flex items-baseline gap-2 shrink-0">
               <p className={`text-4xl font-bold leading-none ${cfg.score}`}>{overallHealthScore}</p>
               <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] text-muted-foreground/60 font-medium uppercase tracking-wider leading-none">Overall</span>
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${cfg.cls}`}>{cfg.label}</span>
+                <span className="text-[14px] text-muted-foreground/60 font-medium  leading-none">Overall</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-none ${cfg.cls}`}>{cfg.label}</span>
               </div>
             </div>
             <div className="w-px h-8 bg-border/60 shrink-0" />
@@ -200,13 +200,13 @@ export default function Home() {
               ].map(s => (
                 <div key={s.l} className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 ${s.bg}`}>
                   <span className={`text-xl font-bold leading-none ${s.c}`}>{s.v}</span>
-                  <span className={`text-[9px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>
+                  <span className={`text-[14px] font-medium leading-tight ${s.c} opacity-80`}>{s.l}</span>
                 </div>
               ))}
             </div>
             <button
               onClick={() => navigate('/operations')}
-              className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5 shrink-0"
+              className="text-[14px] font-semibold text-primary hover:underline flex items-center gap-0.5 shrink-0"
             >
               Full report <ChevronRight className="w-3 h-3" />
             </button>
@@ -217,10 +217,10 @@ export default function Home() {
         {!isEveryday && (
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Domain Health</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Domain Health</p>
               <button
                 onClick={() => navigate('/operations/health')}
-                className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+                className="text-[14px] font-semibold text-primary hover:underline flex items-center gap-0.5"
               >
                 Health Indicators <ChevronRight className="w-3 h-3" />
               </button>
@@ -233,11 +233,11 @@ export default function Home() {
                     onClick={() => navigate('/operations/health')}
                     className="rounded-lg border border-border bg-white px-2.5 py-2 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
                     <div className="flex items-center justify-between mb-1">
-                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${dc.cls}`}>{dc.label}</span>
                       <span className={`text-lg font-bold leading-none ${dc.score}`}>{d.score}</span>
                     </div>
-                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
-                    <p className="text-[9px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
+                    <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">{d.domain}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5 line-clamp-1 leading-tight">{d.summary}</p>
                   </button>
                 );
               })}
@@ -257,13 +257,13 @@ export default function Home() {
           return (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                <p className="text-[14px] font-bold  text-muted-foreground/60">
                   Critical &amp; High Priority Actions
                 </p>
                 {extra > 0 && (
                   <button
                     onClick={() => navigate('/operations/recommendations')}
-                    className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-0.5"
+                    className="text-[14px] font-semibold text-primary hover:underline flex items-center gap-0.5"
                   >
                     View all {allItems.length} <ChevronRight className="w-3 h-3" />
                   </button>
@@ -278,15 +278,15 @@ export default function Home() {
                       onClick={() => navigate(dest)}
                       className="text-left rounded-lg border border-border bg-white px-2.5 py-2 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-1">
                       <div className="flex items-center justify-between gap-1">
-                        <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight shrink-0 ${pc.cls}`}>
+                        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-tight shrink-0 ${pc.cls}`}>
                           {pc.label}
                         </span>
                         <ChevronRight className="w-3 h-3 text-muted-foreground/25 group-hover:text-primary transition-colors shrink-0" />
                       </div>
-                      <p className="text-[10px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
+                      <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug line-clamp-2">
                         {r.action}
                       </p>
-                      <p className="text-[9px] text-muted-foreground/70 truncate">{r.domain}</p>
+                      <p className="text-[14px] text-muted-foreground/70 truncate">{r.domain}</p>
                     </button>
                   );
                 })}
@@ -294,7 +294,7 @@ export default function Home() {
               {extra > 0 && (
                 <button
                   onClick={() => navigate('/operations/recommendations')}
-                  className="mt-2 w-full text-center text-[10px] font-semibold text-primary hover:underline py-1.5 rounded-lg border border-dashed border-primary/30 hover:border-primary/60 transition-colors"
+                  className="mt-2 w-full text-center text-[14px] font-semibold text-primary hover:underline py-1.5 rounded-lg border border-dashed border-primary/30 hover:border-primary/60 transition-colors"
                 >
                   + {extra} more attention items
                 </button>
@@ -315,8 +315,8 @@ export default function Home() {
                   <div key={s.label} className={`flex items-center gap-2.5 px-3 py-2 ${i < UPCOMING_SESSIONS.length - 1 ? 'border-b border-border/30' : ''}`}>
                     <Calendar className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium text-foreground truncate">{s.label}</p>
-                      <p className="text-[9px] text-muted-foreground/60 mt-0.5">{s.date}</p>
+                      <p className="text-[14px] font-medium text-foreground truncate">{s.label}</p>
+                      <p className="text-[14px] text-muted-foreground/60 mt-0.5">{s.date}</p>
                     </div>
                   </div>
                 ))}
@@ -338,7 +338,7 @@ export default function Home() {
                         ? <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] flex-shrink-0" />
                         : <Circle className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
                       }
-                      <span className={`text-[11px] flex-1 ${t.done ? 'line-through text-muted-foreground/50' : 'text-foreground'}`}>{t.label}</span>
+                      <span className={`text-[14px] flex-1 ${t.done ? 'line-through text-muted-foreground/50' : 'text-foreground'}`}>{t.label}</span>
                     </div>
                   ))}
                 </Card>
@@ -351,7 +351,7 @@ export default function Home() {
                       className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-muted/30 transition-colors ${i < QUICK_LINKS.length - 1 ? 'border-b border-border/30' : ''}`}
                     >
                       <FileText className="w-3 h-3 text-[#2F6F7E] flex-shrink-0" />
-                      <span className="text-[11px] text-foreground flex-1 truncate">{l.label}</span>
+                      <span className="text-[14px] text-foreground flex-1 truncate">{l.label}</span>
                       <ArrowRight className="w-3 h-3 text-muted-foreground/40 flex-shrink-0" />
                     </button>
                   ))}
@@ -372,10 +372,10 @@ export default function Home() {
                       <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 ${m.bg}`}>
                         <Icon className={`w-3 h-3 ${m.cls}`} />
                       </div>
-                      <span className="text-[11px] text-muted-foreground flex-1">{m.label}</span>
+                      <span className="text-[14px] text-muted-foreground flex-1">{m.label}</span>
                       <div className="text-right">
-                        <p className={`text-[13px] font-bold leading-none ${m.cls}`}>{m.value}</p>
-                        <p className="text-[9px] text-muted-foreground/60 leading-none mt-0.5">{m.sub}</p>
+                        <p className={`text-[14px] font-bold leading-none ${m.cls}`}>{m.value}</p>
+                        <p className="text-[14px] text-muted-foreground/60 leading-none mt-0.5">{m.sub}</p>
                       </div>
                     </div>
                   );
@@ -395,7 +395,7 @@ export default function Home() {
 
 function Label({ children }: { children: ReactNode }) {
   return (
-    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">{children}</p>
+    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">{children}</p>
   );
 }
 
@@ -413,7 +413,7 @@ function Card({ label, children }: { label: string; children: ReactNode }) {
 function CardFooter({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <div className="border-t border-border/30 px-3 py-1.5">
-      <button onClick={onClick} className="flex items-center gap-1 text-[10px] text-primary hover:underline font-medium">
+      <button onClick={onClick} className="flex items-center gap-1 text-[14px] text-primary hover:underline font-medium">
         {label} <ArrowRight className="w-3 h-3" />
       </button>
     </div>

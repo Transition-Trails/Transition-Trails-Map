@@ -186,7 +186,7 @@ function StatusBadge({ status }: { status: ValidationStatus }) {
   const cfg = STATUS_CONFIG[status];
   const Icon = cfg.icon;
   return (
-    <span className={`inline-flex items-center gap-1 text-[9px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
+    <span className={`inline-flex items-center gap-1 text-[14px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
       <Icon className="w-2.5 h-2.5" />
       {cfg.label}
     </span>
@@ -215,7 +215,7 @@ function ReadinessTrackingView() {
                 className="w-full text-left px-4 py-3 hover:bg-muted/20 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[13px] font-bold text-foreground">{prod.product}</p>
+                  <p className="text-[14px] font-bold text-foreground">{prod.product}</p>
                   <div className="flex items-center gap-2">
                     <StatusBadge status={prod.overallStatus} />
                     <span className={`text-[15px] font-bold ${prod.score >= 60 ? 'text-[#2F6F7E]' : prod.score >= 30 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>{prod.score}</span>
@@ -224,14 +224,14 @@ function ReadinessTrackingView() {
                       : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
                   </div>
                 </div>
-                <p className="text-[11px] text-muted-foreground mb-2">{prod.description}</p>
+                <p className="text-[14px] text-muted-foreground mb-2">{prod.description}</p>
                 <div className="h-1.5 bg-muted rounded-full">
                   <div
                     className={`h-1.5 rounded-full ${prod.score >= 60 ? 'bg-[#2F6F7E]' : prod.score >= 30 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`}
                     style={{ width: `${prod.score}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-1">{prod.objectsMapped} of {prod.objectsTotal} object groups mapped</p>
+                <p className="text-[14px] text-muted-foreground mt-1">{prod.objectsMapped} of {prod.objectsTotal} object groups mapped</p>
               </button>
               {open && (
                 <div className="border-t border-border/50 divide-y divide-border/40">
@@ -239,8 +239,8 @@ function ReadinessTrackingView() {
                     <div key={c.label} className="px-4 py-2 flex items-start gap-3">
                       <StatusBadge status={c.status} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-semibold text-foreground">{c.label}</p>
-                        <p className="text-[10px] text-muted-foreground">{c.note}</p>
+                        <p className="text-[14px] font-semibold text-foreground">{c.label}</p>
+                        <p className="text-[14px] text-muted-foreground">{c.note}</p>
                       </div>
                     </div>
                   ))}
@@ -272,28 +272,28 @@ function ObjectMappingView() {
       {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center">
         <select value={groupFilter} onChange={e => setGroupFilter(e.target.value)}
-          className="text-[11px] border border-border rounded px-2 py-1.5 bg-background">
+          className="text-[14px] border border-border rounded px-2 py-1.5 bg-background">
           {groups.map(g => <option key={g} value={g}>{g === 'all' ? 'All Groups' : g}</option>)}
         </select>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as ValidationStatus | 'all')}
-          className="text-[11px] border border-border rounded px-2 py-1.5 bg-background">
+          className="text-[14px] border border-border rounded px-2 py-1.5 bg-background">
           <option value="all">All Statuses</option>
           {(Object.keys(STATUS_CONFIG) as ValidationStatus[]).map(s => (
             <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
           ))}
         </select>
-        <span className="text-[11px] text-muted-foreground ml-auto">{filtered.length} mappings · click a row to expand notes</span>
+        <span className="text-[14px] text-muted-foreground ml-auto">{filtered.length} mappings · click a row to expand notes</span>
       </div>
 
       <div className="rounded-lg border border-border overflow-hidden">
-        <table className="w-full text-[11px]">
+        <table className="w-full text-[14px]">
           <thead>
             <tr className="bg-muted/30 border-b border-border">
-              <th className="text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Trail OS Object</th>
-              <th className="text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">SF Object</th>
-              <th className="text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Product</th>
-              <th className="text-center px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Fields</th>
-              <th className="text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Status</th>
+              <th className="text-left px-3 py-2 text-[14px] font-bold  text-muted-foreground">Trail OS Object</th>
+              <th className="text-left px-3 py-2 text-[14px] font-bold  text-muted-foreground">SF Object</th>
+              <th className="text-left px-3 py-2 text-[14px] font-bold  text-muted-foreground">Product</th>
+              <th className="text-center px-3 py-2 text-[14px] font-bold  text-muted-foreground">Fields</th>
+              <th className="text-left px-3 py-2 text-[14px] font-bold  text-muted-foreground">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/40">
@@ -313,7 +313,7 @@ function ObjectMappingView() {
                           : <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />}
                         <div>
                           <p className="font-semibold text-foreground">{m.trailOsObject}</p>
-                          <p className="text-[10px] text-muted-foreground">{m.trailOsGroup}</p>
+                          <p className="text-[14px] text-muted-foreground">{m.trailOsGroup}</p>
                         </div>
                       </div>
                     </td>
@@ -321,7 +321,7 @@ function ObjectMappingView() {
                       <p className="text-foreground">{m.sfObject}</p>
                     </td>
                     <td className="px-3 py-2.5">
-                      <span className="text-[10px] font-bold bg-muted/60 border border-border rounded px-1.5 py-0.5 text-foreground">{m.sfProduct}</span>
+                      <span className="text-[14px] font-bold bg-muted/60 border border-border rounded px-1.5 py-0.5 text-foreground">{m.sfProduct}</span>
                     </td>
                     <td className="px-3 py-2.5 text-center">
                       <p className="font-bold text-foreground">{m.validatedFields}/{m.fieldCount}</p>
@@ -336,7 +336,7 @@ function ObjectMappingView() {
                   {isExpanded && (
                     <tr key={`${m.id}-notes`} className="bg-muted/10">
                       <td colSpan={5} className="px-4 py-2.5 border-t border-border/40">
-                        <p className="text-[11px] text-foreground leading-relaxed">{m.notes}</p>
+                        <p className="text-[14px] text-foreground leading-relaxed">{m.notes}</p>
                       </td>
                     </tr>
                   )}
@@ -356,13 +356,13 @@ function ValidationWorkflowView() {
       {VALIDATION_WORKFLOWS.map(wf => (
         <div key={wf.stage} className="rounded-lg border border-border bg-background overflow-hidden">
           <div className="px-4 py-3 bg-muted/20 border-b border-border/50">
-            <p className="text-[12px] font-bold text-foreground">{wf.stage}</p>
+            <p className="text-[14px] font-bold text-foreground">{wf.stage}</p>
             <div className="flex gap-2 mt-1">
               {(['validated','partial','pending','blocked'] as ValidationStatus[]).map(s => {
                 const count = wf.steps.filter(st => st.status === s).length;
                 if (!count) return null;
                 return (
-                  <span key={s} className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${STATUS_CONFIG[s].cls}`}>
+                  <span key={s} className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${STATUS_CONFIG[s].cls}`}>
                     {count} {STATUS_CONFIG[s].label}
                   </span>
                 );
@@ -374,10 +374,10 @@ function ValidationWorkflowView() {
               <div key={step.id} className="px-4 py-3 flex items-start gap-3">
                 <StatusBadge status={step.status} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-semibold text-foreground">{step.label}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{step.detail}</p>
+                  <p className="text-[14px] font-semibold text-foreground">{step.label}</p>
+                  <p className="text-[14px] text-muted-foreground mt-0.5">{step.detail}</p>
                 </div>
-                <span className="text-[10px] text-muted-foreground shrink-0 pt-0.5">{step.owner}</span>
+                <span className="text-[14px] text-muted-foreground shrink-0 pt-0.5">{step.owner}</span>
               </div>
             ))}
           </div>
@@ -406,7 +406,7 @@ function GapAnalysisView() {
         ].map(s => (
           <div key={s.label} className="rounded-lg border border-border bg-background px-3 py-3 text-center">
             <p className={`text-xl font-bold ${s.cls}`}>{s.v}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
+            <p className="text-[14px] text-muted-foreground mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -415,14 +415,14 @@ function GapAnalysisView() {
       {blocked.length > 0 && (
         <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] overflow-hidden">
           <div className="px-4 py-2.5 border-b border-[#E8B9B4]">
-            <p className="text-[11px] font-bold text-[#A93F2F]">Critical Blockers ({blocked.length} mappings)</p>
+            <p className="text-[14px] font-bold text-[#A93F2F]">Critical Blockers ({blocked.length} mappings)</p>
           </div>
           {blocked.map(m => (
             <div key={m.id} className="px-4 py-2.5 border-b border-[#FBEAE6] last:border-0 flex items-start gap-2">
               <XCircle className="w-3.5 h-3.5 text-[#A93F2F] mt-0.5 shrink-0" />
               <div>
-                <p className="text-[11px] font-semibold text-foreground">{m.trailOsObject} → {m.sfObject}</p>
-                <p className="text-[10px] text-muted-foreground">{m.notes}</p>
+                <p className="text-[14px] font-semibold text-foreground">{m.trailOsObject} → {m.sfObject}</p>
+                <p className="text-[14px] text-muted-foreground">{m.notes}</p>
               </div>
             </div>
           ))}
@@ -433,14 +433,14 @@ function GapAnalysisView() {
       {partial.length > 0 && (
         <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] overflow-hidden">
           <div className="px-4 py-2.5 border-b border-[#7FAFC6]">
-            <p className="text-[11px] font-bold text-[#2F6F7E]">Partially Mapped — Needs Completion ({partial.length})</p>
+            <p className="text-[14px] font-bold text-[#2F6F7E]">Partially Mapped — Needs Completion ({partial.length})</p>
           </div>
           {partial.map(m => (
             <div key={m.id} className="px-4 py-2.5 border-b border-[#EDF5F8] last:border-0 flex items-start gap-2">
               <AlertTriangle className="w-3.5 h-3.5 text-[#2F6F7E] mt-0.5 shrink-0" />
               <div>
-                <p className="text-[11px] font-semibold text-foreground">{m.trailOsObject} → {m.sfObject}</p>
-                <p className="text-[10px] text-muted-foreground">{m.validatedFields}/{m.fieldCount} fields · {m.notes}</p>
+                <p className="text-[14px] font-semibold text-foreground">{m.trailOsObject} → {m.sfObject}</p>
+                <p className="text-[14px] text-muted-foreground">{m.validatedFields}/{m.fieldCount} fields · {m.notes}</p>
               </div>
             </div>
           ))}
@@ -449,7 +449,7 @@ function GapAnalysisView() {
 
       {/* Top unblocking actions */}
       <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-primary mb-3">Top Unblocking Actions</p>
+        <p className="text-[14px] font-bold  text-primary mb-3">Top Unblocking Actions</p>
         {[
           { priority: 1, action: 'Obtain Salesforce org access (sandbox) — unblocks 12 of 16 mappings' },
           { priority: 2, action: 'Request PMM permission set — unblocks Program, Cohort, Engagement objects' },
@@ -458,8 +458,8 @@ function GapAnalysisView() {
           { priority: 5, action: 'Complete Contact Type field design (learner vs coach) — partial mappings can be completed' },
         ].map(a => (
           <div key={a.priority} className="flex items-start gap-2 py-1.5 border-b border-primary/10 last:border-0">
-            <span className="text-[9px] font-bold text-primary bg-primary/10 rounded-full w-4 h-4 flex items-center justify-center shrink-0 mt-0.5">{a.priority}</span>
-            <p className="text-[11px] text-foreground">{a.action}</p>
+            <span className="text-[14px] font-bold text-primary bg-primary/10 rounded-full w-4 h-4 flex items-center justify-center shrink-0 mt-0.5">{a.priority}</span>
+            <p className="text-[14px] text-foreground">{a.action}</p>
           </div>
         ))}
       </div>
@@ -491,17 +491,17 @@ export default function SalesforceValidationCenter() {
       <div className="px-6 pt-5 pb-0 border-b border-border/50">
         <div className="flex items-start justify-between mb-3 gap-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration · SF Validation</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration · SF Validation</p>
             <h2 className="text-base font-semibold text-foreground leading-snug">Salesforce Validation & Mapping Center</h2>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               Object mapping inventory, validation workflows, and readiness tracking across {PRODUCT_READINESS.length} SF products.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 pt-1">
             <Database className="w-4 h-4 text-[#2F6F7E]" />
             <div>
-              <p className="text-[11px] font-bold text-foreground">{PRODUCT_READINESS.length} SF Products</p>
-              <p className="text-[10px] text-muted-foreground">{totalMapped}/{OBJECT_MAPPINGS.length} mapped · {totalValidated} validated</p>
+              <p className="text-[14px] font-bold text-foreground">{PRODUCT_READINESS.length} SF Products</p>
+              <p className="text-[14px] text-muted-foreground">{totalMapped}/{OBJECT_MAPPINGS.length} mapped · {totalValidated} validated</p>
             </div>
           </div>
         </div>
@@ -510,7 +510,7 @@ export default function SalesforceValidationCenter() {
         <div className="flex gap-1">
           {VIEWS.map(v => (
             <button key={v.id} onClick={() => setView(v.id)}
-              className={`px-3 py-1.5 text-[11px] font-semibold rounded-t transition-colors border-b-2 ${
+              className={`px-3 py-1.5 text-[14px] font-semibold rounded-t transition-colors border-b-2 ${
                 view === v.id
                   ? 'text-primary border-primary'
                   : 'text-muted-foreground border-transparent hover:text-foreground'

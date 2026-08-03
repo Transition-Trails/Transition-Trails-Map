@@ -42,7 +42,7 @@ export default function CurriculumAssignments() {
       <div className="max-w-5xl mx-auto space-y-6">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio</p>
           <h1 className="text-3xl font-bold text-foreground">Assignments</h1>
           <p className="text-muted-foreground mt-2">2 assignments per module — practical exercises reinforcing lesson content in a Salesforce sandbox. Click any assignment to open its Knowledge Brief.</p>
         </div>
@@ -50,7 +50,7 @@ export default function CurriculumAssignments() {
         <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
           <div className="grid grid-cols-[90px_1fr_140px_60px_70px_70px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
             {['#', 'Assignment', 'Type', 'Time', 'Status', 'Rubric'].map(h => (
-              <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
+              <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
             ))}
           </div>
           {assignments.map((asgn, i) => {
@@ -61,14 +61,14 @@ export default function CurriculumAssignments() {
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: asgn.id, data: asgn })}
                 className={`w-full text-left grid grid-cols-[90px_1fr_140px_60px_70px_70px] gap-x-3 items-center px-4 py-3 group hover:bg-[#FFF3E0]/50 transition-colors ${i < assignments.length - 1 ? 'border-b border-border/30' : ''}`}
               >
-                <p className="text-[11px] font-mono text-muted-foreground">{asgn.assignmentNumber}</p>
+                <p className="text-[14px] font-mono text-muted-foreground">{asgn.assignmentNumber}</p>
                 <div className="min-w-0">
-                  <p className="text-[12px] font-semibold text-foreground group-hover:text-primary truncate">{asgn.name}</p>
-                  <p className="text-[10px] text-muted-foreground truncate">{asgn.module}</p>
+                  <p className="text-[14px] font-semibold text-foreground group-hover:text-primary truncate">{asgn.name}</p>
+                  <p className="text-[14px] text-muted-foreground truncate">{asgn.module}</p>
                 </div>
-                <span className="text-[11px] text-muted-foreground">{asgn.assignmentType}</span>
-                <p className="text-[11px] text-muted-foreground">{asgn.estimatedTime}</p>
-                <span className={`inline-flex text-[10px] font-semibold border rounded-full px-2 py-0.5 w-fit ${statusCfg.cls}`}>{statusCfg.label}</span>
+                <span className="text-[14px] text-muted-foreground">{asgn.assignmentType}</span>
+                <p className="text-[14px] text-muted-foreground">{asgn.estimatedTime}</p>
+                <span className={`inline-flex text-[14px] font-semibold border rounded-full px-2 py-0.5 w-fit ${statusCfg.cls}`}>{statusCfg.label}</span>
                 <div className="flex items-center">
                   {asgn.hasScoringRubric
                     ? <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />
@@ -79,7 +79,7 @@ export default function CurriculumAssignments() {
           })}
         </div>
 
-        <p className="text-[11px] text-muted-foreground text-center">
+        <p className="text-[14px] text-muted-foreground text-center">
           {assignments.length} assignments shown · 24 total for Foundations Trail (prototype)
         </p>
 

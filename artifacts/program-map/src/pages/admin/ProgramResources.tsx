@@ -93,7 +93,7 @@ export default function ProgramResources() {
   const needsSetupCount = resources.filter(r => r.status === 'needs-setup').length;
   const pendingCount    = resources.filter(r => r.status === 'pending').length;
 
-  const inputCls = 'w-full text-[12px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:border-primary';
+  const inputCls = 'w-full text-[14px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:border-primary';
 
   return (
     <ScrollArea className="h-full">
@@ -101,11 +101,11 @@ export default function ProgramResources() {
 
         {/* Header */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration · Program Resources</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration · Program Resources</p>
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-base font-semibold text-foreground leading-snug">Drive Workspaces</h1>
-              <p className="text-[12px] text-muted-foreground mt-0.5">
+              <p className="text-[14px] text-muted-foreground mt-0.5">
                 Google Drive folder metadata per program. Phase 1: metadata management only — live Drive API is Phase 2.
               </p>
             </div>
@@ -118,26 +118,26 @@ export default function ProgramResources() {
             <div className="space-y-0.5">
               <div className="flex items-center justify-center gap-1.5">
                 <Database className="w-3.5 h-3.5 text-[#2F6F7E]" />
-                <p className="text-[12px] font-bold text-foreground">Salesforce</p>
+                <p className="text-[14px] font-bold text-foreground">Salesforce</p>
               </div>
-              <p className="text-[10px] text-muted-foreground">System of Record</p>
-              <p className="text-[9px] text-[#2F6F7E] font-medium border border-[#7FAFC6] bg-[#EDF5F8] rounded-full px-2 py-0.5 inline-block">Program__c stores Drive metadata</p>
+              <p className="text-[14px] text-muted-foreground">System of Record</p>
+              <p className="text-[14px] text-[#2F6F7E] font-medium border border-[#7FAFC6] bg-[#EDF5F8] rounded-full px-2 py-0.5 inline-block">Program__c stores Drive metadata</p>
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center justify-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-primary" />
-                <p className="text-[12px] font-bold text-foreground">{TERMS.platform}</p>
+                <p className="text-[14px] font-bold text-foreground">{TERMS.platform}</p>
               </div>
-              <p className="text-[10px] text-muted-foreground">Operating Layer</p>
-              <p className="text-[9px] text-primary font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 inline-block">Displays + manages Drive metadata</p>
+              <p className="text-[14px] text-muted-foreground">Operating Layer</p>
+              <p className="text-[14px] text-primary font-medium border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5 inline-block">Displays + manages Drive metadata</p>
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center justify-center gap-1.5">
                 <FolderOpen className="w-3.5 h-3.5 text-[#2F6B3F]" />
-                <p className="text-[12px] font-bold text-foreground">Google Drive</p>
+                <p className="text-[14px] font-bold text-foreground">Google Drive</p>
               </div>
-              <p className="text-[10px] text-muted-foreground">Content Repository</p>
-              <p className="text-[9px] text-[#2F6B3F] font-medium border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2 py-0.5 inline-block">Authoritative content source</p>
+              <p className="text-[14px] text-muted-foreground">Content Repository</p>
+              <p className="text-[14px] text-[#2F6B3F] font-medium border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2 py-0.5 inline-block">Authoritative content source</p>
             </div>
           </div>
         </div>
@@ -146,19 +146,19 @@ export default function ProgramResources() {
         <div className="grid grid-cols-4 gap-3">
           <div className="rounded-lg border border-border bg-background px-4 py-3 text-center">
             <p className="text-xl font-bold text-foreground">{resources.length}</p>
-            <p className="text-[11px] text-muted-foreground">Programs</p>
+            <p className="text-[14px] text-muted-foreground">Programs</p>
           </div>
           <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3 text-center">
             <p className="text-xl font-bold text-[#2F6B3F]">{activeCount}</p>
-            <p className="text-[11px] text-[#2F6B3F]">Active Drives</p>
+            <p className="text-[14px] text-[#2F6B3F]">Active Drives</p>
           </div>
           <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 text-center">
             <p className="text-xl font-bold text-[#CC8400]">{needsSetupCount}</p>
-            <p className="text-[11px] text-[#CC8400]">Needs Setup</p>
+            <p className="text-[14px] text-[#CC8400]">Needs Setup</p>
           </div>
           <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] px-4 py-3 text-center">
             <p className="text-xl font-bold text-[#2F6F7E]">{pendingCount}</p>
-            <p className="text-[11px] text-[#2F6F7E]">Pending</p>
+            <p className="text-[14px] text-[#2F6F7E]">Pending</p>
           </div>
         </div>
 
@@ -197,9 +197,9 @@ export default function ProgramResources() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[14px] font-bold text-foreground">{resource.programName}</p>
-                      <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground truncate">
+                    <p className="text-[14px] text-muted-foreground truncate">
                       {resource.folderName || 'No folder configured'}
                     </p>
                   </div>
@@ -210,14 +210,14 @@ export default function ProgramResources() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
-                        className="flex items-center gap-1 text-[10px] font-medium text-primary border border-primary/20 rounded-full px-2 py-1 hover:bg-primary/5 transition-colors"
+                        className="flex items-center gap-1 text-[14px] font-medium text-primary border border-primary/20 rounded-full px-2 py-1 hover:bg-primary/5 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" /> Open
                       </a>
                     )}
                     <button
                       onClick={e => { e.stopPropagation(); isEditing ? cancelEdit() : startEdit(resource); }}
-                      className={`flex items-center gap-1 text-[10px] font-medium border rounded-full px-2 py-1 transition-colors ${
+                      className={`flex items-center gap-1 text-[14px] font-medium border rounded-full px-2 py-1 transition-colors ${
                         isEditing
                           ? 'border-[#E8B9B4] text-[#A93F2F] hover:bg-[#FBEAE6]'
                           : 'border-border text-muted-foreground hover:border-secondary/40'
@@ -234,11 +234,11 @@ export default function ProgramResources() {
                 {/* Edit form */}
                 {isEditing && (
                   <div className="border-t border-border bg-muted/20 p-4 space-y-4">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/60">Editing — {resource.programName}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/60">Editing — {resource.programName}</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground block mb-1">Folder Name</label>
+                        <label className="text-[14px] font-semibold text-muted-foreground block mb-1">Folder Name</label>
                         <input
                           type="text"
                           value={editDraft.folderName ?? ''}
@@ -248,7 +248,7 @@ export default function ProgramResources() {
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground block mb-1">Google Drive Folder URL</label>
+                        <label className="text-[14px] font-semibold text-muted-foreground block mb-1">Google Drive Folder URL</label>
                         <input
                           type="url"
                           value={editDraft.folderUrl ?? ''}
@@ -258,7 +258,7 @@ export default function ProgramResources() {
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground block mb-1">Owner</label>
+                        <label className="text-[14px] font-semibold text-muted-foreground block mb-1">Owner</label>
                         <input
                           type="text"
                           value={editDraft.owner ?? ''}
@@ -268,7 +268,7 @@ export default function ProgramResources() {
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground block mb-1">Status</label>
+                        <label className="text-[14px] font-semibold text-muted-foreground block mb-1">Status</label>
                         <select
                           value={editDraft.status ?? 'needs-setup'}
                           onChange={e => setEditDraft(d => ({ ...d, status: e.target.value as DriveStatus }))}
@@ -280,7 +280,7 @@ export default function ProgramResources() {
                         </select>
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground block mb-1">Permissions Model</label>
+                        <label className="text-[14px] font-semibold text-muted-foreground block mb-1">Permissions Model</label>
                         <select
                           value={editDraft.permissionsModel ?? 'not-set'}
                           onChange={e => setEditDraft(d => ({ ...d, permissionsModel: e.target.value as PermissionsModel }))}
@@ -292,9 +292,9 @@ export default function ProgramResources() {
                         </select>
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground block mb-1">
+                        <label className="text-[14px] font-semibold text-muted-foreground block mb-1">
                           Shared Drive ID
-                          <span className="ml-1 text-[9px] text-muted-foreground font-normal">(future API access)</span>
+                          <span className="ml-1 text-[14px] text-muted-foreground font-normal">(future API access)</span>
                         </label>
                         <input
                           type="text"
@@ -307,7 +307,7 @@ export default function ProgramResources() {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground block mb-1">Description</label>
+                      <label className="text-[14px] font-semibold text-muted-foreground block mb-1">Description</label>
                       <textarea
                         value={editDraft.description ?? ''}
                         onChange={e => setEditDraft(d => ({ ...d, description: e.target.value }))}
@@ -318,7 +318,7 @@ export default function ProgramResources() {
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground block mb-1">Notes</label>
+                      <label className="text-[14px] font-semibold text-muted-foreground block mb-1">Notes</label>
                       <textarea
                         value={editDraft.notes ?? ''}
                         onChange={e => setEditDraft(d => ({ ...d, notes: e.target.value }))}
@@ -331,17 +331,17 @@ export default function ProgramResources() {
                     <div className="flex items-center gap-2 pt-1">
                       <button
                         onClick={saveEdit}
-                        className="flex items-center gap-1.5 text-[12px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-4 py-1.5 hover:bg-primary/90 transition-colors"
+                        className="flex items-center gap-1.5 text-[14px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-4 py-1.5 hover:bg-primary/90 transition-colors"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" /> Save Changes
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="text-[12px] font-medium text-muted-foreground border border-border rounded-full px-4 py-1.5 hover:bg-muted/20 transition-colors"
+                        className="text-[14px] font-medium text-muted-foreground border border-border rounded-full px-4 py-1.5 hover:bg-muted/20 transition-colors"
                       >
                         Cancel
                       </button>
-                      <p className="text-[10px] text-muted-foreground/60 ml-2 italic">Persists locally · production will sync to Salesforce.</p>
+                      <p className="text-[14px] text-muted-foreground/60 ml-2 italic">Persists locally · production will sync to Salesforce.</p>
                     </div>
                   </div>
                 )}
@@ -354,11 +354,11 @@ export default function ProgramResources() {
                   >
                     {/* Description */}
                     {resource.description && (
-                      <p className="text-[11px] text-muted-foreground leading-snug mb-2 line-clamp-2">{resource.description}</p>
+                      <p className="text-[14px] text-muted-foreground leading-snug mb-2 line-clamp-2">{resource.description}</p>
                     )}
 
                     {/* Meta row */}
-                    <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-3 text-[14px] text-muted-foreground">
                       <span>Owner: <strong className="text-foreground">{resource.owner}</strong></span>
                       <span>Permissions: <strong className="text-foreground">{permCfg.label}</strong></span>
                       <span>Sync: <strong className="text-foreground capitalize">{resource.syncStatus.replace(/-/g, ' ')}</strong></span>
@@ -372,7 +372,7 @@ export default function ProgramResources() {
                     {resource.contentTypes.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {resource.contentTypes.map(ct => (
-                          <span key={ct} className="text-[9px] font-medium text-muted-foreground border border-border/60 bg-background rounded-full px-1.5 py-0.5">
+                          <span key={ct} className="text-[14px] font-medium text-muted-foreground border border-border/60 bg-background rounded-full px-1.5 py-0.5">
                             {ct}
                           </span>
                         ))}
@@ -381,7 +381,7 @@ export default function ProgramResources() {
 
                     {/* Notes */}
                     {resource.notes && (
-                      <p className="text-[10px] text-muted-foreground/70 mt-1.5 italic">{resource.notes}</p>
+                      <p className="text-[14px] text-muted-foreground/70 mt-1.5 italic">{resource.notes}</p>
                     )}
                   </div>
                 )}
@@ -392,17 +392,17 @@ export default function ProgramResources() {
 
         {/* Integration roadmap */}
         <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
-          <p className="text-[12px] font-bold text-foreground">Google Drive Integration Roadmap</p>
+          <p className="text-[14px] font-bold text-foreground">Google Drive Integration Roadmap</p>
           <div className="space-y-2">
             {ROADMAP.map(item => (
               <div key={item.phase} className="flex items-start gap-3">
                 <div className="shrink-0 mt-0.5 text-right w-16">
-                  <p className="text-[9px] font-bold text-muted-foreground/60 uppercase">{item.phase}</p>
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 inline-block mt-0.5 ${item.cls}`}>{item.status}</span>
+                  <p className="text-[14px] font-bold text-muted-foreground/60 ">{item.phase}</p>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 inline-block mt-0.5 ${item.cls}`}>{item.status}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-[11px] font-bold text-foreground">{item.label}</p>
-                  <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">{item.desc}</p>
+                  <p className="text-[14px] font-bold text-foreground">{item.label}</p>
+                  <p className="text-[14px] text-muted-foreground leading-snug mt-0.5">{item.desc}</p>
                 </div>
               </div>
             ))}

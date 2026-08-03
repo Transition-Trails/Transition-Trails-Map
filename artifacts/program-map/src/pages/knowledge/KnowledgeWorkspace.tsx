@@ -12,8 +12,8 @@ import { useKnowledgeSources } from '@/hooks/useKnowledgeSources';
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 w-32 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[12px] text-foreground flex-1">{value}</span>
+      <span className="text-[14px] font-bold  text-muted-foreground/60 w-32 shrink-0 mt-0.5">{label}</span>
+      <span className="text-[14px] text-foreground flex-1">{value}</span>
     </div>
   );
 }
@@ -25,10 +25,10 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4 max-w-3xl">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${typeCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
+          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${typeCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
             {src.type}
           </span>
-          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${trustCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
+          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${trustCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
             {src.trustLevel}
           </span>
         </div>
@@ -40,15 +40,15 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
         </div>
         {src.trustLevel === 'Unverified' && (
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3">
-            <p className="text-[11px] font-bold text-[#A93F2F] mb-1">⚠ Unverified Source</p>
-            <p className="text-[12px] text-[#A93F2F]">This source has not passed a trust review. It may not be activated in {TERMS.aiAssistant} without Knowledge Manager approval.</p>
+            <p className="text-[14px] font-bold text-[#A93F2F] mb-1">⚠ Unverified Source</p>
+            <p className="text-[14px] text-[#A93F2F]">This source has not passed a trust review. It may not be activated in {TERMS.aiAssistant} without Knowledge Manager approval.</p>
           </div>
         )}
         {src.healthIssues.length > 0 && (
           <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 space-y-1.5">
-            <p className="text-[11px] font-bold text-[#CC8400]">Open Issues</p>
+            <p className="text-[14px] font-bold text-[#CC8400]">Open Issues</p>
             {src.healthIssues.map((issue, i) => (
-              <p key={i} className="text-[11px] text-[#CC8400] leading-snug">· {issue}</p>
+              <p key={i} className="text-[14px] text-[#CC8400] leading-snug">· {issue}</p>
             ))}
           </div>
         )}
@@ -83,14 +83,14 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
   return (
     <div className="rounded-lg border border-border bg-background p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-bold uppercase text-muted-foreground/60 tracking-wide">Category Mapping</p>
-        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${mapped === total ? 'text-[#2F6B3F] bg-[#E6F0EA]' : 'text-[#CC8400] bg-[#FFF3E0]'}`}>
+        <p className="text-[14px] font-bold  text-muted-foreground/60 tracking-wide">Category Mapping</p>
+        <span className={`text-[14px] font-bold px-1.5 py-0.5 rounded ${mapped === total ? 'text-[#2F6B3F] bg-[#E6F0EA]' : 'text-[#CC8400] bg-[#FFF3E0]'}`}>
           {mapped} / {total} mapped
         </span>
       </div>
 
       <div className="space-y-1">
-        <div className="flex items-center justify-between text-[9px] text-muted-foreground mb-0.5">
+        <div className="flex items-center justify-between text-[14px] text-muted-foreground mb-0.5">
           <span>{pct}% complete</span>
           {mapped === total && (
             <span className="flex items-center gap-1 text-[#2F6B3F] font-semibold">
@@ -122,24 +122,24 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-left"
               >
                 <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isMapped ? 'bg-[#E6F0EA]0' : 'bg-[#CC8400]'}`} />
-                <span className="text-[11px] font-medium text-foreground flex-1 truncate">{doc.name}</span>
+                <span className="text-[14px] font-medium text-foreground flex-1 truncate">{doc.name}</span>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {isMapped ? (
                     <>
                       {cats.slice(0, 2).map(catId => {
                         const cat = DOCUMENT_CATEGORY_TAXONOMY.find(c => c.id === catId);
                         return cat ? (
-                          <span key={catId} className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border ${cat.color}`}>
+                          <span key={catId} className={`text-[14px] font-semibold px-1.5 py-0.5 rounded border ${cat.color}`}>
                             {cat.label}
                           </span>
                         ) : null;
                       })}
                       {cats.length > 2 && (
-                        <span className="text-[9px] text-muted-foreground">+{cats.length - 2}</span>
+                        <span className="text-[14px] text-muted-foreground">+{cats.length - 2}</span>
                       )}
                     </>
                   ) : (
-                    <span className="text-[9px] font-bold text-[#CC8400]">Unassigned</span>
+                    <span className="text-[14px] font-bold text-[#CC8400]">Unassigned</span>
                   )}
                 </div>
                 <ChevronDown className={`w-3 h-3 text-muted-foreground flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
@@ -147,7 +147,7 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
 
               {isExpanded && (
                 <div className="px-3 pb-3 border-t border-border/40 pt-2.5 space-y-2.5">
-                  <p className="text-[10px] text-muted-foreground font-medium">Assign categories:</p>
+                  <p className="text-[14px] text-muted-foreground font-medium">Assign categories:</p>
                   <div className="flex flex-wrap gap-1.5">
                     {DOCUMENT_CATEGORY_TAXONOMY.map(cat => {
                       const active = cats.includes(cat.id);
@@ -155,7 +155,7 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
                         <button
                           key={cat.id}
                           onClick={() => toggleCategory(doc.id, cat.id)}
-                          className={`text-[10px] font-semibold px-2 py-1 rounded-full border transition-all ${
+                          className={`text-[14px] font-semibold px-2 py-1 rounded-full border transition-all ${
                             active
                               ? cat.color
                               : 'bg-background border-border text-muted-foreground hover:border-muted-foreground/50'
@@ -167,7 +167,7 @@ function CategoryMappingSection({ src }: { src: KnowledgeSource }) {
                     })}
                   </div>
                   {(doc.uploadedBy || doc.uploadDate) && (
-                    <p className="text-[10px] text-muted-foreground/70">
+                    <p className="text-[14px] text-muted-foreground/70">
                       {doc.uploadedBy && `Uploaded by ${doc.uploadedBy}`}
                       {doc.uploadedBy && doc.uploadDate && ' · '}
                       {doc.uploadDate}
@@ -199,22 +199,22 @@ function GovernanceTab({ src }: { src: KnowledgeSource }) {
             <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
               <div className="flex items-center gap-2.5">
                 <HealthDot health={ind.status} />
-                <span className="text-[12px] font-medium text-foreground">{ind.label}</span>
+                <span className="text-[14px] font-medium text-foreground">{ind.label}</span>
               </div>
-              <span className="text-[11px] text-muted-foreground text-right max-w-xs">{ind.note}</span>
+              <span className="text-[14px] text-muted-foreground text-right max-w-xs">{ind.note}</span>
             </div>
           ))}
         </div>
         <CategoryMappingSection src={src} />
         <div className="rounded-lg border border-border bg-background p-4 space-y-2">
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60">Ownership</p>
-          <p className="text-[12px] text-foreground">Primary: <strong>Knowledge Manager</strong></p>
-          <p className="text-[12px] text-foreground">Secondary: <strong>{TERMS.aiAssistant} Lead</strong></p>
-          <p className="text-[12px] text-foreground">Approval: <strong>Knowledge Manager</strong></p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60">Ownership</p>
+          <p className="text-[14px] text-foreground">Primary: <strong>Knowledge Manager</strong></p>
+          <p className="text-[14px] text-foreground">Secondary: <strong>{TERMS.aiAssistant} Lead</strong></p>
+          <p className="text-[14px] text-foreground">Approval: <strong>Knowledge Manager</strong></p>
         </div>
         <div className="rounded-lg border border-muted bg-muted/30 p-3">
-          <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mb-1">Governance Policy</p>
-          <p className="text-[11px] text-muted-foreground">Per Source Trust Standard: all sources must pass trust review before {TERMS.aiAssistant} activation. Quarterly reviews required to maintain Active status.</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Governance Policy</p>
+          <p className="text-[14px] text-muted-foreground">Per Source Trust Standard: all sources must pass trust review before {TERMS.aiAssistant} activation. Quarterly reviews required to maintain Active status.</p>
         </div>
       </div>
     </ScrollArea>
@@ -231,20 +231,20 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">{TERMS.aiAssistant} capabilities and prompts that depend on this knowledge source.</p>
+        <p className="text-[14px] text-muted-foreground">{TERMS.aiAssistant} capabilities and prompts that depend on this knowledge source.</p>
         {caps.length > 0 ? (
           <div className="space-y-2">
             {caps.map(c => (
               <div key={c.name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2F6F7E] shrink-0" />
-                <span className="text-[12px] text-foreground font-medium">{c.name}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground">{c.status}</span>
+                <span className="text-[14px] text-foreground font-medium">{c.name}</span>
+                <span className="ml-auto text-[14px] text-muted-foreground">{c.status}</span>
               </div>
             ))}
           </div>
         ) : (
           <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">No {TERMS.aiAssistant} assets currently mapped to this source. Full capability mapping is a Phase 2 feature.</p>
+            <p className="text-[14px] text-muted-foreground">No {TERMS.aiAssistant} assets currently mapped to this source. Full capability mapping is a Phase 2 feature.</p>
           </div>
         )}
       </div>
@@ -261,17 +261,17 @@ function RelatedProgramsTab({ src: _src }: { src: KnowledgeSource }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Programs that reference this knowledge source in their curriculum or {TERMS.aiAssistant} integration.</p>
+        <p className="text-[14px] text-muted-foreground">Programs that reference this knowledge source in their curriculum or {TERMS.aiAssistant} integration.</p>
         <div className="space-y-2">
           {programs.map(prog => (
             <div key={prog.name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background">
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${prog.dot}`} />
-              <span className="text-[12px] text-foreground font-medium">{prog.name}</span>
-              <span className={`ml-auto text-[10px] font-bold ${prog.dot === 'bg-[#2F6B3F]' ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>{prog.status}</span>
+              <span className="text-[14px] text-foreground font-medium">{prog.name}</span>
+              <span className={`ml-auto text-[14px] font-bold ${prog.dot === 'bg-[#2F6B3F]' ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>{prog.status}</span>
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-muted-foreground/60 italic">Full per-source program mapping is a Phase 2 feature — live Salesforce integration will populate this view.</p>
+        <p className="text-[14px] text-muted-foreground/60 italic">Full per-source program mapping is a Phase 2 feature — live Salesforce integration will populate this view.</p>
       </div>
     </ScrollArea>
   );
@@ -296,7 +296,7 @@ function RelationshipsTabKS({ src }: { src: KnowledgeSource }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Digital Twin relationships — programs, {TERMS.aiAssistant} capabilities, and graph connections for this source.</p>
+        <p className="text-[14px] text-muted-foreground">Digital Twin relationships — programs, {TERMS.aiAssistant} capabilities, and graph connections for this source.</p>
         <RelationshipCard title="Programs"                      icon={GraduationCap} items={programItems}                   viewAllHref="/program"               emptyMessage="No programs linked" />
         <RelationshipCard title={`${TERMS.aiAssistant} Capabilities`} icon={Brain}  items={capMap[(src as any).id] ?? []}  viewAllHref="/penny"                 emptyMessage="No capabilities depend on this source" />
         <RelationshipCard title="Digital Twin"                  icon={Network}       items={dtItems}                        viewAllHref="/knowledge/relationships" />
@@ -314,10 +314,10 @@ function HealthTabKS({ src }: { src: KnowledgeSource }) {
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
         <div className="flex items-center gap-2 mb-4">
-          <span className={`inline-flex items-center px-2 py-1 rounded border text-[11px] font-bold ${cfg.cls}`}>
+          <span className={`inline-flex items-center px-2 py-1 rounded border text-[14px] font-bold ${cfg.cls}`}>
             {(src as any).health ?? 'Healthy'}
           </span>
-          <span className="text-[11px] text-muted-foreground">{(src as any).healthNote ?? 'Source health within acceptable parameters.'}</span>
+          <span className="text-[14px] text-muted-foreground">{(src as any).healthNote ?? 'Source health within acceptable parameters.'}</span>
         </div>
         {[
           { label: 'Trust Review',  health: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel },
@@ -328,16 +328,16 @@ function HealthTabKS({ src }: { src: KnowledgeSource }) {
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
             <div className="flex items-center gap-2.5">
               <HealthDot health={ind.health} />
-              <span className="text-[12px] font-medium text-foreground">{ind.label}</span>
+              <span className="text-[14px] font-medium text-foreground">{ind.label}</span>
             </div>
-            <span className="text-[11px] text-muted-foreground">{ind.note}</span>
+            <span className="text-[14px] text-muted-foreground">{ind.note}</span>
           </div>
         ))}
         {src.healthIssues.length > 0 && (
           <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 space-y-1.5">
-            <p className="text-[11px] font-bold text-[#CC8400]">Open Health Issues</p>
+            <p className="text-[14px] font-bold text-[#CC8400]">Open Health Issues</p>
             {src.healthIssues.map((issue, i) => (
-              <p key={i} className="text-[11px] text-[#CC8400] leading-snug">· {issue}</p>
+              <p key={i} className="text-[14px] text-[#CC8400] leading-snug">· {issue}</p>
             ))}
           </div>
         )}

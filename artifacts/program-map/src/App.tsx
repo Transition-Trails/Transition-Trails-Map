@@ -377,7 +377,7 @@ function SignInLanding() {
       >
         Sign in with Google
       </button>
-      <p className="text-[11px] text-muted-foreground/60">@transitiontrails.org accounts only</p>
+      <p className="text-[14px] text-muted-foreground/60">@transitiontrails.org accounts only</p>
     </div>
   );
 }

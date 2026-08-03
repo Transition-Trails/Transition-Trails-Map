@@ -12,7 +12,7 @@ import { useSfLmsCourses } from '@/hooks/useSfCurriculum';
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2">
+    <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2">
       {children}
     </p>
   );
@@ -26,14 +26,14 @@ function StatPill({
     return (
       <button onClick={onClick} className={`${base} hover:border-primary/40 hover:bg-primary/[0.02] transition-colors`}>
         <span className={`text-xl font-semibold ${color}`}>{value}</span>
-        <span className="text-[10px] text-muted-foreground mt-0.5 text-center leading-tight">{label}</span>
+        <span className="text-[14px] text-muted-foreground mt-0.5 text-center leading-tight">{label}</span>
       </button>
     );
   }
   return (
     <div className={base}>
       <span className={`text-xl font-semibold ${color}`}>{value}</span>
-      <span className="text-[10px] text-muted-foreground mt-0.5 text-center leading-tight">{label}</span>
+      <span className="text-[14px] text-muted-foreground mt-0.5 text-center leading-tight">{label}</span>
     </div>
   );
 }
@@ -56,13 +56,13 @@ function NavCard({
             <Icon className="w-3.5 h-3.5 text-muted-foreground" />
           </div>
           <div>
-            <p className="text-[12px] font-semibold text-foreground">{title}</p>
-            <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">{desc}</p>
+            <p className="text-[14px] font-semibold text-foreground">{title}</p>
+            <p className="text-[14px] text-muted-foreground leading-snug mt-0.5">{desc}</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {badge && (
-            <span className={`text-[9px] font-bold border rounded px-1.5 py-0.5 ${badgeColor ?? 'bg-muted text-muted-foreground border-border'}`}>
+            <span className={`text-[14px] font-bold border rounded px-1.5 py-0.5 ${badgeColor ?? 'bg-muted text-muted-foreground border-border'}`}>
               {badge}
             </span>
           )}
@@ -163,11 +163,11 @@ export default function ProgramOverview() {
                     <div className="flex items-center gap-3">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-semibold text-foreground">{p.name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{p.coreOutcome}</p>
+                        <p className="text-[14px] font-semibold text-foreground">{p.name}</p>
+                        <p className="text-[14px] text-muted-foreground truncate">{p.coreOutcome}</p>
                       </div>
                       {pennyStatus === 'Active' && (
-                        <span className="text-[9px] font-bold bg-primary/10 text-primary border border-primary/20 rounded px-1.5 py-0.5 shrink-0">
+                        <span className="text-[14px] font-bold bg-primary/10 text-primary border border-primary/20 rounded px-1.5 py-0.5 shrink-0">
                           {TERMS.aiAssistant} Active
                         </span>
                       )}
@@ -211,10 +211,10 @@ export default function ProgramOverview() {
                     className="group w-full flex items-center gap-2.5 py-1.5 px-1 rounded hover:bg-primary/[0.04] border-b border-border/30 last:border-0 transition-colors"
                   >
                     <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
-                    <span className="text-[11px] text-foreground flex-1 truncate text-left group-hover:text-primary transition-colors">
+                    <span className="text-[14px] text-foreground flex-1 truncate text-left group-hover:text-primary transition-colors">
                       {p.name}
                     </span>
-                    <span className={`text-[9px] font-bold border rounded px-1.5 py-0.5 shrink-0 ${cfg.bgCls} ${cfg.textCls}`}>
+                    <span className={`text-[14px] font-bold border rounded px-1.5 py-0.5 shrink-0 ${cfg.bgCls} ${cfg.textCls}`}>
                       {cfg.label}
                     </span>
                     <ChevronRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary shrink-0 transition-colors" />
@@ -224,7 +224,7 @@ export default function ProgramOverview() {
             </div>
             <button
               onClick={() => setLocation('/program/config')}
-              className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
+              className="text-[14px] font-medium text-primary hover:underline flex items-center gap-0.5"
             >
               Configure programs <ChevronRight className="w-3 h-3" />
             </button>
@@ -271,8 +271,8 @@ export default function ProgramOverview() {
                   <row.icon className={`w-3.5 h-3.5 shrink-0 ${row.iconCls}`} />
                   <div className="flex-1 text-left">
                     <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-[11px] font-medium text-foreground group-hover:text-primary transition-colors">{row.label}</span>
-                      <span className="text-[11px] font-semibold text-foreground">{row.count}</span>
+                      <span className="text-[14px] font-medium text-foreground group-hover:text-primary transition-colors">{row.label}</span>
+                      <span className="text-[14px] font-semibold text-foreground">{row.count}</span>
                     </div>
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                       <div
@@ -280,7 +280,7 @@ export default function ProgramOverview() {
                         style={{ width: `${programs.length ? Math.round((row.count / programs.length) * 100) : 0}%` }}
                       />
                     </div>
-                    <p className="text-[9px] text-muted-foreground/60 mt-0.5 truncate">{row.note}</p>
+                    <p className="text-[14px] text-muted-foreground/60 mt-0.5 truncate">{row.note}</p>
                   </div>
                   <ChevronRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary shrink-0 transition-colors" />
                 </button>
@@ -289,7 +289,7 @@ export default function ProgramOverview() {
             {isAdminOrAbove && (
               <button
                 onClick={() => setLocation('/program/blueprint')}
-                className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
+                className="text-[14px] font-medium text-primary hover:underline flex items-center gap-0.5"
               >
                 Open Blueprint canvas <ChevronRight className="w-3 h-3" />
               </button>
@@ -306,7 +306,7 @@ export default function ProgramOverview() {
             {pennyConfigsLoading ? (
               <div className="flex items-center gap-1.5 py-2 text-muted-foreground">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span className="text-[11px]">Loading…</span>
+                <span className="text-[14px]">Loading…</span>
               </div>
             ) : (
               <div className="space-y-1">
@@ -320,10 +320,10 @@ export default function ProgramOverview() {
                       className="group w-full flex items-center gap-2.5 py-1.5 px-1 rounded hover:bg-primary/[0.04] border-b border-border/30 last:border-0 transition-colors"
                     >
                       <Sparkles className={`w-3 h-3 shrink-0 ${cfg.dot}`} />
-                      <span className="text-[11px] text-foreground flex-1 truncate text-left group-hover:text-primary transition-colors">
+                      <span className="text-[14px] text-foreground flex-1 truncate text-left group-hover:text-primary transition-colors">
                         {p.name}
                       </span>
-                      <span className={`text-[10px] shrink-0 ${cfg.textCls}`}>
+                      <span className={`text-[14px] shrink-0 ${cfg.textCls}`}>
                         {cfg.label}
                       </span>
                       <ChevronRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary shrink-0 transition-colors" />
@@ -337,7 +337,7 @@ export default function ProgramOverview() {
                 onClick={() => setLocation('/penny/capabilities')}
                 className="group w-full text-left rounded border border-[#FFD08A] bg-[#FFF3E0] px-2.5 py-1.5 hover:border-[#CC8400] transition-colors"
               >
-                <p className="text-[10px] text-[#CC8400] font-medium group-hover:underline">
+                <p className="text-[14px] text-[#CC8400] font-medium group-hover:underline">
                   {stats.withoutPenny} program{stats.withoutPenny > 1 ? 's' : ''} without {TERMS.aiAssistant} — configure in {TERMS.aiAssistant} Capabilities →
                 </p>
               </button>
@@ -350,7 +350,7 @@ export default function ProgramOverview() {
             {lmsLoading ? (
               <div className="flex items-center gap-1.5 py-2 text-muted-foreground">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span className="text-[11px]">Loading from Salesforce…</span>
+                <span className="text-[14px]">Loading from Salesforce…</span>
               </div>
             ) : (
               <>
@@ -363,13 +363,13 @@ export default function ProgramOverview() {
                   ].map(s => (
                     <div key={s.label} className="rounded-md bg-background border border-border px-2.5 py-2">
                       <p className={`text-base font-semibold ${s.color}`}>{s.value}</p>
-                      <p className="text-[10px] text-muted-foreground">{s.label}</p>
+                      <p className="text-[14px] text-muted-foreground">{s.label}</p>
                     </div>
                   ))}
                 </div>
                 {lmsSummary.totalModules > 0 && (
                   <div>
-                    <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
+                    <div className="flex justify-between text-[14px] text-muted-foreground mb-1">
                       <span>Overall module completion</span>
                       <span>{Math.round((lmsSummary.completedModules / lmsSummary.totalModules) * 100)}%</span>
                     </div>
@@ -383,7 +383,7 @@ export default function ProgramOverview() {
                 )}
                 <button
                   onClick={() => setLocation('/program/courses')}
-                  className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5"
+                  className="text-[14px] font-medium text-primary hover:underline flex items-center gap-0.5"
                 >
                   <BookOpen className="w-3 h-3" /> Open Courses &amp; Modules <ChevronRight className="w-3 h-3" />
                 </button>
@@ -449,17 +449,17 @@ export default function ProgramOverview() {
                 onClick={() => setLocation(item.path)}
                 className="group w-full text-left flex items-start gap-3 rounded-md px-2 py-2 hover:bg-primary/[0.05] transition-colors"
               >
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[14px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                   {item.priority}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors">{item.action}</p>
-                    <span className={`text-[9px] font-bold border rounded px-1.5 py-0.5 ${item.tagColor}`}>
+                    <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">{item.action}</p>
+                    <span className={`text-[14px] font-bold border rounded px-1.5 py-0.5 ${item.tagColor}`}>
                       {item.tag}
                     </span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{item.why}</p>
+                  <p className="text-[14px] text-muted-foreground mt-0.5 leading-relaxed">{item.why}</p>
                 </div>
                 <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/20 group-hover:text-primary shrink-0 mt-0.5 transition-colors" />
               </button>

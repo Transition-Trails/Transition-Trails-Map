@@ -40,11 +40,11 @@ export function HubShell({
           <Icon className="w-3.5 h-3.5 text-primary flex-shrink-0" />
           <h1 className="text-sm font-semibold text-foreground leading-none">{title}</h1>
           {badge && (
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+            <span className="text-[14px] font-semibold  text-muted-foreground/50">
               {badge}
             </span>
           )}
-          <span className="text-[11px] text-muted-foreground line-clamp-1 hidden sm:block">{description}</span>
+          <span className="text-[14px] text-muted-foreground line-clamp-1 hidden sm:block">{description}</span>
         </div>
         {tabs.length > 1 && (
           <div className="flex gap-0.5 overflow-x-auto pb-0.5 mt-1.5">
@@ -55,7 +55,7 @@ export function HubShell({
                 <button
                   key={tab.id}
                   onClick={() => setLocation(tab.path)}
-                  className={`flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold rounded-t-md whitespace-nowrap border-b-2 transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-2 text-[14px] font-semibold rounded-t-md whitespace-nowrap border-b-2 transition-colors ${
                     isActive
                       ? 'border-primary text-primary bg-primary/5'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40'

@@ -4,8 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, ArrowRight, ChevronRight, CalendarDays } from 'lucide-react';
 
 function statusBadge(s: CommNotification['status']) {
-  if (s === 'active')  return <Badge className="text-[10px] bg-[#E6F0EA] text-[#245531] border-[#9FC3AE] border">Active</Badge>;
-  return <Badge className="text-[10px] bg-primary/10 text-primary border-primary/20 border">Planned</Badge>;
+  if (s === 'active')  return <Badge className="text-[14px] bg-[#E6F0EA] text-[#245531] border-[#9FC3AE] border">Active</Badge>;
+  return <Badge className="text-[14px] bg-primary/10 text-primary border-primary/20 border">Planned</Badge>;
 }
 
 export default function CommNotifications() {
@@ -20,7 +20,7 @@ export default function CommNotifications() {
       <div className="max-w-4xl mx-auto space-y-8">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Communications & Collaboration</p>
           <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             Routing rules combining audience, timing, and provider — Slack for community, Google Chat for clients, Google Calendar for timing context. Click any rule to open its Knowledge Brief.
@@ -29,10 +29,10 @@ export default function CommNotifications() {
 
         <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
           <div className="px-5 py-2.5 bg-muted/30 border-b border-border/60 grid grid-cols-[1fr_28px_1fr_100px] gap-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Event · Source</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Event · Source</p>
             <div />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Destination(s)</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Status</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Destination(s)</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Status</p>
           </div>
 
           {commNotifications.map((n, i) => (
@@ -47,23 +47,23 @@ export default function CommNotifications() {
               <div>
                 <div className="flex items-center gap-1.5 mb-1">
                   <Bell className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="text-[12px] font-semibold text-foreground leading-snug">{n.event}</span>
+                  <span className="text-[14px] font-semibold text-foreground leading-snug">{n.event}</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">{n.source}</p>
+                <p className="text-[14px] text-muted-foreground">{n.source}</p>
               </div>
 
               <ArrowRight className="w-4 h-4 text-muted-foreground/30 justify-self-center mt-0.5" />
 
               {/* Destination(s) */}
               <div className="space-y-1">
-                <p className="text-[12px] font-mono font-semibold text-foreground leading-snug">{n.destination}</p>
+                <p className="text-[14px] font-mono font-semibold text-foreground leading-snug">{n.destination}</p>
                 {n.secondaryDestination && (
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
+                  <div className="flex items-center gap-1 text-[14px] text-muted-foreground/70">
                     <CalendarDays className="w-2.5 h-2.5 shrink-0" />
                     <span>{n.secondaryDestination}</span>
                   </div>
                 )}
-                <p className="text-[10px] text-muted-foreground">{n.audience}</p>
+                <p className="text-[14px] text-muted-foreground">{n.audience}</p>
               </div>
 
               <div className="flex items-center justify-between pt-0.5">
@@ -75,7 +75,7 @@ export default function CommNotifications() {
         </div>
 
         <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             <strong>Audience + timing, not just channel.</strong> Rules combining a primary channel (Slack or Google Chat) with a secondary Calendar destination fire at the right moment — not on a fixed schedule. Routing configuration is available in Administration → Comm Routing.
           </p>
         </div>

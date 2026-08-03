@@ -295,8 +295,8 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <p className={`font-semibold text-foreground ${isOverall ? 'text-[15px]' : 'text-[13px]'}`}>{area.title}</p>
-              <span className={`inline-flex items-center gap-1 text-[9px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
+              <p className={`font-semibold text-foreground ${isOverall ? 'text-[15px]' : 'text-[14px]'}`}>{area.title}</p>
+              <span className={`inline-flex items-center gap-1 text-[14px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
                 <StatusIcon className="w-2.5 h-2.5" />
                 {cfg.label}
               </span>
@@ -307,7 +307,7 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
             <p className={`font-bold ${isOverall ? 'text-4xl' : 'text-3xl'} ${area.score >= 70 ? 'text-[#2F6F7E]' : area.score >= 50 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
               {area.score}
             </p>
-            <p className="text-[9px] text-muted-foreground">/ 100</p>
+            <p className="text-[14px] text-muted-foreground">/ 100</p>
           </div>
           {open ? <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
         </div>
@@ -317,21 +317,21 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
       {open && (
         <div className="border-t border-border/50 px-5 py-4 space-y-4 bg-muted/10">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] text-muted-foreground max-w-xl">{area.description}</p>
-            <span className="text-[10px] text-muted-foreground shrink-0 ml-4">Owner: <strong>{area.owner}</strong></span>
+            <p className="text-[14px] text-muted-foreground max-w-xl">{area.description}</p>
+            <span className="text-[14px] text-muted-foreground shrink-0 ml-4">Owner: <strong>{area.owner}</strong></span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Completed */}
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#2F6B3F]/70 mb-2 flex items-center gap-1">
+              <p className="text-[14px] font-bold  text-[#2F6B3F]/70 mb-2 flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" /> Completed ({area.completed.length})
               </p>
               <div className="space-y-1">
                 {area.completed.map(item => (
                   <div key={item} className="flex items-start gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 mt-1.5 shrink-0" />
-                    <p className="text-[11px] text-foreground">{item}</p>
+                    <p className="text-[14px] text-foreground">{item}</p>
                   </div>
                 ))}
               </div>
@@ -341,14 +341,14 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
             <div className="space-y-3">
               {area.gaps.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]/70 mb-2 flex items-center gap-1">
+                  <p className="text-[14px] font-bold  text-[#CC8400]/70 mb-2 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" /> Gaps ({area.gaps.length})
                   </p>
                   <div className="space-y-1">
                     {area.gaps.map(g => (
                       <div key={g} className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#CC8400] mt-1.5 shrink-0" />
-                        <p className="text-[11px] text-foreground">{g}</p>
+                        <p className="text-[14px] text-foreground">{g}</p>
                       </div>
                     ))}
                   </div>
@@ -356,14 +356,14 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
               )}
               {area.blockers.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#A93F2F]/70 mb-2 flex items-center gap-1">
+                  <p className="text-[14px] font-bold  text-[#A93F2F]/70 mb-2 flex items-center gap-1">
                     <XCircle className="w-3 h-3" /> Blockers ({area.blockers.length})
                   </p>
                   <div className="space-y-1">
                     {area.blockers.map(b => (
                       <div key={b} className="flex items-start gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#FBEAE6]0 mt-1.5 shrink-0" />
-                        <p className="text-[11px] text-foreground font-medium">{b}</p>
+                        <p className="text-[14px] text-foreground font-medium">{b}</p>
                       </div>
                     ))}
                   </div>
@@ -375,12 +375,12 @@ function AreaCard({ area, isOverall = false }: { area: ReadinessArea; isOverall?
           {/* Next Actions */}
           {area.nextActions.length > 0 && (
             <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-primary mb-2">Recommended Next Actions</p>
+              <p className="text-[14px] font-bold  text-primary mb-2">Recommended Next Actions</p>
               <div className="space-y-1.5">
                 {area.nextActions.map((a, i) => (
                   <div key={a} className="flex items-start gap-2">
-                    <span className="text-[9px] font-bold text-primary bg-primary/10 rounded-full w-4 h-4 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                    <p className="text-[11px] text-foreground">{a}</p>
+                    <span className="text-[14px] font-bold text-primary bg-primary/10 rounded-full w-4 h-4 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                    <p className="text-[14px] text-foreground">{a}</p>
                   </div>
                 ))}
               </div>
@@ -405,9 +405,9 @@ export default function Phase1ReadinessDashboard() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration — Phase 1</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration — Phase 1</p>
             <h1 className="text-base font-semibold text-foreground">Phase 1 Readiness Dashboard</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5 max-w-2xl">
+            <p className="text-[14px] text-muted-foreground mt-0.5 max-w-2xl">
               Architecture, integration, governance, knowledge, {TERMS.aiAssistant}, and operations readiness — scored, gap-analysed, and prioritised for production onboarding.
             </p>
           </div>
@@ -423,7 +423,7 @@ export default function Phase1ReadinessDashboard() {
           ].map(s => (
             <div key={s.label} className={`rounded-lg border px-3 py-2.5 text-center ${s.bg}`}>
               <p className={`text-xl font-bold ${s.cls}`}>{s.v}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -433,7 +433,7 @@ export default function Phase1ReadinessDashboard() {
 
         {/* Domain areas */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-3">Domain Readiness</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-3">Domain Readiness</p>
           <div className="space-y-2">
             {AREAS.map(area => (
               <AreaCard key={area.id} area={area} />
@@ -443,7 +443,7 @@ export default function Phase1ReadinessDashboard() {
 
         {/* ── Trail Signals Roadmap ─────────────────────────────────── */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-3">
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-3">
             Trail Signals Roadmap
           </p>
           <div className="space-y-3">
@@ -451,12 +451,12 @@ export default function Phase1ReadinessDashboard() {
             {/* Phase 1 — active model */}
             <div className="rounded-xl border border-[#9FC3AE] bg-[#E6F0EA]/60 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] px-2 py-0.5 rounded-full">
+                <span className="text-[14px] font-bold  text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] px-2 py-0.5 rounded-full">
                   Phase 1 · Active
                 </span>
-                <span className="text-[12px] font-bold text-foreground">System-Driven Trail Signals</span>
+                <span className="text-[14px] font-bold text-foreground">System-Driven Trail Signals</span>
               </div>
-              <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+              <p className="text-[14px] text-muted-foreground mb-3 leading-snug">
                 In Phase 1, Trail Signals are assigned automatically by the platform — not configured by users.
                 The system selects signals based on four factors:
               </p>
@@ -468,14 +468,14 @@ export default function Phase1ReadinessDashboard() {
                   { label: 'Digital Twin relationships',detail: 'Object connections in the Twin route related signals to the right people' },
                 ].map(f => (
                   <div key={f.label} className="bg-white/70 border border-[#E6F0EA] rounded-lg px-3 py-2">
-                    <p className="text-[11px] font-semibold text-foreground">{f.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{f.detail}</p>
+                    <p className="text-[14px] font-semibold text-foreground">{f.label}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug">{f.detail}</p>
                   </div>
                 ))}
               </div>
 
               {/* Role-based signal model */}
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">
                 Phase 1 signal model by role
               </p>
               <div className="space-y-1.5">
@@ -487,8 +487,8 @@ export default function Phase1ReadinessDashboard() {
                   <div key={r.tier} className="flex items-start gap-2 bg-white/60 border border-[#E6F0EA] rounded-lg px-3 py-2">
                     <span className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${r.dot}`} />
                     <div>
-                      <span className="text-[11px] font-semibold text-foreground">{r.tier}  </span>
-                      <span className="text-[11px] text-muted-foreground">{r.signals}</span>
+                      <span className="text-[14px] font-semibold text-foreground">{r.tier}  </span>
+                      <span className="text-[14px] text-muted-foreground">{r.signals}</span>
                     </div>
                   </div>
                 ))}
@@ -496,8 +496,8 @@ export default function Phase1ReadinessDashboard() {
 
               {/* Required vs Optional note */}
               <div className="mt-3 bg-[#E6F0EA]/60 border border-[#9FC3AE] rounded-lg px-3 py-2">
-                <p className="text-[10px] font-bold text-[#245531] mb-0.5">Required vs Optional Signals</p>
-                <p className="text-[11px] text-[#245531] leading-snug">
+                <p className="text-[14px] font-bold text-[#245531] mb-0.5">Required vs Optional Signals</p>
+                <p className="text-[14px] text-[#245531] leading-snug">
                   <span className="font-semibold">Required signals</span> come from your role and responsibility — they cannot be hidden because ignoring them would create a blind spot in your accountability area.
                   <span className="font-semibold"> Optional signals</span> are contextual and informational — in Phase 2 users will control these. Phase 1 shows both without distinction.
                 </p>
@@ -508,14 +508,14 @@ export default function Phase1ReadinessDashboard() {
             <div className="rounded-xl border border-dashed border-border bg-muted/10 p-4">
               <div className="flex items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 bg-muted border border-border px-2 py-0.5 rounded-full">
+                  <span className="text-[14px] font-bold  text-muted-foreground/60 bg-muted border border-border px-2 py-0.5 rounded-full">
                     Phase 2 · Deferred
                   </span>
-                  <span className="text-[12px] font-bold text-foreground">My Trail Signals Control Center</span>
+                  <span className="text-[14px] font-bold text-foreground">My Trail Signals Control Center</span>
                 </div>
-                <span className="text-[9px] text-muted-foreground/50 flex-shrink-0">Requires Phase 1 live data first</span>
+                <span className="text-[14px] text-muted-foreground/50 flex-shrink-0">Requires Phase 1 live data first</span>
               </div>
-              <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+              <p className="text-[14px] text-muted-foreground mb-3 leading-snug">
                 Once Phase 1 data connections are live, users will be able to customize what enters their Trail Signals feed.
                 Required signals (role + responsibility) remain always-on; optional signals become user-controlled.
               </p>
@@ -529,8 +529,8 @@ export default function Phase1ReadinessDashboard() {
                   { label: 'Required signals always on', detail: 'Role/responsibility signals stay visible — no blind spots created' },
                 ].map(item => (
                   <div key={item.label} className="bg-white/50 border border-border/60 rounded-lg px-3 py-2 opacity-70">
-                    <p className="text-[11px] font-semibold text-foreground">{item.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{item.detail}</p>
+                    <p className="text-[14px] font-semibold text-foreground">{item.label}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug">{item.detail}</p>
                   </div>
                 ))}
               </div>
@@ -541,8 +541,8 @@ export default function Phase1ReadinessDashboard() {
 
         {/* Footer note */}
         <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">About These Scores</p>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">About These Scores</p>
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             Scores reflect the current state of the Trail OS prototype vs. Phase 1 production-readiness targets. All scores are manually assessed based on completed architecture, built features, and known blockers. They will be replaced by automated readiness checks once live data connections are established.
           </p>
         </div>

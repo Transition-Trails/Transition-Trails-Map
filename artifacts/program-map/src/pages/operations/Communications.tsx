@@ -44,18 +44,18 @@ export default function OperationsCommunications() {
                     </div>
                     <div>
                       <p className="font-semibold text-foreground text-sm">{p.name}</p>
-                      <p className="text-[11px] text-muted-foreground">{p.tagline}</p>
+                      <p className="text-[14px] text-muted-foreground">{p.tagline}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mb-2">
                     <StatusDot status={p.status === 'prototype' ? 'amber' : 'gray'} />
-                    <span className="text-xs text-muted-foreground">{p.connectionStatus}</span>
-                    <span className={`inline-flex text-[10px] font-semibold border px-2 py-0.5 rounded-full ml-auto ${p.status === 'prototype' ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' : 'bg-muted border-border text-muted-foreground'}`}>
+                    <span className="text-sm text-muted-foreground">{p.connectionStatus}</span>
+                    <span className={`inline-flex text-[14px] font-semibold border px-2 py-0.5 rounded-full ml-auto ${p.status === 'prototype' ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' : 'bg-muted border-border text-muted-foreground'}`}>
                       {p.status === 'prototype' ? 'Prototype-Ready' : 'Future'}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">{p.purpose}</p>
-                  <p className="text-[10px] text-primary font-medium mt-2 group-hover:underline">Open Trail Insights →</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{p.purpose}</p>
+                  <p className="text-[14px] text-primary font-medium mt-2 group-hover:underline">Open Trail Insights →</p>
                 </button>
               ))}
             </div>
@@ -67,7 +67,7 @@ export default function OperationsCommunications() {
               <h2 className="text-sm font-semibold text-foreground">Routing Rules</h2>
               <button
                 onClick={() => setLocation('/admin/comm-routing')}
-                className="flex items-center gap-1 text-xs text-primary hover:underline"
+                className="flex items-center gap-1 text-sm text-primary hover:underline"
               >
                 Configure <ArrowRight className="w-3 h-3" />
               </button>
@@ -77,7 +77,7 @@ export default function OperationsCommunications() {
                 <thead>
                   <tr className="bg-muted/50 border-b border-border">
                     {['Event Type', 'Slack Channel', 'Audience', 'Status'].map(h => (
-                      <th key={h} className="text-left px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{h}</th>
+                      <th key={h} className="text-left px-4 py-2.5 text-[14px] font-bold  text-muted-foreground">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -88,13 +88,13 @@ export default function OperationsCommunications() {
                       onClick={() => setSelectedItem({ type: 'commRoute', id: r.id, data: r })}
                       className="hover:bg-primary/5 cursor-pointer transition-colors"
                     >
-                      <td className="px-4 py-2.5 font-medium text-foreground text-[13px]">{r.eventType}</td>
-                      <td className="px-4 py-2.5 font-mono text-[11px] text-muted-foreground">{r.slackChannel}</td>
-                      <td className="px-4 py-2.5 text-[12px] text-muted-foreground">{r.audience}</td>
+                      <td className="px-4 py-2.5 font-medium text-foreground text-[14px]">{r.eventType}</td>
+                      <td className="px-4 py-2.5 font-mono text-[14px] text-muted-foreground">{r.slackChannel}</td>
+                      <td className="px-4 py-2.5 text-[14px] text-muted-foreground">{r.audience}</td>
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-1.5">
                           <StatusDot status="amber" />
-                          <span className="text-[11px] text-[#CC8400]">{r.slackStatus}</span>
+                          <span className="text-[14px] text-[#CC8400]">{r.slackStatus}</span>
                         </div>
                       </td>
                     </tr>

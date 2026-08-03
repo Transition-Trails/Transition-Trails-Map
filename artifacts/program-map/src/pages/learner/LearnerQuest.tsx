@@ -106,7 +106,7 @@ export default function LearnerQuest() {
             >
               <Sparkles className="w-7 h-7" style={{ color: '#2F6B3F' }} />
             </div>
-            <p className="text-[13px]" style={{ color: '#4A4F4D' }}>
+            <p className="text-[14px]" style={{ color: '#4A4F4D' }}>
               Penny is preparing today's quest — check back soon.
             </p>
           </div>
@@ -117,18 +117,18 @@ export default function LearnerQuest() {
           <>
             {/* Quest header */}
             <div className="rounded-xl p-4 text-white" style={{ background: '#2F6B3F' }}>
-              <p className="text-[10px] uppercase font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              <p className="text-[14px]  font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
                 Today's Quest
               </p>
               <p className="text-xl font-bold mt-1">{quest.title}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span
-                  className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  className="text-[14px] font-bold px-2 py-0.5 rounded-full"
                   style={{ background: diffClrs.bg, color: diffClrs.text }}
                 >
                   {quest.difficulty}
                 </span>
-                <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                <span className="text-[14px]" style={{ color: 'rgba(255,255,255,0.8)' }}>
                   Worth {quest.pointValue} points
                 </span>
               </div>
@@ -136,7 +136,7 @@ export default function LearnerQuest() {
 
             {/* Description */}
             <div
-              className="rounded-xl border p-4 text-[13px]"
+              className="rounded-xl border p-4 text-[14px]"
               style={{ background: 'white', borderColor: '#E2E4E1', color: '#2A2E2C' }}
             >
               {quest.description}
@@ -144,10 +144,10 @@ export default function LearnerQuest() {
 
             {/* Acceptance criteria */}
             <div className="rounded-xl p-4" style={{ background: '#EAF4EC' }}>
-              <p className="text-[10px] font-bold uppercase" style={{ color: '#2F6B3F' }}>
+              <p className="text-[14px] font-bold " style={{ color: '#2F6B3F' }}>
                 What a good answer looks like
               </p>
-              <p className="text-[12px] mt-1" style={{ color: '#2A2E2C' }}>
+              <p className="text-[14px] mt-1" style={{ color: '#2A2E2C' }}>
                 {quest.acceptanceCriteria}
               </p>
             </div>
@@ -158,7 +158,7 @@ export default function LearnerQuest() {
               onChange={e => setResponse(e.target.value)}
               disabled={submitting}
               placeholder="Write your response here..."
-              className="w-full min-h-[150px] rounded-xl border p-3 text-[13px] resize-none focus:outline-none focus:ring-1"
+              className="w-full min-h-[150px] rounded-xl border p-3 text-[14px] resize-none focus:outline-none focus:ring-1"
               style={{
                 borderColor: '#E2E4E1',
                 '--tw-ring-color': '#2F6B3F',
@@ -190,7 +190,7 @@ export default function LearnerQuest() {
                 <p className="font-bold text-lg" style={{ color: '#2F6B3F' }}>
                   +{result.pointsEarned} points earned!
                 </p>
-                <p className="text-[12px]" style={{ color: '#2A2E2C' }}>
+                <p className="text-[14px]" style={{ color: '#2A2E2C' }}>
                   Total: {result.totalPoints} points
                 </p>
               </div>
@@ -208,9 +208,9 @@ export default function LearnerQuest() {
                 >
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-[11px] font-bold" style={{ color: '#4A4F4D' }}>{TERMS.aiAssistant}'s feedback</p>
+                <p className="text-[14px] font-bold" style={{ color: '#4A4F4D' }}>{TERMS.aiAssistant}'s feedback</p>
               </div>
-              <p className="text-[13px] whitespace-pre-line" style={{ color: '#2A2E2C' }}>
+              <p className="text-[14px] whitespace-pre-line" style={{ color: '#2A2E2C' }}>
                 {result.feedback}
               </p>
             </div>
@@ -218,7 +218,7 @@ export default function LearnerQuest() {
             {/* Back home */}
             <button
               onClick={() => navigate('/learner/dashboard')}
-              className="w-full h-11 rounded-xl border font-semibold text-[13px] transition-colors"
+              className="w-full h-11 rounded-xl border font-semibold text-[14px] transition-colors"
               style={{ background: 'white', borderColor: '#E2E4E1', color: '#2A2E2C' }}
             >
               Back to Home

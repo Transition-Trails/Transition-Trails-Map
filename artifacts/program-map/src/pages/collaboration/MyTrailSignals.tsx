@@ -127,7 +127,7 @@ function UrgencyPicker({
   value, onChange, disabled,
 }: { value: Urgency; onChange: (v: Urgency) => void; disabled?: boolean }) {
   return (
-    <div className="flex rounded-md border border-zinc-200 overflow-hidden text-[10px] font-semibold divide-x divide-zinc-200">
+    <div className="flex rounded-md border border-zinc-200 overflow-hidden text-[14px] font-semibold divide-x divide-zinc-200">
       {URGENCY_OPTS.map(o => (
         <button
           key={o.value}
@@ -148,7 +148,7 @@ function DeliveryToggle({
   value, onChange, disabled,
 }: { value: Delivery; onChange: (v: Delivery) => void; disabled?: boolean }) {
   return (
-    <div className="flex rounded-md border border-zinc-200 overflow-hidden text-[10px] font-semibold divide-x divide-zinc-200">
+    <div className="flex rounded-md border border-zinc-200 overflow-hidden text-[14px] font-semibold divide-x divide-zinc-200">
       <button
         disabled={disabled}
         onClick={() => onChange('realtime')}
@@ -256,7 +256,7 @@ export default function MyTrailSignals() {
         {/* ── Header ── */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[13px] text-zinc-600 leading-relaxed max-w-2xl">
+            <p className="text-[14px] text-zinc-600 leading-relaxed max-w-2xl">
               Control what enters your personal {TERMS.trailSignals} feed — choose which sources to
               watch, set urgency levels, and decide whether signals arrive in real-time or as a
               daily digest. Watch rules let you define your own conditions on top of the
@@ -264,10 +264,10 @@ export default function MyTrailSignals() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+            <span className="text-[14px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
               {activeCount} sources active
             </span>
-            <span className="text-[10px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2.5 py-1">
+            <span className="text-[14px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2.5 py-1">
               {ruleCount} rules live
             </span>
           </div>
@@ -276,7 +276,7 @@ export default function MyTrailSignals() {
         {/* ── Required signals notice ── */}
         <div className="flex items-start gap-2.5 rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
           <Info className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-          <p className="text-[11px] text-[#CC8400] leading-snug">
+          <p className="text-[14px] text-[#CC8400] leading-snug">
             <span className="font-semibold">Required signals</span> — sources and rules marked with a lock are
             set by your organisation and cannot be paused or removed. They ensure the team always has visibility
             on critical learner and program activity.
@@ -287,7 +287,7 @@ export default function MyTrailSignals() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Activity className="w-3.5 h-3.5 text-zinc-400" />
-            <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Signal sources</h2>
+            <h2 className="text-[14px] font-semibold text-zinc-500 ">Signal sources</h2>
           </div>
           <div className="space-y-2">
             {SOURCES.map(src => {
@@ -320,17 +320,17 @@ export default function MyTrailSignals() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className={`text-[13px] font-semibold ${s.active ? 'text-zinc-800' : 'text-zinc-400'}`}>
+                        <span className={`text-[14px] font-semibold ${s.active ? 'text-zinc-800' : 'text-zinc-400'}`}>
                           {src.label}
                         </span>
                         {src.required && <span title="Required — set by organisation"><Lock className="w-3 h-3 text-zinc-400" /></span>}
                         {!s.active && (
-                          <span className="text-[9px] font-semibold text-zinc-400 bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded-full">
+                          <span className="text-[14px] font-semibold text-zinc-400 bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded-full">
                             Paused
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-zinc-500 truncate mt-0.5">{src.description}</p>
+                      <p className="text-[14px] text-zinc-500 truncate mt-0.5">{src.description}</p>
                     </div>
 
                     {/* Controls */}
@@ -359,7 +359,7 @@ export default function MyTrailSignals() {
                   {/* Expanded signal list */}
                   {isExp && (
                     <div className="border-t border-zinc-100 px-5 py-3 bg-zinc-50">
-                      <div className="text-[9px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                      <div className="text-[14px] font-semibold text-zinc-400  mb-2">
                         Signals included
                       </div>
                       <div className="space-y-1.5">
@@ -368,7 +368,7 @@ export default function MyTrailSignals() {
                             {s.active
                               ? <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
                               : <AlertCircle  className="w-3 h-3 text-zinc-300 shrink-0" />}
-                            <span className={`text-[11px] leading-snug ${s.active ? 'text-zinc-700' : 'text-zinc-400'}`}>
+                            <span className={`text-[14px] leading-snug ${s.active ? 'text-zinc-700' : 'text-zinc-400'}`}>
                               {sig}
                             </span>
                           </div>
@@ -387,11 +387,11 @@ export default function MyTrailSignals() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Settings2 className="w-3.5 h-3.5 text-zinc-400" />
-              <h2 className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">My watch rules</h2>
+              <h2 className="text-[14px] font-semibold text-zinc-500 ">My watch rules</h2>
             </div>
             <button
               onClick={() => setShowForm(f => !f)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-[10px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-[14px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
             >
               <Plus className="w-3 h-3" /> Add rule
             </button>
@@ -400,7 +400,7 @@ export default function MyTrailSignals() {
           {/* Add rule form */}
           {showForm && (
             <div className="mb-3 rounded-xl border border-[#7FAFC6] bg-[#EDF5F8] px-5 py-4 space-y-3">
-              <div className="text-[10px] font-semibold text-[#2F6F7E] uppercase tracking-wider mb-1">New watch rule</div>
+              <div className="text-[14px] font-semibold text-[#2F6F7E]  mb-1">New watch rule</div>
               <div className="grid grid-cols-5 gap-2">
                 {[
                   { label: 'Object',    value: newObj,    set: setNewObj,    opts: OBJECT_TYPES  },
@@ -409,36 +409,36 @@ export default function MyTrailSignals() {
                   { label: 'Action',    value: newAction, set: setNewAction, opts: ACTIONS       },
                 ].map(sel => (
                   <div key={sel.label}>
-                    <div className="text-[9px] text-zinc-500 mb-1">{sel.label}</div>
+                    <div className="text-[14px] text-zinc-500 mb-1">{sel.label}</div>
                     <select
                       value={sel.value}
                       onChange={e => sel.set(e.target.value)}
-                      className="w-full text-[11px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-[#2F6B3F]/15"
+                      className="w-full text-[14px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-[#2F6B3F]/15"
                     >
                       {sel.opts.map(o => <option key={o}>{o}</option>)}
                     </select>
                   </div>
                 ))}
                 <div>
-                  <div className="text-[9px] text-zinc-500 mb-1">Threshold</div>
+                  <div className="text-[14px] text-zinc-500 mb-1">Threshold</div>
                   <input
                     value={newThresh}
                     onChange={e => setNewThresh(e.target.value)}
                     placeholder="e.g. 14 days"
-                    className="w-full text-[11px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-[#2F6B3F]/15"
+                    className="w-full text-[14px] border border-zinc-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-[#2F6B3F]/15"
                   />
                 </div>
               </div>
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={addRule}
-                  className="px-3 py-1.5 rounded-lg bg-[#2F6F7E] text-white text-[11px] font-semibold hover:bg-[#225968] transition-colors"
+                  className="px-3 py-1.5 rounded-lg bg-[#2F6F7E] text-white text-[14px] font-semibold hover:bg-[#225968] transition-colors"
                 >
                   Add rule
                 </button>
                 <button
                   onClick={() => setShowForm(false)}
-                  className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-[11px] text-zinc-600 hover:bg-zinc-50 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-white text-[14px] text-zinc-600 hover:bg-zinc-50 transition-colors"
                 >
                   Cancel
                 </button>
@@ -451,7 +451,7 @@ export default function MyTrailSignals() {
             {rules.map(rule => (
               <div key={rule.id} className={`flex items-center gap-3 px-5 py-3 ${rule.paused ? 'opacity-50' : ''}`}>
                 <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${rule.paused ? 'bg-zinc-300' : 'bg-[#E6F0EA]0'}`} />
-                <span className="text-[11px] text-zinc-700 flex-1 leading-snug">
+                <span className="text-[14px] text-zinc-700 flex-1 leading-snug">
                   When <span className="font-semibold">{rule.objectType}</span> {' '}
                   <span className="text-zinc-500">{rule.field}</span> {' '}
                   <span className="font-medium">{rule.condition}</span> {' '}
@@ -483,13 +483,13 @@ export default function MyTrailSignals() {
               </div>
             ))}
             {rules.length === 0 && (
-              <div className="px-5 py-6 text-center text-[11px] text-zinc-400">
+              <div className="px-5 py-6 text-center text-[14px] text-zinc-400">
                 No watch rules yet — click "Add rule" to create one.
               </div>
             )}
           </div>
 
-          <p className="text-[10px] text-zinc-400 mt-2">
+          <p className="text-[14px] text-zinc-400 mt-2">
             Watch rules layer on top of the org-level signal rules configured in{' '}
             <span className="font-medium">Systems Overview</span>.
             Required rules (🔒) are set by Admin and apply to all users of your tier.
@@ -498,14 +498,14 @@ export default function MyTrailSignals() {
 
         {/* ── Save bar ── */}
         <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-3.5">
-          <p className="text-[11px] text-zinc-500">
+          <p className="text-[14px] text-zinc-500">
             {saved
               ? '✓ Preferences saved — your settings will persist across sessions.'
               : 'Changes are unsaved — click Save to apply your preferences.'}
           </p>
           <button
             onClick={handleSave}
-            className="px-4 py-2 rounded-lg bg-zinc-800 text-white text-[11px] font-semibold hover:bg-zinc-700 transition-colors"
+            className="px-4 py-2 rounded-lg bg-zinc-800 text-white text-[14px] font-semibold hover:bg-zinc-700 transition-colors"
           >
             Save preferences
           </button>

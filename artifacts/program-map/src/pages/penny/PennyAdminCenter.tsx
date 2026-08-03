@@ -44,7 +44,7 @@ export default function PennyAdminCenter() {
       <div className="px-6 pt-5 pb-0 border-b border-border shrink-0 bg-background">
         <div className="flex items-center gap-1.5 mb-3">
           <Settings className="w-3.5 h-3.5 text-muted-foreground/50" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+          <span className="text-[14px] font-bold  text-muted-foreground/50">
             Config Zone
           </span>
         </div>
@@ -54,7 +54,7 @@ export default function PennyAdminCenter() {
             <h1 className="text-base font-semibold text-foreground leading-tight">
               Penny Command Center
             </h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               Trail configuration, quest library, intelligence reports, logs, and Penny sandbox.
             </p>
           </div>
@@ -69,7 +69,7 @@ export default function PennyAdminCenter() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTabId(tab.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-2.5 text-[12px] font-medium border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                className={`flex items-center gap-1.5 px-3.5 py-2.5 text-[14px] font-medium border-b-2 transition-colors whitespace-nowrap shrink-0 ${
                   isAct
                     ? 'border-primary text-primary'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'

@@ -169,7 +169,7 @@ function ReadinessMini({ value, status }: { value: number; status: IntegrationSt
       <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
         <div className={`h-1.5 rounded-full ${cfg.dot}`} style={{ width: `${value}%` }} />
       </div>
-      <span className="text-[10px] text-muted-foreground">{value}%</span>
+      <span className="text-[14px] text-muted-foreground">{value}%</span>
     </div>
   );
 }
@@ -187,20 +187,20 @@ function ConnectionCard({ conn }: { conn: IntegrationConnection }) {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 bg-primary/10 rounded-lg px-2 py-1">
               <Brain className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[11px] font-bold text-primary">{conn.from}</span>
+              <span className="text-[14px] font-bold text-primary">{conn.from}</span>
             </div>
             <ArrowRight className="w-3 h-3 text-muted-foreground" />
             <div className="flex items-center gap-1.5 bg-muted rounded-lg px-2 py-1">
               <ToIcon className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-[11px] font-bold text-foreground">{conn.to}</span>
+              <span className="text-[14px] font-bold text-foreground">{conn.to}</span>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className={`inline-flex items-center gap-1 text-[9px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
+            <span className={`inline-flex items-center gap-1 text-[14px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
               <StatusIcon className="w-2.5 h-2.5" />
               {cfg.label}
             </span>
-            <span className="text-[9px] font-bold text-muted-foreground border border-border rounded-full px-1.5 py-0.5">
+            <span className="text-[14px] font-bold text-muted-foreground border border-border rounded-full px-1.5 py-0.5">
               Phase {conn.phase}
             </span>
           </div>
@@ -210,32 +210,32 @@ function ConnectionCard({ conn }: { conn: IntegrationConnection }) {
 
       {/* Card body */}
       <div className="px-4 py-3 space-y-3">
-        <p className="text-[11px] text-muted-foreground leading-relaxed">{conn.description}</p>
+        <p className="text-[14px] text-muted-foreground leading-relaxed">{conn.description}</p>
 
         <div>
-          <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Method</p>
-          <p className="text-[11px] text-foreground">{conn.method}</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Method</p>
+          <p className="text-[14px] text-foreground">{conn.method}</p>
         </div>
 
         <div>
-          <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">Penny Capabilities</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Penny Capabilities</p>
           <div className="flex flex-wrap gap-1">
             {conn.capabilities.map(c => (
-              <span key={c} className="inline-flex text-[9px] font-medium bg-primary/5 border border-primary/15 text-primary rounded px-1.5 py-0.5">{c}</span>
+              <span key={c} className="inline-flex text-[14px] font-medium bg-primary/5 border border-primary/15 text-primary rounded px-1.5 py-0.5">{c}</span>
             ))}
           </div>
         </div>
 
         {conn.blockers.length > 0 && (
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-wider text-[#A93F2F]/70 mb-1 flex items-center gap-1">
+            <p className="text-[14px] font-bold  text-[#A93F2F]/70 mb-1 flex items-center gap-1">
               <XCircle className="w-2.5 h-2.5" /> Blockers
             </p>
             <div className="space-y-0.5">
               {conn.blockers.map(b => (
                 <div key={b} className="flex items-start gap-1.5">
                   <div className="w-1 h-1 rounded-full bg-[#A93F2F] mt-1.5 shrink-0" />
-                  <p className="text-[10px] text-foreground">{b}</p>
+                  <p className="text-[14px] text-foreground">{b}</p>
                 </div>
               ))}
             </div>
@@ -243,8 +243,8 @@ function ConnectionCard({ conn }: { conn: IntegrationConnection }) {
         )}
 
         <div className="rounded bg-primary/5 border border-primary/15 px-3 py-2">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-primary mb-0.5">Next Step</p>
-          <p className="text-[11px] text-foreground">{conn.nextStep}</p>
+          <p className="text-[14px] font-bold  text-primary mb-0.5">Next Step</p>
+          <p className="text-[14px] text-foreground">{conn.nextStep}</p>
         </div>
       </div>
     </div>
@@ -284,16 +284,16 @@ export default function PennyIntegrationLayer() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Penny — POC Integration Layer</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Penny — POC Integration Layer</p>
             <h2 className="text-2xl font-bold text-foreground">Penny Integration Readiness</h2>
-            <p className="text-[12px] text-muted-foreground mt-1 max-w-2xl">
+            <p className="text-[14px] text-muted-foreground mt-1 max-w-2xl">
               Integration readiness tracking between Penny capabilities and all connected systems — internal registry and external platform integrations.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             <button
               onClick={() => openSlackPanel({ context: 'penny', title: 'POC Integrations', subtitle: 'Slack bot status and pending actions for Penny integration work.' })}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
               title="Open Slack context"
             >
               <Hash className="w-3.5 h-3.5" />
@@ -301,7 +301,7 @@ export default function PennyIntegrationLayer() {
             </button>
             <button
               onClick={handleAddIntegration}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3.5 h-3.5" />
               Add Integration
@@ -319,7 +319,7 @@ export default function PennyIntegrationLayer() {
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-white px-3 py-3 text-center">
               <p className={`text-2xl font-bold ${s.cls}`}>{s.v}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -327,8 +327,8 @@ export default function PennyIntegrationLayer() {
         {/* Phase 1 integrations */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Phase 1 Integrations</p>
-            <span className="text-[9px] bg-primary/10 text-primary font-bold rounded-full px-2 py-0.5">Target: Production onboarding</span>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">Phase 1 Integrations</p>
+            <span className="text-[14px] bg-primary/10 text-primary font-bold rounded-full px-2 py-0.5">Target: Production onboarding</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {PHASE1.map(c => <ConnectionCard key={c.id} conn={c} />)}
@@ -339,8 +339,8 @@ export default function PennyIntegrationLayer() {
         {PHASE2.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Phase 2 Integrations</p>
-              <span className="text-[9px] bg-muted text-muted-foreground font-bold rounded-full px-2 py-0.5">Post Phase 1 — blocked on Phase 1 foundation</span>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Phase 2 Integrations</p>
+              <span className="text-[14px] bg-muted text-muted-foreground font-bold rounded-full px-2 py-0.5">Post Phase 1 — blocked on Phase 1 foundation</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {PHASE2.map(c => <ConnectionCard key={c.id} conn={c} />)}
@@ -350,8 +350,8 @@ export default function PennyIntegrationLayer() {
 
         {/* What "POC Ready" means */}
         <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">What "POC Ready" Means</p>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">What "POC Ready" Means</p>
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             <strong className="text-foreground">POC Ready</strong> = the Trail OS architecture, data models, and UI are ready to connect. The only remaining step is obtaining the external credential (API key, OAuth token, or org access) and wiring the first live call. No structural rework is needed. <strong className="text-foreground">Blocked</strong> means an external dependency is required before any integration work can begin.
           </p>
         </div>

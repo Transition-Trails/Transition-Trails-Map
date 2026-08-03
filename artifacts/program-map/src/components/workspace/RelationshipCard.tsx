@@ -48,9 +48,9 @@ export function RelationshipCard({
         className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-muted/30 transition-colors"
       >
         {Icon && <Icon className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />}
-        <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground flex-1">{title}</span>
+        <span className="text-[14px] font-bold  text-muted-foreground flex-1">{title}</span>
         {items.length > 0 && (
-          <span className="text-[10px] text-muted-foreground/50 tabular-nums mr-1">{items.length}</span>
+          <span className="text-[14px] text-muted-foreground/50 tabular-nums mr-1">{items.length}</span>
         )}
         <ChevronDown className={`w-3 h-3 text-muted-foreground/40 transition-transform duration-150 ${open ? '' : '-rotate-90'}`} />
       </button>
@@ -58,7 +58,7 @@ export function RelationshipCard({
       {open && (
         <div className="px-3 pb-3">
           {items.length === 0 ? (
-            <p className="text-[11px] text-muted-foreground/50 italic py-1">{emptyMessage}</p>
+            <p className="text-[14px] text-muted-foreground/50 italic py-1">{emptyMessage}</p>
           ) : (
             <div className="space-y-2">
               <div className="flex flex-wrap gap-1.5 pt-0.5">
@@ -70,7 +70,7 @@ export function RelationshipCard({
                   >
                     <Badge
                       variant="outline"
-                      className="text-[10px] bg-muted/40 font-normal py-0 h-5 gap-1 hover:bg-muted/70 transition-colors"
+                      className="text-[14px] bg-muted/40 font-normal py-0 h-5 gap-1 hover:bg-muted/70 transition-colors"
                     >
                       {item.statusColor && (
                         <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.statusColor}`} />
@@ -83,7 +83,7 @@ export function RelationshipCard({
               {(viewAllHref || onViewAll) && (
                 <button
                   onClick={handleViewAll}
-                  className="text-[10px] text-primary font-semibold hover:underline"
+                  className="text-[14px] text-primary font-semibold hover:underline"
                 >
                   View all →
                 </button>

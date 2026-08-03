@@ -37,29 +37,29 @@ function StatusDot({ status }: { status: string }) {
 
 function ReadinessBadge({ r }: { r: string }) {
   const cls = r === 'Ready' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : r === 'Partial' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : r === 'Not Ready' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : 'bg-zinc-100 text-zinc-500 border-zinc-200';
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border uppercase ${cls}`}>{r}</span>;
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-semibold border  ${cls}`}>{r}</span>;
 }
 
 function SeverityBadge({ s }: { s: string }) {
   const cls = s === 'Critical' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : s === 'High' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : s === 'Medium' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-zinc-100 text-zinc-500 border-zinc-200';
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold border uppercase ${cls}`}>{s}</span>;
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border  ${cls}`}>{s}</span>;
 }
 
 function CalTypeBadge({ t }: { t: string }) {
   const cls = t === 'Program' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Cohort' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Coaching' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : t === 'Executive' ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : t === 'Client' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : t === 'Office Hours' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Assessment' ? 'bg-cyan-100 text-cyan-700 border-cyan-200' : 'bg-muted text-muted-foreground border-border';
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border uppercase ${cls}`}>{t}</span>;
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-semibold border  ${cls}`}>{t}</span>;
 }
 
 function EventTypeBadge({ t }: { t: string }) {
   const cls = t === 'Cohort Session' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Workshop' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Coaching Session' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : t === 'Office Hours' ? 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]' : t === 'Assessment Window' ? 'bg-cyan-100 text-cyan-700 border-cyan-200' : t === 'Leadership Review' ? 'bg-zinc-100 text-zinc-600 border-zinc-200' : t === 'Penny Reminder' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : t === 'Weekly Brief' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : t === 'Curriculum Deadline' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : 'bg-muted text-muted-foreground border-border';
-  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border uppercase ${cls}`}>{t}</span>;
+  return <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-semibold border  ${cls}`}>{t}</span>;
 }
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex gap-2 py-1.5 border-b border-border/40 last:border-0">
-      <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium w-36 shrink-0">{label}</span>
-      <span className="text-[13px] text-foreground">{value}</span>
+      <span className="text-[14px]  text-muted-foreground font-medium w-36 shrink-0">{label}</span>
+      <span className="text-[14px] text-foreground">{value}</span>
     </div>
   );
 }
@@ -106,8 +106,8 @@ function OverviewTab() {
             <s.icon className={`w-8 h-8 ${s.color} opacity-80`} />
             <div>
               <div className="text-2xl font-bold text-foreground">{s.value}</div>
-              <div className="text-[11px] font-medium text-muted-foreground">{s.label}</div>
-              <div className="text-[10px] text-muted-foreground/70">{s.sub}</div>
+              <div className="text-[14px] font-medium text-muted-foreground">{s.label}</div>
+              <div className="text-[14px] text-muted-foreground/70">{s.sub}</div>
             </div>
           </div>
         ))}
@@ -115,13 +115,13 @@ function OverviewTab() {
 
       {criticals.length > 0 && (
         <div className="bg-[#FBEAE6] border border-[#E8B9B4] rounded-lg p-3">
-          <div className="text-[11px] uppercase tracking-wide text-[#A93F2F] font-semibold mb-2">Critical Blockers</div>
+          <div className="text-[14px]  text-[#A93F2F] font-semibold mb-2">Critical Blockers</div>
           {criticals.map(c => (
             <div key={c.id} className="flex gap-2 items-start mb-2 last:mb-0">
               <XCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
               <div>
-                <div className="text-[12px] font-medium text-[#A93F2F]">{c.title}</div>
-                <div className="text-[11px] text-[#A93F2F]">{c.resolution}</div>
+                <div className="text-[14px] font-medium text-[#A93F2F]">{c.title}</div>
+                <div className="text-[14px] text-[#A93F2F]">{c.resolution}</div>
               </div>
             </div>
           ))}
@@ -129,18 +129,18 @@ function OverviewTab() {
       )}
 
       <div className="bg-card border border-border rounded-lg p-3">
-        <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-3">Integration Readiness by Area</div>
+        <div className="text-[14px]  text-muted-foreground font-semibold mb-3">Integration Readiness by Area</div>
         <div className="space-y-2">
           {readinessAreas.map(a => {
             const pct = Math.round((a.score / a.max) * 100);
             const color = pct >= 70 ? 'bg-[#2F6B3F]' : pct >= 40 ? 'bg-[#FFF3E0]0' : 'bg-[#A93F2F]';
             return (
               <div key={a.label} className="flex items-center gap-3">
-                <div className="text-[12px] text-foreground w-48 shrink-0">{a.label}</div>
+                <div className="text-[14px] text-foreground w-48 shrink-0">{a.label}</div>
                 <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                   <div className={`h-full ${color} rounded-full transition-all`} style={{ width:`${pct}%` }} />
                 </div>
-                <div className="text-[11px] text-muted-foreground w-8 text-right">{pct}%</div>
+                <div className="text-[14px] text-muted-foreground w-8 text-right">{pct}%</div>
               </div>
             );
           })}
@@ -149,19 +149,19 @@ function OverviewTab() {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-card border border-border rounded-lg p-3">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Validation Status</div>
+          <div className="text-[14px]  text-muted-foreground font-semibold mb-2">Validation Status</div>
           <div className="grid grid-cols-4 gap-2">
             {[{ l:'Pass', v: valSummary.pass, c:'text-[#2F6B3F]' },{ l:'Fail', v: valSummary.fail, c:'text-[#A93F2F]' },{ l:'Warning', v: valSummary.warning, c:'text-[#CC8400]' },{ l:'Pending', v: valSummary.pending, c:'text-zinc-400' }].map(s => (
               <div key={s.l} className="text-center">
                 <div className={`text-xl font-bold ${s.c}`}>{s.v}</div>
-                <div className="text-[10px] uppercase text-muted-foreground">{s.l}</div>
+                <div className="text-[14px]  text-muted-foreground">{s.l}</div>
               </div>
             ))}
           </div>
         </div>
         <div className="bg-card border border-border rounded-lg p-3">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Go-Live Blockers</div>
-          <div className="text-[12px] text-foreground space-y-1">
+          <div className="text-[14px]  text-muted-foreground font-semibold mb-2">Go-Live Blockers</div>
+          <div className="text-[14px] text-foreground space-y-1">
             <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-[#A93F2F]" /><span>GOOGLE_CLIENT_ID not configured</span></div>
             <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-[#A93F2F]" /><span>GOOGLE_CLIENT_SECRET not configured</span></div>
             <div className="flex gap-2 items-center"><XCircle className="w-3.5 h-3.5 text-[#A93F2F]" /><span>GOOGLE_CALENDAR_REFRESH_TOKEN missing</span></div>
@@ -184,10 +184,10 @@ function AccountConfigTab() {
     <div className="flex h-full">
       <div className="w-64 border-r border-border flex flex-col">
         <div className="p-3 border-b border-border">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Validation Checks</div>
+          <div className="text-[14px]  text-muted-foreground font-semibold mb-2">Validation Checks</div>
           <div className="grid grid-cols-4 gap-1 text-center">
             {[{ l:'Pass', v:summary.pass, c:'text-[#2F6B3F]' },{ l:'Fail', v:summary.fail, c:'text-[#A93F2F]' },{ l:'Warn', v:summary.warning, c:'text-[#CC8400]' },{ l:'Pend', v:summary.pending, c:'text-zinc-400' }].map(s => (
-              <div key={s.l}><div className={`text-base font-bold ${s.c}`}>{s.v}</div><div className="text-[9px] uppercase text-muted-foreground">{s.l}</div></div>
+              <div key={s.l}><div className={`text-base font-bold ${s.c}`}>{s.v}</div><div className="text-[14px]  text-muted-foreground">{s.l}</div></div>
             ))}
           </div>
         </div>
@@ -197,12 +197,12 @@ function AccountConfigTab() {
             if (!checks.length) return null;
             return (
               <div key={cat}>
-                <div className="px-3 py-1.5 text-[10px] uppercase tracking-wide text-muted-foreground font-semibold bg-muted/30 border-b border-border">{cat}</div>
+                <div className="px-3 py-1.5 text-[14px]  text-muted-foreground font-semibold bg-muted/30 border-b border-border">{cat}</div>
                 {checks.map(c => (
                   <button key={c.id} onClick={() => setSelected(c)}
                     className={`w-full flex items-center gap-2 px-3 py-2.5 text-left border-b border-border/40 hover:bg-accent transition-colors ${selected?.id === c.id ? 'bg-primary text-primary-foreground' : ''}`}>
                     <CheckIcon status={c.status} />
-                    <span className={`text-[12px] font-medium line-clamp-2 ${selected?.id === c.id ? 'text-primary-foreground' : 'text-foreground'}`}>{c.label}</span>
+                    <span className={`text-[14px] font-medium line-clamp-2 ${selected?.id === c.id ? 'text-primary-foreground' : 'text-foreground'}`}>{c.label}</span>
                   </button>
                 ))}
               </div>
@@ -217,19 +217,19 @@ function AccountConfigTab() {
               <CheckIcon status={selected.status} />
               <div>
                 <div className="text-[16px] font-semibold text-foreground">{selected.label}</div>
-                <div className="text-[11px] text-muted-foreground">{selected.category} · {selected.status.toUpperCase()}</div>
+                <div className="text-[14px] text-muted-foreground">{selected.category} · {selected.status.toUpperCase()}</div>
               </div>
             </div>
             <div className="bg-card border border-border rounded-lg divide-y divide-border/40">
               <InfoRow label="Status"     value={<CheckIcon status={selected.status} />} />
               <InfoRow label="Category"   value={selected.category} />
-              <InfoRow label="Detail"     value={<span className="text-[12px]">{selected.detail}</span>} />
-              <InfoRow label="Impact"     value={<span className="text-[12px] text-[#CC8400]">{selected.impact}</span>} />
-              {selected.fix && <InfoRow label="Resolution" value={<span className="text-[12px] text-[#2F6B3F]">{selected.fix}</span>} />}
+              <InfoRow label="Detail"     value={<span className="text-[14px]">{selected.detail}</span>} />
+              <InfoRow label="Impact"     value={<span className="text-[14px] text-[#CC8400]">{selected.impact}</span>} />
+              {selected.fix && <InfoRow label="Resolution" value={<span className="text-[14px] text-[#2F6B3F]">{selected.fix}</span>} />}
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full text-[13px] text-muted-foreground">Select a check to view details</div>
+          <div className="flex items-center justify-center h-full text-[14px] text-muted-foreground">Select a check to view details</div>
         )}
       </div>
     </div>
@@ -265,23 +265,23 @@ function CalendarRegistryTab() {
               <ReadinessBadge r={cal.readiness} />
             </div>
             <div className="bg-card border border-border rounded-lg divide-y divide-border/40">
-              <InfoRow label="Purpose"    value={<span className="text-[12px]">{cal.purpose}</span>} />
+              <InfoRow label="Purpose"    value={<span className="text-[14px]">{cal.purpose}</span>} />
               <InfoRow label="Owner"      value={cal.owner} />
               <InfoRow label="Visibility" value={cal.visibility} />
               <InfoRow label="Status"     value={<><StatusDot status={cal.status} />{cal.status}</>} />
               <InfoRow label="Events"     value={`${cal.activeEventCount} active · ${cal.eventCount} total`} />
               <InfoRow label="Programs"   value={cal.programIds.length > 0 ? cal.programIds.join(', ') : 'Cross-program'} />
-              <InfoRow label="Calendar ID" value={cal.googleCalendarId ? <span className="font-mono text-[11px]">{cal.googleCalendarId}</span> : <span className="text-[#CC8400]">Not yet connected</span>} />
+              <InfoRow label="Calendar ID" value={cal.googleCalendarId ? <span className="font-mono text-[14px]">{cal.googleCalendarId}</span> : <span className="text-[#CC8400]">Not yet connected</span>} />
             </div>
             {cal.subCalendars && cal.subCalendars.length > 0 && (
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-1.5">Sub-Calendars</div>
+                <div className="text-[14px]  text-muted-foreground font-semibold mb-1.5">Sub-Calendars</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {cal.subCalendars.map(sc => <span key={sc} className="px-2 py-0.5 rounded text-[11px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">{sc}</span>)}
+                  {cal.subCalendars.map(sc => <span key={sc} className="px-2 py-0.5 rounded text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">{sc}</span>)}
                 </div>
               </div>
             )}
-            <div className="text-[11px] text-muted-foreground">{cal.notes}</div>
+            <div className="text-[14px] text-muted-foreground">{cal.notes}</div>
           </div>
         );
       },
@@ -296,18 +296,18 @@ function CalendarRegistryTab() {
         return (
           <div className="p-1 space-y-2">
             {events.length === 0 ? (
-              <div className="text-[12px] text-muted-foreground">No catalogued events for this calendar.</div>
+              <div className="text-[14px] text-muted-foreground">No catalogued events for this calendar.</div>
             ) : (
               events.map(e => (
                 <div key={e.id} className="bg-card border border-border rounded-lg p-2.5">
                   <div className="flex items-center gap-2 mb-1">
                     <StatusDot status={e.status} />
-                    <span className="text-[12px] font-medium text-foreground">{e.title}</span>
+                    <span className="text-[14px] font-medium text-foreground">{e.title}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <EventTypeBadge t={e.eventType} />
-                    <span className="text-[11px] text-muted-foreground">{e.frequency} · {e.duration}</span>
-                    {e.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
+                    <span className="text-[14px] text-muted-foreground">{e.frequency} · {e.duration}</span>
+                    {e.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
                   </div>
                 </div>
               ))
@@ -347,7 +347,7 @@ function EventCatalogTab() {
           <div className="space-y-3 p-1">
             <div className="flex items-center gap-2">
               <EventTypeBadge t={ev.eventType} />
-              {ev.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] font-semibold uppercase">{TERMS.aiAssistant} Enabled</span>}
+              {ev.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6] font-semibold ">{TERMS.aiAssistant} Enabled</span>}
             </div>
             <div className="bg-card border border-border rounded-lg divide-y divide-border/40">
               <InfoRow label="Program"     value={ev.programName} />
@@ -360,10 +360,10 @@ function EventCatalogTab() {
               <InfoRow label="Timezone"    value={ev.timezone} />
               <InfoRow label="Attendees"   value={`${ev.attendeeCount} · ${ev.attendeeRoles.join(', ')}`} />
               <InfoRow label="Next"        value={ev.nextOccurrence} />
-              {ev.slackChannel   && <InfoRow label="Slack Channel"  value={<span className="font-mono text-[11px]">{ev.slackChannel}</span>} />}
-              {ev.driveResourceId && <InfoRow label="Drive Resource" value={<span className="font-mono text-[11px]">{ev.driveResourceId}</span>} />}
+              {ev.slackChannel   && <InfoRow label="Slack Channel"  value={<span className="font-mono text-[14px]">{ev.slackChannel}</span>} />}
+              {ev.driveResourceId && <InfoRow label="Drive Resource" value={<span className="font-mono text-[14px]">{ev.driveResourceId}</span>} />}
             </div>
-            <div className="text-[11px] text-muted-foreground">{ev.notes}</div>
+            <div className="text-[14px] text-muted-foreground">{ev.notes}</div>
           </div>
         );
       },
@@ -381,25 +381,25 @@ function EventCatalogTab() {
           <div className="p-1 space-y-3">
             {mapping ? (
               <>
-                {mapping.sprintLink          && <div><span className="text-[11px] text-muted-foreground font-medium">Sprint: </span><span className="text-[12px]">{mapping.sprintLink}</span></div>}
-                {mapping.moduleLink          && <div><span className="text-[11px] text-muted-foreground font-medium">Module: </span><span className="text-[12px]">{mapping.moduleLink}</span></div>}
-                {mapping.assessmentLink      && <div><span className="text-[11px] text-muted-foreground font-medium">Assessment: </span><span className="text-[12px]">{mapping.assessmentLink}</span></div>}
-                {mapping.salesforceObjectLink && <div><span className="text-[11px] text-muted-foreground font-medium">Salesforce: </span><span className="text-[12px]">{mapping.salesforceObjectLink}</span></div>}
-                {mapping.driveResourceLink   && <div><span className="text-[11px] text-muted-foreground font-medium">Drive: </span><span className="text-[12px]">{mapping.driveResourceLink}</span></div>}
-                {mapping.pennyCapabilityLink && <div><span className="text-[11px] text-muted-foreground font-medium">Penny Capability: </span><span className="text-[12px] text-[#2F6F7E]">{mapping.pennyCapabilityLink}</span></div>}
-                {mapping.promptTemplateLink  && <div><span className="text-[11px] text-muted-foreground font-medium">Prompt Template: </span><span className="text-[12px]">{mapping.promptTemplateLink}</span></div>}
-                {mapping.slackChannelLink    && <div><span className="text-[11px] text-muted-foreground font-medium">Slack: </span><span className="font-mono text-[12px]">{mapping.slackChannelLink}</span></div>}
+                {mapping.sprintLink          && <div><span className="text-[14px] text-muted-foreground font-medium">Sprint: </span><span className="text-[14px]">{mapping.sprintLink}</span></div>}
+                {mapping.moduleLink          && <div><span className="text-[14px] text-muted-foreground font-medium">Module: </span><span className="text-[14px]">{mapping.moduleLink}</span></div>}
+                {mapping.assessmentLink      && <div><span className="text-[14px] text-muted-foreground font-medium">Assessment: </span><span className="text-[14px]">{mapping.assessmentLink}</span></div>}
+                {mapping.salesforceObjectLink && <div><span className="text-[14px] text-muted-foreground font-medium">Salesforce: </span><span className="text-[14px]">{mapping.salesforceObjectLink}</span></div>}
+                {mapping.driveResourceLink   && <div><span className="text-[14px] text-muted-foreground font-medium">Drive: </span><span className="text-[14px]">{mapping.driveResourceLink}</span></div>}
+                {mapping.pennyCapabilityLink && <div><span className="text-[14px] text-muted-foreground font-medium">Penny Capability: </span><span className="text-[14px] text-[#2F6F7E]">{mapping.pennyCapabilityLink}</span></div>}
+                {mapping.promptTemplateLink  && <div><span className="text-[14px] text-muted-foreground font-medium">Prompt Template: </span><span className="text-[14px]">{mapping.promptTemplateLink}</span></div>}
+                {mapping.slackChannelLink    && <div><span className="text-[14px] text-muted-foreground font-medium">Slack: </span><span className="font-mono text-[14px]">{mapping.slackChannelLink}</span></div>}
                 {mapping.people && mapping.people.length > 0 && (
                   <div>
-                    <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-1.5">People</div>
+                    <div className="text-[14px]  text-muted-foreground font-semibold mb-1.5">People</div>
                     <div className="flex flex-wrap gap-1.5">
-                      {mapping.people.map(p => <span key={p} className="px-2 py-0.5 rounded text-[11px] bg-muted border border-border text-muted-foreground">{p}</span>)}
+                      {mapping.people.map(p => <span key={p} className="px-2 py-0.5 rounded text-[14px] bg-muted border border-border text-muted-foreground">{p}</span>)}
                     </div>
                   </div>
                 )}
               </>
             ) : (
-              <div className="text-[12px] text-muted-foreground">No detailed object mappings defined for this event.</div>
+              <div className="text-[14px] text-muted-foreground">No detailed object mappings defined for this event.</div>
             )}
           </div>
         );
@@ -423,14 +423,14 @@ function ProgramCohortMappingTab() {
   return (
     <div className="flex h-full">
       <div className="w-52 border-r border-border flex flex-col">
-        <div className="p-3 border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Programs</div>
+        <div className="p-3 border-b border-border text-[14px]  text-muted-foreground font-semibold">Programs</div>
         <div className="flex-1 overflow-auto">
           {PROGRAM_EVENT_MAPPINGS.map(m => (
             <button key={m.programId} onClick={() => { setSelectedProgramId(m.programId); setSelectedEventId(m.events[0]?.eventId ?? ''); }}
               className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selectedProgramId === m.programId ? 'bg-primary text-primary-foreground' : ''}`}>
               <div>
-                <div className={`text-[12px] font-semibold ${selectedProgramId === m.programId ? 'text-primary-foreground' : 'text-foreground'}`}>{m.programName}</div>
-                <div className={`text-[11px] ${selectedProgramId === m.programId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{m.events.length} events · {m.calendarIds.length} calendars</div>
+                <div className={`text-[14px] font-semibold ${selectedProgramId === m.programId ? 'text-primary-foreground' : 'text-foreground'}`}>{m.programName}</div>
+                <div className={`text-[14px] ${selectedProgramId === m.programId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{m.events.length} events · {m.calendarIds.length} calendars</div>
               </div>
             </button>
           ))}
@@ -438,7 +438,7 @@ function ProgramCohortMappingTab() {
       </div>
       {program && (
         <div className="w-56 border-r border-border flex flex-col">
-          <div className="p-3 border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Events</div>
+          <div className="p-3 border-b border-border text-[14px]  text-muted-foreground font-semibold">Events</div>
           <ScrollArea className="flex-1">
             {program.events.map(e => {
               const full = CALENDAR_EVENTS.find(ev => ev.id === e.eventId);
@@ -446,9 +446,9 @@ function ProgramCohortMappingTab() {
                 <button key={e.eventId} onClick={() => setSelectedEventId(e.eventId)}
                   className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selectedEventId === e.eventId ? 'bg-accent' : ''}`}>
                   <div className="min-w-0">
-                    <div className="text-[11px] font-medium text-foreground line-clamp-2">{e.eventTitle}</div>
+                    <div className="text-[14px] font-medium text-foreground line-clamp-2">{e.eventTitle}</div>
                     <EventTypeBadge t={e.eventType} />
-                    {full && <div className="text-[10px] text-muted-foreground mt-0.5">{full.frequency}</div>}
+                    {full && <div className="text-[14px] text-muted-foreground mt-0.5">{full.frequency}</div>}
                   </div>
                 </button>
               );
@@ -463,31 +463,31 @@ function ProgramCohortMappingTab() {
               <div className="text-[14px] font-semibold text-foreground">{eventFull.title}</div>
               <div className="flex items-center gap-2 mt-1">
                 <EventTypeBadge t={eventFull.eventType} />
-                {eventFull.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
+                {eventFull.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
               </div>
             </div>
             <div className="space-y-1.5">
-              {event.sprintLink          && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Sprint</span><span className="text-[12px] text-foreground">{event.sprintLink}</span></div>}
-              {event.moduleLink          && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Module</span><span className="text-[12px] text-foreground">{event.moduleLink}</span></div>}
-              {event.assessmentLink      && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Assessment</span><span className="text-[12px] text-foreground">{event.assessmentLink}</span></div>}
-              {event.salesforceObjectLink && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Salesforce</span><span className="text-[12px] text-foreground">{event.salesforceObjectLink}</span></div>}
-              {event.driveResourceLink   && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Drive Resource</span><span className="text-[12px] text-foreground">{event.driveResourceLink}</span></div>}
-              {event.slackChannelLink    && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Slack Channel</span><span className="font-mono text-[12px] text-foreground">{event.slackChannelLink}</span></div>}
-              {event.pennyCapabilityLink && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Penny Cap.</span><span className="text-[12px] text-[#2F6F7E]">{event.pennyCapabilityLink}</span></div>}
-              {event.promptTemplateLink  && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Prompt Template</span><span className="text-[12px] text-foreground">{event.promptTemplateLink}</span></div>}
-              {event.chatSpaceLink       && <div className="flex gap-2"><span className="text-[11px] text-muted-foreground w-28">Chat Space</span><span className="text-[12px] text-foreground">{event.chatSpaceLink}</span></div>}
+              {event.sprintLink          && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Sprint</span><span className="text-[14px] text-foreground">{event.sprintLink}</span></div>}
+              {event.moduleLink          && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Module</span><span className="text-[14px] text-foreground">{event.moduleLink}</span></div>}
+              {event.assessmentLink      && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Assessment</span><span className="text-[14px] text-foreground">{event.assessmentLink}</span></div>}
+              {event.salesforceObjectLink && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Salesforce</span><span className="text-[14px] text-foreground">{event.salesforceObjectLink}</span></div>}
+              {event.driveResourceLink   && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Drive Resource</span><span className="text-[14px] text-foreground">{event.driveResourceLink}</span></div>}
+              {event.slackChannelLink    && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Slack Channel</span><span className="font-mono text-[14px] text-foreground">{event.slackChannelLink}</span></div>}
+              {event.pennyCapabilityLink && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Penny Cap.</span><span className="text-[14px] text-[#2F6F7E]">{event.pennyCapabilityLink}</span></div>}
+              {event.promptTemplateLink  && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Prompt Template</span><span className="text-[14px] text-foreground">{event.promptTemplateLink}</span></div>}
+              {event.chatSpaceLink       && <div className="flex gap-2"><span className="text-[14px] text-muted-foreground w-28">Chat Space</span><span className="text-[14px] text-foreground">{event.chatSpaceLink}</span></div>}
             </div>
             {event.people && event.people.length > 0 && (
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-1.5">People</div>
+                <div className="text-[14px]  text-muted-foreground font-semibold mb-1.5">People</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {event.people.map(p => <span key={p} className="px-2 py-0.5 rounded text-[11px] bg-muted border border-border">{p}</span>)}
+                  {event.people.map(p => <span key={p} className="px-2 py-0.5 rounded text-[14px] bg-muted border border-border">{p}</span>)}
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full text-[13px] text-muted-foreground">Select a program and event</div>
+          <div className="flex items-center justify-center h-full text-[14px] text-muted-foreground">Select a program and event</div>
         )}
       </ScrollArea>
     </div>
@@ -502,7 +502,7 @@ function RolePeopleMappingTab() {
   return (
     <div className="flex h-full">
       <div className="w-64 border-r border-border flex flex-col">
-        <div className="p-3 border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+        <div className="p-3 border-b border-border text-[14px]  text-muted-foreground font-semibold">
           {ROLE_PEOPLE_MAPPINGS.length} roles · {ROLE_PEOPLE_MAPPINGS.reduce((s, r) => s + r.peopleCount, 0)} people
         </div>
         <ScrollArea className="flex-1">
@@ -511,9 +511,9 @@ function RolePeopleMappingTab() {
               className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selected.roleId === r.roleId ? 'bg-primary text-primary-foreground' : ''}`}>
               <Users className={`w-4 h-4 shrink-0 mt-0.5 ${selected.roleId === r.roleId ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
               <div className="min-w-0">
-                <div className={`text-[12px] font-semibold ${selected.roleId === r.roleId ? 'text-primary-foreground' : 'text-foreground'}`}>{r.roleName}</div>
-                <div className={`text-[11px] ${selected.roleId === r.roleId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{r.peopleCount} people · {r.pennyPersona}</div>
-                <div className={`text-[10px] mt-0.5 ${selected.roleId === r.roleId ? 'text-primary-foreground/60' : 'text-muted-foreground/60'}`}>{r.eventTypes.length} event types</div>
+                <div className={`text-[14px] font-semibold ${selected.roleId === r.roleId ? 'text-primary-foreground' : 'text-foreground'}`}>{r.roleName}</div>
+                <div className={`text-[14px] ${selected.roleId === r.roleId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{r.peopleCount} people · {r.pennyPersona}</div>
+                <div className={`text-[14px] mt-0.5 ${selected.roleId === r.roleId ? 'text-primary-foreground/60' : 'text-muted-foreground/60'}`}>{r.eventTypes.length} event types</div>
               </div>
             </button>
           ))}
@@ -525,46 +525,46 @@ function RolePeopleMappingTab() {
             <Users className="w-5 h-5 text-muted-foreground" />
             <div>
               <div className="text-[15px] font-semibold text-foreground">{selected.roleName}</div>
-              <div className="text-[12px] text-muted-foreground">{TERMS.aiAssistant} Persona: <span className="font-medium text-foreground">{selected.pennyPersona}</span> · {selected.peopleCount} people</div>
+              <div className="text-[14px] text-muted-foreground">{TERMS.aiAssistant} Persona: <span className="font-medium text-foreground">{selected.pennyPersona}</span> · {selected.peopleCount} people</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[{ label:'Event Types', items: selected.eventTypes },{ label:'Owns', items: selected.ownership }].map(g => (
               <div key={g.label} className="bg-card border border-border rounded-lg p-3">
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">{g.label}</div>
+                <div className="text-[14px]  text-muted-foreground font-semibold mb-2">{g.label}</div>
                 {g.items.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {g.items.map(i => <span key={i} className="px-1.5 py-0.5 rounded text-[11px] bg-muted border border-border text-muted-foreground">{i}</span>)}
+                    {g.items.map(i => <span key={i} className="px-1.5 py-0.5 rounded text-[14px] bg-muted border border-border text-muted-foreground">{i}</span>)}
                   </div>
-                ) : <div className="text-[11px] text-muted-foreground/60">None</div>}
+                ) : <div className="text-[14px] text-muted-foreground/60">None</div>}
               </div>
             ))}
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[{ label:'Attends', items: selected.attendance },{ label:'Facilitates', items: selected.facilitation }].map(g => (
               <div key={g.label} className="bg-card border border-border rounded-lg p-3">
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">{g.label}</div>
+                <div className="text-[14px]  text-muted-foreground font-semibold mb-2">{g.label}</div>
                 {g.items.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {g.items.map(i => <span key={i} className="px-1.5 py-0.5 rounded text-[11px] bg-muted border border-border text-muted-foreground">{i}</span>)}
+                    {g.items.map(i => <span key={i} className="px-1.5 py-0.5 rounded text-[14px] bg-muted border border-border text-muted-foreground">{i}</span>)}
                   </div>
-                ) : <div className="text-[11px] text-muted-foreground/60">None</div>}
+                ) : <div className="text-[14px] text-muted-foreground/60">None</div>}
               </div>
             ))}
           </div>
           <div className="bg-card border border-border rounded-lg p-3">
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">{TERMS.aiAssistant} Reminder Types</div>
+            <div className="text-[14px]  text-muted-foreground font-semibold mb-2">{TERMS.aiAssistant} Reminder Types</div>
             {selected.reminderTypes.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
-                {selected.reminderTypes.map(r => <span key={r} className="px-2 py-0.5 rounded text-[11px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">{r}</span>)}
+                {selected.reminderTypes.map(r => <span key={r} className="px-2 py-0.5 rounded text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">{r}</span>)}
               </div>
-            ) : <div className="text-[11px] text-muted-foreground/60">No reminders configured</div>}
+            ) : <div className="text-[14px] text-muted-foreground/60">No reminders configured</div>}
           </div>
           {selected.dependencies.length > 0 && (
             <div className="bg-card border border-border rounded-lg p-3">
-              <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">System Dependencies</div>
+              <div className="text-[14px]  text-muted-foreground font-semibold mb-2">System Dependencies</div>
               <div className="flex flex-wrap gap-1.5">
-                {selected.dependencies.map(d => <span key={d} className="px-2 py-0.5 rounded text-[11px] bg-muted border border-border font-mono text-muted-foreground">{d}</span>)}
+                {selected.dependencies.map(d => <span key={d} className="px-2 py-0.5 rounded text-[14px] bg-muted border border-border font-mono text-muted-foreground">{d}</span>)}
               </div>
             </div>
           )}
@@ -584,7 +584,7 @@ function PennySchedulingTab() {
   return (
     <div className="flex h-full">
       <div className="w-64 border-r border-border flex flex-col">
-        <div className="p-3 border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+        <div className="p-3 border-b border-border text-[14px]  text-muted-foreground font-semibold">
           {PENNY_SCHEDULING_CAPABILITIES.length} scheduling capabilities
         </div>
         <ScrollArea className="flex-1">
@@ -593,8 +593,8 @@ function PennySchedulingTab() {
               className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selected.capabilityId === cap.capabilityId ? 'bg-primary text-primary-foreground' : ''}`}>
               <Brain className={`w-4 h-4 shrink-0 mt-0.5 ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground' : 'text-[#2F6F7E]'}`} />
               <div className="min-w-0">
-                <div className={`text-[12px] font-semibold truncate ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground' : 'text-foreground'}`}>{cap.capabilityName}</div>
-                <div className={`text-[11px] ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{cap.triggerType} · {cap.status}</div>
+                <div className={`text-[14px] font-semibold truncate ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground' : 'text-foreground'}`}>{cap.capabilityName}</div>
+                <div className={`text-[14px] ${selected.capabilityId === cap.capabilityId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{cap.triggerType} · {cap.status}</div>
                 <div className="mt-0.5"><ReadinessBadge r={cap.readiness} /></div>
               </div>
             </button>
@@ -608,9 +608,9 @@ function PennySchedulingTab() {
             <div>
               <div className="text-[15px] font-semibold text-foreground">{selected.capabilityName}</div>
               <div className="flex items-center gap-2 mt-1">
-                <span className={`px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${triggerColor(selected.triggerType)}`}>{selected.triggerType}</span>
+                <span className={`px-1.5 py-0.5 rounded border text-[14px] font-semibold  ${triggerColor(selected.triggerType)}`}>{selected.triggerType}</span>
                 <ReadinessBadge r={selected.readiness} />
-                <span className="px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase bg-muted border-border text-muted-foreground">{selected.status}</span>
+                <span className="px-1.5 py-0.5 rounded border text-[14px] font-semibold  bg-muted border-border text-muted-foreground">{selected.status}</span>
               </div>
             </div>
           </div>
@@ -619,18 +619,18 @@ function PennySchedulingTab() {
             <InfoRow label="Trigger"      value={selected.triggerOffset} />
             <InfoRow label="Target Roles" value={selected.targetRoles.join(', ')} />
             <InfoRow label="Event Types"  value={selected.targetEventTypes.join(', ')} />
-            {selected.slackDelivery  && <InfoRow label="Slack Delivery" value={<span className="font-mono text-[11px]">{selected.slackDelivery}</span>} />}
+            {selected.slackDelivery  && <InfoRow label="Slack Delivery" value={<span className="font-mono text-[14px]">{selected.slackDelivery}</span>} />}
             {selected.driveSource    && <InfoRow label="Drive Source"   value={selected.driveSource} />}
           </div>
           {selected.blockReason && (
             <div className="bg-[#FFF3E0] border border-[#FFD08A] rounded-lg p-3">
-              <div className="text-[11px] uppercase tracking-wide text-[#CC8400] font-semibold mb-1">Blocker</div>
-              <div className="text-[12px] text-[#CC8400]">{selected.blockReason}</div>
+              <div className="text-[14px]  text-[#CC8400] font-semibold mb-1">Blocker</div>
+              <div className="text-[14px] text-[#CC8400]">{selected.blockReason}</div>
             </div>
           )}
           <div className="bg-muted/30 border border-border rounded-lg p-3">
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-1.5">Example Output</div>
-            <div className="text-[12px] text-foreground font-mono bg-card border border-border rounded p-2.5">{selected.exampleOutput}</div>
+            <div className="text-[14px]  text-muted-foreground font-semibold mb-1.5">Example Output</div>
+            <div className="text-[14px] text-foreground font-mono bg-card border border-border rounded p-2.5">{selected.exampleOutput}</div>
           </div>
         </div>
       </ScrollArea>
@@ -649,7 +649,7 @@ function CommMappingTab() {
   return (
     <div className="flex h-full">
       <div className="w-64 border-r border-border flex flex-col">
-        <div className="p-3 border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+        <div className="p-3 border-b border-border text-[14px]  text-muted-foreground font-semibold">
           {CAL_COMM_MAPPINGS.length} calendars mapped
         </div>
         <ScrollArea className="flex-1">
@@ -661,15 +661,15 @@ function CommMappingTab() {
                 className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selectedCalId === m.calendarId ? 'bg-primary text-primary-foreground' : ''}`}>
                 <CalendarDays className={`w-4 h-4 shrink-0 mt-0.5 ${selectedCalId === m.calendarId ? 'text-primary-foreground' : 'text-[#2F6F7E]'}`} />
                 <div className="min-w-0">
-                  <div className={`text-[12px] font-semibold truncate ${selectedCalId === m.calendarId ? 'text-primary-foreground' : 'text-foreground'}`}>{m.calendarName}</div>
-                  <div className={`text-[11px] ${selectedCalId === m.calendarId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{channels} channel{channels !== 1 ? 's' : ''} linked</div>
+                  <div className={`text-[14px] font-semibold truncate ${selectedCalId === m.calendarId ? 'text-primary-foreground' : 'text-foreground'}`}>{m.calendarName}</div>
+                  <div className={`text-[14px] ${selectedCalId === m.calendarId ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{channels} channel{channels !== 1 ? 's' : ''} linked</div>
                   {cal && <CalTypeBadge t={cal.calendarType} />}
                 </div>
               </button>
             );
           })}
         </ScrollArea>
-        <div className="p-3 border-t border-border bg-muted/20 text-[10px] text-muted-foreground">
+        <div className="p-3 border-t border-border bg-muted/20 text-[14px] text-muted-foreground">
           {TRAIL_CALENDARS.length - CAL_COMM_MAPPINGS.length} calendars have no channel mappings
         </div>
       </div>
@@ -679,20 +679,20 @@ function CommMappingTab() {
             <div className="text-[15px] font-semibold text-foreground">{mapping.calendarName}</div>
             {mapping.slackChannels.length > 0 && (
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Slack Channels ({mapping.slackChannels.length})</div>
+                <div className="text-[14px]  text-muted-foreground font-semibold mb-2">Slack Channels ({mapping.slackChannels.length})</div>
                 {mapping.slackChannels.map((ch, i) => (
                   <div key={i} className="bg-card border border-border rounded-lg p-3 mb-2">
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
                         <Hash className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-mono text-[13px] font-medium text-foreground">{ch.channel}</span>
+                        <span className="font-mono text-[14px] font-medium text-foreground">{ch.channel}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        {ch.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
-                        <span className={`px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${statusColor(ch.status)}`}>{ch.status}</span>
+                        {ch.pennyEnabled && <span className="px-1.5 py-0.5 rounded text-[14px] bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">Penny</span>}
+                        <span className={`px-1.5 py-0.5 rounded border text-[14px] font-semibold  ${statusColor(ch.status)}`}>{ch.status}</span>
                       </div>
                     </div>
-                    <div className="text-[12px] text-muted-foreground mb-1.5">{ch.purpose}</div>
+                    <div className="text-[14px] text-muted-foreground mb-1.5">{ch.purpose}</div>
                     <div className="flex flex-wrap gap-1">
                       {ch.eventTypes.map(et => <EventTypeBadge key={et} t={et} />)}
                     </div>
@@ -702,24 +702,24 @@ function CommMappingTab() {
             )}
             {mapping.chatSpaces.length > 0 && (
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Google Chat Spaces ({mapping.chatSpaces.length})</div>
+                <div className="text-[14px]  text-muted-foreground font-semibold mb-2">Google Chat Spaces ({mapping.chatSpaces.length})</div>
                 {mapping.chatSpaces.map((sp, i) => (
                   <div key={i} className="bg-card border border-border rounded-lg p-3 mb-2">
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
                         <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-[13px] font-medium text-foreground">{sp.channel}</span>
+                        <span className="text-[14px] font-medium text-foreground">{sp.channel}</span>
                       </div>
-                      <span className={`px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase ${statusColor(sp.status)}`}>{sp.status}</span>
+                      <span className={`px-1.5 py-0.5 rounded border text-[14px] font-semibold  ${statusColor(sp.status)}`}>{sp.status}</span>
                     </div>
-                    <div className="text-[12px] text-muted-foreground">{sp.purpose}</div>
+                    <div className="text-[14px] text-muted-foreground">{sp.purpose}</div>
                   </div>
                 ))}
               </div>
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full text-[13px] text-muted-foreground">Select a calendar to view communication mappings</div>
+          <div className="flex items-center justify-center h-full text-[14px] text-muted-foreground">Select a calendar to view communication mappings</div>
         )}
       </ScrollArea>
     </div>
@@ -741,13 +741,13 @@ function GovernanceTab() {
         {[{ l:'Critical', v:summary.critical, c:'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },{ l:'High', v:summary.high, c:'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },{ l:'Medium', v:summary.medium, c:'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },{ l:'Low', v:summary.low, c:'text-zinc-500 bg-zinc-50 border-zinc-200' }].map(s => (
           <div key={s.l} className={`rounded-lg border p-3 text-center ${s.c}`}>
             <div className="text-2xl font-bold">{s.v}</div>
-            <div className="text-[11px] uppercase font-semibold">{s.l}</div>
+            <div className="text-[14px]  font-semibold">{s.l}</div>
           </div>
         ))}
       </div>
       <div className="flex items-center gap-2">
         {['All','Critical','High','Medium','Low'].map(f => (
-          <button key={f} onClick={() => setFilter(f)} className={`px-2.5 py-1 rounded text-[12px] font-medium transition-colors ${filter === f ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>{f}</button>
+          <button key={f} onClick={() => setFilter(f)} className={`px-2.5 py-1 rounded text-[14px] font-medium transition-colors ${filter === f ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-accent'}`}>{f}</button>
         ))}
       </div>
       <div className="space-y-2">
@@ -757,23 +757,23 @@ function GovernanceTab() {
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
                 <SeverityBadge s={issue.severity} />
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-muted border border-border text-muted-foreground uppercase">{issue.category}</span>
-                <span className="text-[13px] font-medium text-foreground">{issue.title}</span>
+                <span className="px-1.5 py-0.5 rounded text-[14px] font-semibold bg-muted border border-border text-muted-foreground ">{issue.category}</span>
+                <span className="text-[14px] font-medium text-foreground">{issue.title}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`text-[11px] font-medium ${issue.status === 'Open' ? 'text-[#A93F2F]' : issue.status === 'In Progress' ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`}>{issue.status}</span>
+                <span className={`text-[14px] font-medium ${issue.status === 'Open' ? 'text-[#A93F2F]' : issue.status === 'In Progress' ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`}>{issue.status}</span>
                 <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${selected?.id === issue.id ? 'rotate-90' : ''}`} />
               </div>
             </div>
             {selected?.id === issue.id && (
               <div className="mt-2 pt-2 border-t border-border space-y-2">
-                <div className="text-[12px] text-foreground">{issue.detail}</div>
+                <div className="text-[14px] text-foreground">{issue.detail}</div>
                 {issue.affectedObjects.length > 0 && (
-                  <div><span className="text-[11px] text-muted-foreground font-medium">Affected: </span><span className="text-[11px] text-foreground">{issue.affectedObjects.join(', ')}</span></div>
+                  <div><span className="text-[14px] text-muted-foreground font-medium">Affected: </span><span className="text-[14px] text-foreground">{issue.affectedObjects.join(', ')}</span></div>
                 )}
                 <div className="bg-[#E6F0EA] border border-[#9FC3AE] rounded p-2">
-                  <span className="text-[11px] font-medium text-[#2F6B3F]">Resolution: </span>
-                  <span className="text-[11px] text-[#2F6B3F]">{issue.resolution}</span>
+                  <span className="text-[14px] font-medium text-[#2F6B3F]">Resolution: </span>
+                  <span className="text-[14px] text-[#2F6B3F]">{issue.resolution}</span>
                 </div>
               </div>
             )}
@@ -799,8 +799,8 @@ function TestSuiteTab() {
     <div className="flex h-full">
       <div className="w-64 border-r border-border flex flex-col">
         <div className="p-3 border-b border-border">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-1">Test Suites</div>
-          <div className="text-[11px] text-muted-foreground">{overall.pass}/{overall.total} passing · {overall.pct}%</div>
+          <div className="text-[14px]  text-muted-foreground font-semibold mb-1">Test Suites</div>
+          <div className="text-[14px] text-muted-foreground">{overall.pass}/{overall.total} passing · {overall.pct}%</div>
         </div>
         <ScrollArea className="flex-1">
           {CAL_TEST_SUITES.map(suite => {
@@ -810,8 +810,8 @@ function TestSuiteTab() {
               <button key={suite.id} onClick={() => setSelected(suite)}
                 className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selected.id === suite.id ? 'bg-primary text-primary-foreground' : ''}`}>
                 <div className="min-w-0 flex-1">
-                  <div className={`text-[12px] font-semibold ${selected.id === suite.id ? 'text-primary-foreground' : 'text-foreground'}`}>{suite.name}</div>
-                  <div className={`text-[11px] ${selected.id === suite.id ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{pass}/{suite.tests.length} passing · {pct}%</div>
+                  <div className={`text-[14px] font-semibold ${selected.id === suite.id ? 'text-primary-foreground' : 'text-foreground'}`}>{suite.name}</div>
+                  <div className={`text-[14px] ${selected.id === suite.id ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{pass}/{suite.tests.length} passing · {pct}%</div>
                   <div className="mt-1 h-1 bg-muted/40 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${selected.id === suite.id ? 'bg-primary-foreground/70' : pct === 100 ? 'bg-[#2F6B3F]' : pct >= 50 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`} style={{ width:`${pct}%` }} />
                   </div>
@@ -825,18 +825,18 @@ function TestSuiteTab() {
         <div className="space-y-3">
           <div>
             <div className="text-[15px] font-semibold text-foreground">{selected.name}</div>
-            <div className="text-[12px] text-muted-foreground mt-0.5">{selected.description}</div>
+            <div className="text-[14px] text-muted-foreground mt-0.5">{selected.description}</div>
           </div>
           {selected.tests.map(test => (
             <div key={test.id} className="bg-card border border-border rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
                 <CheckIcon status={test.status} />
-                <span className="text-[13px] font-medium text-foreground">{test.name}</span>
-                <span className={`ml-auto px-1.5 py-0.5 rounded text-[10px] font-bold uppercase border ${test.status === 'pass' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : test.status === 'fail' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : test.status === 'blocked' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4] opacity-70' : test.status === 'warning' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}>{test.status}</span>
+                <span className="text-[14px] font-medium text-foreground">{test.name}</span>
+                <span className={`ml-auto px-1.5 py-0.5 rounded text-[14px] font-bold  border ${test.status === 'pass' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : test.status === 'fail' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]' : test.status === 'blocked' ? 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4] opacity-70' : test.status === 'warning' ? 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}>{test.status}</span>
               </div>
-              <div className="text-[11px] text-muted-foreground">{test.description}</div>
-              <div className={`mt-1 text-[11px] italic ${test.status === 'pass' ? 'text-[#2F6B3F]' : test.status === 'fail' ? 'text-[#A93F2F]' : test.status === 'blocked' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>{test.result}</div>
-              {test.blockedBy && <div className="mt-1 text-[10px] text-[#A93F2F]">Blocked by: {test.blockedBy}</div>}
+              <div className="text-[14px] text-muted-foreground">{test.description}</div>
+              <div className={`mt-1 text-[14px] italic ${test.status === 'pass' ? 'text-[#2F6B3F]' : test.status === 'fail' ? 'text-[#A93F2F]' : test.status === 'blocked' ? 'text-[#A93F2F]' : 'text-[#CC8400]'}`}>{test.result}</div>
+              {test.blockedBy && <div className="mt-1 text-[14px] text-[#A93F2F]">Blocked by: {test.blockedBy}</div>}
             </div>
           ))}
         </div>
@@ -853,7 +853,7 @@ function HealthTab() {
   return (
     <div className="flex h-full">
       <div className="w-64 border-r border-border flex flex-col">
-        <div className="p-3 border-b border-border text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Health Dimensions</div>
+        <div className="p-3 border-b border-border text-[14px]  text-muted-foreground font-semibold">Health Dimensions</div>
         <ScrollArea className="flex-1">
           {CAL_HEALTH_SCORES.map(h => {
             const pct = Math.round((h.score / h.maxScore) * 100);
@@ -861,11 +861,11 @@ function HealthTab() {
               <button key={h.dimension} onClick={() => setSelected(h)}
                 className={`w-full flex items-start gap-2 px-3 py-3 text-left border-b border-border/40 hover:bg-accent transition-colors ${selected.dimension === h.dimension ? 'bg-primary text-primary-foreground' : ''}`}>
                 <div className="min-w-0 flex-1">
-                  <div className={`text-[12px] font-semibold ${selected.dimension === h.dimension ? 'text-primary-foreground' : 'text-foreground'}`}>{h.label}</div>
+                  <div className={`text-[14px] font-semibold ${selected.dimension === h.dimension ? 'text-primary-foreground' : 'text-foreground'}`}>{h.label}</div>
                   <div className="mt-1 h-1.5 bg-muted/40 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${selected.dimension === h.dimension ? 'bg-primary-foreground/70' : pct >= 70 ? 'bg-[#2F6B3F]' : pct >= 40 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`} style={{ width:`${pct}%` }} />
                   </div>
-                  <div className={`text-[11px] mt-0.5 ${selected.dimension === h.dimension ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{pct}% — {h.status}</div>
+                  <div className={`text-[14px] mt-0.5 ${selected.dimension === h.dimension ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{pct}% — {h.status}</div>
                 </div>
               </button>
             );
@@ -876,11 +876,11 @@ function HealthTab() {
         <div className="space-y-4">
           <div>
             <div className="text-[15px] font-semibold text-foreground">{selected.label}</div>
-            <div className="text-[12px] text-muted-foreground">{selected.note}</div>
+            <div className="text-[14px] text-muted-foreground">{selected.note}</div>
           </div>
           <div className="bg-card border border-border rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Score</span>
+              <span className="text-[14px]  text-muted-foreground font-semibold">Score</span>
               <span className="text-[16px] font-bold text-foreground">{selected.score}/{selected.maxScore}</span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -892,8 +892,8 @@ function HealthTab() {
               <div key={item.label} className="bg-card border border-border rounded-lg p-2.5 flex items-center gap-3">
                 <CheckIcon status={item.status} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-[12px] font-medium text-foreground">{item.label}</div>
-                  <div className="text-[11px] text-muted-foreground">{item.note}</div>
+                  <div className="text-[14px] font-medium text-foreground">{item.label}</div>
+                  <div className="text-[14px] text-muted-foreground">{item.note}</div>
                 </div>
               </div>
             ))}

@@ -9,13 +9,13 @@ export default function PennyTemplates() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-4xl space-y-4">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio</p>
           <h1 className="text-3xl font-bold text-foreground">{TERMS.aiAssistant} Templates</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             This section has moved. {TERMS.aiAssistant} content generation is now managed in the {TERMS.aiAssistant} Content Assistant — Content Workshop.
           </p>
         </div>
-        <button onClick={() => setLocation('/curriculum/penny-assistant')} className="flex items-center gap-2 text-[13px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-lg px-4 py-3 hover:bg-primary/10 transition-colors">
+        <button onClick={() => setLocation('/curriculum/penny-assistant')} className="flex items-center gap-2 text-[14px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-lg px-4 py-3 hover:bg-primary/10 transition-colors">
           Go to Content Workshop <ArrowRight className="w-4 h-4" />
         </button>
       </div>

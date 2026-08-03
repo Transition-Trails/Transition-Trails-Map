@@ -63,8 +63,8 @@ function DocForm({
   isNew: boolean;
   isSaving: boolean;
 }) {
-  const inputCls = 'w-full text-[12px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:border-primary';
-  const labelCls = 'text-[11px] font-semibold text-muted-foreground block mb-1';
+  const inputCls = 'w-full text-[14px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:border-primary';
+  const labelCls = 'text-[14px] font-semibold text-muted-foreground block mb-1';
 
   const PROGRAM_OPTIONS = ['All', ...PROGRAM_LIST.map(p => p.name)];
   function csv(arr?: string[]) { return (arr ?? []).join(', '); }
@@ -87,7 +87,7 @@ function DocForm({
   return (
     <div className="border-b border-border bg-muted/10">
       <div className="px-4 py-3 flex items-center justify-between border-b border-border/50">
-        <p className="text-[12px] font-bold text-foreground">
+        <p className="text-[14px] font-bold text-foreground">
           {isNew ? 'Add New Document' : `Editing — ${draft.name || 'Untitled'}`}
         </p>
         <button onClick={onCancel} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -153,7 +153,7 @@ function DocForm({
                       key={prog}
                       type="button"
                       onClick={() => toggleProgram(prog)}
-                      className={`text-[11px] font-medium px-2.5 py-1 rounded-full border transition-colors ${
+                      className={`text-[14px] font-medium px-2.5 py-1 rounded-full border transition-colors ${
                         selected
                           ? 'bg-primary text-primary-foreground border-primary'
                           : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
@@ -165,7 +165,7 @@ function DocForm({
                 })}
               </div>
               {(draft.programs ?? []).length === 0 && (
-                <p className="text-[10px] text-muted-foreground/60 mt-1">Select one or more programs</p>
+                <p className="text-[14px] text-muted-foreground/60 mt-1">Select one or more programs</p>
               )}
             </div>
             <div>
@@ -266,18 +266,18 @@ function DocForm({
         <button
           onClick={onSave}
           disabled={!draft.name?.trim() || isSaving}
-          className="flex items-center gap-1.5 text-[12px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-4 py-1.5 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1.5 text-[14px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-4 py-1.5 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
           {isNew ? 'Add Document' : 'Save Changes'}
         </button>
         <button
           onClick={onCancel}
-          className="text-[12px] font-medium text-muted-foreground border border-border rounded-full px-4 py-1.5 hover:bg-muted/20 transition-colors"
+          className="text-[14px] font-medium text-muted-foreground border border-border rounded-full px-4 py-1.5 hover:bg-muted/20 transition-colors"
         >
           Cancel
         </button>
-        <p className="text-[10px] text-muted-foreground/60 ml-2 italic">
+        <p className="text-[14px] text-muted-foreground/60 ml-2 italic">
           Saved to server · shared across all users
         </p>
       </div>
@@ -383,7 +383,7 @@ export default function SourceDocs() {
             placeholder={isEveryday ? 'Search documents…' : 'Search by name, category, program…'}
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-7 pr-3 py-1 text-[12px] rounded-md border border-border/70 bg-background text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/40 h-7"
+            className="w-full pl-7 pr-3 py-1 text-[14px] rounded-md border border-border/70 bg-background text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/40 h-7"
           />
         </div>
 
@@ -392,7 +392,7 @@ export default function SourceDocs() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-colors whitespace-nowrap ${
+              className={`px-2 py-0.5 rounded-full text-[14px] font-medium border transition-colors whitespace-nowrap ${
                 statusFilter === s
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-muted-foreground border-border/70 hover:text-foreground hover:border-border'
@@ -403,14 +403,14 @@ export default function SourceDocs() {
           ))}
         </div>
 
-        <span className="text-[10px] text-muted-foreground/60 whitespace-nowrap hidden sm:block">
+        <span className="text-[14px] text-muted-foreground/60 whitespace-nowrap hidden sm:block">
           {isLoading ? '…' : `${filtered.length} ${filtered.length === 1 ? 'doc' : 'docs'}`}
         </span>
 
         {canEdit && !showForm && (
           <button
             onClick={startAdd}
-            className="ml-auto flex items-center gap-1.5 text-[11px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-3 py-1 hover:bg-primary/90 transition-colors"
+            className="ml-auto flex items-center gap-1.5 text-[14px] font-semibold text-primary-foreground bg-primary border border-primary rounded-full px-3 py-1 hover:bg-primary/90 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Document
@@ -439,7 +439,7 @@ export default function SourceDocs() {
             {isLoading && (
               <div className="flex items-center justify-center py-16 gap-2 text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-[12px]">Loading library…</span>
+                <span className="text-[14px]">Loading library…</span>
               </div>
             )}
 
@@ -448,7 +448,7 @@ export default function SourceDocs() {
                 {/* Header */}
                 <div className="grid grid-cols-[40px_2fr_1fr_90px_1fr_1fr_40px] gap-3 px-3 py-2 border-b bg-muted/40 sticky top-0 z-10">
                   {['#', 'Document', 'Category', 'Status', 'Owner', 'Updated', ''].map((h, i) => (
-                    <div key={i} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{h}</div>
+                    <div key={i} className="text-[14px] font-bold  text-muted-foreground">{h}</div>
                   ))}
                 </div>
 
@@ -468,19 +468,19 @@ export default function SourceDocs() {
                             isSelected ? 'bg-primary/[0.03]' : ''
                           }`}
                         >
-                          <div className="text-[10px] text-muted-foreground/50 font-mono">{doc.id}</div>
+                          <div className="text-[14px] text-muted-foreground/50 font-mono">{doc.id}</div>
                           <div className="flex items-center gap-1.5 min-w-0">
                             <FileText className="w-3.5 h-3.5 text-[#2F6F7E] flex-shrink-0" />
-                            <span className="text-[12px] font-medium text-foreground truncate">{doc.name}</span>
+                            <span className="text-[14px] font-medium text-foreground truncate">{doc.name}</span>
                           </div>
-                          <div className="text-[11px] text-muted-foreground truncate">{doc.category}</div>
+                          <div className="text-[14px] text-muted-foreground truncate">{doc.category}</div>
                           <div>
-                            <span className={`inline-flex text-[10px] font-semibold px-1.5 py-0.5 rounded-full border whitespace-nowrap ${STATUS_COLORS[doc.status] ?? 'bg-muted text-muted-foreground border-border'}`}>
+                            <span className={`inline-flex text-[14px] font-semibold px-1.5 py-0.5 rounded-full border whitespace-nowrap ${STATUS_COLORS[doc.status] ?? 'bg-muted text-muted-foreground border-border'}`}>
                               {doc.status}
                             </span>
                           </div>
-                          <div className="text-[11px] text-muted-foreground truncate">{doc.owner}</div>
-                          <div className="text-[11px] text-muted-foreground truncate">{doc.lastUpdated}</div>
+                          <div className="text-[14px] text-muted-foreground truncate">{doc.owner}</div>
+                          <div className="text-[14px] text-muted-foreground truncate">{doc.lastUpdated}</div>
 
                           {/* Edit / delete controls — admin/power only */}
                           <div className="flex items-center justify-end gap-1 shrink-0">
@@ -508,18 +508,18 @@ export default function SourceDocs() {
                         {/* Inline delete confirmation */}
                         {isDeleting && (
                           <div className="px-4 py-2.5 bg-[#FBEAE6] border-t border-[#E8B9B4] flex items-center gap-3">
-                            <p className="text-[11px] text-[#A93F2F] font-medium flex-1">
+                            <p className="text-[14px] text-[#A93F2F] font-medium flex-1">
                               Delete <strong>{doc.name}</strong>? This cannot be undone.
                             </p>
                             <button
                               onClick={() => deleteDoc(doc.id)}
-                              className="text-[11px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-3 py-1 hover:bg-[#FBEAE6] transition-colors"
+                              className="text-[14px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-3 py-1 hover:bg-[#FBEAE6] transition-colors"
                             >
                               Delete
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(null)}
-                              className="text-[11px] font-medium text-muted-foreground border border-border bg-background rounded-full px-3 py-1 hover:bg-muted/20 transition-colors"
+                              className="text-[14px] font-medium text-muted-foreground border border-border bg-background rounded-full px-3 py-1 hover:bg-muted/20 transition-colors"
                             >
                               Cancel
                             </button>
@@ -532,7 +532,7 @@ export default function SourceDocs() {
                   {!isLoading && filtered.length === 0 && (
                     <div className="px-3 py-10 text-center">
                       <FileText className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                      <p className="text-[12px] text-muted-foreground">
+                      <p className="text-[14px] text-muted-foreground">
                         {search || statusFilter !== 'All'
                           ? 'No documents match your search.'
                           : `No documents yet. ${canEdit ? 'Click "Add Document" to create the first one.' : ''}`}
@@ -549,7 +549,7 @@ export default function SourceDocs() {
       {/* ── Tier hint ── */}
       {isEveryday && (
         <div className="flex-shrink-0 px-3 py-1.5 border-t border-border/40 bg-muted/20">
-          <p className="text-[10px] text-muted-foreground/60">
+          <p className="text-[14px] text-muted-foreground/60">
             Contact an Admin or Power user to add or edit library documents.
           </p>
         </div>

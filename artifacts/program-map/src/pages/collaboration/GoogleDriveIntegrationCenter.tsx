@@ -62,7 +62,7 @@ function OverviewTab() {
               <CheckCircle className="w-4 h-4 text-[#2F6B3F] shrink-0" />
             )}
             <div>
-              <p className={`text-[12px] font-semibold ${
+              <p className={`text-[14px] font-semibold ${
                 isLoading ? 'text-muted-foreground'
                 : !driveConnected ? 'text-[#A93F2F]'
                 : !folderConfigured ? 'text-[#CC8400]'
@@ -77,7 +77,7 @@ function OverviewTab() {
                   : `Drive connected · Penny Assets folder active${status?.pennyFolderId ? ` (${status.pennyFolderId.slice(0, 12)}…)` : ''}`}
               </p>
               {!driveConnected && status?.reason && (
-                <p className="text-[10px] text-[#A93F2F] mt-0.5">{status.reason}</p>
+                <p className="text-[14px] text-[#A93F2F] mt-0.5">{status.reason}</p>
               )}
             </div>
           </div>
@@ -91,41 +91,41 @@ function OverviewTab() {
 
         {/* Setup checklist */}
         <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Setup Checklist</p>
+          <p className="text-[14px] font-bold  text-muted-foreground mb-3">Setup Checklist</p>
           <div className="space-y-2">
             <div className="flex gap-2 items-center">
               <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
-              <span className="text-[12px]">Google Drive connected via Replit integration</span>
+              <span className="text-[14px]">Google Drive connected via Replit integration</span>
             </div>
             <div className="flex gap-2 items-center">
               <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
-              <span className="text-[12px]">OAuth refresh token active</span>
+              <span className="text-[14px]">OAuth refresh token active</span>
             </div>
             <div className="flex gap-2 items-center">
               {folderConfigured
                 ? <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
                 : <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />}
-              <span className="text-[12px]">
-                <code className="font-mono text-[11px] bg-muted px-1 rounded">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>
+              <span className="text-[14px]">
+                <code className="font-mono text-[14px] bg-muted px-1 rounded">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>
                 {' '}— set in Replit Secrets
               </span>
             </div>
             <div className="flex gap-2 items-start">
               <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-              <span className="text-[12px]">Program Drive folders — create one per program and link in Knowledge Sources</span>
+              <span className="text-[14px]">Program Drive folders — create one per program and link in Knowledge Sources</span>
             </div>
           </div>
         </div>
 
         {/* About */}
         <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-          <p className="text-[13px] font-semibold text-foreground">About this integration</p>
-          <p className="text-[12px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] font-semibold text-foreground">About this integration</p>
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             The Google Drive integration connects Trail OS to your workspace's Drive folders. It powers Penny's asset library — images, audio scripts, PDFs, and videos organized by coaching context — and enables program folder mapping for knowledge source management.
           </p>
-          <p className="text-[12px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             The connection is established via the Replit Google integration (OAuth refresh token). The only manual step is setting the{' '}
-            <code className="font-mono text-[11px] bg-muted px-1 rounded">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>{' '}
+            <code className="font-mono text-[14px] bg-muted px-1 rounded">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>{' '}
             secret, then creating the subfolder structure described in the <strong>Penny Assets Setup</strong> tab.
           </p>
         </div>
@@ -169,7 +169,7 @@ function PennyAssetsSetupTab() {
               <CheckCircle className="w-4 h-4 text-[#2F6B3F] shrink-0" />
             )}
             <div>
-              <p className={`text-[12px] font-semibold ${
+              <p className={`text-[14px] font-semibold ${
                 isLoading ? 'text-muted-foreground'
                 : !driveConnected ? 'text-[#A93F2F]'
                 : !folderConfigured ? 'text-[#CC8400]'
@@ -184,7 +184,7 @@ function PennyAssetsSetupTab() {
                   : `Drive connected · Penny Assets folder active${status?.pennyFolderId ? ` (${status.pennyFolderId.slice(0, 12)}…)` : ''}`}
               </p>
               {!driveConnected && status?.reason && (
-                <p className="text-[10px] text-[#A93F2F] mt-0.5">{status.reason}</p>
+                <p className="text-[14px] text-[#A93F2F] mt-0.5">{status.reason}</p>
               )}
             </div>
           </div>
@@ -198,22 +198,22 @@ function PennyAssetsSetupTab() {
 
         {/* Setup steps */}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Setup steps</p>
+          <p className="text-[14px] font-bold  text-muted-foreground mb-3">Setup steps</p>
           <div className="space-y-3">
 
             {/* Step 1 */}
             <div className="rounded-lg border border-border bg-white p-4 flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">1</div>
+              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5">1</div>
               <div className="space-y-1.5">
-                <p className="text-[13px] font-semibold text-foreground">Create the root folder in Google Drive</p>
-                <p className="text-[11px] text-muted-foreground leading-snug">
+                <p className="text-[14px] font-semibold text-foreground">Create the root folder in Google Drive</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Open Google Drive, create a new folder, and name it exactly <strong>Penny Assets</strong> (or anything you like — the name doesn't matter, only the folder ID does).
                 </p>
                 <a
                   href="https://drive.google.com/drive/my-drive"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                  className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:underline"
                 >
                   Open Google Drive <ExternalLink className="w-3 h-3" />
                 </a>
@@ -222,12 +222,12 @@ function PennyAssetsSetupTab() {
 
             {/* Step 2 */}
             <div className="rounded-lg border border-border bg-white p-4 flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">2</div>
+              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5">2</div>
               <div className="space-y-1.5">
-                <p className="text-[13px] font-semibold text-foreground">Copy the folder ID from the URL</p>
-                <p className="text-[11px] text-muted-foreground leading-snug">
+                <p className="text-[14px] font-semibold text-foreground">Copy the folder ID from the URL</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Open the folder in Drive — the URL will look like:<br />
-                  <code className="font-mono text-[10px] bg-muted px-1.5 py-0.5 rounded">
+                  <code className="font-mono text-[14px] bg-muted px-1.5 py-0.5 rounded">
                     drive.google.com/drive/folders/<strong>1ABCdeFGhi2JKlmNOpqrSTuv3WXyz</strong>
                   </code>
                   <br />
@@ -238,23 +238,23 @@ function PennyAssetsSetupTab() {
 
             {/* Step 3 */}
             <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-4 flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-[#FFF3E0] text-[#CC8400] flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">3</div>
+              <div className="w-6 h-6 rounded-full bg-[#FFF3E0] text-[#CC8400] flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5">3</div>
               <div className="space-y-2">
-                <p className="text-[13px] font-semibold text-[#CC8400]">Add the secret to Replit</p>
-                <p className="text-[11px] text-[#CC8400] leading-snug">
+                <p className="text-[14px] font-semibold text-[#CC8400]">Add the secret to Replit</p>
+                <p className="text-[14px] text-[#CC8400] leading-snug">
                   In Replit, open <strong>Tools → Secrets</strong> (padlock icon in the left sidebar). Add a new secret:
                 </p>
                 <div className="rounded border border-[#FFD08A] bg-white px-3 py-2 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase text-[#CC8400] w-12 shrink-0">Key</span>
-                    <code className="font-mono text-[12px] font-bold text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded select-all">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>
+                    <span className="text-[14px] font-bold  text-[#CC8400] w-12 shrink-0">Key</span>
+                    <code className="font-mono text-[14px] font-bold text-zinc-800 bg-zinc-100 px-2 py-0.5 rounded select-all">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-[10px] font-bold uppercase text-[#CC8400] w-12 shrink-0 mt-0.5">Value</span>
-                    <span className="text-[11px] text-zinc-600">Paste the folder ID you copied in step 2</span>
+                    <span className="text-[14px] font-bold  text-[#CC8400] w-12 shrink-0 mt-0.5">Value</span>
+                    <span className="text-[14px] text-zinc-600">Paste the folder ID you copied in step 2</span>
                   </div>
                 </div>
-                <p className="text-[10px] text-[#CC8400]">
+                <p className="text-[14px] text-[#CC8400]">
                   After saving the secret, the API server picks it up automatically — no restart needed.
                 </p>
               </div>
@@ -262,10 +262,10 @@ function PennyAssetsSetupTab() {
 
             {/* Step 4 */}
             <div className="rounded-lg border border-border bg-white p-4 flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">4</div>
+              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5">4</div>
               <div className="space-y-2">
-                <p className="text-[13px] font-semibold text-foreground">Create subfolders for each Penny state</p>
-                <p className="text-[11px] text-muted-foreground leading-snug">
+                <p className="text-[14px] font-semibold text-foreground">Create subfolders for each Penny state</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Inside your root <em>Penny Assets</em> folder, create one subfolder per state. The subfolder names must match exactly (lowercase, hyphens):
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -275,14 +275,14 @@ function PennyAssetsSetupTab() {
                       <div key={s.id} className={`rounded-lg border border-border flex items-center gap-2.5 px-3 py-2 ${s.bg}`}>
                         <SI className={`w-3.5 h-3.5 shrink-0 ${s.color}`} />
                         <div className="min-w-0">
-                          <code className="font-mono text-[11px] font-bold text-zinc-700">{s.id}/</code>
-                          <p className="text-[9px] text-zinc-500 truncate">{s.desc}</p>
+                          <code className="font-mono text-[14px] font-bold text-zinc-700">{s.id}/</code>
+                          <p className="text-[14px] text-zinc-500 truncate">{s.desc}</p>
                         </div>
                       </div>
                     );
                   })}
                 </div>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[14px] text-muted-foreground">
                   {`Upload PNG/JPG images, MP3 audio scripts, PDFs, and video files into the relevant subfolder. ${TERMS.aiAssistant} will surface these when a learner enters that coaching context.`}
                 </p>
               </div>
@@ -290,10 +290,10 @@ function PennyAssetsSetupTab() {
 
             {/* Step 5 */}
             <div className="rounded-lg border border-border bg-white p-4 flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">5</div>
+              <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[14px] font-bold shrink-0 mt-0.5">5</div>
               <div className="space-y-1.5">
-                <p className="text-[13px] font-semibold text-foreground">Verify in the Asset Library</p>
-                <p className="text-[11px] text-muted-foreground leading-snug">
+                <p className="text-[14px] font-semibold text-foreground">Verify in the Asset Library</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Navigate to <strong>{TERMS.aiAssistant} → Asset Library</strong> in the sidebar. The status pill should turn green ("Drive live") and each state in the sidebar will show an asset count. Hit the refresh button if it hasn't updated yet.
                 </p>
               </div>
@@ -305,7 +305,7 @@ function PennyAssetsSetupTab() {
         {/* Verify note */}
         <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 flex items-center gap-2">
           <Image className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          <p className="text-[11px] text-muted-foreground">Once configured, navigate to <strong>{TERMS.aiAssistant} → Asset Library</strong> in the sidebar to manage and browse assets.</p>
+          <p className="text-[14px] text-muted-foreground">Once configured, navigate to <strong>{TERMS.aiAssistant} → Asset Library</strong> in the sidebar to manage and browse assets.</p>
         </div>
 
       </div>

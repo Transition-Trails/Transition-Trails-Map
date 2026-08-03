@@ -145,21 +145,21 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Administration</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration</p>
               <h1 className="text-base font-semibold text-foreground">Knowledge Management</h1>
-              <p className="text-[12px] text-muted-foreground mt-0.5">
+              <p className="text-[14px] text-muted-foreground mt-0.5">
                 Admin &amp; Super Admin functions — data editing, access control, integration credentials, and system readiness.
               </p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => openSlackPanel({ context: 'admin', title: 'Administration', subtitle: TERMS.signalSubtitle('Administration') })}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[14px] font-semibold text-muted-foreground bg-white border border-border/70 hover:text-foreground hover:border-border transition-colors"
               >
                 <Layers className="w-3 h-3" />
                 {TERMS.trailSignals}
               </button>
-              <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] text-[11px] font-medium px-3 py-1.5 rounded-full">
+              <div className="flex items-center gap-1.5 bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400] text-[14px] font-medium px-3 py-1.5 rounded-full">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 Prototype — edits reset on refresh
               </div>
@@ -168,7 +168,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
           {/* Canonical page map */}
           <div className="mb-5 rounded-lg border border-border/50 bg-muted/20 p-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2.5">Canonical Page Map — one home per concept</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2.5">Canonical Page Map — one home per concept</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
               {([
                 { concept: 'Program operations & blueprints',  path: '/program' },
@@ -179,10 +179,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                 { concept: 'Source docs & knowledge',          path: '/knowledge' },
                 { concept: 'Integration credentials & auth',   path: '/admin/secrets-audit' },
               ] as const).map(row => (
-                <div key={row.concept} className="flex items-center gap-2 text-[11px]">
+                <div key={row.concept} className="flex items-center gap-2 text-[14px]">
                   <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />
                   <span className="text-muted-foreground flex-1">{row.concept}</span>
-                  <code className="text-[10px] font-mono text-foreground bg-background border border-border/40 px-1.5 py-0.5 rounded shrink-0 ml-2">{row.path}</code>
+                  <code className="text-[14px] font-mono text-foreground bg-background border border-border/40 px-1.5 py-0.5 rounded shrink-0 ml-2">{row.path}</code>
                 </div>
               ))}
             </div>
@@ -190,7 +190,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
           {/* ── Section 1: Knowledge Management CMS ── */}
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Knowledge Management</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-3">Knowledge Management</p>
             <div className="grid grid-cols-3 gap-3">
               {cmsAreas.map(area => (
                 <button
@@ -202,11 +202,11 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                     <div className={`w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 ${area.iconBg}`}>
                       {area.icon}
                     </div>
-                    <Badge variant="secondary" className="text-xs font-semibold tabular-nums">{area.count}</Badge>
+                    <Badge variant="secondary" className="text-sm font-semibold tabular-nums">{area.count}</Badge>
                   </div>
                   <p className="font-semibold text-foreground text-sm mb-1.5">{area.label}</p>
-                  <p className="text-[12px] text-muted-foreground leading-snug line-clamp-3">{area.description}</p>
-                  <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                  <p className="text-[14px] text-muted-foreground leading-snug line-clamp-3">{area.description}</p>
+                  <div className="flex items-center gap-1 mt-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                     <span>Manage</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </div>
@@ -217,7 +217,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
           {/* ── Section 2: Platform Administration ── */}
           <div className="mt-5">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Platform Administration</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-3">Platform Administration</p>
             <div className="grid grid-cols-3 gap-3">
               <button
                 onClick={() => setLocation('/admin/people-access')}
@@ -227,13 +227,13 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-[#EDF5F8] text-[#2F6F7E]">
                     <Users className="w-5 h-5" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">People · Access</Badge>
+                  <Badge variant="secondary" className="text-sm font-semibold">People · Access</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">People &amp; Access</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Personas, organizational roles, access tiers, Google Groups mapping, navigation visibility matrix, and feature permission grid.
                 </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                <div className="flex items-center gap-1 mt-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
@@ -243,10 +243,10 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-muted/60 text-muted-foreground/50">
                     <Lock className="w-5 h-5" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold text-muted-foreground/60">Phase 2</Badge>
+                  <Badge variant="secondary" className="text-sm font-semibold text-muted-foreground/60">Phase 2</Badge>
                 </div>
                 <p className="font-semibold text-muted-foreground/50 text-sm mb-1.5">Platform Controls</p>
-                <p className="text-[12px] text-muted-foreground/40 leading-snug">
+                <p className="text-[14px] text-muted-foreground/40 leading-snug">
                   User provisioning, permissions configuration, settings, and template management — planned for Phase 2.
                 </p>
               </div>
@@ -255,7 +255,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
 
           {/* ── Section 3: Setup & Integration ── */}
           <div className="mt-5">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-3">Setup &amp; Integration</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-3">Setup &amp; Integration</p>
             <div className="grid grid-cols-3 gap-3">
               {/* Primary Setup entry — spans full row visually as the command center */}
               <button
@@ -270,14 +270,14 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="font-semibold text-foreground text-sm">Setup</p>
-                        <Badge variant="secondary" className="text-xs font-semibold">Command Center</Badge>
+                        <Badge variant="secondary" className="text-sm font-semibold">Command Center</Badge>
                       </div>
-                      <p className="text-[12px] text-muted-foreground leading-snug max-w-2xl">
+                      <p className="text-[14px] text-muted-foreground leading-snug max-w-2xl">
                         One view of every integration, credential, and readiness area — Salesforce, Slack, Google Workspace, Gemini AI, Phase 1 readiness, Phase 2 backlog, UX standards, secrets audit, and access matrix.
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 ml-4 text-xs text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0">
+                  <div className="flex items-center gap-1 ml-4 text-sm text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0">
                     <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -291,13 +291,13 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-[#EDF5F8] text-[#2F6F7E]">
                     <Plug className="w-5 h-5" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">17 integrations</Badge>
+                  <Badge variant="secondary" className="text-sm font-semibold">17 integrations</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Integration Readiness Center</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Full integration planning workspace — catalog, data flow, auth, field mapping, sync readiness, risk register, testing, and launch planning.
                 </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                <div className="flex items-center gap-1 mt-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
@@ -310,13 +310,13 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-[#EDF5F8] text-[#2F6F7E]">
                     <Database className="w-5 h-5" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Mapping</Badge>
+                  <Badge variant="secondary" className="text-sm font-semibold">Mapping</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Salesforce Architecture</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Object-level mapping between Trail OS, Salesforce (NPSP · PMM · Nonprofit Cloud), and Google Drive. Visual map, table, and by-product views.
                 </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                <div className="flex items-center gap-1 mt-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
@@ -329,13 +329,13 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 bg-slate-50 text-slate-600">
                     <Plus className="w-5 h-5" />
                   </div>
-                  <Badge variant="secondary" className="text-xs font-semibold">Audit</Badge>
+                  <Badge variant="secondary" className="text-sm font-semibold">Audit</Badge>
                 </div>
                 <p className="font-semibold text-foreground text-sm mb-1.5">Create Actions Audit</p>
-                <p className="text-[12px] text-muted-foreground leading-snug">
+                <p className="text-[14px] text-muted-foreground leading-snug">
                   Full audit of every create/add action across Trail OS — workspaces covered, object types, entry points, and read-only views.
                 </p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                <div className="flex items-center gap-1 mt-3 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                   <span>Open</span><ChevronRight className="w-3.5 h-3.5" />
                 </div>
               </button>
@@ -352,9 +352,9 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
                   onClick={() => setLocation(item.href)}
                   className={`text-left px-3 py-2.5 rounded-md border bg-card transition-all duration-150 hover:shadow-sm group flex items-center justify-between ${item.cls}`}
                 >
-                  <span className="text-[12px] font-medium text-foreground">{item.label}</span>
+                  <span className="text-[14px] font-medium text-foreground">{item.label}</span>
                   <div className="flex items-center gap-1.5">
-                    <Badge variant="secondary" className="text-[10px] font-semibold">{item.badge}</Badge>
+                    <Badge variant="secondary" className="text-[14px] font-semibold">{item.badge}</Badge>
                     <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
                 </button>
@@ -363,7 +363,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
           </div>
 
           {/* Prototype notice */}
-          <div className="mt-8 p-4 rounded-lg bg-muted/40 border border-border/40 text-[12px] text-muted-foreground leading-relaxed">
+          <div className="mt-8 p-4 rounded-lg bg-muted/40 border border-border/40 text-[14px] text-muted-foreground leading-relaxed">
             <strong className="text-foreground">Prototype admin.</strong> Edits apply to this browser session only and reset on page refresh.
             This admin is not yet connected to Google Drive or a database.
             A future version will write edits back to a connected knowledge store.
@@ -409,19 +409,19 @@ function AreaEditor({
     return (
       <div className="h-full flex flex-col overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-card flex-shrink-0">
-          <button onClick={onBack} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" />
             Administration
           </button>
           <span className="text-muted-foreground/40">/</span>
-          <span className="text-xs font-medium text-foreground">{areaLabels[view]}</span>
+          <span className="text-sm font-medium text-foreground">{areaLabels[view]}</span>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-10 text-center">
           <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
             <Building2 className="w-6 h-6 text-muted-foreground" />
           </div>
           <p className="text-sm font-medium text-foreground mb-1.5">{areaLabels[view]}</p>
-          <p className="text-xs text-muted-foreground max-w-[280px] leading-relaxed">
+          <p className="text-sm text-muted-foreground max-w-[280px] leading-relaxed">
             This administration section is being built. Configuration and management tools will be added in a future sprint.
           </p>
         </div>
@@ -451,14 +451,14 @@ function AreaEditor({
       <div className="flex items-center gap-2 px-4 py-2.5 border-b bg-card flex-shrink-0">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Knowledge Base
         </button>
         <span className="text-muted-foreground/40">/</span>
-        <span className="text-xs font-medium text-foreground">{areaLabels[view]}</span>
-        <Badge variant="secondary" className="text-[10px] tabular-nums ml-1">{allRecords.length}</Badge>
+        <span className="text-sm font-medium text-foreground">{areaLabels[view]}</span>
+        <Badge variant="secondary" className="text-[14px] tabular-nums ml-1">{allRecords.length}</Badge>
       </div>
 
       <div className="flex-1 min-h-0 flex overflow-hidden">
@@ -472,7 +472,7 @@ function AreaEditor({
                 value={search}
                 onChange={e => onSearch(e.target.value)}
                 placeholder="Search records..."
-                className="pl-8 h-8 text-xs bg-white"
+                className="pl-8 h-8 text-sm bg-white"
               />
             </div>
           </div>
@@ -480,7 +480,7 @@ function AreaEditor({
           <ScrollArea className="flex-1">
             <div className="py-1">
               {filtered.length === 0 ? (
-                <p className="px-4 py-6 text-xs text-muted-foreground text-center">No records match.</p>
+                <p className="px-4 py-6 text-sm text-muted-foreground text-center">No records match.</p>
               ) : (
                 filtered.map(record => (
                   <button
@@ -492,13 +492,13 @@ function AreaEditor({
                         : 'hover:bg-muted/50 border-l-[3px] border-l-transparent'
                     }`}
                   >
-                    <p className="text-xs font-medium text-foreground leading-snug line-clamp-2">{record.name}</p>
+                    <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{record.name}</p>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       {record.confidence && (
                         <ConfidenceBadge status={record.confidence as any} />
                       )}
                       {record.category && (
-                        <span className="text-[10px] text-muted-foreground">{record.category}</span>
+                        <span className="text-[14px] text-muted-foreground">{record.category}</span>
                       )}
                     </div>
                   </button>
@@ -541,10 +541,10 @@ function SelectPrompt({ areaLabel, count }: { areaLabel: string; count: number }
         <FileText className="w-5 h-5 text-muted-foreground" />
       </div>
       <p className="text-sm font-medium text-foreground mb-1.5">Select a record to edit</p>
-      <p className="text-xs text-muted-foreground max-w-[260px] leading-relaxed mb-4">
+      <p className="text-sm text-muted-foreground max-w-[260px] leading-relaxed mb-4">
         Choose one of the {count} {areaLabel.toLowerCase()} records from the list on the left.
       </p>
-      <div className="text-[11px] text-muted-foreground/70 bg-muted/50 border border-border/50 rounded-lg px-4 py-3 max-w-[280px] leading-relaxed">
+      <div className="text-[14px] text-muted-foreground/70 bg-muted/50 border border-border/50 rounded-lg px-4 py-3 max-w-[280px] leading-relaxed">
         Changes apply to this session only and reset on refresh. A future version will persist edits to a connected knowledge store.
       </div>
     </div>
@@ -574,24 +574,24 @@ function FormHeader({
     <div className="flex items-center justify-between px-5 py-3 border-b bg-card flex-shrink-0">
       <div className="min-w-0 mr-4">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{entityLabel}</span>
+          <span className="text-[14px]  text-muted-foreground font-semibold">{entityLabel}</span>
           {confidence && <ConfidenceBadge status={confidence as any} />}
         </div>
         <p className="font-semibold text-foreground text-base leading-tight mt-0.5 line-clamp-1">{name}</p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         {saved && (
-          <span className="flex items-center gap-1 text-xs text-primary font-medium">
+          <span className="flex items-center gap-1 text-sm text-primary font-medium">
             <CheckCircle2 className="w-3.5 h-3.5" /> Saved
           </span>
         )}
         {dirty && !saved && (
-          <span className="text-[11px] text-[#CC8400] font-medium">Unsaved changes</span>
+          <span className="text-[14px] text-[#CC8400] font-medium">Unsaved changes</span>
         )}
-        <Button variant="outline" size="sm" onClick={onCancel} disabled={!dirty} className="h-7 text-xs">
+        <Button variant="outline" size="sm" onClick={onCancel} disabled={!dirty} className="h-7 text-sm">
           <X className="w-3.5 h-3.5 mr-1" />Cancel
         </Button>
-        <Button size="sm" onClick={onSave} disabled={!dirty} className="h-7 text-xs">
+        <Button size="sm" onClick={onSave} disabled={!dirty} className="h-7 text-sm">
           <Save className="w-3.5 h-3.5 mr-1" />Save
         </Button>
       </div>
@@ -602,7 +602,7 @@ function FormHeader({
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
-      <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground border-b border-border/40 pb-1.5">
+      <h3 className="text-[14px] font-bold  text-muted-foreground border-b border-border/40 pb-1.5">
         {title}
       </h3>
       {children}
@@ -613,8 +613,8 @@ function FormSection({ title, children }: { title: string; children: React.React
 function FormRow({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <label className="text-xs font-semibold text-foreground">{label}</label>
-      {hint && <p className="text-[11px] text-muted-foreground leading-snug">{hint}</p>}
+      <label className="text-sm font-semibold text-foreground">{label}</label>
+      {hint && <p className="text-[14px] text-muted-foreground leading-snug">{hint}</p>}
       {children}
     </div>
   );
@@ -625,7 +625,7 @@ function ConfidenceSelect({ value, onChange }: { value: string; onChange: (v: st
     <select
       value={value}
       onChange={e => onChange(e.target.value)}
-      className="w-full h-8 rounded-md border border-input bg-white px-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+      className="w-full h-8 rounded-md border border-input bg-white px-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
     >
       <option value="confirmed">Confirmed</option>
       <option value="needs-review">Needs Review</option>
@@ -646,7 +646,7 @@ function MultilineField({
         value={value.join('\n')}
         onChange={e => onChange(e.target.value === '' ? [] : e.target.value.split('\n'))}
         rows={rows}
-        className="text-xs resize-none"
+        className="text-sm resize-none"
       />
     </FormRow>
   );
@@ -680,45 +680,45 @@ function ProgramEditor({ id }: { id: string }) {
 
           <FormSection title="Core Info">
             <FormRow label="Program Name">
-              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-xs h-8" />
+              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-sm h-8" />
             </FormRow>
             <div className="grid grid-cols-2 gap-3">
               <FormRow label="Confidence">
                 <ConfidenceSelect value={form.confidence ?? 'needs-review'} onChange={v => set('confidence', v as any)} />
               </FormRow>
               <FormRow label="Duration">
-                <Input value={form.duration ?? ''} onChange={e => set('duration', e.target.value)} className="text-xs h-8" placeholder="e.g. 4 weeks" />
+                <Input value={form.duration ?? ''} onChange={e => set('duration', e.target.value)} className="text-sm h-8" placeholder="e.g. 4 weeks" />
               </FormRow>
             </div>
             <FormRow label="Format">
-              <Input value={form.format ?? ''} onChange={e => set('format', e.target.value)} className="text-xs h-8" placeholder="e.g. Cohort-based, self-paced" />
+              <Input value={form.format ?? ''} onChange={e => set('format', e.target.value)} className="text-sm h-8" placeholder="e.g. Cohort-based, self-paced" />
             </FormRow>
           </FormSection>
 
           <FormSection title="Positioning">
             <FormRow label="Strategic Role" hint="Short phrase for the colored card header.">
-              <Input value={form.strategicRole ?? ''} onChange={e => set('strategicRole', e.target.value)} className="text-xs h-8" />
+              <Input value={form.strategicRole ?? ''} onChange={e => set('strategicRole', e.target.value)} className="text-sm h-8" />
             </FormRow>
             <FormRow label="Core Outcome" hint="Primary learner outcome — shown in the card body.">
-              <Textarea value={form.coreOutcome ?? ''} onChange={e => set('coreOutcome', e.target.value)} rows={2} className="text-xs resize-none" />
+              <Textarea value={form.coreOutcome ?? ''} onChange={e => set('coreOutcome', e.target.value)} rows={2} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Audience" hint="Who this program is designed for. Separate multiple with semicolons.">
-              <Textarea value={form.audience ?? ''} onChange={e => set('audience', e.target.value)} rows={2} className="text-xs resize-none" />
+              <Textarea value={form.audience ?? ''} onChange={e => set('audience', e.target.value)} rows={2} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Prerequisites / Dependencies">
-              <Input value={form.dependencies ?? ''} onChange={e => set('dependencies', e.target.value)} className="text-xs h-8" placeholder="e.g. Explorer's Trail completion" />
+              <Input value={form.dependencies ?? ''} onChange={e => set('dependencies', e.target.value)} className="text-sm h-8" placeholder="e.g. Explorer's Trail completion" />
             </FormRow>
           </FormSection>
 
           <FormSection title="Decision Brief Content">
             <FormRow label="Executive Summary" hint="Full narrative for the Follow the Trail panel.">
-              <Textarea value={form.executiveSummary ?? ''} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-xs resize-none" />
+              <Textarea value={form.executiveSummary ?? ''} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Why It Matters">
-              <Textarea value={form.whyItMatters ?? ''} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-xs resize-none" />
+              <Textarea value={form.whyItMatters ?? ''} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="What Breaks If Missing">
-              <Textarea value={form.whatBreaksIfMissing ?? ''} onChange={e => set('whatBreaksIfMissing', e.target.value)} rows={2} className="text-xs resize-none" />
+              <Textarea value={form.whatBreaksIfMissing ?? ''} onChange={e => set('whatBreaksIfMissing', e.target.value)} rows={2} className="text-sm resize-none" />
             </FormRow>
           </FormSection>
 
@@ -756,17 +756,17 @@ function DocumentEditor({ id }: { id: string }) {
 
           <FormSection title="Core Info">
             <FormRow label="Document Name">
-              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-xs h-8" />
+              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-sm h-8" />
             </FormRow>
             <div className="grid grid-cols-2 gap-3">
               <FormRow label="Category">
-                <Input value={form.category} onChange={e => set('category', e.target.value)} className="text-xs h-8" placeholder="Strategy, Brand, Curriculum…" />
+                <Input value={form.category} onChange={e => set('category', e.target.value)} className="text-sm h-8" placeholder="Strategy, Brand, Curriculum…" />
               </FormRow>
               <FormRow label="Status">
                 <select
                   value={form.status}
                   onChange={e => set('status', e.target.value as any)}
-                  className="w-full h-8 rounded-md border border-input bg-white px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full h-8 rounded-md border border-input bg-white px-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option>Active</option>
                   <option>Draft</option>
@@ -778,11 +778,11 @@ function DocumentEditor({ id }: { id: string }) {
                 <ConfidenceSelect value={form.confidence} onChange={v => set('confidence', v as any)} />
               </FormRow>
               <FormRow label="Owner">
-                <Input value={form.owner} onChange={e => set('owner', e.target.value)} className="text-xs h-8" />
+                <Input value={form.owner} onChange={e => set('owner', e.target.value)} className="text-sm h-8" />
               </FormRow>
             </div>
             <FormRow label="Last Updated">
-              <Input value={form.lastUpdated} onChange={e => set('lastUpdated', e.target.value)} className="text-xs h-8" placeholder="e.g. Jun 2025" />
+              <Input value={form.lastUpdated} onChange={e => set('lastUpdated', e.target.value)} className="text-sm h-8" placeholder="e.g. Jun 2025" />
             </FormRow>
             <FormRow label="Google Drive URL" hint="Link to the official source document in Google Drive or another shared location.">
               <div className="flex gap-2">
@@ -790,7 +790,7 @@ function DocumentEditor({ id }: { id: string }) {
                   type="url"
                   value={form.driveUrl ?? ''}
                   onChange={e => set('driveUrl', e.target.value || undefined)}
-                  className="text-xs h-8 flex-1"
+                  className="text-sm h-8 flex-1"
                   placeholder="https://docs.google.com/…"
                 />
                 {form.driveUrl && (
@@ -798,7 +798,7 @@ function DocumentEditor({ id }: { id: string }) {
                     href={form.driveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 px-2.5 h-8 rounded-md border border-input bg-white text-xs text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+                    className="flex items-center gap-1 px-2.5 h-8 rounded-md border border-input bg-white text-sm text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
                   >
                     <ExternalLink className="w-3.5 h-3.5" /> Open
                   </a>
@@ -809,13 +809,13 @@ function DocumentEditor({ id }: { id: string }) {
 
           <FormSection title="Content">
             <FormRow label="Summary" hint="1–2 sentence overview shown in the dashboard.">
-              <Textarea value={form.summary} onChange={e => set('summary', e.target.value)} rows={3} className="text-xs resize-none" />
+              <Textarea value={form.summary} onChange={e => set('summary', e.target.value)} rows={3} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Purpose">
-              <Textarea value={form.purpose} onChange={e => set('purpose', e.target.value)} rows={2} className="text-xs resize-none" />
+              <Textarea value={form.purpose} onChange={e => set('purpose', e.target.value)} rows={2} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Quick Take" hint="One sentence summarising when to consult this document.">
-              <Input value={form.quickTake} onChange={e => set('quickTake', e.target.value)} className="text-xs h-8" />
+              <Input value={form.quickTake} onChange={e => set('quickTake', e.target.value)} className="text-sm h-8" />
             </FormRow>
           </FormSection>
 
@@ -893,11 +893,11 @@ function ResolvePhaseEditor({ id }: { id: string }) {
           <FormSection title="Core Info">
             <div className="grid grid-cols-4 gap-3">
               <FormRow label="Letter">
-                <Input value={form.letter} onChange={e => set('letter', e.target.value)} className="text-xs h-8" placeholder="R" />
+                <Input value={form.letter} onChange={e => set('letter', e.target.value)} className="text-sm h-8" placeholder="R" />
               </FormRow>
               <div className="col-span-3">
                 <FormRow label="Phase Name">
-                  <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-xs h-8" />
+                  <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-sm h-8" />
                 </FormRow>
               </div>
             </div>
@@ -908,16 +908,16 @@ function ResolvePhaseEditor({ id }: { id: string }) {
 
           <FormSection title="Content">
             <FormRow label="Purpose" hint="Short phrase — what this phase accomplishes.">
-              <Input value={form.purpose ?? ''} onChange={e => set('purpose', e.target.value)} className="text-xs h-8" />
+              <Input value={form.purpose ?? ''} onChange={e => set('purpose', e.target.value)} className="text-sm h-8" />
             </FormRow>
             <FormRow label="Executive Summary">
-              <Textarea value={form.executiveSummary ?? ''} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-xs resize-none" />
+              <Textarea value={form.executiveSummary ?? ''} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Why It Matters">
-              <Textarea value={form.whyItMatters ?? ''} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-xs resize-none" />
+              <Textarea value={form.whyItMatters ?? ''} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Source Note" hint="Where the operational detail for this phase comes from, or 'Source mapping needed'.">
-              <Textarea value={form.sourceNote ?? ''} onChange={e => set('sourceNote', e.target.value)} rows={2} className="text-xs resize-none" />
+              <Textarea value={form.sourceNote ?? ''} onChange={e => set('sourceNote', e.target.value)} rows={2} className="text-sm resize-none" />
             </FormRow>
           </FormSection>
 
@@ -970,22 +970,22 @@ function PennyCapabilityEditor({ id }: { id: string }) {
 
           <FormSection title="Core Info">
             <FormRow label="Capability Name">
-              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-xs h-8" />
+              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-sm h-8" />
             </FormRow>
             <FormRow label="Confidence">
               <ConfidenceSelect value={form.confidence} onChange={v => set('confidence', v as any)} />
             </FormRow>
             <FormRow label="Purpose" hint="Short phrase — what this capability does.">
-              <Input value={form.purpose} onChange={e => set('purpose', e.target.value)} className="text-xs h-8" />
+              <Input value={form.purpose} onChange={e => set('purpose', e.target.value)} className="text-sm h-8" />
             </FormRow>
           </FormSection>
 
           <FormSection title="Content">
             <FormRow label="Executive Summary">
-              <Textarea value={form.executiveSummary} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-xs resize-none" />
+              <Textarea value={form.executiveSummary} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Why It Matters">
-              <Textarea value={form.whyItMatters} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-xs resize-none" />
+              <Textarea value={form.whyItMatters} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-sm resize-none" />
             </FormRow>
             <MultilineField
               label="Key Facts"
@@ -1052,22 +1052,22 @@ function TrailOsCapabilityEditor({ id }: { id: string }) {
 
           <FormSection title="Core Info">
             <FormRow label="Capability Name">
-              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-xs h-8" />
+              <Input value={form.name} onChange={e => set('name', e.target.value)} className="text-sm h-8" />
             </FormRow>
             <FormRow label="Confidence">
               <ConfidenceSelect value={form.confidence} onChange={v => set('confidence', v as any)} />
             </FormRow>
             <FormRow label="Description" hint="One-sentence operational summary shown on the map tile.">
-              <Input value={form.description} onChange={e => set('description', e.target.value)} className="text-xs h-8" />
+              <Input value={form.description} onChange={e => set('description', e.target.value)} className="text-sm h-8" />
             </FormRow>
           </FormSection>
 
           <FormSection title="Content">
             <FormRow label="Executive Summary">
-              <Textarea value={form.executiveSummary} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-xs resize-none" />
+              <Textarea value={form.executiveSummary} onChange={e => set('executiveSummary', e.target.value)} rows={4} className="text-sm resize-none" />
             </FormRow>
             <FormRow label="Why It Matters">
-              <Textarea value={form.whyItMatters} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-xs resize-none" />
+              <Textarea value={form.whyItMatters} onChange={e => set('whyItMatters', e.target.value)} rows={3} className="text-sm resize-none" />
             </FormRow>
             <MultilineField
               label="Key Facts"
@@ -1114,10 +1114,10 @@ function SalesforceEditor() {
     <div className="flex flex-col h-full overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3 border-b bg-card flex-shrink-0">
         <div>
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Integration</span>
+          <span className="text-[14px]  text-muted-foreground font-semibold">Integration</span>
           <p className="font-semibold text-foreground text-base leading-tight mt-0.5">Salesforce Cases Kanban</p>
         </div>
-        <Badge variant="outline" className="text-[10px] text-muted-foreground border-border">Future State</Badge>
+        <Badge variant="outline" className="text-[14px] text-muted-foreground border-border">Future State</Badge>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-6 max-w-xl">
@@ -1128,23 +1128,23 @@ function SalesforceEditor() {
 
           <FormSection title="Connection Settings (Future)">
             <FormRow label="Salesforce Instance URL" hint="Your Salesforce org URL (e.g. https://mycompany.my.salesforce.com).">
-              <Input disabled placeholder="Not configured" className="text-xs h-8 opacity-50" />
+              <Input disabled placeholder="Not configured" className="text-sm h-8 opacity-50" />
             </FormRow>
             <FormRow label="Case Object / View" hint="Which Salesforce Case list view or report to surface in the Kanban.">
-              <Input disabled placeholder="Not configured" className="text-xs h-8 opacity-50" />
+              <Input disabled placeholder="Not configured" className="text-sm h-8 opacity-50" />
             </FormRow>
           </FormSection>
 
           <FormSection title="Display Settings (Future)">
             <FormRow label="Columns" hint="Comma-separated Kanban column names.">
-              <Input disabled placeholder="Open, In Progress, Pending, Closed" className="text-xs h-8 opacity-50" />
+              <Input disabled placeholder="Open, In Progress, Pending, Closed" className="text-sm h-8 opacity-50" />
             </FormRow>
             <FormRow label="Card Fields" hint="Which case fields appear on each Kanban card.">
-              <Input disabled placeholder="Subject, Account, Priority, Owner" className="text-xs h-8 opacity-50" />
+              <Input disabled placeholder="Subject, Account, Priority, Owner" className="text-sm h-8 opacity-50" />
             </FormRow>
           </FormSection>
 
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-[14px] text-muted-foreground">
             To enable this integration, a Salesforce Connected App and OAuth credentials are required.
             Contact the platform administrator to configure the connection.
           </p>

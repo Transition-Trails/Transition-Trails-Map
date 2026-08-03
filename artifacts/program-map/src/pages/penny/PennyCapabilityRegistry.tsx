@@ -63,7 +63,7 @@ const EMPTY_FORM: AddFormData = {
 
 function DomainBadge({ domain }: { domain: CapabilityDomain }) {
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide ${DOMAIN_COLORS[domain]}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  ${DOMAIN_COLORS[domain]}`}>
       {domain === 'Communications' ? 'Comms' : domain}
     </span>
   );
@@ -72,7 +72,7 @@ function DomainBadge({ domain }: { domain: CapabilityDomain }) {
 function StatusChip({ pocStatus }: { pocStatus: 'exists' | 'partial' }) {
   const live = pocStatus === 'exists';
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${live ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
+    <span className={`inline-flex items-center gap-1 text-[14px] font-medium ${live ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${live ? 'bg-[#E6F0EA]0' : 'bg-[#CC8400]'}`} />
       {live ? 'Live' : 'Partial'}
     </span>
@@ -81,7 +81,7 @@ function StatusChip({ pocStatus }: { pocStatus: 'exists' | 'partial' }) {
 
 function MaturityBadge({ maturity }: { maturity: string }) {
   return (
-    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-muted text-muted-foreground">
+    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold  bg-muted text-muted-foreground">
       {maturity}
     </span>
   );
@@ -95,7 +95,7 @@ function Tag({
   mono?: boolean;
 }) {
   return (
-    <span className={`group inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-foreground font-medium ${mono ? 'font-mono text-[10px]' : 'text-[11px]'}`}>
+    <span className={`group inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-foreground font-medium ${mono ? 'font-mono text-[14px]' : 'text-[14px]'}`}>
       {label}
       {onRemove && (
         <button
@@ -125,7 +125,7 @@ function InlineTagInput({ onAdd, placeholder }: { onAdd: (v: string) => void; pl
         value={val}
         onChange={e => setVal(e.target.value)}
         placeholder={placeholder}
-        className="text-[11px] border border-dashed border-border rounded-full px-2 py-0.5 bg-white focus:outline-none focus:border-primary/50 w-24 placeholder:text-muted-foreground/40"
+        className="text-[14px] border border-dashed border-border rounded-full px-2 py-0.5 bg-white focus:outline-none focus:border-primary/50 w-24 placeholder:text-muted-foreground/40"
       />
     </form>
   );
@@ -133,7 +133,7 @@ function InlineTagInput({ onAdd, placeholder }: { onAdd: (v: string) => void; pl
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-2">
+    <p className="text-[14px] font-bold text-muted-foreground  mb-2">
       {children}
     </p>
   );
@@ -142,7 +142,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 px-3 py-2 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wide w-24 shrink-0 mt-0.5">
+      <span className="text-[14px] font-semibold text-muted-foreground/60  w-24 shrink-0 mt-0.5">
         {label}
       </span>
       <div className="flex-1 flex flex-wrap gap-1 items-start">{children}</div>
@@ -173,7 +173,7 @@ function MaturityTrack({
             key={stage}
             onClick={() => isFuture && onPromote(stage)}
             disabled={isDone || isCurrent}
-            className={`flex-1 py-2 px-1.5 text-[9px] font-semibold text-center border-r border-border/50 last:border-0 transition-colors leading-tight ${
+            className={`flex-1 py-2 px-1.5 text-[14px] font-semibold text-center border-r border-border/50 last:border-0 transition-colors leading-tight ${
               isCurrent
                 ? 'bg-primary/10 text-primary font-bold'
                 : isDone
@@ -182,7 +182,7 @@ function MaturityTrack({
             }`}
             title={isFuture ? `Promote to ${stage}` : undefined}
           >
-            {isDone && <span className="block text-[#2F6B3F] mb-0.5 text-[8px]">✓</span>}
+            {isDone && <span className="block text-[#2F6B3F] mb-0.5 text-[14px]">✓</span>}
             {stage}
           </button>
         );
@@ -258,7 +258,7 @@ function CapabilityDetail({
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => editing ? handleCancel() : setEditing(true)}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold transition-colors ${
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[14px] font-semibold transition-colors ${
                 editing
                   ? 'border-primary/30 bg-primary/5 text-primary'
                   : 'border-border bg-white text-muted-foreground hover:text-foreground hover:border-primary/30'
@@ -291,10 +291,10 @@ function CapabilityDetail({
                   <input
                     value={draft.shortDescription}
                     onChange={e => setDraft(d => ({ ...d, shortDescription: e.target.value }))}
-                    className="flex-1 text-[12px] text-foreground border border-border rounded px-2 py-1 focus:outline-none focus:border-primary/50 bg-white"
+                    className="flex-1 text-[14px] text-foreground border border-border rounded px-2 py-1 focus:outline-none focus:border-primary/50 bg-white"
                   />
                 ) : (
-                  <span className="text-[12px] text-foreground leading-relaxed">{cap.shortDescription}</span>
+                  <span className="text-[14px] text-foreground leading-relaxed">{cap.shortDescription}</span>
                 )}
               </FieldRow>
               <FieldRow label="Audience">
@@ -312,7 +312,7 @@ function CapabilityDetail({
                   : (
                     <button
                       onClick={() => console.log('[Penny Capabilities] Add trail — not yet wired')}
-                      className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full border border-dashed border-border text-[10px] text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                      className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full border border-dashed border-border text-[14px] text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
                     >
                       <Plus className="w-2.5 h-2.5" /> add
                     </button>
@@ -341,7 +341,7 @@ function CapabilityDetail({
               <FieldRow label="Prompt template">
                 <button
                   onClick={() => console.log('[Penny Capabilities] Navigate to Prompt Studio')}
-                  className="flex items-center gap-1 text-[11px] text-primary font-medium hover:underline"
+                  className="flex items-center gap-1 text-[14px] text-primary font-medium hover:underline"
                 >
                   {cap.name} <ExternalLink className="w-2.5 h-2.5" />
                 </button>
@@ -367,13 +367,13 @@ function CapabilityDetail({
                 onChange={e => setDraft(d => ({ ...d, nextSteps: e.target.value.split('\n') }))}
                 rows={Math.max(draft.nextSteps.length + 1, 4)}
                 placeholder="One step per line"
-                className="w-full text-[12px] border border-border rounded-lg px-3 py-2 focus:outline-none focus:border-primary/50 bg-white resize-none"
+                className="w-full text-[14px] border border-border rounded-lg px-3 py-2 focus:outline-none focus:border-primary/50 bg-white resize-none"
               />
             ) : (
               <ol className="space-y-1.5">
                 {cap.nextSteps.filter(Boolean).map((step, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[12px] text-foreground leading-snug">
-                    <span className="w-4 h-4 rounded-full bg-muted text-muted-foreground text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  <li key={i} className="flex items-start gap-2.5 text-[14px] text-foreground leading-snug">
+                    <span className="w-4 h-4 rounded-full bg-muted text-muted-foreground text-[14px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                       {i + 1}
                     </span>
                     {step}
@@ -395,7 +395,7 @@ function CapabilityDetail({
                 : (
                   <button
                     onClick={() => console.log('[Penny Capabilities] Add SF object — not yet wired')}
-                    className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full border border-dashed border-border text-[10px] font-mono text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                    className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full border border-dashed border-border text-[14px] font-mono text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
                   >
                     <Plus className="w-2.5 h-2.5" /> add
                   </button>
@@ -412,13 +412,13 @@ function CapabilityDetail({
         <div className="shrink-0 px-6 py-3 border-t border-border bg-background flex items-center justify-end gap-2">
           <button
             onClick={handleCancel}
-            className="px-4 py-1.5 rounded-lg border border-border text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+            className="px-4 py-1.5 rounded-lg border border-border text-[14px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold hover:opacity-90 transition-opacity"
+            className="px-4 py-1.5 rounded-lg bg-foreground text-background text-[14px] font-semibold hover:opacity-90 transition-opacity"
           >
             Save to Salesforce
           </button>
@@ -472,9 +472,9 @@ function AddCapabilityForm({
     onAdd(newCap);
   }
 
-  const inputCls  = 'w-full text-[12px] border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary/50 bg-white placeholder:text-muted-foreground/40';
-  const labelCls  = 'block text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1';
-  const hintCls   = 'text-[9px] text-muted-foreground mt-0.5';
+  const inputCls  = 'w-full text-[14px] border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary/50 bg-white placeholder:text-muted-foreground/40';
+  const labelCls  = 'block text-[14px] font-semibold text-muted-foreground  mb-1';
+  const hintCls   = 'text-[14px] text-muted-foreground mt-0.5';
 
   return (
     <div className="flex flex-col h-full">
@@ -482,7 +482,7 @@ function AddCapabilityForm({
       {/* Header */}
       <div className="px-6 pt-5 pb-4 border-b border-border shrink-0">
         <h2 className="text-[16px] font-medium text-foreground">Add a capability</h2>
-        <p className="text-[11px] text-muted-foreground mt-1 leading-snug max-w-md">
+        <p className="text-[14px] text-muted-foreground mt-1 leading-snug max-w-md">
           Define what Penny can do. This creates a record in Salesforce and makes the capability available to Prompt Studio.
         </p>
       </div>
@@ -573,14 +573,14 @@ function AddCapabilityForm({
       <div className="shrink-0 px-6 py-3 border-t border-border bg-background flex items-center justify-end gap-2">
         <button
           onClick={onCancel}
-          className="px-4 py-1.5 rounded-lg border border-border text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+          className="px-4 py-1.5 rounded-lg border border-border text-[14px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
         >
           Cancel
         </button>
         <button
           onClick={handleSubmit}
           disabled={!form.name.trim()}
-          className="px-4 py-1.5 rounded-lg bg-foreground text-background text-[11px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-40"
+          className="px-4 py-1.5 rounded-lg bg-foreground text-background text-[14px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-40"
         >
           Save to Salesforce
         </button>
@@ -634,12 +634,12 @@ export default function PennyCapabilityRegistry() {
         {/* List header */}
         <div className="px-3 pt-3 pb-2 border-b border-border/60 space-y-2 shrink-0">
           <div className="flex items-center justify-between">
-            <span className="text-[13px] font-medium text-foreground">
+            <span className="text-[14px] font-medium text-foreground">
               All capabilities
             </span>
             <button
               onClick={() => { setIsAdding(true); }}
-              className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary text-primary-foreground text-[10px] font-bold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1 px-2 py-1 rounded-md bg-primary text-primary-foreground text-[14px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3 h-3" /> Add
             </button>
@@ -652,7 +652,7 @@ export default function PennyCapabilityRegistry() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search capabilities…"
-              className="w-full text-[11px] border border-border rounded-md pl-6 pr-2.5 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/40"
+              className="w-full text-[14px] border border-border rounded-md pl-6 pr-2.5 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-primary/30 placeholder:text-muted-foreground/40"
             />
           </div>
 
@@ -662,7 +662,7 @@ export default function PennyCapabilityRegistry() {
               <button
                 key={p.label}
                 onClick={() => setDomainFilter(p.value)}
-                className={`px-2 py-0.5 rounded-full text-[9px] font-bold transition-colors ${
+                className={`px-2 py-0.5 rounded-full text-[14px] font-bold transition-colors ${
                   domainFilter === p.value
                     ? 'bg-foreground text-background'
                     : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
@@ -677,7 +677,7 @@ export default function PennyCapabilityRegistry() {
         {/* List items */}
         <div className="flex-1 overflow-y-auto">
           {filtered.length === 0 ? (
-            <p className="px-3 py-6 text-[11px] text-muted-foreground text-center">
+            <p className="px-3 py-6 text-[14px] text-muted-foreground text-center">
               No capabilities match.
             </p>
           ) : (
@@ -693,7 +693,7 @@ export default function PennyCapabilityRegistry() {
                       : 'hover:bg-muted/30 border-l-2 border-l-transparent'
                   }`}
                 >
-                  <p className={`text-[12px] font-medium leading-snug truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
+                  <p className={`text-[14px] font-medium leading-snug truncate ${isActive ? 'text-primary' : 'text-foreground'}`}>
                     {cap.name}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -723,8 +723,8 @@ export default function PennyCapabilityRegistry() {
           />
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center p-8 text-muted-foreground">
-            <p className="text-[13px] font-medium text-foreground mb-1">Select a capability</p>
-            <p className="text-[11px] max-w-xs">
+            <p className="text-[14px] font-medium text-foreground mb-1">Select a capability</p>
+            <p className="text-[14px] max-w-xs">
               Choose a capability from the list, or click Add to define a new one.
             </p>
           </div>

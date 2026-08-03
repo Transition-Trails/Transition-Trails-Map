@@ -21,14 +21,14 @@ const APPEARANCE = {
     card:                 '!shadow-none !border-0 !bg-transparent !rounded-none',
     footer:               '!shadow-none !bg-stone-50 !border-t !border-stone-200 !rounded-none',
     headerTitle:          '!text-[20px] !font-semibold !leading-tight',
-    headerSubtitle:       '!text-[13px]',
+    headerSubtitle:       '!text-[14px]',
     socialButtonsBlockButton:     '!border !border-stone-200 !bg-white hover:!bg-stone-50 !rounded-lg !transition-colors',
-    socialButtonsBlockButtonText: '!text-[13px] !font-medium',
+    socialButtonsBlockButtonText: '!text-[14px] !font-medium',
     formButtonPrimary:    '!rounded-lg !font-medium !transition-colors',
-    formFieldLabel:       '!text-[13px] !font-medium',
+    formFieldLabel:       '!text-[14px] !font-medium',
     formFieldInput:       '!border-stone-200 !bg-white !rounded-lg',
     footerActionLink:     '!font-medium',
-    dividerText:          '!text-[11px]',
+    dividerText:          '!text-[14px]',
     logoBox:              '!hidden',
   },
 };
@@ -45,7 +45,7 @@ export default function SignInPage() {
         </div>
         <span className="text-base font-semibold text-foreground leading-none">Trail OS</span>
         <span className="text-muted-foreground/30 select-none">·</span>
-        <span className="text-xs text-muted-foreground font-medium">Transition Trails</span>
+        <span className="text-sm text-muted-foreground font-medium">Transition Trails</span>
       </div>
 
       {/* Main */}
@@ -66,7 +66,7 @@ export default function SignInPage() {
           path={`${basePath}/sign-in`}
         />
 
-        <div className="flex items-center gap-2 text-[11px] text-muted-foreground/60">
+        <div className="flex items-center gap-2 text-[14px] text-muted-foreground/60">
           <svg className="w-3 h-3 text-muted-foreground/40" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
           </svg>

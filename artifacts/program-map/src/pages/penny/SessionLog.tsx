@@ -89,22 +89,22 @@ function SessionRow({ session }: { session: SessionRecord }) {
           <Icon className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[12px] font-semibold text-foreground">
+              <span className="text-[14px] font-semibold text-foreground">
                 {session.sessionType ?? 'Session'}
               </span>
               {session.status && (
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${statusColor(session.status)}`}>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${statusColor(session.status)}`}>
                   {session.status}
                 </span>
               )}
               {session.sessionDate && (
-                <span className="text-[11px] text-muted-foreground">{formatDate(session.sessionDate)}</span>
+                <span className="text-[14px] text-muted-foreground">{formatDate(session.sessionDate)}</span>
               )}
               {session.durationMinutes && (
-                <span className="text-[10px] text-muted-foreground/70">{session.durationMinutes} min</span>
+                <span className="text-[14px] text-muted-foreground/70">{session.durationMinutes} min</span>
               )}
             </div>
-            <div className="flex items-center gap-2 mt-0.5 text-[11px] text-muted-foreground">
+            <div className="flex items-center gap-2 mt-0.5 text-[14px] text-muted-foreground">
               {session.learnerName && <span>{session.learnerName}</span>}
               {session.learnerName && session.coachName && <span className="text-muted-foreground/30">·</span>}
               {session.coachName && <span>Coach: {session.coachName}</span>}
@@ -121,13 +121,13 @@ function SessionRow({ session }: { session: SessionRecord }) {
         <div className="border-t border-border/50 px-4 py-3 bg-muted/20 space-y-2">
           {session.notes ? (
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-1">Notes</p>
-              <p className="text-[12px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{session.notes}</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Notes</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{session.notes}</p>
             </div>
           ) : (
-            <p className="text-[11px] text-muted-foreground/50 italic">No notes recorded.</p>
+            <p className="text-[14px] text-muted-foreground/50 italic">No notes recorded.</p>
           )}
-          <p className="text-[10px] text-muted-foreground/40">SF ID: {session.id} · Logged {formatDate(session.createdDate)}</p>
+          <p className="text-[14px] text-muted-foreground/40">SF ID: {session.id} · Logged {formatDate(session.createdDate)}</p>
         </div>
       )}
     </div>
@@ -183,20 +183,20 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
     }
   }
 
-  const inputCls = "w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-[12px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring";
+  const inputCls = "w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Session type */}
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Session Type *</p>
+        <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Session Type *</p>
         <div className="flex flex-wrap gap-2">
           {SESSION_TYPES.map(({ value, label, icon: Icon }) => (
             <button
               key={value}
               type="button"
               onClick={() => set('sessionType', value)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-[12px] font-medium border transition-colors
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-[14px] font-medium border transition-colors
                 ${form.sessionType === value
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'border-border text-muted-foreground hover:bg-muted/40'}`}
@@ -211,11 +211,11 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
       {/* Date + duration */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Date *</label>
+          <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Date *</label>
           <input type="date" value={form.sessionDate} onChange={e => set('sessionDate', e.target.value)} className={inputCls} required />
         </div>
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Duration (min)</label>
+          <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Duration (min)</label>
           <input type="number" min="1" max="480" value={form.durationMinutes} onChange={e => set('durationMinutes', e.target.value)} placeholder="60" className={inputCls} />
         </div>
       </div>
@@ -223,11 +223,11 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
       {/* Coach + learner */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Coach Name</label>
+          <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Coach Name</label>
           <input value={form.coachName} onChange={e => set('coachName', e.target.value)} placeholder="e.g. Alex Rivera" className={inputCls} />
         </div>
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Learner Name</label>
+          <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Learner Name</label>
           <input value={form.learnerName} onChange={e => set('learnerName', e.target.value)} placeholder="e.g. Jordan Lee" className={inputCls} />
         </div>
       </div>
@@ -235,11 +235,11 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
       {/* Program + status */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Program</label>
+          <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Program</label>
           <input value={form.program} onChange={e => set('program', e.target.value)} placeholder="e.g. Explorer's Trail" className={inputCls} />
         </div>
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Outcome</label>
+          <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Outcome</label>
           <select value={form.status} onChange={e => set('status', e.target.value)} className={inputCls}>
             {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -248,7 +248,7 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
 
       {/* Notes */}
       <div>
-        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1 block">Notes</label>
+        <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Notes</label>
         <textarea
           value={form.notes}
           onChange={e => set('notes', e.target.value)}
@@ -261,9 +261,9 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
       {/* Errors */}
       {error && (
         <div className="rounded-md border border-[#E8B9B4] bg-[#FBEAE6] p-3 space-y-1">
-          <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
+          <p className="text-[14px] text-[#A93F2F] font-medium">{error}</p>
           {sfError !== null && (
-            <pre className="text-[10px] text-[#A93F2F]/80 whitespace-pre-wrap break-all font-mono">
+            <pre className="text-[14px] text-[#A93F2F]/80 whitespace-pre-wrap break-all font-mono">
               {typeof sfError === 'string' ? sfError : JSON.stringify(sfError, null, 2)}
             </pre>
           )}
@@ -273,7 +273,7 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
       <button
         type="submit"
         disabled={saving}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-primary text-primary-foreground text-[14px] font-semibold hover:bg-primary/90 transition-colors disabled:opacity-60"
       >
         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
         {saving ? 'Saving to Salesforce…' : 'Log Session'}
@@ -327,26 +327,26 @@ export default function SessionLog() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-foreground">Session Log</h2>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               {loading ? 'Loading from Salesforce…' : `${sessions.length} sessions · ${total} total in Salesforce`}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-md px-2 py-1">
+            <span className="flex items-center gap-1.5 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-md px-2 py-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               Salesforce · TT_Session_Log__c
             </span>
             <button
               onClick={() => void fetchSessions(true)}
               disabled={refreshing}
-              className="flex items-center gap-1.5 text-[11px] border border-border rounded-md px-2.5 py-1.5 hover:bg-muted/40 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 text-[14px] border border-border rounded-md px-2.5 py-1.5 hover:bg-muted/40 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh
             </button>
             <button
               onClick={() => setShowForm(v => !v)}
-              className="flex items-center gap-1.5 text-[11px] font-medium bg-primary text-primary-foreground rounded-md px-3 py-1.5 hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-1.5 text-[14px] font-medium bg-primary text-primary-foreground rounded-md px-3 py-1.5 hover:bg-primary/90 transition-colors"
             >
               {showForm ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
               {showForm ? 'Cancel' : 'Log Session'}
@@ -358,14 +358,14 @@ export default function SessionLog() {
         {success && (
           <div className="flex items-center gap-2 px-3 py-2 rounded-md border bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]">
             <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-            <span className="text-[12px] font-medium">Session logged successfully in Salesforce.</span>
+            <span className="text-[14px] font-medium">Session logged successfully in Salesforce.</span>
           </div>
         )}
 
         {/* Log form */}
         {showForm && (
           <div className="rounded-lg border border-border bg-card p-4">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-4">New Session</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-4">New Session</p>
             <LogForm onSuccess={handleSuccess} />
           </div>
         )}
@@ -384,8 +384,8 @@ export default function SessionLog() {
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[12px] text-[#A93F2F] font-medium">{error}</p>
-              <p className="text-[11px] text-[#A93F2F]/70 mt-0.5">
+              <p className="text-[14px] text-[#A93F2F] font-medium">{error}</p>
+              <p className="text-[14px] text-[#A93F2F]/70 mt-0.5">
                 Verify the SF service token has access to <code className="font-mono">TT_Session_Log__c</code>.
               </p>
             </div>
@@ -396,10 +396,10 @@ export default function SessionLog() {
         {!loading && !error && sessions.length === 0 && !showForm && (
           <div className="rounded-lg border border-dashed border-border bg-card p-10 text-center space-y-3">
             <CalendarDays className="w-7 h-7 text-muted-foreground/30 mx-auto" />
-            <p className="text-[12px] font-medium text-muted-foreground">No sessions logged yet.</p>
+            <p className="text-[14px] font-medium text-muted-foreground">No sessions logged yet.</p>
             <button
               onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-1.5 text-[12px] font-medium bg-primary text-primary-foreground rounded-md px-3 py-1.5 hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center gap-1.5 text-[14px] font-medium bg-primary text-primary-foreground rounded-md px-3 py-1.5 hover:bg-primary/90 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" /> Log your first session
             </button>
@@ -411,7 +411,7 @@ export default function SessionLog() {
           <div className="space-y-2">
             {sessions.map(s => <SessionRow key={s.id} session={s} />)}
             {sessions.length >= 50 && (
-              <p className="text-center text-[11px] text-muted-foreground/60">
+              <p className="text-center text-[14px] text-muted-foreground/60">
                 Showing 50 most recent. Total in Salesforce: {total}.
               </p>
             )}

@@ -132,7 +132,7 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
       {ev.isTrailTalk && (
         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EDF5F8] border-b border-[#7FAFC6]">
           <Star className="w-3 h-3 text-[#2F6F7E]" />
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#2F6F7E]">Trail Talk</span>
+          <span className="text-[14px] font-bold  text-[#2F6F7E]">Trail Talk</span>
         </div>
       )}
 
@@ -141,13 +141,13 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
         <div className="flex items-center justify-between px-3 py-1.5 bg-[#FFF3E0] border-b border-[#FFD08A]">
           <div className="flex items-center gap-1.5">
             <AlertCircle className="w-3 h-3 text-[#CC8400]" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#CC8400]">Response needed</span>
+            <span className="text-[14px] font-bold  text-[#CC8400]">Response needed</span>
           </div>
           <a
             href={ev.htmlLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] font-semibold text-[#CC8400] hover:underline flex items-center gap-1"
+            className="text-[14px] font-semibold text-[#CC8400] hover:underline flex items-center gap-1"
           >
             Open in Google Calendar <ExternalLink className="w-2.5 h-2.5" />
           </a>
@@ -157,7 +157,7 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
       <div className="p-3 space-y-2">
         {/* Title + link */}
         <div className="flex items-start justify-between gap-2">
-          <p className="text-[13px] font-semibold text-foreground leading-snug">{ev.summary}</p>
+          <p className="text-[14px] font-semibold text-foreground leading-snug">{ev.summary}</p>
           <a
             href={ev.htmlLink}
             target="_blank"
@@ -171,36 +171,36 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
 
         {/* Time + countdown */}
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
             <CalendarDays className="w-3 h-3" />
             <span>{formatDate(start)}{!isAllDayEv && ` · ${formatTime(start)}`}</span>
           </div>
-          <div className="flex items-center gap-1 text-[11px] font-medium text-primary">
+          <div className="flex items-center gap-1 text-[14px] font-medium text-primary">
             <Clock className="w-3 h-3" />
             <span>{timeToStart(start)}</span>
           </div>
           {selfAttendee && (
-            <span className={`text-[10px] font-medium ${statusCls}`}>{statusLabel}</span>
+            <span className={`text-[14px] font-medium ${statusCls}`}>{statusLabel}</span>
           )}
         </div>
 
         {/* Attendees */}
         {ev.attendeeCount > 0 && (
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
             <Users className="w-3 h-3" />
             <span>{ev.attendeeCount} attendee{ev.attendeeCount !== 1 ? 's' : ''}</span>
             {ev.attendees.slice(0, 3).map(a => (
-              <span key={a.email} className="bg-muted rounded-full px-1.5 py-0.5 text-[10px] truncate max-w-[90px]">
+              <span key={a.email} className="bg-muted rounded-full px-1.5 py-0.5 text-[14px] truncate max-w-[90px]">
                 {a.displayName ?? a.email.split('@')[0]}
               </span>
             ))}
-            {ev.attendeeCount > 3 && <span className="text-[10px] text-muted-foreground">+{ev.attendeeCount - 3}</span>}
+            {ev.attendeeCount > 3 && <span className="text-[14px] text-muted-foreground">+{ev.attendeeCount - 3}</span>}
           </div>
         )}
 
         {/* Location */}
         {ev.location && (
-          <p className="text-[11px] text-muted-foreground truncate">📍 {ev.location}</p>
+          <p className="text-[14px] text-muted-foreground truncate">📍 {ev.location}</p>
         )}
 
         {/* Penny prep */}
@@ -210,14 +210,14 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
               variant="ghost"
               size="sm"
               onClick={() => void requestPrep()}
-              className="h-7 text-[11px] text-primary border border-primary/20 hover:bg-primary/5 px-2.5 gap-1.5"
+              className="h-7 text-[14px] text-primary border border-primary/20 hover:bg-primary/5 px-2.5 gap-1.5"
             >
               <Brain className="w-3 h-3" /> Get {TERMS.aiAssistant} prep brief
             </Button>
           )}
 
           {prep.loading && (
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
               <Brain className="w-3 h-3 text-primary animate-pulse" />
               <span>{TERMS.aiAssistant} is preparing your brief…</span>
             </div>
@@ -227,12 +227,12 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
             <div className="rounded-lg border border-primary/20 bg-primary/5 p-2.5 space-y-1">
               <div className="flex items-center gap-1.5 mb-1">
                 <Brain className="w-3 h-3 text-primary" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{TERMS.aiAssistant} Prep Brief</span>
+                <span className="text-[14px] font-bold  text-primary">{TERMS.aiAssistant} Prep Brief</span>
               </div>
-              <p className="text-[11px] text-foreground leading-relaxed whitespace-pre-wrap">{prep.reply}</p>
+              <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-wrap">{prep.reply}</p>
               <button
                 onClick={() => setPrep({ loading: false, reply: null, error: null })}
-                className="text-[10px] text-muted-foreground hover:text-foreground mt-1"
+                className="text-[14px] text-muted-foreground hover:text-foreground mt-1"
               >
                 Dismiss
               </button>
@@ -240,7 +240,7 @@ function EventCard({ ev }: { ev: CalendarEvent }) {
           )}
 
           {prep.error && (
-            <div className="flex items-center gap-1.5 text-[11px] text-[#A93F2F]">
+            <div className="flex items-center gap-1.5 text-[14px] text-[#A93F2F]">
               <AlertCircle className="w-3 h-3" />
               <span>{prep.error}</span>
             </div>
@@ -294,15 +294,15 @@ export default function CalendarPanel() {
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">
               Collaboration · Google Calendar
             </p>
             <h1 className="text-base font-semibold text-foreground">Calendar Action Panel</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               Upcoming events from your primary Google Calendar — live data
             </p>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => void load()} disabled={loading} className="h-8 gap-1.5 text-[12px]">
+          <Button variant="ghost" size="sm" onClick={() => void load()} disabled={loading} className="h-8 gap-1.5 text-[14px]">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             {loading ? 'Loading…' : 'Refresh'}
           </Button>
@@ -310,17 +310,17 @@ export default function CalendarPanel() {
 
         {/* Status strip */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+          <div className="flex items-center gap-1.5 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
             <Zap className="w-3 h-3" />
             <span className="font-semibold">Live · Google Calendar API</span>
           </div>
           {fetchedAt && (
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[14px] text-muted-foreground">
               Updated {new Date(fetchedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
           {!loading && !error && (
-            <span className="text-[10px] text-muted-foreground">{events.length} event{events.length !== 1 ? 's' : ''} in next 7 days</span>
+            <span className="text-[14px] text-muted-foreground">{events.length} event{events.length !== 1 ? 's' : ''} in next 7 days</span>
           )}
         </div>
 
@@ -329,9 +329,9 @@ export default function CalendarPanel() {
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-3">
             <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[13px] font-semibold text-[#A93F2F] mb-0.5">Could not load calendar</p>
-              <p className="text-[12px] text-[#A93F2F]">{error}</p>
-              <Button variant="ghost" size="sm" onClick={() => void load()} className="mt-2 h-7 text-[11px] text-[#A93F2F]">
+              <p className="text-[14px] font-semibold text-[#A93F2F] mb-0.5">Could not load calendar</p>
+              <p className="text-[14px] text-[#A93F2F]">{error}</p>
+              <Button variant="ghost" size="sm" onClick={() => void load()} className="mt-2 h-7 text-[14px] text-[#A93F2F]">
                 Try again
               </Button>
             </div>
@@ -355,7 +355,7 @@ export default function CalendarPanel() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="w-3.5 h-3.5 text-[#CC8400]" />
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#CC8400]">
+              <p className="text-[14px] font-bold  text-[#CC8400]">
                 Needs Response ({pending.length})
               </p>
             </div>
@@ -370,7 +370,7 @@ export default function CalendarPanel() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70">
+              <p className="text-[14px] font-bold  text-muted-foreground/70">
                 Upcoming — Next 7 Days
               </p>
             </div>
@@ -385,13 +385,13 @@ export default function CalendarPanel() {
           <div className="rounded-xl border border-dashed border-border p-8 text-center">
             <CheckCircle2 className="w-8 h-8 text-[#2F6B3F] mx-auto mb-3" />
             <p className="text-sm font-semibold text-foreground mb-1">All clear for the next 7 days</p>
-            <p className="text-[12px] text-muted-foreground">No upcoming events found in your primary Google Calendar.</p>
+            <p className="text-[14px] text-muted-foreground">No upcoming events found in your primary Google Calendar.</p>
           </div>
         )}
 
         {/* Footer note */}
         {!loading && !error && events.length > 0 && (
-          <p className="text-[10px] text-muted-foreground/60 text-center pt-2">
+          <p className="text-[14px] text-muted-foreground/60 text-center pt-2">
             Read-only view — no calendar writes occur without your action in Google Calendar.{' '}
             {TERMS.aiAssistant} prep briefs are generated by Gemini 2.5 Flash.
           </p>

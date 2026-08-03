@@ -230,16 +230,16 @@ export default function TestPenny() {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Penny Command Center</span>
-              <Badge variant="outline" className="text-[10px] bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE] flex items-center gap-1">
+              <span className="text-[14px] font-bold  text-muted-foreground">Penny Command Center</span>
+              <Badge variant="outline" className="text-[14px] bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE] flex items-center gap-1">
                 <Zap className="w-2.5 h-2.5" /> Live · Gemini 2.5 Flash
               </Badge>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Test Penny</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Live AI — powered by Gemini 2.5 Flash · role-aware · multi-turn</p>
+            <p className="text-sm text-muted-foreground mt-0.5">Live AI — powered by Gemini 2.5 Flash · role-aware · multi-turn</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <div className="flex items-center gap-1.5 text-[11px] bg-primary/5 border border-primary/20 rounded-full px-3 py-1">
+            <div className="flex items-center gap-1.5 text-[14px] bg-primary/5 border border-primary/20 rounded-full px-3 py-1">
               <Brain className="w-3.5 h-3.5 text-primary" />
               <span className="font-medium text-primary">Penny</span>
               <span className="text-muted-foreground">— {ROLE_LABELS[userTier] ?? userTier}</span>
@@ -278,7 +278,7 @@ export default function TestPenny() {
                   }`}>
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{m.content}</p>
                     {m.time !== '—' && (
-                      <p className={`text-[10px] mt-1 flex items-center gap-1.5 ${
+                      <p className={`text-[14px] mt-1 flex items-center gap-1.5 ${
                         m.role === 'user' ? 'text-primary-foreground/60 justify-end' : 'text-muted-foreground'
                       }`}>
                         {m.time}
@@ -314,19 +314,19 @@ export default function TestPenny() {
 
             {/* Learner selector */}
             <div className="flex items-center gap-2 max-w-2xl">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap flex-shrink-0">
+              <span className="text-[14px] font-bold  text-muted-foreground whitespace-nowrap flex-shrink-0">
                 Test as
               </span>
               {learnersLoading ? (
-                <span className="text-[12px] text-muted-foreground">Loading learners…</span>
+                <span className="text-[14px] text-muted-foreground">Loading learners…</span>
               ) : learnersError ? (
-                <span className="text-[12px] text-[#A93F2F]">Unable to load learners</span>
+                <span className="text-[14px] text-[#A93F2F]">Unable to load learners</span>
               ) : (
                 <div className="relative flex-1">
                   <select
                     value={selectedLearner?.id ?? ''}
                     onChange={e => handleLearnerChange(e.target.value)}
-                    className="w-full text-[12px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/40 appearance-none pr-7"
+                    className="w-full text-[14px] border border-border rounded-lg px-3 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/40 appearance-none pr-7"
                   >
                     <option value="">Your Salesforce Session (default)</option>
                     {learners.map(l => (
@@ -367,36 +367,36 @@ export default function TestPenny() {
 
           {/* SECTION 1 — Testing As */}
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Testing As</p>
+            <p className="text-[14px] font-bold  text-muted-foreground mb-2">Testing As</p>
             {selectedLearner ? (
               <div className="space-y-1.5">
-                <p className="text-[13px] font-semibold text-foreground leading-tight">
+                <p className="text-[14px] font-semibold text-foreground leading-tight">
                   {selectedLearner.firstName} {selectedLearner.lastName}
                 </p>
-                <span className={`inline-flex text-[10px] font-medium border rounded-full px-2 py-0.5 ${trailBadgeClass(selectedLearner.pennyTrail)}`}>
+                <span className={`inline-flex text-[14px] font-medium border rounded-full px-2 py-0.5 ${trailBadgeClass(selectedLearner.pennyTrail)}`}>
                   {selectedLearner.pennyTrail ?? 'No trail'}
                 </span>
                 {contextMeta?.currentPhase && (
-                  <p className="text-[11px] text-muted-foreground">Phase: {contextMeta.currentPhase}</p>
+                  <p className="text-[14px] text-muted-foreground">Phase: {contextMeta.currentPhase}</p>
                 )}
               </div>
             ) : (
-              <p className="text-[12px] text-muted-foreground">Your Salesforce Session</p>
+              <p className="text-[14px] text-muted-foreground">Your Salesforce Session</p>
             )}
           </div>
 
           {/* SECTION 2 — Live Context */}
           <div className="pt-3 border-t border-border">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Live Context</p>
+            <p className="text-[14px] font-bold  text-muted-foreground mb-2">Live Context</p>
             {!hasSentMessage ? (
-              <p className="text-[11px] text-muted-foreground/60 italic leading-relaxed">
+              <p className="text-[14px] text-muted-foreground/60 italic leading-relaxed">
                 Send a message to load live context.
               </p>
             ) : (
-              <div className="space-y-2.5 text-[12px]">
+              <div className="space-y-2.5 text-[14px]">
 
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Prompt Path</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Prompt Path</span>
                   {contextMeta ? (
                     contextMeta.promptPath === 'salesforce' ? (
                       <span className="flex items-center gap-1 text-[#2F6B3F] font-medium">
@@ -411,43 +411,43 @@ export default function TestPenny() {
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Current Goal</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Current Goal</span>
                   <span className={`leading-snug ${contextMeta?.currentGoal ? 'text-foreground' : 'text-muted-foreground'}`}>
                     {contextMeta?.currentGoal ?? '—'}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Current Phase</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Current Phase</span>
                   <span className="text-muted-foreground">{contextMeta?.currentPhase ?? '—'}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Coaching Tone</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Coaching Tone</span>
                   <span className="text-muted-foreground">{contextMeta?.coachingTone ?? '—'}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Confidence Score</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Confidence Score</span>
                   <span className="text-muted-foreground">
                     {contextMeta?.confidenceScore != null ? `${contextMeta.confidenceScore}/10` : '—'}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Trail</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Trail</span>
                   <span className="text-muted-foreground">{contextMeta?.trailId ?? '—'}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Interaction Logged</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Interaction Logged</span>
                   {contextMeta ? (
                     contextMeta.promptPath === 'salesforce' ? (
-                      <span className="flex items-center gap-1 text-[#2F6B3F] font-medium text-[11px]">
+                      <span className="flex items-center gap-1 text-[#2F6B3F] font-medium text-[14px]">
                         <CheckCircle2 className="w-3 h-3" /> Yes
                       </span>
                     ) : (
-                      <span className="text-muted-foreground text-[11px]">No (fallback)</span>
+                      <span className="text-muted-foreground text-[14px]">No (fallback)</span>
                     )
                   ) : <span className="text-muted-foreground">—</span>}
                 </div>
@@ -458,21 +458,21 @@ export default function TestPenny() {
 
           {/* SECTION 3 — Session */}
           <div className="pt-3 border-t border-border">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Session</p>
-            <div className="space-y-2 text-[12px]">
+            <p className="text-[14px] font-bold  text-muted-foreground mb-2">Session</p>
+            <div className="space-y-2 text-[14px]">
               <div>
-                <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Model</span>
+                <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Model</span>
                 <span className="flex items-center gap-1 text-muted-foreground">
                   <Zap className="w-3 h-3" /> Gemini 2.5 Flash
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Messages</span>
+                <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Messages</span>
                 <span className="text-muted-foreground">{msgCount} sent</span>
               </div>
               {lastMs !== null && (
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground block mb-0.5">Last Response</span>
+                  <span className="text-[14px] font-semibold text-muted-foreground block mb-0.5">Last Response</span>
                   <span className="text-muted-foreground">{(lastMs / 1000).toFixed(1)}s</span>
                 </div>
               )}
@@ -481,14 +481,14 @@ export default function TestPenny() {
 
           {/* Starter prompts */}
           <div className="pt-3 border-t border-border">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Try asking</p>
+            <p className="text-[14px] font-bold  text-muted-foreground mb-2">Try asking</p>
             <div className="space-y-1.5">
               {STARTERS.map(q => (
                 <button
                   key={q}
                   onClick={() => setInput(q)}
                   disabled={loading}
-                  className="w-full text-left text-[11px] text-muted-foreground bg-muted hover:bg-primary/10 hover:text-primary rounded-md px-2 py-1.5 transition-colors disabled:opacity-50"
+                  className="w-full text-left text-[14px] text-muted-foreground bg-muted hover:bg-primary/10 hover:text-primary rounded-md px-2 py-1.5 transition-colors disabled:opacity-50"
                 >
                   {q}
                 </button>

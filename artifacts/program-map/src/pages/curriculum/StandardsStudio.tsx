@@ -44,7 +44,7 @@ function ViewTab({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all border ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-all border ${
         active
           ? 'bg-foreground text-background border-foreground'
           : 'border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground'
@@ -53,7 +53,7 @@ function ViewTab({
       <Icon className="w-3.5 h-3.5" />
       {label}
       {count !== undefined && (
-        <span className={`text-[10px] font-bold rounded-full px-1.5 py-0 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
+        <span className={`text-[14px] font-bold rounded-full px-1.5 py-0 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
       )}
     </button>
   );
@@ -77,12 +77,12 @@ function StandardRow({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className={`text-[12px] font-bold leading-snug ${selected ? 'text-background' : 'text-foreground'}`}>{std.name}</p>
-          <p className={`text-[10px] mt-0.5 truncate ${selected ? 'text-background/60' : 'text-muted-foreground'}`}>{std.category}</p>
+          <p className={`text-[14px] font-bold leading-snug ${selected ? 'text-background' : 'text-foreground'}`}>{std.name}</p>
+          <p className={`text-[14px] mt-0.5 truncate ${selected ? 'text-background/60' : 'text-muted-foreground'}`}>{std.category}</p>
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
-          <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : statusCfg.cls}`}>{statusCfg.label}</span>
-          <span className={`text-[9px] font-medium ${selected ? 'text-background/50' : 'text-muted-foreground/60'}`}>{std.pennyChecks.length} checks</span>
+          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : statusCfg.cls}`}>{statusCfg.label}</span>
+          <span className={`text-[14px] font-medium ${selected ? 'text-background/50' : 'text-muted-foreground/60'}`}>{std.pennyChecks.length} checks</span>
         </div>
       </div>
     </button>
@@ -108,7 +108,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
     return (
       <div className="border border-border rounded-lg overflow-hidden">
         <button onClick={() => toggleSection(id)} className="w-full flex items-center justify-between px-3 py-2 bg-muted/30 hover:bg-muted/50 transition-colors">
-          <span className="text-[11px] font-bold text-foreground uppercase tracking-wider">{label}</span>
+          <span className="text-[14px] font-bold text-foreground ">{label}</span>
           {open ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
         </button>
         {open && <div className="p-3">{children}</div>}
@@ -123,33 +123,33 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
         <div>
           <div className="flex items-start justify-between gap-2 mb-2">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-0.5">Content Standard</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">Content Standard</p>
               <h3 className="text-lg font-bold text-foreground">{std.name}</h3>
             </div>
             <button
               onClick={onOpenBrief}
-              className="text-[10px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0"
+              className="text-[14px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0"
             >
               {TERMS.knowledgeBrief}
             </button>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${catCfg.cls}`}>{std.category}</span>
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
-            <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${confidenceCfg.cls}`}>{confidenceCfg.label}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${catCfg.cls}`}>{std.category}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${confidenceCfg.cls}`}>{confidenceCfg.label}</span>
           </div>
         </div>
 
         {/* Purpose */}
         <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-          <p className="text-[10px] font-bold text-primary/70 uppercase tracking-wider mb-1">Purpose</p>
-          <p className="text-[12px] text-foreground leading-relaxed">{std.purpose}</p>
+          <p className="text-[14px] font-bold text-primary/70  mb-1">Purpose</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{std.purpose}</p>
         </div>
 
         {/* Why it matters */}
         <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0]/50 p-3">
-          <p className="text-[10px] font-bold text-[#CC8400] uppercase tracking-wider mb-1">Why It Matters</p>
-          <p className="text-[11px] text-[#CC8400] leading-relaxed">{std.whyItMatters}</p>
+          <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Why It Matters</p>
+          <p className="text-[14px] text-[#CC8400] leading-relaxed">{std.whyItMatters}</p>
         </div>
 
         {/* Required Fields */}
@@ -157,12 +157,12 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
           <div className="space-y-1.5">
             {std.requiredFields.map(f => (
               <div key={f.field} className="flex items-start gap-2">
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>
                   {f.required ? 'Req' : 'Opt'}
                 </span>
                 <div>
-                  <p className="text-[11px] font-semibold text-foreground">{f.field}</p>
-                  <p className="text-[10px] text-muted-foreground">{f.description}</p>
+                  <p className="text-[14px] font-semibold text-foreground">{f.field}</p>
+                  <p className="text-[14px] text-muted-foreground">{f.description}</p>
                 </div>
               </div>
             ))}
@@ -175,7 +175,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
             {std.qualityCriteria.map((c, i) => (
               <div key={i} className="flex items-start gap-2">
                 <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
-                <p className="text-[11px] text-foreground">{c}</p>
+                <p className="text-[14px] text-foreground">{c}</p>
               </div>
             ))}
           </div>
@@ -187,17 +187,17 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
             {std.pennyChecks.map(chk => (
               <div key={chk.id} className="rounded border border-border bg-muted/20 p-2.5 space-y-1">
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${chk.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{chk.required ? 'Required' : 'Optional'}</span>
-                  <p className="text-[11px] font-semibold text-foreground">{chk.check}</p>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${chk.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{chk.required ? 'Required' : 'Optional'}</span>
+                  <p className="text-[14px] font-semibold text-foreground">{chk.check}</p>
                 </div>
                 <div className="grid grid-cols-1 gap-1 pl-1">
                   <div className="flex items-start gap-1.5">
                     <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-muted-foreground">{chk.passing}</p>
+                    <p className="text-[14px] text-muted-foreground">{chk.passing}</p>
                   </div>
                   <div className="flex items-start gap-1.5">
                     <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-muted-foreground">{chk.failing}</p>
+                    <p className="text-[14px] text-muted-foreground">{chk.failing}</p>
                   </div>
                 </div>
               </div>
@@ -208,31 +208,31 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
         {/* Example Output */}
         <Section id="example" label="Example Output">
           <div className="rounded-lg border border-secondary/15 bg-secondary/5 p-3">
-            <p className="text-[11px] text-foreground/80 italic leading-relaxed">{std.exampleOutput}</p>
+            <p className="text-[14px] text-foreground/80 italic leading-relaxed">{std.exampleOutput}</p>
           </div>
         </Section>
 
         {/* How Penny Uses It */}
         <Section id="penny" label="How Penny Uses This Standard">
-          <p className="text-[11px] text-foreground leading-relaxed">{std.howPennyUsesIt}</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{std.howPennyUsesIt}</p>
         </Section>
 
         {/* Mappings */}
         <Section id="mappings" label="Salesforce & LMS Mapping">
           <div className="space-y-2">
             <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
-              <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">Salesforce</p>
-              <p className="text-[11px] text-[#2F6F7E]">{std.sfMapping}</p>
+              <p className="text-[14px] font-bold text-[#2F6F7E]  mb-0.5">Salesforce</p>
+              <p className="text-[14px] text-[#2F6F7E]">{std.sfMapping}</p>
             </div>
             <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
-              <p className="text-[9px] font-bold text-[#2F6F7E] uppercase tracking-wider mb-0.5">LMS</p>
-              <p className="text-[11px] text-[#2F6F7E]">{std.lmsMapping}</p>
+              <p className="text-[14px] font-bold text-[#2F6F7E]  mb-0.5">LMS</p>
+              <p className="text-[14px] text-[#2F6F7E]">{std.lmsMapping}</p>
             </div>
           </div>
         </Section>
 
         {/* Meta */}
-        <div className="rounded-lg border border-border bg-muted/20 p-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
+        <div className="rounded-lg border border-border bg-muted/20 p-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[14px]">
           <div><span className="text-muted-foreground">Owner</span><p className="font-semibold text-foreground">{std.owner}</p></div>
           <div><span className="text-muted-foreground">Review Cycle</span><p className="font-semibold text-foreground">{std.reviewCycle}</p></div>
           <div><span className="text-muted-foreground">Knowledge Category</span><p className="font-semibold text-foreground">{std.relatedKnowledgeCategory}</p></div>
@@ -240,7 +240,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
             <span className="text-muted-foreground">Related Objects</span>
             <div className="flex flex-wrap gap-1 mt-0.5">
               {std.relatedContentObjects.map(o => (
-                <span key={o} className="text-[9px] font-medium border border-border bg-background rounded-full px-1.5 py-0.5 text-muted-foreground">{o}</span>
+                <span key={o} className="text-[14px] font-medium border border-border bg-background rounded-full px-1.5 py-0.5 text-muted-foreground">{o}</span>
               ))}
             </div>
           </div>
@@ -265,7 +265,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
         {/* Intro strip */}
         <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
           <ShieldCheck className="w-4 h-4 text-muted-foreground shrink-0" />
-          <p className="text-[12px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             Standards are the rulebook {TERMS.aiAssistant} uses to create, review, and improve curriculum content.
             The <strong className="text-foreground">Program Blueprint</strong> defines what every program should contain;
             <strong className="text-foreground"> Foundations Trail</strong> is the reference implementation.
@@ -282,15 +282,15 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           ].map(stat => (
             <div key={stat.label} className={`rounded-lg border p-3 text-center ${stat.cls}`}>
               <p className="text-xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-[11px] font-semibold text-foreground/80">{stat.label}</p>
-              <p className="text-[10px] text-muted-foreground">{stat.sub}</p>
+              <p className="text-[14px] font-semibold text-foreground/80">{stat.label}</p>
+              <p className="text-[14px] text-muted-foreground">{stat.sub}</p>
             </div>
           ))}
         </div>
 
         {/* How standards work */}
         <div>
-          <h3 className="text-[13px] font-bold text-foreground mb-3">How Standards Work</h3>
+          <h3 className="text-[14px] font-bold text-foreground mb-3">How Standards Work</h3>
           <div className="grid grid-cols-3 gap-3">
             {[
               { step: '1', title: 'Author creates content', desc: 'Curriculum authors use the required fields list as a checklist while writing modules, lessons, prompts, or delivery assets.' },
@@ -298,9 +298,9 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
               { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps in the reference implementation and all programs, sorted by severity, so teams can prioritise fixes before the next cohort.' },
             ].map(s => (
               <div key={s.step} className="rounded-lg border border-border bg-background p-3">
-                <div className="w-6 h-6 rounded-full bg-foreground text-background text-[11px] font-bold flex items-center justify-center mb-2">{s.step}</div>
-                <p className="text-[11px] font-bold text-foreground mb-1">{s.title}</p>
-                <p className="text-[10px] text-muted-foreground leading-relaxed">{s.desc}</p>
+                <div className="w-6 h-6 rounded-full bg-foreground text-background text-[14px] font-bold flex items-center justify-center mb-2">{s.step}</div>
+                <p className="text-[14px] font-bold text-foreground mb-1">{s.title}</p>
+                <p className="text-[14px] text-muted-foreground leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -314,8 +314,8 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
             <div key={cat}>
               <div className="flex items-center gap-2 mb-2">
                 <Icon className="w-4 h-4 text-muted-foreground" />
-                <h3 className="text-[12px] font-bold text-foreground">{cat}</h3>
-                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{standards.length}</span>
+                <h3 className="text-[14px] font-bold text-foreground">{cat}</h3>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{standards.length}</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {standards.map(std => {
@@ -327,12 +327,12 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
                       className="text-left rounded-lg border border-border bg-background hover:border-foreground/20 hover:bg-muted/20 p-3 transition-all"
                     >
                       <div className="flex items-start justify-between mb-1">
-                        <p className="text-[12px] font-bold text-foreground">{std.name}</p>
-                        <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ml-1 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                        <p className="text-[14px] font-bold text-foreground">{std.name}</p>
+                        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ml-1 ${statusCfg.cls}`}>{statusCfg.label}</span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">{std.purpose}</p>
+                      <p className="text-[14px] text-muted-foreground leading-snug line-clamp-2">{std.purpose}</p>
                       <div className="flex items-center gap-2 mt-1.5">
-                        <span className="text-[9px] text-muted-foreground/70">{std.pennyChecks.length} checks · Owner: {std.owner}</span>
+                        <span className="text-[14px] text-muted-foreground/70">{std.pennyChecks.length} checks · Owner: {std.owner}</span>
                       </div>
                     </button>
                   );
@@ -349,16 +349,16 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
             className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 text-left hover:bg-secondary/10 transition-colors"
           >
             <ClipboardList className="w-5 h-5 text-secondary mb-2" />
-            <p className="text-[12px] font-bold text-foreground mb-1">Standards Checklist</p>
-            <p className="text-[11px] text-muted-foreground">{TERMS.aiAssistant}'s audit tool — run all required checks against any content object.</p>
+            <p className="text-[14px] font-bold text-foreground mb-1">Standards Checklist</p>
+            <p className="text-[14px] text-muted-foreground">{TERMS.aiAssistant}'s audit tool — run all required checks against any content object.</p>
           </button>
           <button
             onClick={() => onNavigate('gap-report')}
             className="rounded-xl border border-[#E8B9B4] bg-[#FBEAE6] p-4 text-left hover:bg-[#FBEAE6] transition-colors"
           >
             <AlertTriangle className="w-5 h-5 text-[#A93F2F] mb-2" />
-            <p className="text-[12px] font-bold text-foreground mb-1">Gap Report</p>
-            <p className="text-[11px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps across all programs require attention before the next cohort.</p>
+            <p className="text-[14px] font-bold text-foreground mb-1">Gap Report</p>
+            <p className="text-[14px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps across all programs require attention before the next cohort.</p>
           </button>
         </div>
 
@@ -401,13 +401,13 @@ function StandardsBrowserView({
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search standards…"
-              className="pl-7 h-7 text-[11px] bg-background"
+              className="pl-7 h-7 text-[14px] bg-background"
             />
           </div>
           <select
             value={filterCat}
             onChange={e => setFilterCat(e.target.value as StandardCategory | 'all')}
-            className="w-full h-7 text-[11px] rounded-md border border-input bg-background px-2"
+            className="w-full h-7 text-[14px] rounded-md border border-input bg-background px-2"
           >
             <option value="all">All categories</option>
             {CATEGORY_ORDER.map(c => <option key={c} value={c}>{c}</option>)}
@@ -416,14 +416,14 @@ function StandardsBrowserView({
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {filtered.length === 0 && (
-              <p className="text-[11px] text-muted-foreground text-center py-6">No standards match.</p>
+              <p className="text-[14px] text-muted-foreground text-center py-6">No standards match.</p>
             )}
             {CATEGORY_ORDER.map(cat => {
               const catStds = filtered.filter(s => s.category === cat);
               if (catStds.length === 0) return null;
               return (
                 <div key={cat}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 px-1 py-1.5">{cat}</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{cat}</p>
                   {catStds.map(std => (
                     <StandardRow key={std.id} std={std} selected={selectedId === std.id} onSelect={() => setSelectedId(std.id)} />
                   ))}
@@ -478,30 +478,30 @@ function ChecklistView() {
       <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-background">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-muted-foreground">Filter:</span>
+            <span className="text-[14px] text-muted-foreground">Filter:</span>
             <select
               value={filterType}
               onChange={e => { setFilterType(e.target.value); setStates({}); }}
-              className="h-7 text-[11px] rounded-md border border-input bg-background px-2"
+              className="h-7 text-[14px] rounded-md border border-input bg-background px-2"
             >
               <option value="all">All object types</option>
               {objectTypes.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
-          <p className="text-[11px] text-muted-foreground">{total} checks · Click to cycle: → ✓ Pass → ✗ Fail → unchecked</p>
+          <p className="text-[14px] text-muted-foreground">{total} checks · Click to cycle: → ✓ Pass → ✗ Fail → unchecked</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
           {total > 0 && (
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold text-[#2F6B3F]">{passCount} pass</span>
-              <span className="text-[11px] font-semibold text-[#A93F2F]">{failCount} fail</span>
-              <span className="text-[11px] text-muted-foreground">{pct}% complete</span>
+              <span className="text-[14px] font-semibold text-[#2F6B3F]">{passCount} pass</span>
+              <span className="text-[14px] font-semibold text-[#A93F2F]">{failCount} fail</span>
+              <span className="text-[14px] text-muted-foreground">{pct}% complete</span>
               <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
                 <div className="h-full rounded-full bg-[#2F6B3F] transition-all" style={{ width: `${pct}%` }} />
               </div>
             </div>
           )}
-          <button onClick={resetAll} className="text-[10px] font-semibold text-muted-foreground border border-border rounded-full px-2.5 py-1 hover:bg-muted transition-colors">Reset</button>
+          <button onClick={resetAll} className="text-[14px] font-semibold text-muted-foreground border border-border rounded-full px-2.5 py-1 hover:bg-muted transition-colors">Reset</button>
         </div>
       </div>
 
@@ -518,13 +518,13 @@ function ChecklistView() {
                 <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookCheck className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-[13px] font-bold text-foreground">{std.name}</span>
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{std.category}</span>
+                    <span className="text-[14px] font-bold text-foreground">{std.name}</span>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{std.category}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    {stdPass > 0 && <span className="text-[10px] font-semibold text-[#2F6B3F]">{stdPass} pass</span>}
-                    {stdFail > 0 && <span className="text-[10px] font-semibold text-[#A93F2F]">{stdFail} fail</span>}
-                    <span className="text-[10px] text-muted-foreground">{stdChecks.length} checks</span>
+                    {stdPass > 0 && <span className="text-[14px] font-semibold text-[#2F6B3F]">{stdPass} pass</span>}
+                    {stdFail > 0 && <span className="text-[14px] font-semibold text-[#A93F2F]">{stdFail} fail</span>}
+                    <span className="text-[14px] text-muted-foreground">{stdChecks.length} checks</span>
                   </div>
                 </div>
                 <div className="divide-y divide-border">
@@ -548,17 +548,17 @@ function ChecklistView() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 mb-0.5">
-                            <p className="text-[12px] font-semibold text-foreground">{chk.check}</p>
-                            {chk.required && <span className="text-[9px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Required</span>}
+                            <p className="text-[14px] font-semibold text-foreground">{chk.check}</p>
+                            {chk.required && <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Required</span>}
                           </div>
                           <div className="flex items-start gap-4">
                             <div className="flex items-start gap-1">
-                              <span className="text-[9px] font-bold text-[#2F6B3F] uppercase shrink-0 mt-0.5">✓</span>
-                              <p className="text-[10px] text-muted-foreground">{chk.passing}</p>
+                              <span className="text-[14px] font-bold text-[#2F6B3F]  shrink-0 mt-0.5">✓</span>
+                              <p className="text-[14px] text-muted-foreground">{chk.passing}</p>
                             </div>
                             <div className="flex items-start gap-1">
-                              <span className="text-[9px] font-bold text-[#A93F2F] uppercase shrink-0 mt-0.5">✗</span>
-                              <p className="text-[10px] text-muted-foreground">{chk.failing}</p>
+                              <span className="text-[14px] font-bold text-[#A93F2F]  shrink-0 mt-0.5">✗</span>
+                              <p className="text-[14px] text-muted-foreground">{chk.failing}</p>
                             </div>
                           </div>
                         </div>
@@ -611,22 +611,22 @@ function GapReportView() {
             { label: `${GAP_SUMMARY.bySeverity.medium} Medium`, cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
             { label: `${GAP_SUMMARY.bySeverity.low} Low`, cls: 'text-slate-600 bg-slate-50 border-slate-200' },
           ].map(s => (
-            <span key={s.label} className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${s.cls}`}>{s.label}</span>
+            <span key={s.label} className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${s.cls}`}>{s.label}</span>
           ))}
         </div>
         <div className="flex items-center gap-2 ml-auto">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select value={filterType} onChange={e => setFilterType(e.target.value as GapType | 'all')} className="h-7 text-[11px] rounded-md border border-input bg-background px-2">
+          <select value={filterType} onChange={e => setFilterType(e.target.value as GapType | 'all')} className="h-7 text-[14px] rounded-md border border-input bg-background px-2">
             <option value="all">All gap types</option>
             {(Object.keys(GAP_TYPE_CONFIG) as GapType[]).map(t => <option key={t} value={t}>{GAP_TYPE_CONFIG[t].label}</option>)}
           </select>
-          <select value={filterSev} onChange={e => setFilterSev(e.target.value as 'all' | 'high' | 'medium' | 'low')} className="h-7 text-[11px] rounded-md border border-input bg-background px-2">
+          <select value={filterSev} onChange={e => setFilterSev(e.target.value as 'all' | 'high' | 'medium' | 'low')} className="h-7 text-[14px] rounded-md border border-input bg-background px-2">
             <option value="all">All severities</option>
             <option value="high">High only</option>
             <option value="medium">Medium only</option>
             <option value="low">Low only</option>
           </select>
-          <span className="text-[11px] text-muted-foreground">{filtered.length} gaps</span>
+          <span className="text-[14px] text-muted-foreground">{filtered.length} gaps</span>
         </div>
       </div>
 
@@ -635,7 +635,7 @@ function GapReportView() {
           {filtered.length === 0 && (
             <div className="text-center py-12">
               <CheckCircle2 className="w-8 h-8 text-[#2F6B3F] mx-auto mb-2" />
-              <p className="text-[12px] font-semibold text-foreground">No gaps match the current filters.</p>
+              <p className="text-[14px] font-semibold text-foreground">No gaps match the current filters.</p>
             </div>
           )}
           {filtered.map(gap => {
@@ -655,15 +655,15 @@ function GapReportView() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-[12px] font-bold text-foreground truncate">{gap.objectName}</p>
+                      <p className="text-[14px] font-bold text-foreground truncate">{gap.objectName}</p>
                       <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                        <span className="text-[10px] text-muted-foreground font-medium">{gap.objectType}</span>
-                        {gap.sprint && <><span className="text-muted-foreground/40">·</span><span className="text-[10px] text-muted-foreground">{gap.sprint}</span></>}
+                        <span className="text-[14px] text-muted-foreground font-medium">{gap.objectType}</span>
+                        {gap.sprint && <><span className="text-muted-foreground/40">·</span><span className="text-[14px] text-muted-foreground">{gap.sprint}</span></>}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${typeCfg.cls}`}>{typeCfg.label}</span>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${sevCls[gap.severity]}`}>{gap.severity}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${typeCfg.cls}`}>{typeCfg.label}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${sevCls[gap.severity]}`}>{gap.severity}</span>
                       {isFocused && <Sparkles className="w-3.5 h-3.5 text-primary" />}
                     </div>
                   </div>
@@ -715,25 +715,25 @@ export default function StandardsStudio() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Page header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">
           Programs · Standards
         </p>
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-[15px] font-semibold text-foreground leading-snug">Standards Studio</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               The rulebook Penny uses to create, review, and improve curriculum content consistently.
             </p>
           </div>
           {view === 'gap-report' && (
             <div className="flex items-center gap-1.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 shrink-0">
               <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F]" />
-              <span className="text-[11px] font-bold text-[#A93F2F]">{GAP_SUMMARY.bySeverity.high} high-severity gaps</span>
+              <span className="text-[14px] font-bold text-[#A93F2F]">{GAP_SUMMARY.bySeverity.high} high-severity gaps</span>
             </div>
           )}
           <button
             onClick={handleNewStandard}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[11px] font-bold hover:opacity-90 transition-opacity shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
             New Standard

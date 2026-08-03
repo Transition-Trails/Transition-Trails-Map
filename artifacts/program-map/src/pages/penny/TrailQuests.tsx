@@ -39,7 +39,7 @@ const STATUS_CONFIG: Record<LearnerDelivery['status'], { cls: string; dot: strin
 function DeliveryStatusBadge({ status }: { status: LearnerDelivery['status'] }) {
   const cfg = STATUS_CONFIG[status];
   return (
-    <span className={`inline-flex items-center gap-1 text-[9px] font-semibold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
+    <span className={`inline-flex items-center gap-1 text-[14px] font-semibold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {status}
     </span>
@@ -87,7 +87,7 @@ export default function TrailQuests() {
 
         {/* Header */}
         <div className="space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+          <p className="text-[14px] font-bold  text-muted-foreground/50">
             Penny Command Center
           </p>
           <div className="flex items-center justify-between gap-3">
@@ -97,12 +97,12 @@ export default function TrailQuests() {
               </div>
               <div>
                 <h1 className="text-base font-semibold text-foreground">Trail Quests</h1>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[14px] text-muted-foreground">
                   Earnable badges and challenges delivered by Penny — tracked in Salesforce, sent via Slack.
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
+            <div className="flex items-center gap-1 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
               <span className="font-semibold">POC Confirmed</span>
             </div>
@@ -120,7 +120,7 @@ export default function TrailQuests() {
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
               <s.icon className={`w-4 h-4 ${s.color} mb-1.5`} />
               <p className={`text-xl font-semibold ${s.color}`}>{s.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -128,12 +128,12 @@ export default function TrailQuests() {
         {/* Active Deliveries */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <p className="text-[14px] font-bold  text-muted-foreground/60">
               Active Deliveries
             </p>
             <button
               onClick={() => openPennyForQuest('Active Quest Delivery')}
-              className="flex items-center gap-1 text-[10px] text-primary hover:underline"
+              className="flex items-center gap-1 text-[14px] text-primary hover:underline"
             >
               <Brain className="w-3 h-3" /> Ask Penny for delivery tips
             </button>
@@ -142,7 +142,7 @@ export default function TrailQuests() {
           <div className="rounded-xl border border-border overflow-hidden">
             <div className="grid grid-cols-[1fr_160px_120px_100px_80px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
               {['Learner', 'Quest', 'Status', 'Progress', 'Action'].map(h => (
-                <p key={h} className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{h}</p>
+                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
               ))}
             </div>
             <div className="bg-card divide-y divide-border">
@@ -156,12 +156,12 @@ export default function TrailQuests() {
                     className="grid grid-cols-[1fr_160px_120px_100px_80px] gap-x-3 items-center px-4 py-3"
                   >
                     <div>
-                      <p className="text-[12px] font-semibold text-foreground">{d.learner}</p>
-                      <p className="text-[10px] text-muted-foreground">{d.program}</p>
+                      <p className="text-[14px] font-semibold text-foreground">{d.learner}</p>
+                      <p className="text-[14px] text-muted-foreground">{d.program}</p>
                     </div>
                     <div>
-                      <p className="text-[11px] text-foreground truncate">{quest?.name ?? d.questId}</p>
-                      <p className="text-[10px] text-muted-foreground">{quest?.questType as string ?? ''}</p>
+                      <p className="text-[14px] text-foreground truncate">{quest?.name ?? d.questId}</p>
+                      <p className="text-[14px] text-muted-foreground">{quest?.questType as string ?? ''}</p>
                     </div>
                     <DeliveryStatusBadge status={d.status} />
                     <div>
@@ -172,18 +172,18 @@ export default function TrailQuests() {
                             style={{ width: `${(d.completedCriteria / d.totalCriteria) * 100}%` }}
                           />
                         </div>
-                        <span className="text-[9px] text-muted-foreground">{d.completedCriteria}/{d.totalCriteria}</span>
+                        <span className="text-[14px] text-muted-foreground">{d.completedCriteria}/{d.totalCriteria}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
                       {isSent ? (
-                        <span className="text-[10px] text-[#2F6B3F] font-medium">Sent ✓</span>
+                        <span className="text-[14px] text-[#2F6B3F] font-medium">Sent ✓</span>
                       ) : (
                         <button
                           onClick={() => void deliverViaSlack(d)}
                           disabled={isSending}
                           title={`Send nudge to ${d.learner} via Slack`}
-                          className="flex items-center gap-1 text-[10px] text-[#4A154B] border border-[#4A154B]/20 rounded-md px-2 py-1 hover:bg-[#4A154B]/5 transition-colors disabled:opacity-40"
+                          className="flex items-center gap-1 text-[14px] text-[#4A154B] border border-[#4A154B]/20 rounded-md px-2 py-1 hover:bg-[#4A154B]/5 transition-colors disabled:opacity-40"
                         >
                           {isSending
                             ? <Send className="w-2.5 h-2.5 animate-pulse" />
@@ -209,12 +209,12 @@ export default function TrailQuests() {
         {/* Quest Catalogue */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+            <p className="text-[14px] font-bold  text-muted-foreground/60">
               Quest Catalogue
             </p>
             <button
               onClick={() => openPennyForQuest('New Trail Quest')}
-              className="flex items-center gap-1 text-[10px] text-primary hover:underline"
+              className="flex items-center gap-1 text-[14px] text-primary hover:underline"
             >
               <Star className="w-3 h-3" /> Generate new quest
             </button>
@@ -238,16 +238,16 @@ export default function TrailQuests() {
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-[13px] font-semibold text-foreground">{quest.name as string}</p>
-                          <span className={`text-[9px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>
+                          <p className="text-[14px] font-semibold text-foreground">{quest.name as string}</p>
+                          <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>
                             {statusCfg.label}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 font-medium">
+                          <span className="text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 font-medium">
                             {quest.questType as string}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[14px] text-muted-foreground">
                             {quest.difficulty as string} · {quest.estimatedTime as string}
                           </span>
                         </div>
@@ -256,46 +256,46 @@ export default function TrailQuests() {
 
                     <div className="flex items-center gap-1.5 shrink-0">
                       {activeCount > 0 && (
-                        <span className="text-[9px] text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2 py-0.5 font-semibold">
+                        <span className="text-[14px] text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2 py-0.5 font-semibold">
                           {activeCount} active
                         </span>
                       )}
                       {doneCount > 0 && (
-                        <span className="text-[9px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5 font-semibold">
+                        <span className="text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5 font-semibold">
                           {doneCount} done
                         </span>
                       )}
                       <button
                         onClick={() => openPennyForQuest(quest.name as string)}
-                        className="flex items-center gap-1 text-[10px] text-primary border border-primary/20 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
+                        className="flex items-center gap-1 text-[14px] text-primary border border-primary/20 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
                       >
                         <Brain className="w-2.5 h-2.5" /> Penny
                       </button>
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">{quest.purpose as string}</p>
+                  <p className="text-[14px] text-muted-foreground mb-3 leading-relaxed">{quest.purpose as string}</p>
 
                   {((quest.criteria as string[]) || []).length > 0 && (
                     <div className="space-y-1">
-                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                      <p className="text-[14px] font-bold  text-muted-foreground/50">
                         Completion Criteria
                       </p>
                       {(quest.criteria as string[]).map((c, i) => (
                         <div key={i} className="flex items-center gap-2">
                           <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
-                          <p className="text-[11px] text-foreground/80">{c}</p>
+                          <p className="text-[14px] text-foreground/80">{c}</p>
                         </div>
                       ))}
                     </div>
                   )}
 
                   <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border/40">
-                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
                       <Users className="w-3 h-3" />
                       <span>{quest.program as string}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
                       <BookOpen className="w-3 h-3" />
                       <span>{quest.relatedSalesforceObject as string}</span>
                     </div>
@@ -310,8 +310,8 @@ export default function TrailQuests() {
         <div className="rounded-lg border border-[#E6F0EA] bg-[#E6F0EA]/50 p-3.5 flex items-start gap-2">
           <Slack className="w-3.5 h-3.5 text-[#4A154B] shrink-0 mt-0.5" />
           <div>
-            <p className="text-[11px] font-medium text-foreground mb-0.5">Slack + Salesforce delivery</p>
-            <p className="text-[10px] text-muted-foreground leading-snug">
+            <p className="text-[14px] font-medium text-foreground mb-0.5">Slack + Salesforce delivery</p>
+            <p className="text-[14px] text-muted-foreground leading-snug">
               Trail Quests are delivered via Slack (Penny AI channel) and completion events write to Salesforce
               <span className="font-mono">TrailQuest__c</span>. Use the Slack button per learner to send a coaching nudge,
               or ask Penny to draft a personalised delivery message.
@@ -322,7 +322,7 @@ export default function TrailQuests() {
         {/* Upcoming */}
         <div className="rounded-lg border border-border bg-muted/20 p-3.5 flex items-center gap-2">
           <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-[14px] text-muted-foreground">
             <span className="font-semibold text-foreground">Flow Builder Badge</span> — Draft quest in Sprint 3 module. 
             Complete Module 3.1 content health fixes before assigning to learners.
           </p>

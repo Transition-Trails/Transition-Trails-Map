@@ -25,18 +25,18 @@ const STATUS_ORDER: Record<CapabilityStatus, number> = { 'Live': 2, 'Ready': 1, 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-1.5 border-b border-border/40 last:border-0">
-      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 w-28 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[12px] text-foreground flex-1">{value}</span>
+      <span className="text-[14px] font-bold  text-muted-foreground/60 w-28 shrink-0 mt-0.5">{label}</span>
+      <span className="text-[14px] text-foreground flex-1">{value}</span>
     </div>
   );
 }
 
 function ChipList({ items }: { items: string[] }) {
-  if (!items?.length) return <p className="text-[11px] text-muted-foreground">—</p>;
+  if (!items?.length) return <p className="text-[14px] text-muted-foreground">—</p>;
   return (
     <div className="flex flex-wrap gap-1">
       {items.map(item => (
-        <span key={item} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] bg-muted border border-border text-foreground">{item}</span>
+        <span key={item} className="inline-flex items-center px-2 py-0.5 rounded text-[14px] bg-muted border border-border text-foreground">{item}</span>
       ))}
     </div>
   );
@@ -48,7 +48,7 @@ function StatusSelector({ current, onChange }: { current: CapabilityStatus; onCh
   const statuses: CapabilityStatus[] = ['Partial', 'Ready', 'Live'];
   return (
     <div>
-      <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 mb-1.5">Configure Status</p>
+      <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1.5">Configure Status</p>
       <div className="inline-flex rounded-md border border-border overflow-hidden">
         {statuses.map((s, i) => {
           const cfg = CAPABILITY_STATUS_CONFIG[s];
@@ -57,7 +57,7 @@ function StatusSelector({ current, onChange }: { current: CapabilityStatus; onCh
             <button
               key={s}
               onClick={() => onChange(s)}
-              className={`px-4 py-1.5 text-[11px] font-semibold transition-colors ${i < statuses.length - 1 ? 'border-r border-border' : ''} ${
+              className={`px-4 py-1.5 text-[14px] font-semibold transition-colors ${i < statuses.length - 1 ? 'border-r border-border' : ''} ${
                 isActive
                   ? cfg.badgeCls + ' border-0'
                   : 'bg-white text-muted-foreground hover:bg-muted/50'
@@ -68,7 +68,7 @@ function StatusSelector({ current, onChange }: { current: CapabilityStatus; onCh
           );
         })}
       </div>
-      <p className="text-[10px] text-muted-foreground mt-1.5">
+      <p className="text-[14px] text-muted-foreground mt-1.5">
         {current === 'Partial' && 'This capability is still being configured — not yet ready for use.'}
         {current === 'Ready'   && 'Fully configured and ready to activate, but not yet serving learners.'}
         {current === 'Live'    && 'Actively running and serving learners or coaches.'}
@@ -89,20 +89,20 @@ function OverviewTab({ cap, status, onStatusChange }: { cap: PennyCapability; st
       <div className="p-5 space-y-4 max-w-3xl">
         {/* Badges row */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${statusCfg.badgeCls}`}>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold  border ${statusCfg.badgeCls}`}>
             {status}
           </span>
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${domainCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold  border ${domainCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
             {cap.domain}
           </span>
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${readinessCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold  border ${readinessCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
             {cap.maturity}
           </span>
         </div>
 
         {/* Purpose */}
         {cap.purpose && (
-          <p className="text-[12px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{cap.purpose}</p>
+          <p className="text-[14px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{cap.purpose}</p>
         )}
 
         {/* Status selector */}
@@ -118,20 +118,20 @@ function OverviewTab({ cap, status, onStatusChange }: { cap: PennyCapability; st
 
         {cap.inputs?.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 mb-2">Inputs</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Inputs</p>
             <ChipList items={cap.inputs} />
           </div>
         )}
         {cap.outputs?.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60 mb-2">Outputs</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Outputs</p>
             <ChipList items={cap.outputs} />
           </div>
         )}
         {isOperational && (
           <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3">
-            <p className="text-[11px] font-bold text-[#2F6B3F]">Operational</p>
-            <p className="text-[12px] text-[#245531]">This capability is live and serving learners or coaches.</p>
+            <p className="text-[14px] font-bold text-[#2F6B3F]">Operational</p>
+            <p className="text-[14px] text-[#245531]">This capability is live and serving learners or coaches.</p>
           </div>
         )}
       </div>
@@ -151,21 +151,21 @@ function PromptsTab({ cap }: { cap: PennyCapability }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Prompt templates that power this capability. Manage templates in Prompt Studio.</p>
+        <p className="text-[14px] text-muted-foreground">Prompt templates that power this capability. Manage templates in Prompt Studio.</p>
         {prompts.length > 0 ? (
           prompts.map(prompt => (
             <div key={prompt} className="rounded-lg border border-border bg-white p-4">
-              <p className="text-[12px] font-bold text-foreground">{prompt.split('—')[0].trim()}</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">{prompt.split('—')[1]?.trim() ?? ''}</p>
-              <span className="inline-flex items-center mt-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#E6F0EA] text-[#2F6B3F] border border-[#9FC3AE]">Operational</span>
+              <p className="text-[14px] font-bold text-foreground">{prompt.split('—')[0].trim()}</p>
+              <p className="text-[14px] text-muted-foreground mt-0.5">{prompt.split('—')[1]?.trim() ?? ''}</p>
+              <span className="inline-flex items-center mt-2 px-1.5 py-0.5 rounded text-[14px] font-bold bg-[#E6F0EA] text-[#2F6B3F] border border-[#9FC3AE]">Operational</span>
             </div>
           ))
         ) : (
           <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">No prompt templates mapped for this capability yet.</p>
+            <p className="text-[14px] text-muted-foreground">No prompt templates mapped for this capability yet.</p>
           </div>
         )}
-        <p className="text-[10px] text-muted-foreground">Full prompt authoring and version history available in Prompt Studio.</p>
+        <p className="text-[14px] text-muted-foreground">Full prompt authoring and version history available in Prompt Studio.</p>
       </div>
     </ScrollArea>
   );
@@ -182,14 +182,14 @@ function SourcesTab({ cap }: { cap: PennyCapability }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Knowledge sources this capability depends on. All sources require trust review before Penny activation.</p>
+        <p className="text-[14px] text-muted-foreground">Knowledge sources this capability depends on. All sources require trust review before Penny activation.</p>
         {sources.length > 0 ? (
           <div className="rounded-lg border border-border overflow-hidden">
-            <table className="w-full text-[11px]">
+            <table className="w-full text-[14px]">
               <thead className="bg-muted/40 border-b border-border">
                 <tr>
                   {['Source', 'Trust Level', 'Status'].map(h => (
-                    <th key={h} className="text-left px-3 py-2 text-[9px] font-bold uppercase text-muted-foreground">{h}</th>
+                    <th key={h} className="text-left px-3 py-2 text-[14px] font-bold  text-muted-foreground">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -198,7 +198,7 @@ function SourcesTab({ cap }: { cap: PennyCapability }) {
                   <tr key={s.name} className={`border-b border-border/40 ${i % 2 === 0 ? 'bg-white' : 'bg-muted/10'}`}>
                     <td className="px-3 py-2 font-medium text-foreground">{s.name}</td>
                     <td className="px-3 py-2">
-                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${s.trust === 'Authoritative' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'}`}>
+                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${s.trust === 'Authoritative' ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]' : 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'}`}>
                         {s.trust}
                       </span>
                     </td>
@@ -209,7 +209,7 @@ function SourcesTab({ cap }: { cap: PennyCapability }) {
             </table>
           </div>
         ) : (
-          <p className="text-[12px] text-muted-foreground">No knowledge sources mapped for this capability.</p>
+          <p className="text-[14px] text-muted-foreground">No knowledge sources mapped for this capability.</p>
         )}
       </div>
     </ScrollArea>
@@ -232,14 +232,14 @@ function QualityTab({ cap }: { cap: PennyCapability }) {
             <div className="flex items-center gap-4">
               <div className="text-center">
                 <p className={`text-4xl font-bold ${scoreColor}`}>{score}</p>
-                <p className="text-[10px] text-muted-foreground">/ 100</p>
-                <p className="text-[10px] font-bold uppercase text-muted-foreground/60 mt-1">Quality Score</p>
+                <p className="text-[14px] text-muted-foreground">/ 100</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mt-1">Quality Score</p>
               </div>
               <div className="flex-1">
                 <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <div className={`h-full rounded-full ${score >= 85 ? 'bg-[#2F6B3F]' : score >= 75 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`} style={{ width:`${score}%` }} />
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1">{score >= 80 ? 'Meets quality threshold' : 'Below threshold — review recommended'}</p>
+                <p className="text-[14px] text-muted-foreground mt-1">{score >= 80 ? 'Meets quality threshold' : 'Below threshold — review recommended'}</p>
               </div>
             </div>
             <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
@@ -251,7 +251,7 @@ function QualityTab({ cap }: { cap: PennyCapability }) {
           </>
         ) : (
           <div className="rounded-lg border border-muted bg-muted/30 p-4">
-            <p className="text-[12px] text-muted-foreground">Quality monitoring is active for Operational and Integrated capabilities. This capability is in <strong>{cap.maturity}</strong> state.</p>
+            <p className="text-[14px] text-muted-foreground">Quality monitoring is active for Operational and Integrated capabilities. This capability is in <strong>{cap.maturity}</strong> state.</p>
           </div>
         )}
       </div>
@@ -275,9 +275,9 @@ function HealthTab({ cap, status }: { cap: PennyCapability; status: CapabilitySt
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
             <div className="flex items-center gap-2.5">
               <HealthDot health={ind.health} />
-              <span className="text-[12px] font-medium text-foreground">{ind.label}</span>
+              <span className="text-[14px] font-medium text-foreground">{ind.label}</span>
             </div>
-            <span className="text-[11px] text-muted-foreground">{ind.note}</span>
+            <span className="text-[14px] text-muted-foreground">{ind.note}</span>
           </div>
         ))}
       </div>
@@ -310,7 +310,7 @@ function RelationshipsTab({ cap }: { cap: PennyCapability }) {
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-3 max-w-3xl">
-        <p className="text-[12px] text-muted-foreground">Digital Twin relationships — programs, knowledge sources, and integrations connected to this capability.</p>
+        <p className="text-[14px] text-muted-foreground">Digital Twin relationships — programs, knowledge sources, and integrations connected to this capability.</p>
         <RelationshipCard title="Programs"          icon={GraduationCap} items={programMap[cap.id]  ?? []} viewAllHref="/digital-twin/penny-network" emptyMessage="No programs linked" />
         <RelationshipCard title="Knowledge Sources" icon={BookOpen}      items={knowledgeMap[cap.id] ?? []} viewAllHref="/knowledge"                 emptyMessage="No knowledge sources linked" />
         <RelationshipCard title="Integrations"      icon={Puzzle}        items={integrationItems}            viewAllHref="/penny/integration-layer"   emptyMessage="No integrations linked" />

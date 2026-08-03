@@ -114,10 +114,10 @@ function FileRow({ file }: { file: DriveFile }) {
         <FIcon className={`w-3.5 h-3.5 ${meta.text}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-medium text-zinc-700 truncate" title={file.name}>{file.name}</p>
-        <p className="text-[10px] text-zinc-400">{formatDate(file.modifiedTime)}{file.size ? ` · ${file.size}` : ''}</p>
+        <p className="text-[14px] font-medium text-zinc-700 truncate" title={file.name}>{file.name}</p>
+        <p className="text-[14px] text-zinc-400">{formatDate(file.modifiedTime)}{file.size ? ` · ${file.size}` : ''}</p>
       </div>
-      <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded ${meta.bg} ${meta.text}`}>
+      <span className={`text-[14px] font-semibold  px-1.5 py-0.5 rounded ${meta.bg} ${meta.text}`}>
         {mimeLabel(file.mimeType)}
       </span>
       {file.webViewLink && (
@@ -161,12 +161,12 @@ function FileCard({ file }: { file: DriveFile }) {
         )}
       </div>
       <div className="px-3 py-2.5">
-        <p className="text-[11px] font-medium text-zinc-700 truncate" title={file.name}>{file.name}</p>
+        <p className="text-[14px] font-medium text-zinc-700 truncate" title={file.name}>{file.name}</p>
         <div className="flex items-center justify-between mt-1.5">
-          <span className={`text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded ${meta.bg} ${meta.text}`}>
+          <span className={`text-[14px] font-semibold  px-1.5 py-0.5 rounded ${meta.bg} ${meta.text}`}>
             {mimeLabel(file.mimeType)}
           </span>
-          <span className="text-[9px] text-zinc-400">{formatDate(file.modifiedTime)}</span>
+          <span className="text-[14px] text-zinc-400">{formatDate(file.modifiedTime)}</span>
         </div>
       </div>
     </div>
@@ -218,15 +218,15 @@ export default function PennyAssetLibrary() {
       <div className="border-b border-zinc-200 px-5 py-3 flex items-center justify-between bg-white shrink-0">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-[#2F6F7E]" />
-          <span className="text-[13px] font-semibold text-zinc-800">Asset Library</span>
+          <span className="text-[14px] font-semibold text-zinc-800">Asset Library</span>
           {isLoading && (
-            <span className="text-[10px] text-zinc-400 italic ml-1">Loading from Drive…</span>
+            <span className="text-[14px] text-zinc-400 italic ml-1">Loading from Drive…</span>
           )}
         </div>
         <div className="flex items-center gap-2">
           {/* Config warning */}
           {driveConnected && !folderConfigured && (
-            <span className="flex items-center gap-1.5 text-[10px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2.5 py-1">
+            <span className="flex items-center gap-1.5 text-[14px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2.5 py-1">
               <AlertTriangle className="w-3 h-3" />
               Folder not configured
             </span>
@@ -234,11 +234,11 @@ export default function PennyAssetLibrary() {
           {/* Drive status pill */}
           {!statusLoading && (
             driveConnected
-              ? <span className="flex items-center gap-1.5 text-[10px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+              ? <span className="flex items-center gap-1.5 text-[14px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 inline-block" />
                   Drive live
                 </span>
-              : <span className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 bg-zinc-100 border border-zinc-200 rounded-full px-2.5 py-1">
+              : <span className="flex items-center gap-1.5 text-[14px] font-medium text-zinc-500 bg-zinc-100 border border-zinc-200 rounded-full px-2.5 py-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 inline-block" />
                   Drive offline
                 </span>
@@ -257,7 +257,7 @@ export default function PennyAssetLibrary() {
       {!statusLoading && !driveConnected && (
         <div className="flex items-center gap-2.5 px-5 py-3 bg-zinc-50 border-b border-zinc-100 shrink-0">
           <HardDrive className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          <p className="text-[11px] text-zinc-500">
+          <p className="text-[14px] text-zinc-500">
             <span className="font-semibold text-zinc-600">Google Drive not connected. </span>
             {status?.reason ?? 'GOOGLE_DRIVE_REFRESH_TOKEN is missing. '}
             Complete the OAuth flow at <strong>Administration → Google OAuth Setup</strong>.
@@ -269,7 +269,7 @@ export default function PennyAssetLibrary() {
       {(isError || data?.error) && (
         <div className="flex items-center gap-2 px-5 py-2.5 bg-[#FBEAE6] border-b border-[#FBEAE6] shrink-0">
           <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />
-          <p className="text-[11px] text-[#A93F2F]">
+          <p className="text-[14px] text-[#A93F2F]">
             {data?.error ?? 'Error loading assets from Drive.'}
           </p>
         </div>
@@ -281,7 +281,7 @@ export default function PennyAssetLibrary() {
         {/* LEFT: state sidebar */}
         <aside className="w-52 border-r border-zinc-100 bg-zinc-50/60 flex flex-col shrink-0 overflow-y-auto">
           <div className="px-4 pt-4 pb-2">
-            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Penny states</p>
+            <p className="text-[14px] font-bold text-zinc-400 ">Penny states</p>
           </div>
           <nav className="flex-1 px-2 pb-2 space-y-0.5">
             {PENNY_STATES.map(s => {
@@ -306,19 +306,19 @@ export default function PennyAssetLibrary() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-[11px] font-semibold truncate ${isActive ? 'text-zinc-800' : 'text-zinc-600'}`}>
+                    <p className={`text-[14px] font-semibold truncate ${isActive ? 'text-zinc-800' : 'text-zinc-600'}`}>
                       {s.label}
                     </p>
                   </div>
                   {count > 0 ? (
                     <span
-                      className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                      className="text-[14px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
                       style={{ background: isActive ? s.lightBg : '#f4f4f5', color: isActive ? s.accent : '#a1a1aa' }}
                     >
                       {count}
                     </span>
                   ) : (
-                    <span className="text-[9px] text-zinc-300 shrink-0">—</span>
+                    <span className="text-[14px] text-zinc-300 shrink-0">—</span>
                   )}
                 </button>
               );
@@ -328,7 +328,7 @@ export default function PennyAssetLibrary() {
             {ungrouped.length > 0 && (
               <>
                 <div className="px-3 pt-3 pb-1">
-                  <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Other</p>
+                  <p className="text-[14px] font-bold text-zinc-400 ">Other</p>
                 </div>
                 <button
                   onClick={() => setActiveId('__ungrouped__')}
@@ -340,9 +340,9 @@ export default function PennyAssetLibrary() {
                     <HardDrive className="w-3 h-3 text-zinc-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-semibold truncate text-zinc-600">Ungrouped</p>
+                    <p className="text-[14px] font-semibold truncate text-zinc-600">Ungrouped</p>
                   </div>
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-400 shrink-0">
+                  <span className="text-[14px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-400 shrink-0">
                     {ungrouped.length}
                   </span>
                 </button>
@@ -353,7 +353,7 @@ export default function PennyAssetLibrary() {
           {/* Total count footer */}
           {totalAssets > 0 && (
             <div className="px-4 py-3 border-t border-zinc-100 shrink-0">
-              <p className="text-[9px] text-zinc-400">{totalAssets} total assets across {groups.length} folders</p>
+              <p className="text-[14px] text-zinc-400">{totalAssets} total assets across {groups.length} folders</p>
             </div>
           )}
         </aside>
@@ -373,11 +373,11 @@ export default function PennyAssetLibrary() {
                 </div>
                 <div>
                   <h2 className="text-[14px] font-semibold text-zinc-800">{active.label}</h2>
-                  <p className="text-[11px] text-zinc-500">{active.sub}</p>
+                  <p className="text-[14px] text-zinc-500">{active.sub}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] text-zinc-500 mr-2">
+                <span className="text-[14px] text-zinc-500 mr-2">
                   <code className="font-mono bg-white/70 px-1.5 py-0.5 rounded text-zinc-600">{active.folderHint}/</code>
                 </span>
                 <button
@@ -402,7 +402,7 @@ export default function PennyAssetLibrary() {
                 </div>
                 <div>
                   <h2 className="text-[14px] font-semibold text-zinc-700">Ungrouped assets</h2>
-                  <p className="text-[11px] text-zinc-400">Files at the root of your Penny Assets folder — move into a state subfolder to assign them.</p>
+                  <p className="text-[14px] text-zinc-400">Files at the root of your Penny Assets folder — move into a state subfolder to assign them.</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -425,13 +425,13 @@ export default function PennyAssetLibrary() {
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-[#FFF3E0]">
                   <HardDrive className="w-7 h-7 text-[#CC8400]" />
                 </div>
-                <p className="text-[13px] font-semibold text-zinc-600 mb-2">Penny Assets folder not configured</p>
-                <p className="text-[11px] text-zinc-400 max-w-sm leading-relaxed mb-3">
+                <p className="text-[14px] font-semibold text-zinc-600 mb-2">Penny Assets folder not configured</p>
+                <p className="text-[14px] text-zinc-400 max-w-sm leading-relaxed mb-3">
                   Create a folder named <strong>Penny Assets</strong> in Google Drive, copy the folder ID from its URL, and add it as the secret{' '}
                   <code className="font-mono bg-zinc-100 px-1 rounded text-zinc-500">GOOGLE_DRIVE_PENNY_FOLDER_ID</code>{' '}
                   in Administration → Integrations.
                 </p>
-                <p className="text-[10px] text-zinc-400">
+                <p className="text-[14px] text-zinc-400">
                   Then create subfolders: <code className="font-mono text-zinc-500">coaching/</code>,{' '}
                   <code className="font-mono text-zinc-500">trail-talk/</code>,{' '}
                   <code className="font-mono text-zinc-500">resume-review/</code>, etc.
@@ -461,13 +461,13 @@ export default function PennyAssetLibrary() {
                 >
                   <HardDrive className="w-7 h-7" style={{ color: active.accent + '66' }} />
                 </div>
-                <p className="text-[13px] font-semibold text-zinc-600 mb-1">No assets for {active.label}</p>
-                <p className="text-[11px] text-zinc-400 max-w-xs leading-relaxed">
+                <p className="text-[14px] font-semibold text-zinc-600 mb-1">No assets for {active.label}</p>
+                <p className="text-[14px] text-zinc-400 max-w-xs leading-relaxed">
                   Create a subfolder named{' '}
                   <code className="font-mono bg-zinc-100 px-1 rounded text-zinc-500">{active.folderHint}/</code>{' '}
                   inside your Penny Assets Drive folder, then upload images, voice scripts, or media.
                 </p>
-                <div className="mt-4 flex items-center gap-1.5 text-[10px] text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-3 py-1.5">
+                <div className="mt-4 flex items-center gap-1.5 text-[14px] text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-3 py-1.5">
                   <AlertTriangle className="w-3 h-3" />
                   No folder detected in Drive
                 </div>

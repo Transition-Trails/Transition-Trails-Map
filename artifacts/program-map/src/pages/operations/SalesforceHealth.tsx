@@ -51,30 +51,30 @@ export default function SalesforceHealth() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-muted/50 border-b border-border">
-                    <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Case ID</th>
-                    <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Subject</th>
-                    <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Priority</th>
-                    <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                    <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Age</th>
+                    <th className="text-left px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Case ID</th>
+                    <th className="text-left px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Subject</th>
+                    <th className="text-left px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Priority</th>
+                    <th className="text-left px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Status</th>
+                    <th className="text-left px-4 py-2.5 text-[14px] font-semibold text-muted-foreground ">Age</th>
                   </tr>
                 </thead>
                 <tbody className="bg-card divide-y divide-border">
                   {cases.map(c => (
                     <tr key={c.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{c.id}</td>
+                      <td className="px-4 py-3 font-mono text-sm text-muted-foreground">{c.id}</td>
                       <td className="px-4 py-3 text-foreground">{c.subject}</td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center text-[10px] font-semibold border px-2 py-0.5 rounded-full ${priorityStyle[c.priority]}`}>
+                        <span className={`inline-flex items-center text-[14px] font-semibold border px-2 py-0.5 rounded-full ${priorityStyle[c.priority]}`}>
                           {c.priority}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <StatusDot status={statusDot[c.status] ?? 'gray'} />
-                          <span className="text-muted-foreground text-[13px]">{c.status}</span>
+                          <span className="text-muted-foreground text-[14px]">{c.status}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground text-[13px]">{c.age}</td>
+                      <td className="px-4 py-3 text-muted-foreground text-[14px]">{c.age}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -84,7 +84,7 @@ export default function SalesforceHealth() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Pipeline Summary</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground  mb-3">Pipeline Summary</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Discovery</span><span className="font-medium">1 opp — $8,000</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Proposal</span><span className="font-medium">2 opps — $28,000</span></div>
@@ -93,7 +93,7 @@ export default function SalesforceHealth() {
               </div>
             </div>
             <div className="rounded-xl border border-border bg-card p-4">
-              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Lead Sources</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground  mb-3">Lead Sources</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Website Inquiry</span><span className="font-medium">8 leads</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Referral</span><span className="font-medium">4 leads</span></div>

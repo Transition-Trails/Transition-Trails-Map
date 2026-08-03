@@ -36,9 +36,9 @@ function HealthDot({ status }: { status: 'healthy' | 'needs-attention' | 'incomp
 function StatBox({ label, value, sub, color = 'text-foreground' }: { label: string; value: string | number; sub?: string; color?: string }) {
   return (
     <div className="rounded-lg border border-border bg-white px-4 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{label}</p>
+      <p className="text-[14px] font-bold  text-muted-foreground/60">{label}</p>
       <p className={`text-2xl font-bold mt-0.5 ${color}`}>{value}</p>
-      {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
+      {sub && <p className="text-[14px] text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -98,25 +98,25 @@ export default function PeopleRolesStudio() {
         <div className="flex items-center gap-2 mb-1">
           <Users className="w-4 h-4 text-primary" />
           <h1 className="text-lg font-bold text-foreground">People &amp; Roles Studio</h1>
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50 ml-1">Human Layer</span>
+          <span className="text-[14px] font-semibold  text-muted-foreground/50 ml-1">Human Layer</span>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             <button
               onClick={handleNewPersona}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[10px] font-bold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity"
             >
               <Plus className="w-3 h-3" />
               New Persona
             </button>
             <button
               onClick={handleNewRole}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-full text-[10px] font-bold hover:bg-muted/40 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-full text-[14px] font-bold hover:bg-muted/40 transition-colors"
             >
               <Plus className="w-3 h-3" />
               New Role
             </button>
           </div>
         </div>
-        <p className="text-[11px] text-muted-foreground mb-3 max-w-2xl">Models the human operating layer of Trail OS — personas, roles, blueprints, program participation, communications, Penny support, and Salesforce mappings.</p>
+        <p className="text-[14px] text-muted-foreground mb-3 max-w-2xl">Models the human operating layer of Trail OS — personas, roles, blueprints, program participation, communications, Penny support, and Salesforce mappings.</p>
         <div className="flex gap-1 overflow-x-auto pb-0.5">
           {VIEWS.map(v => {
             const Icon = VIEW_ICONS[v];
@@ -124,7 +124,7 @@ export default function PeopleRolesStudio() {
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold rounded-t-md whitespace-nowrap border-b-2 transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-2 text-[14px] font-semibold rounded-t-md whitespace-nowrap border-b-2 transition-colors ${
                   view === v ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40'
                 }`}
               >
@@ -153,13 +153,13 @@ export default function PeopleRolesStudio() {
               <div className="grid grid-cols-3 gap-4">
                 {/* Role health bar */}
                 <div className="col-span-2 rounded-lg border border-border bg-white p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-3">Role Health Overview</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/60 mb-3">Role Health Overview</p>
                   <div className="flex h-3 rounded-full overflow-hidden mb-2">
                     <div className="bg-[#2F6B3F] transition-all" style={{ width: `${(healthy / roles.length) * 100}%` }} />
                     <div className="bg-[#CC8400] transition-all"   style={{ width: `${(attention / roles.length) * 100}%` }} />
                     <div className="bg-[#A93F2F] transition-all"    style={{ width: `${(incomplete / roles.length) * 100}%` }} />
                   </div>
-                  <div className="flex gap-4 text-[10px] text-muted-foreground">
+                  <div className="flex gap-4 text-[14px] text-muted-foreground">
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#2F6B3F] inline-block" />{healthy} Healthy</span>
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#CC8400] inline-block" />{attention} Needs Attention</span>
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#A93F2F] inline-block" />{incomplete} Incomplete</span>
@@ -168,7 +168,7 @@ export default function PeopleRolesStudio() {
 
                 {/* Quick stats */}
                 <div className="rounded-lg border border-border bg-white p-4 space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">Quick Stats</p>
+                  <p className="text-[14px] font-bold  text-muted-foreground/60">Quick Stats</p>
                   {[
                     { label: 'Roles with owner',       value: `${roles.filter(r=>r.owner).length}/${roles.length}` },
                     { label: 'Blueprints complete',    value: `${blueprintsDone}/${roleBlueprints.length}` },
@@ -177,7 +177,7 @@ export default function PeopleRolesStudio() {
                     { label: `${TERMS.aiAssistant} support mapped`,   value: pennySupportMappings.length },
                     { label: 'SF mappings defined',    value: salesforceMappings.length },
                   ].map(s => (
-                    <div key={s.label} className="flex items-center justify-between text-[11px]">
+                    <div key={s.label} className="flex items-center justify-between text-[14px]">
                       <span className="text-muted-foreground">{s.label}</span>
                       <span className="font-semibold text-foreground">{s.value}</span>
                     </div>
@@ -187,7 +187,7 @@ export default function PeopleRolesStudio() {
 
               {/* Personas at a glance */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Personas at a Glance</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Personas at a Glance</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {personas.map(p => {
                     const typCfg = PERSONA_TYPE_CONFIG[p.type];
@@ -196,11 +196,11 @@ export default function PeopleRolesStudio() {
                       <button key={p.id} onClick={() => selectPersona(p)}
                         className="rounded-lg border border-border bg-white p-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group">
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${typCfg.cls}`}>{typCfg.label}</span>
+                          <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${typCfg.cls}`}>{typCfg.label}</span>
                           <HealthDot status={p.healthStatus} />
                         </div>
-                        <p className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors">{p.name}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{p.description}</p>
+                        <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">{p.name}</p>
+                        <p className="text-[14px] text-muted-foreground mt-0.5 line-clamp-2">{p.description}</p>
                       </button>
                     );
                   })}
@@ -213,13 +213,13 @@ export default function PeopleRolesStudio() {
           {view === 'Personas' && (
             <div className="space-y-3">
               <div className="rounded-lg border border-border overflow-hidden">
-                <table className="w-full text-[11px]">
+                <table className="w-full text-[14px]">
                   <thead>
                     <tr className="border-b border-border bg-muted/30">
-                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Persona</th>
-                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Type</th>
-                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px] hidden md:table-cell">Purpose</th>
-                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Health</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Persona</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Type</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px] hidden md:table-cell">Purpose</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Health</th>
                       <th className="px-3 py-2 w-6" />
                     </tr>
                   </thead>
@@ -231,10 +231,10 @@ export default function PeopleRolesStudio() {
                         <tr key={p.id} onClick={() => selectPersona(p)}
                           className="border-b border-border/50 hover:bg-primary/5 cursor-pointer transition-colors">
                           <td className="px-3 py-2.5 font-semibold text-foreground">{p.name}</td>
-                          <td className="px-3 py-2.5"><span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${typCfg.cls}`}>{typCfg.label}</span></td>
+                          <td className="px-3 py-2.5"><span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${typCfg.cls}`}>{typCfg.label}</span></td>
                           <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell max-w-xs truncate">{p.purpose}</td>
                           <td className="px-3 py-2.5">
-                            <span className={`flex items-center gap-1 text-[10px] font-semibold ${hlth.cls.split(' ')[0]}`}>
+                            <span className={`flex items-center gap-1 text-[14px] font-semibold ${hlth.cls.split(' ')[0]}`}>
                               <HealthDot status={p.healthStatus} />{hlth.label}
                             </span>
                           </td>
@@ -251,15 +251,15 @@ export default function PeopleRolesStudio() {
           {/* ── ROLES ── */}
           {view === 'Roles' && (
             <div className="rounded-lg border border-border overflow-hidden">
-              <table className="w-full text-[11px]">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Role</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Persona</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Type</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Blueprint</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Owner</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Health</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Role</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Persona</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Type</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Blueprint</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Owner</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Health</th>
                     <th className="px-3 py-2 w-6" />
                   </tr>
                 </thead>
@@ -273,9 +273,9 @@ export default function PeopleRolesStudio() {
                         <td className="px-3 py-2.5 font-semibold text-foreground">{r.name}</td>
                         <td className="px-3 py-2.5 text-muted-foreground">{r.personaName}</td>
                         <td className="px-3 py-2.5 text-muted-foreground">{r.type}</td>
-                        <td className="px-3 py-2.5"><span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${bpCfg.cls}`}>{bpCfg.label}</span></td>
+                        <td className="px-3 py-2.5"><span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${bpCfg.cls}`}>{bpCfg.label}</span></td>
                         <td className="px-3 py-2.5">{r.owner ?? <span className="text-[#A93F2F] italic">Unassigned</span>}</td>
-                        <td className="px-3 py-2.5"><span className={`flex items-center gap-1 text-[10px] font-semibold ${hlth.cls.split(' ')[0]}`}><HealthDot status={r.healthStatus} />{hlth.label}</span></td>
+                        <td className="px-3 py-2.5"><span className={`flex items-center gap-1 text-[14px] font-semibold ${hlth.cls.split(' ')[0]}`}><HealthDot status={r.healthStatus} />{hlth.label}</span></td>
                         <td className="px-3 py-2.5"><ChevronRight className="w-3 h-3 text-muted-foreground/40" /></td>
                       </tr>
                     );
@@ -288,14 +288,14 @@ export default function PeopleRolesStudio() {
           {/* ── RESPONSIBILITIES ── */}
           {view === 'Responsibilities' && (
             <div className="rounded-lg border border-border overflow-hidden">
-              <table className="w-full text-[11px]">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Role</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Area</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px] hidden md:table-cell">Description</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Required</th>
-                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">{TERMS.aiAssistant}</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Role</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Area</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px] hidden md:table-cell">Description</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Required</th>
+                    <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">{TERMS.aiAssistant}</th>
                     <th className="px-3 py-2 w-6" />
                   </tr>
                 </thead>
@@ -311,12 +311,12 @@ export default function PeopleRolesStudio() {
                         <td className="px-3 py-2.5 text-muted-foreground hidden md:table-cell max-w-xs truncate">{resp.description}</td>
                         <td className="px-3 py-2.5">
                           {resp.required
-                            ? <span className="text-[10px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-2 py-0.5">Required</span>
-                            : <span className="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5">Optional</span>}
+                            ? <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-2 py-0.5">Required</span>
+                            : <span className="text-[14px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5">Optional</span>}
                         </td>
                         <td className="px-3 py-2.5">{resp.pennySupport
-                          ? <span className="flex items-center gap-1 text-[10px] text-secondary font-medium"><Sparkles className="w-2.5 h-2.5" />AI</span>
-                          : <span className="text-muted-foreground/40 text-[10px]">—</span>}
+                          ? <span className="flex items-center gap-1 text-[14px] text-secondary font-medium"><Sparkles className="w-2.5 h-2.5" />AI</span>
+                          : <span className="text-muted-foreground/40 text-[14px]">—</span>}
                         </td>
                         <td className="px-3 py-2.5"><ChevronRight className="w-3 h-3 text-muted-foreground/40" /></td>
                       </tr>
@@ -339,19 +339,19 @@ export default function PeopleRolesStudio() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${stCfg.cls}`}>{stCfg.label}</span>
-                          <span className="text-[10px] text-muted-foreground/60">{bp.personaName}</span>
-                          <span className="text-[10px] text-muted-foreground/40">·</span>
-                          <span className="text-[10px] text-muted-foreground/60">Owner: {bp.owner || <em>unassigned</em>}</span>
-                          <span className="text-[10px] text-muted-foreground/40">·</span>
-                          <span className="text-[10px] text-muted-foreground/60">Reviewed {bp.lastReviewed}</span>
+                          <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${stCfg.cls}`}>{stCfg.label}</span>
+                          <span className="text-[14px] text-muted-foreground/60">{bp.personaName}</span>
+                          <span className="text-[14px] text-muted-foreground/40">·</span>
+                          <span className="text-[14px] text-muted-foreground/60">Owner: {bp.owner || <em>unassigned</em>}</span>
+                          <span className="text-[14px] text-muted-foreground/40">·</span>
+                          <span className="text-[14px] text-muted-foreground/60">Reviewed {bp.lastReviewed}</span>
                         </div>
-                        <p className="text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">{bp.roleName}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">{bp.shortDescription}</p>
+                        <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">{bp.roleName}</p>
+                        <p className="text-[14px] text-muted-foreground mt-0.5">{bp.shortDescription}</p>
                       </div>
                       <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0 mt-1" />
                     </div>
-                    <div className="flex gap-4 mt-3 text-[10px] text-muted-foreground">
+                    <div className="flex gap-4 mt-3 text-[14px] text-muted-foreground">
                       <span>{bp.responsibilities.length} responsibilities</span>
                       <span>{bp.pennySupport.length} Penny capabilities</span>
                       <span>{bp.salesforceMappings.length} SF objects</span>
@@ -359,7 +359,7 @@ export default function PeopleRolesStudio() {
                     </div>
                     <div className="flex gap-1 mt-2 flex-wrap">
                       {bp.standards.map(s => (
-                        <span key={s} className="text-[10px] border border-border rounded-full px-2 py-0.5 text-muted-foreground">{s}</span>
+                        <span key={s} className="text-[14px] border border-border rounded-full px-2 py-0.5 text-muted-foreground">{s}</span>
                       ))}
                     </div>
                   </div>
@@ -367,12 +367,12 @@ export default function PeopleRolesStudio() {
               })}
               {/* Roles without blueprints */}
               <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Roles Pending Blueprint</p>
+                <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Roles Pending Blueprint</p>
                 <div className="flex flex-wrap gap-2">
                   {roles.filter(r => r.blueprintStatus !== 'complete').map(r => (
                     <span key={r.id}
                       onClick={() => selectRole(r)}
-                      className={`cursor-pointer text-[10px] font-medium border rounded-full px-2 py-0.5 hover:bg-[#FFF3E0] transition-colors ${BLUEPRINT_STATUS_CONFIG[r.blueprintStatus].cls}`}>
+                      className={`cursor-pointer text-[14px] font-medium border rounded-full px-2 py-0.5 hover:bg-[#FFF3E0] transition-colors ${BLUEPRINT_STATUS_CONFIG[r.blueprintStatus].cls}`}>
                       {r.name} — {r.blueprintStatus}
                     </span>
                   ))}
@@ -390,17 +390,17 @@ export default function PeopleRolesStudio() {
                   className="rounded-lg border border-border bg-white overflow-hidden hover:border-primary/40 cursor-pointer transition-colors group">
                   <div className="px-4 py-3 border-b border-border/50 bg-muted/20 flex items-center justify-between">
                     <div>
-                      <p className={`text-[12px] font-bold ${prog.programColorCls}`}>{prog.programName}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{prog.description}</p>
+                      <p className={`text-[14px] font-bold ${prog.programColorCls}`}>{prog.programName}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5">{prog.description}</p>
                     </div>
-                    <span className="text-[10px] text-muted-foreground">{prog.roleParticipation.length} roles</span>
+                    <span className="text-[14px] text-muted-foreground">{prog.roleParticipation.length} roles</span>
                   </div>
                   <div className="px-4 py-2">
                     <div className="flex flex-wrap gap-1.5 py-1.5">
                       {prog.roleParticipation.map(rp => {
                         const typCfg = PARTICIPATION_TYPE_CONFIG[rp.type];
                         return (
-                          <span key={rp.roleId} className={`text-[10px] font-semibold border rounded-full px-2.5 py-0.5 ${typCfg.cls}`}>
+                          <span key={rp.roleId} className={`text-[14px] font-semibold border rounded-full px-2.5 py-0.5 ${typCfg.cls}`}>
                             {rp.roleName} <span className="opacity-60">·</span> {rp.type}
                           </span>
                         );
@@ -423,16 +423,16 @@ export default function PeopleRolesStudio() {
                     className="rounded-lg border border-border bg-white p-4 hover:border-primary/40 cursor-pointer transition-colors group">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-[12px] font-semibold text-foreground group-hover:text-primary transition-colors">{cm.roleName}</p>
-                        <p className="text-[10px] text-muted-foreground">{cm.personaName}</p>
+                        <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">{cm.roleName}</p>
+                        <p className="text-[14px] text-muted-foreground">{cm.personaName}</p>
                       </div>
                       <div className="flex gap-1.5">
-                        {cm.slack.length > 0 && <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">{cm.slack.length} Slack</span>}
-                        {cm.googleChat.length > 0 && <span className="text-[9px] font-bold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5">{cm.googleChat.length} Chat</span>}
-                        {cm.calendar.length > 0 && <span className="text-[9px] font-bold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5">{cm.calendar.length} Cal</span>}
+                        {cm.slack.length > 0 && <span className="text-[14px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">{cm.slack.length} Slack</span>}
+                        {cm.googleChat.length > 0 && <span className="text-[14px] font-bold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5">{cm.googleChat.length} Chat</span>}
+                        {cm.calendar.length > 0 && <span className="text-[14px] font-bold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-1.5 py-0.5">{cm.calendar.length} Cal</span>}
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[10px]">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[14px]">
                       {cm.slack.map(s => (
                         <div key={s.channel} className="rounded border border-[#E6F0EA] bg-[#E6F0EA]/50 px-2 py-1">
                           <p className="font-semibold text-[#245531]">{s.channel}</p>
@@ -480,23 +480,23 @@ export default function PeopleRolesStudio() {
                     className="rounded-lg border border-border bg-white p-4 hover:border-primary/40 cursor-pointer transition-colors group">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-[12px] font-semibold text-foreground group-hover:text-primary">{ps.roleName}</p>
-                        <p className="text-[10px] text-muted-foreground">{ps.personaName}</p>
+                        <p className="text-[14px] font-semibold text-foreground group-hover:text-primary">{ps.roleName}</p>
+                        <p className="text-[14px] text-muted-foreground">{ps.personaName}</p>
                       </div>
-                      <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 ${ACCESS_CLS[ps.accessLevel]}`}>{ps.accessLevel} Access</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${ACCESS_CLS[ps.accessLevel]}`}>{ps.accessLevel} Access</span>
                     </div>
                     <div className="space-y-1.5 mb-2">
                       {ps.capabilities.map(c => (
                         <div key={c.capability} className="flex items-start gap-2">
-                          <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${STATUS_CLS[c.status]}`}>{c.status}</span>
+                          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${STATUS_CLS[c.status]}`}>{c.status}</span>
                           <div>
-                            <p className="text-[11px] font-semibold text-foreground leading-tight">{c.capability}</p>
-                            <p className="text-[10px] text-muted-foreground leading-tight">{c.description}</p>
+                            <p className="text-[14px] font-semibold text-foreground leading-tight">{c.capability}</p>
+                            <p className="text-[14px] text-muted-foreground leading-tight">{c.description}</p>
                           </div>
                         </div>
                       ))}
                     </div>
-                    {ps.notes && <p className="text-[10px] text-muted-foreground/70 italic border-t border-border/50 pt-2">{ps.notes}</p>}
+                    {ps.notes && <p className="text-[14px] text-muted-foreground/70 italic border-t border-border/50 pt-2">{ps.notes}</p>}
                   </div>
                 );
               })}
@@ -514,24 +514,24 @@ export default function PeopleRolesStudio() {
                     className="rounded-lg border border-border bg-white p-4 hover:border-primary/40 cursor-pointer transition-colors group">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-[12px] font-semibold text-foreground group-hover:text-primary">{sm.roleName}</p>
-                        <p className="text-[10px] text-muted-foreground">{sm.personaName} · Primary: <strong>{sm.primaryObject}</strong></p>
+                        <p className="text-[14px] font-semibold text-foreground group-hover:text-primary">{sm.roleName}</p>
+                        <p className="text-[14px] text-muted-foreground">{sm.personaName} · Primary: <strong>{sm.primaryObject}</strong></p>
                       </div>
                       <Database className="w-3.5 h-3.5 text-[#2F6F7E]" />
                     </div>
                     <div className="space-y-1.5 mb-2">
                       {sm.relatedObjects.map(obj => (
                         <div key={obj.object} className="flex items-start gap-2">
-                          <span className="text-[9px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]">{obj.relationship}</span>
+                          <span className="text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]">{obj.relationship}</span>
                           <div>
-                            <p className="text-[11px] font-semibold text-foreground leading-tight">{obj.object}</p>
-                            <p className="text-[10px] text-muted-foreground leading-tight">{obj.fields.slice(0, 3).join(', ')}{obj.fields.length > 3 ? '…' : ''}</p>
+                            <p className="text-[14px] font-semibold text-foreground leading-tight">{obj.object}</p>
+                            <p className="text-[14px] text-muted-foreground leading-tight">{obj.fields.slice(0, 3).join(', ')}{obj.fields.length > 3 ? '…' : ''}</p>
                           </div>
                         </div>
                       ))}
                     </div>
-                    <p className="text-[10px] text-muted-foreground/70 italic border-t border-border/50 pt-2">{sm.permissionModel}</p>
-                    {sm.futureNotes && <p className="text-[10px] text-[#CC8400] italic mt-1">{sm.futureNotes}</p>}
+                    <p className="text-[14px] text-muted-foreground/70 italic border-t border-border/50 pt-2">{sm.permissionModel}</p>
+                    {sm.futureNotes && <p className="text-[14px] text-[#CC8400] italic mt-1">{sm.futureNotes}</p>}
                   </div>
                 );
               })}
@@ -547,16 +547,16 @@ export default function PeopleRolesStudio() {
                 <StatBox label="Incomplete"      value={roleHealthRecords.filter(r=>r.healthStatus==='incomplete').length}      color="text-[#A93F2F]" />
               </div>
               <div className="rounded-lg border border-border overflow-hidden">
-                <table className="w-full text-[11px]">
+                <table className="w-full text-[14px]">
                   <thead>
                     <tr className="border-b border-border bg-muted/30">
-                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Role</th>
-                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Score</th>
-                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Owner</th>
-                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Blueprint</th>
-                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">Comms</th>
-                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">{TERMS.aiAssistant}</th>
-                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground uppercase tracking-wider text-[9px]">SF</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Role</th>
+                      <th className="text-left px-3 py-2 font-semibold text-muted-foreground  text-[14px]">Score</th>
+                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground  text-[14px]">Owner</th>
+                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground  text-[14px]">Blueprint</th>
+                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground  text-[14px]">Comms</th>
+                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground  text-[14px]">{TERMS.aiAssistant}</th>
+                      <th className="text-center px-2 py-2 font-semibold text-muted-foreground  text-[14px]">SF</th>
                     </tr>
                   </thead>
                   <tbody>

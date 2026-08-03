@@ -38,26 +38,26 @@ export default function RecommendationsManager() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-0.5">
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">
               Action Item Manager
             </p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[14px] text-muted-foreground">
               Adjust priority or mark items resolved · changes persist in your browser
             </p>
           </div>
           {(resolvedCount > 0 || dismissedCount > 0) && (
             confirmReset ? (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground">Reset all overrides?</span>
+                <span className="text-[14px] text-muted-foreground">Reset all overrides?</span>
                 <button
                   onClick={() => { resetActionItemOverrides(); setConfirmReset(false); }}
-                  className="text-[10px] font-semibold text-[#A93F2F] hover:underline"
+                  className="text-[14px] font-semibold text-[#A93F2F] hover:underline"
                 >
                   Confirm
                 </button>
                 <button
                   onClick={() => setConfirmReset(false)}
-                  className="text-[10px] font-semibold text-muted-foreground hover:underline"
+                  className="text-[14px] font-semibold text-muted-foreground hover:underline"
                 >
                   Cancel
                 </button>
@@ -65,7 +65,7 @@ export default function RecommendationsManager() {
             ) : (
               <button
                 onClick={() => setConfirmReset(true)}
-                className="flex items-center gap-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1 text-[14px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
               >
                 <RotateCcw className="w-3 h-3" />
                 Reset all
@@ -79,7 +79,7 @@ export default function RecommendationsManager() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-colors capitalize ${
+              className={`text-[14px] font-semibold px-2.5 py-1 rounded-full border transition-colors capitalize ${
                 filter === f
                   ? 'bg-foreground text-background border-foreground'
                   : 'bg-white text-muted-foreground border-border hover:border-foreground/30'
@@ -92,7 +92,7 @@ export default function RecommendationsManager() {
 
         <div className="space-y-1.5">
           {displayed.length === 0 && (
-            <p className="text-[11px] text-muted-foreground py-4 text-center">No items in this view.</p>
+            <p className="text-[14px] text-muted-foreground py-4 text-center">No items in this view.</p>
           )}
           {displayed.map(r => {
             const sc  = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.open;
@@ -108,16 +108,16 @@ export default function RecommendationsManager() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                    <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${pc.cls}`}>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 leading-tight ${pc.cls}`}>
                       {pc.label}
                     </span>
-                    <span className={`text-[8px] font-semibold border rounded-full px-1.5 py-0.5 leading-tight flex items-center gap-0.5 ${sc.cls}`}>
+                    <span className={`text-[14px] font-semibold border rounded-full px-1.5 py-0.5 leading-tight flex items-center gap-0.5 ${sc.cls}`}>
                       <StatusIcon className="w-2.5 h-2.5" />
                       {sc.label}
                     </span>
-                    <span className="text-[8px] text-muted-foreground/60">{r.domain}</span>
+                    <span className="text-[14px] text-muted-foreground/60">{r.domain}</span>
                   </div>
-                  <p className="text-[11px] font-semibold text-foreground leading-snug">{r.action}</p>
+                  <p className="text-[14px] font-semibold text-foreground leading-snug">{r.action}</p>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
@@ -154,7 +154,7 @@ function PriorityDropdown({
     <div className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className={`flex items-center gap-1 text-[9px] font-bold border rounded-full px-2 py-0.5 leading-tight ${pc.cls}`}
+        className={`flex items-center gap-1 text-[14px] font-bold border rounded-full px-2 py-0.5 leading-tight ${pc.cls}`}
       >
         {pc.label}
         <ChevronDown className="w-2.5 h-2.5" />
@@ -167,7 +167,7 @@ function PriorityDropdown({
               <button
                 key={p}
                 onClick={() => { onChange(p); setOpen(false); }}
-                className={`w-full text-left px-3 py-1.5 text-[10px] font-semibold hover:bg-muted/40 flex items-center gap-2 ${
+                className={`w-full text-left px-3 py-1.5 text-[14px] font-semibold hover:bg-muted/40 flex items-center gap-2 ${
                   p === value ? 'opacity-40' : ''
                 }`}
               >
@@ -198,7 +198,7 @@ function StatusCycler({
     <button
       onClick={() => onChange(next)}
       title={`Mark as ${next}`}
-      className={`flex items-center gap-1 text-[9px] font-semibold border rounded-full px-2 py-0.5 leading-tight transition-colors hover:opacity-80 ${sc.cls}`}
+      className={`flex items-center gap-1 text-[14px] font-semibold border rounded-full px-2 py-0.5 leading-tight transition-colors hover:opacity-80 ${sc.cls}`}
     >
       <StatusIcon className="w-2.5 h-2.5" />
       {sc.label}

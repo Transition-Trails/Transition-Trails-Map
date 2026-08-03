@@ -24,9 +24,9 @@ export default function CurriculumOverview() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-7">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio</p>
           <h1 className="text-3xl font-bold text-foreground">Learning Architecture Workspace</h1>
-          <p className="text-[13px] text-muted-foreground mt-2 max-w-2xl">
+          <p className="text-[14px] text-muted-foreground mt-2 max-w-2xl">
             Model relationships between Program Structure, Learning Assets, Penny Assets, and Delivery Assets so staff can build
             consistent, standards-based curriculum. Consistency comes from <strong>relationships</strong>, not templates.
           </p>
@@ -34,7 +34,7 @@ export default function CurriculumOverview() {
 
         <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3 flex items-start gap-3">
           <AlertTriangle className="w-4 h-4 text-[#CC8400] mt-0.5 shrink-0" />
-          <p className="text-[12px] text-[#CC8400]">
+          <p className="text-[14px] text-[#CC8400]">
             <strong>Prototype — Content Architecture Layer.</strong> Foundations Trail is the primary fully-connected example.
             All 12 modules model the four-layer relationship architecture. Module 2.1 is the standards reference.
           </p>
@@ -49,24 +49,24 @@ export default function CurriculumOverview() {
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-white px-4 py-3">
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
-              <p className="text-[11px] font-semibold text-foreground/70">{s.label}</p>
-              <p className="text-[10px] text-muted-foreground">{s.sub}</p>
+              <p className="text-[14px] font-semibold text-foreground/70">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground">{s.sub}</p>
             </div>
           ))}
         </div>
 
         <div className="space-y-3">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Four-Layer Architecture</p>
-          <p className="text-[12px] text-muted-foreground">Module is the central connective node — it links all four asset layers into a complete learning experience.</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60">Four-Layer Architecture</p>
+          <p className="text-[14px] text-muted-foreground">Module is the central connective node — it links all four asset layers into a complete learning experience.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {ARCHITECTURE_LAYERS.map(layer => {
               const Icon = layer.icon;
               return (
                 <button key={layer.id} onClick={() => setLocation(layer.path)} className={`rounded-lg border-2 p-4 text-left transition-all hover:shadow-sm ${layer.color}`}>
-                  <div className="flex items-center gap-2 mb-2"><Icon className="w-4 h-4" /><span className="text-[13px] font-bold">{layer.label}</span></div>
+                  <div className="flex items-center gap-2 mb-2"><Icon className="w-4 h-4" /><span className="text-[14px] font-bold">{layer.label}</span></div>
                   <div className="flex flex-wrap gap-1">
                     {layer.items.map(item => (
-                      <span key={item} className={`text-[10px] font-medium border rounded-full px-2 py-0.5 ${layer.chipColor}`}>{item}</span>
+                      <span key={item} className={`text-[14px] font-medium border rounded-full px-2 py-0.5 ${layer.chipColor}`}>{item}</span>
                     ))}
                   </div>
                 </button>
@@ -76,11 +76,11 @@ export default function CurriculumOverview() {
         </div>
 
         <div className="rounded-lg border-2 border-primary/20 bg-primary/5 px-5 py-4">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-primary/60 mb-1">The Relationship Principle</p>
-          <p className="text-[13px] font-semibold text-foreground mb-1">
+          <p className="text-[14px] font-bold  text-primary/60 mb-1">The Relationship Principle</p>
+          <p className="text-[14px] font-semibold text-foreground mb-1">
             A fully-connected module has: lessons → assessment → knowledge articles → coaching prompts → reflection prompts → delivery activities → outcomes.
           </p>
-          <p className="text-[12px] text-muted-foreground">
+          <p className="text-[14px] text-muted-foreground">
             When staff select any object, the Knowledge Brief rail shows all related objects across all four layers — not just the object's properties.
           </p>
         </div>
@@ -88,11 +88,11 @@ export default function CurriculumOverview() {
         {mod21 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">Fully-Connected Example</p>
-              <span className="text-[10px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5">★ Module 2.1 — Foundations Trail</span>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Fully-Connected Example</p>
+              <span className="text-[14px] font-bold text-primary border border-primary/20 bg-primary/5 rounded-full px-2 py-0.5">★ Module 2.1 — Foundations Trail</span>
             </div>
             <div className="rounded-lg border-2 border-[#7FAFC6] bg-[#EDF5F8]/30 p-4">
-              <p className="text-[13px] font-bold text-[#2F6F7E] mb-3">{mod21.name as string} · {mod21.sprint as string}</p>
+              <p className="text-[14px] font-bold text-[#2F6F7E] mb-3">{mod21.name as string} · {mod21.sprint as string}</p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {[
                   { label: 'Lessons', count: (mod21.lessonIds as string[]).length, path: '/curriculum/lessons' },
@@ -104,11 +104,11 @@ export default function CurriculumOverview() {
                 ].map(rel => (
                   <button key={rel.label} onClick={() => setLocation(rel.path)} className="flex items-center gap-2 rounded-md border border-[#7FAFC6] bg-white px-3 py-2 text-left hover:border-[#7FAFC6] transition-colors">
                     <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
-                    <span className="text-[11px] font-medium text-[#2F6F7E]">{rel.count} {rel.label}</span>
+                    <span className="text-[14px] font-medium text-[#2F6F7E]">{rel.count} {rel.label}</span>
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-[#2F6F7E] mt-2 italic">Use Module 2.1 as the content architecture standard — all future modules should reach this level of completeness.</p>
+              <p className="text-[14px] text-[#2F6F7E] mt-2 italic">Use Module 2.1 as the content architecture standard — all future modules should reach this level of completeness.</p>
             </div>
           </div>
         )}
@@ -116,27 +116,27 @@ export default function CurriculumOverview() {
         <div className="rounded-lg border border-secondary/30 bg-secondary/5 px-5 py-4 flex items-start gap-3">
           <Sparkles className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
           <div className="flex-1">
-            <p className="text-[13px] font-bold text-foreground">Penny Content Assistant</p>
-            <p className="text-[12px] text-muted-foreground mt-0.5">Select any learning object and use Penny to generate outlines, draft lessons, create assessments, write prompts, and more. Penny works as curriculum architect and content co-author.</p>
+            <p className="text-[14px] font-bold text-foreground">Penny Content Assistant</p>
+            <p className="text-[14px] text-muted-foreground mt-0.5">Select any learning object and use Penny to generate outlines, draft lessons, create assessments, write prompts, and more. Penny works as curriculum architect and content co-author.</p>
           </div>
-          <button onClick={() => setLocation('/curriculum/penny-assistant')} className="flex items-center gap-1.5 text-[12px] font-semibold text-secondary border border-secondary/30 rounded-full px-3 py-1.5 hover:bg-secondary/10 transition-colors whitespace-nowrap">
+          <button onClick={() => setLocation('/curriculum/penny-assistant')} className="flex items-center gap-1.5 text-[14px] font-semibold text-secondary border border-secondary/30 rounded-full px-3 py-1.5 hover:bg-secondary/10 transition-colors whitespace-nowrap">
             Open <ArrowRight className="w-3 h-3" />
           </button>
         </div>
 
         {highIssues.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">High-Priority Health Issues</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60">High-Priority Health Issues</p>
             {highIssues.map(issue => (
               <div key={issue.id} className="flex items-start gap-3 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]/50 px-4 py-3">
                 <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-[12px] font-semibold text-[#A93F2F]">{issue.name as string}</p>
-                  <p className="text-[11px] text-[#A93F2F]">{issue.actionRequired as string}</p>
+                  <p className="text-[14px] font-semibold text-[#A93F2F]">{issue.name as string}</p>
+                  <p className="text-[14px] text-[#A93F2F]">{issue.actionRequired as string}</p>
                 </div>
               </div>
             ))}
-            <button onClick={() => setLocation('/curriculum/content-health')} className="text-[12px] text-primary font-medium flex items-center gap-1 hover:underline">View all health issues <ArrowRight className="w-3 h-3" /></button>
+            <button onClick={() => setLocation('/curriculum/content-health')} className="text-[14px] text-primary font-medium flex items-center gap-1 hover:underline">View all health issues <ArrowRight className="w-3 h-3" /></button>
           </div>
         )}
 
@@ -150,8 +150,8 @@ export default function CurriculumOverview() {
             { label: 'Action Library', path: '/curriculum/penny-actions', desc: '11 prototype actions' },
           ].map(link => (
             <button key={link.path} onClick={() => setLocation(link.path)} className="rounded-lg border border-border bg-white px-4 py-3 text-left hover:border-primary/30 hover:bg-primary/5 transition-colors">
-              <div className="flex items-center gap-1.5 mb-0.5"><Zap className="w-3 h-3 text-primary" /><span className="text-[12px] font-semibold text-foreground">{link.label}</span></div>
-              <p className="text-[10px] text-muted-foreground">{link.desc}</p>
+              <div className="flex items-center gap-1.5 mb-0.5"><Zap className="w-3 h-3 text-primary" /><span className="text-[14px] font-semibold text-foreground">{link.label}</span></div>
+              <p className="text-[14px] text-muted-foreground">{link.desc}</p>
             </button>
           ))}
         </div>

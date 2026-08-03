@@ -149,7 +149,7 @@ export default function PennyCommandCenter() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold text-foreground leading-tight">Penny</h1>
-            <p className="text-[12px] text-muted-foreground mt-0.5">
+            <p className="text-[14px] text-muted-foreground mt-0.5">
               AI coaching companion — Transition Trails
             </p>
           </div>
@@ -157,7 +157,7 @@ export default function PennyCommandCenter() {
             {STATUS_PILLS.map(p => (
               <div
                 key={p.label}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-medium ${p.bg}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[14px] font-medium ${p.bg}`}
               >
                 <span className="text-muted-foreground/60">{p.label}</span>
                 <span className={p.color}>{p.value}</span>
@@ -181,8 +181,8 @@ export default function PennyCommandCenter() {
                   <tile.icon className={`w-3.5 h-3.5 ${tile.iconCls}`} />
                 </div>
                 <p className="text-xl font-bold text-foreground leading-none">{tile.value}</p>
-                <p className="text-[10px] font-medium text-muted-foreground mt-1">{tile.label}</p>
-                <p className="text-[10px] text-muted-foreground/70 mt-0.5">{tile.sub}</p>
+                <p className="text-[14px] font-medium text-muted-foreground mt-1">{tile.label}</p>
+                <p className="text-[14px] text-muted-foreground/70 mt-0.5">{tile.sub}</p>
               </div>
             ))}
           </div>
@@ -190,7 +190,7 @@ export default function PennyCommandCenter() {
 
         {/* ── Needs attention ───────────────────────────────────────────────── */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2.5">
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2.5">
             Needs attention
           </p>
           <div className="rounded-lg border border-border bg-card divide-y divide-border">
@@ -200,7 +200,7 @@ export default function PennyCommandCenter() {
                   ? <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
                   : <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
                 }
-                <p className="text-[12px] text-foreground">{item.label}</p>
+                <p className="text-[14px] text-foreground">{item.label}</p>
               </div>
             ))}
           </div>
@@ -208,27 +208,27 @@ export default function PennyCommandCenter() {
 
         {/* ── Quick actions ─────────────────────────────────────────────────── */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-2.5">
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-2.5">
             Quick actions
           </p>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleAskPenny}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[14px] font-medium hover:bg-primary/90 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Ask Penny
             </button>
             <button
               onClick={() => navigate('/penny/prompts')}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-card text-foreground text-[12px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-card text-foreground text-[14px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
             >
               <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
               New prompt template
             </button>
             <button
               onClick={() => navigate('/penny/learners')}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-card text-foreground text-[12px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-card text-foreground text-[14px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
             >
               <Users className="w-3.5 h-3.5 text-muted-foreground" />
               View learners

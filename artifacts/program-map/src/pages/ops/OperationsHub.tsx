@@ -88,11 +88,11 @@ function HealthIndicators() {
         <div className="rounded-lg border border-border bg-white overflow-hidden">
           <div className="px-4 py-3 border-b border-border/40 bg-muted/20 flex items-center justify-between">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">Trail OS Platform Health</p>
-              <p className="text-[11px] text-muted-foreground">Composite score across {baseDomains.length} domains</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Trail OS Platform Health</p>
+              <p className="text-[14px] text-muted-foreground">Composite score across {baseDomains.length} domains</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`text-[9px] font-bold border rounded-full px-2 py-0.5 ${oc.cls}`}>{oc.label}</span>
+              <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${oc.cls}`}>{oc.label}</span>
               <span className={`text-[44px] font-bold leading-none tabular-nums ${oc.score}`}>{overallHealthScore}</span>
               <span className="text-[18px] text-muted-foreground/40 font-light leading-none">/100</span>
             </div>
@@ -109,11 +109,11 @@ function HealthIndicators() {
                   onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
                   className="flex items-center gap-2 group hover:opacity-80 transition-opacity"
                 >
-                  <span className="text-[10px] text-foreground w-28 shrink-0 text-left truncate group-hover:text-primary transition-colors">{d.domain}</span>
+                  <span className="text-[14px] text-foreground w-28 shrink-0 text-left truncate group-hover:text-primary transition-colors">{d.domain}</span>
                   <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                     <div className={`h-full rounded-full ${bar} transition-all`} style={{ width: `${d.score}%` }} />
                   </div>
-                  <span className={`text-[10px] font-bold w-6 text-right shrink-0 ${dc.score}`}>{d.score}</span>
+                  <span className={`text-[14px] font-bold w-6 text-right shrink-0 ${dc.score}`}>{d.score}</span>
                 </button>
               );
             })}
@@ -124,7 +124,7 @@ function HealthIndicators() {
             <div className="mx-4 mb-3 border-t border-border/30 pt-3">
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-muted animate-pulse shrink-0" />
-                <p className="text-[9px] text-muted-foreground">Loading Salesforce data…</p>
+                <p className="text-[14px] text-muted-foreground">Loading Salesforce data…</p>
               </div>
             </div>
           )}
@@ -132,9 +132,9 @@ function HealthIndicators() {
             <div className="mx-4 mb-3 border-t border-border/30 pt-3">
               <div className="flex items-center gap-1.5 mb-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 shrink-0" />
-                <p className="text-[9px] font-bold uppercase tracking-wider text-[#2F6B3F]">Salesforce Live</p>
+                <p className="text-[14px] font-bold  text-[#2F6B3F]">Salesforce Live</p>
                 {sfData.fromCache && (
-                  <span className="text-[8px] text-muted-foreground/50 ml-auto">
+                  <span className="text-[14px] text-muted-foreground/50 ml-auto">
                     cached · {sfData.cacheAge < 60 ? `${sfData.cacheAge}s` : `${Math.round(sfData.cacheAge / 60)}m`} ago
                   </span>
                 )}
@@ -154,9 +154,9 @@ function HealthIndicators() {
                     <p className={`text-[15px] font-bold leading-tight tabular-nums ${stat.alert ? 'text-[#CC8400]' : 'text-foreground'}`}>
                       {stat.value ?? '—'}
                     </p>
-                    <p className="text-[8px] text-muted-foreground leading-tight mt-0.5">{stat.label}</p>
+                    <p className="text-[14px] text-muted-foreground leading-tight mt-0.5">{stat.label}</p>
                     {'sub' in stat && stat.sub && (
-                      <p className="text-[7px] text-[#CC8400] font-bold mt-0.5">{stat.sub}</p>
+                      <p className="text-[14px] text-[#CC8400] font-bold mt-0.5">{stat.sub}</p>
                     )}
                   </div>
                 ))}
@@ -168,7 +168,7 @@ function HealthIndicators() {
           <div className="px-4 pb-3">
             <button
               onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(pennyQ); }}
-              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] font-semibold text-primary hover:bg-primary/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-[14px] font-semibold text-primary hover:bg-primary/10 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Get {`Penny's`} action plan to improve the score
@@ -179,9 +179,9 @@ function HealthIndicators() {
         {/* ── Top 5 High-Impact Items ────────────────────────────────────── */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 shrink-0">Top 5 High-Impact Items</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 shrink-0">Top 5 High-Impact Items</p>
             <div className="flex-1 h-px bg-border/50" />
-            <p className="text-[9px] text-muted-foreground shrink-0">Fixing these will move the score most</p>
+            <p className="text-[14px] text-muted-foreground shrink-0">Fixing these will move the score most</p>
           </div>
           <div className="space-y-1.5">
             {top5.map((ind, idx) => {
@@ -192,11 +192,11 @@ function HealthIndicators() {
                   onClick={() => setSelectedItem({ type: 'healthIndicator', id: ind.id, data: ind })}
                   className="w-full text-left rounded-lg border border-border bg-white px-3 py-2.5 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex items-center gap-3"
                 >
-                  <span className="text-[11px] font-bold text-muted-foreground/30 w-4 shrink-0 text-right">{idx + 1}</span>
-                  <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${ic.cls}`}>{ic.label}</span>
+                  <span className="text-[14px] font-bold text-muted-foreground/30 w-4 shrink-0 text-right">{idx + 1}</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${ic.cls}`}>{ic.label}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-semibold text-foreground group-hover:text-primary leading-snug">{ind.label}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{ind.domain} · {ind.detail}</p>
+                    <p className="text-[14px] font-semibold text-foreground group-hover:text-primary leading-snug">{ind.label}</p>
+                    <p className="text-[14px] text-muted-foreground truncate">{ind.domain} · {ind.detail}</p>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary shrink-0 transition-colors" />
                 </button>
@@ -208,7 +208,7 @@ function HealthIndicators() {
         {/* ── Domain Cards ──────────────────────────────────────────────── */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 shrink-0">By Domain</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50 shrink-0">By Domain</p>
             <div className="flex-1 h-px bg-border/50" />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -227,11 +227,11 @@ function HealthIndicators() {
                     className="px-3 py-2.5 border-b border-border/50 bg-muted/20 flex items-center justify-between w-full text-left hover:bg-primary/5 transition-colors group"
                   >
                     <div className="min-w-0 mr-2">
-                      <p className="text-[12px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{d.domain}</p>
-                      <p className="text-[9px] text-muted-foreground truncate">{d.sourceSystem}</p>
+                      <p className="text-[14px] font-bold text-foreground group-hover:text-primary transition-colors truncate">{d.domain}</p>
+                      <p className="text-[14px] text-muted-foreground truncate">{d.sourceSystem}</p>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-[8px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dc.label}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dc.label}</span>
                       <span className={`text-[22px] font-bold leading-none ${dc.score}`}>{d.score}</span>
                     </div>
                   </button>
@@ -253,15 +253,15 @@ function HealthIndicators() {
                           className="w-full flex items-center gap-2 py-[5px] rounded hover:bg-primary/5 transition-colors group text-left"
                         >
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-px ${dot}`} />
-                          <span className="text-[10px] text-foreground group-hover:text-primary flex-1 truncate leading-tight">{ind.label}</span>
-                          <span className={`text-[8px] font-bold border rounded-full px-1 py-0.5 shrink-0 leading-tight ${ic.cls}`}>{ic.label}</span>
+                          <span className="text-[14px] text-foreground group-hover:text-primary flex-1 truncate leading-tight">{ind.label}</span>
+                          <span className={`text-[14px] font-bold border rounded-full px-1 py-0.5 shrink-0 leading-tight ${ic.cls}`}>{ic.label}</span>
                         </button>
                       );
                     })}
                     {extra > 0 && (
                       <button
                         onClick={() => setSelectedItem({ type: 'healthIndicator', id: d.id, data: d })}
-                        className="text-[9px] text-primary hover:underline pl-3.5 mt-0.5 block"
+                        className="text-[14px] text-primary hover:underline pl-3.5 mt-0.5 block"
                       >
                         +{extra} more checks
                       </button>
@@ -274,11 +274,11 @@ function HealthIndicators() {
                       onClick={() => setSelectedItem({ type: 'healthIndicator', id: firstBad.id, data: firstBad })}
                       className="w-full px-3 py-1.5 border-t border-[#FFD08A]/60 bg-[#FFF3E0]/60 hover:bg-[#FFF3E0]/70 transition-colors text-left group"
                     >
-                      <p className="text-[8px] font-bold uppercase tracking-wide text-[#CC8400]/70 mb-0.5 flex items-center gap-1">
+                      <p className="text-[14px] font-bold  text-[#CC8400]/70 mb-0.5 flex items-center gap-1">
                         Next action
                         <span className="text-[#CC8400]/60 group-hover:text-[#CC8400] transition-colors">→</span>
                       </p>
-                      <p className="text-[9px] text-muted-foreground leading-snug line-clamp-2 group-hover:text-[#CC8400]/80 transition-colors">{firstBad.detail}</p>
+                      <p className="text-[14px] text-muted-foreground leading-snug line-clamp-2 group-hover:text-[#CC8400]/80 transition-colors">{firstBad.detail}</p>
                     </button>
                   )}
                 </div>
@@ -304,7 +304,7 @@ const TYPE_BORDER: Record<string, string> = {
 function SectionHeader({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-2 mb-3">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 shrink-0">{label}</p>
+      <p className="text-[14px] font-bold  text-muted-foreground/50 shrink-0">{label}</p>
       <div className="flex-1 h-px bg-border/50" />
     </div>
   );
@@ -337,13 +337,13 @@ function IntelligenceView() {
                 <div key={sc.id} className="rounded-lg border border-border bg-white overflow-hidden flex flex-col">
                   <div className="px-3 py-2.5 border-b border-border/50 bg-muted/20 flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{sc.category}</p>
-                      <p className="text-[13px] font-semibold text-foreground leading-tight">{sc.title}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{sc.summary}</p>
+                      <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">{sc.category}</p>
+                      <p className="text-[14px] font-semibold text-foreground leading-tight">{sc.title}</p>
+                      <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{sc.summary}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0 pl-1">
                       <span className={`text-xl font-bold leading-none ${cfg.score}`}>{sc.score}</span>
-                      <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{cfg.label}</span>
+                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{cfg.label}</span>
                     </div>
                   </div>
                   <div className="px-3 py-2 space-y-1 flex-1">
@@ -352,8 +352,8 @@ function IntelligenceView() {
                       return (
                         <div key={dim.label} className="flex items-center gap-1.5">
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dc.dot}`} />
-                          <span className="text-[11px] text-foreground flex-1 truncate">{dim.label}</span>
-                          <span className="text-[10px] font-bold text-muted-foreground shrink-0">{dim.score}</span>
+                          <span className="text-[14px] text-foreground flex-1 truncate">{dim.label}</span>
+                          <span className="text-[14px] font-bold text-muted-foreground shrink-0">{dim.score}</span>
                         </div>
                       );
                     })}
@@ -361,7 +361,7 @@ function IntelligenceView() {
                   <div className="px-3 pb-2.5 border-t border-border/30 pt-2">
                     <button
                       onClick={() => toggle(sc.id)}
-                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                      className="flex items-center gap-1 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                       {isOpen ? 'Hide detail' : 'Show detail'}
@@ -374,8 +374,8 @@ function IntelligenceView() {
                           return (
                             <div key={dim.label}>
                               <div className="flex items-center justify-between mb-0.5">
-                                <span className="text-[10px] font-semibold text-foreground">{dim.label}</span>
-                                <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dim.score}</span>
+                                <span className="text-[14px] font-semibold text-foreground">{dim.label}</span>
+                                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dim.score}</span>
                               </div>
                               <div className="h-1 bg-muted rounded-full mb-0.5">
                                 <div
@@ -383,7 +383,7 @@ function IntelligenceView() {
                                   style={{ width: `${pct}%` }}
                                 />
                               </div>
-                              <p className="text-[10px] text-muted-foreground leading-snug">{dim.notes}</p>
+                              <p className="text-[14px] text-muted-foreground leading-snug">{dim.notes}</p>
                             </div>
                           );
                         })}
@@ -407,12 +407,12 @@ function IntelligenceView() {
                 <button key={r.id}
                   onClick={() => setSelectedItem({ type: 'oicRecommendation', id: r.id, data: r })}
                   className="w-full text-left rounded-lg border border-border bg-white px-4 py-3 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex items-center gap-3">
-                  <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 shrink-0 ${pc.cls}`}>{pc.label}</span>
+                  <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 shrink-0 ${pc.cls}`}>{pc.label}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold text-foreground group-hover:text-primary">{r.action}</p>
-                    <p className="text-[10px] text-muted-foreground">{r.domain} · {r.systems.slice(0, 2).join(', ')}</p>
+                    <p className="text-[14px] font-semibold text-foreground group-hover:text-primary">{r.action}</p>
+                    <p className="text-[14px] text-muted-foreground">{r.domain} · {r.systems.slice(0, 2).join(', ')}</p>
                   </div>
-                  <span className={`text-[10px] font-semibold shrink-0 ${effort}`}>{r.effort} effort</span>
+                  <span className={`text-[14px] font-semibold shrink-0 ${effort}`}>{r.effort} effort</span>
                   <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />
                 </button>
               );
@@ -435,20 +435,20 @@ function IntelligenceView() {
                   className={`text-left rounded-lg border border-border border-l-[3px] ${TYPE_BORDER[t.type]} bg-white p-3 hover:border-primary/40 hover:bg-primary/5 transition-colors group flex flex-col gap-2`}
                 >
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${tc.cls}`}>{tc.label}</span>
-                    <span className={`text-[9px] ${uc.cls}`}>{uc.label}</span>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${tc.cls}`}>{tc.label}</span>
+                    <span className={`text-[14px] ${uc.cls}`}>{uc.label}</span>
                   </div>
                   <div>
-                    <p className="text-[12px] font-semibold text-foreground group-hover:text-primary leading-snug">{t.title}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{shortDesc}</p>
+                    <p className="text-[14px] font-semibold text-foreground group-hover:text-primary leading-snug">{t.title}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{shortDesc}</p>
                   </div>
                   <div className="flex items-end justify-between gap-2 mt-auto">
                     <div className="flex flex-wrap gap-1">
                       {t.affectedDomains.slice(0, 3).map(d => (
-                        <span key={d} className="text-[9px] font-medium border border-border rounded-full px-1.5 py-0.5 text-muted-foreground">{d}</span>
+                        <span key={d} className="text-[14px] font-medium border border-border rounded-full px-1.5 py-0.5 text-muted-foreground">{d}</span>
                       ))}
                       {t.affectedDomains.length > 3 && (
-                        <span className="text-[9px] text-muted-foreground/50">+{t.affectedDomains.length - 3}</span>
+                        <span className="text-[14px] text-muted-foreground/50">+{t.affectedDomains.length - 3}</span>
                       )}
                     </div>
                     <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0" />

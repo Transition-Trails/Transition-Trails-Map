@@ -102,7 +102,7 @@ function SignalsIndicator() {
     <button
       onClick={() => openSlackPanel(getSignalPanelConfig(context))}
       title={TERMS.signalTooltip(counts.total, counts.urgent)}
-      className={`group flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-all duration-200 whitespace-nowrap ${
+      className={`group flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-all duration-200 whitespace-nowrap ${
         panelOpen
           ? 'bg-[#4A154B]/10 border-[#4A154B]/25 text-[#4A154B]/80'
           : counts.urgent > 0
@@ -157,11 +157,11 @@ function PrefRow({ icon: Icon, label, hint, badge, onClick }: {
     >
       <Icon className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-medium text-foreground leading-none">{label}</p>
-        <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{hint}</p>
+        <p className="text-[14px] font-medium text-foreground leading-none">{label}</p>
+        <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug">{hint}</p>
       </div>
       {badge ? (
-        <span className="text-[8px] font-bold uppercase tracking-wide bg-muted border border-border text-muted-foreground/60 px-1.5 py-0.5 rounded flex-shrink-0">
+        <span className="text-[14px] font-bold  bg-muted border border-border text-muted-foreground/60 px-1.5 py-0.5 rounded flex-shrink-0">
           {badge}
         </span>
       ) : (
@@ -226,7 +226,7 @@ function UserProfileButton() {
         {photoUrl ? (
           <img src={photoUrl} alt={name} className="w-full h-full rounded-full object-cover" />
         ) : (
-          <div className="w-full h-full rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold select-none">
+          <div className="w-full h-full rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold select-none">
             {initials}
           </div>
         )}
@@ -255,18 +255,18 @@ function UserProfileButton() {
 
               {/* Name + email */}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-semibold text-foreground truncate">{name}</p>
-                <p className="text-[10px] text-muted-foreground truncate">{email}</p>
+                <p className="text-[14px] font-semibold text-foreground truncate">{name}</p>
+                <p className="text-[14px] text-muted-foreground truncate">{email}</p>
               </div>
 
               {/* Google connected badge */}
-              <span className="text-[8px] font-bold uppercase tracking-wide bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded flex-shrink-0">
+              <span className="text-[14px] font-bold  bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded flex-shrink-0">
                 Google
               </span>
             </div>
 
             {/* Current tier pill */}
-            <div className={`mt-2.5 inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full border ${current.badgeClass}`}>
+            <div className={`mt-2.5 inline-flex items-center gap-1.5 text-[14px] font-semibold px-2.5 py-1 rounded-full border ${current.badgeClass}`}>
               <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tierDot[userTier]}`} />
               {current.label}
               {isPreviewing && <span className="font-normal opacity-60 ml-0.5">· previewing</span>}
@@ -275,7 +275,7 @@ function UserProfileButton() {
 
           {/* ── View as / Tier switcher ── */}
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">View As</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">View As</p>
             <div className="grid grid-cols-2 gap-1.5">
               {TIER_ORDER.map(tier => {
                 const cfg    = TIER_CONFIG[tier];
@@ -285,21 +285,21 @@ function UserProfileButton() {
                   <button
                     key={tier}
                     onClick={() => setUserTier(tier)}
-                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-colors border text-[11px] font-medium ${
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left transition-colors border text-[14px] font-medium ${
                       active
                         ? `${cfg.badgeClass} shadow-sm`
                         : 'border-border/60 text-muted-foreground hover:bg-muted/50 hover:text-foreground bg-transparent'
                     }`}
                   >
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tierDot[tier]}`} />
-                    {seg.icon && <span className="text-[9px] leading-none mr-[-2px]">{seg.icon}</span>}
+                    {seg.icon && <span className="text-[14px] leading-none mr-[-2px]">{seg.icon}</span>}
                     <span className="flex-1 truncate">{cfg.shortLabel}</span>
-                    {active && <span className="text-[8px] opacity-50 font-normal">active</span>}
+                    {active && <span className="text-[14px] opacity-50 font-normal">active</span>}
                   </button>
                 );
               })}
             </div>
-            <p className="text-[9px] text-muted-foreground/50 mt-2 leading-snug">
+            <p className="text-[14px] text-muted-foreground/50 mt-2 leading-snug">
               Tier auto-assigned via Google Groups on sign-in. Super Admin can preview any tier.
             </p>
           </div>
@@ -307,7 +307,7 @@ function UserProfileButton() {
           {/* ── Preferences ── */}
           <div className="py-1">
             <div className="px-4 pt-2 pb-1">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60">Preferences</p>
+              <p className="text-[14px] font-bold  text-muted-foreground/60">Preferences</p>
             </div>
             <PrefRow
               icon={Layers}
@@ -341,12 +341,12 @@ function UserProfileButton() {
               <Chrome className="w-3.5 h-3.5 text-[#2F6B3F] mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-[11px] font-semibold text-foreground">Google Account</p>
-                  <span className="text-[8px] font-bold bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded uppercase tracking-wide">
+                  <p className="text-[14px] font-semibold text-foreground">Google Account</p>
+                  <span className="text-[14px] font-bold bg-[#E6F0EA] border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded ">
                     Connected
                   </span>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug truncate">
+                <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug truncate">
                   {email || 'Signed in via Google Workspace'}
                 </p>
               </div>
@@ -357,7 +357,7 @@ function UserProfileButton() {
           <div className="px-4 py-2 border-t border-border">
             <button
               onClick={() => { setOpen(false); void signOut(); }}
-              className="w-full flex items-center gap-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors py-1 group"
+              className="w-full flex items-center gap-2 text-[14px] text-muted-foreground hover:text-foreground transition-colors py-1 group"
             >
               <LogOut className="w-3.5 h-3.5 flex-shrink-0 group-hover:text-[#A93F2F] transition-colors" />
               <span className="group-hover:text-[#A93F2F] transition-colors">Sign out</span>
@@ -403,7 +403,7 @@ export function Topbar() {
           {TERMS.brand}
         </span>
         <span className="text-muted-foreground/30 select-none mx-0.5 flex-shrink-0">·</span>
-        <span className="text-xs text-muted-foreground font-medium flex-shrink-0 hidden sm:block">{section}</span>
+        <span className="text-sm text-muted-foreground font-medium flex-shrink-0 hidden sm:block">{section}</span>
         <span className="text-muted-foreground/30 select-none hidden sm:block flex-shrink-0">/</span>
         <span className="text-sm text-foreground font-medium truncate">{title}</span>
       </div>
@@ -412,7 +412,7 @@ export function Topbar() {
       <div className="flex items-center gap-2 flex-shrink-0">
         {/* Ask Penny panel toggle — always visible */}
         <button
-          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
             askPennyOpen
               ? 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E] hover:bg-[#EDF5F8]'
               : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#EDF5F8] hover:border-[#7FAFC6] hover:text-[#2F6F7E]'
@@ -433,7 +433,7 @@ export function Topbar() {
 
         {/* Calendar action panel toggle */}
         <button
-          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
             calendarPanelOpen
               ? 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F] hover:bg-[#E6F0EA]'
               : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#E6F0EA] hover:border-[#9FC3AE] hover:text-[#2F6B3F]'
@@ -455,7 +455,7 @@ export function Topbar() {
 
         {/* Gmail action panel toggle */}
         <button
-          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[10px] font-semibold border transition-colors whitespace-nowrap ${
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
             gmailPanelOpen
               ? 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F] hover:bg-[#FBEAE6]'
               : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#FBEAE6] hover:border-[#E8B9B4] hover:text-[#A93F2F]'

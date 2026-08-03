@@ -158,10 +158,10 @@ function ConfigCard({
     }
   }
 
-  const inputCls    = 'w-full h-7 rounded-md border border-input bg-white px-2 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring';
-  const textareaCls = 'w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[11px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y';
-  const labelCls    = 'block text-[10px] font-bold text-foreground mb-1';
-  const noteCls     = 'text-[10px] text-muted-foreground leading-snug mb-2';
+  const inputCls    = 'w-full h-7 rounded-md border border-input bg-white px-2 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring';
+  const textareaCls = 'w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y';
+  const labelCls    = 'block text-[14px] font-bold text-foreground mb-1';
+  const noteCls     = 'text-[14px] text-muted-foreground leading-snug mb-2';
 
   return (
     <div className={`rounded-lg border bg-card transition-shadow ${isEditing ? 'border-primary/40 shadow-md' : config.isActive ? 'border-border' : 'border-border/40'} ${!config.isActive && !isEditing ? 'opacity-60' : ''}`}>
@@ -171,18 +171,18 @@ function ConfigCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              <p className="text-[13px] font-semibold text-foreground">{config.name}</p>
+              <p className="text-[14px] font-semibold text-foreground">{config.name}</p>
               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${config.isActive ? 'bg-[#E6F0EA]0' : 'bg-muted-foreground/40'}`} />
-              <span className="text-[9px] text-muted-foreground">{config.isActive ? 'Active' : 'Inactive'}</span>
+              <span className="text-[14px] text-muted-foreground">{config.isActive ? 'Active' : 'Inactive'}</span>
             </div>
-            <code className="text-[9px] font-mono bg-muted/60 border border-border/60 rounded px-1.5 py-0.5 text-muted-foreground">
+            <code className="text-[14px] font-mono bg-muted/60 border border-border/60 rounded px-1.5 py-0.5 text-muted-foreground">
               {config.trailId}
             </code>
           </div>
           {isEditing ? (
             <button
               onClick={onCancel}
-              className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
+              className="flex items-center gap-1 px-2.5 py-1 text-[14px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
             >
               <ChevronUp className="w-3 h-3" /> Cancel
             </button>
@@ -191,14 +191,14 @@ function ConfigCard({
               <button
                 onClick={() => void handleReactivate()}
                 disabled={reactivating}
-                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full hover:bg-[#E6F0EA] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-1 px-2.5 py-1 text-[14px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full hover:bg-[#E6F0EA] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {reactivating && <Loader2 className="w-3 h-3 animate-spin" />}
                 Reactivate
               </button>
               <button
                 onClick={onEdit}
-                className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1 text-[14px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors"
               >
                 <ChevronDown className="w-3 h-3" /> Edit
               </button>
@@ -206,7 +206,7 @@ function ConfigCard({
           ) : (
             <button
               onClick={onEdit}
-              className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
+              className="flex items-center gap-1 px-2.5 py-1 text-[14px] font-semibold border border-border rounded-full hover:bg-muted/40 transition-colors shrink-0"
             >
               <ChevronDown className="w-3 h-3" /> Edit
             </button>
@@ -215,24 +215,24 @@ function ConfigCard({
 
         {!config.isActive && (
           <div className="mt-2 flex items-start gap-1.5 rounded border border-[#FFD08A] bg-[#FFF3E0] px-2 py-1">
-            <span className="text-[10px] text-[#CC8400] leading-snug">
+            <span className="text-[14px] text-[#CC8400] leading-snug">
               ⚠ This trail is inactive. Learners on this trail will receive the fallback Penny persona.
             </span>
           </div>
         )}
         {!isEditing && (
           <div className="mt-2 space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">Penny Persona</p>
-            <p className="text-[11px] text-muted-foreground leading-snug">{trailPersonaSummary(config.trailId)}</p>
+            <p className="text-[14px] font-bold  text-muted-foreground/50">Penny Persona</p>
+            <p className="text-[14px] text-muted-foreground leading-snug">{trailPersonaSummary(config.trailId)}</p>
             {config.pennyRole && (
-              <p className="text-[11px] text-foreground leading-snug">
+              <p className="text-[14px] text-foreground leading-snug">
                 {config.pennyRole.length > 120 ? `${config.pennyRole.slice(0, 120)}…` : config.pennyRole}
               </p>
             )}
             {config.tone && (
               <div className="flex items-center gap-1.5 pt-0.5">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">Tone</span>
-                <span className="text-[10px] text-foreground">{config.tone}</span>
+                <span className="text-[14px] font-bold  text-muted-foreground/50">Tone</span>
+                <span className="text-[14px] text-foreground">{config.tone}</span>
               </div>
             )}
           </div>
@@ -252,10 +252,10 @@ function ConfigCard({
               className="w-3.5 h-3.5 rounded border-border accent-primary mt-0.5 shrink-0"
             />
             <div>
-              <label htmlFor={`active-top-${config.id}`} className="text-[11px] font-medium text-foreground cursor-pointer">
+              <label htmlFor={`active-top-${config.id}`} className="text-[14px] font-medium text-foreground cursor-pointer">
                 Trail is active
               </label>
-              <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">
+              <p className="text-[14px] text-muted-foreground leading-snug mt-0.5">
                 Saving with this toggle OFF keeps the trail inactive.
               </p>
             </div>
@@ -312,27 +312,27 @@ function ConfigCard({
           {saveError && (
             <div className="flex items-start gap-2 rounded border border-[#E8B9B4] bg-[#FBEAE6] px-2.5 py-2">
               <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
-              <p className="text-[11px] text-[#A93F2F] leading-snug">{saveError}</p>
+              <p className="text-[14px] text-[#A93F2F] leading-snug">{saveError}</p>
             </div>
           )}
 
           <div className="flex items-center gap-2 pt-1">
             {saveSuccess && (
-              <span className="flex items-center gap-1 text-[11px] text-[#2F6B3F] font-medium">
+              <span className="flex items-center gap-1 text-[14px] text-[#2F6B3F] font-medium">
                 <CheckCircle2 className="w-3.5 h-3.5" /> Saved
               </span>
             )}
             <div className="ml-auto flex items-center gap-2">
               <button
                 onClick={onCancel}
-                className="px-2.5 py-1.5 text-[10px] font-semibold text-muted-foreground border border-border rounded-full hover:bg-muted/40 transition-colors"
+                className="px-2.5 py-1.5 text-[14px] font-semibold text-muted-foreground border border-border rounded-full hover:bg-muted/40 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => void handleSave()}
                 disabled={saving}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[14px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {saving && <Loader2 className="w-3 h-3 animate-spin" />}
                 Save Config
@@ -376,7 +376,7 @@ export default function TrailConfigs() {
         {/* ── Page header ───────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+            <p className="text-[14px] font-bold  text-muted-foreground/50">
               Penny Command Center
             </p>
             <div className="flex items-center gap-2.5">
@@ -385,7 +385,7 @@ export default function TrailConfigs() {
               </div>
               <h1 className="text-base font-semibold text-foreground">Trail Configurations</h1>
             </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed max-w-2xl">
+            <p className="text-[14px] text-muted-foreground leading-relaxed max-w-2xl">
               Each trail configuration defines Penny's persona, tone, and coaching behavior for learners
               on that trail. Changes take effect immediately on the next conversation.
             </p>
@@ -394,14 +394,14 @@ export default function TrailConfigs() {
             <div className="shrink-0 flex items-center gap-2 px-2.5 py-1 rounded-full border border-[#9FC3AE] bg-[#E6F0EA]">
               <span className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 inline-block" />
-                <span className="text-[10px] font-semibold text-[#245531]">{activeCount} active</span>
+                <span className="text-[14px] font-semibold text-[#245531]">{activeCount} active</span>
               </span>
               {inactiveCount > 0 && (
                 <>
-                  <span className="text-[10px] text-[#2F6B3F]/50">·</span>
+                  <span className="text-[14px] text-[#2F6B3F]/50">·</span>
                   <span className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 inline-block" />
-                    <span className="text-[10px] font-semibold text-muted-foreground">{inactiveCount} inactive</span>
+                    <span className="text-[14px] font-semibold text-muted-foreground">{inactiveCount} inactive</span>
                   </span>
                 </>
               )}
@@ -411,7 +411,7 @@ export default function TrailConfigs() {
 
         {/* ── What this page does ─────────────────────────────────────── */}
         <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/50">How this works</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50">How this works</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               {
@@ -431,9 +431,9 @@ export default function TrailConfigs() {
               },
             ].map(item => (
               <div key={item.label} className="space-y-0.5">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{item.label}</p>
-                <p className="text-[11px] font-semibold text-foreground">{item.value}</p>
-                <p className="text-[10px] text-muted-foreground leading-snug">{item.note}</p>
+                <p className="text-[14px] font-bold text-muted-foreground ">{item.label}</p>
+                <p className="text-[14px] font-semibold text-foreground">{item.value}</p>
+                <p className="text-[14px] text-muted-foreground leading-snug">{item.note}</p>
               </div>
             ))}
           </div>
@@ -450,9 +450,9 @@ export default function TrailConfigs() {
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-4 flex items-start gap-3">
             <AlertCircle className="w-4 h-4 text-[#A93F2F] shrink-0 mt-0.5" />
             <div>
-              <p className="text-[12px] font-semibold text-[#A93F2F]">Failed to load trail configurations</p>
-              <p className="text-[11px] text-[#A93F2F]/80 mt-0.5">{error}</p>
-              <p className="text-[11px] text-[#A93F2F]/60 mt-1">
+              <p className="text-[14px] font-semibold text-[#A93F2F]">Failed to load trail configurations</p>
+              <p className="text-[14px] text-[#A93F2F]/80 mt-0.5">{error}</p>
+              <p className="text-[14px] text-[#A93F2F]/60 mt-1">
                 Check Salesforce authentication in Admin → Integrations.
               </p>
             </div>
@@ -462,10 +462,10 @@ export default function TrailConfigs() {
         {!loading && !error && configs.length === 0 && (
           <div className="rounded-lg border border-border bg-card p-8 text-center">
             <Sliders className="w-8 h-8 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-[13px] font-medium text-foreground">No trail configurations found</p>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              Add <code className="text-[10px] bg-muted px-1 rounded">Penny_Trail_Config__c</code> records
-              in Salesforce with <code className="text-[10px] bg-muted px-1 rounded">Is_Active__c = true</code>.
+            <p className="text-[14px] font-medium text-foreground">No trail configurations found</p>
+            <p className="text-[14px] text-muted-foreground mt-1">
+              Add <code className="text-[14px] bg-muted px-1 rounded">Penny_Trail_Config__c</code> records
+              in Salesforce with <code className="text-[14px] bg-muted px-1 rounded">Is_Active__c = true</code>.
             </p>
           </div>
         )}
@@ -490,8 +490,8 @@ export default function TrailConfigs() {
         {!loading && !error && configs.length > 0 && (
           <div className="rounded border border-[#9FC3AE] bg-[#E6F0EA]/60 px-3 py-2 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0 shrink-0 inline-block" />
-            <p className="text-[10px] text-[#245531] leading-snug">
-              <strong>Live · Salesforce.</strong> All edits write directly to <code className="text-[9px] bg-[#E6F0EA] px-1 rounded">Penny_Trail_Config__c</code> records in production.
+            <p className="text-[14px] text-[#245531] leading-snug">
+              <strong>Live · Salesforce.</strong> All edits write directly to <code className="text-[14px] bg-[#E6F0EA] px-1 rounded">Penny_Trail_Config__c</code> records in production.
             </p>
           </div>
         )}

@@ -169,7 +169,7 @@ const RISK_META: Record<PocRisk, { badge: string }> = {
 
 function Badge({ text, cls }: { text: string; cls: string }) {
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold border ${cls}`}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${cls}`}>
       {text}
     </span>
   );
@@ -190,7 +190,7 @@ function SectionHeader({
       className="w-full flex items-center gap-2 px-4 py-3 hover:bg-muted/30 transition-colors text-left"
     >
       <span className="text-muted-foreground">{icon}</span>
-      <span className="text-[12px] font-bold text-foreground flex-1">{title}</span>
+      <span className="text-[14px] font-bold text-foreground flex-1">{title}</span>
       <span className="flex items-center gap-2 mr-2">{meta}</span>
       {open
         ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -232,9 +232,9 @@ export default function Phase1CompletionAudit() {
 
         {/* Header */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Administration</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Administration</p>
           <h1 className="text-[15px] font-semibold text-foreground">Penny Capability Build Audit</h1>
-          <p className="text-[12px] text-muted-foreground mt-0.5">
+          <p className="text-[14px] text-muted-foreground mt-0.5">
             Full audit of UX compliance, hardcoded content, test coverage, and Penny capability build status — {AUDIT_DATE}
           </p>
         </div>
@@ -250,7 +250,7 @@ export default function Phase1CompletionAudit() {
           ].map(s => (
             <div key={s.label} className={`rounded-lg border p-2.5 ${s.cls}`}>
               <p className="text-[18px] font-bold text-foreground leading-none">{s.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-1">{s.label}</p>
+              <p className="text-[14px] text-muted-foreground mt-1">{s.label}</p>
             </div>
           ))}
         </div>
@@ -271,13 +271,13 @@ export default function Phase1CompletionAudit() {
           />
           {open.ux && (
             <div className="border-t border-border overflow-x-auto">
-              <table className="w-full text-[11px]">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-5/12">Page</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-1/12">Role</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-1/12">Status</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px]">Notes</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-5/12">Page</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-1/12">Role</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-1/12">Status</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px]">Notes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -289,14 +289,14 @@ export default function Phase1CompletionAudit() {
                           <p className="font-semibold text-foreground">{p.name}</p>
                           <button
                             onClick={() => setLocation(p.path)}
-                            className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5"
+                            className="text-[14px] text-muted-foreground hover:text-primary flex items-center gap-0.5"
                           >
                             {p.path} <ExternalLink className="w-2.5 h-2.5" />
                           </button>
                         </td>
                         <td className="px-3 py-1.5 text-muted-foreground whitespace-nowrap">{p.role}</td>
                         <td className="px-3 py-1.5">
-                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-bold ${m.badge}`}>
+                          <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[14px] font-bold ${m.badge}`}>
                             {m.icon}{m.label}
                           </span>
                         </td>
@@ -325,13 +325,13 @@ export default function Phase1CompletionAudit() {
           />
           {open.hc && (
             <div className="border-t border-border overflow-x-auto">
-              <table className="w-full text-[11px]">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-3/12">Item</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-2/12">Class</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-2/12">Phase 2 Ticket</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px]">Notes</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-3/12">Item</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-2/12">Class</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-2/12">Phase 2 Ticket</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px]">Notes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -341,12 +341,12 @@ export default function Phase1CompletionAudit() {
                       <tr key={item.name} className={`border-b border-border/60 ${i % 2 === 0 ? '' : 'bg-muted/10'}`}>
                         <td className="px-3 py-1.5">
                           <p className="font-semibold text-foreground">{item.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{item.location}</p>
+                          <p className="text-[14px] text-muted-foreground">{item.location}</p>
                         </td>
                         <td className="px-3 py-1.5">
                           <Badge text={m.label} cls={m.badge} />
                         </td>
-                        <td className="px-3 py-1.5 text-muted-foreground font-mono text-[10px]">
+                        <td className="px-3 py-1.5 text-muted-foreground font-mono text-[14px]">
                           {item.p2Item ? (
                             <span>{item.p2Item}</span>
                           ) : '—'}
@@ -375,7 +375,7 @@ export default function Phase1CompletionAudit() {
             onToggle={() => toggle('tests')}
           />
           {open.tests && (
-            <div className="border-t border-border p-4 space-y-3 text-[12px]">
+            <div className="border-t border-border p-4 space-y-3 text-[14px]">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   {
@@ -402,14 +402,14 @@ export default function Phase1CompletionAudit() {
                 ].map(card => (
                   <div key={card.title} className={`rounded-lg border p-3 ${card.cls}`}>
                     <p className={`text-[22px] font-bold leading-none mb-1 ${card.valcls}`}>{card.value}</p>
-                    <p className="text-[11px] font-semibold text-foreground mb-1">{card.title}</p>
-                    <p className="text-[10px] text-muted-foreground">{card.sub}</p>
+                    <p className="text-[14px] font-semibold text-foreground mb-1">{card.title}</p>
+                    <p className="text-[14px] text-muted-foreground">{card.sub}</p>
                   </div>
                 ))}
               </div>
               <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0]/60 px-3 py-2.5 flex items-start gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-                <div className="text-[11px] text-[#CC8400]">
+                <div className="text-[14px] text-[#CC8400]">
                   <span className="font-bold">Phase 2 recommendation:</span> add a Vitest test suite. Start by consuming the 70 metadata test cases in{' '}
                   <span className="font-mono">slackIntegrationData.ts</span> and{' '}
                   <span className="font-mono">googleCalendarData.ts</span> as automated assertions. Add the{' '}
@@ -435,14 +435,14 @@ export default function Phase1CompletionAudit() {
           />
           {open.poc && (
             <div className="border-t border-border overflow-x-auto">
-              <table className="w-full text-[11px]">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-3/12">Capability</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-2/12">POC State</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-2/12">In Trail OS</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px] w-1/12">Risk</th>
-                    <th className="px-3 py-2 text-left font-bold text-muted-foreground uppercase tracking-wide text-[10px]">Phase 2 Ticket</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-3/12">Capability</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-2/12">POC State</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-2/12">In Trail OS</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px] w-1/12">Risk</th>
+                    <th className="px-3 py-2 text-left font-bold text-muted-foreground  text-[14px]">Phase 2 Ticket</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -460,9 +460,9 @@ export default function Phase1CompletionAudit() {
                       </td>
                       <td className="px-3 py-1.5">
                         {item.p2Item ? (
-                          <span className="font-mono text-[10px] text-muted-foreground">{item.p2Item}</span>
+                          <span className="font-mono text-[14px] text-muted-foreground">{item.p2Item}</span>
                         ) : (
-                          <span className="text-[#2F6B3F] font-semibold text-[10px]">In Phase 1 ✅</span>
+                          <span className="text-[#2F6B3F] font-semibold text-[14px]">In Phase 1 ✅</span>
                         )}
                       </td>
                     </tr>
@@ -486,18 +486,18 @@ export default function Phase1CompletionAudit() {
             onToggle={() => toggle('verdict')}
           />
           {open.verdict && (
-            <div className="border-t border-border p-4 space-y-3 text-[12px]">
+            <div className="border-t border-border p-4 space-y-3 text-[14px]">
               <div className={`rounded-lg border px-4 py-3 ${verdictOk ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#E8B9B4] bg-[#FBEAE6]'}`}>
-                <p className={`text-[13px] font-bold mb-1 ${verdictOk ? 'text-[#245531]' : 'text-[#A93F2F]'}`}>
+                <p className={`text-[14px] font-bold mb-1 ${verdictOk ? 'text-[#245531]' : 'text-[#A93F2F]'}`}>
                   Phase 1 UX: {failCount === 0 ? 'No violations' : `${failCount} violations found`}
                 </p>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[14px] text-muted-foreground">
                   {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0–Jul 17 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup Gmail card + href fixes, Calendar panel, Agentforce coexistence, SF live cases table, SF case → Penny focus, Program Config wizard with Penny guidance panel),
                   {watchCount > 0 ? ` ${watchCount} page(s) have acceptable Phase 2 placeholders` : ' 0 watch items'}. No major violations found.
                 </p>
               </div>
 
-              <div className="space-y-2 text-[11px] text-muted-foreground">
+              <div className="space-y-2 text-[14px] text-muted-foreground">
                 {[
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `${totalPages} routes audited — all Phase 1 UX standards applied.` },
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `${hcOk} hardcoded data sets classified as Phase 1 acceptable — realistic sample data.` },
@@ -515,18 +515,18 @@ export default function Phase1CompletionAudit() {
               </div>
 
               <div className="flex items-center gap-2 pt-1">
-                <span className="text-[11px] text-muted-foreground">Phase 2 features tracked in Salesforce.</span>
+                <span className="text-[14px] text-muted-foreground">Phase 2 features tracked in Salesforce.</span>
                 <span className="text-muted-foreground/40">·</span>
                 <button
                   onClick={() => setLocation('/admin/phase1-readiness')}
-                  className="text-[11px] font-bold text-primary hover:text-primary/80 flex items-center gap-1"
+                  className="text-[14px] font-bold text-primary hover:text-primary/80 flex items-center gap-1"
                 >
                   Phase 1 Readiness <ExternalLink className="w-3 h-3" />
                 </button>
                 <span className="text-muted-foreground/40">·</span>
                 <button
                   onClick={() => setLocation('/admin/ux-standards')}
-                  className="text-[11px] font-bold text-primary hover:text-primary/80 flex items-center gap-1"
+                  className="text-[14px] font-bold text-primary hover:text-primary/80 flex items-center gap-1"
                 >
                   UX Standards <ExternalLink className="w-3 h-3" />
                 </button>
@@ -535,7 +535,7 @@ export default function Phase1CompletionAudit() {
           )}
         </div>
 
-        <p className="text-[10px] text-muted-foreground/40 text-center pb-2">
+        <p className="text-[14px] text-muted-foreground/40 text-center pb-2">
           Audit generated {AUDIT_DATE} · Trail OS Phase 1 · {totalPages} pages · {HARDCODED_ITEMS.length} data items · {POC_ITEMS.length} POC capabilities reviewed
         </p>
       </div>

@@ -148,29 +148,29 @@ function ThreadRow({
       }`}
     >
       <div className="flex items-center gap-2 mb-1">
-        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${avatarColor(thread.from)}`}>
+        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0 ${avatarColor(thread.from)}`}>
           {initials(thread.from)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">
-            <span className={`text-[11px] truncate ${thread.unread ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
+            <span className={`text-[14px] truncate ${thread.unread ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
               {thread.from}
             </span>
-            <span className="text-[9px] text-muted-foreground shrink-0 ml-auto">{formatDate(thread.date)}</span>
+            <span className="text-[14px] text-muted-foreground shrink-0 ml-auto">{formatDate(thread.date)}</span>
           </div>
-          <p className={`text-[11px] truncate ${thread.unread ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
+          <p className={`text-[14px] truncate ${thread.unread ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
             {thread.subject}
           </p>
         </div>
       </div>
       {badge && (
-        <div className="inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full border mt-1 bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">
+        <div className="inline-flex items-center gap-1 text-[14px] font-semibold px-2 py-0.5 rounded-full border mt-1 bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">
           <Sparkles className="w-2 h-2" />
           {TERMS.aiAssistant} · {badge}
         </div>
       )}
       {thread.needsAction && !badge && (
-        <div className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A]">
+        <div className="inline-flex items-center gap-1 text-[14px] font-medium px-2 py-0.5 rounded-full mt-1 bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A]">
           Needs action
         </div>
       )}
@@ -256,9 +256,9 @@ function ThreadPreview({
         <div>
           <h2 className="text-sm font-semibold text-foreground mb-1">{thread.subject}</h2>
           <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-[10px] text-muted-foreground">{thread.fromEmail}</span>
+            <span className="text-[14px] text-muted-foreground">{thread.fromEmail}</span>
             {thread.important && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] font-medium">Important</span>
+              <span className="text-[14px] px-1.5 py-0.5 rounded-full bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A] font-medium">Important</span>
             )}
           </div>
         </div>
@@ -273,10 +273,10 @@ function ThreadPreview({
       {badge && pennyAction && (
         <div className="px-6 py-2 bg-[#EDF5F8] border-b border-[#C5DDE6] flex items-center gap-2 shrink-0">
           <Sparkles className="w-3.5 h-3.5 text-[#2F6F7E] shrink-0" />
-          <p className="text-[11px] text-[#2F6F7E] flex-1">
+          <p className="text-[14px] text-[#2F6F7E] flex-1">
             <strong>{TERMS.aiAssistant}</strong> · {pennyAction.desc}
           </p>
-          <button className="text-[10px] font-semibold text-[#2F6F7E] hover:underline flex items-center gap-0.5 shrink-0">
+          <button className="text-[14px] font-semibold text-[#2F6F7E] hover:underline flex items-center gap-0.5 shrink-0">
             Adjust <ChevronRight className="w-3 h-3" />
           </button>
         </div>
@@ -286,39 +286,39 @@ function ThreadPreview({
       <ScrollArea className="flex-1">
         <div className="px-6 py-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 ${avatarColor(thread.from)}`}>
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-bold shrink-0 ${avatarColor(thread.from)}`}>
               {initials(thread.from)}
             </div>
             <div>
-              <p className="text-[12px] font-semibold text-foreground">{thread.from}</p>
-              <p className="text-[10px] text-muted-foreground">{formatDate(thread.date)}</p>
+              <p className="text-[14px] font-semibold text-foreground">{thread.from}</p>
+              <p className="text-[14px] text-muted-foreground">{formatDate(thread.date)}</p>
             </div>
           </div>
-          <p className="text-[13px] text-foreground leading-relaxed">{thread.snippet}</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{thread.snippet}</p>
 
           {/* Reply box */}
           <div className="mt-5 rounded-xl border border-border p-4">
-            <div className="text-[10px] text-muted-foreground mb-2">Reply to {thread.from}</div>
+            <div className="text-[14px] text-muted-foreground mb-2">Reply to {thread.from}</div>
             <textarea
-              className="w-full outline-none resize-none text-[12px] text-foreground placeholder:text-muted-foreground min-h-16 bg-transparent"
+              className="w-full outline-none resize-none text-[14px] text-foreground placeholder:text-muted-foreground min-h-16 bg-transparent"
               placeholder="Write a reply…"
               value={replyBody}
               onChange={e => setReplyBody(e.target.value)}
             />
             {draftError && (
-              <p className="text-[10px] text-[#A93F2F] mb-2">{draftError}</p>
+              <p className="text-[14px] text-[#A93F2F] mb-2">{draftError}</p>
             )}
             {sendError && (
-              <p className="text-[10px] text-[#A93F2F] mb-2">{sendError}</p>
+              <p className="text-[14px] text-[#A93F2F] mb-2">{sendError}</p>
             )}
             {sendDone && (
-              <p className="text-[10px] text-[#2F6B3F] mb-2">Sent!</p>
+              <p className="text-[14px] text-[#2F6B3F] mb-2">Sent!</p>
             )}
             <div className="flex items-center justify-between pt-2 border-t border-border">
               <button
                 onClick={draftWithPenny}
                 disabled={draftLoading}
-                className="flex items-center gap-1.5 text-[10px] text-[#2F6F7E] font-medium hover:underline disabled:opacity-50"
+                className="flex items-center gap-1.5 text-[14px] text-[#2F6F7E] font-medium hover:underline disabled:opacity-50"
               >
                 <Sparkles className="w-3 h-3" />
                 {draftLoading ? 'Drafting…' : `Draft with ${TERMS.aiAssistant}`}
@@ -327,7 +327,7 @@ function ThreadPreview({
                 size="sm"
                 onClick={sendReply}
                 disabled={sendLoading || !replyBody.trim()}
-                className="h-7 px-3 text-[11px] bg-[#A93F2F] hover:bg-[#8B3527] text-white border-0"
+                className="h-7 px-3 text-[14px] bg-[#A93F2F] hover:bg-[#8B3527] text-white border-0"
               >
                 <Send className="w-3 h-3 mr-1" />
                 {sendLoading ? 'Sending…' : 'Send'}
@@ -358,13 +358,13 @@ function PennyConfigPanel({
     <div className="bg-[#EDF5F8] border-b border-[#C5DDE6] px-6 py-4 shrink-0">
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="w-4 h-4 text-[#2F6F7E]" />
-        <h3 className="text-[13px] font-semibold text-[#2F6F7E]">{TERMS.aiAssistant} Label Intelligence</h3>
-        <span className="text-[10px] text-[#2F6F7E] bg-[#EDF5F8] px-2 py-0.5 rounded-full">{watchedCount} active</span>
+        <h3 className="text-[14px] font-semibold text-[#2F6F7E]">{TERMS.aiAssistant} Label Intelligence</h3>
+        <span className="text-[14px] text-[#2F6F7E] bg-[#EDF5F8] px-2 py-0.5 rounded-full">{watchedCount} active</span>
         <button onClick={onClose} className="ml-auto text-[#7FAFC6] hover:text-[#2F6F7E] transition-colors">
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
-      <p className="text-[11px] text-[#2F6F7E] mb-3 leading-snug max-w-2xl">
+      <p className="text-[14px] text-[#2F6F7E] mb-3 leading-snug max-w-2xl">
         Choose which Gmail labels Penny monitors for insights, alerts, and automated follow-ups. Threads tagged with a watched label are surfaced in Trail Signals.
       </p>
       <div className="grid grid-cols-5 gap-2">
@@ -380,7 +380,7 @@ function PennyConfigPanel({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: l.hex }} />
-                  <span className="text-[11px] font-semibold text-foreground">{l.name}</span>
+                  <span className="text-[14px] font-semibold text-foreground">{l.name}</span>
                 </div>
                 <button onClick={() => onToggle(l.id)} className="shrink-0">
                   {cfg.watched
@@ -390,13 +390,13 @@ function PennyConfigPanel({
               </div>
               {cfg.watched ? (
                 <div>
-                  <div className="text-[9px] text-[#2F6F7E] font-semibold uppercase tracking-wide mb-1.5">{TERMS.aiAssistant} action</div>
+                  <div className="text-[14px] text-[#2F6F7E] font-semibold  mb-1.5">{TERMS.aiAssistant} action</div>
                   <div className="space-y-1">
                     {PENNY_ACTIONS.map(action => (
                       <button
                         key={action.id}
                         onClick={() => onSetAction(l.id, action.id)}
-                        className={`w-full text-left flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] transition-colors ${
+                        className={`w-full text-left flex items-center gap-1.5 px-2 py-1 rounded-lg text-[14px] transition-colors ${
                           cfg.action === action.id
                             ? 'bg-[#EDF5F8] text-[#2F6F7E] font-semibold'
                             : 'text-muted-foreground hover:bg-muted/50'
@@ -409,7 +409,7 @@ function PennyConfigPanel({
                   </div>
                 </div>
               ) : (
-                <p className="text-[10px] text-muted-foreground">Click ✓ to enable</p>
+                <p className="text-[14px] text-muted-foreground">Click ✓ to enable</p>
               )}
             </div>
           );
@@ -470,14 +470,14 @@ export default function GmailCenter() {
               <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
             </svg>
           </div>
-          <span className="text-[12px] font-semibold text-foreground">Gmail</span>
+          <span className="text-[14px] font-semibold text-foreground">Gmail</span>
         </div>
 
         <div className="flex-1 max-w-lg">
           <div className="flex items-center gap-2 bg-muted rounded-md px-2.5 py-1">
             <Search className="w-3 h-3 text-muted-foreground shrink-0" />
             <input
-              className="flex-1 bg-transparent outline-none text-[11px] text-foreground placeholder:text-muted-foreground"
+              className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder:text-muted-foreground"
               placeholder="Search mail…"
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -500,7 +500,7 @@ export default function GmailCenter() {
           </button>
           <button
             onClick={() => setConfigOpen(v => !v)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-colors ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[14px] font-semibold border transition-colors ${
               configOpen
                 ? 'bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]'
                 : 'bg-background border-border text-muted-foreground hover:border-muted-foreground'
@@ -508,7 +508,7 @@ export default function GmailCenter() {
           >
             <Sparkles className="w-2.5 h-2.5" />
             {TERMS.aiAssistant} Labels
-            <span className="text-[9px] bg-[#EDF5F8]0 text-white rounded-full px-1 ml-0.5">{watchedCount}</span>
+            <span className="text-[14px] bg-[#EDF5F8]0 text-white rounded-full px-1 ml-0.5">{watchedCount}</span>
           </button>
         </div>
       </div>
@@ -530,9 +530,9 @@ export default function GmailCenter() {
         <div className={`border-r border-border bg-background flex flex-col shrink-0 ${selected ? 'w-72' : 'flex-1'}`}>
           <div className="px-3 py-2 border-b border-border/50 flex items-center gap-2 shrink-0">
             <Inbox className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-[11px] font-semibold text-muted-foreground">Inbox</span>
+            <span className="text-[14px] font-semibold text-muted-foreground">Inbox</span>
             {unreadCount > 0 && (
-              <span className="ml-auto text-[9px] text-muted-foreground">{unreadCount} unread</span>
+              <span className="ml-auto text-[14px] text-muted-foreground">{unreadCount} unread</span>
             )}
           </div>
 
@@ -545,10 +545,10 @@ export default function GmailCenter() {
           {error && !loading && (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 px-6 text-center">
               <AlertCircle className="w-5 h-5 text-[#A93F2F]" />
-              <p className="text-[11px] text-muted-foreground">{error}</p>
+              <p className="text-[14px] text-muted-foreground">{error}</p>
               <button
                 onClick={() => void fetchThreads()}
-                className="text-[10px] font-semibold text-primary hover:underline"
+                className="text-[14px] font-semibold text-primary hover:underline"
               >
                 Retry
               </button>
@@ -560,7 +560,7 @@ export default function GmailCenter() {
               {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 gap-2">
                   <Inbox className="w-6 h-6 text-muted-foreground/40" />
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[14px] text-muted-foreground">
                     {search ? 'No threads match your search.' : 'Inbox is empty.'}
                   </p>
                 </div>
@@ -592,8 +592,8 @@ export default function GmailCenter() {
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
               </svg>
             </div>
-            <p className="text-[12px] font-medium text-foreground">Select a thread to read</p>
-            <p className="text-[11px] text-muted-foreground">Click any message on the left</p>
+            <p className="text-[14px] font-medium text-foreground">Select a thread to read</p>
+            <p className="text-[14px] text-muted-foreground">Click any message on the left</p>
           </div>
         )}
       </div>

@@ -21,13 +21,13 @@ export default function OpsScorecards() {
 
                 <div className="px-3 py-2.5 border-b border-border/50 bg-muted/20 flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-0.5">{sc.category}</p>
-                    <p className="text-[13px] font-semibold text-foreground leading-tight">{sc.title}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{sc.summary}</p>
+                    <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">{sc.category}</p>
+                    <p className="text-[14px] font-semibold text-foreground leading-tight">{sc.title}</p>
+                    <p className="text-[14px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{sc.summary}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0 pl-1">
                     <span className={`text-xl font-bold leading-none ${cfg.score}`}>{sc.score}</span>
-                    <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{cfg.label}</span>
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{cfg.label}</span>
                   </div>
                 </div>
 
@@ -37,8 +37,8 @@ export default function OpsScorecards() {
                     return (
                       <div key={dim.label} className="flex items-center gap-1.5">
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dc.dot}`} />
-                        <span className="text-[11px] text-foreground flex-1 truncate">{dim.label}</span>
-                        <span className="text-[10px] font-bold text-muted-foreground shrink-0">{dim.score}</span>
+                        <span className="text-[14px] text-foreground flex-1 truncate">{dim.label}</span>
+                        <span className="text-[14px] font-bold text-muted-foreground shrink-0">{dim.score}</span>
                       </div>
                     );
                   })}
@@ -47,7 +47,7 @@ export default function OpsScorecards() {
                 <div className="px-3 pb-2.5 border-t border-border/30 pt-2">
                   <button
                     onClick={() => toggle(sc.id)}
-                    className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-1 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                     {isOpen ? 'Hide detail' : 'Show detail'}
@@ -60,8 +60,8 @@ export default function OpsScorecards() {
                         return (
                           <div key={dim.label}>
                             <div className="flex items-center justify-between mb-0.5">
-                              <span className="text-[10px] font-semibold text-foreground">{dim.label}</span>
-                              <span className={`text-[9px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dim.score}</span>
+                              <span className="text-[14px] font-semibold text-foreground">{dim.label}</span>
+                              <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${dc.cls}`}>{dim.score}</span>
                             </div>
                             <div className="h-1 bg-muted rounded-full mb-0.5">
                               <div
@@ -69,7 +69,7 @@ export default function OpsScorecards() {
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
-                            <p className="text-[10px] text-muted-foreground leading-snug">{dim.notes}</p>
+                            <p className="text-[14px] text-muted-foreground leading-snug">{dim.notes}</p>
                           </div>
                         );
                       })}

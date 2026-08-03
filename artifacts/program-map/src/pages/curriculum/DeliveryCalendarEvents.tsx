@@ -17,9 +17,9 @@ export default function DeliveryCalendarEvents() {
     <ScrollArea className="h-full">
       <div className="p-6 max-w-5xl space-y-5">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
           <h1 className="text-3xl font-bold text-foreground">Calendar Events</h1>
-          <p className="text-[13px] text-muted-foreground mt-1">
+          <p className="text-[14px] text-muted-foreground mt-1">
             Scheduled live touchpoints in the learning journey — office hours, kickoff sessions, progress reviews, and workshops.
             Each event is linked to a module or cohort. Select an event to view its full agenda in the Knowledge Brief.
           </p>
@@ -38,20 +38,20 @@ export default function DeliveryCalendarEvents() {
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-[#CC8400] shrink-0" />
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">{event.name}</p>
+                      <p className="text-[14px] font-bold text-foreground">{event.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[10px] font-medium border rounded-full px-1.5 py-0.5 ${typeCls}`}>{event.eventType as string}</span>
-                        <span className="text-[10px] text-muted-foreground">{event.timing as string}</span>
+                        <span className={`text-[14px] font-medium border rounded-full px-1.5 py-0.5 ${typeCls}`}>{event.eventType as string}</span>
+                        <span className="text-[14px] text-muted-foreground">{event.timing as string}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                    <span className={`text-[14px] font-semibold border rounded-full px-2 py-0.5 ${statusCfg.cls}`}>{statusCfg.label}</span>
                     <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                 </div>
-                <p className="text-[12px] text-muted-foreground mb-1">{event.purpose}</p>
-                <p className="text-[11px] text-muted-foreground/70">Attendees: {event.attendees as string}</p>
+                <p className="text-[14px] text-muted-foreground mb-1">{event.purpose}</p>
+                <p className="text-[14px] text-muted-foreground/70">Attendees: {event.attendees as string}</p>
               </button>
             );
           })}

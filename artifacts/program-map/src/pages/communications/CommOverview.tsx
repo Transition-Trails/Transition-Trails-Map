@@ -90,7 +90,7 @@ export default function CommOverview() {
 
         {/* Header */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Communications & Collaboration</p>
+          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Communications & Collaboration</p>
           <h1 className="text-3xl font-bold text-foreground">Overview</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
             The messaging and timing layer for Trail OS and {TERMS.aiAssistant} — routing program signals, learner nudges, and weekly briefs to the right people, through the right channel, at the right moment.
@@ -103,20 +103,20 @@ export default function CommOverview() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {MENTAL_MODEL.map(m => (
               <div key={m.role} className={`rounded-lg border px-3 py-3 ${m.color}`}>
-                <p className="text-[11px] font-bold uppercase tracking-wider opacity-70">{m.role}</p>
-                <p className="text-[12px] font-bold mt-0.5">{m.label}</p>
-                <p className="text-[10px] mt-1 opacity-70 leading-relaxed">{m.note}</p>
+                <p className="text-[14px] font-bold  opacity-70">{m.role}</p>
+                <p className="text-[14px] font-bold mt-0.5">{m.label}</p>
+                <p className="text-[14px] mt-1 opacity-70 leading-relaxed">{m.note}</p>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             Communications is the <strong>who</strong> layer. It is not a chat product — it is an adapter and routing system that connects Trail OS events to the right people through Slack, Google Chat, and Google Calendar. The provider can change; the routing logic stays the same.
           </p>
         </section>
 
         {/* Architecture */}
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">Message Flow</h2>
+          <h2 className="text-sm font-bold  text-muted-foreground/60 mb-4">Message Flow</h2>
           <div className="flex items-center gap-2 flex-wrap text-sm">
             {[
               { icon: Database, label: 'Trail OS', sub: 'events', color: 'text-primary' },
@@ -131,8 +131,8 @@ export default function CommOverview() {
                   {i > 0 && <ArrowRight className="w-4 h-4 text-muted-foreground/30 shrink-0" />}
                   <div className="flex items-center gap-1.5 rounded-lg border border-border/60 bg-white px-3 py-2 shadow-sm">
                     <Icon className={`w-3.5 h-3.5 ${step.color}`} />
-                    <span className="text-[11px] font-semibold text-foreground">{step.label}</span>
-                    <span className="text-[9px] text-muted-foreground/60 uppercase tracking-wider">{step.sub}</span>
+                    <span className="text-[14px] font-semibold text-foreground">{step.label}</span>
+                    <span className="text-[14px] text-muted-foreground/60 ">{step.sub}</span>
                   </div>
                 </div>
               );
@@ -143,10 +143,10 @@ export default function CommOverview() {
         {/* Provider summary */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60">Providers</h2>
+            <h2 className="text-sm font-bold  text-muted-foreground/60">Providers</h2>
             <button
               onClick={() => setLocation('/communications/providers')}
-              className="text-[11px] font-medium text-primary hover:underline flex items-center gap-1"
+              className="text-[14px] font-medium text-primary hover:underline flex items-center gap-1"
             >
               View all providers <ArrowRight className="w-3 h-3" />
             </button>
@@ -156,10 +156,10 @@ export default function CommOverview() {
               <div key={p.label} className={`rounded-lg border px-4 py-3 ${p.color}`}>
                 <div className="flex items-baseline justify-between gap-1 mb-1">
                   <p className="font-bold text-sm">{p.label}</p>
-                  <span className={`text-[9px] font-semibold uppercase tracking-wider shrink-0 ${p.noteCls}`}>{p.role}</span>
+                  <span className={`text-[14px] font-semibold  shrink-0 ${p.noteCls}`}>{p.role}</span>
                 </div>
-                <p className={`text-[9px] font-medium uppercase tracking-wider mb-1.5 ${p.noteCls}`}>{p.note}</p>
-                <p className="text-[10px] opacity-80 leading-relaxed">{p.desc}</p>
+                <p className={`text-[14px] font-medium  mb-1.5 ${p.noteCls}`}>{p.note}</p>
+                <p className="text-[14px] opacity-80 leading-relaxed">{p.desc}</p>
               </div>
             ))}
           </div>
@@ -167,7 +167,7 @@ export default function CommOverview() {
 
         {/* What lives here */}
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 mb-4">What Lives Here</h2>
+          <h2 className="text-sm font-bold  text-muted-foreground/60 mb-4">What Lives Here</h2>
           <div className="grid md:grid-cols-2 gap-3">
             {WHAT_IT_DOES.map(item => {
               const Icon = item.icon;
@@ -179,10 +179,10 @@ export default function CommOverview() {
                 >
                   <div className="flex items-center gap-2 mb-1.5">
                     <Icon className="w-3.5 h-3.5 text-primary" />
-                    <span className="font-bold text-[12px] text-foreground">{item.label}</span>
+                    <span className="font-bold text-[14px] text-foreground">{item.label}</span>
                     <ArrowRight className="w-3 h-3 text-muted-foreground/30 ml-auto group-hover:text-primary transition-colors" />
                   </div>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">{item.desc}</p>
+                  <p className="text-[14px] text-muted-foreground leading-relaxed">{item.desc}</p>
                 </button>
               );
             })}
@@ -190,7 +190,7 @@ export default function CommOverview() {
         </section>
 
         <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <p className="text-[14px] text-muted-foreground leading-relaxed">
             <strong>Slack live</strong> (@penny). Google Calendar connected. Google Chat: Phase 2. Configuration managed in Administration → Integrations.
           </p>
         </div>
