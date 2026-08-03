@@ -61,7 +61,7 @@ type SigItem = {
 const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
   home: [
     { urgent: true,  source: 'slack',      text: 'Learning Coach: low confidence on Cohort 3 recap scoring',     meta: '8m ago',  why: `${TERMS.aiAssistant} monitors coach confidence scores to flag when outputs may need human review before affecting learner feedback` },
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery source docs overdue — execute phase blocked', meta: '1h ago',  why: `This Salesforce phase record requires documentation before ${TERMS.aiAssistant} can generate content or update program status` },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery source docs overdue — launch phase blocked', meta: '1h ago',  why: `This Salesforce phase record requires documentation before ${TERMS.aiAssistant} can generate content or update program status` },
     { urgent: false, source: 'slack',      text: 'Foundations Trail Cohort 2: enrollment at 89% capacity',       meta: '2h ago',  why: `${TERMS.aiAssistant} watches enrollment channels to flag when a new cohort may need to open soon` },
     { urgent: false, source: 'drive',      text: 'Sprint 3 Resume Writing materials updated',                    meta: '3h ago',  why: `${TERMS.aiAssistant} reads Drive so learners always see the most current version of program materials` },
     { urgent: false, source: 'calendar',   text: 'Sprint 3 session confirmed — Thursday 10am',                   meta: '5h ago',  why: `${TERMS.aiAssistant} reads Calendar to surface upcoming milestones and session timing relevant to your programs` },
@@ -69,7 +69,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: "Explorer's Trail Cohort 3 — 3 enrollment slots open",          meta: '8h ago',  why: `${TERMS.aiAssistant} tracks Salesforce enrollment records to surface open capacity for outreach or cohort planning` },
   ],
   programs: [
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before execute phase can proceed', meta: '1h ago',  why: `Salesforce execution phases require documentation records — ${TERMS.aiAssistant} flags these as blockers to program delivery` },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery: source documentation needed before launch phase can proceed', meta: '1h ago',  why: `Salesforce execution phases require documentation records — ${TERMS.aiAssistant} flags these as blockers to program delivery` },
     { urgent: false, source: 'slack',      text: "Explorer's Trail Cohort 3 — enrollment at 80%",                meta: '2h ago',  why: `${TERMS.aiAssistant} watches cohort enrollment channels to surface capacity trends across active programs` },
     { urgent: false, source: 'drive',      text: 'Content standards: 4 items pending review',                    meta: '4h ago',  why: `${TERMS.aiAssistant} reads Drive metadata to surface content quality review backlogs before they affect delivery` },
     { urgent: false, source: 'calendar',   text: 'Sprint 3 review scheduled — Thursday',                         meta: '5h ago',  why: `${TERMS.aiAssistant} reads Calendar to surface program milestone timing and flag missing reviews` },
@@ -82,7 +82,7 @@ const SIGNAL_ITEMS: Record<PageCtx, SigItem[]> = {
     { urgent: false, source: 'salesforce', text: `${TERMS.aiAssistant} interaction log: 234 this week`,                         meta: '8h ago',  why: `${TERMS.aiAssistant} reads its interaction log from Salesforce to surface usage patterns for system improvement` },
   ],
   operations: [
-    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery execute phase: source docs required',         meta: '1h ago',  why: `${TERMS.aiAssistant} flags Salesforce phase blockers that prevent program delivery from moving forward` },
+    { urgent: true,  source: 'salesforce', text: 'Trail of Mastery launch phase: source docs required',         meta: '1h ago',  why: `${TERMS.aiAssistant} flags Salesforce phase blockers that prevent program delivery from moving forward` },
     { urgent: false, source: 'slack',      text: '2 demand change requests unassigned in queue',                 meta: '3h ago',  why: `${TERMS.aiAssistant} monitors demand channels to flag unassigned work that may accumulate into delivery delays` },
     { urgent: false, source: 'salesforce', text: 'Salesforce live — wire first data query to health dashboard',   meta: '4h ago',  why: `${TERMS.aiAssistant} monitors integration status so the team knows when live data can replace prototype figures in the health dashboard` },
     { urgent: false, source: 'drive',      text: 'Integration readiness: 5 checklist items open',                meta: '6h ago',  why: `${TERMS.aiAssistant} reads Drive checklists to surface open operational items affecting integration timelines` },
@@ -146,7 +146,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
     ],
     powerInsights: [
       '5 open demand items — 2 change requests awaiting triage',
-      'Trail of Mastery · Execute phase needs source documentation before delivery can proceed',
+      'Trail of Mastery · Launch phase needs source documentation before delivery can proceed',
       `234 ${TERMS.aiAssistant} interactions this week · 1 Learning Coach confidence flag`,
       'Foundations Trail Cohort 2 approaching capacity (89%)',
     ],
@@ -166,7 +166,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: `${TERMS.aiAssistant} activity log`,     path: '/penny/intelligence' },
     ],
     everydayCanned: "Your programs are on track this week. Guided Trail Cohort 1 is in Week 3 with all materials uploaded. Your next session is the Sprint 3 Resume Workshop on Thursday. Foundations Trail is nearly full — you may want to check if any colleagues need enrollment support.",
-    powerCanned:    `Current priority: Trail of Mastery execute phase needs source documentation before delivery can proceed. 2 change requests are unassigned. ${TERMS.aiAssistant} flagged 1 Learning Coach confidence issue — review at /penny/intelligence.`,
+    powerCanned:    `Current priority: Trail of Mastery launch phase needs source documentation before delivery can proceed. 2 change requests are unassigned. ${TERMS.aiAssistant} flagged 1 Learning Coach confidence issue — review at /penny/intelligence.`,
   },
   programs: {
     everydayInsights: [
@@ -181,7 +181,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Salesforce mapping: 6 of 12 objects fully mapped',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: 'Trail of Mastery · Execute phase needs source docs' },
+      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',       iconCls: 'text-amber-500',   text: 'Trail of Mastery · Launch phase needs source docs' },
       { icon: CheckCircle2,  bg: 'bg-emerald-50 border-emerald-200', iconCls: 'text-emerald-500', text: "Explorer's Trail Cohort 3 · 12 of 15 enrolled" },
     ],
     everydaySteps: [
@@ -194,7 +194,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Program blueprint',  path: '/program/blueprint' },
     ],
     everydayCanned: `Each program has a structured curriculum, cohort schedule, and ${TERMS.aiAssistant} support built in. Your active programs have all materials for this sprint uploaded.`,
-    powerCanned:    "Programs overview: Explorer's Trail has the most complete Salesforce mapping. Trail of Mastery execute phase needs source documentation before delivery can proceed. Content standards flagged 4 items needing updates.",
+    powerCanned:    "Programs overview: Explorer's Trail has the most complete Salesforce mapping. Trail of Mastery launch phase needs source documentation before delivery can proceed. Content standards flagged 4 items needing updates.",
   },
   penny: {
     everydayInsights: [
@@ -233,10 +233,10 @@ const CONTENT: Record<PageCtx, PageContent> = {
       'Health status: 3 active, 1 in discovery, 1 in planning',
       'Integration readiness: Salesforce · Slack · Google Drive · Google Calendar live — Agentforce + GA4: Phase 2',
       '7 open demand items — 2 flagged at-risk by age and type',
-      'Trail of Mastery execute phase needs source documentation before delivery',
+      'Trail of Mastery launch phase needs source documentation before delivery',
     ],
     attentionItems: [
-      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',   iconCls: 'text-amber-500', text: 'Execute phase — source documentation needed' },
+      { icon: AlertTriangle, bg: 'bg-amber-50 border-amber-200',   iconCls: 'text-amber-500', text: 'Launch phase — source documentation needed' },
       { icon: Lightbulb,     bg: 'bg-sky-50 border-sky-200',        iconCls: 'text-sky-500',   text: 'Schedule Trail of Mastery Q3 sprint review' },
     ],
     everydaySteps: [{ label: 'View program status', path: '/operations' }],
@@ -246,7 +246,7 @@ const CONTENT: Record<PageCtx, PageContent> = {
       { label: 'Demand queue',          path: '/operations/demand' },
     ],
     everydayCanned: "Operations are running normally. Guided Trail Cohort 1 is in Week 3 of 8 and on track. Your next milestone is Sprint 3 on Thursday.",
-    powerCanned:    "Ops summary: 3 programs in active delivery. Trail of Mastery execute phase is top priority — source documentation needed before delivery. Salesforce live — wire first data query to health dashboard at /api/salesforce/validate.",
+    powerCanned:    "Ops summary: 3 programs in active delivery. Trail of Mastery launch phase is top priority — source documentation needed before delivery. Salesforce live — wire first data query to health dashboard at /api/salesforce/validate.",
   },
   demand: {
     everydayInsights: [

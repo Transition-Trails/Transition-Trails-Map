@@ -107,7 +107,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
       count: resolvePhases.length,
       borderColor: 'border-teal-200 hover:border-teal-400',
       iconBg: 'bg-teal-50 text-teal-700',
-      description: 'Edit the 8 RESOLVE phases — names, purposes, source notes, confidence status, and source document references.',
+      description: 'Edit the 7 RESOLVE phases — names, purposes, source notes, confidence status, and source document references.',
     },
     {
       id: 'penny',

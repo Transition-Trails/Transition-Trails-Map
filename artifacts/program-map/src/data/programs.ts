@@ -87,7 +87,7 @@ export const programs: Program[] = [
     pennyActive: true,
     pennyFeatures: ["Trail Guide", "Learning Coach", "Career Translator"],
     trailOsCapabilities: ["Intake Coordination", "Learner-Client Matching", "Org Readiness"],
-    resolvePhases: ["Recognize", "Evaluate"],
+    resolvePhases: ["Recognize", "Explore"],
     docs: ["Explorer's Trail Blueprint", "Facilitator Guide", "Brand Book"],
     relatedConcepts: [
       { label: "Foundations Trail", type: "program", id: "foundations-trail" },
@@ -126,7 +126,7 @@ export const programs: Program[] = [
     pennyActive: true,
     pennyFeatures: ["Trail Guide", "Learning Coach", "Exam Coach", "Build Companion"],
     trailOsCapabilities: ["Project Delivery", "Documentation", "Coach Visibility"],
-    resolvePhases: ["Recognize", "Evaluate", "Solve"],
+    resolvePhases: ["Recognize", "Explore", "Select"],
     docs: ["Foundations Trail Blueprint", "Program Comparison Sheet", "Facilitator Guide"],
     relatedConcepts: [
       { label: "Explorer's Trail", type: "program", id: "explorers-trail" },
@@ -165,7 +165,7 @@ export const programs: Program[] = [
     pennyActive: true,
     pennyFeatures: ["Trail Guide", "Exam Coach", "Build Companion", "Quest Master", "Career Translator"],
     trailOsCapabilities: ["Project Delivery", "Coach Visibility", "Outcomes Tracking"],
-    resolvePhases: ["Solve", "Organize", "Leverage", "Verify"],
+    resolvePhases: ["Select", "Outline", "Launch", "Verify"],
     docs: ["Guided Trail Blueprint", "Guided Trail Sprint Cadence", "RESOLVE Course Canvas", "Intern Workbook"],
     relatedConcepts: [
       { label: "Foundations Trail", type: "program", id: "foundations-trail" },
@@ -204,7 +204,7 @@ export const programs: Program[] = [
     pennyActive: false,
     pennyFeatures: ["Coach Intelligence Layer"],
     trailOsCapabilities: ["Outcomes Tracking", "Coach Visibility"],
-    resolvePhases: ["Leverage", "Verify"],
+    resolvePhases: ["Launch", "Verify"],
     docs: ["Trail of Mastery Proposal", "Pricing Analysis", "Program Comparison Sheet"],
     relatedConcepts: [
       { label: "Guided Trail", type: "program", id: "guided-trail" },
@@ -242,7 +242,7 @@ export const programs: Program[] = [
     pennyActive: false,
     pennyFeatures: [],
     trailOsCapabilities: ["Intake Coordination", "Org Readiness", "Outcomes Tracking"],
-    resolvePhases: ["Recognize", "Evaluate", "Solve", "Organize"],
+    resolvePhases: ["Recognize", "Explore", "Select", "Outline"],
     docs: ["Digital Compass Blueprint", "RESOLVE Course Canvas", "Brand Book"],
     relatedConcepts: [
       { label: "Guided Trail", type: "program", id: "guided-trail" },

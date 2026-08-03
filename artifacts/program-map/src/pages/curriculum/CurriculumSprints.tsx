@@ -5,9 +5,12 @@ import { Layers, ArrowRight } from 'lucide-react';
 
 const RESOLVE_COLORS: Record<string, string> = {
   Recognize: 'bg-sky-50 text-sky-800 border-sky-200',
-  Evaluate:  'bg-violet-50 text-violet-800 border-violet-200',
-  Solve:     'bg-amber-50 text-amber-800 border-amber-200',
+  Explore:   'bg-violet-50 text-violet-800 border-violet-200',
+  Select:    'bg-amber-50 text-amber-800 border-amber-200',
+  Outline:   'bg-sky-50 text-sky-800 border-sky-200',
+  Launch:    'bg-emerald-50 text-emerald-800 border-emerald-200',
   Verify:    'bg-emerald-50 text-emerald-800 border-emerald-200',
+  Evolve:    'bg-violet-50 text-violet-800 border-violet-200',
 };
 
 export default function CurriculumSprints() {

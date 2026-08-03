@@ -26,7 +26,7 @@ export const trailOsCapabilities: TrailOsCapability[] = [
     keyFacts: ["First operational touchpoint for learners", "Feeds Learner-Client Matching", "Active in Explorer's Trail and Digital Compass"],
     programs: ["Explorer's Trail", "Digital Compass"],
     penny: ["Trail Guide"],
-    resolve: ["Recognize", "Evaluate"]
+    resolve: ["Recognize", "Explore"]
   },
   {
     id: "delivery",
@@ -39,7 +39,7 @@ export const trailOsCapabilities: TrailOsCapability[] = [
     keyFacts: ["Sprint and milestone management", "Facilitator scheduling", "Active in Foundations and Guided Trail"],
     programs: ["Foundations Trail", "Guided Trail"],
     penny: ["Build Companion", "Quest Master"],
-    resolve: ["Organize", "Execute"]
+    resolve: ["Outline", "Launch"]
   },
   {
     id: "docs",
@@ -52,7 +52,7 @@ export const trailOsCapabilities: TrailOsCapability[] = [
     keyFacts: ["Houses all active program blueprints", "Supports source-of-truth access", "Connected to Curriculum Lead workflows"],
     programs: ["Foundations Trail"],
     penny: ["Learning Coach"],
-    resolve: ["Solve"]
+    resolve: ["Select"]
   },
   {
     id: "matching",
@@ -65,7 +65,7 @@ export const trailOsCapabilities: TrailOsCapability[] = [
     keyFacts: ["Driven by Career Translator outputs", "Connects learner profiles to employer opportunities", "Active at Explorer's Trail exit"],
     programs: ["Explorer's Trail"],
     penny: ["Career Translator"],
-    resolve: ["Leverage"]
+    resolve: ["Launch"]
   },
   {
     id: "readiness",
@@ -78,7 +78,7 @@ export const trailOsCapabilities: TrailOsCapability[] = [
     keyFacts: ["Covers internal and partner capacity", "Used before new cohort launches", "Active in Explorer's Trail and Digital Compass"],
     programs: ["Explorer's Trail", "Digital Compass"],
     penny: [],
-    resolve: ["Evaluate", "Organize"]
+    resolve: ["Explore", "Outline"]
   },
   {
     id: "visibility",
@@ -91,7 +91,7 @@ export const trailOsCapabilities: TrailOsCapability[] = [
     keyFacts: ["Flags at-risk learners", "Tracks session attendance and project progress", "Connects to Coach Intelligence Layer"],
     programs: ["Foundations Trail", "Trail of Mastery"],
     penny: ["Learning Coach", "Coach Intelligence Layer"],
-    resolve: ["Leverage", "Verify"]
+    resolve: ["Launch", "Verify"]
   },
   {
     id: "outcomes",

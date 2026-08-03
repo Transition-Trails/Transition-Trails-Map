@@ -29,3 +29,4 @@
 - [Learner edit drawer pattern](learner-edit-drawer.md) — profile state lifted to LearnerDetail parent; EditDrawer receives profile prop; two separate save sections (trail + coaching) with independent PATCH routes.
 - [Program Penny config pattern](program-penny-config.md) — pennyStatus DB-backed via program_penny_configs table; GET/PATCH /api/programs/:id/penny-config; useProgramPennyConfig hook fetches on mount + PATCHes on change; pennyActive boolean kept as derived field for backward compat.
 - [Procedure Builder decisions](procedure-builder-decisions.md) — Drive: Content/Procedures/[slug]/; Google Drive single source for media; public share = lightweight Express HTML page (not React route); learners can view published procedures; Chrome extension = Phase 2.
+- [RESOLVE phase names](resolve-phase-names.md) — 7 phases: Recognize, Explore, Select, Outline, Launch, Verify, Evolve. Execute removed. Old names Evaluate/Solve/Organize/Leverage never use again.
