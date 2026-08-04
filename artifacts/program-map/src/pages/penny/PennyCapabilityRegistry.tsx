@@ -1034,7 +1034,7 @@ export default function PennyCapabilityRegistry() {
       </div>
 
       {/* Bottom help bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-[52px] bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.04)] px-6 flex items-center justify-between z-10">
+      <div className="shrink-0 h-[52px] bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.04)] px-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-500" />
           <span className="text-[13px] text-gray-600">Working through a requirement? Ask Penny for help</span>
