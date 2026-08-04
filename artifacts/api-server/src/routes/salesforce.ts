@@ -92,7 +92,12 @@ async function sfGetWithRetry(
       return await sfGet(proxyFetch, path);
     } catch (e) {
       if (e instanceof RateLimitError && attempt < maxRetries) {
-        await sleep(Math.min(e.retryAfter * 1000, 15_000));
+        // In production: wait at least 12 s so the proxy's 10 s sliding window fully resets.
+        // In test: honour the mock's Retry-After directly (mocks set it to 0 for instant retries).
+        const sleepMs = process.env['NODE_ENV'] === 'test'
+          ? e.retryAfter * 1000
+          : Math.max(e.retryAfter * 1000, 12_000);
+        await sleep(sleepMs);
         continue;
       }
       throw e;
@@ -400,18 +405,20 @@ router.get("/salesforce/validate", async (req, res) => {
   const pmmObjects: { object: string; label: string; accessible: boolean; count: number; error?: string }[] = [];
   let pmmDetected = false;
 
-  await Promise.all(
-    PMM_OBJECTS.map(async ({ api, label }) => {
-      try {
-        const r = await sfQuery(proxyFetch, `SELECT COUNT() FROM ${api}`);
-        pmmObjects.push({ object: api, label, accessible: true, count: r.totalSize });
-        pmmDetected = true;
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        pmmObjects.push({ object: api, label, accessible: false, count: 0, error: msg.slice(0, 120) });
-      }
-    })
-  );
+  // Probe PMM objects sequentially — parallel would fire 8 requests at once and
+  // exhaust most of the proxy's 20-req/10s budget before TT probes even start.
+  const PMM_DELAY_MS = process.env['NODE_ENV'] === 'test' ? 0 : 500;
+  for (const { api, label } of PMM_OBJECTS) {
+    try {
+      const r = await sfQuery(proxyFetch, `SELECT COUNT() FROM ${api}`);
+      pmmObjects.push({ object: api, label, accessible: true, count: r.totalSize });
+      pmmDetected = true;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      pmmObjects.push({ object: api, label, accessible: false, count: 0, error: msg.slice(0, 120) });
+    }
+    await sleep(PMM_DELAY_MS);
+  }
   pmmObjects.sort((a, b) => {
     if (a.accessible !== b.accessible) return a.accessible ? -1 : 1;
     return a.label.localeCompare(b.label);
@@ -432,9 +439,15 @@ router.get("/salesforce/validate", async (req, res) => {
   //      accessible: false → confirmed inaccessible (4xx object error) — real finding
   //      accessible: true  → confirmed accessible
 
-  // 0 ms in test env so the suite does not block on delays; 1.2 s in production
-  const PROBE_BATCH_SIZE     = 6;
-  const PROBE_BATCH_DELAY_MS = process.env['NODE_ENV'] === 'test' ? 0 : 1_200;
+  // Batch budget math (20 req / 10 s sliding window):
+  //   ~14 requests fire before this point (identity, org, 2 objects, 1 NPSP, 8 PMM × 500ms each).
+  //   With PROBE_BATCH_SIZE=3 and PROBE_BATCH_DELAY_MS=3000:
+  //     batch 1 at ~t=4.5 s → window total ≤ 17  ✓
+  //     batch 2 at ~t=7.5 s → window total ≤ 20  ✓ (early requests start dropping out)
+  //     batch 3 at ~t=10.5 s → window total ≤ 17 ✓ (requests from t<0.5s are expired)
+  //   0 ms / size=6 in test so the suite does not sleep.
+  const PROBE_BATCH_SIZE     = process.env['NODE_ENV'] === 'test' ? 6 : 3;
+  const PROBE_BATCH_DELAY_MS = process.env['NODE_ENV'] === 'test' ? 0 : 3_000;
 
   type TtObjectResult = {
     object: string; label: string;
