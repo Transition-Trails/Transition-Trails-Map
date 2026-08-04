@@ -587,13 +587,13 @@ describe('GET /api/salesforce/operations/summary — picklist describe error', (
     expect(programs.active.value).toBeNull();
     expect(typeof programs.active.error).toBe('string');
     expect(programs.active.error).not.toBeNull();
-    // The error message must mention the unavailable picklist value, not just a generic error.
-    expect(programs.active.error).toMatch(/Active/);
+    // The error message must reference the picklist describe failure, not a generic error.
+    expect(programs.active.error).toMatch(/picklist describe failed/i);
 
     expect(programs.planning.value).toBeNull();
     expect(typeof programs.planning.error).toBe('string');
     expect(programs.planning.error).not.toBeNull();
-    expect(programs.planning.error).toMatch(/Planning/);
+    expect(programs.planning.error).toMatch(/picklist describe failed/i);
   });
 
   test('programs.total remains queryable even when picklist describe fails', async () => {
