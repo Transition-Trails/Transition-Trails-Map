@@ -22,6 +22,10 @@ interface SfArticle {
   lastModifiedDate: string;
   isVisibleInApp: boolean;
   language: string;
+  /** Excerpt around the matched text (present only when a search was performed). */
+  snippet?: string | null;
+  /** True when the search hit came from the article body, not title or summary. */
+  bodyMatch?: boolean;
 }
 
 interface ArticleSection {
@@ -58,15 +62,36 @@ const STATUS_STYLES: Record<string, string> = {
   archived: 'text-muted-foreground bg-muted border-border',
 };
 
+// ── Highlight matching text in a string ───────────────────────────────────────
+
+function HighlightMatch({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="bg-amber-100 text-amber-900 rounded-[2px] px-0.5 not-italic font-medium">
+        {text.slice(idx, idx + query.length)}
+      </mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
 // ── Article list card ──────────────────────────────────────────────────────────
 
 function ArticleCard({
-  article, isSelected, onClick,
+  article, isSelected, onClick, activeSearch,
 }: {
   article: SfArticle;
   isSelected: boolean;
   onClick: () => void;
+  activeSearch: string;
 }) {
+  const showSnippet  = activeSearch.length >= 3 && article.snippet;
+  const showBodyBadge = activeSearch.length >= 3 && !article.snippet && article.bodyMatch;
+
   return (
     <button
       type="button"
@@ -79,16 +104,23 @@ function ArticleCard({
     >
       <div className="flex items-start justify-between gap-2">
         <p className={`text-sm font-medium leading-snug line-clamp-2 flex-1 ${isSelected ? 'text-primary' : 'text-foreground'}`}>
-          {article.title}
+          {activeSearch.length >= 3
+            ? <HighlightMatch text={article.title} query={activeSearch} />
+            : article.title}
         </p>
         <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isSelected ? 'text-primary' : 'text-muted-foreground/40 group-hover:text-muted-foreground'}`} />
       </div>
 
-      {article.summary && (
+      {/* Snippet from summary (search active) or plain summary (no search) */}
+      {showSnippet ? (
+        <p className="text-[12px] text-muted-foreground mt-1 line-clamp-3 leading-relaxed italic">
+          <HighlightMatch text={article.snippet!} query={activeSearch} />
+        </p>
+      ) : !activeSearch && article.summary ? (
         <p className="text-[12px] text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
           {article.summary}
         </p>
-      )}
+      ) : null}
 
       <div className="flex items-center gap-2 mt-2 flex-wrap">
         <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_STYLES[article.publishStatus] ?? STATUS_STYLES['archived']}`}>
@@ -96,6 +128,11 @@ function ArticleCard({
         </span>
         {article.articleType && (
           <span className="text-[11px] text-muted-foreground">{article.articleType.replace(/__kav$/, '').replace(/_/g, ' ')}</span>
+        )}
+        {showBodyBadge && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 border border-sky-200 px-2 py-0.5 text-[10px] font-medium text-sky-700">
+            body match
+          </span>
         )}
         <span className="text-[11px] text-muted-foreground ml-auto">{fmtDateShort(article.lastModifiedDate)}</span>
       </div>
@@ -270,13 +307,16 @@ export default function SfKnowledgeArticles() {
     return () => clearTimeout(t);
   }, [searchInput]);
 
+  // Only use the search term server-side once it's ≥3 chars.
+  const activeSearch = search.length >= 3 ? search : '';
+
   const { data, isLoading, isError, refetch, isFetching } = useQuery<ArticlesResponse>({
-    queryKey: ['sf-articles', statusFilter, typeFilter, search],
+    queryKey: ['sf-articles', statusFilter, typeFilter, activeSearch],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (statusFilter !== 'online') params.set('status', statusFilter);
-      if (typeFilter) params.set('type', typeFilter);
-      if (search)     params.set('q', search);
+      if (typeFilter)    params.set('type', typeFilter);
+      if (activeSearch)  params.set('q', activeSearch);
       const r = await fetch(`/api/knowledge/sf-articles${params.size ? `?${params}` : ''}`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json() as Promise<ArticlesResponse>;
@@ -329,7 +369,7 @@ export default function SfKnowledgeArticles() {
                 type="text"
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
-                placeholder="Search by title…"
+                placeholder="Search articles… (3+ chars)"
                 className="w-full h-8 pl-8 pr-3 text-sm bg-background border border-input rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
@@ -394,6 +434,7 @@ export default function SfKnowledgeArticles() {
                 article={article}
                 isSelected={article.id === selectedId}
                 onClick={() => setSelectedId(article.id)}
+                activeSearch={activeSearch}
               />
             ))}
           </div>

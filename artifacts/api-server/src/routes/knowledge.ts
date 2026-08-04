@@ -836,6 +836,10 @@ interface SfArticle {
   isVisibleInApp: boolean;
   language: string;
   dataCategories: string[];
+  /** Present when a search was performed. Excerpt around the matched text. */
+  snippet?: string | null;
+  /** True when the search match came from the article body, not title/summary. */
+  bodyMatch?: boolean;
 }
 
 interface ArticleSection {
@@ -1229,11 +1233,38 @@ async function getKavAllBodyFields(
   }
 }
 
+// ── SOSL helpers ──────────────────────────────────────────────────────────────
+
+/** Escape special characters inside a SOSL FIND {} clause. */
+function soslEscape(term: string): string {
+  // Characters that must be escaped within FIND {}: \ { }
+  return term.replace(/[\\{}]/g, "\\$&");
+}
+
+/**
+ * Extract a ~150-char excerpt from `text` around the first occurrence of `query`.
+ * Returns null when `query` is not found in `text`.
+ */
+function extractSnippet(query: string, text: string | null): string | null {
+  if (!text || !query) return null;
+  const lc    = text.toLowerCase();
+  const qLc   = query.toLowerCase();
+  const idx   = lc.indexOf(qLc);
+  if (idx === -1) return null;
+  const CONTEXT = 70;
+  const start  = Math.max(0, idx - CONTEXT);
+  const end    = Math.min(text.length, idx + query.length + CONTEXT);
+  let snippet  = text.slice(start, end).trim();
+  if (start > 0)             snippet = "\u2026" + snippet;
+  if (end < text.length)     snippet = snippet + "\u2026";
+  return snippet;
+}
+
 // GET /api/knowledge/sf-articles
 // Lists Salesforce Knowledge articles. Optional query params:
 //   status  — 'online' (default) | 'draft' | 'all'
 //   type    — article type filter (ArticleType field; skipped if field absent in org)
-//   q       — title/summary search substring
+//   q       — full-text search (≥3 chars: uses SOSL IN ALL FIELDS; <3 chars: ignored)
 //   cat     — data category filter as 'GroupApiName:CategoryApiName'
 //             e.g. 'Topics:Products' → WITH DATA CATEGORY Topics BELOW Products
 router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
@@ -1241,29 +1272,12 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
     const client = new ConnectorSalesforceClient();
     const fields = await getKavFieldSet(client, { warn: (m) => req.log.warn(m) });
 
-    const statusParam   = typeof req.query["status"]   === "string" ? req.query["status"]   : "online";
-    const typeParam     = typeof req.query["type"]     === "string" ? req.query["type"]     : "";
-    const qParam        = typeof req.query["q"]        === "string" ? req.query["q"]        : "";
-
-    const categoryParam = typeof req.query["category"] === "string" ? req.query["category"] : "";
+    const statusParam = typeof req.query["status"] === "string" ? req.query["status"] : "online";
+    const typeParam   = typeof req.query["type"]   === "string" ? req.query["type"]   : "";
+    const qParam      = typeof req.query["q"]      === "string" ? req.query["q"].trim() : "";
     const catParam    = typeof req.query["cat"]    === "string" ? req.query["cat"]    : "";
 
-    const whereClauses: string[] = [];
-    if (statusParam === "all") {
-      whereClauses.push("PublishStatus IN ('online', 'draft')");
-    } else {
-      whereClauses.push(`PublishStatus = '${statusParam === "draft" ? "draft" : "online"}'`);
-    }
-    // ArticleType filter only if the field exists in this org
-    if (typeParam && fields.has("ArticleType")) {
-      whereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
-    }
-    if (qParam) whereClauses.push(`Title LIKE '%${qParam.replace(/'/g, "\\'")}%'`);
-
-    const where = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
-
-    // WITH DATA CATEGORY clause must come between WHERE and ORDER BY.
-    // BELOW matches the selected category and all of its descendants.
+    // Build WITH DATA CATEGORY (valid for both SOQL and SOSL).
     let withDataCategory = "";
     if (catParam && catParam.includes(":")) {
       const colonIdx  = catParam.indexOf(":");
@@ -1274,42 +1288,105 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       }
     }
 
-    const soql = `SELECT ${fields.selectList}
-                  FROM KnowledgeArticleVersion
-                  ${where}
-                  ${withDataCategory}
-                  ORDER BY LastModifiedDate DESC
-                  LIMIT 200`;
+    // Build publish-status condition (reused in both SOQL and SOSL WHERE).
+    const statusClause =
+      statusParam === "all"   ? "PublishStatus IN ('online', 'draft')" :
+      statusParam === "draft" ? "PublishStatus = 'draft'"              :
+                                "PublishStatus = 'online'";
 
-    const result = await client.query<{
+    type KavRow = {
       Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
       ArticleType?: string; PublishStatus: string; VersionNumber?: number;
       CreatedDate: string; LastModifiedDate: string;
       IsVisibleInApp?: boolean; Language?: string;
-    }>(soql);
+    };
+
+    let records: KavRow[] = [];
+    let totalSize = 0;
+
+    // ── Full-text SOSL (≥3 chars) ───────────────────────────────────────────
+    if (qParam.length >= 3) {
+      // Build WHERE inside the RETURNING clause.
+      const returningWhereClauses: string[] = [statusClause];
+      if (typeParam && fields.has("ArticleType")) {
+        returningWhereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
+      }
+      const returningWhere = returningWhereClauses.join(" AND ");
+
+      // SOSL: FIND {term} IN ALL FIELDS RETURNING KnowledgeArticleVersion(fields WHERE ... ORDER BY ... LIMIT ...)
+      // WITH DATA CATEGORY goes after RETURNING.
+      const soslQuery =
+        `FIND {${soslEscape(qParam)}} IN ALL FIELDS ` +
+        `RETURNING KnowledgeArticleVersion(${fields.selectList} ` +
+        `WHERE ${returningWhere} ORDER BY LastModifiedDate DESC LIMIT 200) ` +
+        `${withDataCategory}`;
+
+      const encoded = encodeURIComponent(soslQuery);
+      const soslResult = await client.rest<{
+        searchRecords: (KavRow & { attributes: unknown })[];
+      }>(`/services/data/v62.0/search/?q=${encoded}`);
+
+      records   = soslResult.searchRecords ?? [];
+      totalSize = records.length;
+
+    // ── Standard SOQL (no search term or <3 chars) ──────────────────────────
+    } else {
+      const whereClauses: string[] = [statusClause];
+      if (typeParam && fields.has("ArticleType")) {
+        whereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
+      }
+      const where = `WHERE ${whereClauses.join(" AND ")}`;
+
+      // WITH DATA CATEGORY must come between WHERE and ORDER BY in SOQL.
+      const soql = `SELECT ${fields.selectList}
+                    FROM KnowledgeArticleVersion
+                    ${where}
+                    ${withDataCategory}
+                    ORDER BY LastModifiedDate DESC
+                    LIMIT 200`;
+
+      const result = await client.query<KavRow>(soql);
+      records   = result.records;
+      totalSize = result.totalSize;
+    }
 
     const typeSet = fields.has("ArticleType")
-      ? new Set(result.records.map(r => r.ArticleType).filter(Boolean))
+      ? new Set(records.map(r => r.ArticleType).filter(Boolean))
       : new Set<string>();
 
-    const articles: SfArticle[] = result.records.map(r => ({
-      id:                 r.Id,
-      knowledgeArticleId: r.KnowledgeArticleId,
-      title:              r.Title,
-      summary:            r.Summary ?? null,
-      articleType:        r.ArticleType ?? null,
-      publishStatus:      r.PublishStatus,
-      versionNumber:      r.VersionNumber ?? null,
-      createdDate:        r.CreatedDate,
-      lastModifiedDate:   r.LastModifiedDate,
-      isVisibleInApp:     r.IsVisibleInApp ?? false,
-      language:           r.Language ?? "en_US",
-      dataCategories:     [],
-    }));
+    const articles: SfArticle[] = records.map(r => {
+      // Generate snippet: prefer summary excerpt, fall back to body-match indicator.
+      let snippet: string | null = null;
+      let bodyMatch = false;
+      if (qParam.length >= 3) {
+        snippet = extractSnippet(qParam, r.Summary ?? null);
+        if (!snippet) {
+          // Match wasn't in the summary — it came from the body or title.
+          const titleMatches = r.Title.toLowerCase().includes(qParam.toLowerCase());
+          bodyMatch = !titleMatches;
+        }
+      }
+      return {
+        id:                 r.Id,
+        knowledgeArticleId: r.KnowledgeArticleId,
+        title:              r.Title,
+        summary:            r.Summary ?? null,
+        articleType:        r.ArticleType ?? null,
+        publishStatus:      r.PublishStatus,
+        versionNumber:      r.VersionNumber ?? null,
+        createdDate:        r.CreatedDate,
+        lastModifiedDate:   r.LastModifiedDate,
+        isVisibleInApp:     r.IsVisibleInApp ?? false,
+        language:           r.Language ?? "en_US",
+        dataCategories:     [],
+        snippet,
+        bodyMatch,
+      };
+    });
 
     res.json({
       articles,
-      total:        result.totalSize,
+      total:        totalSize,
       articleTypes: Array.from(typeSet),
     });
   } catch (err) {
