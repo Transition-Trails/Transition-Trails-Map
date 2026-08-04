@@ -38,7 +38,7 @@ async function postSource(body: Partial<KnowledgeSource>): Promise<KnowledgeSour
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-interface DriveFolder { id: string; name: string; webViewLink?: string; modifiedTime?: string; }
+interface DriveFolder { id: string; name: string; webViewLink?: string; modifiedTime?: string; path?: string; }
 
 // ── Style helpers ──────────────────────────────────────────────────────────────
 
@@ -150,6 +150,8 @@ function DriveFolderPicker({
   const pickerRef                     = useRef<HTMLDivElement>(null);
 
   const currentParentId = breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].id : 'root';
+  // When a non-empty query is typed, we search globally across all of Drive
+  const isGlobalSearch = query.length > 0;
 
   // Close picker when clicking outside
   useEffect(() => {
@@ -161,12 +163,16 @@ function DriveFolderPicker({
     return () => document.removeEventListener('mousedown', handle);
   }, [open]);
 
-  async function fetchFolders(parentId: string, q = '') {
+  async function fetchFolders(parentId: string, q = '', globalSearch = false) {
     setLoading(true);
     setError('');
     try {
       const params = new URLSearchParams();
-      if (parentId !== 'root') params.set('parent', parentId);
+      if (globalSearch) {
+        params.set('global', 'true');
+      } else if (parentId !== 'root') {
+        params.set('parent', parentId);
+      }
       if (q) params.set('q', q);
       const qs = params.toString() ? `?${params.toString()}` : '';
       const r  = await fetch(`/api/drive/folders${qs}`);
@@ -211,7 +217,13 @@ function DriveFolderPicker({
 
   function search(q: string) {
     setQuery(q);
-    fetchFolders(currentParentId, q);
+    if (q) {
+      // Non-empty query → global search across all of Drive
+      fetchFolders('root', q, true);
+    } else {
+      // Cleared → return to local browse at current position
+      fetchFolders(currentParentId);
+    }
   }
 
   function select(f: DriveFolder) {
@@ -319,23 +331,28 @@ function DriveFolderPicker({
                 type="text"
                 value={query}
                 onChange={e => search(e.target.value)}
-                placeholder={breadcrumbs.length > 0 ? `Search inside "${breadcrumbs[breadcrumbs.length - 1].name}"…` : 'Search your Drive folders…'}
+                placeholder="Search all Drive folders…"
                 className="w-full h-8 pl-8 pr-3 text-sm bg-muted/30 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
+            {isGlobalSearch && (
+              <p className="mt-1 px-1 text-[10px] text-muted-foreground">
+                Searching all folders in Drive
+              </p>
+            )}
           </div>
 
           <div className="max-h-52 overflow-y-auto">
             {loading ? (
               <div className="flex items-center gap-2 px-3 py-3 text-sm text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" /> Loading folders…
+                <Loader2 className="w-4 h-4 animate-spin" /> {isGlobalSearch ? 'Searching Drive…' : 'Loading folders…'}
               </div>
             ) : error ? (
               <div className="px-3 py-3 text-sm text-[#8B2A2A]">{error}</div>
             ) : folders.length === 0 ? (
               <div className="flex items-center gap-2 px-3 py-3 text-sm text-muted-foreground">
                 <CornerDownRight className="w-3.5 h-3.5 shrink-0" />
-                {breadcrumbs.length > 0 ? 'No subfolders here.' : 'No folders found.'}
+                {isGlobalSearch ? 'No folders match that name.' : breadcrumbs.length > 0 ? 'No subfolders here.' : 'No folders found.'}
               </div>
             ) : folders.map(f => (
               <div
@@ -352,11 +369,14 @@ function DriveFolderPicker({
                   <FolderOpen className="w-4 h-4 text-muted-foreground shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{f.name}</p>
-                    {f.modifiedTime && (
+                    {/* Show ancestor path for global search results; modified date for local browse */}
+                    {isGlobalSearch && f.path ? (
+                      <p className="text-[11px] text-muted-foreground truncate">{f.path}</p>
+                    ) : !isGlobalSearch && f.modifiedTime ? (
                       <p className="text-[11px] text-muted-foreground">
                         Modified {new Date(f.modifiedTime).toLocaleDateString()}
                       </p>
-                    )}
+                    ) : null}
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>

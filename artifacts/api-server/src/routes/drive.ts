@@ -59,6 +59,15 @@ interface DriveFolder {
   name: string;
 }
 
+interface DriveFolderResult {
+  id:           string;
+  name:         string;
+  webViewLink?: string;
+  modifiedTime?: string;
+  parents?:     string[];
+  path?:        string;  // ancestor path, e.g. "Programs → Coaching"
+}
+
 // ─── Helper: list files in a folder ──────────────────────────────────────────
 
 async function listFilesInFolder(token: string, folderId: string): Promise<DriveFile[]> {
@@ -89,32 +98,102 @@ async function getFolderMeta(token: string, folderId: string): Promise<DriveFold
   return resp.json() as Promise<DriveFolder>;
 }
 
+// ─── Helper: resolve ancestor path strings for a set of folders ──────────────
+//
+// For each folder, walks up the parent chain (up to 5 levels) and returns a
+// Map<folderId, "Grandparent → Parent"> path prefix string.
+// Skips the Drive root ("root" pseudo-ID and any ID matching the org root).
+
+async function buildFolderPaths(
+  token: string,
+  folders: Array<{ id: string; name: string; parents?: string[] }>
+): Promise<Map<string, string>> {
+  const nameCache = new Map<string, string>(); // id → name
+  const parentOf  = new Map<string, string>(); // id → parentId
+
+  for (const f of folders) {
+    nameCache.set(f.id, f.name);
+    if (f.parents?.[0]) parentOf.set(f.id, f.parents[0]);
+  }
+
+  // Iteratively fetch ancestor layers (up to 4 additional hops)
+  let idsToFetch = new Set<string>(
+    [...parentOf.values()].filter(id => !nameCache.has(id))
+  );
+
+  for (let depth = 0; depth < 4 && idsToFetch.size > 0; depth++) {
+    const ids = [...idsToFetch];
+    const results = await Promise.all(
+      ids.map(id =>
+        fetch(`https://www.googleapis.com/drive/v3/files/${id}?fields=id,name,parents`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal:  AbortSignal.timeout(8_000),
+        })
+          .then(r => r.ok ? r.json() as Promise<{ id: string; name: string; parents?: string[] }> : null)
+          .catch(() => null)
+      )
+    );
+
+    idsToFetch = new Set<string>();
+    for (const r of results) {
+      if (!r) continue;
+      nameCache.set(r.id, r.name);
+      if (r.parents?.[0]) {
+        parentOf.set(r.id, r.parents[0]);
+        if (!nameCache.has(r.parents[0])) idsToFetch.add(r.parents[0]);
+      }
+    }
+  }
+
+  // Build path strings (ancestors only, not the folder itself)
+  const pathMap = new Map<string, string>();
+  for (const f of folders) {
+    const parts: string[] = [];
+    let cur: string | undefined = parentOf.get(f.id);
+    const visited = new Set<string>();
+    while (cur && cur !== "root" && !visited.has(cur)) {
+      visited.add(cur);
+      const n = nameCache.get(cur);
+      if (n) parts.unshift(n);
+      cur = parentOf.get(cur);
+    }
+    if (parts.length > 0) pathMap.set(f.id, parts.join(" → "));
+  }
+  return pathMap;
+}
+
 // ─── GET /api/drive/folders ────────────────────────────────────────────────
 //
 // Lists Drive folders inside a parent (default: "root" = My Drive).
 // Used by the Knowledge Sources admin folder picker.
 // Query params:
-//   parent  — folder ID (default "root")
+//   parent  — folder ID (default "root"); ignored when global=true
 //   q       — optional name fragment to filter by
+//   global  — "true" to search across all of Drive (omits parent filter)
+//             When global=true, each result includes a `path` field showing
+//             the ancestor chain, e.g. "Programs → Coaching"
 //
-// Response: { folders: [{ id, name, webViewLink, modifiedTime }] }
+// Response: { folders: [{ id, name, webViewLink, modifiedTime, path? }] }
 
 router.get("/drive/folders", async (req, res): Promise<void> => {
   try {
-    const token  = await getAccessToken();
-    const parent = typeof req.query["parent"] === "string" ? req.query["parent"] : "root";
-    const nameQ  = typeof req.query["q"] === "string" ? req.query["q"].replace(/'/g, "\\'") : "";
+    const token    = await getAccessToken();
+    const isGlobal = req.query["global"] === "true";
+    const parent   = typeof req.query["parent"] === "string" ? req.query["parent"] : "root";
+    const nameQ    = typeof req.query["q"] === "string" ? req.query["q"].replace(/'/g, "\\'") : "";
 
-    const parts = [
-      `'${parent}' in parents`,
+    const parts: string[] = [
       `mimeType = 'application/vnd.google-apps.folder'`,
       `trashed = false`,
     ];
-    if (nameQ) parts.push(`name contains '${nameQ}'`);
+    if (!isGlobal) parts.push(`'${parent}' in parents`);
+    if (nameQ)     parts.push(`name contains '${nameQ}'`);
 
     const q      = encodeURIComponent(parts.join(" and "));
-    const fields = "files(id,name,webViewLink,modifiedTime)";
-    const url    = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=${fields}&pageSize=50&orderBy=modifiedTime+desc&supportsAllDrives=true&includeItemsFromAllDrives=true`;
+    // Include `parents` so we can build ancestor paths for global results
+    const fields  = "files(id,name,webViewLink,modifiedTime,parents)";
+    const orderBy = isGlobal ? "name" : "modifiedTime+desc";
+    const url     = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=${fields}&pageSize=50&orderBy=${orderBy}&supportsAllDrives=true&includeItemsFromAllDrives=true`;
 
     const resp = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
@@ -127,8 +206,20 @@ router.get("/drive/folders", async (req, res): Promise<void> => {
       return;
     }
 
-    const data = await resp.json() as { files: Array<{ id: string; name: string; webViewLink?: string; modifiedTime?: string }> };
-    res.json({ folders: data.files ?? [] });
+    const data    = await resp.json() as { files: DriveFolderResult[] };
+    const folders = data.files ?? [];
+
+    // For global searches, resolve ancestor paths so the UI can show
+    // "Programs → Coaching → Spring 2026" next to each result.
+    if (isGlobal && folders.length > 0) {
+      const pathMap = await buildFolderPaths(token, folders);
+      for (const f of folders) {
+        const p = pathMap.get(f.id);
+        if (p) f.path = p;
+      }
+    }
+
+    res.json({ folders });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("Missing GOOGLE")) {
