@@ -19,8 +19,8 @@ export const INITIAL_PLATFORM_ROLES: PlatformRole[] = [
     description: 'Owns prompt governance, source trust management, capability quality monitoring, and RAG pipeline health.',
     responsibilities: ['Approve and version all prompt templates', 'Review source trust assignments', 'Monitor capability quality metrics', 'Define prompt governance SLA', 'Manage Penny capability registry'],
     requiredTier: 'power',
-    owner: '',
-    ownerEmail: '',
+    owner: 'Angela Landrith',
+    ownerEmail: 'angela@transitiontrails.org',
   },
   {
     id: 'knowledge-manager',

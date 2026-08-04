@@ -113,6 +113,8 @@ export function useHealthScores(): ComputedHealth {
               detail: pennyAdminOwner
                 ? `Penny Admin assigned to ${pennyAdminOwner}. Prompt governance SLA still undefined.`
                 : 'No formal Penny Admin assigned. Prompt governance SLA not defined.',
+              actionLabel: pennyAdminOwner ? 'Define Governance SLA' : 'Assign Penny Admin',
+              actionPath:  pennyAdminOwner ? '/penny/prompts'        : '/admin/people-access',
             },
             'penny-6': {
               status: agentLive ? 'good' : 'needs-work',

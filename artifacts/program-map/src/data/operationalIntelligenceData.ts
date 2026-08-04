@@ -316,14 +316,14 @@ export const readinessScorecards: ReadinessScorecard[] = [
 export const trendInsights: TrendInsight[] = [
   {
     id: 'trend-1',
-    type: 'blocker',
-    urgency: 'immediate',
-    title: 'Penny Admin Role Unassigned',
-    description: 'No owner is assigned to the Penny Admin role. Prompt governance, source trust management, and quality monitoring are ungoverned. This is a platform-level risk as Penny scales to more capabilities.',
+    type: 'risk',
+    urgency: 'near-term',
+    title: 'Prompt Governance SLA Not Yet Defined',
+    description: 'Penny Admin is assigned (Angela Landrith). The remaining governance gap is a formal prompt governance SLA — review cadence, approval workflow, and maximum time from draft to approval. Without it, governance depends on individual effort rather than process.',
     affectedDomains: ['Penny AI', 'Curriculum', 'Knowledge'],
     affectedPrograms: ['All programs'],
     relatedSystems: ['Penny Capability Registry', 'Penny Prompt Studio', 'Knowledge Source Registry'],
-    actionPath: '/people',
+    actionPath: '/penny/prompts',
   },
   {
     id: 'trend-2',
@@ -375,13 +375,13 @@ export const trendInsights: TrendInsight[] = [
 export const recommendations: Recommendation[] = [
   {
     id: 'rec-1',
-    action: 'Assign Penny Admin Owner',
+    action: 'Define Prompt Governance SLA',
     domain: 'Penny AI',
-    priority: 'critical',
+    priority: 'high',
     effort: 'Low',
-    systems: ['People & Roles Studio', 'Penny Capability Registry', 'Penny Prompt Studio'],
-    nextSteps: ['Identify internal candidate for Penny Admin', 'Define Penny Admin role blueprint', 'Grant Prompt Studio admin access', 'Document prompt governance SLA'],
-    status: 'open',
+    systems: ['Penny Prompt Studio', 'Penny Capability Registry'],
+    nextSteps: ['Define review cycle and approval workflow', 'Document maximum time from draft to approval', 'Create escalation path for blocked prompts', 'Add SLA to Penny Admin role blueprint'],
+    status: 'done',
   },
   {
     id: 'rec-3',
