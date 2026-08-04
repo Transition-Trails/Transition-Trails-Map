@@ -118,7 +118,7 @@ vi.mock('@replit/connectors-sdk', () => {
 });
 
 import app from '../app.js';
-import { opsCache } from '../routes/salesforce.js';
+import { opsCache, flushSfCacheForUser } from '../routes/salesforce.js';
 
 // ── Operations summary ────────────────────────────────────────────────────────
 
@@ -745,6 +745,110 @@ describe('GET /api/salesforce/operations/summary — picklist cache skips stale 
     // was written.  Confirm the picklist cache now holds an entry for this object.
     const picklistKeys = Array.from(opsCache.keys()).filter(k => k.includes(':picklist:'));
     expect(picklistKeys.length).toBeGreaterThan(0);
+  });
+});
+
+// ── Ops-summary cache does not serve stale error payloads ────────────────────
+//
+// The picklist describe cache correctly skips caching failures so the next
+// describe is retried live.  However, the ops-summary result itself is cached
+// in a SEPARATE layer (5-minute TTL, key `<ns>:ops-summary`).  If that layer
+// is written while a describe was erroring, and then the ops-summary key is
+// evicted (e.g. by flushSfCacheForUser), the subsequent request MUST return a
+// fresh summary — it must NOT serve the stale error payload from the previous
+// cache entry.
+//
+// Invariants tested here:
+//   1. A request made while describe is erroring caches an error-containing summary.
+//   2. The cached summary IS served on a second request in the same mode (fromCache true).
+//   3. After flushSfCacheForUser() evicts the ops-summary key, the third request
+//      re-enters the handler, retries the describe, and returns a fresh result
+//      without the error payload.
+
+describe('GET /api/salesforce/operations/summary — ops-summary cache eviction clears stale errors', () => {
+  beforeEach(() => {
+    mockProxyMode.value = 'normal';
+    // Start each test from a fully cold cache so state does not leak between runs.
+    for (const key of opsCache.keys()) {
+      if (key.includes(':picklist:') || key.includes(':ops-summary')) {
+        opsCache.delete(key);
+      }
+    }
+  });
+  afterEach(() => { mockProxyMode.value = 'normal'; });
+
+  test('after evicting the ops-summary cache via flushSfCacheForUser, the next request returns a fresh non-error summary', async () => {
+    // ── Step 1: cache a summary that contains error data ──────────────────────
+    mockProxyMode.value = 'describeError';
+
+    const res1 = await request(app).get('/api/salesforce/operations/summary');
+    expect(res1.status).toBe(200);
+
+    const prog1 = res1.body.programs as {
+      active:   { value: number | null; error: string | null };
+      planning: { value: number | null; error: string | null };
+    };
+
+    // The first request must carry explicit errors — describe was failing.
+    expect(prog1.active.value).toBeNull();
+    expect(prog1.active.error).toMatch(/picklist describe failed/i);
+    expect(prog1.planning.value).toBeNull();
+    expect(prog1.planning.error).toMatch(/picklist describe failed/i);
+
+    // ── Step 2: confirm the second request is served from the cache ───────────
+    // The ops-summary was just written; a second request in error mode must be
+    // served from the cache rather than re-querying Salesforce.
+    const res2 = await request(app).get('/api/salesforce/operations/summary');
+    expect(res2.status).toBe(200);
+    expect(res2.body.fromCache).toBe(true);
+
+    // The cached payload must still carry the error — it has not been cleared yet.
+    const prog2 = res2.body.programs as {
+      active:   { value: number | null; error: string | null };
+    };
+    expect(prog2.active.value).toBeNull();
+    expect(prog2.active.error).toMatch(/picklist describe failed/i);
+
+    // ── Step 3: flush the ops-summary cache and switch to a healthy describe ──
+    // flushSfCacheForUser with no argument clears all "system:" keys, which
+    // includes the "system:ops-summary" key used in test (no session sfUserId).
+    flushSfCacheForUser();
+
+    // Confirm the ops-summary key was actually evicted.
+    const summaryKeysAfterFlush = Array.from(opsCache.keys()).filter(k => k.includes(':ops-summary'));
+    expect(summaryKeysAfterFlush).toHaveLength(0);
+
+    // Switch to normal mode so the describe now succeeds.
+    mockProxyMode.value = 'normal';
+
+    // ── Step 4: verify the third request returns a fresh, error-free summary ──
+    const res3 = await request(app).get('/api/salesforce/operations/summary');
+    expect(res3.status).toBe(200);
+
+    // Must NOT be served from cache — the key was evicted; the route
+    // stores fromCache: false in the fresh data object itself.
+    expect(res3.body.fromCache).toBe(false);
+
+    const prog3 = res3.body.programs as {
+      active:             { value: number | null; error: string | null };
+      planning:           { value: number | null; error: string | null };
+      statusDescribeError: string | null;
+    };
+
+    // The describe itself succeeded (mock returns 200 for /describe in normal mode),
+    // so the describe-level error must be null on the fresh response.
+    expect(prog3.statusDescribeError).toBeNull();
+
+    // The stale "picklist describe failed" error must NOT bleed into this response.
+    // (The mock's describe returns no fields, so Active/Planning may still be reported
+    // as "not found in org" — that is a different, expected error for the mock env.
+    // What must be absent is the old "Picklist describe failed" string from the error mode.)
+    if (prog3.active.error !== null) {
+      expect(prog3.active.error).not.toMatch(/picklist describe failed/i);
+    }
+    if (prog3.planning.error !== null) {
+      expect(prog3.planning.error).not.toMatch(/picklist describe failed/i);
+    }
   });
 });
 
