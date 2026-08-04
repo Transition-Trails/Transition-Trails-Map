@@ -1,10 +1,185 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { X, CheckCircle2, Pencil, Hash, Send, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionPanelConfig } from '@/types/actionPanel';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
+import { promptVariables } from '@/data/pennyPromptStudioData';
+
+// ── Variable token autocomplete ───────────────────────────────────────────────
+
+/**
+ * Textarea with {{ autocomplete for prompt variable tokens.
+ * Triggers when the user types {{ and shows a filtered list of matching variables.
+ * Selecting one inserts {{variable_name}} at the cursor.
+ */
+function PromptBodyTextarea({
+  value,
+  onChange,
+  placeholder,
+  rows = 5,
+  className,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+  rows?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const [query, setQuery]     = useState<string | null>(null); // null = closed
+  const [activeIdx, setActive] = useState(0);
+
+  // Compute filtered suggestions
+  const suggestions = query === null
+    ? []
+    : promptVariables.filter(v =>
+        v.name.replace(/[{}]/g, '').toLowerCase().startsWith(query.toLowerCase()) ||
+        v.label.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8);
+
+  // Detect {{ trigger on every keystroke
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    const pos = e.target.selectionStart ?? val.length;
+
+    // Find the last {{ before the cursor that hasn't been closed yet
+    const before = val.slice(0, pos);
+    const match = before.match(/\{\{([a-z_]*)$/i);
+    if (match) {
+      setQuery(match[1]);   // partial text after {{
+      setActive(0);
+    } else {
+      setQuery(null);
+    }
+
+    onChange(val);
+  }, [onChange]);
+
+  // Insert chosen variable at cursor
+  function insertToken(varName: string) {
+    const ta = ref.current;
+    if (!ta) return;
+
+    const pos   = ta.selectionStart ?? value.length;
+    const before = value.slice(0, pos);
+    const after  = value.slice(pos);
+
+    // Replace the partial {{ … we've typed so far
+    const match = before.match(/\{\{([a-z_]*)$/i);
+    const replaceFrom = match ? pos - match[0].length : pos;
+
+    const token   = varName; // already includes {{ }}
+    const newVal  = value.slice(0, replaceFrom) + token + after;
+    onChange(newVal);
+    setQuery(null);
+
+    // Restore focus & move cursor to end of inserted token
+    requestAnimationFrame(() => {
+      ta.focus();
+      const newPos = replaceFrom + token.length;
+      ta.setSelectionRange(newPos, newPos);
+    });
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (query === null || suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActive(i => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActive(i => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (suggestions[activeIdx]) {
+        e.preventDefault();
+        insertToken(suggestions[activeIdx].name);
+      }
+    } else if (e.key === 'Escape') {
+      setQuery(null);
+    }
+  }
+
+  return (
+    <div className="relative">
+      <textarea
+        ref={ref}
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onBlur={() => setTimeout(() => setQuery(null), 150)}
+        placeholder={placeholder}
+        rows={rows}
+        className={className}
+        spellCheck={false}
+      />
+
+      {/* Autocomplete dropdown */}
+      {query !== null && suggestions.length > 0 && (
+        <div
+          className="absolute left-0 right-0 z-50 mt-0.5 rounded-lg border border-border bg-background shadow-lg overflow-hidden"
+          style={{ top: '100%' }}
+          onMouseDown={e => e.preventDefault()} // prevent blur before click
+        >
+          <div className="px-2.5 py-1.5 border-b border-border/60 flex items-center gap-1.5">
+            <Hash className="w-2.5 h-2.5 text-muted-foreground" />
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+              Variable tokens
+            </span>
+            <span className="text-[10px] text-muted-foreground ml-auto">
+              ↑↓ navigate · Enter/Tab insert · Esc close
+            </span>
+          </div>
+          <ul className="max-h-[220px] overflow-y-auto py-0.5">
+            {suggestions.map((v, i) => (
+              <li key={v.id}>
+                <button
+                  type="button"
+                  onClick={() => insertToken(v.name)}
+                  className={`w-full text-left flex items-start gap-2.5 px-3 py-2 transition-colors ${
+                    i === activeIdx ? 'bg-primary/8 text-foreground' : 'hover:bg-muted/40 text-foreground'
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <code className={`text-[11px] font-mono font-bold ${i === activeIdx ? 'text-primary' : 'text-foreground'}`}>
+                        {v.name}
+                      </code>
+                      <span className="text-[9px] font-bold text-muted-foreground bg-muted border border-border rounded px-1 py-0.5">
+                        {v.type}
+                      </span>
+                      <span className="text-[9px] text-muted-foreground">
+                        {v.source}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug truncate">
+                      e.g. <span className="italic">{v.exampleValue}</span>
+                    </p>
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* No-match hint */}
+      {query !== null && suggestions.length === 0 && query.length > 0 && (
+        <div
+          className="absolute left-0 right-0 z-50 mt-0.5 rounded-lg border border-border bg-background shadow-sm px-3 py-2"
+          style={{ top: '100%' }}
+        >
+          <p className="text-[11px] text-muted-foreground">
+            No variables match <code className="font-mono">{`{{${query}`}</code>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 const SLACK_CHANNELS: Record<string, string[]> = {
   penny:         ['#penny-ops', '#ai-coaching-team', '#capability-reviews'],
@@ -200,13 +375,23 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
                 />
               )}
 
-              {field.type === 'textarea' && (
+              {field.type === 'textarea' && !field.enableVariableAutocomplete && (
                 <textarea
                   value={values[field.id] ?? ''}
                   onChange={e => set(field.id, e.target.value)}
                   placeholder={field.placeholder ?? `Enter ${field.label.toLowerCase()}…`}
                   rows={field.rows ?? 3}
                   className="w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y min-h-[60px]"
+                />
+              )}
+
+              {field.type === 'textarea' && field.enableVariableAutocomplete && (
+                <PromptBodyTextarea
+                  value={values[field.id] ?? ''}
+                  onChange={val => set(field.id, val)}
+                  placeholder={field.placeholder ?? `Enter ${field.label.toLowerCase()}…`}
+                  rows={field.rows ?? 5}
+                  className="w-full rounded-md border border-input bg-white px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-y min-h-[60px] font-mono"
                 />
               )}
 

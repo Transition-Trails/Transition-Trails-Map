@@ -7,6 +7,8 @@ export interface ActionField {
   required?: boolean;
   hint?: string;
   rows?: number;
+  /** When true, typing {{ in this textarea triggers a variable token autocomplete list */
+  enableVariableAutocomplete?: boolean;
 }
 
 export interface ActionPanelConfig {

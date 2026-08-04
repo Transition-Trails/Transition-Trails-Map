@@ -1175,7 +1175,7 @@ export default function PennyPromptStudio() {
         { id: 'name',         label: 'Template Name',   type: 'text',     required: true, placeholder: t.name },
         { id: 'domain',       label: 'Domain',           type: 'select',   options: DOMAIN_ORDER as string[], required: true },
         { id: 'purpose',      label: 'Purpose',          type: 'textarea', placeholder: t.purpose, rows: 3 },
-        { id: 'promptBody',   label: 'Prompt Body',      type: 'textarea', placeholder: t.promptBody, rows: 5 },
+        { id: 'promptBody',   label: 'Prompt Body',      type: 'textarea', placeholder: t.promptBody, rows: 5, enableVariableAutocomplete: true },
         { id: 'audience',     label: 'Audience',         type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'] },
         { id: 'tone',         label: 'Tone & Style',     type: 'text',     placeholder: t.tone },
         { id: 'guardrails',   label: 'Guardrails',       type: 'textarea', placeholder: t.guardrails.join('\n'), rows: 3 },
