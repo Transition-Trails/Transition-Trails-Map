@@ -21,7 +21,7 @@ vi.mock('../middlewares/requireAuth.js', () => ({
 //              Used to test the throttled → undetermined classification.
 
 const { mockProxyMode } = vi.hoisted(() => ({
-  mockProxyMode: { value: 'normal' as 'normal' | 'rateLimit' },
+  mockProxyMode: { value: 'normal' as 'normal' | 'rateLimit' | 'describeError' },
 }));
 
 // ── Connector SDK mock ────────────────────────────────────────────────────────
@@ -55,6 +55,32 @@ vi.mock('@replit/connectors-sdk', () => {
             json: async () => ({}),
             text: async () =>
               'Rate limit exceeded. You have exceeded the limit of 20 requests per 10 seconds.',
+            redirected: false,
+            type: 'basic' as Response['type'],
+            url: '',
+            clone: () => ({ ok: false } as Response),
+            arrayBuffer: async () => new ArrayBuffer(0),
+            blob: async () => new Blob(),
+            formData: async () => new FormData(),
+            body: null,
+            bodyUsed: false,
+          } as Response;
+        }
+
+        // Describe-error mode: return 403 for all describe calls.
+        // Simulates a permission-denied (or any other non-rate-limit) failure
+        // from the org describe endpoint so the field-check error path is exercised.
+        if (
+          mockProxyMode.value === 'describeError' &&
+          url.includes('/describe')
+        ) {
+          return {
+            ok: false,
+            status: 403,
+            statusText: 'Forbidden',
+            headers: new Headers(),
+            json: async () => ([{ message: 'You do not have access to describe this object.', errorCode: 'INSUFFICIENT_ACCESS' }]),
+            text: async () => '403 Forbidden: INSUFFICIENT_ACCESS',
             redirected: false,
             type: 'basic' as Response['type'],
             url: '',
@@ -373,6 +399,162 @@ describe('GET /api/salesforce/validate — 429 throttle handling', () => {
     // and describeUndetermined must be false
     if (!contactCheck?.describeError) {
       expect(contactCheck?.describeUndetermined).toBe(false);
+    }
+  });
+});
+
+// ── Generic describe error (non-rate-limit) ───────────────────────────────────
+//
+// When the org's describe endpoint fails with a non-429 error (e.g. 403
+// permission denied, 500 server error), the field check must NOT report
+// missing fields — absence of describe data is not evidence of absence.
+//
+// Invariants:
+//   • requiredFieldsMissing === []   for every field check
+//   • describeUndetermined === false (it's a definitive error, not a throttle)
+//   • describeError is a non-null string describing the failure
+
+describe('GET /api/salesforce/validate — generic describe error (non-rate-limit)', () => {
+  beforeEach(() => { mockProxyMode.value = 'normal'; });
+  afterEach(() => { mockProxyMode.value = 'normal'; });
+
+  test('requiredFieldsMissing is always [] when describe returns a non-429 error', async () => {
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const fieldChecks = res.body.customFieldChecks as {
+      id: string;
+      requiredFieldsMissing: string[];
+      describeError: string | null;
+    }[];
+
+    expect(Array.isArray(fieldChecks)).toBe(true);
+    expect(fieldChecks.length).toBeGreaterThan(0);
+
+    // Every check with a describeError must have an empty missing-fields list —
+    // a failed describe is not evidence that fields are absent.
+    for (const fc of fieldChecks) {
+      if (fc.describeError) {
+        expect(fc.requiredFieldsMissing).toEqual([]);
+      }
+    }
+  });
+
+  test('describeUndetermined is false when describe returns a non-429 error', async () => {
+    // describeUndetermined === true is reserved for rate-limit (429) failures only.
+    // A 403/500/etc. error is a definitive failure, not an undetermined probe.
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const fieldChecks = res.body.customFieldChecks as {
+      id: string;
+      describeError: string | null;
+      describeUndetermined: boolean;
+    }[];
+
+    for (const fc of fieldChecks) {
+      if (fc.describeError) {
+        expect(fc.describeUndetermined).toBe(false);
+      }
+    }
+  });
+
+  test('describeError is a non-null string when describe returns a non-429 error', async () => {
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const fieldChecks = res.body.customFieldChecks as {
+      id: string;
+      describeError: string | null;
+    }[];
+
+    // All checks should have hit the 403 describe mock, so every entry
+    // must carry a non-null describeError string.
+    for (const fc of fieldChecks) {
+      expect(typeof fc.describeError).toBe('string');
+      expect(fc.describeError).not.toBeNull();
+    }
+  });
+});
+
+// ── Penny + Governance field-check coverage ───────────────────────────────────
+//
+// Confirms that every Penny object and every Build Governance object defined in
+// TT_CUSTOM_OBJECT_GROUPS has a matching field-check entry returned in
+// customFieldChecks.  This is a contract test: if an object is added to the
+// groups list but its field-check config is omitted, this test will catch it.
+
+describe('GET /api/salesforce/validate — Penny + Governance field-check coverage', () => {
+  // The 8 Penny object IDs expected in customFieldChecks
+  const EXPECTED_PENNY_FIELD_CHECK_IDS = [
+    'penny-trail-config-fields',
+    'penny-interaction-log-fields',
+    'penny-quest-submission-fields',
+    'penny-career-review-fields',
+    'penny-weekly-report-fields',
+    'penny-badge-fields',
+    'penny-gamification-fields',
+    'penny-classroom-nudge-fields',
+  ] as const;
+
+  // The 4 Build Governance object IDs expected in customFieldChecks
+  const EXPECTED_GOVERNANCE_FIELD_CHECK_IDS = [
+    'tt-build-item-fields',
+    'tt-automation-fields',
+    'tt-sop-automation-fields',
+    'tt-sop-account-fields',
+  ] as const;
+
+  test('all 8 Penny custom object field checks are present in customFieldChecks', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const ids = (res.body.customFieldChecks as { id: string }[]).map(fc => fc.id);
+    for (const expected of EXPECTED_PENNY_FIELD_CHECK_IDS) {
+      expect(ids).toContain(expected);
+    }
+  });
+
+  test('all 4 Build Governance custom object field checks are present in customFieldChecks', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const ids = (res.body.customFieldChecks as { id: string }[]).map(fc => fc.id);
+    for (const expected of EXPECTED_GOVERNANCE_FIELD_CHECK_IDS) {
+      expect(ids).toContain(expected);
+    }
+  });
+
+  test('each Penny + Governance field check has a non-empty requiredFields list in normal mode', async () => {
+    // Verify that the REUSED_OBJECT_FIELD_CHECKS definitions actually enumerate
+    // required fields for Penny and Governance objects — not just empty arrays.
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const allFieldChecks = res.body.customFieldChecks as {
+      id: string;
+      requiredFieldsFound: string[];
+      requiredFieldsMissing: string[];
+    }[];
+
+    const pennyAndGovernanceIds = [
+      ...EXPECTED_PENNY_FIELD_CHECK_IDS,
+      ...EXPECTED_GOVERNANCE_FIELD_CHECK_IDS,
+    ];
+
+    for (const id of pennyAndGovernanceIds) {
+      const fc = allFieldChecks.find(c => c.id === id);
+      expect(fc).toBeDefined();
+      // The combined found+missing list represents the requiredFields config —
+      // it should be non-empty for every Penny/Governance object.
+      const totalConfigured = (fc?.requiredFieldsFound?.length ?? 0) + (fc?.requiredFieldsMissing?.length ?? 0);
+      expect(totalConfigured).toBeGreaterThan(0);
     }
   });
 });
