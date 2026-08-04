@@ -24,6 +24,9 @@ export interface ActionPanelConfig {
   slackContext?: string;
   onSaveDraft?: (data: Record<string, string>) => void;
   onSaveAndView?: (data: Record<string, string>) => void;
+  /** Called instead of onSaveAndView when the user clicks "Send for Review".
+   *  Use this to force status → Review and record reviewRequestedBy. */
+  onSendForReview?: (data: Record<string, string>) => void;
   onClose?: () => void;
   pennyPrompt?: string;
 }

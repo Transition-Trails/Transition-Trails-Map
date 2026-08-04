@@ -56,6 +56,8 @@ export interface PromptTemplate {
   guardrails: string[];
   owner: string;
   lastModifiedBy?: string;
+  /** Email of the user who last submitted this template for review via "Send for Review". */
+  reviewRequestedBy?: string;
   status: PromptStatus;
   version: string;
   lastReviewed: string;

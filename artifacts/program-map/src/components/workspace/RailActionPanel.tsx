@@ -262,6 +262,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     slackContext,
     onSaveDraft,
     onSaveAndView,
+    onSendForReview,
     pennyPrompt,
   } = config;
 
@@ -296,11 +297,16 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     setTimeout(() => { setSavedMode('idle'); onClose(); }, 1200);
   }
 
-  // Send for review — saves, then fires the Slack notification so a team mate
-  // can pick it up for review. Shows a confirmation screen before closing.
+  // Send for review — saves (via onSendForReview if provided, otherwise onSaveAndView),
+  // fires the Slack notification, and shows a confirmation screen before closing.
   function handleSendForReview() {
     onSaveDraft?.(values);
-    onSaveAndView?.(values);
+    // onSendForReview lets callers override save behaviour (e.g. force status → Review).
+    if (onSendForReview) {
+      onSendForReview(values);
+    } else {
+      onSaveAndView?.(values);
+    }
     fetch('/api/slack/notify', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },

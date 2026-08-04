@@ -422,8 +422,21 @@ function TemplateDetailPanel({
   onBrief: (t: PromptTemplate) => void;
   onStatusChange: (id: string, status: PromptStatus) => void;
 }) {
+  const { user: currentUser } = useGoogleAuth();
   const [open, setOpen] = useState<Set<string>>(() => new Set(['purpose', 'config', 'guardrails']));
   const [confirmChip, setConfirmChip] = useState<'approved' | 'revision' | null>(null);
+
+  // Two-person approval rule:
+  //   • Only allowed when status is 'Review' (template has been sent for review)
+  //   • The user who submitted for review cannot self-approve
+  const reviewedBySelf =
+    template.status === 'Review' &&
+    !!template.reviewRequestedBy &&
+    !!currentUser?.email &&
+    currentUser.email === template.reviewRequestedBy;
+
+  const canApprove =
+    template.status === 'Review' && !reviewedBySelf;
 
   function fireStatusChange(id: string, status: PromptStatus, chip: 'approved' | 'revision') {
     onStatusChange(id, status);
@@ -491,18 +504,26 @@ function TemplateDetailPanel({
               </span>
             )}
 
-            {/* Approve */}
-            {(template.status === 'Draft' || template.status === 'Review') && (
+            {/* Approve — two-person rule enforced */}
+            {canApprove ? (
               <button
                 onClick={() => fireStatusChange(template.id, 'Approved', 'approved')}
                 className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F] text-[12px] font-bold hover:bg-[#C8E6D0] transition-colors"
               >
                 <CheckCircle2 className="w-3 h-3" /> Approve
               </button>
-            )}
-            {(template.status === 'Approved' || template.status === 'Deprecated') && (
+            ) : reviewedBySelf ? (
               <button
                 disabled
+                title="You submitted this for review — another team member must approve it"
+                className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400] text-[12px] font-bold cursor-not-allowed opacity-80"
+              >
+                <Clock className="w-3 h-3" /> Awaiting reviewer
+              </button>
+            ) : (
+              <button
+                disabled
+                title={template.status === 'Draft' ? 'Send for review before approving' : 'Already approved'}
                 className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-border text-[12px] font-bold text-muted-foreground/40 cursor-not-allowed"
               >
                 <CheckCircle2 className="w-3 h-3" /> Approve
@@ -1290,6 +1311,27 @@ export default function PennyPromptStudio() {
           status:         (data.reviewStatus || t.status) as PromptStatus,
           lastReviewed:   'Just now',
           lastModifiedBy: modifiedBy,
+        };
+        update({ id: t.id, updates });
+      },
+      // "Send for Review" forces status → Review and records who submitted it,
+      // enforcing the two-person approval rule.
+      onSendForReview: (data) => {
+        const modifiedBy = user?.name ?? t.owner;
+        const updates: Partial<PromptTemplate> = {
+          name:               data.name       || t.name,
+          domain:             (data.domain     || t.domain) as PromptDomain,
+          purpose:            data.purpose    || t.purpose,
+          promptBody:         data.promptBody || t.promptBody,
+          tone:               data.tone       || t.tone,
+          audience:           data.audience   ? [data.audience] : t.audience,
+          guardrails:         data.guardrails
+            ? data.guardrails.split('\n').filter(Boolean)
+            : t.guardrails,
+          status:             'Review',           // always force Review on submit
+          reviewRequestedBy:  user?.email ?? '',  // email for identity comparison
+          lastReviewed:       'Just now',
+          lastModifiedBy:     modifiedBy,
         };
         update({ id: t.id, updates });
       },
