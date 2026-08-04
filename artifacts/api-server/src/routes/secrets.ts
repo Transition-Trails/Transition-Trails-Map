@@ -168,8 +168,8 @@ function buildCatalog(): SecretEntry[] {
     // ── Gemini / Penny AI ──────────────────────────────────────────────────
     { id: "gemini-api-key",       primary: "GEMINI_API_KEY",            alts: ["GOOGLE_AI_API_KEY", "GOOGLE_AI_KEY", "PALM_API_KEY", "VERTEX_AI_API_KEY"], integration: "Gemini / Penny AI", category: "API Key", required: true,  purpose: "Powers Penny AI for staff (POST /api/penny/ask), quest submission feedback (POST /api/learner/quest/submit), and learner chat (POST /api/learner/penny/ask) — all on Gemini 2.5 Flash.", nextFix: "Google AI Studio (aistudio.google.com) → Get API Key. New keys start with AQ. (secure auth key format); legacy keys start with AIza. Both formats are accepted.", fmtCheck: geminiKeyFormat },
 
-    // ── Anthropic / Quest Generation ──────────────────────────────────────
-    { id: "anthropic-api-key",    primary: "ANTHROPIC_API_KEY",         alts: ["CLAUDE_API_KEY"], integration: "Anthropic / Quest Generation", category: "API Key", required: true,  purpose: "Powers daily quest generation for learners (GET /api/learner/daily-quest) via Claude Sonnet 4.6. Quest generation is Penny's only Claude surface — feedback and learner chat use Gemini.", nextFix: "console.anthropic.com → API Keys → Create Key. Keys start with sk-ant-." },
+    // ── Anthropic / Claude (reserved) ────────────────────────────────────
+    { id: "anthropic-api-key",    primary: "ANTHROPIC_API_KEY",         alts: ["CLAUDE_API_KEY"], integration: "Anthropic / Claude", category: "API Key", required: false, purpose: "Reserved for future Claude integration. Not currently wired to any active endpoint — quest generation was consolidated onto Gemini 2.5 Flash (Aug 2026). Set now to avoid setup overhead when a Claude capability is added.", nextFix: "console.anthropic.com → API Keys → Create Key. Keys start with sk-ant-." },
 
     // ── Salesforce ─────────────────────────────────────────────────────────
     // Auth is managed via Replit Connectors SDK (proxyFetch) — no client ID/secret/instance URL env vars needed.

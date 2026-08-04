@@ -127,9 +127,9 @@ router.get("/learner/daily-quest", async (req, res) => {
   }
 
   const contactId = req.session.learnerContactId!;
-  const apiKey    = process.env["ANTHROPIC_API_KEY"];
+  const apiKey    = process.env["GEMINI_API_KEY"];
   if (!apiKey) {
-    return res.status(503).json({ error: "Quest generation not configured — set ANTHROPIC_API_KEY" });
+    return res.status(503).json({ error: "Quest generation not configured — set GEMINI_API_KEY" });
   }
 
   const records = await sfQuery<{
@@ -139,37 +139,39 @@ router.get("/learner/daily-quest", async (req, res) => {
   }>(`SELECT Penny_Trail__c, Penny_Current_Phase__c, Penny_Current_Goal__c FROM Contact WHERE Id = '${contactId}'`);
 
   const ctx   = records[0];
-  const trail = ctx?.Penny_Trail__c       ?? req.session.learnerTrail ?? "Salesforce Admin";
+  const trail = ctx?.Penny_Trail__c        ?? req.session.learnerTrail ?? "Salesforce Admin";
   const phase = ctx?.Penny_Current_Phase__c ?? "Explore";
   const goal  = ctx?.Penny_Current_Goal__c  ?? "Develop Salesforce Admin skills";
 
   try {
-    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const geminiRes = await fetch(url, {
       method:  "POST",
-      headers: {
-        "x-api-key":         apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type":      "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model:      "claude-sonnet-4-6",
-        max_tokens: 512,
-        system:     `You are Penny, an AI coaching companion for Transition Trails Academy. Generate exactly one daily Salesforce Admin learning quest for a learner on the ${trail} trail in phase ${phase}. The quest must be a practical scenario-based challenge that takes 10-15 minutes. Return ONLY valid JSON with no markdown, no backticks, no explanation — just the raw JSON object.`,
-        messages: [{
-          role:    "user",
-          content: `Generate today's daily quest for a ${trail} learner in phase ${phase} with goal: ${goal}. Return JSON: { "title": string, "description": string, "difficulty": "Beginner"|"Intermediate"|"Expert", "pointValue": number (10 for Beginner, 25 for Intermediate, 50 for Expert), "category": string, "acceptanceCriteria": string }`,
+        system_instruction: {
+          parts: [{ text: `You are Penny, an AI coaching companion for Transition Trails Academy. Generate exactly one daily Salesforce Admin learning quest for a learner on the ${trail} trail in phase ${phase}. The quest must be a practical scenario-based challenge that takes 10–15 minutes.` }],
+        },
+        contents: [{
+          role:  "user",
+          parts: [{ text: `Generate today's daily quest for a ${trail} learner in phase ${phase} with goal: ${goal}. Return JSON with these exact fields: { "title": string, "description": string, "difficulty": "Beginner"|"Intermediate"|"Expert", "pointValue": number (10 for Beginner, 25 for Intermediate, 50 for Expert), "category": string, "acceptanceCriteria": string }` }],
         }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          maxOutputTokens:  512,
+          temperature:      0.8,
+        },
       }),
       signal: AbortSignal.timeout(20_000),
     });
 
-    if (!anthropicRes.ok) {
-      logger.warn({ status: anthropicRes.status }, "Anthropic quest generation failed");
+    if (!geminiRes.ok) {
+      logger.warn({ status: geminiRes.status }, "Gemini quest generation failed");
       return res.status(502).json({ error: "Quest generation failed" });
     }
 
-    const body = await anthropicRes.json() as { content?: Array<{ text?: string }> };
-    const raw  = body.content?.[0]?.text?.trim() ?? "";
+    const body  = await geminiRes.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+    const raw   = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
     const quest = JSON.parse(raw) as DailyQuest;
 
     req.session.dailyQuest     = quest as unknown as Record<string, unknown>;

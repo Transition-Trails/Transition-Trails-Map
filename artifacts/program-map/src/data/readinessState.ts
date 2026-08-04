@@ -54,30 +54,28 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
     id: 'gemini',
     label: 'Gemini / Penny AI',
     health: 'live',
-    summary: 'Penny live — staff chat, learner chat, and quest feedback all on Gemini 2.5 Flash',
+    summary: 'Penny live — all four AI surfaces on Gemini 2.5 Flash (staff chat, learner chat, quest generation, quest feedback)',
     detail:
       'GEMINI_API_KEY confirmed valid, billing active (serviceTier: standard). ' +
-      'Three surfaces: POST /api/penny/ask (staff Ask Penny panel, RAG + Trail OS context), ' +
-      'POST /api/learner/penny/ask (learner-authenticated Penny chat with SF coaching context), ' +
-      'POST /api/learner/quest/submit (quest feedback — 2–3 sentence evaluation after submission). ' +
-      'Quest generation uses Claude Sonnet 4.6 — see Anthropic entry. ' +
+      'Four surfaces: POST /api/penny/ask (staff Ask Penny panel, RAG + Trail OS context), ' +
+      'GET /api/learner/daily-quest (daily quest generation — JSON output via responseMimeType, session-cached per day), ' +
+      'POST /api/learner/quest/submit (quest feedback — 2–3 sentence evaluation after submission), ' +
+      'POST /api/learner/penny/ask (learner-authenticated Penny chat with SF coaching context). ' +
       'Validation endpoint: GET /api/gemini/validate',
     lastVerified: 'August 2026',
   },
   anthropic: {
     id: 'anthropic',
-    label: 'Anthropic / Quest Generation',
-    health: 'live',
-    summary: 'Claude Sonnet 4.6 live — daily quest generation · GET /api/learner/daily-quest',
+    label: 'Anthropic / Claude',
+    health: 'planned',
+    summary: 'Reserved for future use — not currently wired to any active endpoint',
     detail:
-      'ANTHROPIC_API_KEY configured. Claude Sonnet 4.6 generates one scenario-based daily quest per ' +
-      'learner based on their trail and current phase (10–15 min challenge, JSON response). ' +
-      'Quest is session-cached so repeat loads within the same day do not re-call the API. ' +
-      'Quest feedback after submission uses Gemini 2.5 Flash, not Claude. ' +
-      'Failure mode: 503 "Quest generation not configured" if key is absent; ' +
-      '502 "Quest generation failed" if Claude returns a non-OK response. ' +
-      'Rate limits and cost differ from Gemini — monitor independently at console.anthropic.com. ' +
-      'Validation endpoint: GET /api/anthropic/validate',
+      'Claude was previously used for daily quest generation (GET /api/learner/daily-quest) ' +
+      'but that surface was consolidated onto Gemini 2.5 Flash in August 2026 to simplify ' +
+      'the AI provider footprint. The ANTHROPIC_API_KEY secret and GET /api/anthropic/validate ' +
+      'endpoint are retained so Claude can be wired to future capabilities without setup overhead. ' +
+      'No active API calls are made to Anthropic — omitting ANTHROPIC_API_KEY has no impact on ' +
+      'current platform behaviour.',
     lastVerified: 'August 2026',
   },
   googleDrive: {
