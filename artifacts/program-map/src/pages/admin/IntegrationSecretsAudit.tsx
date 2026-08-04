@@ -477,9 +477,28 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
             )}
 
             {/* Custom field verification on reused objects */}
-            {result.customFieldChecks && result.customFieldChecks.length > 0 && (
+            {result.customFieldChecks && result.customFieldChecks.length > 0 && (() => {
+              const allDescribesFailed = result.customFieldChecks.every(fc => !!fc.describeError);
+              return (
               <div className="space-y-1.5">
-                <p className="text-[14px] font-bold text-foreground">Custom Fields on Reused Objects</p>
+                <p className="text-[14px] font-bold text-foreground">
+                  Custom Fields on Reused Objects
+                  {allDescribesFailed && (
+                    <span className="ml-1.5 font-normal text-[#CC8400]">· all describes failed</span>
+                  )}
+                </p>
+                {allDescribesFailed && (
+                  <div className="flex items-start gap-2 rounded border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[14px] font-semibold text-[#CC8400]">Field checks skipped — describe permission missing org-wide</p>
+                      <p className="text-[14px] text-[#CC8400]/80 mt-0.5">
+                        Every object describe call failed. This is <strong>not a pass</strong> — field presence could not be verified.
+                        Grant the connected Salesforce user "View Setup and Configuration" or "Modify All Data" permission, then rerun validation.
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {result.customFieldChecks.map(fc => {
                   const isUndetermined = fc.describeUndetermined;
                   const hasError       = !!fc.describeError && !isUndetermined;
@@ -532,7 +551,7 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
                   );
                 })}
               </div>
-            )}
+              );})()}
 
             {/* Check list */}
             <div className="space-y-1">
