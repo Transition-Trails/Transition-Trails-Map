@@ -20,6 +20,8 @@ import {
   createWeeklyReport,
 } from "../lib/salesforceService.js";
 import type { LearnerContextUpdate } from "../types/salesforce.js";
+import { SF_INTERACTION_SOURCES } from "../lib/salesforceService.js";
+import type { SfInteractionSource } from "../types/salesforce.js";
 
 const router = Router();
 
@@ -133,12 +135,19 @@ router.post(
     const REQUIRED = ["userMessage", "pennyResponse", "promptMode", "source"] as const;
     if (!requireStringFields(req.body, [...REQUIRED], res)) return;
     const body = req.body as Record<typeof REQUIRED[number], string>;
+    // Source__c is a RESTRICTED picklist — validate before writing to Salesforce.
+    if (!(SF_INTERACTION_SOURCES as readonly string[]).includes(body.source)) {
+      res.status(400).json({
+        error: `Invalid source value "${body.source}". Permitted values: ${SF_INTERACTION_SOURCES.join(', ')}`,
+      });
+      return;
+    }
     const result = await logInteraction(client, {
       contactId,
       userMessage:   body.userMessage,
       pennyResponse: body.pennyResponse,
       promptMode:    body.promptMode,
-      source:        body.source,
+      source:        body.source as SfInteractionSource,
     });
     res.json(result);
   })

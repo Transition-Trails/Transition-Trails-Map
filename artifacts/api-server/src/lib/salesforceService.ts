@@ -14,6 +14,9 @@ import type {
   WeeklyReportRecord,
   CreateWeeklyReportPayload,
 } from "../types/salesforce.js";
+// Re-export so callers can validate source values without importing from types directly
+export type { SfInteractionSource } from "../types/salesforce.js";
+export { SF_INTERACTION_SOURCES } from "../types/salesforce.js";
 
 // ── Raw SF response shapes (internal, not exported) ───────────────────────────
 

@@ -13,11 +13,32 @@
  *   • Prompt_Mode__c truncation at 50 chars
  *   • Fire-and-forget isolation: a rejected createRecord, when caught like the
  *     route does, must not propagate to the surrounding code
+ *   • Source__c picklist conformance
+ *
+ * ─── Test Blind Spot (honest) ──────────────────────────────────────────────────
+ *
+ * These tests mock ISalesforceClient.createRecord with vi.fn().  The mock
+ * accepts ANY value — it never validates against the real Salesforce schema.
+ * This means:
+ *
+ *   1. A wrong Source__c value (e.g. "web", which is NOT a permitted picklist
+ *      value) will pass every test in this file.  The mock does not reject it.
+ *      This is exactly how the original bug (source: "web" → zero SF records
+ *      for months) went undetected.
+ *
+ *   2. The picklist conformance tests below close the gap for source only by
+ *      asserting that the written value is in the known permitted list.  They
+ *      do NOT prove the schema is correct — that requires a live describe call
+ *      against the org (done manually during the source: "web" post-mortem).
+ *
+ * If you add a new picklist field to logInteraction, add a conformance test for
+ * it here AND verify the permitted values with a live SF describe before shipping.
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { logInteraction } from '../lib/salesforceService.js';
+import { logInteraction, SF_INTERACTION_SOURCES } from '../lib/salesforceService.js';
 import type { ISalesforceClient } from '../lib/salesforceClient.js';
+import type { SfInteractionSource } from '../types/salesforce.js';
 
 // ── Fixture ───────────────────────────────────────────────────────────────────
 
@@ -35,8 +56,11 @@ const VALID_PAYLOAD = {
   contactId:     '0031000000testCCC',
   userMessage:   'What phase am I in?',
   pennyResponse: 'You are in the Explore phase.',
-  promptMode:    'ask',
-  source:        'web',
+  promptMode:    'ask+learner',
+  // Source__c is a RESTRICTED picklist — only these values are permitted by SF:
+  // 'dashboard' | 'slack_dm' | 'slack_mention' | 'mobile'
+  // "web" is NOT a permitted value. The /api/penny/ask route uses 'dashboard'.
+  source:        'dashboard' as SfInteractionSource,
 };
 
 // ── Happy path ────────────────────────────────────────────────────────────────
@@ -186,4 +210,40 @@ describe('fire-and-forget write isolation', () => {
       logInteraction(client, VALID_PAYLOAD).catch(() => 'handled')
     ).resolves.toBe('handled');
   });
+});
+
+// ── Source__c picklist conformance ────────────────────────────────────────────
+//
+// Source__c is a RESTRICTED picklist in the Salesforce org.  A value that is
+// not in the permitted list causes the entire insert to be rejected — with no
+// error returned to the caller (fire-and-forget).
+//
+// These tests assert that logInteraction writes a value that is in the known
+// permitted list.  They do NOT validate against the live schema (that requires
+// a describe call against the org) but they prevent a regression where a
+// developer changes the hardcoded source without updating this list.
+//
+// Permitted values confirmed by a live SF describe on 2026-08-04:
+//   'dashboard', 'slack_dm', 'slack_mention', 'mobile'
+//
+// The original bug: source: "web" was written for all Trail OS web requests.
+// "web" is not in the permitted list.  Every SF write was silently discarded.
+
+describe('logInteraction — Source__c picklist conformance', () => {
+  it('the default fixture writes a Source__c value in the permitted picklist', async () => {
+    const client = makeMockClient();
+    await logInteraction(client, VALID_PAYLOAD);
+    const [, data] = (client.createRecord as ReturnType<typeof vi.fn>).mock.calls[0] as [string, Record<string, unknown>];
+    expect(SF_INTERACTION_SOURCES).toContain(data['Source__c']);
+  });
+
+  it.each([...SF_INTERACTION_SOURCES] as SfInteractionSource[])(
+    'accepts "%s" as a valid source and passes it through to Source__c',
+    async (src) => {
+      const client = makeMockClient();
+      await logInteraction(client, { ...VALID_PAYLOAD, source: src });
+      const [, data] = (client.createRecord as ReturnType<typeof vi.fn>).mock.calls[0] as [string, Record<string, unknown>];
+      expect(data['Source__c']).toBe(src);
+    }
+  );
 });

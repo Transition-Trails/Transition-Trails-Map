@@ -7,6 +7,12 @@ import {
   logInteraction,
   getInteractionHistory,
 } from "../lib/salesforceService.js";
+import {
+  recordSfWriteAttempt,
+  recordSfWriteSuccess,
+  recordSfWriteFailure,
+  getSfWriteHealth,
+} from "../lib/sfWriteHealth.js";
 import { resolveExchangeContact } from "../lib/pennyContactResolver.js";
 import {
   assemblePrompt,
@@ -22,6 +28,20 @@ import { pennyLogsTable } from "@workspace/db/schema";
 import { desc, gte, sql } from "drizzle-orm";
 
 const router = Router();
+
+// ── Prompt mode derivation ─────────────────────────────────────────────────────
+/**
+ * Compute a human-readable Prompt_Mode__c value that describes which context
+ * layers were active.  Prompt_Mode__c is a plain string (not a picklist) so
+ * any value is accepted by Salesforce, but it should be meaningful to admins
+ * reading the record.
+ */
+function derivePromptMode(hasLearnerCtx: boolean, hasMemory: boolean): string {
+  if (hasLearnerCtx && hasMemory) return 'ask+learner+memory';
+  if (hasLearnerCtx)              return 'ask+learner';
+  if (hasMemory)                  return 'ask+memory';
+  return 'ask';
+}
 
 // ─── In-memory rate limiter (10 req / 60 s per IP) ────────────────────────────
 const RATE_WINDOW_MS  = 60_000;
@@ -258,19 +278,26 @@ router.post("/penny/ask", async (req, res) => {
       return res.status(502).json({ error: "Penny returned an empty response. Try rephrasing your question." });
     }
 
-    const durationMs = Date.now() - start;
+    const durationMs  = Date.now() - start;
+    // Describe what actually happened rather than hardcoding "ask".
+    // Prompt_Mode__c is a plain string field (not a picklist) so any value is
+    // accepted by Salesforce — we use it to show admins which context layers
+    // were active for this exchange.
+    const promptMode  = derivePromptMode(learnerCtx !== null, recentExchanges.length > 0);
     const learnerName = learnerCtx
       ? `${learnerCtx.firstName} ${learnerCtx.lastName}`.trim()
       : null;
 
-    // Fire-and-forget: write to DB (always) + Salesforce (when contact known)
+    // Fire-and-forget: write to DB (always) + Salesforce (when contact known).
+    // Neither write is awaited — a failed write must never cost the user their
+    // reply.  The local DB is the primary persistence path; SF is supplementary.
     db.insert(pennyLogsTable).values({
       sessionId:     req.sessionID ?? null,
       userTier:      typeof role === 'string' ? role : null,
       userEmail:     req.session.sfEmail ?? null,
       userMessage:   query.trim(),
       pennyResponse: text,
-      promptMode:    "ask",
+      promptMode,
       model,
       durationMs,
       contextRoute:  null,
@@ -282,26 +309,29 @@ router.post("/penny/ask", async (req, res) => {
     });
 
     if (sfClient !== null && sfContactId !== null) {
-      // Fire-and-forget Salesforce write.  Any failure here is caught and
-      // logged but NEVER surfaced to the caller — the user already has their
-      // reply.  The local DB write above is the primary persistence path; this
-      // is supplementary and is allowed to fail silently.
+      // Source__c is a RESTRICTED picklist — only 'dashboard', 'slack_dm',
+      // 'slack_mention', 'mobile' are permitted.  Any other value causes
+      // Salesforce to silently reject the entire insert.
+      // This endpoint is the Trail OS web interface → 'dashboard'.
+      // When Slack / mobile channels are added they will pass their own source.
+      recordSfWriteAttempt();
       logInteraction(sfClient, {
         contactId:     sfContactId,
         userMessage:   query.trim(),
         pennyResponse: text,
-        promptMode:    "ask",
-        source:        "web",
+        promptMode,
+        source:        'dashboard',
+      }).then(() => {
+        recordSfWriteSuccess();
       }).catch((logErr: unknown) => {
         const errMsg = logErr instanceof Error ? logErr.message : String(logErr);
+        recordSfWriteFailure('Penny_Interaction_Log__c', errMsg);
         const isPermission =
           errMsg.includes('INSUFFICIENT_ACCESS') ||
           errMsg.includes('FIELD_INTEGRITY_EXCEPTION') ||
           errMsg.includes('Required fields are missing') ||
           errMsg.includes('CREATE_FAILED');
         if (isPermission) {
-          // Loud error so a new integration user's missing Create permission
-          // is found immediately rather than silently losing records.
           logger.error(
             { logErr, object: 'Penny_Interaction_Log__c', sfContactId },
             'SF WRITE REFUSED — Penny_Interaction_Log__c — Create permission denied. ' +
@@ -342,6 +372,15 @@ router.post("/penny/ask", async (req, res) => {
       : `Could not reach Gemini: ${e instanceof Error ? e.message : String(e)}`;
     return res.status(502).json({ error: msg });
   }
+});
+
+// ── GET /penny/write-health ───────────────────────────────────────────────────
+// Returns the in-process Salesforce write health state so the admin UI can
+// surface a write failure within minutes rather than on the next org query.
+// State resets on server restart — stale errors from a prior deployment mislead.
+
+router.get("/penny/write-health", (_req, res) => {
+  res.json(getSfWriteHealth());
 });
 
 // ── Preflight helpers (minimal SF client, rate-limit-aware) ───────────────────

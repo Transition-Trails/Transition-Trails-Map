@@ -37,12 +37,33 @@ export interface TrailConfig {
   isActive: boolean;
 }
 
+/**
+ * Permitted values for Penny_Interaction_Log__c.Source__c.
+ *
+ * This field is a RESTRICTED picklist in Salesforce — any value not in this
+ * list causes the entire record insert to be rejected.  Keep this in sync with
+ * the org schema.  Do NOT add values here without first adding them to the
+ * picklist in SF Setup → Object Manager → Penny Interaction Log → Fields → Source.
+ *
+ * History: the original code wrote "web", which is not a permitted value.
+ * Salesforce silently rejected every insert; the fire-and-forget design meant
+ * the failure was only visible in server logs.  The correct value for the Trail
+ * OS web interface is "dashboard".
+ */
+export type SfInteractionSource = 'dashboard' | 'slack_dm' | 'slack_mention' | 'mobile';
+
+export const SF_INTERACTION_SOURCES: readonly SfInteractionSource[] = [
+  'dashboard', 'slack_dm', 'slack_mention', 'mobile',
+] as const;
+
 export interface LogInteractionPayload {
   contactId: string;
   userMessage: string;
   pennyResponse: string;
+  /** Plain string — not a picklist. Describe what actually happened, e.g. "ask+learner+memory". */
   promptMode: string;
-  source: string;
+  /** Must be one of SF_INTERACTION_SOURCES — Source__c is a restricted picklist. */
+  source: SfInteractionSource;
 }
 
 export interface InteractionLogRecord {
