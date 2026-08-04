@@ -155,20 +155,31 @@ async function safeRecords(
 // ── Picklist helpers ───────────────────────────────────────────────────────────
 
 /**
+ * Returned by getPicklistValues.  `error` is non-null when the describe call
+ * failed; callers should distinguish this from an empty-but-successful result.
+ */
+export interface PicklistResult {
+  values: string[];
+  /** Non-null when the describe call itself failed (network error, 429, etc.). */
+  error: string | null;
+}
+
+/**
  * Read the picklist values (in defined order) for a specific field.
  * Results are cached for PICKLIST_CACHE_TTL to avoid per-request describes.
- * Returns [] and logs nothing on failure — callers check for empty.
+ * On failure, logs a structured warning and returns { values: [], error: <message> }
+ * so callers can distinguish a failed describe from a legitimately empty picklist.
  */
 async function getPicklistValues(
   proxyFetch: SfFetch,
   cacheNs: string,
   objectApiName: string,
   fieldApiName: string
-): Promise<string[]> {
+): Promise<PicklistResult> {
   const cacheKey = `${cacheNs}:picklist:${objectApiName}:${fieldApiName}`;
   const cached   = opsCache.get(cacheKey);
   if (cached && Date.now() - cached.ts < PICKLIST_CACHE_TTL) {
-    return cached.data as string[];
+    return cached.data as PicklistResult;
   }
   try {
     const describe = await sfGet(proxyFetch, `/sobjects/${objectApiName}/describe`);
@@ -177,10 +188,16 @@ async function getPicklistValues(
     const values   = ((field?.["picklistValues"] ?? []) as Record<string, unknown>[])
       .filter(v => v["active"] !== false)
       .map(v => String(v["value"]));
-    opsCache.set(cacheKey, { data: values, ts: Date.now() });
-    return values;
-  } catch {
-    return [];
+    const result: PicklistResult = { values, error: null };
+    opsCache.set(cacheKey, { data: result, ts: Date.now() });
+    return result;
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.warn(
+      `[getPicklistValues] describe failed — object=${objectApiName} field=${fieldApiName} error=${message}`
+    );
+    // Do not cache failures so the next request retries the describe.
+    return { values: [], error: message };
   }
 }
 
@@ -848,10 +865,12 @@ router.get("/salesforce/operations/summary", async (req, res) => {
   }
 
   // Read picklist values so filtered queries use real org values
-  const [programStatusValues, casePriorityValues] = await Promise.all([
+  const [programStatusResult, casePriorityResult] = await Promise.all([
     getPicklistValues(proxyFetch, cacheNs, "pmdm__Program__c", "pmdm__Status__c"),
     getPicklistValues(proxyFetch, cacheNs, "Case", "Priority"),
   ]);
+  const programStatusValues = programStatusResult.values;
+  const casePriorityValues  = casePriorityResult.values;
 
   // Determine which expected status values are actually present
   const statusExpected = ["Active", "Planning"];
@@ -865,10 +884,13 @@ router.get("/salesforce/operations/summary", async (req, res) => {
   // Run all counts in parallel.
   // If an expected picklist value is absent, return an explicit error rather than
   // running a query that succeeds with misleading zero results.
+  // If the describe itself failed, surface the describe error on every affected count.
   const makeStatusError = (val: string) =>
-    statusMissing.includes(val)
-      ? `Picklist value '${val}' not found in this org. Available: ${programStatusValues.join(", ") || "none"}`
-      : null;
+    programStatusResult.error
+      ? `Picklist describe failed for pmdm__Program__c.pmdm__Status__c: ${programStatusResult.error}`
+      : statusMissing.includes(val)
+        ? `Picklist value '${val}' not found in this org. Available: ${programStatusValues.join(", ") || "none"}`
+        : null;
 
   const activeError   = makeStatusError("Active");
   const planningError = makeStatusError("Planning");
@@ -900,8 +922,9 @@ router.get("/salesforce/operations/summary", async (req, res) => {
       total:    progTotal,
       active:   progActive,
       planning: progPlanning,
-      statusValuesFound:   programStatusValues,
-      statusValuesMissing: statusMissing,
+      statusValuesFound:    programStatusValues,
+      statusValuesMissing:  statusMissing,
+      statusDescribeError:  programStatusResult.error,
     },
     engagements: {
       total:  engTotal,
@@ -909,10 +932,11 @@ router.get("/salesforce/operations/summary", async (req, res) => {
     },
     serviceDeliveries: { last30Days: sdLast30 },
     cases: {
-      open:          casesOpen,
-      highPriority:  casesHigh,
-      priorityValuesFound: casePriorityValues,
-      priorityValueUsed:   priorityAvailable,
+      open:                 casesOpen,
+      highPriority:         casesHigh,
+      priorityValuesFound:  casePriorityValues,
+      priorityValueUsed:    priorityAvailable,
+      priorityDescribeError: casePriorityResult.error,
     },
     contacts: { total: contacts },
     lastUpdated: new Date().toISOString(),
@@ -946,9 +970,10 @@ router.get("/salesforce/operations/cases", async (req, res) => {
   // Salesforce ORDER BY on a picklist field sorts by the picklist-definition order,
   // not alphabetically. ASC = first picklist value first. We want most-urgent first,
   // which is the first value in the admin-defined picklist.
-  const priorityValues = await getPicklistValues(proxyFetch, cacheNs, "Case", "Priority");
+  const priorityResult    = await getPicklistValues(proxyFetch, cacheNs, "Case", "Priority");
+  const priorityValues    = priorityResult.values;
   // "High" is the expected first (most urgent) value; verify it actually is first.
-  const sortDirection  = "ASC";  // ASC = picklist order = most urgent first
+  const sortDirection     = "ASC";  // ASC = picklist order = most urgent first
   const priorityValueUsed = priorityValues.includes("High") ? "High"
     : priorityValues[0] ?? "High";
 
@@ -961,9 +986,11 @@ router.get("/salesforce/operations/cases", async (req, res) => {
       `FROM Case WHERE IsClosed = false ORDER BY Priority ${sortDirection}, CreatedDate ASC LIMIT ${LIMIT}`
     ),
     safeCount(proxyFetch, "SELECT COUNT() FROM Case WHERE IsClosed = false"),
-    priorityValueUsed
-      ? safeCount(proxyFetch, `SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = '${priorityValueUsed}'`)
-      : Promise.resolve<SfCount>({ value: null, error: "No Priority picklist values found." }),
+    priorityResult.error
+      ? Promise.resolve<SfCount>({ value: null, error: `Picklist describe failed for Case.Priority: ${priorityResult.error}` })
+      : priorityValueUsed
+        ? safeCount(proxyFetch, `SELECT COUNT() FROM Case WHERE IsClosed = false AND Priority = '${priorityValueUsed}'`)
+        : Promise.resolve<SfCount>({ value: null, error: "No Priority picklist values found." }),
     getOrgBaseUrl(proxyFetch),
   ]);
 
@@ -971,22 +998,23 @@ router.get("/salesforce/operations/cases", async (req, res) => {
   const fetchError    = casesResult.error ?? totalOpen.error ?? highPriority.error ?? null;
 
   const data = {
-    cases:             casesResult.records,
-    casesError:        casesResult.error,
-    totalOpen:         totalOpen.value,
-    totalOpenError:    totalOpen.error,
-    highPriority:      highPriority.value,
-    highPriorityError: highPriority.error,
-    priorityValuesFound: priorityValues,
+    cases:                 casesResult.records,
+    casesError:            casesResult.error,
+    totalOpen:             totalOpen.value,
+    totalOpenError:        totalOpen.error,
+    highPriority:          highPriority.value,
+    highPriorityError:     highPriority.error,
+    priorityValuesFound:   priorityValues,
+    priorityDescribeError: priorityResult.error,
     priorityValueUsed,
     sortDirection,
     isTruncated,
-    limit:             LIMIT,
+    limit:                 LIMIT,
     fetchError,
     orgBaseUrl,
-    lastUpdated:       new Date().toISOString(),
-    fromCache:         false,
-    cacheAge:          0,
+    lastUpdated:           new Date().toISOString(),
+    fromCache:             false,
+    cacheAge:              0,
   };
 
   opsCache.set(CACHE_KEY, { data, ts: Date.now() });
@@ -1010,11 +1038,14 @@ router.get("/salesforce/operations/programs", async (req, res) => {
     return res.json({ ...(cached.data as object), fromCache: true, cacheAge: Math.floor((Date.now() - cached.ts) / 1000) });
   }
 
-  const statusValues = await getPicklistValues(proxyFetch, cacheNs, "pmdm__Program__c", "pmdm__Status__c");
+  const statusResult = await getPicklistValues(proxyFetch, cacheNs, "pmdm__Program__c", "pmdm__Status__c");
+  const statusValues = statusResult.values;
   const makeStatusError = (val: string) =>
-    !statusValues.includes(val) && statusValues.length > 0
-      ? `Picklist value '${val}' not in this org. Available: ${statusValues.join(", ")}`
-      : null;
+    statusResult.error
+      ? `Picklist describe failed for pmdm__Program__c.pmdm__Status__c: ${statusResult.error}`
+      : !statusValues.includes(val) && statusValues.length > 0
+        ? `Picklist value '${val}' not in this org. Available: ${statusValues.join(", ")}`
+        : null;
 
   const activeError   = makeStatusError("Active");
   const planningError = makeStatusError("Planning");
@@ -1038,17 +1069,18 @@ router.get("/salesforce/operations/programs", async (req, res) => {
   const isTruncated = (total.value ?? 0) > programs.records.length;
 
   const data = {
-    programs:      programs.records,
-    programsError: programs.error,
+    programs:           programs.records,
+    programsError:      programs.error,
     total,
     active,
     planning,
-    statusValuesFound: statusValues,
+    statusValuesFound:  statusValues,
+    statusDescribeError: statusResult.error,
     isTruncated,
-    limit:             LIMIT,
-    lastUpdated:       new Date().toISOString(),
-    fromCache:         false,
-    cacheAge:          0,
+    limit:              LIMIT,
+    lastUpdated:        new Date().toISOString(),
+    fromCache:          false,
+    cacheAge:           0,
   };
 
   opsCache.set(CACHE_KEY, { data, ts: Date.now() });
