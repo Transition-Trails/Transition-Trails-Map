@@ -1022,9 +1022,15 @@ export default function PeopleAccess() {
   const { userTier, setUserTier } = useAppContext();
 
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash === '#owners') setActiveTab('owners');
-    else if (hash === '#access') setActiveTab('access');
+    function applyHash() {
+      const hash = window.location.hash;
+      if (hash === '#owners') setActiveTab('owners');
+      else if (hash === '#access') setActiveTab('access');
+      else if (hash === '#matrix') setActiveTab('matrix');
+    }
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
   }, []);
 
   return (
