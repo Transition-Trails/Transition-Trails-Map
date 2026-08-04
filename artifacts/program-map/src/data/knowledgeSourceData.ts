@@ -88,6 +88,14 @@ export interface KnowledgeSource {
   // Live-enrichment fields injected at serve-time
   liveFileCount?: number | null;
   liveSfArticleCount?: number | null;
+  // Connection fields — set and persisted via Knowledge Sources admin UI
+  driveFolderUrl?: string;
+  driveFolderName?: string;
+  driveSyncFrequency?: 'live' | 'daily' | 'weekly' | 'manual';
+  driveLastSynced?: string;
+  sfArticleFilter?: 'published' | 'published_draft' | 'all';
+  linkUrl?: string;
+  linkCheckFrequency?: 'daily' | 'weekly' | 'monthly' | 'manual';
 }
 
 export interface PennyRetrievalEntry {

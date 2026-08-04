@@ -89,6 +89,56 @@ async function getFolderMeta(token: string, folderId: string): Promise<DriveFold
   return resp.json() as Promise<DriveFolder>;
 }
 
+// ─── GET /api/drive/folders ────────────────────────────────────────────────
+//
+// Lists Drive folders inside a parent (default: "root" = My Drive).
+// Used by the Knowledge Sources admin folder picker.
+// Query params:
+//   parent  — folder ID (default "root")
+//   q       — optional name fragment to filter by
+//
+// Response: { folders: [{ id, name, webViewLink, modifiedTime }] }
+
+router.get("/drive/folders", async (req, res): Promise<void> => {
+  try {
+    const token  = await getAccessToken();
+    const parent = typeof req.query["parent"] === "string" ? req.query["parent"] : "root";
+    const nameQ  = typeof req.query["q"] === "string" ? req.query["q"].replace(/'/g, "\\'") : "";
+
+    const parts = [
+      `'${parent}' in parents`,
+      `mimeType = 'application/vnd.google-apps.folder'`,
+      `trashed = false`,
+    ];
+    if (nameQ) parts.push(`name contains '${nameQ}'`);
+
+    const q      = encodeURIComponent(parts.join(" and "));
+    const fields = "files(id,name,webViewLink,modifiedTime)";
+    const url    = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=${fields}&pageSize=50&orderBy=modifiedTime+desc&supportsAllDrives=true&includeItemsFromAllDrives=true`;
+
+    const resp = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal:  AbortSignal.timeout(10_000),
+    });
+
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({})) as { error?: { message?: string } };
+      res.status(resp.status).json({ error: body.error?.message ?? `Drive API error: HTTP ${resp.status}`, folders: [] });
+      return;
+    }
+
+    const data = await resp.json() as { files: Array<{ id: string; name: string; webViewLink?: string; modifiedTime?: string }> };
+    res.json({ folders: data.files ?? [] });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("Missing GOOGLE")) {
+      res.status(503).json({ error: "Drive integration not configured", folders: [] });
+      return;
+    }
+    res.status(500).json({ error: msg, folders: [] });
+  }
+});
+
 // ─── GET /api/drive/status ─────────────────────────────────────────────────
 
 router.get("/drive/status", async (_req, res) => {

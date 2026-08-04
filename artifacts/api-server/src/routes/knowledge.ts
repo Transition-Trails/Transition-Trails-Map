@@ -61,6 +61,14 @@ interface KnowledgeSource {
   // Live-enrichment fields (injected at serve-time, not persisted)
   liveFileCount?: number | null;
   liveSfArticleCount?: number | null;
+  // Connection fields — set via admin UI, persisted in DB
+  driveFolderUrl?: string;
+  driveFolderName?: string;
+  driveSyncFrequency?: string;
+  driveLastSynced?: string;
+  sfArticleFilter?: string;
+  linkUrl?: string;
+  linkCheckFrequency?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -754,6 +762,60 @@ router.patch("/knowledge/sources/:id", async (req, res): Promise<void> => {
   } catch (err) {
     req.log.error(err, "Failed to update knowledge source");
     res.status(500).json({ error: "Failed to update source" });
+  }
+});
+
+// POST /api/knowledge/sources
+// Create a new knowledge source record.
+router.post("/knowledge/sources", async (req, res): Promise<void> => {
+  try {
+    const body = req.body as Partial<KnowledgeSource>;
+    if (!body.name || !body.type) {
+      res.status(400).json({ error: "name and type are required" });
+      return;
+    }
+    const id = `src-${Date.now()}`;
+    const newSource: KnowledgeSource = {
+      id,
+      name:                   body.name,
+      shortName:              body.shortName ?? body.name,
+      type:                   body.type,
+      owner:                  body.owner ?? "Admin",
+      systemOfRecord:         body.systemOfRecord ?? body.type,
+      description:            body.description ?? "",
+      purpose:                body.purpose ?? "",
+      relatedPrograms:        body.relatedPrograms ?? [],
+      relatedKnowledgeCategories: body.relatedKnowledgeCategories ?? [],
+      relatedSfObjects:       body.relatedSfObjects ?? [],
+      relatedPennyCapabilities: body.relatedPennyCapabilities ?? [],
+      relatedStandards:       body.relatedStandards ?? [],
+      relatedSources:         body.relatedSources ?? [],
+      trustLevel:             body.trustLevel ?? "Unverified",
+      reviewCycle:            body.reviewCycle ?? "Annual",
+      lastReviewDate:         body.lastReviewDate ?? "",
+      nextReviewDate:         body.nextReviewDate ?? "",
+      accessStatus:           body.accessStatus ?? "Not Connected",
+      syncStatus:             body.syncStatus ?? "Manual",
+      availability:           body.availability ?? "Partial",
+      approvedForPenny:       body.approvedForPenny ?? false,
+      pennyUseDescription:    body.pennyUseDescription ?? "",
+      healthStatus:           body.healthStatus ?? "Warning",
+      healthIssues:           body.healthIssues ?? ["Connection not configured"],
+      futureIntegrationPath:  body.futureIntegrationPath ?? "",
+      integrationPriority:    body.integrationPriority ?? "P3",
+      driveFolderUrl:         body.driveFolderUrl,
+      driveFolderName:        body.driveFolderName,
+      driveSyncFrequency:     body.driveSyncFrequency,
+      sfCategory:             body.sfCategory,
+      sfArticleFilter:        body.sfArticleFilter,
+      linkUrl:                body.linkUrl,
+      linkCheckFrequency:     body.linkCheckFrequency,
+    };
+    await db.insert(knowledgeSourcesTable).values({ id, data: newSource });
+    res.status(201).json({ source: newSource });
+  } catch (err) {
+    req.log.error(err, "Failed to create knowledge source");
+    res.status(500).json({ error: "Failed to create source" });
   }
 });
 
