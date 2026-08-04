@@ -134,11 +134,11 @@ function Select({ value, onChange, children }: { value: string; onChange: (v: st
 
 interface BreadcrumbItem { id: string; name: string; }
 
-const DRIVE_PICKER_SESSION_KEY = 'drive-picker-breadcrumbs';
+const DRIVE_PICKER_STORAGE_KEY = 'drive-picker-breadcrumbs';
 
 function loadSavedBreadcrumbs(): BreadcrumbItem[] | null {
   try {
-    const raw = sessionStorage.getItem(DRIVE_PICKER_SESSION_KEY);
+    const raw = localStorage.getItem(DRIVE_PICKER_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as unknown;
     if (
@@ -162,9 +162,9 @@ function loadSavedBreadcrumbs(): BreadcrumbItem[] | null {
 function saveBreadcrumbs(crumbs: BreadcrumbItem[]) {
   try {
     if (crumbs.length === 0) {
-      sessionStorage.removeItem(DRIVE_PICKER_SESSION_KEY);
+      localStorage.removeItem(DRIVE_PICKER_STORAGE_KEY);
     } else {
-      sessionStorage.setItem(DRIVE_PICKER_SESSION_KEY, JSON.stringify(crumbs));
+      localStorage.setItem(DRIVE_PICKER_STORAGE_KEY, JSON.stringify(crumbs));
     }
   } catch {
     // ignore storage errors (private browsing, quota)
