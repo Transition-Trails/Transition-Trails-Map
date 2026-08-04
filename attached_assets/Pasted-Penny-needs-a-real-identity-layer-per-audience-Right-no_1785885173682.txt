@@ -1,0 +1,19 @@
+Penny needs a real identity layer per audience. Right now she has one identity — an internal operations assistant — and the other audiences are a tone paragraph appended to it. That changes her vocabulary but not her behaviour, so a learner currently gets an admin's answer written more warmly. That is the opposite of what a coach should do.
+
+The distinction I want is behavioural. Ask an admin "how do I fix this flow?" and they should get the answer. Ask a learner the same question and they should get a question back — what have you tried, what did you expect to happen, what does the error tell you. Penny coaches learners toward their own answer; she does not hand it over. She serves internal staff, learners, coaches, clients and eventually the public, but only build the learner identity now — coach and client when those surfaces exist.
+
+Three things I need done properly.
+
+First, restructure the identity layer so each audience has its own full identity rather than a shared identity plus a modifier. Each one states who Penny is for that audience, how she responds, and what she does not do. The learner identity should be explicit that when a learner asks for an answer she can give, she asks a question that moves them toward it instead — and that she gives the answer directly when someone is genuinely stuck rather than merely uncomfortable, because a coach who never answers is just an obstacle. Use your judgement on where that line sits and tell me what you chose.
+
+Second, resolve the audience from the session and never from the request body. This matters more than the prompt wording. If a request can name its own audience, then a learner-facing surface can ask for the admin identity and receive direct answers, which defeats the entire feature. The session already carries what is needed — a Google session for staff, a learner session for learners, and the derived group set. If audience cannot be determined, treat the request as the most restricted audience rather than the least.
+
+Third, persist which identity was used. We currently record the model, latency and tier but not the audience, so there is no way to answer "did this learner actually get coached?" after the fact. Add it wherever the interaction telemetry is written.
+
+A design question I want your read on, not a change. Layer seven feeds recent exchanges back as memory. If a learner's history contains coaching exchanges and an admin's contains direct answers, does mixing them ever cause the wrong behaviour to leak — for instance a learner whose earlier session was answered directly? Tell me whether memory should be filtered by audience, and what it would cost.
+
+Do not change how any existing screen calls Penny. This is the identity layer and the resolution path only. The prompt templates from the Prompt Studio work are a separate layer and should keep working unchanged — a template describes a task, an identity describes who is performing it, and they compose.
+
+Acceptance: the same question from a learner session and an admin session returns recognisably different kinds of response, not just different tone; audience cannot be set by a request parameter; an unresolvable audience gets the most restricted identity; and the audience used is recorded with each interaction.
+
+Please add tests covering the resolution path — particularly that a request attempting to claim an audience it does not hold is ignored — and a test that the learner identity returns a question rather than a direct answer for a question that has a known answer. Run a typecheck and the full suite, then tell me where you set the stuck-versus-uncomfortable line and what you concluded about memory filtering.

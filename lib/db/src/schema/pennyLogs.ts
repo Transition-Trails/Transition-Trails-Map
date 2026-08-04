@@ -14,6 +14,12 @@ export const pennyLogsTable = pgTable("penny_logs", {
   sfContactId:   text("sf_contact_id"),
   learnerName:   text("learner_name"),
   trailId:       text("trail_id"),
+  /**
+   * The resolved audience for this exchange — 'learner', 'internal', etc.
+   * Derived from session state only (never from the request body).
+   * Null for rows written before this column was added.
+   */
+  audience:      text("audience"),
   createdAt:     timestamp("created_at").defaultNow().notNull(),
 });
 

@@ -79,10 +79,19 @@ describe('layer1Identity', () => {
     expect(text).toContain('RESOLVE framework');
   });
 
-  test('unimplemented audiences (learner/coach/client/public) fall back to internal', () => {
-    // When the identity placeholder is null, the text must equal the internal identity.
+  test('learner audience returns its own standalone coaching identity, not the internal identity', () => {
+    const learner = layer1Identity('learner');
     const internal = layer1Identity('internal');
-    expect(layer1Identity('learner')).toBe(internal);
+    // Learner identity is implemented and distinct from internal
+    expect(learner).toContain('coaching companion');
+    expect(learner).not.toContain('AI Chief of Staff');
+    expect(internal).not.toContain('coaching companion');
+    expect(learner).not.toBe(internal);
+  });
+
+  test('unimplemented audiences (coach/client/public) fall back to internal', () => {
+    // coach, client, public are null placeholders — they fall through to internal.
+    const internal = layer1Identity('internal');
     expect(layer1Identity('coach')).toBe(internal);
     expect(layer1Identity('client')).toBe(internal);
     expect(layer1Identity('public')).toBe(internal);
@@ -242,7 +251,8 @@ describe('assemblePrompt — integration', () => {
     });
 
     expect(layersPresent).toEqual(['identity', 'trail-context', 'learner-context', 'knowledge']);
-    expect(systemPrompt).toContain('AI Chief of Staff');   // identity (falls back to internal today)
+    // audience:'learner' → learner coaching identity (not the internal ops identity)
+    expect(systemPrompt).toContain('coaching companion');
     expect(systemPrompt).toContain('TRAIL CONTEXT');
     expect(systemPrompt).toContain('LEARNER CONTEXT');
     expect(systemPrompt).toContain('Retrieved Knowledge');

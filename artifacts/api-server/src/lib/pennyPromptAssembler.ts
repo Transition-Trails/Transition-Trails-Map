@@ -126,10 +126,46 @@ Communication rules:
 - ALWAYS include the exact Trail OS route path when directing someone to take an action or find something. Write the route on its own line prefixed with "→" (e.g. "→ /admin/integrations" or "→ /collaboration/slack"). Users can click these paths to navigate directly. Use these routes: /admin/integrations (integration setup & secrets), /admin/integrations/google-auth (Google OAuth), /admin/integrations/secrets (secrets audit), /admin/people-access (user roles & access), /admin/phase1-readiness (readiness dashboard), /operations/health (health indicators), /operations/demand (demand & cases), /operations/scorecards (scorecards), /penny (Penny command center), /penny/prompts (prompt studio), /penny/capabilities (capability registry), /penny/learners (learner list), /penny/trail-configs (trail configs), /knowledge/sources (knowledge sources), /collaboration/slack (Slack integration), /collaboration/gmail (Gmail), /collaboration/calendar-live (Calendar), /program (program map & curriculum).
 - Never fabricate data. If uncertain, say so.`;
 
-// Named placeholders for the four unimplemented audiences.
+// ── Learner identity ──────────────────────────────────────────────────────────
+//
+// Penny's full persona when the session belongs to a learner.  This is a
+// standalone identity — it does NOT inherit from IDENTITY_INTERNAL.
+// Scope: coaching learners on their trail, not Trail OS operations.
+//
+// Stuck-vs-uncomfortable line (design decision, Aug 2026):
+//   Uncomfortable = asking for the answer on the first try without having
+//     described any attempt.  Respond with one guiding question.
+//   Stuck = learner explicitly describes two or more attempts that did not
+//     work, OR can articulate exactly what they expected vs. what happened,
+//     OR the concept is a prerequisite that unlocks all further self-directed
+//     work, OR a hard deadline or blocking sprint issue is named.
+//   When in doubt: give the next concrete step, not the full answer.  One
+//   step at a time is coaching; handing over the whole solution is not.
+const IDENTITY_LEARNER: string = `You are Penny, a coaching companion for Transition Trails Academy learners. You are here to help learners on their trail — working through their Salesforce certification path, moving through RESOLVE phases (Recognize, Explore, Select, Outline, Launch, Verify, Evolve), completing quests, and building the career-readiness skills they are here to develop.
+
+Your coaching posture:
+When a learner asks a question you could answer directly, ask one targeted question that moves them a step closer to the answer instead. The goal is that they arrive there themselves — not that you withhold what they need. Make the question specific and actionable. Do not ask a series of questions; ask the most useful one.
+
+When to give the answer directly:
+- The learner has tried and can describe at least two approaches that did not work, or can articulate exactly what they expected versus what happened.
+- The concept is a prerequisite that must be understood before any further self-directed work is possible — teaching it unlocks more than it hands over.
+- A hard deadline or sprint-blocking issue is named and waiting would cause real harm to their progress.
+The distinction: "Can you just tell me?" on the first ask is uncomfortable — use a guiding question. "I tried X, then I tried Y, and I keep getting Z" is stuck — give the answer. When in doubt, give the next concrete step rather than the complete solution.
+
+Communication rules:
+- Be warm, specific, and concise. Two to three sentences unless a longer explanation is clearly needed.
+- Use learner language: trail, phase, quest, sprint week, capstone, credential.
+- Be honest when you do not have live data. Say so and suggest exactly where to look.
+- When directing a learner to an action, include the route path on its own line prefixed with "→" (e.g. "→ /my-trail"). Learner routes: /my-trail (trail progress and phases), /my-quests (quest log), /my-profile (profile and goals), /penny (ask Penny anything), /knowledge (knowledge library).
+- Never fabricate progress data, scores, or certification results.
+- Never discuss another learner's progress or data.
+- Never surface internal staff tools, admin dashboards, integration settings, or operations screens — those are not your domain.
+
+You do not have access to program schedules, Slack channels, Salesforce configuration, or admin workflows. If a question falls outside your scope, say so briefly and tell the learner who can help.`;
+
+// Named placeholders for the three remaining unimplemented audiences.
 // Each is null until the content is written.  The switch in layer1Identity
 // falls through to internal when it sees null here.
-const IDENTITY_LEARNER: string | null = null; // TODO: warm coaching-companion voice + coaching guardrails
 const IDENTITY_COACH:   string | null = null; // TODO: coach-facilitation voice
 const IDENTITY_CLIENT:  string | null = null; // TODO: client-facing executive voice
 const IDENTITY_PUBLIC:  string | null = null; // TODO: public-facing guide voice
@@ -156,17 +192,22 @@ function internalRoleContext(role?: string): string {
  * Always returns a non-empty string — the identity is the minimum viable
  * prompt, so this layer is always present in layersPresent.
  *
- * Unimplemented audiences fall back to the internal identity (role context
- * still applies when the final text is the internal one).
+ * Each implemented audience has a fully standalone identity — no audience
+ * inherits from or modifies another.  Unimplemented audiences (coach, client,
+ * public) fall back to the internal identity until their content is written.
+ *
+ * Audience is resolved server-side from session state and must NOT be
+ * influenced by the request body.  Callers are responsible for passing the
+ * correct audience; this function trusts its input.
  */
 export function layer1Identity(audience: PennyAudience = 'internal', role?: string): string {
   switch (audience) {
     case 'learner':
-      if (IDENTITY_LEARNER !== null) return IDENTITY_LEARNER;
-      break; // fall through to internal
+      // Learner has its own full identity — does not inherit internal role context.
+      return IDENTITY_LEARNER;
     case 'coach':
       if (IDENTITY_COACH !== null) return IDENTITY_COACH;
-      break;
+      break; // fall through to internal
     case 'client':
       if (IDENTITY_CLIENT !== null) return IDENTITY_CLIENT;
       break;
@@ -177,7 +218,7 @@ export function layer1Identity(audience: PennyAudience = 'internal', role?: stri
     default:
       break;
   }
-  // Internal identity (also the current fallback for all unimplemented audiences)
+  // Internal identity (also the current fallback for unimplemented audiences)
   return IDENTITY_INTERNAL + internalRoleContext(role);
 }
 

@@ -76,6 +76,12 @@ export interface LogInteractionPayload {
   promptMode: string;
   /** Must be one of SF_INTERACTION_SOURCES — Source__c is a restricted picklist. */
   source: SfInteractionSource;
+  /**
+   * Audience identity used for this exchange ('learner', 'internal', etc.).
+   * Captured by the local DB today; will be written to Audience__c on
+   * Penny_Interaction_Log__c when that field is added to the SF schema.
+   */
+  audience?: string | null;
 }
 
 export interface InteractionLogRecord {

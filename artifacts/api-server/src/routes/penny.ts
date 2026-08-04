@@ -17,6 +17,7 @@ import { resolveExchangeContact } from "../lib/pennyContactResolver.js";
 import {
   assemblePrompt,
   type AssemblerInput,
+  type PennyAudience,
   type RetrievedChunk,
   type MemoryExchange,
 } from "../lib/pennyPromptAssembler.js";
@@ -110,8 +111,22 @@ router.post("/penny/ask", async (req, res) => {
     role?: unknown;
     history?: unknown;
     retrievedChunks?: unknown;
-    contactId?: unknown;
+    contactId?: unknown; // admin "test as learner" — loads learner data but does NOT change audience
   };
+
+  // ── Resolve audience from session — never from request body ──────────────
+  // A request body cannot be trusted to self-report its audience; a learner
+  // surface could otherwise pass audience: 'internal' to receive direct answers
+  // instead of coaching.  The session is the only trustworthy signal.
+  //
+  // Priority:
+  //   1. learnerAuthenticated === true  → 'learner'   (most specific)
+  //   2. sfEmail or sfUserId present   → 'internal'  (Google SSO staff)
+  //   3. Unresolvable                  → 'learner'   (most restricted fallback)
+  const audience: PennyAudience =
+    req.session.learnerAuthenticated === true ? 'learner'
+    : (req.session.sfEmail != null || req.session.sfUserId != null) ? 'internal'
+    : 'learner'; // safest fallback when session state cannot be determined
 
   // ── Validate query ────────────────────────────────────────────────────────
   if (!query || typeof query !== "string" || !query.trim()) {
@@ -144,10 +159,9 @@ router.post("/penny/ask", async (req, res) => {
       "FROM Penny_Interaction_Log__c " +
       "ORDER BY CreatedDate DESC LIMIT 5";
   let sfContactId: string | null = null;
-  // Tracks whether sfContactId belongs to a learner (session/override) vs the
-  // staff user's own Contact (resolved by email below).  Controls audience in
-  // the prompt assembler — staff users should get the 'internal' identity even
-  // after their own Contact is resolved.
+  // isLearnerContact tracks whether sfContactId refers to a learner's Contact
+  // (for SF logging decisions) — it is SEPARATE from audience identity, which
+  // is derived from session state only and set above.
   let isLearnerContact = false;
   let learnerCtx: Awaited<ReturnType<typeof getLearnerContext>> | null = null;
   let trailCfg:   Awaited<ReturnType<typeof getTrailConfig>> | null   = null;
@@ -162,11 +176,17 @@ router.post("/penny/ask", async (req, res) => {
     sfContactId = contactIdStr ?? req.session.sfContactId ?? null;
 
     if (sfContactId) {
-      // Learner path: a Contact is already known from the session or admin
-      // override — fetch the learner's trail config and coaching context.
-      isLearnerContact = true;
-      if (contactIdStr) {
-        logger.info({ contactIdOverride: contactIdStr, sfContactId }, 'Admin testing Penny as learner override');
+      // A Contact is known — fetch learner trail config and coaching context.
+      // Note: contactIdStr may come from an admin "test as learner" override.
+      // In that case isLearnerContact is still true (so SF logging targets the
+      // Contact) but the audience identity stays 'internal' because audience is
+      // derived from session, not from which Contact is loaded.
+      isLearnerContact = audience === 'learner';
+      if (contactIdStr && audience !== 'learner') {
+        logger.info({ contactIdOverride: contactIdStr, sfContactId, audience }, 'Staff testing Penny with learner Contact — retaining internal identity');
+      }
+      if (contactIdStr && audience === 'learner') {
+        logger.info({ contactIdOverride: contactIdStr, sfContactId }, 'Learner session with explicit contactId override');
       }
       learnerCtx = await getLearnerContext(sfClient, sfContactId);
       trailCfg   = learnerCtx.pennyTrailConfigId
@@ -225,7 +245,9 @@ router.post("/penny/ask", async (req, res) => {
   // The Gemini call receives only the finished string; it has no knowledge of
   // how the prompt was built.  Layers with no data contribute nothing.
   const assemblerInput: AssemblerInput = {
-    audience:        isLearnerContact ? 'learner' : 'internal',
+    // audience is resolved from session state only — see derivation above.
+    // Never set from req.body or from isLearnerContact.
+    audience,
     role:            roleStr,
     trailConfig:     trailCfg,
     learnerContext:  learnerCtx,
@@ -346,6 +368,7 @@ router.post("/penny/ask", async (req, res) => {
       sfContactId,
       learnerName,
       trailId:       trailCfg?.trailId ?? null,
+      audience,
     }).catch((dbErr: unknown) => {
       logger.warn({ dbErr }, "Failed to write Penny interaction to DB");
     });
@@ -373,6 +396,10 @@ router.post("/penny/ask", async (req, res) => {
         pennyResponse: text,
         promptMode,
         source:        'dashboard',
+        audience,
+        // NOTE: audience is captured in the local DB today.
+        // When Audience__c is added to Penny_Interaction_Log__c in the SF
+        // schema, add it to the fields map in salesforceService.ts logInteraction().
       }).then(() => {
         recordSfWriteSuccess(isStaffWrite);
         if (isStaffWrite) {
@@ -409,6 +436,7 @@ router.post("/penny/ask", async (req, res) => {
       durationMs,
       layersPresent,
       contextMeta: {
+        audience,
         contactId:         sfContactId,
         learnerName,
         trailId:           trailCfg?.trailId ?? null,
