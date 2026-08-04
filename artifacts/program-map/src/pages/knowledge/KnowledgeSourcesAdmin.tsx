@@ -999,7 +999,7 @@ export default function KnowledgeSourcesAdmin() {
   );
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground flex flex-col relative">
+    <div className="h-screen bg-background font-sans text-foreground flex flex-col relative overflow-hidden">
       {/* Header */}
       <header className="border-b px-6 py-4 flex items-center justify-between bg-card shadow-sm z-10 relative">
         <div>
