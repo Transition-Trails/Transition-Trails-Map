@@ -752,8 +752,8 @@ router.patch("/knowledge/sources/:id", async (req, res): Promise<void> => {
       res.status(404).json({ error: "Source not found" });
       return;
     }
-    const current = rows[0].data as KnowledgeSource;
-    const updated: KnowledgeSource = { ...current, ...(req.body as Partial<KnowledgeSource>), id };
+    const current = rows[0]!.data as KnowledgeSource;
+    const updated = { ...current, ...(req.body as Partial<KnowledgeSource>) };
     await db
       .update(knowledgeSourcesTable)
       .set({ data: updated, updatedAt: new Date() })
@@ -835,6 +835,7 @@ interface SfArticle {
   lastModifiedDate: string;
   isVisibleInApp: boolean;
   language: string;
+  dataCategories: string[];
 }
 
 interface SfArticleDetail extends SfArticle {
@@ -1148,11 +1149,13 @@ async function getKavBodyInfo(
 router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
   try {
     const client = new ConnectorSalesforceClient();
-    const fields  = await getKavFieldSet(client, { warn: (m) => req.log.warn(m) });
+    const fields = await getKavFieldSet(client, { warn: (m) => req.log.warn(m) });
 
-    const statusParam = typeof req.query["status"] === "string" ? req.query["status"] : "online";
-    const typeParam   = typeof req.query["type"]   === "string" ? req.query["type"]   : "";
-    const qParam      = typeof req.query["q"]      === "string" ? req.query["q"]      : "";
+    const statusParam   = typeof req.query["status"]   === "string" ? req.query["status"]   : "online";
+    const typeParam     = typeof req.query["type"]     === "string" ? req.query["type"]     : "";
+    const qParam        = typeof req.query["q"]        === "string" ? req.query["q"]        : "";
+
+    const categoryParam = typeof req.query["category"] === "string" ? req.query["category"] : "";
     const catParam    = typeof req.query["cat"]    === "string" ? req.query["cat"]    : "";
 
     const whereClauses: string[] = [];
@@ -1181,7 +1184,8 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       }
     }
 
-    const soql = `SELECT ${fields.selectList}
+    const soql = `SELECT ${fields.selectList},
+                         (SELECT DataCategoryGroupName, DataCategoryName FROM DataCategorySelections)
                   FROM KnowledgeArticleVersion
                   ${where}
                   ${withDataCategory}
@@ -1193,28 +1197,50 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       ArticleType?: string; PublishStatus: string; VersionNumber?: number;
       CreatedDate: string; LastModifiedDate: string;
       IsVisibleInApp?: boolean; Language?: string;
+      DataCategorySelections?: { records: Array<{ DataCategoryGroupName: string; DataCategoryName: string }> };
     }>(soql);
 
-    // Derive available article types from result for filter UI (only if field present)
-    const typeSet = fields.has("ArticleType")
+    // Derive available article types (guarded by fields.has) and data categories
+    const typeSet     = fields.has("ArticleType")
       ? new Set(result.records.map(r => r.ArticleType).filter(Boolean))
       : new Set<string>();
 
-    const articles: SfArticle[] = result.records.map(r => ({
-      id:                 r.Id,
-      knowledgeArticleId: r.KnowledgeArticleId,
-      title:              r.Title,
-      summary:            r.Summary ?? null,
-      articleType:        r.ArticleType ?? null,
-      publishStatus:      r.PublishStatus,
-      versionNumber:      r.VersionNumber ?? null,
-      createdDate:        r.CreatedDate,
-      lastModifiedDate:   r.LastModifiedDate,
-      isVisibleInApp:     r.IsVisibleInApp ?? false,
-      language:           r.Language ?? "en_US",
-    }));
+    const categorySet = new Set<string>();
+    let articles: SfArticle[] = result.records.map(r => {
+      const cats = (r.DataCategorySelections?.records ?? []).map(c => c.DataCategoryName).filter(Boolean);
+      cats.forEach(c => categorySet.add(c));
+      return {
+        id:                 r.Id,
+        knowledgeArticleId: r.KnowledgeArticleId,
+        title:              r.Title,
+        summary:            r.Summary ?? null,
+        articleType:        r.ArticleType ?? null,
+        publishStatus:      r.PublishStatus,
+        versionNumber:      r.VersionNumber ?? null,
+        createdDate:        r.CreatedDate,
+        lastModifiedDate:   r.LastModifiedDate,
+        isVisibleInApp:     r.IsVisibleInApp ?? false,
+        language:           r.Language ?? "en_US",
+        dataCategories:     cats,
+      };
+    });
 
-    res.json({ articles, total: result.totalSize, articleTypes: Array.from(typeSet) });
+    // Post-filter by data category name when requested (case-insensitive).
+    // catParam uses WITH DATA CATEGORY for server-side filtering; categoryParam
+    // is a fallback that post-filters by DataCategoryName from the subquery.
+    if (categoryParam && !catParam) {
+      const needle = categoryParam.toLowerCase();
+      articles = articles.filter(a =>
+        a.dataCategories.some(c => c.toLowerCase() === needle)
+      );
+    }
+
+    res.json({
+      articles,
+      total:          (categoryParam && !catParam) ? articles.length : result.totalSize,
+      articleTypes:   Array.from(typeSet),
+      dataCategories: Array.from(categorySet).sort(),
+    });
   } catch (err) {
     req.log.error(err, "Failed to fetch SF Knowledge articles");
     const msg = err instanceof Error ? err.message : "Unknown error";
@@ -1293,6 +1319,7 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
       lastModifiedDate:   meta.LastModifiedDate,
       isVisibleInApp:     meta.IsVisibleInApp ?? false,
       language:           meta.Language ?? "en_US",
+      dataCategories:     [],
       urlName:            meta.UrlName ?? null,
       body: processedBody,
     };
@@ -1358,7 +1385,7 @@ async function seedDocumentsIfEmpty(): Promise<void> {
 router.get("/knowledge/documents", async (req, res): Promise<void> => {
   try {
     await seedDocumentsIfEmpty();
-    const rows = await db.select().from(knowledgeDocumentsTable).orderBy(knowledgeDocumentsTable.createdAt);
+    const rows = await db.select().from(knowledgeDocumentsTable);
     res.json({ documents: rows.map(r => r.data as SourceDocument) });
   } catch (err) {
     req.log.error(err, "Failed to list knowledge documents");

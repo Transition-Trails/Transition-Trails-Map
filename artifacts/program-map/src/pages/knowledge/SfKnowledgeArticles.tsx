@@ -22,6 +22,7 @@ interface SfArticle {
   lastModifiedDate: string;
   isVisibleInApp: boolean;
   language: string;
+  dataCategories: string[];
 }
 
 interface SfArticleDetail extends SfArticle {
@@ -33,29 +34,12 @@ interface ArticlesResponse {
   articles: SfArticle[];
   total: number;
   articleTypes: string[];
+  dataCategories: string[];
 }
 
 interface DetailResponse {
   article: SfArticleDetail;
 }
-
-interface CategoryOption {
-  value: string;    // 'GroupName:CategoryName'
-  label: string;
-  depth: number;
-  groupLabel: string;
-}
-
-interface CategoriesResponse {
-  groups: {
-    name: string;
-    label: string;
-    categories: { name: string; label: string; depth: number }[];
-  }[];
-}
-
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
@@ -244,12 +228,12 @@ function EmptyDetail() {
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function SfKnowledgeArticles() {
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch]           = useState('');
+  const [searchInput, setSearchInput]   = useState('');
+  const [search, setSearch]             = useState('');
   const [statusFilter, setStatusFilter] = useState<'online' | 'draft' | 'all'>('online');
-  const [typeFilter, setTypeFilter]   = useState('');
+  const [typeFilter, setTypeFilter]     = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [selectedId, setSelectedId]   = useState<string | null>(null);
+  const [selectedId, setSelectedId]     = useState<string | null>(null);
 
   // Debounce search
   useEffect(() => {
@@ -257,36 +241,14 @@ export default function SfKnowledgeArticles() {
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  // Fetch data category groups (cached 10 min — categories rarely change)
-  const { data: catData } = useQuery<CategoriesResponse>({
-    queryKey: ['sf-article-categories'],
-    queryFn: async () => {
-      const r = await fetch('/api/knowledge/sf-article-categories');
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json() as Promise<CategoriesResponse>;
-    },
-    staleTime: 10 * 60 * 1000,
-    retry: false,
-  });
-
-  // Flatten category groups into a single list for the <select>
-  const categoryOptions: CategoryOption[] = (catData?.groups ?? []).flatMap(group =>
-    group.categories.map(cat => ({
-      value:      `${group.name}:${cat.name}`,
-      label:      cat.label,
-      depth:      cat.depth,
-      groupLabel: group.label,
-    }))
-  );
-
   const { data, isLoading, isError, refetch, isFetching } = useQuery<ArticlesResponse>({
     queryKey: ['sf-articles', statusFilter, typeFilter, categoryFilter, search],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (statusFilter !== 'online') params.set('status', statusFilter);
-      if (typeFilter)      params.set('type', typeFilter);
-      if (categoryFilter)  params.set('cat', categoryFilter);
-      if (search)          params.set('q', search);
+      if (typeFilter)     params.set('type', typeFilter);
+      if (categoryFilter) params.set('category', categoryFilter);
+      if (search)         params.set('q', search);
       const r = await fetch(`/api/knowledge/sf-articles${params.size ? `?${params}` : ''}`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json() as Promise<ArticlesResponse>;
@@ -295,11 +257,10 @@ export default function SfKnowledgeArticles() {
     retry: 1,
   });
 
-  const articles   = data?.articles ?? [];
-  const types      = data?.articleTypes ?? [];
-  const totalCount = data?.total ?? 0;
-
-  const hasActiveFilters = !!(search || typeFilter || categoryFilter || statusFilter !== 'online');
+  const articles        = data?.articles ?? [];
+  const types           = data?.articleTypes ?? [];
+  const dataCategories  = data?.dataCategories ?? [];
+  const totalCount      = data?.total ?? 0;
 
   // Auto-select first article on initial load
   useEffect(() => {
@@ -372,19 +333,16 @@ export default function SfKnowledgeArticles() {
               </select>
             </div>
 
-            {/* Data category filter — only shown when category groups exist in this org */}
-            {categoryOptions.length > 0 && (
+            {/* Data category filter — only shown when the org returns categories */}
+            {dataCategories.length > 0 && (
               <select
                 value={categoryFilter}
                 onChange={e => { setCategoryFilter(e.target.value); setSelectedId(null); }}
                 className="w-full h-8 rounded-md border border-input bg-background px-2.5 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="">All categories</option>
-                {categoryOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>
-                    {'\u00A0'.repeat(opt.depth * 2)}{opt.depth > 0 ? '↳ ' : ''}{opt.label}
-                    {opt.depth === 0 ? ` (${opt.groupLabel})` : ''}
-                  </option>
+                {dataCategories.map(c => (
+                  <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>
                 ))}
               </select>
             )}
@@ -407,7 +365,7 @@ export default function SfKnowledgeArticles() {
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <BookOpen className="w-8 h-8 text-muted-foreground/30 mb-2" />
                 <p className="text-sm text-muted-foreground">No articles found</p>
-                {hasActiveFilters && (
+                {(search || typeFilter || categoryFilter || statusFilter !== 'online') && (
                   <button
                     onClick={() => { setSearchInput(''); setTypeFilter(''); setCategoryFilter(''); setStatusFilter('online'); }}
                     className="mt-2 text-[12px] font-medium text-primary underline"
