@@ -7,6 +7,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Docs — 2026-08-04 (ada7cba)
+
+- Auto-logged: `ROADMAP.md` updated in commit `ada7cba`
+
 Changes on `dev` branch not yet merged to `main`.
 
 ---
