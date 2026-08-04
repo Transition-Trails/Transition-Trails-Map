@@ -685,7 +685,7 @@ function EditDrawer({
         {/* Sections */}
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {/* Auto-disconnect notice banner */}
-          {wasAutoDisconnected && folderInaccessible && (
+          {(wasAutoDisconnected || (folderInaccessible && source.syncStatus === 'Disconnected')) && (
             <div className="rounded-lg border border-[#B6D8E4] bg-[#EDF5F8] px-4 py-3">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-[#2F6F7E] shrink-0 mt-0.5" />
