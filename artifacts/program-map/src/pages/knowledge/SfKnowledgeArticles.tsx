@@ -24,9 +24,15 @@ interface SfArticle {
   language: string;
 }
 
+interface ArticleSection {
+  label: string;
+  html: string;
+}
+
 interface SfArticleDetail extends SfArticle {
   body: string | null;
   urlName: string | null;
+  sections?: ArticleSection[];
 }
 
 interface ArticlesResponse {
@@ -175,9 +181,35 @@ function DetailPanel({ articleId }: { articleId: string }) {
         </div>
       </div>
 
-      {/* Body content */}
-      <div className="px-6 py-5">
-        {a.body ? (
+      {/* Body content — render all sections when available, fall back to legacy body */}
+      <div className="px-6 py-5 space-y-6">
+        {(a.sections && a.sections.length > 0) ? (
+          a.sections.map((section, i) => (
+            <div key={i}>
+              {/* Only show section label when there are multiple sections */}
+              {a.sections!.length > 1 && (
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 pb-1.5 border-b">
+                  {section.label}
+                </h2>
+              )}
+              <div
+                className="prose prose-sm max-w-none text-foreground
+                  prose-headings:font-semibold prose-headings:text-foreground
+                  prose-p:text-[13px] prose-p:leading-relaxed prose-p:text-muted-foreground
+                  prose-li:text-[13px] prose-li:text-muted-foreground
+                  prose-a:text-primary prose-a:underline
+                  prose-strong:text-foreground prose-strong:font-semibold
+                  prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-img:my-3 prose-img:border prose-img:border-border/40
+                  prose-table:w-full prose-table:text-[13px]
+                  prose-th:bg-muted/40 prose-th:font-semibold prose-th:text-foreground prose-th:text-[12px] prose-th:uppercase prose-th:tracking-wide
+                  prose-td:text-muted-foreground prose-td:text-[13px]
+                  prose-code:text-[12px] prose-code:bg-muted/60 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+                  prose-pre:bg-muted/60 prose-pre:text-[12px]"
+                dangerouslySetInnerHTML={{ __html: section.html }}
+              />
+            </div>
+          ))
+        ) : a.body ? (
           <div
             className="prose prose-sm max-w-none text-foreground
               prose-headings:font-semibold prose-headings:text-foreground

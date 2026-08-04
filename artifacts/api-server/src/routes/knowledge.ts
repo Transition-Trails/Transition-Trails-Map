@@ -838,9 +838,15 @@ interface SfArticle {
   dataCategories: string[];
 }
 
+interface ArticleSection {
+  label: string;
+  html: string;
+}
+
 interface SfArticleDetail extends SfArticle {
   body: string | null;
   urlName: string | null;
+  sections: ArticleSection[];
 }
 
 // ── Data-category helpers ──────────────────────────────────────────────────────
@@ -1139,6 +1145,90 @@ async function getKavBodyInfo(
   }
 }
 
+// ── KAV all-body-fields discovery ─────────────────────────────────────────────
+// Companion to getKavBodyInfo: discovers ALL rich-text / textarea fields on the
+// __kav object so the detail route can return every populated content section.
+
+interface KavBodyField {
+  name: string;
+  label: string;
+}
+
+interface KavAllBodyInfo {
+  objectName: string;
+  fields: KavBodyField[];
+}
+
+let kavAllBodyInfoCache: KavAllBodyInfo | null | undefined = undefined;
+let kavAllBodyInfoInflight: Promise<KavAllBodyInfo | null> | null = null;
+
+async function getKavAllBodyFields(
+  client: ConnectorSalesforceClient,
+  log: { warn: (msg: string) => void; info: (msg: string) => void }
+): Promise<KavAllBodyInfo | null> {
+  if (kavAllBodyInfoCache !== undefined) return kavAllBodyInfoCache;
+  if (kavAllBodyInfoInflight) return kavAllBodyInfoInflight;
+
+  kavAllBodyInfoInflight = (async (): Promise<KavAllBodyInfo | null> => {
+    try {
+      const entityResult = await client.query<{ QualifiedApiName: string }>(
+        `SELECT QualifiedApiName FROM EntityDefinition
+         WHERE QualifiedApiName LIKE '%__kav'
+         LIMIT 10`
+      );
+      const kavObjects = entityResult.records.map(r => r.QualifiedApiName);
+      log.info(`KAV all-fields discovery: found __kav objects: ${kavObjects.join(", ") || "(none)"}`);
+
+      if (!kavObjects.length) { kavAllBodyInfoCache = null; return null; }
+
+      const EXCLUDE = new Set([
+        "Summary__c", "Summary", "Title", "UrlName", "PublishStatus", "Name",
+        "AssignmentNote", "ArticleTotalViewCount", "ArticleCreatedById",
+      ]);
+      const isBodyType = (t: string) =>
+        t.toLowerCase() === "richtextarea" || t.toLowerCase() === "textarea";
+
+      for (const objName of kavObjects) {
+        try {
+          const desc = await client.rest<{ fields: { name: string; type: string; label: string }[] }>(
+            `/services/data/v62.0/sobjects/${objName}/describe`
+          );
+          const allTextFields = desc.fields.filter(
+            f => isBodyType(f.type) && !EXCLUDE.has(f.name)
+          );
+          // Prefer custom fields (ending __c) over standard fields
+          const richFields: KavBodyField[] = [
+            ...allTextFields.filter(f => f.name.endsWith("__c")).map(f => ({ name: f.name, label: f.label })),
+            ...allTextFields.filter(f => !f.name.endsWith("__c")).map(f => ({ name: f.name, label: f.label })),
+          ];
+          log.info(`KAV all-fields discovery: ${objName} → ${richFields.map(f => f.name).join(", ") || "(none)"}`);
+
+          if (richFields.length > 0) {
+            const info: KavAllBodyInfo = { objectName: objName, fields: richFields };
+            kavAllBodyInfoCache = info;
+            return info;
+          }
+        } catch (descErr) {
+          log.warn(`KAV all-fields discovery: could not describe ${objName}: ${String(descErr)}`);
+        }
+      }
+
+      kavAllBodyInfoCache = null;
+      return null;
+    } catch (err) {
+      log.warn(`KAV all-fields discovery failed: ${String(err)}`);
+      kavAllBodyInfoCache = null;
+      return null;
+    }
+  })();
+
+  try {
+    return await kavAllBodyInfoInflight;
+  } finally {
+    kavAllBodyInfoInflight = null;
+  }
+}
+
 // GET /api/knowledge/sf-articles
 // Lists Salesforce Knowledge articles. Optional query params:
 //   status  — 'online' (default) | 'draft' | 'all'
@@ -1214,6 +1304,7 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       lastModifiedDate:   r.LastModifiedDate,
       isVisibleInApp:     r.IsVisibleInApp ?? false,
       language:           r.Language ?? "en_US",
+      dataCategories:     [],
     }));
 
     res.json({
@@ -1256,34 +1347,41 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
     }
     const meta = metaResult.records[0]!;
 
-    // Fetch body from the article-type __kav object using discovered object/field names.
+    // Fetch ALL content fields from the article-type __kav object.
+    const sections: ArticleSection[] = [];
     let body: string | null = null;
-    const bodyInfo = await getKavBodyInfo(client, {
+    const allBodyInfo = await getKavAllBodyFields(client, {
       warn: (m) => req.log.warn(m),
       info: (m) => req.log.info(m),
     });
-    if (bodyInfo) {
+    if (allBodyInfo && allBodyInfo.fields.length > 0) {
       try {
-        const bodySoql = `SELECT Id, ${bodyInfo.fieldName}
-                          FROM ${bodyInfo.objectName}
+        const fieldList = allBodyInfo.fields.map(f => f.name).join(", ");
+        const bodySoql = `SELECT Id, ${fieldList}
+                          FROM ${allBodyInfo.objectName}
                           WHERE KnowledgeArticleId = '${meta.KnowledgeArticleId}'
                           AND PublishStatus = '${meta.PublishStatus}'
                           LIMIT 1`;
         const bodyResult = await client.query<{ Id: string; [k: string]: string | undefined }>(bodySoql);
-        body = bodyResult.records[0]?.[bodyInfo.fieldName] ?? null;
-      } catch (bodyErr) {
-        req.log.warn(`Body fetch failed for ${bodyInfo.objectName}.${bodyInfo.fieldName}: ${String(bodyErr)}`);
-      }
-    }
+        const row = bodyResult.records[0];
+        if (row) {
+          // Fetch org base URL once for image rewriting across all sections.
+          let orgBaseUrl: string | null = null;
+          try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* ok — images will load without rewrite */ }
 
-    // Rewrite SF image URLs so the browser can load them through our auth proxy.
-    let processedBody = body;
-    if (body && body.includes("<img")) {
-      try {
-        const orgBaseUrl = await client.getOrgBaseUrl();
-        processedBody = rewriteSfImageUrls(body, orgBaseUrl);
-      } catch (urlErr) {
-        req.log.warn(`Could not fetch org base URL for image rewriting: ${String(urlErr)}`);
+          for (const field of allBodyInfo.fields) {
+            const raw = row[field.name] ?? null;
+            if (!raw) continue;
+            const html = (orgBaseUrl && raw.includes("<img"))
+              ? rewriteSfImageUrls(raw, orgBaseUrl)
+              : raw;
+            sections.push({ label: field.label, html });
+          }
+          // Keep legacy `body` field as the first section for backward compat.
+          body = sections[0]?.html ?? null;
+        }
+      } catch (bodyErr) {
+        req.log.warn(`Body fetch failed for ${allBodyInfo.objectName}: ${String(bodyErr)}`);
       }
     }
 
@@ -1301,7 +1399,8 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
       language:           meta.Language ?? "en_US",
       dataCategories:     [],
       urlName:            meta.UrlName ?? null,
-      body: processedBody,
+      body,
+      sections,
     };
 
     res.json({ article });
