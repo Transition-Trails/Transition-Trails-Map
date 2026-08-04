@@ -828,7 +828,7 @@ interface SfArticle {
   knowledgeArticleId: string;
   title: string;
   summary: string | null;
-  articleType: string;
+  articleType: string | null;
   publishStatus: string;
   versionNumber: number | null;
   createdDate: string;
@@ -896,16 +896,74 @@ router.get("/knowledge/sf-article-categories", async (req, res): Promise<void> =
   }
 });
 
+// ── KnowledgeArticleVersion field discovery ────────────────────────────────────
+// Orgs vary in which optional fields exist on KAV. We describe the object once
+// per server lifetime and cache the result so every article query uses only the
+// fields that are actually present. This prevents INVALID_FIELD 400 errors from
+// fields like ArticleType or IsVisibleInApp that may not exist in all orgs.
+
+const ALWAYS_REQUIRED_KAV_FIELDS = [
+  "Id", "KnowledgeArticleId", "Title", "PublishStatus", "CreatedDate", "LastModifiedDate",
+] as const;
+
+const OPTIONAL_KAV_FIELDS = [
+  "Summary", "ArticleType", "VersionNumber", "IsVisibleInApp", "Language", "UrlName",
+] as const;
+
+type OptionalKavField = typeof OPTIONAL_KAV_FIELDS[number];
+
+interface KavFieldSet {
+  selectList: string;          // comma-joined SELECT fields
+  has: (f: OptionalKavField) => boolean;
+}
+
+let kavFieldSetCache: KavFieldSet | null = null;
+let kavFieldSetInflight: Promise<KavFieldSet> | null = null;
+
+async function getKavFieldSet(client: ConnectorSalesforceClient, log: { warn: (msg: string) => void }): Promise<KavFieldSet> {
+  if (kavFieldSetCache) return kavFieldSetCache;
+  if (kavFieldSetInflight) return kavFieldSetInflight;
+
+  kavFieldSetInflight = (async (): Promise<KavFieldSet> => {
+    let presentOptional = new Set<string>(OPTIONAL_KAV_FIELDS);
+    try {
+      const desc = await client.rest<{ fields: { name: string }[] }>(
+        `/services/data/v62.0/sobjects/KnowledgeArticleVersion/describe`
+      );
+      const orgFields = new Set(desc.fields.map(f => f.name));
+      presentOptional = new Set(OPTIONAL_KAV_FIELDS.filter(f => orgFields.has(f)));
+    } catch {
+      log.warn("Could not describe KnowledgeArticleVersion — using minimal field set");
+      presentOptional = new Set<string>();
+    }
+
+    const allFields = [...ALWAYS_REQUIRED_KAV_FIELDS, ...OPTIONAL_KAV_FIELDS.filter(f => presentOptional.has(f))];
+    const result: KavFieldSet = {
+      selectList: allFields.join(", "),
+      has: (f) => presentOptional.has(f),
+    };
+    kavFieldSetCache = result;
+    return result;
+  })();
+
+  try {
+    return await kavFieldSetInflight;
+  } finally {
+    kavFieldSetInflight = null;
+  }
+}
+
 // GET /api/knowledge/sf-articles
 // Lists Salesforce Knowledge articles. Optional query params:
 //   status  — 'online' (default) | 'draft' | 'all'
-//   type    — article type filter (e.g. 'FAQ')
+//   type    — article type filter (ArticleType field; skipped if field absent in org)
 //   q       — title/summary search substring
 //   cat     — data category filter as 'GroupApiName:CategoryApiName'
 //             e.g. 'Topics:Products' → WITH DATA CATEGORY Topics BELOW Products
 router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
   try {
     const client = new ConnectorSalesforceClient();
+    const fields  = await getKavFieldSet(client, { warn: (m) => req.log.warn(m) });
 
     const statusParam = typeof req.query["status"] === "string" ? req.query["status"] : "online";
     const typeParam   = typeof req.query["type"]   === "string" ? req.query["type"]   : "";
@@ -918,27 +976,27 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
     } else {
       whereClauses.push(`PublishStatus = '${statusParam === "draft" ? "draft" : "online"}'`);
     }
-    if (typeParam) whereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
-    if (qParam)    whereClauses.push(`Title LIKE '%${qParam.replace(/'/g, "\\'")}%'`);
+    // ArticleType filter only if the field exists in this org
+    if (typeParam && fields.has("ArticleType")) {
+      whereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
+    }
+    if (qParam) whereClauses.push(`Title LIKE '%${qParam.replace(/'/g, "\\'")}%'`);
 
     const where = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
     // WITH DATA CATEGORY clause must come between WHERE and ORDER BY.
-    // Format: WITH DATA CATEGORY GroupName BELOW CategoryName
     // BELOW matches the selected category and all of its descendants.
     let withDataCategory = "";
     if (catParam && catParam.includes(":")) {
-      const colonIdx   = catParam.indexOf(":");
-      const groupName  = catParam.slice(0, colonIdx).replace(/[^a-zA-Z0-9_]/g, "");
-      const catName    = catParam.slice(colonIdx + 1).replace(/[^a-zA-Z0-9_]/g, "");
+      const colonIdx  = catParam.indexOf(":");
+      const groupName = catParam.slice(0, colonIdx).replace(/[^a-zA-Z0-9_]/g, "");
+      const catName   = catParam.slice(colonIdx + 1).replace(/[^a-zA-Z0-9_]/g, "");
       if (groupName && catName) {
         withDataCategory = `WITH DATA CATEGORY ${groupName} BELOW ${catName}`;
       }
     }
 
-    const soql = `SELECT Id, KnowledgeArticleId, Title, Summary, ArticleType,
-                         PublishStatus, VersionNumber, CreatedDate, LastModifiedDate,
-                         IsVisibleInApp, Language
+    const soql = `SELECT ${fields.selectList}
                   FROM KnowledgeArticleVersion
                   ${where}
                   ${withDataCategory}
@@ -947,26 +1005,28 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
 
     const result = await client.query<{
       Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
-      ArticleType: string; PublishStatus: string; VersionNumber?: number;
+      ArticleType?: string; PublishStatus: string; VersionNumber?: number;
       CreatedDate: string; LastModifiedDate: string;
       IsVisibleInApp?: boolean; Language?: string;
     }>(soql);
 
-    // Derive available article types from result for filter UI
-    const typeSet = new Set(result.records.map(r => r.ArticleType).filter(Boolean));
+    // Derive available article types from result for filter UI (only if field present)
+    const typeSet = fields.has("ArticleType")
+      ? new Set(result.records.map(r => r.ArticleType).filter(Boolean))
+      : new Set<string>();
 
     const articles: SfArticle[] = result.records.map(r => ({
-      id:                r.Id,
+      id:                 r.Id,
       knowledgeArticleId: r.KnowledgeArticleId,
-      title:             r.Title,
-      summary:           r.Summary ?? null,
-      articleType:       r.ArticleType,
-      publishStatus:     r.PublishStatus,
-      versionNumber:     r.VersionNumber ?? null,
-      createdDate:       r.CreatedDate,
-      lastModifiedDate:  r.LastModifiedDate,
-      isVisibleInApp:    r.IsVisibleInApp ?? false,
-      language:          r.Language ?? "en_US",
+      title:              r.Title,
+      summary:            r.Summary ?? null,
+      articleType:        r.ArticleType ?? null,
+      publishStatus:      r.PublishStatus,
+      versionNumber:      r.VersionNumber ?? null,
+      createdDate:        r.CreatedDate,
+      lastModifiedDate:   r.LastModifiedDate,
+      isVisibleInApp:     r.IsVisibleInApp ?? false,
+      language:           r.Language ?? "en_US",
     }));
 
     res.json({ articles, total: result.totalSize, articleTypes: Array.from(typeSet) });
@@ -985,16 +1045,16 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
   try {
     const client = new ConnectorSalesforceClient();
 
-    // Fetch the version record for metadata
-    const metaSoql = `SELECT Id, KnowledgeArticleId, Title, Summary, ArticleType,
-                             PublishStatus, VersionNumber, CreatedDate, LastModifiedDate,
-                             IsVisibleInApp, Language, UrlName
+    // Reuse the cached field set so we never SELECT fields absent in this org.
+    const fields = await getKavFieldSet(client, { warn: (m) => req.log.warn(m) });
+
+    const metaSoql = `SELECT ${fields.selectList}
                       FROM KnowledgeArticleVersion
                       WHERE Id = '${id}'
                       LIMIT 1`;
     const metaResult = await client.query<{
       Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
-      ArticleType: string; PublishStatus: string; VersionNumber?: number;
+      ArticleType?: string; PublishStatus: string; VersionNumber?: number;
       CreatedDate: string; LastModifiedDate: string;
       IsVisibleInApp?: boolean; Language?: string; UrlName?: string;
     }>(metaSoql);
@@ -1010,7 +1070,7 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
     let body: string | null = null;
     try {
       const articleType = meta.ArticleType ?? "Knowledge__kav";
-      const kavObject = articleType.replace(/__c$/, "__kav");
+      const kavObject = articleType.endsWith("__kav") ? articleType : articleType.replace(/__c$/, "__kav");
       const bodySoql = `SELECT Id, Body__c
                         FROM ${kavObject}
                         WHERE KnowledgeArticleId = '${meta.KnowledgeArticleId}'
@@ -1023,18 +1083,18 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
     }
 
     const article: SfArticleDetail = {
-      id:                meta.Id,
+      id:                 meta.Id,
       knowledgeArticleId: meta.KnowledgeArticleId,
-      title:             meta.Title,
-      summary:           meta.Summary ?? null,
-      articleType:       meta.ArticleType,
-      publishStatus:     meta.PublishStatus,
-      versionNumber:     meta.VersionNumber ?? null,
-      createdDate:       meta.CreatedDate,
-      lastModifiedDate:  meta.LastModifiedDate,
-      isVisibleInApp:    meta.IsVisibleInApp ?? false,
-      language:          meta.Language ?? "en_US",
-      urlName:           meta.UrlName ?? null,
+      title:              meta.Title,
+      summary:            meta.Summary ?? null,
+      articleType:        meta.ArticleType ?? null,
+      publishStatus:      meta.PublishStatus,
+      versionNumber:      meta.VersionNumber ?? null,
+      createdDate:        meta.CreatedDate,
+      lastModifiedDate:   meta.LastModifiedDate,
+      isVisibleInApp:     meta.IsVisibleInApp ?? false,
+      language:           meta.Language ?? "en_US",
+      urlName:            meta.UrlName ?? null,
       body,
     };
 

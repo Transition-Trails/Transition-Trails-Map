@@ -15,7 +15,7 @@ interface SfArticle {
   knowledgeArticleId: string;
   title: string;
   summary: string | null;
-  articleType: string;
+  articleType: string | null;
   publishStatus: string;
   versionNumber: number | null;
   createdDate: string;
