@@ -646,4 +646,120 @@ router.post('/slack/events', async (req, res) => {
     .catch((err: unknown) => req.log.error({ err }, 'Slack adapter: Penny dispatch failed'));
 });
 
+// ─── POST /slack/notify-reviewer ─────────────────────────────────────────────
+// Body: { submitterEmail: string; action: "Approved" | "Revision requested"; templateName: string }
+// Resolves the submitter's email to a Slack user ID, opens a DM, and sends a
+// notification. Falls back to a channel mention in the Penny channel if the DM
+// lookup fails. Fails silently (returns ok: true) in all error cases so the
+// approver's workflow is never blocked.
+
+router.post('/slack/notify-reviewer', async (req, res) => {
+  const botToken = process.env['SLACK_BOT_TOKEN'] ?? process.env['SLACK_BOT_USER_OAUTH_TOKEN'];
+
+  // Always return 200 so the client never shows an error to the approver
+  if (!botToken) {
+    req.log.warn('notify-reviewer: SLACK_BOT_TOKEN not set — skipping DM');
+    res.json({ ok: true, skipped: true, reason: 'no_token' });
+    return;
+  }
+
+  const { submitterEmail, action, templateName } = req.body as {
+    submitterEmail?: string;
+    action?: string;
+    templateName?: string;
+  };
+
+  if (!submitterEmail || !action) {
+    res.json({ ok: true, skipped: true, reason: 'missing_params' });
+    return;
+  }
+
+  const name = templateName ?? 'a prompt template';
+  const emoji = action === 'Approved' ? '✅' : '🔄';
+  const messageText = `${emoji} *${action}* — your prompt template *${name}* has been reviewed. Check the Prompt Studio in Trail OS for details.`;
+
+  // ── Step 1: look up submitter's Slack user by email ──────────────────────
+
+  let userId: string | null = null;
+
+  try {
+    const lookupUrl = new URL('https://slack.com/api/users.lookupByEmail');
+    lookupUrl.searchParams.set('email', submitterEmail);
+    const lookupRes = await fetch(lookupUrl.toString(), {
+      headers: { Authorization: `Bearer ${botToken}` },
+    });
+    const lookupData = await lookupRes.json() as { ok: boolean; user?: { id: string } };
+    if (lookupData.ok && lookupData.user?.id) {
+      userId = lookupData.user.id;
+    }
+  } catch {
+    req.log.warn({ submitterEmail }, 'notify-reviewer: users.lookupByEmail network error');
+  }
+
+  // ── Step 2a: DM the user if we found them ─────────────────────────────────
+
+  if (userId) {
+    try {
+      // Open a DM channel with the user
+      const openRes = await fetch('https://slack.com/api/conversations.open', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${botToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ users: userId }),
+      });
+      const openData = await openRes.json() as { ok: boolean; channel?: { id: string } };
+
+      if (openData.ok && openData.channel?.id) {
+        const dmChannelId = openData.channel.id;
+        await fetch('https://slack.com/api/chat.postMessage', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${botToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            channel: dmChannelId,
+            text: messageText,
+            unfurl_links: false,
+            unfurl_media: false,
+          }),
+        });
+        req.log.info({ submitterEmail, action, templateName }, 'notify-reviewer: DM sent');
+        res.json({ ok: true, method: 'dm' });
+        return;
+      }
+    } catch {
+      req.log.warn({ userId }, 'notify-reviewer: DM send failed — falling back to channel mention');
+    }
+  }
+
+  // ── Step 2b: Fallback — mention in Penny channel ──────────────────────────
+
+  const pennyChannelRaw = process.env['SLACK_PENNY_CHANNEL_ID'] ?? process.env['SLACK_CHANNEL_ID'];
+  if (!pennyChannelRaw) {
+    req.log.warn('notify-reviewer: no channel configured for fallback mention');
+    res.json({ ok: true, skipped: true, reason: 'no_channel_for_fallback' });
+    return;
+  }
+
+  const fallbackChannel = normalizeChannelId(pennyChannelRaw);
+  // Build mention text: use <@userId> if we have it, otherwise just the email
+  const mentionPart = userId ? `<@${userId}>` : submitterEmail;
+  const fallbackText = `${emoji} ${mentionPart} — *${action}* — your prompt template *${name}* has been reviewed. Check the Prompt Studio in Trail OS for details.`;
+
+  try {
+    await fetch('https://slack.com/api/chat.postMessage', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${botToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        channel: fallbackChannel,
+        text: fallbackText,
+        unfurl_links: false,
+        unfurl_media: false,
+      }),
+    });
+    req.log.info({ submitterEmail, action, templateName, fallbackChannel }, 'notify-reviewer: channel mention sent');
+    res.json({ ok: true, method: 'channel_mention' });
+  } catch {
+    req.log.warn('notify-reviewer: fallback channel post failed — swallowed silently');
+    res.json({ ok: true, skipped: true, reason: 'post_failed' });
+  }
+});
+
 export default router;

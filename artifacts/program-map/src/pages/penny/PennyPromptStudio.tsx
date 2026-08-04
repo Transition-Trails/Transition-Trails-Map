@@ -454,6 +454,22 @@ function TemplateDetailPanel({
     onStatusChange(id, status);
     setConfirmChip(chip);
     setTimeout(() => setConfirmChip(null), 2200);
+
+    // Notify the submitter in Slack — fire-and-forget, never blocks the approver
+    if (template.reviewRequestedBy) {
+      const action = chip === 'approved' ? 'Approved' : 'Revision requested';
+      fetch('/api/slack/notify-reviewer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submitterEmail: template.reviewRequestedBy,
+          action,
+          templateName: template.name,
+        }),
+      }).catch(() => {
+        // Swallow silently — notification failure must never surface to the approver
+      });
+    }
   }
   function toggle(id: string) {
     setOpen(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
