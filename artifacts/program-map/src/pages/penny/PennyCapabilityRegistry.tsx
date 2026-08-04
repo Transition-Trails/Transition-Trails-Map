@@ -194,6 +194,7 @@ function PennyCopiloPanel({
   step,
   requirements,
   isLoading,
+  isFetching,
   onWalkThrough,
   onRecheck,
 }: {
@@ -201,6 +202,7 @@ function PennyCopiloPanel({
   step: SetupStep;
   requirements: RequirementCheckResult[] | undefined;
   isLoading: boolean;
+  isFetching: boolean;
   onWalkThrough: (req: CapabilityRequirement) => void;
   onRecheck?: () => void;
 }) {
@@ -235,7 +237,7 @@ function PennyCopiloPanel({
     : [];
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+    <div className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm">
       {/* Header */}
       <div className="px-3.5 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/60 shrink-0">
         <Sparkles className="w-4 h-4 text-amber-500" />
@@ -284,10 +286,11 @@ function PennyCopiloPanel({
             <button
               type="button"
               onClick={onRecheck}
-              className="w-full px-3 py-2 rounded-md border border-amber-200 bg-amber-50 text-[12px] font-medium text-amber-700 hover:bg-amber-100 flex items-center justify-center gap-1.5 transition-colors"
+              disabled={isFetching}
+              className="w-full px-3 py-2 rounded-md border border-amber-200 bg-amber-50 text-[12px] font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-60 flex items-center justify-center gap-1.5 transition-colors"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Re-check requirements
+              <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+              {isFetching ? 'Checking…' : 'Re-check requirements'}
             </button>
           </div>
         )}
@@ -429,7 +432,7 @@ function SetupCard({
   onAskPenny: (query: string) => void;
   onNavigate: (route: string) => void;
 }) {
-  const { data: preflight, isLoading: preflightLoading, refetch } = useCapabilityPreflight(
+  const { data: preflight, isLoading: preflightLoading, isFetching: preflightFetching, refetch } = useCapabilityPreflight(
     capability.id,
     activeCapabilityIds,
     step === 'preflight',
@@ -709,6 +712,7 @@ function SetupCard({
             step={step}
             requirements={preflight?.requirements}
             isLoading={preflightLoading}
+            isFetching={preflightFetching}
             onWalkThrough={handleWalkThrough}
             onRecheck={refetch}
           />

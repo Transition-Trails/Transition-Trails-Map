@@ -77,6 +77,7 @@ export function useCapabilityPreflight(
 ): {
   data: PreflightResult | undefined;
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   refetch: () => void;
 } {
@@ -84,13 +85,13 @@ export function useCapabilityPreflight(
     queryKey: ['capability-preflight', capabilityId],
     queryFn: () => fetchPreflight(capabilityId!),
     enabled: !!capabilityId && enabled,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,          // always treat as stale so Re-check always hits the server
     gcTime:    5 * 60 * 1000,
     retry: 1,
   });
 
   if (!query.data) {
-    return { data: undefined, isLoading: query.isLoading, isError: query.isError, refetch: query.refetch };
+    return { data: undefined, isLoading: query.isLoading, isFetching: query.isFetching, isError: query.isError, refetch: query.refetch };
   }
 
   const mergedRequirements = mergeConfigChecks(query.data.requirements, activeCapabilityIds);
@@ -121,5 +122,5 @@ export function useCapabilityPreflight(
     error:         query.data.error,
   };
 
-  return { data: result, isLoading: query.isLoading, isError: query.isError, refetch: query.refetch };
+  return { data: result, isLoading: query.isLoading, isFetching: query.isFetching, isError: query.isError, refetch: query.refetch };
 }
