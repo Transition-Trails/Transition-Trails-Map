@@ -537,8 +537,8 @@ export class TtAutomationFieldsNotProvisionedError extends Error {
     super(
       "TT_Automation__c cannot be queried: required filter fields " +
       "(Is_Active__c, Automation_Type__c, Description__c, Status__c) " +
-      "are not yet provisioned on the org (phase2Deferred). " +
-      "Add the fields in SF Setup and re-run probe-governance-fields.ts before enabling this query."
+      "were not confirmed present by the preflight describe. " +
+      "Ensure the fields exist in the org and that the describe call succeeds before enabling this query."
     );
     this.name = "TtAutomationFieldsNotProvisionedError";
   }

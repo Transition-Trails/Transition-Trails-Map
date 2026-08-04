@@ -731,14 +731,9 @@ describe('GET /api/salesforce/validate — Penny + Governance field-check covera
     // Verify that the REUSED_OBJECT_FIELD_CHECKS definitions actually enumerate
     // required fields for Penny and Governance objects — not just empty arrays.
     //
-    // Exception: 'tt-automation-fields' is phase2Deferred — TT_Automation__c has
-    // 0 custom fields on the live org. The four expected fields (Is_Active__c,
-    // Automation_Type__c, Description__c, Status__c) are documented in
-    // phase2ExpectedFields but not in requiredFields until they are provisioned.
-    // When phase2Deferred is true, requiredFieldsFound + requiredFieldsMissing will
-    // both be [] — use phase2ExpectedFields.length to detect documented intent.
-    const PHASE2_DEFERRED: string[] = ['tt-automation-fields'];
-
+    // TT_Automation__c fields (Is_Active__c, Automation_Type__c, Description__c,
+    // Status__c) are confirmed provisioned on the org — tt-automation-fields is no
+    // longer phase2Deferred and must appear in requiredFields like all other objects.
     const res = await request(app).get('/api/salesforce/validate');
     expect(res.status).toBe(200);
 
@@ -758,16 +753,8 @@ describe('GET /api/salesforce/validate — Penny + Governance field-check covera
     for (const id of pennyAndGovernanceIds) {
       const fc = allFieldChecks.find(c => c.id === id);
       expect(fc).toBeDefined();
-      if (PHASE2_DEFERRED.includes(id)) {
-        // TT_Automation__c is phase2Deferred — fields are documented in
-        // phase2ExpectedFields, not in requiredFields (they don't exist in org yet).
-        // Verify the expected fields are documented rather than silently empty.
-        expect(fc?.phase2Deferred).toBe(true);
-        expect((fc?.phase2ExpectedFields ?? []).length).toBeGreaterThan(0);
-        continue;
-      }
       // The combined found+missing list represents the requiredFields config —
-      // it should be non-empty for every other Penny/Governance object.
+      // it should be non-empty for every Penny/Governance object.
       const totalConfigured = (fc?.requiredFieldsFound?.length ?? 0) + (fc?.requiredFieldsMissing?.length ?? 0);
       expect(totalConfigured).toBeGreaterThan(0);
     }

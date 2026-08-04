@@ -1299,7 +1299,7 @@ router.post("/salesforce/governance/build-items", withClient(async (req, res, cl
 // GET /salesforce/governance/automations
 // Returns active TT_Automation__c records.
 //
-// PHASE 2 DEFERRED — this route probes for the four required filter fields
+// This route probes for the four required filter fields
 // (Is_Active__c, Automation_Type__c, Description__c, Status__c) before issuing
 // any SOQL.  If they are absent the route returns HTTP 503 with a clear error
 // rather than executing an unfiltered query that would dump every automation
@@ -1308,10 +1308,9 @@ router.post("/salesforce/governance/build-items", withClient(async (req, res, cl
 // The probe uses the same getCustomFields helper used by the preflight validate
 // endpoint, so this check is always live rather than relying on a cached result.
 //
-// ACTION REQUIRED before go-live: add the four fields to TT_Automation__c in
-// SF Setup, re-run probe-governance-fields.ts to confirm, then remove the
-// phase2Deferred guard from tt-automation-fields in REUSED_OBJECT_FIELD_CHECKS
-// and from getAutomations() in salesforceService.ts.
+// All four fields have been confirmed provisioned on the org via
+// probe-governance-fields.ts.  The runtime describe guard remains as a safety
+// rail in case the org schema changes unexpectedly.
 
 const TT_AUTOMATION_REQUIRED_FIELDS = [
   "Is_Active__c",

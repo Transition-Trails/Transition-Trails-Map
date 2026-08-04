@@ -437,6 +437,7 @@ describe('GET /api/salesforce/validate — 429 rate-limit on describe', () => {
     describeOverrides.set('Penny_Gamification__c',      ['Learner__c', 'Points__c', 'Sprint_Points__c', 'Sprint_Number__c', 'Reason__c', 'Note__c', 'Awarded_By__c']);
     describeOverrides.set('Penny_Classroom_Nudge__c',   ['Course_Work_ID__c', 'Learner__c', 'Nudge_Date__c', 'Sent_At__c']);
     describeOverrides.set('TT_Build_Item__c',           ['TT_Automation__c']);
+    describeOverrides.set('TT_Automation__c',           ['Is_Active__c', 'Automation_Type__c', 'Description__c', 'Status__c']);
     describeOverrides.set('TT_SOP_Automation__c',       ['Automation__c', 'Knowledge_Article__c']);
     describeOverrides.set('TT_SOP_Account__c',          ['Account__c', 'Knowledge_Article__c']);
 
@@ -481,6 +482,7 @@ describe('GET /api/salesforce/validate — 429 rate-limit on describe', () => {
     describeOverrides.set('Penny_Gamification__c',      ['Learner__c', 'Points__c', 'Sprint_Points__c', 'Sprint_Number__c', 'Reason__c', 'Note__c', 'Awarded_By__c']);
     describeOverrides.set('Penny_Classroom_Nudge__c',   ['Course_Work_ID__c', 'Learner__c', 'Nudge_Date__c', 'Sent_At__c']);
     describeOverrides.set('TT_Build_Item__c',           ['TT_Automation__c']);
+    describeOverrides.set('TT_Automation__c',           ['Is_Active__c', 'Automation_Type__c', 'Description__c', 'Status__c']);
     describeOverrides.set('TT_SOP_Automation__c',       ['Automation__c', 'Knowledge_Article__c']);
     describeOverrides.set('TT_SOP_Account__c',          ['Account__c', 'Knowledge_Article__c']);
 
