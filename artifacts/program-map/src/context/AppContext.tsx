@@ -175,8 +175,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activePage, setActivePage]     = useState('program-map');
   // activeLens is auto-managed based on userTier; kept for backward compat (ProgramMap uses it)
   const [activeLens, setActiveLens]     = useState('builder');
-  // Default: superadmin — sees everything, can preview any tier. Future: derive from Google Workspace.
-  const [userTier, setUserTierRaw]      = useState<AccessTier>('superadmin');
+  // Default: everyday — least privilege until the Google session tells us the real tier.
+  // Tier is set in InnerApp (App.tsx) once useGoogleAuth resolves the signed-in user.
+  const [userTier, setUserTierRaw]      = useState<AccessTier>('everyday');
   const [selectedItem, setSelectedItem] = useState<AppState['selectedItem']>(null);
   const [searchOpen, setSearchOpen]     = useState(false);
   const [actionPanel, setActionPanel]   = useState<ActionPanelConfig | null>(null);

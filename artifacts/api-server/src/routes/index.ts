@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type RequestHandler } from "express";
 import healthRouter          from "./health";
 import slackRouter           from "./slack";
 import secretsRouter         from "./secrets";
@@ -27,8 +27,83 @@ import knowledgeRouter         from "./knowledge";
 import roleOwnersRouter        from "./roleOwners";
 import sessionsRouter           from "./sessions";
 import voiceoverRouter          from "./voiceover";
+import { requireStaff, requireAdmin } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
+
+// ── Public-path allowlist ─────────────────────────────────────────────────────
+//
+// These paths are reachable without a signed-in Google session.  Everything
+// else requires requireStaff (authentication + at least one Trail OS group).
+//
+// Default: "refused unless explicitly public" — the opposite of the old
+// prototype behaviour where everything was open.
+//
+// Paths here are relative to the /api mount point (i.e. strip leading /api).
+// The learner surface (/learner/*) uses its own requireLearnerAuth and is
+// excluded entirely from staff auth via the prefix check below.
+
+const PUBLIC_PATHS: readonly string[] = [
+  // Health probe
+  '/healthz',
+  // Per-user Google Sign-In flow (no session exists yet during these requests)
+  '/auth/google/login',
+  '/auth/google/callback',
+  '/auth/google/me',       // returns { authenticated: false } when not signed in
+  '/auth/google/sign-out', // safe to call without a session
+  // Salesforce auth flow (browser redirect round-trips, same reasoning)
+  '/auth/salesforce/login',
+  '/auth/salesforce/callback',
+  '/auth/salesforce/status',
+  '/auth/salesforce/logout',
+  // Admin Google OAuth wizard (involves browser redirects from Google;
+  // the wizard UI itself is behind the client-side auth gate)
+  '/google/oauth/info',
+  '/google/oauth/start',
+  '/google/oauth/callback',
+  '/google/oauth/session', // prefix — matches /google/oauth/session/:id
+  // Slack webhook (HMAC-authenticated by Slack's signature, not user session)
+  '/slack/events',
+];
+
+// ── Global staff-auth middleware ──────────────────────────────────────────────
+//
+// Applied before any router is mounted so every data route is protected by
+// default.  Public paths and the learner surface are explicitly excluded.
+
+const staffAuthGate: RequestHandler = (req, res, next) => {
+  const path = req.path;
+
+  // Learner routes (/learner/*) use requireLearnerAuth, not staff auth.
+  if (path.startsWith('/learner')) return next();
+
+  // Check against the public allowlist (exact match or path prefix).
+  const isPublic = PUBLIC_PATHS.some(
+    p => path === p || path.startsWith(`${p}/`),
+  );
+  if (isPublic) return next();
+
+  // All other paths require a valid signed-in staff session.
+  return (requireStaff as RequestHandler)(req, res, next);
+};
+
+router.use(staffAuthGate);
+
+// ── Admin-only path guards ────────────────────────────────────────────────────
+//
+// These paths require the trailosadmin group (or superadmin).  The staff gate
+// above has already run, so we only need the group check here.
+// requireAdmin also handles the 401 case for defence-in-depth.
+
+const ADMIN_PREFIXES: string[] = [
+  '/secrets',           // GET /api/secrets/audit — credential exposure
+  '/admin/google-groups', // GET /api/admin/google-groups — workspace admin
+  '/admin/role-owners', // GET/PATCH /api/admin/role-owners
+];
+
+router.use(ADMIN_PREFIXES as unknown as string, requireAdmin as RequestHandler);
+
+// ── Router mounts ─────────────────────────────────────────────────────────────
 
 router.use("/auth/salesforce", salesforceAuthRouter);
 router.use("/penny/data", pennyDataRouter);

@@ -1,6 +1,18 @@
 import { describe, test, expect, vi } from 'vitest';
 import request from 'supertest';
 
+// Auth middleware is tested separately in authEnforcement.test.ts.
+// Mock it here so business-logic tests run without needing an OAuth session.
+vi.mock('../middlewares/requireAuth.js', () => ({
+  requireStaff: (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireAdmin: (_req: unknown, _res: unknown, next: () => void) => next(),
+  isStaff:        () => true,
+  isAdmin:        () => true,
+  isSuperAdmin:   () => false,
+  TRAIL_OS_STAFF_GROUPS: [],
+  TRAIL_OS_ADMIN_GROUPS: [],
+}));
+
 // Mock with a real class so `new ReplitConnectors()` works correctly in ESM
 vi.mock('@replit/connectors-sdk', () => {
   class ReplitConnectors {

@@ -9,6 +9,18 @@ const { mockOrderBy, mockWhere, mockOnConflictDoNothing, mockUpdateWhere } = vi.
   mockUpdateWhere: vi.fn().mockResolvedValue({ rowCount: 1 }),
 }));
 
+// Auth middleware is tested separately in authEnforcement.test.ts.
+// Mock it here so business-logic tests run without needing an OAuth session.
+vi.mock('../middlewares/requireAuth.js', () => ({
+  requireStaff: (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireAdmin: (_req: unknown, _res: unknown, next: () => void) => next(),
+  isStaff:        () => true,
+  isAdmin:        () => true,
+  isSuperAdmin:   () => false,
+  TRAIL_OS_STAFF_GROUPS: [],
+  TRAIL_OS_ADMIN_GROUPS: [],
+}));
+
 vi.mock('@workspace/db', () => ({
   db: {
     select: vi.fn(() => ({

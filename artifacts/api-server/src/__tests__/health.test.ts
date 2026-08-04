@@ -14,8 +14,12 @@ describe('GET /api/healthz', () => {
     expect(res.headers['content-type']).toMatch(/json/);
   });
 
-  test('unknown route returns 404', async () => {
+  test('unknown route returns 401 (auth gate runs before 404)', async () => {
+    // Under default-deny enforcement, an unauthenticated request to any route
+    // that is not in the public-path allowlist hits the staff-auth middleware
+    // before Express can discover there is no matching handler.
     const res = await request(app).get('/api/does-not-exist');
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe('not_authenticated');
   });
 });

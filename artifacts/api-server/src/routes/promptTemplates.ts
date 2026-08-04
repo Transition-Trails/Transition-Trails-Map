@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { promptTemplatesTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -39,7 +40,7 @@ router.post("/penny/prompt-templates", async (req, res): Promise<void> => {
 });
 
 // POST /api/penny/prompt-templates/seed — bulk upsert (idempotent, skips existing)
-router.post("/penny/prompt-templates/seed", async (req, res): Promise<void> => {
+router.post("/penny/prompt-templates/seed", requireAdmin, async (req, res): Promise<void> => {
   try {
     const { templates } = req.body as { templates: Record<string, unknown>[] };
     if (!Array.isArray(templates)) {

@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { logger } from "../lib/logger";
+import { requireAdmin } from "../middlewares/requireAuth";
 
 const router = Router();
 
-router.post("/slack/notify", async (req, res) => {
+router.post("/slack/notify", requireAdmin, async (req, res) => {
   const { objectType, fields, submittedBy } = req.body as {
     objectType?:  string;
     fields?:      Record<string, string>;

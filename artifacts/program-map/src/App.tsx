@@ -1,15 +1,46 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider, useAppContext } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import SignInPage from "@/pages/SignIn";
-import { Map } from "lucide-react";
+import { Map, ShieldOff } from "lucide-react";
 
 const basePath = (import.meta.env.BASE_URL as string).replace(/\/$/, "");
+
+// ── Global API error interceptor ──────────────────────────────────────────────
+// Wraps window.fetch once at module load so 401/403 responses from our own API
+// are caught regardless of which hook makes the call.
+//   401 → session gone  → re-check /me (which returns authenticated:false) →
+//          InnerApp shows the sign-in page automatically.
+//   403 → signed in but not permitted → dispatch event so UI can show a clear
+//          "ask your administrator" message rather than a silent failure.
+const _origFetch = window.fetch.bind(window);
+const queryClient = new QueryClient();
+
+window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  const res = await _origFetch(input, init);
+  const url  = typeof input === 'string' ? input
+             : input instanceof URL      ? input.href
+             : (input as Request).url;
+
+  // Only intercept calls to our own API (not Google, Slack, etc.)
+  if (url.startsWith('/api/') || url.includes('/api/')) {
+    if (res.status === 401) {
+      // Re-check auth — the /me endpoint returns authenticated:false if the
+      // session is gone, which causes InnerApp to show the sign-in page.
+      void queryClient.invalidateQueries({ queryKey: ['google-auth-me'] });
+    } else if (res.status === 403) {
+      window.dispatchEvent(new CustomEvent('trail-os-forbidden'));
+    }
+  }
+
+  return res;
+};
 
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
@@ -76,7 +107,7 @@ import LearnerPenny       from "@/pages/learner/LearnerPenny";
 import LearnerQuest       from "@/pages/learner/LearnerQuest";
 import LearnerProgress    from "@/pages/learner/LearnerProgress";
 
-const queryClient = new QueryClient();
+// queryClient is declared at module level above (next to the fetch interceptor)
 
 function Redirect({ to }: { to: string }) {
   const [, setLocation] = useLocation();
@@ -355,6 +386,7 @@ function SignInLanding() {
 function InnerApp() {
   const auth = useGoogleAuth();
   const { setUserTier } = useAppContext();
+  const { toast } = useToast();
 
   // Apply tier from session on sign-in (server computed it from the group set)
   useEffect(() => {
@@ -362,6 +394,20 @@ function InnerApp() {
       setUserTier(auth.user.tier);
     }
   }, [auth.isLoading, auth.isSignedIn, auth.user?.email]);
+
+  // 403 handler — fired by the module-level fetch interceptor above.
+  // Shows a clear "ask your administrator" message rather than a silent failure.
+  useEffect(() => {
+    function handleForbidden() {
+      toast({
+        variant:     'destructive',
+        title:       'Access denied',
+        description: 'Your account does not have permission for this resource. Ask your administrator to check your Trail OS group membership.',
+      });
+    }
+    window.addEventListener('trail-os-forbidden', handleForbidden);
+    return () => window.removeEventListener('trail-os-forbidden', handleForbidden);
+  }, [toast]);
 
   // Full-page loading state while session check is in flight
   if (auth.isLoading) {

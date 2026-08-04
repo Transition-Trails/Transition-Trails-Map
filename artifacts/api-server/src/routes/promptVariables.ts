@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { promptVariablesTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -39,7 +40,7 @@ router.post("/penny/prompt-variables", async (req, res): Promise<void> => {
 });
 
 // POST /api/penny/prompt-variables/seed — bulk upsert (idempotent)
-router.post("/penny/prompt-variables/seed", async (req, res): Promise<void> => {
+router.post("/penny/prompt-variables/seed", requireAdmin, async (req, res): Promise<void> => {
   try {
     const { variables } = req.body as { variables: Record<string, unknown>[] };
     if (!Array.isArray(variables)) {
