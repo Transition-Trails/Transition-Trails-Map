@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express, { Router } from "express";
 
 const router = Router();
 
@@ -444,6 +444,92 @@ router.get("/drive/penny-content", async (_req, res): Promise<void> => {
     });
   }
 });
+
+// ─── POST /api/drive/penny-content ────────────────────────────────────────────
+//
+// Uploads a media file (image, audio, or video) to GOOGLE_DRIVE_PENNY_FOLDER_ID.
+// The file is sent as a raw binary body; metadata arrives as query params.
+//
+// Query params:
+//   name     — desired filename in Drive
+//   mimeType — MIME type of the file (e.g. "image/png")
+//
+// Response: { success: true, file: DriveFile }
+
+router.post(
+  "/drive/penny-content",
+  express.raw({ type: "*/*", limit: "100mb" }),
+  async (req, res): Promise<void> => {
+    const pennyFolderId = process.env["GOOGLE_DRIVE_PENNY_FOLDER_ID"];
+    if (!pennyFolderId) {
+      res.status(503).json({ error: "GOOGLE_DRIVE_PENNY_FOLDER_ID is not configured" });
+      return;
+    }
+
+    const fileName = typeof req.query["name"] === "string" && req.query["name"].trim()
+      ? req.query["name"].trim()
+      : "upload";
+    const mimeType = typeof req.query["mimeType"] === "string" && req.query["mimeType"].trim()
+      ? req.query["mimeType"].trim()
+      : "application/octet-stream";
+
+    const body = req.body as Buffer;
+    if (!Buffer.isBuffer(body) || body.length === 0) {
+      res.status(400).json({ error: "No file data received" });
+      return;
+    }
+
+    try {
+      const token = await getAccessToken();
+
+      // Build a multipart/related body (metadata + media) for the Drive upload API
+      const boundary  = "tt_drive_upload_boundary";
+      const metadata  = JSON.stringify({ name: fileName, parents: [pennyFolderId] });
+      const multipart = Buffer.concat([
+        Buffer.from(
+          `--${boundary}\r\n` +
+          `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+          `${metadata}\r\n` +
+          `--${boundary}\r\n` +
+          `Content-Type: ${mimeType}\r\n\r\n`
+        ),
+        body,
+        Buffer.from(`\r\n--${boundary}--`),
+      ]);
+
+      const uploadResp = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType,webViewLink",
+        {
+          method:  "POST",
+          headers: {
+            Authorization:  `Bearer ${token}`,
+            "Content-Type": `multipart/related; boundary=${boundary}`,
+          },
+          body:   multipart,
+          signal: AbortSignal.timeout(120_000),
+        }
+      );
+
+      if (!uploadResp.ok) {
+        const errBody = await uploadResp.json().catch(() => ({})) as { error?: { message?: string } };
+        res.status(uploadResp.status).json({
+          error: errBody.error?.message ?? `Drive upload failed: HTTP ${uploadResp.status}`,
+        });
+        return;
+      }
+
+      const file = await uploadResp.json() as DriveFile;
+      res.json({ success: true, file });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("Missing GOOGLE")) {
+        res.status(503).json({ error: "Drive integration not configured" });
+        return;
+      }
+      res.status(500).json({ error: msg });
+    }
+  }
+);
 
 // ─── GET /api/drive/folder-check ──────────────────────────────────────────────
 //

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { usePromptTemplates } from '@/hooks/usePromptTemplates';
@@ -17,7 +17,7 @@ import {
   ChevronDown, ChevronRight, MoreHorizontal, ArrowRight,
   ArrowLeft, Eye, Wand2, Lightbulb, RotateCcw,
   ImageIcon, Music, Video, FolderOpen, Wifi, ExternalLink,
-  Layers, Database, ShieldCheck, Lock, Sparkles,
+  Layers, Database, ShieldCheck, Lock, Sparkles, Upload,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -93,28 +93,85 @@ function StatusBadge({ status }: { status: PromptStatus }) {
   );
 }
 
+// ── MIME accept map for the file picker ───────────────────────────────────────
+
+const MIME_ACCEPT: Record<string, string> = {
+  images: 'image/*',
+  audio:  'audio/*',
+  video:  'video/*',
+};
+
 // ── Penny content strip ───────────────────────────────────────────────────────
 
 function PennyContentStrip() {
-  const [data, setData]       = useState<PennyContentData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData]             = useState<PennyContentData | null>(null);
+  const [loading, setLoading]       = useState(true);
+  const [uploading, setUploading]   = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingKind  = useRef<string>('');
+
+  const fetchContent = useCallback(() => {
     setLoading(true);
     fetch('/api/drive/penny-content')
       .then(r => r.json() as Promise<PennyContentData>)
-      .then(d => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
-  const connected = data?.configured && !data?.error;
+  useEffect(() => { fetchContent(); }, [fetchContent]);
+
+  function openPicker(kind: string) {
+    if (!fileInputRef.current) return;
+    pendingKind.current = kind;
+    fileInputRef.current.accept = MIME_ACCEPT[kind] ?? '*/*';
+    fileInputRef.current.value  = '';
+    fileInputRef.current.click();
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const kind = pendingKind.current;
+    setUploading(kind);
+    setUploadError(null);
+    try {
+      const params = new URLSearchParams({
+        name:     file.name,
+        mimeType: file.type || 'application/octet-stream',
+      });
+      const resp = await fetch(`/api/drive/penny-content?${params}`, {
+        method:  'POST',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body:    file,
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({})) as { error?: string };
+        throw new Error(err.error ?? `Upload failed (HTTP ${resp.status})`);
+      }
+      fetchContent();
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(null);
+    }
+  }
+
+  const connected  = data?.configured && !data?.error;
   const folderName = data?.folderName ?? 'Penny Content / Assets';
   const folderLink = data?.folderWebViewLink ?? null;
 
   return (
     <div className="rounded-xl border border-[#D9EAE0] bg-[#F0F5F2] overflow-hidden">
+      {/* Hidden file input — shared across all rows */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       {/* Header */}
       <div className="flex items-center gap-2.5 px-3 py-2 border-b border-[#D9EAE0]">
         <div className="w-7 h-7 rounded-full bg-foreground flex items-center justify-center text-[11px] font-bold text-background ring-2 ring-white shadow-sm shrink-0">
@@ -166,9 +223,10 @@ function PennyContentStrip() {
       {/* Asset rows */}
       <div className="divide-y divide-[#D9EAE0]">
         {ASSET_ROWS.map(({ kind, icon: Icon, hint }) => {
-          const files = data?.[kind] ?? [];
-          const ready = files.length > 0;
-          const label = ready ? files[0].name : (loading ? '—' : 'No file found');
+          const files      = data?.[kind] ?? [];
+          const ready      = files.length > 0;
+          const label      = ready ? files[0].name : (loading ? '—' : 'No file found');
+          const isUploading = uploading === kind;
           return (
             <div key={kind} className="flex items-center gap-2.5 px-3 py-2">
               <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${ready ? 'bg-foreground' : 'bg-muted'}`}>
@@ -185,12 +243,43 @@ function PennyContentStrip() {
                   ? 'bg-[#C8E6D0] text-[#2F6B3F] border-[#9FC3AE]'
                   : 'bg-muted text-muted-foreground border-border'
               }`}>
-                {loading ? '…' : ready ? 'Ready' : 'Not set'}
+                {isUploading ? '…' : loading ? '…' : ready ? 'Ready' : 'Not set'}
               </span>
+              {/* Upload button */}
+              <button
+                onClick={() => openPicker(kind)}
+                disabled={isUploading || !connected}
+                title={connected ? `Upload ${kind}` : 'Drive folder not configured'}
+                className={`shrink-0 w-5 h-5 flex items-center justify-center rounded-md border transition-colors ${
+                  !connected
+                    ? 'border-border text-muted-foreground/30 cursor-not-allowed'
+                    : isUploading
+                    ? 'border-border text-muted-foreground cursor-wait'
+                    : 'border-border text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5'
+                }`}
+              >
+                {isUploading
+                  ? <RotateCcw className="w-2.5 h-2.5 animate-spin" />
+                  : <Upload className="w-2.5 h-2.5" />
+                }
+              </button>
             </div>
           );
         })}
       </div>
+
+      {/* Inline upload error */}
+      {uploadError && (
+        <div className="px-3 py-1.5 border-t border-[#D9EAE0] flex items-center justify-between gap-2">
+          <p className="text-[10px] text-[#A93F2F] leading-snug flex-1">{uploadError}</p>
+          <button
+            onClick={() => setUploadError(null)}
+            className="text-[10px] text-muted-foreground hover:text-foreground shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }
