@@ -27,9 +27,16 @@ vi.mock('../middlewares/requireAuth.js', () => ({
 // 'throttled' – every describe returns 429 (rate-limited, not absent)
 // 'forbidden' – every describe returns 403 (permissions, not absent)
 
-const { mockDescribeMode } = vi.hoisted(() => ({
-  mockDescribeMode: { value: 'success' as 'success' | 'notFound' | 'throttled' | 'forbidden' },
-}));
+const { mockDescribeMode } = vi.hoisted(() => {
+  // Override PF_OBJECT_TIMEOUT_MS to a small value so timeout tests complete in
+  // well under 1 second.  This must run inside vi.hoisted() so the env var is
+  // set before the app module (and its IIFE constant) is first evaluated.
+  process.env['PF_OBJECT_TIMEOUT_MS'] = '50';
+
+  return {
+    mockDescribeMode: { value: 'success' as 'success' | 'notFound' | 'throttled' | 'forbidden' | 'timeout' },
+  };
+});
 
 vi.mock('@replit/connectors-sdk', () => {
   class ReplitConnectors {
@@ -79,6 +86,13 @@ vi.mock('@replit/connectors-sdk', () => {
               body: null,
               bodyUsed: false,
             } as Response;
+          }
+
+          if (mockDescribeMode.value === 'timeout') {
+            // Return a promise that never settles — pfSfGetRetry's per-object
+            // timeout (PF_OBJECT_TIMEOUT_MS, set to 50 ms above) will race
+            // against this and reject with 'preflight-timeout' first.
+            return new Promise<Response>(() => { /* never resolves */ });
           }
 
           if (mockDescribeMode.value === 'forbidden') {
@@ -357,5 +371,45 @@ describe('GET /api/penny/capabilities/cap-cohort-summaries/preflight — pmdm__S
     // A permissions error is NOT evidence of absence — must never report "missing"
     expect(scheduleReq!.status).toBe('undetermined');
     expect(scheduleReq!.status).not.toBe('missing');
+  });
+});
+
+// ── Per-object timeout path ────────────────────────────────────────────────────
+//
+// pfSfGetRetry wraps every SF describe in a race against PF_OBJECT_TIMEOUT_MS.
+// If the describe stalls, the timeout rejects first with 'preflight-timeout'.
+// Because that error does NOT start with '404', it must never be treated as
+// conclusive evidence of absence — only 'undetermined' is correct.
+//
+// PF_OBJECT_TIMEOUT_MS is overridden to 50 ms in vi.hoisted() above, so these
+// tests complete in well under 1 second even though the mock never settles.
+
+describe('GET /api/penny/capabilities/:id/preflight — per-object timeout path', () => {
+  test('sf-object requirement is "undetermined" (NOT "missing") when describe call times out', async () => {
+    mockDescribeMode.value = 'timeout';
+    const res = await request(app).get('/api/penny/capabilities/cap-learner-coaching/preflight');
+    expect(res.status).toBe(200);
+    const body = res.body as PreflightBody;
+    const sfObjectReqs = body.requirements.filter(r => r.kind === 'sf-object');
+    expect(sfObjectReqs.length).toBeGreaterThan(0);
+    for (const r of sfObjectReqs) {
+      // A timeout means we cannot conclude the object is absent — must never report "missing"
+      expect(r.status).toBe('undetermined');
+      expect(r.status).not.toBe('missing');
+    }
+  });
+
+  test('sf-field requirement is "undetermined" (NOT "missing") when parent describe call times out', async () => {
+    mockDescribeMode.value = 'timeout';
+    const res = await request(app).get('/api/penny/capabilities/cap-learner-coaching/preflight');
+    expect(res.status).toBe(200);
+    const body = res.body as PreflightBody;
+    const sfFieldReqs = body.requirements.filter(r => r.kind === 'sf-field');
+    expect(sfFieldReqs.length).toBeGreaterThan(0);
+    for (const r of sfFieldReqs) {
+      // A timeout on the parent describe must not propagate as a missing field
+      expect(r.status).toBe('undetermined');
+      expect(r.status).not.toBe('missing');
+    }
   });
 });
