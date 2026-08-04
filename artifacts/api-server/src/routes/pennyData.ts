@@ -23,6 +23,7 @@ import {
   updateLearnerContext,
   getWeeklyReports,
   createWeeklyReport,
+  getTrailQuestDeliveries,
 } from "../lib/salesforceService.js";
 import type { LearnerContextUpdate } from "../types/salesforce.js";
 import { SF_INTERACTION_SOURCES } from "../lib/salesforceService.js";
@@ -414,6 +415,17 @@ router.post(
       generatedAt:      body.generatedAt,
     });
     res.json(result);
+  })
+);
+
+// ── GET /trail-quest-deliveries ───────────────────────────────────────────────
+
+router.get(
+  "/trail-quest-deliveries",
+  withClient(async (_req, res, client) => {
+    const data = await getTrailQuestDeliveries(client);
+    res.set('Cache-Control', 'no-store');
+    res.json(data);
   })
 );
 

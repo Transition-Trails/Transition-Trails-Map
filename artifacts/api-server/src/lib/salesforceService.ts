@@ -605,3 +605,115 @@ export async function createClassroomNudge(
   });
   return { id: result.id };
 }
+
+// ── Trail Quest deliveries (TrailQuest__c) ────────────────────────────────────
+//
+// Fields expected on TrailQuest__c:
+//   Contact__c             — Lookup(Contact)
+//   Quest_ID__c            — Text
+//   Status__c              — Picklist: 'In Progress' | 'Completed' | 'Pending Acceptance'
+//   Assigned_Date__c       — Date
+//   Completed_Criteria__c  — Number
+//   Total_Criteria__c      — Number
+//   Slack_Handle__c        — Text
+//
+// Contact is joined for FirstName, LastName, and Penny_Trail__c (used as the
+// program label when the learner has been assigned a Penny trail).
+//
+// Returns an empty array with objectMissing:true when the custom object has
+// not yet been provisioned in the org — this lets the UI show a graceful
+// "coming soon" state without throwing a 500.
+
+export interface TrailQuestDelivery {
+  id:                 string;
+  learner:            string;
+  program:            string;
+  questId:            string;
+  assignedDate:       string;
+  status:             'In Progress' | 'Completed' | 'Pending Acceptance';
+  completedCriteria:  number;
+  totalCriteria:      number;
+  slackHandle:        string;
+}
+
+interface RawTrailQuest {
+  Id:                     string;
+  Contact__c:             string | null;
+  Quest_ID__c:            string | null;
+  Status__c:              string | null;
+  Assigned_Date__c:       string | null;
+  Completed_Criteria__c:  number | null;
+  Total_Criteria__c:      number | null;
+  Slack_Handle__c:        string | null;
+  Contact: {
+    FirstName: string | null;
+    LastName:  string | null;
+    Penny_Trail__c: string | null;
+  } | null;
+}
+
+const VALID_STATUSES = new Set<TrailQuestDelivery['status']>([
+  'In Progress',
+  'Completed',
+  'Pending Acceptance',
+]);
+
+function coerceStatus(raw: string | null): TrailQuestDelivery['status'] {
+  if (raw && VALID_STATUSES.has(raw as TrailQuestDelivery['status'])) {
+    return raw as TrailQuestDelivery['status'];
+  }
+  return 'In Progress';
+}
+
+export async function getTrailQuestDeliveries(
+  client: ISalesforceClient,
+  limit = 200
+): Promise<{ deliveries: TrailQuestDelivery[]; objectMissing: boolean }> {
+  const safeLimit = Math.min(Math.max(1, limit), 500);
+  const soql = [
+    "SELECT Id, Contact__c, Quest_ID__c, Status__c, Assigned_Date__c,",
+    "Completed_Criteria__c, Total_Criteria__c, Slack_Handle__c,",
+    "Contact.FirstName, Contact.LastName, Contact.Penny_Trail__c",
+    "FROM TrailQuest__c",
+    `ORDER BY Assigned_Date__c DESC LIMIT ${safeLimit}`,
+  ].join(" ");
+
+  let records: RawTrailQuest[];
+  try {
+    const result = await client.query<RawTrailQuest>(soql);
+    records = result.records;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    // Salesforce returns INVALID_TYPE or sObject_not_found when the custom
+    // object has not yet been deployed.  Surface this as a clean empty list
+    // rather than a 500 so the UI can show a "pending provisioning" state.
+    if (/INVALID_TYPE|sObject|not supported|does not support/i.test(msg)) {
+      return { deliveries: [], objectMissing: true };
+    }
+    throw err;
+  }
+
+  const deliveries: TrailQuestDelivery[] = records.map(raw => {
+    const firstName = raw.Contact?.FirstName ?? "";
+    const lastName  = raw.Contact?.LastName  ?? "";
+    const fullName  = [firstName, lastName].filter(Boolean).join(" ") || "Unknown";
+    // Use initials form (e.g. "Marissa P.") to match existing UI convention
+    const learnerLabel = lastName
+      ? `${firstName} ${lastName.charAt(0)}.`
+      : fullName;
+
+    return {
+      id:                raw.Id,
+      learner:           learnerLabel,
+      program:           raw.Contact?.Penny_Trail__c ?? "Foundations Trail",
+      questId:           raw.Quest_ID__c ?? "",
+      assignedDate:      raw.Assigned_Date__c ?? "",
+      status:            coerceStatus(raw.Status__c),
+      completedCriteria: raw.Completed_Criteria__c ?? 0,
+      totalCriteria:     raw.Total_Criteria__c      ?? 0,
+      slackHandle:       raw.Slack_Handle__c        ?? "",
+    };
+  });
+
+  return { deliveries, objectMissing: false };
+}

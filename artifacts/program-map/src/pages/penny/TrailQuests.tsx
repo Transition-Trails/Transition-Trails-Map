@@ -1,39 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { curriculumTrailQuests, CONTENT_STATUS_CONFIG } from '@/data/curriculumData';
 import { useAppContext } from '@/context/AppContext';
 import {
   Star, CheckCircle2, Clock, Users, Slack, Brain,
-  ChevronRight, Send, Trophy, Zap, BookOpen,
+  ChevronRight, Send, Trophy, Zap, BookOpen, AlertCircle,
 } from 'lucide-react';
 
-// ── Learner delivery data (cross-referenced from Learners page) ───────────────
+// ── Learner delivery data (fetched from Salesforce TrailQuest__c) ─────────────
 
 interface LearnerDelivery {
-  learner: string;
-  program: string;
-  questId: string;
-  assignedDate: string;
-  status: 'In Progress' | 'Completed' | 'Pending Acceptance';
+  id:                string;
+  learner:           string;
+  program:           string;
+  questId:           string;
+  assignedDate:      string;
+  status:            'In Progress' | 'Completed' | 'Pending Acceptance';
   completedCriteria: number;
-  totalCriteria: number;
-  slackHandle: string;
+  totalCriteria:     number;
+  slackHandle:       string;
 }
-
-// NOTE: Quest delivery data will be read from Salesforce TrailQuest__c once the
-// custom object is created. Until then, only confirmed active learners are shown.
-// Real learners confirmed via pmdm__ProgramEngagement__c WHERE pmdm__Stage__c = 'Active':
-//   Marissa Pavlak — Foundations Trail
-//   Michele Ward   — Foundations Trail
-const QUEST_DELIVERIES: LearnerDelivery[] = [
-  { learner: 'Marissa P.', program: 'Foundations Trail', questId: 'tq-schema-designer', assignedDate: '2026-07-15', status: 'In Progress',        completedCriteria: 1, totalCriteria: 3, slackHandle: '@marissa.pavlak' },
-  { learner: 'Michele W.', program: 'Foundations Trail', questId: 'tq-admin-challenge',  assignedDate: '2026-07-15', status: 'In Progress',        completedCriteria: 1, totalCriteria: 3, slackHandle: '@michele.ward' },
-];
 
 const STATUS_CONFIG: Record<LearnerDelivery['status'], { cls: string; dot: string }> = {
   'Completed':           { cls: 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]', dot: 'bg-[#E6F0EA]0' },
-  'In Progress':         { cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',             dot: 'bg-[#EDF5F8]0'     },
-  'Pending Acceptance':  { cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]',       dot: 'bg-[#FFF3E0]0'   },
+  'In Progress':         { cls: 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]', dot: 'bg-[#EDF5F8]0' },
+  'Pending Acceptance':  { cls: 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]', dot: 'bg-[#FFF3E0]0' },
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -48,6 +39,21 @@ function DeliveryStatusBadge({ status }: { status: LearnerDelivery['status'] }) 
   );
 }
 
+function SkeletonRow() {
+  return (
+    <div className="grid grid-cols-[1fr_160px_120px_100px_80px] gap-x-3 items-center px-4 py-3 animate-pulse">
+      <div className="space-y-1.5">
+        <div className="h-3 w-28 bg-muted rounded" />
+        <div className="h-2.5 w-20 bg-muted/60 rounded" />
+      </div>
+      <div className="h-3 w-24 bg-muted rounded" />
+      <div className="h-5 w-20 bg-muted rounded-full" />
+      <div className="h-2 w-16 bg-muted rounded-full" />
+      <div className="h-6 w-8 bg-muted rounded-md" />
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function TrailQuests() {
@@ -55,21 +61,55 @@ export default function TrailQuests() {
   const [sending, setSending] = useState<string | null>(null);
   const [sent,    setSent]    = useState<Set<string>>(new Set());
 
-  const active    = QUEST_DELIVERIES.filter(d => d.status === 'In Progress');
-  const completed = QUEST_DELIVERIES.filter(d => d.status === 'Completed');
-  const pending   = QUEST_DELIVERIES.filter(d => d.status === 'Pending Acceptance');
+  // Live delivery data from Salesforce
+  const [deliveries,    setDeliveries]    = useState<LearnerDelivery[]>([]);
+  const [loading,       setLoading]       = useState(true);
+  const [error,         setError]         = useState<string | null>(null);
+  const [objectMissing, setObjectMissing] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchDeliveries() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${import.meta.env.BASE_URL}api/penny/data/trail-quest-deliveries`);
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({})) as { error?: string };
+          throw new Error(body.error ?? `HTTP ${res.status}`);
+        }
+        const data = await res.json() as { deliveries: LearnerDelivery[]; objectMissing: boolean };
+        if (!cancelled) {
+          setDeliveries(data.deliveries);
+          setObjectMissing(data.objectMissing);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load deliveries');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    void fetchDeliveries();
+    return () => { cancelled = true; };
+  }, []);
+
+  const active    = deliveries.filter(d => d.status === 'In Progress');
+  const completed = deliveries.filter(d => d.status === 'Completed');
+  const pending   = deliveries.filter(d => d.status === 'Pending Acceptance');
 
   async function deliverViaSlack(delivery: LearnerDelivery) {
     const quest = curriculumTrailQuests.find(q => q.id === delivery.questId);
     if (!quest) return;
-    setSending(delivery.learner);
+    setSending(delivery.id);
     try {
-      await fetch('/api/slack/validate/test-message', {
+      await fetch(`${import.meta.env.BASE_URL}api/slack/validate/test-message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ target: 'penny' }),
       });
-      setSent(prev => new Set([...prev, delivery.learner]));
+      setSent(prev => new Set([...prev, delivery.id]));
     } finally {
       setSending(null);
     }
@@ -115,9 +155,9 @@ export default function TrailQuests() {
         <div className="grid grid-cols-4 gap-3">
           {[
             { label: 'Total Quests',   value: curriculumTrailQuests.length, color: 'text-foreground', icon: Trophy },
-            { label: 'Active',         value: active.length,                color: 'text-[#2F6F7E]',     icon: Zap },
-            { label: 'Completed',      value: completed.length,             color: 'text-[#2F6B3F]', icon: CheckCircle2 },
-            { label: 'Awaiting',       value: pending.length,               color: 'text-[#CC8400]',   icon: Clock },
+            { label: 'Active',         value: loading ? '–' : active.length,     color: 'text-[#2F6F7E]',  icon: Zap },
+            { label: 'Completed',      value: loading ? '–' : completed.length,  color: 'text-[#2F6B3F]',  icon: CheckCircle2 },
+            { label: 'Awaiting',       value: loading ? '–' : pending.length,    color: 'text-[#CC8400]',  icon: Clock },
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
               <s.icon className={`w-4 h-4 ${s.color} mb-1.5`} />
@@ -126,6 +166,28 @@ export default function TrailQuests() {
             </div>
           ))}
         </div>
+
+        {/* Error banner */}
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[14px] font-medium text-red-700">Could not load deliveries</p>
+              <p className="text-[14px] text-red-600">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Object-missing notice */}
+        {objectMissing && !error && (
+          <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0]/60 p-3 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-[#CC8400] shrink-0 mt-0.5" />
+            <p className="text-[14px] text-[#CC8400]">
+              <span className="font-semibold">TrailQuest__c</span> has not yet been provisioned in Salesforce.
+              Delivery data will appear here once the custom object is created.
+            </p>
+          </div>
+        )}
 
         {/* Active Deliveries */}
         <div>
@@ -148,62 +210,73 @@ export default function TrailQuests() {
               ))}
             </div>
             <div className="bg-card divide-y divide-border">
-              {QUEST_DELIVERIES.map(d => {
-                const quest     = curriculumTrailQuests.find(q => q.id === d.questId);
-                const isSending = sending === d.learner;
-                const isSent    = sent.has(d.learner);
-                return (
-                  <div
-                    key={d.learner}
-                    className="grid grid-cols-[1fr_160px_120px_100px_80px] gap-x-3 items-center px-4 py-3"
-                  >
-                    <div>
-                      <p className="text-[14px] font-semibold text-foreground">{d.learner}</p>
-                      <p className="text-[14px] text-muted-foreground">{d.program}</p>
-                    </div>
-                    <div>
-                      <p className="text-[14px] text-foreground truncate">{quest?.name ?? d.questId}</p>
-                      <p className="text-[14px] text-muted-foreground">{quest?.questType as string ?? ''}</p>
-                    </div>
-                    <DeliveryStatusBadge status={d.status} />
-                    <div>
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <div className="flex-1 bg-muted rounded-full h-1">
-                          <div
-                            className="bg-[#E6F0EA]0 h-1 rounded-full transition-all"
-                            style={{ width: `${(d.completedCriteria / d.totalCriteria) * 100}%` }}
-                          />
+              {loading ? (
+                <>
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </>
+              ) : deliveries.length === 0 ? (
+                <div className="px-4 py-6 text-center text-[14px] text-muted-foreground">
+                  {objectMissing ? 'No data — TrailQuest__c pending provisioning.' : 'No quest deliveries yet.'}
+                </div>
+              ) : (
+                deliveries.map(d => {
+                  const quest     = curriculumTrailQuests.find(q => q.id === d.questId);
+                  const isSending = sending === d.id;
+                  const isSent    = sent.has(d.id);
+                  return (
+                    <div
+                      key={d.id}
+                      className="grid grid-cols-[1fr_160px_120px_100px_80px] gap-x-3 items-center px-4 py-3"
+                    >
+                      <div>
+                        <p className="text-[14px] font-semibold text-foreground">{d.learner}</p>
+                        <p className="text-[14px] text-muted-foreground">{d.program}</p>
+                      </div>
+                      <div>
+                        <p className="text-[14px] text-foreground truncate">{quest?.name ?? d.questId}</p>
+                        <p className="text-[14px] text-muted-foreground">{quest?.questType as string ?? ''}</p>
+                      </div>
+                      <DeliveryStatusBadge status={d.status} />
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <div className="flex-1 bg-muted rounded-full h-1">
+                            <div
+                              className="bg-[#E6F0EA]0 h-1 rounded-full transition-all"
+                              style={{ width: `${d.totalCriteria > 0 ? (d.completedCriteria / d.totalCriteria) * 100 : 0}%` }}
+                            />
+                          </div>
+                          <span className="text-[14px] text-muted-foreground">{d.completedCriteria}/{d.totalCriteria}</span>
                         </div>
-                        <span className="text-[14px] text-muted-foreground">{d.completedCriteria}/{d.totalCriteria}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {isSent ? (
+                          <span className="text-[14px] text-[#2F6B3F] font-medium">Sent ✓</span>
+                        ) : (
+                          <button
+                            onClick={() => void deliverViaSlack(d)}
+                            disabled={isSending}
+                            title={`Send nudge to ${d.learner} via Slack`}
+                            className="flex items-center gap-1 text-[14px] text-[#4A154B] border border-[#4A154B]/20 rounded-md px-2 py-1 hover:bg-[#4A154B]/5 transition-colors disabled:opacity-40"
+                          >
+                            {isSending
+                              ? <Send className="w-2.5 h-2.5 animate-pulse" />
+                              : <Slack className="w-2.5 h-2.5" />
+                            }
+                          </button>
+                        )}
+                        <button
+                          onClick={() => openPennyForQuest(quest?.name as string ?? '', d.learner)}
+                          title="Penny coaching"
+                          className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-[#EDF5F8] transition-colors"
+                        >
+                          <Brain className="w-2.5 h-2.5 text-[#2F6F7E]" />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      {isSent ? (
-                        <span className="text-[14px] text-[#2F6B3F] font-medium">Sent ✓</span>
-                      ) : (
-                        <button
-                          onClick={() => void deliverViaSlack(d)}
-                          disabled={isSending}
-                          title={`Send nudge to ${d.learner} via Slack`}
-                          className="flex items-center gap-1 text-[14px] text-[#4A154B] border border-[#4A154B]/20 rounded-md px-2 py-1 hover:bg-[#4A154B]/5 transition-colors disabled:opacity-40"
-                        >
-                          {isSending
-                            ? <Send className="w-2.5 h-2.5 animate-pulse" />
-                            : <Slack className="w-2.5 h-2.5" />
-                          }
-                        </button>
-                      )}
-                      <button
-                        onClick={() => openPennyForQuest(quest?.name as string ?? '', d.learner)}
-                        title="Penny coaching"
-                        className="flex items-center justify-center w-6 h-6 rounded-md hover:bg-[#EDF5F8] transition-colors"
-                      >
-                        <Brain className="w-2.5 h-2.5 text-[#2F6F7E]" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -225,9 +298,8 @@ export default function TrailQuests() {
           <div className="space-y-3">
             {curriculumTrailQuests.map(quest => {
               const statusCfg    = CONTENT_STATUS_CONFIG[quest.status];
-              const deliveries   = QUEST_DELIVERIES.filter(d => d.questId === quest.id);
-              const activeCount  = deliveries.filter(d => d.status === 'In Progress').length;
-              const doneCount    = deliveries.filter(d => d.status === 'Completed').length;
+              const activeCount  = deliveries.filter(d => d.questId === quest.id && d.status === 'In Progress').length;
+              const doneCount    = deliveries.filter(d => d.questId === quest.id && d.status === 'Completed').length;
               return (
                 <div
                   key={quest.id}
@@ -314,7 +386,7 @@ export default function TrailQuests() {
           <div>
             <p className="text-[14px] font-medium text-foreground mb-0.5">Slack + Salesforce delivery</p>
             <p className="text-[14px] text-muted-foreground leading-snug">
-              Trail Quests are delivered via Slack (Penny AI channel) and completion events write to Salesforce
+              Trail Quests are delivered via Slack (Penny AI channel) and completion events write to Salesforce{' '}
               <span className="font-mono">TrailQuest__c</span>. Use the Slack button per learner to send a coaching nudge,
               or ask Penny to draft a personalised delivery message.
             </p>
@@ -325,7 +397,7 @@ export default function TrailQuests() {
         <div className="rounded-lg border border-border bg-muted/20 p-3.5 flex items-center gap-2">
           <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />
           <p className="text-[14px] text-muted-foreground">
-            <span className="font-semibold text-foreground">Flow Builder Badge</span> — Draft quest in Sprint 3 module. 
+            <span className="font-semibold text-foreground">Flow Builder Badge</span> — Draft quest in Sprint 3 module.{' '}
             Complete Module 3.1 content health fixes before assigning to learners.
           </p>
         </div>
