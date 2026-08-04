@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getSalesforceClient } from "../lib/getSalesforceClient.js";
+import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
 import {
   getLearnerContext,
   getTrailConfig,
@@ -341,6 +342,169 @@ router.post("/penny/ask", async (req, res) => {
       : `Could not reach Gemini: ${e instanceof Error ? e.message : String(e)}`;
     return res.status(502).json({ error: msg });
   }
+});
+
+// ── Preflight helpers (minimal SF client, rate-limit-aware) ───────────────────
+
+type SfFetchFn = (url: string, init?: RequestInit) => Promise<Response>;
+
+const SF_API_VERSION = "v62.0";
+
+async function pfSfGet(proxyFetch: SfFetchFn, path: string): Promise<Record<string, unknown>> {
+  const res = await proxyFetch(`/services/data/${SF_API_VERSION}${path}`, {
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+  });
+  if (!res.ok) {
+    if (res.status === 429) throw Object.assign(new Error("rate-limited"), { status: 429 });
+    const text = await res.text().catch(() => `HTTP ${res.status}`);
+    throw new Error(`${res.status}: ${text.slice(0, 120)}`);
+  }
+  return res.json() as Promise<Record<string, unknown>>;
+}
+
+async function pfSfGetRetry(proxyFetch: SfFetchFn, path: string): Promise<Record<string, unknown>> {
+  try { return await pfSfGet(proxyFetch, path); }
+  catch (e) {
+    if ((e as { status?: number }).status === 429) {
+      await new Promise(r => setTimeout(r, process.env['NODE_ENV'] === 'test' ? 0 : 12_000));
+      return pfSfGet(proxyFetch, path);
+    }
+    throw e;
+  }
+}
+
+// ── Capability requirement definitions (backend mirror) ────────────────────────
+
+interface BReq {
+  id: string;
+  label: string;
+  kind: 'sf-field' | 'sf-object' | 'integration' | 'config';
+  sfObject?: string;
+  sfField?: string;
+  integrationKey?: string;
+  capabilityDep?: string;
+  fixRoute?: string;
+  fixLabel?: string;
+  pennyMissingNote: string;
+}
+
+const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
+  'cap-learner-coaching': [
+    { id: 'salesforce-connected', label: 'Salesforce integration connected', kind: 'integration', integrationKey: 'salesforce', fixRoute: '/admin/integrations', fixLabel: 'Open Integrations', pennyMissingNote: 'Without a Salesforce connection I have no learner context.' },
+    { id: 'sf-contact-accessible', label: 'Contact object accessible in Salesforce', kind: 'sf-object', sfObject: 'Contact', pennyMissingNote: 'I read the Contact record to know who I\'m coaching.' },
+    { id: 'sf-penny-trail-config', label: 'Penny_Trail_Config__c field on Contact', kind: 'sf-field', sfObject: 'Contact', sfField: 'Penny_Trail_Config__c', fixRoute: '/admin/integrations', fixLabel: 'Open SF Validation', pennyMissingNote: 'This field links each learner to their Trail configuration.' },
+    { id: 'sf-program-engagement', label: 'Program_Engagement__c object accessible', kind: 'sf-object', sfObject: 'Program_Engagement__c', pennyMissingNote: 'I use engagement records to track progress.' },
+  ],
+  'cap-reflection-prompts': [
+    { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Reflection Prompts builds on Learner Coaching — set that up first.' },
+    { id: 'sf-training-plan-item', label: 'Training_Plan_Item__c object accessible', kind: 'sf-object', sfObject: 'Training_Plan_Item__c', pennyMissingNote: 'Module completion events come from Training_Plan_Item__c.' },
+    { id: 'slack-connected', label: 'Slack integration connected', kind: 'integration', integrationKey: 'slack', fixRoute: '/admin/integrations', fixLabel: 'Connect Slack', pennyMissingNote: 'I deliver reflection prompts through Slack DMs.' },
+  ],
+  'cap-resume-review': [
+    { id: 'salesforce-connected', label: 'Salesforce integration connected', kind: 'integration', integrationKey: 'salesforce', fixRoute: '/admin/integrations', fixLabel: 'Open Integrations', pennyMissingNote: 'I need Salesforce to look up certification and program data.' },
+    { id: 'sf-contact-accessible', label: 'Contact object accessible in Salesforce', kind: 'sf-object', sfObject: 'Contact', pennyMissingNote: 'I check program stage from the Contact record.' },
+    { id: 'sf-program-engagement', label: 'Program_Engagement__c object accessible', kind: 'sf-object', sfObject: 'Program_Engagement__c', pennyMissingNote: 'Program completion status calibrates the feedback.' },
+  ],
+  'cap-interview-prep': [
+    { id: 'cap-resume-review-active', label: 'Resume Review capability active', kind: 'config', capabilityDep: 'cap-resume-review', fixRoute: '/penny/capabilities', fixLabel: 'Enable Resume Review', pennyMissingNote: 'Interview Prep works best after Resume Review is in place.' },
+    { id: 'sf-contact-accessible', label: 'Contact object accessible in Salesforce', kind: 'sf-object', sfObject: 'Contact', pennyMissingNote: 'I need completion data to select the right interview questions.' },
+  ],
+  'cap-study-coach': [
+    { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Study Coach extends Learner Coaching — enable that first.' },
+    { id: 'sf-training-plan-item', label: 'Training_Plan_Item__c accessible', kind: 'sf-object', sfObject: 'Training_Plan_Item__c', pennyMissingNote: 'I check module deadlines from Training_Plan_Item__c.' },
+    { id: 'sf-program-engagement', label: 'Program_Engagement__c accessible', kind: 'sf-object', sfObject: 'Program_Engagement__c', pennyMissingNote: 'I need the engagement record to see where each learner is in their sprint.' },
+  ],
+};
+
+const DEFAULT_BACKEND_REQUIREMENTS: BReq[] = [
+  { id: 'salesforce-connected', label: 'Salesforce integration connected', kind: 'integration', integrationKey: 'salesforce', fixRoute: '/admin/integrations', fixLabel: 'Open Integrations', pennyMissingNote: 'I need a Salesforce connection to access learner and program data.' },
+  { id: 'sf-contact-accessible', label: 'Contact object accessible in Salesforce', kind: 'sf-object', sfObject: 'Contact', pennyMissingNote: 'I need Contact access to personalise my responses.' },
+];
+
+// ── GET /penny/capabilities/:id/preflight ──────────────────────────────────────
+
+router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> => {
+  const capabilityId = req.params["id"] ?? "";
+  const requirements = BACKEND_REQUIREMENTS[capabilityId] ?? DEFAULT_BACKEND_REQUIREMENTS;
+
+  // Attempt to get an authenticated SF fetch function
+  let proxyFetch: SfFetchFn | null = null;
+  let sfConnected = false;
+  try {
+    proxyFetch = await getEffectiveSfFetch(req);
+    sfConnected = true;
+  } catch {
+    /* SF not connected — degrade gracefully */
+  }
+
+  // Batch unique SF object describes to minimise API calls
+  const uniqueSfObjects = [...new Set(
+    requirements
+      .filter(r => (r.kind === 'sf-field' || r.kind === 'sf-object') && r.sfObject)
+      .map(r => r.sfObject!)
+  )];
+
+  const describeCache = new Map<string, Record<string, unknown> | null>();
+  if (proxyFetch) {
+    for (const objName of uniqueSfObjects) {
+      try {
+        const describe = await pfSfGetRetry(proxyFetch, `/sobjects/${objName}/describe`);
+        describeCache.set(objName, describe);
+      } catch {
+        describeCache.set(objName, null); // mark as inaccessible
+      }
+    }
+  }
+
+  // Check Slack availability (session-based heuristic — no full API call needed)
+  const sess = req.session as unknown as Record<string, unknown>;
+  const slackConnected =
+    typeof sess['slackAccessToken'] === 'string' ||
+    typeof sess['slackBotToken']    === 'string';
+
+  // Evaluate each requirement
+  const results = requirements.map(r => {
+    const base = { ...r };
+
+    if (r.kind === 'config') {
+      // Resolved client-side; return undetermined so the frontend overrides it
+      return { ...base, status: 'undetermined', detail: 'Checked by browser' };
+    }
+
+    if (r.kind === 'integration') {
+      if (r.integrationKey === 'salesforce') {
+        return { ...base, status: sfConnected ? 'met' : 'missing', detail: sfConnected ? 'Connected' : 'Not connected' };
+      }
+      if (r.integrationKey === 'slack') {
+        return { ...base, status: slackConnected ? 'met' : 'missing', detail: slackConnected ? 'Connected' : 'Not connected' };
+      }
+      return { ...base, status: 'undetermined', detail: 'Cannot check automatically' };
+    }
+
+    if (!proxyFetch) {
+      return { ...base, status: 'undetermined', detail: 'Salesforce not connected' };
+    }
+
+    const describe = r.sfObject ? describeCache.get(r.sfObject) : null;
+
+    if (r.kind === 'sf-object') {
+      if (describe === null) return { ...base, status: 'missing', detail: 'Not accessible' };
+      if (!describe)         return { ...base, status: 'undetermined', detail: 'Could not check' };
+      return { ...base, status: 'met', detail: 'Accessible' };
+    }
+
+    if (r.kind === 'sf-field') {
+      if (describe === null) return { ...base, status: 'missing', detail: 'Object not accessible' };
+      if (!describe)         return { ...base, status: 'undetermined', detail: 'Could not check' };
+      const fields = (describe['fields'] as Array<{ name: string }>) ?? [];
+      const found  = fields.some(f => f.name === r.sfField);
+      return { ...base, status: found ? 'met' : 'missing', detail: found ? 'Present' : 'Missing' };
+    }
+
+    return { ...base, status: 'undetermined', detail: 'Unknown requirement kind' };
+  });
+
+  res.json({ capabilityId, sfConnected, requirements: results });
 });
 
 // ── GET /penny/logs ────────────────────────────────────────────────────────────
