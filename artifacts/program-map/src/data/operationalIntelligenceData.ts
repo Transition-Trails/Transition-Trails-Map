@@ -289,7 +289,7 @@ export const readinessScorecards: ReadinessScorecard[] = [
     summary: 'Penny AI core capabilities are active and valuable. Governance, coverage, and advanced capabilities need significant investment before scale.',
     dimensions: [
       { label: 'Core capability delivery', score: 78, level: 'good',       notes: 'Study Coach, Trail Quests, and Consistency Review are delivering value.' },
-      { label: 'Prompt governance',        score: 58, level: 'needs-work', notes: 'Penny Admin assigned (Angela Landrith). Governance SLA not yet defined.' },
+      { label: 'Prompt governance',        score: 75, level: 'good',       notes: 'Penny Admin: Angela Landrith. Governance SLA defined: 3-day review-to-approval window for all Draft prompts.' },
       { label: 'Knowledge source coverage', score: 67, level: 'good',      notes: '6/9 sources Penny-approved. 3 pending.' },
       { label: 'Executive intelligence',   score: 35, level: 'at-risk',    notes: 'Executive Briefs and Program Health Summaries planned only.' },
       { label: 'Integration readiness',    score: 30, level: 'at-risk',    notes: 'Agentforce integration not started. Standalone Penny only.' },
@@ -316,13 +316,13 @@ export const readinessScorecards: ReadinessScorecard[] = [
 export const trendInsights: TrendInsight[] = [
   {
     id: 'trend-1',
-    type: 'risk',
-    urgency: 'near-term',
-    title: 'Prompt Governance SLA Not Yet Defined',
-    description: 'Penny Admin is assigned (Angela Landrith). The remaining governance gap is a formal prompt governance SLA — review cadence, approval workflow, and maximum time from draft to approval. Without it, governance depends on individual effort rather than process.',
+    type: 'opportunity',
+    urgency: 'watch',
+    title: 'Prompt Governance SLA Now Active — Monitor Compliance',
+    description: 'Governance SLA defined: all Draft prompts must reach Approved or Request Revision within 3 days of submission. Penny Admin (Angela Landrith) is the owner. Next step: verify the Prompt Studio review queue surfaces prompts older than 3 days as overdue.',
     affectedDomains: ['Penny AI', 'Curriculum', 'Knowledge'],
     affectedPrograms: ['All programs'],
-    relatedSystems: ['Penny Capability Registry', 'Penny Prompt Studio', 'Knowledge Source Registry'],
+    relatedSystems: ['Penny Prompt Studio', 'Penny Capability Registry'],
     actionPath: '/penny/prompts',
   },
   {
@@ -375,12 +375,12 @@ export const trendInsights: TrendInsight[] = [
 export const recommendations: Recommendation[] = [
   {
     id: 'rec-1',
-    action: 'Define Prompt Governance SLA',
+    action: 'Prompt Governance SLA Defined (3-Day Window)',
     domain: 'Penny AI',
     priority: 'high',
     effort: 'Low',
     systems: ['Penny Prompt Studio', 'Penny Capability Registry'],
-    nextSteps: ['Define review cycle and approval workflow', 'Document maximum time from draft to approval', 'Create escalation path for blocked prompts', 'Add SLA to Penny Admin role blueprint'],
+    nextSteps: ['SLA active: Draft → Approved or Request Revision within 3 days', 'Owner: Angela Landrith (Penny Admin)', 'Next: surface prompts older than 3 days as overdue in Prompt Studio review queue', 'Add SLA to Penny Admin role blueprint'],
     status: 'done',
   },
   {
@@ -455,12 +455,12 @@ export const recommendations: Recommendation[] = [
   },
   {
     id: 'rec-12',
-    action: 'Formalise Prompt Governance SLA',
+    action: 'Wire Prompt Studio Overdue Indicator (3-Day SLA)',
     domain: 'Penny AI',
     priority: 'medium',
     effort: 'Low',
     systems: ['Penny Prompt Studio', 'People & Roles Studio'],
-    nextSteps: ['Define review cycle and approval workflow', 'Document maximum time from draft to approval', 'Create escalation path for blocked prompts', 'Add to Penny Admin role blueprint'],
+    nextSteps: ['SLA confirmed: 3-day review-to-approval window', 'Surface prompts in Draft > 3 days as overdue in Prompt Studio review queue', 'Add SLA reminder to Penny Admin role blueprint', 'Define escalation path for prompts blocked beyond SLA'],
     status: 'open',
   },
 ];

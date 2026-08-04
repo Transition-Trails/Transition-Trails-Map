@@ -109,12 +109,12 @@ export function useHealthScores(): ComputedHealth {
           const agentLive = INTEGRATION_STATUS.agentforce?.health === 'live';
           const indicators = patch(domain.indicators, {
             'penny-3': {
-              status: pennyAdminOwner ? 'needs-work' : 'at-risk',
+              status: pennyAdminOwner ? 'good' : 'at-risk',
               detail: pennyAdminOwner
-                ? `Penny Admin assigned to ${pennyAdminOwner}. Prompt governance SLA still undefined.`
+                ? `Penny Admin: ${pennyAdminOwner}. Governance SLA: 3-day review-to-approval window for all Draft prompts.`
                 : 'No formal Penny Admin assigned. Prompt governance SLA not defined.',
-              actionLabel: pennyAdminOwner ? 'Define Governance SLA' : 'Assign Penny Admin',
-              actionPath:  pennyAdminOwner ? '/penny/prompts'        : '/admin/people-access',
+              actionLabel: pennyAdminOwner ? 'View Prompt Queue' : 'Assign Penny Admin',
+              actionPath:  pennyAdminOwner ? '/penny/prompts'    : '/admin/people-access',
             },
             'penny-6': {
               status: agentLive ? 'good' : 'needs-work',
