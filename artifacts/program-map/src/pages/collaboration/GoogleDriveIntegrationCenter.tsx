@@ -6,6 +6,7 @@ import {
   HardDrive, Activity, Image, Settings,
   CheckCircle, XCircle, AlertTriangle, RefreshCw,
   FileText, Key, Layers, Sparkles, CheckCircle2, ExternalLink,
+  Music, Video, FolderOpen,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -15,6 +16,140 @@ interface DriveStatusResponse {
   reason?:               string;
   pennyFolderConfigured: boolean;
   pennyFolderId?:        string | null;
+}
+
+interface PennyContentResponse {
+  configured:        boolean;
+  folderId:          string | null;
+  folderName:        string | null;
+  folderWebViewLink: string | null;
+  images:            { id: string; name: string }[];
+  audio:             { id: string; name: string }[];
+  video:             { id: string; name: string }[];
+  error?:            string;
+}
+
+// ── Penny Content Folder Card ─────────────────────────────────────────────────
+
+function PennyContentFolderCard() {
+  const { data, isLoading, refetch } = useQuery<PennyContentResponse>({
+    queryKey:  ['penny-content-summary'],
+    queryFn:   () => fetch('/api/drive/penny-content').then(r => r.json()),
+    staleTime: 60_000,
+  });
+
+  const configured = data?.configured === true;
+  const hasError   = !!data?.error;
+
+  const imgCount   = data?.images?.length ?? 0;
+  const audCount   = data?.audio?.length  ?? 0;
+  const vidCount   = data?.video?.length  ?? 0;
+  const totalCount = imgCount + audCount + vidCount;
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+
+      {/* Header row */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-7 h-7 rounded-md bg-[#E6F0EA] flex items-center justify-center shrink-0">
+            <FolderOpen className="w-4 h-4 text-[#2F6B3F]" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[14px] font-semibold text-foreground leading-tight">
+              {isLoading ? 'Checking folder…' : (data?.folderName ?? 'Penny Content Folder')}
+            </p>
+            <p className="text-[14px] text-muted-foreground">
+              {TERMS.aiAssistant} prompt media — images, audio, video
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Status badge */}
+          {isLoading ? (
+            <span className="flex items-center gap-1 border border-border rounded-full px-2 py-0.5 bg-muted/30">
+              <RefreshCw className="w-3 h-3 text-muted-foreground animate-spin" />
+              <span className="text-[14px] text-muted-foreground">Checking…</span>
+            </span>
+          ) : !configured ? (
+            <span className="flex items-center gap-1.5 border border-[#FFD08A] rounded-full px-2 py-0.5 bg-[#FFF3E0]">
+              <AlertTriangle className="w-3 h-3 text-[#CC8400]" />
+              <span className="text-[14px] font-semibold text-[#CC8400]">Not configured</span>
+            </span>
+          ) : hasError ? (
+            <span className="flex items-center gap-1.5 border border-[#E8B9B4] rounded-full px-2 py-0.5 bg-[#FBEAE6]">
+              <XCircle className="w-3 h-3 text-[#A93F2F]" />
+              <span className="text-[14px] font-semibold text-[#A93F2F]">Error</span>
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 border border-[#9FC3AE] rounded-full px-2 py-0.5 bg-[#E6F0EA]">
+              <CheckCircle className="w-3 h-3 text-[#2F6B3F]" />
+              <span className="text-[14px] font-semibold text-[#2F6B3F]">Connected</span>
+            </span>
+          )}
+
+          {/* Refresh */}
+          <button
+            onClick={() => refetch()}
+            className="p-1 rounded hover:bg-muted/60 transition-colors"
+            title="Refresh"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-muted-foreground/60" />
+          </button>
+        </div>
+      </div>
+
+      {/* Not configured notice */}
+      {!isLoading && !configured && (
+        <p className="text-[14px] text-[#CC8400] leading-snug">
+          Set <code className="font-mono text-[14px] bg-[#FFF3E0] px-1 rounded">GOOGLE_DRIVE_PENNY_FOLDER_ID</code> in Replit Secrets, then open the <strong>{TERMS.aiAssistant} Assets Setup</strong> tab for instructions.
+        </p>
+      )}
+
+      {/* Error notice */}
+      {!isLoading && configured && hasError && (
+        <p className="text-[14px] text-[#A93F2F] leading-snug">{data!.error}</p>
+      )}
+
+      {/* Asset counts — only when connected and no error */}
+      {!isLoading && configured && !hasError && (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 rounded-md border border-border bg-muted/30 px-3 py-1.5">
+            <Image  className="w-3.5 h-3.5 text-[#2F6F7E] shrink-0" />
+            <span className="text-[14px] font-semibold text-foreground">{imgCount}</span>
+            <span className="text-[14px] text-muted-foreground">image{imgCount !== 1 ? 's' : ''}</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-md border border-border bg-muted/30 px-3 py-1.5">
+            <Music  className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
+            <span className="text-[14px] font-semibold text-foreground">{audCount}</span>
+            <span className="text-[14px] text-muted-foreground">audio</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-md border border-border bg-muted/30 px-3 py-1.5">
+            <Video  className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
+            <span className="text-[14px] font-semibold text-foreground">{vidCount}</span>
+            <span className="text-[14px] text-muted-foreground">video{vidCount !== 1 ? 's' : ''}</span>
+          </div>
+          {totalCount === 0 && (
+            <span className="text-[14px] text-muted-foreground/60 italic">No media files found in the folder yet</span>
+          )}
+        </div>
+      )}
+
+      {/* Open in Drive link */}
+      {!isLoading && configured && !hasError && data?.folderWebViewLink && (
+        <a
+          href={data.folderWebViewLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/70 transition-colors"
+        >
+          Open in Drive <ExternalLink className="w-3 h-3" />
+        </a>
+      )}
+
+    </div>
+  );
 }
 
 // ── Penny subfolder definitions ────────────────────────────────────────────────
@@ -116,6 +251,9 @@ function OverviewTab() {
             </div>
           </div>
         </div>
+
+        {/* Penny content folder summary */}
+        <PennyContentFolderCard />
 
         {/* About */}
         <div className="rounded-lg border border-border bg-card p-4 space-y-2">
