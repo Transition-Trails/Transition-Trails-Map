@@ -7,6 +7,7 @@ import {
   Search, Plus, FolderOpen, Database, Link as LinkIcon,
   Edit, X, ChevronDown, ExternalLink, RefreshCw,
   CheckCircle2, AlertCircle, XCircle, Loader2,
+  ChevronRight, Home, CornerDownRight,
 } from 'lucide-react';
 import type { KnowledgeSource, SourceType, TrustLevel, SyncStatus, HealthStatus } from '@/data/knowledgeSourceData';
 import { useKnowledgeSources } from '@/hooks/useKnowledgeSources';
@@ -131,6 +132,8 @@ function Select({ value, onChange, children }: { value: string; onChange: (v: st
 
 // ── Drive folder picker ────────────────────────────────────────────────────────
 
+interface BreadcrumbItem { id: string; name: string; }
+
 function DriveFolderPicker({
   value, folderName, onChange,
 }: {
@@ -138,12 +141,15 @@ function DriveFolderPicker({
   folderName: string;
   onChange: (url: string, name: string) => void;
 }) {
-  const [open, setOpen]         = useState(false);
-  const [query, setQuery]       = useState('');
-  const [folders, setFolders]   = useState<DriveFolder[]>([]);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const pickerRef               = useRef<HTMLDivElement>(null);
+  const [open, setOpen]               = useState(false);
+  const [query, setQuery]             = useState('');
+  const [folders, setFolders]         = useState<DriveFolder[]>([]);
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState('');
+  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
+  const pickerRef                     = useRef<HTMLDivElement>(null);
+
+  const currentParentId = breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].id : 'root';
 
   // Close picker when clicking outside
   useEffect(() => {
@@ -155,12 +161,14 @@ function DriveFolderPicker({
     return () => document.removeEventListener('mousedown', handle);
   }, [open]);
 
-  async function browse() {
-    setOpen(true);
+  async function fetchFolders(parentId: string, q = '') {
     setLoading(true);
     setError('');
     try {
-      const qs = query ? `?q=${encodeURIComponent(query)}` : '';
+      const params = new URLSearchParams();
+      if (parentId !== 'root') params.set('parent', parentId);
+      if (q) params.set('q', q);
+      const qs = params.toString() ? `?${params.toString()}` : '';
       const r  = await fetch(`/api/drive/folders${qs}`);
       const d  = await r.json() as { folders: DriveFolder[]; error?: string };
       if (!r.ok || d.error) throw new Error(d.error ?? `HTTP ${r.status}`);
@@ -173,19 +181,37 @@ function DriveFolderPicker({
     }
   }
 
-  async function search(q: string) {
-    setQuery(q);
-    setLoading(true);
-    setError('');
-    try {
-      const r = await fetch(`/api/drive/folders${q ? `?q=${encodeURIComponent(q)}` : ''}`);
-      const d = await r.json() as { folders: DriveFolder[]; error?: string };
-      setFolders(d.folders ?? []);
-    } catch {
-      setFolders([]);
-    } finally {
-      setLoading(false);
+  function browse() {
+    setOpen(true);
+    setBreadcrumbs([]);
+    setQuery('');
+    fetchFolders('root');
+  }
+
+  function navigateInto(f: DriveFolder) {
+    const next = [...breadcrumbs, { id: f.id, name: f.name }];
+    setBreadcrumbs(next);
+    setQuery('');
+    fetchFolders(f.id);
+  }
+
+  function navigateTo(index: number) {
+    // index === -1 → root "My Drive"
+    if (index === -1) {
+      setBreadcrumbs([]);
+      setQuery('');
+      fetchFolders('root');
+    } else {
+      const next = breadcrumbs.slice(0, index + 1);
+      setBreadcrumbs(next);
+      setQuery('');
+      fetchFolders(next[index].id);
     }
+  }
+
+  function search(q: string) {
+    setQuery(q);
+    fetchFolders(currentParentId, q);
   }
 
   function select(f: DriveFolder) {
@@ -193,7 +219,14 @@ function DriveFolderPicker({
     setOpen(false);
   }
 
-  const displayUrl = value;
+  function selectCurrent() {
+    if (breadcrumbs.length === 0) return;
+    const cur = breadcrumbs[breadcrumbs.length - 1];
+    onChange(`https://drive.google.com/drive/folders/${cur.id}`, cur.name);
+    setOpen(false);
+  }
+
+  const displayUrl  = value;
   const displayName = folderName || (value ? value.replace('https://drive.google.com/drive/folders/', '').slice(0, 20) + '…' : '');
 
   return (
@@ -237,6 +270,46 @@ function DriveFolderPicker({
       {/* Picker dropdown */}
       {open && (
         <div className="border rounded-lg bg-background shadow-lg overflow-hidden">
+
+          {/* Breadcrumb trail */}
+          <div className="flex items-center gap-0.5 px-3 py-2 border-b bg-muted/20 flex-wrap">
+            <button
+              type="button"
+              onClick={() => navigateTo(-1)}
+              className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Home className="w-3 h-3" />
+              <span>My Drive</span>
+            </button>
+            {breadcrumbs.map((bc, i) => (
+              <span key={bc.id} className="flex items-center gap-0.5">
+                <ChevronRight className="w-3 h-3 text-muted-foreground/50" />
+                <button
+                  type="button"
+                  onClick={() => navigateTo(i)}
+                  className={`text-[11px] font-medium transition-colors max-w-[120px] truncate ${
+                    i === breadcrumbs.length - 1
+                      ? 'text-foreground cursor-default'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {bc.name}
+                </button>
+              </span>
+            ))}
+            {/* Select current folder button — only shown when inside a subfolder */}
+            {breadcrumbs.length > 0 && (
+              <button
+                type="button"
+                onClick={selectCurrent}
+                className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-primary hover:opacity-70 transition-opacity shrink-0"
+              >
+                <CheckCircle2 className="w-3 h-3" />
+                Select this folder
+              </button>
+            )}
+          </div>
+
           {/* Search within picker */}
           <div className="p-2 border-b">
             <div className="relative">
@@ -246,7 +319,7 @@ function DriveFolderPicker({
                 type="text"
                 value={query}
                 onChange={e => search(e.target.value)}
-                placeholder="Search your Drive folders…"
+                placeholder={breadcrumbs.length > 0 ? `Search inside "${breadcrumbs[breadcrumbs.length - 1].name}"…` : 'Search your Drive folders…'}
                 className="w-full h-8 pl-8 pr-3 text-sm bg-muted/30 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
@@ -260,25 +333,43 @@ function DriveFolderPicker({
             ) : error ? (
               <div className="px-3 py-3 text-sm text-[#8B2A2A]">{error}</div>
             ) : folders.length === 0 ? (
-              <div className="px-3 py-3 text-sm text-muted-foreground">No folders found.</div>
+              <div className="flex items-center gap-2 px-3 py-3 text-sm text-muted-foreground">
+                <CornerDownRight className="w-3.5 h-3.5 shrink-0" />
+                {breadcrumbs.length > 0 ? 'No subfolders here.' : 'No folders found.'}
+              </div>
             ) : folders.map(f => (
-              <button
+              <div
                 key={f.id}
-                type="button"
-                onClick={() => select(f)}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-muted/50 text-left transition-colors"
+                className="group flex items-center gap-2.5 px-3 py-2.5 hover:bg-muted/50 transition-colors"
               >
-                <FolderOpen className="w-4 h-4 text-muted-foreground shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{f.name}</p>
-                  {f.modifiedTime && (
-                    <p className="text-[11px] text-muted-foreground">
-                      Modified {new Date(f.modifiedTime).toLocaleDateString()}
-                    </p>
-                  )}
-                </div>
-                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100" />
-              </button>
+                {/* Navigate into folder */}
+                <button
+                  type="button"
+                  onClick={() => navigateInto(f)}
+                  className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
+                  title="Open folder"
+                >
+                  <FolderOpen className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{f.name}</p>
+                    {f.modifiedTime && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Modified {new Date(f.modifiedTime).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                {/* Select this folder */}
+                <button
+                  type="button"
+                  onClick={() => select(f)}
+                  title="Select this folder"
+                  className="shrink-0 text-[11px] font-semibold text-primary opacity-0 group-hover:opacity-100 hover:underline transition-opacity whitespace-nowrap"
+                >
+                  Select
+                </button>
+              </div>
             ))}
           </div>
         </div>
