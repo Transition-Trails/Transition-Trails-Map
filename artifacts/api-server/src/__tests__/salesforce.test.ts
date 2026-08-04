@@ -185,6 +185,107 @@ describe('GET /api/salesforce/validate', () => {
   });
 });
 
+// ── All three TT custom object groups ────────────────────────────────────────
+//
+// Confirms that each of the three logical object groups (penny, curriculum,
+// governance) is present in the response and that accessible counts are
+// consistent when the org returns records for every object.
+
+describe('GET /api/salesforce/validate — three TT custom object groups', () => {
+  test('all three groups appear: penny, curriculum, governance', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const tt = res.body.ttCustomObjects as {
+      groups: { id: string; label: string; accessibleCount: number; inaccessibleCount: number; undeterminedCount: number; totalCount: number; objects: unknown[] }[];
+      totalAccessible: number;
+      totalInaccessible: number;
+      totalUndetermined: number;
+      totalObjects: number;
+    };
+
+    const ids = tt.groups.map(g => g.id);
+    expect(ids).toContain('penny');
+    expect(ids).toContain('curriculum');
+    expect(ids).toContain('governance');
+    expect(tt.groups).toHaveLength(3);
+  });
+
+  test('penny group has 8 objects, all accessible', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    const tt = res.body.ttCustomObjects as {
+      groups: { id: string; accessibleCount: number; inaccessibleCount: number; undeterminedCount: number; totalCount: number }[];
+    };
+    const penny = tt.groups.find(g => g.id === 'penny');
+    expect(penny).toBeDefined();
+    expect(penny!.totalCount).toBe(8);
+    expect(penny!.accessibleCount).toBe(8);
+    expect(penny!.inaccessibleCount).toBe(0);
+    expect(penny!.undeterminedCount).toBe(0);
+  });
+
+  test('curriculum group has 5 objects, all accessible', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    const tt = res.body.ttCustomObjects as {
+      groups: { id: string; accessibleCount: number; inaccessibleCount: number; undeterminedCount: number; totalCount: number }[];
+    };
+    const curriculum = tt.groups.find(g => g.id === 'curriculum');
+    expect(curriculum).toBeDefined();
+    expect(curriculum!.totalCount).toBe(5);
+    expect(curriculum!.accessibleCount).toBe(5);
+    expect(curriculum!.inaccessibleCount).toBe(0);
+    expect(curriculum!.undeterminedCount).toBe(0);
+  });
+
+  test('governance group has 4 objects, all accessible', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    const tt = res.body.ttCustomObjects as {
+      groups: { id: string; accessibleCount: number; inaccessibleCount: number; undeterminedCount: number; totalCount: number }[];
+    };
+    const governance = tt.groups.find(g => g.id === 'governance');
+    expect(governance).toBeDefined();
+    expect(governance!.totalCount).toBe(4);
+    expect(governance!.accessibleCount).toBe(4);
+    expect(governance!.inaccessibleCount).toBe(0);
+    expect(governance!.undeterminedCount).toBe(0);
+  });
+
+  test('totals across all groups: 17 objects, all accessible, none inaccessible or undetermined', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    const tt = res.body.ttCustomObjects as {
+      totalAccessible: number; totalInaccessible: number; totalUndetermined: number; totalObjects: number;
+    };
+    expect(tt.totalObjects).toBe(17);
+    expect(tt.totalAccessible).toBe(17);
+    expect(tt.totalInaccessible).toBe(0);
+    expect(tt.totalUndetermined).toBe(0);
+  });
+
+  test('each group has correct label', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    const tt = res.body.ttCustomObjects as {
+      groups: { id: string; label: string }[];
+    };
+    const byId = Object.fromEntries(tt.groups.map(g => [g.id, g.label]));
+    expect(byId['penny']).toBe('Penny Objects');
+    expect(byId['curriculum']).toBe('Curriculum & Progress');
+    expect(byId['governance']).toBe('Build Governance');
+  });
+
+  test('each object in every group has accessible:true and a non-negative count', async () => {
+    const res = await request(app).get('/api/salesforce/validate');
+    const tt = res.body.ttCustomObjects as {
+      groups: { objects: { accessible: boolean | null; count: number }[] }[];
+    };
+    for (const group of tt.groups) {
+      for (const obj of group.objects) {
+        expect(obj.accessible).toBe(true);
+        expect(obj.count).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+});
+
 // ── Throttle → undetermined classification ───────────────────────────────────
 //
 // This is the critical invariant: when the Replit connector proxy returns 429
