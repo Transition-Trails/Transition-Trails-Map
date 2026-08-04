@@ -473,7 +473,7 @@ const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
     { id: 'salesforce-connected', label: 'Salesforce integration connected', kind: 'integration', integrationKey: 'salesforce', fixRoute: '/admin/integrations', fixLabel: 'Open Integrations', pennyMissingNote: 'Without a Salesforce connection I have no learner context.' },
     { id: 'sf-contact-accessible', label: 'Contact object accessible in Salesforce', kind: 'sf-object', sfObject: 'Contact', pennyMissingNote: 'I read the Contact record to know who I\'m coaching.' },
     { id: 'sf-penny-trail-config', label: 'Penny_Trail_Config__c field on Contact', kind: 'sf-field', sfObject: 'Contact', sfField: 'Penny_Trail_Config__c', fixRoute: '/admin/integrations', fixLabel: 'Open SF Validation', pennyMissingNote: 'This field links each learner to their Trail configuration.' },
-    { id: 'sf-program-engagement', label: 'Program_Engagement__c object accessible', kind: 'sf-object', sfObject: 'Program_Engagement__c', pennyMissingNote: 'I use engagement records to track progress.' },
+    { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c object accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I use engagement records to track progress.' },
   ],
   'cap-reflection-prompts': [
     { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Reflection Prompts builds on Learner Coaching — set that up first.' },
@@ -483,7 +483,7 @@ const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
   'cap-resume-review': [
     { id: 'salesforce-connected', label: 'Salesforce integration connected', kind: 'integration', integrationKey: 'salesforce', fixRoute: '/admin/integrations', fixLabel: 'Open Integrations', pennyMissingNote: 'I need Salesforce to look up certification and program data.' },
     { id: 'sf-contact-accessible', label: 'Contact object accessible in Salesforce', kind: 'sf-object', sfObject: 'Contact', pennyMissingNote: 'I check program stage from the Contact record.' },
-    { id: 'sf-program-engagement', label: 'Program_Engagement__c object accessible', kind: 'sf-object', sfObject: 'Program_Engagement__c', pennyMissingNote: 'Program completion status calibrates the feedback.' },
+    { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c object accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'Program completion status calibrates the feedback.' },
   ],
   'cap-interview-prep': [
     { id: 'cap-resume-review-active', label: 'Resume Review capability active', kind: 'config', capabilityDep: 'cap-resume-review', fixRoute: '/penny/capabilities', fixLabel: 'Enable Resume Review', pennyMissingNote: 'Interview Prep works best after Resume Review is in place.' },
@@ -492,7 +492,7 @@ const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
   'cap-study-coach': [
     { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Study Coach extends Learner Coaching — enable that first.' },
     { id: 'sf-training-plan-item', label: 'Training_Plan_Item__c accessible', kind: 'sf-object', sfObject: 'Training_Plan_Item__c', pennyMissingNote: 'I check module deadlines from Training_Plan_Item__c.' },
-    { id: 'sf-program-engagement', label: 'Program_Engagement__c accessible', kind: 'sf-object', sfObject: 'Program_Engagement__c', pennyMissingNote: 'I need the engagement record to see where each learner is in their sprint.' },
+    { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I need the engagement record to see where each learner is in their sprint.' },
   ],
 };
 

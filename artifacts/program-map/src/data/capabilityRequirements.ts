@@ -58,9 +58,9 @@ export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = 
     },
     {
       id: 'sf-program-engagement',
-      label: 'Program_Engagement__c object accessible',
+      label: 'pmdm__ProgramEngagement__c object accessible',
       kind: 'sf-object',
-      sfObject: 'Program_Engagement__c',
+      sfObject: 'pmdm__ProgramEngagement__c',
       pennyMissingNote:
         'I use engagement records to track progress and flag where learners need support.',
     },
@@ -118,9 +118,9 @@ export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = 
     },
     {
       id: 'sf-program-engagement',
-      label: 'Program_Engagement__c object accessible',
+      label: 'pmdm__ProgramEngagement__c object accessible',
       kind: 'sf-object',
-      sfObject: 'Program_Engagement__c',
+      sfObject: 'pmdm__ProgramEngagement__c',
       pennyMissingNote:
         'Program completion status helps me calibrate feedback — a Sprint 1 resume needs very different advice from a Sprint 6 one.',
     },
@@ -167,9 +167,9 @@ export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = 
     },
     {
       id: 'sf-program-engagement',
-      label: 'Program_Engagement__c accessible',
+      label: 'pmdm__ProgramEngagement__c accessible',
       kind: 'sf-object',
-      sfObject: 'Program_Engagement__c',
+      sfObject: 'pmdm__ProgramEngagement__c',
       pennyMissingNote:
         'I need the engagement record to see where each learner is in their sprint and what\'s overdue.',
     },
@@ -218,9 +218,9 @@ export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = 
     },
     {
       id: 'sf-program-engagement',
-      label: 'Program_Engagement__c accessible',
+      label: 'pmdm__ProgramEngagement__c accessible',
       kind: 'sf-object',
-      sfObject: 'Program_Engagement__c',
+      sfObject: 'pmdm__ProgramEngagement__c',
       pennyMissingNote:
         'I track what each learner has completed by reading their Program_Engagement__c record.',
     },
