@@ -6,12 +6,11 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   AlertCircle, AlertTriangle, BookOpen, Calendar, CheckCircle2,
-  ChevronRight, Clock, FileText, Globe, Loader2, RefreshCw,
+  ChevronRight, Clock, ExternalLink, FileText, Globe, Loader2, RefreshCw,
   Eye, EyeOff,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-
 interface SfArticle {
   id: string;
   knowledgeArticleId: string;
@@ -165,6 +164,8 @@ const PROSE_CLS = `prose prose-sm max-w-none text-foreground
   prose-td:text-muted-foreground prose-td:text-[13px]
   prose-code:text-[12px] prose-code:bg-muted/60 prose-code:px-1 prose-code:py-0.5 prose-code:rounded`;
 
+interface OrgUrlResponse { orgBaseUrl: string; }
+
 function DetailPanel({ item }: { item: ReviewItem }) {
   const { article, daysUntilDue, urgency, nextReviewDate } = item;
 
@@ -177,6 +178,20 @@ function DetailPanel({ item }: { item: ReviewItem }) {
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  const { data: orgData } = useQuery<OrgUrlResponse>({
+    queryKey: ['sf-org-url'],
+    queryFn: async () => {
+      const r = await fetch('/api/salesforce/org-url');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json() as Promise<OrgUrlResponse>;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const sfArticleUrl = (orgData?.orgBaseUrl && article.knowledgeArticleId)
+    ? `${orgData.orgBaseUrl}/lightning/r/Knowledge__kav/${article.knowledgeArticleId}/view`
+    : null;
 
   const urgencyCfg = URGENCY_CFG[urgency];
 
@@ -245,6 +260,20 @@ function DetailPanel({ item }: { item: ReviewItem }) {
             <RefreshCw className="w-3 h-3" /> Updated {fmtDate(article.lastModifiedDate)}
           </span>
         </div>
+
+        {sfArticleUrl && (
+          <div className="mt-4">
+            <a
+              href={sfArticleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-[12px] font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Open in Salesforce
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        )}
       </div>
 
       {/* Body */}
