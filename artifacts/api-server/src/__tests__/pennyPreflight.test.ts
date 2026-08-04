@@ -304,3 +304,58 @@ describe('GET /api/penny/capabilities/:id/preflight — sf-object status logic',
     }
   });
 });
+
+// ── cap-cohort-summaries: pmdm__ServiceSchedule__c probe ──────────────────────
+//
+// pmdm__ServiceSchedule__c has NOT been verified against the live org via a
+// direct describe probe.  These tests pin the exact semantics for that object:
+//  - A true 404 from describe is the only conclusive evidence of absence → 'missing'
+//  - Any other non-200 (throttle, permissions, network) → 'undetermined'
+
+describe('GET /api/penny/capabilities/cap-cohort-summaries/preflight — pmdm__ServiceSchedule__c probe', () => {
+  test('sf-object requirement for pmdm__ServiceSchedule__c is "met" when describe succeeds', async () => {
+    mockDescribeMode.value = 'success';
+    const res = await request(app).get('/api/penny/capabilities/cap-cohort-summaries/preflight');
+    expect(res.status).toBe(200);
+    const body = res.body as PreflightBody;
+    expect(body.capabilityId).toBe('cap-cohort-summaries');
+    const scheduleReq = body.requirements.find(r => r.kind === 'sf-object' && r.id === 'sf-service-schedule');
+    expect(scheduleReq).toBeDefined();
+    expect(scheduleReq!.status).toBe('met');
+  });
+
+  test('sf-object requirement for pmdm__ServiceSchedule__c is "missing" when describe returns 404', async () => {
+    mockDescribeMode.value = 'notFound';
+    const res = await request(app).get('/api/penny/capabilities/cap-cohort-summaries/preflight');
+    expect(res.status).toBe(200);
+    const body = res.body as PreflightBody;
+    const scheduleReq = body.requirements.find(r => r.kind === 'sf-object' && r.id === 'sf-service-schedule');
+    expect(scheduleReq).toBeDefined();
+    expect(scheduleReq!.status).toBe('missing');
+    expect(scheduleReq!.detail).toMatch(/not found/i);
+  });
+
+  test('sf-object requirement for pmdm__ServiceSchedule__c is "undetermined" (NOT "missing") when describe is throttled (429)', async () => {
+    mockDescribeMode.value = 'throttled';
+    const res = await request(app).get('/api/penny/capabilities/cap-cohort-summaries/preflight');
+    expect(res.status).toBe(200);
+    const body = res.body as PreflightBody;
+    const scheduleReq = body.requirements.find(r => r.kind === 'sf-object' && r.id === 'sf-service-schedule');
+    expect(scheduleReq).toBeDefined();
+    // A throttle is NOT evidence of absence — must never report "missing"
+    expect(scheduleReq!.status).toBe('undetermined');
+    expect(scheduleReq!.status).not.toBe('missing');
+  });
+
+  test('sf-object requirement for pmdm__ServiceSchedule__c is "undetermined" (NOT "missing") when describe returns 403', async () => {
+    mockDescribeMode.value = 'forbidden';
+    const res = await request(app).get('/api/penny/capabilities/cap-cohort-summaries/preflight');
+    expect(res.status).toBe(200);
+    const body = res.body as PreflightBody;
+    const scheduleReq = body.requirements.find(r => r.kind === 'sf-object' && r.id === 'sf-service-schedule');
+    expect(scheduleReq).toBeDefined();
+    // A permissions error is NOT evidence of absence — must never report "missing"
+    expect(scheduleReq!.status).toBe('undetermined');
+    expect(scheduleReq!.status).not.toBe('missing');
+  });
+});
