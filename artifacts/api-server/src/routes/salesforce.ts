@@ -313,6 +313,123 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     requiredFields: [],
     excludeNamespaces: [],
   },
+  // ── Penny custom objects ────────────────────────────────────────────────────
+  {
+    id: "penny-trail-config-fields",
+    objectApi: "Penny_Trail_Config__c",
+    label: "Penny Trail Config",
+    description: "Fields queried when loading a learner's trail configuration for Penny coaching",
+    requiredFields: [
+      "Trail_ID__c", "Penny_Role__c", "Tone__c",
+      "Focal_Points__c", "Special_Instructions__c", "Is_Active__c",
+    ],
+    excludeNamespaces: [],
+  },
+  {
+    id: "penny-interaction-log-fields",
+    objectApi: "Penny_Interaction_Log__c",
+    label: "Penny Interaction Log",
+    description: "Write-critical object — fields created on every Penny ask; Learner__c is required (not nillable)",
+    requiredFields: [
+      "Learner__c", "User_Message__c", "Penny_Response__c",
+      "Prompt_Mode__c", "Source__c",
+    ],
+    excludeNamespaces: [],
+  },
+  {
+    id: "penny-quest-submission-fields",
+    objectApi: "Penny_Quest_Submission__c",
+    label: "Penny Quest Submission",
+    description: "Fields queried when retrieving a learner's quest submission history",
+    requiredFields: [
+      "Learner__c", "Submission_Text__c", "Submitted_At__c",
+    ],
+    excludeNamespaces: [],
+  },
+  {
+    id: "penny-career-review-fields",
+    objectApi: "Penny_Career_Review__c",
+    label: "Penny Career Review",
+    description: "Fields queried and written for learner career review records",
+    requiredFields: [
+      "Learner__c", "Area_Scores__c", "Feedback_JSON__c",
+      "Readiness_Label__c", "Review_Mode__c", "Reviewed_At__c", "Target_Role__c",
+    ],
+    excludeNamespaces: [],
+  },
+  {
+    id: "penny-weekly-report-fields",
+    objectApi: "Penny_Weekly_Report__c",
+    label: "Penny Weekly Report",
+    description: "Fields queried when loading weekly learner progress reports",
+    requiredFields: [
+      "Generated_At__c", "Top_Themes__c", "Support_Flags__c",
+      "Suggested_Actions__c", "Trail_Breakdown__c", "Week_Start__c", "Week_End__c",
+    ],
+    excludeNamespaces: [],
+  },
+  {
+    id: "penny-badge-fields",
+    objectApi: "Penny_Badge__c",
+    label: "Penny Badge",
+    description: "Fields queried when loading badges awarded to a learner",
+    requiredFields: [
+      "Learner__c", "Awarded_By__c",
+    ],
+    excludeNamespaces: [],
+  },
+  {
+    id: "penny-gamification-fields",
+    objectApi: "Penny_Gamification__c",
+    label: "Penny Gamification",
+    description: "Fields queried when loading gamification points and sprint scores for a learner",
+    requiredFields: [
+      "Learner__c", "Points__c", "Sprint_Points__c", "Sprint_Number__c",
+      "Reason__c", "Note__c", "Awarded_By__c",
+    ],
+    excludeNamespaces: [],
+  },
+  {
+    id: "penny-classroom-nudge-fields",
+    objectApi: "Penny_Classroom_Nudge__c",
+    label: "Penny Classroom Nudge",
+    description: "Classroom nudge records — no field queries in use yet; confirms object presence",
+    requiredFields: [],
+    excludeNamespaces: [],
+  },
+  // ── Build Governance custom objects ────────────────────────────────────────
+  {
+    id: "tt-build-item-fields",
+    objectApi: "TT_Build_Item__c",
+    label: "TT Build Item",
+    description: "Governance build item records — confirms object presence and custom field availability",
+    requiredFields: [],
+    excludeNamespaces: [],
+  },
+  {
+    id: "tt-automation-fields",
+    objectApi: "TT_Automation__c",
+    label: "TT Automation",
+    description: "Governance automation records — confirms object presence and custom field availability",
+    requiredFields: [],
+    excludeNamespaces: [],
+  },
+  {
+    id: "tt-sop-automation-fields",
+    objectApi: "TT_SOP_Automation__c",
+    label: "TT SOP Automation",
+    description: "Governance SOP automation records — confirms object presence and custom field availability",
+    requiredFields: [],
+    excludeNamespaces: [],
+  },
+  {
+    id: "tt-sop-account-fields",
+    objectApi: "TT_SOP_Account__c",
+    label: "TT SOP Account",
+    description: "Governance SOP account records — confirms object presence and custom field availability",
+    requiredFields: [],
+    excludeNamespaces: [],
+  },
 ];
 
 // ── GET /salesforce/validate ───────────────────────────────────────────────────
