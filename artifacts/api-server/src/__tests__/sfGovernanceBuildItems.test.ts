@@ -1,15 +1,21 @@
 /**
- * Tests for GET /api/salesforce/governance/build-items — query failure handling.
+ * Tests for GET and POST /api/salesforce/governance/build-items.
  *
- * Coverage:
+ * GET coverage (C1–C4, Guard):
  *   C1. Valid request, but client.query() throws a realistic SF error
  *       → route returns 500 with a generic message (not the raw SF error)
  *   C2. 500 body contains a non-empty error string
  *   C3. 500 body does not contain a stack trace or file paths
  *   C4. 500 body does not contain raw Salesforce XML or SOAP markup
  *
- * Pattern mirrors sfGovernanceNudges.test.ts — a shared mockQueryError controls
- * whether client.query() throws; reset in beforeEach.
+ * POST coverage (P1–P2):
+ *   P1. Valid body, but client.createRecord() throws → route returns 500
+ *       with a generic message (not the raw SF error)
+ *   P2. 500 body does not contain a stack trace, file paths, or raw SF
+ *       XML/SOAP markup
+ *
+ * Pattern mirrors sfGovernanceNudges.test.ts — shared mockQueryError and
+ * mockCreateRecordError control throw behaviour; both reset in beforeEach.
  */
 
 import { describe, test, expect, vi, beforeEach } from 'vitest';
@@ -29,7 +35,7 @@ vi.mock('../middlewares/requireAuth.js', () => ({
 
 // ── Shared mock state ──────────────────────────────────────────────────────────
 
-const { mockQueryRecords, mockQueryError } = vi.hoisted(() => ({
+const { mockQueryRecords, mockQueryError, mockCreateRecordError } = vi.hoisted(() => ({
   /** Records returned by any SOQL query (happy-path). */
   mockQueryRecords: { value: [] as Record<string, unknown>[] },
   /**
@@ -37,6 +43,11 @@ const { mockQueryRecords, mockQueryError } = vi.hoisted(() => ({
    * Reset to null in beforeEach.
    */
   mockQueryError: { value: null as Error | null },
+  /**
+   * When non-null, client.createRecord() throws this error instead of returning
+   * a success result.  Reset to null in beforeEach.
+   */
+  mockCreateRecordError: { value: null as Error | null },
 }));
 
 // ── Mock salesforceOAuth (describe probes — not exercised by this suite) ───────
@@ -64,7 +75,10 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
         records:   mockQueryRecords.value as T[],
       };
     },
-    createRecord: async () => ({ id: 'mock-id' }),
+    createRecord: async () => {
+      if (mockCreateRecordError.value) throw mockCreateRecordError.value;
+      return { id: 'mock-id' };
+    },
     updateRecord: async () => undefined,
   }),
 }));
@@ -79,7 +93,10 @@ vi.mock('../lib/connectorSalesforceClient.js', () => ({
         records:   mockQueryRecords.value as T[],
       };
     }
-    async createRecord() { return { id: 'mock-id' }; }
+    async createRecord() {
+      if (mockCreateRecordError.value) throw mockCreateRecordError.value;
+      return { id: 'mock-id' };
+    }
     async updateRecord() { return undefined; }
   },
 }));
@@ -91,6 +108,7 @@ import app from '../app.js';
 beforeEach(() => {
   mockQueryRecords.value = [];
   mockQueryError.value = null;
+  mockCreateRecordError.value = null;
 });
 
 // ── C. Route tests: query failure handling ─────────────────────────────────────
@@ -176,5 +194,99 @@ describe('GET /api/salesforce/governance/build-items — query failure handling'
 
     expect(res.status).toBe(500);
     expect(res.body.items).toBeUndefined();
+  });
+});
+
+// ── P. POST route: createRecord failure handling ───────────────────────────────
+
+describe('POST /api/salesforce/governance/build-items — createRecord failure handling', () => {
+
+  // ── P1: createRecord throws → 500 with generic message ───────────────────────
+
+  test('P1: returns 500 when client.createRecord() throws INVALID_SESSION_ID', async () => {
+    mockCreateRecordError.value = new Error('INVALID_SESSION_ID: Session expired or invalid');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 'Test Build Item' });
+
+    expect(res.status).toBe(500);
+  });
+
+  test('P1: returns 500 when client.createRecord() throws INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY', async () => {
+    mockCreateRecordError.value = new Error(
+      'INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY: insufficient access rights on cross-reference id'
+    );
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 'Build Item With Bad Ref', automationId: 'bad-id' });
+
+    expect(res.status).toBe(500);
+  });
+
+  test('P1: 500 body contains a non-empty error field', async () => {
+    mockCreateRecordError.value = new Error('INVALID_SESSION_ID: Session expired or invalid');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 'Test Build Item' });
+
+    expect(res.status).toBe(500);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  // ── P2: 500 body must not expose stack traces or raw SF XML/SOAP ─────────────
+
+  test('P2: 500 body does not contain a stack trace', async () => {
+    mockCreateRecordError.value = new Error('INVALID_SESSION_ID: Session expired or invalid');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 'Test Build Item' });
+
+    expect(res.status).toBe(500);
+
+    const body = JSON.stringify(res.body);
+    // Stack traces contain "at " followed by a function name or file path
+    expect(body).not.toMatch(/\bat\s+\w/);
+    // No TypeScript or compiled-JS file paths
+    expect(body).not.toMatch(/\.ts:\d+/);
+    expect(body).not.toMatch(/\.js:\d+/);
+  });
+
+  test('P2: 500 body does not contain raw Salesforce XML or SOAP markup', async () => {
+    // Simulate a network-level SOAP fault returned instead of JSON
+    mockCreateRecordError.value = new Error(
+      '<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope>' +
+      '<soapenv:Body><soapenv:Fault><faultcode>sf:INVALID_SESSION_ID</faultcode>' +
+      '<faultstring>Invalid Session ID found in SessionHeader</faultstring>' +
+      '</soapenv:Fault></soapenv:Body></soapenv:Envelope>'
+    );
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 'Test Build Item' });
+
+    expect(res.status).toBe(500);
+
+    const body = JSON.stringify(res.body);
+    expect(body).not.toMatch(/<soapenv:/);
+    expect(body).not.toMatch(/<faultcode>/);
+    expect(body).not.toMatch(/<\?xml/);
+  });
+
+  // ── Guard: success id must not appear in error responses ─────────────────────
+
+  test('Guard: id field is not present in the 500 error body', async () => {
+    mockCreateRecordError.value = new Error('INVALID_SESSION_ID: Session expired or invalid');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 'Test Build Item' });
+
+    expect(res.status).toBe(500);
+    expect(res.body.id).toBeUndefined();
   });
 });
