@@ -304,73 +304,61 @@ function PermissionMatrixTab() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
 
-      {/* ── Filter toolbar ─────────────────────────────────────────────────── */}
-      <div className="flex-shrink-0 border-b border-border bg-card px-5 py-3 space-y-2.5">
+      {/* ── Filter toolbar — single row ─────────────────────────────────────── */}
+      <div className="flex-shrink-0 border-b border-border bg-card px-5 py-2">
+        <div className="flex items-center gap-3 flex-wrap">
 
-        {/* Health summary + row count */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          {/* Health summary badges */}
+          <div className="flex items-center gap-1.5">
             {[
-              { label: `${hc.healthy} healthy`,          dot: 'bg-[#E6F0EA]0', cls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' },
-              { label: `${hc.needsAttn} needs attention`, dot: 'bg-[#CC8400]',  cls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' },
-              { label: `${hc.incomplete} incomplete`,    dot: 'bg-[#FBEAE6]0',   cls: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' },
+              { label: `${hc.healthy} healthy`,           cls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]' },
+              { label: `${hc.needsAttn} needs attention`,  cls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]' },
+              { label: `${hc.incomplete} incomplete`,      cls: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]' },
             ].map(b => (
-              <div key={b.label} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[14px] font-semibold ${b.cls}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${b.dot}`} />{b.label}
-              </div>
+              <span key={b.label} className={`text-[13px] font-semibold px-2 py-0.5 rounded border ${b.cls}`}>
+                {b.label}
+              </span>
             ))}
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[14px] text-muted-foreground">
-              {shown === total ? `${total} roles` : `${shown} of ${total} roles`}
-            </span>
-            {hasFilters && (
-              <button onClick={clearFilters} className="flex items-center gap-1 text-[14px] text-muted-foreground hover:text-foreground">
-                <X className="w-3 h-3" /> Clear all
-              </button>
-            )}
-          </div>
-        </div>
 
-        {/* Filter controls */}
-        <div className="flex items-center gap-4 flex-wrap">
+          <div className="w-px h-4 bg-border/60 mx-1" />
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/50" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/50" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search personas…"
-              className="pl-7 pr-3 py-1.5 text-[14px] rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground/50 outline-none focus:border-ring w-44"
+              placeholder="Search…"
+              className="pl-6 pr-2 py-1 text-[13px] rounded-md border border-border bg-background text-foreground placeholder-muted-foreground/50 outline-none focus:border-ring w-32"
             />
           </div>
 
           {/* Tier pills */}
           <div className="flex items-center gap-1">
-            <span className="text-[14px] font-bold text-muted-foreground/50 mr-1">Tier</span>
+            <span className="text-[13px] font-bold text-muted-foreground/50 mr-0.5">Tier</span>
             {TIER_FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.key}
                 onClick={() => setFilterTier(opt.key)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[14px] font-semibold transition-all ${
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[13px] font-semibold transition-all ${
                   filterTier === opt.key
                     ? 'bg-foreground border-foreground text-background'
                     : 'bg-card border-border text-muted-foreground hover:border-ring/50'
                 }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${opt.dot}`} />{opt.label}
+                {opt.label}
               </button>
             ))}
           </div>
 
           {/* Type */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[14px] font-bold text-muted-foreground/50">Type</span>
+          <div className="flex items-center gap-1">
+            <span className="text-[13px] font-bold text-muted-foreground/50">Type</span>
             <select
               value={filterType}
               onChange={e => setFilterType(e.target.value as FilterType)}
-              className="text-[14px] rounded-lg border border-border bg-background text-foreground px-2 py-1.5 outline-none focus:border-ring"
+              className="text-[13px] rounded-md border border-border bg-background text-foreground px-1.5 py-0.5 outline-none focus:border-ring"
             >
               {TYPE_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
             </select>
@@ -378,20 +366,32 @@ function PermissionMatrixTab() {
 
           {/* Health pills */}
           <div className="flex items-center gap-1">
-            <span className="text-[14px] font-bold text-muted-foreground/50 mr-1">Health</span>
+            <span className="text-[13px] font-bold text-muted-foreground/50 mr-0.5">Health</span>
             {HEALTH_FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.key}
                 onClick={() => setFilterHealth(opt.key)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[14px] font-semibold transition-all ${
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[13px] font-semibold transition-all ${
                   filterHealth === opt.key
                     ? 'bg-foreground border-foreground text-background'
                     : 'bg-card border-border text-muted-foreground hover:border-ring/50'
                 }`}
               >
-                <span className={`w-1.5 h-1.5 rounded-full ${opt.dot}`} />{opt.label}
+                {opt.label}
               </button>
             ))}
+          </div>
+
+          {/* Row count + clear */}
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-[13px] text-muted-foreground">
+              {shown === total ? `${total} roles` : `${shown} / ${total}`}
+            </span>
+            {hasFilters && (
+              <button onClick={clearFilters} className="flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">
+                <X className="w-3 h-3" /> Clear
+              </button>
+            )}
           </div>
 
         </div>
@@ -1115,41 +1115,34 @@ export default function PeopleAccess() {
   return (
     <div className="h-full flex flex-col overflow-hidden">
 
-      {/* Compact header */}
+      {/* Single-row header + tabs */}
       <div className="flex-shrink-0 border-b bg-card">
-        <div className="flex items-center justify-between gap-4 px-5 pt-3 pb-0">
-          <div className="min-w-0">
-            <p className="text-[14px] font-bold text-muted-foreground/50 mb-0.5">
-              Administration · People &amp; Access
-            </p>
-            <h1 className="text-[15px] font-semibold text-foreground leading-snug">People, Roles &amp; Access</h1>
-            <p className="text-[14px] text-muted-foreground mt-0.5 mb-3">
-              Sort and filter all {MATRIX_ROWS.length} personas by tier, type, or health. Click a row to inspect its full access profile.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0 pb-3">
-            <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
-              <CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" />
-              <span className="text-[14px] font-semibold text-[#2F6B3F]">Auth live · Clerk + Google Groups</span>
-            </div>
-          </div>
-        </div>
+        <div className="flex items-center justify-between gap-3 px-5 pt-2 pb-0">
 
-        {/* Tab bar */}
-        <div className="flex items-center gap-0 px-5">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-[14px] font-semibold border-b-2 transition-all ${
-                activeTab === tab.id
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border/60'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {/* Left: title + tabs on same baseline */}
+          <div className="flex items-center gap-0 min-w-0">
+            <span className="text-[14px] font-semibold text-foreground mr-4 whitespace-nowrap">People, Roles &amp; Access</span>
+            {TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-[14px] font-semibold border-b-2 transition-all ${
+                  activeTab === tab.id
+                    ? 'border-primary text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border/60'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Right: auth badge */}
+          <div className="flex items-center gap-1.5 bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 flex-shrink-0 mb-1">
+            <CheckCircle2 className="w-3 h-3 text-[#2F6B3F]" />
+            <span className="text-[14px] font-semibold text-[#2F6B3F]">Auth live · Clerk + Google Groups</span>
+          </div>
+
         </div>
       </div>
 
