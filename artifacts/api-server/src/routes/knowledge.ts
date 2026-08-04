@@ -1276,6 +1276,9 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
     const typeParam   = typeof req.query["type"]   === "string" ? req.query["type"]   : "";
     const qParam      = typeof req.query["q"]      === "string" ? req.query["q"].trim() : "";
     const catParam    = typeof req.query["cat"]    === "string" ? req.query["cat"]    : "";
+    // sort=oldest → ORDER BY LastModifiedDate ASC (used by review queue to surface most-stale articles first)
+    const sortParam   = typeof req.query["sort"]   === "string" ? req.query["sort"]   : "newest";
+    const orderDir    = sortParam === "oldest" ? "ASC" : "DESC";
 
     // Build WITH DATA CATEGORY (valid for both SOQL and SOSL).
     let withDataCategory = "";
@@ -1318,7 +1321,7 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       const soslQuery =
         `FIND {${soslEscape(qParam)}} IN ALL FIELDS ` +
         `RETURNING KnowledgeArticleVersion(${fields.selectList} ` +
-        `WHERE ${returningWhere} ORDER BY LastModifiedDate DESC LIMIT 200) ` +
+        `WHERE ${returningWhere} ORDER BY LastModifiedDate ${orderDir} LIMIT 200) ` +
         `${withDataCategory}`;
 
       const encoded = encodeURIComponent(soslQuery);
@@ -1342,7 +1345,7 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
                     FROM KnowledgeArticleVersion
                     ${where}
                     ${withDataCategory}
-                    ORDER BY LastModifiedDate DESC
+                    ORDER BY LastModifiedDate ${orderDir}
                     LIMIT 200`;
 
       const result = await client.query<KavRow>(soql);

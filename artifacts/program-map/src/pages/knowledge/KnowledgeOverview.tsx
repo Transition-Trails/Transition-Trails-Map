@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import {
   Database, BookMarked, GitBranch, Archive, CheckCircle, AlertTriangle,
-  XCircle, Shield, ChevronRight, Brain, Clock, Layers,
+  XCircle, Shield, ChevronRight, Brain, Clock, Layers, ClipboardList,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TRUST_LEVEL_CONFIG } from '@/data/knowledgeSourceData';
@@ -404,6 +404,12 @@ export default function KnowledgeOverview() {
               title="Library"
               desc="Source documents, templates, and reference materials."
               path="/knowledge/library"
+            />
+            <NavCard
+              icon={ClipboardList}
+              title="Review Queue"
+              desc="Published articles with a biannual review due within the next 30 days."
+              path="/knowledge/review-queue"
             />
             <NavCard
               icon={GitBranch}

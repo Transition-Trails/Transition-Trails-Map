@@ -82,9 +82,10 @@ import TestPenny               from "@/pages/penny/TestPenny";
 import LearnerDetail           from "@/pages/penny/LearnerDetail";
 import TrailConfigs            from "@/pages/penny/TrailConfigs";
 import { PennyPageShell }      from "@/components/penny/PennyPageShell";
-import KnowledgeOverview  from "@/pages/knowledge/KnowledgeOverview";
+import KnowledgeOverview      from "@/pages/knowledge/KnowledgeOverview";
 import KnowledgeSourcesAdmin  from "@/pages/knowledge/KnowledgeSourcesAdmin";
 import SfKnowledgeArticles    from "@/pages/knowledge/SfKnowledgeArticles";
+import KnowledgeReviewQueue   from "@/pages/knowledge/KnowledgeReviewQueue";
 import LibraryDocuments   from "@/pages/library/LibraryDocuments";
 import OrgMemory          from "@/pages/knowledge/OrgMemory";
 import CollaborationWorkspace from "@/pages/collaboration/CollaborationWorkspace";
@@ -274,8 +275,9 @@ function Router() {
       <Route path="/penny/video-production">   <PennyPageShell><VideoProduction /></PennyPageShell></Route>
       <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
-      <Route path="/knowledge/sources"      component={KnowledgeSourcesAdmin} />
+      <Route path="/knowledge/sources"       component={KnowledgeSourcesAdmin} />
       <Route path="/knowledge/sf-articles"  component={SfKnowledgeArticles} />
+      <Route path="/knowledge/review-queue" component={KnowledgeReviewQueue} />
       <Route path="/knowledge/library" component={LibraryDocuments} />
       <Route path="/knowledge/memory"  component={OrgMemory} />
       <Route path="/knowledge"         component={KnowledgeOverview} />
