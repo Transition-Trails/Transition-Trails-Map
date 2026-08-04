@@ -443,15 +443,33 @@ async function pfSfGet(proxyFetch: SfFetchFn, path: string): Promise<Record<stri
   return res.json() as Promise<Record<string, unknown>>;
 }
 
+/**
+ * Per-object timeout for preflight describe calls.
+ * Configurable via PF_OBJECT_TIMEOUT_MS env var; defaults to 5 s.
+ * A slow describe never blocks the entire preflight response beyond this budget.
+ */
+const PF_OBJECT_TIMEOUT_MS = (() => {
+  const v = parseInt(process.env['PF_OBJECT_TIMEOUT_MS'] ?? '', 10);
+  return isNaN(v) || v <= 0 ? 5_000 : v;
+})();
+
+/**
+ * Wraps pfSfGet with:
+ *  1. A hard per-object timeout (PF_OBJECT_TIMEOUT_MS).  If the describe
+ *     call stalls, the timeout resolves first and the object is classified
+ *     as 'undetermined' by the caller.
+ *  2. No retry on 429.  A throttle is not evidence of absence — the preflight
+ *     batch loop classifies rate-limited objects as 'undetermined' immediately
+ *     rather than waiting the old 12-second hold.
+ */
 async function pfSfGetRetry(proxyFetch: SfFetchFn, path: string): Promise<Record<string, unknown>> {
-  try { return await pfSfGet(proxyFetch, path); }
-  catch (e) {
-    if ((e as { status?: number }).status === 429) {
-      await new Promise(r => setTimeout(r, process.env['NODE_ENV'] === 'test' ? 0 : 12_000));
-      return pfSfGet(proxyFetch, path);
-    }
-    throw e;
-  }
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(
+      () => reject(Object.assign(new Error('preflight-timeout'), { status: 0 })),
+      PF_OBJECT_TIMEOUT_MS,
+    )
+  );
+  return Promise.race([pfSfGet(proxyFetch, path), timeoutPromise]);
 }
 
 // ── Capability requirement definitions (backend mirror) ────────────────────────
