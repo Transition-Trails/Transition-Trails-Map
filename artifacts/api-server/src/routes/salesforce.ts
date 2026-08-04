@@ -393,8 +393,10 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     id: "penny-classroom-nudge-fields",
     objectApi: "Penny_Classroom_Nudge__c",
     label: "Penny Classroom Nudge",
-    description: "Classroom nudge records — no field queries in use yet; confirms object presence",
-    requiredFields: [],
+    description: "Classroom nudge records written when Penny sends a nudge to a learner during a session",
+    requiredFields: [
+      "Learner__c", "Nudge_Type__c", "Message__c", "Status__c", "Sent_At__c",
+    ],
     excludeNamespaces: [],
   },
   // ── Build Governance custom objects ────────────────────────────────────────
@@ -402,32 +404,40 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     id: "tt-build-item-fields",
     objectApi: "TT_Build_Item__c",
     label: "TT Build Item",
-    description: "Governance build item records — confirms object presence and custom field availability",
-    requiredFields: [],
+    description: "Governance build item records queried and written by the Build Governance pipeline",
+    requiredFields: [
+      "Status__c", "Priority__c", "Description__c", "Assigned_To__c", "Due_Date__c",
+    ],
     excludeNamespaces: [],
   },
   {
     id: "tt-automation-fields",
     objectApi: "TT_Automation__c",
     label: "TT Automation",
-    description: "Governance automation records — confirms object presence and custom field availability",
-    requiredFields: [],
+    description: "Automation definition records queried when the governance layer resolves active automations",
+    requiredFields: [
+      "Is_Active__c", "Automation_Type__c", "Description__c", "Status__c",
+    ],
     excludeNamespaces: [],
   },
   {
     id: "tt-sop-automation-fields",
     objectApi: "TT_SOP_Automation__c",
     label: "TT SOP Automation",
-    description: "Governance SOP automation records — confirms object presence and custom field availability",
-    requiredFields: [],
+    description: "Junction records linking SOP definitions to their associated automations",
+    requiredFields: [
+      "TT_SOP__c", "TT_Automation__c", "Status__c",
+    ],
     excludeNamespaces: [],
   },
   {
     id: "tt-sop-account-fields",
     objectApi: "TT_SOP_Account__c",
     label: "TT SOP Account",
-    description: "Governance SOP account records — confirms object presence and custom field availability",
-    requiredFields: [],
+    description: "Junction records linking SOP definitions to the accounts they govern",
+    requiredFields: [
+      "Account__c", "TT_SOP__c", "Status__c",
+    ],
     excludeNamespaces: [],
   },
 ];
