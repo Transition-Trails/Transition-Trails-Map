@@ -832,18 +832,40 @@ function EditDrawer({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t bg-card flex justify-end gap-3 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)]">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors">
-            Cancel
-          </button>
-          <button
-            onClick={() => onSave(draft)}
-            disabled={isSaving || Object.keys(draft).length === 0}
-            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50"
-          >
-            {isSaving ? 'Saving…' : 'Save Changes'}
-          </button>
-        </div>
+        {(() => {
+          const effectiveSyncStatus = draft.syncStatus ?? source.syncStatus;
+          const newFolderSelected   = Boolean(draft.driveFolderUrl);
+          const blockedByBadFolder  =
+            source.type === 'Google Drive' &&
+            folderInaccessible === true &&
+            effectiveSyncStatus === 'Live' &&
+            !newFolderSelected;
+
+          return (
+            <div className="border-t bg-card shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)]">
+              {blockedByBadFolder && (
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-[#FAE6E6] border-b border-[#F0BDBD]">
+                  <XCircle className="w-3.5 h-3.5 shrink-0 text-[#8B2A2A]" />
+                  <p className="text-[11px] text-[#8B2A2A] leading-snug font-medium">
+                    Cannot set status to Live — folder is unreachable. Select a new folder first.
+                  </p>
+                </div>
+              )}
+              <div className="flex justify-end gap-3 p-4">
+                <button onClick={onClose} className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={() => onSave(draft)}
+                  disabled={isSaving || Object.keys(draft).length === 0 || blockedByBadFolder}
+                  className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50"
+                >
+                  {isSaving ? 'Saving…' : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
