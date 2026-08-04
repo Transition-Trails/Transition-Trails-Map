@@ -2,14 +2,14 @@
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/collab-overview/CommandCenter.tsx": () => import("../components/mockups/collab-overview/CommandCenter.tsx"),
+  "./components/mockups/gmail-page/OptionA.tsx": () => import("../components/mockups/gmail-page/OptionA.tsx"),
+  "./components/mockups/gmail-page/OptionB.tsx": () => import("../components/mockups/gmail-page/OptionB.tsx"),
   "./components/mockups/gmail-panel/InboxHybrid.tsx": () => import("../components/mockups/gmail-panel/InboxHybrid.tsx"),
   "./components/mockups/gmail-panel/InboxSummary.tsx": () => import("../components/mockups/gmail-panel/InboxSummary.tsx"),
   "./components/mockups/gmail-panel/QuickCompose.tsx": () => import("../components/mockups/gmail-panel/QuickCompose.tsx"),
   "./components/mockups/integration-hub/OptionA.tsx": () => import("../components/mockups/integration-hub/OptionA.tsx"),
   "./components/mockups/integration-hub/OptionB.tsx": () => import("../components/mockups/integration-hub/OptionB.tsx"),
   "./components/mockups/integration-hub/OptionC.tsx": () => import("../components/mockups/integration-hub/OptionC.tsx"),
-  "./components/mockups/gmail-page/OptionA.tsx": () => import("../components/mockups/gmail-page/OptionA.tsx"),
-  "./components/mockups/gmail-page/OptionB.tsx": () => import("../components/mockups/gmail-page/OptionB.tsx"),
   "./components/mockups/knowledge-sources/IntegrationWorkshop.tsx": () => import("../components/mockups/knowledge-sources/IntegrationWorkshop.tsx"),
   "./components/mockups/knowledge-sources/SourceBuilderStudio.tsx": () => import("../components/mockups/knowledge-sources/SourceBuilderStudio.tsx"),
   "./components/mockups/knowledge-sources/SourceRegistry.tsx": () => import("../components/mockups/knowledge-sources/SourceRegistry.tsx"),
