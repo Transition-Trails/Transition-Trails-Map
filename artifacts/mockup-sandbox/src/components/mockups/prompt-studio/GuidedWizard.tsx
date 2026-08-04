@@ -5,7 +5,8 @@ import { useState } from "react";
 import {
   ArrowRight, ArrowLeft, Brain, Sparkles, Users, MessageSquare,
   FileText, BookOpen, CheckCircle2, ChevronRight, Play,
-  Lightbulb, Target, Wand2, Eye, RotateCcw
+  Lightbulb, Target, Wand2, Eye, RotateCcw,
+  ImageIcon, Music, Video, FolderOpen, Wifi, WifiOff, AlertCircle,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -72,6 +73,113 @@ const CATEGORIES: Category[] = [
     accent: "#6B3FA0",
   },
 ];
+
+// ── Penny content (Drive folder) ─────────────────────────────────────────────
+
+type AssetStatus = "available" | "not-configured";
+
+interface PennyAsset {
+  kind: "image" | "audio" | "video";
+  label: string;
+  status: AssetStatus;
+  hint: string;
+}
+
+const PENNY_CONTENT: { folder: string; connected: boolean; assets: PennyAsset[] } = {
+  folder: "Penny Content / Assets",
+  connected: true,
+  assets: [
+    { kind: "image", label: "penny-avatar.png",        status: "available",       hint: "Used in chat bubbles and preview cards" },
+    { kind: "audio", label: "penny-voice-intro.mp3",   status: "available",       hint: "Played when Penny first opens in a session" },
+    { kind: "video", label: "penny-welcome.mp4",       status: "not-configured",  hint: "Short welcome clip — add to Drive folder to activate" },
+  ],
+};
+
+const ASSET_ICONS = { image: ImageIcon, audio: Music, video: Video } as const;
+
+// ── PennyAvatarCard ───────────────────────────────────────────────────────────
+
+function PennyAvatarCard({ compact = false }: { compact?: boolean }) {
+  const availableCount = PENNY_CONTENT.assets.filter(a => a.status === "available").length;
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-2 bg-[#F0F5F2] border-b border-[#D9EAE0] rounded-none">
+        {/* Avatar circle */}
+        <div className="w-7 h-7 rounded-full bg-[#1B3A2D] flex items-center justify-center text-[11px] font-bold text-white shrink-0 ring-2 ring-white shadow-sm">
+          P
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[12px] font-semibold text-[#1B3A2D]">Penny's avatar</span>
+            <span className="flex items-center gap-0.5 text-[10px] font-bold text-[#2F6B3F] bg-[#C8E6D0] rounded-full px-1.5 py-0.5">
+              <Wifi className="w-2.5 h-2.5" /> Connected
+            </span>
+          </div>
+          <p className="text-[11px] text-[#64748B] truncate">{PENNY_CONTENT.folder}</p>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          {PENNY_CONTENT.assets.map(a => {
+            const Icon = ASSET_ICONS[a.kind];
+            return (
+              <span key={a.kind} title={`${a.label} — ${a.status}`}
+                className={`w-5 h-5 rounded flex items-center justify-center ${
+                  a.status === "available" ? "bg-[#1B3A2D] text-white" : "bg-[#E2E8F0] text-[#94A3B8]"
+                }`}>
+                <Icon className="w-3 h-3" />
+              </span>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-[#D9EAE0] bg-[#F0F5F2] overflow-hidden">
+      {/* Header row */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#D9EAE0]">
+        <div className="w-9 h-9 rounded-full bg-[#1B3A2D] flex items-center justify-center text-[14px] font-bold text-white ring-2 ring-white shadow shrink-0">
+          P
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-[13px] font-semibold text-[#1B3A2D]">Penny's avatar & voice</p>
+            <span className="flex items-center gap-1 text-[10px] font-bold text-[#2F6B3F] bg-[#C8E6D0] border border-[#9FC3AE] rounded-full px-2 py-0.5">
+              <Wifi className="w-2.5 h-2.5" /> Content folder connected
+            </span>
+          </div>
+          <p className="text-[11px] text-[#64748B] flex items-center gap-1 mt-0.5">
+            <FolderOpen className="w-3 h-3" /> {PENNY_CONTENT.folder}
+          </p>
+        </div>
+      </div>
+
+      {/* Asset rows */}
+      <div className="divide-y divide-[#D9EAE0]">
+        {PENNY_CONTENT.assets.map(a => {
+          const Icon = ASSET_ICONS[a.kind];
+          const avail = a.status === "available";
+          return (
+            <div key={a.kind} className="flex items-center gap-3 px-4 py-2.5">
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${avail ? "bg-[#1B3A2D]" : "bg-[#E2E8F0]"}`}>
+                <Icon className={`w-3.5 h-3.5 ${avail ? "text-white" : "text-[#94A3B8]"}`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-[12px] font-medium truncate ${avail ? "text-[#1E293B]" : "text-[#94A3B8]"}`}>{a.label}</p>
+                <p className="text-[11px] text-[#64748B] leading-tight">{a.hint}</p>
+              </div>
+              {avail
+                ? <span className="text-[10px] font-bold text-[#2F6B3F] bg-[#C8E6D0] border border-[#9FC3AE] rounded-full px-2 py-0.5 shrink-0">Ready</span>
+                : <span className="text-[10px] font-bold text-[#94A3B8] bg-[#F1F5F9] border border-[#E2E8F0] rounded-full px-2 py-0.5 shrink-0">Not set</span>
+              }
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 const AUDIENCE_OPTIONS = ["All Learners", "Active Learners", "Coaching Stage", "Job Ready", "Alumni", "Staff / Coaches"];
 const TONE_OPTIONS = ["Warm & Encouraging", "Direct & Clear", "Curious & Inviting", "Professional", "Celebratory"];
@@ -276,20 +384,25 @@ function Step2({ category, fields, onChange }: {
 
       {/* Live preview */}
       <div className="flex-1 flex flex-col bg-[#F8FAFC] overflow-hidden">
-        <div className="px-8 pt-8 pb-5 border-b border-[#E8F0EC]">
-          <div className="flex items-center gap-2">
+        {/* Preview header */}
+        <div className="px-8 pt-6 pb-4 border-b border-[#E8F0EC]">
+          <div className="flex items-center gap-2 mb-1">
             <Eye className="w-4 h-4 text-[#64748B]" />
             <span className="text-[13px] font-semibold text-[#475569] uppercase tracking-wide">Live Preview</span>
           </div>
-          <p className="text-[12px] text-[#94A3B8] mt-1">How Penny will introduce herself to this prompt</p>
+          <p className="text-[12px] text-[#94A3B8]">How Penny will appear when this prompt fires</p>
         </div>
+
+        {/* Avatar + content strip */}
+        <PennyAvatarCard compact />
 
         <div className="flex-1 overflow-y-auto p-8">
           {/* Penny "card" */}
           <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
             <div className="bg-[#1B3A2D] px-5 py-3 flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                <Brain className="w-4 h-4 text-white" />
+              {/* Avatar from content folder */}
+              <div className="w-8 h-8 rounded-full bg-[#2F6B3F] flex items-center justify-center text-[13px] font-bold text-white ring-2 ring-white/30 shrink-0">
+                P
               </div>
               <span className="text-[14px] font-semibold text-white">Penny</span>
               <span className="text-[11px] text-white/50 ml-auto">{fields.audience || "..."}</span>
@@ -331,6 +444,11 @@ function Step2({ category, fields, onChange }: {
               </p>
             </div>
           )}
+
+          {/* Penny content card — full detail, shown in step 2 */}
+          <div className="mt-5">
+            <PennyAvatarCard />
+          </div>
         </div>
       </div>
     </div>
