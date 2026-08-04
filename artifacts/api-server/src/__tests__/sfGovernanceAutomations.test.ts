@@ -41,10 +41,15 @@ vi.mock('../middlewares/requireAuth.js', () => ({
 
 type DescribeOverride = string[] | null | { rateLimited: true; retryAfter?: number };
 
-const { describeOverrides, mockQueryRecords } = vi.hoisted(() => ({
+const { describeOverrides, mockQueryRecords, mockQueryError } = vi.hoisted(() => ({
   describeOverrides: new Map<string, DescribeOverride>(),
   /** Records returned by any SOQL query against TT_Automation__c. */
   mockQueryRecords: { value: [] as Record<string, unknown>[] },
+  /**
+   * When set, client.query() throws this error instead of returning records.
+   * Reset to null in beforeEach.
+   */
+  mockQueryError: { value: null as Error | null },
 }));
 
 // Helper to build a minimal Response-like object (matches sfValidateCustomFields pattern)
@@ -141,11 +146,14 @@ vi.mock('../lib/salesforceOAuth.js', () => ({
 
 vi.mock('../lib/getSalesforceClient.js', () => ({
   getSalesforceClient: (_req: unknown) => ({
-    query: async <T>(_soql: string) => ({
-      totalSize: mockQueryRecords.value.length,
-      done:      true,
-      records:   mockQueryRecords.value as T[],
-    }),
+    query: async <T>(_soql: string) => {
+      if (mockQueryError.value) throw mockQueryError.value;
+      return {
+        totalSize: mockQueryRecords.value.length,
+        done:      true,
+        records:   mockQueryRecords.value as T[],
+      };
+    },
     createRecord: async () => ({ id: 'mock-id' }),
     updateRecord: async () => undefined,
   }),
@@ -154,6 +162,7 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
 vi.mock('../lib/connectorSalesforceClient.js', () => ({
   ConnectorSalesforceClient: class {
     async query<T>(_soql: string) {
+      if (mockQueryError.value) throw mockQueryError.value;
       return {
         totalSize: mockQueryRecords.value.length,
         done:      true,
@@ -179,6 +188,7 @@ import type { ISalesforceClient } from '../lib/salesforceClient.js';
 beforeEach(() => {
   describeOverrides.clear();
   mockQueryRecords.value = [];
+  mockQueryError.value = null;
 });
 
 // ── A. Unit tests: getAutomations() ───────────────────────────────────────────
@@ -469,6 +479,87 @@ describe('GET /api/salesforce/governance/automations — route integration tests
     const res = await request(app).get('/api/salesforce/governance/automations');
     expect(res.status).toBe(503);
     // automations key must not be present in the 503 body
+    expect(res.body.automations).toBeUndefined();
+  });
+
+  // ── B5: Describe succeeds, query throws → 500 with generic message ────────────
+
+  test('B5: returns 500 when describe succeeds but client.query() throws', async () => {
+    // All four fields present — describe path is clear
+    describeOverrides.set('TT_Automation__c', ALL_FOUR_FIELDS);
+    // Force the SOQL query to throw a realistic SF error
+    mockQueryError.value = new Error('INVALID_SESSION_ID: Session expired or invalid');
+
+    const res = await request(app).get('/api/salesforce/governance/automations');
+    expect(res.status).toBe(500);
+  });
+
+  test('B5: 500 body contains a generic error field', async () => {
+    describeOverrides.set('TT_Automation__c', ALL_FOUR_FIELDS);
+    mockQueryError.value = new Error('QUERY_TIMEOUT: CpuTime limit exceeded');
+
+    const res = await request(app).get('/api/salesforce/governance/automations');
+    expect(res.status).toBe(500);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  // ── B6: 500 body must not expose stack trace or raw SF XML ───────────────────
+
+  test('B6: 500 error body does not contain a stack trace', async () => {
+    describeOverrides.set('TT_Automation__c', ALL_FOUR_FIELDS);
+    mockQueryError.value = new Error('INVALID_SESSION_ID: Session expired or invalid');
+
+    const res = await request(app).get('/api/salesforce/governance/automations');
+    expect(res.status).toBe(500);
+
+    const body = JSON.stringify(res.body);
+    // Stack traces contain "at " followed by a function name or file path
+    expect(body).not.toMatch(/\bat\s+\w/);
+    // No file paths leaked
+    expect(body).not.toMatch(/\.ts:\d+/);
+    expect(body).not.toMatch(/\.js:\d+/);
+  });
+
+  test('B6: 500 error body does not contain raw Salesforce XML or HTML', async () => {
+    describeOverrides.set('TT_Automation__c', ALL_FOUR_FIELDS);
+    // Simulate a network-level error returning raw XML (common with SOAP faults)
+    mockQueryError.value = new Error(
+      '<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope>' +
+      '<faultcode>sf:INVALID_SESSION_ID</faultcode></soapenv:Envelope>'
+    );
+
+    const res = await request(app).get('/api/salesforce/governance/automations');
+    expect(res.status).toBe(500);
+
+    const body = JSON.stringify(res.body);
+    // The response must not re-echo raw XML tags back to the caller
+    expect(body).not.toMatch(/<soapenv:/);
+    expect(body).not.toMatch(/<faultcode>/);
+  });
+
+  // ── B7: TtAutomationFieldsNotProvisionedError from query → 503 ───────────────
+
+  test('B7: TtAutomationFieldsNotProvisionedError thrown from query still returns 503 with phase2Deferred:true', async () => {
+    // Describe reports all fields present, but getAutomations() somehow throws the
+    // not-provisioned error (unexpected guard path) — route must still return 503.
+    describeOverrides.set('TT_Automation__c', ALL_FOUR_FIELDS);
+    mockQueryError.value = new TtAutomationFieldsNotProvisionedError();
+
+    const res = await request(app).get('/api/salesforce/governance/automations');
+    expect(res.status).toBe(503);
+    expect(res.body.phase2Deferred).toBe(true);
+  });
+
+  test('B7: 503 body from TtAutomationFieldsNotProvisionedError contains an error string', async () => {
+    describeOverrides.set('TT_Automation__c', ALL_FOUR_FIELDS);
+    mockQueryError.value = new TtAutomationFieldsNotProvisionedError();
+
+    const res = await request(app).get('/api/salesforce/governance/automations');
+    expect(res.status).toBe(503);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.length).toBeGreaterThan(0);
+    // automations key must not be present in the error body
     expect(res.body.automations).toBeUndefined();
   });
 });

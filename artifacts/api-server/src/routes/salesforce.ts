@@ -1380,9 +1380,15 @@ router.get("/salesforce/governance/automations", async (req, res) => {
       // Should not reach here (we checked above), but guard anyway.
       return res.status(503).json({ error: err.message, phase2Deferred: true });
     }
-    return res.status(500).json({
-      error: err instanceof Error ? err.message : "Internal server error",
-    });
+    // Log the full error server-side; return a sanitised message to the client.
+    // Raw Salesforce errors may contain SOAP XML faults or internal stack details
+    // that must never be forwarded to callers.
+    console.error('[salesforce/governance/automations] SOQL query error:', err);
+    const rawMessage = err instanceof Error ? err.message : 'Internal server error';
+    const safeMessage = /<[^>]+>/.test(rawMessage)
+      ? 'Salesforce query failed. Check server logs for details.'
+      : rawMessage;
+    return res.status(500).json({ error: safeMessage });
   }
 });
 
