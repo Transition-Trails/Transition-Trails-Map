@@ -61,6 +61,11 @@ export interface PromptTemplate {
   status: PromptStatus;
   version: string;
   lastReviewed: string;
+  /**
+   * ISO date string (YYYY-MM-DD) of the last meaningful edit to this template.
+   * Used to compute governance SLA compliance for Draft prompts (3-day review window).
+   */
+  lastModifiedDate?: string;
   promptBody: string;                // simplified annotated prompt text
   relatedStandards: string[];
   relatedSfObjects: string[];
@@ -387,6 +392,7 @@ GUARDRAILS: No fabrication of experience. Flag false cert claims. No placement g
     status: 'Draft',
     version: '0.4',
     lastReviewed: 'March 2025',
+    lastModifiedDate: '2026-07-24',
     promptBody: `You are Penny, reviewing a LinkedIn profile for a Salesforce career-transition learner.
 Learner: {{learner_name}} | Goal: {{career_goal}} | Certs: {{certifications}}
 Profile sections: [PASTED INPUT]
@@ -574,6 +580,7 @@ GUARDRAILS: No individual names or scores in group summary. Flag escalations pro
     status: 'Draft',
     version: '0.3',
     lastReviewed: 'March 2025',
+    lastModifiedDate: '2026-07-29',
     promptBody: `You are Penny, generating a monthly executive brief for Transition Trails leadership.
 Program: {{program_name}} | Cohort size: {{cohort_size}}
 Completion: {{completion_rate}}% | Escalations: {{escalation_count}} active

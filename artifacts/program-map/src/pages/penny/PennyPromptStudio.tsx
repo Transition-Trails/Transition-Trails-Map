@@ -20,6 +20,7 @@ import {
   ArrowLeft, Eye, Wand2, Lightbulb, RotateCcw,
   ImageIcon, Music, Video, FolderOpen, Wifi, ExternalLink,
   Layers, Database, ShieldCheck, Lock, Sparkles, Upload,
+  Timer,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -62,6 +63,25 @@ const WIZARD_CATEGORIES: {
 const TONE_OPTIONS = ['Warm & Encouraging', 'Direct & Clear', 'Curious & Inviting', 'Professional', 'Celebratory'];
 const AUDIENCE_OPTIONS = ['All Learners', 'Active Learners', 'Coaching Stage', 'Job Ready', 'Alumni', 'Staff / Coaches'];
 
+// ── Governance SLA helpers ────────────────────────────────────────────────────
+
+const DRAFT_SLA_DAYS = 3;
+
+/**
+ * Returns how many days past the 3-day governance SLA a Draft prompt is,
+ * or null if the template is not a Draft or has no lastModifiedDate.
+ */
+function getDraftOverdueDays(template: PromptTemplate): number | null {
+  if (template.status !== 'Draft' || !template.lastModifiedDate) return null;
+  const modified = new Date(template.lastModifiedDate);
+  const now = new Date();
+  // Zero out time so we compare calendar days only
+  modified.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+  const diffDays = Math.floor((now.getTime() - modified.getTime()) / (1000 * 60 * 60 * 24));
+  return diffDays > DRAFT_SLA_DAYS ? diffDays - DRAFT_SLA_DAYS : null;
+}
+
 // ── Small reusables ───────────────────────────────────────────────────────────
 
 function Chip({ children, cls }: { children: React.ReactNode; cls: string }) {
@@ -91,6 +111,23 @@ function StatusBadge({ status }: { status: PromptStatus }) {
     <span className={`inline-flex items-center gap-1 text-[11px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
       <Icon className="w-2.5 h-2.5" />
       {status === 'Review' ? 'In Review' : status}
+    </span>
+  );
+}
+
+/**
+ * Overdue badge shown on Draft prompts that have breached the 3-day governance SLA.
+ * `daysOverdue` is the number of calendar days past the SLA deadline.
+ */
+function OverdueBadge({ daysOverdue, size = 'default' }: { daysOverdue: number; size?: 'default' | 'compact' }) {
+  const label = size === 'compact' ? 'Overdue' : `Overdue · ${daysOverdue}d past SLA`;
+  return (
+    <span
+      title={`This Draft has been waiting ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} past the 3-day governance review SLA. Approve or request a revision to clear this flag.`}
+      className="inline-flex items-center gap-1 text-[11px] font-bold border rounded-full px-2 py-0.5 text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4] cursor-help"
+    >
+      <Timer className="w-2.5 h-2.5 shrink-0" />
+      {label}
     </span>
   );
 }
@@ -308,11 +345,21 @@ function Sidebar({
 
   const grouped = useMemo(() =>
     DOMAIN_ORDER.reduce<Record<string, PromptTemplate[]>>((acc, d) => {
-      const items = filtered.filter(t => t.domain === d);
+      const items = filtered.filter(t => t.domain === d).sort((a, b) => {
+        // Float overdue drafts to the top within each domain group
+        const aOverdue = getDraftOverdueDays(a) ?? -1;
+        const bOverdue = getDraftOverdueDays(b) ?? -1;
+        return bOverdue - aOverdue;
+      });
       if (items.length) acc[d] = items;
       return acc;
     }, {}),
   [filtered]);
+
+  const overdueCount = useMemo(
+    () => templates.filter(t => getDraftOverdueDays(t) !== null).length,
+    [templates],
+  );
 
   return (
     <aside className="w-[240px] shrink-0 border-r border-border flex flex-col bg-muted/20 overflow-hidden">
@@ -363,12 +410,17 @@ function Sidebar({
               </div>
               {items.map(t => {
                 const isActive = t.id === selectedId;
+                const overdueDays = getDraftOverdueDays(t);
                 return (
                   <button
                     key={t.id}
                     onClick={() => onSelect(t.id)}
                     className={`w-full text-left px-3 py-2 transition-colors ${
-                      isActive ? 'bg-foreground' : 'hover:bg-muted/50'
+                      isActive
+                        ? 'bg-foreground'
+                        : overdueDays !== null
+                        ? 'bg-[#FFF5F3] hover:bg-[#FBEAE6]'
+                        : 'hover:bg-muted/50'
                     }`}
                   >
                     <div className="flex items-start gap-1">
@@ -379,10 +431,23 @@ function Sidebar({
                         {t.name}
                       </p>
                     </div>
-                    <div className="flex items-center gap-1 mt-0.5">
+                    <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                       <span className={`text-[10px] font-bold ${isActive ? 'text-background/70' : 'text-muted-foreground'}`}>
                         {t.status === 'Review' ? 'In Review' : t.status}
                       </span>
+                      {overdueDays !== null && (
+                        <span
+                          title={`Overdue by ${overdueDays} day${overdueDays !== 1 ? 's' : ''} — breached 3-day governance SLA`}
+                          className={`inline-flex items-center gap-0.5 text-[9px] font-bold border rounded-full px-1.5 py-0.5 cursor-help ${
+                            isActive
+                              ? 'text-orange-200 bg-orange-900/40 border-orange-700/40'
+                              : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
+                          }`}
+                        >
+                          <Timer className="w-2 h-2 shrink-0" />
+                          {overdueDays}d overdue
+                        </span>
+                      )}
                       <span className={`text-[11px] ml-auto font-bold tabular-nums ${
                         isActive ? 'text-background/70'
                           : t.qualityScore >= 90 ? 'text-[#2F6B3F]'
@@ -406,6 +471,12 @@ function Sidebar({
           <span>{templates.length} total</span>
           <span>{templates.filter(t => t.status === 'Approved').length} approved · {templates.filter(t => t.status === 'Review').length} in review</span>
         </div>
+        {overdueCount > 0 && (
+          <div className="flex items-center gap-1 text-[10px] text-[#A93F2F] font-semibold">
+            <Timer className="w-2.5 h-2.5 shrink-0" />
+            {overdueCount} draft{overdueCount !== 1 ? 's' : ''} past 3-day SLA
+          </div>
+        )}
       </div>
     </aside>
   );
@@ -500,12 +571,18 @@ function TemplateDetailPanel({
       <div className="shrink-0 border-b border-border px-5 py-3 bg-background">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-              <Chip cls={domCls}>{template.domain}</Chip>
-              <StatusBadge status={template.status} />
-              <Chip cls={riskCfg.cls}>Risk: {template.hallucinationRisk}</Chip>
-              <span className="text-[11px] text-muted-foreground">v{template.version}</span>
-            </div>
+            {(() => {
+              const overdueDays = getDraftOverdueDays(template);
+              return (
+                <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                  <Chip cls={domCls}>{template.domain}</Chip>
+                  <StatusBadge status={template.status} />
+                  {overdueDays !== null && <OverdueBadge daysOverdue={overdueDays} />}
+                  <Chip cls={riskCfg.cls}>Risk: {template.hallucinationRisk}</Chip>
+                  <span className="text-[11px] text-muted-foreground">v{template.version}</span>
+                </div>
+              );
+            })()}
             <h2 className="text-[16px] font-bold text-foreground leading-snug">{template.name}</h2>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
