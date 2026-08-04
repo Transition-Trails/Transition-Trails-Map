@@ -502,7 +502,12 @@ function ConnectionSection({
           <DriveFolderPicker
             value={url}
             folderName={name}
-            onChange={(u, n) => onChange({ driveFolderUrl: u, driveFolderName: n })}
+            onChange={(u, n) => onChange({
+              driveFolderUrl: u,
+              driveFolderName: n,
+              // Selecting a valid folder restores the connection — reset sync status to Live
+              ...(u ? { syncStatus: 'Live' as SyncStatus } : {}),
+            })}
           />
         </Field>
 
@@ -632,13 +637,14 @@ function ConnectionSection({
 // ── Edit drawer ────────────────────────────────────────────────────────────────
 
 function EditDrawer({
-  source, onClose, onSave, isSaving, folderInaccessible,
+  source, onClose, onSave, isSaving, folderInaccessible, wasAutoDisconnected,
 }: {
   source: KnowledgeSource;
   onClose: () => void;
   onSave: (patch: Partial<KnowledgeSource>) => void;
   isSaving: boolean;
   folderInaccessible?: boolean;
+  wasAutoDisconnected?: boolean;
 }) {
   const [draft, setDraft] = useState<Partial<KnowledgeSource>>({});
   function patch(p: Partial<KnowledgeSource>) { setDraft(d => ({ ...d, ...p })); }
@@ -678,6 +684,22 @@ function EditDrawer({
 
         {/* Sections */}
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
+          {/* Auto-disconnect notice banner */}
+          {wasAutoDisconnected && folderInaccessible && (
+            <div className="rounded-lg border border-[#B6D8E4] bg-[#EDF5F8] px-4 py-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-[#2F6F7E] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[12px] font-semibold text-[#2F6F7E]">Sync status set to Disconnected automatically</p>
+                  <p className="text-[11px] text-[#2F6F7E] mt-0.5 leading-snug">
+                    This folder could not be reached, so the sync status was changed from <strong>Live</strong> to <strong>Disconnected</strong> to prevent silent indexing failures.
+                    Select a new folder below to restore the connection — saving with a valid folder will reset the status back to <strong>Live</strong>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Health warning banner */}
           {source.healthStatus === 'Warning' && source.healthIssues?.length > 0 && (
             <div className="rounded-lg border border-[#F0BDBD] bg-[#FAE6E6] px-4 py-3">
@@ -993,6 +1015,8 @@ export default function KnowledgeSourcesAdmin() {
   // ── Drive folder health check ─────────────────────────────────────────────
   // Maps source.id → FolderHealthStatus for Google Drive sources with a saved folder URL.
   const [folderHealth, setFolderHealth] = useState<Map<string, FolderHealthStatus>>(new Map());
+  // Tracks which source IDs had syncStatus auto-changed to "Disconnected" this session.
+  const [autoDisconnected, setAutoDisconnected] = useState<Set<string>>(new Set());
 
   const checkFolderHealth = useCallback(async (sourcesToCheck: typeof sources) => {
     const driveSources = sourcesToCheck.filter(
@@ -1034,6 +1058,17 @@ export default function KnowledgeSourcesAdmin() {
         }),
       );
 
+      // Collect inaccessible source IDs before updating state
+      const inaccessibleIds: string[] = [];
+      for (const { chunk, results } of chunkResults) {
+        for (const [sourceId, folderId] of chunk) {
+          const status = results[folderId];
+          if (status === 'not_found' || status === 'forbidden') {
+            inaccessibleIds.push(sourceId);
+          }
+        }
+      }
+
       setFolderHealth(prev => {
         const next = new Map(prev);
         for (const { chunk, results } of chunkResults) {
@@ -1052,6 +1087,22 @@ export default function KnowledgeSourcesAdmin() {
         }
         return next;
       });
+
+      // Auto-PATCH any inaccessible sources that aren't already "Disconnected"
+      const toDisconnect = inaccessibleIds.filter(id => {
+        const src = sourcesToCheck.find(s => s.id === id);
+        return src && src.syncStatus !== 'Disconnected';
+      });
+
+      if (toDisconnect.length > 0) {
+        await Promise.all(toDisconnect.map(id => patchSource(id, { syncStatus: 'Disconnected' })));
+        setAutoDisconnected(prev => {
+          const next = new Set(prev);
+          toDisconnect.forEach(id => next.add(id));
+          return next;
+        });
+        void qc.invalidateQueries({ queryKey: ['knowledge-sources'] });
+      }
     } catch {
       // Network / auth failure — clear check state so we don't show false warnings
       setFolderHealth(prev => {
@@ -1060,7 +1111,7 @@ export default function KnowledgeSourcesAdmin() {
         return next;
       });
     }
-  }, []);
+  }, [qc]);
 
   useEffect(() => {
     if (!isLoading && !isError && sources.length > 0) {
@@ -1294,6 +1345,7 @@ export default function KnowledgeSourcesAdmin() {
           onSave={patch => patchMutation.mutate({ id: editSource.id, patch })}
           isSaving={patchMutation.isPending}
           folderInaccessible={folderHealth.get(editSource.id) === 'inaccessible'}
+          wasAutoDisconnected={autoDisconnected.has(editSource.id)}
         />
       )}
 
