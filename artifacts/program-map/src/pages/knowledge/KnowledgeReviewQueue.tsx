@@ -3,11 +3,11 @@
 // (6-month / 180-day cadence, matching the governance schedule).
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle, AlertTriangle, BookOpen, Calendar, CheckCircle2,
   ChevronRight, Clock, ExternalLink, FileText, Globe, Loader2, RefreshCw,
-  Eye, EyeOff,
+  Eye, EyeOff, CheckCheck,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -41,6 +41,15 @@ interface ArticlesResponse {
 
 interface DetailResponse { article: SfArticleDetail; }
 
+interface ArticleReview {
+  id: number;
+  articleId: string;
+  reviewedAt: string;
+  reviewedBy: string | null;
+}
+
+interface ReviewsResponse { reviews: ArticleReview[]; }
+
 // ── Review-queue helpers ──────────────────────────────────────────────────────
 
 /** Biannual = 180 days */
@@ -58,8 +67,16 @@ interface ReviewItem {
   urgency: Urgency;
 }
 
-function classifyArticle(article: SfArticle, now: Date): ReviewItem | null {
-  const last = new Date(article.lastModifiedDate);
+function classifyArticle(
+  article: SfArticle,
+  now: Date,
+  reviewedAtMap: Map<string, Date>,
+): ReviewItem | null {
+  // Use local review timestamp if it's more recent than lastModifiedDate
+  const sfDate  = new Date(article.lastModifiedDate);
+  const localReviewedAt = reviewedAtMap.get(article.id);
+  const last = (localReviewedAt && localReviewedAt > sfDate) ? localReviewedAt : sfDate;
+
   const next = new Date(last.getTime() + REVIEW_CADENCE_DAYS * 86_400_000);
   const daysUntilDue = Math.ceil((next.getTime() - now.getTime()) / 86_400_000);
 
@@ -166,8 +183,15 @@ const PROSE_CLS = `prose prose-sm max-w-none text-foreground
 
 interface OrgUrlResponse { orgBaseUrl: string; }
 
-function DetailPanel({ item }: { item: ReviewItem }) {
+function DetailPanel({
+  item,
+  onMarkedReviewed,
+}: {
+  item: ReviewItem;
+  onMarkedReviewed: () => void;
+}) {
   const { article, daysUntilDue, urgency, nextReviewDate } = item;
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery<DetailResponse>({
     queryKey: ['sf-article-detail', article.id],
@@ -187,6 +211,22 @@ function DetailPanel({ item }: { item: ReviewItem }) {
       return r.json() as Promise<OrgUrlResponse>;
     },
     staleTime: 10 * 60 * 1000,
+  });
+
+  const markReviewed = useMutation({
+    mutationFn: async () => {
+      const r = await fetch(`/api/knowledge/sf-articles/${encodeURIComponent(article.id)}/mark-reviewed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json() as Promise<{ review: ArticleReview }>;
+    },
+    onSuccess: () => {
+      // Invalidate reviews cache so the queue re-filters
+      void queryClient.invalidateQueries({ queryKey: ['sf-article-reviews'] });
+      onMarkedReviewed();
+    },
   });
 
   const sfArticleUrl = (orgData?.orgBaseUrl && article.knowledgeArticleId)
@@ -261,8 +301,9 @@ function DetailPanel({ item }: { item: ReviewItem }) {
           </span>
         </div>
 
-        {sfArticleUrl && (
-          <div className="mt-4">
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 mt-4 flex-wrap">
+          {sfArticleUrl && (
             <a
               href={sfArticleUrl}
               target="_blank"
@@ -272,8 +313,33 @@ function DetailPanel({ item }: { item: ReviewItem }) {
               Open in Salesforce
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
-          </div>
-        )}
+          )}
+
+          {markReviewed.isSuccess ? (
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-[#E6F0EA] border border-[#9FC3AE] px-3 py-1.5 text-[12px] font-semibold text-[#2F6B3F]">
+              <CheckCheck className="w-3.5 h-3.5" />
+              Marked as reviewed
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => markReviewed.mutate()}
+              disabled={markReviewed.isPending}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {markReviewed.isPending ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <CheckCheck className="w-3.5 h-3.5" />
+              )}
+              {markReviewed.isPending ? 'Saving…' : 'Mark reviewed'}
+            </button>
+          )}
+
+          {markReviewed.isError && (
+            <span className="text-[11px] text-[#A93F2F]">Failed to save — try again</span>
+          )}
+        </div>
       </div>
 
       {/* Body */}
@@ -363,9 +429,29 @@ export default function KnowledgeReviewQueue() {
     retry: 1,
   });
 
+  const { data: reviewsData } = useQuery<ReviewsResponse>({
+    queryKey: ['sf-article-reviews'],
+    queryFn: async () => {
+      const r = await fetch('/api/knowledge/sf-article-reviews');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json() as Promise<ReviewsResponse>;
+    },
+    staleTime: 0,  // always fresh — we want the queue to update immediately after marking
+  });
+
+  // Build a map of articleId → most recent reviewedAt date
+  const reviewedAtMap = new Map<string, Date>();
+  for (const review of reviewsData?.reviews ?? []) {
+    const existing = reviewedAtMap.get(review.articleId);
+    const ts = new Date(review.reviewedAt);
+    if (!existing || ts > existing) {
+      reviewedAtMap.set(review.articleId, ts);
+    }
+  }
+
   // Client-side filtering: only articles whose next review date ≤ now + 30 days
   const reviewItems: ReviewItem[] = (data?.articles ?? [])
-    .map(a => classifyArticle(a, now))
+    .map(a => classifyArticle(a, now, reviewedAtMap))
     .filter((x): x is ReviewItem => x !== null)
     .sort((a, b) => a.daysUntilDue - b.daysUntilDue);  // overdue first
 
@@ -373,9 +459,14 @@ export default function KnowledgeReviewQueue() {
   const thisWeek  = reviewItems.filter(i => i.urgency === 'this-week').length;
   const thisMonth = reviewItems.filter(i => i.urgency === 'this-month').length;
 
-  // Auto-select first item
+  // Auto-select first item; clear selection if it was just removed from the queue
   useEffect(() => {
-    if (!selectedId && reviewItems.length > 0) setSelectedId(reviewItems[0]!.article.id);
+    if (!selectedId && reviewItems.length > 0) {
+      setSelectedId(reviewItems[0]!.article.id);
+    } else if (selectedId && !reviewItems.find(i => i.article.id === selectedId)) {
+      // Item dropped off the queue — select the new first item
+      setSelectedId(reviewItems[0]?.article.id ?? null);
+    }
   }, [reviewItems, selectedId]);
 
   const selectedItem = reviewItems.find(i => i.article.id === selectedId) ?? null;
@@ -517,7 +608,13 @@ export default function KnowledgeReviewQueue() {
         {/* Right — detail */}
         <div className="flex-1 overflow-hidden bg-background">
           {selectedItem ? (
-            <DetailPanel key={selectedItem.article.id} item={selectedItem} />
+            <DetailPanel
+              key={selectedItem.article.id}
+              item={selectedItem}
+              onMarkedReviewed={() => {
+                // The queue will auto-update via invalidateQueries + re-classify
+              }}
+            />
           ) : (
             <EmptyDetail />
           )}

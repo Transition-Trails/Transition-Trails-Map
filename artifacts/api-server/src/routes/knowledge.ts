@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { knowledgeDocumentsTable, knowledgeSourcesTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable } from "@workspace/db/schema";
+import { eq, desc } from "drizzle-orm";
 import {
   fetchSfLiveMetrics,
   buildIntegrationStatus,
@@ -1488,6 +1488,50 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
     req.log.error(err, "Failed to fetch SF Knowledge article detail");
     const msg = err instanceof Error ? err.message : "Unknown error";
     res.status(502).json({ error: `Salesforce query failed: ${msg}` });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ARTICLE REVIEW ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+
+// GET /api/knowledge/sf-article-reviews
+// Returns all recorded review timestamps so the frontend can filter the queue.
+router.get("/knowledge/sf-article-reviews", async (req, res): Promise<void> => {
+  try {
+    const rows = await db
+      .select()
+      .from(articleReviewsTable)
+      .orderBy(desc(articleReviewsTable.reviewedAt));
+    res.json({ reviews: rows });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch article reviews");
+    res.status(500).json({ error: "Failed to fetch article reviews" });
+  }
+});
+
+// POST /api/knowledge/sf-articles/:id/mark-reviewed
+// Records that the authenticated user reviewed this article right now.
+// :id is the KnowledgeArticleVersion Id (same as used in the list/detail routes).
+router.post("/knowledge/sf-articles/:id/mark-reviewed", async (req, res): Promise<void> => {
+  const { id } = req.params;
+  if (!id || typeof id !== "string" || id.length === 0) {
+    res.status(400).json({ error: "Invalid article id" });
+    return;
+  }
+  try {
+    const reviewedBy: string | null =
+      (req.user as { email?: string } | undefined)?.email ?? null;
+
+    const [row] = await db
+      .insert(articleReviewsTable)
+      .values({ articleId: id, reviewedBy })
+      .returning();
+
+    res.status(201).json({ review: row });
+  } catch (err) {
+    req.log.error(err, "Failed to record article review");
+    res.status(500).json({ error: "Failed to record review" });
   }
 });
 
