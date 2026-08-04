@@ -341,4 +341,54 @@ router.get("/drive/penny-assets/folders", async (_req, res) => {
   }
 });
 
+// ─── GET /api/drive/folder-check ──────────────────────────────────────────────
+//
+// Checks whether one or more Drive folders are still accessible.
+// Query param: ids — comma-separated folder IDs to check (max 20)
+// Response: { results: { [folderId]: "ok" | "not_found" | "forbidden" | "error" } }
+
+router.get("/drive/folder-check", async (req, res): Promise<void> => {
+  const raw = typeof req.query["ids"] === "string" ? req.query["ids"] : "";
+  const ids = raw.split(",").map(s => s.trim()).filter(Boolean).slice(0, 20);
+
+  if (ids.length === 0) {
+    res.json({ results: {} });
+    return;
+  }
+
+  try {
+    const token = await getAccessToken();
+    const results: Record<string, "ok" | "not_found" | "forbidden" | "error"> = {};
+
+    await Promise.all(ids.map(async (id) => {
+      try {
+        const resp = await fetch(
+          `https://www.googleapis.com/drive/v3/files/${id}?fields=id&supportsAllDrives=true`,
+          { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(8_000) },
+        );
+        if (resp.ok) {
+          results[id] = "ok";
+        } else if (resp.status === 404) {
+          results[id] = "not_found";
+        } else if (resp.status === 403) {
+          results[id] = "forbidden";
+        } else {
+          results[id] = "error";
+        }
+      } catch {
+        results[id] = "error";
+      }
+    }));
+
+    res.json({ results });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("Missing GOOGLE")) {
+      res.status(503).json({ error: "Drive integration not configured", results: {} });
+      return;
+    }
+    res.status(500).json({ error: msg, results: {} });
+  }
+});
+
 export default router;

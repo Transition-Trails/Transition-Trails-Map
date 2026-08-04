@@ -1,7 +1,7 @@
 // KnowledgeSourcesAdmin — replaces the read-only KnowledgeWorkspace at /knowledge/sources.
 // Admin table + edit drawer with type-specific connection fields, including a real Drive folder picker.
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search, Plus, FolderOpen, Database, Link as LinkIcon,
@@ -40,8 +40,10 @@ async function postSource(body: Partial<KnowledgeSource>): Promise<KnowledgeSour
 
 interface DriveFolder { id: string; name: string; webViewLink?: string; modifiedTime?: string; path?: string; }
 
-// ── Style helpers ──────────────────────────────────────────────────────────────
-
+function extractFolderId(url: string): string | null {
+  const m = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  return m ? (m[1] ?? null) : null;
+}
 const TRUST_CLASSES: Record<TrustLevel, string> = {
   Authoritative: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
   Trusted:       'text-[#2F6F7E] bg-[#EDF5F8] border-[#B6D8E4]',
@@ -468,11 +470,12 @@ function DriveFolderPicker({
 // ── Connection section (type-specific) ────────────────────────────────────────
 
 function ConnectionSection({
-  source, draft, onChange,
+  source, draft, onChange, folderInaccessible,
 }: {
   source: KnowledgeSource;
   draft: Partial<KnowledgeSource>;
   onChange: (patch: Partial<KnowledgeSource>) => void;
+  folderInaccessible?: boolean;
 }) {
   const t = source.type;
 
@@ -483,6 +486,15 @@ function ConnectionSection({
 
     return (
       <>
+        {folderInaccessible && (
+          <div className="flex items-start gap-2 rounded-md px-3 py-2.5 text-[12px] bg-[#FFF3E0] border border-[#FFD08A] text-[#CC8400]">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <span className="font-medium leading-snug">
+              This folder can no longer be reached — it may have been deleted or access was removed.
+              Select a new folder below to restore the connection.
+            </span>
+          </div>
+        )}
         <Field
           label="Drive folder"
           hint="Select a folder to index all files inside it, or paste a file URL for a single document."
@@ -620,12 +632,13 @@ function ConnectionSection({
 // ── Edit drawer ────────────────────────────────────────────────────────────────
 
 function EditDrawer({
-  source, onClose, onSave, isSaving,
+  source, onClose, onSave, isSaving, folderInaccessible,
 }: {
   source: KnowledgeSource;
   onClose: () => void;
   onSave: (patch: Partial<KnowledgeSource>) => void;
   isSaving: boolean;
+  folderInaccessible?: boolean;
 }) {
   const [draft, setDraft] = useState<Partial<KnowledgeSource>>({});
   function patch(p: Partial<KnowledgeSource>) { setDraft(d => ({ ...d, ...p })); }
@@ -725,7 +738,7 @@ function EditDrawer({
               ) : undefined
             }
           >
-            <ConnectionSection source={source} draft={draft} onChange={patch} />
+            <ConnectionSection source={source} draft={draft} onChange={patch} folderInaccessible={folderInaccessible} />
           </Section>
 
           {/* Governance */}
@@ -977,6 +990,84 @@ export default function KnowledgeSourcesAdmin() {
   const [editSource, setEditSource]       = useState<KnowledgeSource | null>(null);
   const [showNewDrawer, setShowNewDrawer] = useState(false);
 
+  // ── Drive folder health check ─────────────────────────────────────────────
+  // Maps source.id → FolderHealthStatus for Google Drive sources with a saved folder URL.
+  const [folderHealth, setFolderHealth] = useState<Map<string, FolderHealthStatus>>(new Map());
+
+  const checkFolderHealth = useCallback(async (sourcesToCheck: typeof sources) => {
+    const driveSources = sourcesToCheck.filter(
+      s => s.type === 'Google Drive' && s.driveFolderUrl,
+    );
+    if (driveSources.length === 0) return;
+
+    // Build sourceId → folderId map
+    const idMap = new Map<string, string>(); // sourceId → folderId
+    for (const s of driveSources) {
+      const fid = extractFolderId(s.driveFolderUrl ?? '');
+      if (fid) idMap.set(s.id, fid);
+    }
+    if (idMap.size === 0) return;
+
+    // Mark all Drive sources with a folder as 'checking'
+    setFolderHealth(prev => {
+      const next = new Map(prev);
+      for (const id of idMap.keys()) next.set(id, 'checking');
+      return next;
+    });
+
+    try {
+      // Chunk into batches of 20 (matches the backend cap) and fire in parallel
+      const BATCH = 20;
+      const entries = [...idMap.entries()]; // [sourceId, folderId][]
+      const chunks: Array<typeof entries> = [];
+      for (let i = 0; i < entries.length; i += BATCH) {
+        chunks.push(entries.slice(i, i + BATCH));
+      }
+
+      const chunkResults = await Promise.all(
+        chunks.map(async chunk => {
+          const ids = chunk.map(([, fid]) => fid).join(',');
+          const r = await fetch(`/api/drive/folder-check?ids=${encodeURIComponent(ids)}`);
+          const data = await r.json() as { results: Record<string, string>; error?: string };
+          if (!r.ok || data.error) throw new Error(data.error ?? `HTTP ${r.status}`);
+          return { chunk, results: data.results };
+        }),
+      );
+
+      setFolderHealth(prev => {
+        const next = new Map(prev);
+        for (const { chunk, results } of chunkResults) {
+          for (const [sourceId, folderId] of chunk) {
+            const status = results[folderId];
+            // Only mark inaccessible on explicit denial — never on a missing result
+            if (status === 'ok') {
+              next.set(sourceId, 'ok');
+            } else if (status === 'not_found' || status === 'forbidden') {
+              next.set(sourceId, 'inaccessible');
+            } else {
+              // 'error' or undefined (shouldn't happen with batching) → unknown, no warning
+              next.delete(sourceId);
+            }
+          }
+        }
+        return next;
+      });
+    } catch {
+      // Network / auth failure — clear check state so we don't show false warnings
+      setFolderHealth(prev => {
+        const next = new Map(prev);
+        for (const id of idMap.keys()) next.delete(id);
+        return next;
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !isError && sources.length > 0) {
+      void checkFolderHealth(sources);
+    }
+  }, [sources, isLoading, isError, checkFolderHealth]);
+
   // PATCH mutation
   const patchMutation = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: Partial<KnowledgeSource> }) => patchSource(id, patch),
@@ -1113,9 +1204,23 @@ export default function KnowledgeSourcesAdmin() {
                         </div>
                       </td>
                       <td className="px-4 py-2 w-[22%]">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <SourceTypeIcon type={source.type} className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                           <ConnectionPreview source={source} />
+                          {folderHealth.get(source.id) === 'inaccessible' && (
+                            <button
+                              type="button"
+                              onClick={() => setEditSource(source)}
+                              title="Folder inaccessible — click to fix"
+                              className="inline-flex items-center gap-1 rounded-full bg-[#FFF3E0] border border-[#FFD08A] px-2 py-0.5 text-[10px] font-semibold text-[#CC8400] hover:bg-[#FFE0B2] transition-colors"
+                            >
+                              <AlertCircle className="w-3 h-3 shrink-0" />
+                              Inaccessible
+                            </button>
+                          )}
+                          {folderHealth.get(source.id) === 'checking' && (
+                            <Loader2 className="w-3 h-3 animate-spin text-muted-foreground shrink-0" />
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-2">
@@ -1188,6 +1293,7 @@ export default function KnowledgeSourcesAdmin() {
           onClose={() => setEditSource(null)}
           onSave={patch => patchMutation.mutate({ id: editSource.id, patch })}
           isSaving={patchMutation.isPending}
+          folderInaccessible={folderHealth.get(editSource.id) === 'inaccessible'}
         />
       )}
 
@@ -1202,3 +1308,5 @@ export default function KnowledgeSourcesAdmin() {
     </div>
   );
 }
+
+type FolderHealthStatus = 'checking' | 'ok' | 'inaccessible';
