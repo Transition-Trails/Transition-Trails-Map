@@ -177,7 +177,9 @@ function UserProfileButton() {
   const { user: googleUser }      = useGoogleAuth();
   const signOut                   = useSignOut();
   const [open, setOpen]           = useState(false);
-  const ref                       = useRef<HTMLDivElement>(null);
+  const ref       = useRef<HTMLDivElement>(null);
+  const btnRef    = useRef<HTMLButtonElement>(null);
+  const [dropPos, setDropPos] = useState<{ top: number; right: number }>({ top: 0, right: 0 });
 
   const current      = TIER_CONFIG[userTier];
   const isPreviewing = userTier !== 'superadmin';
@@ -192,6 +194,15 @@ function UserProfileButton() {
     .join('')
     .toUpperCase() || 'TO';
   const photoUrl: string | null = null; // Google profile photos require extra scope
+
+  // Measure button position so the fixed dropdown lands in the right spot
+  function openMenu() {
+    if (btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setDropPos({ top: r.bottom + 6, right: window.innerWidth - r.right });
+    }
+    setOpen(o => !o);
+  }
 
   // Close panel on outside click
   useEffect(() => {
@@ -215,7 +226,8 @@ function UserProfileButton() {
 
       {/* ── Avatar button ── */}
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={openMenu}
         title={`Signed in as ${name} · ${current.label} view`}
         className={`relative flex items-center justify-center w-7 h-7 rounded-full ring-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-primary/50 ${
           open
@@ -238,7 +250,10 @@ function UserProfileButton() {
 
       {/* ── Profile panel dropdown ── */}
       {open && (
-        <div className="absolute right-0 top-[36px] z-50 w-[310px] bg-card border border-border rounded-xl shadow-xl overflow-hidden">
+        <div
+          className="fixed z-[200] w-[310px] bg-card border border-border rounded-xl shadow-xl overflow-hidden"
+          style={{ top: dropPos.top, right: dropPos.right }}
+        >
 
           {/* ── Identity header ── */}
           <div className="px-4 py-3.5 border-b border-border bg-muted/20">
