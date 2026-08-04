@@ -9,6 +9,8 @@ import type { ISalesforceClient } from "../lib/salesforceClient.js";
 import {
   getBuildItems,
   createBuildItem,
+  getAutomations,
+  TtAutomationFieldsNotProvisionedError,
   getClassroomNudges,
   createClassroomNudge,
 } from "../lib/salesforceService.js";
@@ -1300,6 +1302,97 @@ router.post("/salesforce/governance/build-items", withClient(async (req, res, cl
   });
   res.status(201).json(result);
 }));
+
+// GET /salesforce/governance/automations
+// Returns active TT_Automation__c records.
+//
+// PHASE 2 DEFERRED — this route probes for the four required filter fields
+// (Is_Active__c, Automation_Type__c, Description__c, Status__c) before issuing
+// any SOQL.  If they are absent the route returns HTTP 503 with a clear error
+// rather than executing an unfiltered query that would dump every automation
+// record in the org.
+//
+// The probe uses the same getCustomFields helper used by the preflight validate
+// endpoint, so this check is always live rather than relying on a cached result.
+//
+// ACTION REQUIRED before go-live: add the four fields to TT_Automation__c in
+// SF Setup, re-run probe-governance-fields.ts to confirm, then remove the
+// phase2Deferred guard from tt-automation-fields in REUSED_OBJECT_FIELD_CHECKS
+// and from getAutomations() in salesforceService.ts.
+
+const TT_AUTOMATION_REQUIRED_FIELDS = [
+  "Is_Active__c",
+  "Automation_Type__c",
+  "Description__c",
+  "Status__c",
+] as const;
+
+router.get("/salesforce/governance/automations", async (req, res) => {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) {
+    return res.status(401).json({ error: "Not connected to Salesforce." });
+  }
+
+  // Probe whether the four required filter fields are provisioned.
+  const { found, error: describeError, undetermined } = await getCustomFields(
+    proxyFetch,
+    "TT_Automation__c",
+  );
+
+  if (undetermined) {
+    // Rate-limited — cannot confirm field presence; refuse to query rather than
+    // risk an unfiltered dump.
+    return res.status(503).json({
+      error: "TT_Automation__c field describe was rate-limited. Retry after a moment.",
+      phase2Deferred: true,
+    });
+  }
+
+  if (describeError) {
+    return res.status(503).json({
+      error: `TT_Automation__c describe failed: ${describeError}`,
+      phase2Deferred: true,
+    });
+  }
+
+  const missingFields = TT_AUTOMATION_REQUIRED_FIELDS.filter(f => !found.includes(f));
+  if (missingFields.length > 0) {
+    // Required filter fields are not provisioned — refuse to query unfiltered.
+    // This is an explicit safety guard: without Is_Active__c (and the other
+    // three fields) there is no way to restrict the SOQL result set, so every
+    // TT_Automation__c record in the org would be returned.
+    return res.status(503).json({
+      error:
+        `TT_Automation__c cannot be queried: required filter fields are not yet provisioned on the org ` +
+        `(missing: ${missingFields.join(", ")}). ` +
+        `Add the fields in SF Setup and re-run probe-governance-fields.ts before enabling this route.`,
+      phase2Deferred: true,
+      missingFields,
+    });
+  }
+
+  // All four filter fields confirmed — safe to query with Is_Active__c = true.
+  try {
+    let client;
+    try {
+      client = getSalesforceClient(req);
+    } catch {
+      client = new ConnectorSalesforceClient();
+    }
+    const limitParam = Number(req.query["limit"]) || 50;
+    const limit = Math.min(Math.max(1, limitParam), 200);
+    const automations = await getAutomations(client, /* fieldsReady */ true, limit);
+    return res.json({ automations, total: automations.length });
+  } catch (err) {
+    if (err instanceof TtAutomationFieldsNotProvisionedError) {
+      // Should not reach here (we checked above), but guard anyway.
+      return res.status(503).json({ error: err.message, phase2Deferred: true });
+    }
+    return res.status(500).json({
+      error: err instanceof Error ? err.message : "Internal server error",
+    });
+  }
+});
 
 // GET /salesforce/governance/classroom-nudges/:contactId
 // Returns Penny_Classroom_Nudge__c records for a learner (most recent first, limit 25).

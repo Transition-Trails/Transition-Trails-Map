@@ -15,6 +15,7 @@ import type {
   CreateWeeklyReportPayload,
   BuildItemRecord,
   CreateBuildItemPayload,
+  AutomationRecord,
   ClassroomNudgeRecord,
   CreateClassroomNudgePayload,
 } from "../types/salesforce.js";
@@ -482,6 +483,92 @@ export async function createBuildItem(
   }
   const result = await client.createRecord("TT_Build_Item__c", fields);
   return { id: result.id };
+}
+
+// ── TT Automation (TT_Automation__c) ─────────────────────────────────────────
+//
+// PHASE 2 DEFERRED — four required filter fields are not yet provisioned:
+//   Is_Active__c, Automation_Type__c, Description__c, Status__c.
+//
+// Without these fields, any SOQL against TT_Automation__c would return every
+// record in the org with no way to filter by active status or type — a silent
+// correctness bug.  The guard below prevents this by refusing to query until
+// the caller confirms the fields are present via a preflight describe.
+//
+// ACTION REQUIRED before go-live:
+//   1. Add the four fields to TT_Automation__c in SF Setup → Object Manager.
+//   2. Re-run probe-governance-fields.ts to confirm all four appear in the org.
+//   3. Remove the phase2Deferred guard from getAutomations() and from the
+//      tt-automation-fields entry in REUSED_OBJECT_FIELD_CHECKS (salesforce.ts).
+
+interface RawAutomation {
+  Id: string;
+  Name: string;
+  Is_Active__c: boolean;
+  Automation_Type__c: string | null;
+  Description__c: string | null;
+  Status__c: string | null;
+  CreatedDate: string;
+}
+
+function mapAutomation(raw: RawAutomation): AutomationRecord {
+  return {
+    id:             raw.Id,
+    name:           raw.Name,
+    isActive:       raw.Is_Active__c,
+    automationType: raw.Automation_Type__c,
+    description:    raw.Description__c,
+    status:         raw.Status__c,
+    createdDate:    raw.CreatedDate,
+  };
+}
+
+/**
+ * Fetch TT_Automation__c records filtered by Is_Active__c = true.
+ *
+ * @param client        - Salesforce client (session or connector).
+ * @param fieldsReady   - Pass `true` ONLY after a preflight describe confirms
+ *                        that Is_Active__c, Automation_Type__c, Description__c,
+ *                        and Status__c all exist on TT_Automation__c.
+ *                        Pass `false` (or omit) to get a clear error instead of
+ *                        an unfiltered dump of every automation record.
+ * @param limit         - Maximum number of records to return (default 50, max 200).
+ *
+ * Throws an explicit TtAutomationFieldsNotProvisionedError when fieldsReady is
+ * false — this is intentional.  Never silently fall back to an unfiltered query.
+ */
+export class TtAutomationFieldsNotProvisionedError extends Error {
+  constructor() {
+    super(
+      "TT_Automation__c cannot be queried: required filter fields " +
+      "(Is_Active__c, Automation_Type__c, Description__c, Status__c) " +
+      "are not yet provisioned on the org (phase2Deferred). " +
+      "Add the fields in SF Setup and re-run probe-governance-fields.ts before enabling this query."
+    );
+    this.name = "TtAutomationFieldsNotProvisionedError";
+  }
+}
+
+export async function getAutomations(
+  client: ISalesforceClient,
+  fieldsReady: boolean,
+  limit = 50
+): Promise<AutomationRecord[]> {
+  // Guard: refuse to query without confirmed filter fields.
+  // This is a hard error — not a warning — because a query without Is_Active__c
+  // would return every TT_Automation__c record in the org, which is incorrect.
+  if (!fieldsReady) {
+    throw new TtAutomationFieldsNotProvisionedError();
+  }
+  const safeLimit = Math.min(Math.max(1, limit), 200);
+  const soql = [
+    "SELECT Id, Name, Is_Active__c, Automation_Type__c, Description__c, Status__c, CreatedDate",
+    "FROM TT_Automation__c",
+    "WHERE Is_Active__c = true",
+    `ORDER BY CreatedDate DESC LIMIT ${safeLimit}`,
+  ].join(" ");
+  const result = await client.query<RawAutomation>(soql);
+  return result.records.map(mapAutomation);
 }
 
 // ── Classroom Nudges (Penny_Classroom_Nudge__c) ───────────────────────────────

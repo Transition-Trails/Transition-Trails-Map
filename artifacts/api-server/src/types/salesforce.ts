@@ -224,6 +224,35 @@ export interface CreateBuildItemPayload {
   automationId?: string;
 }
 
+// ── TT Automation ─────────────────────────────────────────────────────────────
+
+/**
+ * A TT_Automation__c record — returned only when the four governance filter
+ * fields are confirmed present on the org.
+ *
+ * PHASE 2 DEFERRED: Is_Active__c, Automation_Type__c, Description__c, and
+ * Status__c have not yet been provisioned.  Do not query TT_Automation__c
+ * without first verifying these fields exist; without them any SOQL against
+ * the object returns every record unfiltered (no active/type filter possible).
+ *
+ * ACTION REQUIRED before go-live: add the four fields to TT_Automation__c in
+ * SF Setup, re-run probe-governance-fields.ts to confirm, then update
+ * getAutomations() in salesforceService.ts to remove the phase2Deferred guard.
+ */
+export interface AutomationRecord {
+  id: string;
+  name: string;
+  /** Is_Active__c — required filter field; absent on org until Phase 2. */
+  isActive: boolean;
+  /** Automation_Type__c — required filter field; absent on org until Phase 2. */
+  automationType: string | null;
+  /** Description__c — required filter field; absent on org until Phase 2. */
+  description: string | null;
+  /** Status__c — required filter field; absent on org until Phase 2. */
+  status: string | null;
+  createdDate: string;
+}
+
 // ── Classroom Nudges ──────────────────────────────────────────────────────────
 
 /**
