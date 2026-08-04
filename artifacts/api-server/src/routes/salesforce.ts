@@ -44,15 +44,61 @@ interface Check {
 
 type SfFetch = (url: string, init?: RequestInit) => Promise<Response>;
 
+/**
+ * Thrown when the Replit connector proxy returns 429 Too Many Requests.
+ * Callers that want retry behaviour should catch this specifically; other
+ * callers propagate it like any other error.
+ */
+class RateLimitError extends Error {
+  readonly retryAfter: number; // seconds from Retry-After header
+  constructor(retryAfter: number, detail: string) {
+    super(`Rate limited — retry after ${retryAfter}s: ${detail}`);
+    this.name = 'RateLimitError';
+    this.retryAfter = retryAfter;
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function sfGet(proxyFetch: SfFetch, path: string): Promise<Record<string, unknown>> {
   const res = await proxyFetch(`/services/data/${SF_API_VERSION}${path}`, {
     headers: { "Content-Type": "application/json", Accept: "application/json" },
   });
   if (!res.ok) {
+    if (res.status === 429) {
+      const retryAfter = parseInt(res.headers.get('Retry-After') ?? '10', 10);
+      const text = await res.text().catch(() => '');
+      throw new RateLimitError(retryAfter, text.slice(0, 100));
+    }
     const text = await res.text().catch(() => `HTTP ${res.status}`);
     throw new Error(`${res.status} ${res.statusText}: ${text.slice(0, 200)}`);
   }
   return res.json() as Promise<Record<string, unknown>>;
+}
+
+/**
+ * Like sfGet but retries once on RateLimitError, honouring the Retry-After header.
+ * Used in validation probes where a stale result is worse than waiting a moment.
+ */
+async function sfGetWithRetry(
+  proxyFetch: SfFetch,
+  path: string,
+  maxRetries = 1,
+): Promise<Record<string, unknown>> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await sfGet(proxyFetch, path);
+    } catch (e) {
+      if (e instanceof RateLimitError && attempt < maxRetries) {
+        await sleep(Math.min(e.retryAfter * 1000, 15_000));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error('sfGetWithRetry: unreachable');
 }
 
 async function sfQuery(
@@ -130,17 +176,22 @@ async function getCustomFields(
   proxyFetch: SfFetch,
   objectApiName: string,
   excludeNamespacePrefixes: string[] = []
-): Promise<{ found: string[]; error: string | null }> {
+): Promise<{ found: string[]; error: string | null; undetermined: boolean }> {
   try {
-    const describe = await sfGet(proxyFetch, `/sobjects/${objectApiName}/describe`);
+    // Use retry so a transient 429 doesn't produce a false "fields missing" report
+    const describe = await sfGetWithRetry(proxyFetch, `/sobjects/${objectApiName}/describe`);
     const fields   = (describe["fields"] ?? []) as Record<string, unknown>[];
     const custom   = fields
       .filter(f => f["custom"] === true)
       .map(f => String(f["name"]))
       .filter(name => !excludeNamespacePrefixes.some(ns => name.startsWith(ns)));
-    return { found: custom, error: null };
+    return { found: custom, error: null, undetermined: false };
   } catch (e: unknown) {
-    return { found: [], error: e instanceof Error ? e.message : String(e) };
+    return {
+      found:        [],
+      error:        e instanceof Error ? e.message : String(e),
+      undetermined: e instanceof RateLimitError,
+    };
   }
 }
 
@@ -373,76 +424,146 @@ router.get("/salesforce/validate", async (req, res) => {
     checks.push({ id: "pmm", category: "PMM", label: "Program Management Module detected", status: "warning", detail: "No pmdm__ objects found. PMM may not be installed, or the connected user lacks access." });
   }
 
-  // 7. TT custom objects — probe all 18 in parallel, grouped by category
-  type TtObjectResult = { object: string; label: string; accessible: boolean; count: number; error?: string };
-  type TtGroupResult  = { id: string; label: string; objects: TtObjectResult[]; accessibleCount: number; totalCount: number };
+  // 7. TT custom objects — probed in sequential batches to stay within the
+  //    Replit connector proxy rate limit (20 req / 10 s).
+  //
+  //    PRINCIPLE: a throttled probe (429) and a genuine absence are DIFFERENT.
+  //      accessible: null  → undetermined (throttled after one retry)  — NOT a failure
+  //      accessible: false → confirmed inaccessible (4xx object error) — real finding
+  //      accessible: true  → confirmed accessible
 
-  const ttGroupResults: TtGroupResult[] = await Promise.all(
-    TT_CUSTOM_OBJECT_GROUPS.map(async (group) => {
-      const objectResults2: TtObjectResult[] = await Promise.all(
-        group.objects.map(async ({ api, label }) => {
-          try {
-            const r = await sfQuery(proxyFetch, `SELECT COUNT() FROM ${api}`);
-            return { object: api, label, accessible: true, count: r.totalSize };
-          } catch (e: unknown) {
-            const msg = e instanceof Error ? e.message : String(e);
-            // Extract just the errorCode from SF error JSON if present, otherwise use trimmed message
-            const sfError = msg.match(/INVALID_TYPE|INVALID_FIELD|MALFORMED_QUERY|INSUFFICIENT_ACCESS|NOT_FOUND/)?.[0] ?? msg.slice(0, 80);
-            return { object: api, label, accessible: false, count: 0, error: sfError };
-          }
-        })
-      );
-      // Sort: accessible first, then by label
-      objectResults2.sort((a, b) => {
-        if (a.accessible !== b.accessible) return a.accessible ? -1 : 1;
-        return a.label.localeCompare(b.label);
-      });
-      const accessibleCount = objectResults2.filter(o => o.accessible).length;
-      return { id: group.id, label: group.label, objects: objectResults2, accessibleCount, totalCount: group.objects.length };
-    })
-  );
+  // 0 ms in test env so the suite does not block on delays; 1.2 s in production
+  const PROBE_BATCH_SIZE     = 6;
+  const PROBE_BATCH_DELAY_MS = process.env['NODE_ENV'] === 'test' ? 0 : 1_200;
 
-  const ttTotalAccessible = ttGroupResults.reduce((s, g) => s + g.accessibleCount, 0);
-  const ttTotalObjects    = ttGroupResults.reduce((s, g) => s + g.totalCount, 0);
-  const ttStatus: CheckStatus = ttTotalAccessible === ttTotalObjects ? "pass" : ttTotalAccessible > 0 ? "warning" : "fail";
+  type TtObjectResult = {
+    object: string; label: string;
+    /** true = confirmed; false = confirmed inaccessible; null = undetermined (throttled) */
+    accessible: boolean | null;
+    count: number; error?: string;
+  };
+  type TtGroupResult = {
+    id: string; label: string; objects: TtObjectResult[];
+    accessibleCount: number; inaccessibleCount: number; undeterminedCount: number; totalCount: number;
+  };
+
+  const probeObject = async (api: string, label: string): Promise<TtObjectResult> => {
+    const encoded = encodeURIComponent(`SELECT COUNT() FROM ${api}`);
+    try {
+      const result = await sfGetWithRetry(proxyFetch, `/query?q=${encoded}`);
+      return { object: api, label, accessible: true, count: (result["totalSize"] as number) ?? 0 };
+    } catch (e: unknown) {
+      if (e instanceof RateLimitError) {
+        return { object: api, label, accessible: null, count: 0,
+          error: `Rate limited — undetermined (Retry-After ${e.retryAfter}s)` };
+      }
+      const msg     = e instanceof Error ? e.message : String(e);
+      const sfError = msg.match(/INVALID_TYPE|INVALID_FIELD|MALFORMED_QUERY|INSUFFICIENT_ACCESS|NOT_FOUND/)?.[0]
+        ?? msg.slice(0, 80);
+      return { object: api, label, accessible: false, count: 0, error: sfError };
+    }
+  };
+
+  const ttGroupResults: TtGroupResult[] = [];
+
+  for (const group of TT_CUSTOM_OBJECT_GROUPS) {
+    const groupObjects: TtObjectResult[] = [];
+    const objs = [...group.objects];
+
+    for (let i = 0; i < objs.length; i += PROBE_BATCH_SIZE) {
+      const batch   = objs.slice(i, i + PROBE_BATCH_SIZE);
+      const results = await Promise.all(batch.map(({ api, label }) => probeObject(api, label)));
+      groupObjects.push(...results);
+      if (i + PROBE_BATCH_SIZE < objs.length) await sleep(PROBE_BATCH_DELAY_MS);
+    }
+
+    // Sort: confirmed inaccessible first (the real finding), then undetermined, then accessible
+    groupObjects.sort((a, b) => {
+      const rank = (o: TtObjectResult) => o.accessible === false ? 0 : o.accessible === null ? 1 : 2;
+      return rank(a) - rank(b);
+    });
+
+    ttGroupResults.push({
+      id: group.id, label: group.label, objects: groupObjects,
+      accessibleCount:   groupObjects.filter(o => o.accessible === true).length,
+      inaccessibleCount: groupObjects.filter(o => o.accessible === false).length,
+      undeterminedCount: groupObjects.filter(o => o.accessible === null).length,
+      totalCount:        group.objects.length,
+    });
+  }
+
+  const ttTotalAccessible   = ttGroupResults.reduce((s, g) => s + g.accessibleCount,   0);
+  const ttTotalInaccessible = ttGroupResults.reduce((s, g) => s + g.inaccessibleCount, 0);
+  const ttTotalUndetermined = ttGroupResults.reduce((s, g) => s + g.undeterminedCount, 0);
+  const ttTotalObjects      = ttGroupResults.reduce((s, g) => s + g.totalCount,        0);
+
+  // Status is driven by confirmed inaccessible only — undetermined is not a failure
+  const ttStatus: CheckStatus =
+    ttTotalInaccessible > 0 ? "warning"
+    : ttTotalUndetermined > 0 ? "warning"
+    : "pass";
+
+  let ttDetail = `${ttTotalAccessible}/${ttTotalObjects} TT custom objects confirmed accessible`;
+  if (ttTotalInaccessible > 0) {
+    const names = ttGroupResults.flatMap(g => g.objects.filter(o => o.accessible === false).map(o => o.label));
+    ttDetail += `, ${ttTotalInaccessible} confirmed inaccessible: ${names.join(', ')}`;
+  }
+  if (ttTotalUndetermined > 0) {
+    ttDetail += `, ${ttTotalUndetermined} undetermined (rate limited — rerun to confirm)`;
+  }
+
   checks.push({
     id: "tt-custom-objects", category: "TT Objects", label: "Transition Trails custom objects",
-    status: ttStatus,
-    detail: `${ttTotalAccessible}/${ttTotalObjects} TT custom objects accessible across ${TT_CUSTOM_OBJECT_GROUPS.length} groups.`,
+    status: ttStatus, detail: ttDetail,
     meta: { groups: ttGroupResults },
   });
 
-  // 8. Custom field verification on reused managed / standard objects
+  // 8. Custom field verification on reused managed / standard objects.
+  //
+  //    PRINCIPLE: a throttled or errored describe is not evidence of absence.
+  //    Only a successful describe that omits a field proves it is missing.
+  //    Probed sequentially to avoid another rate-limit burst after the object probes.
+
   type FieldCheckResult = {
     id: string; object: string; label: string; description: string;
-    ourFields: string[]; requiredFieldsFound: string[]; requiredFieldsMissing: string[];
-    describeError: string | null;
+    ourFields: string[];
+    requiredFieldsFound:   string[];
+    requiredFieldsMissing: string[]; // always [] when describeError is non-null
+    describeError:         string | null;
+    describeUndetermined:  boolean;  // true = throttled; undetermined, not missing
   };
 
-  const customFieldResults: FieldCheckResult[] = await Promise.all(
-    REUSED_OBJECT_FIELD_CHECKS.map(async (cfg) => {
-      const { found, error } = await getCustomFields(proxyFetch, cfg.objectApi, cfg.excludeNamespaces);
-      const foundSet = new Set(found);
-      return {
-        id:                   cfg.id,
-        object:               cfg.objectApi,
-        label:                cfg.label,
-        description:          cfg.description,
-        ourFields:            found,
-        requiredFieldsFound:  cfg.requiredFields.filter(f => foundSet.has(f)),
-        requiredFieldsMissing:cfg.requiredFields.filter(f => !foundSet.has(f)),
-        describeError:        error,
-      };
-    })
-  );
+  const customFieldResults: FieldCheckResult[] = [];
+  const FIELD_CHECK_DELAY_MS = process.env['NODE_ENV'] === 'test' ? 0 : 400;
 
-  const fieldCheckIssues = customFieldResults.some(r => r.requiredFieldsMissing.length > 0 || r.describeError);
+  for (const cfg of REUSED_OBJECT_FIELD_CHECKS) {
+    const { found, error, undetermined: isUndetermined } = await getCustomFields(
+      proxyFetch, cfg.objectApi, cfg.excludeNamespaces,
+    );
+    const foundSet = new Set(found);
+    customFieldResults.push({
+      id: cfg.id, object: cfg.objectApi, label: cfg.label, description: cfg.description,
+      ourFields: found,
+      // Only infer presence / absence when the describe actually succeeded
+      requiredFieldsFound:   error ? [] : cfg.requiredFields.filter(f =>  foundSet.has(f)),
+      requiredFieldsMissing: error ? [] : cfg.requiredFields.filter(f => !foundSet.has(f)),
+      describeError:         error,
+      describeUndetermined:  isUndetermined,
+    });
+    await sleep(FIELD_CHECK_DELAY_MS);
+  }
+
+  // An issue is only a confirmed-missing field — throttled/errored describes are not issues
+  const fieldCheckIssues = customFieldResults.some(
+    r => !r.describeError && r.requiredFieldsMissing.length > 0,
+  );
   checks.push({
     id: "custom-fields", category: "TT Fields", label: "Custom fields on reused objects",
     status: fieldCheckIssues ? "warning" : "pass",
     detail: customFieldResults
       .map(r => {
-        if (r.describeError) return `${r.label}: describe failed`;
+        if (r.describeUndetermined) return `${r.label}: describe rate-limited — undetermined`;
+        if (r.describeError)        return `${r.label}: describe failed`;
         const missing = r.requiredFieldsMissing.length;
         return `${r.label}: ${r.ourFields.length} TT fields, ${missing ? `${missing} required missing` : "all required present"}`;
       })
@@ -453,15 +574,21 @@ router.get("/salesforce/validate", async (req, res) => {
   return res.json({
     checks,
     orgInfo,
-    objects:           objectResults,
+    objects:         objectResults,
     npspDetected,
     pmmDetected,
     pmmObjects,
-    ttCustomObjects:   { groups: ttGroupResults, totalAccessible: ttTotalAccessible, totalObjects: ttTotalObjects },
+    ttCustomObjects: {
+      groups:            ttGroupResults,
+      totalAccessible:   ttTotalAccessible,
+      totalInaccessible: ttTotalInaccessible,
+      totalUndetermined: ttTotalUndetermined,
+      totalObjects:      ttTotalObjects,
+    },
     customFieldChecks: customFieldResults,
     identity,
-    durationMs:        Date.now() - start,
-    timestamp:         new Date().toISOString(),
+    durationMs: Date.now() - start,
+    timestamp:  new Date().toISOString(),
   });
 });
 

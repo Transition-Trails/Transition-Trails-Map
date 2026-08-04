@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Key, RefreshCw, CheckCircle, XCircle, AlertTriangle, Shield,
   ChevronDown, ChevronRight, ExternalLink, Zap, Brain, Globe,
-  Lock, Wifi, WifiOff, ArrowRight, Database,
+  Lock, Wifi, WifiOff, ArrowRight, Database, HelpCircle,
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
@@ -74,21 +74,25 @@ interface PmmObject {
 }
 
 interface TtObjectResult {
-  object: string; label: string; accessible: boolean; count: number; error?: string;
+  object: string; label: string;
+  /** true = confirmed accessible; false = confirmed inaccessible; null = undetermined (throttled) */
+  accessible: boolean | null;
+  count: number; error?: string;
 }
 
 interface TtGroupResult {
   id: string; label: string;
   objects: TtObjectResult[];
-  accessibleCount: number; totalCount: number;
+  accessibleCount: number; inaccessibleCount: number; undeterminedCount: number; totalCount: number;
 }
 
 interface FieldCheckResult {
   id: string; object: string; label: string; description: string;
   ourFields: string[];
-  requiredFieldsFound: string[];
-  requiredFieldsMissing: string[];
-  describeError: string | null;
+  requiredFieldsFound:   string[];
+  requiredFieldsMissing: string[]; // always [] when describeError is non-null
+  describeError:         string | null;
+  describeUndetermined:  boolean;  // true = throttled; undetermined, not missing
 }
 
 interface SalesforceResult {
@@ -98,7 +102,10 @@ interface SalesforceResult {
   npspDetected: boolean;
   pmmDetected: boolean;
   pmmObjects: PmmObject[];
-  ttCustomObjects: { groups: TtGroupResult[]; totalAccessible: number; totalObjects: number };
+  ttCustomObjects: {
+    groups: TtGroupResult[];
+    totalAccessible: number; totalInaccessible: number; totalUndetermined: number; totalObjects: number;
+  };
   customFieldChecks: FieldCheckResult[];
   identity: { username: string | null; displayName: string | null; email: string | null } | null;
   durationMs: number;
@@ -412,27 +419,53 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
               <div className="space-y-1.5">
                 <p className="text-[14px] font-bold text-foreground">
                   Transition Trails Custom Objects
-                  <span className={`ml-1.5 font-normal ${result.ttCustomObjects.totalAccessible === result.ttCustomObjects.totalObjects ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
-                    · {result.ttCustomObjects.totalAccessible}/{result.ttCustomObjects.totalObjects} accessible
+                  <span className={`ml-1.5 font-normal ${
+                    result.ttCustomObjects.totalInaccessible > 0 ? 'text-[#A93F2F]'
+                    : result.ttCustomObjects.totalUndetermined > 0 ? 'text-[#CC8400]'
+                    : 'text-[#2F6B3F]'
+                  }`}>
+                    · {result.ttCustomObjects.totalAccessible}/{result.ttCustomObjects.totalObjects} confirmed accessible
+                    {result.ttCustomObjects.totalInaccessible > 0 && ` · ${result.ttCustomObjects.totalInaccessible} inaccessible`}
+                    {result.ttCustomObjects.totalUndetermined > 0 && ` · ${result.ttCustomObjects.totalUndetermined} undetermined`}
                   </span>
                 </p>
                 {result.ttCustomObjects.groups.map(group => (
-                  <div key={group.id} className={`rounded border px-3 py-2 space-y-1 ${group.accessibleCount === group.totalCount ? 'border-[#9FC3AE] bg-[#E6F0EA]/40' : group.accessibleCount > 0 ? 'border-[#FFD08A] bg-[#FFF3E0]/40' : 'border-[#E8B9B4] bg-[#FBEAE6]/40'}`}>
-                    <p className={`text-[14px] font-semibold ${group.accessibleCount === group.totalCount ? 'text-[#245531]' : group.accessibleCount > 0 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>
+                  <div key={group.id} className={`rounded border px-3 py-2 space-y-1 ${
+                    group.inaccessibleCount > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]/40'
+                    : group.undeterminedCount > 0 ? 'border-[#FFD08A] bg-[#FFF3E0]/40'
+                    : 'border-[#9FC3AE] bg-[#E6F0EA]/40'
+                  }`}>
+                    <p className={`text-[14px] font-semibold ${
+                      group.inaccessibleCount > 0 ? 'text-[#A93F2F]'
+                      : group.undeterminedCount > 0 ? 'text-[#CC8400]'
+                      : 'text-[#245531]'
+                    }`}>
                       {group.label}
-                      <span className="font-normal ml-1.5">· {group.accessibleCount}/{group.totalCount}</span>
+                      <span className="font-normal ml-1.5">
+                        · {group.accessibleCount} accessible
+                        {group.inaccessibleCount > 0 && <span className="text-[#A93F2F]"> · {group.inaccessibleCount} inaccessible</span>}
+                        {group.undeterminedCount > 0 && <span className="text-[#CC8400]"> · {group.undeterminedCount} undetermined</span>}
+                      </span>
                     </p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
                       {group.objects.map(o => (
                         <div key={o.object} className="flex items-start gap-1.5 min-w-0">
-                          {o.accessible
+                          {o.accessible === true
                             ? <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
-                            : <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0 mt-0.5" />}
+                            : o.accessible === false
+                              ? <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0 mt-0.5" />
+                              : <HelpCircle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />}
                           <div className="min-w-0 flex-1">
-                            <span className={`text-[14px] font-semibold ${o.accessible ? 'text-foreground' : 'text-[#A93F2F]'}`}>{o.label}</span>
-                            {o.accessible
+                            <span className={`text-[14px] font-semibold ${
+                              o.accessible === true ? 'text-foreground'
+                              : o.accessible === false ? 'text-[#A93F2F]'
+                              : 'text-[#CC8400]'
+                            }`}>{o.label}</span>
+                            {o.accessible === true
                               ? <span className="text-[14px] text-muted-foreground ml-1.5">{o.count.toLocaleString()}</span>
-                              : o.error && <span className="text-[14px] text-[#A93F2F]/70 ml-1 truncate" title={o.error}>{o.error.slice(0, 30)}</span>
+                              : o.accessible === false && o.error
+                                ? <span className="text-[14px] text-[#A93F2F]/70 ml-1 truncate" title={o.error}>{o.error.slice(0, 30)}</span>
+                                : <span className="text-[14px] text-[#CC8400]/80 ml-1">undetermined</span>
                             }
                           </div>
                         </div>
@@ -448,30 +481,49 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
               <div className="space-y-1.5">
                 <p className="text-[14px] font-bold text-foreground">Custom Fields on Reused Objects</p>
                 {result.customFieldChecks.map(fc => {
-                  const allPresent = fc.requiredFieldsMissing.length === 0 && !fc.describeError;
-                  const hasIssue   = fc.requiredFieldsMissing.length > 0 || !!fc.describeError;
+                  const isUndetermined = fc.describeUndetermined;
+                  const hasError       = !!fc.describeError && !isUndetermined;
+                  const allPresent     = !fc.describeError && fc.requiredFieldsMissing.length === 0;
+                  const hasMissing     = !fc.describeError && fc.requiredFieldsMissing.length > 0;
                   return (
-                    <div key={fc.id} className={`rounded border px-3 py-2 ${hasIssue ? 'border-[#FFD08A] bg-[#FFF3E0]/40' : 'border-[#9FC3AE] bg-[#E6F0EA]/40'}`}>
+                    <div key={fc.id} className={`rounded border px-3 py-2 ${
+                      isUndetermined ? 'border-[#FFD08A] bg-[#FFF3E0]/40'
+                      : hasError     ? 'border-[#E8B9B4] bg-[#FBEAE6]/40'
+                      : hasMissing   ? 'border-[#FFD08A] bg-[#FFF3E0]/40'
+                      : 'border-[#9FC3AE] bg-[#E6F0EA]/40'
+                    }`}>
                       <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                        {allPresent
-                          ? <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0" />
-                          : <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0" />}
+                        {isUndetermined
+                          ? <HelpCircle className="w-3 h-3 text-[#CC8400] shrink-0" />
+                          : allPresent
+                            ? <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0" />
+                            : <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0" />}
                         <span className="text-[14px] font-semibold text-foreground">{fc.label}</span>
                         <span className="text-[14px] text-muted-foreground">{fc.description}</span>
-                        <span className={`ml-auto text-[14px] font-semibold ${hasIssue ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`}>
-                          {fc.ourFields.length} TT fields
+                        <span className={`ml-auto text-[14px] font-semibold ${
+                          isUndetermined ? 'text-[#CC8400]'
+                          : hasError     ? 'text-[#A93F2F]'
+                          : hasMissing   ? 'text-[#CC8400]'
+                          : 'text-[#2F6B3F]'
+                        }`}>
+                          {isUndetermined ? '? TT fields' : `${fc.ourFields.length} TT fields`}
                         </span>
                       </div>
-                      {fc.describeError && (
-                        <p className="text-[14px] text-[#A93F2F] mt-0.5">Describe failed: {fc.describeError.slice(0, 100)}</p>
+                      {isUndetermined && (
+                        <p className="text-[14px] text-[#CC8400] mt-0.5">
+                          Describe rate-limited — field status undetermined. Rerun validation to confirm.
+                        </p>
                       )}
-                      {fc.requiredFieldsMissing.length > 0 && (
+                      {hasError && (
+                        <p className="text-[14px] text-[#A93F2F] mt-0.5">Describe failed: {fc.describeError!.slice(0, 100)}</p>
+                      )}
+                      {hasMissing && (
                         <div className="mt-1">
                           <span className="text-[14px] text-[#CC8400] font-semibold">Missing required: </span>
                           <span className="text-[14px] text-[#CC8400] font-mono">{fc.requiredFieldsMissing.join(', ')}</span>
                         </div>
                       )}
-                      {fc.requiredFieldsFound.length > 0 && !hasIssue && (
+                      {allPresent && fc.requiredFieldsFound.length > 0 && (
                         <p className="text-[14px] text-[#2F6B3F]/70 mt-0.5">
                           All {fc.requiredFieldsFound.length} required fields present.
                         </p>
