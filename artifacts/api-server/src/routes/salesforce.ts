@@ -237,7 +237,6 @@ const TT_CUSTOM_OBJECT_GROUPS = [
       { api: "Course__c",                          label: "Course" },
       { api: "Course_Module__c",                   label: "Course Module" },
       { api: "Course_Module_Activity__c",          label: "Course Module Activity" },
-      { api: "Learner_Course__c",                  label: "Learner Course" },
       { api: "Learner_Course_Module__c",           label: "Learner Course Module" },
       { api: "Learner_Course_Module_Activity__c",  label: "Learner Course Module Activity" },
     ],
