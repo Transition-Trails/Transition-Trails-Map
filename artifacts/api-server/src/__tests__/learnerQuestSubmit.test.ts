@@ -268,3 +268,131 @@ describe('POST /api/learner/quest/submit — Gemini success path', () => {
     expect(res.body.pointsEarned).toBe(VALID_BODY.pointValue);
   });
 });
+
+describe('POST /api/learner/quest/submit — activityId wires Assignment__c in Salesforce', () => {
+  const ACTIVITY_ID = 'a0B000000TestActivity001';
+  const BODY_WITH_ACTIVITY = { ...VALID_BODY, activityId: ACTIVITY_ID };
+
+  function makeSfCreateResponse(id: string): Response {
+    const body = { id, success: true, errors: [] };
+    return {
+      ok: true, status: 201, statusText: 'Created',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      json: async () => body,
+      text: async () => JSON.stringify(body),
+      redirected: false, type: 'basic' as Response['type'], url: '',
+      clone: () => makeSfCreateResponse(id),
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob(),
+      formData: async () => new FormData(),
+      body: null, bodyUsed: false,
+    } as Response;
+  }
+
+  function makeSfEmptyQueryResponse(): Response {
+    const body = { totalSize: 0, done: true, records: [] };
+    return {
+      ok: true, status: 200, statusText: 'OK',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      json: async () => body,
+      text: async () => JSON.stringify(body),
+      redirected: false, type: 'basic' as Response['type'], url: '',
+      clone: () => makeSfEmptyQueryResponse(),
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob: async () => new Blob(),
+      formData: async () => new FormData(),
+      body: null, bodyUsed: false,
+    } as Response;
+  }
+
+  test('calls SF create with Assignment__c when activityId is provided', async () => {
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    const sfCreateRequests: { url: string; body: unknown }[] = [];
+
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url: string, init?: RequestInit) => {
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return makeGeminiOkFeedback('Good job!');
+      }
+      if ((url as string).includes('/sobjects/Penny_Quest_Submission__c') && init?.method === 'POST') {
+        sfCreateRequests.push({ url, body: JSON.parse(init.body as string) });
+        return makeSfCreateResponse('a0C000000TestSubmission');
+      }
+      // Gamification queries and creates
+      return makeSfEmptyQueryResponse();
+    }));
+
+    const res = await request(app)
+      .post('/api/learner/quest/submit')
+      .send(BODY_WITH_ACTIVITY);
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+
+    expect(sfCreateRequests).toHaveLength(1);
+    const sfBody = sfCreateRequests[0]!.body as Record<string, unknown>;
+    expect(sfBody['Assignment__c']).toBe(ACTIVITY_ID);
+    expect(sfBody['Submission_Text__c']).toBe(VALID_BODY.learnerResponse);
+    expect(sfBody['Name']).toBe(VALID_BODY.questTitle);
+  });
+
+  test('omits SF create when activityId is not provided (AI-generated quest)', async () => {
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    const sfCreateRequests: string[] = [];
+
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url: string, init?: RequestInit) => {
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return makeGeminiOkFeedback('Good job!');
+      }
+      if ((url as string).includes('/sobjects/Penny_Quest_Submission__c') && init?.method === 'POST') {
+        sfCreateRequests.push(url as string);
+        return makeSfCreateResponse('a0C000000TestSubmission');
+      }
+      return makeSfEmptyQueryResponse();
+    }));
+
+    const res = await request(app)
+      .post('/api/learner/quest/submit')
+      .send(VALID_BODY); // no activityId
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(sfCreateRequests).toHaveLength(0);
+  });
+
+  test('returns 502 when activityId is provided but SF create fails', async () => {
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url: string, init?: RequestInit) => {
+      if ((url as string).includes('/sobjects/Penny_Quest_Submission__c') && init?.method === 'POST') {
+        return {
+          ok: false, status: 400, statusText: 'Bad Request',
+          headers: new Headers(),
+          json: async () => ([{ message: 'Required fields missing', errorCode: 'REQUIRED_FIELD_MISSING' }]),
+          text: async () => 'Required fields missing',
+          redirected: false, type: 'basic' as Response['type'], url: '',
+          clone: function() { return this; },
+          arrayBuffer: async () => new ArrayBuffer(0),
+          blob: async () => new Blob(),
+          formData: async () => new FormData(),
+          body: null, bodyUsed: false,
+        } as Response;
+      }
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return makeGeminiOkFeedback('Good job!');
+      }
+      return makeSfEmptyQueryResponse();
+    }));
+
+    const res = await request(app)
+      .post('/api/learner/quest/submit')
+      .send(BODY_WITH_ACTIVITY);
+
+    expect(res.status).toBe(502);
+    expect(res.body.error).toBeDefined();
+  });
+});

@@ -162,6 +162,8 @@ interface DailyQuest {
   pointValue:         number;
   category:           string;
   acceptanceCriteria: string;
+  /** Set when the quest is anchored to a Quest_Eligible__c activity from the learner's current enrollment. Omitted for AI-invented quests with no SF anchor. */
+  activityId?:        string;
 }
 
 router.get("/learner/daily-quest", async (req, res) => {
@@ -195,6 +197,26 @@ router.get("/learner/daily-quest", async (req, res) => {
     }
   } catch { /* use fallback values above */ }
 
+  // Best-effort: resolve the learner's current activity and check Quest_Eligible__c.
+  // When found, the quest is anchored to a real Course_Module_Activity__c record so
+  // the submission can populate Penny_Quest_Submission__c.Assignment__c in SF.
+  // AI-generated quests with no eligible anchor correctly omit activityId.
+  let eligibleActivityId: string | undefined;
+  try {
+    const enrollRecords = await sfQuery<{ Current_Activity__c: string | null }>(
+      `SELECT Current_Activity__c FROM Course_Enrollment__c WHERE Contact__c = '${contactId}' AND Current_Activity__c != null LIMIT 1`
+    );
+    const currentActivityId = enrollRecords[0]?.Current_Activity__c;
+    if (currentActivityId) {
+      const activityRecords = await sfQuery<{ Id: string }>(
+        `SELECT Id FROM Course_Module_Activity__c WHERE Id = '${currentActivityId}' AND Quest_Eligible__c = true LIMIT 1`
+      );
+      if (activityRecords[0]) {
+        eligibleActivityId = activityRecords[0].Id;
+      }
+    }
+  } catch { /* activity lookup is advisory — quest generation proceeds without it */ }
+
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const geminiRes = await fetch(url, {
@@ -224,7 +246,10 @@ router.get("/learner/daily-quest", async (req, res) => {
 
     const body  = await geminiRes.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
     const raw   = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
-    const quest = JSON.parse(raw) as DailyQuest;
+    const quest: DailyQuest = {
+      ...(JSON.parse(raw) as DailyQuest),
+      ...(eligibleActivityId ? { activityId: eligibleActivityId } : {}),
+    };
 
     req.session.dailyQuest     = quest as unknown as Record<string, unknown>;
     req.session.dailyQuestDate = today;

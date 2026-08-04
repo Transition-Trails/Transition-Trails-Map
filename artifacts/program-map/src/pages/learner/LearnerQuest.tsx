@@ -13,6 +13,8 @@ interface DailyQuest {
   pointValue: number;
   category: string;
   acceptanceCriteria: string;
+  /** Present when the quest is anchored to a Quest_Eligible__c activity; omitted for AI-generated quests with no SF anchor. */
+  activityId?: string;
 }
 
 interface SubmitResult {
@@ -67,6 +69,9 @@ export default function LearnerQuest() {
           questDescription: quest.acceptanceCriteria,
           pointValue:       quest.pointValue,
           learnerResponse:  response.trim(),
+          // Only sent when the quest is anchored to a Quest_Eligible__c activity.
+          // AI-generated quests have no anchor and correctly omit this field.
+          ...(quest.activityId ? { activityId: quest.activityId } : {}),
         }),
       });
       if (resp.ok) {

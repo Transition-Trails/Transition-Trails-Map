@@ -257,6 +257,130 @@ describe('GET /api/learner/daily-quest — Gemini returns a non-OK response', ()
   });
 });
 
+describe('GET /api/learner/daily-quest — activityId from quest-eligible enrollment', () => {
+  const ELIGIBLE_ACTIVITY_ID = 'a0B000000TestActivity001';
+
+  function makeSfActivityResponse(records: unknown[]): Response {
+    const body = { totalSize: records.length, done: true, records };
+    return {
+      ok:         true,
+      status:     200,
+      statusText: 'OK',
+      headers:    new Headers({ 'Content-Type': 'application/json' }),
+      json:       async () => body,
+      text:       async () => JSON.stringify(body),
+      redirected: false,
+      type:       'basic' as Response['type'],
+      url:        '',
+      clone:      () => makeSfActivityResponse(records),
+      arrayBuffer: async () => new ArrayBuffer(0),
+      blob:       async () => new Blob(),
+      formData:   async () => new FormData(),
+      body:       null,
+      bodyUsed:   false,
+    } as Response;
+  }
+
+  test('includes activityId when learner has a quest-eligible current activity', async () => {
+    delete mockSession['dailyQuestDate'];
+    delete mockSession['dailyQuest'];
+
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return Promise.resolve(makeGeminiOkResponse(VALID_QUEST));
+      }
+      // SF queries: enrollment → activity → contact context
+      if ((url as string).includes('Course_Enrollment__c')) {
+        return Promise.resolve(makeSfActivityResponse([{ Current_Activity__c: ELIGIBLE_ACTIVITY_ID }]));
+      }
+      if ((url as string).includes('Course_Module_Activity__c')) {
+        return Promise.resolve(makeSfActivityResponse([{ Id: ELIGIBLE_ACTIVITY_ID }]));
+      }
+      return Promise.resolve(makeSfEmptyResponse());
+    }));
+
+    const res = await request(app).get('/api/learner/daily-quest');
+
+    expect(res.status).toBe(200);
+    expect(res.body.title).toBe(VALID_QUEST.title);
+    expect(res.body.activityId).toBe(ELIGIBLE_ACTIVITY_ID);
+  });
+
+  test('omits activityId when current activity is not Quest_Eligible__c', async () => {
+    delete mockSession['dailyQuestDate'];
+    delete mockSession['dailyQuest'];
+
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return Promise.resolve(makeGeminiOkResponse(VALID_QUEST));
+      }
+      if ((url as string).includes('Course_Enrollment__c')) {
+        return Promise.resolve(makeSfActivityResponse([{ Current_Activity__c: 'a0B000000NonEligible' }]));
+      }
+      // Activity check returns empty → not quest-eligible
+      if ((url as string).includes('Course_Module_Activity__c')) {
+        return Promise.resolve(makeSfEmptyResponse());
+      }
+      return Promise.resolve(makeSfEmptyResponse());
+    }));
+
+    const res = await request(app).get('/api/learner/daily-quest');
+
+    expect(res.status).toBe(200);
+    expect(res.body.activityId).toBeUndefined();
+  });
+
+  test('omits activityId and still generates quest when enrollment lookup fails', async () => {
+    delete mockSession['dailyQuestDate'];
+    delete mockSession['dailyQuest'];
+
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return Promise.resolve(makeGeminiOkResponse(VALID_QUEST));
+      }
+      if ((url as string).includes('Course_Enrollment__c')) {
+        return Promise.reject(new Error('SF timeout'));
+      }
+      return Promise.resolve(makeSfEmptyResponse());
+    }));
+
+    const res = await request(app).get('/api/learner/daily-quest');
+
+    expect(res.status).toBe(200);
+    expect(res.body.title).toBe(VALID_QUEST.title);
+    expect(res.body.activityId).toBeUndefined();
+  });
+
+  test('activityId cached with quest and returned on cache hit', async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    mockSession['dailyQuestDate'] = today;
+    mockSession['dailyQuest']     = { ...VALID_QUEST, activityId: ELIGIBLE_ACTIVITY_ID };
+
+    const fetchSpy = vi.fn().mockResolvedValue(makeSfEmptyResponse());
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const res = await request(app).get('/api/learner/daily-quest');
+
+    expect(res.status).toBe(200);
+    expect(res.body.cached).toBe(true);
+    expect(res.body.activityId).toBe(ELIGIBLE_ACTIVITY_ID);
+
+    const geminiCalls = (fetchSpy.mock.calls as [string][]).filter(([url]) =>
+      url.includes('generativelanguage.googleapis.com')
+    );
+    expect(geminiCalls).toHaveLength(0);
+  });
+});
+
 describe('GET /api/learner/daily-quest — session cache short-circuits Gemini', () => {
   test('returns cached:true without calling Gemini when cache is warm for today', async () => {
     const today = new Date().toISOString().slice(0, 10);
