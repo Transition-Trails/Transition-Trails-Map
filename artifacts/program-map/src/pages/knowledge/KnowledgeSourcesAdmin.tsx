@@ -665,6 +665,26 @@ function EditDrawer({
 
         {/* Sections */}
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
+          {/* Health warning banner */}
+          {source.healthStatus === 'Warning' && source.healthIssues?.length > 0 && (
+            <div className="rounded-lg border border-[#F0BDBD] bg-[#FAE6E6] px-4 py-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-[#8B2A2A] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[12px] font-semibold text-[#8B2A2A]">Issues to resolve</p>
+                  <ul className="mt-1 space-y-0.5">
+                    {source.healthIssues.map((issue, i) => (
+                      <li key={i} className="text-[11px] text-[#8B2A2A] flex gap-1.5">
+                        <span className="shrink-0">·</span>
+                        <span>{issue}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Identity */}
           <Section title="Identity">
             <Field label="Source name">
@@ -1115,10 +1135,30 @@ export default function KnowledgeSourcesAdmin() {
                         </div>
                       </td>
                       <td className="px-4 py-2">
-                        <div className="flex items-center gap-1.5">
-                          {healthIcon(source.healthStatus)}
-                          <span className="text-[11px] capitalize text-muted-foreground font-medium">{source.healthStatus}</span>
-                        </div>
+                        {source.healthStatus === 'Warning' && source.healthIssues?.length > 0 ? (
+                          <div className="group relative inline-flex items-center gap-1.5 cursor-default">
+                            {healthIcon(source.healthStatus)}
+                            <span className="text-[11px] capitalize text-muted-foreground font-medium underline decoration-dotted decoration-[#CC8400]">Warning</span>
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full left-0 mb-2 w-64 bg-foreground text-background rounded-md px-3 py-2.5 shadow-lg text-[11px] leading-snug opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                              <p className="font-semibold mb-1.5 text-[11px]">Issues to resolve:</p>
+                              <ul className="space-y-1 list-none">
+                                {source.healthIssues.map((issue, i) => (
+                                  <li key={i} className="flex gap-1.5">
+                                    <span className="shrink-0 mt-0.5 text-[#CC8400]">·</span>
+                                    <span>{issue}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              <p className="mt-2 text-[10px] opacity-70">Open Edit to fix →</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5">
+                            {healthIcon(source.healthStatus)}
+                            <span className="text-[11px] capitalize text-muted-foreground font-medium">{source.healthStatus}</span>
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-2 text-right">
                         <button
