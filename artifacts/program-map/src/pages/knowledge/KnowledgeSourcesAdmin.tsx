@@ -637,17 +637,23 @@ function ConnectionSection({
 // ── Edit drawer ────────────────────────────────────────────────────────────────
 
 function EditDrawer({
-  source, onClose, onSave, isSaving, folderInaccessible, wasAutoDisconnected,
+  source, onClose, onSave, isSaving, saveError, onClearError,
+  folderInaccessible, wasAutoDisconnected,
 }: {
   source: KnowledgeSource;
   onClose: () => void;
   onSave: (patch: Partial<KnowledgeSource>) => void;
   isSaving: boolean;
+  saveError?: string | null;
+  onClearError?: () => void;
   folderInaccessible?: boolean;
   wasAutoDisconnected?: boolean;
 }) {
   const [draft, setDraft] = useState<Partial<KnowledgeSource>>({});
-  function patch(p: Partial<KnowledgeSource>) { setDraft(d => ({ ...d, ...p })); }
+  function patch(p: Partial<KnowledgeSource>) {
+    onClearError?.();
+    setDraft(d => ({ ...d, ...p }));
+  }
 
   const hasConnectionGap =
     (source.type === 'Google Drive' && !(draft.driveFolderUrl ?? source.driveFolderUrl)) ||
@@ -662,7 +668,7 @@ function EditDrawer({
       !(draft.linkUrl ?? source.linkUrl));
 
   return (
-    <div className="absolute inset-0 z-50 flex justify-end overflow-hidden">
+    <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
       {/* Scrim */}
       <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" onClick={onClose} />
 
@@ -851,6 +857,12 @@ function EditDrawer({
                   </p>
                 </div>
               )}
+              {saveError && (
+                <div className="flex items-start gap-2 px-4 py-2.5 bg-[#FAE6E6] border-b border-[#F0BDBD]">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0 text-[#8B2A2A] mt-0.5" />
+                  <p className="text-[11px] text-[#8B2A2A] leading-snug font-medium">{saveError}</p>
+                </div>
+              )}
               <div className="flex justify-end gap-3 p-4">
                 <button onClick={onClose} className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-muted transition-colors">
                   Cancel
@@ -876,7 +888,9 @@ function EditDrawer({
 const NEW_SOURCE_TYPES: SourceType[] = ['Google Drive', 'Salesforce Knowledge', 'Google Drive']; // reuse for 3 canonical types
 
 function NewSourceDrawer({
-  onClose, onCreate, isCreating,
+  onClose,
+  onCreate,
+  isCreating,
 }: {
   onClose: () => void;
   onCreate: (body: Partial<KnowledgeSource>) => void;
@@ -894,7 +908,7 @@ function NewSourceDrawer({
   ];
 
   return (
-    <div className="absolute inset-0 z-50 flex justify-end overflow-hidden">
+    <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
       <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" onClick={onClose} />
       <div className="w-[480px] bg-background h-full shadow-2xl border-l flex flex-col relative">
         <div className="flex items-start justify-between px-6 py-5 border-b bg-card">
@@ -1033,6 +1047,7 @@ export default function KnowledgeSourcesAdmin() {
   const [activeTab, setActiveTab]         = useState<TabId>('all');
   const [editSource, setEditSource]       = useState<KnowledgeSource | null>(null);
   const [showNewDrawer, setShowNewDrawer] = useState(false);
+  const [saveError, setSaveError]         = useState<string | null>(null);
 
   // ── Drive folder health check ─────────────────────────────────────────────
   // Maps source.id → FolderHealthStatus for Google Drive sources with a saved folder URL.
@@ -1148,6 +1163,10 @@ export default function KnowledgeSourcesAdmin() {
       void qc.invalidateQueries({ queryKey: ['knowledge-sources'] });
       setEditSource(null);
     },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setSaveError(`Save failed: ${msg}. Please try again.`);
+    },
   });
 
   // POST mutation
@@ -1156,6 +1175,10 @@ export default function KnowledgeSourcesAdmin() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['knowledge-sources'] });
       setShowNewDrawer(false);
+    },
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setSaveError(`Could not create source: ${msg}`);
     },
   });
 
@@ -1363,9 +1386,11 @@ export default function KnowledgeSourcesAdmin() {
       {editSource && (
         <EditDrawer
           source={editSource}
-          onClose={() => setEditSource(null)}
-          onSave={patch => patchMutation.mutate({ id: editSource.id, patch })}
+          onClose={() => { setEditSource(null); setSaveError(null); }}
+          onSave={patch => { setSaveError(null); patchMutation.mutate({ id: editSource.id, patch }); }}
           isSaving={patchMutation.isPending}
+          saveError={saveError}
+          onClearError={() => setSaveError(null)}
           folderInaccessible={folderHealth.get(editSource.id) === 'inaccessible'}
           wasAutoDisconnected={autoDisconnected.has(editSource.id)}
         />
