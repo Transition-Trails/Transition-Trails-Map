@@ -1007,10 +1007,9 @@ export default function IntegrationReadinessCenter() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[15px] font-semibold text-foreground">Integration Readiness Center</h1>
-              <SampleDataBadge />
             </div>
             <p className="text-[14px] text-muted-foreground mt-0.5">
-              Planning workspace — readiness percentages are prototype figures. For live integration health, see the Phase 1 Readiness dashboard.
+              Live integration planning workspace — readiness scores reflect confirmed live status. For real-time health checks, see the Phase 1 Readiness dashboard.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
