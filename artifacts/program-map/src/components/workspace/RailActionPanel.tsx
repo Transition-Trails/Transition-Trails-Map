@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { X, CheckCircle2, Pencil, Hash, Send, Sparkles } from 'lucide-react';
+import { X, CheckCircle2, Pencil, Hash, Send, Sparkles, Save, MessageSquare } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionPanelConfig } from '@/types/actionPanel';
@@ -251,8 +251,8 @@ interface RailActionPanelProps {
 }
 
 export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [saved,  setSaved]  = useState(false);
+  const [values,    setValues]    = useState<Record<string, string>>({});
+  const [savedMode, setSavedMode] = useState<'idle' | 'saved' | 'notified'>('idle');
   const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
 
   const {
@@ -277,7 +277,17 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     setValues(prev => ({ ...prev, [id]: val }));
   }
 
-  function handleSendRequest() {
+  // Save only — writes to DB, closes immediately with no Slack notification.
+  function handleSave() {
+    onSaveDraft?.(values);
+    onSaveAndView?.(values);
+    setSavedMode('saved');
+    setTimeout(() => { setSavedMode('idle'); onClose(); }, 1200);
+  }
+
+  // Send for review — saves, then fires the Slack notification so a team mate
+  // can pick it up for review. Shows a confirmation screen before closing.
+  function handleSendForReview() {
     onSaveDraft?.(values);
     onSaveAndView?.(values);
     fetch('/api/slack/notify', {
@@ -285,8 +295,8 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ objectType, fields: values }),
     }).catch(() => {});
-    setSaved(true);
-    setTimeout(() => { setSaved(false); onClose(); }, 1600);
+    setSavedMode('notified');
+    setTimeout(() => { setSavedMode('idle'); onClose(); }, 1800);
   }
 
   function handleClose() {
@@ -294,21 +304,32 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     onClose();
   }
 
-  if (saved) {
+  if (savedMode === 'saved') {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 px-4 bg-white">
         <div className="w-10 h-10 rounded-full bg-[#E6F0EA] flex items-center justify-center">
           <CheckCircle2 className="w-5 h-5 text-[#2F6B3F]" />
         </div>
-        <p className="text-[14px] font-bold text-foreground text-center">Request Sent to Slack</p>
+        <p className="text-[14px] font-bold text-foreground text-center">Saved</p>
         <p className="text-[14px] text-muted-foreground text-center leading-relaxed">
-          Your {objectType} has been saved to the list and a notification sent to the team channel.
+          Your {objectType} changes have been saved.
         </p>
-        <p className="text-[14px] text-muted-foreground/60 text-center leading-snug mt-1">
-          Changes are session-only and will reset on page refresh.
+      </div>
+    );
+  }
+
+  if (savedMode === 'notified') {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-3 px-4 bg-white">
+        <div className="w-10 h-10 rounded-full bg-[#EDF5F8] flex items-center justify-center">
+          <MessageSquare className="w-5 h-5 text-[#2F6F7E]" />
+        </div>
+        <p className="text-[14px] font-bold text-foreground text-center">Sent for Review</p>
+        <p className="text-[14px] text-muted-foreground text-center leading-relaxed">
+          Your {objectType} has been saved and a review request sent to the team Slack channel.
         </p>
-        <span className="text-[14px] font-bold  text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-2.5 py-1">
-          Saved · Session Only
+        <span className="text-[14px] font-bold text-[#2F6F7E] border border-[#7FAFC6] bg-[#EDF5F8] rounded-full px-2.5 py-1">
+          Saved · Slack notified
         </span>
       </div>
     );
@@ -462,16 +483,29 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
           >
             Cancel
           </button>
-          <button
-            onClick={handleSendRequest}
-            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-[14px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity"
-          >
-            <Send className="w-3 h-3" />
-            Save &amp; Notify Slack
-          </button>
+          <div className="ml-auto flex items-center gap-1.5">
+            {/* Always visible: Save — writes to DB, no Slack notification */}
+            <button
+              onClick={handleSave}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[14px] font-bold bg-foreground text-background rounded-full hover:opacity-90 transition-opacity"
+            >
+              <Save className="w-3 h-3" />
+              Save
+            </button>
+            {/* Slack context only: separate "Send for Review" action */}
+            {slackContext && (
+              <button
+                onClick={handleSendForReview}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[14px] font-bold border border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E] rounded-full hover:bg-[#D6E9F0] transition-colors"
+              >
+                <MessageSquare className="w-3 h-3" />
+                Send for Review
+              </button>
+            )}
+          </div>
         </div>
         <p className="text-[14px] text-muted-foreground/40 text-center leading-snug">
-          Create from the right panel · workspace stays focused
+          Save drafts freely · notify Slack when it&apos;s ready for review
         </p>
       </div>
 
