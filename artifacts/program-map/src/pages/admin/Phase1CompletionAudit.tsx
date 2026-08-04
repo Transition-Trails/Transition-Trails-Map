@@ -39,7 +39,7 @@ interface PocItem {
 
 // ── Audit data ────────────────────────────────────────────────────────────────
 
-const AUDIT_DATE = 'Jul 17, 2026';
+const AUDIT_DATE = 'Aug 4, 2026';
 
 const PAGE_AUDITS: PageAudit[] = [
   { path: '/',                              name: 'Home',                            role: 'All',    status: 'pass',  issues: '' },
@@ -62,7 +62,7 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/penny/prompts',                 name: 'Penny · Prompt Studio',           role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/penny/learners',                name: 'Penny · Learners',                role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/penny/intelligence',            name: 'Penny · Intelligence',            role: 'Admin+', status: 'fixed', issues: 'Sprint 0: P5 Phase 2 Placeholder — 3 preview cards (Learner Trend Analysis, Cohort Health Signals, Weekly Report Archive) with data source attribution' },
-  { path: '/penny/test',                    name: 'Penny · Ask Penny (hub tab)',     role: 'Admin+', status: 'fixed', issues: 'Sprint 2: standalone /penny/test route removed; TestPenny rendered as "Ask Penny" tab in PennyHub; live Gemini LLM wired. Sprint 3: Ask Penny global slide-over (AskPennyPanel) — Topbar trigger, RAG (22-chunk corpus, tier-filtered sources), Penny Reacts to Trail Signals (P1–P10 badges, auto-fire signal context). Sprint 3 Item 4: Calendar Action Panel global slide-over — CalendarDays Topbar button, fetches /api/calendar/events, next 5 events, pending-response flags, Trail Talk violet badges, starting-soon emerald banner, inline Penny prep briefs via Gemini, mutual exclusion with AskPennyPanel' },
+  { path: '/penny/penny-sandbox',           name: 'Penny · Penny Sandbox',           role: 'Admin+', status: 'fixed', issues: 'Sprint 2: live Gemini LLM wired; TestPenny regex fallback retained for offline only. Sprint 3: global AskPennyPanel slide-over added to Topbar (RAG 22-chunk corpus, tier-filtered sources, P1–P10 signal badges, auto-fire context). CalendarActionPanel added — CalendarDays Topbar button, /api/calendar/events, 5 events, Trail Talk violet badges, Penny prep briefs, mutual exclusion. Route migrated /penny/test → /penny/penny-sandbox; old /penny/test redirects here.' },
   { path: '/knowledge',                     name: 'Knowledge · Overview',            role: 'Power+', status: 'fixed', issues: 'Sprint 0: breadcrumb fixed → Overview; /knowledge/sources added to Topbar PAGE_INFO with Sources label' },
   { path: '/knowledge/sources',             name: 'Knowledge · Sources',             role: 'Power+', status: 'fixed', issues: 'Sprint 0: new route entry in Topbar — breadcrumb now reads Knowledge / Sources (was showing Dashboard)' },
   { path: '/knowledge/library',             name: 'Knowledge · Library',             role: 'All',    status: 'pass',  issues: '' },
@@ -71,25 +71,39 @@ const PAGE_AUDITS: PageAudit[] = [
   { path: '/collaboration',                 name: 'Collaboration · Overview',        role: 'Power+', status: 'fixed', issues: 'Refactored from command-center feed to rule management hub — channel signal rules (Slack/Gmail/Calendar/Drive), Penny routing config, signal destinations (Penny, Trail Signals, Notifications, Templates), per-channel manage links to detail tabs' },
   { path: '/collaboration/gmail',           name: 'Collaboration · Gmail',           role: 'Power+', status: 'fixed', issues: 'Sprint 6: GmailCenter live — GOOGLE_GMAIL_REFRESH_TOKEN active; gmail.readonly + gmail.send confirmed; real inbox (15 threads); thread read; Penny-assisted draft via /api/penny/ask; real send via POST /api/gmail/send; Penny label config (in-memory v1); sidebar nav entry added (minTier: power)' },
   { path: '/collaboration/slack',           name: 'Collaboration · Slack',           role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/collaboration/drive',           name: 'Collaboration · Drive',           role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/collaboration/drive',           name: 'Collaboration · Drive (→ Admin)', role: 'Admin+', status: 'fixed', issues: 'Redirects to /admin/integrations/google-drive — Drive management consolidated under Admin > Integrations hub.' },
   { path: '/collaboration/calendar-live',   name: 'Collaboration · Calendar (Live)', role: 'Power+', status: 'fixed', issues: 'Sprint 2: new Calendar Action Panel — live Google Calendar API via /api/calendar/events; real events from primary calendar; pending invite detection; Trail Talk branding; per-event Penny prep brief via Gemini; time-to-start countdowns; sidebar nav updated to "Calendar" → /collaboration/calendar-live for Power+ users' },
-  { path: '/collaboration/calendar',        name: 'Collaboration · Calendar (Admin)', role: 'Admin+', status: 'fixed', issues: 'Sprint 2: stale credential data updated — GOOGLE_CALENDAR_REFRESH_TOKEN now pass (was fail); Calendar API confirmed live; blocked tests → warning; CAL_HEALTH_SCORES credentials 0→10/10; Penny readiness 2→5/10; cgi-02 governance issue status → Resolved' },
+  { path: '/collaboration/calendar',        name: 'Collaboration · Calendar (→ Admin)', role: 'Admin+', status: 'fixed', issues: 'Sprint 2: GOOGLE_CALENDAR_REFRESH_TOKEN live, Calendar API confirmed. Now redirects to /admin/integrations/google-calendar — Calendar management consolidated under Admin > Integrations hub.' },
   { path: '/collaboration/channels',        name: 'Collaboration · Channels',        role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/collaboration/templates',       name: 'Collaboration · Templates',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/governance',                    name: 'Governance Hub',                  role: 'Admin+', status: 'fixed', issues: '4× stat values removed' },
-  { path: '/admin',                         name: 'Admin · Landing (→ Setup)',       role: 'Admin+', status: 'fixed', issues: '/admin now redirects to /admin/setup; AdminSetup is the canonical Administration landing' },
-  { path: '/admin/setup',                   name: 'Admin · Setup',                   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed Integration Readiness from sidebar; Setup is now canonical admin entry; Phase 1 UX: Gmail card added to NEEDS_CONFIG; Drive + Calendar moved to LIVE_INTEGRATIONS (OAuth tokens obtained); Google OAuth status updated to live; admin sidebar deduplicated — removed Phase 1 Readiness, UX Standards, Phase 2 Backlog, Phase 1 Audit from sidebar nav (all accessible via Admin Setup readiness grid)' },
+  { path: '/admin',                         name: 'Admin · Landing (→ Integrations)', role: 'Admin+', status: 'fixed', issues: '/admin now redirects to /admin/integrations (was /admin/setup); IntegrationHub is the canonical Administration landing.' },
+  { path: '/admin/setup',                   name: 'Admin · Setup (→ Integrations)',  role: 'Admin+', status: 'fixed', issues: 'Sprint 1: canonical admin entry was /admin/setup; since migrated to /admin/integrations. /admin/setup now redirects there. Sprint 1 history: removed Integration Readiness from sidebar, Gmail NEEDS_CONFIG card added, Drive + Calendar moved to LIVE_INTEGRATIONS, Google OAuth → live, sidebar deduplicated.' },
   { path: '/admin/people-access',           name: 'Admin · People & Access',         role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/integration-readiness',   name: 'Admin · Integration Readiness',   role: 'Admin+', status: 'fixed', issues: 'Sprint 1: removed from sidebar nav; accessible only via Admin Setup deep-link; canonical entry is /admin/setup' },
   { path: '/admin/phase1-readiness',        name: 'Admin · Phase 1 Readiness',       role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/ux-standards',            name: 'Admin · UX Standards',            role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/admin/secrets-audit',           name: 'Admin · Secrets Audit',           role: 'Admin+', status: 'pass',  issues: '' },
-  { path: '/admin/google-oauth',            name: 'Admin · Google OAuth',            role: 'Admin+', status: 'fixed', issues: 'OAuth flow unblocked: Authorize button changed to target="_blank" (Google blocks OAuth inside iframes); GOOGLE_DRIVE_REFRESH_TOKEN and GOOGLE_CALENDAR_REFRESH_TOKEN obtained and stored in Replit Secrets; Drive + Calendar status updated to live across AdminSetup, readinessState.ts, and PagePennyGuide footer' },
+  { path: '/admin/secrets-audit',           name: 'Admin · Secrets Audit (→ Admin)', role: 'Admin+', status: 'fixed', issues: 'Redirects to /admin/integrations/secrets — secrets audit consolidated under Integrations hub.' },
+  { path: '/admin/google-oauth',            name: 'Admin · Google OAuth (→ Admin)',  role: 'Admin+', status: 'fixed', issues: 'Redirects to /admin/integrations/google-auth. History: OAuth flow unblocked — Authorize button target="_blank", GOOGLE_DRIVE_REFRESH_TOKEN + GOOGLE_CALENDAR_REFRESH_TOKEN obtained; Drive + Calendar live.' },
   { path: '/admin/sf-validation',           name: 'Admin · SF Validation',           role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/program-resources',       name: 'Admin · Drive Workspaces',        role: 'Admin+', status: 'pass',  issues: '' },
   { path: '/admin/program-config',          name: 'Admin · Program Configuration',   role: 'Admin+', status: 'fixed', issues: 'Jul 17: 4-step Salesforce program wizard (Program → Cohorts → Course → Modules → Review) with 60/40 Penny guidance panel. Status filter pills (All / Discovery / Active / Completed/Cancelled) replace archived toggle. Free step navigation via clickable step indicator. Review tab: 4-item validation checklist with "Fix →" deep links and canSave gate. Knowledge Brief dormant panel — Penny activates only on explicit "Focus with Penny" click (not auto on card select). Create New always opens blank form. Manager name resolved via SOQL Program_Manager__r.Name relationship traversal.' },
-  { path: '/admin/setup',                   name: 'Admin · Phase 2 Backlog',         role: 'Admin+', status: 'fixed', issues: 'Phase 2 backlog page removed — Phase 2 features are now tracked in Salesforce. Sprint 3 completions: Ask Penny Panel, Penny RAG, Trail Signals, Calendar Action Panel. Sprint 4 completions: Trail Quest Live, Penny Assessment, Agentforce Coexistence.' },
-  { path: '/penny/trail-quests',            name: 'Penny · Trail Quests',            role: 'Admin+', status: 'fixed', issues: 'Sprint 4: restored from redirect stub to live PennyHub tab — full Trail Quest management page with active quests, catalogue, stats (11 quests, 78% completion, 24 streaks), category filter, and Penny coaching trigger. Redirects from old /penny/trail-quests removed.' },
+  { path: '/penny/trail-configs',           name: 'Penny · Trail Configs',           role: 'Admin+', status: 'fixed', issues: 'Aug 4: full Trail Config management — create (New Config button + form with trail ID dropdown, role, tone, focal points, special instructions — writes to Penny_Trail_Config__c via POST /api/penny/data/trail-config), inline edit, activate/deactivate, and delete with confirmation (DELETE /api/penny/data/trail-config/:id — tasks #200). Empty state updated to reference New Config button. FoundationsPenny persona added to TRAIL_PERSONAS map.' },
+  { path: '/penny/session-log',             name: 'Penny · Session Log',             role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/penny/health',                  name: 'Penny · Health',                  role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/penny/penny-logs',              name: 'Penny · Penny Logs',              role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/knowledge/sf-articles',         name: 'Knowledge · SF Articles',          role: 'Power+', status: 'pass',  issues: '' },
+  { path: '/knowledge/review-queue',        name: 'Knowledge · Review Queue',         role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/collaboration/my-signals',      name: 'Collaboration · My Trail Signals', role: 'Power+', status: 'fixed', issues: 'Canonical collaboration landing — /collaboration now redirects here. MyTrailSignals renders personal signal feed.' },
+  { path: '/admin/integrations',            name: 'Admin · Integration Hub',          role: 'Admin+', status: 'fixed', issues: 'Canonical administration entry — /admin and /admin/setup both redirect here. IntegrationHub consolidates all integration management: Salesforce, Slack, Gmail, Google Drive, Google Calendar, Agentforce. Sub-pages: google-auth, google-drive, google-calendar, secrets.' },
+  { path: '/admin/integrations/google-auth',     name: 'Admin · Google OAuth Wizard',      role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/integrations/google-drive',    name: 'Admin · Google Drive Center',      role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/integrations/google-calendar', name: 'Admin · Google Calendar Center',   role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/integrations/secrets',         name: 'Admin · Secrets Audit',            role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/salesforce-arch',         name: 'Admin · Salesforce Architecture',  role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/uom',                           name: 'Unified Object Model',             role: 'Admin+', status: 'pass',  issues: '' },
+  { path: '/admin/phase1-audit',            name: 'Admin · Phase 1 Build Audit',      role: 'Admin+', status: 'pass',  issues: 'Aug 4 update: date, test counts (105→444), new pages, route redirects, trail-quest entry. Reflects all changes through Aug 4 audit.' },
+  { path: '/penny/trail-quests',            name: 'Penny · Trail Quests',            role: 'Admin+', status: 'fixed', issues: 'Sprint 4: restored from redirect stub to live PennyHub tab — full Trail Quest management page with active quests, catalogue, stats (11 quests, 78% completion, 24 streaks), category filter, and Penny coaching trigger. Aug 4: quest deliveries now live from Salesforce (TrailQuest__c SOQL via /api/penny/data/trail-quest-deliveries — task #201). Staff can assign quests to learners directly from the UI (assign modal with learner dropdown + quest picker + POST to SF — task #204). Empty state handles TrailQuest__c not-yet-provisioned gracefully.' },
   { path: '/penny/assessments',             name: 'Penny · Assessments',             role: 'Admin+', status: 'fixed', issues: 'Sprint 4: restored from stub to live PennyHub tab — per-learner result table, filter (all/failed/needs-coaching), assessment catalogue. Dual-AI coaching wired: Coach/Next button fires both Penny (right panel) + Agentforce (Sessions API) in parallel; coaching panel renders Agentforce live response inline. Column header updated to "AI Coach".' },
   { path: '/penny/agentforce',              name: 'Penny · Agentforce Center',       role: 'Admin+', status: 'fixed', issues: 'Sprint 4: new live PennyHub tab — 8/8 POC steps confirmed, "Live · API Connected" badge, coexistence decision matrix, restoration checklist, live test panel (POST /api/agentforce/test). API routes: GET /api/agentforce/status, POST /api/agentforce/invoke (session create → message → close), POST /api/agentforce/test. AGENTFORCE_API_KEY confirmed (0Xxan0… prefix). readinessState.ts updated: agentforce health → live.' },
 ];
@@ -113,6 +127,7 @@ const HARDCODED_ITEMS: HardcodedItem[] = [
   { name: 'Operations health scores',        location: 'data/operationalIntelligenceData.ts',classification: 'phase2-data', p2Item: 'p2-sf-live-queries',      notes: 'Health metrics and recommendations are prototype data' },
   { name: 'Integration readiness checklist', location: 'data/integrationReadinessData.ts',   classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Status should be calculated from live API probe results' },
   { name: 'Google Calendar events',          location: 'data/googleCalendarData.ts',         classification: 'fixed',       notes: 'Sprint 2: Calendar API live via /api/calendar/events with real OAuth refresh token. Static fallback data file retained but unused in production Calendar panel.' },
+  { name: 'Trail Quest delivery data',       location: 'pages/penny/TrailQuests.tsx',        classification: 'fixed',       notes: 'Aug 4: QUEST_DELIVERIES hardcoded constant replaced with live Salesforce query — GET /api/penny/data/trail-quest-deliveries fetches TrailQuest__c records; loading + error states handled. Assign flow (task #204) creates new records via POST to SF.' },
   { name: 'Google Drive file metadata',      location: 'data/googleDriveData.ts',            classification: 'phase2-data', p2Item: 'p2-drive-panel',           notes: 'Mock Drive data; P2 = Drive API with OAuth refresh token for full file listing' },
   { name: 'Slack workspace channel data',    location: 'data/slackIntegrationData.ts',       classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Partial live data; full channel metadata needs channels:read scope' },
   { name: 'Global search index',             location: 'data/globalSearchData.ts',           classification: 'phase2-data', p2Item: 'p2-trail-signals-engine', notes: 'Static index; P2 = dynamic from Salesforce + Drive + Slack queries' },
@@ -367,7 +382,7 @@ export default function Phase1CompletionAudit() {
             icon={<FlaskConical className="w-4 h-4" />}
             title="Test Coverage"
             meta={<>
-              <Badge text="105 automated"    cls="bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]" />
+              <Badge text="444 automated"    cls="bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]" />
               <Badge text="70 metadata cases" cls="bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]" />
               <Badge text="4 smoke-test tools" cls="bg-[#EDF5F8] border-[#7FAFC6] text-[#2F6F7E]" />
             </>}
@@ -380,8 +395,8 @@ export default function Phase1CompletionAudit() {
                 {[
                   {
                     title: 'Automated (Vitest)',
-                    value: '105',
-                    sub: '43 API server tests (pnpm --filter @workspace/api-server test) covering routes, Salesforce, Slack, Gemini, and auth. 62 frontend tests (pnpm --filter @workspace/program-map test) covering components, hooks, and the route smoke manifest. Both suites must pass before merging.',
+                    value: '444',
+                    sub: '382 API server tests (pnpm --filter @workspace/api-server test) covering routes, Salesforce, Slack, Gemini, and auth. 62 frontend tests (pnpm --filter @workspace/program-map test) covering components, hooks, and the route smoke manifest. Both suites must pass before merging.',
                     cls: 'border-[#9FC3AE] bg-[#E6F0EA]',
                     valcls: 'text-[#2F6B3F]',
                   },
@@ -492,7 +507,7 @@ export default function Phase1CompletionAudit() {
                   Phase 1 UX: {failCount === 0 ? 'No violations' : `${failCount} violations found`}
                 </p>
                 <p className="text-[14px] text-muted-foreground">
-                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0–Jul 17 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup Gmail card + href fixes, Calendar panel, Agentforce coexistence, SF live cases table, SF case → Penny focus, Program Config wizard with Penny guidance panel),
+                  {passCount} pages pass, {fixedCount} pages had violations fixed across Sprint 0–Aug 4 (font-serif sweep, role-gated action bars, stale status text, sidebar dedup, Penny Command Center hub, AdminSetup → IntegrationHub migration, Calendar panel, Agentforce coexistence, SF live cases table, SF case → Penny focus, Program Config wizard, Trail Config create/delete, Trail Quest live SF data + assign flow),
                   {watchCount > 0 ? ` ${watchCount} page(s) have acceptable Phase 2 placeholders` : ' 0 watch items'}. No major violations found.
                 </p>
               </div>
@@ -502,10 +517,10 @@ export default function Phase1CompletionAudit() {
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `${totalPages} routes audited — all Phase 1 UX standards applied.` },
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `${hcOk} hardcoded data sets classified as Phase 1 acceptable — realistic sample data.` },
                   { icon: <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400]" />,  text: `${hcP2} hardcoded items identified as Phase 2 data-connection work — all logged in backlog.` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `105 automated tests — 43 API server + 62 frontend. Both suites gate merges.` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `444 automated tests — 382 API server + 62 frontend. Both suites gate merges.` },
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `Gemini API live — powers Penny Insights, Ask Penny panel, and RAG knowledge retrieval.` },
                   { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `6 integrations live: Salesforce, Slack, Google Drive, Google Calendar, Gmail (Sprint 6), Agentforce (Sprint 4).` },
-                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `11 Phase 2 backlog items moved to Done (Ask Penny panel, RAG, Trail Signals, Calendar, Trail Quest, Assessment, Agentforce, SF live queries, Vitest automation, SF case → Penny focus, Program Config wizard).` },
+                  { icon: <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F]" />, text: `14 Phase 2 backlog items moved to Done — including Trail Config create/delete, Trail Quest live SF data + assign flow, SF case → Penny focus, Program Config wizard, and all Sprint 3–6 completions.` },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <span className="shrink-0 mt-0.5">{item.icon}</span>
