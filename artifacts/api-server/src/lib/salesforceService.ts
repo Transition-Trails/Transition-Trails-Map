@@ -19,6 +19,8 @@ import type {
   ClassroomNudgeRecord,
   CreateClassroomNudgePayload,
 } from "../types/salesforce.js";
+import { assembleLearnerProfile } from "./learnerReadModel.js";
+export type { LearnerProfileResult } from "./learnerReadModel.js";
 // Re-export so callers can validate source values without importing from types directly
 export type { SfInteractionSource } from "../types/salesforce.js";
 export { SF_INTERACTION_SOURCES } from "../types/salesforce.js";
@@ -783,4 +785,29 @@ export async function createTrailQuestDelivery(
     Total_Criteria__c:     payload.totalCriteria,
   });
   return { id: result.id };
+}
+
+// ── Full learner read model ────────────────────────────────────────────────────
+
+/**
+ * Assembles the canonical learner read model using the connector OAuth client.
+ * This is the Penny path — used in penny.ts after the learner Contact is resolved.
+ *
+ * The learner surface (learner.ts routes) uses the service-token path via
+ * assembleLearnerProfile(sfQuery, contactId) directly, which avoids requiring
+ * an active OAuth session for pre-auth learner requests.
+ *
+ * Returns LearnerProfileResult — ok=false means the Contact query failed;
+ * callers must check ok before trusting contact.
+ */
+export async function getLearnerProfile(
+  client: ISalesforceClient,
+  contactId: string
+) {
+  // Adapt the connector client's query method to the generic SfQueryFn signature
+  const queryFn = async <T>(soql: string): Promise<T[]> => {
+    const result = await client.query<T>(soql);
+    return result.records;
+  };
+  return assembleLearnerProfile(queryFn, contactId);
 }

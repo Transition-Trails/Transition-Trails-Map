@@ -2,7 +2,7 @@ import { Router } from "express";
 import { getSalesforceClient } from "../lib/getSalesforceClient.js";
 import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
 import {
-  getLearnerContext,
+  getLearnerProfile,
   getTrailConfig,
   logInteraction,
   getInteractionHistory,
@@ -163,7 +163,7 @@ router.post("/penny/ask", async (req, res) => {
   // (for SF logging decisions) — it is SEPARATE from audience identity, which
   // is derived from session state only and set above.
   let isLearnerContact = false;
-  let learnerCtx: Awaited<ReturnType<typeof getLearnerContext>> | null = null;
+  let learnerCtx: Awaited<ReturnType<typeof getLearnerProfile>>['contact'] = null;
   let trailCfg:   Awaited<ReturnType<typeof getTrailConfig>> | null   = null;
   let promptPath: 'salesforce' | 'fallback' = 'fallback';
 
@@ -188,8 +188,12 @@ router.post("/penny/ask", async (req, res) => {
       if (contactIdStr && audience === 'learner') {
         logger.info({ contactIdOverride: contactIdStr, sfContactId }, 'Learner session with explicit contactId override');
       }
-      learnerCtx = await getLearnerContext(sfClient, sfContactId);
-      trailCfg   = learnerCtx.pennyTrailConfigId
+      const profile = await getLearnerProfile(sfClient, sfContactId);
+      learnerCtx = profile.contact;
+      if (!profile.ok) {
+        logger.warn({ contactError: profile.contactError, sfContactId }, 'getLearnerProfile: Contact query failed — assembling without learner context');
+      }
+      trailCfg = learnerCtx?.pennyTrailConfigId
         ? await getTrailConfig(sfClient, learnerCtx.pennyTrailConfigId)
         : DEFAULT_TRAIL_CONFIG;
     }

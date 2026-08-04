@@ -1,6 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { logger } from "../lib/logger.js";
 import { SF_API_VERSION } from "../lib/sfConstants.js";
+import { assembleLearnerProfile } from "../lib/learnerReadModel.js";
 
 const router = Router();
 
@@ -93,6 +94,8 @@ function requireLearnerAuth(req: Request, res: Response, next: NextFunction): vo
 router.use("/learner", requireLearnerAuth);
 
 // ── GET /api/learner/me ───────────────────────────────────────────────────────
+// Kept for backward compat with LearnerPenny and any callers that reference raw
+// SF field names.  New screens should use /api/learner/profile instead.
 router.get("/learner/me", async (req, res) => {
   const contactId = req.session.learnerContactId!;
   try {
@@ -103,6 +106,32 @@ router.get("/learner/me", async (req, res) => {
     logger.warn({ e }, "learner/me: query failed");
     return res.json({ authenticated: true, contact: null });
   }
+});
+
+// ── GET /api/learner/profile ──────────────────────────────────────────────────
+//
+// Canonical learner read model.  Assembles Contact, Program Engagement,
+// Course_Enrollment__c, and Course_Activity_Completion__c in parallel.
+//
+// Response shape:
+//   { ok, contact?, programEngagements, enrollments, completions, emptyFields, assembledAt }
+//
+// ok=true  — Contact query succeeded (data may still be sparse if fields unseeded).
+// ok=false — Contact query failed (SF down or permissions); contact is null;
+//            contactError carries the failure reason.
+//
+// Distinction from ok=true + empty arrays: a learner with no completions is normal.
+// A permissions failure is not.  Callers must check ok before trusting contact.
+//
+// No picklist values appear in WHERE clauses.  All filters use Id/lookup fields.
+router.get("/learner/profile", async (req, res) => {
+  const contactId = req.session.learnerContactId!;
+  const profile = await assembleLearnerProfile(sfQuery, contactId);
+  if (!profile.ok) {
+    logger.warn({ contactError: profile.contactError, contactId }, "learner/profile: Contact query failed");
+    return res.status(503).json(profile);
+  }
+  return res.json(profile);
 });
 
 // ── GET /api/learner/assignments ─────────────────────────────────────────────

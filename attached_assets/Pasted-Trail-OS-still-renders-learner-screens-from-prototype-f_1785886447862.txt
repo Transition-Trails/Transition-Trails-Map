@@ -1,0 +1,21 @@
+Trail OS still renders learner screens from prototype fixtures. I want one live learner read model that the screens and Penny's learner-context layer both read from. Both things that were blocking this are now settled, and the schema facts below are verified against production — please treat them as given.
+
+How a learner is identified. Anyone with a Contact record is a learner. Access to the learner surface will be granted by a dedicated Google group, so authorisation is a group question and does not belong in this query. Do not invent a record type filter or a flag — if a Contact exists, they are a learner.
+
+Where progress lives. Not on Course_Module_Activity__c — that is the curriculum catalogue, describing activities per module rather than per person. Per-learner progress is on Course_Enrollment__c and Course_Activity_Completion__c, neither of which appears in our data model workbook. The real link runs enrolment to completion as a required relationship, with Contact__c as an optional denormalised field on the completion object — that denormalisation is what lets you query per learner without a join. The assignments endpoint was already rebuilt onto this, so follow the same pattern rather than inventing a second one.
+
+What I want built. One endpoint returning a learner in the shape the interface actually needs, assembled from Contact with its roughly twenty-eight organisation-specific fields, Program Engagement for trail and cohort membership, and the enrolment and completion objects for progress. Include the Penny context fields — trail, coach, confidence score, LMS learner identifier — because Penny's learner-context layer needs exactly the same data and should read from this endpoint rather than assembling it separately. If you find the layer currently querying Contact directly, point it here.
+
+Three things I care about more than shape.
+
+First, an empty result and a failed query must be distinguishable. This has bitten us three times now. A learner with no completions is normal; a permissions failure is not; and right now both arrive as nothing. Return the failure reason alongside the data.
+
+Second, most of these objects have no records yet. Course_Activity_Completion__c has zero rows in production. So this endpoint will be correct and return almost nothing, and that is expected — do not fill gaps with placeholder values to make screens look populated. A learner with no progress should render as a learner with no progress. Tell me which fields came back consistently empty across real Contacts, because that tells us what still needs seeding.
+
+Third, do not hardcode picklist values. Read trail, stage and status values from the org. We have already had a silent failure from a hardcoded value that was not in a restricted picklist, and a filter comparing against a value that does not exist returns zero rather than an error.
+
+One thing to check and report rather than fix. Program Engagement is a managed-package object with only seven custom fields on it. Tell me whether it actually carries what we need for trail and cohort, or whether that information really lives on Contact and Program Engagement is only recording membership. I would rather know now than build a join that returns nothing meaningful.
+
+Acceptance: the learner screens render from this endpoint with no fixture fallback; a new enrolment in Salesforce appears without a code change; a permissions failure is distinguishable from an empty result; Penny's learner-context layer reads from the same source; and no picklist value is hardcoded.
+
+Please add tests covering a learner with no progress, a learner with partial progress, and a query failure. Run a typecheck and the full suite, then tell me which fields were consistently empty and what you concluded about Program Engagement.
