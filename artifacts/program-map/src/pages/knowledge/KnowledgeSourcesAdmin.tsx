@@ -183,6 +183,7 @@ function DriveFolderPicker({
   const [folders, setFolders]         = useState<DriveFolder[]>([]);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState('');
+  const [folderGone, setFolderGone]   = useState(false);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const pickerRef                     = useRef<HTMLDivElement>(null);
 
@@ -200,7 +201,7 @@ function DriveFolderPicker({
     return () => document.removeEventListener('mousedown', handle);
   }, [open]);
 
-  async function fetchFolders(parentId: string, q = '', globalSearch = false) {
+  async function fetchFolders(parentId: string, q = '', globalSearch = false): Promise<{ ok: boolean }> {
     setLoading(true);
     setError('');
     try {
@@ -216,25 +217,36 @@ function DriveFolderPicker({
       const d  = await r.json() as { folders: DriveFolder[]; error?: string };
       if (!r.ok || d.error) throw new Error(d.error ?? `HTTP ${r.status}`);
       setFolders(d.folders);
+      return { ok: true };
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load folders');
       setFolders([]);
+      return { ok: false };
     } finally {
       setLoading(false);
     }
   }
 
-  function browse() {
+  async function browse() {
     setOpen(true);
     setQuery('');
+    setFolderGone(false);
     // Restore the last-browsed position for this session
     const saved = loadSavedBreadcrumbs();
     if (saved) {
       setBreadcrumbs(saved);
-      fetchFolders(saved[saved.length - 1].id);
+      const result = await fetchFolders(saved[saved.length - 1].id);
+      if (!result.ok) {
+        // Folder no longer accessible — clear saved state and fall back to root
+        setBreadcrumbs([]);
+        saveBreadcrumbs([]);
+        setFolderGone(true);
+        setError('');
+        void fetchFolders('root');
+      }
     } else {
       setBreadcrumbs([]);
-      fetchFolders('root');
+      void fetchFolders('root');
     }
   }
 
@@ -368,6 +380,14 @@ function DriveFolderPicker({
               </button>
             )}
           </div>
+
+          {/* Fallback notice when the last-browsed folder is no longer accessible */}
+          {folderGone && (
+            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] text-[#CC8400] bg-[#FFF3E0] border-b border-[#FFD08A]">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              Last folder no longer accessible — starting from My Drive
+            </div>
+          )}
 
           {/* Search within picker */}
           <div className="p-2 border-b">
