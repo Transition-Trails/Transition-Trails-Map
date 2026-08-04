@@ -1184,8 +1184,7 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       }
     }
 
-    const soql = `SELECT ${fields.selectList},
-                         (SELECT DataCategoryGroupName, DataCategoryName FROM DataCategorySelections)
+    const soql = `SELECT ${fields.selectList}
                   FROM KnowledgeArticleVersion
                   ${where}
                   ${withDataCategory}
@@ -1197,49 +1196,30 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       ArticleType?: string; PublishStatus: string; VersionNumber?: number;
       CreatedDate: string; LastModifiedDate: string;
       IsVisibleInApp?: boolean; Language?: string;
-      DataCategorySelections?: { records: Array<{ DataCategoryGroupName: string; DataCategoryName: string }> };
     }>(soql);
 
-    // Derive available article types (guarded by fields.has) and data categories
-    const typeSet     = fields.has("ArticleType")
+    const typeSet = fields.has("ArticleType")
       ? new Set(result.records.map(r => r.ArticleType).filter(Boolean))
       : new Set<string>();
 
-    const categorySet = new Set<string>();
-    let articles: SfArticle[] = result.records.map(r => {
-      const cats = (r.DataCategorySelections?.records ?? []).map(c => c.DataCategoryName).filter(Boolean);
-      cats.forEach(c => categorySet.add(c));
-      return {
-        id:                 r.Id,
-        knowledgeArticleId: r.KnowledgeArticleId,
-        title:              r.Title,
-        summary:            r.Summary ?? null,
-        articleType:        r.ArticleType ?? null,
-        publishStatus:      r.PublishStatus,
-        versionNumber:      r.VersionNumber ?? null,
-        createdDate:        r.CreatedDate,
-        lastModifiedDate:   r.LastModifiedDate,
-        isVisibleInApp:     r.IsVisibleInApp ?? false,
-        language:           r.Language ?? "en_US",
-        dataCategories:     cats,
-      };
-    });
-
-    // Post-filter by data category name when requested (case-insensitive).
-    // catParam uses WITH DATA CATEGORY for server-side filtering; categoryParam
-    // is a fallback that post-filters by DataCategoryName from the subquery.
-    if (categoryParam && !catParam) {
-      const needle = categoryParam.toLowerCase();
-      articles = articles.filter(a =>
-        a.dataCategories.some(c => c.toLowerCase() === needle)
-      );
-    }
+    const articles: SfArticle[] = result.records.map(r => ({
+      id:                 r.Id,
+      knowledgeArticleId: r.KnowledgeArticleId,
+      title:              r.Title,
+      summary:            r.Summary ?? null,
+      articleType:        r.ArticleType ?? null,
+      publishStatus:      r.PublishStatus,
+      versionNumber:      r.VersionNumber ?? null,
+      createdDate:        r.CreatedDate,
+      lastModifiedDate:   r.LastModifiedDate,
+      isVisibleInApp:     r.IsVisibleInApp ?? false,
+      language:           r.Language ?? "en_US",
+    }));
 
     res.json({
       articles,
-      total:          (categoryParam && !catParam) ? articles.length : result.totalSize,
-      articleTypes:   Array.from(typeSet),
-      dataCategories: Array.from(categorySet).sort(),
+      total:        result.totalSize,
+      articleTypes: Array.from(typeSet),
     });
   } catch (err) {
     req.log.error(err, "Failed to fetch SF Knowledge articles");

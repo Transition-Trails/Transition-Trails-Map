@@ -22,7 +22,6 @@ interface SfArticle {
   lastModifiedDate: string;
   isVisibleInApp: boolean;
   language: string;
-  dataCategories: string[];
 }
 
 interface SfArticleDetail extends SfArticle {
@@ -34,7 +33,6 @@ interface ArticlesResponse {
   articles: SfArticle[];
   total: number;
   articleTypes: string[];
-  dataCategories: string[];
 }
 
 interface DetailResponse {
@@ -232,7 +230,6 @@ export default function SfKnowledgeArticles() {
   const [search, setSearch]             = useState('');
   const [statusFilter, setStatusFilter] = useState<'online' | 'draft' | 'all'>('online');
   const [typeFilter, setTypeFilter]     = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
   const [selectedId, setSelectedId]     = useState<string | null>(null);
 
   // Debounce search
@@ -242,13 +239,12 @@ export default function SfKnowledgeArticles() {
   }, [searchInput]);
 
   const { data, isLoading, isError, refetch, isFetching } = useQuery<ArticlesResponse>({
-    queryKey: ['sf-articles', statusFilter, typeFilter, categoryFilter, search],
+    queryKey: ['sf-articles', statusFilter, typeFilter, search],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (statusFilter !== 'online') params.set('status', statusFilter);
-      if (typeFilter)     params.set('type', typeFilter);
-      if (categoryFilter) params.set('category', categoryFilter);
-      if (search)         params.set('q', search);
+      if (typeFilter) params.set('type', typeFilter);
+      if (search)     params.set('q', search);
       const r = await fetch(`/api/knowledge/sf-articles${params.size ? `?${params}` : ''}`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json() as Promise<ArticlesResponse>;
@@ -257,10 +253,9 @@ export default function SfKnowledgeArticles() {
     retry: 1,
   });
 
-  const articles        = data?.articles ?? [];
-  const types           = data?.articleTypes ?? [];
-  const dataCategories  = data?.dataCategories ?? [];
-  const totalCount      = data?.total ?? 0;
+  const articles   = data?.articles ?? [];
+  const types      = data?.articleTypes ?? [];
+  const totalCount = data?.total ?? 0;
 
   // Auto-select first article on initial load
   useEffect(() => {
@@ -333,19 +328,6 @@ export default function SfKnowledgeArticles() {
               </select>
             </div>
 
-            {/* Data category filter — only shown when the org returns categories */}
-            {dataCategories.length > 0 && (
-              <select
-                value={categoryFilter}
-                onChange={e => { setCategoryFilter(e.target.value); setSelectedId(null); }}
-                className="w-full h-8 rounded-md border border-input bg-background px-2.5 text-[12px] focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="">All categories</option>
-                {dataCategories.map(c => (
-                  <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>
-                ))}
-              </select>
-            )}
           </div>
 
           {/* Article list */}
@@ -365,9 +347,9 @@ export default function SfKnowledgeArticles() {
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <BookOpen className="w-8 h-8 text-muted-foreground/30 mb-2" />
                 <p className="text-sm text-muted-foreground">No articles found</p>
-                {(search || typeFilter || categoryFilter || statusFilter !== 'online') && (
+                {(search || typeFilter || statusFilter !== 'online') && (
                   <button
-                    onClick={() => { setSearchInput(''); setTypeFilter(''); setCategoryFilter(''); setStatusFilter('online'); }}
+                    onClick={() => { setSearchInput(''); setTypeFilter(''); setStatusFilter('online'); }}
                     className="mt-2 text-[12px] font-medium text-primary underline"
                   >
                     Clear filters
