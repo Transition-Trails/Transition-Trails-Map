@@ -122,8 +122,8 @@ export default function Learners() {
     <PageShell
       section="Penny Command Center"
       title="Learners"
-      subtitle="Live from Salesforce Contacts — all learners assigned to a Penny trail"
-      integration="Contact · Penny_Interaction_Log__c"
+      subtitle="Live from Salesforce — all contacts with an active program engagement"
+      integration="pmdm__ProgramEngagement__c · Contact"
     >
       <div className="space-y-4">
 

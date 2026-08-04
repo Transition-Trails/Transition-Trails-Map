@@ -427,8 +427,13 @@ router.get(
 );
 
 // ── GET /learners/directory ───────────────────────────────────────────────────
+// Source of truth: pmdm__ProgramEngagement__c WHERE pmdm__Stage__c = 'Active'
+// A contact qualifies as a learner when they have at least one active engagement.
+// Contact Penny fields are pulled via the relationship traversal and are shown
+// when populated; the PMM program name is the trail fallback when Penny_Trail__c
+// is not yet set on the contact.
 
-interface SfContactLearner {
+interface SfContactFromEngagement {
   Id: string;
   FirstName: string | null;
   LastName: string | null;
@@ -443,6 +448,12 @@ interface SfContactLearner {
   Penny_Coaching_Tone__c: string | null;
 }
 
+interface SfEngagementRecord {
+  pmdm__Contact__r: SfContactFromEngagement | null;
+  pmdm__Stage__c: string | null;
+  pmdm__Program__r: { Name: string } | null;
+}
+
 interface SfAggLastInteraction {
   Learner__c: string;
   lastInteraction: string;
@@ -451,34 +462,54 @@ interface SfAggLastInteraction {
 router.get(
   "/learners/directory",
   withClient(async (_req, res, client) => {
-    const contactsResult = await client.query<SfContactLearner>(
-      "SELECT Id, FirstName, LastName, Email, Penny_Trail__c, Penny_Current_Phase__c, " +
-      "Penny_Current_Goal__c, Penny_Confidence_Score__c, Penny_Skill_Score__c, " +
-      "Penny_Sprint_Week__c, Penny_Onboarding_Complete__c, Penny_Coaching_Tone__c " +
-      "FROM Contact WHERE Penny_Trail__c != null ORDER BY LastName ASC"
+    // All active program engagements with full Contact + Program detail
+    const engResult = await client.query<SfEngagementRecord>(
+      "SELECT pmdm__Contact__r.Id, pmdm__Contact__r.FirstName, pmdm__Contact__r.LastName, " +
+      "pmdm__Contact__r.Email, pmdm__Contact__r.Penny_Trail__c, " +
+      "pmdm__Contact__r.Penny_Current_Phase__c, pmdm__Contact__r.Penny_Current_Goal__c, " +
+      "pmdm__Contact__r.Penny_Confidence_Score__c, pmdm__Contact__r.Penny_Skill_Score__c, " +
+      "pmdm__Contact__r.Penny_Sprint_Week__c, pmdm__Contact__r.Penny_Onboarding_Complete__c, " +
+      "pmdm__Contact__r.Penny_Coaching_Tone__c, pmdm__Stage__c, pmdm__Program__r.Name " +
+      "FROM pmdm__ProgramEngagement__c WHERE pmdm__Stage__c = 'Active'"
     );
-    const contacts = contactsResult.records;
 
+    // Deduplicate by contact ID — keep first active engagement per person
+    const seen = new Set<string>();
+    const rows: Array<{ contact: SfContactFromEngagement; programName: string | null }> = [];
+    for (const eng of engResult.records) {
+      const c = eng.pmdm__Contact__r;
+      if (!c?.Id || seen.has(c.Id)) continue;
+      seen.add(c.Id);
+      rows.push({ contact: c, programName: eng.pmdm__Program__r?.Name ?? null });
+    }
+    rows.sort((a, b) => (a.contact.LastName ?? "").localeCompare(b.contact.LastName ?? ""));
+
+    // Last Penny interaction per contact
     const lastMap = new Map<string, string>();
-    if (contacts.length > 0) {
-      const idList = contacts.map(c => `'${c.Id}'`).join(",");
-      const lastResult = await client.query<SfAggLastInteraction>(
-        `SELECT Learner__c, MAX(CreatedDate) lastInteraction ` +
-        `FROM Penny_Interaction_Log__c WHERE Learner__c IN (${idList}) GROUP BY Learner__c`
-      );
-      for (const r of lastResult.records) {
-        lastMap.set(r.Learner__c, r.lastInteraction);
+    if (rows.length > 0) {
+      const idList = rows.map(r => `'${r.contact.Id}'`).join(",");
+      try {
+        const lastResult = await client.query<SfAggLastInteraction>(
+          `SELECT Learner__c, MAX(CreatedDate) lastInteraction ` +
+          `FROM Penny_Interaction_Log__c WHERE Learner__c IN (${idList}) GROUP BY Learner__c`
+        );
+        for (const r of lastResult.records) {
+          lastMap.set(r.Learner__c, r.lastInteraction);
+        }
+      } catch {
+        // Interaction log unavailable — last active stays null
       }
     }
 
     res.set('Cache-Control', 'no-store');
     res.json(
-      contacts.map(c => ({
+      rows.map(({ contact: c, programName }) => ({
         id:                 c.Id,
         firstName:          c.FirstName ?? "",
         lastName:           c.LastName ?? "",
         email:              c.Email ?? "",
-        pennyTrail:         c.Penny_Trail__c,
+        // Use Penny trail config if set, otherwise fall back to program name
+        pennyTrail:         c.Penny_Trail__c ?? programName,
         currentPhase:       c.Penny_Current_Phase__c,
         currentGoal:        c.Penny_Current_Goal__c,
         confidenceScore:    c.Penny_Confidence_Score__c,
