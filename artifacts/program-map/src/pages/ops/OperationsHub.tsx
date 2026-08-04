@@ -3,7 +3,14 @@ import {
   Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown, Sparkles, ListChecks,
 } from 'lucide-react';
 import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
-import { useOpsSummary } from '@/hooks/useOpsSummary';
+import { useOpsSummary, type SfCount } from '@/hooks/useOpsSummary';
+
+/** Safely extract a display string from a SfCount or bare number. */
+function nv(c: SfCount | number | null | undefined): string {
+  if (c == null) return '—';
+  if (typeof c === 'number') return String(c);
+  return c.value != null ? String(c.value) : '—';
+}
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -40,7 +47,7 @@ function HealthIndicators() {
               ? {
                   ...ind,
                   status: 'good' as const,
-                  detail: `${sfData.programs.active ?? '—'} active programs in Salesforce PMM · ${sfData.programs.planning ?? '—'} in planning · ${sfData.engagements.active ?? '—'} active engagements`,
+                  detail: `${nv(sfData.programs.active)} active programs in Salesforce PMM · ${nv(sfData.programs.planning)} in planning · ${nv(sfData.engagements.active)} active engagements`,
                 }
               : ind
           ),
@@ -54,7 +61,7 @@ function HealthIndicators() {
               ? {
                   ...ind,
                   status: 'strong' as const,
-                  detail: `Salesforce REST API live · ${sfData.programs.total ?? '—'} programs · ${sfData.contacts.total ?? '—'} contacts · ${sfData.cases.open ?? '—'} open cases`,
+                  detail: `Salesforce REST API live · ${nv(sfData.programs.total)} programs · ${nv(sfData.contacts.total)} contacts · ${nv(sfData.cases.open)} open cases`,
                 }
               : ind
           ),
@@ -145,11 +152,11 @@ function HealthIndicators() {
               </div>
               <div className="grid grid-cols-5 gap-2">
                 {([
-                  { label: 'Active Programs',     value: sfData.programs.active,    alert: false },
-                  { label: 'In Planning',         value: sfData.programs.planning,  alert: false },
-                  { label: 'Active Engagements',  value: sfData.engagements.active, alert: false },
-                  { label: 'Open Cases',          value: sfData.cases.open,         alert: (sfData.cases.highPriority ?? 0) > 0, sub: sfData.cases.highPriority != null && sfData.cases.highPriority > 0 ? `${sfData.cases.highPriority} high pri` : undefined },
-                  { label: 'Contacts',            value: sfData.contacts.total,     alert: false },
+                  { label: 'Active Programs',     value: nv(sfData.programs.active),    alert: false },
+                  { label: 'In Planning',         value: nv(sfData.programs.planning),  alert: false },
+                  { label: 'Active Engagements',  value: nv(sfData.engagements.active), alert: false },
+                  { label: 'Open Cases',          value: nv(sfData.cases.open),         alert: (sfData.cases.highPriority?.value ?? 0) > 0, sub: (sfData.cases.highPriority?.value ?? 0) > 0 ? `${sfData.cases.highPriority!.value} high pri` : undefined },
+                  { label: 'Contacts',            value: nv(sfData.contacts.total),     alert: false },
                 ] as const).map(stat => (
                   <div
                     key={stat.label}

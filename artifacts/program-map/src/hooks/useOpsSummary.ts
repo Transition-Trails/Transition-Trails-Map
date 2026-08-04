@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 
+/** Mirrors the server-side SfCount — every count field is {value, error} not a bare number. */
+export interface SfCount { value: number | null; error: string | null; }
+
 export interface SfOpsSummary {
-  programs:          { total: number | null; active: number | null; planning: number | null };
-  engagements:       { total: number | null; active: number | null };
-  serviceDeliveries: { last30Days: number | null };
-  cases:             { open: number | null; highPriority: number | null };
-  contacts:          { total: number | null };
+  programs:          { total: SfCount; active: SfCount; planning: SfCount };
+  engagements:       { total: SfCount; active: SfCount };
+  serviceDeliveries: { last30Days: SfCount };
+  cases:             { open: SfCount; highPriority: SfCount };
+  contacts:          { total: SfCount };
   lastUpdated:       string;
   fromCache:         boolean;
   cacheAge:          number;

@@ -875,6 +875,68 @@ function flattenCategories(
   return out;
 }
 
+// ── Image URL rewriter ────────────────────────────────────────────────────────
+// Salesforce rich-text bodies embed images as `/servlet/rtaImage?...` (relative
+// to the org base URL). Browsers can't inject a Bearer token into <img> src
+// requests, so we rewrite every SF image URL to route through our proxy.
+function rewriteSfImageUrls(html: string, orgBaseUrl: string): string {
+  return html.replace(
+    /(<img\b[^>]*?\ssrc=")([^"]*?)(")/gi,
+    (_match, pre, src, post) => {
+      // Skip already-proxied URLs or data URIs
+      if (src.startsWith("/api/knowledge/sf-image") || src.startsWith("data:")) {
+        return `${pre}${src}${post}`;
+      }
+      // Make relative paths absolute using the org base URL
+      const abs = src.startsWith("http") ? src : `${orgBaseUrl}${src.startsWith("/") ? "" : "/"}${src}`;
+      // Only proxy URLs that belong to Salesforce (contains .salesforce.com or .force.com
+      // or was originally a relative path on the same org)
+      const isSfUrl =
+        abs.includes(".salesforce.com") ||
+        abs.includes(".force.com") ||
+        abs.startsWith(orgBaseUrl);
+      if (!isSfUrl) return `${pre}${src}${post}`;
+      return `${pre}/api/knowledge/sf-image?url=${encodeURIComponent(abs)}${post}`;
+    }
+  );
+}
+
+// GET /api/knowledge/sf-image  — authenticated image proxy for SF rich-text content
+// Query params: url=<encoded absolute SF image URL>
+router.get("/knowledge/sf-image", async (req, res): Promise<void> => {
+  const rawUrl = req.query["url"] as string | undefined;
+  if (!rawUrl) {
+    res.status(400).json({ error: "Missing url param" });
+    return;
+  }
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(rawUrl);
+  } catch {
+    res.status(400).json({ error: "Invalid url param" });
+    return;
+  }
+  // Build just the path+query portion to pass through the connector proxy
+  const sfPath = `${parsedUrl.pathname}${parsedUrl.search}`;
+  try {
+    const client = new ConnectorSalesforceClient();
+    const imgResp = await client.fetchRaw(sfPath);
+    if (!imgResp.ok) {
+      res.status(imgResp.status).json({ error: `SF image fetch failed: ${imgResp.status}` });
+      return;
+    }
+    const contentType = imgResp.headers.get("content-type") ?? "image/png";
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    const buf = await imgResp.arrayBuffer();
+    res.end(Buffer.from(buf));
+  } catch (err) {
+    req.log.warn({ err, sfPath }, "SF image proxy failed");
+    res.status(502).json({ error: "Could not fetch image from Salesforce" });
+  }
+});
+
+
 // GET /api/knowledge/sf-article-categories
 // Returns all data category groups and their categories for Knowledge articles.
 // Returns { groups: [] } gracefully if categories are not configured in this org.
@@ -882,7 +944,7 @@ router.get("/knowledge/sf-article-categories", async (req, res): Promise<void> =
   try {
     const client = new ConnectorSalesforceClient();
     const data = await client.rest<SfDataCategoryGroupsResponse>(
-      `/services/data/v62.0/support/dataCategoryGroups?sObjectType=KnowledgeArticle`
+      `/services/data/v62.0/support/dataCategoryGroups?sObjectType=KnowledgeArticleVersion`
     );
     const groups = (data.categoryGroups ?? []).map(g => ({
       name:       g.name,
@@ -991,17 +1053,32 @@ async function getKavBodyInfo(
         return null;
       }
 
-      // 2. Describe each __kav object, look for rich-text / body-like fields
+      // 2. Describe each __kav object, look for rich-text / body-like fields.
+      // Candidates are checked in order; first match wins.
       const BODY_FIELD_CANDIDATES = [
-        "Body__c", "Content__c", "Details__c", "Answer__c", "Question__c",
-        "Description__c", "Text__c", "ArticleBody", "ArticleBody__c",
+        // Generic body field names
+        "Body__c", "Content__c", "ArticleBody", "ArticleBody__c",
+        // Procedural / how-to article types
+        "Procedure__c", "Steps__c", "Instructions__c",
+        // FAQ / Q&A article types
+        "Answer__c", "Question__c", "Resolution__c",
+        // Other common patterns
+        "Details__c", "Description__c", "Overview__c",
+        "Text__c", "Information__c", "Solution__c",
       ];
 
       for (const objName of kavObjects) {
         try {
-          const desc = await client.rest<{ fields: { name: string; type: string }[] }>(
+          const desc = await client.rest<{ fields: { name: string; type: string; label: string }[] }>(
             `/services/data/v62.0/sobjects/${objName}/describe`
           );
+
+          // Log every field so we can diagnose which one holds the body
+          const fieldSummary = desc.fields
+            .map(f => `${f.name}[${f.type}]`)
+            .join(", ");
+          log.info(`KAV body discovery: ${objName} fields → ${fieldSummary}`);
+
           const fieldNames = new Set(desc.fields.map(f => f.name));
 
           // Prefer explicit candidates first
@@ -1014,14 +1091,28 @@ async function getKavBodyInfo(
             }
           }
 
-          // Fall back: any richTextarea or textarea field not in the exclusion list
-          const EXCLUDE = new Set(["Summary__c", "Title", "UrlName", "PublishStatus"]);
-          const richField = desc.fields.find(
-            f => (f.type === "richTextarea" || f.type === "textarea") && !EXCLUDE.has(f.name)
+          // Fall back: prefer custom __c textarea/richTextArea fields over bare system fields.
+          // Type comparison is case-insensitive — SF API returns "richTextArea" (capital A).
+          const EXCLUDE = new Set([
+            "Summary__c", "Summary", "Title", "UrlName", "PublishStatus", "Name",
+            "AssignmentNote", "ArticleTotalViewCount", "ArticleCreatedById",
+          ]);
+          const isBodyType = (t: string) =>
+            t.toLowerCase() === "richtextarea" || t.toLowerCase() === "textarea";
+
+          const allTextFields = desc.fields.filter(
+            f => isBodyType(f.type) && !EXCLUDE.has(f.name)
           );
-          if (richField) {
-            const info = { objectName: objName, fieldName: richField.name };
-            log.info(`KAV body discovery: fallback rich-text field ${objName}.${richField.name}`);
+          // Prefer custom fields (ending __c) over standard fields
+          const richFields = [
+            ...allTextFields.filter(f => f.name.endsWith("__c")),
+            ...allTextFields.filter(f => !f.name.endsWith("__c")),
+          ];
+          log.info(`KAV body discovery: ${objName} candidate body fields: ${richFields.map(f => `${f.name}[${f.type}]`).join(", ") || "(none)"}`);
+
+          if (richFields.length > 0) {
+            const info = { objectName: objName, fieldName: richFields[0]!.name };
+            log.info(`KAV body discovery: selected ${objName}.${richFields[0]!.name}`);
             kavBodyInfoCache = info;
             return info;
           }
@@ -1179,6 +1270,17 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
       }
     }
 
+    // Rewrite SF image URLs so the browser can load them through our auth proxy.
+    let processedBody = body;
+    if (body && body.includes("<img")) {
+      try {
+        const orgBaseUrl = await client.getOrgBaseUrl();
+        processedBody = rewriteSfImageUrls(body, orgBaseUrl);
+      } catch (urlErr) {
+        req.log.warn(`Could not fetch org base URL for image rewriting: ${String(urlErr)}`);
+      }
+    }
+
     const article: SfArticleDetail = {
       id:                 meta.Id,
       knowledgeArticleId: meta.KnowledgeArticleId,
@@ -1192,7 +1294,7 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
       isVisibleInApp:     meta.IsVisibleInApp ?? false,
       language:           meta.Language ?? "en_US",
       urlName:            meta.UrlName ?? null,
-      body,
+      body: processedBody,
     };
 
     res.json({ article });

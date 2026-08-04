@@ -99,4 +99,25 @@ export class ConnectorSalesforceClient implements ISalesforceClient {
       data
     );
   }
+
+  /**
+   * Fetch a resource through the SF proxy without parsing the response body.
+   * Used for binary assets (images, attachments) where the caller needs the raw Response.
+   * `path` must start with `/` and be relative to the SF org root (e.g. `/servlet/rtaImage?...`).
+   */
+  async fetchRaw(path: string): Promise<Response> {
+    const proxyFetch = this.connectors.createProxyFetch("salesforce");
+    const proxyUrl   = this.connectors.getProxyUrl();
+    return proxyFetch(`${proxyUrl}${path}`, { method: "GET" });
+  }
+
+  /** Return the base URL of the connected SF org (e.g. `https://myorg.salesforce.com`). */
+  async getOrgBaseUrl(): Promise<string> {
+    const info = await this.request<{ urls: { sobjects: string } }>(
+      "GET",
+      "/services/oauth2/userinfo"
+    );
+    // sobjects URL looks like: https://myorg.salesforce.com/services/data/vXX.0/sobjects/
+    return info.urls.sobjects.replace(/\/services\/.*$/, "");
+  }
 }
