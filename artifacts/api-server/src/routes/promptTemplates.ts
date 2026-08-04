@@ -20,8 +20,10 @@ router.get("/penny/prompt-templates", async (req, res): Promise<void> => {
   }
 });
 
-// POST /api/penny/prompt-templates — create one template
-router.post("/penny/prompt-templates", async (req, res): Promise<void> => {
+// POST /api/penny/prompt-templates — create one template (admin only)
+// Approving a template is what makes it reachable by learners, so write
+// access is restricted to admins at the route level rather than in the UI.
+router.post("/penny/prompt-templates", requireAdmin, async (req, res): Promise<void> => {
   try {
     const template = req.body as Record<string, unknown>;
     if (!template["id"] || !template["name"]) {
@@ -62,10 +64,15 @@ router.post("/penny/prompt-templates/seed", requireAdmin, async (req, res): Prom
   }
 });
 
-// PATCH /api/penny/prompt-templates/:id — update one template (partial merge)
-router.patch("/penny/prompt-templates/:id", async (req, res): Promise<void> => {
+// PATCH /api/penny/prompt-templates/:id — update one template (admin only)
+//
+// Self-approval rule: an admin who submitted a template for review cannot be
+// the same admin who approves it.  reviewRequestedBy on the stored template
+// holds the submitter's email.  This is enforced here, server-side, so the
+// rule survives direct API calls regardless of what the UI renders.
+router.patch("/penny/prompt-templates/:id", requireAdmin, async (req, res): Promise<void> => {
   try {
-    const { id } = req.params;
+    const id      = String(req.params['id']);
     const updates = req.body as Record<string, unknown>;
 
     const [existing] = await db
@@ -78,7 +85,18 @@ router.patch("/penny/prompt-templates/:id", async (req, res): Promise<void> => {
       return;
     }
 
-    const merged = { ...(existing.data as Record<string, unknown>), ...updates, id };
+    const existingData      = existing.data as Record<string, unknown>;
+    const reviewRequestedBy = existingData["reviewRequestedBy"] as string | undefined;
+    const isApproval        = updates["status"] === "Approved";
+
+    if (isApproval && reviewRequestedBy && req.session?.sfEmail === reviewRequestedBy) {
+      res.status(403).json({
+        error: "Self-approval is not permitted — a different admin must approve templates you submitted for review.",
+      });
+      return;
+    }
+
+    const merged = { ...existingData, ...updates, id };
     await db
       .update(promptTemplatesTable)
       .set({ data: merged, updatedAt: new Date() })

@@ -2,6 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { logger } from "../lib/logger.js";
+import { SF_API_VERSION } from "../lib/sfConstants.js";
 
 // ── Passport User type declaration ────────────────────────────────────────────
 declare global {
@@ -36,7 +37,7 @@ async function queryContactByEmail(email: string): Promise<SFContact | null> {
   const soql = `SELECT Id, FirstName, LastName, Penny_Trail__c FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`;
   try {
     const res = await fetch(
-      `${instanceUrl}/services/data/v59.0/query?q=${encodeURIComponent(soql)}`,
+      `${instanceUrl}/services/data/${SF_API_VERSION}/query?q=${encodeURIComponent(soql)}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     if (!res.ok) return null;
