@@ -594,21 +594,29 @@ router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> 
     if (r.kind === 'sf-object') {
       if (describe === null) {
         const errMsg = r.sfObject ? (describeErrorCache.get(r.sfObject) ?? '') : '';
-        // 404 means the object genuinely doesn't exist in this org
-        const detail = errMsg.startsWith('404')
-          ? 'Object not found in this org'
-          : errMsg
-            ? `Not accessible — ${errMsg.slice(0, 80)}`
-            : 'Not accessible';
-        return { ...base, status: 'missing', detail };
+        // Only a 404 is proof the object genuinely does not exist in this org.
+        // Any other error (throttle, permissions, network) is inconclusive — report
+        // 'undetermined' so the admin is not shown a false "missing" result.
+        if (errMsg.startsWith('404')) {
+          return { ...base, status: 'missing', detail: 'Object not found in this org' };
+        }
+        const detail = errMsg ? `Could not check — ${errMsg.slice(0, 80)}` : 'Could not check';
+        return { ...base, status: 'undetermined', detail };
       }
       if (!describe) return { ...base, status: 'undetermined', detail: 'Could not check' };
       return { ...base, status: 'met', detail: 'Accessible' };
     }
 
     if (r.kind === 'sf-field') {
-      if (describe === null) return { ...base, status: 'missing', detail: 'Object not accessible' };
-      if (!describe)         return { ...base, status: 'undetermined', detail: 'Could not check' };
+      if (describe === null) {
+        const errMsg = r.sfObject ? (describeErrorCache.get(r.sfObject) ?? '') : '';
+        // Same principle: only a 404 on the parent object is conclusive.
+        if (errMsg.startsWith('404')) {
+          return { ...base, status: 'missing', detail: 'Parent object not found in this org' };
+        }
+        return { ...base, status: 'undetermined', detail: errMsg ? `Could not check — ${errMsg.slice(0, 80)}` : 'Could not check' };
+      }
+      if (!describe) return { ...base, status: 'undetermined', detail: 'Could not check' };
       const fields = (describe['fields'] as Array<{ name: string }>) ?? [];
       const found  = fields.some(f => f.name === r.sfField);
       return { ...base, status: found ? 'met' : 'missing', detail: found ? 'Present' : 'Missing' };
