@@ -14,6 +14,10 @@
  *   P2. 500 body does not contain a stack trace, file paths, or raw SF
  *       XML/SOAP markup
  *
+ * V3 tests confirm the typeof guard fires for non-string name values:
+ *   V3a. name is a number (42) → 400 with error mentioning "name"; createRecord not reached
+ *   V3b. name is an array ([]) → 400 with error mentioning "name"; createRecord not reached
+ *
  * Pattern mirrors sfGovernanceNudges.test.ts — shared mockQueryError and
  * mockCreateRecordError control throw behaviour; both reset in beforeEach.
  */
@@ -281,6 +285,76 @@ describe('POST /api/salesforce/governance/build-items — input validation', () 
       .post('/api/salesforce/governance/build-items')
       .send({ name: '' });
 
+    expect(res.status).toBe(400);
+    expect(res.body.error).not.toContain('SENTINEL');
+  });
+
+  // ── V3: non-string name types → 400 ──────────────────────────────────────────
+
+  test('V3a: returns 400 when name is a number', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is a number');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 42 });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('V3a: 400 body mentions "name" when name is a number', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is a number');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 42 });
+
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.toLowerCase()).toContain('name');
+  });
+
+  test('V3a: createRecord sentinel is not returned when name is a number', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is a number');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: 42 });
+
+    // If createRecord were reached, the sentinel throw → 500; we must get 400
+    expect(res.status).toBe(400);
+    expect(res.body.error).not.toContain('SENTINEL');
+  });
+
+  test('V3b: returns 400 when name is an array', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is an array');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: [] });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('V3b: 400 body mentions "name" when name is an array', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is an array');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: [] });
+
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.toLowerCase()).toContain('name');
+  });
+
+  test('V3b: createRecord sentinel is not returned when name is an array', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is an array');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: [] });
+
+    // If createRecord were reached, the sentinel throw → 500; we must get 400
     expect(res.status).toBe(400);
     expect(res.body.error).not.toContain('SENTINEL');
   });
