@@ -410,6 +410,18 @@ function Sidebar({
   );
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Convert a Google email to a readable display name.
+ *  e.g. "angela.landrith@example.com" → "Angela Landrith"
+ */
+function formatEmailAsName(email: string): string {
+  const local = email.split('@')[0] ?? email;
+  return local
+    .replace(/[._-]+/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
 // ── Template detail panel ─────────────────────────────────────────────────────
 
 function TemplateDetailPanel({
@@ -515,7 +527,7 @@ function TemplateDetailPanel({
             ) : reviewedBySelf ? (
               <button
                 disabled
-                title="You submitted this for review — another team member must approve it"
+                title={`Submitted by ${template.reviewRequestedBy ? formatEmailAsName(template.reviewRequestedBy) : 'you'} — another team member must approve`}
                 className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400] text-[12px] font-bold cursor-not-allowed opacity-80"
               >
                 <Clock className="w-3 h-3" /> Awaiting reviewer
@@ -586,6 +598,9 @@ function TemplateDetailPanel({
             Modified {template.lastReviewed}
             {template.lastModifiedBy ? <> · by <span className="font-semibold text-foreground">{template.lastModifiedBy}</span></> : ''}
             {' '}· {vars.length} variable{vars.length !== 1 ? 's' : ''}
+            {template.status === 'Review' && template.reviewRequestedBy && (
+              <> · <span className="text-[#CC8400] font-semibold">In review · submitted by {formatEmailAsName(template.reviewRequestedBy)}</span></>
+            )}
           </span>
         </div>
       </div>
