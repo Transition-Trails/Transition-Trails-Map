@@ -122,6 +122,7 @@ export default function SignInPage() {
             {/* Google sign-in button */}
             <a
               href={`${BASE}/api/auth/google/login`}
+              target="_top"
               className="flex items-center justify-center gap-3 w-full px-4 py-2.5 border border-stone-200 bg-white hover:bg-stone-50 rounded-lg transition-colors text-[14px] font-medium text-foreground shadow-sm"
             >
               {/* Google G logo */}
