@@ -537,6 +537,11 @@ function PermissionMatrixTab() {
                 const borderCls = isIncomplete ? 'border-[#E8B9B4] bg-[#FBEAE6]/60' : 'border-[#FFD08A] bg-[#FFF3E0]/60';
                 const labelCls  = isIncomplete ? 'text-[#A93F2F]' : 'text-[#CC8400]';
                 const dotCls    = isIncomplete ? 'bg-[#A93F2F]' : 'bg-[#CC8400]';
+                // Pair issues with their steps by original index so filtering both stays in sync
+                const pairedItems = detail.healthIssues
+                  .map((issue, i) => ({ issue, step: detail.nextSteps[i] ?? null }))
+                  .filter(({ issue }) => effectiveIssues.includes(issue));
+
                 return (
                   <div className={`rounded-lg border p-3 space-y-3 ${borderCls}`}>
                     {/* Issues with dismiss buttons */}
@@ -544,15 +549,15 @@ function PermissionMatrixTab() {
                       <p className={`text-[14px] font-bold mb-1.5 ${labelCls}`}>
                         {isIncomplete ? 'Incomplete — issues' : 'Needs attention — issues'}
                       </p>
-                      <ul className="space-y-1.5">
-                        {effectiveIssues.map(issue => (
-                          <li key={issue} className="flex items-start gap-1.5 group">
+                      <ul className="space-y-2">
+                        {pairedItems.map(({ issue }) => (
+                          <li key={issue} className="flex items-start gap-1.5">
                             <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${dotCls}`} />
                             <span className="text-[14px] text-foreground leading-snug flex-1">{issue}</span>
                             <button
                               onClick={() => { void dismissIssue(activeRow.persona, issue); }}
                               title="Mark as resolved"
-                              className="opacity-0 group-hover:opacity-100 shrink-0 text-[11px] font-semibold text-[#2F6B3F] hover:underline transition-opacity ml-1 mt-0.5"
+                              className="shrink-0 text-[11px] font-semibold text-[#2F6B3F] hover:underline ml-1 mt-0.5 whitespace-nowrap"
                             >
                               ✓ Resolve
                             </button>
@@ -560,18 +565,20 @@ function PermissionMatrixTab() {
                         ))}
                       </ul>
                     </div>
-                    {/* Next steps */}
-                    <div>
-                      <p className="text-[14px] font-bold text-muted-foreground/60 mb-1.5">How to resolve</p>
-                      <ol className="space-y-1 list-none">
-                        {detail.nextSteps.map((step, i) => (
-                          <li key={step} className="flex items-start gap-2">
-                            <span className="text-[14px] font-bold text-muted-foreground/50 mt-0.5 w-3 shrink-0">{i + 1}.</span>
-                            <span className="text-[14px] text-foreground leading-snug">{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
+                    {/* Next steps — only show steps for remaining issues */}
+                    {pairedItems.some(p => p.step) && (
+                      <div>
+                        <p className="text-[14px] font-bold text-muted-foreground/60 mb-1.5">How to resolve</p>
+                        <ol className="space-y-1 list-none">
+                          {pairedItems.map(({ issue, step }, i) => step && (
+                            <li key={issue} className="flex items-start gap-2">
+                              <span className="text-[14px] font-bold text-muted-foreground/50 mt-0.5 w-3 shrink-0">{i + 1}.</span>
+                              <span className="text-[14px] text-foreground leading-snug">{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
