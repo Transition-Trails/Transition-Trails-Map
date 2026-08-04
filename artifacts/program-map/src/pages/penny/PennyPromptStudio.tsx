@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { usePromptTemplates } from '@/hooks/usePromptTemplates';
@@ -27,10 +27,21 @@ type WizardStep = 1 | 2 | 3;
 
 // ── Penny content (Drive folder) ──────────────────────────────────────────────
 
-const PENNY_ASSETS = [
-  { kind: 'image' as const, icon: ImageIcon, label: 'penny-avatar.png',      hint: 'Used in chat bubbles & preview cards', ready: true  },
-  { kind: 'audio' as const, icon: Music,     label: 'penny-voice-intro.mp3', hint: 'Played when Penny first opens',       ready: true  },
-  { kind: 'video' as const, icon: Video,     label: 'penny-welcome.mp4',     hint: 'Add to Drive folder to activate',     ready: false },
+interface PennyContentData {
+  configured:        boolean;
+  folderId:          string | null;
+  folderName:        string | null;
+  folderWebViewLink: string | null;
+  images: { id: string; name: string }[];
+  audio:  { id: string; name: string }[];
+  video:  { id: string; name: string }[];
+  error?: string;
+}
+
+const ASSET_ROWS: { kind: keyof Pick<PennyContentData, 'images' | 'audio' | 'video'>; icon: React.ElementType; hint: string }[] = [
+  { kind: 'images', icon: ImageIcon, hint: 'Used in chat bubbles & preview cards' },
+  { kind: 'audio',  icon: Music,     hint: 'Played when Penny first opens'        },
+  { kind: 'video',  icon: Video,     hint: 'Add to Drive folder to activate'      },
 ];
 
 // ── Domain category cards for wizard step 1 ───────────────────────────────────
@@ -85,8 +96,26 @@ function StatusBadge({ status }: { status: PromptStatus }) {
 // ── Penny content strip ───────────────────────────────────────────────────────
 
 function PennyContentStrip() {
+  const [data, setData]       = useState<PennyContentData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetch('/api/drive/penny-content')
+      .then(r => r.json() as Promise<PennyContentData>)
+      .then(d => { if (!cancelled) { setData(d); setLoading(false); } })
+      .catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const connected = data?.configured && !data?.error;
+  const folderName = data?.folderName ?? 'Penny Content / Assets';
+  const folderLink = data?.folderWebViewLink ?? null;
+
   return (
     <div className="rounded-xl border border-[#D9EAE0] bg-[#F0F5F2] overflow-hidden">
+      {/* Header */}
       <div className="flex items-center gap-2.5 px-3 py-2 border-b border-[#D9EAE0]">
         <div className="w-7 h-7 rounded-full bg-foreground flex items-center justify-center text-[11px] font-bold text-background ring-2 ring-white shadow-sm shrink-0">
           P
@@ -94,35 +123,70 @@ function PennyContentStrip() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <span className="text-[12px] font-semibold text-foreground">Penny's content</span>
-            <span className="flex items-center gap-0.5 text-[9px] font-bold text-[#2F6B3F] bg-[#C8E6D0] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">
-              <Wifi className="w-2 h-2" /> Connected
-            </span>
+            {loading ? (
+              <span className="text-[9px] font-bold text-muted-foreground bg-muted border border-border rounded-full px-1.5 py-0.5">
+                Loading…
+              </span>
+            ) : connected ? (
+              <span className="flex items-center gap-0.5 text-[9px] font-bold text-[#2F6B3F] bg-[#C8E6D0] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">
+                <Wifi className="w-2 h-2" /> Connected
+              </span>
+            ) : (
+              <span className="text-[9px] font-bold text-muted-foreground bg-muted border border-border rounded-full px-1.5 py-0.5">
+                Not configured
+              </span>
+            )}
           </div>
           <p className="text-[10px] text-muted-foreground flex items-center gap-1 truncate">
-            <FolderOpen className="w-2.5 h-2.5 shrink-0" /> Penny Content / Assets
+            <FolderOpen className="w-2.5 h-2.5 shrink-0" />
+            <span className="truncate">{folderName}</span>
           </p>
         </div>
-        <button className="text-muted-foreground hover:text-foreground transition-colors" title="Open in Drive">
-          <ExternalLink className="w-3 h-3" />
-        </button>
+        {folderLink ? (
+          <a
+            href={folderLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            title="Open in Drive"
+          >
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        ) : (
+          <button
+            className="text-muted-foreground/40 cursor-not-allowed"
+            title="Drive folder not configured"
+            disabled
+          >
+            <ExternalLink className="w-3 h-3" />
+          </button>
+        )}
       </div>
+
+      {/* Asset rows */}
       <div className="divide-y divide-[#D9EAE0]">
-        {PENNY_ASSETS.map(a => {
-          const Icon = a.icon;
+        {ASSET_ROWS.map(({ kind, icon: Icon, hint }) => {
+          const files = data?.[kind] ?? [];
+          const ready = files.length > 0;
+          const label = ready ? files[0].name : (loading ? '—' : 'No file found');
           return (
-            <div key={a.kind} className="flex items-center gap-2.5 px-3 py-2">
-              <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${a.ready ? 'bg-foreground' : 'bg-muted'}`}>
-                <Icon className={`w-2.5 h-2.5 ${a.ready ? 'text-background' : 'text-muted-foreground'}`} />
+            <div key={kind} className="flex items-center gap-2.5 px-3 py-2">
+              <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${ready ? 'bg-foreground' : 'bg-muted'}`}>
+                <Icon className={`w-2.5 h-2.5 ${ready ? 'text-background' : 'text-muted-foreground'}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-[11px] font-medium truncate ${a.ready ? 'text-foreground' : 'text-muted-foreground'}`}>{a.label}</p>
-                <p className="text-[10px] text-muted-foreground">{a.hint}</p>
+                <p className={`text-[11px] font-medium truncate ${ready ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  {label}
+                </p>
+                <p className="text-[10px] text-muted-foreground">{hint}</p>
               </div>
               <span className={`text-[9px] font-bold rounded-full px-1.5 py-0.5 shrink-0 border ${
-                a.ready
+                ready
                   ? 'bg-[#C8E6D0] text-[#2F6B3F] border-[#9FC3AE]'
                   : 'bg-muted text-muted-foreground border-border'
-              }`}>{a.ready ? 'Ready' : 'Not set'}</span>
+              }`}>
+                {loading ? '…' : ready ? 'Ready' : 'Not set'}
+              </span>
             </div>
           );
         })}
@@ -858,14 +922,11 @@ function GuidedWizardOverlay({
                 <Wifi className="w-2 h-2" /> Connected
               </span>
               <div className="flex items-center gap-1 ml-auto">
-                {PENNY_ASSETS.map(a => {
-                  const Icon = a.icon;
-                  return (
-                    <span key={a.kind} className={`w-5 h-5 rounded flex items-center justify-center ${a.ready ? 'bg-foreground' : 'bg-muted'}`}>
-                      <Icon className={`w-2.5 h-2.5 ${a.ready ? 'text-background' : 'text-muted-foreground'}`} />
-                    </span>
-                  );
-                })}
+                {ASSET_ROWS.map(({ kind, icon: Icon }) => (
+                  <span key={kind} className="w-5 h-5 rounded flex items-center justify-center bg-foreground">
+                    <Icon className="w-2.5 h-2.5 text-background" />
+                  </span>
+                ))}
               </div>
             </div>
 

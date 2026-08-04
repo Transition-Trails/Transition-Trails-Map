@@ -341,6 +341,110 @@ router.get("/drive/penny-assets/folders", async (_req, res) => {
   }
 });
 
+// ─── GET /api/drive/penny-content ─────────────────────────────────────────────
+//
+// Lists media files (images, audio, video) from the GOOGLE_DRIVE_PENNY_FOLDER_ID
+// folder, for use in the Prompt Studio PennyContentStrip.
+//
+// Response shape:
+//   {
+//     configured: boolean,
+//     folderId: string | null,
+//     folderName: string | null,
+//     folderWebViewLink: string | null,
+//     images: DriveFile[],
+//     audio:  DriveFile[],
+//     video:  DriveFile[],
+//   }
+
+router.get("/drive/penny-content", async (_req, res): Promise<void> => {
+  const pennyFolderId = process.env["GOOGLE_DRIVE_PENNY_FOLDER_ID"];
+
+  if (!pennyFolderId) {
+    res.status(200).json({
+      configured: false,
+      folderId: null,
+      folderName: null,
+      folderWebViewLink: null,
+      images: [],
+      audio:  [],
+      video:  [],
+    });
+    return;
+  }
+
+  try {
+    const token = await getAccessToken();
+
+    // Fetch folder metadata and media files in parallel
+    const mediaQuery = encodeURIComponent(
+      `'${pennyFolderId}' in parents and trashed = false and ` +
+      `(mimeType contains 'image/' or mimeType contains 'audio/' or mimeType contains 'video/')`
+    );
+    const fields = "files(id,name,mimeType,webViewLink,modifiedTime,size)";
+    const url = `https://www.googleapis.com/drive/v3/files?q=${mediaQuery}&fields=${fields}&pageSize=100&orderBy=name&supportsAllDrives=true&includeItemsFromAllDrives=true`;
+
+    const [rootMeta, filesResp] = await Promise.all([
+      fetch(
+        `https://www.googleapis.com/drive/v3/files/${pennyFolderId}?fields=id,name,webViewLink&supportsAllDrives=true`,
+        { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(8_000) }
+      ),
+      fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal:  AbortSignal.timeout(10_000),
+      }),
+    ]);
+
+    const folderMeta = rootMeta.ok
+      ? (await rootMeta.json() as { id: string; name: string; webViewLink?: string })
+      : null;
+
+    if (!filesResp.ok) {
+      const body = await filesResp.json().catch(() => ({})) as { error?: { message?: string } };
+      res.status(filesResp.status).json({
+        configured: true,
+        error: body.error?.message ?? `Drive API error: HTTP ${filesResp.status}`,
+        folderId: pennyFolderId,
+        folderName: folderMeta?.name ?? null,
+        folderWebViewLink: folderMeta?.webViewLink ?? null,
+        images: [], audio: [], video: [],
+      });
+      return;
+    }
+
+    const data  = await filesResp.json() as { files: DriveFile[] };
+    const files = data.files ?? [];
+
+    const images = files.filter(f => f.mimeType.startsWith("image/"));
+    const audio  = files.filter(f => f.mimeType.startsWith("audio/"));
+    const video  = files.filter(f => f.mimeType.startsWith("video/"));
+
+    res.json({
+      configured:        true,
+      folderId:          pennyFolderId,
+      folderName:        folderMeta?.name ?? "Penny Content",
+      folderWebViewLink: folderMeta?.webViewLink ?? null,
+      images,
+      audio,
+      video,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("Missing GOOGLE")) {
+      res.status(503).json({ configured: false, error: "Drive integration not configured", images: [], audio: [], video: [] });
+      return;
+    }
+    res.status(500).json({
+      configured: true,
+      error: msg,
+      folderId: pennyFolderId,
+      folderName: null,
+      folderWebViewLink: null,
+      images: [], audio: [], video: [],
+    });
+  }
+});
+
 // ─── GET /api/drive/folder-check ──────────────────────────────────────────────
 //
 // Checks whether one or more Drive folders are still accessible.
