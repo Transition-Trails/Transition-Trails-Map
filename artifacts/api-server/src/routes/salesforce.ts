@@ -273,6 +273,15 @@ interface FieldCheckConfig {
   description: string;
   requiredFields: string[];
   excludeNamespaces: string[];
+  /**
+   * When true, the describe is skipped entirely and the result is marked as
+   * Phase 2 deferred. Use this when the required fields are documented but have
+   * not yet been provisioned in the org — it prevents the entry from appearing
+   * as a vacuous "0 fields, all required present" pass.
+   */
+  phase2Deferred?: boolean;
+  /** The fields expected once this object is fully provisioned (documentation only). */
+  phase2ExpectedFields?: string[];
 }
 
 const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
@@ -429,11 +438,23 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     objectApi: "TT_Automation__c",
     label: "TT Automation",
     description: "Automation definition records queried when the governance layer resolves active automations",
-    // Verified against live org (Task #143): 0 custom fields present on this object.
-    // Is_Active__c / Automation_Type__c / Description__c / Status__c do not exist — all removed.
-    // Phase 2: expected fields should be added to the object before pipeline goes live.
+    // Verified against live org: 0 custom fields present on this object.
+    // The four fields below are required by the governance pipeline but have not
+    // yet been provisioned in the org.  Set phase2Deferred so the preflight result
+    // shows an explicit "Phase 2 deferred" label instead of a vacuous
+    // "0 fields, all required present" pass that hides the gap.
+    // ACTION REQUIRED before go-live: add these four fields to TT_Automation__c in
+    // the org, then remove phase2Deferred, move the field names into requiredFields,
+    // and re-run probe-governance-fields.ts to confirm.
     requiredFields: [],
     excludeNamespaces: [],
+    phase2Deferred: true,
+    phase2ExpectedFields: [
+      "Is_Active__c",
+      "Automation_Type__c",
+      "Description__c",
+      "Status__c",
+    ],
   },
   {
     id: "tt-sop-automation-fields",
@@ -690,12 +711,45 @@ router.get("/salesforce/validate", async (req, res) => {
     requiredFieldsMissing: string[]; // always [] when describeError is non-null
     describeError:         string | null;
     describeUndetermined:  boolean;  // true = throttled; undetermined, not missing
+    /**
+     * True when the describe was intentionally skipped (e.g. phase2Deferred).
+     * Callers must exclude rows where describeSkipped===true from "all describes
+     * failed" detection — a skipped row has describeError:null by design, not
+     * because the describe succeeded.
+     */
+    describeSkipped:       boolean;
+    /** True when the object's required fields are documented but not yet provisioned. */
+    phase2Deferred:        boolean;
+    /** The fields expected once this object is fully provisioned (documentation only). */
+    phase2ExpectedFields:  string[];
   };
 
   const customFieldResults: FieldCheckResult[] = [];
   const FIELD_CHECK_DELAY_MS = process.env['NODE_ENV'] === 'test' ? 0 : 400;
 
   for (const cfg of REUSED_OBJECT_FIELD_CHECKS) {
+    // Phase-2-deferred objects skip the describe entirely — they are not yet
+    // provisioned in the org, so running a describe would always return "missing"
+    // and still wouldn't tell us anything useful.  The result is marked explicitly
+    // so the UI can render a "Phase 2 deferred" label instead of a vacuous pass.
+    if (cfg.phase2Deferred) {
+      customFieldResults.push({
+        id: cfg.id, object: cfg.objectApi, label: cfg.label, description: cfg.description,
+        ourFields: [],
+        requiredFieldsFound:  [],
+        requiredFieldsMissing: [],
+        describeError:         null,
+        describeUndetermined:  false,
+        // describeSkipped:true distinguishes "intentionally not attempted" from
+        // "attempted and succeeded with no error".  Callers that detect the
+        // "all describes failed" condition MUST filter out skipped rows first.
+        describeSkipped:       true,
+        phase2Deferred:        true,
+        phase2ExpectedFields:  cfg.phase2ExpectedFields ?? [],
+      });
+      continue;
+    }
+
     const { found, error, undetermined: isUndetermined } = await getCustomFields(
       proxyFetch, cfg.objectApi, cfg.excludeNamespaces,
     );
@@ -708,19 +762,25 @@ router.get("/salesforce/validate", async (req, res) => {
       requiredFieldsMissing: error ? [] : cfg.requiredFields.filter(f => !foundSet.has(f)),
       describeError:         error,
       describeUndetermined:  isUndetermined,
+      describeSkipped:       false,
+      phase2Deferred:        false,
+      phase2ExpectedFields:  [],
     });
     await sleep(FIELD_CHECK_DELAY_MS);
   }
 
-  // An issue is only a confirmed-missing field — throttled/errored describes are not issues
+  // An issue is only a confirmed-missing field on a non-deferred object.
+  // Phase-2-deferred objects are intentionally unprovisioned and must not
+  // block the overall check status.
   const fieldCheckIssues = customFieldResults.some(
-    r => !r.describeError && r.requiredFieldsMissing.length > 0,
+    r => !r.phase2Deferred && !r.describeError && r.requiredFieldsMissing.length > 0,
   );
   checks.push({
     id: "custom-fields", category: "TT Fields", label: "Custom fields on reused objects",
     status: fieldCheckIssues ? "warning" : "pass",
     detail: customFieldResults
       .map(r => {
+        if (r.phase2Deferred)       return `${r.label}: Phase 2 deferred — ${r.phase2ExpectedFields.length} fields not yet provisioned in org (${r.phase2ExpectedFields.join(", ")})`;
         if (r.describeUndetermined) return `${r.label}: describe rate-limited — undetermined`;
         if (r.describeError)        return `${r.label}: describe failed`;
         const missing = r.requiredFieldsMissing.length;

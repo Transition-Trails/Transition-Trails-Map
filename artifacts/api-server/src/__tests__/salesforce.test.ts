@@ -429,6 +429,7 @@ describe('GET /api/salesforce/validate — generic describe error (non-rate-limi
       id: string;
       requiredFieldsMissing: string[];
       describeError: string | null;
+      describeSkipped: boolean;
     }[];
 
     expect(Array.isArray(fieldChecks)).toBe(true);
@@ -455,6 +456,7 @@ describe('GET /api/salesforce/validate — generic describe error (non-rate-limi
       id: string;
       describeError: string | null;
       describeUndetermined: boolean;
+      describeSkipped: boolean;
     }[];
 
     for (const fc of fieldChecks) {
@@ -464,7 +466,10 @@ describe('GET /api/salesforce/validate — generic describe error (non-rate-limi
     }
   });
 
-  test('describeError is a non-null string when describe returns a non-429 error', async () => {
+  test('describeError is a non-null string for all attempted (non-skipped) checks when describe returns a non-429 error', async () => {
+    // Rows with describeSkipped:true had their describe intentionally bypassed
+    // (e.g. phase2Deferred objects) — they always have describeError:null by
+    // design and must be excluded from this assertion.
     mockProxyMode.value = 'describeError';
 
     const res = await request(app).get('/api/salesforce/validate');
@@ -473,13 +478,42 @@ describe('GET /api/salesforce/validate — generic describe error (non-rate-limi
     const fieldChecks = res.body.customFieldChecks as {
       id: string;
       describeError: string | null;
+      describeSkipped: boolean;
     }[];
 
-    // All checks should have hit the 403 describe mock, so every entry
-    // must carry a non-null describeError string.
-    for (const fc of fieldChecks) {
+    // All attempted (non-skipped) checks should have hit the 403 describe mock,
+    // so every such entry must carry a non-null describeError string.
+    const attempted = fieldChecks.filter(fc => !fc.describeSkipped);
+    expect(attempted.length).toBeGreaterThan(0);
+    for (const fc of attempted) {
       expect(typeof fc.describeError).toBe('string');
       expect(fc.describeError).not.toBeNull();
+    }
+  });
+
+  test('phase2Deferred rows have describeSkipped:true and describeError:null in all modes', async () => {
+    // Verify the deferred contract holds in both normal and error modes.
+    for (const mode of ['normal', 'describeError'] as const) {
+      mockProxyMode.value = mode;
+      const res = await request(app).get('/api/salesforce/validate');
+      expect(res.status).toBe(200);
+
+      const fieldChecks = res.body.customFieldChecks as {
+        id: string;
+        phase2Deferred: boolean;
+        describeSkipped: boolean;
+        describeError: string | null;
+        phase2ExpectedFields: string[];
+      }[];
+
+      const deferred = fieldChecks.filter(fc => fc.phase2Deferred);
+      for (const fc of deferred) {
+        expect(fc.describeSkipped).toBe(true);
+        expect(fc.describeError).toBeNull();
+        // Must document the expected fields even though they are not yet in the org
+        expect(Array.isArray(fc.phase2ExpectedFields)).toBe(true);
+        expect(fc.phase2ExpectedFields.length).toBeGreaterThan(0);
+      }
     }
   });
 });
@@ -697,10 +731,13 @@ describe('GET /api/salesforce/validate — Penny + Governance field-check covera
     // Verify that the REUSED_OBJECT_FIELD_CHECKS definitions actually enumerate
     // required fields for Penny and Governance objects — not just empty arrays.
     //
-    // Exception: 'tt-automation-fields' is intentionally requiredFields:[] because
-    // TT_Automation__c has 0 custom fields on the live org as of Task #143.
-    // Phase 2 will add Is_Active__c / Automation_Type__c / Description__c / Status__c.
-    const INTENTIONALLY_EMPTY: string[] = ['tt-automation-fields'];
+    // Exception: 'tt-automation-fields' is phase2Deferred — TT_Automation__c has
+    // 0 custom fields on the live org. The four expected fields (Is_Active__c,
+    // Automation_Type__c, Description__c, Status__c) are documented in
+    // phase2ExpectedFields but not in requiredFields until they are provisioned.
+    // When phase2Deferred is true, requiredFieldsFound + requiredFieldsMissing will
+    // both be [] — use phase2ExpectedFields.length to detect documented intent.
+    const PHASE2_DEFERRED: string[] = ['tt-automation-fields'];
 
     const res = await request(app).get('/api/salesforce/validate');
     expect(res.status).toBe(200);
@@ -709,6 +746,8 @@ describe('GET /api/salesforce/validate — Penny + Governance field-check covera
       id: string;
       requiredFieldsFound: string[];
       requiredFieldsMissing: string[];
+      phase2Deferred: boolean;
+      phase2ExpectedFields: string[];
     }[];
 
     const pennyAndGovernanceIds = [
@@ -719,9 +758,12 @@ describe('GET /api/salesforce/validate — Penny + Governance field-check covera
     for (const id of pennyAndGovernanceIds) {
       const fc = allFieldChecks.find(c => c.id === id);
       expect(fc).toBeDefined();
-      if (INTENTIONALLY_EMPTY.includes(id)) {
-        // Confirmed Phase 2: TT_Automation__c has no custom fields on the live
-        // org yet. The check is present but the required list is empty by design.
+      if (PHASE2_DEFERRED.includes(id)) {
+        // TT_Automation__c is phase2Deferred — fields are documented in
+        // phase2ExpectedFields, not in requiredFields (they don't exist in org yet).
+        // Verify the expected fields are documented rather than silently empty.
+        expect(fc?.phase2Deferred).toBe(true);
+        expect((fc?.phase2ExpectedFields ?? []).length).toBeGreaterThan(0);
         continue;
       }
       // The combined found+missing list represents the requiredFields config —

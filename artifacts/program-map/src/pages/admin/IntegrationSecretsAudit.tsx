@@ -93,6 +93,12 @@ interface FieldCheckResult {
   requiredFieldsMissing: string[]; // always [] when describeError is non-null
   describeError:         string | null;
   describeUndetermined:  boolean;  // true = throttled; undetermined, not missing
+  /** True when the describe was intentionally skipped (e.g. phase2Deferred). Exclude from "all describes failed" detection. */
+  describeSkipped:       boolean;
+  /** True when the object's required fields are documented but not yet provisioned in the org. */
+  phase2Deferred:        boolean;
+  /** The fields expected once this object is fully provisioned (documentation only). */
+  phase2ExpectedFields:  string[];
 }
 
 interface SalesforceResult {
@@ -478,7 +484,11 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
 
             {/* Custom field verification on reused objects */}
             {result.customFieldChecks && result.customFieldChecks.length > 0 && (() => {
-              const allDescribesFailed = result.customFieldChecks.every(fc => !!fc.describeError);
+              // Exclude phase2-deferred rows (describeSkipped:true) from the "all describes
+              // failed" check — their describeError is null by design, not because the
+              // describe succeeded.
+              const attempted        = result.customFieldChecks.filter(fc => !fc.describeSkipped);
+              const allDescribesFailed = attempted.length > 0 && attempted.every(fc => !!fc.describeError);
               return (
               <div className="space-y-1.5">
                 <p className="text-[14px] font-bold text-foreground">
@@ -500,49 +510,66 @@ function SalesforceCard({ result, loading }: { result: SalesforceResult | null; 
                   </div>
                 )}
                 {result.customFieldChecks.map(fc => {
+                  const isPhase2      = fc.phase2Deferred;
                   const isUndetermined = fc.describeUndetermined;
                   const hasError       = !!fc.describeError && !isUndetermined;
-                  const allPresent     = !fc.describeError && fc.requiredFieldsMissing.length === 0;
+                  const allPresent     = !fc.describeSkipped && !fc.describeError && fc.requiredFieldsMissing.length === 0;
                   const hasMissing     = !fc.describeError && fc.requiredFieldsMissing.length > 0;
                   return (
                     <div key={fc.id} className={`rounded border px-3 py-2 ${
-                      isUndetermined ? 'border-[#FFD08A] bg-[#FFF3E0]/40'
+                      isPhase2       ? 'border-border bg-muted/30'
+                      : isUndetermined ? 'border-[#FFD08A] bg-[#FFF3E0]/40'
                       : hasError     ? 'border-[#E8B9B4] bg-[#FBEAE6]/40'
                       : hasMissing   ? 'border-[#FFD08A] bg-[#FFF3E0]/40'
                       : 'border-[#9FC3AE] bg-[#E6F0EA]/40'
                     }`}>
                       <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                        {isUndetermined
-                          ? <HelpCircle className="w-3 h-3 text-[#CC8400] shrink-0" />
-                          : allPresent
-                            ? <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0" />
-                            : <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0" />}
+                        {isPhase2
+                          ? <HelpCircle className="w-3 h-3 text-muted-foreground shrink-0" />
+                          : isUndetermined
+                            ? <HelpCircle className="w-3 h-3 text-[#CC8400] shrink-0" />
+                            : allPresent
+                              ? <CheckCircle className="w-3 h-3 text-[#2F6B3F] shrink-0" />
+                              : <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0" />}
                         <span className="text-[14px] font-semibold text-foreground">{fc.label}</span>
                         <span className="text-[14px] text-muted-foreground">{fc.description}</span>
                         <span className={`ml-auto text-[14px] font-semibold ${
-                          isUndetermined ? 'text-[#CC8400]'
+                          isPhase2       ? 'text-muted-foreground'
+                          : isUndetermined ? 'text-[#CC8400]'
                           : hasError     ? 'text-[#A93F2F]'
                           : hasMissing   ? 'text-[#CC8400]'
                           : 'text-[#2F6B3F]'
                         }`}>
-                          {isUndetermined ? '? TT fields' : `${fc.ourFields.length} TT fields`}
+                          {isPhase2 ? 'Phase 2' : isUndetermined ? '? TT fields' : `${fc.ourFields.length} TT fields`}
                         </span>
                       </div>
-                      {isUndetermined && (
+                      {isPhase2 && (
+                        <div className="mt-1">
+                          <p className="text-[14px] text-muted-foreground">
+                            Phase 2 — fields not yet provisioned in org. Expected once this object is fully set up:
+                          </p>
+                          {fc.phase2ExpectedFields.length > 0 && (
+                            <p className="text-[14px] text-muted-foreground font-mono mt-0.5">
+                              {fc.phase2ExpectedFields.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {!isPhase2 && isUndetermined && (
                         <p className="text-[14px] text-[#CC8400] mt-0.5">
                           Describe rate-limited — field status undetermined. Rerun validation to confirm.
                         </p>
                       )}
-                      {hasError && (
+                      {!isPhase2 && hasError && (
                         <p className="text-[14px] text-[#A93F2F] mt-0.5">Describe failed: {fc.describeError!.slice(0, 100)}</p>
                       )}
-                      {hasMissing && (
+                      {!isPhase2 && hasMissing && (
                         <div className="mt-1">
                           <span className="text-[14px] text-[#CC8400] font-semibold">Missing required: </span>
                           <span className="text-[14px] text-[#CC8400] font-mono">{fc.requiredFieldsMissing.join(', ')}</span>
                         </div>
                       )}
-                      {allPresent && fc.requiredFieldsFound.length > 0 && (
+                      {!isPhase2 && allPresent && fc.requiredFieldsFound.length > 0 && (
                         <p className="text-[14px] text-[#2F6B3F]/70 mt-0.5">
                           All {fc.requiredFieldsFound.length} required fields present.
                         </p>
