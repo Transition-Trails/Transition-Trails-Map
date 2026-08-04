@@ -376,28 +376,42 @@ router.get("/drive/penny-content", async (_req, res): Promise<void> => {
   try {
     const token = await getAccessToken();
 
-    // Fetch folder metadata and media files in parallel
-    const mediaQuery = encodeURIComponent(
-      `'${pennyFolderId}' in parents and trashed = false and ` +
-      `(mimeType contains 'image/' or mimeType contains 'audio/' or mimeType contains 'video/')`
-    );
-    const fields = "files(id,name,mimeType,webViewLink,modifiedTime,size)";
-    const url = `https://www.googleapis.com/drive/v3/files?q=${mediaQuery}&fields=${fields}&pageSize=100&orderBy=name&supportsAllDrives=true&includeItemsFromAllDrives=true`;
-
-    const [rootMeta, filesResp] = await Promise.all([
+    // 1. Fetch folder metadata and root contents in parallel (root contents
+    //    needed to discover subfolders before querying media recursively).
+    const [rootMeta, rootContents] = await Promise.all([
       fetch(
         `https://www.googleapis.com/drive/v3/files/${pennyFolderId}?fields=id,name,webViewLink&supportsAllDrives=true`,
         { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(8_000) }
       ),
-      fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-        signal:  AbortSignal.timeout(10_000),
-      }),
+      listFilesInFolder(token, pennyFolderId),
     ]);
 
     const folderMeta = rootMeta.ok
       ? (await rootMeta.json() as { id: string; name: string; webViewLink?: string })
       : null;
+
+    // 2. Collect every folder ID to search: the root + all immediate subfolders.
+    //    Users organise assets into subfolders (e.g. "Coaching", "Trail Talk")
+    //    so we must look inside them as well as the root.
+    const subfolderIds = rootContents
+      .filter(f => f.mimeType === "application/vnd.google-apps.folder")
+      .map(f => f.id);
+    const allFolderIds = [pennyFolderId, ...subfolderIds];
+
+    // 3. Build a single Drive query that matches media files in any of those folders.
+    //    Drive's OR syntax: ('id1' in parents or 'id2' in parents or ...)
+    const parentClause = allFolderIds.map(id => `'${id}' in parents`).join(" or ");
+    const mediaQuery = encodeURIComponent(
+      `(${parentClause}) and trashed = false and ` +
+      `(mimeType contains 'image/' or mimeType contains 'audio/' or mimeType contains 'video/')`
+    );
+    const fields = "files(id,name,mimeType,webViewLink,modifiedTime,size)";
+    const url = `https://www.googleapis.com/drive/v3/files?q=${mediaQuery}&fields=${fields}&pageSize=200&orderBy=name&supportsAllDrives=true&includeItemsFromAllDrives=true`;
+
+    const filesResp = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal:  AbortSignal.timeout(15_000),
+    });
 
     if (!filesResp.ok) {
       const body = await filesResp.json().catch(() => ({})) as { error?: { message?: string } };
