@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useGoogleAuth, useSignOut } from '@/hooks/useGoogleAuth';
 import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
@@ -248,8 +249,8 @@ function UserProfileButton() {
         <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-[1.5px] border-background ${tierDot[userTier]}`} />
       </button>
 
-      {/* ── Profile panel dropdown ── */}
-      {open && (
+      {/* ── Profile panel dropdown — portalled to body to escape overflow/transform ancestors ── */}
+      {open && createPortal(
         <div
           className="fixed z-[200] w-[310px] bg-card border border-border rounded-xl shadow-xl overflow-hidden"
           style={{ top: dropPos.top, right: dropPos.right }}
@@ -382,7 +383,7 @@ function UserProfileButton() {
           </div>
 
         </div>
-      )}
+      , document.body)}
     </div>
   );
 }
