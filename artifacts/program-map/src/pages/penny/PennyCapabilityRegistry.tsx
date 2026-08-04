@@ -260,6 +260,7 @@ function PennyCopiloPanel({
           <div className="mt-4 flex flex-col gap-2">
             {walkThroughItems.slice(0, 3).map(r => (
               <button
+                type="button"
                 key={r.id}
                 onClick={() => onWalkThrough(r)}
                 className="px-3 py-2.5 border border-gray-200 rounded-md text-[12px] font-medium text-gray-700 hover:bg-gray-50 text-left flex justify-between items-center group transition-colors shadow-sm"
@@ -272,11 +273,16 @@ function PennyCopiloPanel({
             ))}
           </div>
         )}
+      </div>
 
-        {/* Re-check button — shown after fixing something in preflight */}
+      {/* Re-check + Input — kept in shrink-0 footer so they're never inside
+          the overflow-y:auto region (which can swallow pointer events in some
+          browsers even when the content is fully visible). */}
+      <div className="shrink-0 border-t border-gray-100 bg-white">
         {step === 'preflight' && !isLoading && onRecheck && (
-          <div className="mt-4 pt-3 border-t border-gray-100">
+          <div className="px-3 pt-3">
             <button
+              type="button"
               onClick={onRecheck}
               className="w-full px-3 py-2 rounded-md border border-amber-200 bg-amber-50 text-[12px] font-medium text-amber-700 hover:bg-amber-100 flex items-center justify-center gap-1.5 transition-colors"
             >
@@ -285,25 +291,25 @@ function PennyCopiloPanel({
             </button>
           </div>
         )}
-      </div>
 
-      {/* Input */}
-      <div className="p-3 border-t border-gray-100 bg-white shrink-0">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Ask Penny about this step…"
-            className="w-full h-9 pl-3 pr-9 rounded-md border border-gray-300 text-[12px] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 placeholder:text-gray-400"
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const v = (e.currentTarget as HTMLInputElement).value.trim();
-                if (v) { onWalkThrough({ id: 'freeform', label: v, kind: 'config', pennyMissingNote: v }); (e.currentTarget as HTMLInputElement).value = ''; }
-              }
-            }}
-          />
-          <button className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded text-white bg-amber-500 hover:bg-amber-600 transition-colors">
-            <Send className="w-3.5 h-3.5" />
-          </button>
+        {/* Input */}
+        <div className="p-3">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Ask Penny about this step…"
+              className="w-full h-9 pl-3 pr-9 rounded-md border border-gray-300 text-[12px] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 placeholder:text-gray-400"
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  const v = (e.currentTarget as HTMLInputElement).value.trim();
+                  if (v) { onWalkThrough({ id: 'freeform', label: v, kind: 'config', pennyMissingNote: v }); (e.currentTarget as HTMLInputElement).value = ''; }
+                }
+              }}
+            />
+            <button type="button" className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded text-white bg-amber-500 hover:bg-amber-600 transition-colors">
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
