@@ -118,6 +118,7 @@ vi.mock('@replit/connectors-sdk', () => {
 });
 
 import app from '../app.js';
+import { opsCache } from '../routes/salesforce.js';
 
 // ── Operations summary ────────────────────────────────────────────────────────
 
@@ -479,6 +480,167 @@ describe('GET /api/salesforce/validate — generic describe error (non-rate-limi
     for (const fc of fieldChecks) {
       expect(typeof fc.describeError).toBe('string');
       expect(fc.describeError).not.toBeNull();
+    }
+  });
+});
+
+// ── Picklist-fetch error handling ─────────────────────────────────────────────
+//
+// getPicklistValues() silently returns [] on any describe error.
+// These tests confirm two invariants:
+//
+//   1. The [] return is OBSERVABLE — the ops summary exposes it via
+//      statusValuesFound / statusValuesMissing so callers can distinguish
+//      "describe failed" from "org genuinely has no picklist values".
+//
+//   2. A failed picklist describe causes filtered counts to return explicit
+//      errors (value: null, error: <string>), NOT silent zeros.
+//
+// This guards against a regression where a failed picklist fetch looks
+// identical to a genuinely empty picklist in the API response.
+
+describe('GET /api/salesforce/operations/summary — picklist describe error', () => {
+  beforeEach(() => {
+    mockProxyMode.value = 'normal';
+    // Evict picklist entries AND the ops-summary result cached by earlier
+    // normal-mode tests so the describe-error mock is actually exercised.
+    for (const key of opsCache.keys()) {
+      if (key.includes(':picklist:') || key.includes(':ops-summary')) {
+        opsCache.delete(key);
+      }
+    }
+  });
+  afterEach(() => { mockProxyMode.value = 'normal'; });
+
+  test('getPicklistValues returns [] when describe returns non-200 — surfaced as empty statusValuesFound', async () => {
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/operations/summary');
+    expect(res.status).toBe(200);
+
+    const programs = res.body.programs as {
+      statusValuesFound: string[];
+      statusValuesMissing: string[];
+    };
+
+    // A failed describe must return an empty picklist list, not throw or silently
+    // fall back to hardcoded defaults.
+    // statusValuesFound surfaces the raw [] so callers can distinguish error from empty.
+    expect(programs.statusValuesFound).toEqual([]);
+
+    // All expected values are absent from the empty picklist and must be reported.
+    expect(programs.statusValuesMissing).toContain('Active');
+    expect(programs.statusValuesMissing).toContain('Planning');
+  });
+
+  test('programs.active and programs.planning carry explicit errors (not zero) when picklist describe fails', async () => {
+    // When getPicklistValues returns [] because the describe call failed,
+    // the expected status values ('Active', 'Planning') are not found in the picklist.
+    // The filtered-count queries must NOT run with those values — they would succeed
+    // with zero results, which is indistinguishable from a real empty org.
+    // Instead, each count must carry an explicit error string and null value.
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/operations/summary');
+    expect(res.status).toBe(200);
+
+    const programs = res.body.programs as {
+      active:   { value: number | null; error: string | null };
+      planning: { value: number | null; error: string | null };
+    };
+
+    // Null value confirms the query was skipped, not that zero records were returned.
+    expect(programs.active.value).toBeNull();
+    expect(typeof programs.active.error).toBe('string');
+    expect(programs.active.error).not.toBeNull();
+    // The error message must mention the unavailable picklist value, not just a generic error.
+    expect(programs.active.error).toMatch(/Active/);
+
+    expect(programs.planning.value).toBeNull();
+    expect(typeof programs.planning.error).toBe('string');
+    expect(programs.planning.error).not.toBeNull();
+    expect(programs.planning.error).toMatch(/Planning/);
+  });
+
+  test('programs.total remains queryable even when picklist describe fails', async () => {
+    // The total program count does not rely on picklist values — it should succeed
+    // regardless of describe errors, confirming the failure is isolated to the
+    // filtered queries, not the entire ops summary.
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/operations/summary');
+    expect(res.status).toBe(200);
+
+    const programs = res.body.programs as {
+      total: { value: number | null; error: string | null };
+    };
+
+    // Total count uses no picklist filter — describe error must not affect it.
+    expect(programs.total.error).toBeNull();
+    expect(typeof programs.total.value).toBe('number');
+  });
+});
+
+// ── customFieldChecks with picklist fields — describe error ────────────────────
+//
+// Several field-check entries include restricted-picklist fields (e.g.
+// Source__c on Penny_Interaction_Log__c).  When the describe call that
+// backs both getCustomFields AND getPicklistValues returns a non-200
+// response, the Validation Center must NOT report those fields as missing.
+// A failed describe is not evidence of absence.
+//
+// This is a focused companion to the generic describe-error block above:
+// it confirms the invariant holds specifically for objects that carry
+// picklist-typed required fields.
+
+describe('GET /api/salesforce/validate — picklist field checks when describe fails', () => {
+  beforeEach(() => { mockProxyMode.value = 'normal'; });
+  afterEach(() => { mockProxyMode.value = 'normal'; });
+
+  test('penny-interaction-log-fields reports no missing fields when describe returns non-200', async () => {
+    // Penny_Interaction_Log__c requires Source__c (a restricted picklist).
+    // If describe fails, Source__c must NOT appear in requiredFieldsMissing.
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const fc = (res.body.customFieldChecks as {
+      id: string;
+      requiredFieldsMissing: string[];
+      describeError: string | null;
+    }[]).find(c => c.id === 'penny-interaction-log-fields');
+
+    expect(fc).toBeDefined();
+    // Describe failed → must not infer any field is missing.
+    expect(fc!.requiredFieldsMissing).toEqual([]);
+    // The error must be reported so the UI can show "data unavailable" not "all clear".
+    expect(fc!.describeError).not.toBeNull();
+  });
+
+  test('no customFieldCheck entry reports a missing picklist field when describe is unavailable', async () => {
+    // Broad sweep: confirm the invariant holds across all field-check entries,
+    // not just Penny_Interaction_Log__c.  Covers any future object additions too.
+    mockProxyMode.value = 'describeError';
+
+    const res = await request(app).get('/api/salesforce/validate');
+    expect(res.status).toBe(200);
+
+    const fieldChecks = res.body.customFieldChecks as {
+      id: string;
+      requiredFieldsMissing: string[];
+      describeError: string | null;
+    }[];
+
+    expect(Array.isArray(fieldChecks)).toBe(true);
+    expect(fieldChecks.length).toBeGreaterThan(0);
+
+    for (const fc of fieldChecks) {
+      if (fc.describeError !== null) {
+        // Any entry whose describe call failed must have an empty missing-fields list —
+        // regardless of whether the required fields are picklist-typed or not.
+        expect(fc.requiredFieldsMissing).toEqual([]);
+      }
     }
   });
 });
