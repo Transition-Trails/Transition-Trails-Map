@@ -117,6 +117,7 @@ interface RawSessionLog {
 
 router.get("/sessions", withClient(async (req, res, client) => {
   const limitParam = Math.min(parseInt(String(req.query["limit"] ?? "50"), 10), 200);
+  const learnerIdFilter = typeof req.query["learnerId"] === "string" ? req.query["learnerId"].trim() : null;
 
   // Describe the object first so we only SELECT fields that actually exist.
   const fieldSet = await getSessionFieldSet(client);
@@ -133,12 +134,17 @@ router.get("/sessions", withClient(async (req, res, client) => {
     ? "ORDER BY Session_Date__c DESC NULLS LAST, CreatedDate DESC"
     : "ORDER BY CreatedDate DESC";
 
+  // Optional WHERE clause for learner filtering
+  const whereClause = learnerIdFilter && fieldSet.present.has("Learner__c")
+    ? `WHERE Learner__c = '${learnerIdFilter.replace(/'/g, "\\'")}'`
+    : "";
+
   let records: RawSessionLog[] = [];
   let totalSize = 0;
 
   try {
     const result = await client.query<RawSessionLog>(
-      `SELECT ${fieldSet.selectClause} FROM ${OBJECT} ${orderBy} LIMIT ${limitParam}`
+      `SELECT ${fieldSet.selectClause} FROM ${OBJECT} ${whereClause} ${orderBy} LIMIT ${limitParam}`
     );
     records   = result.records;
     totalSize = result.totalSize;

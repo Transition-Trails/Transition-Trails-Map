@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Clock, Users, CalendarDays, RefreshCw, Plus, X,
@@ -14,6 +15,7 @@ interface SessionRecord {
   sessionDate: string | null;
   coachName: string | null;
   learnerName: string | null;
+  learnerId: string | null;
   program: string | null;
   durationMinutes: number | null;
   notes: string | null;
@@ -132,7 +134,7 @@ function LearnerPicker({
           placeholder="Search learners…"
           className={`${inputCls} pl-8 pr-8`}
           onFocus={() => { ensureLoaded(); setOpen(true); }}
-          onChange={e => { setQuery(e.target.value); onChange('', ''); setOpen(true); }}
+          onChange={e => { setQuery(e.target.value); onChange('', '', null); setOpen(true); }}
         />
         {query && (
           <button type="button" onClick={handleClear} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground">
@@ -223,8 +225,20 @@ function SessionRow({ session }: { session: SessionRecord }) {
                 <span className="text-[14px] text-muted-foreground/70">{session.durationMinutes} min</span>
               )}
             </div>
-            <div className="flex items-center gap-2 mt-0.5 text-[14px] text-muted-foreground">
-              {session.learnerName && <span>{session.learnerName}</span>}
+            <div className="flex items-center gap-2 mt-0.5 text-[14px] text-muted-foreground flex-wrap">
+              {session.learnerName && (
+                session.learnerId ? (
+                  <Link
+                    href={`/penny/learner/${session.learnerId}`}
+                    onClick={e => e.stopPropagation()}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-primary/30 bg-primary/8 text-primary text-[13px] font-medium hover:bg-primary/15 transition-colors"
+                  >
+                    {session.learnerName}
+                  </Link>
+                ) : (
+                  <span>{session.learnerName}</span>
+                )
+              )}
               {session.learnerName && session.coachName && <span className="text-muted-foreground/30">·</span>}
               {session.coachName && <span>Coach: {session.coachName}</span>}
               {session.program && <><span className="text-muted-foreground/30">·</span><span>{session.program}</span></>}

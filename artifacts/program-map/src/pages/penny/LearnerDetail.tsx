@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   ArrowLeft, User, MessageSquare, ClipboardList, Briefcase,
-  CheckCircle2, XCircle, X, Pencil, Loader2,
+  CheckCircle2, XCircle, X, Pencil, Loader2, CalendarDays, Clock, Users,
+  ChevronDown, ChevronUp,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -58,13 +59,14 @@ interface CareerReview {
   areaScores:    string;
 }
 
-type TabId = 'profile' | 'conversations' | 'quests' | 'career';
+type TabId = 'profile' | 'conversations' | 'quests' | 'career' | 'sessions';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'profile',       label: 'Profile',          icon: User },
   { id: 'conversations', label: 'Conversations',     icon: MessageSquare },
+  { id: 'sessions',      label: 'Sessions',          icon: CalendarDays },
   { id: 'quests',        label: 'Quest Submissions', icon: ClipboardList },
   { id: 'career',        label: 'Career Reviews',    icon: Briefcase },
 ];
@@ -365,6 +367,127 @@ function CareerPanel({ contactId }: { contactId: string }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Sessions panel ─────────────────────────────────────────────────────────────
+
+interface SessionRecord {
+  id: string;
+  sessionType: string | null;
+  sessionDate: string | null;
+  coachName: string | null;
+  learnerName: string | null;
+  program: string | null;
+  durationMinutes: number | null;
+  notes: string | null;
+  status: string | null;
+  createdDate: string;
+}
+
+function sessionStatusColor(s: string | null): string {
+  switch (s?.toLowerCase()) {
+    case 'completed':   return 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]';
+    case 'no-show':     return 'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]';
+    case 'rescheduled': return 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]';
+    case 'pending':     return 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]';
+    default:            return 'bg-muted text-muted-foreground border-border';
+  }
+}
+
+function sessionTypeIcon(t: string | null) {
+  if (t === 'Campfire Session') return Users;
+  if (t === 'Private Session')  return CalendarDays;
+  return Clock;
+}
+
+function SessionHistoryRow({ session }: { session: SessionRecord }) {
+  const [expanded, setExpanded] = useState(false);
+  const Icon = sessionTypeIcon(session.sessionType);
+
+  return (
+    <div className="rounded-lg border border-border bg-card hover:bg-muted/10 transition-colors">
+      <button className="w-full text-left p-3.5" onClick={() => setExpanded(v => !v)}>
+        <div className="flex items-center gap-3">
+          <Icon className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[14px] font-semibold text-foreground">
+                {session.sessionType ?? 'Session'}
+              </span>
+              {session.status && (
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${sessionStatusColor(session.status)}`}>
+                  {session.status}
+                </span>
+              )}
+              {session.sessionDate && (
+                <span className="text-[14px] text-muted-foreground">{formatDate(session.sessionDate)}</span>
+              )}
+              {session.durationMinutes && (
+                <span className="text-[14px] text-muted-foreground/70">{session.durationMinutes} min</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2 mt-0.5 text-[14px] text-muted-foreground">
+              {session.coachName && <span>Coach: {session.coachName}</span>}
+              {session.coachName && session.program && <span className="text-muted-foreground/30">·</span>}
+              {session.program && <span>{session.program}</span>}
+            </div>
+          </div>
+          <div className="text-muted-foreground/40 shrink-0">
+            {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </div>
+        </div>
+      </button>
+      {expanded && (
+        <div className="border-t border-border/50 px-4 py-3 bg-muted/20 space-y-2">
+          {session.notes ? (
+            <div>
+              <p className="text-[14px] font-bold text-muted-foreground/50 mb-1">Notes</p>
+              <p className="text-[14px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{session.notes}</p>
+            </div>
+          ) : (
+            <p className="text-[14px] text-muted-foreground/50 italic">No notes recorded.</p>
+          )}
+          <p className="text-[14px] text-muted-foreground/40">SF ID: {session.id} · Logged {formatDate(session.createdDate)}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SessionsPanel({ contactId }: { contactId: string }) {
+  const [sessions, setSessions] = useState<SessionRecord[]>([]);
+  const [total, setTotal]       = useState(0);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/sessions?learnerId=${encodeURIComponent(contactId)}&limit=100`)
+      .then(r => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json() as Promise<{ sessions: SessionRecord[]; total: number }>; })
+      .then(data => { setSessions(data.sessions ?? []); setTotal(data.total ?? 0); setLoading(false); })
+      .catch((err: unknown) => { setError(err instanceof Error ? err.message : 'Failed to load sessions'); setLoading(false); });
+  }, [contactId]);
+
+  if (loading) return <SkeletonBlock lines={4} />;
+  if (error)   return <ErrorBox message={error} />;
+  if (sessions.length === 0) return (
+    <p className="text-[14px] text-muted-foreground text-center py-8">No sessions logged for this learner.</p>
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[14px] text-muted-foreground">
+          {sessions.length} session{sessions.length !== 1 ? 's' : ''}
+          {total > sessions.length ? ` · ${total} total in Salesforce` : ''}
+        </p>
+        <span className="text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-md px-2 py-0.5">
+          Salesforce · TT_Session_Log__c
+        </span>
+      </div>
+      {sessions.map(s => <SessionHistoryRow key={s.id} session={s} />)}
     </div>
   );
 }
@@ -877,6 +1000,11 @@ export default function LearnerDetail({ params }: { params?: { contactId?: strin
             {loadedTabs.current.has('conversations') && (
               <div className={activeTab !== 'conversations' ? 'hidden' : ''}>
                 <ConversationsPanel contactId={contactId} />
+              </div>
+            )}
+            {loadedTabs.current.has('sessions') && (
+              <div className={activeTab !== 'sessions' ? 'hidden' : ''}>
+                <SessionsPanel contactId={contactId} />
               </div>
             )}
             {loadedTabs.current.has('quests') && (
