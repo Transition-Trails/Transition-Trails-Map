@@ -99,6 +99,7 @@ router.use(staffAuthGate);
 const ADMIN_PREFIXES: string[] = [
   '/secrets',           // GET /api/secrets/audit — credential exposure
   '/admin/google-groups', // GET /api/admin/google-groups — workspace admin
+  '/admin/staff-users',   // GET /api/admin/staff-users — people picker
   '/admin/role-owners',    // GET/PATCH /api/admin/role-owners
   '/admin/persona-health', // GET/PATCH /api/admin/persona-health
 ];
