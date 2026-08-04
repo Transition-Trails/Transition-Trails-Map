@@ -143,4 +143,43 @@ router.get('/admin/staff-users', async (_req, res) => {
   res.json({ users: [], source: 'none' });
 });
 
+// ── GET /google/directory/user?email=… ───────────────────────────────────────
+// Resolves a single user's display name from the Google Admin Directory.
+// Returns { email, displayName } on success, or { email, displayName: null }
+// when the directory is not configured or the user cannot be found.
+// Requires a valid staff session (protected by the global staffAuthGate).
+router.get('/google/directory/user', async (req, res) => {
+  const email = (typeof req.query.email === 'string' ? req.query.email : '').trim();
+  if (!email) {
+    res.status(400).json({ error: 'email query param is required' });
+    return;
+  }
+
+  const userToken = await getAdminUserAccessToken().catch(() => null);
+  if (!userToken) {
+    // Directory not configured — return null gracefully so callers can fall back
+    res.json({ email, displayName: null });
+    return;
+  }
+
+  try {
+    const url = `https://admin.googleapis.com/admin/directory/v1/users/${encodeURIComponent(email)}?projection=basic`;
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${userToken}` } });
+    if (!r.ok) {
+      res.json({ email, displayName: null });
+      return;
+    }
+    const data = await r.json() as {
+      name?: { fullName?: string; givenName?: string; familyName?: string };
+    };
+    const displayName =
+      data.name?.fullName?.trim() ||
+      `${data.name?.givenName ?? ''} ${data.name?.familyName ?? ''}`.trim() ||
+      null;
+    res.json({ email, displayName: displayName || null });
+  } catch {
+    res.json({ email, displayName: null });
+  }
+});
+
 export default router;
