@@ -953,6 +953,100 @@ async function getKavFieldSet(client: ConnectorSalesforceClient, log: { warn: (m
   }
 }
 
+// ── KAV body-field discovery ───────────────────────────────────────────────────
+// The article body lives on a separate __kav object (e.g. Knowledge__kav,
+// How_To__kav). We discover the right object + field once per server lifetime
+// via EntityDefinition, then describe that object to find rich-text/textarea
+// fields that are likely the body. Falls back to a null body if nothing found.
+
+interface KavBodyInfo {
+  objectName: string;
+  fieldName:  string;
+}
+
+// undefined = not yet fetched; null = fetched, nothing found; KavBodyInfo = found
+let kavBodyInfoCache: KavBodyInfo | null | undefined = undefined;
+let kavBodyInfoInflight: Promise<KavBodyInfo | null> | null = null;
+
+async function getKavBodyInfo(
+  client: ConnectorSalesforceClient,
+  log: { warn: (msg: string) => void; info: (msg: string) => void }
+): Promise<KavBodyInfo | null> {
+  if (kavBodyInfoCache !== undefined) return kavBodyInfoCache;
+  if (kavBodyInfoInflight) return kavBodyInfoInflight;
+
+  kavBodyInfoInflight = (async (): Promise<KavBodyInfo | null> => {
+    try {
+      // 1. Find all __kav objects in this org via EntityDefinition
+      const entityResult = await client.query<{ QualifiedApiName: string }>(
+        `SELECT QualifiedApiName FROM EntityDefinition
+         WHERE QualifiedApiName LIKE '%__kav'
+         LIMIT 10`
+      );
+      const kavObjects = entityResult.records.map(r => r.QualifiedApiName);
+      log.info(`KAV body discovery: found __kav objects: ${kavObjects.join(", ") || "(none)"}`);
+
+      if (!kavObjects.length) {
+        kavBodyInfoCache = null;
+        return null;
+      }
+
+      // 2. Describe each __kav object, look for rich-text / body-like fields
+      const BODY_FIELD_CANDIDATES = [
+        "Body__c", "Content__c", "Details__c", "Answer__c", "Question__c",
+        "Description__c", "Text__c", "ArticleBody", "ArticleBody__c",
+      ];
+
+      for (const objName of kavObjects) {
+        try {
+          const desc = await client.rest<{ fields: { name: string; type: string }[] }>(
+            `/services/data/v62.0/sobjects/${objName}/describe`
+          );
+          const fieldNames = new Set(desc.fields.map(f => f.name));
+
+          // Prefer explicit candidates first
+          for (const candidate of BODY_FIELD_CANDIDATES) {
+            if (fieldNames.has(candidate)) {
+              const info = { objectName: objName, fieldName: candidate };
+              log.info(`KAV body discovery: using ${objName}.${candidate}`);
+              kavBodyInfoCache = info;
+              return info;
+            }
+          }
+
+          // Fall back: any richTextarea or textarea field not in the exclusion list
+          const EXCLUDE = new Set(["Summary__c", "Title", "UrlName", "PublishStatus"]);
+          const richField = desc.fields.find(
+            f => (f.type === "richTextarea" || f.type === "textarea") && !EXCLUDE.has(f.name)
+          );
+          if (richField) {
+            const info = { objectName: objName, fieldName: richField.name };
+            log.info(`KAV body discovery: fallback rich-text field ${objName}.${richField.name}`);
+            kavBodyInfoCache = info;
+            return info;
+          }
+        } catch (descErr) {
+          log.warn(`KAV body discovery: could not describe ${objName}: ${String(descErr)}`);
+        }
+      }
+
+      log.warn("KAV body discovery: no body field found in any __kav object");
+      kavBodyInfoCache = null;
+      return null;
+    } catch (err) {
+      log.warn(`KAV body discovery failed: ${String(err)}`);
+      kavBodyInfoCache = null;
+      return null;
+    }
+  })();
+
+  try {
+    return await kavBodyInfoInflight;
+  } finally {
+    kavBodyInfoInflight = null;
+  }
+}
+
 // GET /api/knowledge/sf-articles
 // Lists Salesforce Knowledge articles. Optional query params:
 //   status  — 'online' (default) | 'draft' | 'all'
@@ -1065,21 +1159,24 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
     }
     const meta = metaResult.records[0]!;
 
-    // Attempt to fetch body from the article-type object (Knowledge__kav).
-    // Body field name varies by org — try Body__c, then fall back gracefully.
+    // Fetch body from the article-type __kav object using discovered object/field names.
     let body: string | null = null;
-    try {
-      const articleType = meta.ArticleType ?? "Knowledge__kav";
-      const kavObject = articleType.endsWith("__kav") ? articleType : articleType.replace(/__c$/, "__kav");
-      const bodySoql = `SELECT Id, Body__c
-                        FROM ${kavObject}
-                        WHERE KnowledgeArticleId = '${meta.KnowledgeArticleId}'
-                        AND PublishStatus = '${meta.PublishStatus}'
-                        LIMIT 1`;
-      const bodyResult = await client.query<{ Id: string; Body__c?: string }>(bodySoql);
-      body = bodyResult.records[0]?.Body__c ?? null;
-    } catch {
-      // Body fetch is best-effort — the article type or field may not exist.
+    const bodyInfo = await getKavBodyInfo(client, {
+      warn: (m) => req.log.warn(m),
+      info: (m) => req.log.info(m),
+    });
+    if (bodyInfo) {
+      try {
+        const bodySoql = `SELECT Id, ${bodyInfo.fieldName}
+                          FROM ${bodyInfo.objectName}
+                          WHERE KnowledgeArticleId = '${meta.KnowledgeArticleId}'
+                          AND PublishStatus = '${meta.PublishStatus}'
+                          LIMIT 1`;
+        const bodyResult = await client.query<{ Id: string; [k: string]: string | undefined }>(bodySoql);
+        body = bodyResult.records[0]?.[bodyInfo.fieldName] ?? null;
+      } catch (bodyErr) {
+        req.log.warn(`Body fetch failed for ${bodyInfo.objectName}.${bodyInfo.fieldName}: ${String(bodyErr)}`);
+      }
     }
 
     const article: SfArticleDetail = {
