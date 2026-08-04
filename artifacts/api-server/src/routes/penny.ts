@@ -454,6 +454,17 @@ const PF_OBJECT_TIMEOUT_MS = (() => {
 })();
 
 /**
+ * Maximum number of SF describe calls issued concurrently during a preflight
+ * batch.  Configurable via PF_CONCURRENCY env var; defaults to 5.
+ * Running describes in parallel collapses N × PF_OBJECT_TIMEOUT_MS serial waits
+ * into approximately one timeout window regardless of object count.
+ */
+const PF_CONCURRENCY = (() => {
+  const v = parseInt(process.env['PF_CONCURRENCY'] ?? '', 10);
+  return isNaN(v) || v <= 0 ? 5 : v;
+})();
+
+/**
  * Wraps pfSfGet with:
  *  1. A hard per-object timeout (PF_OBJECT_TIMEOUT_MS).  If the describe
  *     call stalls, the timeout resolves first and the object is classified
@@ -565,16 +576,22 @@ router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> 
   const describeCache      = new Map<string, Record<string, unknown> | null>();
   const describeErrorCache = new Map<string, string>();
   if (proxyFetch) {
-    for (const objName of uniqueSfObjects) {
-      try {
-        const describe = await pfSfGetRetry(proxyFetch, `/sobjects/${objName}/describe`);
-        describeCache.set(objName, describe);
-      } catch (e) {
-        const errMsg = e instanceof Error ? e.message : String(e);
-        describeCache.set(objName, null);
-        describeErrorCache.set(objName, errMsg);
-        logger.warn({ sfObject: objName, err: errMsg }, 'preflight: SF describe failed');
-      }
+    // Issue describes in parallel, PF_CONCURRENCY at a time, so that N × timeout
+    // collapses to roughly one timeout window even when every object stalls.
+    const describeFetch = proxyFetch; // capture for closure — already non-null here
+    for (let i = 0; i < uniqueSfObjects.length; i += PF_CONCURRENCY) {
+      const batch = uniqueSfObjects.slice(i, i + PF_CONCURRENCY);
+      await Promise.all(batch.map(async (objName) => {
+        try {
+          const describe = await pfSfGetRetry(describeFetch, `/sobjects/${objName}/describe`);
+          describeCache.set(objName, describe);
+        } catch (e) {
+          const errMsg = e instanceof Error ? e.message : String(e);
+          describeCache.set(objName, null);
+          describeErrorCache.set(objName, errMsg);
+          logger.warn({ sfObject: objName, err: errMsg }, 'preflight: SF describe failed');
+        }
+      }));
     }
   }
 
