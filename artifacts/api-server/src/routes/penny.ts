@@ -499,6 +499,15 @@ const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
     { id: 'sf-training-plan-item', label: 'Learner_Course_Module__c accessible', kind: 'sf-object', sfObject: 'Learner_Course_Module__c', pennyMissingNote: 'I check module progress from Learner_Course_Module__c to send pacing alerts before it\'s too late.' },
     { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I need the engagement record to see where each learner is in their sprint.' },
   ],
+  'cap-cohort-summaries': [
+    { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Cohort Summaries aggregates data that comes through Learner Coaching. Set that up first.' },
+    { id: 'sf-service-schedule', label: 'pmdm__ServiceSchedule__c object accessible', kind: 'sf-object', sfObject: 'pmdm__ServiceSchedule__c', pennyMissingNote: 'Program schedule data lives in pmdm__ServiceSchedule__c — I need it to generate cohort briefs.' },
+    { id: 'slack-connected', label: 'Slack integration connected', kind: 'integration', integrationKey: 'slack', fixRoute: '/admin/integrations', fixLabel: 'Connect Slack', pennyMissingNote: 'I deliver cohort summaries to the coach channel every Monday. Slack is required.' },
+  ],
+  'cap-progress-insights': [
+    { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Progress Insights builds on Learner Coaching context. Enable that first.' },
+    { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I track what each learner has completed by reading their Program_Engagement__c record.' },
+  ],
 };
 
 const DEFAULT_BACKEND_REQUIREMENTS: BReq[] = [
