@@ -679,6 +679,75 @@ describe('GET /api/salesforce/validate — picklist field checks when describe f
   });
 });
 
+// ── Picklist describe cache: failures are not cached ─────────────────────────
+//
+// getPicklistValues intentionally skips caching when the describe call fails,
+// so the next request retries the live endpoint rather than serving the error.
+//
+// Invariant: a failed describe on request 1 must NOT be served as a cached
+// result on request 2; request 2 must trigger a live describe call.
+
+describe('GET /api/salesforce/operations/summary — picklist cache skips stale failure', () => {
+  beforeEach(() => {
+    mockProxyMode.value = 'normal';
+    // Clear picklist entries and the ops-summary result so both requests
+    // start from a cold cache and exercise the describe path.
+    for (const key of opsCache.keys()) {
+      if (key.includes(':picklist:') || key.includes(':ops-summary')) {
+        opsCache.delete(key);
+      }
+    }
+  });
+  afterEach(() => { mockProxyMode.value = 'normal'; });
+
+  test('request 2 retries the describe and does not serve the failure from request 1', async () => {
+    // ── Request 1: describe fails ──────────────────────────────────────────────
+    mockProxyMode.value = 'describeError';
+
+    const res1 = await request(app).get('/api/salesforce/operations/summary');
+    expect(res1.status).toBe(200);
+
+    const prog1 = res1.body.programs as {
+      active:            { value: number | null; error: string | null };
+      statusValuesFound: string[];
+    };
+
+    // The describe error must be surfaced on the filtered counts.
+    expect(prog1.active.value).toBeNull();
+    expect(prog1.active.error).toMatch(/picklist describe failed/i);
+    // No picklist values were returned because the describe failed.
+    expect(prog1.statusValuesFound).toEqual([]);
+
+    // ── Evict the ops-summary cache so request 2 re-enters the handler ────────
+    // (The picklist cache has no entry to evict — failures are not stored.)
+    for (const key of opsCache.keys()) {
+      if (key.includes(':ops-summary')) {
+        opsCache.delete(key);
+      }
+    }
+
+    // ── Request 2: describe succeeds ───────────────────────────────────────────
+    mockProxyMode.value = 'normal';
+
+    const res2 = await request(app).get('/api/salesforce/operations/summary');
+    expect(res2.status).toBe(200);
+
+    const prog2 = res2.body.programs as {
+      active:            { value: number | null; error: string | null };
+      statusValuesFound: string[];
+    };
+
+    // The error from request 1 must NOT appear on request 2 — the describe was
+    // retried rather than served from a cached failure.
+    expect(prog2.active.error).not.toMatch(/picklist describe failed/i);
+
+    // The second describe succeeded (mock returns 200), so a fresh cache entry
+    // was written.  Confirm the picklist cache now holds an entry for this object.
+    const picklistKeys = Array.from(opsCache.keys()).filter(k => k.includes(':picklist:'));
+    expect(picklistKeys.length).toBeGreaterThan(0);
+  });
+});
+
 // ── Penny + Governance field-check coverage ───────────────────────────────────
 //
 // Confirms that every Penny object and every Build Governance object defined in
