@@ -842,11 +842,67 @@ interface SfArticleDetail extends SfArticle {
   urlName: string | null;
 }
 
+// ── Data-category helpers ──────────────────────────────────────────────────────
+
+interface SfDataCategory {
+  name: string;
+  label: string;
+  childCategories?: SfDataCategory[];
+}
+
+interface SfDataCategoryGroup {
+  name: string;
+  label: string;
+  topCategories: SfDataCategory[];
+}
+
+interface SfDataCategoryGroupsResponse {
+  categoryGroups: SfDataCategoryGroup[];
+}
+
+/** Flatten a nested category tree into a depth-annotated list. */
+function flattenCategories(
+  cats: SfDataCategory[],
+  depth = 0
+): { name: string; label: string; depth: number }[] {
+  const out: { name: string; label: string; depth: number }[] = [];
+  for (const cat of cats) {
+    out.push({ name: cat.name, label: cat.label, depth });
+    if (cat.childCategories?.length) {
+      out.push(...flattenCategories(cat.childCategories, depth + 1));
+    }
+  }
+  return out;
+}
+
+// GET /api/knowledge/sf-article-categories
+// Returns all data category groups and their categories for Knowledge articles.
+// Returns { groups: [] } gracefully if categories are not configured in this org.
+router.get("/knowledge/sf-article-categories", async (req, res): Promise<void> => {
+  try {
+    const client = new ConnectorSalesforceClient();
+    const data = await client.rest<SfDataCategoryGroupsResponse>(
+      `/services/data/v62.0/support/dataCategoryGroups?sObjectType=KnowledgeArticle`
+    );
+    const groups = (data.categoryGroups ?? []).map(g => ({
+      name:       g.name,
+      label:      g.label,
+      categories: flattenCategories(g.topCategories ?? []),
+    }));
+    res.json({ groups });
+  } catch (err) {
+    req.log.warn(err, "Failed to fetch SF data category groups — returning empty");
+    res.json({ groups: [] });
+  }
+});
+
 // GET /api/knowledge/sf-articles
 // Lists Salesforce Knowledge articles. Optional query params:
 //   status  — 'online' (default) | 'draft' | 'all'
 //   type    — article type filter (e.g. 'FAQ')
 //   q       — title/summary search substring
+//   cat     — data category filter as 'GroupApiName:CategoryApiName'
+//             e.g. 'Topics:Products' → WITH DATA CATEGORY Topics BELOW Products
 router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
   try {
     const client = new ConnectorSalesforceClient();
@@ -854,6 +910,7 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
     const statusParam = typeof req.query["status"] === "string" ? req.query["status"] : "online";
     const typeParam   = typeof req.query["type"]   === "string" ? req.query["type"]   : "";
     const qParam      = typeof req.query["q"]      === "string" ? req.query["q"]      : "";
+    const catParam    = typeof req.query["cat"]    === "string" ? req.query["cat"]    : "";
 
     const whereClauses: string[] = [];
     if (statusParam === "all") {
@@ -866,11 +923,25 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
 
     const where = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
+    // WITH DATA CATEGORY clause must come between WHERE and ORDER BY.
+    // Format: WITH DATA CATEGORY GroupName BELOW CategoryName
+    // BELOW matches the selected category and all of its descendants.
+    let withDataCategory = "";
+    if (catParam && catParam.includes(":")) {
+      const colonIdx   = catParam.indexOf(":");
+      const groupName  = catParam.slice(0, colonIdx).replace(/[^a-zA-Z0-9_]/g, "");
+      const catName    = catParam.slice(colonIdx + 1).replace(/[^a-zA-Z0-9_]/g, "");
+      if (groupName && catName) {
+        withDataCategory = `WITH DATA CATEGORY ${groupName} BELOW ${catName}`;
+      }
+    }
+
     const soql = `SELECT Id, KnowledgeArticleId, Title, Summary, ArticleType,
                          PublishStatus, VersionNumber, CreatedDate, LastModifiedDate,
                          IsVisibleInApp, Language
                   FROM KnowledgeArticleVersion
                   ${where}
+                  ${withDataCategory}
                   ORDER BY LastModifiedDate DESC
                   LIMIT 200`;
 

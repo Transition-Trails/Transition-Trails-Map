@@ -53,6 +53,11 @@ export class ConnectorSalesforceClient implements ISalesforceClient {
     return resp.json() as Promise<T>;
   }
 
+  /** Make an arbitrary REST GET against the Salesforce API (path includes /services/…). */
+  rest<T>(path: string): Promise<T> {
+    return this.request<T>("GET", path);
+  }
+
   query<T>(soql: string): Promise<SoqlQueryResult<T>> {
     const encoded = encodeURIComponent(soql);
     return this.request<SoqlQueryResult<T>>(
