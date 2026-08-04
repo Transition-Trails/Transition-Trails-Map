@@ -24,6 +24,7 @@ import {
   getWeeklyReports,
   createWeeklyReport,
   getTrailQuestDeliveries,
+  createTrailQuestDelivery,
 } from "../lib/salesforceService.js";
 import type { LearnerContextUpdate } from "../types/salesforce.js";
 import { SF_INTERACTION_SOURCES } from "../lib/salesforceService.js";
@@ -426,6 +427,59 @@ router.get(
     const data = await getTrailQuestDeliveries(client);
     res.set('Cache-Control', 'no-store');
     res.json(data);
+  })
+);
+
+// ── POST /trail-quest-deliveries ──────────────────────────────────────────────
+
+router.post(
+  "/trail-quest-deliveries",
+  withClient(async (req, res, client) => {
+    const body = req.body as {
+      contactId?:     unknown;
+      questId?:       unknown;
+      assignedDate?:  unknown;
+      totalCriteria?: unknown;
+    };
+
+    if (typeof body.contactId !== "string" || !body.contactId.trim()) {
+      res.status(400).json({ error: "contactId is required" });
+      return;
+    }
+    if (typeof body.questId !== "string" || !body.questId.trim()) {
+      res.status(400).json({ error: "questId is required" });
+      return;
+    }
+    if (typeof body.assignedDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(body.assignedDate)) {
+      res.status(400).json({ error: "assignedDate must be a YYYY-MM-DD string" });
+      return;
+    }
+    const totalCriteria =
+      typeof body.totalCriteria === "number"
+        ? Math.max(0, Math.floor(body.totalCriteria))
+        : 0;
+
+    recordSfWriteAttempt();
+    let result: Awaited<ReturnType<typeof createTrailQuestDelivery>>;
+    try {
+      result = await createTrailQuestDelivery(client, {
+        contactId:    body.contactId.trim(),
+        questId:      body.questId.trim(),
+        assignedDate: body.assignedDate,
+        totalCriteria,
+      });
+      recordSfWriteSuccess();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      recordSfWriteFailure("TrailQuest__c", msg);
+      // Duplicate-assignment errors are user-facing 409s, not 500s
+      if (/already has an active assignment/i.test(msg)) {
+        res.status(409).json({ error: msg });
+        return;
+      }
+      throw err;
+    }
+    res.status(201).json(result);
   })
 );
 

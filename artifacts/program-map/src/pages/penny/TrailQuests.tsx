@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { curriculumTrailQuests, CONTENT_STATUS_CONFIG } from '@/data/curriculumData';
 import { useAppContext } from '@/context/AppContext';
 import {
   Star, CheckCircle2, Clock, Users, Slack, Brain,
   ChevronRight, Send, Trophy, Zap, BookOpen, AlertCircle,
+  UserPlus, X, Loader2,
 } from 'lucide-react';
 
 // ── Learner delivery data (fetched from Salesforce TrailQuest__c) ─────────────
@@ -54,6 +55,206 @@ function SkeletonRow() {
   );
 }
 
+// ── Learner directory entry (from /api/penny/data/learners/directory) ─────────
+
+interface LearnerDirectoryEntry {
+  id:        string;
+  firstName: string;
+  lastName:  string;
+  email:     string;
+}
+
+// ── Assign modal ──────────────────────────────────────────────────────────────
+
+interface AssignModalProps {
+  onClose:    () => void;
+  onAssigned: () => void;
+  existingDeliveries: LearnerDelivery[];
+}
+
+function AssignModal({ onClose, onAssigned, existingDeliveries }: AssignModalProps) {
+  const [learners,       setLearners]       = useState<LearnerDirectoryEntry[]>([]);
+  const [loadingLearners,setLoadingLearners] = useState(true);
+  const [learnerError,   setLearnerError]   = useState<string | null>(null);
+
+  const [selectedContact, setSelectedContact] = useState('');
+  const [selectedQuestId, setSelectedQuestId] = useState('');
+
+  const [submitting,   setSubmitting]   = useState(false);
+  const [submitError,  setSubmitError]  = useState<string | null>(null);
+
+  // Fetch learner directory on mount
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch(`${import.meta.env.BASE_URL}api/penny/data/learners/directory`);
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({})) as { error?: string };
+          throw new Error(body.error ?? `HTTP ${res.status}`);
+        }
+        const data = await res.json() as LearnerDirectoryEntry[];
+        if (!cancelled) setLearners(data);
+      } catch (err) {
+        if (!cancelled) setLearnerError(err instanceof Error ? err.message : 'Failed to load learners');
+      } finally {
+        if (!cancelled) setLoadingLearners(false);
+      }
+    }
+    void load();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Duplicate check (client-side fast path — server also validates)
+  const alreadyActive = selectedContact && selectedQuestId
+    ? existingDeliveries.some(
+        d => d.questId === selectedQuestId &&
+             // Match by contact id is not available directly; server will catch it
+             // We can only check quest+name match — the server is the authoritative guard
+             false
+      )
+    : false;
+
+  const selectedQuest = curriculumTrailQuests.find(q => q.id === selectedQuestId);
+
+  async function handleAssign() {
+    if (!selectedContact || !selectedQuestId) return;
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const res = await fetch(`${import.meta.env.BASE_URL}api/penny/data/trail-quest-deliveries`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contactId:    selectedContact,
+          questId:      selectedQuestId,
+          assignedDate: today,
+          totalCriteria: (selectedQuest?.criteria as string[] | undefined)?.length ?? 0,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(body.error ?? `HTTP ${res.status}`);
+      }
+      onAssigned();
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Assignment failed');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Scrim */}
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+
+      <div className="relative z-10 w-full max-w-md rounded-xl border border-border bg-card shadow-xl p-6 space-y-5">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#E6F0EA] flex items-center justify-center">
+              <UserPlus className="w-4 h-4 text-[#2F6B3F]" />
+            </div>
+            <h2 className="text-[14px] font-semibold text-foreground">Assign Trail Quest</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-md p-1 hover:bg-muted transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </div>
+
+        {/* Learner picker */}
+        <div className="space-y-1.5">
+          <label className="text-[14px] font-medium text-foreground">Learner</label>
+          {loadingLearners ? (
+            <div className="flex items-center gap-2 text-[14px] text-muted-foreground py-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading learners…
+            </div>
+          ) : learnerError ? (
+            <p className="text-[14px] text-red-600">{learnerError}</p>
+          ) : (
+            <select
+              value={selectedContact}
+              onChange={e => setSelectedContact(e.target.value)}
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-[14px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+            >
+              <option value="">Select a learner…</option>
+              {learners.map(l => (
+                <option key={l.id} value={l.id}>
+                  {l.firstName} {l.lastName}{l.email ? ` (${l.email})` : ''}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* Quest picker */}
+        <div className="space-y-1.5">
+          <label className="text-[14px] font-medium text-foreground">Trail Quest</label>
+          <select
+            value={selectedQuestId}
+            onChange={e => setSelectedQuestId(e.target.value)}
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-[14px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          >
+            <option value="">Select a quest…</option>
+            {curriculumTrailQuests.map(q => (
+              <option key={q.id as string} value={q.id as string}>
+                {q.name as string} · {q.questType as string}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Quest summary */}
+        {selectedQuest && (
+          <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1">
+            <p className="text-[14px] font-medium text-foreground">{selectedQuest.name as string}</p>
+            <p className="text-[14px] text-muted-foreground leading-snug">{selectedQuest.purpose as string}</p>
+            <p className="text-[14px] text-muted-foreground">
+              <span className="font-medium">{(selectedQuest.criteria as string[])?.length ?? 0}</span> completion criteria
+              · <span className="font-medium">{selectedQuest.difficulty as string}</span>
+              · <span className="font-medium">{selectedQuest.estimatedTime as string}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Error */}
+        {submitError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+            <p className="text-[14px] text-red-700">{submitError}</p>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-2 pt-1">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-[14px] text-muted-foreground rounded-md border border-border hover:bg-muted transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => void handleAssign()}
+            disabled={!selectedContact || !selectedQuestId || submitting || alreadyActive}
+            className="flex items-center gap-1.5 px-4 py-2 text-[14px] font-medium text-white bg-[#2F6B3F] rounded-md hover:bg-[#265C35] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {submitting
+              ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Assigning…</>
+              : <><UserPlus className="w-3.5 h-3.5" /> Assign Quest</>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function TrailQuests() {
@@ -66,6 +267,12 @@ export default function TrailQuests() {
   const [loading,       setLoading]       = useState(true);
   const [error,         setError]         = useState<string | null>(null);
   const [objectMissing, setObjectMissing] = useState(false);
+
+  // Assign modal
+  const [assignOpen, setAssignOpen] = useState(false);
+
+  // Stable fetch ref so we can call refresh after assignment
+  const fetchDeliveriesRef = useRef<(() => Promise<void>) | undefined>(undefined);
 
   useEffect(() => {
     let cancelled = false;
@@ -91,9 +298,14 @@ export default function TrailQuests() {
         if (!cancelled) setLoading(false);
       }
     }
+    fetchDeliveriesRef.current = fetchDeliveries;
     void fetchDeliveries();
     return () => { cancelled = true; };
   }, []);
+
+  function refreshDeliveries() {
+    void fetchDeliveriesRef.current?.();
+  }
 
   const active    = deliveries.filter(d => d.status === 'In Progress');
   const completed = deliveries.filter(d => d.status === 'Completed');
@@ -124,6 +336,14 @@ export default function TrailQuests() {
   }
 
   return (
+    <>
+    {assignOpen && (
+      <AssignModal
+        onClose={() => setAssignOpen(false)}
+        onAssigned={() => { setAssignOpen(false); refreshDeliveries(); }}
+        existingDeliveries={deliveries}
+      />
+    )}
     <ScrollArea className="h-full">
       <div className="p-6 space-y-6 max-w-5xl">
 
@@ -144,9 +364,18 @@ export default function TrailQuests() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
-              <span className="font-semibold">POC Confirmed</span>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setAssignOpen(true)}
+                className="flex items-center gap-1.5 text-[14px] font-medium text-white bg-[#2F6B3F] border border-[#2F6B3F] rounded-full px-3 py-1.5 hover:bg-[#265C35] transition-colors"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                Assign Quest
+              </button>
+              <div className="flex items-center gap-1 text-[14px] text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
+                <span className="font-semibold">POC Confirmed</span>
+              </div>
             </div>
           </div>
         </div>
@@ -404,5 +633,6 @@ export default function TrailQuests() {
 
       </div>
     </ScrollArea>
+    </>
   );
 }

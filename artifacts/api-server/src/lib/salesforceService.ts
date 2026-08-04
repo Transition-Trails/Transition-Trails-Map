@@ -717,3 +717,57 @@ export async function getTrailQuestDeliveries(
 
   return { deliveries, objectMissing: false };
 }
+
+// ── Create Trail Quest Delivery ───────────────────────────────────────────────
+
+export interface CreateTrailQuestDeliveryPayload {
+  contactId:      string;
+  questId:        string;
+  assignedDate:   string; // YYYY-MM-DD
+  totalCriteria:  number;
+}
+
+export async function createTrailQuestDelivery(
+  client: ISalesforceClient,
+  payload: CreateTrailQuestDeliveryPayload
+): Promise<{ id: string }> {
+  // Duplicate guard: reject if an active/pending record already exists for
+  // this learner + quest combination.
+  const checkSoql = [
+    "SELECT Id FROM TrailQuest__c",
+    `WHERE Contact__c = '${payload.contactId}'`,
+    `AND Quest_ID__c = '${payload.questId}'`,
+    "AND Status__c IN ('In Progress', 'Pending Acceptance')",
+    "LIMIT 1",
+  ].join(" ");
+
+  let existing: { records: { Id: string }[] };
+  try {
+    existing = await client.query<{ Id: string }>(checkSoql);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/INVALID_TYPE|sObject|not supported|does not support/i.test(msg)) {
+      // Object not provisioned — let the create attempt surface the real error
+      existing = { records: [] };
+    } else {
+      throw err;
+    }
+  }
+
+  if (existing.records.length > 0) {
+    throw new Error(
+      "This learner already has an active assignment for that quest. " +
+      "Resolve the existing record before assigning again."
+    );
+  }
+
+  const result = await client.createRecord("TrailQuest__c", {
+    Contact__c:            payload.contactId,
+    Quest_ID__c:           payload.questId,
+    Status__c:             "In Progress",
+    Assigned_Date__c:      payload.assignedDate,
+    Completed_Criteria__c: 0,
+    Total_Criteria__c:     payload.totalCriteria,
+  });
+  return { id: result.id };
+}
