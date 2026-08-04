@@ -6,8 +6,7 @@
  * so it works without a logged-in session.
  */
 import { ReplitConnectors } from "@replit/connectors-sdk";
-
-const SF_API_VERSION = "v62.0";
+import { SF_API_VERSION } from "../lib/sfConstants.js";
 
 const CURRICULUM_OBJECTS = [
   { api: "Course__c",                         label: "Course" },

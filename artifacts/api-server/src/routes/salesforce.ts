@@ -1,14 +1,15 @@
 import { Router } from "express";
 import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
 import { SfPersistentCache } from "../lib/sfFileCache.js";
+import { SF_API_VERSION } from "../lib/sfConstants.js";
 
 const router = Router();
 
 // ── Configuration ──────────────────────────────────────────────────────────────
-// Change SF_API_VERSION here when upgrading the Salesforce REST API target.
+// To upgrade the Salesforce REST API target, update SF_API_VERSION in
+// src/lib/sfConstants.ts — the route file and probe scripts share that constant.
 // Change SF_CONNECTOR_ID here when pointing the app at a different org
 // (staging, sandbox, secondary production org, etc.) — no other code edit needed.
-const SF_API_VERSION     = "v62.0";
 const SF_CONNECTOR_ID    = "conn_salesforce_01KTVV2KV10ESH5DJE3871WY1E"; // eslint-disable-line @typescript-eslint/no-unused-vars
 const OPS_CACHE_TTL      = 5 * 60 * 1000;          // 5 min — ops counts
 const PICKLIST_CACHE_TTL = 60 * 60 * 1000;         // 1 hr  — picklist describes
