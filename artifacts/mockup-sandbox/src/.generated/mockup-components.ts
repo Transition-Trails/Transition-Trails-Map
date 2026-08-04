@@ -16,12 +16,12 @@ export const modules: ModuleMap = {
   "./components/mockups/penny-assets-v1/StatePicker.tsx": () => import("../components/mockups/penny-assets-v1/StatePicker.tsx"),
   "./components/mockups/penny-assets-v2/TwoPanel.tsx": () => import("../components/mockups/penny-assets-v2/TwoPanel.tsx"),
   "./components/mockups/penny-config-a/GuidedMissionTrail.tsx": () => import("../components/mockups/penny-config-a/GuidedMissionTrail.tsx"),
+  "./components/mockups/penny-config-b/InlineCopilotWorkshop.tsx": () => import("../components/mockups/penny-config-b/InlineCopilotWorkshop.tsx"),
+  "./components/mockups/penny-config-b/SetupProcessWorkshop.tsx": () => import("../components/mockups/penny-config-b/SetupProcessWorkshop.tsx"),
   "./components/mockups/penny-config-c/ProgressiveSkillTree.tsx": () => import("../components/mockups/penny-config-c/ProgressiveSkillTree.tsx"),
   "./components/mockups/people-access/OptionA.tsx": () => import("../components/mockups/people-access/OptionA.tsx"),
   "./components/mockups/people-access/OptionB.tsx": () => import("../components/mockups/people-access/OptionB.tsx"),
   "./components/mockups/people-access/OptionC.tsx": () => import("../components/mockups/people-access/OptionC.tsx"),
   "./components/mockups/prompt-studio/GuidedWizard.tsx": () => import("../components/mockups/prompt-studio/GuidedWizard.tsx"),
-  "./components/mockups/prompt-studio/PowerStudio.tsx": () => import("../components/mockups/prompt-studio/PowerStudio.tsx"),
-  "./components/mockups/penny-config-b/InlineCopilotWorkshop.tsx": () => import("../components/mockups/penny-config-b/InlineCopilotWorkshop.tsx"),
-  "./components/mockups/penny-config-b/SetupProcessWorkshop.tsx": () => import("../components/mockups/penny-config-b/SetupProcessWorkshop.tsx")
+  "./components/mockups/prompt-studio/PowerStudio.tsx": () => import("../components/mockups/prompt-studio/PowerStudio.tsx")
 };
