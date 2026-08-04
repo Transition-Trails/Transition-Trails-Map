@@ -1,26 +1,28 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
 import {
-  contentStandards, gapReportItems,
+  contentStandards as SEED_STANDARDS,
+  gapReportItems,
   STANDARDS_SUMMARY, GAP_SUMMARY,
   STANDARD_STATUS_CONFIG, STANDARD_CONFIDENCE_CONFIG,
   STANDARD_CATEGORY_CONFIG, GAP_TYPE_CONFIG,
   type ContentStandard, type StandardCategory, type GapType,
+  type StandardStatus, type StandardConfidence,
+  type StandardField, type QualityCheck,
 } from '@/data/standardsData';
 import {
   BookCheck, ShieldCheck, ClipboardList, AlertTriangle,
   ChevronDown, ChevronRight, CheckCircle2, XCircle,
   Layers, BookOpen, Brain, Zap, Search, Filter, Plus, Sparkles,
+  Pencil, X, Trash2, GripVertical,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-type StudioView = 'overview' | 'standards' | 'checklist' | 'gap-report' | 'create';
+type StudioView = 'overview' | 'standards' | 'checklist' | 'gap-report';
 
 const CATEGORY_ICONS: Record<StandardCategory, typeof BookOpen> = {
   'Program Architecture': Layers,
@@ -33,38 +35,562 @@ const CATEGORY_ORDER: StandardCategory[] = [
   'Program Architecture', 'Learning Content', 'Penny Assets', 'Delivery Assets',
 ];
 
-// ── Subcomponents ──────────────────────────────────────────────────────────
+const CATEGORIES: StandardCategory[] = [...CATEGORY_ORDER];
+const STATUSES: StandardStatus[]     = ['active', 'review', 'draft'];
+const CONFIDENCES: StandardConfidence[] = ['high', 'medium', 'low'];
 
-function ViewTab({
-  id, label, icon: Icon, active, count, onClick,
+function uid() {
+  return Math.random().toString(36).slice(2, 9);
+}
+
+function blankStandard(): ContentStandard {
+  return {
+    id: `std-${uid()}`,
+    name: '',
+    objectType: '',
+    category: 'Learning Content',
+    purpose: '',
+    whyItMatters: '',
+    howPennyUsesIt: '',
+    exampleOutput: '',
+    sfMapping: '',
+    lmsMapping: '',
+    relatedKnowledgeCategory: '',
+    relatedContentObjects: [],
+    owner: '',
+    reviewCycle: 'Quarterly',
+    status: 'draft',
+    confidence: 'medium',
+    requiredFields: [],
+    qualityCriteria: [],
+    pennyChecks: [],
+  };
+}
+
+// ── StandardEditDrawer ─────────────────────────────────────────────────────
+
+type DrawerTab = 'basic' | 'content' | 'fields' | 'checks' | 'mappings';
+
+function StandardEditDrawer({
+  standard,
+  onSave,
+  onClose,
 }: {
-  id: StudioView; label: string; icon: typeof BookCheck;
-  active: boolean; count?: number; onClick: () => void;
+  standard: ContentStandard | null; // null = create mode
+  onSave: (std: ContentStandard) => void;
+  onClose: () => void;
 }) {
+  const isCreate = standard === null;
+  const [draft, setDraft] = useState<ContentStandard>(() =>
+    standard ? { ...standard, requiredFields: standard.requiredFields.map(f => ({ ...f })), qualityCriteria: [...standard.qualityCriteria], pennyChecks: standard.pennyChecks.map(c => ({ ...c })), relatedContentObjects: [...standard.relatedContentObjects] } : blankStandard()
+  );
+  const [tab, setTab] = useState<DrawerTab>('basic');
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
+
+  function close() {
+    setVisible(false);
+    setTimeout(onClose, 250);
+  }
+
+  function handleSave() {
+    if (!draft.name.trim()) { setTab('basic'); return; }
+    onSave(draft);
+    close();
+  }
+
+  function set<K extends keyof ContentStandard>(key: K, val: ContentStandard[K]) {
+    setDraft(d => ({ ...d, [key]: val }));
+  }
+
+  // Required fields
+  function addField() {
+    setDraft(d => ({ ...d, requiredFields: [...d.requiredFields, { field: '', description: '', required: true }] }));
+  }
+  function updateField(i: number, patch: Partial<StandardField>) {
+    setDraft(d => { const arr = d.requiredFields.map((f, j) => j === i ? { ...f, ...patch } : f); return { ...d, requiredFields: arr }; });
+  }
+  function removeField(i: number) {
+    setDraft(d => ({ ...d, requiredFields: d.requiredFields.filter((_, j) => j !== i) }));
+  }
+
+  // Quality criteria
+  function addCriteria() {
+    setDraft(d => ({ ...d, qualityCriteria: [...d.qualityCriteria, ''] }));
+  }
+  function updateCriteria(i: number, val: string) {
+    setDraft(d => { const arr = [...d.qualityCriteria]; arr[i] = val; return { ...d, qualityCriteria: arr }; });
+  }
+  function removeCriteria(i: number) {
+    setDraft(d => ({ ...d, qualityCriteria: d.qualityCriteria.filter((_, j) => j !== i) }));
+  }
+
+  // Penny checks
+  function addCheck() {
+    setDraft(d => ({ ...d, pennyChecks: [...d.pennyChecks, { id: `chk-${uid()}`, check: '', passing: '', failing: '', required: true }] }));
+  }
+  function updateCheck(i: number, patch: Partial<QualityCheck>) {
+    setDraft(d => { const arr = d.pennyChecks.map((c, j) => j === i ? { ...c, ...patch } : c); return { ...d, pennyChecks: arr }; });
+  }
+  function removeCheck(i: number) {
+    setDraft(d => ({ ...d, pennyChecks: d.pennyChecks.filter((_, j) => j !== i) }));
+  }
+
+  // Related objects (comma-separated)
+  function relatedStr() { return draft.relatedContentObjects.join(', '); }
+  function setRelated(val: string) {
+    set('relatedContentObjects', val.split(',').map(s => s.trim()).filter(Boolean));
+  }
+
+  const TABS: { id: DrawerTab; label: string }[] = [
+    { id: 'basic',    label: 'Basic Info' },
+    { id: 'content',  label: 'Content' },
+    { id: 'fields',   label: `Fields (${draft.requiredFields.length})` },
+    { id: 'checks',   label: `Checks (${draft.pennyChecks.length})` },
+    { id: 'mappings', label: 'Mappings' },
+  ];
+
+  const nameEmpty = !draft.name.trim();
+
   return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-all border ${
-        active
-          ? 'bg-foreground text-background border-foreground'
-          : 'border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground'
-      }`}
-    >
-      <Icon className="w-3.5 h-3.5" />
-      {label}
-      {count !== undefined && (
-        <span className={`text-[14px] font-bold rounded-full px-1.5 py-0 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
-      )}
-    </button>
+    <>
+      {/* Scrim */}
+      <div
+        onClick={close}
+        className={`fixed inset-0 z-40 bg-black/30 transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
+      />
+
+      {/* Drawer */}
+      <div
+        className={`fixed inset-y-0 right-0 z-50 w-[580px] max-w-full bg-background border-l border-border shadow-2xl flex flex-col transition-transform duration-250 ease-out ${visible ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        {/* Header */}
+        <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide">
+              {isCreate ? 'New Content Standard' : 'Edit Standard'}
+            </p>
+            <button onClick={close} className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          {draft.name ? (
+            <h2 className="text-base font-semibold text-foreground truncate">{draft.name}</h2>
+          ) : (
+            <p className="text-base text-muted-foreground/40 italic">Untitled standard…</p>
+          )}
+
+          {/* Tabs */}
+          <div className="flex items-center gap-0 mt-3 border-b border-border -mb-3">
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`px-3 py-2 text-[13px] font-semibold border-b-2 transition-colors ${
+                  tab === t.id
+                    ? 'border-foreground text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Body */}
+        <ScrollArea className="flex-1">
+          <div className="p-5 space-y-4">
+
+            {/* ── BASIC TAB ── */}
+            {tab === 'basic' && (
+              <>
+                <Field label="Standard Name" required error={nameEmpty && 'Name is required'}>
+                  <input
+                    className="w-full h-8 rounded-md border border-input bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
+                    value={draft.name}
+                    onChange={e => set('name', e.target.value)}
+                    placeholder="e.g. Knowledge Article"
+                    autoFocus
+                  />
+                </Field>
+
+                <Field label="Object Type">
+                  <input
+                    className="w-full h-8 rounded-md border border-input bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
+                    value={draft.objectType}
+                    onChange={e => set('objectType', e.target.value)}
+                    placeholder="e.g. Knowledge Article"
+                  />
+                </Field>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Category">
+                    <select
+                      className="w-full h-8 rounded-md border border-input bg-background px-2 text-[13px]"
+                      value={draft.category}
+                      onChange={e => set('category', e.target.value as StandardCategory)}
+                    >
+                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </Field>
+
+                  <Field label="Status">
+                    <select
+                      className="w-full h-8 rounded-md border border-input bg-background px-2 text-[13px]"
+                      value={draft.status}
+                      onChange={e => set('status', e.target.value as StandardStatus)}
+                    >
+                      {STATUSES.map(s => <option key={s} value={s}>{STANDARD_STATUS_CONFIG[s].label}</option>)}
+                    </select>
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Confidence">
+                    <select
+                      className="w-full h-8 rounded-md border border-input bg-background px-2 text-[13px]"
+                      value={draft.confidence}
+                      onChange={e => set('confidence', e.target.value as StandardConfidence)}
+                    >
+                      {CONFIDENCES.map(c => <option key={c} value={c}>{STANDARD_CONFIDENCE_CONFIG[c].label}</option>)}
+                    </select>
+                  </Field>
+
+                  <Field label="Review Cycle">
+                    <input
+                      className="w-full h-8 rounded-md border border-input bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
+                      value={draft.reviewCycle}
+                      onChange={e => set('reviewCycle', e.target.value)}
+                      placeholder="e.g. Quarterly"
+                    />
+                  </Field>
+                </div>
+
+                <Field label="Owner">
+                  <input
+                    className="w-full h-8 rounded-md border border-input bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
+                    value={draft.owner}
+                    onChange={e => set('owner', e.target.value)}
+                    placeholder="e.g. Curriculum Lead"
+                  />
+                </Field>
+
+                {/* Status preview */}
+                <div className="rounded-lg border border-border bg-muted/20 p-3">
+                  <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-2">Preview</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className={`text-[12px] font-bold border rounded-full px-2 py-0.5 ${STANDARD_CATEGORY_CONFIG[draft.category].cls}`}>{draft.category}</span>
+                    <span className={`text-[12px] font-bold border rounded-full px-2 py-0.5 ${STANDARD_STATUS_CONFIG[draft.status].cls}`}>{STANDARD_STATUS_CONFIG[draft.status].label}</span>
+                    <span className={`text-[12px] font-bold border rounded-full px-2 py-0.5 ${STANDARD_CONFIDENCE_CONFIG[draft.confidence].cls}`}>{STANDARD_CONFIDENCE_CONFIG[draft.confidence].label}</span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── CONTENT TAB ── */}
+            {tab === 'content' && (
+              <>
+                <Field label="Purpose" hint="What does this standard define?">
+                  <textarea
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                    rows={4}
+                    value={draft.purpose}
+                    onChange={e => set('purpose', e.target.value)}
+                    placeholder="Provide a reference-grade explanation of…"
+                  />
+                </Field>
+
+                <Field label="Why It Matters" hint="What breaks without this standard?">
+                  <textarea
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                    rows={3}
+                    value={draft.whyItMatters}
+                    onChange={e => set('whyItMatters', e.target.value)}
+                    placeholder="Without this standard, Penny will…"
+                  />
+                </Field>
+
+                <Field label={`How ${TERMS.aiAssistant} Uses It`} hint="Penny reads this at generation time">
+                  <textarea
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                    rows={3}
+                    value={draft.howPennyUsesIt}
+                    onChange={e => set('howPennyUsesIt', e.target.value)}
+                    placeholder="Before generating content, Penny reads…"
+                  />
+                </Field>
+
+                <Field label="Example Output" hint="Concrete illustration of a passing object">
+                  <textarea
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                    rows={3}
+                    value={draft.exampleOutput}
+                    onChange={e => set('exampleOutput', e.target.value)}
+                    placeholder="A knowledge article that meets this standard looks like…"
+                  />
+                </Field>
+
+                {/* Quality criteria */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[12px] font-semibold text-foreground">Quality Criteria</label>
+                    <button onClick={addCriteria} className="flex items-center gap-1 text-[12px] font-semibold text-primary hover:text-primary/70 transition-colors">
+                      <Plus className="w-3 h-3" /> Add criterion
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {draft.qualityCriteria.length === 0 && (
+                      <p className="text-[12px] text-muted-foreground/50 italic">No quality criteria yet — add one above.</p>
+                    )}
+                    {draft.qualityCriteria.map((c, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
+                        <input
+                          className="flex-1 h-8 rounded-md border border-input bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
+                          value={c}
+                          onChange={e => updateCriteria(i, e.target.value)}
+                          placeholder="Quality criterion…"
+                        />
+                        <button onClick={() => removeCriteria(i)} className="text-muted-foreground/50 hover:text-destructive transition-colors p-1">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── FIELDS TAB ── */}
+            {tab === 'fields' && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-[13px] font-semibold text-foreground">Required Fields</p>
+                    <p className="text-[12px] text-muted-foreground">Fields that content objects matching this standard must have.</p>
+                  </div>
+                  <button onClick={addField} className="flex items-center gap-1 text-[12px] font-semibold text-primary hover:text-primary/70 transition-colors border border-primary/30 rounded-full px-2.5 py-1">
+                    <Plus className="w-3 h-3" /> Add field
+                  </button>
+                </div>
+
+                {draft.requiredFields.length === 0 && (
+                  <div className="text-center py-8 rounded-lg border border-dashed border-border">
+                    <p className="text-[13px] text-muted-foreground/50">No fields defined yet.</p>
+                    <button onClick={addField} className="mt-2 text-[12px] font-semibold text-primary">Add the first field</button>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  {draft.requiredFields.map((f, i) => (
+                    <div key={i} className="rounded-lg border border-border bg-muted/20 p-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 flex-1">
+                          <input
+                            className="flex-1 h-7 rounded-md border border-input bg-background px-2.5 text-[13px] font-semibold focus:outline-none focus:ring-1 focus:ring-ring"
+                            value={f.field}
+                            onChange={e => updateField(i, { field: e.target.value })}
+                            placeholder="Field name"
+                          />
+                        </div>
+                        <button
+                          onClick={() => updateField(i, { required: !f.required })}
+                          className={`flex-shrink-0 text-[11px] font-bold border rounded-full px-2 py-0.5 transition-colors ${
+                            f.required
+                              ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4] hover:bg-[#FBEAE6]/70'
+                              : 'text-slate-500 bg-slate-50 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          {f.required ? 'Required' : 'Optional'}
+                        </button>
+                        <button onClick={() => removeField(i)} className="text-muted-foreground/50 hover:text-destructive transition-colors p-1 shrink-0">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <textarea
+                        className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-[12px] text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                        rows={2}
+                        value={f.description}
+                        onChange={e => updateField(i, { description: e.target.value })}
+                        placeholder="Description of what this field should contain…"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── CHECKS TAB ── */}
+            {tab === 'checks' && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-[13px] font-semibold text-foreground">{TERMS.aiAssistant} Quality Checks</p>
+                    <p className="text-[12px] text-muted-foreground">Pass/fail criteria Penny runs against this content type.</p>
+                  </div>
+                  <button onClick={addCheck} className="flex items-center gap-1 text-[12px] font-semibold text-primary hover:text-primary/70 transition-colors border border-primary/30 rounded-full px-2.5 py-1">
+                    <Plus className="w-3 h-3" /> Add check
+                  </button>
+                </div>
+
+                {draft.pennyChecks.length === 0 && (
+                  <div className="text-center py-8 rounded-lg border border-dashed border-border">
+                    <p className="text-[13px] text-muted-foreground/50">No quality checks defined yet.</p>
+                    <button onClick={addCheck} className="mt-2 text-[12px] font-semibold text-primary">Add the first check</button>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  {draft.pennyChecks.map((chk, i) => (
+                    <div key={chk.id} className="rounded-lg border border-border bg-background p-3 space-y-2.5">
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="flex-1 h-7 rounded-md border border-input bg-background px-2.5 text-[13px] font-semibold focus:outline-none focus:ring-1 focus:ring-ring"
+                          value={chk.check}
+                          onChange={e => updateCheck(i, { check: e.target.value })}
+                          placeholder="Check description…"
+                        />
+                        <button
+                          onClick={() => updateCheck(i, { required: !chk.required })}
+                          className={`flex-shrink-0 text-[11px] font-bold border rounded-full px-2 py-0.5 transition-colors ${
+                            chk.required
+                              ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
+                              : 'text-slate-500 bg-slate-50 border-slate-200'
+                          }`}
+                        >
+                          {chk.required ? 'Required' : 'Optional'}
+                        </button>
+                        <button onClick={() => removeCheck(i)} className="text-muted-foreground/50 hover:text-destructive transition-colors p-1 shrink-0">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0 mt-1.5" />
+                          <input
+                            className="flex-1 h-7 rounded-md border border-input bg-background px-2.5 text-[12px] focus:outline-none focus:ring-1 focus:ring-ring"
+                            value={chk.passing}
+                            onChange={e => updateCheck(i, { passing: e.target.value })}
+                            placeholder="Passing example…"
+                          />
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-1.5" />
+                          <input
+                            className="flex-1 h-7 rounded-md border border-input bg-background px-2.5 text-[12px] focus:outline-none focus:ring-1 focus:ring-ring"
+                            value={chk.failing}
+                            onChange={e => updateCheck(i, { failing: e.target.value })}
+                            placeholder="Failing example…"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── MAPPINGS TAB ── */}
+            {tab === 'mappings' && (
+              <>
+                <Field label="Salesforce Mapping" hint="Which SF objects does this standard govern?">
+                  <textarea
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                    rows={3}
+                    value={draft.sfMapping}
+                    onChange={e => set('sfMapping', e.target.value)}
+                    placeholder="e.g. Knowledge__c — Salesforce Knowledge article object"
+                  />
+                </Field>
+
+                <Field label="LMS Mapping" hint="How this maps to the LMS course structure">
+                  <textarea
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+                    rows={3}
+                    value={draft.lmsMapping}
+                    onChange={e => set('lmsMapping', e.target.value)}
+                    placeholder="e.g. Course unit in LMS, linked via Learner_Course_Module__c"
+                  />
+                </Field>
+
+                <Field label="Related Knowledge Category">
+                  <input
+                    className="w-full h-8 rounded-md border border-input bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
+                    value={draft.relatedKnowledgeCategory}
+                    onChange={e => set('relatedKnowledgeCategory', e.target.value)}
+                    placeholder="e.g. Program Architecture"
+                  />
+                </Field>
+
+                <Field label="Related Content Objects" hint="Comma-separated list">
+                  <input
+                    className="w-full h-8 rounded-md border border-input bg-background px-3 text-[13px] focus:outline-none focus:ring-1 focus:ring-ring"
+                    value={relatedStr()}
+                    onChange={e => setRelated(e.target.value)}
+                    placeholder="e.g. Module, Lesson, Assessment"
+                  />
+                  {draft.relatedContentObjects.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {draft.relatedContentObjects.map(o => (
+                        <span key={o} className="text-[11px] font-medium border border-border bg-muted rounded-full px-2 py-0.5 text-muted-foreground">{o}</span>
+                      ))}
+                    </div>
+                  )}
+                </Field>
+              </>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Footer */}
+        <div className="px-5 py-4 border-t border-border bg-background flex items-center gap-3 flex-shrink-0">
+          <button
+            onClick={handleSave}
+            disabled={nameEmpty}
+            className="flex-1 h-9 bg-foreground text-background rounded-lg text-[13px] font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {isCreate ? 'Create Standard' : 'Save Changes'}
+          </button>
+          <button
+            onClick={close}
+            className="h-9 px-4 rounded-lg border border-border text-[13px] font-semibold text-muted-foreground hover:bg-muted transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
+
+// ── Field helper ───────────────────────────────────────────────────────────
+
+function Field({ label, hint, required, error, children }: {
+  label: string; hint?: string; required?: boolean; error?: string | false; children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-1">
+        <label className="text-[12px] font-semibold text-foreground">{label}</label>
+        {required && <span className="text-[11px] text-[#A93F2F]">*</span>}
+        {hint && <span className="text-[11px] text-muted-foreground/60 ml-1">— {hint}</span>}
+      </div>
+      {children}
+      {error && <p className="text-[11px] text-[#A93F2F]">{error}</p>}
+    </div>
+  );
+}
+
+// ── StandardRow ────────────────────────────────────────────────────────────
 
 function StandardRow({
   std, selected, onSelect,
 }: {
   std: ContentStandard; selected: boolean; onSelect: () => void;
 }) {
-  const catCfg = STANDARD_CATEGORY_CONFIG[std.category];
+  const catCfg    = STANDARD_CATEGORY_CONFIG[std.category];
   const statusCfg = STANDARD_STATUS_CONFIG[std.status];
   return (
     <button
@@ -89,11 +615,17 @@ function StandardRow({
   );
 }
 
-function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrief: () => void }) {
+// ── StandardDetail ─────────────────────────────────────────────────────────
+
+function StandardDetail({
+  std, onOpenBrief, onEdit,
+}: {
+  std: ContentStandard; onOpenBrief: () => void; onEdit: () => void;
+}) {
   const [openSections, setOpenSections] = useState<Set<string>>(() => new Set(['fields', 'criteria']));
-  const statusCfg   = STANDARD_STATUS_CONFIG[std.status];
+  const statusCfg     = STANDARD_STATUS_CONFIG[std.status];
   const confidenceCfg = STANDARD_CONFIDENCE_CONFIG[std.confidence];
-  const catCfg      = STANDARD_CATEGORY_CONFIG[std.category];
+  const catCfg        = STANDARD_CATEGORY_CONFIG[std.category];
 
   function toggleSection(id: string) {
     setOpenSections(prev => {
@@ -108,7 +640,7 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
     return (
       <div className="border border-border rounded-lg overflow-hidden">
         <button onClick={() => toggleSection(id)} className="w-full flex items-center justify-between px-3 py-2 bg-muted/30 hover:bg-muted/50 transition-colors">
-          <span className="text-[14px] font-bold text-foreground ">{label}</span>
+          <span className="text-[14px] font-bold text-foreground">{label}</span>
           {open ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
         </button>
         {open && <div className="p-3">{children}</div>}
@@ -123,15 +655,23 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
         <div>
           <div className="flex items-start justify-between gap-2 mb-2">
             <div>
-              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">Content Standard</p>
+              <p className="text-[14px] font-bold text-muted-foreground/60 mb-0.5">Content Standard</p>
               <h3 className="text-lg font-bold text-foreground">{std.name}</h3>
             </div>
-            <button
-              onClick={onOpenBrief}
-              className="text-[14px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 shrink-0"
-            >
-              {TERMS.knowledgeBrief}
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                onClick={onEdit}
+                className="flex items-center gap-1 text-[14px] font-bold text-muted-foreground border border-border rounded-full px-2 py-1 hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <Pencil className="w-3 h-3" /> Edit
+              </button>
+              <button
+                onClick={onOpenBrief}
+                className="text-[14px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5"
+              >
+                {TERMS.knowledgeBrief}
+              </button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${catCfg.cls}`}>{std.category}</span>
@@ -142,107 +682,123 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
 
         {/* Purpose */}
         <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-          <p className="text-[14px] font-bold text-primary/70  mb-1">Purpose</p>
-          <p className="text-[14px] text-foreground leading-relaxed">{std.purpose}</p>
+          <p className="text-[14px] font-bold text-primary/70 mb-1">Purpose</p>
+          <p className="text-[14px] text-foreground leading-relaxed">{std.purpose || <span className="text-muted-foreground/40 italic">No purpose defined.</span>}</p>
         </div>
 
         {/* Why it matters */}
         <div className="rounded-lg border border-[#FFF3E0] bg-[#FFF3E0]/50 p-3">
-          <p className="text-[14px] font-bold text-[#CC8400]  mb-1">Why It Matters</p>
-          <p className="text-[14px] text-[#CC8400] leading-relaxed">{std.whyItMatters}</p>
+          <p className="text-[14px] font-bold text-[#CC8400] mb-1">Why It Matters</p>
+          <p className="text-[14px] text-[#CC8400] leading-relaxed">{std.whyItMatters || <span className="opacity-50 italic">Not defined.</span>}</p>
         </div>
 
         {/* Required Fields */}
         <Section id="fields" label={`Required Fields (${std.requiredFields.length})`}>
-          <div className="space-y-1.5">
-            {std.requiredFields.map(f => (
-              <div key={f.field} className="flex items-start gap-2">
-                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>
-                  {f.required ? 'Req' : 'Opt'}
-                </span>
-                <div>
-                  <p className="text-[14px] font-semibold text-foreground">{f.field}</p>
-                  <p className="text-[14px] text-muted-foreground">{f.description}</p>
+          {std.requiredFields.length === 0 ? (
+            <p className="text-[13px] text-muted-foreground/50 italic">No fields defined — click Edit to add them.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {std.requiredFields.map(f => (
+                <div key={f.field} className="flex items-start gap-2">
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${f.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>
+                    {f.required ? 'Req' : 'Opt'}
+                  </span>
+                  <div>
+                    <p className="text-[14px] font-semibold text-foreground">{f.field}</p>
+                    <p className="text-[14px] text-muted-foreground">{f.description}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Section>
 
         {/* Quality Criteria */}
         <Section id="criteria" label="Quality Criteria">
-          <div className="space-y-1.5">
-            {std.qualityCriteria.map((c, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
-                <p className="text-[14px] text-foreground">{c}</p>
-              </div>
-            ))}
-          </div>
+          {std.qualityCriteria.length === 0 ? (
+            <p className="text-[13px] text-muted-foreground/50 italic">No criteria defined — click Edit to add them.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {std.qualityCriteria.map((c, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
+                  <p className="text-[14px] text-foreground">{c}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </Section>
 
         {/* Penny Checks */}
         <Section id="checks" label={`${TERMS.aiAssistant} Checks (${std.pennyChecks.length})`}>
-          <div className="space-y-2">
-            {std.pennyChecks.map(chk => (
-              <div key={chk.id} className="rounded border border-border bg-muted/20 p-2.5 space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${chk.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{chk.required ? 'Required' : 'Optional'}</span>
-                  <p className="text-[14px] font-semibold text-foreground">{chk.check}</p>
-                </div>
-                <div className="grid grid-cols-1 gap-1 pl-1">
-                  <div className="flex items-start gap-1.5">
-                    <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
-                    <p className="text-[14px] text-muted-foreground">{chk.passing}</p>
+          {std.pennyChecks.length === 0 ? (
+            <p className="text-[13px] text-muted-foreground/50 italic">No quality checks defined — click Edit to add them.</p>
+          ) : (
+            <div className="space-y-2">
+              {std.pennyChecks.map(chk => (
+                <div key={chk.id} className="rounded border border-border bg-muted/20 p-2.5 space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${chk.required ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' : 'text-slate-500 bg-slate-50 border-slate-200'}`}>{chk.required ? 'Required' : 'Optional'}</span>
+                    <p className="text-[14px] font-semibold text-foreground">{chk.check}</p>
                   </div>
-                  <div className="flex items-start gap-1.5">
-                    <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0 mt-0.5" />
-                    <p className="text-[14px] text-muted-foreground">{chk.failing}</p>
+                  <div className="grid grid-cols-1 gap-1 pl-1">
+                    <div className="flex items-start gap-1.5">
+                      <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0 mt-0.5" />
+                      <p className="text-[14px] text-muted-foreground">{chk.passing}</p>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <XCircle className="w-3 h-3 text-[#A93F2F] shrink-0 mt-0.5" />
+                      <p className="text-[14px] text-muted-foreground">{chk.failing}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Section>
 
         {/* Example Output */}
         <Section id="example" label="Example Output">
           <div className="rounded-lg border border-secondary/15 bg-secondary/5 p-3">
-            <p className="text-[14px] text-foreground/80 italic leading-relaxed">{std.exampleOutput}</p>
+            <p className="text-[14px] text-foreground/80 italic leading-relaxed">{std.exampleOutput || <span className="not-italic text-muted-foreground/40">Not defined.</span>}</p>
           </div>
         </Section>
 
         {/* How Penny Uses It */}
-        <Section id="penny" label="How Penny Uses This Standard">
-          <p className="text-[14px] text-foreground leading-relaxed">{std.howPennyUsesIt}</p>
+        <Section id="penny" label={`How ${TERMS.aiAssistant} Uses This Standard`}>
+          <p className="text-[14px] text-foreground leading-relaxed">{std.howPennyUsesIt || <span className="text-muted-foreground/40 italic">Not defined.</span>}</p>
         </Section>
 
         {/* Mappings */}
         <Section id="mappings" label="Salesforce & LMS Mapping">
           <div className="space-y-2">
             <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
-              <p className="text-[14px] font-bold text-[#2F6F7E]  mb-0.5">Salesforce</p>
-              <p className="text-[14px] text-[#2F6F7E]">{std.sfMapping}</p>
+              <p className="text-[14px] font-bold text-[#2F6F7E] mb-0.5">Salesforce</p>
+              <p className="text-[14px] text-[#2F6F7E]">{std.sfMapping || <span className="italic opacity-50">Not mapped.</span>}</p>
             </div>
             <div className="rounded-lg border border-[#7FAFC6] bg-[#EDF5F8] p-2.5">
-              <p className="text-[14px] font-bold text-[#2F6F7E]  mb-0.5">LMS</p>
-              <p className="text-[14px] text-[#2F6F7E]">{std.lmsMapping}</p>
+              <p className="text-[14px] font-bold text-[#2F6F7E] mb-0.5">LMS</p>
+              <p className="text-[14px] text-[#2F6F7E]">{std.lmsMapping || <span className="italic opacity-50">Not mapped.</span>}</p>
             </div>
           </div>
         </Section>
 
         {/* Meta */}
         <div className="rounded-lg border border-border bg-muted/20 p-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[14px]">
-          <div><span className="text-muted-foreground">Owner</span><p className="font-semibold text-foreground">{std.owner}</p></div>
-          <div><span className="text-muted-foreground">Review Cycle</span><p className="font-semibold text-foreground">{std.reviewCycle}</p></div>
-          <div><span className="text-muted-foreground">Knowledge Category</span><p className="font-semibold text-foreground">{std.relatedKnowledgeCategory}</p></div>
+          <div><span className="text-muted-foreground">Owner</span><p className="font-semibold text-foreground">{std.owner || '—'}</p></div>
+          <div><span className="text-muted-foreground">Review Cycle</span><p className="font-semibold text-foreground">{std.reviewCycle || '—'}</p></div>
+          <div><span className="text-muted-foreground">Knowledge Category</span><p className="font-semibold text-foreground">{std.relatedKnowledgeCategory || '—'}</p></div>
           <div>
             <span className="text-muted-foreground">Related Objects</span>
-            <div className="flex flex-wrap gap-1 mt-0.5">
-              {std.relatedContentObjects.map(o => (
-                <span key={o} className="text-[14px] font-medium border border-border bg-background rounded-full px-1.5 py-0.5 text-muted-foreground">{o}</span>
-              ))}
-            </div>
+            {std.relatedContentObjects.length === 0 ? (
+              <p className="text-muted-foreground/40 italic text-[13px] mt-0.5">None</p>
+            ) : (
+              <div className="flex flex-wrap gap-1 mt-0.5">
+                {std.relatedContentObjects.map(o => (
+                  <span key={o} className="text-[14px] font-medium border border-border bg-background rounded-full px-1.5 py-0.5 text-muted-foreground">{o}</span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -252,17 +808,25 @@ function StandardDetail({ std, onOpenBrief }: { std: ContentStandard; onOpenBrie
 
 // ── Overview View ──────────────────────────────────────────────────────────
 
-function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: string) => void }) {
+function OverviewView({
+  standards,
+  onNavigate,
+}: {
+  standards: ContentStandard[];
+  onNavigate: (view: StudioView, stdId?: string) => void;
+}) {
   const byCategory = CATEGORY_ORDER.map(cat => ({
     cat,
-    standards: contentStandards.filter(s => s.category === cat),
+    stds: standards.filter(s => s.category === cat),
   }));
+
+  const activeCount  = standards.filter(s => s.status === 'active').length;
+  const totalChecks  = standards.reduce((n, s) => n + s.pennyChecks.length, 0);
+  const reqChecks    = standards.reduce((n, s) => n + s.pennyChecks.filter(c => c.required).length, 0);
 
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-6 max-w-3xl">
-
-        {/* Intro strip */}
         <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
           <ShieldCheck className="w-4 h-4 text-muted-foreground shrink-0" />
           <p className="text-[14px] text-muted-foreground leading-relaxed">
@@ -272,13 +836,12 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           </p>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-4 gap-3">
           {[
-            { label: 'Standards', value: STANDARDS_SUMMARY.total, sub: 'defined', cls: 'border-foreground/20 bg-foreground/5' },
-            { label: 'Active',    value: STANDARDS_SUMMARY.byStatus.active, sub: 'live', cls: 'border-[#9FC3AE] bg-[#E6F0EA]' },
-            { label: `${TERMS.aiAssistant} Checks`, value: STANDARDS_SUMMARY.totalChecks, sub: 'total', cls: 'border-secondary/20 bg-secondary/5' },
-            { label: 'Required Checks', value: STANDARDS_SUMMARY.requiredChecks, sub: 'must-pass', cls: 'border-[#E8B9B4] bg-[#FBEAE6]' },
+            { label: 'Standards',      value: standards.length, sub: 'defined',   cls: 'border-foreground/20 bg-foreground/5' },
+            { label: 'Active',         value: activeCount,      sub: 'live',       cls: 'border-[#9FC3AE] bg-[#E6F0EA]' },
+            { label: `${TERMS.aiAssistant} Checks`, value: totalChecks, sub: 'total', cls: 'border-secondary/20 bg-secondary/5' },
+            { label: 'Required Checks', value: reqChecks,       sub: 'must-pass',  cls: 'border-[#E8B9B4] bg-[#FBEAE6]' },
           ].map(stat => (
             <div key={stat.label} className={`rounded-lg border p-3 text-center ${stat.cls}`}>
               <p className="text-xl font-bold text-foreground">{stat.value}</p>
@@ -288,14 +851,13 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           ))}
         </div>
 
-        {/* How standards work */}
         <div>
           <h3 className="text-[14px] font-bold text-foreground mb-3">How Standards Work</h3>
           <div className="grid grid-cols-3 gap-3">
             {[
               { step: '1', title: 'Author creates content', desc: 'Curriculum authors use the required fields list as a checklist while writing modules, lessons, prompts, or delivery assets.' },
               { step: '2', title: `${TERMS.aiAssistant} audits with checklist`, desc: `Before publishing, ${TERMS.aiAssistant} runs the Standards Checklist against each content object — flagging missing fields and quality issues.` },
-              { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps in the reference implementation and all programs, sorted by severity, so teams can prioritise fixes before the next cohort.' },
+              { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps in the reference implementation and all programs, sorted by severity.' },
             ].map(s => (
               <div key={s.step} className="rounded-lg border border-border bg-background p-3">
                 <div className="w-6 h-6 rounded-full bg-foreground text-background text-[14px] font-bold flex items-center justify-center mb-2">{s.step}</div>
@@ -306,19 +868,19 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           </div>
         </div>
 
-        {/* Standards by category */}
-        {byCategory.map(({ cat, standards }) => {
-          const Icon = CATEGORY_ICONS[cat];
+        {byCategory.map(({ cat, stds }) => {
+          if (stds.length === 0) return null;
+          const Icon   = CATEGORY_ICONS[cat];
           const catCfg = STANDARD_CATEGORY_CONFIG[cat];
           return (
             <div key={cat}>
               <div className="flex items-center gap-2 mb-2">
                 <Icon className="w-4 h-4 text-muted-foreground" />
                 <h3 className="text-[14px] font-bold text-foreground">{cat}</h3>
-                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{standards.length}</span>
+                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{stds.length}</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                {standards.map(std => {
+                {stds.map(std => {
                   const statusCfg = STANDARD_STATUS_CONFIG[std.status];
                   return (
                     <button
@@ -332,7 +894,7 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
                       </div>
                       <p className="text-[14px] text-muted-foreground leading-snug line-clamp-2">{std.purpose}</p>
                       <div className="flex items-center gap-2 mt-1.5">
-                        <span className="text-[14px] text-muted-foreground/70">{std.pennyChecks.length} checks · Owner: {std.owner}</span>
+                        <span className="text-[14px] text-muted-foreground/70">{std.pennyChecks.length} checks · Owner: {std.owner || '—'}</span>
                       </div>
                     </button>
                   );
@@ -342,7 +904,6 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
           );
         })}
 
-        {/* CTA row */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => onNavigate('checklist')}
@@ -361,7 +922,6 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
             <p className="text-[14px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps across all programs require attention before the next cohort.</p>
           </button>
         </div>
-
       </div>
     </ScrollArea>
   );
@@ -370,25 +930,41 @@ function OverviewView({ onNavigate }: { onNavigate: (view: StudioView, stdId?: s
 // ── Standards Browser View ─────────────────────────────────────────────────
 
 function StandardsBrowserView({
-  initialStdId, onOpenBrief,
+  standards,
+  initialStdId,
+  onOpenBrief,
+  onEdit,
 }: {
+  standards: ContentStandard[];
   initialStdId?: string;
   onOpenBrief: (std: ContentStandard) => void;
+  onEdit: (std: ContentStandard) => void;
 }) {
-  const [selectedId, setSelectedId] = useState<string>(initialStdId ?? contentStandards[0].id);
-  const [search, setSearch] = useState('');
-  const [filterCat, setFilterCat] = useState<StandardCategory | 'all'>('all');
+  const [selectedId, setSelectedId] = useState<string>(initialStdId ?? (standards[0]?.id ?? ''));
+  const [search, setSearch]         = useState('');
+  const [filterCat, setFilterCat]   = useState<StandardCategory | 'all'>('all');
+
+  // keep selection valid if standards list changes
+  useEffect(() => {
+    if (!standards.find(s => s.id === selectedId) && standards.length > 0) {
+      setSelectedId(standards[0].id);
+    }
+  }, [standards, selectedId]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return contentStandards.filter(s => {
+    return standards.filter(s => {
       const matchesCat = filterCat === 'all' || s.category === filterCat;
       const matchesQ   = !q || s.name.toLowerCase().includes(q) || s.purpose.toLowerCase().includes(q);
       return matchesCat && matchesQ;
     });
-  }, [search, filterCat]);
+  }, [search, filterCat, standards]);
 
-  const selected = contentStandards.find(s => s.id === selectedId) ?? contentStandards[0];
+  const selected = standards.find(s => s.id === selectedId) ?? standards[0];
+
+  if (!selected) return (
+    <div className="flex items-center justify-center h-full text-muted-foreground text-[14px]">No standards yet — create one above.</div>
+  );
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -423,7 +999,7 @@ function StandardsBrowserView({
               if (catStds.length === 0) return null;
               return (
                 <div key={cat}>
-                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{cat}</p>
+                  <p className="text-[14px] font-bold text-muted-foreground/50 px-1 py-1.5">{cat}</p>
                   {catStds.map(std => (
                     <StandardRow key={std.id} std={std} selected={selectedId === std.id} onSelect={() => setSelectedId(std.id)} />
                   ))}
@@ -436,7 +1012,11 @@ function StandardsBrowserView({
 
       {/* Detail */}
       <div className="flex-1 overflow-hidden">
-        <StandardDetail std={selected} onOpenBrief={() => onOpenBrief(selected)} />
+        <StandardDetail
+          std={selected}
+          onOpenBrief={() => onOpenBrief(selected)}
+          onEdit={() => onEdit(selected)}
+        />
       </div>
     </div>
   );
@@ -446,15 +1026,15 @@ function StandardsBrowserView({
 
 type CheckState = 'pass' | 'fail' | 'unchecked';
 
-function ChecklistView() {
-  const [states, setStates] = useState<Record<string, CheckState>>({});
+function ChecklistView({ standards }: { standards: ContentStandard[] }) {
+  const [states, setStates]       = useState<Record<string, CheckState>>({});
   const [filterType, setFilterType] = useState<string>('all');
 
-  const objectTypes = Array.from(new Set(contentStandards.map(s => s.objectType)));
+  const objectTypes = Array.from(new Set(standards.map(s => s.objectType)));
 
   const shownStandards = filterType === 'all'
-    ? contentStandards
-    : contentStandards.filter(s => s.objectType === filterType);
+    ? standards
+    : standards.filter(s => s.objectType === filterType);
 
   function cycle(id: string) {
     setStates(prev => {
@@ -464,30 +1044,23 @@ function ChecklistView() {
   }
 
   const allChecks = shownStandards.flatMap(s => s.pennyChecks.map(c => ({ ...c, stdId: s.id })));
-  const passCount  = allChecks.filter(c => states[c.id] === 'pass').length;
-  const failCount  = allChecks.filter(c => states[c.id] === 'fail').length;
-  const total      = allChecks.length;
-
-  const pct = total === 0 ? 0 : Math.round((passCount / total) * 100);
-
-  function resetAll() { setStates({}); }
+  const passCount = allChecks.filter(c => states[c.id] === 'pass').length;
+  const failCount = allChecks.filter(c => states[c.id] === 'fail').length;
+  const total     = allChecks.length;
+  const pct       = total === 0 ? 0 : Math.round((passCount / total) * 100);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Header */}
       <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-background">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[14px] text-muted-foreground">Filter:</span>
-            <select
-              value={filterType}
-              onChange={e => { setFilterType(e.target.value); setStates({}); }}
-              className="h-7 text-[14px] rounded-md border border-input bg-background px-2"
-            >
-              <option value="all">All object types</option>
-              {objectTypes.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
+          <select
+            value={filterType}
+            onChange={e => { setFilterType(e.target.value); setStates({}); }}
+            className="h-7 text-[14px] rounded-md border border-input bg-background px-2"
+          >
+            <option value="all">All object types</option>
+            {objectTypes.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
           <p className="text-[14px] text-muted-foreground">{total} checks · Click to cycle: → ✓ Pass → ✗ Fail → unchecked</p>
         </div>
         <div className="ml-auto flex items-center gap-3">
@@ -501,18 +1074,16 @@ function ChecklistView() {
               </div>
             </div>
           )}
-          <button onClick={resetAll} className="text-[14px] font-semibold text-muted-foreground border border-border rounded-full px-2.5 py-1 hover:bg-muted transition-colors">Reset</button>
+          <button onClick={() => setStates({})} className="text-[14px] font-semibold text-muted-foreground border border-border rounded-full px-2.5 py-1 hover:bg-muted transition-colors">Reset</button>
         </div>
       </div>
 
-      {/* Checks */}
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-5">
           {shownStandards.map(std => {
-            const catCfg = STANDARD_CATEGORY_CONFIG[std.category];
-            const stdChecks = std.pennyChecks;
-            const stdPass   = stdChecks.filter(c => states[c.id] === 'pass').length;
-            const stdFail   = stdChecks.filter(c => states[c.id] === 'fail').length;
+            const catCfg  = STANDARD_CATEGORY_CONFIG[std.category];
+            const stdPass = std.pennyChecks.filter(c => states[c.id] === 'pass').length;
+            const stdFail = std.pennyChecks.filter(c => states[c.id] === 'fail').length;
             return (
               <div key={std.id} className="rounded-xl border border-border bg-background overflow-hidden">
                 <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
@@ -524,48 +1095,50 @@ function ChecklistView() {
                   <div className="flex items-center gap-2">
                     {stdPass > 0 && <span className="text-[14px] font-semibold text-[#2F6B3F]">{stdPass} pass</span>}
                     {stdFail > 0 && <span className="text-[14px] font-semibold text-[#A93F2F]">{stdFail} fail</span>}
-                    <span className="text-[14px] text-muted-foreground">{stdChecks.length} checks</span>
+                    <span className="text-[14px] text-muted-foreground">{std.pennyChecks.length} checks</span>
                   </div>
                 </div>
-                <div className="divide-y divide-border">
-                  {stdChecks.map(chk => {
-                    const state = states[chk.id] ?? 'unchecked';
-                    return (
-                      <button
-                        key={chk.id}
-                        onClick={() => cycle(chk.id)}
-                        className={`w-full text-left px-4 py-2.5 flex items-start gap-3 hover:bg-muted/20 transition-colors ${
-                          state === 'pass' ? 'bg-[#E6F0EA]/50' : state === 'fail' ? 'bg-[#FBEAE6]/50' : ''
-                        }`}
-                      >
-                        <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                          state === 'pass' ? 'bg-[#2F6B3F] border-[#2F6B3F]'
-                            : state === 'fail' ? 'bg-[#FBEAE6]0 border-[#FBEAE6]0'
-                            : 'bg-background border-muted-foreground/30'
-                        }`}>
-                          {state === 'pass' && <CheckCircle2 className="w-3 h-3 text-white" />}
-                          {state === 'fail' && <XCircle className="w-3 h-3 text-white" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <p className="text-[14px] font-semibold text-foreground">{chk.check}</p>
-                            {chk.required && <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Required</span>}
+                {std.pennyChecks.length === 0 ? (
+                  <div className="px-4 py-3 text-[13px] text-muted-foreground/50 italic">No checks defined for this standard.</div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {std.pennyChecks.map(chk => {
+                      const state = states[chk.id] ?? 'unchecked';
+                      return (
+                        <button
+                          key={chk.id}
+                          onClick={() => cycle(chk.id)}
+                          className={`w-full text-left px-4 py-2.5 flex items-start gap-3 hover:bg-muted/20 transition-colors ${
+                            state === 'pass' ? 'bg-[#E6F0EA]/50' : state === 'fail' ? 'bg-[#FBEAE6]/50' : ''
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                            state === 'pass' ? 'bg-[#2F6B3F] border-[#2F6B3F]' : state === 'fail' ? 'bg-[#A93F2F] border-[#A93F2F]' : 'bg-background border-muted-foreground/30'
+                          }`}>
+                            {state === 'pass' && <CheckCircle2 className="w-3 h-3 text-white" />}
+                            {state === 'fail' && <XCircle className="w-3 h-3 text-white" />}
                           </div>
-                          <div className="flex items-start gap-4">
-                            <div className="flex items-start gap-1">
-                              <span className="text-[14px] font-bold text-[#2F6B3F]  shrink-0 mt-0.5">✓</span>
-                              <p className="text-[14px] text-muted-foreground">{chk.passing}</p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <p className="text-[14px] font-semibold text-foreground">{chk.check}</p>
+                              {chk.required && <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Required</span>}
                             </div>
-                            <div className="flex items-start gap-1">
-                              <span className="text-[14px] font-bold text-[#A93F2F]  shrink-0 mt-0.5">✗</span>
-                              <p className="text-[14px] text-muted-foreground">{chk.failing}</p>
+                            <div className="flex items-start gap-4">
+                              <div className="flex items-start gap-1">
+                                <span className="text-[14px] font-bold text-[#2F6B3F] shrink-0 mt-0.5">✓</span>
+                                <p className="text-[14px] text-muted-foreground">{chk.passing}</p>
+                              </div>
+                              <div className="flex items-start gap-1">
+                                <span className="text-[14px] font-bold text-[#A93F2F] shrink-0 mt-0.5">✗</span>
+                                <p className="text-[14px] text-muted-foreground">{chk.failing}</p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -577,11 +1150,11 @@ function ChecklistView() {
 
 // ── Gap Report View ────────────────────────────────────────────────────────
 
-function GapReportView() {
+function GapReportView({ standards }: { standards: ContentStandard[] }) {
   const { setSelectedItem } = useAppContext();
   const [filterType, setFilterType] = useState<GapType | 'all'>('all');
-  const [filterSev, setFilterSev] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [filterSev, setFilterSev]   = useState<'all' | 'high' | 'medium' | 'low'>('all');
+  const [focusedId, setFocusedId]   = useState<string | null>(null);
 
   const filtered = useMemo(() =>
     gapReportItems.filter(g =>
@@ -596,20 +1169,19 @@ function GapReportView() {
   };
 
   function selectGap(gap: (typeof gapReportItems)[0]) {
-    const std = contentStandards.find(s => s.id === gap.standardId);
+    const std = standards.find(s => s.id === gap.standardId);
     setFocusedId(gap.id);
     setSelectedItem({ type: 'gapReportItem', id: gap.id, data: { gap, std } });
   }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Header */}
       <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 flex-wrap">
           {[
-            { label: `${GAP_SUMMARY.bySeverity.high} High`, cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+            { label: `${GAP_SUMMARY.bySeverity.high} High`,   cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
             { label: `${GAP_SUMMARY.bySeverity.medium} Medium`, cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
-            { label: `${GAP_SUMMARY.bySeverity.low} Low`, cls: 'text-slate-600 bg-slate-50 border-slate-200' },
+            { label: `${GAP_SUMMARY.bySeverity.low} Low`,      cls: 'text-slate-600 bg-slate-50 border-slate-200' },
           ].map(s => (
             <span key={s.label} className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${s.cls}`}>{s.label}</span>
           ))}
@@ -620,7 +1192,7 @@ function GapReportView() {
             <option value="all">All gap types</option>
             {(Object.keys(GAP_TYPE_CONFIG) as GapType[]).map(t => <option key={t} value={t}>{GAP_TYPE_CONFIG[t].label}</option>)}
           </select>
-          <select value={filterSev} onChange={e => setFilterSev(e.target.value as 'all' | 'high' | 'medium' | 'low')} className="h-7 text-[14px] rounded-md border border-input bg-background px-2">
+          <select value={filterSev} onChange={e => setFilterSev(e.target.value as typeof filterSev)} className="h-7 text-[14px] rounded-md border border-input bg-background px-2">
             <option value="all">All severities</option>
             <option value="high">High only</option>
             <option value="medium">Medium only</option>
@@ -646,9 +1218,7 @@ function GapReportView() {
                 key={gap.id}
                 onClick={() => selectGap(gap)}
                 className={`w-full text-left rounded-xl border overflow-hidden transition-all flex items-start gap-3 px-4 py-3 hover:border-foreground/20 hover:bg-muted/10 ${
-                  isFocused
-                    ? 'border-primary/40 bg-primary/5 border-l-2 border-l-primary'
-                    : 'border-border bg-background'
+                  isFocused ? 'border-primary/40 bg-primary/5 border-l-2 border-l-primary' : 'border-border bg-background'
                 }`}
               >
                 <div className="text-[16px] shrink-0 mt-0.5">{typeCfg.icon}</div>
@@ -679,10 +1249,20 @@ function GapReportView() {
 
 // ── Main Page ──────────────────────────────────────────────────────────────
 
+type DrawerState =
+  | { mode: 'closed' }
+  | { mode: 'create' }
+  | { mode: 'edit'; std: ContentStandard };
+
 export default function StandardsStudio() {
-  const { setSelectedItem, openActionPanel } = useAppContext();
-  const [view, setView]      = useState<StudioView>('overview');
+  const { setSelectedItem } = useAppContext();
+
+  // Live standards state — starts from seed data, mutations are in-session
+  const [standards, setStandards] = useState<ContentStandard[]>(SEED_STANDARDS);
+
+  const [view, setView]               = useState<StudioView>('overview');
   const [initialStdId, setInitialStdId] = useState<string | undefined>(undefined);
+  const [drawer, setDrawer]           = useState<DrawerState>({ mode: 'closed' });
 
   function navigateTo(v: StudioView, stdId?: string) {
     setView(v);
@@ -693,36 +1273,32 @@ export default function StandardsStudio() {
     setSelectedItem({ type: 'contentStandard', id: std.id, data: std });
   }
 
-  function handleNewStandard() {
-    openActionPanel({
-      title: 'New Content Standard', objectType: 'Content Standard',
-      subtitle: `Define a new quality rule that ${TERMS.aiAssistant} will use to create, review, and improve curriculum content.`,
-      fields: [
-        { id: 'title',       label: 'Standard Title',   type: 'text',     required: true, placeholder: 'e.g. Lesson Learning Objectives Format' },
-        { id: 'category',    label: 'Category',          type: 'select',   options: ['Program Architecture', 'Learning Content', 'Penny AI', 'Assessments', 'Delivery'], required: true },
-        { id: 'rule',        label: 'The Rule',          type: 'textarea', required: true, placeholder: 'State the standard as a clear, actionable rule…', rows: 4 },
-        { id: 'rationale',   label: 'Rationale',         type: 'textarea', placeholder: 'Why does this standard exist?', rows: 2 },
-        { id: 'goodExample', label: 'Good Example',      type: 'textarea', placeholder: 'A concrete example that meets this standard…', rows: 2 },
-        { id: 'badExample',  label: 'Counter-Example',   type: 'textarea', placeholder: 'An example that violates this standard…', rows: 2 },
-        { id: 'applies',     label: 'Applies To',        type: 'select',   options: ['All Content', 'Lessons', 'Modules', 'Assessments', 'Penny Prompts', 'Program Overviews'] },
-      ],
-      onSaveAndView: () => navigateTo('standards'),
-      pennyPrompt: `I'm creating a new content standard for Trail OS — Standards Studio. Help me write it well.\n\nA content standard needs:\n- A clear, actionable rule statement (what must be true for content to pass)\n- A rationale (why this rule exists and what breaks without it)\n- A concrete good example (content that meets the standard)\n- A counter-example (content that violates it)\n- Quality criteria ${TERMS.aiAssistant} can check automatically\n\nAsk me what type of content object I'm writing the standard for (Module, Lesson, Assessment, ${TERMS.aiAssistant} Prompt, Delivery Asset, or Program-level), then guide me through drafting each section.`,
+  function handleSave(updated: ContentStandard) {
+    setStandards(prev => {
+      const exists = prev.find(s => s.id === updated.id);
+      if (exists) return prev.map(s => s.id === updated.id ? updated : s);
+      return [...prev, updated];
     });
+    // After create, navigate to the new standard in the browser
+    if (drawer.mode === 'create') {
+      setInitialStdId(updated.id);
+      setView('standards');
+    }
   }
+
+  const totalChecks = standards.reduce((n, s) => n + s.pennyChecks.length, 0);
+  const reqChecks   = standards.reduce((n, s) => n + s.pennyChecks.filter(c => c.required).length, 0);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Page header */}
       <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">
-          Programs · Standards
-        </p>
+        <p className="text-[14px] font-bold text-muted-foreground/50 mb-0.5">Programs · Standards</p>
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-[15px] font-semibold text-foreground leading-snug">Standards Studio</h1>
             <p className="text-[14px] text-muted-foreground mt-0.5">
-              The rulebook Penny uses to create, review, and improve curriculum content consistently.
+              The rulebook {TERMS.aiAssistant} uses to create, review, and improve curriculum content consistently.
             </p>
           </div>
           {view === 'gap-report' && (
@@ -732,7 +1308,7 @@ export default function StandardsStudio() {
             </div>
           )}
           <button
-            onClick={handleNewStandard}
+            onClick={() => setDrawer({ mode: 'create' })}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -743,20 +1319,61 @@ export default function StandardsStudio() {
         {/* View tabs */}
         <div className="flex items-center gap-2 mt-3">
           <ViewTab id="overview"   label="Overview"   icon={BookCheck}     active={view === 'overview'}   onClick={() => navigateTo('overview')} />
-          <ViewTab id="standards"  label="Standards"  icon={ShieldCheck}   active={view === 'standards'}  count={STANDARDS_SUMMARY.total} onClick={() => navigateTo('standards')} />
-          <ViewTab id="checklist"  label="Checklist"  icon={ClipboardList} active={view === 'checklist'}  count={STANDARDS_SUMMARY.requiredChecks} onClick={() => navigateTo('checklist')} />
+          <ViewTab id="standards"  label="Standards"  icon={ShieldCheck}   active={view === 'standards'}  count={standards.length} onClick={() => navigateTo('standards')} />
+          <ViewTab id="checklist"  label="Checklist"  icon={ClipboardList} active={view === 'checklist'}  count={reqChecks} onClick={() => navigateTo('checklist')} />
           <ViewTab id="gap-report" label="Gap Report" icon={AlertTriangle} active={view === 'gap-report'} count={GAP_SUMMARY.total} onClick={() => navigateTo('gap-report')} />
         </div>
       </div>
 
       {/* View content */}
       <div className="flex-1 overflow-hidden">
-        {view === 'create' && <OverviewView onNavigate={navigateTo} />}
-        {view === 'overview'    && <OverviewView onNavigate={navigateTo} />}
-        {view === 'standards'   && <StandardsBrowserView initialStdId={initialStdId} onOpenBrief={openBrief} />}
-        {view === 'checklist'   && <ChecklistView />}
-        {view === 'gap-report'  && <GapReportView />}
+        {view === 'overview'   && <OverviewView standards={standards} onNavigate={navigateTo} />}
+        {view === 'standards'  && (
+          <StandardsBrowserView
+            standards={standards}
+            initialStdId={initialStdId}
+            onOpenBrief={openBrief}
+            onEdit={std => setDrawer({ mode: 'edit', std })}
+          />
+        )}
+        {view === 'checklist'  && <ChecklistView standards={standards} />}
+        {view === 'gap-report' && <GapReportView standards={standards} />}
       </div>
+
+      {/* Edit / Create drawer */}
+      {drawer.mode !== 'closed' && (
+        <StandardEditDrawer
+          standard={drawer.mode === 'edit' ? drawer.std : null}
+          onSave={handleSave}
+          onClose={() => setDrawer({ mode: 'closed' })}
+        />
+      )}
     </div>
+  );
+}
+
+// ── ViewTab (kept local) ───────────────────────────────────────────────────
+
+function ViewTab({
+  id, label, icon: Icon, active, count, onClick,
+}: {
+  id: StudioView; label: string; icon: typeof BookCheck;
+  active: boolean; count?: number; onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-all border ${
+        active
+          ? 'bg-foreground text-background border-foreground'
+          : 'border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+      }`}
+    >
+      <Icon className="w-3.5 h-3.5" />
+      {label}
+      {count !== undefined && (
+        <span className={`text-[14px] font-bold rounded-full px-1.5 py-0 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
+      )}
+    </button>
   );
 }
