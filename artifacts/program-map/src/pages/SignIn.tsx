@@ -71,6 +71,11 @@ export default function SignInPage() {
   const errorEmail = params.get('email');
   const error = getError(errorCode, errorEmail);
 
+  // If rendered inside an iframe (Replit preview), open OAuth in a new tab so
+  // Google's consent screen isn't blocked by the iframe sandbox.
+  const inIframe = window.self !== window.top;
+  const linkTarget = inIframe ? '_blank' : '_self';
+
   return (
     <div className="min-h-screen bg-[hsl(40_30%_94%)] flex flex-col">
       {/* Top bar */}
@@ -122,7 +127,8 @@ export default function SignInPage() {
             {/* Google sign-in button */}
             <a
               href={`${BASE}/api/auth/google/login`}
-              target="_top"
+              target={linkTarget}
+              rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 w-full px-4 py-2.5 border border-stone-200 bg-white hover:bg-stone-50 rounded-lg transition-colors text-[14px] font-medium text-foreground shadow-sm"
             >
               {/* Google G logo */}
