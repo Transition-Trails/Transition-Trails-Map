@@ -134,6 +134,43 @@ function Select({ value, onChange, children }: { value: string; onChange: (v: st
 
 interface BreadcrumbItem { id: string; name: string; }
 
+const DRIVE_PICKER_SESSION_KEY = 'drive-picker-breadcrumbs';
+
+function loadSavedBreadcrumbs(): BreadcrumbItem[] | null {
+  try {
+    const raw = sessionStorage.getItem(DRIVE_PICKER_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as unknown;
+    if (
+      Array.isArray(parsed) &&
+      parsed.length > 0 &&
+      parsed.every(
+        (x): x is BreadcrumbItem =>
+          typeof x === 'object' && x !== null &&
+          typeof (x as BreadcrumbItem).id === 'string' &&
+          typeof (x as BreadcrumbItem).name === 'string',
+      )
+    ) {
+      return parsed;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+function saveBreadcrumbs(crumbs: BreadcrumbItem[]) {
+  try {
+    if (crumbs.length === 0) {
+      sessionStorage.removeItem(DRIVE_PICKER_SESSION_KEY);
+    } else {
+      sessionStorage.setItem(DRIVE_PICKER_SESSION_KEY, JSON.stringify(crumbs));
+    }
+  } catch {
+    // ignore storage errors (private browsing, quota)
+  }
+}
+
 function DriveFolderPicker({
   value, folderName, onChange,
 }: {
@@ -189,14 +226,22 @@ function DriveFolderPicker({
 
   function browse() {
     setOpen(true);
-    setBreadcrumbs([]);
     setQuery('');
-    fetchFolders('root');
+    // Restore the last-browsed position for this session
+    const saved = loadSavedBreadcrumbs();
+    if (saved) {
+      setBreadcrumbs(saved);
+      fetchFolders(saved[saved.length - 1].id);
+    } else {
+      setBreadcrumbs([]);
+      fetchFolders('root');
+    }
   }
 
   function navigateInto(f: DriveFolder) {
     const next = [...breadcrumbs, { id: f.id, name: f.name }];
     setBreadcrumbs(next);
+    saveBreadcrumbs(next);
     setQuery('');
     fetchFolders(f.id);
   }
@@ -205,11 +250,13 @@ function DriveFolderPicker({
     // index === -1 → root "My Drive"
     if (index === -1) {
       setBreadcrumbs([]);
+      saveBreadcrumbs([]);
       setQuery('');
       fetchFolders('root');
     } else {
       const next = breadcrumbs.slice(0, index + 1);
       setBreadcrumbs(next);
+      saveBreadcrumbs(next);
       setQuery('');
       fetchFolders(next[index].id);
     }
