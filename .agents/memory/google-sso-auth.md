@@ -43,6 +43,14 @@ Uses React Query (`queryKey: ['google-auth-me']`). Both `InnerApp` (App.tsx) and
 
 After callback success/failure: `res.redirect('/')` following the same pattern as `salesforceAuth.ts`. Frontend `useGoogleAuth()` re-fetches `/me` on mount.
 
+## OAuth in the Replit preview iframe
+
+The Replit preview pane renders the app inside a sandboxed iframe. Google's OAuth consent screen blocks iframe embedding (returns "403. That's an error."), and the iframe sandbox also blocks `target="_top"` navigation silently (click does nothing).
+
+**Fix in SignIn.tsx**: detect `window.self !== window.top` at render time. If in an iframe, set `target="_blank"` so OAuth opens in a new tab where Google has no restrictions. In production (not in iframe), keep `target="_self"` so the page stays in the same tab. This is already implemented.
+
+**Why:** `target="_top"` seems like the right answer but Replit's sandbox `allow-top-navigation` isn't set, so it silently does nothing. `_blank` always works.
+
 ## What Clerk did (and was removed)
 
 Server: `clerkMiddleware` + `clerkProxyMiddleware` registered globally in app.ts — never read identity on any route. Pure decoration.
