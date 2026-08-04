@@ -580,3 +580,115 @@ describe('GET /api/salesforce/validate — 429 rate-limit on describe', () => {
     }
   });
 });
+
+// ── Tests: TT_Automation__c field checks (provisioned — no phase2Deferred) ────
+//
+// TT_Automation__c previously carried phase2Deferred:true, causing the
+// Validation Center to show a "Phase 2 deferred" label.  After provisioning,
+// the four filter fields (Is_Active__c, Automation_Type__c, Description__c,
+// Status__c) were added to requiredFields and phase2Deferred was removed.
+//
+// These tests confirm that:
+//   1. When all four fields are present the /validate endpoint returns
+//      status:"pass" for the tt-automation-fields check.
+//   2. When fields are missing a "warning" is raised (not a deferred skip).
+//   3. The aggregate custom-fields check is "pass" when all fields are present.
+//   4. The UI contract: no phase2Deferred flag on the result row.
+
+describe('GET /api/salesforce/validate — TT_Automation__c field checks (post-provisioning)', () => {
+
+  test('tt-automation-fields is "pass" when all four provisioned fields are present', async () => {
+    // Simulate the org after provisioning: all four required fields present.
+    describeOverrides.set('TT_Automation__c', [
+      'Is_Active__c', 'Automation_Type__c', 'Description__c', 'Status__c',
+    ]);
+
+    const body    = await runValidate();
+    const ttCheck = getFieldCheck(body, 'tt-automation-fields');
+
+    expect(ttCheck).toBeDefined();
+    expect(ttCheck!.requiredFieldsMissing).toHaveLength(0);
+    expect(ttCheck!.describeError).toBeNull();
+    expect(ttCheck!.describeUndetermined).toBe(false);
+  });
+
+  test('aggregate custom-fields check is "pass" when TT_Automation__c has all required fields', async () => {
+    // Supply the full required field set for every object that has non-empty
+    // requiredFields so nothing else produces a warning.
+    describeOverrides.set('Contact', [
+      'Penny_Trail_Config__c', 'Penny_Trail__c', 'Penny_Coaching_Tone__c',
+      'Penny_Confidence_Score__c', 'Penny_Current_Goal__c', 'Penny_Current_Phase__c',
+      'Penny_Current_Blockers__c', 'Penny_Sprint_Week__c', 'Penny_Skill_Score__c',
+      'Penny_Onboarding_Complete__c', 'LMS_Learner_ID__c', 'Last_Assessment_Date__c',
+      'Coach__c', 'Learner_Slack_User_Id__c', 'TT_Academy_Connector_Token__c',
+    ]);
+    describeOverrides.set('pmdm__Program__c', [
+      'Program_Manager__c', 'Program_Goals__c', 'Program_Structure__c',
+      'Program_Target_Audience__c', 'Program_Expected_Outcomes__c',
+      'Problem_Statement__c', 'Success_Metrics_Evaluation_Plan__c',
+      'Google_Drive_Folder__c', 'Canva_Folder__c',
+      'Program_Reference_Link__c', 'Requires_Payment__c',
+    ]);
+    describeOverrides.set('Penny_Trail_Config__c',    ['Trail_ID__c', 'Penny_Role__c', 'Tone__c', 'Focal_Points__c', 'Special_Instructions__c', 'Is_Active__c']);
+    describeOverrides.set('Penny_Interaction_Log__c', ['Learner__c', 'User_Message__c', 'Penny_Response__c', 'Prompt_Mode__c', 'Source__c']);
+    describeOverrides.set('Penny_Quest_Submission__c',['Learner__c', 'Submission_Text__c', 'Submitted_At__c']);
+    describeOverrides.set('Penny_Career_Review__c',   ['Learner__c', 'Area_Scores__c', 'Feedback_JSON__c', 'Readiness_Label__c', 'Review_Mode__c', 'Reviewed_At__c', 'Target_Role__c']);
+    describeOverrides.set('Penny_Weekly_Report__c',   ['Generated_At__c', 'Top_Themes__c', 'Support_Flags__c', 'Suggested_Actions__c', 'Trail_Breakdown__c', 'Week_Start__c', 'Week_End__c']);
+    describeOverrides.set('Penny_Badge__c',           ['Learner__c', 'Awarded_By__c']);
+    describeOverrides.set('Penny_Gamification__c',    ['Learner__c', 'Points__c', 'Sprint_Points__c', 'Sprint_Number__c', 'Reason__c', 'Note__c', 'Awarded_By__c']);
+    describeOverrides.set('Penny_Classroom_Nudge__c', ['Course_Work_ID__c', 'Learner__c', 'Nudge_Date__c', 'Sent_At__c']);
+    describeOverrides.set('TT_Build_Item__c',         ['TT_Automation__c']);
+    describeOverrides.set('TT_Automation__c',         ['Is_Active__c', 'Automation_Type__c', 'Description__c', 'Status__c']);
+    describeOverrides.set('TT_SOP_Automation__c',     ['Automation__c', 'Knowledge_Article__c']);
+    describeOverrides.set('TT_SOP_Account__c',        ['Account__c', 'Knowledge_Article__c']);
+
+    const body    = await runValidate();
+    const cfCheck = getCustomFieldsCheck(body);
+
+    expect(cfCheck).toBeDefined();
+    // All required fields present on every object — aggregate must be pass
+    expect(cfCheck!.status).toBe('pass');
+  });
+
+  test('tt-automation-fields is "warning" when a required field is missing', async () => {
+    // Simulate a partial provisioning: Is_Active__c missing.
+    describeOverrides.set('TT_Automation__c', [
+      'Automation_Type__c', 'Description__c', 'Status__c',
+      // Is_Active__c intentionally absent
+    ]);
+
+    const body    = await runValidate();
+    const ttCheck = getFieldCheck(body, 'tt-automation-fields');
+
+    expect(ttCheck).toBeDefined();
+    expect(ttCheck!.requiredFieldsMissing).toContain('Is_Active__c');
+    expect(ttCheck!.requiredFieldsMissing).toHaveLength(1);
+    expect(ttCheck!.requiredFieldsFound).toContain('Automation_Type__c');
+    expect(ttCheck!.describeError).toBeNull();
+    expect(ttCheck!.describeUndetermined).toBe(false);
+
+    const cfCheck = getCustomFieldsCheck(body);
+    expect(cfCheck!.status).toBe('warning');
+  });
+
+  test('UI contract: tt-automation-fields result has no phase2Deferred flag', async () => {
+    // Previously phase2Deferred:true caused the Validation Center to render a
+    // "Phase 2 deferred" label.  After provisioning that flag was removed.
+    // The result row must either omit phase2Deferred or set it to false/undefined.
+    describeOverrides.set('TT_Automation__c', [
+      'Is_Active__c', 'Automation_Type__c', 'Description__c', 'Status__c',
+    ]);
+
+    const body    = await runValidate();
+    const ttCheck = getFieldCheck(body, 'tt-automation-fields') as FieldCheckResult & { phase2Deferred?: boolean };
+
+    expect(ttCheck).toBeDefined();
+    // If phase2Deferred is present on the result, it must not be true
+    if ('phase2Deferred' in ttCheck) {
+      expect(ttCheck.phase2Deferred).not.toBe(true);
+    }
+    // Confirm the entry is included in customFieldChecks (not skipped)
+    const ids = (await runValidate()).customFieldChecks.map(r => r.id);
+    expect(ids).toContain('tt-automation-fields');
+  });
+});
