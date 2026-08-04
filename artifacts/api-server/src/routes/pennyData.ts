@@ -334,6 +334,40 @@ router.patch(
   })
 );
 
+// ── POST /trail-config ────────────────────────────────────────────────────────
+
+router.post(
+  "/trail-config",
+  withClient(async (req, res, client) => {
+    const body = req.body as {
+      name?:               string;
+      trailId?:            string;
+      pennyRole?:          string;
+      tone?:               string;
+      focalPoints?:        string;
+      specialInstructions?: string;
+      isActive?:           boolean;
+    };
+    if (!body.trailId || typeof body.trailId !== "string" || !body.trailId.trim()) {
+      res.status(400).json({ error: "trailId is required" });
+      return;
+    }
+    const name = (body.name ?? "").trim() || `PTC-${Date.now().toString().slice(-6)}`;
+    const result = await client.createRecord("Penny_Trail_Config__c", {
+      Name:                    name,
+      Trail_ID__c:             body.trailId.trim(),
+      Penny_Role__c:           body.pennyRole          ?? null,
+      Tone__c:                 body.tone               ?? null,
+      Focal_Points__c:         body.focalPoints        ?? null,
+      Special_Instructions__c: body.specialInstructions ?? null,
+      Is_Active__c:            body.isActive           ?? true,
+    });
+    // Return the freshly-created record so the UI can append it immediately
+    const fresh = await getAllTrailConfigs(client);
+    res.status(201).json({ id: (result as { id: string }).id, configs: fresh });
+  })
+);
+
 // ── GET /weekly-reports ───────────────────────────────────────────────────────
 
 router.get(
