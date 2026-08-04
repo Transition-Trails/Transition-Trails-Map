@@ -1,1037 +1,542 @@
-import { useState, useMemo, useEffect, createContext, useContext } from 'react';
+import { useState, useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
-import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
+import { useTierFlags } from '@/hooks/useTierFlags';
 import { usePromptTemplates } from '@/hooks/usePromptTemplates';
-import { usePromptVariables } from '@/hooks/usePromptVariables';
-import {
-  promptTemplates, promptVariables, outputFormats, versionHistory, qualityReviews,
-  PROMPT_STUDIO_SUMMARY, DOMAIN_ORDER, DOMAIN_CLS,
-  PROMPT_STATUS_CONFIG, RISK_CONFIG,
-  type PromptTemplate, type PromptDomain, type PromptStatus,
-  type PromptVariable, type VariableType, type VariableSource,
-} from '@/data/pennyPromptStudioData';
+import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
+import {
+  promptTemplates as seedTemplates,
+  promptVariables, outputFormats,
+  DOMAIN_ORDER, DOMAIN_CLS, PROMPT_STATUS_CONFIG, RISK_CONFIG,
+  type PromptTemplate, type PromptDomain, type PromptStatus,
+} from '@/data/pennyPromptStudioData';
 
 import {
-  Brain, BookOpen, Layers, ShieldCheck, Database, Search, Filter,
-  ChevronDown, ChevronRight, ArrowRight, AlertTriangle, CheckCircle2,
-  Zap, Clock, Star, GitBranch, FlaskConical, ClipboardCheck, BarChart3,
-  Play, RotateCcw, Users, FileText, Plus, Hash, Loader2, Pencil,
+  Brain, Search, Plus, Play, Copy, FlaskConical, Hash,
+  FileText, CheckCircle2, AlertTriangle, Clock, Star,
+  ChevronDown, ChevronRight, MoreHorizontal, ArrowRight,
+  ArrowLeft, Eye, Wand2, Lightbulb, RotateCcw,
+  ImageIcon, Music, Video, FolderOpen, Wifi, ExternalLink,
+  Layers, Database, ShieldCheck, Lock, Sparkles,
 } from 'lucide-react';
 
-type StudioView = 'library' | 'templates' | 'variables' | 'source-rules' | 'formats' | 'test-bench' | 'history' | 'quality' | 'create';
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-// ── Tab ────────────────────────────────────────────────────────────────────
+type StudioTab = 'templates' | 'variables' | 'source-rules' | 'formats';
+type WizardStep = 1 | 2 | 3;
 
-function ViewTab({ label, icon: Icon, active, count, onClick }: {
-  label: string; icon: typeof Brain; active: boolean; count?: number; onClick: () => void;
-}) {
+// ── Penny content (Drive folder) ──────────────────────────────────────────────
+
+const PENNY_ASSETS = [
+  { kind: 'image' as const, icon: ImageIcon, label: 'penny-avatar.png',      hint: 'Used in chat bubbles & preview cards', ready: true  },
+  { kind: 'audio' as const, icon: Music,     label: 'penny-voice-intro.mp3', hint: 'Played when Penny first opens',       ready: true  },
+  { kind: 'video' as const, icon: Video,     label: 'penny-welcome.mp4',     hint: 'Add to Drive folder to activate',     ready: false },
+];
+
+// ── Domain category cards for wizard step 1 ───────────────────────────────────
+
+const WIZARD_CATEGORIES: {
+  domain: PromptDomain; description: string; examples: string[];
+}[] = [
+  { domain: 'Coaching',        description: 'Penny checks in with learners, nudges reflection, and surfaces next steps.',             examples: ['Weekly check-in', 'Module reflection', 'Progress celebration']          },
+  { domain: 'Career',          description: 'Penny helps learners explore roles, prep for interviews, and build confidence.',          examples: ['Resume review', 'Interview prep', 'Job-fit discovery']                  },
+  { domain: 'Knowledge',       description: 'Penny answers questions from verified sources — handbooks, procedures, FAQs.',            examples: ['Policy questions', 'Step-by-step how-to', 'Resource discovery']         },
+  { domain: 'Learning',        description: 'Penny guides learners through modules, surfaces gaps, and builds study plans.',           examples: ['Study plan', 'Module guidance', 'Assessment support']                   },
+  { domain: 'Communications',  description: 'Penny drafts messages, summaries, and briefs for staff and leadership.',                  examples: ['Cohort brief', 'Executive summary', 'Escalation alert']                 },
+  { domain: 'Operations',      description: 'Penny monitors program health, flags risks, and surfaces operational insights.',          examples: ['Risk flag', 'Missed milestone notice', 'Cohort health summary']         },
+];
+
+const TONE_OPTIONS = ['Warm & Encouraging', 'Direct & Clear', 'Curious & Inviting', 'Professional', 'Celebratory'];
+const AUDIENCE_OPTIONS = ['All Learners', 'Active Learners', 'Coaching Stage', 'Job Ready', 'Alumni', 'Staff / Coaches'];
+
+// ── Small reusables ───────────────────────────────────────────────────────────
+
+function Chip({ children, cls }: { children: React.ReactNode; cls: string }) {
   return (
-    <button onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-all border ${
-        active ? 'bg-foreground text-background border-foreground'
-               : 'border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground'
-      }`}
-    >
-      <Icon className="w-3.5 h-3.5" />
-      {label}
-      {count !== undefined && (
-        <span className={`text-[14px] font-bold rounded-full px-1.5 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
-      )}
-    </button>
+    <span className={`inline-flex items-center text-[11px] font-bold border rounded-full px-2 py-0.5 ${cls}`}>
+      {children}
+    </span>
   );
 }
 
-// ── Status dot ─────────────────────────────────────────────────────────────
+function ScoreBar({ score }: { score: number }) {
+  const color = score >= 90 ? '#2F6B3F' : score >= 70 ? '#CC8400' : '#A93F2F';
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
+        <div className="h-full rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: color }} />
+      </div>
+      <span className="text-[12px] font-bold tabular-nums w-6 text-right" style={{ color }}>{score}</span>
+    </div>
+  );
+}
 
 function StatusBadge({ status }: { status: PromptStatus }) {
   const cfg = PROMPT_STATUS_CONFIG[status];
-  return <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{status}</span>;
-}
-
-// ── Template Row ───────────────────────────────────────────────────────────
-
-function TemplateRow({ t, selected, onSelect }: { t: PromptTemplate; selected: boolean; onSelect: () => void }) {
-  const domCls = DOMAIN_CLS[t.domain];
+  const Icon = status === 'Approved' ? CheckCircle2 : status === 'Review' ? Clock : status === 'Deprecated' ? AlertTriangle : FileText;
   return (
-    <button onClick={onSelect}
-      className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
-        selected ? 'bg-foreground text-background border-foreground'
-                 : 'bg-white border-border hover:border-foreground/20 hover:bg-muted/20'
-      }`}
-    >
-      <p className={`text-[14px] font-bold leading-snug mb-0.5 ${selected ? 'text-background' : 'text-foreground'}`}>{t.name}</p>
-      <div className="flex items-center gap-1">
-        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : domCls}`}>{t.domain}</span>
-        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${selected ? 'bg-background/20 text-background border-background/30' : PROMPT_STATUS_CONFIG[t.status].cls}`}>{t.status}</span>
-      </div>
-    </button>
+    <span className={`inline-flex items-center gap-1 text-[11px] font-bold border rounded-full px-2 py-0.5 ${cfg.cls}`}>
+      <Icon className="w-2.5 h-2.5" />
+      {status === 'Review' ? 'In Review' : status}
+    </span>
   );
 }
 
-// ── Template Detail ────────────────────────────────────────────────────────
+// ── Penny content strip ───────────────────────────────────────────────────────
 
-function TemplateDetail({ t, onOpenBrief, onEdit }: { t: PromptTemplate; onOpenBrief: () => void; onEdit: () => void }) {
-  const [open, setOpen] = useState<Set<string>>(() => new Set(['purpose','guardrails']));
-  function toggle(id: string) {
-    setOpen(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  }
-  const Sec = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => {
-    const isOpen = open.has(id);
-    return (
-      <div className="border border-border rounded-lg overflow-hidden">
-        <button onClick={() => toggle(id)} className="w-full flex items-center justify-between px-3 py-2 bg-muted/30 hover:bg-muted/50">
-          <span className="text-[14px] font-bold text-foreground ">{label}</span>
-          {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
+function PennyContentStrip() {
+  return (
+    <div className="rounded-xl border border-[#D9EAE0] bg-[#F0F5F2] overflow-hidden">
+      <div className="flex items-center gap-2.5 px-3 py-2 border-b border-[#D9EAE0]">
+        <div className="w-7 h-7 rounded-full bg-foreground flex items-center justify-center text-[11px] font-bold text-background ring-2 ring-white shadow-sm shrink-0">
+          P
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[12px] font-semibold text-foreground">Penny's content</span>
+            <span className="flex items-center gap-0.5 text-[9px] font-bold text-[#2F6B3F] bg-[#C8E6D0] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">
+              <Wifi className="w-2 h-2" /> Connected
+            </span>
+          </div>
+          <p className="text-[10px] text-muted-foreground flex items-center gap-1 truncate">
+            <FolderOpen className="w-2.5 h-2.5 shrink-0" /> Penny Content / Assets
+          </p>
+        </div>
+        <button className="text-muted-foreground hover:text-foreground transition-colors" title="Open in Drive">
+          <ExternalLink className="w-3 h-3" />
         </button>
-        {isOpen && <div className="p-3">{children}</div>}
       </div>
-    );
-  };
-  const riskCfg = RISK_CONFIG[t.hallucinationRisk];
-  const domCls  = DOMAIN_CLS[t.domain];
-  const stsCfg  = PROMPT_STATUS_CONFIG[t.status];
-  const qr      = qualityReviews.find(q => q.templateId === t.id);
-
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-4 space-y-4">
-        {/* Header */}
-        <div>
-          <div className="flex items-start justify-between gap-2 mb-2">
-            <div>
-              <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">Prompt Template · v{t.version}</p>
-              <h3 className="text-[16px] font-bold text-foreground leading-snug">{t.name}</h3>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button onClick={onEdit} className="text-[14px] font-bold text-muted-foreground border border-border rounded-full px-2 py-1 hover:bg-muted/40 transition-colors">Edit</button>
-              <button onClick={onOpenBrief} className="text-[14px] font-bold text-primary border border-primary/30 rounded-full px-2 py-1 hover:bg-primary/5 transition-colors">Brief</button>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${domCls}`}>{t.domain}</span>
-            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${stsCfg.cls}`}>{t.status}</span>
-            <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${riskCfg.cls}`}>Risk: {t.hallucinationRisk}</span>
-            <span className="text-[14px] font-bold border rounded-full px-2 py-0.5 border-border text-muted-foreground">Score: {t.qualityScore}/100</span>
-          </div>
-        </div>
-
-        {/* Purpose */}
-        <div className="rounded-lg border border-primary/15 bg-primary/5 p-3">
-          <p className="text-[14px] font-bold text-primary/70  mb-1">Purpose</p>
-          <p className="text-[14px] text-foreground leading-relaxed">{t.purpose}</p>
-        </div>
-
-        {/* Meta */}
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            { label: 'Owner',           value: t.owner },
-            { label: 'Capability',      value: t.capabilityId.replace('cap-', '').replace(/-/g, ' ') },
-            { label: 'Output Format',   value: t.outputFormatId },
-            { label: 'Last Reviewed',   value: t.lastReviewed },
-            { label: 'Audience',        value: t.audience.join(', ') },
-            { label: 'Tone',            value: t.tone.split('.')[0] },
-          ].map(({ label, value }) => (
-            <div key={label} className="rounded-lg border border-border bg-white p-2">
-              <p className="text-[14px] font-bold  text-muted-foreground/50">{label}</p>
-              <p className="text-[14px] font-semibold text-foreground capitalize">{value}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Required variables */}
-        <Sec id="vars" label={`Required Variables (${t.requiredVariables.length})`}>
-          <div className="flex flex-wrap gap-1">
-            {t.requiredVariables.map(id => {
-              const v = promptVariables.find(v => v.id === id);
-              return v ? (
-                <span key={id} className="text-[14px] font-mono font-semibold bg-muted border border-border rounded px-1.5 py-0.5 text-foreground">{v.name}</span>
-              ) : null;
-            })}
-          </div>
-        </Sec>
-
-        {/* Source rules */}
-        <Sec id="sources" label={`Source Rules (${t.sourceRules.length})`}>
-          <div className="space-y-1.5">
-            {t.sourceRules.map(sr => {
-              const cls = sr.role === 'Required' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
-                        : sr.role === 'Preferred' ? 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]'
-                        : sr.role === 'Optional' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
-                        : 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]';
-              return (
-                <div key={sr.sourceId} className="flex items-start gap-2">
-                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 mt-0.5 ${cls}`}>{sr.role}</span>
-                  <div>
-                    <p className="text-[14px] font-semibold text-foreground">{sr.sourceName}</p>
-                    <p className="text-[14px] text-muted-foreground">{sr.reasoning}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Sec>
-
-        {/* Guardrails */}
-        <Sec id="guardrails" label={`Guardrails (${t.guardrails.length})`}>
-          <div className="space-y-1.5">
-            {t.guardrails.map((g, i) => (
-              <div key={i} className="flex items-start gap-2 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
-                <p className="text-[14px] text-[#A93F2F] leading-snug">{g}</p>
-              </div>
-            ))}
-          </div>
-        </Sec>
-
-        {/* Prompt body */}
-        <Sec id="prompt" label="Prompt Body (Annotated)">
-          <pre className="text-[14px] font-mono text-foreground bg-muted/40 rounded-lg p-3 whitespace-pre-wrap leading-relaxed overflow-x-auto">{t.promptBody}</pre>
-        </Sec>
-
-        {/* SF Objects + Standards */}
-        <Sec id="related" label="Related Systems">
-          <div className="space-y-2">
-            <div>
-              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Salesforce Objects</p>
-              <div className="flex flex-wrap gap-1">
-                {t.relatedSfObjects.length === 0
-                  ? <span className="text-[14px] italic text-muted-foreground/50">None</span>
-                  : t.relatedSfObjects.map(o => <span key={o} className="text-[14px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#EDF5F8] rounded-full px-2 py-0.5">{o}</span>)
-                }
-              </div>
-            </div>
-            <div>
-              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Standards</p>
-              <div className="flex flex-wrap gap-1">
-                {t.relatedStandards.length === 0
-                  ? <span className="text-[14px] italic text-muted-foreground/50">None defined yet</span>
-                  : t.relatedStandards.map(s => <span key={s} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{s.replace('std-','').replace(/-/g,' ')}</span>)
-                }
-              </div>
-            </div>
-          </div>
-        </Sec>
-
-        {/* Quality */}
-        {qr && (
-          <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-2">Quality Review</p>
-            <div className="grid grid-cols-2 gap-1.5 mb-2">
-              {[
-                { label: 'Source Coverage',    value: qr.sourceCoverage },
-                { label: 'Standards Alignment', value: qr.standardsAlignment },
-                { label: 'Usefulness',          value: qr.usefulnessScore },
-              ].map(({ label, value }) => (
-                <div key={label}>
-                  <p className="text-[14px] text-muted-foreground mb-0.5">{label}</p>
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
-                      <div className="h-full bg-foreground rounded-full" style={{ width: `${value}%` }} />
-                    </div>
-                    <span className="text-[14px] font-bold">{value}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {qr.openFlags.length > 0 && (
-              <div className="space-y-1">
-                {qr.openFlags.map((f, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-[14px] text-[#CC8400]">
-                    <AlertTriangle className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
-                    {f}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </ScrollArea>
-  );
-}
-
-// ── Studio context (live template state) ───────────────────────────────────
-
-interface StudioCtxValue { templates: PromptTemplate[]; }
-const StudioCtx = createContext<StudioCtxValue>({ templates: promptTemplates });
-function useStudioTemplates() { return useContext(StudioCtx).templates; }
-
-// ── Library View ───────────────────────────────────────────────────────────
-
-function LibraryView({ onSelectTemplate }: { onSelectTemplate: (t: PromptTemplate) => void }) {
-  const templates = useStudioTemplates();
-  return (
-    <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-          <div className="flex items-start gap-3">
-            <Brain className="w-7 h-7 text-primary shrink-0 mt-0.5" />
-            <div>
-              <h2 className="text-[14px] font-bold text-foreground mb-1">Prompt Library</h2>
-              <p className="text-[14px] text-foreground/80 leading-relaxed">
-                All Penny prompt templates organized by capability domain. Each template defines how Penny thinks, what it retrieves, and what guardrails govern its output. Staff configure Penny behavior here — no code required.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {DOMAIN_ORDER.map(domain => {
-          const domTemplates = templates.filter(t => t.domain === domain);
-          if (!domTemplates.length) return null;
-          const cls = DOMAIN_CLS[domain];
+      <div className="divide-y divide-[#D9EAE0]">
+        {PENNY_ASSETS.map(a => {
+          const Icon = a.icon;
           return (
-            <div key={domain}>
-              <div className={`flex items-center gap-2 rounded-xl border p-3 mb-2 ${cls}`}>
-                <Brain className="w-4 h-4" />
-                <p className="text-[14px] font-bold">{domain}</p>
-                <span className="text-[14px] font-bold ml-auto">{domTemplates.length} template{domTemplates.length > 1 ? 's' : ''}</span>
+            <div key={a.kind} className="flex items-center gap-2.5 px-3 py-2">
+              <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${a.ready ? 'bg-foreground' : 'bg-muted'}`}>
+                <Icon className={`w-2.5 h-2.5 ${a.ready ? 'text-background' : 'text-muted-foreground'}`} />
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {domTemplates.map(t => (
-                  <button key={t.id} onClick={() => onSelectTemplate(t)}
-                    className="text-left rounded-xl border border-border bg-white p-3 hover:border-foreground/30 hover:shadow-sm transition-all group"
-                  >
-                    <div className="flex items-start justify-between gap-1 mb-1.5">
-                      <p className="text-[14px] font-bold text-foreground leading-snug group-hover:text-primary transition-colors">{t.name}</p>
-                      <StatusBadge status={t.status} />
-                    </div>
-                    <p className="text-[14px] text-muted-foreground leading-snug mb-2">{t.shortDescription}</p>
-                    <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
-                      <span className={`font-bold border rounded-full px-1.5 py-0.5 ${RISK_CONFIG[t.hallucinationRisk].cls}`}>Risk: {t.hallucinationRisk}</span>
-                      <span className="border border-border bg-muted/40 rounded-full px-1.5 py-0.5">v{t.version}</span>
-                      <span className="ml-auto font-semibold">{t.qualityScore}/100</span>
-                    </div>
-                  </button>
-                ))}
+              <div className="flex-1 min-w-0">
+                <p className={`text-[11px] font-medium truncate ${a.ready ? 'text-foreground' : 'text-muted-foreground'}`}>{a.label}</p>
+                <p className="text-[10px] text-muted-foreground">{a.hint}</p>
               </div>
+              <span className={`text-[9px] font-bold rounded-full px-1.5 py-0.5 shrink-0 border ${
+                a.ready
+                  ? 'bg-[#C8E6D0] text-[#2F6B3F] border-[#9FC3AE]'
+                  : 'bg-muted text-muted-foreground border-border'
+              }`}>{a.ready ? 'Ready' : 'Not set'}</span>
             </div>
           );
         })}
       </div>
-    </ScrollArea>
+    </div>
   );
 }
 
-// ── Templates View ─────────────────────────────────────────────────────────
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 
-function TemplatesView({ onOpenBrief, onEdit }: { onOpenBrief: (t: PromptTemplate) => void; onEdit: (t: PromptTemplate) => void }) {
-  const templates = useStudioTemplates();
-  const [selectedId, setSelectedId] = useState(() => templates[0]?.id ?? '');
+function Sidebar({
+  templates, selectedId, onSelect,
+}: {
+  templates: PromptTemplate[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
   const [search, setSearch]         = useState('');
-  const [filterDomain, setFilterDomain]   = useState<PromptDomain | 'all'>('all');
-  const [filterStatus, setFilterStatus]   = useState<PromptStatus | 'all'>('all');
+  const [domainFilter, setDomain]   = useState<PromptDomain | 'all'>('all');
+  const [statusFilter, setStatus]   = useState<PromptStatus | 'all'>('all');
 
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return templates.filter(t =>
-      (filterDomain === 'all' || t.domain === filterDomain) &&
-      (filterStatus === 'all' || t.status === filterStatus) &&
-      (!q || t.name.toLowerCase().includes(q) || t.shortDescription.toLowerCase().includes(q))
-    );
-  }, [templates, search, filterDomain, filterStatus]);
+  const filtered = useMemo(() => templates.filter(t => {
+    if (search && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (domainFilter !== 'all' && t.domain !== domainFilter) return false;
+    if (statusFilter !== 'all' && t.status !== statusFilter) return false;
+    return true;
+  }), [templates, search, domainFilter, statusFilter]);
 
-  const selected = templates.find(t => t.id === selectedId) ?? templates[0];
-
-  return (
-    <div className="flex h-full overflow-hidden">
-      <div className="w-[220px] flex-shrink-0 border-r border-border flex flex-col">
-        <div className="p-2.5 space-y-2 border-b border-border">
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates…" className="pl-7 h-7 text-[14px] bg-white" />
-          </div>
-          <select value={filterDomain} onChange={e => setFilterDomain(e.target.value as any)} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
-            <option value="all">All domains</option>
-            {DOMAIN_ORDER.map(d => <option key={d} value={d}>{d}</option>)}
-          </select>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)} className="w-full h-7 text-[14px] rounded-md border border-input bg-white px-2">
-            <option value="all">All statuses</option>
-            {(['Approved','Review','Draft','Deprecated'] as PromptStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {filtered.length === 0 && <p className="text-[14px] text-center text-muted-foreground py-6">No templates match.</p>}
-            {DOMAIN_ORDER.map(domain => {
-              const ts = filtered.filter(t => t.domain === domain);
-              if (!ts.length) return null;
-              return (
-                <div key={domain}>
-                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
-                  {ts.map(t => <TemplateRow key={t.id} t={t} selected={selectedId === t.id} onSelect={() => setSelectedId(t.id)} />)}
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
-      </div>
-      <div className="flex-1 overflow-hidden">
-        <TemplateDetail t={selected} onOpenBrief={() => onOpenBrief(selected)} onEdit={() => onEdit(selected)} />
-      </div>
-    </div>
-  );
-}
-
-// ── Variables View ─────────────────────────────────────────────────────────
-
-const SOURCE_CLS: Record<string, string> = {
-  'Salesforce':       'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
-  'LMS':              'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
-  'Calendar':         'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
-  'Standards Studio': 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
-  'Curriculum Studio':'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
-  'Penny Generated':  'text-secondary border-secondary/20 bg-secondary/10',
-};
-
-const VARIABLE_SOURCES: VariableSource[] = [
-  'Salesforce', 'LMS', 'Calendar', 'User Input',
-  'Standards Studio', 'Curriculum Studio', 'Penny Generated',
-];
-
-function VariablesView() {
-  const { openActionPanel } = useAppContext();
-  const { variables, create, update } = usePromptVariables();
-  const [selectedId, setSelectedId] = useState<string | null>(() => null);
-  const selected = selectedId ? (variables.find(v => v.id === selectedId) ?? null) : null;
-
-  function handleNew() {
-    openActionPanel({
-      title:       'New Variable',
-      objectType:  'Prompt Variable',
-      subtitle:    'Define a new runtime variable Penny can use in prompts. Saved to the database.',
-      slackContext:'penny',
-      fields: [
-        { id: 'name',         label: 'Placeholder',    type: 'text',     required: true,  placeholder: '{{variable_name}}' },
-        { id: 'label',        label: 'Display Label',  type: 'text',     required: true,  placeholder: 'Human-readable label' },
-        { id: 'type',         label: 'Type',           type: 'select',   required: true,  options: ['text','number','list','object','boolean'] },
-        { id: 'source',       label: 'Data Source',    type: 'select',   required: true,  options: VARIABLE_SOURCES },
-        { id: 'description',  label: 'Description',    type: 'textarea', required: true,  placeholder: 'What does this variable represent?', rows: 2 },
-        { id: 'exampleValue', label: 'Example Value',  type: 'text',     placeholder: 'e.g. Jordan Smith' },
-        { id: 'required',     label: 'Required',       type: 'select',   options: ['true','false'] },
-      ],
-      onSaveAndView: (data) => {
-        if (data.name?.trim() && data.label?.trim()) {
-          create({
-            id:              `var-${Date.now()}`,
-            name:            data.name.trim(),
-            label:           data.label.trim(),
-            type:            (data.type as VariableType)     || 'text',
-            source:          (data.source as VariableSource) || 'User Input',
-            description:     data.description  || '',
-            exampleValue:    data.exampleValue || '',
-            required:        data.required === 'true',
-            usedByTemplates: [],
-          });
-        }
-      },
-    });
-  }
-
-  function handleEdit(v: PromptVariable) {
-    openActionPanel({
-      title:       `Edit: ${v.label}`,
-      objectType:  'Prompt Variable',
-      subtitle:    'Update variable configuration. Changes are saved to the database.',
-      slackContext:'penny',
-      fields: [
-        { id: 'label',        label: 'Display Label', type: 'text',     placeholder: v.label },
-        { id: 'type',         label: 'Type',          type: 'select',   options: ['text','number','list','object','boolean'] },
-        { id: 'source',       label: 'Data Source',   type: 'select',   options: VARIABLE_SOURCES },
-        { id: 'description',  label: 'Description',   type: 'textarea', placeholder: v.description, rows: 2 },
-        { id: 'exampleValue', label: 'Example Value', type: 'text',     placeholder: v.exampleValue },
-      ],
-      onSaveAndView: (data) => {
-        update({ id: v.id, updates: {
-          ...(data.label        ? { label:        data.label                     } : {}),
-          ...(data.type         ? { type:         data.type as VariableType      } : {}),
-          ...(data.source       ? { source:       data.source as VariableSource  } : {}),
-          ...(data.description  ? { description:  data.description               } : {}),
-          ...(data.exampleValue ? { exampleValue: data.exampleValue              } : {}),
-        }});
-      },
-    });
-  }
+  const grouped = useMemo(() =>
+    DOMAIN_ORDER.reduce<Record<string, PromptTemplate[]>>((acc, d) => {
+      const items = filtered.filter(t => t.domain === d);
+      if (items.length) acc[d] = items;
+      return acc;
+    }, {}),
+  [filtered]);
 
   return (
-    <div className="flex h-full overflow-hidden">
-
-      {/* ── List column ───────────────────────────────────── */}
-      <div className="flex flex-col flex-1 min-w-0">
-        {/* Sub-header */}
-        <div className="px-5 py-2.5 border-b border-border bg-white flex-shrink-0 flex items-center justify-between gap-4">
-          <p className="text-[14px] text-muted-foreground leading-snug">
-            Runtime variables injected into Penny prompts. Each maps to a live data source — Salesforce, LMS, Calendar, or User Input.
-          </p>
-          <button
-            onClick={handleNew}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity shrink-0"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            New Variable
-          </button>
+    <aside className="w-[240px] shrink-0 border-r border-border flex flex-col bg-muted/20 overflow-hidden">
+      {/* Search */}
+      <div className="px-3 pt-3 pb-2 border-b border-border">
+        <div className="relative">
+          <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search templates…"
+            className="w-full h-7 rounded-lg border border-border bg-background pl-7 pr-2.5 text-[12px] placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40"
+          />
         </div>
-
-        <ScrollArea className="flex-1">
-          <div className="p-4 space-y-1">
-            {/* Column headers */}
-            <div className="grid grid-cols-[1fr_64px_96px_24px] gap-2 px-3 py-1">
-              {['Variable / Label','Type','Source',''].map((h,i) => (
-                <p key={i} className="text-[14px] font-bold  text-muted-foreground/50">{h}</p>
-              ))}
-            </div>
-
-            {variables.map(v => (
-              <button
-                key={v.id}
-                onClick={() => setSelectedId(id => id === v.id ? null : v.id)}
-                className={`w-full text-left grid grid-cols-[1fr_64px_96px_24px] gap-2 px-3 py-2.5 rounded-lg border transition-all items-center ${
-                  selectedId === v.id
-                    ? 'border-foreground bg-foreground/5'
-                    : 'border-border bg-white hover:bg-muted/20'
-                }`}
-              >
-                <div>
-                  <code className="text-[14px] font-mono font-bold text-foreground bg-muted/40 rounded px-1.5 py-0.5">{v.name}</code>
-                  <p className="text-[14px] text-muted-foreground mt-0.5">{v.label}</p>
-                </div>
-                <span className="text-[14px] font-semibold text-muted-foreground capitalize">{v.type}</span>
-                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 truncate ${SOURCE_CLS[v.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>
-                  {v.source}
-                </span>
-                <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${selectedId === v.id ? 'rotate-90' : ''}`} />
-              </button>
-            ))}
-          </div>
-        </ScrollArea>
       </div>
 
-      {/* ── Detail panel ──────────────────────────────────── */}
-      {selected && (
-        <div className="w-[280px] flex-shrink-0 border-l border-border flex flex-col bg-white">
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-border flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Variable</p>
-              <p className="text-[14px] font-bold text-foreground leading-tight truncate">{selected.label}</p>
-              <code className="text-[14px] font-mono text-muted-foreground">{selected.name}</code>
-            </div>
-            <button
-              onClick={() => handleEdit(selected)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-border text-[14px] font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors shrink-0"
-            >
-              <Pencil className="w-3 h-3" /> Edit
-            </button>
-          </div>
-
-          <ScrollArea className="flex-1">
-            <div className="p-4 space-y-4">
-              {/* Badges */}
-              <div className="flex flex-wrap gap-1.5">
-                <span className="text-[14px] font-bold border rounded-full px-2 py-0.5 text-slate-600 bg-slate-50 border-slate-200 capitalize">{selected.type}</span>
-                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${SOURCE_CLS[selected.source] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>{selected.source}</span>
-                {selected.required && (
-                  <span className="text-[14px] font-bold border rounded-full px-2 py-0.5 text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]">Required</span>
-                )}
-              </div>
-
-              {/* Description */}
-              <div>
-                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Description</p>
-                <p className="text-[14px] text-foreground leading-relaxed">{selected.description}</p>
-              </div>
-
-              {/* Example */}
-              <div>
-                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Example Value</p>
-                <code className="text-[14px] font-mono text-muted-foreground block bg-muted/30 rounded px-2 py-1.5 break-all">{selected.exampleValue || '—'}</code>
-              </div>
-
-              {/* Used by */}
-              <div>
-                <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">
-                  Used by {selected.usedByTemplates.length} template{selected.usedByTemplates.length !== 1 ? 's' : ''}
-                </p>
-                {selected.usedByTemplates.length > 0 ? (
-                  <div className="space-y-1">
-                    {selected.usedByTemplates.map(tid => (
-                      <p key={tid} className="text-[14px] font-mono text-muted-foreground bg-muted/20 rounded px-2 py-1">{tid}</p>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-[14px] text-muted-foreground italic">No templates yet</p>
-                )}
-              </div>
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Source Rules View ──────────────────────────────────────────────────────
-
-function SourceRulesView() {
-  const templates = useStudioTemplates();
-  const [selectedId, setSelectedId] = useState(() => templates[0]?.id ?? '');
-  const t = templates.find(t => t.id === selectedId) ?? templates[0];
-
-  const roleConfig = {
-    Required:  'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
-    Preferred: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
-    Optional:  'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
-    Forbidden: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
-  };
-
-  return (
-    <div className="flex h-full overflow-hidden">
-      <div className="w-[200px] flex-shrink-0 border-r border-border flex flex-col">
-        <div className="p-2.5 border-b border-border">
-          <p className="text-[14px] font-bold  text-muted-foreground/50">Select Template</p>
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {DOMAIN_ORDER.map(domain => {
-              const ts = templates.filter(t => t.domain === domain);
-              if (!ts.length) return null;
-              return (
-                <div key={domain}>
-                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
-                  {ts.map(pt => (
-                    <button key={pt.id} onClick={() => setSelectedId(pt.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
-                        selectedId === pt.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
-                      }`}
-                    >{pt.name}</button>
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
+      {/* Filters */}
+      <div className="px-3 py-2 flex items-center gap-1.5 border-b border-border">
+        <select
+          value={domainFilter}
+          onChange={e => setDomain(e.target.value as PromptDomain | 'all')}
+          className="flex-1 h-7 rounded-md border border-border bg-background text-[11px] text-foreground px-2 focus:outline-none"
+        >
+          <option value="all">All domains</option>
+          {DOMAIN_ORDER.map(d => <option key={d} value={d}>{d}</option>)}
+        </select>
+        <select
+          value={statusFilter}
+          onChange={e => setStatus(e.target.value as PromptStatus | 'all')}
+          className="flex-1 h-7 rounded-md border border-border bg-background text-[11px] text-foreground px-2 focus:outline-none"
+        >
+          <option value="all">All statuses</option>
+          {(['Approved','Review','Draft','Deprecated'] as PromptStatus[]).map(s =>
+            <option key={s} value={s}>{s === 'Review' ? 'In Review' : s}</option>
+          )}
+        </select>
       </div>
+
+      {/* List */}
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-2xl space-y-4">
-          <div className={`rounded-xl border p-3 ${DOMAIN_CLS[t.domain]}`}>
-            <p className="text-[14px] font-bold">{t.name}</p>
-            <p className="text-[14px] text-muted-foreground">{t.shortDescription}</p>
-          </div>
-          <div className="rounded-xl border border-border bg-white overflow-hidden">
-            <div className="grid grid-cols-[100px_1fr_1fr] gap-2 px-4 py-2 bg-muted/30 border-b border-border">
-              {['Role','Source','Reasoning'].map(h => (
-                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
-              ))}
-            </div>
-            {t.sourceRules.map((sr, i) => (
-              <div key={sr.sourceId} className={`grid grid-cols-[100px_1fr_1fr] gap-2 px-4 py-3 items-start ${i < t.sourceRules.length - 1 ? 'border-b border-border' : ''}`}>
-                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 self-start ${roleConfig[sr.role]}`}>{sr.role}</span>
-                <p className="text-[14px] font-semibold text-foreground">{sr.sourceName}</p>
-                <p className="text-[14px] text-muted-foreground leading-snug">{sr.reasoning}</p>
+        <div className="py-1.5">
+          {Object.entries(grouped).map(([domain, items]) => (
+            <div key={domain} className="mb-1">
+              <div className="flex items-center gap-1.5 px-3 py-1">
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${DOMAIN_CLS[domain as PromptDomain].split(' ')[0].replace('text-', 'bg-')}`} />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{domain}</span>
+                <span className="text-[10px] text-muted-foreground ml-auto">{items.length}</span>
               </div>
-            ))}
-          </div>
-          <div className="rounded-xl border border-border bg-muted/20 p-4">
-            <p className="text-[14px] font-bold text-foreground mb-2">Source Rule Legend</p>
-            <div className="space-y-1.5">
-              {(['Required','Preferred','Optional','Forbidden'] as const).map(role => (
-                <div key={role} className="flex items-center gap-2">
-                  <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 w-20 text-center ${roleConfig[role]}`}>{role}</span>
-                  <p className="text-[14px] text-muted-foreground">
-                    {role === 'Required'  ? 'Penny must retrieve from this source. Missing = abort and flag.' : ''}
-                    {role === 'Preferred' ? 'Use if available. Penny continues without it but logs the gap.' : ''}
-                    {role === 'Optional'  ? 'Enrich context if present. Never required.' : ''}
-                    {role === 'Forbidden' ? 'Penny must never retrieve from this source for this prompt.' : ''}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </ScrollArea>
-    </div>
-  );
-}
-
-// ── Output Formats View ────────────────────────────────────────────────────
-
-function OutputFormatsView() {
-  const templates = useStudioTemplates();
-  const [selectedId, setSelectedId] = useState<string>(outputFormats[0].id);
-  const selected = outputFormats.find(f => f.id === selectedId) ?? outputFormats[0];
-  return (
-    <div className="flex h-full overflow-hidden">
-      <div className="w-[190px] flex-shrink-0 border-r border-border flex flex-col">
-        <div className="p-2.5 border-b border-border">
-          <p className="text-[14px] font-bold  text-muted-foreground/50">Formats ({outputFormats.length})</p>
-        </div>
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {outputFormats.map(f => (
-              <button key={f.id} onClick={() => setSelectedId(f.id)}
-                className={`w-full text-left px-2.5 py-2.5 rounded-lg transition-all ${
-                  selectedId === f.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
-                }`}
-              >
-                <p className={`text-[14px] font-bold ${selectedId === f.id ? 'text-background' : 'text-foreground'}`}>{f.name}</p>
-                <p className={`text-[14px] ${selectedId === f.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>{f.usedBy.length} template{f.usedBy.length !== 1 ? 's' : ''}</p>
-              </button>
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
-      <ScrollArea className="flex-1">
-        <div className="p-5 max-w-2xl space-y-4">
-          <div>
-            <p className="text-[14px] font-bold  text-muted-foreground/60 mb-0.5">Output Format</p>
-            <h2 className="text-[18px] font-bold text-foreground">{selected.name}</h2>
-          </div>
-          <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
-            <p className="text-[14px] font-bold text-primary/70  mb-1">Description</p>
-            <p className="text-[14px] text-foreground leading-relaxed">{selected.description}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-border bg-white p-3">
-              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Length Guidance</p>
-              <p className="text-[14px] text-foreground">{selected.lengthGuidance}</p>
-            </div>
-            <div className="rounded-xl border border-border bg-white p-3">
-              <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1.5">Tone</p>
-              <p className="text-[14px] text-foreground">{selected.tone}</p>
-            </div>
-          </div>
-          <div className="rounded-xl border border-border bg-white p-4">
-            <p className="text-[14px] font-bold text-foreground mb-2">Required Structure</p>
-            <div className="space-y-1.5">
-              {selected.structure.map((s, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="w-5 h-5 rounded-full bg-foreground text-background text-[14px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                  <p className="text-[14px] text-foreground">{s}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="rounded-xl border border-border bg-muted/20 p-4">
-            <p className="text-[14px] font-bold text-foreground mb-2">Format Example</p>
-            <p className="text-[14px] text-foreground/80 italic leading-relaxed">{selected.example}</p>
-          </div>
-          <div>
-            <p className="text-[14px] font-bold text-foreground mb-2">Used by Templates</p>
-            <div className="flex flex-wrap gap-1">
-              {selected.usedBy.map(id => {
-                const t = templates.find(t => t.id === id);
-                return t ? <span key={id} className="text-[14px] font-medium border border-border bg-white rounded-full px-2 py-0.5 text-muted-foreground">{t.name}</span> : null;
+              {items.map(t => {
+                const isActive = t.id === selectedId;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => onSelect(t.id)}
+                    className={`w-full text-left px-3 py-2 transition-colors ${
+                      isActive ? 'bg-foreground' : 'hover:bg-muted/50'
+                    }`}
+                  >
+                    <div className="flex items-start gap-1">
+                      {t.qualityScore >= 90 &&
+                        <Star className={`w-3 h-3 shrink-0 mt-0.5 fill-current ${isActive ? 'text-amber-300' : 'text-amber-400'}`} />
+                      }
+                      <p className={`text-[12px] font-medium leading-snug flex-1 ${isActive ? 'text-background' : 'text-foreground'}`}>
+                        {t.name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className={`text-[10px] font-bold ${isActive ? 'text-background/70' : 'text-muted-foreground'}`}>
+                        {t.status === 'Review' ? 'In Review' : t.status}
+                      </span>
+                      <span className={`text-[11px] ml-auto font-bold tabular-nums ${
+                        isActive ? 'text-background/70'
+                          : t.qualityScore >= 90 ? 'text-[#2F6B3F]'
+                          : 'text-[#CC8400]'
+                      }`}>{t.qualityScore}</span>
+                    </div>
+                  </button>
+                );
               })}
             </div>
+          ))}
+          {Object.keys(grouped).length === 0 && (
+            <p className="px-4 py-6 text-[12px] text-muted-foreground text-center">No templates match</p>
+          )}
+        </div>
+      </ScrollArea>
+
+      {/* Footer stats */}
+      <div className="border-t border-border px-3 py-2 space-y-1">
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span>{templates.length} total</span>
+          <span>{templates.filter(t => t.status === 'Approved').length} approved · {templates.filter(t => t.status === 'Review').length} in review</span>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+// ── Template detail panel ─────────────────────────────────────────────────────
+
+function TemplateDetailPanel({
+  template, showTest, onToggleTest, onEdit, onBrief,
+}: {
+  template: PromptTemplate;
+  showTest: boolean;
+  onToggleTest: () => void;
+  onEdit: (t: PromptTemplate) => void;
+  onBrief: (t: PromptTemplate) => void;
+}) {
+  const [open, setOpen] = useState<Set<string>>(() => new Set(['purpose', 'config', 'guardrails']));
+  function toggle(id: string) {
+    setOpen(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  }
+
+  const domCls  = DOMAIN_CLS[template.domain];
+  const riskCfg = RISK_CONFIG[template.hallucinationRisk];
+
+  const Sec = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => {
+    const isOpen = open.has(id);
+    return (
+      <div className="border-b border-border last:border-0">
+        <button
+          onClick={() => toggle(id)}
+          className="w-full flex items-center justify-between px-5 py-2.5 hover:bg-muted/30 transition-colors"
+        >
+          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">{label}</span>
+          {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
+        </button>
+        {isOpen && <div className="px-5 pb-4">{children}</div>}
+      </div>
+    );
+  };
+
+  // look up variables from the shared list
+  const vars = useMemo(() =>
+    template.requiredVariables
+      .map(vid => promptVariables.find(v => v.id === vid))
+      .filter(Boolean) as typeof promptVariables,
+  [template.requiredVariables]);
+
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      {/* Detail header */}
+      <div className="shrink-0 border-b border-border px-5 py-3 bg-background">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+              <Chip cls={domCls}>{template.domain}</Chip>
+              <StatusBadge status={template.status} />
+              <Chip cls={riskCfg.cls}>Risk: {template.hallucinationRisk}</Chip>
+              <span className="text-[11px] text-muted-foreground">v{template.version}</span>
+            </div>
+            <h2 className="text-[16px] font-bold text-foreground leading-snug">{template.name}</h2>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              onClick={() => onToggleTest()}
+              className={`flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[12px] font-bold transition-colors ${
+                showTest
+                  ? 'bg-foreground text-background border-foreground'
+                  : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground'
+              }`}
+            >
+              <FlaskConical className="w-3 h-3" /> Test
+            </button>
+            <button
+              onClick={() => onBrief(template)}
+              className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-border text-[12px] font-bold text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+            >
+              <Eye className="w-3 h-3" /> Brief
+            </button>
+            <button
+              onClick={() => onEdit(template)}
+              className="flex items-center gap-1.5 h-7 px-2.5 rounded-full bg-foreground text-background text-[12px] font-bold hover:opacity-90 transition-opacity"
+            >
+              Edit
+            </button>
+            <button className="h-7 w-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+              <MoreHorizontal className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
+
+        {/* Score */}
+        <div className="mt-2 flex items-center gap-4">
+          <div className="flex items-center gap-2 flex-1 max-w-[200px]">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide shrink-0">Score</span>
+            <ScoreBar score={template.qualityScore} />
+          </div>
+          <span className="text-[11px] text-muted-foreground">
+            Reviewed {template.lastReviewed} · {vars.length} variable{vars.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
+
+      {/* Sections */}
+      <ScrollArea className="flex-1">
+        <Sec id="purpose" label="Purpose">
+          <p className="text-[13px] text-muted-foreground leading-relaxed">{template.purpose}</p>
+          {template.shortDescription && (
+            <p className="text-[12px] text-muted-foreground/60 mt-2 italic">{template.shortDescription}</p>
+          )}
+        </Sec>
+
+        <Sec id="config" label="Configuration">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+            {[
+              { label: 'Owner',         value: template.owner },
+              { label: 'Output Format', value: template.outputFormatId },
+              { label: 'Tone',          value: template.tone },
+              { label: 'Last Reviewed', value: template.lastReviewed },
+              { label: 'Audience',      value: template.audience.join(', ') },
+              { label: 'Capability',    value: template.capabilityId },
+            ].map(row => (
+              <div key={row.label}>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-0.5">{row.label}</p>
+                <p className="text-[12px] text-foreground font-medium">{row.value}</p>
+              </div>
+            ))}
+          </div>
+        </Sec>
+
+        {vars.length > 0 && (
+          <Sec id="variables" label={`Variables (${vars.length})`}>
+            <div className="space-y-1.5">
+              {vars.map(v => (
+                <div key={v.id} className="flex items-center gap-2.5 rounded-lg bg-muted/30 border border-border px-3 py-2">
+                  <Hash className="w-3 h-3 text-muted-foreground shrink-0" />
+                  <code className="text-[11px] font-mono text-foreground flex-1">{v.name}</code>
+                  <span className="text-[10px] text-muted-foreground bg-muted border border-border rounded px-1.5 py-0.5">{v.type}</span>
+                  <span className="text-[10px] text-muted-foreground">{v.source}</span>
+                </div>
+              ))}
+            </div>
+          </Sec>
+        )}
+
+        {template.guardrails.length > 0 && (
+          <Sec id="guardrails" label="Guardrails">
+            <div className="space-y-1.5">
+              {template.guardrails.map((g, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0 mt-0.5" />
+                  <p className="text-[12px] text-muted-foreground leading-snug">{g}</p>
+                </div>
+              ))}
+            </div>
+          </Sec>
+        )}
+
+        {template.sourceRules.length > 0 && (
+          <Sec id="sources" label="Source Rules">
+            <div className="space-y-1.5">
+              {template.sourceRules.map(sr => (
+                <div key={sr.sourceId} className="flex items-start gap-2.5 rounded-lg bg-muted/30 border border-border px-3 py-2">
+                  <Database className="w-3 h-3 text-muted-foreground shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] font-medium text-foreground">{sr.sourceName}</p>
+                    <p className="text-[11px] text-muted-foreground leading-snug">{sr.reasoning}</p>
+                  </div>
+                  <span className={`text-[10px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ${
+                    sr.role === 'Required'  ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' :
+                    sr.role === 'Preferred' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' :
+                    sr.role === 'Forbidden' ? 'text-foreground bg-muted border-border' :
+                                             'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
+                  }`}>{sr.role}</span>
+                </div>
+              ))}
+            </div>
+          </Sec>
+        )}
+
+        {template.promptBody && (
+          <Sec id="body" label="Prompt Body">
+            <pre className="text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap font-mono bg-muted/30 border border-border rounded-lg p-3 overflow-x-auto">
+              {template.promptBody}
+            </pre>
+          </Sec>
+        )}
       </ScrollArea>
     </div>
   );
 }
 
-// ── Test Bench View ────────────────────────────────────────────────────────
+// ── Test bench panel ──────────────────────────────────────────────────────────
 
-type RunStatus = 'idle' | 'loading' | 'success' | 'error';
+function TestBenchPanel({ template }: { template: PromptTemplate }) {
+  const vars = useMemo(() =>
+    template.requiredVariables
+      .map(vid => promptVariables.find(v => v.id === vid))
+      .filter(Boolean) as typeof promptVariables,
+  [template.requiredVariables]);
 
-function interpolatePrompt(body: string, inputs: Record<string, string>): string {
-  return body.replace(/\{\{(\w+)\}\}/g, (_, key: string) => inputs[key] ?? '');
-}
-
-interface LearnerOption {
-  id: string;
-  firstName: string;
-  lastName: string;
-  pennyTrail: string | null;
-}
-
-interface ContextMeta {
-  promptPath: string;
-  currentGoal: string | null;
-  currentPhase: string | null;
-  coachingTone: string | null;
-  trailId: string | null;
-}
-
-function TestBenchView() {
-  const templates = useStudioTemplates();
-  const [selectedId, setSelectedId]         = useState(() => templates[0]?.id ?? '');
-  const [status, setStatus]                 = useState<RunStatus>('idle');
-  const [liveReply, setLiveReply]           = useState('');
-  const [liveDurationMs, setLiveDurationMs] = useState<number | null>(null);
-  const [errorMsg, setErrorMsg]             = useState('');
-  const [inputs, setInputs]                 = useState<Record<string, string>>({});
-
-  const [learners, setLearners]                 = useState<LearnerOption[]>([]);
-  const [learnersLoading, setLearnersLoading]   = useState(true);
-  const [selectedLearnerId, setSelectedLearnerId] = useState<string>('');
-  const [contextMeta, setContextMeta]           = useState<ContextMeta | null>(null);
-
-  useEffect(() => {
-    fetch('/api/penny/data/learners/directory')
-      .then(r => r.ok ? r.json() as Promise<LearnerOption[]> : Promise.resolve([]))
-      .then((data: LearnerOption[]) => {
-        setLearners(data);
-        setLearnersLoading(false);
-      })
-      .catch(() => setLearnersLoading(false));
-  }, []);
-
-  const t = templates.find(t => t.id === selectedId) ?? templates[0];
-
-  function loadTemplate(id: string) {
-    const tmpl = templates.find(t => t.id === id) ?? templates[0];
-    setSelectedId(id);
-    setStatus('idle');
-    setLiveReply('');
-    setLiveDurationMs(null);
-    setErrorMsg('');
-    setInputs({ ...tmpl.testBench.sampleInputs });
-  }
-
-  function reset() {
-    setStatus('idle');
-    setLiveReply('');
-    setLiveDurationMs(null);
-    setErrorMsg('');
-  }
-
-  async function runPenny() {
-    setStatus('loading');
-    setLiveReply('');
-    setLiveDurationMs(null);
-    setErrorMsg('');
-    const interpolated = interpolatePrompt(t.promptBody, inputs);
-    try {
-      const resp = await fetch('/api/penny/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: interpolated,
-          systemOverride: interpolated,
-          role: 'admin',
-          context: 'Prompt Studio Test Bench',
-          ...(selectedLearnerId ? { contactId: selectedLearnerId } : {}),
-        }),
-      });
-      const data = await resp.json() as { reply?: string; durationMs?: number; error?: string; contextMeta?: ContextMeta };
-      if (!resp.ok || data.error) {
-        setErrorMsg(data.error ?? `HTTP ${resp.status}`);
-        setStatus('error');
-        return;
-      }
-      setLiveReply(data.reply ?? '');
-      setLiveDurationMs(data.durationMs ?? null);
-      setContextMeta(data.contextMeta ?? null);
-      setStatus('success');
-    } catch (e: unknown) {
-      setErrorMsg(e instanceof Error ? e.message : 'Network error — could not reach API.');
-      setStatus('error');
-    }
-  }
-
-  const domCls = DOMAIN_CLS[t.domain];
-  const isLoading = status === 'loading';
-  const showOutput = status === 'success' || status === 'error';
+  const [inputs, setInputs] = useState<Record<string, string>>(() =>
+    Object.fromEntries(vars.map(v => [v.id, v.exampleValue]))
+  );
+  const [ran, setRan] = useState(true); // show pre-populated output
 
   return (
-    <div className="flex h-full overflow-hidden">
-      {/* Template picker */}
-      <div className="w-[190px] flex-shrink-0 border-r border-border flex flex-col">
-        <div className="p-2.5 border-b border-border">
-          <div className="flex items-center gap-1.5"><FlaskConical className="w-3.5 h-3.5 text-muted-foreground" /><p className="text-[14px] font-bold  text-muted-foreground/50">Test Bench</p></div>
+    <div className="w-[300px] shrink-0 border-l border-border flex flex-col bg-muted/20 overflow-hidden">
+      <div className="shrink-0 px-4 py-2.5 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FlaskConical className="w-3.5 h-3.5 text-foreground" />
+          <span className="text-[13px] font-bold text-foreground">Test Bench</span>
         </div>
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {DOMAIN_ORDER.map(domain => {
-              const ts = templates.filter(t => t.domain === domain);
-              if (!ts.length) return null;
-              return (
-                <div key={domain}>
-                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
-                  {ts.map(pt => (
-                    <button key={pt.id} onClick={() => loadTemplate(pt.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
-                        selectedId === pt.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
-                      }`}
-                    >{pt.name}</button>
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
       </div>
 
-      {/* Run panel */}
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-2xl space-y-4">
-          <div className={`rounded-xl border p-3 ${domCls}`}>
-            <p className="text-[14px] font-bold">{t.name}</p>
-            <p className="text-[14px] text-muted-foreground">{t.shortDescription}</p>
-          </div>
+        <div className="p-4 space-y-4">
+          {/* Penny content */}
+          <PennyContentStrip />
 
-          {/* Learner selector */}
+          {/* Scenario */}
           <div>
-            <p className="text-[14px] font-bold text-muted-foreground  mb-1.5">Test As Learner</p>
-            <p className="text-[14px] text-muted-foreground mb-2">Select a learner to inject their live Salesforce context into this prompt. Leave blank to use the generic fallback prompt.</p>
-            <select
-              value={selectedLearnerId}
-              onChange={e => {
-                setSelectedLearnerId(e.target.value);
-                setContextMeta(null);
-                setLiveReply('');
-                setStatus('idle');
-              }}
-              disabled={isLoading}
-              className="w-full h-7 rounded-md border border-input bg-white px-2 text-[14px] text-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-60"
-            >
-              <option value="">No learner — use fallback prompt</option>
-              {learnersLoading
-                ? <option disabled>Loading learners…</option>
-                : learners.map(l => (
-                    <option key={l.id} value={l.id}>
-                      {l.firstName} {l.lastName} — {l.pennyTrail ?? 'No trail'}
-                    </option>
-                  ))
-              }
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1.5">Scenario</p>
+            <select className="w-full h-7 rounded-lg border border-border bg-background text-[12px] text-foreground px-2.5 focus:outline-none focus:ring-1 focus:ring-primary/30">
+              <option>Active learner — week 4</option>
+              <option>Learner at risk — missed 2 milestones</option>
+              <option>High performer — ready for next stage</option>
             </select>
-            {selectedLearnerId && (
-              <div className="mt-1.5">
-                {contextMeta === null ? (
-                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
-                    ⚡ Learner context will load on first run
-                  </span>
-                ) : contextMeta.promptPath === 'salesforce' ? (
-                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2 py-0.5">
-                    ✓ Live Salesforce context active for {learners.find(l => l.id === selectedLearnerId)?.firstName ?? 'learner'}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
-                    ⚠ Using fallback prompt — check Salesforce connection
-                  </span>
-                )}
-              </div>
-            )}
           </div>
 
-          {/* Inputs */}
-          <div>
-            <p className="text-[14px] font-bold text-foreground mb-2">Sample Inputs</p>
-            <div className="space-y-2">
-              {Object.entries(t.testBench.sampleInputs).map(([key]) => (
-                <div key={key}>
-                  <label className="text-[14px] font-mono font-bold text-foreground/70">{`{{${key}}}`}</label>
-                  <Input
-                    value={inputs[key] ?? ''}
-                    onChange={e => setInputs(prev => ({ ...prev, [key]: e.target.value }))}
-                    className="mt-0.5 h-7 text-[14px] bg-white"
-                    disabled={isLoading}
+          {/* Variable overrides */}
+          {vars.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Variable overrides</p>
+              {vars.slice(0, 5).map(v => (
+                <div key={v.id} className="flex items-center gap-2 bg-background rounded-lg border border-border px-2.5 py-1.5">
+                  <code className="text-[10px] text-muted-foreground w-24 shrink-0 truncate">{v.name}</code>
+                  <input
+                    value={inputs[v.id] ?? v.exampleValue}
+                    onChange={e => setInputs(prev => ({ ...prev, [v.id]: e.target.value }))}
+                    className="flex-1 min-w-0 text-[12px] text-foreground bg-transparent focus:outline-none"
                   />
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Sources that would be queried */}
-          <div className="rounded-xl border border-border bg-muted/20 p-3">
-            <p className="text-[14px] font-bold text-foreground mb-1.5">Sources Penny Would Query</p>
-            <div className="flex flex-wrap gap-1">
-              {t.sourceRules.filter(sr => sr.role !== 'Forbidden').map(sr => (
-                <span key={sr.sourceId} className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${
-                  sr.role === 'Required' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-slate-600 bg-slate-50 border-slate-200'
-                }`}>{sr.sourceName}</span>
-              ))}
-            </div>
-          </div>
-
-          {/* Run button */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={runPenny}
-              disabled={isLoading}
-              className="flex items-center gap-2 bg-foreground text-background px-4 py-2 rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isLoading
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                : <Play className="w-3.5 h-3.5" />
-              }
-              {isLoading ? 'Running…' : 'Run Penny'}
-            </button>
-            {showOutput && (
-              <button onClick={reset} className="flex items-center gap-1.5 text-[14px] text-muted-foreground hover:text-foreground">
-                <RotateCcw className="w-3 h-3" />Reset
-              </button>
-            )}
-          </div>
-
-          {/* Loading skeleton */}
-          {isLoading && (
-            <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 space-y-3 animate-pulse">
-              <div className="flex items-center gap-2">
-                <Brain className="w-4 h-4 text-secondary" />
-                <p className="text-[14px] font-bold text-foreground">Penny Output</p>
-                <span className="text-[14px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
-              </div>
-              <div className="rounded-lg border border-secondary/20 bg-white p-3 space-y-2">
-                <div className="h-2.5 bg-muted rounded w-full" />
-                <div className="h-2.5 bg-muted rounded w-5/6" />
-                <div className="h-2.5 bg-muted rounded w-4/6" />
-                <div className="h-2.5 bg-muted rounded w-3/4" />
-              </div>
-            </div>
           )}
 
-          {/* Live output */}
-          {showOutput && (
-            <div className={`rounded-xl border p-4 space-y-3 ${status === 'error' ? 'border-[#E8B9B4] bg-[#FBEAE6]/50' : 'border-secondary/20 bg-secondary/5'}`}>
-              <div className="flex items-center gap-2">
-                <Brain className="w-4 h-4 text-secondary" />
-                <p className="text-[14px] font-bold text-foreground">Penny Output</p>
-                {status === 'success' && (
-                  <span className="text-[14px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5 ml-auto">Live · Gemini 2.5 Flash</span>
-                )}
-                {status === 'error' && (
-                  <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5 ml-auto">Error</span>
-                )}
+          <button
+            onClick={() => setRan(true)}
+            className="w-full h-8 rounded-lg bg-foreground text-[12px] font-bold text-background hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          >
+            <Play className="w-3.5 h-3.5" /> Run Test
+          </button>
+
+          {/* Output */}
+          {ran && (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Penny's Output</p>
+                <span className="text-[9px] font-bold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">Pass</span>
               </div>
-
-              {status === 'success' && (
-                <>
-                  <div className="rounded-lg border border-secondary/20 bg-white p-3">
-                    <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-line">{liveReply}</p>
+              <div className="bg-background rounded-xl border border-border p-3">
+                <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border">
+                  <div className="w-5 h-5 rounded-full bg-foreground flex items-center justify-center text-[9px] font-bold text-background ring-1 ring-border">
+                    P
                   </div>
-                  {liveDurationMs !== null && (
-                    <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] p-3">
-                      <p className="text-[14px] font-bold text-[#2F6B3F]  mb-1">Run Complete</p>
-                      <p className="text-[14px] text-[#245531] leading-snug">
-                        Completed in {liveDurationMs.toLocaleString()} ms
-                      </p>
-                      {contextMeta && selectedLearnerId && contextMeta.promptPath === 'salesforce' && (
-                        <p className="text-[14px] text-muted-foreground mt-1">
-                          Context: Salesforce ✓ · Trail: {contextMeta.trailId ?? '—'} · Phase: {contextMeta.currentPhase ?? '—'} · Tone: {contextMeta.coachingTone ?? '—'}
-                        </p>
-                      )}
-                      {contextMeta && contextMeta.promptPath === 'fallback' && (
-                        <p className="text-[14px] text-[#CC8400] mt-1">
-                          Context: Fallback (generic prompt — no learner data)
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-
-              {status === 'error' && (
-                <div className="rounded-lg border border-[#E8B9B4] bg-white p-3">
-                  <p className="text-[14px] text-[#A93F2F] leading-relaxed">{errorMsg}</p>
+                  <span className="text-[12px] font-bold text-foreground">Penny</span>
+                  <span className="text-[10px] text-muted-foreground ml-auto flex items-center gap-1">
+                    <ImageIcon className="w-2.5 h-2.5" /> avatar.png
+                  </span>
                 </div>
-              )}
-
-              <div className="flex items-center gap-3">
-                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${RISK_CONFIG[t.hallucinationRisk].cls}`}>Hallucination Risk: {t.hallucinationRisk}</span>
-                <span className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${PROMPT_STATUS_CONFIG[t.status].cls}`}>{t.status}</span>
+                <p className="text-[12px] text-muted-foreground leading-relaxed">
+                  {template.testBench.simulatedOutput ||
+                    `Hi ${inputs['var-learner-name'] ?? 'there'}! You've been making great progress this week. How are you feeling about ${inputs['var-current-module'] ?? 'your current module'}? Let me know what's clicking and what's still unclear — I'd love to help you focus your energy in the right place.`}
+                </p>
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-1.5 text-center">
+                {[
+                  { label: 'Tokens',  val: '138' },
+                  { label: 'Latency', val: '1.1s' },
+                  { label: 'Risk',    val: template.hallucinationRisk },
+                ].map(m => (
+                  <div key={m.label} className="bg-background rounded-lg border border-border px-2 py-1.5">
+                    <p className="text-[11px] font-bold text-foreground">{m.val}</p>
+                    <p className="text-[10px] text-muted-foreground">{m.label}</p>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -1041,170 +546,505 @@ function TestBenchView() {
   );
 }
 
-// ── Version History View ───────────────────────────────────────────────────
+// ── Secondary tab views ───────────────────────────────────────────────────────
 
-function VersionHistoryView() {
-  const templates = useStudioTemplates();
-  const [selectedId, setSelectedId] = useState(() => templates[0]?.id ?? '');
-  const t       = templates.find(t => t.id === selectedId) ?? templates[0];
-  const entries = versionHistory.filter(v => v.templateId === selectedId).sort((a, b) => b.version.localeCompare(a.version));
+function VariablesView() {
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-6 max-w-4xl">
+        <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
+          Variables are dynamic tokens that Penny substitutes at runtime. Each maps to a data source — Salesforce, LMS, User Input, Calendar, or Penny's own generated context.
+        </p>
+        <div className="space-y-2">
+          {promptVariables.map(v => (
+            <div key={v.id} className="rounded-xl border border-border bg-background px-4 py-3 flex items-start gap-4">
+              <code className="text-[13px] font-mono text-foreground font-bold w-48 shrink-0 pt-0.5">{v.name}</code>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] text-muted-foreground leading-snug">{v.description}</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-1">Example: {v.exampleValue}</p>
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <Chip cls="bg-muted border-border text-muted-foreground">{v.source}</Chip>
+                <Chip cls="bg-muted border-border text-muted-foreground">{v.type}</Chip>
+                {v.required && <Chip cls="text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]">Required</Chip>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
 
-  const changeTypeCls = {
-    Created:    'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
-    Updated:    'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',
-    Approved:   'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
-    Deprecated: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
-    Reverted:   'text-slate-600 bg-slate-50 border-slate-200',
-  };
+function OutputFormatsView() {
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-6 max-w-4xl">
+        <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
+          Output formats define the shape of every response Penny delivers — from coaching messages to executive summaries. Each template is bound to exactly one format.
+        </p>
+        <div className="space-y-3">
+          {outputFormats.map(f => (
+            <div key={f.id} className="rounded-xl border border-border bg-background p-4">
+              <div className="flex items-start justify-between gap-4 mb-2">
+                <div>
+                  <p className="text-[14px] font-bold text-foreground">{f.name}</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">{f.description}</p>
+                </div>
+                <span className="text-[11px] text-muted-foreground shrink-0">{f.usedBy.length} template{f.usedBy.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-border">
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">Structure</p>
+                  <ul className="space-y-0.5">
+                    {f.structure.map((s, i) => (
+                      <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                        <span className="text-muted-foreground/40 shrink-0">{i + 1}.</span> {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1">Tone</p>
+                  <p className="text-[11px] text-muted-foreground">{f.tone}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-1 mt-2">Length</p>
+                  <p className="text-[11px] text-muted-foreground">{f.lengthGuidance}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </ScrollArea>
+  );
+}
+
+function SourceRulesView({ templates }: { templates: PromptTemplate[] }) {
+  const allRules = useMemo(() => {
+    const seen = new Set<string>();
+    return templates.flatMap(t => t.sourceRules.map(sr => ({ ...sr, templateName: t.name, templateId: t.id }))).filter(sr => {
+      if (seen.has(sr.sourceId + sr.templateId)) return false;
+      seen.add(sr.sourceId + sr.templateId);
+      return true;
+    });
+  }, [templates]);
 
   return (
-    <div className="flex h-full overflow-hidden">
-      <div className="w-[190px] flex-shrink-0 border-r border-border flex flex-col">
-        <div className="p-2.5 border-b border-border">
-          <p className="text-[14px] font-bold  text-muted-foreground/50">Templates</p>
+    <ScrollArea className="h-full">
+      <div className="p-6 max-w-4xl">
+        <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
+          Source rules control which knowledge sources Penny may consult for each template — Required, Preferred, Optional, or Forbidden.
+        </p>
+        <div className="space-y-2">
+          {allRules.map((sr, i) => (
+            <div key={i} className="rounded-xl border border-border bg-background px-4 py-3 flex items-start gap-4">
+              <Database className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-foreground">{sr.sourceName}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{sr.reasoning}</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-1">Used in: {sr.templateName}</p>
+              </div>
+              <span className={`text-[10px] font-bold border rounded-full px-2 py-0.5 shrink-0 ${
+                sr.role === 'Required'  ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' :
+                sr.role === 'Preferred' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' :
+                sr.role === 'Forbidden' ? 'text-foreground bg-muted border-border' :
+                                         'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
+              }`}>{sr.role}</span>
+            </div>
+          ))}
+          {allRules.length === 0 && (
+            <p className="text-[13px] text-muted-foreground text-center py-10">No source rules configured yet.</p>
+          )}
         </div>
-        <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
-            {DOMAIN_ORDER.map(domain => {
-              const ts = templates.filter(t => t.domain === domain);
-              if (!ts.length) return null;
-              return (
-                <div key={domain}>
-                  <p className="text-[14px] font-bold  text-muted-foreground/50 px-1 py-1.5">{domain}</p>
-                  {ts.map(pt => (
-                    <button key={pt.id} onClick={() => setSelectedId(pt.id)}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[14px] font-medium transition-all ${
-                        selectedId === pt.id ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted/30 hover:text-foreground'
-                      }`}
-                    >
-                      <p className="font-bold">{pt.name}</p>
-                      <p className={`text-[14px] mt-0.5 ${selectedId === pt.id ? 'text-background/60' : 'text-muted-foreground/60'}`}>
-                        {versionHistory.filter(v => v.templateId === pt.id).length} change{versionHistory.filter(v => v.templateId === pt.id).length !== 1 ? 's' : ''}
-                      </p>
-                    </button>
-                  ))}
+      </div>
+    </ScrollArea>
+  );
+}
+
+// ── Guided Wizard (new template overlay) ─────────────────────────────────────
+
+function GuidedWizardOverlay({
+  onClose, onCreate,
+}: {
+  onClose: () => void;
+  onCreate: (t: PromptTemplate) => void;
+}) {
+  const [step, setStep] = useState<WizardStep>(1);
+  const [domain, setDomain] = useState<PromptDomain | null>(null);
+  const [purpose, setPurpose] = useState('');
+  const [audience, setAudience] = useState('');
+  const [tone, setTone] = useState('');
+  const [name, setName] = useState('');
+
+  const canAdvance = step === 1 ? domain !== null : step === 2 ? purpose.trim().length > 0 : true;
+
+  const previewText = purpose
+    ? `Penny will ${purpose.toLowerCase().replace(/[.!?]$/, '')} — tailored for ${audience || 'your learners'} with a ${tone?.toLowerCase() || 'warm'} tone.`
+    : 'Fill in the fields to see a preview of what Penny will do.';
+
+  function handleSave() {
+    const newTemplate: PromptTemplate = {
+      id: `tpl-${Date.now()}`,
+      name: name.trim() || `${domain} — ${purpose.slice(0, 40)}`,
+      domain: domain!,
+      capabilityId: 'cap-general',
+      shortDescription: purpose.slice(0, 80),
+      purpose,
+      audience: audience ? [audience] : ['All Learners'],
+      requiredVariables: [],
+      sourceRules: [],
+      outputFormatId: 'Coaching Message',
+      tone: tone || 'Warm & Encouraging',
+      guardrails: [],
+      owner: 'Staff',
+      status: 'Draft',
+      version: '1.0',
+      lastReviewed: 'Just now',
+      promptBody: '',
+      relatedStandards: [],
+      relatedSfObjects: [],
+      hallucinationRisk: 'Medium',
+      qualityScore: 0,
+      testBench: { sampleInputs: {}, simulatedOutput: '', simulationNotes: '' },
+    };
+    onCreate(newTemplate);
+    onClose();
+  }
+
+  const STEP_LABELS: Record<WizardStep, string> = { 1: 'Choose type', 2: 'Define purpose', 3: 'Review & save' };
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-background">
+      {/* Topbar */}
+      <header className="shrink-0 border-b border-border px-10 py-3 flex items-center justify-between bg-background">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-xl bg-foreground flex items-center justify-center">
+            <Wand2 className="w-3.5 h-3.5 text-background" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">New Template</p>
+            <p className="text-[13px] font-bold text-foreground leading-none">Guided Setup</p>
+          </div>
+        </div>
+
+        {/* Step indicator */}
+        <div className="flex items-center gap-0">
+          {([1, 2, 3] as WizardStep[]).map((s, i) => (
+            <div key={s} className="flex items-center">
+              <div className="flex items-center gap-1.5">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all ${
+                  s < step  ? 'bg-foreground text-background' :
+                  s === step ? 'bg-foreground text-background ring-4 ring-foreground/20' :
+                               'bg-muted border border-border text-muted-foreground'
+                }`}>
+                  {s < step ? <CheckCircle2 className="w-3.5 h-3.5" /> : s}
                 </div>
+                <span className={`text-[12px] font-semibold ${s === step ? 'text-foreground' : s < step ? 'text-foreground/70' : 'text-muted-foreground'}`}>
+                  {STEP_LABELS[s]}
+                </span>
+              </div>
+              {i < 2 && <div className={`w-8 h-0.5 mx-2 rounded-full ${s < step ? 'bg-foreground' : 'bg-border'}`} />}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button onClick={onClose} className="text-[12px] font-medium text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-muted transition-colors">
+            Cancel
+          </button>
+        </div>
+      </header>
+
+      {/* Step 1 — choose domain */}
+      {step === 1 && (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="px-10 pt-8 pb-5">
+            <h1 className="text-xl font-bold text-foreground">What do you want to teach Penny?</h1>
+            <p className="text-[14px] text-muted-foreground mt-1.5">Choose the type of interaction Penny will handle.</p>
+          </div>
+          <div className="flex-1 px-10 pb-8 grid grid-cols-3 gap-3 content-start overflow-auto">
+            {WIZARD_CATEGORIES.map(cat => {
+              const isSelected = domain === cat.domain;
+              const cls = DOMAIN_CLS[cat.domain];
+              return (
+                <button
+                  key={cat.domain}
+                  onClick={() => setDomain(cat.domain)}
+                  className={`text-left rounded-2xl border-2 p-4 transition-all hover:scale-[1.01] ${
+                    isSelected ? `${cls.replace('text-', 'border-').split(' ')[0]} bg-muted/40 border-2 shadow-sm scale-[1.01]` : 'bg-background border-border hover:border-foreground/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-[12px] font-bold border rounded-full px-2 py-0.5 ${cls}`}>{cat.domain}</span>
+                    {isSelected && <CheckCircle2 className="w-4 h-4 text-foreground" />}
+                  </div>
+                  <p className="text-[12px] text-muted-foreground leading-relaxed">{cat.description}</p>
+                  <div className="flex flex-wrap gap-1 mt-2.5">
+                    {cat.examples.map(ex => (
+                      <span key={ex} className="text-[10px] bg-muted border border-border rounded-full px-1.5 py-0.5 text-muted-foreground">{ex}</span>
+                    ))}
+                  </div>
+                </button>
               );
             })}
           </div>
-        </ScrollArea>
-      </div>
-      <ScrollArea className="flex-1">
-        <div className="p-5 max-w-xl space-y-4">
-          <div className={`rounded-xl border p-3 ${DOMAIN_CLS[t.domain]}`}>
-            <p className="text-[14px] font-bold">{t.name}</p>
-            <p className="text-[14px] text-muted-foreground">Current version: v{t.version} · {entries.length} change{entries.length !== 1 ? 's' : ''}</p>
-          </div>
-          {entries.length === 0 && <p className="text-[14px] text-muted-foreground text-center py-8">No version history yet.</p>}
-          <div className="relative">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
-            <div className="space-y-3">
-              {entries.map(entry => (
-                <div key={entry.id} className="relative flex items-start gap-3 pl-10">
-                  <div className="absolute left-3 top-2 w-2.5 h-2.5 rounded-full bg-background border-2 border-foreground" />
-                  <div className="flex-1 rounded-xl border border-border bg-white p-3">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-[14px] font-mono font-bold bg-muted rounded px-1.5 py-0.5">v{entry.version}</span>
-                      <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${changeTypeCls[entry.changeType]}`}>{entry.changeType}</span>
-                      {entry.breaking && <span className="text-[14px] font-bold text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded-full px-1.5 py-0.5">Breaking</span>}
-                      <span className="text-[14px] text-muted-foreground ml-auto">{entry.date}</span>
-                    </div>
-                    <p className="text-[14px] text-foreground leading-snug">{entry.summary}</p>
-                    <p className="text-[14px] text-muted-foreground mt-0.5">by {entry.author}</p>
-                  </div>
+        </div>
+      )}
+
+      {/* Step 2 — define purpose */}
+      {step === 2 && domain && (
+        <div className="flex-1 flex overflow-hidden">
+          {/* Form */}
+          <div className="w-1/2 border-r border-border flex flex-col overflow-hidden">
+            <div className="px-10 pt-8 pb-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`text-[12px] font-bold border rounded-full px-2 py-0.5 ${DOMAIN_CLS[domain]}`}>{domain}</span>
+              </div>
+              <h2 className="text-xl font-bold text-foreground">Define what Penny should do</h2>
+              <p className="text-[13px] text-muted-foreground mt-1.5">Answer three questions — Penny handles the rest.</p>
+            </div>
+            <div className="flex-1 overflow-y-auto px-10 pb-8 space-y-5">
+              <div>
+                <label className="block text-[12px] font-bold text-foreground mb-1">1. What should Penny do in this prompt?</label>
+                <p className="text-[11px] text-muted-foreground mb-1.5">Write in plain language — what action or outcome?</p>
+                <textarea
+                  value={purpose}
+                  onChange={e => setPurpose(e.target.value)}
+                  rows={3}
+                  placeholder="e.g. Send a weekly check-in that acknowledges a learner's progress and asks how they're feeling about their next step."
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-[13px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all leading-relaxed"
+                />
+              </div>
+              <div>
+                <label className="block text-[12px] font-bold text-foreground mb-1.5">2. Who will receive this?</label>
+                <div className="flex flex-wrap gap-2">
+                  {AUDIENCE_OPTIONS.map(opt => (
+                    <button key={opt} onClick={() => setAudience(opt)}
+                      className={`text-[12px] font-medium rounded-full px-3 py-1.5 border transition-all ${
+                        audience === opt ? 'bg-foreground text-background border-foreground' : 'bg-background text-muted-foreground border-border hover:border-foreground/30'
+                      }`}>{opt}</button>
+                  ))}
                 </div>
-              ))}
+              </div>
+              <div>
+                <label className="block text-[12px] font-bold text-foreground mb-1.5">3. What tone should Penny use?</label>
+                <div className="flex flex-wrap gap-2">
+                  {TONE_OPTIONS.map(opt => (
+                    <button key={opt} onClick={() => setTone(opt)}
+                      className={`text-[12px] font-medium rounded-full px-3 py-1.5 border transition-all ${
+                        tone === opt ? 'bg-foreground text-background border-foreground' : 'bg-background text-muted-foreground border-border hover:border-foreground/30'
+                      }`}>{opt}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Live preview */}
+          <div className="flex-1 flex flex-col bg-muted/10 overflow-hidden">
+            <div className="px-8 pt-8 pb-4 border-b border-border">
+              <div className="flex items-center gap-2">
+                <Eye className="w-4 h-4 text-muted-foreground" />
+                <span className="text-[12px] font-bold text-muted-foreground uppercase tracking-wide">Live Preview</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-0.5">How Penny will appear when this prompt fires</p>
+            </div>
+
+            {/* Avatar + content strip */}
+            <div className="flex items-center gap-2.5 px-8 py-2.5 bg-[#E6F0EA]/60 border-b border-[#D9EAE0]">
+              <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center text-[10px] font-bold text-background ring-1 ring-white shadow-sm shrink-0">P</div>
+              <span className="text-[11px] font-semibold text-foreground">Penny's avatar</span>
+              <span className="flex items-center gap-0.5 text-[9px] font-bold text-[#2F6B3F] bg-[#C8E6D0] border border-[#9FC3AE] rounded-full px-1.5 py-0.5">
+                <Wifi className="w-2 h-2" /> Connected
+              </span>
+              <div className="flex items-center gap-1 ml-auto">
+                {PENNY_ASSETS.map(a => {
+                  const Icon = a.icon;
+                  return (
+                    <span key={a.kind} className={`w-5 h-5 rounded flex items-center justify-center ${a.ready ? 'bg-foreground' : 'bg-muted'}`}>
+                      <Icon className={`w-2.5 h-2.5 ${a.ready ? 'text-background' : 'text-muted-foreground'}`} />
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-8">
+              <div className="bg-background rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="bg-foreground px-4 py-2.5 flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-full bg-background/20 flex items-center justify-center text-[11px] font-bold text-background">P</div>
+                  <span className="text-[13px] font-bold text-background">Penny</span>
+                  <span className="text-[10px] text-background/50 ml-auto">{audience || '…'}</span>
+                </div>
+                <div className="px-4 py-3">
+                  <p className={`text-[13px] leading-relaxed ${purpose ? 'text-foreground' : 'text-muted-foreground italic'}`}>{previewText}</p>
+                </div>
+              </div>
+
+              {purpose && (
+                <div className="mt-4 rounded-xl bg-[#E6F0EA] border border-[#9FC3AE] px-4 py-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Sparkles className="w-3.5 h-3.5 text-[#2F6B3F]" />
+                    <span className="text-[11px] font-bold text-[#2F6B3F]">Looking good</span>
+                  </div>
+                  <p className="text-[11px] text-[#2F6B3F] leading-relaxed">
+                    Penny has enough context. You'll test and refine this before it goes live.
+                  </p>
+                </div>
+              )}
+
+              {!purpose && (
+                <div className="mt-4 space-y-2.5">
+                  {[
+                    { label: 'Be specific', hint: '"Send a coaching message" is vague. "Check in on module progress and suggest one next action" is clear.' },
+                    { label: 'Use plain language', hint: 'Describe what Penny should accomplish — not the prompt itself.' },
+                    { label: 'One job per prompt', hint: 'The best prompts do one thing well. Create more for other scenarios.' },
+                  ].map(tip => (
+                    <div key={tip.label} className="flex items-start gap-3 rounded-xl bg-background border border-border px-4 py-3">
+                      <Lightbulb className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[12px] font-bold text-foreground">{tip.label}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{tip.hint}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </ScrollArea>
-    </div>
-  );
-}
+      )}
 
-// ── Quality Review View ────────────────────────────────────────────────────
-
-function QualityReviewView() {
-  const templates = useStudioTemplates();
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const filtered = filterStatus === 'all' ? qualityReviews : qualityReviews.filter(q => q.reviewStatus === filterStatus);
-
-  return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="px-5 py-3 border-b border-border bg-white flex-shrink-0 flex items-center gap-3">
-        <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-1.5">
-          <p className="text-[14px] font-semibold text-[#2F6B3F]">
-            {qualityReviews.filter(q => q.reviewStatus === 'Approved').length} Approved · {qualityReviews.filter(q => q.reviewStatus !== 'Approved').length} Pending or flagged
-          </p>
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="h-7 text-[14px] rounded-md border border-input bg-white px-2">
-            <option value="all">All statuses</option>
-            {['Approved','In Review','Pending','Rejected'].map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-      </div>
-      <ScrollArea className="flex-1">
-        <div className="p-5 space-y-1">
-          <div className="grid grid-cols-[1fr_80px_80px_80px_80px_100px] gap-2 px-3 py-1.5">
-            {['Template','Coverage','Standards','Usefulness','Risk','Status'].map(h => (
-              <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
-            ))}
+      {/* Step 3 — review & save */}
+      {step === 3 && domain && (
+        <div className="flex-1 overflow-y-auto">
+          <div className="px-10 pt-8 pb-5">
+            <h2 className="text-xl font-bold text-foreground">Review your prompt</h2>
+            <p className="text-[13px] text-muted-foreground mt-1.5">Give it a name and save as Draft — test and refine before going live.</p>
           </div>
-          {filtered.map(qr => {
-            const t = templates.find(t => t.id === qr.templateId);
-            if (!t) return null;
-            const stsCls = qr.reviewStatus === 'Approved' ? 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]'
-                         : qr.reviewStatus === 'In Review' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
-                         : qr.reviewStatus === 'Rejected' ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]'
-                         : 'text-slate-600 bg-slate-50 border-slate-200';
-            return (
-              <div key={qr.templateId} className="grid grid-cols-[1fr_80px_80px_80px_80px_100px] gap-2 px-3 py-3 rounded-lg border border-border bg-white hover:bg-muted/20 transition-colors items-center">
-                <div>
-                  <p className="text-[14px] font-semibold text-foreground">{t.name}</p>
-                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${DOMAIN_CLS[t.domain]}`}>{t.domain}</span>
-                  {qr.openFlags.length > 0 && <span className="ml-1 text-[14px] font-bold text-[#CC8400]">⚠ {qr.openFlags.length} flag{qr.openFlags.length > 1 ? 's' : ''}</span>}
-                </div>
-                {[qr.sourceCoverage, qr.standardsAlignment, qr.usefulnessScore].map((val, i) => (
-                  <div key={i}>
-                    <div className="flex items-center gap-1">
-                      <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
-                        <div className="h-full bg-foreground rounded-full" style={{ width: `${val}%` }} />
-                      </div>
-                      <span className="text-[14px] font-bold">{val}</span>
-                    </div>
-                  </div>
-                ))}
-                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${RISK_CONFIG[qr.hallucinationRisk].cls}`}>{qr.hallucinationRisk}</span>
-                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${stsCls}`}>{qr.reviewStatus}</span>
+          <div className="px-10 pb-10 max-w-2xl space-y-5">
+            <div>
+              <label className="block text-[12px] font-bold text-foreground mb-1.5">Template name</label>
+              <input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder={`e.g. ${domain} — ${purpose.split(' ').slice(0, 4).join(' ')}…`}
+                className="w-full h-10 rounded-xl border border-border bg-background px-4 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+              />
+            </div>
+            <div className="rounded-2xl border border-border bg-background overflow-hidden">
+              <div className="px-5 py-3 border-b border-border">
+                <span className={`text-[12px] font-bold border rounded-full px-2 py-0.5 ${DOMAIN_CLS[domain]}`}>{domain}</span>
               </div>
-            );
-          })}
+              {[
+                { label: 'Purpose',  value: purpose || '—' },
+                { label: 'Audience', value: audience || '—' },
+                { label: 'Tone',     value: tone || '—' },
+                { label: 'Status',   value: 'Draft (saved, not live)' },
+              ].map(row => (
+                <div key={row.label} className="flex items-start gap-8 px-5 py-3 border-b border-border last:border-0">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide w-16 shrink-0 pt-0.5">{row.label}</span>
+                  <span className="text-[13px] text-foreground flex-1 leading-relaxed">{row.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-2xl bg-muted/30 border border-border px-5 py-4">
+              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide mb-2.5">What happens next</p>
+              <div className="space-y-2">
+                {[
+                  { icon: FileText,      text: 'Saved as Draft — not live yet' },
+                  { icon: Play,          text: "Test Penny's response in the Test Bench" },
+                  { icon: CheckCircle2,  text: 'Approve when ready — goes live immediately' },
+                ].map((s, i) => {
+                  const Icon = s.icon;
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center shrink-0">
+                        <Icon className="w-3 h-3 text-foreground" />
+                      </div>
+                      <p className="text-[12px] text-muted-foreground">{s.text}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
-      </ScrollArea>
+      )}
+
+      {/* Footer nav */}
+      <footer className="shrink-0 border-t border-border px-10 py-3 flex items-center justify-between bg-background">
+        <button
+          onClick={() => setStep(s => Math.max(1, s - 1) as WizardStep)}
+          disabled={step === 1}
+          className="flex items-center gap-2 text-[13px] font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors px-4 py-2 rounded-xl hover:bg-muted"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
+
+        <div className="flex items-center gap-1.5">
+          {([1, 2, 3] as WizardStep[]).map(n => (
+            <div key={n} className={`rounded-full transition-all ${
+              n === step ? 'w-5 h-2 bg-foreground' : n < step ? 'w-2 h-2 bg-foreground/60' : 'w-2 h-2 bg-border'
+            }`} />
+          ))}
+        </div>
+
+        {step < 3 ? (
+          <button
+            onClick={() => setStep(s => Math.min(3, s + 1) as WizardStep)}
+            disabled={!canAdvance}
+            className="flex items-center gap-2 text-[13px] font-bold text-background bg-foreground hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-opacity px-5 py-2 rounded-xl"
+          >
+            Continue <ArrowRight className="w-4 h-4" />
+          </button>
+        ) : (
+          <button
+            onClick={handleSave}
+            className="flex items-center gap-2 text-[13px] font-bold text-background bg-foreground hover:opacity-90 transition-opacity px-5 py-2 rounded-xl"
+          >
+            <CheckCircle2 className="w-4 h-4" /> Save as Draft
+          </button>
+        )}
+      </footer>
     </div>
   );
 }
 
-// ── Main Page ──────────────────────────────────────────────────────────────
+// ── Access denied ─────────────────────────────────────────────────────────────
+
+function AccessDenied() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+      <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mb-4">
+        <Lock className="w-6 h-6 text-muted-foreground" />
+      </div>
+      <h2 className="text-[16px] font-bold text-foreground mb-2">Penny Admin access required</h2>
+      <p className="text-[13px] text-muted-foreground max-w-xs leading-relaxed">
+        The Prompt Studio is available to Penny Admins, Platform Admins, and Super Users. Contact your administrator to request access.
+      </p>
+    </div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PennyPromptStudio() {
   const { setSelectedItem, openActionPanel, openSlackPanel } = useAppContext();
+  const { isPowerOrAbove } = useTierFlags();
   const { templates: liveTemplates, create, update } = usePromptTemplates();
-  const [view, setView] = useState<StudioView>('library');
-  const [librarySelectedTemplate, setLibrarySelectedTemplate] = useState<PromptTemplate | null>(null);
 
-  function openBrief(t: PromptTemplate) {
-    setSelectedItem({ type: 'promptTemplate', id: t.id, data: t });
-  }
+  const [activeTab, setActiveTab]   = useState<StudioTab>('templates');
+  const [selectedId, setSelectedId] = useState(() => liveTemplates[0]?.id ?? seedTemplates[0]?.id ?? '');
+  const [showTest, setShowTest]     = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
-  function handleLibrarySelect(t: PromptTemplate) {
-    setLibrarySelectedTemplate(t);
-    setView('templates');
-  }
+  const selected = liveTemplates.find(t => t.id === selectedId) ?? liveTemplates[0] ?? seedTemplates[0];
 
-  function handleEditTemplate(t: PromptTemplate) {
+  // Ensure selectedId stays valid when templates load/change
+  const resolvedId = liveTemplates.find(t => t.id === selectedId) ? selectedId : (liveTemplates[0]?.id ?? '');
+
+  function handleEdit(t: PromptTemplate) {
     openActionPanel({
       title: `Edit: ${t.name}`,
       objectType: 'Prompt Template',
@@ -1212,152 +1052,168 @@ export default function PennyPromptStudio() {
       slackContext: 'penny',
       fields: [
         { id: 'name',         label: 'Template Name',   type: 'text',     required: true, placeholder: t.name },
-        { id: 'domain',       label: 'Domain',           type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
+        { id: 'domain',       label: 'Domain',           type: 'select',   options: DOMAIN_ORDER as string[], required: true },
         { id: 'purpose',      label: 'Purpose',          type: 'textarea', placeholder: t.purpose, rows: 3 },
         { id: 'promptBody',   label: 'Prompt Body',      type: 'textarea', placeholder: t.promptBody, rows: 5 },
         { id: 'audience',     label: 'Audience',         type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'] },
         { id: 'tone',         label: 'Tone & Style',     type: 'text',     placeholder: t.tone },
         { id: 'guardrails',   label: 'Guardrails',       type: 'textarea', placeholder: t.guardrails.join('\n'), rows: 3 },
-        { id: 'reviewStatus', label: 'Review Status',    type: 'select',   options: ['Draft', 'In Review', 'Approved', 'Needs Revision'] },
+        { id: 'reviewStatus', label: 'Review Status',    type: 'select',   options: ['Draft', 'Review', 'Approved', 'Deprecated'] },
       ],
       onSaveAndView: (data) => {
         update({ id: t.id, updates: {
-          ...(data.name         ? { name: data.name }                                          : {}),
-          ...(data.domain       ? { domain: data.domain as PromptDomain }                     : {}),
-          ...(data.purpose      ? { purpose: data.purpose }                                    : {}),
-          ...(data.promptBody   ? { promptBody: data.promptBody }                             : {}),
-          ...(data.tone         ? { tone: data.tone }                                          : {}),
-          ...(data.guardrails   ? { guardrails: data.guardrails.split('\n').filter(Boolean) } : {}),
-          ...(data.reviewStatus ? { status: data.reviewStatus as PromptStatus }               : {}),
+          ...(data.name         && { name: data.name }),
+          ...(data.domain       && { domain: data.domain as PromptDomain }),
+          ...(data.purpose      && { purpose: data.purpose }),
+          ...(data.promptBody   && { promptBody: data.promptBody }),
+          ...(data.tone         && { tone: data.tone }),
+          ...(data.guardrails   && { guardrails: data.guardrails.split('\n').filter(Boolean) }),
+          ...(data.reviewStatus && { status: data.reviewStatus as PromptStatus }),
           lastReviewed: 'Just now',
         }});
-        setView('templates');
       },
     });
   }
 
-  function handleNewTemplate() {
-    openActionPanel({
-      title: 'Request New Prompt Template', objectType: 'Prompt Template',
-      subtitle: 'Configure how Penny thinks, retrieves, and responds in a specific context.',
-      slackContext: 'penny',
-      fields: [
-        { id: 'name',       label: 'Template Name',   type: 'text',     required: true, placeholder: 'e.g. Goal-Setting Coaching Prompt' },
-        { id: 'domain',     label: 'Domain',           type: 'select',   options: ['Coaching', 'Career', 'Learning', 'Knowledge', 'Operations', 'Communications', 'Questing'], required: true },
-        { id: 'purpose',    label: 'Purpose',          type: 'textarea', placeholder: 'What does this prompt do and when should Penny use it?', rows: 3 },
-        { id: 'promptBody', label: 'Prompt Body',      type: 'textarea', placeholder: 'Write the prompt. Use {{variable_name}} for dynamic tokens.', rows: 5 },
-        { id: 'audience',   label: 'Audience',         type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'] },
-        { id: 'inputs',     label: 'Required Inputs',  type: 'textarea', placeholder: 'e.g. learnerName, programName, currentGoal…', rows: 2 },
-        { id: 'tone',       label: 'Tone & Style',     type: 'text',     placeholder: 'e.g. Empathetic and direct.' },
-        { id: 'guardrails', label: 'Guardrails',       type: 'textarea', placeholder: 'Constraints: never recommend specific employers…', rows: 3 },
-        { id: 'reviewStatus', label: 'Review Status',  type: 'select',   options: ['Draft', 'In Review', 'Approved', 'Needs Revision'] },
-        { id: 'testCase',   label: 'Test Case',        type: 'textarea', placeholder: 'Describe a test input and expected Penny response…', rows: 3 },
-      ],
-      onSaveAndView: (data) => {
-        if (data.name?.trim()) {
-          const newTemplate: PromptTemplate = {
-            id: `tpl-${Date.now()}`,
-            name: data.name.trim(),
-            domain: (data.domain as PromptDomain) || 'Coaching',
-            capabilityId: 'cap-general',
-            shortDescription: data.purpose?.slice(0, 80) || '',
-            purpose: data.purpose || '',
-            audience: data.audience ? [data.audience] : ['Coach'],
-            requiredVariables: [],
-            sourceRules: [],
-            outputFormatId: 'Knowledge Answer',
-            tone: data.tone || 'Professional and clear.',
-            guardrails: data.guardrails ? data.guardrails.split('\n').filter(Boolean) : [],
-            owner: 'Staff',
-            status: (data.reviewStatus as PromptStatus) || 'Draft',
-            version: '1.0',
-            lastReviewed: 'Just now',
-            promptBody: data.promptBody || '',
-            relatedStandards: [],
-            relatedSfObjects: [],
-            hallucinationRisk: 'Medium',
-            qualityScore: 0,
-            testBench: { sampleInputs: {}, simulatedOutput: '', simulationNotes: '' },
-          };
-          create(newTemplate);
-        }
-        setView('templates');
-      },
-    });
-  }
+  const TABS: { id: StudioTab; label: string; icon: typeof Brain; count?: number }[] = [
+    { id: 'templates',    label: 'Templates',      icon: Brain,    count: liveTemplates.length },
+    { id: 'variables',    label: 'Variables',      icon: Hash,     count: promptVariables.length },
+    { id: 'source-rules', label: 'Source Rules',   icon: Database },
+    { id: 'formats',      label: 'Output Formats', icon: Layers,   count: outputFormats.length },
+  ];
+
+  if (!isPowerOrAbove) return <AccessDenied />;
 
   return (
-    <StudioCtx.Provider value={{ templates: liveTemplates }}>
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Header */}
-      <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <div className="flex items-center gap-2 mb-0.5">
-          <p className="text-[14px] font-bold  text-muted-foreground/50">Penny — Prompt Studio</p>
-          <SampleDataBadge />
-        </div>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Penny Prompt Studio</h1>
-            <p className="text-[14px] text-muted-foreground mt-0.5">
-              The administrative control center for how Penny thinks. Configure prompts, variables, source rules, and output formats — no code required.
-            </p>
+    <>
+      {wizardOpen && (
+        <GuidedWizardOverlay
+          onClose={() => setWizardOpen(false)}
+          onCreate={(t) => {
+            create(t);
+            setSelectedId(t.id);
+            setActiveTab('templates');
+          }}
+        />
+      )}
+
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Dark header bar */}
+        <header className="shrink-0 bg-foreground px-5 h-11 flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Brain className="w-4 h-4 text-background/70" />
+            <span className="text-[13px] font-bold text-background">Penny</span>
+            <ChevronRight className="w-3.5 h-3.5 text-background/40" />
+            <span className="text-[13px] font-semibold text-background/90">Prompt Studio</span>
+            <SampleDataBadge />
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+
+          {/* Tab strip */}
+          <div className="flex items-center gap-0.5 ml-2">
+            {TABS.map(tab => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 h-11 text-[12px] font-bold border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? 'text-background border-background'
+                      : 'text-background/50 border-transparent hover:text-background/80 hover:border-background/30'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {tab.label}
+                  {tab.count !== undefined && (
+                    <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 ${activeTab === tab.id ? 'bg-background/20' : 'bg-background/10'}`}>
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2 ml-auto">
             <button
-              onClick={() => openSlackPanel({ context: 'penny', title: 'Penny Prompt Studio', subtitle: 'Slack channels, pending asks, and bot status for Penny prompt work.' })}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-bold border border-[#4A154B]/20 bg-[#4A154B]/5 text-[#4A154B] hover:bg-[#4A154B]/10 transition-colors"
-              title="Open Slack context"
+              onClick={() => openSlackPanel({ context: 'penny', title: 'Penny Prompt Studio', subtitle: 'Slack channels, pending asks, and bot status.' })}
+              className="flex items-center gap-1.5 h-7 px-3 rounded-full bg-background/15 hover:bg-background/25 text-[11px] font-bold text-background transition-colors"
             >
-              <Hash className="w-3.5 h-3.5" />
-              Slack
+              <Hash className="w-3 h-3" /> Slack
             </button>
             <button
-              onClick={handleNewTemplate}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity"
+              onClick={() => setWizardOpen(true)}
+              className="flex items-center gap-1.5 h-7 px-3 rounded-full bg-background/15 hover:bg-background/25 text-[11px] font-bold text-background transition-colors"
             >
-              <Plus className="w-3.5 h-3.5" />
-              New Template
+              <Plus className="w-3 h-3" /> New Template
             </button>
-            <span className="text-[14px] font-semibold text-[#2F6B3F] border border-[#9FC3AE] bg-[#E6F0EA] rounded-full px-3 py-1">
+            <span className="text-[10px] font-bold text-[#2F6B3F] bg-[#C8E6D0] border border-[#9FC3AE] rounded-full px-2 py-0.5">
               {liveTemplates.filter(t => t.status === 'Approved').length} Approved
             </span>
-            <span className="text-[14px] font-semibold text-[#CC8400] border border-[#FFD08A] bg-[#FFF3E0] rounded-full px-3 py-1">
+            <span className="text-[10px] font-bold text-[#CC8400] bg-[#FFF3E0] border border-[#FFD08A] rounded-full px-2 py-0.5">
               {liveTemplates.filter(t => t.status === 'Review').length} In Review
             </span>
           </div>
-        </div>
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <ViewTab label="Prompt Library"   icon={BookOpen}       active={view === 'library'}      onClick={() => setView('library')} />
-          <ViewTab label="Templates"        icon={Brain}          active={view === 'templates'}    count={liveTemplates.length} onClick={() => setView('templates')} />
-          <ViewTab label="Variables"        icon={Zap}            active={view === 'variables'}    count={PROMPT_STUDIO_SUMMARY.variables} onClick={() => setView('variables')} />
-          <ViewTab label="Source Rules"     icon={Database}       active={view === 'source-rules'} onClick={() => setView('source-rules')} />
-          <ViewTab label="Output Formats"   icon={FileText}       active={view === 'formats'}      count={PROMPT_STUDIO_SUMMARY.formats} onClick={() => setView('formats')} />
-          <ViewTab label="Test Bench"       icon={FlaskConical}   active={view === 'test-bench'}   onClick={() => setView('test-bench')} />
-          <ViewTab label="Version History"  icon={GitBranch}      active={view === 'history'}      onClick={() => setView('history')} />
-          <ViewTab label="Quality Review"   icon={ClipboardCheck} active={view === 'quality'}      onClick={() => setView('quality')} />
-        </div>
-      </div>
+        </header>
 
-      {/* Content */}
-      <div className="flex-1 overflow-hidden">
-        {view === 'create' && (
-          <div className="flex flex-col items-center justify-center h-full p-8 text-center text-muted-foreground">
-            <p className="text-sm font-semibold mb-1">Use the Action Panel →</p>
-            <p className="text-[14px] leading-relaxed max-w-xs">
-              Click <strong>New Template</strong> above. The creation form opens in the right panel so the library stays visible.
-            </p>
+        {/* Body */}
+        <div className="flex-1 flex overflow-hidden">
+          {activeTab === 'templates' && selected && (
+            <>
+              <Sidebar
+                templates={liveTemplates}
+                selectedId={resolvedId}
+                onSelect={id => setSelectedId(id)}
+              />
+              <TemplateDetailPanel
+                template={selected}
+                showTest={showTest}
+                onToggleTest={() => setShowTest(s => !s)}
+                onEdit={handleEdit}
+                onBrief={t => setSelectedItem({ type: 'promptTemplate', id: t.id, data: t })}
+              />
+              {showTest && <TestBenchPanel template={selected} />}
+            </>
+          )}
+
+          {activeTab === 'variables' && (
+            <div className="flex-1 overflow-hidden">
+              <VariablesView />
+            </div>
+          )}
+          {activeTab === 'source-rules' && (
+            <div className="flex-1 overflow-hidden">
+              <SourceRulesView templates={liveTemplates} />
+            </div>
+          )}
+          {activeTab === 'formats' && (
+            <div className="flex-1 overflow-hidden">
+              <OutputFormatsView />
+            </div>
+          )}
+        </div>
+
+        {/* Status bar */}
+        <footer className="shrink-0 border-t border-border px-5 py-1.5 flex items-center gap-4 bg-background">
+          <span className="text-[11px] text-muted-foreground">
+            {liveTemplates.length} templates · last updated just now
+          </span>
+          <div className="flex items-center gap-3 ml-auto">
+            {[
+              { key: '⌘F', label: 'Search' },
+              { key: '⌘T', label: 'Test' },
+              { key: '⌘E', label: 'Edit' },
+              { key: '⌘N', label: 'New' },
+            ].map(sc => (
+              <div key={sc.key} className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <kbd className="bg-muted border border-border rounded px-1 py-0.5 font-mono text-[10px]">{sc.key}</kbd>
+                <span>{sc.label}</span>
+              </div>
+            ))}
           </div>
-        )}
-        {view === 'library'      && <LibraryView onSelectTemplate={handleLibrarySelect} />}
-        {view === 'templates'    && <TemplatesView onOpenBrief={openBrief} onEdit={handleEditTemplate} />}
-        {view === 'variables'    && <VariablesView />}
-        {view === 'source-rules' && <SourceRulesView />}
-        {view === 'formats'      && <OutputFormatsView />}
-        {view === 'test-bench'   && <TestBenchView />}
-        {view === 'history'      && <VersionHistoryView />}
-        {view === 'quality'      && <QualityReviewView />}
+        </footer>
       </div>
-    </div>
-    </StudioCtx.Provider>
+    </>
   );
 }
