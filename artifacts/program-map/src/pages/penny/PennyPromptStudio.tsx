@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { usePromptTemplates } from '@/hooks/usePromptTemplates';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -561,7 +562,9 @@ function TemplateDetailPanel({
             <ScoreBar score={template.qualityScore} />
           </div>
           <span className="text-[11px] text-muted-foreground">
-            Reviewed {template.lastReviewed} · {vars.length} variable{vars.length !== 1 ? 's' : ''}
+            Modified {template.lastReviewed}
+            {template.lastModifiedBy ? <> · by <span className="font-semibold text-foreground">{template.lastModifiedBy}</span></> : ''}
+            {' '}· {vars.length} variable{vars.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
@@ -1243,6 +1246,7 @@ export default function PennyPromptStudio() {
   const { setSelectedItem, openActionPanel, openSlackPanel } = useAppContext();
   const { isPowerOrAbove } = useTierFlags();
   const { templates: liveTemplates, create, update } = usePromptTemplates();
+  const { user } = useGoogleAuth();
 
   const [activeTab, setActiveTab]   = useState<StudioTab>('templates');
   const [selectedId, setSelectedId] = useState(() => liveTemplates[0]?.id ?? seedTemplates[0]?.id ?? '');
@@ -1266,24 +1270,28 @@ export default function PennyPromptStudio() {
         { id: 'domain',       label: 'Domain',           type: 'select',   options: DOMAIN_ORDER as string[], required: true, default: t.domain },
         { id: 'purpose',      label: 'Purpose',          type: 'textarea', default: t.purpose, rows: 3 },
         { id: 'promptBody',   label: 'Prompt Body',      type: 'textarea', default: t.promptBody, rows: 5, enableVariableAutocomplete: true },
-        { id: 'audience',     label: 'Audience',         type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'], default: t.audience },
+        { id: 'audience',     label: 'Audience',         type: 'select',   options: ['Learner', 'Coach', 'Admin', 'All'], default: t.audience[0] ?? '' },
         { id: 'tone',         label: 'Tone & Style',     type: 'text',     default: t.tone },
         { id: 'guardrails',   label: 'Guardrails',       type: 'textarea', default: t.guardrails.join('\n'), rows: 3 },
         { id: 'reviewStatus', label: 'Review Status',    type: 'select',   options: ['Draft', 'Review', 'Approved', 'Deprecated'], default: t.status },
       ],
       onSaveAndView: (data) => {
-        update({ id: t.id, updates: {
-          name:         data.name         || t.name,
-          domain:       (data.domain       || t.domain)  as PromptDomain,
-          purpose:      data.purpose      || t.purpose,
-          promptBody:   data.promptBody   || t.promptBody,
-          tone:         data.tone         || t.tone,
-          guardrails:   data.guardrails
+        const modifiedBy = user?.name ?? t.owner;
+        const updates: Partial<PromptTemplate> = {
+          name:           data.name         || t.name,
+          domain:         (data.domain       || t.domain)  as PromptDomain,
+          purpose:        data.purpose      || t.purpose,
+          promptBody:     data.promptBody   || t.promptBody,
+          tone:           data.tone         || t.tone,
+          audience:       data.audience     ? [data.audience] : t.audience,
+          guardrails:     data.guardrails
             ? data.guardrails.split('\n').filter(Boolean)
             : t.guardrails,
-          status:       (data.reviewStatus || t.status) as PromptStatus,
-          lastReviewed: 'Just now',
-        }});
+          status:         (data.reviewStatus || t.status) as PromptStatus,
+          lastReviewed:   'Just now',
+          lastModifiedBy: modifiedBy,
+        };
+        update({ id: t.id, updates });
       },
     });
   }
@@ -1385,9 +1393,18 @@ export default function PennyPromptStudio() {
                 onToggleTest={() => setShowTest(s => !s)}
                 onEdit={handleEdit}
                 onBrief={t => setSelectedItem({ type: 'promptTemplate', id: t.id, data: t })}
-                onStatusChange={(id, status) =>
-                  update({ id, updates: { status, lastReviewed: 'Just now' } })
-                }
+                onStatusChange={(id, status) => {
+                  const modifiedBy = user?.name ?? selected.owner;
+                  const updates: Partial<PromptTemplate> = { status, lastReviewed: 'Just now', lastModifiedBy: modifiedBy };
+                  update({ id, updates });
+                  // Keep the Context Panel (Trail Insights) in sync — it holds a snapshot
+                  // set at Brief-click time and won't update unless we push the new data.
+                  setSelectedItem(prev =>
+                    prev?.type === 'promptTemplate' && prev.id === id
+                      ? { ...prev, data: { ...(prev.data as PromptTemplate), ...updates } }
+                      : prev
+                  );
+                }}
               />
               {showTest && <TestBenchPanel template={selected} />}
             </>

@@ -55,6 +55,7 @@ export interface PromptTemplate {
   tone: string;
   guardrails: string[];
   owner: string;
+  lastModifiedBy?: string;
   status: PromptStatus;
   version: string;
   lastReviewed: string;
