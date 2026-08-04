@@ -661,12 +661,8 @@ function NewSourceDrawer({
                 <button
                   key={opt.value}
                   type="button"
-                  onClick={() => { setType(opt.value === 'Slack History' ? 'Slack History' : opt.value); }}
-                  className={`w-full flex items-start gap-4 p-4 rounded-xl border-2 text-left transition-all ${
-                    type === opt.value
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/40 hover:bg-muted/30'
-                  }`}
+                  onClick={() => { setType(opt.value); setStep('connection'); }}
+                  className="w-full flex items-start gap-4 p-4 rounded-xl border-2 text-left transition-all border-border hover:border-primary/40 hover:bg-muted/30 active:border-primary active:bg-primary/5"
                 >
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${type === opt.value ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                     {opt.icon}
