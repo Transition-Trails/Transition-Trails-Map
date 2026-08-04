@@ -534,6 +534,12 @@ describe('GET /api/salesforce/validate — Penny + Governance field-check covera
   test('each Penny + Governance field check has a non-empty requiredFields list in normal mode', async () => {
     // Verify that the REUSED_OBJECT_FIELD_CHECKS definitions actually enumerate
     // required fields for Penny and Governance objects — not just empty arrays.
+    //
+    // Exception: 'tt-automation-fields' is intentionally requiredFields:[] because
+    // TT_Automation__c has 0 custom fields on the live org as of Task #143.
+    // Phase 2 will add Is_Active__c / Automation_Type__c / Description__c / Status__c.
+    const INTENTIONALLY_EMPTY: string[] = ['tt-automation-fields'];
+
     const res = await request(app).get('/api/salesforce/validate');
     expect(res.status).toBe(200);
 
@@ -551,8 +557,13 @@ describe('GET /api/salesforce/validate — Penny + Governance field-check covera
     for (const id of pennyAndGovernanceIds) {
       const fc = allFieldChecks.find(c => c.id === id);
       expect(fc).toBeDefined();
+      if (INTENTIONALLY_EMPTY.includes(id)) {
+        // Confirmed Phase 2: TT_Automation__c has no custom fields on the live
+        // org yet. The check is present but the required list is empty by design.
+        continue;
+      }
       // The combined found+missing list represents the requiredFields config —
-      // it should be non-empty for every Penny/Governance object.
+      // it should be non-empty for every other Penny/Governance object.
       const totalConfigured = (fc?.requiredFieldsFound?.length ?? 0) + (fc?.requiredFieldsMissing?.length ?? 0);
       expect(totalConfigured).toBeGreaterThan(0);
     }

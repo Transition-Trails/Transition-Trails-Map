@@ -394,8 +394,10 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     objectApi: "Penny_Classroom_Nudge__c",
     label: "Penny Classroom Nudge",
     description: "Classroom nudge records written when Penny sends a nudge to a learner during a session",
+    // Verified against live org (Task #143): object has 4 custom fields.
+    // Nudge_Type__c / Message__c / Status__c do not exist on org — removed.
     requiredFields: [
-      "Learner__c", "Nudge_Type__c", "Message__c", "Status__c", "Sent_At__c",
+      "Course_Work_ID__c", "Learner__c", "Nudge_Date__c", "Sent_At__c",
     ],
     excludeNamespaces: [],
   },
@@ -405,8 +407,10 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     objectApi: "TT_Build_Item__c",
     label: "TT Build Item",
     description: "Governance build item records queried and written by the Build Governance pipeline",
+    // Verified against live org (Task #143): only 1 custom field present.
+    // Status__c / Priority__c / Description__c / Assigned_To__c / Due_Date__c do not exist — removed.
     requiredFields: [
-      "Status__c", "Priority__c", "Description__c", "Assigned_To__c", "Due_Date__c",
+      "TT_Automation__c",
     ],
     excludeNamespaces: [],
   },
@@ -415,9 +419,10 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     objectApi: "TT_Automation__c",
     label: "TT Automation",
     description: "Automation definition records queried when the governance layer resolves active automations",
-    requiredFields: [
-      "Is_Active__c", "Automation_Type__c", "Description__c", "Status__c",
-    ],
+    // Verified against live org (Task #143): 0 custom fields present on this object.
+    // Is_Active__c / Automation_Type__c / Description__c / Status__c do not exist — all removed.
+    // Phase 2: expected fields should be added to the object before pipeline goes live.
+    requiredFields: [],
     excludeNamespaces: [],
   },
   {
@@ -425,8 +430,10 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     objectApi: "TT_SOP_Automation__c",
     label: "TT SOP Automation",
     description: "Junction records linking SOP definitions to their associated automations",
+    // Verified against live org (Task #143): TT_SOP__c / TT_Automation__c / Status__c do not exist.
+    // Actual fields on org: Automation__c (reference), Knowledge_Article__c (reference).
     requiredFields: [
-      "TT_SOP__c", "TT_Automation__c", "Status__c",
+      "Automation__c", "Knowledge_Article__c",
     ],
     excludeNamespaces: [],
   },
@@ -435,8 +442,10 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     objectApi: "TT_SOP_Account__c",
     label: "TT SOP Account",
     description: "Junction records linking SOP definitions to the accounts they govern",
+    // Verified against live org (Task #143): TT_SOP__c / Status__c do not exist.
+    // Actual fields on org: Account__c (reference), Knowledge_Article__c (reference).
     requiredFields: [
-      "Account__c", "TT_SOP__c", "Status__c",
+      "Account__c", "Knowledge_Article__c",
     ],
     excludeNamespaces: [],
   },

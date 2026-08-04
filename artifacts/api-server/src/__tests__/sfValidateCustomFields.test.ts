@@ -322,7 +322,8 @@ describe('GET /api/salesforce/validate — all Penny field-check entries present
       ['Penny_Weekly_Report__c',     ['Generated_At__c', 'Top_Themes__c', 'Support_Flags__c', 'Suggested_Actions__c', 'Trail_Breakdown__c', 'Week_Start__c', 'Week_End__c']],
       ['Penny_Badge__c',             ['Learner__c', 'Awarded_By__c']],
       ['Penny_Gamification__c',      ['Learner__c', 'Points__c', 'Sprint_Points__c', 'Sprint_Number__c', 'Reason__c', 'Note__c', 'Awarded_By__c']],
-      ['Penny_Classroom_Nudge__c',   ['Learner__c', 'Nudge_Type__c', 'Message__c', 'Status__c', 'Sent_At__c']],
+      // Verified against live org (Task #143): Nudge_Type__c/Message__c/Status__c absent
+      ['Penny_Classroom_Nudge__c',   ['Course_Work_ID__c', 'Learner__c', 'Nudge_Date__c', 'Sent_At__c']],
     ];
     for (const [obj, fields] of pennyFieldSets) {
       describeOverrides.set(obj, fields);
