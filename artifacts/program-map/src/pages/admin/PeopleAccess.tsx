@@ -194,6 +194,9 @@ function NavCell({ value }: { value: string }) {
 // ── Persona → role ID mapping for owner auto-clear ────────────────────────────
 const PERSONA_TO_ROLE_ID: Record<string, string> = {
   [`${TERMS.aiAssistant} Admin`]: 'penny-admin',
+  'Alumni Learner':               'alumni-learner-lead',
+  'Volunteer Mentor':             'volunteer-mentor-lead',
+  'Employer Partner':             'employer-partner-lead',
 };
 
 // ── Permission Matrix tab ─────────────────────────────────────────────────────
