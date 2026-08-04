@@ -21,6 +21,43 @@ const router = Router();
 
 const OBJECT = "TT_Session_Log__c";
 
+// ── Field-set cache (describe once, reuse) ────────────────────────────────────
+
+// All fields we'd like to SELECT, in preference order.
+const DESIRED_FIELDS = [
+  "Id", "Name", "Session_Type__c", "Session_Date__c",
+  "Coach_Name__c", "Learner_Name__c", "Learner__c", "Program__c",
+  "Duration_Minutes__c", "Notes__c", "Status__c", "CreatedDate",
+];
+
+interface SessionFieldSet {
+  selectClause: string;   // comma-separated fields confirmed to exist
+  present: Set<string>;   // quick membership test
+  fetchedAt: number;
+}
+
+let sessionFieldCache: SessionFieldSet | null = null;
+const SESSION_FIELD_CACHE_TTL_MS = 10 * 60 * 1000; // 10 min
+
+async function getSessionFieldSet(client: ISalesforceClient): Promise<SessionFieldSet | null> {
+  const now = Date.now();
+  if (sessionFieldCache && now - sessionFieldCache.fetchedAt < SESSION_FIELD_CACHE_TTL_MS) {
+    return sessionFieldCache;
+  }
+  try {
+    const result = await client.query<{ QualifiedApiName: string }>(
+      `SELECT QualifiedApiName FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = '${OBJECT}' LIMIT 500`
+    );
+    const present = new Set(result.records.map(r => r.QualifiedApiName));
+    const confirmed = DESIRED_FIELDS.filter(f => present.has(f));
+    if (confirmed.length < 2) return null; // object likely missing
+    sessionFieldCache = { selectClause: confirmed.join(", "), present, fetchedAt: now };
+    return sessionFieldCache;
+  } catch {
+    return null;
+  }
+}
+
 // ── withClient helper (same pattern as programs.ts) ───────────────────────────
 
 type SfHandler = (req: Request, res: Response, client: ISalesforceClient) => Promise<void>;
@@ -81,27 +118,34 @@ interface RawSessionLog {
 router.get("/sessions", withClient(async (req, res, client) => {
   const limitParam = Math.min(parseInt(String(req.query["limit"] ?? "50"), 10), 200);
 
-  // Attempt the full field list; fall back to minimal if any field is missing
+  // Describe the object first so we only SELECT fields that actually exist.
+  const fieldSet = await getSessionFieldSet(client);
+  if (!fieldSet) {
+    // Object doesn't exist or describe failed — return empty rather than crashing.
+    logger.warn("TT_Session_Log__c describe returned no usable fields; returning empty session list");
+    res.json({ sessions: [], total: 0, warning: "TT_Session_Log__c not found or not accessible in this org" });
+    return;
+  }
+
+  // Use Session_Date__c for ordering only if it exists in this org.
+  const hasDate = fieldSet.present.has("Session_Date__c");
+  const orderBy = hasDate
+    ? "ORDER BY Session_Date__c DESC NULLS LAST, CreatedDate DESC"
+    : "ORDER BY CreatedDate DESC";
+
   let records: RawSessionLog[] = [];
   let totalSize = 0;
 
   try {
     const result = await client.query<RawSessionLog>(
-      `SELECT Id, Name, Session_Type__c, Session_Date__c,
-              Coach_Name__c, Learner_Name__c, Learner__c, Program__c,
-              Duration_Minutes__c, Notes__c, Status__c, CreatedDate
-       FROM ${OBJECT}
-       ORDER BY Session_Date__c DESC NULLS LAST, CreatedDate DESC
-       LIMIT ${limitParam}`
-        .trim().replace(/\s+/g, " ")
+      `SELECT ${fieldSet.selectClause} FROM ${OBJECT} ${orderBy} LIMIT ${limitParam}`
     );
     records   = result.records;
     totalSize = result.totalSize;
   } catch (queryErr) {
-    // Surface which fields are actually invalid
     const msg = queryErr instanceof Error ? queryErr.message : String(queryErr);
-    logger.warn({ msg }, "Full session query failed — returning field error");
-    res.status(422).json({ error: "SOQL query failed — some fields may not exist on TT_Session_Log__c", detail: msg });
+    logger.warn({ msg }, "Session query failed after field-set describe");
+    res.status(502).json({ error: "Session query failed", detail: msg });
     return;
   }
 
