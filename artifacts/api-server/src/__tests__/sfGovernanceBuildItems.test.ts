@@ -197,6 +197,95 @@ describe('GET /api/salesforce/governance/build-items — query failure handling'
   });
 });
 
+// ── V. POST route: input validation (name guard) ──────────────────────────────
+
+describe('POST /api/salesforce/governance/build-items — input validation', () => {
+
+  // ── V1: missing name field → 400 ─────────────────────────────────────────────
+
+  test('V1: returns 400 when name field is absent', async () => {
+    // Sentinel: if createRecord is ever called this test must fail
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is missing');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ automationId: 'some-id' }); // no name field
+
+    expect(res.status).toBe(400);
+  });
+
+  test('V1: 400 body mentions "name" when name field is absent', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is missing');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({});
+
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.toLowerCase()).toContain('name');
+  });
+
+  // ── V2: empty string name → 400 ──────────────────────────────────────────────
+
+  test('V2: returns 400 when name is an empty string', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is empty string');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: '' });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('V2: 400 body mentions "name" when name is an empty string', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is empty string');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: '' });
+
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.toLowerCase()).toContain('name');
+  });
+
+  test('V2: returns 400 when name is a whitespace-only string', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is whitespace');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: '   ' });
+
+    expect(res.status).toBe(400);
+  });
+
+  // ── Guard: createRecord must not be reached for invalid requests ──────────────
+
+  test('Guard: createRecord sentinel error is not returned when name is absent', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is missing');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({});
+
+    // If createRecord were reached, the route would throw → 500; we must get 400
+    expect(res.status).toBe(400);
+    expect(res.body.error).not.toContain('SENTINEL');
+  });
+
+  test('Guard: createRecord sentinel error is not returned when name is empty string', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called when name is empty string');
+
+    const res = await request(app)
+      .post('/api/salesforce/governance/build-items')
+      .send({ name: '' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).not.toContain('SENTINEL');
+  });
+});
+
 // ── P. POST route: createRecord failure handling ───────────────────────────────
 
 describe('POST /api/salesforce/governance/build-items — createRecord failure handling', () => {
