@@ -1262,9 +1262,15 @@ function withClient(handler: SfHandler): RequestHandler {
     try {
       await handler(req, res, client);
     } catch (err) {
-      res.status(500).json({
-        error: err instanceof Error ? err.message : "Internal server error",
-      });
+      // Log the full error server-side; return a sanitised message to the client.
+      // Raw Salesforce errors may contain SOAP XML faults or INVALID_SESSION_ID
+      // details that must never be forwarded to callers.
+      console.error(`[salesforce] ${req.method} ${req.path} error:`, err);
+      const rawMessage = err instanceof Error ? err.message : 'Internal server error';
+      const safeMessage = /<[^>]+>/.test(rawMessage)
+        ? 'Salesforce query failed. Check server logs for details.'
+        : rawMessage;
+      res.status(500).json({ error: safeMessage });
     }
   };
 }
