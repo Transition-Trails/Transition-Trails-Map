@@ -188,11 +188,11 @@ export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = 
     },
     {
       id: 'sf-service-schedule',
-      label: 'Service_Schedule__c object accessible',
+      label: 'pmdm__ServiceSchedule__c object accessible',
       kind: 'sf-object',
-      sfObject: 'Service_Schedule__c',
+      sfObject: 'pmdm__ServiceSchedule__c',
       pennyMissingNote:
-        'Program schedule data lives in Service_Schedule__c — I need it to generate cohort briefs.',
+        'Program schedule data lives in pmdm__ServiceSchedule__c — I need it to generate cohort briefs.',
     },
     {
       id: 'slack-connected',
