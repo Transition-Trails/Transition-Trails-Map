@@ -197,25 +197,40 @@ router.get("/learner/daily-quest", async (req, res) => {
     }
   } catch { /* use fallback values above */ }
 
-  // Best-effort: resolve the learner's current activity and check Quest_Eligible__c.
-  // When found, the quest is anchored to a real Course_Module_Activity__c record so
-  // the submission can populate Penny_Quest_Submission__c.Assignment__c in SF.
-  // AI-generated quests with no eligible anchor correctly omit activityId.
+  // Best-effort: resolve the learner's current module and find a Quest_Eligible__c
+  // activity within it.  When found the activity's Name and Description seed the
+  // Gemini prompt (instead of the open-ended trail/phase strings), and the Id is
+  // returned so the submission can populate Penny_Quest_Submission__c.Assignment__c.
+  // If no eligible activity is found the route falls back to open-ended generation.
   let eligibleActivityId: string | undefined;
+  let activityName:        string | undefined;
+  let activityDescription: string | undefined;
   try {
-    const enrollRecords = await sfQuery<{ Current_Activity__c: string | null }>(
-      `SELECT Current_Activity__c FROM Course_Enrollment__c WHERE Contact__c = '${contactId}' AND Current_Activity__c != null LIMIT 1`
+    const enrollRecords = await sfQuery<{ Current_Module__c: string | null }>(
+      `SELECT Current_Module__c FROM Course_Enrollment__c WHERE Contact__c = '${contactId}' AND Current_Module__c != null LIMIT 1`
     );
-    const currentActivityId = enrollRecords[0]?.Current_Activity__c;
-    if (currentActivityId) {
-      const activityRecords = await sfQuery<{ Id: string }>(
-        `SELECT Id FROM Course_Module_Activity__c WHERE Id = '${currentActivityId}' AND Quest_Eligible__c = true LIMIT 1`
+    const currentModuleId = enrollRecords[0]?.Current_Module__c;
+    if (currentModuleId) {
+      const activityRecords = await sfQuery<{ Id: string; Name: string; Description__c: string | null }>(
+        `SELECT Id, Name, Description__c FROM Course_Module_Activity__c WHERE Quest_Eligible__c = true AND Course_Module__c = '${currentModuleId}' LIMIT 1`
       );
-      if (activityRecords[0]) {
-        eligibleActivityId = activityRecords[0].Id;
+      const activity = activityRecords[0];
+      if (activity) {
+        eligibleActivityId  = activity.Id;
+        activityName        = activity.Name;
+        activityDescription = activity.Description__c ?? undefined;
       }
     }
   } catch { /* activity lookup is advisory — quest generation proceeds without it */ }
+
+  // Build prompt — activity-seeded when we have an eligible anchor, open-ended otherwise.
+  const systemText = eligibleActivityId && activityName
+    ? `You are Penny, an AI coaching companion for Transition Trails Academy. Generate exactly one daily Salesforce Admin learning quest based on a specific curriculum activity. The quest must be a practical scenario-based challenge that takes 10–15 minutes and directly relates to the given activity.`
+    : `You are Penny, an AI coaching companion for Transition Trails Academy. Generate exactly one daily Salesforce Admin learning quest for a learner on the ${trail} trail in phase ${phase}. The quest must be a practical scenario-based challenge that takes 10–15 minutes.`;
+
+  const userText = eligibleActivityId && activityName
+    ? `Generate today's daily quest based on this curriculum activity:\nActivity: ${activityName}${activityDescription ? `\nDescription: ${activityDescription}` : ""}\n\nThe quest should help a learner practise and demonstrate mastery of this activity. Return JSON with these exact fields: { "title": string, "description": string, "difficulty": "Beginner"|"Intermediate"|"Expert", "pointValue": number (10 for Beginner, 25 for Intermediate, 50 for Expert), "category": string, "acceptanceCriteria": string }`
+    : `Generate today's daily quest for a ${trail} learner in phase ${phase} with goal: ${goal}. Return JSON with these exact fields: { "title": string, "description": string, "difficulty": "Beginner"|"Intermediate"|"Expert", "pointValue": number (10 for Beginner, 25 for Intermediate, 50 for Expert), "category": string, "acceptanceCriteria": string }`;
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
@@ -224,11 +239,11 @@ router.get("/learner/daily-quest", async (req, res) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         system_instruction: {
-          parts: [{ text: `You are Penny, an AI coaching companion for Transition Trails Academy. Generate exactly one daily Salesforce Admin learning quest for a learner on the ${trail} trail in phase ${phase}. The quest must be a practical scenario-based challenge that takes 10–15 minutes.` }],
+          parts: [{ text: systemText }],
         },
         contents: [{
           role:  "user",
-          parts: [{ text: `Generate today's daily quest for a ${trail} learner in phase ${phase} with goal: ${goal}. Return JSON with these exact fields: { "title": string, "description": string, "difficulty": "Beginner"|"Intermediate"|"Expert", "pointValue": number (10 for Beginner, 25 for Intermediate, 50 for Expert), "category": string, "acceptanceCriteria": string }` }],
+          parts: [{ text: userText }],
         }],
         generationConfig: {
           responseMimeType: "application/json",
@@ -262,21 +277,6 @@ router.get("/learner/daily-quest", async (req, res) => {
 });
 
 // ── POST /api/learner/quest/submit ───────────────────────────────────────────
-//
-// DESIGN NOTE — Quest_Eligible__c and activity-anchored quests:
-// Course_Module_Activity__c carries a Quest_Eligible__c boolean flag.  The
-// Salesforce schema expects Penny_Quest_Submission__c.Assignment__c to be a
-// lookup to a Course_Module_Activity__c where Quest_Eligible__c = true.
-// The current daily-quest generation (GET /learner/daily-quest) asks Gemini
-// to invent a quest from trail + phase, so it has no real activity anchor.
-// Switching to eligible-activity-based generation would:
-//   — require a SOQL query for eligible activities before generation
-//   — let the submission be recorded with a valid Assignment__c
-//   — constrain quest content to the actual curriculum
-//   — lose the flexibility of dynamic trail/phase-aware generation
-// No behaviour change made here per instruction; this note is for the next
-// design decision.
-//
 router.post("/learner/quest/submit", async (req, res) => {
   const contactId = req.session.learnerContactId!;
   const { questTitle, questDescription, pointValue, learnerResponse, activityId } = req.body as {

@@ -258,7 +258,10 @@ describe('GET /api/learner/daily-quest — Gemini returns a non-OK response', ()
 });
 
 describe('GET /api/learner/daily-quest — activityId from quest-eligible enrollment', () => {
-  const ELIGIBLE_ACTIVITY_ID = 'a0B000000TestActivity001';
+  const ELIGIBLE_ACTIVITY_ID   = 'a0B000000TestActivity001';
+  const CURRENT_MODULE_ID      = 'a0C000000TestModule001';
+  const ACTIVITY_NAME          = 'Build a Custom Report';
+  const ACTIVITY_DESCRIPTION   = 'Learn to build Salesforce reports that track open cases by priority.';
 
   function makeSfActivityResponse(records: unknown[]): Response {
     const body = { totalSize: records.length, done: true, records };
@@ -281,7 +284,7 @@ describe('GET /api/learner/daily-quest — activityId from quest-eligible enroll
     } as Response;
   }
 
-  test('includes activityId when learner has a quest-eligible current activity', async () => {
+  test('includes activityId when learner has a quest-eligible activity in current module', async () => {
     delete mockSession['dailyQuestDate'];
     delete mockSession['dailyQuest'];
 
@@ -292,12 +295,17 @@ describe('GET /api/learner/daily-quest — activityId from quest-eligible enroll
       if ((url as string).includes('generativelanguage.googleapis.com')) {
         return Promise.resolve(makeGeminiOkResponse(VALID_QUEST));
       }
-      // SF queries: enrollment → activity → contact context
+      // Enrollment query returns current module
       if ((url as string).includes('Course_Enrollment__c')) {
-        return Promise.resolve(makeSfActivityResponse([{ Current_Activity__c: ELIGIBLE_ACTIVITY_ID }]));
+        return Promise.resolve(makeSfActivityResponse([{ Current_Module__c: CURRENT_MODULE_ID }]));
       }
+      // Activity query returns eligible activity with Name + Description
       if ((url as string).includes('Course_Module_Activity__c')) {
-        return Promise.resolve(makeSfActivityResponse([{ Id: ELIGIBLE_ACTIVITY_ID }]));
+        return Promise.resolve(makeSfActivityResponse([{
+          Id:              ELIGIBLE_ACTIVITY_ID,
+          Name:            ACTIVITY_NAME,
+          Description__c:  ACTIVITY_DESCRIPTION,
+        }]));
       }
       return Promise.resolve(makeSfEmptyResponse());
     }));
@@ -309,7 +317,48 @@ describe('GET /api/learner/daily-quest — activityId from quest-eligible enroll
     expect(res.body.activityId).toBe(ELIGIBLE_ACTIVITY_ID);
   });
 
-  test('omits activityId when current activity is not Quest_Eligible__c', async () => {
+  test('seeds Gemini prompt with activity name and description when eligible activity is found', async () => {
+    delete mockSession['dailyQuestDate'];
+    delete mockSession['dailyQuest'];
+
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    const fetchSpy = vi.fn().mockImplementation((url: string) => {
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return Promise.resolve(makeGeminiOkResponse(VALID_QUEST));
+      }
+      if ((url as string).includes('Course_Enrollment__c')) {
+        return Promise.resolve(makeSfActivityResponse([{ Current_Module__c: CURRENT_MODULE_ID }]));
+      }
+      if ((url as string).includes('Course_Module_Activity__c')) {
+        return Promise.resolve(makeSfActivityResponse([{
+          Id:             ELIGIBLE_ACTIVITY_ID,
+          Name:           ACTIVITY_NAME,
+          Description__c: ACTIVITY_DESCRIPTION,
+        }]));
+      }
+      return Promise.resolve(makeSfEmptyResponse());
+    });
+    vi.stubGlobal('fetch', fetchSpy);
+
+    await request(app).get('/api/learner/daily-quest');
+
+    // Find the Gemini call and inspect its body
+    const geminiCall = (fetchSpy.mock.calls as [string, { body?: string }][]).find(([url]) =>
+      url.includes('generativelanguage.googleapis.com')
+    );
+    expect(geminiCall).toBeDefined();
+    const geminiBody = JSON.parse(geminiCall![1].body ?? '{}') as {
+      contents: Array<{ parts: Array<{ text: string }> }>;
+    };
+    const userPrompt = geminiBody.contents[0]?.parts[0]?.text ?? '';
+    // Prompt must reference the activity name and description, not just trail/phase strings
+    expect(userPrompt).toContain(ACTIVITY_NAME);
+    expect(userPrompt).toContain(ACTIVITY_DESCRIPTION);
+  });
+
+  test('omits activityId when no Quest_Eligible__c activities exist for the current module', async () => {
     delete mockSession['dailyQuestDate'];
     delete mockSession['dailyQuest'];
 
@@ -321,10 +370,34 @@ describe('GET /api/learner/daily-quest — activityId from quest-eligible enroll
         return Promise.resolve(makeGeminiOkResponse(VALID_QUEST));
       }
       if ((url as string).includes('Course_Enrollment__c')) {
-        return Promise.resolve(makeSfActivityResponse([{ Current_Activity__c: 'a0B000000NonEligible' }]));
+        return Promise.resolve(makeSfActivityResponse([{ Current_Module__c: CURRENT_MODULE_ID }]));
       }
-      // Activity check returns empty → not quest-eligible
+      // No eligible activities in module
       if ((url as string).includes('Course_Module_Activity__c')) {
+        return Promise.resolve(makeSfEmptyResponse());
+      }
+      return Promise.resolve(makeSfEmptyResponse());
+    }));
+
+    const res = await request(app).get('/api/learner/daily-quest');
+
+    expect(res.status).toBe(200);
+    expect(res.body.activityId).toBeUndefined();
+  });
+
+  test('omits activityId when enrollment has no Current_Module__c', async () => {
+    delete mockSession['dailyQuestDate'];
+    delete mockSession['dailyQuest'];
+
+    process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+    process.env['SF_SERVICE_TOKEN'] = 'test-sf-token';
+
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if ((url as string).includes('generativelanguage.googleapis.com')) {
+        return Promise.resolve(makeGeminiOkResponse(VALID_QUEST));
+      }
+      // Enrollment exists but Current_Module__c is null (filtered out by != null clause)
+      if ((url as string).includes('Course_Enrollment__c')) {
         return Promise.resolve(makeSfEmptyResponse());
       }
       return Promise.resolve(makeSfEmptyResponse());
