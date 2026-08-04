@@ -54,13 +54,31 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
     id: 'gemini',
     label: 'Gemini / Penny AI',
     health: 'live',
-    summary: 'Penny live — Ask Penny → Gemini 2.5 Flash · POST /api/penny/ask · serviceTier: standard',
+    summary: 'Penny live — staff chat, learner chat, and quest feedback all on Gemini 2.5 Flash',
     detail:
       'GEMINI_API_KEY confirmed valid, billing active (serviceTier: standard). ' +
-      'POST /api/penny/ask endpoint live — Gemini 2.5 Flash responding with Trail OS context. ' +
-      'Ask Penny panel in ContextBar now returns real AI responses. ' +
+      'Three surfaces: POST /api/penny/ask (staff Ask Penny panel, RAG + Trail OS context), ' +
+      'POST /api/learner/penny/ask (learner-authenticated Penny chat with SF coaching context), ' +
+      'POST /api/learner/quest/submit (quest feedback — 2–3 sentence evaluation after submission). ' +
+      'Quest generation uses Claude Sonnet 4.6 — see Anthropic entry. ' +
       'Validation endpoint: GET /api/gemini/validate',
-    lastVerified: 'June 2026',
+    lastVerified: 'August 2026',
+  },
+  anthropic: {
+    id: 'anthropic',
+    label: 'Anthropic / Quest Generation',
+    health: 'live',
+    summary: 'Claude Sonnet 4.6 live — daily quest generation · GET /api/learner/daily-quest',
+    detail:
+      'ANTHROPIC_API_KEY configured. Claude Sonnet 4.6 generates one scenario-based daily quest per ' +
+      'learner based on their trail and current phase (10–15 min challenge, JSON response). ' +
+      'Quest is session-cached so repeat loads within the same day do not re-call the API. ' +
+      'Quest feedback after submission uses Gemini 2.5 Flash, not Claude. ' +
+      'Failure mode: 503 "Quest generation not configured" if key is absent; ' +
+      '502 "Quest generation failed" if Claude returns a non-OK response. ' +
+      'Rate limits and cost differ from Gemini — monitor independently at console.anthropic.com. ' +
+      'Validation endpoint: GET /api/anthropic/validate',
+    lastVerified: 'August 2026',
   },
   googleDrive: {
     id: 'google-drive',

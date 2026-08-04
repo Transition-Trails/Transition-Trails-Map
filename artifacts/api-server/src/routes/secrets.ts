@@ -166,7 +166,10 @@ function buildCatalog(): SecretEntry[] {
     { id: "google-gmail-refresh", primary: "GOOGLE_GMAIL_REFRESH_TOKEN", alts: [], integration: "Gmail", category: "OAuth Token", required: true, purpose: "Persistent access token for Gmail API — inbox read (gmail.readonly) and send (gmail.send) for the Mail action panel in Trail OS.", nextFix: "Re-run the Google OAuth wizard at /admin/google-oauth — scopes now include gmail.readonly + gmail.send. Store the new refresh token as GOOGLE_GMAIL_REFRESH_TOKEN in Replit Secrets.", fmtCheck: googleRefreshTokenFormat },
 
     // ── Gemini / Penny AI ──────────────────────────────────────────────────
-    { id: "gemini-api-key",       primary: "GEMINI_API_KEY",            alts: ["GOOGLE_AI_API_KEY", "GOOGLE_AI_KEY", "PALM_API_KEY", "VERTEX_AI_API_KEY"], integration: "Gemini / Penny AI", category: "API Key", required: true,  purpose: "Authenticates all Penny (Gemini) AI requests — capability responses, assessments, coaching prompts, Trail Quests.", nextFix: "Google AI Studio (aistudio.google.com) → Get API Key. New keys start with AQ. (secure auth key format); legacy keys start with AIza. Both formats are accepted.", fmtCheck: geminiKeyFormat },
+    { id: "gemini-api-key",       primary: "GEMINI_API_KEY",            alts: ["GOOGLE_AI_API_KEY", "GOOGLE_AI_KEY", "PALM_API_KEY", "VERTEX_AI_API_KEY"], integration: "Gemini / Penny AI", category: "API Key", required: true,  purpose: "Powers Penny AI for staff (POST /api/penny/ask), quest submission feedback (POST /api/learner/quest/submit), and learner chat (POST /api/learner/penny/ask) — all on Gemini 2.5 Flash.", nextFix: "Google AI Studio (aistudio.google.com) → Get API Key. New keys start with AQ. (secure auth key format); legacy keys start with AIza. Both formats are accepted.", fmtCheck: geminiKeyFormat },
+
+    // ── Anthropic / Quest Generation ──────────────────────────────────────
+    { id: "anthropic-api-key",    primary: "ANTHROPIC_API_KEY",         alts: ["CLAUDE_API_KEY"], integration: "Anthropic / Quest Generation", category: "API Key", required: true,  purpose: "Powers daily quest generation for learners (GET /api/learner/daily-quest) via Claude Sonnet 4.6. Quest generation is Penny's only Claude surface — feedback and learner chat use Gemini.", nextFix: "console.anthropic.com → API Keys → Create Key. Keys start with sk-ant-." },
 
     // ── Salesforce ─────────────────────────────────────────────────────────
     // Auth is managed via Replit Connectors SDK (proxyFetch) — no client ID/secret/instance URL env vars needed.
@@ -224,6 +227,7 @@ function buildSummaries(entries: SecretEntry[]): IntegrationSummary[] {
     "Google Calendar": "border-indigo-200 bg-indigo-50 text-indigo-800",
     "Gmail": "border-rose-200 bg-rose-50 text-rose-800",
     "Gemini / Penny AI": "border-violet-200 bg-violet-50 text-violet-800",
+    "Anthropic / Quest Generation": "border-orange-200 bg-orange-50 text-orange-800",
     "Salesforce": "border-teal-200 bg-teal-50 text-teal-800",
     "Agentforce": "border-cyan-200 bg-cyan-50 text-cyan-800",
     "GitHub": "border-slate-200 bg-slate-50 text-slate-800",

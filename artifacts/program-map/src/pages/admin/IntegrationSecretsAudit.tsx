@@ -45,6 +45,16 @@ interface GeminiResult {
   permissionsReady: boolean; integrationReady: boolean; nextStep: string; durationMs: number;
 }
 
+type AnthropicStatus = 'key_missing' | 'format_invalid' | 'auth_error' | 'quota_exceeded' | 'api_error' | 'network_error' | 'valid';
+
+interface AnthropicResult {
+  timestamp: string; keyPresent: boolean; formatValid: boolean;
+  apiReachable: boolean; authValid: boolean;
+  modelCount: number; modelSample: string[];
+  status: AnthropicStatus; errorCode: string | null; errorMessage: string | null;
+  permissionsReady: boolean; integrationReady: boolean; nextStep: string; durationMs: number;
+}
+
 type CredentialTier = 'not_configured' | 'format_invalid' | 'credentials_ready' | 'oauth_incomplete' | 'api_ready';
 
 interface ServiceReadiness {
@@ -149,6 +159,83 @@ function TierBar({ tiers }: { tiers: Record<string, boolean | undefined> }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Anthropic Validation Card ─────────────────────────────────────────────────
+
+function AnthropicCard({ result, loading }: { result: AnthropicResult | null; loading: boolean }) {
+  const tiers = result ? {
+    present:     result.keyPresent,
+    format:      result.formatValid,
+    reachable:   result.apiReachable,
+    auth:        result.authValid,
+    integration: result.integrationReady,
+  } : {};
+
+  const statusCfg: Record<AnthropicStatus, { cls: string; label: string }> = {
+    valid:          { cls: 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]',   label: 'Valid — API responding' },
+    quota_exceeded: { cls: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]',   label: 'Rate-limited — key valid' },
+    auth_error:     { cls: 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]',   label: 'Auth error — key rejected' },
+    format_invalid: { cls: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]',   label: 'Format invalid' },
+    key_missing:    { cls: 'border-[#E8B9B4] bg-[#FBEAE6] text-[#A93F2F]',   label: 'Key missing' },
+    api_error:      { cls: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]',   label: 'API error' },
+    network_error:  { cls: 'border-slate-200 bg-slate-50 text-slate-600',     label: 'Network unreachable' },
+  };
+
+  const cfg = result ? statusCfg[result.status] : null;
+
+  return (
+    <div className="rounded-lg border border-orange-200 bg-white overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-orange-50 border-b border-orange-200">
+        <Brain className="w-4 h-4 text-orange-700" />
+        <span className="text-[14px] font-bold text-orange-800">Anthropic / Quest Generation</span>
+        <code className="text-[14px] font-mono text-orange-700 ml-1">ANTHROPIC_API_KEY</code>
+        {result && cfg && (
+          <span className={`ml-auto inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold border ${cfg.cls}`}>{cfg.label}</span>
+        )}
+      </div>
+      <div className="px-4 py-3 space-y-3">
+        <p className="text-[14px] text-muted-foreground leading-snug">
+          Powers daily quest generation via <span className="font-mono text-[13px]">claude-sonnet-4-6</span> ·{' '}
+          <span className="font-mono text-[13px]">GET /api/learner/daily-quest</span>.
+          Quest feedback and learner chat use Gemini 2.5 Flash instead.
+        </p>
+        {loading && <p className="text-[14px] text-muted-foreground italic">Calling Anthropic API…</p>}
+        {result && (
+          <>
+            <TierBar tiers={tiers} />
+            {result.status === 'valid' && (
+              <div className="rounded border border-[#9FC3AE] bg-[#E6F0EA] px-3 py-2">
+                <p className="text-[14px] font-bold text-[#245531] mb-1">
+                  API key valid — {result.modelCount} model{result.modelCount !== 1 ? 's' : ''} available ({result.durationMs}ms)
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {result.modelSample.map(m => (
+                    <span key={m} className="text-[14px] font-mono bg-white border border-[#9FC3AE] text-[#2F6B3F] px-1.5 py-0.5 rounded">{m}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {result.status !== 'valid' && result.errorMessage && (
+              <div className="rounded border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2">
+                <p className="text-[14px] font-bold text-[#CC8400] mb-0.5">
+                  {result.errorCode ? `Error: ${result.errorCode}` : 'Issue'}
+                </p>
+                <p className="text-[14px] text-[#CC8400]">{result.errorMessage}</p>
+              </div>
+            )}
+            <p className="text-[14px] text-muted-foreground leading-snug">{result.nextStep}</p>
+            <p className="text-[14px] text-muted-foreground/60">
+              Validated at {new Date(result.timestamp).toLocaleTimeString()} · {result.durationMs}ms
+            </p>
+          </>
+        )}
+        {!result && !loading && (
+          <p className="text-[14px] text-muted-foreground italic">Click "Run Live Checks" to validate the Anthropic API key.</p>
+        )}
+      </div>
     </div>
   );
 }
@@ -756,6 +843,7 @@ export default function IntegrationSecretsAudit() {
   const [auditError, setAuditError] = useState<string | null>(null);
 
   const [geminiResult, setGeminiResult]         = useState<GeminiResult | null>(null);
+  const [anthropicResult, setAnthropicResult]   = useState<AnthropicResult | null>(null);
   const [googleResult, setGoogleResult]         = useState<GoogleResult | null>(null);
   const [salesforceResult, setSalesforceResult] = useState<SalesforceResult | null>(null);
   const [liveStatus, setLiveStatus]             = useState<LiveStatus>('idle');
@@ -773,11 +861,13 @@ export default function IntegrationSecretsAudit() {
     setLiveStatus('loading');
     Promise.all([
       fetch('/api/gemini/validate').then(r => r.json() as Promise<GeminiResult>),
+      fetch('/api/anthropic/validate').then(r => r.json() as Promise<AnthropicResult>),
       fetch('/api/google/validate').then(r => r.json() as Promise<GoogleResult>),
       fetch('/api/salesforce/validate').then(r => r.json() as Promise<SalesforceResult>),
     ])
-      .then(([gem, goog, sf]) => {
+      .then(([gem, anth, goog, sf]) => {
         setGeminiResult(gem);
+        setAnthropicResult(anth);
         setGoogleResult(goog);
         setSalesforceResult(sf);
         setLiveStatus('done');
@@ -861,6 +951,7 @@ export default function IntegrationSecretsAudit() {
             <div className="grid grid-cols-1 gap-3">
               <SalesforceCard result={salesforceResult} loading={liveStatus === 'loading'} />
               <GeminiCard result={geminiResult} loading={liveStatus === 'loading'} />
+              <AnthropicCard result={anthropicResult} loading={liveStatus === 'loading'} />
               <GoogleCard result={googleResult} loading={liveStatus === 'loading'} />
             </div>
             {liveStatus === 'error' && (
