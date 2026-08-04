@@ -137,6 +137,11 @@ router.post("/penny/ask", async (req, res) => {
 
   // ── Fetch Salesforce context (layers 2 + 3) ────────────────────────────────
   let sfClient: SalesforceClient | null = null;
+
+    const soql =
+      "SELECT Id, Source__c, Prompt_Mode__c, CreatedDate " +
+      "FROM Penny_Interaction_Log__c " +
+      "ORDER BY CreatedDate DESC LIMIT 5";
   let sfContactId: string | null = null;
   // Tracks whether sfContactId belongs to a learner (session/override) vs the
   // staff user's own Contact (resolved by email below).  Controls audience in
@@ -585,6 +590,43 @@ router.get("/penny/logs", async (req, res): Promise<void> => {
   } catch (err) {
     logger.error({ err }, "Failed to fetch Penny logs");
     res.status(500).json({ error: "Failed to fetch logs" });
+  }
+});
+
+// ── GET /penny/sf-recent-logs ─────────────────────────────────────────────────
+// Queries the live Salesforce org for the 5 most recently created
+// Penny_Interaction_Log__c records.  Used by the admin Command Center to
+// confirm that fire-and-forget writes are landing in the org.
+// Returns { records: [...], error: string|null, sfConnected: boolean }.
+
+router.get("/penny/sf-recent-logs", async (req, res): Promise<void> => {
+  let sfClient: SalesforceClient | null = null;
+  try {
+    sfClient = getSalesforceClient(req);
+  } catch {
+    res.json({ records: [], sfConnected: false, error: "Salesforce not connected" });
+    return;
+  }
+
+  try {
+    const soql =
+      "SELECT Id, Source__c, Prompt_Mode__c, CreatedDate " +
+      "FROM Penny_Interaction_Log__c " +
+      "ORDER BY CreatedDate DESC LIMIT 5";
+    const result = await sfClient.query<{
+      Id: string;
+      Source__c: string;
+      Prompt_Mode__c: string;
+      CreatedDate: string;
+    }>(soql);
+    res.json({
+      records: result.records,
+      sfConnected: true,
+      error: null,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.json({ records: [], sfConnected: true, error: msg });
   }
 });
 

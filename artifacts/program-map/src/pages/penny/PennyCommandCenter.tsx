@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Brain, Users, Map, Sparkles, CheckCircle2, AlertTriangle, MessageSquare, Database } from 'lucide-react';
+import { Brain, Users, Map, Sparkles, CheckCircle2, AlertTriangle, MessageSquare, Database, RefreshCw } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -28,6 +28,19 @@ interface WriteHealthData {
   totalAttempts: number;
   failedWrites:  number;
   healthyWrites: number;
+}
+
+interface SfLogRecord {
+  Id:             string;
+  Source__c:      string;
+  Prompt_Mode__c: string;
+  CreatedDate:    string;
+}
+
+interface SfRecentLogsData {
+  records:     SfLogRecord[];
+  sfConnected: boolean;
+  error:       string | null;
 }
 
 // ── Attention items ────────────────────────────────────────────────────────────
@@ -66,8 +79,14 @@ export default function PennyCommandCenter() {
   const [activeTrails,      setActiveTrails]      = useState<number | null>(null);
   const [metricsError,      setMetricsError]      = useState(false);
 
-  // Salesforce write health
-  const [writeHealth, setWriteHealth] = useState<WriteHealthData | null>(null);
+  // Salesforce write health — polled every 10 s so the counter updates live
+  const [writeHealth,       setWriteHealth]       = useState<WriteHealthData | null>(null);
+  const [writeHealthStale,  setWriteHealthStale]  = useState(false);
+  const writeHealthRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Recent SF Penny_Interaction_Log__c records (smoke-test confirmation)
+  const [sfRecentLogs,      setSfRecentLogs]      = useState<SfRecentLogsData | null>(null);
+  const [logsRefreshing,    setLogsRefreshing]    = useState(false);
 
   // 1 — Check SF auth
   useEffect(() => {
@@ -102,13 +121,34 @@ export default function PennyCommandCenter() {
     });
   }, [sfAuthenticated]);
 
-  // 3 — Fetch write health (always — independent of auth check)
+  // 3 — Poll write health every 10 s (independent of auth — counter works even
+  //     when SF auth is expired)
   useEffect(() => {
-    fetch('/api/penny/write-health')
-      .then(r => r.ok ? r.json() as Promise<WriteHealthData> : null)
-      .then(d => { if (d) setWriteHealth(d); })
-      .catch(() => undefined);
+    function fetchHealth() {
+      setWriteHealthStale(false);
+      fetch('/api/penny/write-health')
+        .then(r => r.ok ? r.json() as Promise<WriteHealthData> : null)
+        .then(d => { if (d) setWriteHealth(d); })
+        .catch(() => setWriteHealthStale(true));
+    }
+    fetchHealth(); // immediate
+    writeHealthRef.current = setInterval(fetchHealth, 10_000);
+    return () => {
+      if (writeHealthRef.current) clearInterval(writeHealthRef.current);
+    };
   }, []);
+
+  // 4 — Fetch recent SF records on mount (smoke-test confirmation panel)
+  function fetchSfRecentLogs() {
+    setLogsRefreshing(true);
+    fetch('/api/penny/sf-recent-logs')
+      .then(r => r.ok ? r.json() as Promise<SfRecentLogsData> : null)
+      .then(d => { if (d) setSfRecentLogs(d); })
+      .catch(() => undefined)
+      .finally(() => setLogsRefreshing(false));
+  }
+
+  useEffect(() => { fetchSfRecentLogs(); }, []);
 
   // ── Derived ────────────────────────────────────────────────────────────────
 
@@ -179,6 +219,11 @@ export default function PennyCommandCenter() {
   }
 
   const visibleItems = attentionItems.slice(0, 4);
+
+  // Write health card is always visible once data is loaded,
+  // so admins can confirm the counter is incrementing on success — not only
+  // on failure.
+  const showWriteHealth = writeHealth !== null;
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -252,43 +297,115 @@ export default function PennyCommandCenter() {
           </div>
         </div>
 
-        {/* ── SF write detail card (shown when there is a known failure) ─────── */}
-        {writeHealth && (writeHealth.failedWrites > 0 || writeHealth.lastFailure) && (
-          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF8EC] p-4 space-y-2">
+        {/* ── SF write health card ───────────────────────────────────────────
+            Always shown once any writes have been attempted so admins can
+            confirm the counter increments on success, not only on failure.    */}
+        {showWriteHealth && (
+          <div className={`rounded-lg border p-4 space-y-2 ${
+            writeHealth!.lastFailure
+              ? 'border-[#FFD08A] bg-[#FFF8EC]'
+              : writeHealth!.healthyWrites > 0
+                ? 'border-[#9FC3AE] bg-[#F2F9F4]'
+                : 'border-border bg-card'
+          }`}>
             <div className="flex items-center gap-2">
-              <Database className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
-              <p className="text-[14px] font-semibold text-[#7A4F00]">Salesforce write log</p>
-              <span className="text-[14px] text-muted-foreground/60 ml-auto">since last restart</span>
+              <Database className={`w-3.5 h-3.5 shrink-0 ${writeHealth!.lastFailure ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`} />
+              <p className={`text-[14px] font-semibold ${writeHealth!.lastFailure ? 'text-[#7A4F00]' : 'text-foreground'}`}>
+                Salesforce write log
+              </p>
+              <span className="text-[14px] text-muted-foreground/60 ml-auto">
+                {writeHealthStale ? 'stale' : 'since last restart · live'}
+              </span>
             </div>
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
-                <p className="text-base font-bold text-foreground">{writeHealth.totalAttempts}</p>
+                <p className="text-base font-bold text-foreground">{writeHealth!.totalAttempts}</p>
                 <p className="text-[12px] text-muted-foreground">attempts</p>
               </div>
               <div>
-                <p className="text-base font-bold text-[#2F6B3F]">{writeHealth.healthyWrites}</p>
+                <p className="text-base font-bold text-[#2F6B3F]">{writeHealth!.healthyWrites}</p>
                 <p className="text-[12px] text-muted-foreground">succeeded</p>
               </div>
               <div>
-                <p className="text-base font-bold text-[#CC8400]">{writeHealth.failedWrites}</p>
+                <p className={`text-base font-bold ${writeHealth!.failedWrites > 0 ? 'text-[#CC8400]' : 'text-muted-foreground'}`}>
+                  {writeHealth!.failedWrites}
+                </p>
                 <p className="text-[12px] text-muted-foreground">failed</p>
               </div>
             </div>
-            {writeHealth.lastFailure && (
+            {writeHealth!.lastFailure && (
               <div className="bg-white/70 rounded-md p-3 space-y-1">
                 <p className="text-[12px] font-medium text-muted-foreground">Most recent failure</p>
-                <p className="text-[14px] text-foreground font-medium">{writeHealth.lastFailure.object}</p>
-                <p className="text-[13px] text-[#CC8400] break-words">{writeHealth.lastFailure.reason}</p>
-                <p className="text-[12px] text-muted-foreground">{relativeTime(writeHealth.lastFailure.timestamp)}</p>
+                <p className="text-[14px] text-foreground font-medium">{writeHealth!.lastFailure.object}</p>
+                <p className="text-[13px] text-[#CC8400] break-words">{writeHealth!.lastFailure.reason}</p>
+                <p className="text-[12px] text-muted-foreground">{relativeTime(writeHealth!.lastFailure.timestamp)}</p>
               </div>
             )}
-            {writeHealth.lastSuccess && (
+            {writeHealth!.lastSuccess && (
               <p className="text-[12px] text-[#2F6B3F]">
-                Last successful write: {relativeTime(writeHealth.lastSuccess)}
+                Last successful write: {relativeTime(writeHealth!.lastSuccess)}
+              </p>
+            )}
+            {writeHealth!.totalAttempts === 0 && (
+              <p className="text-[12px] text-muted-foreground/60">
+                No write attempts recorded yet — ask Penny a question to start.
               </p>
             )}
           </div>
         )}
+
+        {/* ── Recent SF records (smoke-test confirmation) ────────────────────
+            Shows the last 5 Penny_Interaction_Log__c records from the live org
+            so admins can confirm writes are landing without leaving the UI.    */}
+        <div>
+          <div className="flex items-center gap-2 mb-2.5">
+            <p className="text-[14px] font-bold text-muted-foreground/50">
+              Recent Salesforce records
+            </p>
+            <button
+              onClick={fetchSfRecentLogs}
+              disabled={logsRefreshing}
+              className="ml-auto flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <RefreshCw className={`w-3 h-3 ${logsRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
+
+          {sfRecentLogs === null ? (
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="text-[14px] text-muted-foreground/60">Loading…</p>
+            </div>
+          ) : !sfRecentLogs.sfConnected ? (
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="text-[14px] text-muted-foreground/60">Salesforce not connected — connect via Integrations to verify writes.</p>
+            </div>
+          ) : sfRecentLogs.error ? (
+            <div className="rounded-lg border border-[#FFD08A] bg-[#FFF8EC] p-4">
+              <p className="text-[14px] text-[#CC8400]">{sfRecentLogs.error}</p>
+            </div>
+          ) : sfRecentLogs.records.length === 0 ? (
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="text-[14px] text-muted-foreground/60">
+                No <code className="text-[12px]">Penny_Interaction_Log__c</code> records found in org yet.
+                Ask Penny a question to create the first one.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border bg-card divide-y divide-border overflow-hidden">
+              {sfRecentLogs.records.map(r => (
+                <div key={r.Id} className="flex items-center gap-3 px-3 py-2.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-medium text-foreground truncate">{r.Prompt_Mode__c || '—'}</p>
+                    <p className="text-[12px] text-muted-foreground">source: {r.Source__c} · {relativeTime(r.CreatedDate)}</p>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground/50 font-mono shrink-0">{r.Id.slice(0, 8)}…</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* ── Quick actions ─────────────────────────────────────────────────── */}
         <div>
