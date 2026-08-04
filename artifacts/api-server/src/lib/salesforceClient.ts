@@ -20,6 +20,7 @@ export interface ISalesforceClient {
   getRecord<T>(objectApiName: string, recordId: string, fields: string[]): Promise<T>;
   createRecord(objectApiName: string, data: Record<string, unknown>): Promise<SalesforceCreateResult>;
   updateRecord(objectApiName: string, recordId: string, data: Record<string, unknown>): Promise<void>;
+  deleteRecord(objectApiName: string, recordId: string): Promise<void>;
 }
 
 // ── Client ────────────────────────────────────────────────────────────────────
@@ -140,6 +141,13 @@ export class SalesforceClient {
       "PATCH",
       `/services/data/v62.0/sobjects/${objectApiName}/${recordId}`,
       data
+    );
+  }
+
+  deleteRecord(objectApiName: string, recordId: string): Promise<void> {
+    return this.request<void>(
+      "DELETE",
+      `/services/data/v62.0/sobjects/${objectApiName}/${recordId}`
     );
   }
 }

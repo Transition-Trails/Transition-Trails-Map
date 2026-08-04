@@ -334,6 +334,21 @@ router.patch(
   })
 );
 
+// ── DELETE /trail-config/:trailConfigId ───────────────────────────────────────
+
+router.delete(
+  "/trail-config/:trailConfigId",
+  withClient(async (req, res, client) => {
+    const { trailConfigId } = req.params as { trailConfigId: string };
+    if (!trailConfigId) {
+      res.status(400).json({ error: "trailConfigId is required" });
+      return;
+    }
+    await client.deleteRecord("Penny_Trail_Config__c", trailConfigId);
+    res.json({ success: true });
+  })
+);
+
 // ── POST /trail-config ────────────────────────────────────────────────────────
 
 router.post(

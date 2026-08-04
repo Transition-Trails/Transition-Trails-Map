@@ -62,6 +62,7 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
       return { id: 'mock-nudge-id' };
     },
     updateRecord: async () => undefined,
+    deleteRecord: async () => undefined,
   }),
 }));
 
@@ -75,6 +76,7 @@ vi.mock('../lib/connectorSalesforceClient.js', () => ({
       return { id: 'mock-nudge-id' };
     }
     async updateRecord() { return undefined; }
+    async deleteRecord() { return undefined; }
   },
 }));
 

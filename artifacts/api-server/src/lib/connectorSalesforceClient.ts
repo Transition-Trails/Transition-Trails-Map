@@ -100,6 +100,13 @@ export class ConnectorSalesforceClient implements ISalesforceClient {
     );
   }
 
+  deleteRecord(objectApiName: string, recordId: string): Promise<void> {
+    return this.request<void>(
+      "DELETE",
+      `/services/data/${SF_API_VERSION}/sobjects/${objectApiName}/${recordId}`
+    );
+  }
+
   /**
    * Fetch a resource through the SF proxy without parsing the response body.
    * Used for binary assets (images, attachments) where the caller needs the raw Response.

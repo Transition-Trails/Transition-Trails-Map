@@ -156,6 +156,7 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
     },
     createRecord: async () => ({ id: 'mock-id' }),
     updateRecord: async () => undefined,
+    deleteRecord: async () => undefined,
   }),
 }));
 
@@ -171,6 +172,7 @@ vi.mock('../lib/connectorSalesforceClient.js', () => ({
     }
     async createRecord() { return { id: 'mock-id' }; }
     async updateRecord() { return undefined; }
+    async deleteRecord() { return undefined; }
   },
 }));
 
@@ -219,6 +221,7 @@ describe('getAutomations() — unit tests', () => {
       },
       async createRecord() { return { id: 'mock-id' }; },
       async updateRecord() { return undefined; },
+      async deleteRecord() { return undefined; },
     };
   }
 

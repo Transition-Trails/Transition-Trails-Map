@@ -48,6 +48,7 @@ function makeMockClient(overrides?: Partial<ISalesforceClient>): ISalesforceClie
     getRecord:    vi.fn().mockResolvedValue({}),
     createRecord: vi.fn().mockResolvedValue({ id: 'a1B000000testAAA', success: true }),
     updateRecord: vi.fn().mockResolvedValue(undefined),
+    deleteRecord: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

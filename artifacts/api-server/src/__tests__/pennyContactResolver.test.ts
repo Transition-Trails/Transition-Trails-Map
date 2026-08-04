@@ -29,6 +29,7 @@ function makeMockClient(contactId: string | null = 'c001'): ISalesforceClient {
     getRecord:    vi.fn().mockResolvedValue({}),
     createRecord: vi.fn().mockResolvedValue({ id: 'x', success: true }),
     updateRecord: vi.fn().mockResolvedValue(undefined),
+    deleteRecord: vi.fn().mockResolvedValue(undefined),
   };
 }
 
@@ -141,6 +142,7 @@ describe('resolveContactByEmail — caching', () => {
       getRecord:    vi.fn().mockResolvedValue({}),
       createRecord: vi.fn().mockResolvedValue({ id: 'x', success: true }),
       updateRecord: vi.fn().mockResolvedValue(undefined),
+      deleteRecord: vi.fn().mockResolvedValue(undefined),
     };
     await resolveContactByEmail(failingClient, 'user@example.com');
     await resolveContactByEmail(failingClient, 'user@example.com');
@@ -154,6 +156,7 @@ describe('resolveContactByEmail — caching', () => {
       getRecord:    vi.fn().mockResolvedValue({}),
       createRecord: vi.fn().mockResolvedValue({ id: 'x', success: true }),
       updateRecord: vi.fn().mockResolvedValue(undefined),
+      deleteRecord: vi.fn().mockResolvedValue(undefined),
     };
     const result = await resolveContactByEmail(failingClient, 'user@example.com');
     expect(result).toBeNull();

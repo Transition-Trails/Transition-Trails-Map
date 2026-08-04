@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   CheckCircle2, Loader2, AlertCircle, ChevronDown, ChevronUp,
-  Sliders, Plus, X,
+  Sliders, Plus, X, Trash2,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -296,12 +296,14 @@ function ConfigCard({
   onEdit,
   onCancel,
   onSave,
+  onDelete,
 }: {
   config:    TrailConfig;
   isEditing: boolean;
   onEdit:    () => void;
   onCancel:  () => void;
   onSave:    (configs: TrailConfig[]) => void;
+  onDelete:  (id: string) => void;
 }) {
   const [form, setForm] = useState<ConfigForm>({
     pennyRole:           config.pennyRole           ?? '',
@@ -310,9 +312,12 @@ function ConfigCard({
     specialInstructions: config.specialInstructions ?? '',
     isActive:            config.isActive,
   });
-  const [saving,      setSaving]      = useState(false);
-  const [saveError,   setSaveError]   = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saving,         setSaving]         = useState(false);
+  const [saveError,      setSaveError]      = useState<string | null>(null);
+  const [saveSuccess,    setSaveSuccess]    = useState(false);
+  const [confirmDelete,  setConfirmDelete]  = useState(false);
+  const [deleting,       setDeleting]       = useState(false);
+  const [deleteError,    setDeleteError]    = useState<string | null>(null);
   const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -394,6 +399,25 @@ function ConfigCard({
     }
   }
 
+  async function handleDelete() {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const resp = await fetch(`/api/penny/data/trail-config/${config.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` })) as { error?: string };
+        throw new Error(data.error ?? `HTTP ${resp.status}`);
+      }
+      onDelete(config.id);
+    } catch (err: unknown) {
+      setDeleteError(err instanceof Error ? err.message : 'Delete failed');
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className={`rounded-lg border bg-card transition-shadow ${isEditing ? 'border-primary/40 shadow-md' : config.isActive ? 'border-border' : 'border-border/40'} ${!config.isActive && !isEditing ? 'opacity-60' : ''}`}>
 
@@ -434,6 +458,13 @@ function ConfigCard({
               >
                 <ChevronDown className="w-3 h-3" /> Edit
               </button>
+              <button
+                onClick={() => { setConfirmDelete(true); setDeleteError(null); }}
+                className="flex items-center gap-1 px-2.5 py-1 text-[14px] font-semibold text-[#A93F2F] border border-[#E8B9B4] rounded-full hover:bg-[#FBEAE6] transition-colors"
+                title="Delete this config"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
             </div>
           ) : (
             <button
@@ -450,6 +481,38 @@ function ConfigCard({
             <span className="text-[14px] text-[#CC8400] leading-snug">
               ⚠ This trail is inactive. Learners will receive the fallback Penny persona.
             </span>
+          </div>
+        )}
+
+        {confirmDelete && (
+          <div className="mt-3 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3 space-y-2">
+            <p className="text-[14px] font-semibold text-[#A93F2F]">Delete this config?</p>
+            <p className="text-[14px] text-[#A93F2F]/80 leading-snug">
+              This will permanently remove this config from Salesforce. Learners on this trail will fall back to the default Penny persona.
+            </p>
+            {deleteError && (
+              <div className="flex items-start gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
+                <p className="text-[14px] text-[#A93F2F] leading-snug">{deleteError}</p>
+              </div>
+            )}
+            <div className="flex items-center gap-2 pt-0.5">
+              <button
+                onClick={() => { setConfirmDelete(false); setDeleteError(null); }}
+                disabled={deleting}
+                className="px-2.5 py-1 text-[14px] font-semibold text-muted-foreground border border-border rounded-full hover:bg-muted/40 transition-colors disabled:opacity-40"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => void handleDelete()}
+                disabled={deleting}
+                className="flex items-center gap-1.5 px-2.5 py-1 text-[14px] font-bold text-white bg-[#A93F2F] rounded-full hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {deleting && <Loader2 className="w-3 h-3 animate-spin" />}
+                Delete permanently
+              </button>
+            </div>
           </div>
         )}
 
@@ -724,6 +787,7 @@ export default function TrailConfigs() {
                 onEdit={() => { setEditingId(config.id); setShowCreate(false); }}
                 onCancel={() => setEditingId(null)}
                 onSave={(fresh) => { setConfigs(fresh); setEditingId(null); }}
+                onDelete={(id) => setConfigs(prev => prev.filter(c => c.id !== id))}
               />
             ))}
           </div>
