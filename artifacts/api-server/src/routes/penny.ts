@@ -524,14 +524,18 @@ router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> 
       .map(r => r.sfObject!)
   )];
 
-  const describeCache = new Map<string, Record<string, unknown> | null>();
+  const describeCache      = new Map<string, Record<string, unknown> | null>();
+  const describeErrorCache = new Map<string, string>();
   if (proxyFetch) {
     for (const objName of uniqueSfObjects) {
       try {
         const describe = await pfSfGetRetry(proxyFetch, `/sobjects/${objName}/describe`);
         describeCache.set(objName, describe);
-      } catch {
-        describeCache.set(objName, null); // mark as inaccessible
+      } catch (e) {
+        const errMsg = e instanceof Error ? e.message : String(e);
+        describeCache.set(objName, null);
+        describeErrorCache.set(objName, errMsg);
+        logger.warn({ sfObject: objName, err: errMsg }, 'preflight: SF describe failed');
       }
     }
   }
@@ -568,8 +572,17 @@ router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> 
     const describe = r.sfObject ? describeCache.get(r.sfObject) : null;
 
     if (r.kind === 'sf-object') {
-      if (describe === null) return { ...base, status: 'missing', detail: 'Not accessible' };
-      if (!describe)         return { ...base, status: 'undetermined', detail: 'Could not check' };
+      if (describe === null) {
+        const errMsg = r.sfObject ? (describeErrorCache.get(r.sfObject) ?? '') : '';
+        // 404 means the object genuinely doesn't exist in this org
+        const detail = errMsg.startsWith('404')
+          ? 'Object not found in this org'
+          : errMsg
+            ? `Not accessible — ${errMsg.slice(0, 80)}`
+            : 'Not accessible';
+        return { ...base, status: 'missing', detail };
+      }
+      if (!describe) return { ...base, status: 'undetermined', detail: 'Could not check' };
       return { ...base, status: 'met', detail: 'Accessible' };
     }
 
