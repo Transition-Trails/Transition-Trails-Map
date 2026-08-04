@@ -539,7 +539,7 @@ const BACKEND_REQUIREMENTS = {
   ],
   'cap-progress-insights': [
     { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Progress Insights builds on Learner Coaching context. Enable that first.' },
-    { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I track what each learner has completed by reading their Program_Engagement__c record.' },
+    { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I track what each learner has completed by reading their pmdm__ProgramEngagement__c record.' },
   ],
 } satisfies Record<CapabilityId, BReq[]>;
 

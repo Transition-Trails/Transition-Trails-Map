@@ -233,7 +233,7 @@ export const CAPABILITY_REQUIREMENTS: Record<CapabilityId, CapabilityRequirement
       kind: 'sf-object',
       sfObject: 'pmdm__ProgramEngagement__c',
       pennyMissingNote:
-        'I track what each learner has completed by reading their Program_Engagement__c record.',
+        'I track what each learner has completed by reading their pmdm__ProgramEngagement__c record.',
     },
   ],
 };

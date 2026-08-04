@@ -11,6 +11,61 @@ Changes on `dev` branch not yet merged to `main`.
 
 ---
 
+## [1.3.0] — 2026-08-04 — Salesforce Preflight Hardening, Penny Capability QA & Prompt Studio Review Flow
+
+### Added
+
+**Penny Capability Preflight — Salesforce object validation**
+- Per-object timeout (`PF_OBJECT_TIMEOUT_MS`, default 10 s) wraps every SF describe call; timeout produces `undetermined` (never `missing`) — a stall is not evidence of absence
+- 429/403 and all non-404 errors from describe produce `undetermined` so rate-limited orgs never see false-positive missing objects
+- `pfSfGetRetry` — retry helper used by all capability preflight SF calls
+- `pmdm__ServiceSchedule__c` probe added to `cap-cohort-summaries` preflight; `sf-service-schedule` requirement ID introduced
+- Validation Center org-wide warning banner when all SF describes fail simultaneously
+- Picklist describe failure surfaced in server logs and caller responses; stale failure entries skipped on retry
+- `TT_Build_Item__c` and `Penny_Classroom_Nudge__c` typed service functions and API routes (`GET /api/salesforce/governance/build-items`, `POST /api/salesforce/governance/build-items`, `GET /api/salesforce/governance/classroom-nudges/:contactId`, `POST /api/salesforce/governance/classroom-nudges`)
+- `TT_Automation__c` governance route guards against unfiltered queries when filter fields are missing; field presence cached after first successful confirm
+- Salesforce error sanitisation in `withClient` catch block — stack traces and raw SF XML/SOAP never reach API consumers
+
+**Prompt Studio — review workflow**
+- Two-person approval rule: the user who submitted a template for review cannot approve their own submission; `reviewRequestedBy` field tracks submitter email
+- `onSendForReview` callback in `ActionPanelConfig`/`RailActionPanel` forces `status: 'Review'` and writes `reviewRequestedBy`
+- `lastModifiedBy` field on `PromptTemplate` written on every save; detail header shows "Modified just now · by [Name] · N variables"
+- Context Panel (Trail Insights) stays in sync after `onStatusChange` — no stale snapshot after Approve/Request Revision
+
+**Penny Co-Pilot panel UX**
+- `overflow-hidden` + `h-full` removed from `PennyCopiloPanel` root — these caused the `shrink-0` footer (Re-check button + input) to fall outside the CSS clip boundary and absorb pointer events even while visually painted
+- Re-check button moved to `shrink-0` footer section, outside `overflow-y: auto` scroll region
+- `isFetching` wired through `useCapabilityPreflight` hook → Re-check button shows spinner and "Checking…" label during active refetch; `staleTime: 0` ensures every Re-check hits the server
+
+### Changed
+
+- `Program_Engagement__c` → `pmdm__ProgramEngagement__c` in all capability requirement definitions (both `artifacts/api-server/src/routes/penny.ts` and `artifacts/program-map/src/data/capabilityRequirements.ts`) — the bare unnamespaced object does not exist in the live org; the real API name carries the `pmdm__` namespace prefix
+- `Training_Plan_Item__c` removed from all preflight requirement definitions — confirmed absent from the live org
+- `Training_Plan__c` references removed from standards data
+- `TT_Automation__c` custom fields moved from `phase2Deferred` to `requiredFields` — all four fields confirmed live
+- Knowledge Retrieval capability maturity advanced from `'Prototype'` to `'Integrated'` — RAG pipeline is live over the Knowledge Library
+
+### Fixed
+
+- Cohort Summaries preflight was silently skipping its Salesforce check — now always probes `pmdm__ServiceSchedule__c`
+- Preflight page freeze when many SF objects time out concurrently — each object now has an independent timeout; one stall does not block others
+- Org probe script hard-coded API version — updated to match server constant (`v62.0`)
+- `PromptTemplate.audience` type bug — `default` was passing `string[]` instead of `string` (first element)
+
+### Tests
+
+**Test suite expanded (352 tests across 18 files)**
+- `pennyPreflight.test.ts` — added: `pmdm__ProgramEngagement__c` guard (bare `Program_Engagement__c` must never appear in any preflight response); `cap-resume-review` missing-status check for `sf-program-engagement`; `pmdm__ServiceSchedule__c` probe suite (met / missing / throttled / 403); per-object timeout path (timeout → `undetermined`, never `missing`)
+- `sfGovernanceAutomations.test.ts` (new) — unit + route integration tests for `TT_Automation__c` governance route
+- `sfGovernanceBuildItems.test.ts` (new) — 500 on query failure, no stack trace or SOAP XML leaked; POST `createRecord` failure tests
+- `sfGovernanceClassroomNudges.test.ts` (new) — GET query-failure tests; POST `createRecord` failure, 500 body checks
+- `sfGovernanceNudges.test.ts` (new) — governance nudge route coverage
+- `sfValidateCustomFields.test.ts` (new) — missing Penny fields surface as warning; custom field checks never report missing when describe is unavailable (generic error path)
+- `sfCacheIsolation.test.ts` (new) — `flushSfCacheForUser` clears stale error payloads from ops-summary cache
+- `salesforce.test.ts` (updated) — 429 rate-limit tests for describe calls in Validation Center; `TT_Automation__c` reflected as live check
+
+---
+
 ## [1.2.0] — 2026-07-16 — DB-backed Prompt Studio & Expanded Test Suite
 
 ### Added

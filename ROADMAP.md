@@ -79,7 +79,7 @@ Phase 2 focuses on **replacing hardcoded prototype data with live connections**,
 
 | Card | Description | Priority | Status |
 |---|---|---|---|
-| `p2-vitest-automation` | Vitest test suite — unit, integration, and component coverage | High | Complete (Phase 1 · 105 tests across 7 files) |
+| `p2-vitest-automation` | Vitest test suite — unit, integration, and component coverage | High | Complete (Phase 1 · 352 tests across 18 files) |
 
 ---
 

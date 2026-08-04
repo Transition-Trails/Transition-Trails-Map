@@ -317,6 +317,40 @@ describe('GET /api/penny/capabilities/:id/preflight — sf-object status logic',
       }
     }
   });
+
+  test('BACKEND_REQUIREMENTS uses pmdm__ProgramEngagement__c not bare Program_Engagement__c', async () => {
+    // Program_Engagement__c does not exist in the live org — the real API name is
+    // pmdm__ProgramEngagement__c (namespace-prefixed).  Verified 2026-08-04.
+    // This test ensures the old unnamespaced name never silently re-enters any preflight.
+    mockDescribeMode.value = 'success';
+    const capabilityIds = [
+      'cap-learner-coaching',
+      'cap-reflection-prompts',
+      'cap-resume-review',
+      'cap-interview-prep',
+      'cap-study-coach',
+      'cap-cohort-summaries',
+      'cap-progress-insights',
+    ];
+    for (const id of capabilityIds) {
+      const res = await request(app).get(`/api/penny/capabilities/${id}/preflight`);
+      const body = res.body as PreflightBody;
+      const raw = JSON.stringify(body);
+      // Bare unnamespaced name must never appear
+      expect(raw).not.toMatch(/(?<![a-zA-Z_])Program_Engagement__c/);
+    }
+  });
+
+  test('cap-resume-review preflight references pmdm__ProgramEngagement__c in requirement detail when missing', async () => {
+    // When describe returns 404 for pmdm__ProgramEngagement__c, the requirement
+    // detail must name the correct namespaced object so operators know what to create.
+    mockDescribeMode.value = 'notFound';
+    const res = await request(app).get('/api/penny/capabilities/cap-resume-review/preflight');
+    const body = res.body as PreflightBody;
+    const pgReq = body.requirements.find(r => r.id === 'sf-program-engagement');
+    expect(pgReq).toBeDefined();
+    expect(pgReq!.status).toBe('missing');
+  });
 });
 
 // ── cap-cohort-summaries: pmdm__ServiceSchedule__c probe ──────────────────────
