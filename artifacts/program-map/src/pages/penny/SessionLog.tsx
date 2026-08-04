@@ -38,6 +38,12 @@ interface LearnerOption {
   firstName: string;
   lastName: string;
   email: string;
+  pennyTrail: string | null;
+}
+
+interface ProgramOption {
+  id: string;
+  name: string;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -69,7 +75,7 @@ function LearnerPicker({
 }: {
   value: string;
   learnerId: string;
-  onChange: (name: string, id: string) => void;
+  onChange: (name: string, id: string, pennyTrail: string | null) => void;
 }) {
   const [query, setQuery]       = useState(value);
   const [open, setOpen]         = useState(false);
@@ -83,7 +89,7 @@ function LearnerPicker({
     if (loaded.current) return;
     loaded.current = true;
     setLoading(true);
-    fetch('/api/learners/directory')
+    fetch('/api/penny/data/learners/directory')
       .then(r => r.ok ? r.json() as Promise<LearnerOption[]> : [])
       .then(data => setLearners(Array.isArray(data) ? data : []))
       .catch(() => {})
@@ -109,13 +115,13 @@ function LearnerPicker({
   function select(l: LearnerOption) {
     const name = `${l.firstName} ${l.lastName}`.trim();
     setQuery(name);
-    onChange(name, l.id);
+    onChange(name, l.id, l.pennyTrail ?? null);
     setOpen(false);
   }
 
   function handleClear() {
     setQuery('');
-    onChange('', '');
+    onChange('', '', null);
   }
 
   const inputCls = "w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring";
@@ -162,6 +168,98 @@ function LearnerPicker({
             >
               <p className="text-[13px] font-medium text-foreground">{l.firstName} {l.lastName}</p>
               {l.email && <p className="text-[11px] text-muted-foreground">{l.email}</p>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Program picker combobox ────────────────────────────────────────────────────
+
+function ProgramPicker({
+  value, onChange,
+}: {
+  value: string;
+  onChange: (name: string) => void;
+}) {
+  const [query, setQuery]       = useState(value);
+  const [open, setOpen]         = useState(false);
+  const [programs, setPrograms] = useState<ProgramOption[]>([]);
+  const [loading, setLoading]   = useState(false);
+  const wrapRef                 = useRef<HTMLDivElement>(null);
+
+  // Sync external value changes (e.g. auto-fill from learner selection)
+  useEffect(() => { setQuery(value); }, [value]);
+
+  // Fetch once on first focus
+  const loaded = useRef(false);
+  function ensureLoaded() {
+    if (loaded.current) return;
+    loaded.current = true;
+    setLoading(true);
+    fetch('/api/salesforce/programs')
+      .then(r => r.ok ? r.json() as Promise<{ programs: { Id: string; Name: string }[] }> : { programs: [] })
+      .then(data => setPrograms((data.programs ?? []).map(p => ({ id: p.Id, name: p.Name }))))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const filtered = query.trim().length === 0
+    ? programs.slice(0, 20)
+    : programs.filter(p => p.name.toLowerCase().includes(query.toLowerCase())).slice(0, 20);
+
+  function select(p: ProgramOption) {
+    setQuery(p.name);
+    onChange(p.name);
+    setOpen(false);
+  }
+
+  const inputCls = "w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring";
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50 pointer-events-none" />
+        <input
+          type="text"
+          value={query}
+          placeholder="Search programs…"
+          className={`${inputCls} pl-8 pr-8`}
+          onFocus={() => { ensureLoaded(); setOpen(true); }}
+          onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
+        />
+        {query && (
+          <button type="button" onClick={() => { setQuery(''); onChange(''); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+      {open && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-lg max-h-48 overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center gap-1.5 py-4 text-[13px] text-muted-foreground">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading programs…
+            </div>
+          ) : filtered.length === 0 ? (
+            <p className="py-4 text-center text-[13px] text-muted-foreground">No programs found</p>
+          ) : filtered.map(p => (
+            <button
+              key={p.id}
+              type="button"
+              onMouseDown={() => select(p)}
+              className="w-full text-left px-3 py-2 text-[13px] font-medium text-foreground hover:bg-muted/50 transition-colors"
+            >
+              {p.name}
             </button>
           ))}
         </div>
@@ -349,7 +447,15 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
           <LearnerPicker
             value={form.learnerName}
             learnerId={form.learnerId}
-            onChange={(name, id) => setForm(f => ({ ...f, learnerName: name, learnerId: id }))}
+            onChange={(name, id, pennyTrail) =>
+              setForm(f => ({
+                ...f,
+                learnerName: name,
+                learnerId: id,
+                // Auto-fill program from learner's trail, but only if program is still empty
+                program: f.program || pennyTrail || '',
+              }))
+            }
           />
         </div>
       </div>
@@ -358,7 +464,10 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Program</label>
-          <input value={form.program} onChange={e => set('program', e.target.value)} placeholder="e.g. Explorer's Trail" className={inputCls} />
+          <ProgramPicker
+            value={form.program}
+            onChange={name => set('program', name)}
+          />
         </div>
         <div>
           <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Outcome</label>
