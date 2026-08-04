@@ -24,3 +24,4 @@ export * from "./knowledgeSources";
 export * from "./programPennyConfigs";
 export * from "./platformRoleOwners";
 export * from "./pennyLogs";
+export * from "./personaHealthDismissals";

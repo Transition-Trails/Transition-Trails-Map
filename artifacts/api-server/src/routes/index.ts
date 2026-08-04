@@ -25,6 +25,7 @@ import promptVariablesRouter  from "./promptVariables";
 import programsRouter          from "./programs";
 import knowledgeRouter         from "./knowledge";
 import roleOwnersRouter        from "./roleOwners";
+import personaHealthRouter     from "./personaHealth";
 import sessionsRouter           from "./sessions";
 import voiceoverRouter          from "./voiceover";
 import { requireStaff, requireAdmin } from "../middlewares/requireAuth";
@@ -98,7 +99,8 @@ router.use(staffAuthGate);
 const ADMIN_PREFIXES: string[] = [
   '/secrets',           // GET /api/secrets/audit — credential exposure
   '/admin/google-groups', // GET /api/admin/google-groups — workspace admin
-  '/admin/role-owners', // GET/PATCH /api/admin/role-owners
+  '/admin/role-owners',    // GET/PATCH /api/admin/role-owners
+  '/admin/persona-health', // GET/PATCH /api/admin/persona-health
 ];
 
 router.use(ADMIN_PREFIXES as unknown as string, requireAdmin as RequestHandler);
@@ -131,6 +133,7 @@ router.use(promptVariablesRouter);
 router.use(programsRouter);
 router.use(knowledgeRouter);
 router.use(roleOwnersRouter);
+router.use(personaHealthRouter);
 router.use(sessionsRouter);
 router.use(voiceoverRouter);
 

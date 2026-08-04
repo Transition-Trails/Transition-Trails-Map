@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import {
   Users, Shield, Star, Brain, Globe, Chrome, Network, Mail,
@@ -191,16 +191,66 @@ function NavCell({ value }: { value: string }) {
   );
 }
 
+// ── Persona → role ID mapping for owner auto-clear ────────────────────────────
+const PERSONA_TO_ROLE_ID: Record<string, string> = {
+  [`${TERMS.aiAssistant} Admin`]: 'penny-admin',
+};
+
 // ── Permission Matrix tab ─────────────────────────────────────────────────────
 
 function PermissionMatrixTab() {
-  const [filterTier,   setFilterTier]   = useState<FilterTier>('all');
-  const [filterType,   setFilterType]   = useState<FilterType>('all');
-  const [filterHealth, setFilterHealth] = useState<FilterHealth>('all');
-  const [search,       setSearch]       = useState('');
-  const [selectedRow,  setSelectedRow]  = useState<string | null>(null);
-  const [sortKey,      setSortKey]      = useState<SortKey>('tier');
-  const [sortDir,      setSortDir]      = useState<SortDir>('asc');
+  const { platformRoles } = useAppContext();
+  const [filterTier,      setFilterTier]      = useState<FilterTier>('all');
+  const [filterType,      setFilterType]      = useState<FilterType>('all');
+  const [filterHealth,    setFilterHealth]    = useState<FilterHealth>('all');
+  const [search,          setSearch]          = useState('');
+  const [selectedRow,     setSelectedRow]     = useState<string | null>(null);
+  const [sortKey,         setSortKey]         = useState<SortKey>('tier');
+  const [sortDir,         setSortDir]         = useState<SortDir>('asc');
+  const [dismissedIssues, setDismissedIssues] = useState<Record<string, string[]>>({});
+
+  // Load persisted dismissals on mount
+  useEffect(() => {
+    fetch('/api/admin/persona-health')
+      .then(r => r.ok ? r.json() : { dismissed: {} })
+      .then((data: { dismissed: Record<string, string[]> }) =>
+        setDismissedIssues(data.dismissed ?? {}))
+      .catch(() => {});
+  }, []);
+
+  // Compute remaining issues for a persona, filtering out:
+  //   1. Owner issues that are auto-cleared by an actual role owner assignment
+  //   2. Manually dismissed issues
+  const getEffectiveIssues = useCallback((persona: string): string[] => {
+    const detail = MATRIX_HEALTH_DETAIL[persona];
+    if (!detail) return [];
+    const roleId  = PERSONA_TO_ROLE_ID[persona];
+    const role    = roleId ? platformRoles.find(r => r.id === roleId) : null;
+    const hasOwner = !!(role?.owner?.trim());
+    const dismissed = dismissedIssues[persona] ?? [];
+    return detail.healthIssues.filter(issue => {
+      if (hasOwner && /owner/i.test(issue)) return false;
+      if (dismissed.includes(issue)) return false;
+      return true;
+    });
+  }, [platformRoles, dismissedIssues]);
+
+  const getEffectiveHealth = useCallback((persona: string, original: MatrixRow['health']): MatrixRow['health'] => {
+    if (original === 'healthy') return 'healthy';
+    return getEffectiveIssues(persona).length === 0 ? 'healthy' : original;
+  }, [getEffectiveIssues]);
+
+  async function dismissIssue(persona: string, issue: string) {
+    const current = dismissedIssues[persona] ?? [];
+    if (current.includes(issue)) return;
+    const updated = [...current, issue];
+    setDismissedIssues(d => ({ ...d, [persona]: updated }));
+    await fetch(`/api/admin/persona-health/${encodeURIComponent(persona)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dismissedIssues: updated }),
+    }).catch(() => {});
+  }
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -215,7 +265,7 @@ function PermissionMatrixTab() {
     let rows = [...MATRIX_ROWS];
     if (filterTier   !== 'all') rows = rows.filter(r => r.tier   === filterTier);
     if (filterType   !== 'all') rows = rows.filter(r => r.type   === filterType);
-    if (filterHealth !== 'all') rows = rows.filter(r => r.health === filterHealth);
+    if (filterHealth !== 'all') rows = rows.filter(r => getEffectiveHealth(r.persona, r.health) === filterHealth);
     if (search.trim())          rows = rows.filter(r =>
       r.persona.toLowerCase().includes(search.toLowerCase()) ||
       r.type.toLowerCase().includes(search.toLowerCase())
@@ -231,17 +281,17 @@ function PermissionMatrixTab() {
       return sortDir === 'asc' ? va.localeCompare(vb as string) : (vb as string).localeCompare(va);
     });
     return rows;
-  }, [filterTier, filterType, filterHealth, search, sortKey, sortDir]);
+  }, [filterTier, filterType, filterHealth, search, sortKey, sortDir, getEffectiveHealth]);
 
-  const activeRow = MATRIX_ROWS.find(r => r.persona === selectedRow) ?? null;
-  const total     = MATRIX_ROWS.length;
-  const shown     = processedRows.length;
+  const activeRow  = MATRIX_ROWS.find(r => r.persona === selectedRow) ?? null;
+  const total      = MATRIX_ROWS.length;
+  const shown      = processedRows.length;
   const hasFilters = filterTier !== 'all' || filterType !== 'all' || filterHealth !== 'all' || search.trim() !== '';
 
   const hc = {
-    healthy:   MATRIX_ROWS.filter(r => r.health === 'healthy').length,
-    needsAttn: MATRIX_ROWS.filter(r => r.health === 'needs-attention').length,
-    incomplete: MATRIX_ROWS.filter(r => r.health === 'incomplete').length,
+    healthy:    MATRIX_ROWS.filter(r => getEffectiveHealth(r.persona, r.health) === 'healthy').length,
+    needsAttn:  MATRIX_ROWS.filter(r => getEffectiveHealth(r.persona, r.health) === 'needs-attention').length,
+    incomplete: MATRIX_ROWS.filter(r => getEffectiveHealth(r.persona, r.health) === 'incomplete').length,
   };
 
   function clearFilters() {
@@ -423,7 +473,7 @@ function PermissionMatrixTab() {
                     </td>
                     {/* Health */}
                     <td className="px-4 py-2.5">
-                      <span className={`w-2.5 h-2.5 rounded-full inline-block ${HEALTH_DOT[row.health]}`} title={row.health} />
+                      <span className={`w-2.5 h-2.5 rounded-full inline-block ${HEALTH_DOT[getEffectiveHealth(row.persona, row.health)]}`} title={getEffectiveHealth(row.persona, row.health)} />
                     </td>
                     {/* Nav cols */}
                     {NAV_COLS.map(col => (
@@ -465,25 +515,47 @@ function PermissionMatrixTab() {
             </div>
             <div className="p-5 space-y-4">
               {/* Health issues + next steps — shown for any non-healthy row */}
-              {activeRow.health !== 'healthy' && (() => {
-                const detail = MATRIX_HEALTH_DETAIL[activeRow.persona];
+              {(() => {
+                const effectiveHealth  = getEffectiveHealth(activeRow.persona, activeRow.health);
+                const detail           = MATRIX_HEALTH_DETAIL[activeRow.persona];
+                const effectiveIssues  = getEffectiveIssues(activeRow.persona);
+                const allDismissed     = detail && effectiveIssues.length === 0 && detail.healthIssues.length > 0;
+                if (!detail) return null;
+
+                if (effectiveHealth === 'healthy') {
+                  return (
+                    <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]/60 p-3 flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#2F6B3F] mt-0.5 shrink-0" />
+                      <p className="text-[14px] text-[#245531]">
+                        {allDismissed ? 'All issues marked resolved.' : 'No open issues.'}
+                      </p>
+                    </div>
+                  );
+                }
+
                 const isIncomplete = activeRow.health === 'incomplete';
                 const borderCls = isIncomplete ? 'border-[#E8B9B4] bg-[#FBEAE6]/60' : 'border-[#FFD08A] bg-[#FFF3E0]/60';
                 const labelCls  = isIncomplete ? 'text-[#A93F2F]' : 'text-[#CC8400]';
                 const dotCls    = isIncomplete ? 'bg-[#A93F2F]' : 'bg-[#CC8400]';
-                if (!detail) return null;
                 return (
                   <div className={`rounded-lg border p-3 space-y-3 ${borderCls}`}>
-                    {/* Issues */}
+                    {/* Issues with dismiss buttons */}
                     <div>
                       <p className={`text-[14px] font-bold mb-1.5 ${labelCls}`}>
                         {isIncomplete ? 'Incomplete — issues' : 'Needs attention — issues'}
                       </p>
-                      <ul className="space-y-1">
-                        {detail.healthIssues.map(issue => (
-                          <li key={issue} className="flex items-start gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full mt-1 shrink-0 ${dotCls}`} />
-                            <span className="text-[14px] text-foreground leading-snug">{issue}</span>
+                      <ul className="space-y-1.5">
+                        {effectiveIssues.map(issue => (
+                          <li key={issue} className="flex items-start gap-1.5 group">
+                            <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${dotCls}`} />
+                            <span className="text-[14px] text-foreground leading-snug flex-1">{issue}</span>
+                            <button
+                              onClick={() => { void dismissIssue(activeRow.persona, issue); }}
+                              title="Mark as resolved"
+                              className="opacity-0 group-hover:opacity-100 shrink-0 text-[11px] font-semibold text-[#2F6B3F] hover:underline transition-opacity ml-1 mt-0.5"
+                            >
+                              ✓ Resolve
+                            </button>
                           </li>
                         ))}
                       </ul>
