@@ -3,6 +3,11 @@ import { getSalesforceClient } from "../lib/getSalesforceClient.js";
 import type { ISalesforceClient } from "../lib/salesforceClient.js";
 import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
 import {
+  recordSfWriteAttempt,
+  recordSfWriteSuccess,
+  recordSfWriteFailure,
+} from "../lib/sfWriteHealth.js";
+import {
   getLearnerContext,
   getTrailConfig,
   getActiveTrailConfigs,
@@ -176,15 +181,24 @@ router.post(
     ] as const;
     if (!requireStringFields(req.body, [...REQUIRED], res)) return;
     const body = req.body as Record<typeof REQUIRED[number], string>;
-    const result = await createCareerReview(client, {
-      contactId,
-      areaScores:     body.areaScores,
-      feedbackJson:   body.feedbackJson,
-      readinessLabel: body.readinessLabel,
-      reviewMode:     body.reviewMode,
-      reviewedAt:     body.reviewedAt,
-      targetRole:     body.targetRole,
-    });
+    recordSfWriteAttempt();
+    let result: Awaited<ReturnType<typeof createCareerReview>>;
+    try {
+      result = await createCareerReview(client, {
+        contactId,
+        areaScores:     body.areaScores,
+        feedbackJson:   body.feedbackJson,
+        readinessLabel: body.readinessLabel,
+        reviewMode:     body.reviewMode,
+        reviewedAt:     body.reviewedAt,
+        targetRole:     body.targetRole,
+      });
+      recordSfWriteSuccess();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      recordSfWriteFailure("Penny_Career_Review__c", msg);
+      throw err;  // re-throw so withClient returns 500
+    }
     res.json(result);
   })
 );

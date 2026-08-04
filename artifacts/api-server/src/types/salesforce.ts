@@ -75,6 +75,53 @@ export interface InteractionLogRecord {
   createdDate: string;
 }
 
+/**
+ * Permitted values for TT_Session_Log__c.Session_Type__c.
+ *
+ * If Session_Type__c is a RESTRICTED picklist in the org, any value not in
+ * this list will cause Salesforce to silently reject the insert.  Verify
+ * permitted values via GET /sessions/describe and keep this array in sync.
+ * Add new values here only after adding them to the picklist in SF Setup →
+ * Object Manager → TT Session Log → Fields → Session Type.
+ */
+export type SfSessionType =
+  | 'Coaching Session'
+  | 'Group Session'
+  | 'Workshop'
+  | 'Check-in'
+  | 'Orientation'
+  | 'Other';
+
+export const SF_SESSION_TYPES: readonly SfSessionType[] = [
+  'Coaching Session',
+  'Group Session',
+  'Workshop',
+  'Check-in',
+  'Orientation',
+  'Other',
+] as const;
+
+/**
+ * Permitted values for TT_Session_Log__c.Status__c.
+ *
+ * Same restricted-picklist risk as Session_Type__c above.  Verify against
+ * GET /sessions/describe and keep in sync with the SF org schema.
+ */
+export type SfSessionStatus =
+  | 'Scheduled'
+  | 'Completed'
+  | 'Cancelled'
+  | 'No Show'
+  | 'Rescheduled';
+
+export const SF_SESSION_STATUSES: readonly SfSessionStatus[] = [
+  'Scheduled',
+  'Completed',
+  'Cancelled',
+  'No Show',
+  'Rescheduled',
+] as const;
+
 export interface CareerReviewRecord {
   id: string;
   name: string;

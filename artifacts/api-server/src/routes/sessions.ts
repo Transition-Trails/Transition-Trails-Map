@@ -5,6 +5,17 @@ import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
 import type { ISalesforceClient } from "../lib/salesforceClient.js";
 import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
 import { logger } from "../lib/logger.js";
+import {
+  recordSfWriteAttempt,
+  recordSfWriteSuccess,
+  recordSfWriteFailure,
+} from "../lib/sfWriteHealth.js";
+import {
+  SF_SESSION_TYPES,
+  SF_SESSION_STATUSES,
+  type SfSessionType,
+  type SfSessionStatus,
+} from "../types/salesforce.js";
 
 const router = Router();
 
@@ -126,11 +137,46 @@ interface CreateSessionBody {
   status?: string;
 }
 
+/**
+ * Type-guard for Session_Type__c restricted picklist values.
+ * If the SF org has different values, update SF_SESSION_TYPES in salesforce.ts
+ * and confirm via GET /sessions/describe.
+ */
+function isValidSessionType(v: string): v is SfSessionType {
+  return (SF_SESSION_TYPES as readonly string[]).includes(v);
+}
+
+/**
+ * Type-guard for Status__c restricted picklist values.
+ */
+function isValidSessionStatus(v: string): v is SfSessionStatus {
+  return (SF_SESSION_STATUSES as readonly string[]).includes(v);
+}
+
 router.post("/sessions", withClient(async (req, res, client) => {
   const body = req.body as CreateSessionBody;
 
   if (!body.sessionType || !body.sessionDate) {
     res.status(400).json({ error: "sessionType and sessionDate are required" });
+    return;
+  }
+
+  // Guard against restricted-picklist rejections (same class of bug as Source__c "web").
+  // If the org's picklist values differ from SF_SESSION_TYPES, update that array
+  // rather than loosening this check — silent SF rejects are harder to debug than a 400.
+  if (!isValidSessionType(body.sessionType)) {
+    res.status(400).json({
+      error: "Invalid sessionType",
+      detail: `'${body.sessionType}' is not a permitted Session_Type__c value. Allowed: ${SF_SESSION_TYPES.join(", ")}. Verify via GET /sessions/describe.`,
+    });
+    return;
+  }
+
+  if (body.status && !isValidSessionStatus(body.status)) {
+    res.status(400).json({
+      error: "Invalid status",
+      detail: `'${body.status}' is not a permitted Status__c value. Allowed: ${SF_SESSION_STATUSES.join(", ")}. Verify via GET /sessions/describe.`,
+    });
     return;
   }
 
@@ -146,13 +192,16 @@ router.post("/sessions", withClient(async (req, res, client) => {
   if (body.notes)           sfFields["Notes__c"]            = body.notes;
   if (body.status)          sfFields["Status__c"]           = body.status;
 
+  recordSfWriteAttempt();
   try {
     const result = await client.createRecord(OBJECT, sfFields);
     const id = result.id;
+    recordSfWriteSuccess();
     logger.info({ id }, "Session log created in Salesforce");
     res.status(201).json({ id, success: true });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    recordSfWriteFailure(OBJECT, msg);
     logger.warn({ msg }, "SF session create failed");
     res.status(422).json({ error: "Salesforce rejected the record", detail: msg });
   }
