@@ -259,9 +259,13 @@ export async function logInteraction(
   client: ISalesforceClient,
   payload: LogInteractionPayload
 ): Promise<{ id: string }> {
-  // NOTE: Penny_Interaction_Log__c.Learner__c is NOT nillable (required).
-  // Records can only be created when a Contact is resolved.  Internal-staff
-  // exchanges (no contactId) are written only to the local DB.
+  // NOTE: Penny_Interaction_Log__c.Learner__c must be nillable on the SF object
+  // for staff-session writes to succeed (contactId === null).  Make it optional
+  // in SF Setup before enabling staff logging.
+  //
+  // NOTE: Admin_Email__c must be provisioned as a Text field on
+  // Penny_Interaction_Log__c to store staff attribution.  Omitted when
+  // contactId is present (learner exchanges are attributed via the lookup).
   //
   // NOTE: Fields that do not exist in this object's current schema are NOT
   // written here: model, durationMs, layersPresent, audience, userTier.
@@ -270,13 +274,22 @@ export async function logInteraction(
   //
   // Assignment__c intentionally omitted — always null.
   // Future LMS integration will populate this field; do not set it here.
-  const result = await client.createRecord("Penny_Interaction_Log__c", {
-    Learner__c:        payload.contactId,
+  const fields: Record<string, unknown> = {
     User_Message__c:   truncateSf(payload.userMessage),
     Penny_Response__c: truncateSf(payload.pennyResponse),
     Prompt_Mode__c:    payload.promptMode.slice(0, 50),
     Source__c:         payload.source,
-  });
+  };
+
+  if (payload.contactId !== null) {
+    // Learner session — populate the Contact lookup.
+    fields['Learner__c'] = payload.contactId;
+  } else if (payload.adminEmail) {
+    // Staff session — no Contact; attribute via email field instead.
+    fields['Admin_Email__c'] = payload.adminEmail;
+  }
+
+  const result = await client.createRecord("Penny_Interaction_Log__c", fields);
   return { id: result.id };
 }
 

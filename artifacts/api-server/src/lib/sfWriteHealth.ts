@@ -18,25 +18,33 @@ export interface SfWriteFailure {
 }
 
 interface WriteHealthState {
-  lastFailure:   SfWriteFailure | null;
-  lastSuccess:   string | null;  // ISO-8601 timestamp of last confirmed write
-  totalAttempts: number;
-  failedWrites:  number;
+  lastFailure:        SfWriteFailure | null;
+  lastSuccess:        string | null;  // ISO-8601 timestamp of last confirmed write
+  totalAttempts:      number;
+  failedWrites:       number;
+  /** Subset of totalAttempts that originated from internal-staff sessions. */
+  staffAttempts:      number;
+  /** Subset of (totalAttempts - failedWrites) from internal-staff sessions. */
+  staffSuccesses:     number;
 }
 
 const state: WriteHealthState = {
-  lastFailure:   null,
-  lastSuccess:   null,
-  totalAttempts: 0,
-  failedWrites:  0,
+  lastFailure:    null,
+  lastSuccess:    null,
+  totalAttempts:  0,
+  failedWrites:   0,
+  staffAttempts:  0,
+  staffSuccesses: 0,
 };
 
-export function recordSfWriteAttempt(): void {
+export function recordSfWriteAttempt(isStaff = false): void {
   state.totalAttempts++;
+  if (isStaff) state.staffAttempts++;
 }
 
-export function recordSfWriteSuccess(): void {
+export function recordSfWriteSuccess(isStaff = false): void {
   state.lastSuccess = new Date().toISOString();
+  if (isStaff) state.staffSuccesses++;
 }
 
 export function recordSfWriteFailure(object: string, rawReason: string): void {
@@ -48,9 +56,12 @@ export function recordSfWriteFailure(object: string, rawReason: string): void {
   };
 }
 
-export function getSfWriteHealth(): WriteHealthState & { healthyWrites: number } {
+export function getSfWriteHealth(): WriteHealthState & { healthyWrites: number; learnerSuccesses: number } {
+  const healthyWrites  = state.totalAttempts - state.failedWrites;
+  const learnerSuccesses = healthyWrites - state.staffSuccesses;
   return {
     ...state,
-    healthyWrites: state.totalAttempts - state.failedWrites,
+    healthyWrites,
+    learnerSuccesses,
   };
 }

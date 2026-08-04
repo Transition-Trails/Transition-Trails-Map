@@ -57,7 +57,19 @@ export const SF_INTERACTION_SOURCES: readonly SfInteractionSource[] = [
 ] as const;
 
 export interface LogInteractionPayload {
-  contactId: string;
+  /**
+   * Salesforce Contact Id for the learner being coached.
+   * Pass null for internal-staff sessions — Learner__c will be left blank
+   * (requires the field to be nillable on the SF object) and Admin_Email__c
+   * will be populated instead so the record is still attributable.
+   */
+  contactId: string | null;
+  /**
+   * Email of the authenticated staff user.  Only written when contactId is null.
+   * Stored in Admin_Email__c so staff exchanges are attributable in Salesforce
+   * without needing a Contact lookup.
+   */
+  adminEmail?: string | null;
   userMessage: string;
   pennyResponse: string;
   /** Plain string — not a picklist. Describe what actually happened, e.g. "ask+learner+memory". */
