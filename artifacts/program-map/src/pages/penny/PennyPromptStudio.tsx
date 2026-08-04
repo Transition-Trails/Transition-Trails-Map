@@ -323,15 +323,23 @@ function Sidebar({
 // ── Template detail panel ─────────────────────────────────────────────────────
 
 function TemplateDetailPanel({
-  template, showTest, onToggleTest, onEdit, onBrief,
+  template, showTest, onToggleTest, onEdit, onBrief, onStatusChange,
 }: {
   template: PromptTemplate;
   showTest: boolean;
   onToggleTest: () => void;
   onEdit: (t: PromptTemplate) => void;
   onBrief: (t: PromptTemplate) => void;
+  onStatusChange: (id: string, status: PromptStatus) => void;
 }) {
   const [open, setOpen] = useState<Set<string>>(() => new Set(['purpose', 'config', 'guardrails']));
+  const [confirmChip, setConfirmChip] = useState<'approved' | 'revision' | null>(null);
+
+  function fireStatusChange(id: string, status: PromptStatus, chip: 'approved' | 'revision') {
+    onStatusChange(id, status);
+    setConfirmChip(chip);
+    setTimeout(() => setConfirmChip(null), 2200);
+  }
   function toggle(id: string) {
     setOpen(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }
@@ -377,6 +385,58 @@ function TemplateDetailPanel({
             <h2 className="text-[16px] font-bold text-foreground leading-snug">{template.name}</h2>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
+            {/* Confirmation chip */}
+            {confirmChip && (
+              <span
+                className={`inline-flex items-center gap-1 text-[11px] font-bold border rounded-full px-2.5 py-0.5 animate-in fade-in slide-in-from-right-2 duration-200 ${
+                  confirmChip === 'approved'
+                    ? 'text-[#2F6B3F] bg-[#C8E6D0] border-[#9FC3AE]'
+                    : 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]'
+                }`}
+              >
+                {confirmChip === 'approved'
+                  ? <><CheckCircle2 className="w-3 h-3" /> Approved</>
+                  : <><RotateCcw className="w-3 h-3" /> Sent for revision</>
+                }
+              </span>
+            )}
+
+            {/* Approve */}
+            {(template.status === 'Draft' || template.status === 'Review') && (
+              <button
+                onClick={() => fireStatusChange(template.id, 'Approved', 'approved')}
+                className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F] text-[12px] font-bold hover:bg-[#C8E6D0] transition-colors"
+              >
+                <CheckCircle2 className="w-3 h-3" /> Approve
+              </button>
+            )}
+            {(template.status === 'Approved' || template.status === 'Deprecated') && (
+              <button
+                disabled
+                className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-border text-[12px] font-bold text-muted-foreground/40 cursor-not-allowed"
+              >
+                <CheckCircle2 className="w-3 h-3" /> Approve
+              </button>
+            )}
+
+            {/* Request Revision */}
+            {(template.status === 'Review' || template.status === 'Approved') && (
+              <button
+                onClick={() => fireStatusChange(template.id, 'Draft', 'revision')}
+                className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400] text-[12px] font-bold hover:bg-[#FFE8A3] transition-colors"
+              >
+                <RotateCcw className="w-3 h-3" /> Request Revision
+              </button>
+            )}
+            {(template.status === 'Draft' || template.status === 'Deprecated') && (
+              <button
+                disabled
+                className="flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-border text-[12px] font-bold text-muted-foreground/40 cursor-not-allowed"
+              >
+                <RotateCcw className="w-3 h-3" /> Request Revision
+              </button>
+            )}
+
             <button
               onClick={() => onToggleTest()}
               className={`flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[12px] font-bold transition-colors ${
@@ -1233,6 +1293,9 @@ export default function PennyPromptStudio() {
                 onToggleTest={() => setShowTest(s => !s)}
                 onEdit={handleEdit}
                 onBrief={t => setSelectedItem({ type: 'promptTemplate', id: t.id, data: t })}
+                onStatusChange={(id, status) =>
+                  update({ id, updates: { status, lastReviewed: 'Just now' } })
+                }
               />
               {showTest && <TestBenchPanel template={selected} />}
             </>
