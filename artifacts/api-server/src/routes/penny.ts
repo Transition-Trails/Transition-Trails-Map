@@ -477,7 +477,10 @@ const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
   ],
   'cap-reflection-prompts': [
     { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Reflection Prompts builds on Learner Coaching — set that up first.' },
-    { id: 'sf-training-plan-item', label: 'Training_Plan_Item__c object accessible', kind: 'sf-object', sfObject: 'Training_Plan_Item__c', pennyMissingNote: 'Module completion events come from Training_Plan_Item__c.' },
+    // Verified 2026-08-04: Training_Plan_Item__c does not exist in the live org.
+    // The TT curriculum uses Learner_Course_Module__c (confirmed accessible, 14 fields) to track
+    // module completion per learner — this is the direct equivalent for reflection trigger events.
+    { id: 'sf-training-plan-item', label: 'Learner_Course_Module__c object accessible', kind: 'sf-object', sfObject: 'Learner_Course_Module__c', pennyMissingNote: 'Module completion events come from Learner_Course_Module__c.' },
     { id: 'slack-connected', label: 'Slack integration connected', kind: 'integration', integrationKey: 'slack', fixRoute: '/admin/integrations', fixLabel: 'Connect Slack', pennyMissingNote: 'I deliver reflection prompts through Slack DMs.' },
   ],
   'cap-resume-review': [
@@ -491,7 +494,9 @@ const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
   ],
   'cap-study-coach': [
     { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Study Coach extends Learner Coaching — enable that first.' },
-    { id: 'sf-training-plan-item', label: 'Training_Plan_Item__c accessible', kind: 'sf-object', sfObject: 'Training_Plan_Item__c', pennyMissingNote: 'I check module deadlines from Training_Plan_Item__c.' },
+    // Verified 2026-08-04: Training_Plan_Item__c does not exist in the live org.
+    // Learner_Course_Module__c is the correct object for checking module progress and deadlines.
+    { id: 'sf-training-plan-item', label: 'Learner_Course_Module__c accessible', kind: 'sf-object', sfObject: 'Learner_Course_Module__c', pennyMissingNote: 'I check module progress from Learner_Course_Module__c to send pacing alerts before it\'s too late.' },
     { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I need the engagement record to see where each learner is in their sprint.' },
   ],
 };

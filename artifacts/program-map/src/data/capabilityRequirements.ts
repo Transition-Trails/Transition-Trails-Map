@@ -78,12 +78,15 @@ export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = 
         'Reflection Prompts builds on Learner Coaching. Set that up first so I have the learner context needed for good reflections.',
     },
     {
+      // Verified 2026-08-04: Training_Plan_Item__c does not exist in the live org.
+      // Learner_Course_Module__c (14 fields, confirmed accessible) tracks module completion
+      // per learner and is the correct object for reflection trigger events.
       id: 'sf-training-plan-item',
-      label: 'Training_Plan_Item__c object accessible',
+      label: 'Learner_Course_Module__c object accessible',
       kind: 'sf-object',
-      sfObject: 'Training_Plan_Item__c',
+      sfObject: 'Learner_Course_Module__c',
       pennyMissingNote:
-        'Module completion events come from Training_Plan_Item__c. I watch this to know when to send reflections.',
+        'Module completion events come from Learner_Course_Module__c. I watch this to know when to send reflections.',
     },
     {
       id: 'slack-connected',
@@ -158,12 +161,14 @@ export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = 
       pennyMissingNote: 'Study Coach extends Learner Coaching. Enable that first.',
     },
     {
+      // Verified 2026-08-04: Training_Plan_Item__c does not exist in the live org.
+      // Learner_Course_Module__c is the correct object for checking module progress and deadlines.
       id: 'sf-training-plan-item',
-      label: 'Training_Plan_Item__c accessible',
+      label: 'Learner_Course_Module__c accessible',
       kind: 'sf-object',
-      sfObject: 'Training_Plan_Item__c',
+      sfObject: 'Learner_Course_Module__c',
       pennyMissingNote:
-        'I check module deadlines from Training_Plan_Item__c to send pacing alerts before it\'s too late.',
+        'I check module progress from Learner_Course_Module__c to send pacing alerts before it\'s too late.',
     },
     {
       id: 'sf-program-engagement',
