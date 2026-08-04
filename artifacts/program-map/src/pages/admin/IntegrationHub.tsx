@@ -212,6 +212,8 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
       ) : (
         <a
           href="/api/auth/salesforce/login"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 bg-[#2F6F7E] hover:bg-[#225968] transition-colors text-white text-[14px] font-semibold"
         >
           <LogIn className="w-3 h-3" />
