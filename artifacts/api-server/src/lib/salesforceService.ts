@@ -13,6 +13,10 @@ import type {
   GamificationRecord,
   WeeklyReportRecord,
   CreateWeeklyReportPayload,
+  BuildItemRecord,
+  CreateBuildItemPayload,
+  ClassroomNudgeRecord,
+  CreateClassroomNudgePayload,
 } from "../types/salesforce.js";
 // Re-export so callers can validate source values without importing from types directly
 export type { SfInteractionSource } from "../types/salesforce.js";
@@ -107,6 +111,23 @@ interface RawWeeklyReport {
   Trail_Breakdown__c: string | null;
   Week_Start__c: string | null;
   Week_End__c: string | null;
+  CreatedDate: string;
+}
+
+interface RawBuildItem {
+  Id: string;
+  Name: string;
+  TT_Automation__c: string | null;
+  CreatedDate: string;
+}
+
+interface RawClassroomNudge {
+  Id: string;
+  Name: string;
+  Course_Work_ID__c: string | null;
+  Learner__c: string;
+  Nudge_Date__c: string | null;
+  Sent_At__c: string | null;
   CreatedDate: string;
 }
 
@@ -422,6 +443,83 @@ export async function createWeeklyReport(
     Week_Start__c:       payload.weekStart,
     Week_End__c:         payload.weekEnd,
     Generated_At__c:     payload.generatedAt,
+  });
+  return { id: result.id };
+}
+
+// ── Build Governance (TT_Build_Item__c) ───────────────────────────────────────
+//
+// Field names match REUSED_OBJECT_FIELD_CHECKS in salesforce.ts.
+// Only the single confirmed custom field (TT_Automation__c) is queried or
+// written.  Do not add Status__c, Priority__c, Description__c, or Assigned_To__c
+// until they are confirmed present via the preflight field check.
+
+function mapBuildItem(raw: RawBuildItem): BuildItemRecord {
+  return {
+    id:           raw.Id,
+    name:         raw.Name,
+    automationId: raw.TT_Automation__c,
+    createdDate:  raw.CreatedDate,
+  };
+}
+
+export async function getBuildItems(
+  client: ISalesforceClient,
+  limit = 50
+): Promise<BuildItemRecord[]> {
+  const soql = `SELECT Id, Name, TT_Automation__c, CreatedDate FROM TT_Build_Item__c ORDER BY CreatedDate DESC LIMIT ${limit}`;
+  const result = await client.query<RawBuildItem>(soql);
+  return result.records.map(mapBuildItem);
+}
+
+export async function createBuildItem(
+  client: ISalesforceClient,
+  payload: CreateBuildItemPayload
+): Promise<{ id: string }> {
+  const fields: Record<string, unknown> = { Name: payload.name };
+  if (payload.automationId) {
+    fields["TT_Automation__c"] = payload.automationId;
+  }
+  const result = await client.createRecord("TT_Build_Item__c", fields);
+  return { id: result.id };
+}
+
+// ── Classroom Nudges (Penny_Classroom_Nudge__c) ───────────────────────────────
+//
+// Field names match REUSED_OBJECT_FIELD_CHECKS in salesforce.ts.
+// Confirmed fields: Course_Work_ID__c, Learner__c, Nudge_Date__c, Sent_At__c.
+
+function mapClassroomNudge(raw: RawClassroomNudge): ClassroomNudgeRecord {
+  return {
+    id:          raw.Id,
+    name:        raw.Name,
+    courseWorkId: raw.Course_Work_ID__c,
+    learnerId:   raw.Learner__c,
+    nudgeDate:   raw.Nudge_Date__c,
+    sentAt:      raw.Sent_At__c,
+    createdDate: raw.CreatedDate,
+  };
+}
+
+export async function getClassroomNudges(
+  client: ISalesforceClient,
+  contactId: string,
+  limit = 25
+): Promise<ClassroomNudgeRecord[]> {
+  const soql = `SELECT Id, Name, Course_Work_ID__c, Learner__c, Nudge_Date__c, Sent_At__c, CreatedDate FROM Penny_Classroom_Nudge__c WHERE Learner__c = '${contactId}' ORDER BY CreatedDate DESC LIMIT ${limit}`;
+  const result = await client.query<RawClassroomNudge>(soql);
+  return result.records.map(mapClassroomNudge);
+}
+
+export async function createClassroomNudge(
+  client: ISalesforceClient,
+  payload: CreateClassroomNudgePayload
+): Promise<{ id: string }> {
+  const result = await client.createRecord("Penny_Classroom_Nudge__c", {
+    Learner__c:       payload.contactId,
+    Course_Work_ID__c: payload.courseWorkId,
+    Nudge_Date__c:    payload.nudgeDate,
+    Sent_At__c:       payload.sentAt,
   });
   return { id: result.id };
 }

@@ -200,3 +200,54 @@ export interface CreateWeeklyReportPayload {
   weekEnd: string;
   generatedAt: string;
 }
+
+// ── Build Governance ──────────────────────────────────────────────────────────
+
+/**
+ * A TT_Build_Item__c record.
+ * The only confirmed custom field is TT_Automation__c (a lookup to TT_Automation__c).
+ * Additional fields (Status__c, Priority__c, etc.) do not yet exist on the live org
+ * and must not be queried or written until they are added and confirmed via the
+ * preflight check.
+ */
+export interface BuildItemRecord {
+  id: string;
+  name: string;
+  /** Lookup to TT_Automation__c — may be null when not yet linked. */
+  automationId: string | null;
+  createdDate: string;
+}
+
+export interface CreateBuildItemPayload {
+  name: string;
+  /** Optional lookup to TT_Automation__c. */
+  automationId?: string;
+}
+
+// ── Classroom Nudges ──────────────────────────────────────────────────────────
+
+/**
+ * A Penny_Classroom_Nudge__c record.
+ * Confirmed fields (via preflight): Course_Work_ID__c, Learner__c,
+ * Nudge_Date__c, Sent_At__c.
+ */
+export interface ClassroomNudgeRecord {
+  id: string;
+  name: string;
+  courseWorkId: string | null;
+  learnerId: string;
+  nudgeDate: string | null;
+  sentAt: string | null;
+  createdDate: string;
+}
+
+export interface CreateClassroomNudgePayload {
+  /** Salesforce Contact Id for the learner receiving the nudge. */
+  contactId: string;
+  /** External course work / activity identifier. */
+  courseWorkId: string;
+  /** ISO date string (YYYY-MM-DD). */
+  nudgeDate: string;
+  /** ISO datetime string when the nudge was dispatched. */
+  sentAt: string;
+}

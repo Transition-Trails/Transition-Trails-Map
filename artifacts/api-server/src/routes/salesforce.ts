@@ -1,7 +1,17 @@
 import { Router } from "express";
+import type { Request, Response as ExpressResponse, RequestHandler } from "express";
 import { getEffectiveSfFetch } from "../lib/salesforceOAuth.js";
 import { SfPersistentCache } from "../lib/sfFileCache.js";
 import { SF_API_VERSION } from "../lib/sfConstants.js";
+import { getSalesforceClient } from "../lib/getSalesforceClient.js";
+import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
+import type { ISalesforceClient } from "../lib/salesforceClient.js";
+import {
+  getBuildItems,
+  createBuildItem,
+  getClassroomNudges,
+  createClassroomNudge,
+} from "../lib/salesforceService.js";
 
 const router = Router();
 
@@ -1146,6 +1156,103 @@ router.get("/lms/courses", async (req, res) => {
     return res.status(500).json({ error: "SOQL failed", detail: msg });
   }
 });
+
+// ── Governance & classroom nudge routes ───────────────────────────────────────
+//
+// These routes use ISalesforceClient (session or connector) rather than the raw
+// proxyFetch pattern so they can share the typed service layer in salesforceService.ts.
+
+type SfHandler = (req: Request, res: ExpressResponse, client: ISalesforceClient) => Promise<void>;
+
+function withClient(handler: SfHandler): RequestHandler {
+  return async (req, res): Promise<void> => {
+    let client: ISalesforceClient;
+    try {
+      client = getSalesforceClient(req);
+    } catch {
+      client = new ConnectorSalesforceClient();
+    }
+    try {
+      await handler(req, res, client);
+    } catch (err) {
+      res.status(500).json({
+        error: err instanceof Error ? err.message : "Internal server error",
+      });
+    }
+  };
+}
+
+// GET /salesforce/governance/build-items
+// Returns TT_Build_Item__c records (most recent first, limit 50).
+
+router.get("/salesforce/governance/build-items", withClient(async (req, res, client) => {
+  const limitParam = Number(req.query["limit"]) || 50;
+  const limit = Math.min(Math.max(1, limitParam), 200);
+  const items = await getBuildItems(client, limit);
+  res.json({ items, total: items.length });
+}));
+
+// POST /salesforce/governance/build-items
+// Creates a new TT_Build_Item__c record.
+// Body: { name: string; automationId?: string }
+
+router.post("/salesforce/governance/build-items", withClient(async (req, res, client) => {
+  const { name, automationId } = req.body as { name?: unknown; automationId?: unknown };
+  if (typeof name !== "string" || !name.trim()) {
+    res.status(400).json({ error: "name is required and must be a non-empty string." });
+    return;
+  }
+  const result = await createBuildItem(client, {
+    name: name.trim(),
+    automationId: typeof automationId === "string" ? automationId : undefined,
+  });
+  res.status(201).json(result);
+}));
+
+// GET /salesforce/governance/classroom-nudges/:contactId
+// Returns Penny_Classroom_Nudge__c records for a learner (most recent first, limit 25).
+
+router.get("/salesforce/governance/classroom-nudges/:contactId", withClient(async (req, res, client) => {
+  const contactId = String(req.params["contactId"] ?? "");
+  if (!/^[a-zA-Z0-9]{15,18}$/.test(contactId)) {
+    res.status(400).json({ error: "Invalid Salesforce Contact ID." });
+    return;
+  }
+  const limitParam = Number(req.query["limit"]) || 25;
+  const limit = Math.min(Math.max(1, limitParam), 100);
+  const nudges = await getClassroomNudges(client, contactId, limit);
+  res.json({ nudges, total: nudges.length });
+}));
+
+// POST /salesforce/governance/classroom-nudges
+// Creates a new Penny_Classroom_Nudge__c record.
+// Body: { contactId: string; courseWorkId: string; nudgeDate: string; sentAt: string }
+
+router.post("/salesforce/governance/classroom-nudges", withClient(async (req, res, client) => {
+  const { contactId, courseWorkId, nudgeDate, sentAt } =
+    req.body as { contactId?: unknown; courseWorkId?: unknown; nudgeDate?: unknown; sentAt?: unknown };
+
+  const missing = (["contactId", "courseWorkId", "nudgeDate", "sentAt"] as const).filter(
+    k => typeof req.body[k] !== "string" || !(req.body[k] as string).trim()
+  );
+  if (missing.length > 0) {
+    res.status(400).json({ error: `Missing required fields: ${missing.join(", ")}.` });
+    return;
+  }
+
+  if (!/^[a-zA-Z0-9]{15,18}$/.test(String(contactId))) {
+    res.status(400).json({ error: "contactId must be a valid Salesforce ID." });
+    return;
+  }
+
+  const result = await createClassroomNudge(client, {
+    contactId:   String(contactId),
+    courseWorkId: String(courseWorkId),
+    nudgeDate:   String(nudgeDate),
+    sentAt:      String(sentAt),
+  });
+  res.status(201).json(result);
+}));
 
 // ── GET /salesforce/describe/:objectApiName ────────────────────────────────────
 
