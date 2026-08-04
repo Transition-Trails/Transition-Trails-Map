@@ -487,19 +487,14 @@ export async function createBuildItem(
 
 // ── TT Automation (TT_Automation__c) ─────────────────────────────────────────
 //
-// PHASE 2 DEFERRED — four required filter fields are not yet provisioned:
+// Four required filter fields confirmed provisioned on the org:
 //   Is_Active__c, Automation_Type__c, Description__c, Status__c.
 //
-// Without these fields, any SOQL against TT_Automation__c would return every
-// record in the org with no way to filter by active status or type — a silent
-// correctness bug.  The guard below prevents this by refusing to query until
-// the caller confirms the fields are present via a preflight describe.
-//
-// ACTION REQUIRED before go-live:
-//   1. Add the four fields to TT_Automation__c in SF Setup → Object Manager.
-//   2. Re-run probe-governance-fields.ts to confirm all four appear in the org.
-//   3. Remove the phase2Deferred guard from getAutomations() and from the
-//      tt-automation-fields entry in REUSED_OBJECT_FIELD_CHECKS (salesforce.ts).
+// getAutomations() accepts a fieldsReady boolean so callers that run the
+// preflight field-check can assert readiness before querying.  Pass true once
+// the Validation Center (or probe-governance-fields.ts) confirms all four
+// fields are present — passing false throws TtAutomationFieldsNotProvisionedError
+// as a hard guard against unfiltered dumps of every automation record.
 
 interface RawAutomation {
   Id: string;

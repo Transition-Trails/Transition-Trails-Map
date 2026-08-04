@@ -457,23 +457,16 @@ const REUSED_OBJECT_FIELD_CHECKS: FieldCheckConfig[] = [
     objectApi: "TT_Automation__c",
     label: "TT Automation",
     description: "Automation definition records queried when the governance layer resolves active automations",
-    // Verified against live org: 0 custom fields present on this object.
-    // The four fields below are required by the governance pipeline but have not
-    // yet been provisioned in the org.  Set phase2Deferred so the preflight result
-    // shows an explicit "Phase 2 deferred" label instead of a vacuous
-    // "0 fields, all required present" pass that hides the gap.
-    // ACTION REQUIRED before go-live: add these four fields to TT_Automation__c in
-    // the org, then remove phase2Deferred, move the field names into requiredFields,
-    // and re-run probe-governance-fields.ts to confirm.
-    requiredFields: [],
-    excludeNamespaces: [],
-    phase2Deferred: true,
-    phase2ExpectedFields: [
+    // Four required filter fields provisioned in the org.
+    // Confirmed via probe-governance-fields.ts: Is_Active__c, Automation_Type__c,
+    // Description__c, and Status__c all present on TT_Automation__c.
+    requiredFields: [
       "Is_Active__c",
       "Automation_Type__c",
       "Description__c",
       "Status__c",
     ],
+    excludeNamespaces: [],
   },
   {
     id: "tt-sop-automation-fields",

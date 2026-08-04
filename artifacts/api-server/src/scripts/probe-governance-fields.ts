@@ -38,14 +38,15 @@ const PROBE_CONFIGS = [
     id: "tt-automation-fields",
     objectApi: "TT_Automation__c",
     label: "TT Automation",
-    // Live org: 0 custom fields — Phase 2 fields not yet provisioned in org.
-    // salesforce.ts marks this entry as phase2Deferred so the preflight endpoint
-    // shows an explicit "Phase 2 deferred" label instead of a vacuous
-    // "0 fields, all required present" pass.
-    // ACTION REQUIRED before go-live: provision Is_Active__c, Automation_Type__c,
-    // Description__c, Status__c in the org, then re-run this probe to confirm,
-    // and remove the phase2Deferred flag from salesforce.ts.
-    requiredFields: [] as string[],
+    // Four required filter fields confirmed provisioned in the org.
+    // phase2Deferred has been removed from salesforce.ts; the Validation Center
+    // now runs a live field-check and shows a passing row for TT Automation.
+    requiredFields: [
+      "Is_Active__c",
+      "Automation_Type__c",
+      "Description__c",
+      "Status__c",
+    ],
   },
   {
     id: "tt-sop-automation-fields",
