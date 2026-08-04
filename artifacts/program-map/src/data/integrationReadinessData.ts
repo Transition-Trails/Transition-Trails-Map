@@ -9,6 +9,7 @@ export type IntegrationDomain =
   | 'Google Calendar' | 'LMS' | 'Assessments' | 'Penny Services';
 
 export type IntegrationStatus =
+  | 'Live'
   | 'Prototype'
   | 'Ready to Configure'
   | 'Needs Admin Setup'
@@ -114,12 +115,13 @@ export interface DataFlowNode {
 // ── Config ─────────────────────────────────────────────────────────────────
 
 export const STATUS_CONFIG: Record<IntegrationStatus, { cls: string; order: number }> = {
-  'Prototype':             { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',  order: 1 },
-  'Ready to Configure':    { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',     order: 2 },
-  'Needs Admin Setup':     { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',     order: 3 },
-  'Needs Security Review': { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',        order: 4 },
-  'Blocked':               { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',           order: 5 },
-  'Future':                { cls: 'text-slate-500 bg-slate-50 border-slate-200',     order: 6 },
+  'Live':                  { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',       order: 0 },
+  'Prototype':             { cls: 'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',       order: 1 },
+  'Ready to Configure':    { cls: 'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',       order: 2 },
+  'Needs Admin Setup':     { cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]',       order: 3 },
+  'Needs Security Review': { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',       order: 4 },
+  'Blocked':               { cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',       order: 5 },
+  'Future':                { cls: 'text-slate-500 bg-slate-50 border-slate-200',         order: 6 },
 };
 
 export const DOMAIN_CONFIG: Record<IntegrationDomain, { cls: string; icon: string; tagline: string }> = {

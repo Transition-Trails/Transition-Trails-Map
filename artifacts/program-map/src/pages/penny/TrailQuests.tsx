@@ -20,12 +20,14 @@ interface LearnerDelivery {
   slackHandle: string;
 }
 
+// NOTE: Quest delivery data will be read from Salesforce TrailQuest__c once the
+// custom object is created. Until then, only confirmed active learners are shown.
+// Real learners confirmed via pmdm__ProgramEngagement__c WHERE pmdm__Stage__c = 'Active':
+//   Marissa Pavlak — Foundations Trail
+//   Michele Ward   — Foundations Trail
 const QUEST_DELIVERIES: LearnerDelivery[] = [
-  { learner: 'Jordan M.',  program: "Explorer's Trail",  questId: 'tq-schema-designer', assignedDate: '2026-06-02', status: 'In Progress',          completedCriteria: 2, totalCriteria: 3, slackHandle: '@jordan.m' },
-  { learner: 'Riley P.',   program: 'Foundations Trail', questId: 'tq-admin-challenge',  assignedDate: '2026-06-01', status: 'In Progress',          completedCriteria: 1, totalCriteria: 3, slackHandle: '@riley.p' },
-  { learner: 'Alex F.',    program: 'Guided Trail',      questId: 'tq-schema-designer', assignedDate: '2026-05-20', status: 'Completed',             completedCriteria: 3, totalCriteria: 3, slackHandle: '@alex.f' },
-  { learner: 'Avery K.',   program: 'Guided Trail',      questId: 'tq-admin-challenge',  assignedDate: '2026-06-05', status: 'Pending Acceptance',   completedCriteria: 0, totalCriteria: 3, slackHandle: '@avery.k' },
-  { learner: 'Drew H.',    program: "Explorer's Trail",  questId: 'tq-schema-designer', assignedDate: '2026-06-08', status: 'In Progress',          completedCriteria: 1, totalCriteria: 3, slackHandle: '@drew.h' },
+  { learner: 'Marissa P.', program: 'Foundations Trail', questId: 'tq-schema-designer', assignedDate: '2026-07-15', status: 'In Progress',        completedCriteria: 1, totalCriteria: 3, slackHandle: '@marissa.pavlak' },
+  { learner: 'Michele W.', program: 'Foundations Trail', questId: 'tq-admin-challenge',  assignedDate: '2026-07-15', status: 'In Progress',        completedCriteria: 1, totalCriteria: 3, slackHandle: '@michele.ward' },
 ];
 
 const STATUS_CONFIG: Record<LearnerDelivery['status'], { cls: string; dot: string }> = {
