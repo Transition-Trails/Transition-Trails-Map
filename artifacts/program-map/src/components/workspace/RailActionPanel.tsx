@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import { X, CheckCircle2, Pencil, Hash, Send, Sparkles, Save, MessageSquare } from 'lucide-react';
+import { X, CheckCircle2, Hash, Sparkles, Save, MessageSquare } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionPanelConfig } from '@/types/actionPanel';
 import { useAppContext } from '@/context/AppContext';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { TERMS } from '@/config/terminology';
 import { promptVariables } from '@/data/pennyPromptStudioData';
 
@@ -251,9 +252,7 @@ interface RailActionPanelProps {
 }
 
 export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
-  const [values,    setValues]    = useState<Record<string, string>>({});
-  const [savedMode, setSavedMode] = useState<'idle' | 'saved' | 'notified'>('idle');
-  const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
+  const { user } = useGoogleAuth();
 
   const {
     title, objectType, subtitle, fields,
@@ -265,6 +264,18 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
     onSaveAndView,
     pennyPrompt,
   } = config;
+
+  // Seed form values from field defaults; pre-fill _owner with the signed-in user.
+  const [values, setValues] = useState<Record<string, string>>(() => {
+    const seed: Record<string, string> = {};
+    for (const f of fields) {
+      if (f.default !== undefined && f.default !== '') seed[f.id] = f.default;
+    }
+    if (user?.name) seed['_owner'] = user.name;
+    return seed;
+  });
+  const [savedMode, setSavedMode] = useState<'idle' | 'saved' | 'notified'>('idle');
+  const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
 
   function handleFocusWithPenny() {
     setPendingPennyQuery(pennyPrompt ?? '');
@@ -371,14 +382,6 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
       {/* Form */}
       <ScrollArea className="flex-1">
         <div className="px-4 py-3 space-y-3.5">
-
-          {/* Prototype notice */}
-          <div className="rounded border border-[#FFD08A] bg-[#FFF3E0]/60 px-2.5 py-2 flex items-start gap-1.5">
-            <Pencil className="w-3 h-3 text-[#CC8400] shrink-0 mt-0.5" />
-            <p className="text-[14px] text-[#CC8400] leading-snug">
-              <strong>Prototype:</strong> New items appear immediately but reset on refresh.
-            </p>
-          </div>
 
           {fields.map(field => (
             <div key={field.id} className="space-y-1">

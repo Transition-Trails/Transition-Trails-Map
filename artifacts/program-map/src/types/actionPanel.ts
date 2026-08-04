@@ -3,6 +3,8 @@ export interface ActionField {
   label: string;
   type: 'text' | 'textarea' | 'select';
   placeholder?: string;
+  /** Pre-fills the field with this value when the panel opens */
+  default?: string;
   options?: string[];
   required?: boolean;
   hint?: string;
