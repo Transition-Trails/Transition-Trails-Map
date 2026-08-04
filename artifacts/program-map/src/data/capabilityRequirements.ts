@@ -2,6 +2,12 @@
 // Defines what must be in place before each capability can be configured and
 // activated. Consumed by useCapabilityPreflight (live SF checks) and the
 // PennyCapabilityRegistry UI (display + Penny guidance).
+//
+// CAPABILITY_REQUIREMENTS is typed as Record<CapabilityId, ...> so TypeScript
+// will fail if a new ID is added to CapabilityId without a matching entry here.
+// The same constraint applies to BACKEND_REQUIREMENTS in api-server/src/routes/penny.ts.
+
+import type { CapabilityId } from '@workspace/api-zod';
 
 export type RequirementKind =
   | 'sf-field'        // a specific field on a specific SF object
@@ -24,7 +30,7 @@ export interface CapabilityRequirement {
   pennyMissingNote: string;
 }
 
-export const CAPABILITY_REQUIREMENTS: Record<string, CapabilityRequirement[]> = {
+export const CAPABILITY_REQUIREMENTS: Record<CapabilityId, CapabilityRequirement[]> = {
 
   'cap-learner-coaching': [
     {
@@ -254,5 +260,7 @@ const DEFAULT_REQUIREMENTS: CapabilityRequirement[] = [
 ];
 
 export function getRequirements(capabilityId: string): CapabilityRequirement[] {
-  return CAPABILITY_REQUIREMENTS[capabilityId] ?? DEFAULT_REQUIREMENTS;
+  // Cast to Record<string, ...> for the runtime lookup; the Record<CapabilityId, ...>
+  // annotation above already guarantees every CapabilityId has an entry at compile time.
+  return (CAPABILITY_REQUIREMENTS as Record<string, CapabilityRequirement[]>)[capabilityId] ?? DEFAULT_REQUIREMENTS;
 }

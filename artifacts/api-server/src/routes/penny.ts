@@ -26,6 +26,7 @@ import { logger } from "../lib/logger.js";
 import { db } from "@workspace/db";
 import { pennyLogsTable } from "@workspace/db/schema";
 import { desc, gte, sql } from "drizzle-orm";
+import type { CapabilityId } from "@workspace/api-zod";
 
 const router = Router();
 
@@ -468,7 +469,10 @@ interface BReq {
   pennyMissingNote: string;
 }
 
-const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
+// satisfies Record<CapabilityId, BReq[]> ensures TypeScript fails at compile
+// time if any capability ID present in the shared CapabilityId union is missing
+// from this map.  Add the new ID to CapabilityId first, then add the entry here.
+const BACKEND_REQUIREMENTS = {
   'cap-learner-coaching': [
     { id: 'salesforce-connected', label: 'Salesforce integration connected', kind: 'integration', integrationKey: 'salesforce', fixRoute: '/admin/integrations', fixLabel: 'Open Integrations', pennyMissingNote: 'Without a Salesforce connection I have no learner context.' },
     { id: 'sf-contact-accessible', label: 'Contact object accessible in Salesforce', kind: 'sf-object', sfObject: 'Contact', pennyMissingNote: 'I read the Contact record to know who I\'m coaching.' },
@@ -508,7 +512,7 @@ const BACKEND_REQUIREMENTS: Record<string, BReq[]> = {
     { id: 'cap-learner-coaching-active', label: 'Learner Coaching capability active', kind: 'config', capabilityDep: 'cap-learner-coaching', fixRoute: '/penny/capabilities', fixLabel: 'Enable Learner Coaching', pennyMissingNote: 'Progress Insights builds on Learner Coaching context. Enable that first.' },
     { id: 'sf-program-engagement', label: 'pmdm__ProgramEngagement__c accessible', kind: 'sf-object', sfObject: 'pmdm__ProgramEngagement__c', pennyMissingNote: 'I track what each learner has completed by reading their Program_Engagement__c record.' },
   ],
-};
+} satisfies Record<CapabilityId, BReq[]>;
 
 const DEFAULT_BACKEND_REQUIREMENTS: BReq[] = [
   { id: 'salesforce-connected', label: 'Salesforce integration connected', kind: 'integration', integrationKey: 'salesforce', fixRoute: '/admin/integrations', fixLabel: 'Open Integrations', pennyMissingNote: 'I need a Salesforce connection to access learner and program data.' },
@@ -519,7 +523,9 @@ const DEFAULT_BACKEND_REQUIREMENTS: BReq[] = [
 
 router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> => {
   const capabilityId = req.params["id"] ?? "";
-  const requirements = BACKEND_REQUIREMENTS[capabilityId] ?? DEFAULT_BACKEND_REQUIREMENTS;
+  // Cast to Record<string, BReq[]> for the runtime lookup; the satisfies constraint
+  // above already guarantees every CapabilityId has an entry at compile time.
+  const requirements = (BACKEND_REQUIREMENTS as Record<string, BReq[]>)[capabilityId] ?? DEFAULT_BACKEND_REQUIREMENTS;
 
   // Attempt to get an authenticated SF fetch function
   let proxyFetch: SfFetchFn | null = null;
