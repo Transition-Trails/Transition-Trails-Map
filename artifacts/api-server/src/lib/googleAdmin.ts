@@ -16,9 +16,10 @@ interface CachedToken {
   expiresAt: number; // ms epoch
 }
 
-// ── Module-level token cache ───────────────────────────────────────────────────
+// ── Module-level token caches ──────────────────────────────────────────────────
 
-let _cache: CachedToken | null = null;
+let _cache:      CachedToken | null = null; // group.member scope
+let _userCache:  CachedToken | null = null; // user.readonly scope
 
 // ── Service Account JWT ────────────────────────────────────────────────────────
 
@@ -34,14 +35,14 @@ function parseServiceAccountKey(): ServiceAccountKey | null {
   }
 }
 
-function createJWT(key: ServiceAccountKey, impersonate: string): string {
+function createJWT(key: ServiceAccountKey, impersonate: string, scope: string): string {
   const now = Math.floor(Date.now() / 1000);
 
   const header  = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(JSON.stringify({
     iss:   key.client_email,
     sub:   impersonate,
-    scope: 'https://www.googleapis.com/auth/admin.directory.group.member.readonly',
+    scope,
     aud:   'https://oauth2.googleapis.com/token',
     iat:   now,
     exp:   now + 3600,
@@ -107,32 +108,56 @@ async function tokenFromRefreshToken(): Promise<string | null> {
  *
  * Tokens are cached in memory for 50 minutes to avoid repeated JWT exchanges.
  */
-export async function getAdminAccessToken(): Promise<string | null> {
-  if (_cache && Date.now() < _cache.expiresAt - 60_000) return _cache.token;
+async function getTokenWithScope(
+  scope: string,
+  cache: CachedToken | null,
+  setCache: (c: CachedToken) => void,
+): Promise<string | null> {
+  if (cache && Date.now() < cache.expiresAt - 60_000) return cache.token;
 
   const key = parseServiceAccountKey();
   const impersonate = process.env.GOOGLE_ADMIN_IMPERSONATE_EMAIL?.trim();
 
   if (key && impersonate) {
     try {
-      const jwt   = createJWT(key, impersonate);
+      const jwt   = createJWT(key, impersonate, scope);
       const token = await exchangeJWTForToken(jwt);
       if (token) {
-        _cache = { token, expiresAt: Date.now() + 50 * 60_000 };
+        setCache({ token, expiresAt: Date.now() + 50 * 60_000 });
         return token;
       }
-    } catch {
-      // fall through to refresh token
+    } catch { /* fall through */ }
+  }
+
+  // group-member scope falls back to refresh token; user scope does not
+  if (scope.includes('group')) {
+    const fallback = await tokenFromRefreshToken();
+    if (fallback) {
+      setCache({ token: fallback, expiresAt: Date.now() + 55 * 60_000 });
+      return fallback;
     }
   }
 
-  const fallback = await tokenFromRefreshToken();
-  if (fallback) {
-    _cache = { token: fallback, expiresAt: Date.now() + 55 * 60_000 };
-    return fallback;
-  }
-
   return null;
+}
+
+export async function getAdminAccessToken(): Promise<string | null> {
+  return getTokenWithScope(
+    'https://www.googleapis.com/auth/admin.directory.group.member.readonly',
+    _cache,
+    c => { _cache = c; },
+  );
+}
+
+/** Token scoped for reading user profiles (admin.directory.user.readonly).
+ *  Requires this scope to be added to DWD in Google Workspace Admin.
+ *  Returns null if not authorized — callers should degrade gracefully. */
+export async function getAdminUserAccessToken(): Promise<string | null> {
+  return getTokenWithScope(
+    'https://www.googleapis.com/auth/admin.directory.user.readonly',
+    _userCache,
+    c => { _userCache = c; },
+  );
 }
 
 export type AdminDirectoryMethod = 'service-account' | 'refresh-token' | 'none';

@@ -1,10 +1,10 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import {
   Users, Shield, Star, Brain, Globe, Chrome, Network, Mail,
   CheckCircle2, XCircle, MinusCircle,
   ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronRight,
-  Pencil, UserCheck, AlertTriangle, Save,
+  Pencil, UserCheck, AlertTriangle, Save, ChevronDown,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -891,6 +891,152 @@ const TIER_BADGE: Record<string, string> = {
   superadmin: 'bg-primary/10 text-primary border-primary/20',
 };
 
+// ── UserPicker ─────────────────────────────────────────────────────────────────
+
+interface StaffUser { name: string; email: string; }
+
+function UserPicker({
+  value,
+  onChange,
+}: {
+  value: { owner: string; ownerEmail: string };
+  onChange: (v: { owner: string; ownerEmail: string }) => void;
+}) {
+  const [users,    setUsers]    = useState<StaffUser[]>([]);
+  const [loading,  setLoading]  = useState(false);
+  const [query,    setQuery]    = useState('');
+  const [open,     setOpen]     = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Fetch users once on mount
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/admin/staff-users')
+      .then(r => r.ok ? r.json() : null)
+      .then((data: { users: StaffUser[] } | null) => {
+        if (data?.users) setUsers(data.users);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handle(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return users;
+    const q = query.toLowerCase();
+    return users.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+  }, [users, query]);
+
+  const selected = value.ownerEmail
+    ? users.find(u => u.email === value.ownerEmail) ?? { name: value.owner, email: value.ownerEmail }
+    : null;
+
+  function select(u: StaffUser) {
+    onChange({ owner: u.name || u.email.split('@')[0], ownerEmail: u.email });
+    setQuery('');
+    setOpen(false);
+  }
+
+  function clear() {
+    onChange({ owner: '', ownerEmail: '' });
+    setQuery('');
+  }
+
+  return (
+    <div ref={wrapRef} className="relative">
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className={`w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md border text-[14px] bg-background transition-colors ${
+          open ? 'border-primary ring-1 ring-primary/20' : 'border-border hover:border-ring/50'
+        }`}
+      >
+        {selected ? (
+          <span className="flex items-center gap-2 min-w-0">
+            <span className="font-medium text-foreground truncate">{selected.name || selected.email}</span>
+            <span className="text-muted-foreground truncate text-[13px]">{selected.email}</span>
+          </span>
+        ) : (
+          <span className="text-muted-foreground/50">{loading ? 'Loading people…' : 'Select a person…'}</span>
+        )}
+        <span className="flex items-center gap-1 flex-shrink-0">
+          {selected && (
+            <span
+              role="button"
+              onClick={e => { e.stopPropagation(); clear(); }}
+              className="p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-3 h-3" />
+            </span>
+          )}
+          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+        </span>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-background shadow-lg overflow-hidden">
+          {/* Search */}
+          <div className="p-2 border-b border-border/60">
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/50" />
+              <input
+                autoFocus
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search by name or email…"
+                className="w-full pl-6 pr-2 py-1 text-[13px] rounded border border-border bg-background outline-none focus:border-primary"
+              />
+            </div>
+          </div>
+
+          {/* Options */}
+          <div className="max-h-48 overflow-y-auto">
+            {loading && (
+              <p className="px-3 py-2 text-[13px] text-muted-foreground">Loading…</p>
+            )}
+            {!loading && filtered.length === 0 && (
+              <p className="px-3 py-2 text-[13px] text-muted-foreground">No people found</p>
+            )}
+            {filtered.map(u => (
+              <button
+                key={u.email}
+                type="button"
+                onClick={() => select(u)}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/60 transition-colors ${
+                  selected?.email === u.email ? 'bg-primary/8' : ''
+                }`}
+              >
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-[11px] font-semibold text-primary">
+                    {(u.name || u.email).charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[14px] font-medium text-foreground truncate">{u.name || u.email}</p>
+                  <p className="text-[12px] text-muted-foreground truncate">{u.email}</p>
+                </div>
+                {selected?.email === u.email && <CheckCircle2 className="w-3.5 h-3.5 text-primary ml-auto flex-shrink-0" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── RoleOwnersTab ──────────────────────────────────────────────────────────────
+
 function RoleOwnersTab() {
   const { platformRoles: roles, setPlatformRoles: setRoles } = useAppContext();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -1022,27 +1168,14 @@ function RoleOwnersTab() {
                 {isEditing ? (
                   <div className="space-y-2 pt-1 border-t border-border/40">
                     <p className="text-[14px] font-bold text-muted-foreground/60">Assign Owner</p>
-                    <div className="flex gap-2">
-                      <input
-                        autoFocus
-                        type="text"
-                        placeholder="Full name"
-                        value={draft.owner}
-                        onChange={e => setDraft(d => ({ ...d, owner: e.target.value }))}
-                        className="flex-1 text-[14px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email address"
-                        value={draft.ownerEmail}
-                        onChange={e => setDraft(d => ({ ...d, ownerEmail: e.target.value }))}
-                        className="flex-1 text-[14px] px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:border-primary placeholder:text-muted-foreground/40"
-                      />
-                    </div>
+                    <UserPicker
+                      value={draft}
+                      onChange={v => setDraft(v)}
+                    />
                     <div className="flex gap-2">
                       <button
                         onClick={() => { void saveEdit(role.id); }}
-                        disabled={saving}
+                        disabled={saving || !draft.ownerEmail}
                         className="flex items-center gap-1.5 text-[14px] font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity disabled:opacity-60"
                       >
                         <Save className="w-3 h-3" /> {saving ? 'Saving…' : 'Save'}

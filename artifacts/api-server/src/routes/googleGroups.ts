@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAdminAccessToken, getAdminDirectoryStatus } from "../lib/googleAdmin";
+import { getAdminAccessToken, getAdminUserAccessToken, getAdminDirectoryStatus } from "../lib/googleAdmin";
 
 const router = Router();
 
@@ -76,6 +76,71 @@ router.get('/admin/google-groups', async (_req, res) => {
     groups:      results,
     syncedAt:    new Date().toISOString(),
   });
+});
+
+// ── GET /admin/staff-users ────────────────────────────────────────────────────
+// Returns all org users with name + email.
+// Tries admin.directory.user.readonly first (needs that scope in DWD);
+// falls back to aggregating unique emails from all Trail OS groups.
+router.get('/admin/staff-users', async (_req, res) => {
+  const status = getAdminDirectoryStatus();
+
+  if (!status.configured) {
+    res.json({ users: [], source: 'none' });
+    return;
+  }
+
+  // ── Attempt 1: full user list via user.readonly scope ──────────────────────
+  try {
+    const userToken = await getAdminUserAccessToken();
+    if (userToken) {
+      const impersonate = process.env.GOOGLE_ADMIN_IMPERSONATE_EMAIL?.trim() ?? '';
+      const domain = impersonate.split('@')[1] ?? 'transitiontrails.org';
+      const url = `https://admin.googleapis.com/admin/directory/v1/users?domain=${encodeURIComponent(domain)}&maxResults=200&orderBy=email`;
+      const r = await fetch(url, { headers: { Authorization: `Bearer ${userToken}` } });
+      if (r.ok) {
+        const data = await r.json() as {
+          users?: Array<{ primaryEmail: string; name?: { fullName?: string; givenName?: string; familyName?: string } }>;
+        };
+        if (data.users?.length) {
+          const users = data.users.map(u => ({
+            name:  u.name?.fullName ?? `${u.name?.givenName ?? ''} ${u.name?.familyName ?? ''}`.trim() ?? '',
+            email: u.primaryEmail,
+          })).filter(u => u.email);
+          res.json({ users, source: 'directory' });
+          return;
+        }
+      }
+    }
+  } catch { /* fall through to group members */ }
+
+  // ── Attempt 2: aggregate unique emails from group members ──────────────────
+  try {
+    const groupToken = await getAdminAccessToken();
+    if (groupToken) {
+      const allMembers = await Promise.all(
+        TRAIL_OS_GROUPS.map(g => getGroupMembers(g.email, groupToken)),
+      );
+      const seen = new Set<string>();
+      const users: { name: string; email: string }[] = [];
+      for (const members of allMembers) {
+        for (const m of members) {
+          if (!seen.has(m.email)) {
+            seen.add(m.email);
+            // Derive a display name from email local-part (angela.landrith → Angela Landrith)
+            const local = m.email.split('@')[0] ?? '';
+            const name  = local.split(/[._-]/).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+            users.push({ name, email: m.email });
+          }
+        }
+      }
+      users.sort((a, b) => a.name.localeCompare(b.name));
+      res.json({ users, source: 'groups' });
+      return;
+    }
+  } catch { /* fall through */ }
+
+  res.json({ users: [], source: 'none' });
 });
 
 export default router;
