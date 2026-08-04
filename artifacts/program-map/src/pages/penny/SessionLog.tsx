@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Clock, Users, CalendarDays, RefreshCw, Plus, X,
-  ChevronDown, ChevronUp, CheckCircle2, AlertCircle, Loader2,
+  ChevronDown, ChevronUp, CheckCircle2, AlertCircle, Loader2, Search,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -26,10 +26,18 @@ interface CreateForm {
   sessionDate: string;
   coachName: string;
   learnerName: string;
+  learnerId: string;
   program: string;
   durationMinutes: string;
   notes: string;
   status: string;
+}
+
+interface LearnerOption {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -47,11 +55,120 @@ const EMPTY_FORM: CreateForm = {
   sessionDate: new Date().toISOString().slice(0, 10),
   coachName: '',
   learnerName: '',
+  learnerId: '',
   program: '',
   durationMinutes: '',
   notes: '',
   status: 'Completed',
 };
+
+// ── Learner picker combobox ────────────────────────────────────────────────────
+
+function LearnerPicker({
+  value, learnerId, onChange,
+}: {
+  value: string;
+  learnerId: string;
+  onChange: (name: string, id: string) => void;
+}) {
+  const [query, setQuery]       = useState(value);
+  const [open, setOpen]         = useState(false);
+  const [learners, setLearners] = useState<LearnerOption[]>([]);
+  const [loading, setLoading]   = useState(false);
+  const wrapRef                 = useRef<HTMLDivElement>(null);
+
+  // Fetch learners once on first focus
+  const loaded = useRef(false);
+  function ensureLoaded() {
+    if (loaded.current) return;
+    loaded.current = true;
+    setLoading(true);
+    fetch('/api/learners/directory')
+      .then(r => r.ok ? r.json() as Promise<LearnerOption[]> : [])
+      .then(data => setLearners(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const filtered = query.trim().length === 0
+    ? learners.slice(0, 20)
+    : learners.filter(l =>
+        `${l.firstName} ${l.lastName}`.toLowerCase().includes(query.toLowerCase()) ||
+        l.email.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 20);
+
+  function select(l: LearnerOption) {
+    const name = `${l.firstName} ${l.lastName}`.trim();
+    setQuery(name);
+    onChange(name, l.id);
+    setOpen(false);
+  }
+
+  function handleClear() {
+    setQuery('');
+    onChange('', '');
+  }
+
+  const inputCls = "w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-ring";
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50 pointer-events-none" />
+        <input
+          type="text"
+          value={query}
+          placeholder="Search learners…"
+          className={`${inputCls} pl-8 pr-8`}
+          onFocus={() => { ensureLoaded(); setOpen(true); }}
+          onChange={e => { setQuery(e.target.value); onChange('', ''); setOpen(true); }}
+        />
+        {query && (
+          <button type="button" onClick={handleClear} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Selected badge */}
+      {learnerId && (
+        <p className="text-[11px] text-[#2F6B3F] mt-0.5">✓ Linked to Salesforce record</p>
+      )}
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-lg max-h-52 overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center gap-1.5 py-4 text-[13px] text-muted-foreground">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading learners…
+            </div>
+          ) : filtered.length === 0 ? (
+            <p className="py-4 text-center text-[13px] text-muted-foreground">No learners found</p>
+          ) : filtered.map(l => (
+            <button
+              key={l.id}
+              type="button"
+              onMouseDown={() => select(l)}
+              className="w-full text-left px-3 py-2 hover:bg-muted/50 transition-colors"
+            >
+              <p className="text-[13px] font-medium text-foreground">{l.firstName} {l.lastName}</p>
+              {l.email && <p className="text-[11px] text-muted-foreground">{l.email}</p>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -160,12 +277,13 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
         body:    JSON.stringify({
           sessionType:     form.sessionType,
           sessionDate:     form.sessionDate,
-          coachName:       form.coachName   || undefined,
-          learnerName:     form.learnerName || undefined,
-          program:         form.program     || undefined,
+          coachName:       form.coachName    || undefined,
+          learnerName:     form.learnerName  || undefined,
+          learnerId:       form.learnerId    || undefined,
+          program:         form.program      || undefined,
           durationMinutes: form.durationMinutes ? parseInt(form.durationMinutes, 10) : undefined,
-          notes:           form.notes       || undefined,
-          status:          form.status      || undefined,
+          notes:           form.notes        || undefined,
+          status:          form.status       || undefined,
         }),
       });
       if (!res.ok) {
@@ -228,7 +346,11 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
         </div>
         <div>
           <label className="text-[14px] font-bold  text-muted-foreground/60 mb-1 block">Learner Name</label>
-          <input value={form.learnerName} onChange={e => set('learnerName', e.target.value)} placeholder="e.g. Jordan Lee" className={inputCls} />
+          <LearnerPicker
+            value={form.learnerName}
+            learnerId={form.learnerId}
+            onChange={(name, id) => setForm(f => ({ ...f, learnerName: name, learnerId: id }))}
+          />
         </div>
       </div>
 
@@ -252,9 +374,9 @@ function LogForm({ onSuccess }: { onSuccess: () => void }) {
         <textarea
           value={form.notes}
           onChange={e => set('notes', e.target.value)}
-          rows={3}
-          placeholder="Key takeaways, next steps, observations…"
-          className={`${inputCls} resize-none`}
+          rows={8}
+          placeholder={`Key takeaways, next steps, observations…\n\nTip: Include what the learner shared, any blockers raised, goals for the next session, and any follow-up actions.`}
+          className={`${inputCls} resize-y min-h-[120px]`}
         />
       </div>
 
