@@ -249,29 +249,65 @@ router.post("/penny/ask", async (req, res) => {
     { role: 'user' as const, parts: [{ text: userText }] },
   ];
 
-  // ── Call Gemini 2.5 Flash via REST ────────────────────────────────────────
+  // ── Call Gemini 2.5 Flash via REST (with overload retries) ──────────────
   const model = "gemini-2.5-flash";
   const url   = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
+  const geminiBody = JSON.stringify({
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents,
+    generationConfig: {
+      maxOutputTokens: 4096,
+      temperature: 0.7,
+    },
+  });
+
+  /** True when the Gemini response signals a transient overload. */
+  function isOverloaded(status: number, msg: string): boolean {
+    return status === 503 || status === 429 ||
+      /high demand|overload|resource.has.been.exhausted|quota/i.test(msg);
+  }
+
+  const MAX_ATTEMPTS = 3;
+  let lastStatus = 502;
+  let lastErrMsg  = '';
+
   try {
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents,
-        generationConfig: {
-          maxOutputTokens: 4096,
-          temperature: 0.7,
-        },
-      }),
-      signal: AbortSignal.timeout(30_000),
-    });
+    let resp: Response | null = null;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      if (attempt > 1) {
+        // exponential back-off: 1s → 2s
+        await new Promise(r => setTimeout(r, (attempt - 1) * 1000));
+      }
+      resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: geminiBody,
+        signal: AbortSignal.timeout(30_000),
+      });
+
+      if (resp.ok) break;
+
+      const errBody = await resp.json().catch(() => ({})) as { error?: { message?: string } };
+      lastStatus  = resp.status;
+      lastErrMsg  = errBody.error?.message ?? `Gemini API returned HTTP ${resp.status}`;
+
+      if (!isOverloaded(resp.status, lastErrMsg)) break; // non-retryable error
+      // else loop and retry
+      resp = null;
+    }
+
+    if (!resp) {
+      // All attempts hit an overload — return a friendly message
+      return res.status(503).json({
+        error: "Penny is temporarily busy due to high demand. Please try again in a moment.",
+        retryable: true,
+      });
+    }
 
     if (!resp.ok) {
-      const body = await resp.json().catch(() => ({})) as { error?: { message?: string } };
-      const msg  = body.error?.message ?? `Gemini API returned HTTP ${resp.status}`;
-      return res.status(502).json({ error: msg });
+      return res.status(502).json({ error: lastErrMsg });
     }
 
     const body = await resp.json() as {

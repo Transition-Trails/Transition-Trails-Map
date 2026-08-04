@@ -117,6 +117,7 @@ interface Message {
   time: string;
   durationMs?: number;
   error?: boolean;
+  retryable?: boolean;
   sources?: Source[];
   retrievalMs?: number;
 }
@@ -251,6 +252,7 @@ export function AskPennyPanel() {
   const bottomRef      = useRef<HTMLDivElement>(null);
   const inputRef       = useRef<HTMLInputElement>(null);
   const pendingFireRef = useRef(false);
+  const lastQueryRef   = useRef<string>('');
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -292,9 +294,10 @@ export function AskPennyPanel() {
     return () => window.removeEventListener('keydown', onKey);
   }, [askPennyOpen, setAskPennyOpen]);
 
-  async function send() {
-    const text = input.trim();
+  async function send(retryText?: string) {
+    const text = retryText ?? input.trim();
     if (!text || loading) return;
+    lastQueryRef.current = text;
 
     const history = buildHistory(messages);
     const userMsg: Message = { role: 'user', content: text, time: ts() };
@@ -336,12 +339,12 @@ export function AskPennyPanel() {
         }),
       });
 
-      const data = await resp.json() as { reply?: string; error?: string; durationMs?: number };
+      const data = await resp.json() as { reply?: string; error?: string; durationMs?: number; retryable?: boolean };
 
       if (!resp.ok || data.error) {
         setMessages(prev => [...prev, {
           role: 'penny', content: data.error ?? 'Something went wrong. Please try again.',
-          time: ts(), error: true,
+          time: ts(), error: true, retryable: data.retryable ?? false,
         }]);
       } else {
         setLastMs(data.durationMs ?? null);
@@ -481,6 +484,17 @@ export function AskPennyPanel() {
                           ? <PennyMessageContent content={m.content} onNavigate={handleRouteLink} />
                           : <p className="text-[14px] leading-relaxed whitespace-pre-wrap">{m.content}</p>
                         }
+                        {m.error && m.retryable && i === messages.length - 1 && (
+                          <button
+                            onClick={() => {
+                              setMessages(prev => prev.slice(0, -1));
+                              void send(lastQueryRef.current);
+                            }}
+                            className="mt-2 flex items-center gap-1 text-[13px] font-semibold text-[#A93F2F] hover:text-[#7A2E22] underline underline-offset-2"
+                          >
+                            ↺ Try again
+                          </button>
+                        )}
                         {m.time !== '—' && (
                           <p className={`text-[14px] mt-1 ${
                             m.role === 'user' ? 'text-primary-foreground/50 text-right' : 'text-muted-foreground'
