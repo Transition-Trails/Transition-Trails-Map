@@ -1311,8 +1311,10 @@ router.post("/salesforce/governance/build-items", withClient(async (req, res, cl
 // rather than executing an unfiltered query that would dump every automation
 // record in the org.
 //
-// The probe uses the same getCustomFields helper used by the preflight validate
-// endpoint, so this check is always live rather than relying on a cached result.
+// The probe result is cached in opsCache for PICKLIST_CACHE_TTL (1 hour) to
+// avoid a redundant describe call on every request.  A cache miss still does a
+// live describe; only successful (non-error, non-rate-limited) results are
+// cached, so a transient failure always retries on the next request.
 //
 // All four fields have been confirmed provisioned on the org via
 // probe-governance-fields.ts.  The runtime describe guard remains as a safety
@@ -1331,42 +1333,65 @@ router.get("/salesforce/governance/automations", async (req, res) => {
     return res.status(401).json({ error: "Not connected to Salesforce." });
   }
 
-  // Probe whether the four required filter fields are provisioned.
-  const { found, error: describeError, undetermined } = await getCustomFields(
-    proxyFetch,
-    "TT_Automation__c",
-  );
+  // Probe whether the four required filter fields are provisioned, then cache
+  // the "all fields confirmed" result so the describe is not repeated on every
+  // request.  The cache key is scoped to the session user (consistent with all
+  // other handlers here).
+  //
+  // Cache semantics:
+  //   • A hit means all required fields were confirmed present on a prior
+  //     request — skip the describe and go straight to SOQL.
+  //   • A miss (or expired entry) always does a live describe.
+  //   • Only a result where ALL required fields are present is cached.
+  //     Errors, rate-limits, and partial field sets are never cached so the
+  //     next request always retries live.
+  const cacheNs = req.session.sfUserId ?? "system";
+  const describeCacheKey = `${cacheNs}:describe:TT_Automation__c:fields`;
 
-  if (undetermined) {
-    // Rate-limited — cannot confirm field presence; refuse to query rather than
-    // risk an unfiltered dump.
-    return res.status(503).json({
-      error: "TT_Automation__c field describe was rate-limited. Retry after a moment.",
-      phase2Deferred: true,
-    });
-  }
+  const cachedOk = opsCache.get(describeCacheKey);
+  const fieldsAlreadyConfirmed = cachedOk !== undefined && Date.now() - cachedOk.ts < PICKLIST_CACHE_TTL;
 
-  if (describeError) {
-    return res.status(503).json({
-      error: `TT_Automation__c describe failed: ${describeError}`,
-      phase2Deferred: true,
-    });
-  }
+  if (!fieldsAlreadyConfirmed) {
+    // Cache miss — run a live describe and enforce the safety guard.
+    const { found, error: describeError, undetermined } = await getCustomFields(
+      proxyFetch,
+      "TT_Automation__c",
+    );
 
-  const missingFields = TT_AUTOMATION_REQUIRED_FIELDS.filter(f => !found.includes(f));
-  if (missingFields.length > 0) {
-    // Required filter fields are not provisioned — refuse to query unfiltered.
-    // This is an explicit safety guard: without Is_Active__c (and the other
-    // three fields) there is no way to restrict the SOQL result set, so every
-    // TT_Automation__c record in the org would be returned.
-    return res.status(503).json({
-      error:
-        `TT_Automation__c cannot be queried: required filter fields are not yet provisioned on the org ` +
-        `(missing: ${missingFields.join(", ")}). ` +
-        `Add the fields in SF Setup and re-run probe-governance-fields.ts before enabling this route.`,
-      phase2Deferred: true,
-      missingFields,
-    });
+    if (undetermined) {
+      // Rate-limited — cannot confirm field presence; refuse to query rather than
+      // risk an unfiltered dump.
+      return res.status(503).json({
+        error: "TT_Automation__c field describe was rate-limited. Retry after a moment.",
+        phase2Deferred: true,
+      });
+    }
+
+    if (describeError) {
+      return res.status(503).json({
+        error: `TT_Automation__c describe failed: ${describeError}`,
+        phase2Deferred: true,
+      });
+    }
+
+    const missingFields = TT_AUTOMATION_REQUIRED_FIELDS.filter(f => !found.includes(f));
+    if (missingFields.length > 0) {
+      // Required filter fields are not provisioned — refuse to query unfiltered.
+      // This is an explicit safety guard: without Is_Active__c (and the other
+      // three fields) there is no way to restrict the SOQL result set, so every
+      // TT_Automation__c record in the org would be returned.
+      return res.status(503).json({
+        error:
+          `TT_Automation__c cannot be queried: required filter fields are not yet provisioned on the org ` +
+          `(missing: ${missingFields.join(", ")}). ` +
+          `Add the fields in SF Setup and re-run probe-governance-fields.ts before enabling this route.`,
+        phase2Deferred: true,
+        missingFields,
+      });
+    }
+
+    // All four required fields confirmed present — cache this for PICKLIST_CACHE_TTL.
+    opsCache.set(describeCacheKey, { data: true, ts: Date.now() });
   }
 
   // All four filter fields confirmed — safe to query with Is_Active__c = true.

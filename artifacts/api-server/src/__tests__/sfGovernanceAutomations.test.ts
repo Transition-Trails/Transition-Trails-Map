@@ -182,13 +182,20 @@ import {
   TtAutomationFieldsNotProvisionedError,
 } from '../lib/salesforceService.js';
 import type { ISalesforceClient } from '../lib/salesforceClient.js';
+import { opsCache } from '../routes/salesforce.js';
 
 // ── Test setup ─────────────────────────────────────────────────────────────────
+//
+// Clear the automation field describe cache before each test so that a
+// successful describe in one test (B1) does not suppress the expected 503
+// responses in subsequent tests (B2/B3/B4).  The key mirrors the route's
+// runtime key when no sfUserId is present on the session ("system" namespace).
 
 beforeEach(() => {
   describeOverrides.clear();
   mockQueryRecords.value = [];
   mockQueryError.value = null;
+  opsCache.delete('system:describe:TT_Automation__c:fields');
 });
 
 // ── A. Unit tests: getAutomations() ───────────────────────────────────────────
