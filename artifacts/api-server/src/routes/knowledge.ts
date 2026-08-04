@@ -820,6 +820,162 @@ router.post("/knowledge/sources", async (req, res): Promise<void> => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// SF KNOWLEDGE ARTICLE ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface SfArticle {
+  id: string;
+  knowledgeArticleId: string;
+  title: string;
+  summary: string | null;
+  articleType: string;
+  publishStatus: string;
+  versionNumber: number | null;
+  createdDate: string;
+  lastModifiedDate: string;
+  isVisibleInApp: boolean;
+  language: string;
+}
+
+interface SfArticleDetail extends SfArticle {
+  body: string | null;
+  urlName: string | null;
+}
+
+// GET /api/knowledge/sf-articles
+// Lists Salesforce Knowledge articles. Optional query params:
+//   status  — 'online' (default) | 'draft' | 'all'
+//   type    — article type filter (e.g. 'FAQ')
+//   q       — title/summary search substring
+router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
+  try {
+    const client = new ConnectorSalesforceClient();
+
+    const statusParam = typeof req.query["status"] === "string" ? req.query["status"] : "online";
+    const typeParam   = typeof req.query["type"]   === "string" ? req.query["type"]   : "";
+    const qParam      = typeof req.query["q"]      === "string" ? req.query["q"]      : "";
+
+    const whereClauses: string[] = [];
+    if (statusParam === "all") {
+      whereClauses.push("PublishStatus IN ('online', 'draft')");
+    } else {
+      whereClauses.push(`PublishStatus = '${statusParam === "draft" ? "draft" : "online"}'`);
+    }
+    if (typeParam) whereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
+    if (qParam)    whereClauses.push(`Title LIKE '%${qParam.replace(/'/g, "\\'")}%'`);
+
+    const where = whereClauses.length ? `WHERE ${whereClauses.join(" AND ")}` : "";
+
+    const soql = `SELECT Id, KnowledgeArticleId, Title, Summary, ArticleType,
+                         PublishStatus, VersionNumber, CreatedDate, LastModifiedDate,
+                         IsVisibleInApp, Language
+                  FROM KnowledgeArticleVersion
+                  ${where}
+                  ORDER BY LastModifiedDate DESC
+                  LIMIT 200`;
+
+    const result = await client.query<{
+      Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
+      ArticleType: string; PublishStatus: string; VersionNumber?: number;
+      CreatedDate: string; LastModifiedDate: string;
+      IsVisibleInApp?: boolean; Language?: string;
+    }>(soql);
+
+    // Derive available article types from result for filter UI
+    const typeSet = new Set(result.records.map(r => r.ArticleType).filter(Boolean));
+
+    const articles: SfArticle[] = result.records.map(r => ({
+      id:                r.Id,
+      knowledgeArticleId: r.KnowledgeArticleId,
+      title:             r.Title,
+      summary:           r.Summary ?? null,
+      articleType:       r.ArticleType,
+      publishStatus:     r.PublishStatus,
+      versionNumber:     r.VersionNumber ?? null,
+      createdDate:       r.CreatedDate,
+      lastModifiedDate:  r.LastModifiedDate,
+      isVisibleInApp:    r.IsVisibleInApp ?? false,
+      language:          r.Language ?? "en_US",
+    }));
+
+    res.json({ articles, total: result.totalSize, articleTypes: Array.from(typeSet) });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch SF Knowledge articles");
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    res.status(502).json({ error: `Salesforce query failed: ${msg}`, articles: [] });
+  }
+});
+
+// GET /api/knowledge/sf-articles/:id
+// Returns full detail for a single article version, including body content.
+// :id is the KnowledgeArticleVersion Id.
+router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const client = new ConnectorSalesforceClient();
+
+    // Fetch the version record for metadata
+    const metaSoql = `SELECT Id, KnowledgeArticleId, Title, Summary, ArticleType,
+                             PublishStatus, VersionNumber, CreatedDate, LastModifiedDate,
+                             IsVisibleInApp, Language, UrlName
+                      FROM KnowledgeArticleVersion
+                      WHERE Id = '${id}'
+                      LIMIT 1`;
+    const metaResult = await client.query<{
+      Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
+      ArticleType: string; PublishStatus: string; VersionNumber?: number;
+      CreatedDate: string; LastModifiedDate: string;
+      IsVisibleInApp?: boolean; Language?: string; UrlName?: string;
+    }>(metaSoql);
+
+    if (!metaResult.records.length) {
+      res.status(404).json({ error: "Article not found" });
+      return;
+    }
+    const meta = metaResult.records[0]!;
+
+    // Attempt to fetch body from the article-type object (Knowledge__kav).
+    // Body field name varies by org — try Body__c, then fall back gracefully.
+    let body: string | null = null;
+    try {
+      const articleType = meta.ArticleType ?? "Knowledge__kav";
+      const kavObject = articleType.replace(/__c$/, "__kav");
+      const bodySoql = `SELECT Id, Body__c
+                        FROM ${kavObject}
+                        WHERE KnowledgeArticleId = '${meta.KnowledgeArticleId}'
+                        AND PublishStatus = '${meta.PublishStatus}'
+                        LIMIT 1`;
+      const bodyResult = await client.query<{ Id: string; Body__c?: string }>(bodySoql);
+      body = bodyResult.records[0]?.Body__c ?? null;
+    } catch {
+      // Body fetch is best-effort — the article type or field may not exist.
+    }
+
+    const article: SfArticleDetail = {
+      id:                meta.Id,
+      knowledgeArticleId: meta.KnowledgeArticleId,
+      title:             meta.Title,
+      summary:           meta.Summary ?? null,
+      articleType:       meta.ArticleType,
+      publishStatus:     meta.PublishStatus,
+      versionNumber:     meta.VersionNumber ?? null,
+      createdDate:       meta.CreatedDate,
+      lastModifiedDate:  meta.LastModifiedDate,
+      isVisibleInApp:    meta.IsVisibleInApp ?? false,
+      language:          meta.Language ?? "en_US",
+      urlName:           meta.UrlName ?? null,
+      body,
+    };
+
+    res.json({ article });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch SF Knowledge article detail");
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    res.status(502).json({ error: `Salesforce query failed: ${msg}` });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // DOCUMENT ROUTES (unchanged)
 // ─────────────────────────────────────────────────────────────────────────────
 
