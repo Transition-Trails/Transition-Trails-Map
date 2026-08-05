@@ -37,11 +37,11 @@ export function ContextPanel() {
   }, [selectedItem]);
 
   useEffect(() => {
-    if (actionPanel) setCollapsed(false);
+    if (actionPanel) { setCollapsed(false); setRightPanelOpen(true); }
   }, [actionPanel]);
 
   useEffect(() => {
-    if (slackPanel) setCollapsed(false);
+    if (slackPanel) { setCollapsed(false); setRightPanelOpen(true); }
   }, [slackPanel]);
 
   const handleChipClick = (type: string, id: string, route?: string) => {

@@ -494,6 +494,21 @@ export function Topbar() {
         </button>
 
         <SignalsIndicator />
+
+        {/* Trail Insights panel toggle — always visible, mirrors Penny/Calendar/Mail pattern */}
+        <button
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
+            rightPanelOpen
+              ? 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/15'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-primary/5 hover:border-primary/25 hover:text-primary'
+          }`}
+          onClick={() => setRightPanelOpen(!rightPanelOpen)}
+          title={rightPanelOpen ? 'Collapse Trail Insights panel' : 'Open Trail Insights panel'}
+        >
+          <Layers className="w-3 h-3 flex-shrink-0" />
+          <span className="hidden sm:inline">Insights</span>
+        </button>
+
         <Button
           variant="ghost" size="icon"
           className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground"

@@ -199,9 +199,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setActiveLens(TIER_CONFIG[tier].defaultLens);
   }
 
-  const openActionPanel  = (cfg: ActionPanelConfig) => { setActionPanel(cfg); setSlackPanel(null); };
+  const openActionPanel  = (cfg: ActionPanelConfig) => { setActionPanel(cfg); setSlackPanel(null); setRightPanelOpen(true); };
   const closeActionPanel = ()                        => setActionPanel(null);
-  const openSlackPanel   = (cfg: SlackPanelConfig)   => { setSlackPanel(cfg); setActionPanel(null); };
+  const openSlackPanel   = (cfg: SlackPanelConfig)   => { setSlackPanel(cfg); setActionPanel(null); setRightPanelOpen(true); };
   const closeSlackPanel  = ()                        => setSlackPanel(null);
 
   const { data: sfProgramsData } = useSfPrograms();
