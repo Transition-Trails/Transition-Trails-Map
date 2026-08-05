@@ -178,7 +178,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Default: everyday — least privilege until the Google session tells us the real tier.
   // Tier is set in InnerApp (App.tsx) once useGoogleAuth resolves the signed-in user.
   const [userTier, setUserTierRaw]      = useState<AccessTier>('everyday');
-  const [selectedItem, setSelectedItem] = useState<AppState['selectedItem']>(null);
+  const [selectedItem, setSelectedItemRaw] = useState<AppState['selectedItem']>(null);
   const [searchOpen, setSearchOpen]     = useState(false);
   const [actionPanel, setActionPanel]   = useState<ActionPanelConfig | null>(null);
   const [slackPanel,  setSlackPanel]    = useState<SlackPanelConfig | null>(null);
@@ -198,6 +198,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUserTierRaw(tier);
     setActiveLens(TIER_CONFIG[tier].defaultLens);
   }
+
+  // Wrapper: selecting an item dismisses Trail Signals / action panels so
+  // renderContent() in ContextPanel can show the item brief / edit form.
+  const setSelectedItem = (item: AppState['selectedItem']) => {
+    setSelectedItemRaw(item);
+    if (item !== null) {
+      setSlackPanel(null);
+      setActionPanel(null);
+      setRightPanelOpen(true);
+    }
+  };
 
   const openActionPanel  = (cfg: ActionPanelConfig) => { setActionPanel(cfg); setSlackPanel(null); setRightPanelOpen(true); };
   const closeActionPanel = ()                        => setActionPanel(null);
@@ -275,7 +286,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   function syncSelected(type: SelectedItemType, id: string, updates: Record<string, any>) {
-    setSelectedItem(prev =>
+    // Use raw setter (functional updater) — syncing existing data doesn't clear panels.
+    setSelectedItemRaw(prev =>
       prev?.type === type && prev.id === id
         ? { ...prev, data: { ...prev.data, ...updates } }
         : prev
