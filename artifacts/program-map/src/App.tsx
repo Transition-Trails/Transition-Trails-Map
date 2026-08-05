@@ -44,6 +44,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
 
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
+import ReleaseNotes        from "@/pages/ReleaseNotes";
 import SalesforceMapping            from "@/pages/curriculum/SalesforceMapping";
 import SalesforceValidationCenter  from "@/pages/curriculum/SalesforceValidationCenter";
 import ProgramResources             from "@/pages/admin/ProgramResources";
@@ -302,6 +303,7 @@ function Router() {
 
       {/* Standalone platform pages */}
       <Route path="/trail-os-overview"       component={TrailOSOverview} />
+      <Route path="/release-notes"           component={ReleaseNotes} />
 
       {/* Administration */}
       <Route path="/admin/setup">             <Redirect to="/admin/integrations" /></Route>

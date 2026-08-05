@@ -270,7 +270,13 @@ export function Sidebar() {
 
         {/* Footer */}
         <div className="px-1 xl:px-3 py-2 border-t border-sidebar-border flex-shrink-0">
-          <p className="hidden xl:block text-[14px] text-muted-foreground/40">Trail OS v1.0 · Internal</p>
+          <a
+            href="/release-notes"
+            onClick={(e) => { e.preventDefault(); window.history.pushState({}, "", "/release-notes"); window.dispatchEvent(new PopStateEvent("popstate")); }}
+            className="hidden xl:block text-[12px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
+          >
+            Trail OS v1.4 · Internal
+          </a>
           <div className="xl:hidden flex justify-center py-0.5">
             <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
           </div>
