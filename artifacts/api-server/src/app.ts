@@ -1,11 +1,12 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import session from "express-session";
-import sessionFileStore from "session-file-store";
+import connectPgSimple from "connect-pg-simple";
 import pinoHttp from "pino-http";
 import passport from "passport";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { pool } from "@workspace/db";
 
 const SESSION_SECRET = process.env["SESSION_SECRET"];
 if (!SESSION_SECRET) {
@@ -16,7 +17,7 @@ if (!SESSION_SECRET) {
   );
 }
 
-const FileStore = sessionFileStore(session);
+const PgStore = connectPgSimple(session);
 
 const app: Express = express();
 
@@ -45,11 +46,11 @@ app.use(
     secret:            SESSION_SECRET,
     resave:            false,
     saveUninitialized: false,
-    store: new FileStore({
-      path:    '/tmp/sessions',
-      ttl:     7 * 24 * 60 * 60,
-      retries: 1,
-      logFn:   () => {},
+    store: new PgStore({
+      pool,
+      tableName:            'session',
+      createTableIfMissing: true,
+      ttl:                  7 * 24 * 60 * 60,
     }),
     cookie: {
       httpOnly: true,
