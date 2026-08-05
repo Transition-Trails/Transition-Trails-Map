@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 
 export type ArticleStatus = 'draft' | 'pending-review' | 'approved' | 'published';
 
+export type ReviewCycle = 'Monthly' | 'Quarterly' | 'Yearly';
+
 export interface KnowledgeArticle {
   id: string;
   title: string;
@@ -9,6 +11,7 @@ export interface KnowledgeArticle {
   body: string;
   category: string;
   articleType: string;
+  reviewCycle: ReviewCycle;
   urlName: string;
   status: ArticleStatus;
   authoredBy: string | null;
@@ -29,6 +32,7 @@ export interface ArticleFormData {
   body: string;
   category: string;
   articleType: string;
+  reviewCycle: ReviewCycle;
   urlName?: string;
 }
 
