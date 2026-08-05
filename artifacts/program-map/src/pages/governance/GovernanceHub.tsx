@@ -7,7 +7,7 @@ import { useAppContext } from '@/context/AppContext';
 import type { ActionItem } from '@/components/workspace/ActionBar';
 import {
   Shield, GitBranch, Users, CheckSquare, RotateCcw,
-  BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight, Plus, Hash,
+  BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight, Plus, Hash, ExternalLink,
 } from 'lucide-react';
 import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import {
@@ -412,6 +412,12 @@ function ApprovalsTab() {
 
 // ── Tab 5: Review Cycles ──────────────────────────────────────────────────────
 
+interface OverdueArticle {
+  articleId:    string;
+  title:        string | null;
+  overdueSince: string;
+}
+
 interface ArticleReviewStats {
   totalReviewed:     number;
   overdue:           number;
@@ -421,6 +427,7 @@ interface ArticleReviewStats {
   nextDueSoonest:    string | null;
   lastReviewedAt:    string | null;
   lastReviewedBy:    string | null;
+  overdueArticles:   OverdueArticle[];
 }
 
 function fmtReviewDate(iso: string | null): string {
@@ -429,6 +436,8 @@ function fmtReviewDate(iso: string | null): string {
 }
 
 function ReviewCyclesTab() {
+  const [showOverdueArticles, setShowOverdueArticles] = useState(false);
+
   const { data: liveData, isLoading: liveLoading } = useQuery<{ knowledgeArticles: ArticleReviewStats }>({
     queryKey: ['governance-review-cycles'],
     queryFn: async () => {
@@ -521,24 +530,80 @@ function ReviewCyclesTab() {
               </tr>
             </thead>
             <tbody>
-              {enrichedCycles.map((r, i) => (
-                <tr
-                  key={r.objectTypeId}
-                  className={`border-b border-border/40 ${i % 2 === 0 ? 'bg-white' : 'bg-muted/20'} ${r.objectTypeId === 'knowledge-article' && live ? 'ring-1 ring-inset ring-primary/10' : ''}`}
-                >
-                  <td className="px-3 py-2 font-semibold text-foreground whitespace-nowrap">
-                    {r.objectTypeName}
-                    {r.objectTypeId === 'knowledge-article' && live && (
-                      <span className="ml-1.5 inline-flex items-center px-1 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">live</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-muted-foreground">{r.cadence}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{r.owner}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{r.lastReview ?? '—'}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{r.nextReview ?? '—'}</td>
-                  <td className="px-3 py-2"><ReviewStatusBadge status={r.status} /></td>
-                </tr>
-              ))}
+              {enrichedCycles.map((r, i) => {
+                const isKA = r.objectTypeId === 'knowledge-article' && !!live;
+                const overdueArticles = live?.overdueArticles ?? [];
+                return (
+                  <tr
+                    key={r.objectTypeId}
+                    onClick={isKA ? () => setShowOverdueArticles(v => !v) : undefined}
+                    className={`border-b border-border/40 ${i % 2 === 0 ? 'bg-white' : 'bg-muted/20'} ${isKA ? 'ring-1 ring-inset ring-primary/10 cursor-pointer hover:bg-primary/5 transition-colors' : ''} ${isKA && showOverdueArticles ? 'border-b-0' : ''}`}
+                  >
+                    <td className="px-3 py-2 font-semibold text-foreground whitespace-nowrap">
+                      <span className="flex items-center gap-1.5">
+                        {r.objectTypeName}
+                        {isKA && (
+                          <span className="inline-flex items-center px-1 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">live</span>
+                        )}
+                        {isKA && (
+                          <ChevronRight className={`w-3 h-3 text-muted-foreground/50 transition-transform shrink-0 ${showOverdueArticles ? 'rotate-90' : ''}`} />
+                        )}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">{r.cadence}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{r.owner}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{r.lastReview ?? '—'}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{r.nextReview ?? '—'}</td>
+                    <td className="px-3 py-2"><ReviewStatusBadge status={r.status} /></td>
+                  </tr>
+                );
+              })}
+              {/* Overdue articles expansion row — rendered separately so it sits after the ka row */}
+              {(() => {
+                const kaRow = enrichedCycles.find(r => r.objectTypeId === 'knowledge-article');
+                const overdueArticles = live?.overdueArticles ?? [];
+                if (!kaRow || !live || !showOverdueArticles) return null;
+                return (
+                  <tr className="border-b border-border/40 bg-primary/[0.03]">
+                    <td colSpan={6} className="px-4 py-3">
+                      {overdueArticles.length === 0 ? (
+                        <p className="text-[13px] text-[#2F6B3F] flex items-center gap-1.5">
+                          <CheckSquare className="w-3.5 h-3.5 shrink-0" />
+                          All articles are current — no overdue reviews.
+                        </p>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <p className="text-[12px] font-bold text-muted-foreground/60 uppercase tracking-wide mb-2">
+                            Overdue articles ({overdueArticles.length})
+                          </p>
+                          {overdueArticles.map(a => (
+                            <div key={a.articleId} className="flex items-center justify-between gap-3 rounded border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />
+                                <span className="text-[13px] font-semibold text-[#A93F2F] truncate">
+                                  {a.title ?? a.articleId}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-[12px] text-[#A93F2F]">
+                                  Since {fmtReviewDate(a.overdueSince)}
+                                </span>
+                                <a
+                                  href="/knowledge/sf-articles"
+                                  onClick={e => e.stopPropagation()}
+                                  className="inline-flex items-center gap-0.5 text-[12px] text-primary hover:underline"
+                                >
+                                  View <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })()}
             </tbody>
           </table>
         </div>

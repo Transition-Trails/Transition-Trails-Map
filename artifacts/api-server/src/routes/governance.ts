@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "@workspace/db";
 import { articleReviewsTable } from "@workspace/db/schema";
 import { desc, sql } from "drizzle-orm";
+import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
 
 const router = Router();
 
@@ -11,6 +12,8 @@ const router = Router();
 // Returns aggregated knowledge-article review stats derived from real DB data.
 // The Governance Hub Review Cycles tab uses this to show live overdue counts
 // instead of hardcoded dates from governanceData.ts.
+// Also returns an `overdueArticles` array with article IDs, titles, and the
+// date each article's review became overdue.
 // ─────────────────────────────────────────────────────────────────────────────
 
 router.get("/governance/review-cycles", async (req, res): Promise<void> => {
@@ -38,6 +41,9 @@ router.get("/governance/review-cycles", async (req, res): Promise<void> => {
     let mostRecentReviewedAt:  Date | null = null;
     let mostRecentReviewedBy:  string | null = null;
 
+    // Collect overdue articles for detailed listing
+    const overdueEntries: { articleId: string; overdueSince: string }[] = [];
+
     for (const row of latestPerArticle) {
       const due = row.nextReviewDue ? new Date(row.nextReviewDue) : null;
       const reviewedAt = row.reviewedAt ? new Date(row.reviewedAt) : null;
@@ -56,6 +62,10 @@ router.get("/governance/review-cycles", async (req, res): Promise<void> => {
 
       if (due < now) {
         overdueCount++;
+        overdueEntries.push({
+          articleId: row.articleId,
+          overdueSince: due.toISOString(),
+        });
         if (!oldestOverdueSince || due < oldestOverdueSince) {
           oldestOverdueSince = due;
         }
@@ -72,7 +82,48 @@ router.get("/governance/review-cycles", async (req, res): Promise<void> => {
       }
     }
 
-    const totalReviewed   = latestPerArticle.length;
+    const totalReviewed = latestPerArticle.length;
+
+    // ── Fetch article titles from Salesforce ──────────────────────────────────
+    // Best-effort: if SF is unavailable or returns an error, we still return
+    // the overdue list with null titles so the UI can fall back gracefully.
+    interface OverdueArticle {
+      articleId:   string;
+      title:       string | null;
+      overdueSince: string;
+    }
+
+    let overdueArticles: OverdueArticle[] = overdueEntries.map(e => ({
+      articleId:   e.articleId,
+      title:       null,
+      overdueSince: e.overdueSince,
+    }));
+
+    if (overdueEntries.length > 0) {
+      try {
+        const client = new ConnectorSalesforceClient();
+        const ids = overdueEntries.map(e => `'${e.articleId}'`).join(", ");
+        const result = await client.query<{ Id: string; Title: string }>(
+          `SELECT Id, Title FROM KnowledgeArticleVersion WHERE Id IN (${ids})`
+        );
+        const titleMap = new Map<string, string>();
+        for (const rec of result.records) {
+          titleMap.set(rec.Id, rec.Title);
+        }
+        overdueArticles = overdueEntries.map(e => ({
+          articleId:   e.articleId,
+          title:       titleMap.get(e.articleId) ?? null,
+          overdueSince: e.overdueSince,
+        }));
+      } catch (sfErr) {
+        req.log.warn(sfErr, "Could not fetch article titles from Salesforce for governance review-cycles; returning IDs only");
+      }
+    }
+
+    // Sort overdue articles oldest-first (most urgent first)
+    overdueArticles.sort((a, b) =>
+      new Date(a.overdueSince).getTime() - new Date(b.overdueSince).getTime()
+    );
 
     res.json({
       knowledgeArticles: {
@@ -86,6 +137,7 @@ router.get("/governance/review-cycles", async (req, res): Promise<void> => {
         nextDueSoonest:     nextDueSoonest?.toISOString()     ?? null,
         lastReviewedAt:     mostRecentReviewedAt?.toISOString() ?? null,
         lastReviewedBy:     mostRecentReviewedBy ?? null,
+        overdueArticles,
       },
     });
   } catch (err) {
