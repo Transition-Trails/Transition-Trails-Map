@@ -709,6 +709,96 @@ router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> 
   res.json({ capabilityId, sfConnected, requirements: results });
 });
 
+// ── GET /penny/stats ──────────────────────────────────────────────────────────
+// Aggregated engagement stats for the Penny dashboard.
+// Returns today's counts by audience + trail, lifetime totals, and the 10
+// most recent interactions.
+
+router.get("/penny/stats", async (_req, res): Promise<void> => {
+  try {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    // Today's rows (all of them — low volume, aggregate in JS)
+    const todayRows = await db
+      .select({
+        audience:  pennyLogsTable.audience,
+        trailId:   pennyLogsTable.trailId,
+      })
+      .from(pennyLogsTable)
+      .where(gte(pennyLogsTable.createdAt, todayStart));
+
+    // Lifetime aggregates
+    const [lifetimeResult] = await db
+      .select({ count: sql<number>`COUNT(*)::int` })
+      .from(pennyLogsTable);
+
+    // Lifetime by audience (top 5 audiences, rest lumped)
+    const lifetimeRows = await db
+      .select({
+        audience: pennyLogsTable.audience,
+        count:    sql<number>`COUNT(*)::int`,
+      })
+      .from(pennyLogsTable)
+      .groupBy(pennyLogsTable.audience);
+
+    // 10 most recent interactions
+    const recent = await db
+      .select({
+        id:           pennyLogsTable.id,
+        audience:     pennyLogsTable.audience,
+        trailId:      pennyLogsTable.trailId,
+        learnerName:  pennyLogsTable.learnerName,
+        userEmail:    pennyLogsTable.userEmail,
+        promptMode:   pennyLogsTable.promptMode,
+        model:        pennyLogsTable.model,
+        durationMs:   pennyLogsTable.durationMs,
+        createdAt:    pennyLogsTable.createdAt,
+      })
+      .from(pennyLogsTable)
+      .orderBy(desc(pennyLogsTable.createdAt))
+      .limit(10);
+
+    // Aggregate today by audience + trail
+    const todayByAudience: Record<string, number> = {};
+    const todayByTrail:    Record<string, number> = {};
+    for (const row of todayRows) {
+      const aud = row.audience ?? 'unknown';
+      todayByAudience[aud] = (todayByAudience[aud] ?? 0) + 1;
+      if (row.trailId) {
+        todayByTrail[row.trailId] = (todayByTrail[row.trailId] ?? 0) + 1;
+      }
+    }
+
+    const lifetimeByAudience: Record<string, number> = {};
+    for (const row of lifetimeRows) {
+      lifetimeByAudience[row.audience ?? 'unknown'] = row.count;
+    }
+
+    const lastInteraction = recent[0]?.createdAt ?? null;
+
+    res.json({
+      today: {
+        total:      todayRows.length,
+        byAudience: todayByAudience,
+        byTrail:    todayByTrail,
+      },
+      lifetime: {
+        total:      lifetimeResult?.count ?? 0,
+        byAudience: lifetimeByAudience,
+      },
+      recentInteractions: recent.map(r => ({
+        ...r,
+        createdAt: r.createdAt.toISOString(),
+      })),
+      lastInteractionAt: lastInteraction ? lastInteraction.toISOString() : null,
+    });
+  } catch (err) {
+    logger.error({ err }, "Failed to compute Penny stats");
+    res.status(500).json({ error: "Failed to compute stats" });
+  }
+});
+
 // ── GET /penny/logs ────────────────────────────────────────────────────────────
 
 router.get("/penny/logs", async (req, res): Promise<void> => {
