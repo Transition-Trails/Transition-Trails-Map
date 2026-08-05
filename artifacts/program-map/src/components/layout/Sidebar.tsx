@@ -74,10 +74,11 @@ const navGroups: NavGroup[] = [
     icon: BookOpen,
     pathPrefix: '/knowledge',
     items: [
-      { id: 'know-overview',  path: '/knowledge',              label: 'Overview',    minTier: 'admin' },
-      { id: 'know-sources',   path: '/knowledge/sources',      label: 'Sources',     minTier: 'admin' },
-      { id: 'know-sf-articles', path: '/knowledge/sf-articles', label: 'SF Articles', minTier: 'admin' },
-      { id: 'know-library',   path: '/knowledge/library',      label: 'Library',     minTier: 'admin' },
+      { id: 'know-overview',       path: '/knowledge',                   label: 'Overview',       minTier: 'admin' },
+      { id: 'know-article-studio', path: '/knowledge/article-studio',    label: 'Article Studio', minTier: 'admin' },
+      { id: 'know-sources',        path: '/knowledge/sources',           label: 'Sources',        minTier: 'admin' },
+      { id: 'know-sf-articles',    path: '/knowledge/sf-articles',       label: 'SF Articles',    minTier: 'admin' },
+      { id: 'know-library',        path: '/knowledge/library',           label: 'Library',        minTier: 'admin' },
     ],
   },
   {

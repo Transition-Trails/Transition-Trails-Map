@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable } from "@workspace/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable, knowledgeArticlesTable } from "@workspace/db/schema";
+import { eq, desc, asc } from "drizzle-orm";
 import {
   fetchSfLiveMetrics,
   buildIntegrationStatus,
@@ -1647,6 +1647,275 @@ router.delete("/knowledge/documents/:id", async (req, res): Promise<void> => {
   } catch (err) {
     req.log.error(err, "Failed to delete knowledge document");
     res.status(500).json({ error: "Failed to delete document" });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ARTICLE STUDIO ROUTES
+// Draft → Review → Approved → Published (Salesforce)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function generateArticleId(): string {
+  return `art-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "article";
+}
+
+// GET /api/knowledge/articles
+router.get("/knowledge/articles", async (req, res): Promise<void> => {
+  try {
+    const rows = await db
+      .select()
+      .from(knowledgeArticlesTable)
+      .orderBy(desc(knowledgeArticlesTable.updatedAt));
+    res.json({ articles: rows });
+  } catch (err) {
+    req.log.error(err, "Failed to list knowledge articles");
+    res.status(500).json({ error: "Failed to fetch articles" });
+  }
+});
+
+// GET /api/knowledge/articles/:id
+router.get("/knowledge/articles/:id", async (req, res): Promise<void> => {
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    res.json({ article: rows[0] });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch knowledge article");
+    res.status(500).json({ error: "Failed to fetch article" });
+  }
+});
+
+// POST /api/knowledge/articles  — create draft
+router.post("/knowledge/articles", async (req, res): Promise<void> => {
+  try {
+    const { title, summary = "", body = "", category = "", urlName } = req.body as {
+      title: string; summary?: string; body?: string; category?: string; urlName?: string;
+    };
+    if (!title?.trim()) { res.status(400).json({ error: "title is required" }); return; }
+    const authoredBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
+    const id = generateArticleId();
+    const [row] = await db.insert(knowledgeArticlesTable).values({
+      id,
+      title: title.trim(),
+      summary,
+      body,
+      category,
+      urlName: urlName?.trim() || slugify(title),
+      status: "draft",
+      authoredBy,
+    }).returning();
+    res.status(201).json({ article: row });
+  } catch (err) {
+    req.log.error(err, "Failed to create knowledge article");
+    res.status(500).json({ error: "Failed to create article" });
+  }
+});
+
+// PATCH /api/knowledge/articles/:id  — update draft fields
+router.patch("/knowledge/articles/:id", async (req, res): Promise<void> => {
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    const current = rows[0]!;
+    if (current.status !== "draft") {
+      res.status(409).json({ error: "Only draft articles can be edited. Recall it first." });
+      return;
+    }
+    const { title, summary, body, category, urlName } = req.body as Partial<{
+      title: string; summary: string; body: string; category: string; urlName: string;
+    }>;
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({
+        ...(title     !== undefined && { title: title.trim() }),
+        ...(summary   !== undefined && { summary }),
+        ...(body      !== undefined && { body }),
+        ...(category  !== undefined && { category }),
+        ...(urlName   !== undefined && { urlName: urlName.trim() || slugify(title ?? current.title) }),
+        updatedAt: new Date(),
+      })
+      .where(eq(knowledgeArticlesTable.id, req.params.id))
+      .returning();
+    res.json({ article: updated });
+  } catch (err) {
+    req.log.error(err, "Failed to update knowledge article");
+    res.status(500).json({ error: "Failed to update article" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/submit  — draft → pending-review
+router.post("/knowledge/articles/:id/submit", async (req, res): Promise<void> => {
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    if (rows[0]!.status !== "draft") {
+      res.status(409).json({ error: `Cannot submit: article is currently '${rows[0]!.status}'` });
+      return;
+    }
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({ status: "pending-review", reviewNote: null, updatedAt: new Date() })
+      .where(eq(knowledgeArticlesTable.id, req.params.id))
+      .returning();
+    res.json({ article: updated });
+  } catch (err) {
+    req.log.error(err, "Failed to submit article for review");
+    res.status(500).json({ error: "Failed to submit article" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/approve  — pending-review → approved
+router.post("/knowledge/articles/:id/approve", async (req, res): Promise<void> => {
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    if (rows[0]!.status !== "pending-review") {
+      res.status(409).json({ error: `Cannot approve: article is currently '${rows[0]!.status}'` });
+      return;
+    }
+    const reviewedBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({ status: "approved", reviewedBy, reviewedAt: new Date(), reviewNote: null, updatedAt: new Date() })
+      .where(eq(knowledgeArticlesTable.id, req.params.id))
+      .returning();
+    res.json({ article: updated });
+  } catch (err) {
+    req.log.error(err, "Failed to approve article");
+    res.status(500).json({ error: "Failed to approve article" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/request-changes  — pending-review → draft (with note)
+router.post("/knowledge/articles/:id/request-changes", async (req, res): Promise<void> => {
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    if (rows[0]!.status !== "pending-review") {
+      res.status(409).json({ error: `Cannot request changes: article is currently '${rows[0]!.status}'` });
+      return;
+    }
+    const { note = "" } = req.body as { note?: string };
+    const reviewedBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({ status: "draft", reviewedBy, reviewNote: note || null, updatedAt: new Date() })
+      .where(eq(knowledgeArticlesTable.id, req.params.id))
+      .returning();
+    res.json({ article: updated });
+  } catch (err) {
+    req.log.error(err, "Failed to request changes on article");
+    res.status(500).json({ error: "Failed to request changes" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/publish-to-sf  — approved → published (creates SF Knowledge record)
+router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    const article = rows[0]!;
+    if (article.status !== "approved") {
+      res.status(409).json({ error: `Cannot publish: article must be 'approved' (currently '${article.status}')` });
+      return;
+    }
+
+    const client = new ConnectorSalesforceClient();
+
+    // Discover the article-type __kav object and its body fields.
+    const bodyInfo = await getKavAllBodyFields(client, {
+      warn: (m) => req.log.warn(m),
+      info: (m) => req.log.info(m),
+    });
+
+    // Build the record payload. Always include standard Knowledge fields.
+    const payload: Record<string, unknown> = {
+      Title:    article.title,
+      UrlName:  article.urlName || slugify(article.title),
+      Language: "en_US",
+    };
+    if (article.summary) payload["Summary"] = article.summary;
+
+    // Map the article body to the first discovered rich-text field, if any.
+    if (bodyInfo && bodyInfo.fields.length > 0 && article.body) {
+      payload[bodyInfo.fields[0]!.name] = article.body;
+    }
+
+    const objectName = bodyInfo?.objectName ?? "Knowledge__kav";
+
+    req.log.info({ objectName, payload: Object.keys(payload) }, "Publishing article to SF Knowledge");
+
+    let sfVersionId: string | null = null;
+    let sfArticleId: string | null = null;
+    let sfPublishStatus = "Draft";
+
+    // Step 1: Create the article record in Salesforce.
+    const createResult = await client.createRecord(objectName, payload);
+    if (!createResult.success) {
+      const errMsg = (createResult as unknown as { errors?: { message: string }[] }).errors?.[0]?.message ?? "Unknown Salesforce error";
+      res.status(502).json({ error: `Salesforce create failed: ${errMsg}` });
+      return;
+    }
+    sfVersionId = createResult.id;
+    req.log.info({ sfVersionId }, "SF Knowledge article version created");
+
+    // Step 2: Retrieve the KnowledgeArticleId from the created record so we can link to it.
+    try {
+      const versionRecord = await client.getRecord<{ Id: string; KnowledgeArticleId?: string }>(
+        objectName, sfVersionId, ["Id", "KnowledgeArticleId"]
+      );
+      sfArticleId = versionRecord.KnowledgeArticleId ?? null;
+    } catch (lookupErr) {
+      req.log.warn(`Could not retrieve KnowledgeArticleId: ${String(lookupErr)}`);
+    }
+
+    // Step 3: Attempt to publish the article (set PublishStatus = Online).
+    // Some orgs require workflow/approval and will reject this — we catch and leave as Draft.
+    try {
+      await client.updateRecord(objectName, sfVersionId, { PublishStatus: "Online" });
+      sfPublishStatus = "Online";
+      req.log.info({ sfVersionId }, "SF Knowledge article published (Online)");
+    } catch (publishErr) {
+      req.log.warn(`Could not auto-publish SF article (may need manual publish in SF): ${String(publishErr)}`);
+      // Not a fatal error — article is created as Draft in SF, user can publish from SF.
+    }
+
+    // Step 4: Persist SF IDs and mark as published.
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({
+        status: "published",
+        sfVersionId,
+        sfArticleId,
+        sfPublishStatus,
+        publishedAt: new Date(),
+        updatedAt:   new Date(),
+      })
+      .where(eq(knowledgeArticlesTable.id, id))
+      .returning();
+
+    res.json({ article: updated });
+  } catch (err) {
+    req.log.error(err, "Failed to publish article to Salesforce");
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    res.status(502).json({ error: `Publish failed: ${msg}` });
+  }
+});
+
+// DELETE /api/knowledge/articles/:id  — only drafts can be deleted
+router.delete("/knowledge/articles/:id", async (req, res): Promise<void> => {
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    if (rows[0]!.status !== "draft") {
+      res.status(409).json({ error: "Only draft articles can be deleted." });
+      return;
+    }
+    await db.delete(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    res.status(204).send();
+  } catch (err) {
+    req.log.error(err, "Failed to delete knowledge article");
+    res.status(500).json({ error: "Failed to delete article" });
   }
 });
 

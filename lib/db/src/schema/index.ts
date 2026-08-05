@@ -26,3 +26,4 @@ export * from "./platformRoleOwners";
 export * from "./pennyLogs";
 export * from "./personaHealthDismissals";
 export * from "./articleReviews";
+export * from "./knowledgeArticles";
