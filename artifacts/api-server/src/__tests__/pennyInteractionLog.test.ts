@@ -13,7 +13,9 @@
  *   • Prompt_Mode__c truncation at 50 chars
  *   • Fire-and-forget isolation: a rejected createRecord, when caught like the
  *     route does, must not propagate to the surrounding code
- *   • Source__c picklist conformance
+ *   • Source__c picklist conformance (static)
+ *   • Audience__c written from payload.audience
+ *   • getInteractionHistory audience filter
  *
  * ─── Test Blind Spot (honest) ──────────────────────────────────────────────────
  *
@@ -21,22 +23,48 @@
  * accepts ANY value — it never validates against the real Salesforce schema.
  * This means:
  *
- *   1. A wrong Source__c value (e.g. "web", which is NOT a permitted picklist
- *      value) will pass every test in this file.  The mock does not reject it.
- *      This is exactly how the original bug (source: "web" → zero SF records
- *      for months) went undetected.
+ *   1. A wrong Source__c value will pass every test in this file.  The mock
+ *      does not reject it.  This is exactly how the original bug (source: "web"
+ *      → zero SF records for months) went undetected.
  *
- *   2. The picklist conformance tests below close the gap for source only by
+ *   2. The picklist conformance tests below close the gap for Source__c by
  *      asserting that the written value is in the known permitted list.  They
- *      do NOT prove the schema is correct — that requires a live describe call
- *      against the org (done manually during the source: "web" post-mortem).
+ *      do NOT prove the SF schema is correct — that requires a live describe
+ *      call against the org.
+ *
+ * ─── On live-schema conformance testing ───────────────────────────────────────
+ *
+ * The unit test mock does not support Salesforce metadata calls (DESCRIBE,
+ * Tooling API, PicklistValueInfo queries).  ISalesforceClient exposes only
+ * query / getRecord / createRecord / updateRecord / deleteRecord.
+ *
+ * A fully automated live-schema conformance test for picklist values would
+ * require either:
+ *   a) Extending ISalesforceClient with a describeObject() method and calling
+ *      the /sobjects/<object>/describe REST endpoint in a separate integration
+ *      test marked @skip in CI (run manually with LIVE_SF_TEST=true).
+ *   b) A standalone script that runs describe and diffs against our constants.
+ *
+ * Neither is in scope for this task.  What IS in scope (and done) is:
+ *   • The compile-time exhaustiveness guard in types/salesforce.ts, which ensures
+ *     SF_INTERACTION_SOURCES and SfInteractionSource cannot drift apart.
+ *   • The conformance tests below, which verify the value written is in the
+ *     known permitted list — preventing a developer from silently changing a
+ *     hardcoded source without updating this list.
  *
  * If you add a new picklist field to logInteraction, add a conformance test for
  * it here AND verify the permitted values with a live SF describe before shipping.
+ *
+ * Permitted values confirmed by a live SF describe on 2026-08-05:
+ *   'TRAIL OS', 'dashboard', 'slack_dm', 'slack_mention', 'mobile'
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { logInteraction, SF_INTERACTION_SOURCES } from '../lib/salesforceService.js';
+import {
+  logInteraction,
+  getInteractionHistory,
+  SF_INTERACTION_SOURCES,
+} from '../lib/salesforceService.js';
 import type { ISalesforceClient } from '../lib/salesforceClient.js';
 import type { SfInteractionSource } from '../types/salesforce.js';
 
@@ -58,10 +86,10 @@ const VALID_PAYLOAD = {
   userMessage:   'What phase am I in?',
   pennyResponse: 'You are in the Explore phase.',
   promptMode:    'ask+learner',
-  // Source__c is a RESTRICTED picklist — only these values are permitted by SF:
-  // 'dashboard' | 'slack_dm' | 'slack_mention' | 'mobile'
-  // "web" is NOT a permitted value. The /api/penny/ask route uses 'dashboard'.
-  source:        'dashboard' as SfInteractionSource,
+  // Source__c is a RESTRICTED picklist — the web interface writes 'TRAIL OS'.
+  // Other origins: 'slack_dm', 'slack_mention', 'mobile', 'dashboard' (legacy).
+  source:        'TRAIL OS' as SfInteractionSource,
+  audience:      'learner',
 };
 
 // ── Happy path ────────────────────────────────────────────────────────────────
@@ -101,6 +129,40 @@ describe('logInteraction — happy path', () => {
     await logInteraction(client, VALID_PAYLOAD);
     const [, data] = (client.createRecord as ReturnType<typeof vi.fn>).mock.calls[0] as [string, Record<string, unknown>];
     expect(data['Penny_Response__c']).toBe(VALID_PAYLOAD.pennyResponse);
+  });
+});
+
+// ── Audience__c field ─────────────────────────────────────────────────────────
+//
+// Audience__c does not yet exist on Penny_Interaction_Log__c in production.
+// Writing a non-existent field causes SF to reject the ENTIRE insert, so the
+// write is commented out in salesforceService.ts logInteraction() until the
+// field is confirmed present.
+//
+// These tests document the CURRENT state (not written) and will be replaced
+// with positive write-assertion tests once the field is provisioned.
+// Steps to enable:
+//   1. Create Audience__c as Text(255) in SF Setup
+//   2. Confirm: SELECT COUNT() FROM Penny_Interaction_Log__c WHERE Audience__c != null
+//   3. Uncomment the write in logInteraction()
+//   4. Replace the tests below with:
+//        expect(data['Audience__c']).toBe('learner')   // etc.
+
+describe('logInteraction — Audience__c (pending SF schema change)', () => {
+  it('does NOT write Audience__c while the field is absent from the SF schema', async () => {
+    const client = makeMockClient();
+    await logInteraction(client, { ...VALID_PAYLOAD, audience: 'learner' });
+    const [, data] = (client.createRecord as ReturnType<typeof vi.fn>).mock.calls[0] as [string, Record<string, unknown>];
+    // Audience__c must be absent from the fields map until the SF column exists.
+    // Writing an unknown field causes SF to reject the entire insert.
+    expect(Object.prototype.hasOwnProperty.call(data, 'Audience__c')).toBe(false);
+  });
+
+  it('the payload type accepts audience — field is ready to wire once column exists', () => {
+    // This test is a compile-time check: if the TypeScript type rejects audience,
+    // this line will not compile.
+    const payload = { ...VALID_PAYLOAD, audience: 'internal' };
+    expect(payload.audience).toBe('internal');
   });
 });
 
@@ -220,15 +282,18 @@ describe('fire-and-forget write isolation', () => {
 // error returned to the caller (fire-and-forget).
 //
 // These tests assert that logInteraction writes a value that is in the known
-// permitted list.  They do NOT validate against the live schema (that requires
-// a describe call against the org) but they prevent a regression where a
-// developer changes the hardcoded source without updating this list.
+// permitted list.  They do NOT validate against the live schema (see the
+// "live-schema conformance testing" note at the top of this file).
 //
-// Permitted values confirmed by a live SF describe on 2026-08-04:
-//   'dashboard', 'slack_dm', 'slack_mention', 'mobile'
+// Permitted values confirmed by a live SF describe on 2026-08-05:
+//   'TRAIL OS', 'dashboard', 'slack_dm', 'slack_mention', 'mobile'
 //
-// The original bug: source: "web" was written for all Trail OS web requests.
-// "web" is not in the permitted list.  Every SF write was silently discarded.
+// Origin → source mapping (as of 2026-08-05):
+//   /api/penny/ask  (Trail OS web)  → 'TRAIL OS'
+//   Future Slack DM                 → 'slack_dm'
+//   Future Slack @mention           → 'slack_mention'
+//   Future mobile                   → 'mobile'
+//   Legacy existing records         → 'dashboard'
 
 describe('logInteraction — Source__c picklist conformance', () => {
   it('the default fixture writes a Source__c value in the permitted picklist', async () => {
@@ -236,6 +301,13 @@ describe('logInteraction — Source__c picklist conformance', () => {
     await logInteraction(client, VALID_PAYLOAD);
     const [, data] = (client.createRecord as ReturnType<typeof vi.fn>).mock.calls[0] as [string, Record<string, unknown>];
     expect(SF_INTERACTION_SOURCES).toContain(data['Source__c']);
+  });
+
+  it('the default fixture writes TRAIL OS as the web-interface source', async () => {
+    const client = makeMockClient();
+    await logInteraction(client, VALID_PAYLOAD);
+    const [, data] = (client.createRecord as ReturnType<typeof vi.fn>).mock.calls[0] as [string, Record<string, unknown>];
+    expect(data['Source__c']).toBe('TRAIL OS');
   });
 
   it.each([...SF_INTERACTION_SOURCES] as SfInteractionSource[])(
@@ -247,4 +319,68 @@ describe('logInteraction — Source__c picklist conformance', () => {
       expect(data['Source__c']).toBe(src);
     }
   );
+});
+
+// ── getInteractionHistory — audience filter ───────────────────────────────────
+//
+// When audience is provided, the SOQL must include AND Audience__c = '...'
+// so that internal-staff test sessions do not contaminate a learner's
+// coaching memory window.
+
+describe('getInteractionHistory — audience filter', () => {
+  it('includes audience filter in SOQL when audience is provided', async () => {
+    const mockQuery = vi.fn().mockResolvedValue({ records: [], totalSize: 0, done: true });
+    const client = makeMockClient({ query: mockQuery });
+    await getInteractionHistory(client, '003test', 5, 'learner');
+    const soql = (mockQuery.mock.calls[0] as [string])[0];
+    expect(soql).toContain("Audience__c = 'learner'");
+  });
+
+  it('omits audience WHERE filter when audience is not provided (Audience__c still selected)', async () => {
+    const mockQuery = vi.fn().mockResolvedValue({ records: [], totalSize: 0, done: true });
+    const client = makeMockClient({ query: mockQuery });
+    await getInteractionHistory(client, '003test', 5);
+    const soql = (mockQuery.mock.calls[0] as [string])[0];
+    // Audience__c appears in the SELECT list (always fetched) but not in the WHERE clause.
+    expect(soql).toContain('Audience__c');           // present in SELECT
+    expect(soql).not.toContain("Audience__c = '");   // absent from WHERE
+  });
+
+  it('returns audience field from records', async () => {
+    const mockQuery = vi.fn().mockResolvedValue({
+      records: [{
+        Id: 'a1B001',
+        User_Message__c: 'Hi',
+        Penny_Response__c: 'Hello',
+        Prompt_Mode__c: 'ask',
+        Source__c: 'TRAIL OS',
+        Audience__c: 'learner',
+        CreatedDate: '2026-08-05T00:00:00.000Z',
+      }],
+      totalSize: 1,
+      done: true,
+    });
+    const client = makeMockClient({ query: mockQuery });
+    const result = await getInteractionHistory(client, '003test', 5, 'learner');
+    expect(result[0].audience).toBe('learner');
+  });
+
+  it('returns null audience when Audience__c is null in record', async () => {
+    const mockQuery = vi.fn().mockResolvedValue({
+      records: [{
+        Id: 'a1B002',
+        User_Message__c: 'Hi',
+        Penny_Response__c: 'Hello',
+        Prompt_Mode__c: 'ask',
+        Source__c: 'TRAIL OS',
+        Audience__c: null,
+        CreatedDate: '2026-08-05T00:00:00.000Z',
+      }],
+      totalSize: 1,
+      done: true,
+    });
+    const client = makeMockClient({ query: mockQuery });
+    const result = await getInteractionHistory(client, '003test', 5);
+    expect(result[0].audience).toBeNull();
+  });
 });

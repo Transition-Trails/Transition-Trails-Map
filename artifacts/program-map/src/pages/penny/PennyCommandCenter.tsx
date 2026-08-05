@@ -59,11 +59,14 @@ interface LearnerEntry {
 }
 
 interface WriteHealthData {
-  lastFailure: { object: string; reason: string; timestamp: string } | null;
-  lastSuccess: string | null;
+  lastFailure:   { object: string; reason: string; timestamp: string } | null;
+  lastSuccess:   string | null;
   totalAttempts: number;
-  failedWrites: number;
+  failedWrites:  number;
   healthyWrites: number;
+  /** Deliberate skips (not failures) — e.g. staff sessions where Learner__c is required */
+  staffSkips:    number;
+  lastStaffSkip: { reason: string; timestamp: string } | null;
 }
 
 // ── Identity config ────────────────────────────────────────────────────────────
@@ -605,11 +608,12 @@ export default function PennyCommandCenter() {
                 <p className="text-[12px] font-bold text-foreground">SF Write Log</p>
                 <span className="ml-auto text-[11px] text-muted-foreground/50">live</span>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="grid grid-cols-4 gap-2 text-center">
                 {[
                   { label: 'Attempts', value: writeHealth?.totalAttempts ?? 0, cls: 'text-foreground' },
                   { label: 'Success',  value: writeHealth?.healthyWrites  ?? 0, cls: 'text-[#2F6B3F]' },
                   { label: 'Failed',   value: writeHealth?.failedWrites   ?? 0, cls: writeHealth?.failedWrites ? 'text-[#CC8400]' : 'text-muted-foreground/40' },
+                  { label: 'Skipped',  value: writeHealth?.staffSkips     ?? 0, cls: 'text-muted-foreground' },
                 ].map(s => (
                   <div key={s.label}>
                     <p className={`text-[15px] font-bold ${s.cls}`}>{s.value}</p>
@@ -624,12 +628,20 @@ export default function PennyCommandCenter() {
                   <p className="text-[10px] text-muted-foreground/50 mt-1">{relativeTime(writeHealth.lastFailure.timestamp)}</p>
                 </div>
               )}
+              {writeHealth?.lastStaffSkip && !writeHealth.lastFailure && (writeHealth.staffSkips ?? 0) > 0 && (
+                <div className="mt-2 flex items-start gap-1.5">
+                  <span className="text-[10px] bg-muted/60 border border-border/60 rounded px-1.5 py-0.5 text-muted-foreground shrink-0">skip</span>
+                  <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
+                    Staff writes deferred — Learner__c required. {writeHealth.staffSkips} session{writeHealth.staffSkips !== 1 ? 's' : ''} skipped.
+                  </p>
+                </div>
+              )}
               {writeHealth?.lastSuccess && !writeHealth.lastFailure && (
                 <p className="text-[11px] text-[#2F6B3F] mt-2">
                   Last write: {relativeTime(writeHealth.lastSuccess)}
                 </p>
               )}
-              {writeHealth?.totalAttempts === 0 && (
+              {writeHealth?.totalAttempts === 0 && !writeHealth?.staffSkips && (
                 <p className="text-[11px] text-muted-foreground/50 mt-2">
                   No writes yet — ask {TERMS.aiAssistant} to start.
                 </p>

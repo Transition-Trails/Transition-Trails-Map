@@ -17,6 +17,11 @@ export interface SfWriteFailure {
   timestamp: string;     // ISO-8601
 }
 
+export interface SfWriteSkip {
+  reason:    string;     // human-readable; capped at 200 chars
+  timestamp: string;     // ISO-8601
+}
+
 interface WriteHealthState {
   lastFailure:        SfWriteFailure | null;
   lastSuccess:        string | null;  // ISO-8601 timestamp of last confirmed write
@@ -26,6 +31,14 @@ interface WriteHealthState {
   staffAttempts:      number;
   /** Subset of (totalAttempts - failedWrites) from internal-staff sessions. */
   staffSuccesses:     number;
+  /**
+   * Count of writes deliberately skipped (not attempted) because the SF schema
+   * cannot accept them yet — e.g. staff sessions where Learner__c is required.
+   * Skips are NOT failures; they are expected and tracked separately so the
+   * write-health strip can show them as neutral rather than red.
+   */
+  staffSkips:         number;
+  lastStaffSkip:      SfWriteSkip | null;
 }
 
 const state: WriteHealthState = {
@@ -35,6 +48,8 @@ const state: WriteHealthState = {
   failedWrites:   0,
   staffAttempts:  0,
   staffSuccesses: 0,
+  staffSkips:     0,
+  lastStaffSkip:  null,
 };
 
 export function recordSfWriteAttempt(isStaff = false): void {
@@ -56,8 +71,21 @@ export function recordSfWriteFailure(object: string, rawReason: string): void {
   };
 }
 
+/**
+ * Record a deliberate skip — no SF write attempted because the schema cannot
+ * accept this record type yet.  Skips are not failures and must not turn the
+ * write-health strip red.
+ */
+export function recordSfWriteSkip(reason: string): void {
+  state.staffSkips++;
+  state.lastStaffSkip = {
+    reason:    reason.slice(0, 200),
+    timestamp: new Date().toISOString(),
+  };
+}
+
 export function getSfWriteHealth(): WriteHealthState & { healthyWrites: number; learnerSuccesses: number } {
-  const healthyWrites  = state.totalAttempts - state.failedWrites;
+  const healthyWrites    = state.totalAttempts - state.failedWrites;
   const learnerSuccesses = healthyWrites - state.staffSuccesses;
   return {
     ...state,

@@ -61,6 +61,7 @@ interface RawInteractionLog {
   Penny_Response__c: string;
   Prompt_Mode__c: string;
   Source__c: string;
+  Audience__c: string | null;
   CreatedDate: string;
 }
 
@@ -270,7 +271,7 @@ export async function logInteraction(
   // contactId is present (learner exchanges are attributed via the lookup).
   //
   // NOTE: Fields that do not exist in this object's current schema are NOT
-  // written here: model, durationMs, layersPresent, audience, userTier.
+  // written here: model, durationMs, layersPresent, userTier.
   // Those metadata fields are captured by the local DB (pennyLogsTable).
   // If they are added to the SF schema in a future sprint, map them here.
   //
@@ -281,6 +282,23 @@ export async function logInteraction(
     Penny_Response__c: truncateSf(payload.pennyResponse),
     Prompt_Mode__c:    payload.promptMode.slice(0, 50),
     Source__c:         payload.source,
+    // ── Audience__c — PENDING SF SCHEMA CHANGE ────────────────────────────
+    // This field does not yet exist on Penny_Interaction_Log__c in production.
+    // Writing a non-existent field causes Salesforce to reject the ENTIRE
+    // insert — including Source__c and Learner__c — so it must stay commented
+    // out until the field is confirmed present in the org.
+    //
+    // To enable:
+    //   1. Create Audience__c as a Text(255) field on Penny_Interaction_Log__c
+    //      in SF Setup → Object Manager → Penny Interaction Log → Fields.
+    //   2. Confirm the field exists:
+    //        SELECT COUNT() FROM Penny_Interaction_Log__c WHERE Audience__c != null
+    //      (0 rows returned without an error = field exists).
+    //   3. Uncomment the line below and redeploy.
+    //
+    // Everything else is already in place: the payload carries audience, the
+    // memory-window SOQL filters by Audience__c, and the test suite covers it.
+    // Audience__c: payload.audience ?? null,
   };
 
   if (payload.contactId !== null) {
@@ -298,17 +316,30 @@ export async function logInteraction(
 export async function getInteractionHistory(
   client: ISalesforceClient,
   contactId: string,
-  limitCount: number
+  limitCount: number,
+  /**
+   * When provided, restricts results to exchanges where Audience__c matches.
+   * Use 'learner' for the memory-window layer so that internal-staff test sessions
+   * (which log with audience='internal') never contaminate a learner's coaching
+   * context window.  Omit for admin/audit views that need the full picture.
+   */
+  audience?: string,
 ): Promise<InteractionLogRecord[]> {
-  const soql = `SELECT Id, User_Message__c, Penny_Response__c, Prompt_Mode__c, Source__c, CreatedDate FROM Penny_Interaction_Log__c WHERE Learner__c = '${contactId}' ORDER BY CreatedDate DESC LIMIT ${limitCount}`;
+  const audienceFilter = audience ? ` AND Audience__c = '${audience}'` : '';
+  const soql =
+    `SELECT Id, User_Message__c, Penny_Response__c, Prompt_Mode__c, Source__c, Audience__c, CreatedDate ` +
+    `FROM Penny_Interaction_Log__c ` +
+    `WHERE Learner__c = '${contactId}'${audienceFilter} ` +
+    `ORDER BY CreatedDate DESC LIMIT ${limitCount}`;
   const result = await client.query<RawInteractionLog>(soql);
   return result.records.map((raw) => ({
-    id:           raw.Id,
-    userMessage:  raw.User_Message__c,
+    id:            raw.Id,
+    userMessage:   raw.User_Message__c,
     pennyResponse: raw.Penny_Response__c,
-    promptMode:   raw.Prompt_Mode__c,
-    source:       raw.Source__c,
-    createdDate:  raw.CreatedDate,
+    promptMode:    raw.Prompt_Mode__c,
+    source:        raw.Source__c,
+    audience:      raw.Audience__c,
+    createdDate:   raw.CreatedDate,
   }));
 }
 

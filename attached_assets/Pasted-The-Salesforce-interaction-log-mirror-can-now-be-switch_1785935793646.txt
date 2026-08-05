@@ -1,0 +1,17 @@
+The Salesforce interaction log mirror can now be switched on. I added a fifth value to the Source__c picklist on Penny_Interaction_Log__c — the active values are now slack_dm, slack_mention, mobile, dashboard and TRAIL OS. That was the blocker: the code writes the literal "web", which is not one of them, so Salesforce has been rejecting every insert.
+
+First, change the value. Web-originated interactions should write TRAIL OS exactly as spelled — spaced and upper-case. Please derive the value from the actual origin of the request rather than hardcoding a single constant, since slack_dm, slack_mention and mobile all exist for real origins that will arrive later. And please check nothing else in the codebase writes "web" to this field.
+
+Second, add the audience field while you are in there. Add Audience__c to Penny_Interaction_Log__c as a plain text field, write the resolved audience to it in logInteraction(), and add an audience filter to the memory window query in getInteractionHistory() so a learner's history returns only learner-audience exchanges. This is the contamination fix identified earlier — an admin testing as a learner currently logs an internal-voice exchange against that learner's Contact, which then appears in the learner's memory and can suppress coaching behaviour. Do it now rather than after learners have real memory windows.
+
+Remember the schema change goes through development and gets promoted, not hand-edited in production.
+
+Third, be explicit about what this does not fix. Learner__c is a required lookup, so staff interactions still cannot be written to Salesforce — that needs the separate schema decision I have parked. Please make sure a staff interaction fails cleanly and visibly rather than looking like a bug: the write-health strip should show it as a known, expected skip rather than a failure, or the write should be skipped for staff with the reason recorded. Your call which reads better, but I do not want the health strip showing red for something we have deliberately deferred.
+
+Then verify against production rather than a mock. Ask Penny a question as a signed-in learner and confirm a record actually appears in Penny_Interaction_Log__c with the correct source and audience. Then ask a second question and confirm the memory window layer reports itself present — that behaviour has never once run, because nothing has ever been persisted for it to read.
+
+One thing I want you to check honestly: the tests mock the Salesforce client, so they assert that a write is attempted with certain values rather than that those values are legal. That is exactly why this went unnoticed. If there is a reasonable way to assert written values against the real picklist definitions — even one test that describes the field and checks our constants against it — please add it. If there is not, say so plainly rather than adding a test that gives false confidence.
+
+Acceptance: a learner interaction creates a real record in production with source TRAIL OS and the audience recorded; a second question shows the memory window present; a learner's memory window contains only learner-audience exchanges; a staff interaction is handled as a deliberate skip rather than an error; and you have told me whether the value-conformance test is feasible.
+
+Run a typecheck and the full suite, then confirm the record count in production before and after.

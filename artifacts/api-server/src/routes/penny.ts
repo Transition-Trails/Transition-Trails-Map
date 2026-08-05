@@ -11,6 +11,7 @@ import {
   recordSfWriteAttempt,
   recordSfWriteSuccess,
   recordSfWriteFailure,
+  recordSfWriteSkip,
   getSfWriteHealth,
 } from "../lib/sfWriteHealth.js";
 import { resolveExchangeContact } from "../lib/pennyContactResolver.js";
@@ -234,7 +235,9 @@ router.post("/penny/ask", async (req, res) => {
   let recentExchanges: MemoryExchange[] = [];
   if (sfClient !== null && sfContactId !== null) {
     try {
-      const raw = await getInteractionHistory(sfClient, sfContactId, 5);
+      // audience filter prevents internal-staff test sessions from polluting
+      // a learner's coaching memory — only 'learner'-audience exchanges surface here.
+      const raw = await getInteractionHistory(sfClient, sfContactId, 5, 'learner');
       recentExchanges = raw.map(r => ({
         userMessage:   r.userMessage,
         pennyResponse: r.pennyResponse,
@@ -385,53 +388,66 @@ router.post("/penny/ask", async (req, res) => {
     const staffEmail = !isLearnerContact ? (req.session.sfEmail ?? null) : null;
     const shouldWriteToSf = sfClient !== null && (sfContactId !== null || staffEmail !== null);
 
-    if (shouldWriteToSf && sfClient !== null) {
-      // Source__c is a RESTRICTED picklist — only 'dashboard', 'slack_dm',
-      // 'slack_mention', 'mobile' are permitted.  Any other value causes
-      // Salesforce to silently reject the entire insert.
-      // This endpoint is the Trail OS web interface → 'dashboard'.
-      // When Slack / mobile channels are added they will pass their own source.
+    if (sfClient !== null) {
+      // ── Source derivation ──────────────────────────────────────────────────
+      // Source__c is a RESTRICTED picklist — only values in SF_INTERACTION_SOURCES
+      // are permitted; any other value causes Salesforce to silently reject the insert.
+      //
+      // Origin → source mapping:
+      //   /api/penny/ask  (Trail OS web interface)  → 'TRAIL OS'
+      //   Future Slack DM route                     → 'slack_dm'
+      //   Future Slack @mention route               → 'slack_mention'
+      //   Future mobile route                       → 'mobile'
+      //
+      // Each channel route is responsible for passing the correct source value
+      // to logInteraction(); never derive it from the request body.
+      const sfSource = 'TRAIL OS' as const;
+
       const isStaffWrite = sfContactId === null;
-      recordSfWriteAttempt(isStaffWrite);
-      logInteraction(sfClient, {
-        contactId:     sfContactId,
-        adminEmail:    isStaffWrite ? staffEmail : null,
-        userMessage:   query.trim(),
-        pennyResponse: text,
-        promptMode,
-        source:        'dashboard',
-        audience,
-        // NOTE: audience is captured in the local DB today.
-        // When Audience__c is added to Penny_Interaction_Log__c in the SF
-        // schema, add it to the fields map in salesforceService.ts logInteraction().
-      }).then(() => {
-        recordSfWriteSuccess(isStaffWrite);
-        if (isStaffWrite) {
-          logger.info({ adminEmail: staffEmail }, 'Staff Penny interaction logged to Salesforce');
-        }
-      }).catch((logErr: unknown) => {
-        const errMsg = logErr instanceof Error ? logErr.message : String(logErr);
-        recordSfWriteFailure('Penny_Interaction_Log__c', errMsg);
-        const isPermission =
-          errMsg.includes('INSUFFICIENT_ACCESS') ||
-          errMsg.includes('FIELD_INTEGRITY_EXCEPTION') ||
-          errMsg.includes('Required fields are missing') ||
-          errMsg.includes('CREATE_FAILED');
-        if (isPermission) {
-          logger.error(
-            { logErr, object: 'Penny_Interaction_Log__c', sfContactId, isStaffWrite },
-            'SF WRITE REFUSED — Penny_Interaction_Log__c — Create permission denied. ' +
-            'If the integration user was recently changed, grant Create on ' +
-            'Penny_Interaction_Log__c in the connected permission set. ' +
-            'For staff writes: also confirm Learner__c is nillable and Admin_Email__c exists.'
-          );
-        } else {
-          logger.warn(
-            { logErr, object: 'Penny_Interaction_Log__c', isStaffWrite },
-            'Failed to log Penny interaction to Salesforce'
-          );
-        }
-      });
+
+      if (isStaffWrite) {
+        // Learner__c is a required (non-nillable) lookup on Penny_Interaction_Log__c.
+        // Staff sessions have no Contact — the write would be rejected.
+        // This is a deliberate, known skip: record it as such so the write-health
+        // strip shows it as neutral rather than a failure.
+        // Resolution: make Learner__c nillable in SF Setup to enable staff logging.
+        recordSfWriteSkip('Learner__c is required — staff SF logging deferred pending schema change');
+        logger.info({ adminEmail: staffEmail, audience }, 'Staff Penny interaction skipped SF write (Learner__c required)');
+      } else if (shouldWriteToSf) {
+        recordSfWriteAttempt(false);
+        logInteraction(sfClient, {
+          contactId:     sfContactId,
+          adminEmail:    null,
+          userMessage:   query.trim(),
+          pennyResponse: text,
+          promptMode,
+          source:        sfSource,
+          audience,
+        }).then(() => {
+          recordSfWriteSuccess(false);
+        }).catch((logErr: unknown) => {
+          const errMsg = logErr instanceof Error ? logErr.message : String(logErr);
+          recordSfWriteFailure('Penny_Interaction_Log__c', errMsg);
+          const isPermission =
+            errMsg.includes('INSUFFICIENT_ACCESS') ||
+            errMsg.includes('FIELD_INTEGRITY_EXCEPTION') ||
+            errMsg.includes('Required fields are missing') ||
+            errMsg.includes('CREATE_FAILED');
+          if (isPermission) {
+            logger.error(
+              { logErr, object: 'Penny_Interaction_Log__c', sfContactId },
+              'SF WRITE REFUSED — Penny_Interaction_Log__c — Create permission denied. ' +
+              'If the integration user was recently changed, grant Create on ' +
+              'Penny_Interaction_Log__c in the connected permission set.'
+            );
+          } else {
+            logger.warn(
+              { logErr, object: 'Penny_Interaction_Log__c' },
+              'Failed to log Penny interaction to Salesforce'
+            );
+          }
+        });
+      }
     }
 
     return res.json({

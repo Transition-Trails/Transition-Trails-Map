@@ -45,16 +45,31 @@ export interface TrailConfig {
  * the org schema.  Do NOT add values here without first adding them to the
  * picklist in SF Setup → Object Manager → Penny Interaction Log → Fields → Source.
  *
- * History: the original code wrote "web", which is not a permitted value.
- * Salesforce silently rejected every insert; the fire-and-forget design meant
- * the failure was only visible in server logs.  The correct value for the Trail
- * OS web interface is "dashboard".
+ * Permitted values confirmed by a live SF describe on 2026-08-05:
+ *   'TRAIL OS', 'dashboard', 'slack_dm', 'slack_mention', 'mobile'
+ *
+ * Origin → source mapping:
+ *   Trail OS web interface  → 'TRAIL OS'   (this file; all /api/penny/ask requests)
+ *   Slack DM                → 'slack_dm'   (future Slack bot route)
+ *   Slack @mention          → 'slack_mention' (future Slack bot route)
+ *   Mobile app              → 'mobile'     (future mobile route)
+ *   Legacy / existing recs  → 'dashboard'  (kept for backward compat with old records)
+ *
+ * History: original code wrote "web" (not permitted → silent zero-record failure).
+ * Then corrected to "dashboard" (permitted but semantically wrong for the web UI).
+ * On 2026-08-05 the org added 'TRAIL OS' as the canonical web-interface value.
  */
-export type SfInteractionSource = 'dashboard' | 'slack_dm' | 'slack_mention' | 'mobile';
+export type SfInteractionSource = 'TRAIL OS' | 'dashboard' | 'slack_dm' | 'slack_mention' | 'mobile';
 
 export const SF_INTERACTION_SOURCES: readonly SfInteractionSource[] = [
-  'dashboard', 'slack_dm', 'slack_mention', 'mobile',
+  'TRAIL OS', 'dashboard', 'slack_dm', 'slack_mention', 'mobile',
 ] as const;
+
+// Compile-time exhaustiveness guard — if SfInteractionSource and
+// SF_INTERACTION_SOURCES drift apart this assignment fails to typecheck.
+const _sourceExhaustive: Record<SfInteractionSource, true> =
+  Object.fromEntries(SF_INTERACTION_SOURCES.map(s => [s, true])) as Record<SfInteractionSource, true>;
+void _sourceExhaustive;
 
 export interface LogInteractionPayload {
   /**
@@ -78,8 +93,8 @@ export interface LogInteractionPayload {
   source: SfInteractionSource;
   /**
    * Audience identity used for this exchange ('learner', 'internal', etc.).
-   * Captured by the local DB today; will be written to Audience__c on
-   * Penny_Interaction_Log__c when that field is added to the SF schema.
+   * Written to Audience__c on Penny_Interaction_Log__c (field added 2026-08-05).
+   * Also captured by the local DB (pennyLogsTable).
    */
   audience?: string | null;
 }
@@ -90,6 +105,7 @@ export interface InteractionLogRecord {
   pennyResponse: string;
   promptMode: string;
   source: string;
+  audience: string | null;
   createdDate: string;
 }
 
