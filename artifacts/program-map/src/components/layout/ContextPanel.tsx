@@ -2585,33 +2585,41 @@ export function ContextPanel() {
       style={{ boxShadow: '-4px 0 18px rgba(0,0,0,0.08)' }}
     >
       {collapsed ? (
-        /* ── Focus Mode ──────────────────────────────────────────────────────
-           Full-height button. ChevronLeft at top signals "click to expand left".
-           Colored left border + group-hover primary tint make it clearly
-           interactive rather than decorative.
+        /* ── Collapsed strip ─────────────────────────────────────────────────
+           Top: × button closes panel entirely (rightPanelOpen → false).
+           Bottom: click-to-expand area restores the full panel.
         ──────────────────────────────────────────────────────────────────── */
-        <button
-          onClick={() => setCollapsed(false)}
-          aria-label="Open Trail Insights"
-          title="Open Trail Insights"
-          className="flex-1 w-full flex flex-col items-center justify-center gap-3 py-6
-            hover:bg-primary/5 hover:border-primary transition-all duration-200
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary
-            group"
-        >
-          {/* Chevron pointing left — expand affordance */}
-          <ChevronLeft className="w-4 h-4 text-primary/50 group-hover:text-primary transition-colors duration-200" />
-
-          {/* Icon + label */}
-          <Layers className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary/70 transition-colors duration-200" />
-          <span
-            className="text-[14px] font-bold  select-none transition-colors duration-200
-              text-muted-foreground/40 group-hover:text-primary/70"
-            style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+        <div className="flex-1 w-full flex flex-col">
+          {/* Close entirely */}
+          <button
+            onClick={() => { setCollapsed(false); setRightPanelOpen(false); }}
+            aria-label="Close panel"
+            title="Close panel"
+            className="w-full flex items-center justify-center py-2 text-muted-foreground/30
+              hover:text-muted-foreground hover:bg-muted/30 transition-colors shrink-0"
           >
-            Trail Insights
-          </span>
-        </button>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Expand back */}
+          <button
+            onClick={() => setCollapsed(false)}
+            aria-label="Open Trail Insights"
+            title="Open Trail Insights"
+            className="flex-1 w-full flex flex-col items-center justify-center gap-3 py-4
+              hover:bg-primary/5 transition-colors duration-200 group"
+          >
+            <Layers className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary/70 transition-colors duration-200" />
+            <span
+              className="text-[14px] font-bold select-none transition-colors duration-200
+                text-muted-foreground/40 group-hover:text-primary/70"
+              style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+            >
+              Trail Insights
+            </span>
+            <ChevronLeft className="w-3.5 h-3.5 text-primary/40 group-hover:text-primary transition-colors duration-200" />
+          </button>
+        </div>
       ) : (
         /* ── Brief Mode ──────────────────────────────────────────────────────
            Labeled "Focus ›" collapse button — clearly shows the action and
