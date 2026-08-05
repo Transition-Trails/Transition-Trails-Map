@@ -1,6 +1,6 @@
+import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Tag, Wrench, Sparkles, ArrowUpCircle } from "lucide-react";
+import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -29,7 +29,6 @@ const RELEASES: Release[] = [
       { kind: "major",  text: "Salesforce interaction log now writes with correct Source__c value ('TRAIL OS') — eliminates the silent zero-record failure that was discarding all logs." },
       { kind: "major",  text: "Staff writes to Penny_Interaction_Log__c are now deliberately skipped (Learner__c is required) and surfaced as a neutral 'Skipped' column in the write-health strip instead of silently failing." },
       { kind: "major",  text: "Audience__c field wiring added to interaction log payload, SOQL queries, and memory-window filter — activates automatically once the field is provisioned in Salesforce Setup." },
-      { kind: "major",  text: "Deployment build hook added: production DB schema is now auto-migrated (drizzle-kit push) on every publish, ending the schema-drift warnings that appeared in the publish UI." },
       { kind: "minor",  text: "Write-health strip expanded to 4 columns: Attempts · Successful · Failed · Skipped." },
       { kind: "minor",  text: "Compile-time exhaustiveness guard added to SfInteractionSource — adding a new picklist value without handling it is now a TypeScript error." },
       { kind: "minor",  text: "Version badge in sidebar footer is now a link to this release notes page." },
@@ -118,18 +117,40 @@ const KIND_META: Record<ChangeKind, { label: string; icon: React.ReactNode; colo
 function KindBadge({ kind }: { kind: ChangeKind }) {
   const meta = KIND_META[kind];
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium shrink-0 ${meta.color}`}
-    >
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium shrink-0 ${meta.color}`}>
       {meta.icon}
       {meta.label}
     </span>
   );
 }
 
+// ── Summary chips for the selector panel ─────────────────────────────────────
+
+function ReleaseSummaryChips({ entries }: { entries: ReleaseEntry[] }) {
+  const counts: Record<ChangeKind, number> = { major: 0, minor: 0, fix: 0 };
+  for (const e of entries) counts[e.kind]++;
+  return (
+    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+      {(["major", "minor", "fix"] as ChangeKind[]).map((k) =>
+        counts[k] > 0 ? (
+          <span
+            key={k}
+            className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium border ${KIND_META[k].color}`}
+          >
+            {counts[k]} {KIND_META[k].label}
+          </span>
+        ) : null
+      )}
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ReleaseNotes() {
+  const [selectedVersion, setSelectedVersion] = useState<string>(RELEASES[0].version);
+  const release = RELEASES.find((r) => r.version === selectedVersion) ?? RELEASES[0];
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -142,52 +163,102 @@ export default function ReleaseNotes() {
         </div>
         <h1 className="text-lg font-semibold font-serif text-foreground">Release Notes</h1>
         <p className="text-[12px] text-muted-foreground mt-0.5">
-          A history of major features, improvements, and bug fixes across every version.
+          A history of major features, improvements, and bug fixes.
         </p>
       </div>
 
-      {/* Legend */}
-      <div className="px-6 py-3 border-b border-border shrink-0 flex items-center gap-3">
-        <span className="text-[11px] text-muted-foreground mr-1">Key:</span>
-        {(["major", "minor", "fix"] as ChangeKind[]).map((k) => (
-          <KindBadge key={k} kind={k} />
-        ))}
-      </div>
+      {/* Body: selector + content */}
+      <div className="flex flex-1 min-h-0">
+        {/* ── Version selector ── */}
+        <aside className="w-52 shrink-0 border-r border-border flex flex-col">
+          <div className="px-3 pt-3 pb-2">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium px-2">
+              Versions
+            </p>
+          </div>
+          <ScrollArea className="flex-1">
+            <nav className="px-2 pb-4 space-y-0.5">
+              {RELEASES.map((r) => {
+                const isActive = r.version === selectedVersion;
+                return (
+                  <button
+                    key={r.version}
+                    onClick={() => setSelectedVersion(r.version)}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors group ${
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground hover:bg-muted/60"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[13px] font-semibold ${isActive ? "text-primary" : "text-foreground"}`}>
+                          v{r.version}
+                        </span>
+                        {r.label && (
+                          <span className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/25">
+                            {r.label}
+                          </span>
+                        )}
+                      </div>
+                      {isActive && (
+                        <ChevronRight className="w-3 h-3 text-primary shrink-0" />
+                      )}
+                    </div>
+                    <p className={`text-[11px] mt-0.5 ${isActive ? "text-primary/70" : "text-muted-foreground"}`}>
+                      {r.date}
+                    </p>
+                    <ReleaseSummaryChips entries={r.entries} />
+                  </button>
+                );
+              })}
+            </nav>
+          </ScrollArea>
+        </aside>
 
-      {/* Releases */}
-      <ScrollArea className="flex-1">
-        <div className="px-6 py-6 space-y-10 max-w-2xl">
-          {RELEASES.map((release) => (
-            <section key={release.version}>
-              {/* Version header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-semibold font-serif text-foreground">
-                    v{release.version}
+        {/* ── Release content ── */}
+        <ScrollArea className="flex-1">
+          <div className="px-8 py-6 max-w-2xl">
+            {/* Version heading */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-semibold font-serif text-foreground">
+                  v{release.version}
+                </h2>
+                {release.label && (
+                  <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                    {release.label}
                   </span>
-                  {release.label && (
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-                      {release.label}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[11px] text-muted-foreground">{release.date}</span>
-                <div className="flex-1 border-t border-border" />
+                )}
               </div>
+              <span className="text-[12px] text-muted-foreground">{release.date}</span>
+            </div>
 
-              {/* Entries grouped by kind */}
+            {/* Legend */}
+            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border">
+              <span className="text-[11px] text-muted-foreground">Key:</span>
+              {(["major", "minor", "fix"] as ChangeKind[]).map((k) => (
+                <KindBadge key={k} kind={k} />
+              ))}
+            </div>
+
+            {/* Entries grouped by kind */}
+            <div className="space-y-6">
               {(["major", "minor", "fix"] as ChangeKind[]).map((kind) => {
                 const items = release.entries.filter((e) => e.kind === kind);
                 if (items.length === 0) return null;
                 return (
-                  <div key={kind} className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
+                  <div key={kind}>
+                    <div className="flex items-center gap-2 mb-3">
                       <KindBadge kind={kind} />
+                      <span className="text-[11px] text-muted-foreground">
+                        {items.length} change{items.length !== 1 ? "s" : ""}
+                      </span>
                     </div>
-                    <ul className="space-y-2 pl-1">
+                    <ul className="space-y-2.5 pl-1">
                       {items.map((entry, i) => (
-                        <li key={i} className="flex gap-2 text-[12px] text-foreground/80 leading-relaxed">
-                          <span className="mt-1.5 w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0" />
+                        <li key={i} className="flex gap-2.5 text-[12px] text-foreground/80 leading-relaxed">
+                          <span className="mt-2 w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0" />
                           {entry.text}
                         </li>
                       ))}
@@ -195,10 +266,45 @@ export default function ReleaseNotes() {
                   </div>
                 );
               })}
-            </section>
-          ))}
-        </div>
-      </ScrollArea>
+            </div>
+
+            {/* Footer nav */}
+            <div className="flex items-center justify-between mt-10 pt-4 border-t border-border">
+              {(() => {
+                const idx = RELEASES.findIndex((r) => r.version === selectedVersion);
+                const prev = RELEASES[idx + 1];
+                const next = RELEASES[idx - 1];
+                return (
+                  <>
+                    <div>
+                      {prev && (
+                        <button
+                          onClick={() => setSelectedVersion(prev.version)}
+                          className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          ← v{prev.version}
+                          <span className="text-muted-foreground/60">{prev.date}</span>
+                        </button>
+                      )}
+                    </div>
+                    <div>
+                      {next && (
+                        <button
+                          onClick={() => setSelectedVersion(next.version)}
+                          className="flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <span className="text-muted-foreground/60">{next.date}</span>
+                          v{next.version} →
+                        </button>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
