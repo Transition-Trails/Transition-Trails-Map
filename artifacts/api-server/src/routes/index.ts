@@ -29,6 +29,7 @@ import roleOwnersRouter        from "./roleOwners";
 import personaHealthRouter     from "./personaHealth";
 import sessionsRouter           from "./sessions";
 import voiceoverRouter          from "./voiceover";
+import governanceRouter         from "./governance";
 import { requireStaff, requireAdmin } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
@@ -139,5 +140,6 @@ router.use(roleOwnersRouter);
 router.use(personaHealthRouter);
 router.use(sessionsRouter);
 router.use(voiceoverRouter);
+router.use(governanceRouter);
 
 export default router;

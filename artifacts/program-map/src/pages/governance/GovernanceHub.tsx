@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { TERMS } from '@/config/terminology';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -410,15 +411,91 @@ function ApprovalsTab() {
 }
 
 // ── Tab 5: Review Cycles ──────────────────────────────────────────────────────
+
+interface ArticleReviewStats {
+  totalReviewed:     number;
+  overdue:           number;
+  upcoming:          number;
+  current:           number;
+  oldestOverdueSince: string | null;
+  nextDueSoonest:    string | null;
+  lastReviewedAt:    string | null;
+  lastReviewedBy:    string | null;
+}
+
+function fmtReviewDate(iso: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function ReviewCyclesTab() {
-  const overdue  = REVIEW_CYCLES.filter(r => r.status === 'overdue');
-  const upcoming = REVIEW_CYCLES.filter(r => r.status === 'upcoming');
-  const current  = REVIEW_CYCLES.filter(r => r.status === 'current');
-  const notSched = REVIEW_CYCLES.filter(r => r.status === 'not-scheduled');
+  const { data: liveData, isLoading: liveLoading } = useQuery<{ knowledgeArticles: ArticleReviewStats }>({
+    queryKey: ['governance-review-cycles'],
+    queryFn: async () => {
+      const r = await fetch('/api/governance/review-cycles');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    },
+    staleTime: 2 * 60 * 1000,
+    retry: 1,
+  });
+
+  const live = liveData?.knowledgeArticles ?? null;
+
+  // Merge live data into the static REVIEW_CYCLES for the knowledge-article row.
+  // All other rows remain static.
+  const enrichedCycles = useMemo(() => {
+    return REVIEW_CYCLES.map(r => {
+      if (r.objectTypeId !== 'knowledge-article' || !live) return r;
+
+      // Derive status from live data
+      const status: ReviewCycle['status'] =
+        live.overdue   > 0   ? 'overdue'  :
+        live.upcoming  > 0   ? 'upcoming' :
+        live.current   > 0   ? 'current'  :
+                               'not-scheduled';
+
+      return {
+        ...r,
+        status,
+        lastReview: fmtReviewDate(live.lastReviewedAt),
+        nextReview: live.nextDueSoonest ? fmtReviewDate(live.nextDueSoonest) : r.nextReview,
+      };
+    });
+  }, [live]);
+
+  const overdue  = enrichedCycles.filter(r => r.status === 'overdue');
+  const upcoming = enrichedCycles.filter(r => r.status === 'upcoming');
+  const current  = enrichedCycles.filter(r => r.status === 'current');
+  const notSched = enrichedCycles.filter(r => r.status === 'not-scheduled');
 
   return (
     <ScrollArea className="h-full">
       <div className="p-5 space-y-4">
+        {/* Live article review stats banner */}
+        {live && live.totalReviewed > 0 && (
+          <div className={`rounded-lg border px-4 py-3 ${live.overdue > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#9FC3AE] bg-[#E6F0EA]'}`}>
+            <p className={`text-[14px] font-bold mb-1 ${live.overdue > 0 ? 'text-[#A93F2F]' : 'text-[#2F6B3F]'}`}>
+              Knowledge Article Reviews — Live Data
+            </p>
+            <div className="flex flex-wrap gap-4 text-[13px]">
+              <span className="text-[#2F6B3F]">✓ {live.current} current</span>
+              <span className="text-[#CC8400]">⚡ {live.upcoming} due soon</span>
+              <span className="text-[#A93F2F]">⚠ {live.overdue} overdue</span>
+              <span className="text-muted-foreground">{live.totalReviewed} total reviewed</span>
+            </div>
+            {live.lastReviewedAt && (
+              <p className="text-[12px] text-muted-foreground mt-1">
+                Last review: {fmtReviewDate(live.lastReviewedAt)}
+                {live.lastReviewedBy ? ` by ${live.lastReviewedBy}` : ''}
+              </p>
+            )}
+          </div>
+        )}
+        {liveLoading && (
+          <div className="text-[12px] text-muted-foreground px-1">Loading live review data…</div>
+        )}
+
         {overdue.length > 0 && (
           <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3">
             <p className="text-[14px] font-bold text-[#A93F2F]  mb-2">⚠ Overdue Reviews ({overdue.length})</p>
@@ -444,9 +521,17 @@ function ReviewCyclesTab() {
               </tr>
             </thead>
             <tbody>
-              {REVIEW_CYCLES.map((r, i) => (
-                <tr key={r.objectTypeId} className={`border-b border-border/40 ${i % 2 === 0 ? 'bg-white' : 'bg-muted/20'}`}>
-                  <td className="px-3 py-2 font-semibold text-foreground whitespace-nowrap">{r.objectTypeName}</td>
+              {enrichedCycles.map((r, i) => (
+                <tr
+                  key={r.objectTypeId}
+                  className={`border-b border-border/40 ${i % 2 === 0 ? 'bg-white' : 'bg-muted/20'} ${r.objectTypeId === 'knowledge-article' && live ? 'ring-1 ring-inset ring-primary/10' : ''}`}
+                >
+                  <td className="px-3 py-2 font-semibold text-foreground whitespace-nowrap">
+                    {r.objectTypeName}
+                    {r.objectTypeId === 'knowledge-article' && live && (
+                      <span className="ml-1.5 inline-flex items-center px-1 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">live</span>
+                    )}
+                  </td>
                   <td className="px-3 py-2 text-muted-foreground">{r.cadence}</td>
                   <td className="px-3 py-2 text-muted-foreground">{r.owner}</td>
                   <td className="px-3 py-2 text-muted-foreground">{r.lastReview ?? '—'}</td>

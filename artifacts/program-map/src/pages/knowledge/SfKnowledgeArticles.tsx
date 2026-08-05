@@ -2,13 +2,21 @@
 // Split-pane: article list on left, detail panel on right.
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search, FileText, ChevronRight, Loader2, AlertCircle,
-  RefreshCw, Calendar, Globe, Eye, EyeOff, BookOpen,
+  RefreshCw, Calendar, Globe, Eye, EyeOff, BookOpen, CheckCircle, Clock,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
+
+interface ArticleReview {
+  id:            number;
+  articleId:     string;
+  reviewedAt:    string;
+  reviewedBy:    string | null;
+  nextReviewDue: string | null;
+}
 
 interface SfArticle {
   id: string;
@@ -140,6 +148,92 @@ function ArticleCard({
   );
 }
 
+// ── Review info strip ─────────────────────────────────────────────────────────
+
+function ReviewStrip({ articleId }: { articleId: string }) {
+  const qc = useQueryClient();
+  const now = new Date();
+
+  const { data: reviewData, isLoading: reviewLoading } = useQuery<{ review: ArticleReview | null }>({
+    queryKey: ['article-review', articleId],
+    queryFn: async () => {
+      const r = await fetch(`/api/governance/article-review/${encodeURIComponent(articleId)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    },
+    staleTime: 2 * 60 * 1000,
+    retry: 1,
+  });
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const r = await fetch(`/api/knowledge/sf-articles/${encodeURIComponent(articleId)}/mark-reviewed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['article-review', articleId] });
+      void qc.invalidateQueries({ queryKey: ['governance-review-cycles'] });
+    },
+  });
+
+  const review = reviewData?.review ?? null;
+  const nextDue = review?.nextReviewDue ? new Date(review.nextReviewDue) : null;
+  const isOverdue = nextDue ? nextDue < now : false;
+  const isDueSoon = nextDue && !isOverdue
+    ? (nextDue.getTime() - now.getTime()) <= 30 * 24 * 60 * 60 * 1000
+    : false;
+
+  if (reviewLoading) return (
+    <div className="px-6 py-2 border-b bg-muted/20 text-[11px] text-muted-foreground flex items-center gap-1.5">
+      <Loader2 className="w-3 h-3 animate-spin" /> Loading review status…
+    </div>
+  );
+
+  return (
+    <div className={`px-6 py-2.5 border-b flex items-center justify-between gap-3 ${
+      isOverdue  ? 'bg-[#FBEAE6] border-b-[#E8B9B4]' :
+      isDueSoon  ? 'bg-[#FFF3E0] border-b-[#FFD08A]' :
+      review     ? 'bg-[#E6F0EA] border-b-[#9FC3AE]' :
+                   'bg-muted/20'
+    }`}>
+      <div className="flex items-center gap-2 flex-wrap text-[12px]">
+        {review ? (
+          <>
+            <CheckCircle className={`w-3.5 h-3.5 shrink-0 ${isOverdue ? 'text-[#A93F2F]' : 'text-[#2F6B3F]'}`} />
+            <span className={isOverdue ? 'text-[#A93F2F]' : isDueSoon ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}>
+              Reviewed {fmtDate(review.reviewedAt)}
+              {review.reviewedBy ? ` by ${review.reviewedBy}` : ''}
+            </span>
+            {nextDue && (
+              <span className={`flex items-center gap-1 ${isOverdue ? 'font-semibold text-[#A93F2F]' : isDueSoon ? 'text-[#CC8400]' : 'text-muted-foreground'}`}>
+                <Clock className="w-3 h-3" />
+                {isOverdue ? 'Overdue since' : 'Next due'} {nextDue.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+            )}
+          </>
+        ) : (
+          <span className="text-muted-foreground flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5" />
+            Never reviewed — mark as reviewed to start tracking the cycle
+          </span>
+        )}
+      </div>
+      <button
+        onClick={() => mutation.mutate()}
+        disabled={mutation.isPending}
+        className="shrink-0 h-7 px-3 rounded-md border border-primary/30 bg-white text-[11px] font-semibold text-primary hover:bg-primary/5 disabled:opacity-40 transition-colors flex items-center gap-1.5"
+      >
+        {mutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
+        Mark reviewed
+      </button>
+    </div>
+  );
+}
+
 // ── Detail panel ───────────────────────────────────────────────────────────────
 
 function DetailPanel({ articleId }: { articleId: string }) {
@@ -217,6 +311,9 @@ function DetailPanel({ articleId }: { articleId: string }) {
           </span>
         </div>
       </div>
+
+      {/* Review info strip */}
+      <ReviewStrip articleId={articleId} />
 
       {/* Body content — render all sections when available, fall back to legacy body */}
       <div className="px-6 py-5 space-y-6">

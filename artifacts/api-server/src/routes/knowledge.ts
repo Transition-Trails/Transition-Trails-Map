@@ -1513,6 +1513,11 @@ router.get("/knowledge/sf-article-reviews", async (req, res): Promise<void> => {
 // POST /api/knowledge/sf-articles/:id/mark-reviewed
 // Records that the authenticated user reviewed this article right now.
 // :id is the KnowledgeArticleVersion Id (same as used in the list/detail routes).
+//
+// Cadence: Knowledge Articles are reviewed biannually (every 6 months) per the
+// Governance Ownership Matrix. next_review_due is set to 6 months from now.
+const KNOWLEDGE_ARTICLE_REVIEW_MONTHS = 6;
+
 router.post("/knowledge/sf-articles/:id/mark-reviewed", async (req, res): Promise<void> => {
   const { id } = req.params;
   if (!id || typeof id !== "string" || id.length === 0) {
@@ -1523,9 +1528,13 @@ router.post("/knowledge/sf-articles/:id/mark-reviewed", async (req, res): Promis
     const reviewedBy: string | null =
       (req.user as { email?: string } | undefined)?.email ?? null;
 
+    const now = new Date();
+    const nextReviewDue = new Date(now);
+    nextReviewDue.setMonth(nextReviewDue.getMonth() + KNOWLEDGE_ARTICLE_REVIEW_MONTHS);
+
     const [row] = await db
       .insert(articleReviewsTable)
-      .values({ articleId: id, reviewedBy })
+      .values({ articleId: id, reviewedBy, nextReviewDue })
       .returning();
 
     res.status(201).json({ review: row });
