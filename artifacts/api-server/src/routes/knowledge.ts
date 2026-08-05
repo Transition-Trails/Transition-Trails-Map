@@ -1663,6 +1663,24 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "article";
 }
 
+// GET /api/knowledge/sf-article-types
+// Returns Knowledge article type __kav object names from the connected SF org.
+router.get("/knowledge/sf-article-types", async (req, res): Promise<void> => {
+  try {
+    const client = new ConnectorSalesforceClient();
+    const result = await client.rest<{ sobjects?: { name: string; label: string; queryable: boolean }[] }>(
+      `/services/data/${(ConnectorSalesforceClient as unknown as { SF_API_VERSION?: string }).SF_API_VERSION ?? "v62.0"}/sobjects/`
+    );
+    const kavTypes = (result.sobjects ?? [])
+      .filter(s => s.name.endsWith("__kav") && s.queryable)
+      .map(s => ({ value: s.name, label: s.label.replace(/ Version$/, "") }));
+    res.json({ articleTypes: kavTypes });
+  } catch (err) {
+    req.log.warn(err, "Failed to fetch SF article types — returning empty list");
+    res.json({ articleTypes: [] });
+  }
+});
+
 // GET /api/knowledge/articles
 router.get("/knowledge/articles", async (req, res): Promise<void> => {
   try {
@@ -1692,8 +1710,8 @@ router.get("/knowledge/articles/:id", async (req, res): Promise<void> => {
 // POST /api/knowledge/articles  — create draft
 router.post("/knowledge/articles", async (req, res): Promise<void> => {
   try {
-    const { title, summary = "", body = "", category = "", urlName } = req.body as {
-      title: string; summary?: string; body?: string; category?: string; urlName?: string;
+    const { title, summary = "", body = "", category = "", articleType = "", urlName } = req.body as {
+      title: string; summary?: string; body?: string; category?: string; articleType?: string; urlName?: string;
     };
     if (!title?.trim()) { res.status(400).json({ error: "title is required" }); return; }
     const authoredBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
@@ -1704,6 +1722,7 @@ router.post("/knowledge/articles", async (req, res): Promise<void> => {
       summary,
       body,
       category,
+      articleType,
       urlName: urlName?.trim() || slugify(title),
       status: "draft",
       authoredBy,
@@ -1725,16 +1744,17 @@ router.patch("/knowledge/articles/:id", async (req, res): Promise<void> => {
       res.status(409).json({ error: "Only draft articles can be edited. Recall it first." });
       return;
     }
-    const { title, summary, body, category, urlName } = req.body as Partial<{
-      title: string; summary: string; body: string; category: string; urlName: string;
+    const { title, summary, body, category, articleType, urlName } = req.body as Partial<{
+      title: string; summary: string; body: string; category: string; articleType: string; urlName: string;
     }>;
     const [updated] = await db.update(knowledgeArticlesTable)
       .set({
-        ...(title     !== undefined && { title: title.trim() }),
-        ...(summary   !== undefined && { summary }),
-        ...(body      !== undefined && { body }),
-        ...(category  !== undefined && { category }),
-        ...(urlName   !== undefined && { urlName: urlName.trim() || slugify(title ?? current.title) }),
+        ...(title       !== undefined && { title: title.trim() }),
+        ...(summary     !== undefined && { summary }),
+        ...(body        !== undefined && { body }),
+        ...(category    !== undefined && { category }),
+        ...(articleType !== undefined && { articleType }),
+        ...(urlName     !== undefined && { urlName: urlName.trim() || slugify(title ?? current.title) }),
         updatedAt: new Date(),
       })
       .where(eq(knowledgeArticlesTable.id, req.params.id))
@@ -1842,7 +1862,8 @@ router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<v
       payload[bodyInfo.fields[0]!.name] = article.body;
     }
 
-    const objectName = bodyInfo?.objectName ?? "Knowledge__kav";
+    // Use the article's chosen type, falling back to the discovered object or a safe default.
+    const objectName = article.articleType || bodyInfo?.objectName || "Knowledge__kav";
 
     req.log.info({ objectName, payload: Object.keys(payload) }, "Publishing article to SF Knowledge");
 

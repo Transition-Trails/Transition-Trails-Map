@@ -8,6 +8,7 @@ export interface KnowledgeArticle {
   summary: string;
   body: string;
   category: string;
+  articleType: string;
   urlName: string;
   status: ArticleStatus;
   authoredBy: string | null;
@@ -27,6 +28,7 @@ export interface ArticleFormData {
   summary: string;
   body: string;
   category: string;
+  articleType: string;
   urlName?: string;
 }
 

@@ -290,6 +290,35 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * Tiptap / ProseMirror rich text editor
+ * ───────────────────────────────────────────────────────────────────────────── */
+.rich-editor .ProseMirror {
+  outline: none;
+  min-height: inherit;
+}
+.rich-editor .ProseMirror p { margin: 0 0 0.6em; }
+.rich-editor .ProseMirror p:last-child { margin-bottom: 0; }
+.rich-editor .ProseMirror h2 { font-size: 1.2em; font-weight: 700; margin: 0.8em 0 0.4em; }
+.rich-editor .ProseMirror h3 { font-size: 1.05em; font-weight: 600; margin: 0.7em 0 0.35em; }
+.rich-editor .ProseMirror h4 { font-size: 0.95em; font-weight: 600; margin: 0.6em 0 0.3em; }
+.rich-editor .ProseMirror ul { list-style: disc; padding-left: 1.5em; margin: 0.4em 0; }
+.rich-editor .ProseMirror ol { list-style: decimal; padding-left: 1.5em; margin: 0.4em 0; }
+.rich-editor .ProseMirror li { margin: 0.15em 0; }
+.rich-editor .ProseMirror hr { border: none; border-top: 1px solid hsl(var(--border)); margin: 1em 0; }
+.rich-editor .ProseMirror blockquote { border-left: 3px solid hsl(var(--border)); padding-left: 0.85em; color: hsl(var(--muted-foreground)); margin: 0.6em 0; }
+.rich-editor .ProseMirror a { color: hsl(var(--primary)); text-decoration: underline; }
+.rich-editor .ProseMirror strong { font-weight: 700; }
+.rich-editor .ProseMirror em { font-style: italic; }
+.rich-editor .ProseMirror u { text-decoration: underline; }
+.rich-editor .ProseMirror .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: hsl(var(--muted-foreground) / 0.5);
+  pointer-events: none;
+  height: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * Quill rich text viewer — matches classes emitted by Salesforce Rich Text Areas
  * ───────────────────────────────────────────────────────────────────────────── */
 .ql-quote-block {

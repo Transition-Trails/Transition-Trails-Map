@@ -11,6 +11,7 @@ export const knowledgeArticlesTable = pgTable("knowledge_articles", {
   body:            text("body").notNull().default(""),
   category:        text("category").notNull().default(""),
   urlName:         text("url_name").notNull(),
+  articleType:     text("article_type").notNull().default(""),
 
   // Workflow status: 'draft' | 'pending-review' | 'approved' | 'published'
   status:          text("status").notNull().default("draft"),
