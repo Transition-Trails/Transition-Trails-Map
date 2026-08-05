@@ -1365,7 +1365,7 @@ function AccessDenied() {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PennyPromptStudio() {
-  const { setSelectedItem, openActionPanel, openSlackPanel } = useAppContext();
+  const { setSelectedItem, openActionPanel, openSlackPanel, selectedItem } = useAppContext();
   const { isPowerOrAbove } = useTierFlags();
   const { templates: liveTemplates, create, update } = usePromptTemplates();
   const { user } = useGoogleAuth();
@@ -1542,10 +1542,10 @@ export default function PennyPromptStudio() {
                   update({ id, updates });
                   // Keep the Context Panel (Trail Insights) in sync — it holds a snapshot
                   // set at Brief-click time and won't update unless we push the new data.
-                  setSelectedItem(prev =>
-                    prev?.type === 'promptTemplate' && prev.id === id
-                      ? { ...prev, data: { ...(prev.data as PromptTemplate), ...updates } }
-                      : prev
+                  setSelectedItem(
+                    selectedItem?.type === 'promptTemplate' && selectedItem.id === id
+                      ? { ...selectedItem, data: { ...(selectedItem.data as PromptTemplate), ...updates } }
+                      : selectedItem
                   );
                 }}
               />

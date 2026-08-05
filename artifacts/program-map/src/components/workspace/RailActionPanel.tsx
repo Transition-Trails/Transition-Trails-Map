@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { X, CheckCircle2, Hash, Sparkles, Save, MessageSquare } from 'lucide-react';
+import { X, CheckCircle2, Hash, Sparkles, Save, MessageSquare, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ActionPanelConfig } from '@/types/actionPanel';

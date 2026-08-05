@@ -21,7 +21,7 @@ export type SyncDirection = 'Read Only' | 'Write Only' | 'Bidirectional' | 'Even
 
 export type AuthType = 'OAuth 2.0' | 'API Key' | 'Service Account' | 'Webhook' | 'JWT' | 'Session Token' | 'TBD';
 
-export type LaunchPhase = 'Planned' | 'TBD';
+export type LaunchPhase = 'Planned' | 'TBD' | 'Live';
 
 export type RiskSeverity  = 'Critical' | 'High' | 'Medium' | 'Low';
 export type RiskLikelihood = 'Likely' | 'Possible' | 'Unlikely';
