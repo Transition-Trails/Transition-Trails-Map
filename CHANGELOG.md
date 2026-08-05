@@ -15,6 +15,62 @@ Changes on `dev` branch not yet merged to `main`.
 
 ---
 
+## [1.4.0] — 2026-08-05 — Penny Dashboard Redesign, Governance Hub Live Dates & Trail Insights Panel Fixes
+
+### Added
+
+**Penny Command Center — identity-aware engagement dashboard (`0a6b532`)**
+- Replaced the system-health-first layout with a two-column engagement overview
+- Four stat cards: Total Interactions, Active Learners, Avg Satisfaction, Top Trail
+- Identity breakdown rows for all five Penny audiences (Learner / Internal / Coach / Client / Public) with interaction counts, last-active recency, top query, and satisfaction
+- Trail Activity table showing top 5 trails by interaction volume with satisfaction bars
+- Recent Interactions feed (last 10) with audience badge, trail tag, and timestamp
+- Right column: 7 prompt-layer status indicators, Salesforce write-health strip, needs-attention alerts, and quick-action buttons (Ask Penny, View Logs, Configure)
+- `GET /api/penny/stats` endpoint — aggregates today's `penny_logs` by audience and trailId, returns lifetime totals and last 10 interactions (`artifacts/api-server/src/routes/penny.ts`)
+
+**Governance Hub — real article review dates (`caf698b`)**
+- Review Cycles tab now shows live `last_reviewed_at` and `next_review_due` dates pulled from the `article_reviews` DB table instead of static placeholders
+- `GET /api/governance/article-review/:articleId` wired into `GovernanceHub.tsx` and `SfKnowledgeArticles.tsx` via per-article fetch on row expand
+- Review status badge (`Up to Date` / `Due Soon` / `Overdue`) derived from real dates at render time
+- `article_reviews` schema updated to include `reviewer_email` and `notes` fields
+
+**Governance Hub — overdue article drill-down (`f5161ab`)**
+- Review Cycles tab now lists every individual overdue article beneath each Knowledge Base source instead of showing only aggregate counts
+- `GET /api/governance/article-reviews/overdue` returns articles with `next_review_due < now()` joined to their KB source
+- Each overdue article row shows title, days overdue, assigned reviewer, and a direct link to the Salesforce article record
+- Aggregate count badge updated to reflect the live overdue count from the API
+
+**Trail Insights panel — Topbar "Insights" toggle (`b651b70`)**
+- Added a persistent **Insights** button (Layers icon, same pill style as Penny / Calendar / Mail) to the Topbar; visible on every page
+- Button turns green/primary when the panel is open; muted when closed — mirrors the existing Penny and Calendar affordances
+- Provides a universal entry point to open Trail Insights without first needing to click a list row
+
+### Fixed
+
+**Trail Insights panel — opening wiring (`b651b70`)**
+- `openSlackPanel()` and `openActionPanel()` in `AppContext.tsx` now call `setRightPanelOpen(true)` — previously both functions set their config state but never surfaced the panel, so Trail Signals clicks and action-panel triggers left `ContextPanel` hidden behind `display:none`
+- `ContextPanel`'s `slackPanel` and `actionPanel` `useEffect` hooks also call `setRightPanelOpen(true)` as belt-and-suspenders for callers that bypass the AppContext helpers
+
+**Trail Insights panel — collapsed strip blocking page content (`ae5078b`)**
+- The 36 px collapsed "Trail Insights" strip (flex child) was covering the `+ Add capability` button and other right-edge controls on pages like Penny Capabilities
+- Collapsed strip now has two zones: a `›` close chevron at the top that fully dismisses the panel (`setRightPanelOpen(false)`), and the "Trail Insights" expand area below that restores the full panel as before
+
+**Trail Insights panel — row clicks no longer blocked by Trail Signals (`b083d81`)**
+- `ContextPanel.tsx` renders `slackPanel` content before calling `renderContent()`, so if Trail Signals was open it always won the display slot — clicking a list row updated `selectedItem` but the panel stayed on `SlackContextPanel`
+- `setSelectedItem` in `AppContext.tsx` is now a wrapper that clears `slackPanel` and `actionPanel` before updating the item and setting `rightPanelOpen(true)`; `syncSelected` (internal data sync) uses the raw setter via functional updater so it does not clear panels
+
+**Right-rail panel crash from task-agent merge (`21099ad`)**
+- `Send` was missing from the lucide-react import in `RailActionPanel.tsx` — caused a `ReferenceError` at runtime whenever any inline edit panel rendered inside the ContextPanel
+- `PennyPromptStudio.tsx` was passing a functional updater `(prev => ...)` to `setSelectedItem` which is typed as a direct-value setter; rewritten to read `selectedItem` from context and construct the updated object explicitly
+- `integrationReadinessData.ts` — `LaunchPhase` union type was missing `'Live'`; two records using that value caused a type error at build
+
+### Changed
+
+- Penny Command Center layout widened to `max-w-4xl` to accommodate the two-column engagement grid
+- Trail Signals indicator (`SignalsIndicator` in Topbar) label now shows `Trail Signals` when the panel is open and `N urgent` / `N Trail Signals` when closed — consistent with the Penny / Calendar button pattern
+
+---
+
 ## [1.3.0] — 2026-08-04 — Salesforce Preflight Hardening, Penny Capability QA & Prompt Studio Review Flow
 
 ### Added
