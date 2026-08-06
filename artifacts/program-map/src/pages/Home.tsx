@@ -3,12 +3,14 @@ import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
 import { useLocation } from 'wouter';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import {
   Activity, Users, Inbox, Brain,
   ArrowRight, CheckCircle2, Circle,
   BarChart3, FileText, Bot,
   AlertTriangle, Calendar,
   RefreshCw, WifiOff, ChevronRight,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { useSfOpsSummary, formatSyncAge, type SfCount } from '@/hooks/useSfOpsSummary';
 import {
@@ -82,6 +84,8 @@ export default function Home() {
   const { programs } = useAppContext();
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, navigate] = useLocation();
+  const { user } = useGoogleAuth();
+  const isTeam = user?.audience === 'team';
   const { visibleRecs } = useActionItems();
   const { domainHealthData, overallHealthScore, overallHealthLevel } = useHealthScores();
 
@@ -121,6 +125,23 @@ export default function Home() {
 
       {/* ── Scrollable body ── */}
       <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
+
+        {/* ── Back to Homebase (team users only) ── */}
+        {isTeam && (
+          <button
+            onClick={() => navigate('/')}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors text-left group"
+          >
+            <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+              <Home className="w-3.5 h-3.5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-foreground leading-none">Back to Homebase</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Return to your daily workspace</p>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+          </button>
+        )}
 
         {/* ── EVERYDAY: compact metric strip ── */}
         {isEveryday && (
