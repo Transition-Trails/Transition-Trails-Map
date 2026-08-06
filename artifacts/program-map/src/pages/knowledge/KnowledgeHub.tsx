@@ -46,7 +46,8 @@ function fmt(iso?: string | null): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-const LS_MODE = 'trailos:knowledgeHubMode';
+const LS_MODE    = 'trailos:knowledgeHubMode';
+const LS_ARTICLE = 'knowledge_last_article_id';
 function lsRead<T>(key: string, fallback: T): T {
   try { const v = localStorage.getItem(key); return v ? (JSON.parse(v) as T) : fallback; } catch { return fallback; }
 }
@@ -1118,7 +1119,7 @@ const GOV_TABS: { id: GovTab; label: string; icon: React.ElementType }[] = [
 // ── Main hub ───────────────────────────────────────────────────────────────────
 
 export default function KnowledgeHub() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const { toast }  = useToast();
 
   const [mode, setModeRaw] = useState<HubMode>(() => {
@@ -1136,7 +1137,35 @@ export default function KnowledgeHub() {
     publishToSf, deleteArticle,
   } = useKnowledgeArticles();
 
-  const [selectedId,   setSelectedId]   = useState<string | null>(null);
+  // ── Persisted article selection ──────────────────────────────────────────────
+  // Priority: ?article=<id> URL param → localStorage → null
+  const [selectedId, setSelectedIdRaw] = useState<string | null>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('article');
+    if (fromUrl) return fromUrl;
+    return lsRead<string | null>(LS_ARTICLE, null);
+  });
+
+  function setSelectedId(id: string | null) {
+    setSelectedIdRaw(id);
+    if (id) {
+      lsWrite(LS_ARTICLE, id);
+      navigate(`/knowledge?article=${id}`, { replace: true });
+    } else {
+      lsWrite(LS_ARTICLE, null);
+      navigate('/knowledge', { replace: true });
+    }
+  }
+
+  // Once articles finish loading, drop the persisted ID if it no longer exists
+  useEffect(() => {
+    if (loading || !selectedId) return;
+    if (!articles.find(a => a.id === selectedId)) {
+      setSelectedIdRaw(null);
+      lsWrite(LS_ARTICLE, null);
+    }
+  }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [isNewArticle, setIsNewArticle] = useState(false);
   const [saving,       setSaving]       = useState(false);
 
