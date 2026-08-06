@@ -15,8 +15,8 @@
 
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { db } from "@workspace/db";
-import { timeLogsTable } from "@workspace/db/schema";
-import { desc, eq, gte } from "drizzle-orm";
+import { timeLogsTable, volunteerProfilesTable } from "@workspace/db/schema";
+import { desc, eq, gte, and } from "drizzle-orm";
 import { requireHomebaseAuth } from "../middlewares/requireAuth";
 import { logger } from "../lib/logger";
 
@@ -530,6 +530,230 @@ router.get("/homebase/coach/cases", requireHomebaseAuth, requireCoachAudience, a
   }
 
   res.json({ linked: true, sfUnavailable: false, cases, totalOpen: cases.length });
+});
+
+// ── Volunteer audience guard ───────────────────────────────────────────────────
+
+function requireVolunteerAudience(req: Request, res: Response, next: NextFunction): void {
+  if (req.session.googleAudience !== "volunteer") {
+    res.status(403).json({ error: "Volunteer access only" });
+    return;
+  }
+  next();
+}
+
+// ── Volunteer helper: resolve or upsert profile ───────────────────────────────
+
+interface VolunteerProfileRow {
+  userEmail:             string;
+  monthlyCommitmentHours: number | null;
+  caseLimit:             number | null;
+  specialty:             string | null;
+  coordinatorSlackId:    string | null;
+  coordinatorName:       string | null;
+  volunteerSlackChannel: string | null;
+  updatedAt:             Date;
+}
+
+async function getOrCreateVolunteerProfile(email: string): Promise<VolunteerProfileRow | null> {
+  try {
+    const rows = await db
+      .select()
+      .from(volunteerProfilesTable)
+      .where(eq(volunteerProfilesTable.userEmail, email))
+      .limit(1);
+    if (rows.length > 0) return rows[0] as VolunteerProfileRow;
+
+    // Seed an empty row so future reads are consistent
+    const inserted = await db
+      .insert(volunteerProfilesTable)
+      .values({ userEmail: email })
+      .returning();
+    return (inserted[0] as VolunteerProfileRow) ?? null;
+  } catch (err) {
+    logger.warn({ err }, "getOrCreateVolunteerProfile: DB error");
+    return null;
+  }
+}
+
+// ── Merch tier helper ──────────────────────────────────────────────────────────
+
+const MERCH_TIERS = [
+  { points: 100,  name: "Trail Sticker" },
+  { points: 250,  name: "Trail Tee"     },
+  { points: 500,  name: "Trail Hoodie"  },
+  { points: 1000, name: "Trail Jacket"  },
+];
+
+function nextMerchTier(points: number) {
+  const tier = MERCH_TIERS.find(t => t.points > points);
+  return tier ?? null;
+}
+
+// ── GET /homebase/volunteer/month ─────────────────────────────────────────────
+//
+// Returns the volunteer's hours logged this calendar month (from time_logs)
+// and their monthly commitment (from volunteer_profiles).
+// Points = hoursLogged × 10 (local tracking; SF gamification is a follow-on).
+//
+// Response:
+//   { hoursLogged, hoursCommitment, commitmentSet, points,
+//     nextMerchTier, nextMerchPoints, pointsToNext, specialty, caseLimit }
+
+router.get("/homebase/volunteer/month", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+
+  // ── Time log sum for current month ─────────────────────────────────────────
+  const now        = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  let hoursLogged = 0;
+  try {
+    const rows = await db
+      .select()
+      .from(timeLogsTable)
+      .where(
+        and(
+          eq(timeLogsTable.userEmail, email),
+          gte(timeLogsTable.loggedAt, monthStart),
+        ),
+      )
+      .orderBy(desc(timeLogsTable.loggedAt));
+    hoursLogged = rows.reduce((sum, r) => sum + Number(r.hours), 0);
+    hoursLogged = Math.round(hoursLogged * 100) / 100;
+  } catch (err) {
+    logger.warn({ err }, "homebase/volunteer/month: time_logs query failed");
+  }
+
+  // ── Volunteer profile ──────────────────────────────────────────────────────
+  const profile = await getOrCreateVolunteerProfile(email);
+
+  const hoursCommitment    = profile?.monthlyCommitmentHours ?? null;
+  const commitmentSet      = hoursCommitment !== null;
+  const points             = Math.floor(hoursLogged * 10);
+  const nextTier           = nextMerchTier(points);
+  const pointsToNext       = nextTier ? Math.max(0, nextTier.points - points) : 0;
+
+  res.json({
+    hoursLogged,
+    hoursCommitment,
+    commitmentSet,
+    points,
+    nextMerchTier:   nextTier?.name   ?? null,
+    nextMerchPoints: nextTier?.points ?? null,
+    pointsToNext,
+    specialty:  profile?.specialty  ?? null,
+    caseLimit:  profile?.caseLimit  ?? null,
+  });
+});
+
+// ── GET /homebase/volunteer/cases ─────────────────────────────────────────────
+//
+// Same three-state SF error contract as learner/coach:
+//   SfNotConfiguredError → { sfUnavailable:true, linked:null }
+//   HTTP error           → 503 { sfUnavailable:true }
+//   No Contact record    → { linked:false }
+//   Records found        → { linked:true, cases, totalOpen }
+
+router.get("/homebase/volunteer/cases", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+
+  // ── Step 1: Contact lookup ────────────────────────────────────────────────
+  let contactId: string | null;
+  try {
+    const contacts = await sfSvcQuery<{ Id: string }>(
+      `SELECT Id FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`,
+    );
+    contactId = contacts[0]?.Id ?? null;
+  } catch (err) {
+    if (err instanceof SfNotConfiguredError) {
+      res.json({ linked: null, sfUnavailable: true, cases: [], totalOpen: 0 });
+      return;
+    }
+    logger.warn({ err }, "homebase/volunteer/cases: SF contact lookup failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  if (!contactId) {
+    res.json({ linked: false, sfUnavailable: false, cases: [], totalOpen: 0 });
+    return;
+  }
+
+  // ── Step 2: Cases ─────────────────────────────────────────────────────────
+  type CaseRecord = {
+    Id: string; CaseNumber: string | null; Subject: string | null;
+    Status: string | null; Priority: string | null;
+    LastModifiedDate: string | null; CreatedDate: string | null;
+  };
+
+  let cases: CaseRecord[];
+  try {
+    cases = await sfSvcQuery<CaseRecord>(
+      `SELECT Id, CaseNumber, Subject, Status, Priority, LastModifiedDate, CreatedDate FROM Case WHERE ContactId = '${contactId}' AND IsClosed = false ORDER BY LastModifiedDate DESC LIMIT 20`,
+    );
+  } catch (err) {
+    logger.warn({ err }, "homebase/volunteer/cases: Cases query failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  res.json({ linked: true, sfUnavailable: false, cases, totalOpen: cases.length });
+});
+
+// ── GET /homebase/volunteer/queue ─────────────────────────────────────────────
+//
+// Phase-1 stub. Returns empty queue.
+// Will query unassigned SF Cases filtered to the volunteer's specialty once
+// the volunteer SF object and queue fields are provisioned.
+
+router.get("/homebase/volunteer/queue", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+  const profile = await getOrCreateVolunteerProfile(email);
+  const caseLimit = profile?.caseLimit ?? 3;
+
+  res.json({
+    items:     [],
+    openCount: 0,
+    caseLimit,
+    hasData:   false,
+  });
+});
+
+// ── GET /homebase/volunteer/growth ────────────────────────────────────────────
+//
+// Phase-1 stub. Returns empty skill suggestions.
+// Will generate Penny skill recommendations from unmatched queue analysis.
+
+router.get("/homebase/volunteer/growth", requireHomebaseAuth, requireVolunteerAudience, (_req, res) => {
+  res.json({ skills: [], hasData: false });
+});
+
+// ── GET /homebase/volunteer/shareables ────────────────────────────────────────
+//
+// Phase-1 stub. Returns empty shareable content.
+// Will pull advocacy posts and volunteer work highlights in a future sprint.
+
+router.get("/homebase/volunteer/shareables", requireHomebaseAuth, requireVolunteerAudience, (_req, res) => {
+  res.json({ items: [], hasData: false });
+});
+
+// ── GET /homebase/volunteer/coordinator ───────────────────────────────────────
+//
+// Returns the volunteer coordinator contact from volunteer_profiles.
+// Phase 1: reads from local DB only; SF Contact lookup is a follow-on once
+// coordinator data is wired into SF records.
+
+router.get("/homebase/volunteer/coordinator", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
+  const email   = req.session.googleEmail!;
+  const profile = await getOrCreateVolunteerProfile(email);
+
+  res.json({
+    coordinatorName:       profile?.coordinatorName       ?? null,
+    coordinatorSlackId:    profile?.coordinatorSlackId    ?? null,
+    volunteerSlackChannel: profile?.volunteerSlackChannel ?? null,
+    linked: profile?.coordinatorName ? true : null,
+  });
 });
 
 export default router;

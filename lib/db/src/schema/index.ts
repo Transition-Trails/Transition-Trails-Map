@@ -29,3 +29,4 @@ export * from "./articleReviews";
 export * from "./knowledgeArticles";
 export * from "./moduleDrafts";
 export * from "./timeLogs";
+export * from "./volunteerProfiles";

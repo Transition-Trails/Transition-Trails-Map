@@ -1,9 +1,8 @@
 import { Loader2 } from "lucide-react";
 import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
-import { HomebaseShell }   from "@/components/layout/HomebaseShell";
-import { LogTimeRow }      from "@/components/homebase/LogTimeRow";
-import LearnerHomebase     from "@/pages/homebase/LearnerHomebase";
-import CoachHomebase       from "@/pages/homebase/CoachHomebase";
+import LearnerHomebase    from "@/pages/homebase/LearnerHomebase";
+import CoachHomebase      from "@/pages/homebase/CoachHomebase";
+import VolunteerHomebase  from "@/pages/homebase/VolunteerHomebase";
 
 /**
  * HomebaseLanding
@@ -45,24 +44,11 @@ export default function HomebaseLanding() {
     );
   }
 
-  // Volunteer — full HomebaseShell with LogTimeRow preserved while
-  // audience-specific page (task #252) is pending.
+  // Volunteer
   return (
-    <HomebaseShell audience="volunteer" displayName={displayName ?? ""}>
-      <div className="flex flex-col gap-6 px-6 py-8 max-w-2xl mx-auto">
-        <div className="rounded-xl border border-border bg-white p-5">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">
-            Volunteer Homebase
-          </p>
-          <h2 className="text-base font-semibold text-foreground">
-            {displayName ? `Welcome back, ${displayName.split(" ")[0]}` : "Welcome to Trail OS"}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-            Your full homebase view is on the way. Log your time below while you wait.
-          </p>
-        </div>
-        <LogTimeRow audience="volunteer" />
-      </div>
-    </HomebaseShell>
+    <VolunteerHomebase
+      audience="volunteer"
+      displayName={displayName ?? ""}
+    />
   );
 }
