@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -159,6 +159,17 @@ const BUILDER_SECTIONS: ContentSection[] = [
     minLength: 60,
   },
 ];
+
+// ── Standard → Builder section mapping ───────────────────────────────────────
+
+const STANDARD_TO_SECTION: Record<string, string> = {
+  'std-program-blueprint': 'overview',
+  'std-module':            'objectives',
+  'std-lesson':            'concepts',
+  'std-assessment':        'assessments',
+  'std-knowledge-article': 'concepts',
+  'std-reflection-prompt': 'penny',
+};
 
 // ── localStorage keys ─────────────────────────────────────────────────────────
 
@@ -401,6 +412,7 @@ function ContentStudio({
   selected,
   sectionValues,
   nodeStatus,
+  focusedSectionKey,
   onChange,
   onSave,
   onPublish,
@@ -409,11 +421,26 @@ function ContentStudio({
   selected: SelectedNode | null;
   sectionValues: Record<string, string>;
   nodeStatus: NodeStatus;
+  focusedSectionKey: string | null;
   onChange: (key: string, val: string) => void;
   onSave: () => void;
   onPublish: () => void;
   onRequestReview: () => void;
 }) {
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Scroll the focused section into view when it changes
+  useEffect(() => {
+    if (!focusedSectionKey) return undefined;
+    const el = sectionRefs.current[focusedSectionKey];
+    if (el) {
+      // Small delay to let mode switch animation settle
+      const id = setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+      return () => clearTimeout(id);
+    }
+    return undefined;
+  }, [focusedSectionKey, selected?.id]);
+
   if (!selected) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 bg-muted/10 p-8">
@@ -468,10 +495,17 @@ function ContentStudio({
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-4">
           {BUILDER_SECTIONS.map(section => {
-            const val    = sectionValues[section.key] ?? '';
-            const status = sectionStatus(val, section.minLength);
+            const val       = sectionValues[section.key] ?? '';
+            const status    = sectionStatus(val, section.minLength);
+            const isFocused = focusedSectionKey === section.key;
             return (
-              <div key={section.key} className="rounded-xl border border-border bg-white overflow-hidden">
+              <div
+                key={section.key}
+                ref={el => { sectionRefs.current[section.key] = el; }}
+                className={`rounded-xl border bg-white overflow-hidden transition-shadow ${
+                  isFocused ? 'border-amber-400 shadow-[0_0_0_3px_rgba(251,191,36,0.25)]' : 'border-border'
+                }`}
+              >
                 <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-border/50 bg-muted/10">
                   <div className="flex items-center gap-2">
                     <p className="text-[13px] font-semibold text-foreground">{section.label}</p>
@@ -1033,6 +1067,9 @@ export default function ProgramHub() {
   // Builder selection
   const [selected, setSelected] = useState<SelectedNode | null>(null);
 
+  // Section to highlight/scroll to when jumping from governance
+  const [focusedSectionKey, setFocusedSectionKey] = useState<string | null>(null);
+
   // Per-node content — persisted in localStorage, never reset on node switch
   const [allSectionValues, setAllSectionValues] = useState<Record<string, Record<string, string>>>(
     () => lsRead<Record<string, Record<string, string>>>(LS_CONTENT, {})
@@ -1096,26 +1133,51 @@ export default function ProgramHub() {
     toast({ title: 'Review requested', description: 'Status set to "In review" and saved locally.' });
   }
 
-  // View in Builder — switches to builder and selects the best-matching course for the program
-  function handleViewInBuilder(progId: string, _stdId: string) {
+  // View in Builder — switches to builder, selects the best-matching course, and scrolls to the relevant section
+  function handleViewInBuilder(progId: string, stdId: string) {
     setMode('builder');
+
+    // Resolve which builder section corresponds to this standard
+    const targetSection = STANDARD_TO_SECTION[stdId] ?? null;
+    setFocusedSectionKey(targetSection);
+    // Clear the highlight after 3 s so it doesn't stay forever
+    if (targetSection) {
+      setTimeout(() => setFocusedSectionKey(null), 3000);
+    }
+
     if (courses.length === 0) return;
 
     const prog = curriculumPrograms.find(p => p.id === progId);
     if (!prog) {
       const first = courses[0]!;
       setSelected({ kind: 'course', id: first.Id, name: first.Name, title: first.Course_Title__c, status: first.Status__c });
+      toast({
+        title: 'Program not found in Salesforce',
+        description: 'Could not find a matching LMS course. Opened the first available course instead.',
+        variant: 'destructive',
+      });
       return;
     }
 
     // Match by looking for a course whose title/name shares keywords with the program name
     const progWords = prog.name.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-    const match = courses.find(c => {
+    const exactMatch = courses.find(c => {
       const t = (c.Course_Title__c ?? c.Name).toLowerCase();
       return progWords.some(w => t.includes(w));
-    }) ?? courses[0]!;
+    });
 
-    setSelected({ kind: 'course', id: match.Id, name: match.Name, title: match.Course_Title__c, status: match.Status__c });
+    if (exactMatch) {
+      setSelected({ kind: 'course', id: exactMatch.Id, name: exactMatch.Name, title: exactMatch.Course_Title__c, status: exactMatch.Status__c });
+    } else {
+      // Fallback: open first course and warn
+      const first = courses[0]!;
+      setSelected({ kind: 'course', id: first.Id, name: first.Name, title: first.Course_Title__c, status: first.Status__c });
+      toast({
+        title: 'No matching LMS course found',
+        description: `"${prog.name}" has no matching Salesforce LMS course. Opened the first available course instead.`,
+        variant: 'destructive',
+      });
+    }
   }
 
   return (
@@ -1136,6 +1198,7 @@ export default function ProgramHub() {
             selected={selected}
             sectionValues={currentSectionValues}
             nodeStatus={currentNodeStatus}
+            focusedSectionKey={focusedSectionKey}
             onChange={handleSectionChange}
             onSave={handleSave}
             onPublish={handlePublish}
