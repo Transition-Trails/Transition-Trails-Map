@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   PenLine, Send, CheckCircle2, CloudUpload, RotateCcw,
   Trash2, Plus, ChevronRight, AlertCircle, Loader2, ExternalLink,
-  FileText, Clock, Eye, RefreshCw,
+  FileText, Clock, Eye, RefreshCw, Timer,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RichTextEditor } from '@/components/knowledge/RichTextEditor';
@@ -61,6 +61,33 @@ function StatusBadge({ status }: { status: string }) {
       {STATUS_LABELS[status] ?? status}
     </span>
   );
+}
+
+// ─── ReviewCycleChip ─────────────────────────────────────────────────────────
+
+const REVIEW_CYCLE_STYLES: Record<ReviewCycle, string> = {
+  Monthly:   'bg-violet-50 text-violet-600 border-violet-200',
+  Quarterly: 'bg-sky-50    text-sky-600    border-sky-200',
+  Yearly:    'bg-emerald-50 text-emerald-600 border-emerald-200',
+};
+
+function ReviewCycleChip({ cycle }: { cycle: ReviewCycle }) {
+  return (
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-semibold ${REVIEW_CYCLE_STYLES[cycle]}`}>
+      {cycle}
+    </span>
+  );
+}
+
+// ─── Overdue helpers ──────────────────────────────────────────────────────────
+
+const CYCLE_DAYS: Record<ReviewCycle, number> = { Monthly: 30, Quarterly: 90, Yearly: 365 };
+
+function isOverdue(article: KnowledgeArticle): boolean {
+  const baseline = article.reviewedAt ?? article.updatedAt;
+  if (!baseline) return false;
+  const daysSince = (Date.now() - new Date(baseline).getTime()) / 86_400_000;
+  return daysSince > CYCLE_DAYS[article.reviewCycle];
 }
 
 // ─── useArticleTypes — fetches SF article types ───────────────────────────────
@@ -530,6 +557,7 @@ function PublishPane({ article, onPublish, saving }: PublishPaneProps) {
 // ─── Main: ArticleStudio ──────────────────────────────────────────────────────
 
 type Filter = 'all' | 'draft' | 'pending-review' | 'approved' | 'published';
+type CycleFilter = 'all' | ReviewCycle;
 
 const FILTER_TABS: { id: Filter; label: string }[] = [
   { id: 'all',            label: 'All'       },
@@ -537,6 +565,13 @@ const FILTER_TABS: { id: Filter; label: string }[] = [
   { id: 'pending-review', label: 'In Review' },
   { id: 'approved',       label: 'Approved'  },
   { id: 'published',      label: 'Published' },
+];
+
+const CYCLE_FILTER_TABS: { id: CycleFilter; label: string }[] = [
+  { id: 'all',       label: 'All cycles' },
+  { id: 'Monthly',   label: 'Monthly'    },
+  { id: 'Quarterly', label: 'Quarterly'  },
+  { id: 'Yearly',    label: 'Yearly'     },
 ];
 
 export default function ArticleStudio() {
@@ -547,14 +582,17 @@ export default function ArticleStudio() {
     publishToSf, deleteArticle,
   } = useKnowledgeArticles();
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [isNew,      setIsNew]      = useState(false);
-  const [filter,     setFilter]     = useState<Filter>('all');
-  const [saving,     setSaving]     = useState(false);
-  const [toast,      setToast]      = useState<{ msg: string; ok: boolean } | null>(null);
+  const [selectedId,   setSelectedId]   = useState<string | null>(null);
+  const [isNew,        setIsNew]        = useState(false);
+  const [filter,       setFilter]       = useState<Filter>('all');
+  const [cycleFilter,  setCycleFilter]  = useState<CycleFilter>('all');
+  const [saving,       setSaving]       = useState(false);
+  const [toast,        setToast]        = useState<{ msg: string; ok: boolean } | null>(null);
 
   const selected = articles.find(a => a.id === selectedId) ?? null;
-  const filtered = filter === 'all' ? articles : articles.filter(a => a.status === filter);
+  const filtered = articles
+    .filter(a => filter === 'all' || a.status === filter)
+    .filter(a => cycleFilter === 'all' || a.reviewCycle === cycleFilter);
 
   function showToast(msg: string, ok = true) {
     setToast({ msg, ok });
@@ -652,6 +690,23 @@ export default function ArticleStudio() {
           })}
         </div>
 
+        {/* Review-cycle filter */}
+        <div className="flex flex-wrap gap-0.5 px-2 pb-2 border-b border-border/40">
+          {CYCLE_FILTER_TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setCycleFilter(tab.id)}
+              className={`px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                cycleFilter === tab.id
+                  ? 'bg-muted-foreground/20 text-foreground'
+                  : 'text-muted-foreground/60 hover:bg-muted/60'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         <ScrollArea className="flex-1">
           {loading ? (
             <div className="flex items-center justify-center p-8">
@@ -665,24 +720,33 @@ export default function ArticleStudio() {
             </p>
           ) : (
             <div className="divide-y divide-border/40">
-              {filtered.map(a => (
-                <button
-                  key={a.id}
-                  onClick={() => { setSelectedId(a.id); setIsNew(false); }}
-                  className={`w-full text-left px-4 py-3 flex items-start gap-2 transition-colors hover:bg-muted/50 ${
-                    selectedId === a.id && !isNew ? 'bg-muted' : ''
-                  }`}
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-foreground truncate">{a.title || 'Untitled'}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                      <StatusBadge status={a.status} />
-                      <span className="text-[11px] text-muted-foreground/60">{fmt(a.updatedAt)}</span>
+              {filtered.map(a => {
+                const overdue = isOverdue(a);
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => { setSelectedId(a.id); setIsNew(false); }}
+                    className={`w-full text-left px-4 py-3 flex items-start gap-2 transition-colors hover:bg-muted/50 ${
+                      selectedId === a.id && !isNew ? 'bg-muted' : ''
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-foreground truncate">{a.title || 'Untitled'}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        <StatusBadge status={a.status} />
+                        <ReviewCycleChip cycle={a.reviewCycle} />
+                        {overdue && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-orange-200 bg-orange-50 text-orange-600 text-[10px] font-semibold">
+                            <Timer className="w-2.5 h-2.5" />Due
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground/50 mt-0.5 block">{fmt(a.updatedAt)}</span>
                     </div>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0 mt-0.5" />
-                </button>
-              ))}
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0 mt-0.5" />
+                  </button>
+                );
+              })}
             </div>
           )}
         </ScrollArea>
