@@ -48,15 +48,13 @@ vi.mock('express-session', () => {
   };
 });
 
-vi.mock('session-file-store', () => {
-  return {
-    default: () => class FakeFileStore {
-      get(_sid: string, cb: (err: null, session: null) => void) { cb(null, null); }
-      set(_sid: string, _session: unknown, cb: () => void) { cb(); }
-      destroy(_sid: string, cb: () => void) { cb(); }
-    },
-  };
-});
+vi.mock('connect-pg-simple', () => ({
+  default: () => class FakePgStore {
+    get(_sid: string, cb: (err: null, s: null) => void) { cb(null, null); }
+    set(_sid: string, _s: unknown, cb: () => void) { cb(); }
+    destroy(_sid: string, cb: () => void) { cb(); }
+  },
+}));
 
 vi.mock('../middlewares/requireAuth.js', () => ({
   requireStaff:  (_req: unknown, _res: unknown, next: () => void) => next(),

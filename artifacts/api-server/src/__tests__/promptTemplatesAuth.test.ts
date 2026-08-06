@@ -52,15 +52,17 @@ vi.mock('express-session', () => ({
   },
 }));
 
-vi.mock('session-file-store', () => ({
-  default: () => class FakeFileStore {
-    get(_sid: string, cb: (err: null, session: null) => void) { cb(null, null); }
-    set(_sid: string, _session: unknown, cb: () => void) { cb(); }
+vi.mock('connect-pg-simple', () => ({
+  default: () => class FakePgStore {
+    on(_event: string, _cb: () => void) {}
+    get(_sid: string, cb: (err: null, s: null) => void) { cb(null, null); }
+    set(_sid: string, _s: unknown, cb: () => void) { cb(); }
     destroy(_sid: string, cb: () => void) { cb(); }
   },
 }));
 
 vi.mock('@workspace/db', () => ({
+  pool: { query: vi.fn().mockResolvedValue({ rows: [] }) },
   db: {
     select: vi.fn(() => ({ from: vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue([]), where: mockWhere })) })),
     insert: vi.fn(() => ({ values: vi.fn(() => ({ onConflictDoNothing: mockOnConflictDoNothing })) })),

@@ -43,13 +43,25 @@ function makeFetchMock(memberOf: string[]) {
 // ── googleGroupsCache ─────────────────────────────────────────────────────────
 
 describe('getGroupsForUser', () => {
+  const ORIG_ENV = { ...process.env };
+
   beforeEach(() => {
     clearGroupsCache();
     vi.clearAllMocks();
+    // Clear homebase group ENV vars so this block always probes exactly 3 staff groups.
+    // Tests that need homebase probing live in the "homebase group probing" describe below.
+    delete process.env['GOOGLE_GROUP_COACHES'];
+    delete process.env['GOOGLE_GROUP_VOLUNTEERS'];
+    delete process.env['GOOGLE_GROUP_LEARNERS'];
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    // Restore any homebase env vars that were set before this suite ran
+    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS']) {
+      if (ORIG_ENV[k] !== undefined) process.env[k] = ORIG_ENV[k];
+      else delete process.env[k];
+    }
   });
 
   it('returns an empty array when user is a personal Gmail account (not in any group)', async () => {

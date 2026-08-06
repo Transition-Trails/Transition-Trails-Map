@@ -58,17 +58,15 @@ vi.mock('express-session', () => {
   };
 });
 
-// stub session-file-store — app.ts calls sessionFileStore(session) at module
-// load time; without this the FileStore constructor throws in the test env
-vi.mock('session-file-store', () => {
-  return {
-    default: () => class FakeFileStore {
-      get(_sid: string, cb: (err: null, session: null) => void) { cb(null, null); }
-      set(_sid: string, _session: unknown, cb: () => void) { cb(); }
-      destroy(_sid: string, cb: () => void) { cb(); }
-    },
-  };
-});
+// stub connect-pg-simple — app.ts calls connectPgSimple(session) at module
+// load time; without this the PgStore constructor throws in the test env
+vi.mock('connect-pg-simple', () => ({
+  default: () => class FakePgStore {
+    get(_sid: string, cb: (err: null, s: null) => void) { cb(null, null); }
+    set(_sid: string, _s: unknown, cb: () => void) { cb(); }
+    destroy(_sid: string, cb: () => void) { cb(); }
+  },
+}));
 
 // Bypass the staff/admin requireAuth middleware entirely
 vi.mock('../middlewares/requireAuth.js', () => ({
