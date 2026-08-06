@@ -197,6 +197,12 @@ function Router() {
       <Route path="/program/sf-validation"> <Redirect to="/admin/sf-validation" /></Route>
       <Route path="/program/resources">     <Redirect to="/admin/program-resources" /></Route>
 
+      {/* Programs hub — old standalone pages now live inside the hub */}
+      <Route path="/program/blueprint">  <Redirect to="/program" /></Route>
+      <Route path="/program/standards">  <Redirect to="/program/governance" /></Route>
+      <Route path="/program/courses">    <Redirect to="/program" /></Route>
+      <Route path="/program/modules">    <Redirect to="/program" /></Route>
+
       {/* Curriculum → program hub */}
       <Route path="/curriculum/blueprint">           <Redirect to="/program/blueprint" /></Route>
       <Route path="/curriculum/standards">           <Redirect to="/program/standards" /></Route>
