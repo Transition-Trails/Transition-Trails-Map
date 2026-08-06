@@ -136,7 +136,7 @@ export default function Home() {
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors text-left group"
           >
             <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-              <Home className="w-3.5 h-3.5 text-primary" />
+              <HomeIcon className="w-3.5 h-3.5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-foreground leading-none">Back to Homebase</p>
