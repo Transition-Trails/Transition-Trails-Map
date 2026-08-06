@@ -251,7 +251,7 @@ export default function MyTrailSignals() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="max-w-4xl mx-auto px-6 py-6 space-y-8">
+      <div className="px-6 py-6 space-y-8">
 
         {/* ── Signal sources ── */}
         <div>

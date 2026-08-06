@@ -87,12 +87,10 @@ const navGroups: NavGroup[] = [
     icon: MessageSquare,
     pathPrefix: '/collaboration',
     items: [
-      { id: 'collab-my-signals',    path: '/collaboration/my-signals',    label: 'My Trail Signals', minTier: 'power' },
-      { id: 'collab-calendar-live', path: '/collaboration/calendar-live', label: 'Calendar',         minTier: 'power' },
-      { id: 'collab-gmail',         path: '/collaboration/gmail',         label: 'Gmail',            minTier: 'power' },
-      { id: 'collab-slack',         path: '/collaboration/slack',         label: 'Slack',     minTier: 'admin' },
-      { id: 'collab-channels',      path: '/collaboration/channels',      label: 'Channels',  minTier: 'admin' },
-      { id: 'collab-templates',     path: '/collaboration/templates',     label: 'Templates', minTier: 'admin' },
+      { id: 'collab-overview', path: '/collaboration',         label: 'Overview'       },
+      { id: 'collab-comms',    path: '/collaboration/comms',   label: 'Comms'          },
+      { id: 'collab-signals',  path: '/collaboration/signals', label: 'Trail Signals'  },
+      { id: 'collab-channels', path: '/collaboration/channels',label: 'Channels', minTier: 'admin' },
     ],
   },
   {
@@ -103,8 +101,8 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/admin',
     extraPrefixes: ['/uom', '/governance'],
     items: [
-      { id: 'admin-integrations',  path: '/admin/integrations',  label: 'Integrations'   },
-      { id: 'admin-people-access', path: '/admin/people-access', label: 'People & Access' },
+      { id: 'admin-integrations',  path: '/admin/integrations',  label: 'Integrations'    },
+      { id: 'admin-people-access', path: '/admin/people-access', label: 'People & Access'  },
     ],
   },
 ];

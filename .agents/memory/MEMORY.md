@@ -38,3 +38,4 @@
 - [Brand design system](brand-design-system.md) — TT brand tokens live in src/index.css :root Section 1; @theme inline maps them; dark theme untouched. Poppins=headings(font-serif), Open Sans=body(font-sans).
 - [Status colour system](status-color-system.md) — 5-role system in src/config/statusColors.ts; all off-brand Tailwind colours swept from the codebase (except ProgramMap.tsx per-program map colours and toast.tsx destructive styles).
 - [Digital Twin migration](digital-twin-migration.md) — Digital Twin folded into Governance as 3 tabs; /digital-twin/* redirects to /governance/tracer|map|impact.
+- [Collaboration hub consolidation](collaboration-hub.md) — 6 sidebar items + 2 dead pages folded into CollaborationHub (4 tabs: Overview/Comms/Signals/Channels); old /collaboration/* routes redirect.
