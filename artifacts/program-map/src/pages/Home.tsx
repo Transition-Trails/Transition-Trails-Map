@@ -85,7 +85,10 @@ export default function Home() {
   const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
   const [, navigate] = useLocation();
   const { user } = useGoogleAuth();
-  const isTeam = user?.audience === 'team';
+  // Superadmins always get audience=null (isKnownStaff short-circuits before
+  // deriveAudience runs), so check group membership directly instead.
+  const isTeam = user?.audience === 'team'
+    || user?.groups?.includes('team@transitiontrails.org');
   const { visibleRecs } = useActionItems();
   const { domainHealthData, overallHealthScore, overallHealthLevel } = useHealthScores();
 
@@ -129,7 +132,7 @@ export default function Home() {
         {/* ── Back to Homebase (team users only) ── */}
         {isTeam && (
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/homebase')}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors text-left group"
           >
             <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">

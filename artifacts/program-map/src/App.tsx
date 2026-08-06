@@ -104,6 +104,7 @@ import LearnerPenny       from "@/pages/learner/LearnerPenny";
 import LearnerQuest       from "@/pages/learner/LearnerQuest";
 import LearnerProgress    from "@/pages/learner/LearnerProgress";
 import HomebaseLanding    from "@/pages/homebase/HomebaseLanding";
+import TeamHomebase       from "@/pages/homebase/TeamHomebase";
 
 // ── TeamRoute — path-aware shell for team@ staff ──────────────────────────────
 // At '/' they see TeamHomebase; any admin path shows Mission Control (AppShell).
@@ -462,6 +463,23 @@ function InnerApp() {
       </Route>
       <Route path="/learner/progress">
         <LearnerRoute><LearnerProgress /></LearnerRoute>
+      </Route>
+
+      {/* /homebase — direct entry for team group members including superadmins.
+           Regular team users (audience='team') land here via TeamRoute at '/'.
+           Superadmins in the team group reach it via the "Back to Homebase" card.
+           Non-team signed-in users are redirected to '/'. */}
+      <Route path="/homebase">
+        {auth.isSignedIn ? (
+          auth.user?.audience === 'team'
+          || auth.user?.groups?.includes('team@transitiontrails.org') ? (
+            <TeamHomebase displayName={auth.user?.name ?? ''} />
+          ) : (
+            <Redirect to="/" />
+          )
+        ) : (
+          <SignInPage />
+        )}
       </Route>
 
       {/* Everything else — audience-dispatched */}
