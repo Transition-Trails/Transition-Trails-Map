@@ -27,6 +27,7 @@ interface DemandRequest {
   risk: RiskLevel;
   program: string;
   notes?: string;
+  sfSynced?: boolean; // true = exists in Salesforce; false/undefined = local draft only
 }
 
 // ── Seed data (prototype — owners/dates are placeholders) ─────────────────────
@@ -359,10 +360,229 @@ function SfCasesStrip() {
   );
 }
 
+// ── Inline Edit Form ──────────────────────────────────────────────────────────
+
+const EDIT_PROGRAMS = ["Explorer's Trail", 'Foundations Trail', 'Guided Trail', 'Trail of Mastery', 'Digital Compass', 'All Programs'];
+const EDIT_TYPES: RequestType[] = ['New Feature', 'Bug / Issue', 'Content Update', 'Change Request', 'Admin'];
+const EDIT_RISKS: { value: RiskLevel; label: string }[] = [
+  { value: 'normal',   label: 'Normal'   },
+  { value: 'elevated', label: 'Elevated' },
+  { value: 'high',     label: 'High / At Risk' },
+];
+
+function InlineEditForm({
+  req, draft, onChange, onSave, onCancel, onSendToSF, isSending, isSent,
+}: {
+  req:        DemandRequest;
+  draft:      Partial<DemandRequest>;
+  onChange:   (field: keyof DemandRequest, value: string) => void;
+  onSave:     () => void;
+  onCancel:   () => void;
+  onSendToSF: () => void;
+  isSending:  boolean;
+  isSent:     boolean;
+}) {
+  const accentCls = draft.risk === 'high' ? 'border-l-[#A93F2F]' : draft.risk === 'elevated' ? 'border-l-amber-400' : 'border-l-primary/40';
+  return (
+    <div className={`rounded-lg border border-primary/30 ring-1 ring-primary/15 bg-white overflow-hidden border-l-[3px] ${accentCls} shadow-sm`}>
+      {/* Header */}
+      <div className="px-4 py-2.5 border-b border-border/40 bg-muted/10 flex items-center gap-2">
+        <span className="text-[14px] font-mono text-muted-foreground/60">{req.id}</span>
+        <span className="text-[14px] text-muted-foreground/40">·</span>
+        <span className="text-[14px] font-semibold text-foreground">Editing</span>
+        {req.sfSynced && (
+          <span className="ml-1 text-[14px] font-semibold border rounded-full px-1.5 py-0.5 border-[#9FC3AE] text-[#245531] bg-[#E6F0EA]">
+            Salesforce
+          </span>
+        )}
+        <button onClick={onCancel} className="ml-auto text-muted-foreground/40 hover:text-foreground transition-colors p-1 rounded">
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <div className="p-4 space-y-3">
+        {/* Subject */}
+        <div>
+          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">Subject</label>
+          <input
+            autoFocus
+            value={draft.subject ?? ''}
+            onChange={e => onChange('subject', e.target.value)}
+            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white"
+            placeholder="Brief description…"
+          />
+        </div>
+
+        {/* Type · Program · Status · Risk */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {([
+            { label: 'Type',    field: 'type'    as const, options: EDIT_TYPES.map(t => ({ value: t, label: t })) },
+            { label: 'Program', field: 'program' as const, options: EDIT_PROGRAMS.map(p => ({ value: p, label: p })) },
+            { label: 'Status',  field: 'status'  as const, options: STATUS_OPTIONS.map(s => ({ value: s, label: s })) },
+            { label: 'Risk',    field: 'risk'    as const, options: EDIT_RISKS },
+          ] as { label: string; field: keyof DemandRequest; options: { value: string; label: string }[] }[]).map(sel => (
+            <div key={sel.label}>
+              <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">{sel.label}</label>
+              <select
+                value={(draft[sel.field] as string) ?? ''}
+                onChange={e => onChange(sel.field, e.target.value)}
+                className="w-full text-[14px] border border-border rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-primary/15"
+              >
+                {sel.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">Notes</label>
+          <textarea
+            value={draft.notes ?? ''}
+            onChange={e => onChange('notes', e.target.value)}
+            rows={3}
+            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white resize-none"
+            placeholder="Context, dependencies, or next actions…"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 pt-1 flex-wrap">
+          <button
+            onClick={onSave}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-semibold hover:opacity-85 transition-opacity"
+          >
+            <Check className="w-3 h-3" /> Save
+          </button>
+          <button
+            onClick={onCancel}
+            className="px-3 py-1.5 rounded-full text-[14px] font-semibold border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+          >
+            Cancel
+          </button>
+          <div className="flex-1" />
+          {isSent ? (
+            <span className="flex items-center gap-1.5 text-[14px] font-semibold text-[#2F6B3F]">
+              <CheckCheck className="w-3.5 h-3.5" /> Sent to Salesforce
+            </span>
+          ) : (
+            <button
+              onClick={onSendToSF}
+              disabled={isSending}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold border border-[#9FC3AE] bg-[#E6F0EA] text-[#245531] hover:bg-[#D0E5D8] transition-colors disabled:opacity-50"
+            >
+              {isSending
+                ? <><RefreshCw className="w-3 h-3 animate-spin" /> Sending…</>
+                : <><Database className="w-3 h-3" /> Send to Salesforce</>}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── New Demand Inline Form ─────────────────────────────────────────────────────
+
+function NewDemandForm({
+  draft, onChange, onSave, onSendToSF, onCancel, isSending,
+}: {
+  draft:      Partial<DemandRequest>;
+  onChange:   (field: keyof DemandRequest, value: string) => void;
+  onSave:     () => void;
+  onSendToSF: () => void;
+  onCancel:   () => void;
+  isSending:  boolean;
+}) {
+  const isValid = (draft.subject ?? '').trim().length > 0;
+  return (
+    <div className="rounded-xl border-2 border-dashed border-primary/40 bg-primary/3 overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-primary/20 bg-primary/5 flex items-center gap-2">
+        <Plus className="w-3.5 h-3.5 text-primary" />
+        <span className="text-[14px] font-semibold text-primary">New Demand Request</span>
+        <span className="text-[14px] text-primary/40">— local draft until sent to Salesforce</span>
+        <button onClick={onCancel} className="ml-auto text-primary/40 hover:text-primary transition-colors p-1 rounded">
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <div className="p-4 space-y-3">
+        <div>
+          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">
+            Subject <span className="text-[#A93F2F]">*</span>
+          </label>
+          <input
+            autoFocus
+            value={draft.subject ?? ''}
+            onChange={e => onChange('subject', e.target.value)}
+            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white"
+            placeholder="Brief description of the request…"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {([
+            { label: 'Type',     field: 'type'    as const, options: EDIT_TYPES.map(t => ({ value: t, label: t })) },
+            { label: 'Program',  field: 'program' as const, options: EDIT_PROGRAMS.map(p => ({ value: p, label: p })) },
+            { label: 'Priority', field: 'risk'    as const, options: EDIT_RISKS },
+          ] as { label: string; field: keyof DemandRequest; options: { value: string; label: string }[] }[]).map(sel => (
+            <div key={sel.label}>
+              <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">{sel.label}</label>
+              <select
+                value={(draft[sel.field] as string) ?? ''}
+                onChange={e => onChange(sel.field, e.target.value)}
+                className="w-full text-[14px] border border-border rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring focus:ring-primary/15"
+              >
+                {sel.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">Notes</label>
+          <textarea
+            value={draft.notes ?? ''}
+            onChange={e => onChange('notes', e.target.value)}
+            rows={3}
+            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white resize-none"
+            placeholder="What needs to happen and why? Any dependencies or urgency…"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 pt-1 flex-wrap">
+          <button
+            onClick={onSave}
+            disabled={!isValid}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-semibold hover:opacity-85 transition-opacity disabled:opacity-40"
+          >
+            <Check className="w-3 h-3" /> Save locally
+          </button>
+          <button
+            onClick={onSendToSF}
+            disabled={!isValid || isSending}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold border border-[#9FC3AE] bg-[#E6F0EA] text-[#245531] hover:bg-[#D0E5D8] transition-colors disabled:opacity-40"
+          >
+            {isSending
+              ? <><RefreshCw className="w-3 h-3 animate-spin" /> Sending…</>
+              : <><Database className="w-3 h-3" /> Save &amp; Send to Salesforce</>}
+          </button>
+          <button
+            onClick={onCancel}
+            className="px-3 py-1.5 rounded-full text-[14px] font-semibold border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── RequestRow ────────────────────────────────────────────────────────────────
 
 function RequestRow({
-  req, accentCls, expanded, selected, onSelect, onToggle, onUpdateStatus, onUpdateRisk, onAskPenny,
+  req, accentCls, expanded, selected, onSelect, onToggle, onUpdateStatus, onUpdateRisk, onAskPenny, onDoubleClick,
 }: {
   req: DemandRequest;
   accentCls: string;
@@ -373,6 +593,7 @@ function RequestRow({
   onUpdateStatus: (s: RequestStatus) => void;
   onUpdateRisk:   (r: RiskLevel)     => void;
   onAskPenny:     () => void;
+  onDoubleClick:  () => void;
 }) {
   const risk = RISK_CFG[req.risk];
   const dot  = TYPE_DOT[req.type];
@@ -418,7 +639,12 @@ function RequestRow({
 
       {/* Main row */}
       <div className="flex items-start group">
-        <button onClick={onSelect} className="flex-1 text-left px-3 py-2.5 flex items-start gap-2.5 min-w-0">
+        <button
+          onClick={onSelect}
+          onDoubleClick={e => { e.preventDefault(); onDoubleClick(); }}
+          title="Double-click to edit"
+          className="flex-1 text-left px-3 py-2.5 flex items-start gap-2.5 min-w-0"
+        >
           <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${dot}`} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
@@ -427,6 +653,11 @@ function RequestRow({
               {risk && (
                 <span className={`text-[14px] font-bold border rounded-full px-1 py-0.5 leading-none ${risk.cls}`}>
                   {risk.badge}
+                </span>
+              )}
+              {req.sfSynced && (
+                <span className="text-[14px] border rounded-full px-1 py-0.5 leading-none border-[#9FC3AE] text-[#245531] bg-[#E6F0EA]">
+                  SF
                 </span>
               )}
             </div>
@@ -439,6 +670,8 @@ function RequestRow({
               <span className="text-[14px] text-muted-foreground">{req.submitter}</span>
               <span className="text-muted-foreground/30 text-[14px]">·</span>
               <span className="text-[14px] text-muted-foreground">{req.age} ago</span>
+              <span className="text-muted-foreground/30 text-[14px]">·</span>
+              <span className="text-[14px] text-muted-foreground/30 group-hover:text-primary/40 transition-colors">double-click to edit</span>
             </div>
           </div>
         </button>
@@ -510,6 +743,8 @@ function GroupSection({
   group, items, collapsed, onToggleCollapse, expandedId, onToggleExpand,
   onSelectItem, selectedId,
   onUpdateStatus, onUpdateRisk, onAskPenny,
+  editingId, editDraft, onEditChange, onStartEdit, onSaveEdit, onCancelEdit, onSendEditToSF,
+  sfSending, sfSent,
 }: {
   group:           Group;
   items:           DemandRequest[];
@@ -522,6 +757,16 @@ function GroupSection({
   onUpdateStatus:  (id: string, s: RequestStatus) => void;
   onUpdateRisk:    (id: string, r: RiskLevel)     => void;
   onAskPenny:      (req: DemandRequest) => void;
+  // Inline edit
+  editingId:       string | null;
+  editDraft:       Partial<DemandRequest>;
+  onEditChange:    (field: keyof DemandRequest, value: string) => void;
+  onStartEdit:     (req: DemandRequest) => void;
+  onSaveEdit:      () => void;
+  onCancelEdit:    () => void;
+  onSendEditToSF:  () => void;
+  sfSending:       string | null;
+  sfSent:          Set<string>;
 }) {
   if (items.length === 0) return null;
 
@@ -550,20 +795,35 @@ function GroupSection({
       {/* Items */}
       {!collapsed && (
         <div className="space-y-1.5 mb-4">
-          {items.map(req => (
-            <RequestRow
-              key={req.id}
-              req={req}
-              accentCls={group.accentCls}
-              expanded={expandedId === req.id}
-              selected={selectedId === req.id}
-              onSelect={() => onSelectItem(req)}
-              onToggle={() => onToggleExpand(req.id)}
-              onUpdateStatus={s => onUpdateStatus(req.id, s)}
-              onUpdateRisk={r => onUpdateRisk(req.id, r)}
-              onAskPenny={() => onAskPenny(req)}
-            />
-          ))}
+          {items.map(req =>
+            editingId === req.id ? (
+              <InlineEditForm
+                key={req.id}
+                req={req}
+                draft={editDraft}
+                onChange={onEditChange}
+                onSave={onSaveEdit}
+                onCancel={onCancelEdit}
+                onSendToSF={onSendEditToSF}
+                isSending={sfSending === req.id}
+                isSent={sfSent.has(req.id)}
+              />
+            ) : (
+              <RequestRow
+                key={req.id}
+                req={req}
+                accentCls={group.accentCls}
+                expanded={expandedId === req.id}
+                selected={selectedId === req.id}
+                onSelect={() => onSelectItem(req)}
+                onToggle={() => onToggleExpand(req.id)}
+                onUpdateStatus={s => onUpdateStatus(req.id, s)}
+                onUpdateRisk={r => onUpdateRisk(req.id, r)}
+                onAskPenny={() => onAskPenny(req)}
+                onDoubleClick={() => onStartEdit(req)}
+              />
+            )
+          )}
         </div>
       )}
     </div>
@@ -689,14 +949,31 @@ const FILTER_OPTS: { key: FilterKey; label: string }[] = [
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+const BLANK_NEW: Partial<DemandRequest> = {
+  type: 'New Feature', program: "Explorer's Trail", status: 'Triaged', risk: 'normal', subject: '', notes: '',
+};
+
+let nextReqNum = 32; // increments for local drafts
+
 export default function Intake() {
-  const { openActionPanel, setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery, setSelectedItem, selectedItem } = useAppContext();
+  const { setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery, setSelectedItem, selectedItem } = useAppContext();
   const { isEveryday } = useTierFlags();
 
-  const [requests, setRequests] = useState<DemandRequest[]>([...SEED_REQUESTS]);
+  const [requests,    setRequests   ] = useState<DemandRequest[]>([...SEED_REQUESTS]);
   const [filter,      setFilter     ] = useState<FilterKey>('all');
   const [expandedId,  setExpandedId ] = useState<string | null>(null);
   const [collapsed,   setCollapsed  ] = useState<Set<string>>(new Set(['done']));
+
+  // ── Inline edit state ──
+  const [editingId,   setEditingId  ] = useState<string | null>(null);
+  const [editDraft,   setEditDraft  ] = useState<Partial<DemandRequest>>({});
+  const [sfSending,   setSfSending  ] = useState<string | null>(null); // id being sent
+  const [sfSent,      setSfSent     ] = useState<Set<string>>(new Set());
+
+  // ── New demand form state ──
+  const [showNewForm, setShowNewForm] = useState(false);
+  const [newDraft,    setNewDraft   ] = useState<Partial<DemandRequest>>({ ...BLANK_NEW });
+  const [newSfSending,setNewSfSending] = useState(false);
 
   // ── Derived ──
   const open      = requests.filter(r => r.status !== 'Completed');
@@ -705,9 +982,7 @@ export default function Intake() {
   const inReview  = requests.filter(r => r.status === 'In Review' || r.status === 'Approved');
   const closed30d = requests.filter(r => r.status === 'Completed').length;
 
-  // ── Group items (sort each group oldest→newest for urgency) ──
   const groups = GROUPS.map(g => ({ ...g, items: sortGroup(requests.filter(g.filter)) }));
-
   const filteredGroups = filter === 'all'     ? groups :
     filter === 'action'  ? groups.filter(g => g.key === 'critical' || g.key === 'elevated') :
     filter === 'active'  ? groups.filter(g => g.key === 'active')  :
@@ -722,28 +997,93 @@ export default function Intake() {
     return 0;
   };
 
-  // ── Handlers ──
+  // ── Status / risk handlers ──
   function updateStatus(id: string, status: RequestStatus) {
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
     if (expandedId === id) setExpandedId(null);
   }
-
   function updateRisk(id: string, risk: RiskLevel) {
     setRequests(prev => prev.map(r => r.id === id ? { ...r, risk } : r));
   }
-
   function toggleCollapse(key: string) {
-    setCollapsed(prev => {
-      const n = new Set(prev);
-      n.has(key) ? n.delete(key) : n.add(key);
-      return n;
-    });
+    setCollapsed(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
   }
-
   function toggleExpand(id: string) {
     setExpandedId(prev => prev === id ? null : id);
   }
 
+  // ── Inline edit handlers ──
+  function handleStartEdit(req: DemandRequest) {
+    setEditingId(req.id);
+    setEditDraft({ ...req });
+    setExpandedId(null);
+  }
+  function handleEditChange(field: keyof DemandRequest, value: string) {
+    setEditDraft(prev => ({ ...prev, [field]: value }));
+  }
+  function handleSaveEdit() {
+    if (!editingId) return;
+    setRequests(prev => prev.map(r => r.id === editingId ? { ...r, ...editDraft } : r));
+    setEditingId(null);
+    setEditDraft({});
+  }
+  function handleCancelEdit() {
+    setEditingId(null);
+    setEditDraft({});
+  }
+  function handleSendEditToSF() {
+    if (!editingId) return;
+    const id = editingId;
+    setSfSending(id);
+    // Simulate SF submission — mark as synced after 1.5s
+    setTimeout(() => {
+      setRequests(prev => prev.map(r => r.id === id ? { ...r, ...editDraft, sfSynced: true } : r));
+      setSfSending(null);
+      setSfSent(prev => new Set([...prev, id]));
+      setEditingId(null);
+      setEditDraft({});
+    }, 1500);
+  }
+
+  // ── New demand form handlers ──
+  function handleNewFormChange(field: keyof DemandRequest, value: string) {
+    setNewDraft(prev => ({ ...prev, [field]: value }));
+  }
+  function buildNewRequest(sfSynced: boolean): DemandRequest {
+    const id = `REQ-${String(nextReqNum++).padStart(3, '0')}`;
+    return {
+      id,
+      type:      (newDraft.type      ?? 'New Feature') as RequestType,
+      subject:   newDraft.subject    ?? '',
+      submitter: 'Me',
+      age:       '0d',
+      status:    'Triaged',
+      risk:      (newDraft.risk      ?? 'normal') as RiskLevel,
+      program:   newDraft.program    ?? "Explorer's Trail",
+      notes:     newDraft.notes,
+      sfSynced,
+    };
+  }
+  function handleSaveNewLocally() {
+    setRequests(prev => [buildNewRequest(false), ...prev]);
+    setShowNewForm(false);
+    setNewDraft({ ...BLANK_NEW });
+  }
+  function handleSendNewToSF() {
+    setNewSfSending(true);
+    setTimeout(() => {
+      setRequests(prev => [buildNewRequest(true), ...prev]);
+      setNewSfSending(false);
+      setShowNewForm(false);
+      setNewDraft({ ...BLANK_NEW });
+    }, 1500);
+  }
+  function handleCancelNew() {
+    setShowNewForm(false);
+    setNewDraft({ ...BLANK_NEW });
+  }
+
+  // ── Penny handlers ──
   function handleAskPennyAbout(req: DemandRequest) {
     const query =
       `Internal Demand Request ${req.id}: "${req.subject}"\n` +
@@ -755,11 +1095,9 @@ export default function Intake() {
     setAskPennyOpen(true);
     setPendingPennyQuery(query);
   }
-
   function handleSelectItem(req: DemandRequest) {
     setSelectedItem({ type: 'demandRequest', id: req.id, data: req });
   }
-
   function handleAskPennyQueue() {
     const summary = open
       .map(r => `• ${r.id} [${r.risk === 'high' ? 'P1' : r.risk === 'elevated' ? 'P2' : 'P3'}] "${r.subject}" — ${r.status}, ${r.age} ago (${r.program})`)
@@ -772,62 +1110,37 @@ export default function Intake() {
     setPendingPennyQuery(query);
   }
 
-  function handleNewRequest() {
-    openActionPanel({
-      title: 'New Request',
-      objectType: 'Demand Request',
-      subtitle: 'Submit a work request, change proposal, or feature idea.',
-      fields: [
-        {
-          id: 'type', label: 'Request Type', type: 'select', required: true,
-          options: ['New Feature', 'Bug / Issue', 'Content Update', 'Change Request', 'Admin'],
-        },
-        { id: 'subject', label: 'Subject', type: 'text', required: true, placeholder: 'Brief description of the request…' },
-        {
-          id: 'program', label: 'Program', type: 'select', required: true,
-          options: ["Explorer's Trail", 'Foundations Trail', 'Guided Trail', 'Trail of Mastery', 'Digital Compass', 'All Programs'],
-        },
-        { id: 'detail', label: 'Detail', type: 'textarea', placeholder: 'What needs to happen and why?', rows: 3 },
-        { id: 'priority', label: 'Priority', type: 'select', options: ['Normal', 'Elevated', 'Critical'] },
-      ],
-    });
-  }
-
   return (
     <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
 
-        {/* ── Header ────────────────────────────────────────────────────── */}
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5 flex items-center gap-1.5">
-              <GitBranch className="w-2.5 h-2.5" />
-              Operations · Demand
-            </p>
-            <h1 className="text-[15px] font-semibold text-foreground leading-snug">Demand Queue</h1>
-            <p className="text-[14px] text-muted-foreground mt-0.5 leading-relaxed max-w-sm">
-              Triage, prioritize, and move work forward. Click any item to take action.
-            </p>
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <GitBranch className="w-3 h-3 text-muted-foreground/50" />
+            <span className="text-[14px] font-semibold text-foreground">Demand Queue</span>
+            <span className="text-[14px] text-muted-foreground/40">·</span>
+            <span className="text-[14px] text-muted-foreground/60">{open.length} open</span>
           </div>
           {!isEveryday && (
             <button
-              onClick={handleNewRequest}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-85 transition-opacity shrink-0 mt-1"
+              onClick={() => { setShowNewForm(true); setEditingId(null); }}
+              disabled={showNewForm}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-85 transition-opacity shrink-0 disabled:opacity-40"
             >
-              <Plus className="w-3 h-3" />
-              New Request
+              <Plus className="w-3 h-3" /> New Request
             </button>
           )}
         </div>
 
-        {/* ── Metric chips ──────────────────────────────────────────────── */}
+        {/* ── Metric chips ── */}
         <div className="flex items-stretch gap-2 flex-wrap">
           {[
-            { label: 'Open',        value: open.length,      cls: 'border-border bg-white',          numCls: 'text-foreground'  },
-            { label: 'P1 Critical', value: p1.length,        cls: 'border-[#E8B9B4] bg-[#FBEAE6]',       numCls: 'text-[#A93F2F]'    },
-            { label: 'P2 Elevated', value: p2.length,        cls: 'border-[#FFD08A] bg-[#FFF3E0]',     numCls: 'text-[#CC8400]'   },
-            { label: 'In Review',   value: inReview.length,  cls: 'border-[#7FAFC6] bg-[#EDF5F8]',         numCls: 'text-[#2F6F7E]'     },
-            { label: 'Closed 30d',  value: closed30d,        cls: 'border-[#9FC3AE] bg-[#E6F0EA]', numCls: 'text-[#245531]' },
+            { label: 'Open',        value: open.length,      cls: 'border-border bg-white',        numCls: 'text-foreground'  },
+            { label: 'P1 Critical', value: p1.length,        cls: 'border-[#E8B9B4] bg-[#FBEAE6]', numCls: 'text-[#A93F2F]'   },
+            { label: 'P2 Elevated', value: p2.length,        cls: 'border-[#FFD08A] bg-[#FFF3E0]', numCls: 'text-[#CC8400]'   },
+            { label: 'In Review',   value: inReview.length,  cls: 'border-[#7FAFC6] bg-[#EDF5F8]', numCls: 'text-[#2F6F7E]'   },
+            { label: 'Closed 30d',  value: closed30d,        cls: 'border-[#9FC3AE] bg-[#E6F0EA]', numCls: 'text-[#245531]'   },
           ].map(m => (
             <div key={m.label} className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${m.cls}`}>
               <span className={`text-[20px] font-bold leading-none ${m.numCls}`}>{m.value}</span>
@@ -836,14 +1149,25 @@ export default function Intake() {
           ))}
         </div>
 
-        {/* ── Two-column layout ─────────────────────────────────────────── */}
+        {/* ── Two-column layout ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-          {/* ── Left: queue ─────────────────────────────────────────────── */}
+          {/* Left: queue */}
           <div className="lg:col-span-2 space-y-4">
 
-            {/* SF Cases */}
             <SfCasesStrip />
+
+            {/* Inline new demand form — shown at top of queue */}
+            {showNewForm && (
+              <NewDemandForm
+                draft={newDraft}
+                onChange={handleNewFormChange}
+                onSave={handleSaveNewLocally}
+                onSendToSF={handleSendNewToSF}
+                onCancel={handleCancelNew}
+                isSending={newSfSending}
+              />
+            )}
 
             {/* Filter tabs */}
             <div className="flex items-center gap-1 flex-wrap">
@@ -895,13 +1219,22 @@ export default function Intake() {
                     onUpdateStatus={updateStatus}
                     onUpdateRisk={updateRisk}
                     onAskPenny={handleAskPennyAbout}
+                    editingId={editingId}
+                    editDraft={editDraft}
+                    onEditChange={handleEditChange}
+                    onStartEdit={handleStartEdit}
+                    onSaveEdit={handleSaveEdit}
+                    onCancelEdit={handleCancelEdit}
+                    onSendEditToSF={handleSendEditToSF}
+                    sfSending={sfSending}
+                    sfSent={sfSent}
                   />
                 ))
               )}
             </div>
           </div>
 
-          {/* ── Right: triage summary ──────────────────────────────────── */}
+          {/* Right: triage summary */}
           <div className="lg:col-span-1">
             <TriageSummary
               requests={requests}
