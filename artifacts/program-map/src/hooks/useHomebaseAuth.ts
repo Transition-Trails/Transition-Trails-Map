@@ -14,7 +14,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { CoachLevel } from "@/hooks/useHomebaseCoach";
 
-export type HomebaseAudience = "learner" | "coach" | "volunteer";
+export type HomebaseAudience = "learner" | "coach" | "volunteer" | "team";
 
 interface HomebaseStatusResponse {
   isSignedIn:   boolean;

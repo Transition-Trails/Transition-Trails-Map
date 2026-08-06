@@ -27,6 +27,9 @@ export const TRAIL_OS_STAFF_GROUPS: readonly string[] = [
   'trailosusers@transitiontrails.org',
   'trailospennyadmin@transitiontrails.org',
   'trailosadmin@transitiontrails.org',
+  // team@ is a homebase-first staff group — they land on TeamHomebase but
+  // are permitted to use Mission Control (the admin app) via the drawer link.
+  'team@transitiontrails.org',
 ];
 
 /** Groups required for admin-only routes. */

@@ -3,6 +3,7 @@ import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
 import LearnerHomebase    from "@/pages/homebase/LearnerHomebase";
 import CoachHomebase      from "@/pages/homebase/CoachHomebase";
 import VolunteerHomebase  from "@/pages/homebase/VolunteerHomebase";
+import TeamHomebase       from "@/pages/homebase/TeamHomebase";
 
 /**
  * HomebaseLanding
@@ -44,7 +45,11 @@ export default function HomebaseLanding() {
     );
   }
 
-  // Volunteer
+  if (audience === "team") {
+    return <TeamHomebase displayName={displayName ?? ""} />;
+  }
+
+  // Volunteer (default for any remaining audience)
   return (
     <VolunteerHomebase
       audience="volunteer"

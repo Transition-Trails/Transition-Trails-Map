@@ -35,6 +35,7 @@ function getGroupsToProbe(): string[] {
     process.env['GOOGLE_GROUP_COACHES'],
     process.env['GOOGLE_GROUP_VOLUNTEERS'],
     process.env['GOOGLE_GROUP_LEARNERS'],
+    process.env['GOOGLE_GROUP_TEAM'],
   ].filter((g): g is string => Boolean(g));
 
   // Deduplicate in case an ENV var was accidentally set to a staff group email

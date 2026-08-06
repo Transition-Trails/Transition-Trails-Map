@@ -99,12 +99,17 @@ export function deriveGroupTier(
 export function deriveAudience(
   groups: string[],
   email:  string,
-): 'learner' | 'coach' | 'volunteer' | null {
+): 'learner' | 'coach' | 'volunteer' | 'team' | null {
   const coachGroup     = (process.env['GOOGLE_GROUP_COACHES']    ?? '').toLowerCase().trim();
   const volunteerGroup = (process.env['GOOGLE_GROUP_VOLUNTEERS'] ?? '').toLowerCase().trim();
   const learnerGroup   = (process.env['GOOGLE_GROUP_LEARNERS']   ?? '').toLowerCase().trim();
+  const teamGroup      = (process.env['GOOGLE_GROUP_TEAM']       ?? '').toLowerCase().trim();
 
   const lowerGroups = groups.map(g => g.toLowerCase());
+
+  // Team is resolved before coach/volunteer/learner — staff takes priority over
+  // homebase audiences, but team is a special staff group that lands on homebase.
+  if (teamGroup && lowerGroups.includes(teamGroup)) return 'team';
 
   const homebaseMatches = [
     coachGroup     && lowerGroups.includes(coachGroup)     ? 'coach'     : null,

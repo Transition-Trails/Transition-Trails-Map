@@ -35,7 +35,7 @@ declare module "express-session" {
      * Set when a signed-in user belongs to a homebase group (learner/coach/volunteer).
      * Null / absent for staff-only users.
      */
-    googleAudience?: 'learner' | 'coach' | 'volunteer' | null;
+    googleAudience?: 'learner' | 'coach' | 'volunteer' | 'team' | null;
     /**
      * Sub-level for coaches.  Populated once SF coaching fields are provisioned
      * (task #254).  Falls back to 'associate' on the frontend when absent.

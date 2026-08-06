@@ -40,6 +40,8 @@ import {
   GraduationCap,
   Heart,
   Send,
+  Briefcase,
+  LayoutDashboard,
 } from "lucide-react";
 import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
 
@@ -54,22 +56,26 @@ const GOOGLE_APPS = [
   { label: "Meet",      Icon: Video,      href: "https://meet.google.com"              },
 ];
 
-const BUILD_LINKS: Record<HomebaseAudience, { label: string; href: string }> = {
-  learner:   { label: "Dev Org",        href: "https://trailhead.salesforce.com" },
-  coach:     { label: "Salesforce",     href: "https://login.salesforce.com"     },
-  volunteer: { label: "Salesforce",     href: "https://login.salesforce.com"     },
+const BUILD_LINKS: Record<HomebaseAudience, { label: string; href: string; external?: boolean }> = {
+  learner:   { label: "Dev Org",         href: "https://trailhead.salesforce.com", external: true  },
+  coach:     { label: "Salesforce",      href: "https://login.salesforce.com",     external: true  },
+  volunteer: { label: "Salesforce",      href: "https://login.salesforce.com",     external: true  },
+  // team: internal link — opens Mission Control (admin app) in the same tab
+  team:      { label: "Mission Control", href: "/program",                         external: false },
 };
 
 const AUDIENCE_ICONS: Record<HomebaseAudience, React.FC<{ className?: string }>> = {
   learner:   GraduationCap,
   coach:     Users,
   volunteer: Heart,
+  team:      Briefcase,
 };
 
 const AUDIENCE_LABELS: Record<HomebaseAudience, string> = {
   learner:   "Learner",
   coach:     "Coach",
   volunteer: "Volunteer",
+  team:      "Team",
 };
 
 // ── WorkspaceDrawer ────────────────────────────────────────────────────────────
@@ -185,12 +191,16 @@ function WorkspaceDrawer({
       <div className="px-1.5 py-2 mt-auto">
         <a
           href={buildLink.href}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...(buildLink.external !== false
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {})}
           className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
           title={buildLink.label}
         >
-          <ExternalLink className="w-4 h-4 flex-shrink-0" />
+          {buildLink.external !== false
+            ? <ExternalLink    className="w-4 h-4 flex-shrink-0" />
+            : <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
+          }
           <AnimatePresence>
             {open && (
               <motion.span
