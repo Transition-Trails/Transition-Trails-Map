@@ -20,7 +20,7 @@ export function HubShell({
 }: {
   title: string;
   icon: ComponentType<{ className?: string }>;
-  description: string;
+  description?: string;
   badge?: string;
   tabs: HubTab[];
   actions?: ActionItem[];
@@ -44,7 +44,7 @@ export function HubShell({
               {badge}
             </span>
           )}
-          <span className="text-[14px] text-muted-foreground line-clamp-1 hidden sm:block">{description}</span>
+          {description && <span className="text-[14px] text-muted-foreground line-clamp-1 hidden sm:block">{description}</span>}
         </div>
         {tabs.length > 1 && (
           <div className="flex gap-0.5 overflow-x-auto pb-0.5 mt-1.5">

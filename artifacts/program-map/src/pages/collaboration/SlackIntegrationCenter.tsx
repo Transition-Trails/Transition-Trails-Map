@@ -180,68 +180,46 @@ function FlowNodeBox({ node }: { node: FlowNode }) {
 // ── Tab 1: Overview ───────────────────────────────────────────────────────────
 
 function OverviewTab() {
-  const { state: valState }  = useSlackValidation();
-  const govSummary      = getGovernanceSummary();
-  const testSummary     = getOverallTestSummary();
-  const scenSummary     = getScenarioSummary();
-  const pennyEnabled    = getPennyEnabledChannels();
-  const productionScore = SLACK_HEALTH_SCORES.find(s => s.dimension === 'production');
+  const { state: valState } = useSlackValidation();
+  const govSummary   = getGovernanceSummary();
+  const pennyEnabled = getPennyEnabledChannels();
 
   const liveChecks = valState.kind === 'done' ? valState.data.checks : null;
   const livePass   = liveChecks ? liveChecks.filter(c => c.status === 'pass').length : null;
   const liveFail   = liveChecks ? liveChecks.filter(c => c.status === 'fail').length : null;
   const liveTotal  = liveChecks ? liveChecks.length : null;
 
+  const failures = liveChecks
+    ? liveChecks.filter(c => c.status === 'fail')
+    : GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical');
+
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-5 max-w-4xl">
-        <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-          <p className="text-[14px] text-foreground leading-relaxed">
-            Program-to-channel mapping, role-to-user routing, {TERMS.aiAssistant} delivery mapping, and end-to-end flow validation are all configured.
-            Workspace Validation runs live against your Replit secrets — see the Workspace Validation tab for real-time results.
-          </p>
-        </div>
+      <div className="p-6 space-y-5 max-w-3xl">
 
-        {/* Phase 2 stat grid */}
-        <div className="flex items-center gap-2 mb-2">
-          <p className="text-[14px] font-bold  text-muted-foreground/60">Integration Metrics</p>
-          <SampleDataBadge />
-        </div>
-        <div className="grid grid-cols-4 gap-3">
-          {[
-            {
-              label: 'Validation Checks',
-              value: valState.kind === 'loading' ? '…' : liveChecks ? `${livePass}/${liveTotal}` : '—',
-              sub:   valState.kind === 'loading' ? 'checking…' : liveChecks ? `passing · live` : 'run validation',
-              cls:   (liveChecks && (liveFail ?? 0) > 0) ? 'border-[#E8B9B4] bg-[#FBEAE6]' : liveChecks ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-border bg-muted/30',
-            },
-            { label:'Governance Issues', value:String(govSummary.critical + govSummary.high), sub:`${govSummary.critical} critical`, cls: govSummary.critical > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#FFD08A] bg-[#FFF3E0]' },
-            { label:'Scenarios Ready',   value:`${scenSummary.ready}/${scenSummary.total}`,   sub:`avg ${scenSummary.avgScore}% ready`,  cls:'border-[#FFD08A] bg-[#FFF3E0]' },
-            { label:'Tests Passing',     value:`${testSummary.pass}/${testSummary.total}`,    sub:`${testSummary.pct}% overall`,         cls:'border-[#FFD08A] bg-[#FFF3E0]' },
-          ].map(s => (
-            <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
-              <p className="text-[14px] font-bold  text-muted-foreground tracking-wide mb-1">{s.label}</p>
-              <p className="text-[22px] font-bold text-foreground leading-none">{s.value}</p>
-              <p className="text-[14px] text-muted-foreground mt-1">{s.sub}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Critical blockers — live failures when available, else static governance */}
+        {/* ── Validation status — the most important thing ── */}
         <div>
-          <p className="text-[14px] font-bold  text-foreground mb-2">
-            {liveChecks ? 'Live Validation Failures' : 'Critical Blockers to Go Live'}
-          </p>
-          <div className="space-y-2">
-            {liveChecks ? (
-              liveChecks.filter(c => c.status === 'fail').length === 0 ? (
-                <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
-                  <CheckCircle className="w-3.5 h-3.5 text-[#2F6B3F] shrink-0" />
-                  <p className="text-[14px] font-medium text-[#2F6B3F]">No live failures — all required secrets and API checks passed.</p>
-                </div>
-              ) : (
-                liveChecks.filter(c => c.status === 'fail').map(c => (
-                  <div key={c.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[14px] font-semibold text-foreground">
+              {liveChecks ? 'Live Validation' : 'Critical Issues'}
+            </p>
+            {liveChecks && (
+              <span className="text-[14px] text-muted-foreground">
+                {livePass}/{liveTotal} checks passing
+              </span>
+            )}
+          </div>
+
+          {failures.length === 0 ? (
+            <div className="flex items-center gap-2.5 px-4 py-3 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
+              <CheckCircle className="w-4 h-4 text-[#2F6B3F] shrink-0" />
+              <p className="text-[14px] font-medium text-[#2F6B3F]">All required secrets and API checks passed — ready to go.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {liveChecks ? (
+                (failures as SlackApiCheck[]).map(c => (
+                  <div key={c.id} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
                     <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[14px] font-semibold text-foreground">{c.label}</p>
@@ -249,60 +227,71 @@ function OverviewTab() {
                     </div>
                   </div>
                 ))
-              )
-            ) : (
-              GOVERNANCE_ISSUES.filter(i => i.severity === 'Critical').map(issue => (
-                <div key={issue.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
-                  <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-foreground">{issue.title}</p>
-                    <p className="text-[14px] text-muted-foreground">{issue.resolution}</p>
+              ) : (
+                (failures as GovernanceIssue[]).map(issue => (
+                  <div key={issue.id} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]">
+                    <XCircle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-foreground">{issue.title}</p>
+                      <p className="text-[14px] text-muted-foreground">{issue.resolution}</p>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Phase 2 readiness by area */}
+        {/* ── Key metrics — compact 3-col ── */}
         <div>
-          <p className="text-[14px] font-bold  text-foreground mb-2">Integration Readiness by Area</p>
-          <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-[14px] font-semibold text-foreground">Integration Metrics</p>
+            <SampleDataBadge />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
             {[
-              { area:'Program-to-Channel Mapping', pct:72, note:'5 programs mapped · 8 channels · 3 missing bot access' },
-              { area:'Role-to-User Mapping',        pct:60, note:'5 of 7 role groups have at least one mapped user' },
-              { area:`${TERMS.aiAssistant} Delivery Mapping`,      pct:55, note:'6 capabilities mapped · 4 with configured routes' },
-              { area:'Communication Flows',          pct:65, note:'5 flows defined · 2 configured · 3 planned/blocked' },
-              { area:'Operational Scenarios',        pct:scenSummary.avgScore, note:`${scenSummary.partial} partially ready · ${scenSummary.blocked} blocked` },
-              { area:'Governance Compliance',        pct:45, note:`${govSummary.critical + govSummary.high} critical/high issues open` },
-              { area:'Production Testing',           pct:testSummary.pct, note:`${testSummary.pass} of ${testSummary.total} tests passing` },
-            ].map(r => (
-              <div key={r.area} className="px-4 py-3">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[14px] font-medium text-foreground">{r.area}</span>
-                  <span className="text-[14px] text-muted-foreground">{r.note}</span>
-                </div>
-                <ScoreBar score={r.pct} />
+              {
+                label: 'Validation',
+                value: valState.kind === 'loading' ? '…' : liveChecks ? `${livePass}/${liveTotal}` : '—',
+                sub:   liveChecks ? 'checks passing · live' : 'run validation',
+                cls:   (liveChecks && (liveFail ?? 0) > 0) ? 'border-[#E8B9B4] bg-[#FBEAE6]' : liveChecks ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-border bg-muted/30',
+              },
+              {
+                label: 'Governance',
+                value: String(govSummary.critical + govSummary.high),
+                sub:   `${govSummary.critical} critical issue${govSummary.critical !== 1 ? 's' : ''}`,
+                cls:   govSummary.critical > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]' : 'border-[#FFD08A] bg-[#FFF3E0]',
+              },
+              {
+                label: `${TERMS.aiAssistant}-enabled Channels`,
+                value: String(pennyEnabled.length),
+                sub:   `of ${SLACK_CHANNELS.length} mapped`,
+                cls:   'border-border bg-muted/30',
+              },
+            ].map(s => (
+              <div key={s.label} className={`rounded-lg border p-3 ${s.cls}`}>
+                <p className="text-[14px] font-semibold text-muted-foreground mb-1">{s.label}</p>
+                <p className="text-xl font-bold text-foreground leading-none">{s.value}</p>
+                <p className="text-[14px] text-muted-foreground mt-1">{s.sub}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Workspace connection status */}
+        {/* ── Workspace connection facts ── */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <p className="text-[14px] font-bold  text-foreground">Workspace</p>
+            <p className="text-[14px] font-semibold text-foreground">Workspace</p>
             <SampleDataBadge />
           </div>
           <div className="rounded-lg border border-border bg-white divide-y divide-border/40">
-            <InfoRow label="Workspace"       value={SLACK_WORKSPACE.displayName} />
-            <InfoRow label="Domain"          value={SLACK_WORKSPACE.domain} />
-            <InfoRow label="Bot User"        value={SLACK_WORKSPACE.botUser} />
-            <InfoRow label="Connection"      value={<ReadinessBadge status={SLACK_WORKSPACE.oauthStatus} />} />
-            <InfoRow label="Channels"        value={`${SLACK_CHANNELS.length} mapped · ${pennyEnabled.length} ${TERMS.aiAssistant}-enabled`} />
-            <InfoRow label="Production Score" value={productionScore ? `${productionScore.score}/${productionScore.maxScore}` : '—'} />
+            <InfoRow label="Workspace" value={SLACK_WORKSPACE.displayName} />
+            <InfoRow label="Bot User"  value={SLACK_WORKSPACE.botUser} />
+            <InfoRow label="OAuth"     value={<ReadinessBadge status={SLACK_WORKSPACE.oauthStatus} />} />
+            <InfoRow label="Channels"  value={`${SLACK_CHANNELS.length} mapped · ${pennyEnabled.length} ${TERMS.aiAssistant}-enabled`} />
           </div>
         </div>
+
       </div>
     </ScrollArea>
   );
@@ -1643,24 +1632,17 @@ function SlackIntegrationCenterInner({ onOpenCreate }: { onOpenCreate: () => voi
     <HubShell
       title="Slack Integration Center"
       icon={Hash}
-      description={`Operational workflow validation. ${descParts.join(' · ')}.`}
-      badge={criticalBadge ?? 'Workflow Validation'}
+      badge={criticalBadge ?? 'Connected'}
       actions={actions}
       tabs={[
-        { id:'overview',    label:'Overview',            path:'/collaboration/slack',                   icon:Hash,          content:<OverviewTab /> },
-        { id:'validation',  label:'Workspace Validation',path:'/collaboration/slack/validation',        icon:Key,           content:<WorkspaceValidationTab /> },
-        { id:'prog-channel',label:'Program → Channel',   path:'/collaboration/slack/prog-channel',      icon:Map,           content:<ProgramChannelTab /> },
-        { id:'role-user',   label:'Role → User',         path:'/collaboration/slack/role-user',         icon:Users,         content:<RoleUserTab /> },
-        { id:'penny-ch',    label:`${TERMS.aiAssistant} → Channel`, path:'/collaboration/slack/penny-channel',     icon:Brain,         content:<PennyDeliveryTab /> },
-        { id:'flows',       label:'Flow Explorer',        path:'/collaboration/slack/flows',             icon:Workflow,      content:<FlowExplorerTab /> },
-        { id:'channels',    label:'Channel Registry',    path:'/collaboration/slack/channels',          icon:Hash,          content:<ChannelRegistry /> },
-        { id:'profiles',    label:'Object Profiles',     path:'/collaboration/slack/profiles',          icon:Layers,        content:<ObjectProfilesTab /> },
-        { id:'scenarios',   label:'Scenarios',           path:'/collaboration/slack/scenarios',         icon:Play,          content:<ScenariosTab /> },
-        { id:'governance',  label:'Governance',          path:'/collaboration/slack/governance',        icon:Shield,        content:<GovernanceTab /> },
-        { id:'testing',     label:'Test Suite',          path:'/collaboration/slack/testing',           icon:FlaskConical,  content:<TestSuiteTab /> },
-        { id:'health',      label:'Health',              path:'/collaboration/slack/health',            icon:BarChart2,     content:<IntegrationHealthTab /> },
-        { id:'poc-state',   label:'Confirmed State',      path:'/collaboration/slack/poc-state',         icon:CheckCircle,   content:<PocStateTab /> },
-        { id:'poc-ready',   label:'Go-Live Checklist',   path:'/collaboration/slack/poc-readiness',     icon:Zap,           content:<PocReadinessTab /> },
+        { id:'overview',    label:'Overview',             path:'/collaboration/slack',              icon:Hash,    content:<OverviewTab /> },
+        { id:'validation',  label:'Workspace Validation', path:'/collaboration/slack/validation',   icon:Key,     content:<WorkspaceValidationTab /> },
+        { id:'channels',    label:'Channel Registry',     path:'/collaboration/slack/channels',     icon:Hash,    content:<ChannelRegistry /> },
+        { id:'prog-channel',label:'Program → Channel',   path:'/collaboration/slack/prog-channel', icon:Map,     content:<ProgramChannelTab /> },
+        { id:'role-user',   label:'Role → User',         path:'/collaboration/slack/role-user',    icon:Users,   content:<RoleUserTab /> },
+        { id:'penny-ch',    label:`${TERMS.aiAssistant} → Channel`, path:'/collaboration/slack/penny-channel', icon:Brain, content:<PennyDeliveryTab /> },
+        { id:'governance',  label:'Governance',          path:'/collaboration/slack/governance',   icon:Shield,  content:<GovernanceTab /> },
+        { id:'poc-ready',   label:'Go-Live Checklist',   path:'/collaboration/slack/poc-readiness',icon:Zap,     content:<PocReadinessTab /> },
       ]}
     />
   );
