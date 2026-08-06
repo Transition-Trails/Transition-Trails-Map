@@ -83,6 +83,7 @@ import TestPenny               from "@/pages/penny/TestPenny";
 import LearnerDetail           from "@/pages/penny/LearnerDetail";
 import TrailConfigs            from "@/pages/penny/TrailConfigs";
 import { PennyPageShell }      from "@/components/penny/PennyPageShell";
+import KnowledgeHub          from "@/pages/knowledge/KnowledgeHub";
 import KnowledgeOverview      from "@/pages/knowledge/KnowledgeOverview";
 import KnowledgeSourcesAdmin  from "@/pages/knowledge/KnowledgeSourcesAdmin";
 import SfKnowledgeArticles    from "@/pages/knowledge/SfKnowledgeArticles";
@@ -277,13 +278,15 @@ function Router() {
       <Route path="/penny/video-production">   <PennyPageShell><VideoProduction /></PennyPageShell></Route>
       <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
-      <Route path="/knowledge/article-studio" component={ArticleStudio} />
-      <Route path="/knowledge/sources"        component={KnowledgeSourcesAdmin} />
-      <Route path="/knowledge/sf-articles"   component={SfKnowledgeArticles} />
-      <Route path="/knowledge/review-queue"  component={KnowledgeReviewQueue} />
+      {/* Knowledge hub — old sub-pages fold into builder or governance */}
+      <Route path="/knowledge/governance" component={KnowledgeHub} />
+      <Route path="/knowledge/article-studio"> <Redirect to="/knowledge" /></Route>
+      <Route path="/knowledge/sources">        <Redirect to="/knowledge/governance" /></Route>
+      <Route path="/knowledge/sf-articles">    <Redirect to="/knowledge/governance" /></Route>
+      <Route path="/knowledge/review-queue">   <Redirect to="/knowledge/governance" /></Route>
       <Route path="/knowledge/library"  component={LibraryDocuments} />
       <Route path="/knowledge/memory"   component={OrgMemory} />
-      <Route path="/knowledge"          component={KnowledgeOverview} />
+      <Route path="/knowledge"          component={KnowledgeHub} />
 
       {/* Old collaboration sub-routes → hub */}
       <Route path="/collaboration/my-signals">    <Redirect to="/collaboration/signals"  /></Route>

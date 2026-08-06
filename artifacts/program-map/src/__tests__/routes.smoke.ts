@@ -122,13 +122,16 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/penny/quest-activity',      kind: 'redirect', target: '/penny/learners' },
 
   // ── Knowledge ──────────────────────────────────────────────────────────────
-  { path: '/knowledge',          kind: 'active' },
-  { path: '/knowledge/sources',  kind: 'active' },
-  { path: '/knowledge/library',  kind: 'active' },
-  { path: '/knowledge/memory',   kind: 'active' },
-  { path: '/knowledge/:tab',     kind: 'active' },
+  { path: '/knowledge',              kind: 'active' },
+  { path: '/knowledge/governance',   kind: 'active' },
+  { path: '/knowledge/library',      kind: 'active' },
+  { path: '/knowledge/memory',       kind: 'active' },
+  { path: '/knowledge/article-studio', kind: 'redirect', target: '/knowledge' },
+  { path: '/knowledge/sources',       kind: 'redirect', target: '/knowledge/governance' },
+  { path: '/knowledge/sf-articles',   kind: 'redirect', target: '/knowledge/governance' },
+  { path: '/knowledge/review-queue',  kind: 'redirect', target: '/knowledge/governance' },
   { path: '/knowledge/search',        kind: 'redirect', target: '/search' },
-  { path: '/knowledge/relationships', kind: 'redirect', target: '/digital-twin' },
+  { path: '/knowledge/relationships', kind: 'redirect', target: '/governance/map' },
 
   // ── Library (legacy redirects to /knowledge) ───────────────────────────────
   { path: '/library',                   kind: 'redirect', target: '/knowledge' },
