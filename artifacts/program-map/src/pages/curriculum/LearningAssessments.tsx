@@ -7,18 +7,22 @@ export default function LearningAssessments() {
   const { setSelectedItem } = useAppContext();
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
-          <h1 className="text-3xl font-bold text-foreground">Assessments</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">Knowledge checks and practice exams linked to modules. Every module in the Foundations Trail standard requires at least one assessment. Select an assessment to view its alignment in the Knowledge Brief.</p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-[14px] font-semibold text-foreground">Assessments</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{curriculumAssessments.length}</span> Assessments
+          </span>
         </div>
-        <div className="grid gap-3">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-3">
           {curriculumAssessments.map(asmnt => {
             const statusCfg = CONTENT_STATUS_CONFIG[asmnt.status];
             return (
-              <button key={asmnt.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: asmnt.id, data: asmnt })} className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#E8B9B4] hover:shadow-sm transition-all">
+              <button key={asmnt.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: asmnt.id, data: asmnt })} className="w-full rounded-xl border border-border bg-white p-4 text-left hover:border-[#E8B9B4] hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#A93F2F] shrink-0" />
@@ -43,7 +47,7 @@ export default function LearningAssessments() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

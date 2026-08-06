@@ -12,25 +12,39 @@ export default function KnowledgeArticles() {
   const filtered = typeFilter === 'all' ? curriculumKnowledgeArticles : curriculumKnowledgeArticles.filter(a => a.articleType === typeFilter);
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
-          <h1 className="text-3xl font-bold text-foreground">Knowledge Articles</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">Reference articles, concept guides, and decision frameworks linked to modules and lessons. Select an article to view its module connections in the Knowledge Brief.</p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-0">
+        {/* Row 1: title + count */}
+        <div className="flex items-center gap-3 flex-wrap mb-3">
+          <h1 className="text-[14px] font-semibold text-foreground">Knowledge Articles</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{filtered.length}</span> of {curriculumKnowledgeArticles.length}
+          </span>
         </div>
-        <div className="flex gap-2 flex-wrap">
+        {/* Row 2: type filter as underline tabs */}
+        <div className="flex items-center gap-0.5 overflow-x-auto">
           {articleTypes.map(t => (
-            <button key={t} onClick={() => setTypeFilter(t)} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors capitalize ${typeFilter === t ? 'bg-[#2F6F7E] text-white border-[#2F6F7E]' : 'border-border text-muted-foreground hover:border-[#7FAFC6]'}`}>
+            <button
+              key={t}
+              onClick={() => setTypeFilter(t)}
+              className={`text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors whitespace-nowrap capitalize ${
+                typeFilter === t
+                  ? 'border-secondary text-secondary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+              }`}
+            >
               {t === 'all' ? 'All Types' : t}
             </button>
           ))}
         </div>
-        <div className="grid gap-3">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-3">
           {filtered.map(article => {
             const statusCfg = CONTENT_STATUS_CONFIG[article.status];
             return (
-              <button key={article.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: article.id, data: article })} className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#7FAFC6] hover:shadow-sm transition-all">
+              <button key={article.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: article.id, data: article })} className="w-full rounded-xl border border-border bg-white p-4 text-left hover:border-[#7FAFC6] hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-[#2F6F7E] shrink-0 mt-0.5" />
@@ -55,7 +69,7 @@ export default function KnowledgeArticles() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

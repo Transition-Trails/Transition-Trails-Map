@@ -121,41 +121,51 @@ export default function CurriculumModules() {
   ) ?? 0;
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-6">
-        {/* Header */}
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
-          <h1 className="text-3xl font-bold text-foreground">Modules</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">
-            Module is the central connective node in the learning architecture. Each module links Learning Assets, Penny Assets,
-            and Delivery Assets. Select a module to see its full relationship map in the Knowledge Brief.
-          </p>
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Compact header */}
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-0">
+        {/* Row 1: title + stats */}
+        <div className="flex items-center gap-3 flex-wrap mb-3">
+          <h1 className="text-[14px] font-semibold text-foreground">Modules</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{totalModules}</span> Total
+          </span>
+          <span className="text-muted-foreground/30 text-[12px]">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-[#2F6B3F]">{fullyConnected}</span> Fully Connected
+          </span>
+          <span className="text-muted-foreground/30 text-[12px]">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-[#A93F2F]">{curriculumHealthIssues.length}</span> Issues
+          </span>
         </div>
+        {/* Row 2: view tabs */}
+        <div className="flex items-center gap-0.5">
+          {([
+            { id: 'live' as ViewMode,      label: 'Live from Salesforce', icon: Zap },
+            { id: 'prototype' as ViewMode, label: 'Architecture Model',   icon: BookOpen },
+          ] as { id: ViewMode; label: string; icon: React.ElementType }[]).map(tab => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setViewMode(tab.id)}
+                className={`inline-flex items-center gap-1.5 text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors ${
+                  viewMode === tab.id
+                    ? 'border-secondary text-secondary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                }`}
+              >
+                <Icon className="w-3 h-3" /> {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-        {/* View toggle */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setViewMode('live')}
-            className={`inline-flex items-center gap-1.5 text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
-              viewMode === 'live'
-                ? 'bg-[#2F6B3F] text-white border-[#2F6B3F]'
-                : 'border-border text-muted-foreground hover:border-[#2F6B3F]'
-            }`}
-          >
-            <Zap className="w-3 h-3" /> Live from Salesforce
-          </button>
-          <button
-            onClick={() => setViewMode('prototype')}
-            className={`inline-flex items-center gap-1.5 text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
-              viewMode === 'prototype'
-                ? 'bg-primary text-white border-primary'
-                : 'border-border text-muted-foreground hover:border-primary/40'
-            }`}
-          >
-            <BookOpen className="w-3 h-3" /> Architecture Model
-          </button>
-        </div>
+      <ScrollArea className="flex-1">
+      <div className="p-5 max-w-5xl space-y-5">
 
         {/* ── LIVE VIEW ── */}
         {viewMode === 'live' && (
@@ -347,6 +357,7 @@ export default function CurriculumModules() {
           </div>
         )}
       </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

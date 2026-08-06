@@ -8,24 +8,25 @@ export default function PennyTrailQuests() {
   const { setSelectedItem } = useAppContext();
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — {TERMS.aiAssistant} Assets</p>
-          <h1 className="text-3xl font-bold text-foreground">Trail Quests</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">
-            Earnable badges and challenge quests that celebrate learning milestones beyond the standard assessments.
-            Trail Quests are designed by staff and awarded by {TERMS.aiAssistant} based on completion criteria.
-          </p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-[14px] font-semibold text-foreground">Trail Quests</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{curriculumTrailQuests.length}</span> Quests
+          </span>
         </div>
-        <div className="grid gap-4">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-4">
           {curriculumTrailQuests.map(quest => {
             const statusCfg = CONTENT_STATUS_CONFIG[quest.status];
             return (
               <button
                 key={quest.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: quest.id, data: quest })}
-                className="rounded-xl border border-border bg-white p-5 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all"
+                className="w-full rounded-xl border border-border bg-white p-5 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2">
@@ -46,7 +47,7 @@ export default function PennyTrailQuests() {
                 <p className="text-[14px] text-muted-foreground mb-3">{quest.purpose}</p>
                 {((quest.criteria as string[]) || []).length > 0 && (
                   <div className="space-y-1">
-                    <p className="text-[14px] font-bold  text-muted-foreground/60">Completion Criteria</p>
+                    <p className="text-[14px] font-bold text-muted-foreground/60">Completion Criteria</p>
                     {(quest.criteria as string[]).map((criterion, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] shrink-0" />
@@ -59,7 +60,7 @@ export default function PennyTrailQuests() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

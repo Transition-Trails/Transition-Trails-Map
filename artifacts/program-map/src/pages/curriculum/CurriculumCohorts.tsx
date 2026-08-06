@@ -7,22 +7,34 @@ export default function CurriculumCohorts() {
   const { setSelectedItem } = useAppContext();
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
-          <h1 className="text-3xl font-bold text-foreground">Cohorts</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">Active and past program cohorts. Each cohort is a group of learners moving through a program together. Select a cohort to view learner progress and delivery assets in the Knowledge Brief.</p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-[14px] font-semibold text-foreground">Cohorts</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{curriculumCohorts.length}</span> Cohorts
+          </span>
+          <span className="text-muted-foreground/30 text-[12px]">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-[#2F6B3F]">{curriculumCohorts.filter(c => c.status === 'published').length}</span> Active
+          </span>
         </div>
-        <div className="grid gap-4">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-3">
           {curriculumCohorts.map(cohort => {
             const statusCfg = CONTENT_STATUS_CONFIG[cohort.status];
             const atRisk = (cohort.atRiskLearners as number) || 0;
             return (
-              <button key={cohort.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: cohort.id, data: cohort })} className="rounded-xl border border-border bg-white p-5 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all">
+              <button
+                key={cohort.id}
+                onClick={() => setSelectedItem({ type: 'curriculumItem', id: cohort.id, data: cohort })}
+                className="w-full rounded-xl border border-border bg-white p-4 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all"
+              >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-[#2F6B3F] shrink-0" />
+                    <Users className="w-4 h-4 text-[#2F6B3F] shrink-0" />
                     <div>
                       <p className="text-[14px] font-bold text-foreground">{cohort.name}</p>
                       <p className="text-[14px] text-muted-foreground">{cohort.program} · Starts {cohort.startDate as string}</p>
@@ -57,7 +69,7 @@ export default function CurriculumCohorts() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

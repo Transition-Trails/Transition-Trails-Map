@@ -19,25 +19,46 @@ export default function LearningLessons() {
     : curriculumLessons.filter(l => l.sprint === `Sprint ${curriculumSprints.find(s => s.id === sprintFilter)?.sprintNumber}`);
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
-          <h1 className="text-3xl font-bold text-foreground">Lessons</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">Individual learning units inside each module. Each lesson has one objective, an instructional sequence, and linked Penny prompts. Select a lesson to see its full asset connections.</p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-0">
+        {/* Row 1: title + count */}
+        <div className="flex items-center gap-3 flex-wrap mb-3">
+          <h1 className="text-[14px] font-semibold text-foreground">Lessons</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{filtered.length}</span> of {curriculumLessons.length}
+          </span>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <button onClick={() => setSprintFilter('all')} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === 'all' ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>All</button>
+        {/* Row 2: sprint filter as underline tabs */}
+        <div className="flex items-center gap-0.5 overflow-x-auto">
+          <button
+            onClick={() => setSprintFilter('all')}
+            className={`text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+              sprintFilter === 'all' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+            }`}
+          >
+            All
+          </button>
           {curriculumSprints.map(s => (
-            <button key={s.id} onClick={() => setSprintFilter(s.id)} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${sprintFilter === s.id ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/40'}`}>Sprint {s.sprintNumber as number}</button>
+            <button
+              key={s.id}
+              onClick={() => setSprintFilter(s.id)}
+              className={`text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+                sprintFilter === s.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+              }`}
+            >
+              Sprint {s.sprintNumber as number}
+            </button>
           ))}
         </div>
-        <div className="grid gap-2">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-2">
           {filtered.map(lesson => {
             const statusCfg = CONTENT_STATUS_CONFIG[lesson.status];
             const typeCls = LESSON_TYPE_COLORS[lesson.lessonType as string] || 'bg-slate-50 text-slate-700 border-slate-200';
             return (
-              <button key={lesson.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: lesson.id, data: lesson })} className="rounded-lg border border-border bg-white p-4 text-left hover:border-[#FFD08A] hover:shadow-sm transition-all">
+              <button key={lesson.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: lesson.id, data: lesson })} className="w-full rounded-lg border border-border bg-white p-4 text-left hover:border-[#FFD08A] hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-2">
                     <BookOpen className="w-4 h-4 text-[#CC8400] mt-0.5 shrink-0" />
@@ -60,7 +81,7 @@ export default function LearningLessons() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

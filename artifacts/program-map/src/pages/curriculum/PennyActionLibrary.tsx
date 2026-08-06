@@ -15,40 +15,48 @@ export default function PennyActionLibrary() {
     : pennyContentActions.filter(a => a.category === catFilter);
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Penny Content Assistant</p>
-          <h1 className="text-3xl font-bold text-foreground">Action Library</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">
-            All 11 prototype content generation actions available in the Penny Content Assistant.
-            Each action is context-aware — it generates content aligned to the selected learning object and the Trail OS architecture standards.
-            Select an action to see its full specification in the Knowledge Brief.
-          </p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-0">
+        {/* Row 1: title + count */}
+        <div className="flex items-center gap-3 flex-wrap mb-3">
+          <h1 className="text-[14px] font-semibold text-foreground">Action Library</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{filtered.length}</span> of {pennyContentActions.length} Actions
+          </span>
         </div>
-
-        <div className="flex gap-2 flex-wrap">
-          <button onClick={() => setCatFilter('all')} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${catFilter === 'all' ? 'bg-secondary text-white border-secondary' : 'border-border text-muted-foreground hover:border-secondary/40'}`}>
+        {/* Row 2: category filter as underline tabs */}
+        <div className="flex items-center gap-0.5 overflow-x-auto">
+          <button
+            onClick={() => setCatFilter('all')}
+            className={`text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+              catFilter === 'all' ? 'border-secondary text-secondary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+            }`}
+          >
             All ({pennyContentActions.length})
           </button>
-          {CATEGORIES.map(cat => {
-            const cfg = ACTION_CATEGORY_CONFIG[cat];
-            return (
-              <button key={cat} onClick={() => setCatFilter(cat)} className={`text-[14px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${catFilter === cat ? cfg.chip + ' border-transparent' : 'border-border text-muted-foreground hover:border-secondary/40'}`}>
-                {cat} ({pennyContentActions.filter(a => a.category === cat).length})
-              </button>
-            );
-          })}
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCatFilter(cat)}
+              className={`text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
+                catFilter === cat ? 'border-secondary text-secondary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+              }`}
+            >
+              {cat} ({pennyContentActions.filter(a => a.category === cat).length})
+            </button>
+          ))}
         </div>
-
-        <div className="grid gap-3">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-3">
           {filtered.map((action, idx) => {
             const catCfg = ACTION_CATEGORY_CONFIG[action.category];
             return (
               <button
                 key={action.id}
                 onClick={() => setSelectedItem({ type: 'pennyAction', id: action.id, data: action })}
-                className={`rounded-xl border-2 p-5 text-left transition-all hover:shadow-sm ${catCfg.border} ${catCfg.bg}`}
+                className={`w-full rounded-xl border-2 p-5 text-left transition-all hover:shadow-sm ${catCfg.border} ${catCfg.bg}`}
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2">
@@ -76,7 +84,7 @@ export default function PennyActionLibrary() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Generates</p>
+                    <p className="text-[14px] font-bold text-muted-foreground/60 mb-1">Generates</p>
                     <div className="space-y-0.5">
                       {action.generates.map(g => (
                         <div key={g.label} className="flex items-center gap-1.5">
@@ -87,7 +95,7 @@ export default function PennyActionLibrary() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Links To</p>
+                    <p className="text-[14px] font-bold text-muted-foreground/60 mb-1">Links To</p>
                     <div className="space-y-0.5">
                       {[...action.relatedLearningAssets, ...action.relatedDeliveryAssets, ...action.relatedPennyAssets].slice(0, 4).map(asset => (
                         <p key={asset} className="text-[14px] text-foreground/70">· {asset}</p>
@@ -99,7 +107,7 @@ export default function PennyActionLibrary() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

@@ -26,13 +26,18 @@ export default function CurriculumPrograms() {
   const { data: lmsData, isLoading, isError } = useSfLmsCourses();
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-6">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Program Structure</p>
-          <h1 className="text-3xl font-bold text-foreground">Programs</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">The top-level learning programs at Transition Trails. Each program contains cohorts, sprints, and modules. Select a program to view its full structure in the Knowledge Brief.</p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-[14px] font-semibold text-foreground">Programs</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{curriculumPrograms.length}</span> Programs
+          </span>
         </div>
+      </div>
+      <ScrollArea className="flex-1">
+      <div className="p-5 max-w-5xl space-y-5">
 
         {/* ── Live from Salesforce ── */}
         <section>
@@ -179,6 +184,7 @@ export default function CurriculumPrograms() {
           </div>
         </section>
       </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

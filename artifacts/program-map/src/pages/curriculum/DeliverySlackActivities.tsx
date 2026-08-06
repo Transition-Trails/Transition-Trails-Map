@@ -15,17 +15,18 @@ export default function DeliverySlackActivities() {
   const { setSelectedItem } = useAppContext();
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Delivery Assets</p>
-          <h1 className="text-3xl font-bold text-foreground">Slack Activities</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">
-            Penny-posted Slack threads, lab shares, and cohort engagement activities linked to modules and lessons.
-            Each activity has a defined trigger timing and channel target. Select an activity to view its full script and Knowledge Brief.
-          </p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-[14px] font-semibold text-foreground">Slack Activities</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{curriculumSlackActivities.length}</span> Activities
+          </span>
         </div>
-        <div className="grid gap-3">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-3">
           {curriculumSlackActivities.map(activity => {
             const statusCfg = CONTENT_STATUS_CONFIG[activity.status];
             const typeCls = ACTIVITY_TYPE_COLORS[activity.activityType as string] || 'bg-slate-50 text-slate-700 border-slate-200';
@@ -33,7 +34,7 @@ export default function DeliverySlackActivities() {
               <button
                 key={activity.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: activity.id, data: activity })}
-                className="rounded-xl border border-border bg-white p-4 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all"
+                className="w-full rounded-xl border border-border bg-white p-4 text-left hover:border-[#9FC3AE] hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
@@ -62,7 +63,7 @@ export default function DeliverySlackActivities() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

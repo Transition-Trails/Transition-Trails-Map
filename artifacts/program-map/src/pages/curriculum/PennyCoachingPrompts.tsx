@@ -7,24 +7,25 @@ export default function PennyCoachingPrompts() {
   const { setSelectedItem } = useAppContext();
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Penny Assets</p>
-          <h1 className="text-3xl font-bold text-foreground">Coaching Prompts</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">
-            Penny-delivered coaching messages triggered by learner context — module opens, stuck signals, or at-risk flags.
-            Each prompt is linked to a specific module or lesson. Select a prompt to see its trigger context, tone, and sample output.
-          </p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-[14px] font-semibold text-foreground">Coaching Prompts</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{curriculumCoachingPrompts.length}</span> Prompts
+          </span>
         </div>
-        <div className="grid gap-3">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-3">
           {curriculumCoachingPrompts.map(prompt => {
             const statusCfg = CONTENT_STATUS_CONFIG[prompt.status];
             return (
               <button
                 key={prompt.id}
                 onClick={() => setSelectedItem({ type: 'curriculumItem', id: prompt.id, data: prompt })}
-                className="rounded-xl border border-border bg-white p-4 text-left hover:border-secondary/30 hover:shadow-sm transition-all"
+                className="w-full rounded-xl border border-border bg-white p-4 text-left hover:border-secondary/30 hover:shadow-sm transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
@@ -58,7 +59,7 @@ export default function PennyCoachingPrompts() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }

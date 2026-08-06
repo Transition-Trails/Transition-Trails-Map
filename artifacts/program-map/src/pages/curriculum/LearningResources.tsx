@@ -13,19 +13,23 @@ export default function LearningResources() {
   const { setSelectedItem } = useAppContext();
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-5">
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/60 mb-1">Curriculum Studio — Learning Assets</p>
-          <h1 className="text-3xl font-bold text-foreground">Resources</h1>
-          <p className="text-[14px] text-muted-foreground mt-1">External platforms, documentation links, and internal reference documents attached to modules. Resources supplement structured lessons with self-directed learning material.</p>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-[14px] font-semibold text-foreground">Resources</h1>
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <span className="text-[12px] text-muted-foreground">
+            <span className="font-bold text-foreground">{curriculumResources.length}</span> Resources
+          </span>
         </div>
-        <div className="grid gap-3">
+      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-5 max-w-5xl space-y-3">
           {curriculumResources.map(res => {
             const statusCfg = CONTENT_STATUS_CONFIG[res.status];
             const typeCls = TYPE_COLORS[res.resourceType as string] || 'bg-slate-50 text-slate-700 border-slate-200';
             return (
-              <button key={res.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: res.id, data: res })} className="rounded-xl border border-border bg-white p-4 text-left hover:border-slate-300 hover:shadow-sm transition-all">
+              <button key={res.id} onClick={() => setSelectedItem({ type: 'curriculumItem', id: res.id, data: res })} className="w-full rounded-xl border border-border bg-white p-4 text-left hover:border-slate-300 hover:shadow-sm transition-all">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex items-center gap-2">
                     <Link className="w-4 h-4 text-slate-600 shrink-0" />
@@ -47,7 +51,7 @@ export default function LearningResources() {
             );
           })}
         </div>
-      </div>
-    </ScrollArea>
+      </ScrollArea>
+    </div>
   );
 }
