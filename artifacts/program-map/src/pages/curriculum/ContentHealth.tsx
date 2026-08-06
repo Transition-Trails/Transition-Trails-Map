@@ -24,7 +24,7 @@ export default function ContentHealth() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-0">
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-0 flex-none">
         {/* Row 1: title + inline stats */}
         <div className="flex items-center gap-3 flex-wrap mb-3">
           <h1 className="text-[14px] font-semibold text-foreground">Content Health</h1>
@@ -64,8 +64,9 @@ export default function ContentHealth() {
           ))}
         </div>
       </div>
+      <div className="flex flex-1 overflow-hidden">
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-4">
+        <div className="p-5 space-y-4">
 
           {/* Penny CTA */}
           <div className="rounded-lg border border-secondary/30 bg-secondary/5 px-4 py-3 flex items-center gap-3">
@@ -135,6 +136,60 @@ export default function ContentHealth() {
           )}
         </div>
       </ScrollArea>
+
+      {/* Right rail */}
+      <div className="w-[272px] shrink-0 border-l border-border overflow-y-auto p-4 space-y-4">
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Health Score</p>
+          <div className="rounded-lg border border-border bg-background px-3 py-3 text-center">
+            <p className={`text-2xl font-bold ${healthScore >= 80 ? 'text-[#2F6B3F]' : healthScore >= 50 ? 'text-[#CC8400]' : 'text-[#A93F2F]'}`}>{healthScore}%</p>
+            <div className="h-1.5 bg-muted rounded-full mt-2">
+              <div
+                className={`h-1.5 rounded-full ${healthScore >= 80 ? 'bg-[#2F6B3F]' : healthScore >= 50 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]'}`}
+                style={{ width: `${healthScore}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">By Severity</p>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-2.5 py-1.5">
+              <p className="text-[12px] font-medium text-[#A93F2F]">High</p>
+              <p className="text-[14px] font-bold text-[#A93F2F]">{counts.high}</p>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-2.5 py-1.5">
+              <p className="text-[12px] font-medium text-[#CC8400]">Medium</p>
+              <p className="text-[14px] font-bold text-[#CC8400]">{counts.medium}</p>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-border bg-background px-2.5 py-1.5">
+              <p className="text-[12px] font-medium text-muted-foreground">Low</p>
+              <p className="text-[14px] font-bold text-foreground">{counts.low}</p>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-border bg-background px-2.5 py-1.5">
+              <p className="text-[12px] font-medium text-muted-foreground">Total</p>
+              <p className="text-[14px] font-bold text-foreground">{curriculumHealthIssues.length}</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">By Check Type</p>
+          <div className="space-y-1.5">
+            {Object.entries(HEALTH_CHECK_CONFIG).map(([type, cfg]) => {
+              const count = curriculumHealthIssues.filter(h => h.checkType === type).length;
+              return count > 0 ? (
+                <div key={type} className="flex items-center justify-between rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]/50 px-2.5 py-1.5">
+                  <p className="text-[12px] font-medium text-[#A93F2F] truncate">{cfg.label}</p>
+                  <p className="text-[13px] font-bold text-[#A93F2F] shrink-0 ml-1">{count}</p>
+                </div>
+              ) : null;
+            })}
+          </div>
+        </div>
+      </div>
+      </div>
     </div>
   );
 }

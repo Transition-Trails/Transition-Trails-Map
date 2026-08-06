@@ -224,7 +224,7 @@ export default function ProgramBlueprint() {
 
       {/* ── Tab content ─────────────────────────────────────────────────────── */}
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-4">
+        <div className="p-5 space-y-4">
 
           {/* ── Structure Tab ── */}
           {tab === 'structure' && (

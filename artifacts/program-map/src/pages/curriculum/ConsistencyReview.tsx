@@ -88,8 +88,9 @@ export default function ConsistencyReview() {
           </div>
         </div>
       </div>
+      <div className="flex flex-1 overflow-hidden">
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-5">
+        <div className="p-5 space-y-5">
 
           {/* Penny action info */}
           <button
@@ -190,6 +191,43 @@ export default function ConsistencyReview() {
           </div>
         </div>
       </ScrollArea>
+
+      {/* Right rail */}
+      <div className="w-[272px] shrink-0 border-l border-border overflow-y-auto p-4 space-y-4">
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Module Results</p>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-2.5 py-1.5">
+              <p className="text-[12px] font-medium text-[#2F6B3F]">Compliant</p>
+              <p className="text-[14px] font-bold text-[#2F6B3F]">{passing.length}</p>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-2.5 py-1.5">
+              <p className="text-[12px] font-medium text-[#A93F2F]">Need Attention</p>
+              <p className="text-[14px] font-bold text-[#A93F2F]">{failing.length}</p>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border border-border bg-background px-2.5 py-1.5">
+              <p className="text-[12px] font-medium text-foreground">Avg Score</p>
+              <p className="text-[14px] font-bold text-primary">{avgScore}%</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Issues by Check</p>
+          <div className="space-y-1.5">
+            {Object.entries(HEALTH_CHECK_CONFIG).map(([type, cfg]) => {
+              const count = issuesByCheck[type] || 0;
+              return (
+                <div key={type} className={`flex items-center justify-between rounded-lg border px-2.5 py-1.5 ${count > 0 ? 'border-[#E8B9B4] bg-[#FBEAE6]/50' : 'border-[#9FC3AE] bg-[#E6F0EA]/50'}`}>
+                  <p className={`text-[12px] font-medium truncate ${count > 0 ? 'text-[#A93F2F]' : 'text-[#245531]'}`}>{cfg.label}</p>
+                  <p className={`text-[13px] font-bold shrink-0 ml-1 ${count > 0 ? 'text-[#A93F2F]' : 'text-[#245531]'}`}>{count > 0 ? count : '✓'}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      </div>
     </div>
   );
 }

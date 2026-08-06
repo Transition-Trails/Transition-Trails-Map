@@ -104,8 +104,9 @@ export default function AgentforceCenter() {
   }
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 space-y-6 max-w-5xl">
+    <div className="flex h-full overflow-hidden">
+      <ScrollArea className="flex-1">
+      <div className="p-6 space-y-6">
 
         {/* Header */}
         <div className="space-y-3">
@@ -322,6 +323,41 @@ export default function AgentforceCenter() {
         </div>
 
       </div>
-    </ScrollArea>
+      </ScrollArea>
+
+      {/* Right rail */}
+      <div className="w-[272px] shrink-0 border-l border-border overflow-y-auto p-4 space-y-4">
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">POC Status</p>
+          <div className="space-y-1.5">
+            {POC_CHECKS.map(item => {
+              const cfg = CHECK_CFG[item.status];
+              return (
+                <div key={item.label} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 ${cfg.bg}`}>
+                  <cfg.icon className={`w-3 h-3 shrink-0 ${cfg.cls}`} />
+                  <p className="text-[12px] font-medium text-foreground truncate">{item.label}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Coexistence</p>
+          <div className="space-y-1.5">
+            {(['Penny', 'Agentforce', 'Both'] as const).map(h => {
+              const count = MATRIX.filter(m => m.handler === h).length;
+              const cfg = HANDLER_CFG[h];
+              return (
+                <div key={h} className={`flex items-center justify-between rounded-lg border px-2.5 py-1.5 ${cfg.cls}`}>
+                  <p className="text-[12px] font-medium">{h}</p>
+                  <p className="text-[13px] font-bold">{count}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

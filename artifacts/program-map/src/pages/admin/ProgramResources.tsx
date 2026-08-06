@@ -96,8 +96,9 @@ export default function ProgramResources() {
   const inputCls = 'w-full text-[14px] border border-border rounded-lg px-3 py-2 bg-background focus:outline-none focus:border-primary';
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-6">
+    <div className="flex h-full overflow-hidden">
+      <ScrollArea className="flex-1">
+      <div className="p-6 space-y-6">
 
         {/* Header */}
         <div>
@@ -410,6 +411,42 @@ export default function ProgramResources() {
         </div>
 
       </div>
-    </ScrollArea>
+      </ScrollArea>
+
+      {/* Right rail */}
+      <div className="w-[272px] shrink-0 border-l border-border overflow-y-auto p-4 space-y-4">
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Drive Workspaces</p>
+          <div className="space-y-1.5">
+            {[
+              { label: 'Total Programs', value: resources.length, cls: 'border-border bg-background text-foreground' },
+              { label: 'Active Drives',  value: activeCount,       cls: 'border-[#9FC3AE] bg-[#E6F0EA] text-[#2F6B3F]' },
+              { label: 'Needs Setup',   value: needsSetupCount,   cls: 'border-[#FFD08A] bg-[#FFF3E0] text-[#CC8400]' },
+              { label: 'Pending',       value: pendingCount,      cls: 'border-[#7FAFC6] bg-[#EDF5F8] text-[#2F6F7E]' },
+            ].map(s => (
+              <div key={s.label} className={`flex items-center justify-between rounded-lg border px-2.5 py-1.5 ${s.cls}`}>
+                <p className="text-[12px] font-medium">{s.label}</p>
+                <p className="text-[14px] font-bold">{s.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Roadmap</p>
+          <div className="space-y-1.5">
+            {ROADMAP.map(item => (
+              <div key={item.phase} className={`rounded-lg border px-2.5 py-1.5 ${item.cls}`}>
+                <div className="flex items-center justify-between">
+                  <p className="text-[12px] font-bold">{item.phase}</p>
+                  <span className="text-[11px] font-semibold">{item.status}</span>
+                </div>
+                <p className="text-[12px] opacity-80 mt-0.5">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -243,7 +243,7 @@ export default function Phase1CompletionAudit() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 space-y-4 max-w-5xl">
+      <div className="p-4 space-y-4">
 
         {/* Header */}
         <div>

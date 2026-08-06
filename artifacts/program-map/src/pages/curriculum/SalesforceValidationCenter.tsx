@@ -200,7 +200,7 @@ function ReadinessTrackingView() {
   const [openProduct, setOpenProduct] = useState<string | null>(null);
 
   return (
-    <div className="p-6 space-y-4 max-w-4xl">
+    <div className="p-6 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {PRODUCT_READINESS.map(prod => {
           const cfg  = STATUS_CONFIG[prod.overallStatus];
@@ -268,7 +268,7 @@ function ObjectMappingView() {
   });
 
   return (
-    <div className="p-6 space-y-4 max-w-5xl">
+    <div className="p-6 space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap gap-2 items-center">
         <select value={groupFilter} onChange={e => setGroupFilter(e.target.value)}
@@ -352,7 +352,7 @@ function ObjectMappingView() {
 
 function ValidationWorkflowView() {
   return (
-    <div className="p-6 space-y-4 max-w-4xl">
+    <div className="p-6 space-y-4">
       {VALIDATION_WORKFLOWS.map(wf => (
         <div key={wf.stage} className="rounded-lg border border-border bg-background overflow-hidden">
           <div className="px-4 py-3 bg-muted/20 border-b border-border/50">
@@ -395,7 +395,7 @@ function GapAnalysisView() {
   const validatedFields = OBJECT_MAPPINGS.reduce((s, m) => s + m.validatedFields, 0);
 
   return (
-    <div className="p-6 space-y-4 max-w-4xl">
+    <div className="p-6 space-y-4">
       {/* Summary row */}
       <div className="grid grid-cols-4 gap-3">
         {[
@@ -521,13 +521,61 @@ export default function SalesforceValidationCenter() {
         </div>
       </div>
 
-      {/* Content */}
-      <ScrollArea className="flex-1">
-        {view === 'readiness'  && <ReadinessTrackingView />}
-        {view === 'mappings'   && <ObjectMappingView />}
-        {view === 'workflows'  && <ValidationWorkflowView />}
-        {view === 'gaps'       && <GapAnalysisView />}
-      </ScrollArea>
+      {/* Content + rail */}
+      <div className="flex flex-1 overflow-hidden">
+        <ScrollArea className="flex-1">
+          {view === 'readiness'  && <ReadinessTrackingView />}
+          {view === 'mappings'   && <ObjectMappingView />}
+          {view === 'workflows'  && <ValidationWorkflowView />}
+          {view === 'gaps'       && <GapAnalysisView />}
+        </ScrollArea>
+
+        {/* Right rail */}
+        <div className="w-[272px] shrink-0 border-l border-border overflow-y-auto p-4 space-y-4">
+          <div>
+            <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Products</p>
+            <div className="space-y-1.5">
+              {PRODUCT_READINESS.map(prod => {
+                const cfg = STATUS_CONFIG[prod.overallStatus];
+                return (
+                  <div key={prod.product} className="flex items-center justify-between gap-2 py-1 border-b border-border/40 last:border-0">
+                    <p className="text-[13px] font-medium text-foreground truncate">{prod.product}</p>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className={`text-[11px] font-bold border rounded-full px-1.5 py-0.5 ${cfg.cls}`}>{prod.score}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Object Mapping</p>
+            <div className="space-y-1.5">
+              {(['validated','partial','pending','blocked'] as const).map(s => {
+                const count = OBJECT_MAPPINGS.filter(m => m.status === s).length;
+                const cfg = STATUS_CONFIG[s];
+                return count > 0 ? (
+                  <div key={s} className={`flex items-center justify-between rounded-lg border px-2.5 py-1.5 ${cfg.cls}`}>
+                    <p className="text-[12px] font-medium">{cfg.label}</p>
+                    <p className="text-[13px] font-bold">{count}</p>
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-wide mb-2">Fields Validated</p>
+            <div className="rounded-lg border border-border bg-background px-3 py-2.5">
+              <p className="text-xl font-bold text-[#2F6F7E]">
+                {OBJECT_MAPPINGS.reduce((s, m) => s + m.validatedFields, 0)}/{OBJECT_MAPPINGS.reduce((s, m) => s + m.fieldCount, 0)}
+              </p>
+              <p className="text-[12px] text-muted-foreground mt-0.5">across {OBJECT_MAPPINGS.length} mappings</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
   );
