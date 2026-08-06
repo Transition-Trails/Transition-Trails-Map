@@ -280,25 +280,6 @@ export default function CollaborationWorkspace() {
     <ScrollArea className="h-full">
       <div className="max-w-5xl mx-auto px-6 py-6 space-y-8">
 
-        {/* ── Intro ── */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[14px] text-zinc-600 leading-relaxed max-w-2xl">
-              Configure how each connected channel generates signals, routes them to Penny, and surfaces
-              actionable insights across Trail OS. These rules define what Penny watches, when it posts,
-              and what reaches Trail Signals.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[14px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
-              {liveChannels.length} channels live
-            </span>
-            <span className="text-[14px] font-semibold text-zinc-400 bg-zinc-50 border border-zinc-200 rounded-full px-2.5 py-1">
-              {phase2Channels.length} phase 2
-            </span>
-          </div>
-        </div>
-
         {/* ── Signal destination strip ── */}
         <div>
           <div className="flex items-center gap-2 mb-3">

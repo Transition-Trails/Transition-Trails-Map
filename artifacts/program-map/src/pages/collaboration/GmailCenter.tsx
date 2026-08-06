@@ -364,9 +364,6 @@ function PennyConfigPanel({
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
-      <p className="text-[14px] text-[#2F6F7E] mb-3 leading-snug max-w-2xl">
-        Choose which Gmail labels Penny monitors for insights, alerts, and automated follow-ups. Threads tagged with a watched label are surfaced in Trail Signals.
-      </p>
       <div className="grid grid-cols-5 gap-2">
         {LABELS.map(l => {
           const cfg = labelCfg[l.id];

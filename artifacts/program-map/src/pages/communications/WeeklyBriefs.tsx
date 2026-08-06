@@ -23,14 +23,6 @@ export default function WeeklyBriefs() {
     <div className="h-full overflow-y-auto p-6 bg-muted/20">
       <div className="max-w-4xl mx-auto space-y-8">
 
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Communications</p>
-          <h1 className="text-3xl font-bold text-foreground">Weekly Briefs</h1>
-          <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            Auto-generated digests that Trail OS and {TERMS.aiAssistant} assemble and deliver on a schedule. Click any brief to open its Knowledge Brief.
-          </p>
-        </div>
-
         <div className="space-y-6">
           {commWeeklyBriefs.map(b => (
             <button
@@ -82,11 +74,6 @@ export default function WeeklyBriefs() {
           ))}
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
-          <p className="text-[14px] text-muted-foreground leading-relaxed">
-            <strong>Prototype mode —</strong> Brief content shown above is the planned section structure. Actual brief generation requires Trail OS data connections and a live Slack (or other provider) adapter. Planned Q3–Q4 2025.
-          </p>
-        </div>
 
       </div>
     </div>

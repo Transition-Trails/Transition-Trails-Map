@@ -253,41 +253,17 @@ export default function MyTrailSignals() {
     <ScrollArea className="h-full">
       <div className="max-w-4xl mx-auto px-6 py-6 space-y-8">
 
-        {/* ── Header ── */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[14px] text-zinc-600 leading-relaxed max-w-2xl">
-              Control what enters your personal {TERMS.trailSignals} feed — choose which sources to
-              watch, set urgency levels, and decide whether signals arrive in real-time or as a
-              daily digest. Watch rules let you define your own conditions on top of the
-              org-level rules set in Systems Overview.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[14px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1">
-              {activeCount} sources active
-            </span>
-            <span className="text-[14px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2.5 py-1">
-              {ruleCount} rules live
-            </span>
-          </div>
-        </div>
-
-        {/* ── Required signals notice ── */}
-        <div className="flex items-start gap-2.5 rounded-lg border border-[#FFD08A] bg-[#FFF3E0] px-4 py-3">
-          <Info className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-          <p className="text-[14px] text-[#CC8400] leading-snug">
-            <span className="font-semibold">Required signals</span> — sources and rules marked with a lock are
-            set by your organisation and cannot be paused or removed. They ensure the team always has visibility
-            on critical learner and program activity.
-          </p>
-        </div>
-
         {/* ── Signal sources ── */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Activity className="w-3.5 h-3.5 text-zinc-400" />
-            <h2 className="text-[14px] font-semibold text-zinc-500 ">Signal sources</h2>
+            <h2 className="text-[14px] font-semibold text-zinc-500">Signal sources</h2>
+            <span className="text-[14px] font-semibold text-[#2F6B3F] bg-[#E6F0EA] border border-[#9FC3AE] rounded-full px-2.5 py-1 ml-1">
+              {activeCount} active
+            </span>
+            <span className="text-[14px] font-semibold text-[#2F6F7E] bg-[#EDF5F8] border border-[#7FAFC6] rounded-full px-2.5 py-1">
+              {ruleCount} rules live
+            </span>
           </div>
           <div className="space-y-2">
             {SOURCES.map(src => {

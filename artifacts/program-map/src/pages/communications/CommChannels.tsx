@@ -65,14 +65,6 @@ export default function CommChannels() {
     <div className="h-full overflow-y-auto p-6 bg-muted/20">
       <div className="max-w-4xl mx-auto space-y-8">
 
-        <div>
-          <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Communications & Collaboration</p>
-          <h1 className="text-3xl font-bold text-foreground">Channels & Spaces</h1>
-          <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
-            Slack channels for the learning community. Google Chat Spaces for client and project collaboration. Click any channel to open its Trail Insights.
-          </p>
-        </div>
-
         {/* Slack channels */}
         <section>
           <div className="flex items-center gap-2 mb-3">
@@ -95,11 +87,6 @@ export default function CommChannels() {
           </div>
         </section>
 
-        <div className="rounded-xl border border-border/60 bg-muted/30 px-5 py-4">
-          <p className="text-[14px] text-muted-foreground leading-relaxed">
-            <strong>Two channel types, two audiences.</strong> Slack is the community and program layer — for learners, coaches, and internal ops. Google Chat Spaces are the client-facing layer — for nonprofit partners, Digital Compass, and executive sponsors who work in Google Workspace.
-          </p>
-        </div>
 
       </div>
     </div>
