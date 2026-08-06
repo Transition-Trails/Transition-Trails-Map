@@ -820,52 +820,34 @@ function OverviewView({
     stds: standards.filter(s => s.category === cat),
   }));
 
-  const activeCount  = standards.filter(s => s.status === 'active').length;
-  const totalChecks  = standards.reduce((n, s) => n + s.pennyChecks.length, 0);
-  const reqChecks    = standards.reduce((n, s) => n + s.pennyChecks.filter(c => c.required).length, 0);
+  const reqChecks = standards.reduce((n, s) => n + s.pennyChecks.filter(c => c.required).length, 0);
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-6 max-w-3xl">
-        <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-          <ShieldCheck className="w-4 h-4 text-muted-foreground shrink-0" />
-          <p className="text-[14px] text-muted-foreground leading-relaxed">
-            Standards are the rulebook {TERMS.aiAssistant} uses to create, review, and improve curriculum content.
-            The <strong className="text-foreground">Program Blueprint</strong> defines what every program should contain;
-            <strong className="text-foreground"> Foundations Trail</strong> is the reference implementation.
-          </p>
-        </div>
+      <div className="p-5 space-y-5 max-w-3xl">
 
-        <div className="grid grid-cols-4 gap-3">
-          {[
-            { label: 'Standards',      value: standards.length, sub: 'defined',   cls: 'border-foreground/20 bg-foreground/5' },
-            { label: 'Active',         value: activeCount,      sub: 'live',       cls: 'border-[#9FC3AE] bg-[#E6F0EA]' },
-            { label: `${TERMS.aiAssistant} Checks`, value: totalChecks, sub: 'total', cls: 'border-secondary/20 bg-secondary/5' },
-            { label: 'Required Checks', value: reqChecks,       sub: 'must-pass',  cls: 'border-[#E8B9B4] bg-[#FBEAE6]' },
-          ].map(stat => (
-            <div key={stat.label} className={`rounded-lg border p-3 text-center ${stat.cls}`}>
-              <p className="text-xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-[14px] font-semibold text-foreground/80">{stat.label}</p>
-              <p className="text-[14px] text-muted-foreground">{stat.sub}</p>
+        {/* Quick-action nav cards */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => onNavigate('checklist')}
+            className="rounded-xl border border-secondary/20 bg-secondary/5 px-4 py-3 text-left hover:bg-secondary/10 transition-colors flex items-center gap-3"
+          >
+            <ClipboardList className="w-4 h-4 text-secondary shrink-0" />
+            <div>
+              <p className="text-[13px] font-bold text-foreground">Standards Checklist</p>
+              <p className="text-[12px] text-muted-foreground">{reqChecks} required checks · run against any content object</p>
             </div>
-          ))}
-        </div>
-
-        <div>
-          <h3 className="text-[14px] font-bold text-foreground mb-3">How Standards Work</h3>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { step: '1', title: 'Author creates content', desc: 'Curriculum authors use the required fields list as a checklist while writing modules, lessons, prompts, or delivery assets.' },
-              { step: '2', title: `${TERMS.aiAssistant} audits with checklist`, desc: `Before publishing, ${TERMS.aiAssistant} runs the Standards Checklist against each content object — flagging missing fields and quality issues.` },
-              { step: '3', title: 'Gap Report surfaces issues', desc: 'The Standards Gap Report shows all open gaps in the reference implementation and all programs, sorted by severity.' },
-            ].map(s => (
-              <div key={s.step} className="rounded-lg border border-border bg-background p-3">
-                <div className="w-6 h-6 rounded-full bg-foreground text-background text-[14px] font-bold flex items-center justify-center mb-2">{s.step}</div>
-                <p className="text-[14px] font-bold text-foreground mb-1">{s.title}</p>
-                <p className="text-[14px] text-muted-foreground leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
-          </div>
+          </button>
+          <button
+            onClick={() => onNavigate('gap-report')}
+            className="rounded-xl border border-[#E8B9B4] bg-[#FBEAE6]/60 px-4 py-3 text-left hover:bg-[#FBEAE6] transition-colors flex items-center gap-3"
+          >
+            <AlertTriangle className="w-4 h-4 text-[#A93F2F] shrink-0" />
+            <div>
+              <p className="text-[13px] font-bold text-foreground">Gap Report</p>
+              <p className="text-[12px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps need attention</p>
+            </div>
+          </button>
         </div>
 
         {byCategory.map(({ cat, stds }) => {
@@ -904,24 +886,6 @@ function OverviewView({
           );
         })}
 
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => onNavigate('checklist')}
-            className="rounded-xl border border-secondary/20 bg-secondary/5 p-4 text-left hover:bg-secondary/10 transition-colors"
-          >
-            <ClipboardList className="w-5 h-5 text-secondary mb-2" />
-            <p className="text-[14px] font-bold text-foreground mb-1">Standards Checklist</p>
-            <p className="text-[14px] text-muted-foreground">{TERMS.aiAssistant}'s audit tool — run all required checks against any content object.</p>
-          </button>
-          <button
-            onClick={() => onNavigate('gap-report')}
-            className="rounded-xl border border-[#E8B9B4] bg-[#FBEAE6] p-4 text-left hover:bg-[#FBEAE6] transition-colors"
-          >
-            <AlertTriangle className="w-5 h-5 text-[#A93F2F] mb-2" />
-            <p className="text-[14px] font-bold text-foreground mb-1">Gap Report</p>
-            <p className="text-[14px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps across all programs require attention before the next cohort.</p>
-          </button>
-        </div>
       </div>
     </ScrollArea>
   );
@@ -1291,33 +1255,49 @@ export default function StandardsStudio() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Page header */}
-      <div className="px-5 pt-5 pb-3 border-b border-border flex-shrink-0 bg-background">
-        <p className="text-[14px] font-bold text-muted-foreground/50 mb-0.5">Programs · Standards</p>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-[15px] font-semibold text-foreground leading-snug">Standards Studio</h1>
-            <p className="text-[14px] text-muted-foreground mt-0.5">
-              The rulebook {TERMS.aiAssistant} uses to create, review, and improve curriculum content consistently.
-            </p>
+      {/* Compact page header */}
+      <div className="shrink-0 border-b border-border bg-background px-5 pt-4 pb-0">
+
+        {/* Row 1: title + stats + action */}
+        <div className="flex items-center gap-3 flex-wrap mb-3">
+          <h1 className="text-[14px] font-semibold text-foreground">Standards Studio</h1>
+
+          {/* Inline stat chips */}
+          <span className="text-muted-foreground/30 text-[12px] hidden sm:inline">·</span>
+          <div className="flex items-center gap-3">
+            <span className="text-[12px] text-muted-foreground">
+              <span className="font-bold text-foreground">{standards.length}</span> Standards
+            </span>
+            <span className="text-muted-foreground/30 text-[12px]">·</span>
+            <span className="text-[12px] text-muted-foreground">
+              <span className="font-bold text-foreground">{totalChecks}</span> {TERMS.aiAssistant} Checks
+            </span>
+            <span className="text-muted-foreground/30 text-[12px]">·</span>
+            <span className="text-[12px] text-muted-foreground">
+              <span className="font-bold text-foreground">{reqChecks}</span> Required
+            </span>
           </div>
+
+          {/* Gap alert — only when on gap-report tab */}
           {view === 'gap-report' && (
-            <div className="flex items-center gap-1.5 rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 shrink-0">
-              <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F]" />
-              <span className="text-[14px] font-bold text-[#A93F2F]">{GAP_SUMMARY.bySeverity.high} high-severity gaps</span>
-            </div>
+            <span className="flex items-center gap-1 text-[11px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-2 py-0.5">
+              <AlertTriangle className="w-3 h-3" />
+              {GAP_SUMMARY.bySeverity.high} high-severity
+            </span>
           )}
+
+          {/* New Standard — right-aligned */}
           <button
             onClick={() => setDrawer({ mode: 'create' })}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[14px] font-bold hover:opacity-90 transition-opacity shrink-0"
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background rounded-full text-[12px] font-bold hover:opacity-90 transition-opacity shrink-0"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3 h-3" />
             New Standard
           </button>
         </div>
 
-        {/* View tabs */}
-        <div className="flex items-center gap-2 mt-3">
+        {/* Row 2: underline tabs flush to border */}
+        <div className="flex items-center gap-0.5">
           <ViewTab id="overview"   label="Overview"   icon={BookCheck}     active={view === 'overview'}   onClick={() => navigateTo('overview')} />
           <ViewTab id="standards"  label="Standards"  icon={ShieldCheck}   active={view === 'standards'}  count={standards.length} onClick={() => navigateTo('standards')} />
           <ViewTab id="checklist"  label="Checklist"  icon={ClipboardList} active={view === 'checklist'}  count={reqChecks} onClick={() => navigateTo('checklist')} />
@@ -1363,16 +1343,16 @@ function ViewTab({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[14px] font-semibold transition-all border ${
+      className={`flex items-center gap-1.5 text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
         active
-          ? 'bg-foreground text-background border-foreground'
-          : 'border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+          ? 'border-secondary text-secondary'
+          : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
       }`}
     >
-      <Icon className="w-3.5 h-3.5" />
+      <Icon className="w-3 h-3" />
       {label}
       {count !== undefined && (
-        <span className={`text-[14px] font-bold rounded-full px-1.5 py-0 ${active ? 'bg-background/20' : 'bg-muted'}`}>{count}</span>
+        <span className={`text-[11px] font-bold rounded-full px-1.5 py-0 ${active ? 'text-secondary bg-secondary/10' : 'text-muted-foreground bg-muted'}`}>{count}</span>
       )}
     </button>
   );
