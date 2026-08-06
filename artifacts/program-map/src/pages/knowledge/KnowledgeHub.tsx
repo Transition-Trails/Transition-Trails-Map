@@ -53,8 +53,11 @@ function lsRead<T>(key: string, fallback: T): T {
 }
 function lsWrite(key: string, val: unknown) { try { localStorage.setItem(key, JSON.stringify(val)); } catch { /* ignore */ } }
 
-// ── SF article types hook ──────────────────────────────────────────────────────
-
+interface ReviewRecord {
+  reviewedAt:    string | null;
+  reviewedBy:    string | null;
+  nextReviewDue: string | null;
+}
 interface ArticleType { value: string; label: string; }
 function useArticleTypes() {
   const [types, setTypes]     = useState<ArticleType[]>([]);
@@ -674,21 +677,32 @@ const HEALTH_DIMS = [
   { key: 'published',   label: 'Published' },
 ];
 
-function articleDims(a: KnowledgeArticle): Record<string, boolean> {
+function articleDims(
+  a: KnowledgeArticle,
+  reviewMap: Record<string, ReviewRecord>,
+): Record<string, boolean> {
   return {
     hasSummary:  (a.summary ?? '').trim().length > 10,
     hasBody:     (a.body    ?? '').trim().length > 100,
-    isCurrent:   !isOverdue(a),
+    isCurrent:   !isOverdueWithReviews(a, reviewMap),
     sfSynced:    !!a.sfArticleId,
     hasCategory: !!a.category,
     published:   a.status === 'published',
   };
 }
 
-function ArticleHealthTab({ articles }: { articles: KnowledgeArticle[] }) {
+function ArticleHealthTab({
+  articles,
+  reviewMap,
+  reviewsLoading,
+}: {
+  articles:      KnowledgeArticle[];
+  reviewMap:     Record<string, ReviewRecord>;
+  reviewsLoading: boolean;
+}) {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const filtered = filterStatus === 'all' ? articles : articles.filter(a => a.status === filterStatus);
-  const overdue  = articles.filter(isOverdue).length;
+  const overdue  = articles.filter(a => isOverdueWithReviews(a, reviewMap)).length;
 
   return (
     <div className="p-5 overflow-auto h-full">
@@ -706,10 +720,16 @@ function ArticleHealthTab({ articles }: { articles: KnowledgeArticle[] }) {
         </div>
       </div>
 
-      {overdue > 0 && (
+      {reviewsLoading && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-muted/20 text-muted-foreground text-[12px] mb-3">
+          <RefreshCw className="w-3.5 h-3.5 shrink-0 animate-spin" />
+          Loading review history…
+        </div>
+      )}
+      {!reviewsLoading && overdue > 0 && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 text-[12px] mb-3">
           <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-          {overdue} article{overdue !== 1 ? 's' : ''} overdue for review based on their review cycle.
+          {overdue} article{overdue !== 1 ? 's' : ''} overdue for review based on their review cycle and last governance review date.
         </div>
       )}
 
@@ -726,7 +746,7 @@ function ArticleHealthTab({ articles }: { articles: KnowledgeArticle[] }) {
           </thead>
           <tbody className="divide-y divide-border/40">
             {filtered.map(a => {
-              const dims  = articleDims(a);
+              const dims  = articleDims(a, reviewMap);
               const pass  = Object.values(dims).filter(Boolean).length;
               const score = Math.round((pass / HEALTH_DIMS.length) * 100);
               return (
@@ -735,7 +755,7 @@ function ArticleHealthTab({ articles }: { articles: KnowledgeArticle[] }) {
                     <p className="font-semibold text-foreground text-[12px] truncate max-w-[180px]" title={a.title}>{a.title}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <StatusBadge status={a.status} />
-                      {isOverdue(a) && (
+                      {isOverdueWithReviews(a, reviewMap) && (
                         <span className="flex items-center gap-0.5 text-[10px] text-amber-600 font-semibold">
                           <AlertTriangle className="w-2.5 h-2.5" />Overdue
                         </span>
@@ -772,7 +792,7 @@ function ArticleHealthTab({ articles }: { articles: KnowledgeArticle[] }) {
               <td className="px-4 py-2 text-[11px] font-bold text-muted-foreground/50">Coverage</td>
               {HEALTH_DIMS.map(d => {
                 const count  = filtered.length;
-                const passed = count ? filtered.filter(a => articleDims(a)[d.key]).length : 0;
+                const passed = count ? filtered.filter(a => articleDims(a, reviewMap)[d.key]).length : 0;
                 const pct    = count ? Math.round((passed / count) * 100) : 0;
                 return <td key={d.key} className="px-3 py-2 text-center text-[11px] font-bold text-muted-foreground/60">{pct}%</td>;
               })}
@@ -1034,7 +1054,13 @@ function SfArticlesTab({ articles }: { articles: KnowledgeArticle[] }) {
 
 // ── Governance: Right rail ─────────────────────────────────────────────────────
 
-function KnowledgeGovernanceRail({ articles }: { articles: KnowledgeArticle[] }) {
+function KnowledgeGovernanceRail({
+  articles,
+  reviewMap,
+}: {
+  articles:  KnowledgeArticle[];
+  reviewMap: Record<string, ReviewRecord>;
+}) {
   const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const { summary: sourceSummary } = useKnowledgeSources();
 
@@ -1043,7 +1069,7 @@ function KnowledgeGovernanceRail({ articles }: { articles: KnowledgeArticle[] })
   const inReview  = articles.filter(a => a.status === 'pending-review').length;
   const approved  = articles.filter(a => a.status === 'approved').length;
   const published = articles.filter(a => a.status === 'published').length;
-  const overdue   = articles.filter(isOverdue).length;
+  const overdue   = articles.filter(a => isOverdueWithReviews(a, reviewMap)).length;
 
   function fireGapSummary() {
     setPendingPennyQuery('Summarize the biggest knowledge gaps in the Transition Trails knowledge base. Consider coverage across categories, overdue reviews, and missing topics learners commonly need. Give me 5 prioritized gaps with a concrete next step for each.');
@@ -1136,6 +1162,15 @@ export default function KnowledgeHub() {
     submitForReview, approveArticle, requestChanges,
     publishToSf, deleteArticle,
   } = useKnowledgeArticles();
+
+  // Fetch real last-reviewed dates from the governance log (governance mode only).
+  // Reviews are keyed by sfVersionId (SF KnowledgeArticleVersion.Id), not local id.
+  const sfVersionIds = articles
+    .map(a => a.sfVersionId)
+    .filter((id): id is string => !!id);
+  const { reviewMap, loading: reviewsLoading } = useArticleReviewsBatch(
+    mode === 'governance' ? sfVersionIds : [],
+  );
 
   // ── Persisted article selection ──────────────────────────────────────────────
   // Priority: ?article=<id> URL param → localStorage → null
@@ -1329,7 +1364,7 @@ export default function KnowledgeHub() {
 
             {/* Tab content */}
             <div className="flex-1 overflow-hidden">
-              {govTab === 'health'  && <ArticleHealthTab articles={articles} />}
+              {govTab === 'health'  && <ArticleHealthTab articles={articles} reviewMap={reviewMap} reviewsLoading={reviewsLoading} />}
               {govTab === 'review'  && (
                 <ScrollArea className="h-full">
                   <ReviewQueueTab
@@ -1345,9 +1380,50 @@ export default function KnowledgeHub() {
             </div>
           </div>
 
-          <KnowledgeGovernanceRail articles={articles} />
+          <KnowledgeGovernanceRail articles={articles} reviewMap={reviewMap} />
         </div>
       )}
     </div>
   );
+}
+
+function useArticleReviewsBatch(ids: string[]) {
+  const [reviewMap, setReviewMap] = useState<Record<string, ReviewRecord>>({});
+  const [loading,   setLoading]   = useState(false);
+  const key = ids.join(',');
+  useEffect(() => {
+    if (!key) { setReviewMap({}); return; }
+    setLoading(true);
+    fetch(`/api/governance/article-reviews-batch?ids=${encodeURIComponent(key)}`, { credentials: 'include' })
+      .then(r => r.json() as Promise<{ reviews: Record<string, ReviewRecord> }>)
+      .then(d => setReviewMap(d.reviews ?? {}))
+      .catch(() => setReviewMap({}))
+      .finally(() => setLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return { reviewMap, loading };
+}
+
+// reviewMap is keyed by sfVersionId (the Salesforce KnowledgeArticleVersion.Id),
+// since that is what the mark-reviewed route stores as articleId.
+// Articles without an sfVersionId (drafts, etc.) fall back to the heuristic.
+function isOverdueWithReviews(
+  a: KnowledgeArticle,
+  reviewMap: Record<string, ReviewRecord>,
+): boolean {
+  const govRecord = a.sfVersionId ? reviewMap[a.sfVersionId] : undefined;
+
+  if (govRecord) {
+    // Use nextReviewDue from the governance log as the authoritative due date.
+    if (govRecord.nextReviewDue) {
+      return new Date(govRecord.nextReviewDue) < new Date();
+    }
+    // Has a review record but no nextReviewDue — treat as current.
+    return false;
+  }
+
+  // No governance review record — fall back to article's own dates vs its cycle.
+  const base = a.reviewedAt ?? a.updatedAt;
+  if (!base) return true; // never reviewed at all → always overdue
+  return (Date.now() - new Date(base).getTime()) / 86_400_000 > CYCLE_DAYS[a.reviewCycle];
 }

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { articleReviewsTable } from "@workspace/db/schema";
-import { desc, sql } from "drizzle-orm";
+import { desc, sql, inArray } from "drizzle-orm";
 import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
 
 const router = Router();
@@ -173,6 +173,62 @@ router.get("/governance/article-review/:articleId", async (req, res): Promise<vo
   } catch (err) {
     req.log.error(err, "Failed to fetch article review");
     res.status(500).json({ error: "Failed to fetch article review" });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/governance/article-reviews-batch?ids=id1,id2,...
+//
+// Returns the most-recent review record for each requested article ID in a
+// single query.  The Article Health tab uses this to determine real overdue
+// status instead of relying on the article's own reviewedAt field.
+//
+// Response: { reviews: { [articleId]: { reviewedAt, reviewedBy, nextReviewDue } } }
+// Articles that have no review record are simply absent from the map.
+// ─────────────────────────────────────────────────────────────────────────────
+
+router.get("/governance/article-reviews-batch", async (req, res): Promise<void> => {
+  const rawIds = typeof req.query.ids === "string" ? req.query.ids : "";
+  const ids = rawIds
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean)
+    .slice(0, 200); // safety cap
+
+  if (ids.length === 0) {
+    res.json({ reviews: {} });
+    return;
+  }
+
+  try {
+    const rows = await db
+      .select({
+        articleId:     articleReviewsTable.articleId,
+        reviewedAt:    sql<string>`MAX(${articleReviewsTable.reviewedAt})`.as("reviewed_at"),
+        reviewedBy:    sql<string>`(array_agg(${articleReviewsTable.reviewedBy} ORDER BY ${articleReviewsTable.reviewedAt} DESC))[1]`.as("reviewed_by"),
+        nextReviewDue: sql<string>`(array_agg(${articleReviewsTable.nextReviewDue} ORDER BY ${articleReviewsTable.reviewedAt} DESC))[1]`.as("next_review_due"),
+      })
+      .from(articleReviewsTable)
+      .where(inArray(articleReviewsTable.articleId, ids))
+      .groupBy(articleReviewsTable.articleId);
+
+    const reviews: Record<
+      string,
+      { reviewedAt: string | null; reviewedBy: string | null; nextReviewDue: string | null }
+    > = {};
+
+    for (const row of rows) {
+      reviews[row.articleId] = {
+        reviewedAt:    row.reviewedAt    ? new Date(row.reviewedAt).toISOString()    : null,
+        reviewedBy:    row.reviewedBy    ?? null,
+        nextReviewDue: row.nextReviewDue ? new Date(row.nextReviewDue).toISOString() : null,
+      };
+    }
+
+    res.json({ reviews });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch batch article reviews");
+    res.status(500).json({ error: "Failed to fetch article reviews" });
   }
 });
 
