@@ -24,6 +24,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 type StudioView = 'overview' | 'standards' | 'checklist' | 'gap-report';
 
+interface ChecklistFilter {
+  objectType?: string;
+  standardId?: string;
+}
+
+type NavigateFn = (view: StudioView, stdId?: string, filter?: ChecklistFilter) => void;
+
 const CATEGORY_ICONS: Record<StandardCategory, typeof BookOpen> = {
   'Program Architecture': Layers,
   'Learning Content':     BookOpen,
@@ -813,7 +820,7 @@ function OverviewView({
   onNavigate,
 }: {
   standards: ContentStandard[];
-  onNavigate: (view: StudioView, stdId?: string) => void;
+  onNavigate: NavigateFn;
 }) {
   const byCategory = CATEGORY_ORDER.map(cat => ({
     cat,
@@ -990,9 +997,26 @@ function StandardsBrowserView({
 
 type CheckState = 'pass' | 'fail' | 'unchecked';
 
-function ChecklistView({ standards }: { standards: ContentStandard[] }) {
-  const [states, setStates]       = useState<Record<string, CheckState>>({});
-  const [filterType, setFilterType] = useState<string>('all');
+function ChecklistView({
+  standards,
+  initialFilter,
+}: {
+  standards: ContentStandard[];
+  initialFilter?: ChecklistFilter;
+}) {
+  const [states, setStates]         = useState<Record<string, CheckState>>({});
+  const [filterType, setFilterType] = useState<string>(initialFilter?.objectType ?? 'all');
+  const sectionRefs                 = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Scroll to the focused standard section once the view has rendered
+  useEffect(() => {
+    if (initialFilter?.standardId) {
+      const el = sectionRefs.current[initialFilter.standardId];
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    // Only run on mount / when the filter identity changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialFilter?.standardId]);
 
   const objectTypes = Array.from(new Set(standards.map(s => s.objectType)));
 
@@ -1042,14 +1066,35 @@ function ChecklistView({ standards }: { standards: ContentStandard[] }) {
         </div>
       </div>
 
+      {/* Focus banner — shown when jumping from a gap row */}
+      {initialFilter?.objectType && (
+        <div className="px-5 py-2 border-b border-primary/20 bg-primary/5 flex items-center gap-2 flex-shrink-0">
+          <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+          <p className="text-[12px] text-primary font-semibold">
+            Focused on <span className="font-bold">{initialFilter.objectType}</span> checks
+            {initialFilter.standardId && (() => {
+              const std = standards.find(s => s.id === initialFilter.standardId);
+              return std ? <> — <span className="font-bold">{std.name}</span> standard highlighted</> : null;
+            })()}
+          </p>
+        </div>
+      )}
+
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-5">
           {shownStandards.map(std => {
-            const catCfg  = STANDARD_CATEGORY_CONFIG[std.category];
-            const stdPass = std.pennyChecks.filter(c => states[c.id] === 'pass').length;
-            const stdFail = std.pennyChecks.filter(c => states[c.id] === 'fail').length;
+            const catCfg    = STANDARD_CATEGORY_CONFIG[std.category];
+            const stdPass   = std.pennyChecks.filter(c => states[c.id] === 'pass').length;
+            const stdFail   = std.pennyChecks.filter(c => states[c.id] === 'fail').length;
+            const isFocused = initialFilter?.standardId === std.id;
             return (
-              <div key={std.id} className="rounded-xl border border-border bg-background overflow-hidden">
+              <div
+                key={std.id}
+                ref={el => { sectionRefs.current[std.id] = el; }}
+                className={`rounded-xl border bg-background overflow-hidden transition-colors ${
+                  isFocused ? 'border-primary ring-1 ring-primary/30' : 'border-border'
+                }`}
+              >
                 <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookCheck className="w-4 h-4 text-muted-foreground" />
@@ -1119,7 +1164,7 @@ function GapReportView({
   onNavigate,
 }: {
   standards: ContentStandard[];
-  onNavigate: (view: StudioView, stdId?: string) => void;
+  onNavigate: NavigateFn;
 }) {
   const { setSelectedItem } = useAppContext();
   const [filterType, setFilterType] = useState<GapType | 'all'>('all');
@@ -1146,10 +1191,10 @@ function GapReportView({
 
   function fixGap(gap: (typeof gapReportItems)[0]) {
     // Route to the most actionable destination for this gap type:
-    // missing-field → Checklist (run required checks against the object)
+    // missing-field → Checklist pre-filtered to the gap's object type and standard
     // everything else → Standards browser focused on the violating standard
     if (gap.gapType === 'missing-field') {
-      onNavigate('checklist');
+      onNavigate('checklist', undefined, { objectType: gap.objectType, standardId: gap.standardId });
     } else {
       onNavigate('standards', gap.standardId);
     }
@@ -1248,13 +1293,16 @@ export default function StandardsStudio() {
   // Live standards state — starts from seed data, mutations are in-session
   const [standards, setStandards] = useState<ContentStandard[]>(SEED_STANDARDS);
 
-  const [view, setView]               = useState<StudioView>('overview');
-  const [initialStdId, setInitialStdId] = useState<string | undefined>(undefined);
-  const [drawer, setDrawer]           = useState<DrawerState>({ mode: 'closed' });
+  const [view, setView]                   = useState<StudioView>('overview');
+  const [initialStdId, setInitialStdId]   = useState<string | undefined>(undefined);
+  const [checklistFilter, setChecklistFilter] = useState<ChecklistFilter | undefined>(undefined);
+  const [drawer, setDrawer]               = useState<DrawerState>({ mode: 'closed' });
 
-  function navigateTo(v: StudioView, stdId?: string) {
+  function navigateTo(v: StudioView, stdId?: string, filter?: ChecklistFilter) {
     setView(v);
     if (stdId) setInitialStdId(stdId);
+    // Only carry a filter into the checklist view; clear it for all other navigation
+    setChecklistFilter(v === 'checklist' ? filter : undefined);
   }
 
   function openBrief(std: ContentStandard) {
@@ -1340,7 +1388,7 @@ export default function StandardsStudio() {
             onEdit={std => setDrawer({ mode: 'edit', std })}
           />
         )}
-        {view === 'checklist'  && <ChecklistView standards={standards} />}
+        {view === 'checklist'  && <ChecklistView standards={standards} initialFilter={checklistFilter} />}
         {view === 'gap-report' && <GapReportView standards={standards} onNavigate={navigateTo} />}
       </div>
 
