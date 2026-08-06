@@ -83,6 +83,64 @@ export function deriveGroupTier(
 }
 
 /**
+ * Derive the homebase audience from a set of group memberships.
+ *
+ * Homebase group emails are read from ENV vars so they can be configured
+ * without a code change:
+ *   GOOGLE_GROUP_COACHES     — trailos-coaches@transitiontrails.org
+ *   GOOGLE_GROUP_VOLUNTEERS  — trailos-volunteers@transitiontrails.org
+ *   GOOGLE_GROUP_LEARNERS    — trailos-learners@transitiontrails.org
+ *
+ * Priority order when a user is (unexpectedly) in multiple homebase groups:
+ *   coach > volunteer > learner
+ *
+ * Returns null when the user is not in any homebase group.
+ */
+export function deriveAudience(
+  groups: string[],
+  email:  string,
+): 'learner' | 'coach' | 'volunteer' | null {
+  const coachGroup     = (process.env['GOOGLE_GROUP_COACHES']    ?? '').toLowerCase().trim();
+  const volunteerGroup = (process.env['GOOGLE_GROUP_VOLUNTEERS'] ?? '').toLowerCase().trim();
+  const learnerGroup   = (process.env['GOOGLE_GROUP_LEARNERS']   ?? '').toLowerCase().trim();
+
+  const lowerGroups = groups.map(g => g.toLowerCase());
+
+  const homebaseMatches = [
+    coachGroup     && lowerGroups.includes(coachGroup)     ? 'coach'     : null,
+    volunteerGroup && lowerGroups.includes(volunteerGroup) ? 'volunteer' : null,
+    learnerGroup   && lowerGroups.includes(learnerGroup)   ? 'learner'   : null,
+  ].filter(Boolean);
+
+  if (homebaseMatches.length > 1) {
+    logger.warn(
+      { email, homebaseGroups: homebaseMatches },
+      'googleSignIn: user is in multiple homebase groups — using priority order (coach > volunteer > learner)',
+    );
+  }
+
+  return (homebaseMatches[0] ?? null) as 'learner' | 'coach' | 'volunteer' | null;
+}
+
+/**
+ * Returns true if the user is a recognised staff member (any staff group or superadmin).
+ * Used to distinguish "staff with no homebase group" from "homebase-only user".
+ */
+function isKnownStaff(groups: string[], email: string): boolean {
+  const superadmins = (process.env['TRAIL_OS_SUPERADMIN_EMAILS'] ?? '')
+    .split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (superadmins.includes(email.toLowerCase())) return true;
+  const staffGroups = [
+    'trailosadmin@transitiontrails.org',
+    'trailospennyadmin@transitiontrails.org',
+    'trailosusers@transitiontrails.org',
+  ];
+  return staffGroups.some(g => groups.map(x => x.toLowerCase()).includes(g));
+}
+
+/**
  * Decode the payload of a Google-issued ID token.
  * We obtained this directly from Google's token endpoint, so no signature
  * verification is needed — we trust the source.
@@ -219,17 +277,23 @@ router.get('/auth/google/callback', async (req, res) => {
       return;
     }
 
-    // Group membership check
-    const groups = await getGroupsForUser(email.toLowerCase());
-    if (groups.length === 0) {
-      logger.warn({ email }, 'googleSignIn: sign-in refused — not in any Trail OS group');
+    // Group membership check — accept staff groups OR homebase groups.
+    // Staff takes priority: if the user is in any staff group, they go to the
+    // admin screens regardless of homebase group membership.
+    const groups    = await getGroupsForUser(email.toLowerCase());
+    const hasStaff  = isKnownStaff(groups, email);
+    const tier      = deriveGroupTier(groups, email);
+    // Only derive homebase audience for non-staff users
+    const audience  = hasStaff ? null : deriveAudience(groups, email);
+    const hasHomebase = audience !== null;
+
+    if (!hasStaff && !hasHomebase) {
+      logger.warn({ email }, 'googleSignIn: sign-in refused — not in any Trail OS or Homebase group');
       res.redirect(
         `/?sign_in_error=no_groups&email=${encodeURIComponent(email)}`,
       );
       return;
     }
-
-    const tier = deriveGroupTier(groups, email);
 
     // Write session — these fields are checked by /me on every load
     req.session.googleEmail        = email.toLowerCase();
@@ -238,6 +302,7 @@ router.get('/auth/google/callback', async (req, res) => {
     req.session.googleGroups       = groups;
     req.session.googleGroupsExpiry = Date.now() + 5 * 60 * 1000;
     req.session.googleTier         = tier;
+    req.session.googleAudience     = audience ?? undefined;
 
     req.session.save((err) => {
       if (err) {
@@ -245,7 +310,7 @@ router.get('/auth/google/callback', async (req, res) => {
         res.redirect('/?sign_in_error=session_save');
         return;
       }
-      logger.info({ email, tier, groupCount: groups.length }, 'googleSignIn: sign-in complete');
+      logger.info({ email, tier, audience, groupCount: groups.length }, 'googleSignIn: sign-in complete');
       res.redirect('/');
     });
 
@@ -267,11 +332,15 @@ router.get('/auth/google/me', async (req, res) => {
 
   // Groups are refreshed after the cache TTL expires
   if (!req.session.googleGroupsExpiry || req.session.googleGroupsExpiry <= now) {
-    const groups = await getGroupsForUser(email);
+    const groups   = await getGroupsForUser(email);
+    const hasStaff = isKnownStaff(groups, email);
+    // Staff takes priority: if the user is in any staff group, audience is
+    // always null — matching callback semantics exactly.
+    const audience = hasStaff ? null : deriveAudience(groups, email);
 
-    if (groups.length === 0) {
-      // User has been removed from all groups — sign them out immediately
-      logger.warn({ email }, 'googleSignIn /me: user is no longer in any Trail OS group — ending session');
+    if (!hasStaff && !audience) {
+      // User has been removed from all known groups — sign them out immediately
+      logger.warn({ email }, 'googleSignIn /me: user is no longer in any known group — ending session');
       req.session.destroy(() => {});
       res.json({ authenticated: false, reason: 'no_groups' });
       return;
@@ -281,17 +350,19 @@ router.get('/auth/google/me', async (req, res) => {
     req.session.googleGroups       = groups;
     req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
     req.session.googleTier         = tier;
+    req.session.googleAudience     = audience ?? undefined;
     // Fire-and-forget save — we'll already return the fresh data below
     req.session.save(() => {});
   }
 
   res.json({
     authenticated: true,
-    email:  req.session.googleEmail,
-    name:   req.session.googleName  ?? req.session.googleEmail,
-    sub:    req.session.googleSub   ?? '',
-    groups: req.session.googleGroups ?? [],
-    tier:   req.session.googleTier  ?? deriveGroupTier(req.session.googleGroups ?? [], email),
+    email:    req.session.googleEmail,
+    name:     req.session.googleName  ?? req.session.googleEmail,
+    sub:      req.session.googleSub   ?? '',
+    groups:   req.session.googleGroups ?? [],
+    tier:     req.session.googleTier  ?? deriveGroupTier(req.session.googleGroups ?? [], email),
+    audience: req.session.googleAudience ?? null,
   });
 });
 

@@ -102,6 +102,8 @@ import LearnerDashboard   from "@/pages/learner/LearnerDashboard";
 import LearnerPenny       from "@/pages/learner/LearnerPenny";
 import LearnerQuest       from "@/pages/learner/LearnerQuest";
 import LearnerProgress    from "@/pages/learner/LearnerProgress";
+import HomebaseLanding    from "@/pages/homebase/HomebaseLanding";
+import AccessNotGranted   from "@/pages/AccessNotGranted";
 
 // queryClient is declared at module level above (next to the fetch interceptor)
 
@@ -446,15 +448,25 @@ function InnerApp() {
         <LearnerRoute><LearnerProgress /></LearnerRoute>
       </Route>
 
-      {/* Everything else — staff auth gated */}
+      {/* Everything else — audience-dispatched */}
       <Route>
         {auth.isSignedIn ? (
-          <AppShell>
-            <Router />
-          </AppShell>
+          auth.user?.audience ? (
+            // ── Homebase users (learner / coach / volunteer) ──────────────
+            // These users get the HomebaseShell, not the admin AppShell.
+            // Individual audience pages (#250, #251, #252) replace HomebaseLanding.
+            <HomebaseLanding />
+          ) : (
+            // ── Staff users (admin / power / everyday / superadmin) ───────
+            <AppShell>
+              <Router />
+            </AppShell>
+          )
         ) : (
           <Switch>
             <Route path="/" component={SignInLanding} />
+            {/* Access not granted — authenticated but no recognised group */}
+            <Route path="/access-not-granted" component={AccessNotGranted} />
             <Route component={SignInPage} />
           </Switch>
         )}

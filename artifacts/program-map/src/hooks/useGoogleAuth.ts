@@ -24,16 +24,22 @@ export interface GoogleUser {
   groups: string[];
   /** Highest-privilege tier derived from the group set (for display). */
   tier:   AccessTier;
+  /**
+   * Homebase audience when the user is in a learner/coach/volunteer group.
+   * null for staff-only users.
+   */
+  audience: 'learner' | 'coach' | 'volunteer' | null;
 }
 
 interface MeResponse {
   authenticated: boolean;
-  email?:  string;
-  name?:   string;
-  sub?:    string;
-  groups?: string[];
-  tier?:   string;
-  reason?: string;
+  email?:    string;
+  name?:     string;
+  sub?:      string;
+  groups?:   string[];
+  tier?:     string;
+  audience?: 'learner' | 'coach' | 'volunteer' | null;
+  reason?:   string;
 }
 
 const VALID_TIERS: AccessTier[] = ['everyday', 'power', 'admin', 'superadmin'];
@@ -67,15 +73,22 @@ export function useGoogleAuth(): {
     ? data.tier
     : 'everyday') as AccessTier;
 
+  const VALID_AUDIENCES = ['learner', 'coach', 'volunteer'] as const;
+  type ValidAudience = typeof VALID_AUDIENCES[number];
+  const audience = (VALID_AUDIENCES as readonly string[]).includes(data.audience ?? '')
+    ? (data.audience as ValidAudience)
+    : null;
+
   return {
     isLoading: false,
     isSignedIn: true,
     user: {
-      email:  data.email,
-      name:   data.name   ?? data.email,
-      sub:    data.sub    ?? '',
-      groups: data.groups ?? [],
+      email:    data.email,
+      name:     data.name   ?? data.email,
+      sub:      data.sub    ?? '',
+      groups:   data.groups ?? [],
       tier,
+      audience,
     },
   };
 }

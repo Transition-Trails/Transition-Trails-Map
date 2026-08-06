@@ -21,6 +21,27 @@ export const TRAIL_OS_GROUPS = [
   'trailosusers@transitiontrails.org',
 ] as const satisfies readonly string[];
 
+/**
+ * Returns the dynamic list of all groups to probe for a given user.
+ *
+ * Includes the three hard-coded Trail OS staff groups PLUS any configured
+ * Homebase groups (GOOGLE_GROUP_COACHES, GOOGLE_GROUP_VOLUNTEERS,
+ * GOOGLE_GROUP_LEARNERS). Missing/empty ENV values are silently skipped —
+ * if a homebase group isn't configured, its users simply don't gain an
+ * audience and are rejected as having no groups during sign-in.
+ */
+function getGroupsToProbe(): string[] {
+  const homebaseGroups = [
+    process.env['GOOGLE_GROUP_COACHES'],
+    process.env['GOOGLE_GROUP_VOLUNTEERS'],
+    process.env['GOOGLE_GROUP_LEARNERS'],
+  ].filter((g): g is string => Boolean(g));
+
+  // Deduplicate in case an ENV var was accidentally set to a staff group email
+  const all = [...TRAIL_OS_GROUPS, ...homebaseGroups];
+  return [...new Set(all)];
+}
+
 export type TrailOsGroup = (typeof TRAIL_OS_GROUPS)[number];
 
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -81,10 +102,11 @@ export async function getGroupsForUser(email: string): Promise<string[]> {
   }
 
   try {
+    const groupsToProbe = getGroupsToProbe();
     const checks = await Promise.all(
-      TRAIL_OS_GROUPS.map(async (g) => {
+      groupsToProbe.map(async (g) => {
         const isMember = await isMemberOf(g, key, accessToken);
-        return isMember ? (g as string) : null;
+        return isMember ? g : null;
       }),
     );
     const groups: string[] = checks.filter((g) => g !== null) as string[];

@@ -134,3 +134,48 @@ export const requireAdmin: RequestHandler = (req, res, next) => {
 
   next();
 };
+
+// ── Homebase audience groups ──────────────────────────────────────────────────
+
+/** Returns the stored homebase audience from session, or null. */
+function getHomebaseAudience(
+  session: Express.Request['session'],
+): 'learner' | 'coach' | 'volunteer' | null {
+  const a = session.googleAudience;
+  if (a === 'learner' || a === 'coach' || a === 'volunteer') return a;
+  return null;
+}
+
+/**
+ * requireHomebaseAuth
+ *
+ * Returns 401 if no Google session.
+ * Returns 403 if the signed-in user does not have a homebase audience in session.
+ *
+ * Applied to homebase data routes (log-time, quest, squad, etc.).
+ * The homebase auth flow uses the same Google Sign-In as staff, so the
+ * session is the single source of truth.
+ */
+export const requireHomebaseAuth: RequestHandler = (req, res, next) => {
+  const email = req.session.googleEmail;
+
+  if (!email) {
+    res.status(401).json({
+      error:   'not_authenticated',
+      message: 'Sign in required.',
+    });
+    return;
+  }
+
+  const audience = getHomebaseAudience(req.session);
+
+  if (!audience) {
+    res.status(403).json({
+      error:   'not_authorized',
+      message: 'This resource is only available to Homebase users (learner, coach, or volunteer).',
+    });
+    return;
+  }
+
+  next();
+};

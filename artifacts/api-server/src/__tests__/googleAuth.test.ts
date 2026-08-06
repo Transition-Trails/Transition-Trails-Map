@@ -143,6 +143,75 @@ describe('getGroupsForUser', () => {
   });
 });
 
+// ── Homebase group probing ────────────────────────────────────────────────────
+//
+// getGroupsForUser must probe GOOGLE_GROUP_COACHES/VOLUNTEERS/LEARNERS in addition
+// to the hard-coded staff groups, so sign-in can derive a homebase audience.
+
+describe('getGroupsForUser — homebase group probing', () => {
+  const ORIG_ENV = { ...process.env };
+
+  beforeEach(() => {
+    clearGroupsCache();
+    vi.clearAllMocks();
+    process.env['GOOGLE_GROUP_COACHES']    = 'coaches@transitiontrails.org';
+    process.env['GOOGLE_GROUP_VOLUNTEERS'] = 'volunteers@transitiontrails.org';
+    process.env['GOOGLE_GROUP_LEARNERS']   = 'learners@transitiontrails.org';
+  });
+
+  afterEach(() => {
+    // Restore env so homebase ENV vars don't bleed into other test cases
+    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS']) {
+      if (ORIG_ENV[k] !== undefined) process.env[k] = ORIG_ENV[k];
+      else delete process.env[k];
+    }
+  });
+
+  it('includes the learner group when the user is only in the learner group', async () => {
+    mockGetToken.mockResolvedValue('tok');
+    global.fetch = makeFetchMock(['learners@transitiontrails.org']);
+
+    const groups = await getGroupsForUser('learner@transitiontrails.org');
+    expect(groups).toContain('learners@transitiontrails.org');
+    expect(groups).not.toContain(GROUPS.admin);
+    expect(groups).not.toContain(GROUPS.everyday);
+  });
+
+  it('includes both a staff group and a homebase group when user is in both', async () => {
+    mockGetToken.mockResolvedValue('tok');
+    global.fetch = makeFetchMock([GROUPS.admin, 'coaches@transitiontrails.org']);
+
+    const groups = await getGroupsForUser('dualrole@transitiontrails.org');
+    // Both memberships are reported — the caller (deriveAudience/isKnownStaff) applies priority
+    expect(groups).toContain(GROUPS.admin);
+    expect(groups).toContain('coaches@transitiontrails.org');
+  });
+
+  it('probes all 6 groups (3 staff + 3 homebase) when all ENV vars are set', async () => {
+    mockGetToken.mockResolvedValue('tok');
+    global.fetch = makeFetchMock([]);
+
+    await getGroupsForUser('nobody@transitiontrails.org');
+
+    // fetch is called once per group — staff(3) + homebase(3) = 6
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(6);
+  });
+
+  it('ignores empty homebase ENV vars — only probes staff groups', async () => {
+    delete process.env['GOOGLE_GROUP_COACHES'];
+    delete process.env['GOOGLE_GROUP_VOLUNTEERS'];
+    delete process.env['GOOGLE_GROUP_LEARNERS'];
+
+    mockGetToken.mockResolvedValue('tok');
+    global.fetch = makeFetchMock([]);
+
+    await getGroupsForUser('nobody@transitiontrails.org');
+
+    // Only 3 staff group probes
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls).toHaveLength(3);
+  });
+});
+
 // ── isOrgEmail ────────────────────────────────────────────────────────────────
 
 describe('isOrgEmail', () => {

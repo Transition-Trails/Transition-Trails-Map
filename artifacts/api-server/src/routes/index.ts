@@ -31,6 +31,7 @@ import sessionsRouter           from "./sessions";
 import voiceoverRouter          from "./voiceover";
 import governanceRouter         from "./governance";
 import moduleDraftsRouter       from "./moduleDrafts";
+import homebaseRouter           from "./homebase";
 import { requireStaff, requireAdmin } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
@@ -55,6 +56,8 @@ const PUBLIC_PATHS: readonly string[] = [
   '/auth/google/callback',
   '/auth/google/me',       // returns { authenticated: false } when not signed in
   '/auth/google/sign-out', // safe to call without a session
+  // Homebase audience check — safe to call without a session (returns isSignedIn:false)
+  '/auth/homebase/status',
   // Salesforce auth flow (browser redirect round-trips, same reasoning)
   '/auth/salesforce/login',
   '/auth/salesforce/callback',
@@ -73,13 +76,17 @@ const PUBLIC_PATHS: readonly string[] = [
 // ── Global staff-auth middleware ──────────────────────────────────────────────
 //
 // Applied before any router is mounted so every data route is protected by
-// default.  Public paths and the learner surface are explicitly excluded.
+// default.  Public paths and the learner/homebase surfaces are explicitly excluded.
 
 const staffAuthGate: RequestHandler = (req, res, next) => {
   const path = req.path;
 
   // Learner routes (/learner/*) use requireLearnerAuth, not staff auth.
   if (path.startsWith('/learner')) return next();
+
+  // Homebase routes (/homebase/*) use requireHomebaseAuth, not staff auth.
+  // The /auth/homebase/status endpoint is in PUBLIC_PATHS below (no auth needed).
+  if (path.startsWith('/homebase')) return next();
 
   // Check against the public allowlist (exact match or path prefix).
   const isPublic = PUBLIC_PATHS.some(
@@ -143,5 +150,6 @@ router.use(sessionsRouter);
 router.use(voiceoverRouter);
 router.use(governanceRouter);
 router.use(moduleDraftsRouter);
+router.use(homebaseRouter);
 
 export default router;

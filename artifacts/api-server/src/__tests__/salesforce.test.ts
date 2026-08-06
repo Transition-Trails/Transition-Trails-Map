@@ -6,6 +6,7 @@ import request from 'supertest';
 vi.mock('../middlewares/requireAuth.js', () => ({
   requireStaff: (_req: unknown, _res: unknown, next: () => void) => next(),
   requireAdmin: (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireHomebaseAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
   isStaff:        () => true,
   isAdmin:        () => true,
   isSuperAdmin:   () => false,

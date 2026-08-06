@@ -28,8 +28,9 @@ const { mockRequireAdmin, mockWhere, mockOnConflictDoNothing, mockUpdateWhere, m
 // ── Mocks ──────────────────────────────────────────────────────────────────────
 
 vi.mock('../middlewares/requireAuth.js', () => ({
-  requireStaff: (_req: unknown, _res: unknown, next: () => void) => next(),
-  requireAdmin: (...args: unknown[]) => (mockRequireAdmin as (...a: unknown[]) => void)(...args),
+  requireStaff:        (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireAdmin:        (...args: unknown[]) => (mockRequireAdmin as (...a: unknown[]) => void)(...args),
+  requireHomebaseAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
   isStaff:               () => true,
   isAdmin:               () => true,
   isSuperAdmin:          () => false,

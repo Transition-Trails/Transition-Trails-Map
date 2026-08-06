@@ -30,6 +30,13 @@ declare module "express-session" {
     codeVerifier?:   string;
     state?:          string;
 
+    // ── Homebase audience ─────────────────────────────────────────────────
+    /**
+     * Set when a signed-in user belongs to a homebase group (learner/coach/volunteer).
+     * Null / absent for staff-only users.
+     */
+    googleAudience?: 'learner' | 'coach' | 'volunteer' | null;
+
     // ── Learner surface ───────────────────────────────────────────────────
     learnerAuthenticated?: boolean;
     learnerContactId?:     string;
