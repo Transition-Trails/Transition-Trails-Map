@@ -116,4 +116,274 @@ router.get("/homebase/log-time", requireHomebaseAuth, async (req, res) => {
   }
 });
 
+// ── SF service token helpers ──────────────────────────────────────────────────
+//
+// Homebase learners authenticate via Google SSO, not Salesforce OAuth.
+// The service token (SF_SERVICE_TOKEN) is the only viable way to query SF
+// on their behalf.  Same pattern as artifacts/api-server/src/routes/learner.ts.
+//
+// Error contract (IMPORTANT):
+//   - sfSvcQuery throws SfNotConfiguredError when the token or instance URL is absent.
+//   - sfSvcQuery throws Error when the HTTP response is non-2xx or the fetch times out.
+//   - sfSvcQuery returns [] ONLY when the query succeeded but Salesforce returned no records.
+//
+// Callers MUST distinguish these three cases:
+//   SfNotConfiguredError  → credentials missing (expected in dev); respond with sfUnavailable:true
+//   other Error           → SF reachable but query failed; respond 503 with sfUnavailable:true
+//   []                    → query succeeded, genuinely no matching records
+
+const SVC_SF_VERSION = "v62.0";
+
+class SfNotConfiguredError extends Error {
+  constructor() { super("SF_SERVICE_TOKEN or SALESFORCE_INSTANCE_URL not set"); this.name = "SfNotConfiguredError"; }
+}
+
+function sfSvcApi(): string | null {
+  const u = process.env["SALESFORCE_INSTANCE_URL"];
+  return u ? `${u}/services/data/${SVC_SF_VERSION}` : null;
+}
+function sfSvcToken(): string | null {
+  return process.env["SF_SERVICE_TOKEN"] ?? null;
+}
+
+async function sfSvcQuery<T>(soql: string): Promise<T[]> {
+  const api   = sfSvcApi();
+  const token = sfSvcToken();
+  if (!api || !token) throw new SfNotConfiguredError();
+
+  const res = await fetch(`${api}/query?q=${encodeURIComponent(soql)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    signal:  AbortSignal.timeout(8_000),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Salesforce query failed (${res.status}): ${body.slice(0, 100)}`);
+  }
+
+  const d = await res.json() as { records: T[] };
+  return d.records ?? [];
+}
+
+// ── requireLearnerAudience ────────────────────────────────────────────────────
+
+function requireLearnerAudience(
+  req:  import("express").Request,
+  res:  import("express").Response,
+  next: import("express").NextFunction,
+): void {
+  if (req.session.googleAudience !== "learner") {
+    res.status(403).json({ error: "This resource is only available to learners." });
+    return;
+  }
+  next();
+}
+
+// ── GET /homebase/learner/quest ───────────────────────────────────────────────
+//
+// Returns today's quest (cached in session).  Generates via Gemini if absent.
+// If Gemini is not configured, returns quest: null so the UI shows an empty state.
+
+router.get("/homebase/learner/quest", requireHomebaseAuth, requireLearnerAudience, async (req, res) => {
+  const today    = new Date().toISOString().slice(0, 10);
+  const stoneSet = req.session.homebaseStoneSet === today;
+
+  // Return cached quest for today
+  if (req.session.homebaseQuestDate === today && req.session.homebaseQuest) {
+    res.json({
+      quest:          req.session.homebaseQuest,
+      stoneSet,
+      stonesThisCairn: stoneSet ? 1 : 0,
+      cairnTarget:    7,
+      trailBehind:    [],
+    });
+    return;
+  }
+
+  const email  = req.session.googleEmail!;
+  const apiKey = process.env["GEMINI_API_KEY"];
+
+  if (!apiKey) {
+    res.json({ quest: null, stoneSet: false, stonesThisCairn: 0, cairnTarget: 7, trailBehind: [] });
+    return;
+  }
+
+  // Best-effort: fetch learner context from SF Contact for a personalised prompt.
+  // This is advisory — if SF is unavailable or not configured, quest generation
+  // proceeds with defaults (Salesforce Admin trail / Explore phase).
+  let trail = "Salesforce Admin";
+  let phase  = "Explore";
+  let goal   = "Develop Salesforce Admin skills";
+
+  try {
+    const contacts = await sfSvcQuery<{
+      Penny_Trail__c:        string | null;
+      Penny_Current_Phase__c: string | null;
+      Penny_Current_Goal__c:  string | null;
+    }>(`SELECT Penny_Trail__c, Penny_Current_Phase__c, Penny_Current_Goal__c FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`);
+
+    const ctx = contacts[0];
+    if (ctx) {
+      trail = ctx.Penny_Trail__c         ?? trail;
+      phase = ctx.Penny_Current_Phase__c ?? phase;
+      goal  = ctx.Penny_Current_Goal__c  ?? goal;
+    }
+  } catch {
+    // SF unavailable — use defaults above
+  }
+
+  try {
+    const gemRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: `You are Penny, an AI coaching companion for Transition Trails Academy. Generate exactly one daily Salesforce Admin learning quest for a learner on the ${trail} trail in phase ${phase}. The quest must be a practical scenario-based challenge that takes 10–15 minutes.` }],
+          },
+          contents: [{
+            role:  "user",
+            parts: [{ text: `Generate today's daily quest for a ${trail} learner in phase ${phase} with goal: ${goal}. Return JSON with these exact fields: { "title": string, "description": string, "difficulty": "Beginner"|"Intermediate"|"Expert", "pointValue": number (10 for Beginner, 25 for Intermediate, 50 for Expert), "category": string, "acceptanceCriteria": string }` }],
+          }],
+          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 512, temperature: 0.8 },
+        }),
+        signal: AbortSignal.timeout(20_000),
+      },
+    );
+
+    if (!gemRes.ok) {
+      res.json({ quest: null, stoneSet: false, stonesThisCairn: 0, cairnTarget: 7, trailBehind: [] });
+      return;
+    }
+
+    const body  = await gemRes.json() as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+    const raw   = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
+    const quest = JSON.parse(raw) as Record<string, unknown>;
+
+    req.session.homebaseQuest     = quest;
+    req.session.homebaseQuestDate = today;
+    req.session.save((err) => {
+      if (err) logger.warn({ err }, "homebase/quest: session save error");
+    });
+
+    res.json({ quest, stoneSet: false, stonesThisCairn: 0, cairnTarget: 7, trailBehind: [] });
+  } catch (err) {
+    logger.warn({ err }, "homebase/learner/quest: generation failed");
+    res.json({ quest: null, stoneSet: false, stonesThisCairn: 0, cairnTarget: 7, trailBehind: [] });
+  }
+});
+
+// ── POST /homebase/learner/quest/set-stone ────────────────────────────────────
+//
+// Marks "today's stone" as set for the session.  SF persistence is deferred
+// to task #254 (Salesforce fields provisioning).
+
+router.post("/homebase/learner/quest/set-stone", requireHomebaseAuth, requireLearnerAudience, (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  req.session.homebaseStoneSet = today;
+  req.session.save((err) => {
+    if (err) logger.warn({ err }, "homebase/set-stone: session save error");
+  });
+  res.json({ ok: true, stoneSet: true, stonesThisCairn: 1 });
+});
+
+// ── GET /homebase/learner/cases ───────────────────────────────────────────────
+//
+// Returns open SF Cases linked to the learner's Contact record.
+// linked:false signals the UI to render the "account setup" empty state rather
+// than an empty list, which would be misleading.
+
+router.get("/homebase/learner/cases", requireHomebaseAuth, requireLearnerAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+
+  // ── Step 1: look up Contact by email ──────────────────────────────────────
+  let contactId: string | null;
+  try {
+    const contacts = await sfSvcQuery<{ Id: string }>(
+      `SELECT Id FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`,
+    );
+    contactId = contacts[0]?.Id ?? null;
+  } catch (err) {
+    if (err instanceof SfNotConfiguredError) {
+      // Credentials absent (common in dev without SF_SERVICE_TOKEN).
+      // Return sfUnavailable so the UI shows "Salesforce connection unavailable"
+      // rather than the misleading "account setup" empty state.
+      res.json({ linked: null, sfUnavailable: true, cases: [], totalOpen: 0 });
+      return;
+    }
+    logger.warn({ err }, "homebase/learner/cases: SF contact lookup failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  // ── Step 2: no Contact → genuinely unlinked account ──────────────────────
+  if (!contactId) {
+    // Query succeeded but returned no record — the learner's email is not in SF.
+    res.json({ linked: false, sfUnavailable: false, cases: [], totalOpen: 0 });
+    return;
+  }
+
+  // ── Step 3: fetch open Cases for this Contact ─────────────────────────────
+  type CaseRecord = {
+    Id:               string;
+    CaseNumber:       string | null;
+    Subject:          string | null;
+    Status:           string | null;
+    Priority:         string | null;
+    LastModifiedDate: string | null;
+    CreatedDate:      string | null;
+  };
+
+  let cases: CaseRecord[];
+  try {
+    cases = await sfSvcQuery<CaseRecord>(
+      `SELECT Id, CaseNumber, Subject, Status, Priority, LastModifiedDate, CreatedDate FROM Case WHERE ContactId = '${contactId}' AND IsClosed = false ORDER BY LastModifiedDate DESC LIMIT 20`,
+    );
+  } catch (err) {
+    logger.warn({ err }, "homebase/learner/cases: Case query failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  res.json({ linked: true, sfUnavailable: false, cases, totalOpen: cases.length });
+});
+
+// ── GET /homebase/learner/week ────────────────────────────────────────────────
+//
+// Phase 1: SF objects not yet provisioned (task #254).
+// Returns an empty item list with hasData:false so the UI renders the honest
+// "Nothing scheduled yet" empty state.
+
+router.get("/homebase/learner/week", requireHomebaseAuth, requireLearnerAudience, (_req, res) => {
+  res.json({ items: [], hasData: false });
+});
+
+// ── GET /homebase/learner/coach ───────────────────────────────────────────────
+//
+// Phase 1: Coaching relationship fields not yet provisioned in SF (task #254).
+// Returns coach: null so the UI renders the Penny fallback.
+
+router.get("/homebase/learner/coach", requireHomebaseAuth, requireLearnerAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+
+  let linked: boolean;
+  try {
+    const contacts = await sfSvcQuery<{ Id: string }>(
+      `SELECT Id FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`,
+    );
+    linked = !!contacts[0]?.Id;
+  } catch (err) {
+    if (err instanceof SfNotConfiguredError) {
+      res.json({ coach: null, cohortSlackChannel: null, linked: null, sfUnavailable: true });
+      return;
+    }
+    logger.warn({ err }, "homebase/learner/coach: SF contact lookup failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  res.json({ coach: null, cohortSlackChannel: null, linked, sfUnavailable: false });
+});
+
 export default router;

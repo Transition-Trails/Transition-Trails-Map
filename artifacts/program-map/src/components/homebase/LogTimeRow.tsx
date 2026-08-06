@@ -50,9 +50,15 @@ interface LogTimeRowProps {
   audience: HomebaseAudience;
   /** Optional default activity label override (e.g. client org name). */
   defaultActivity?: string;
+  /**
+   * 'primary' — amber fill (default, used when this is the only CTA on screen).
+   * 'secondary' — outlined style (use when another amber CTA is already visible,
+   *               e.g. "Set today's stone →" in the CairnBand).
+   */
+  buttonVariant?: "primary" | "secondary";
 }
 
-export function LogTimeRow({ audience, defaultActivity }: LogTimeRowProps) {
+export function LogTimeRow({ audience, defaultActivity, buttonVariant = "primary" }: LogTimeRowProps) {
   const options  = ACTIVITIES[audience];
   const firstOpt = defaultActivity ?? options[0] ?? "Other";
 
@@ -123,11 +129,16 @@ export function LogTimeRow({ audience, defaultActivity }: LogTimeRowProps) {
         />
       </div>
 
-      {/* Submit button */}
+      {/* Submit button — primary=amber fill, secondary=outlined (avoids two amber CTAs) */}
       <button
         onClick={() => void handleSubmit()}
         disabled={!isValid || loading}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#D97706] text-white text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#B45309] transition-colors flex-shrink-0"
+        className={[
+          "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0",
+          buttonVariant === "secondary"
+            ? "border border-border text-foreground hover:bg-muted/40"
+            : "bg-[#D97706] text-white hover:bg-[#B45309]",
+        ].join(" ")}
       >
         {loading ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin" />

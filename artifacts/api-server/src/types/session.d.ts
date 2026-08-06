@@ -45,5 +45,11 @@ declare module "express-session" {
     learnerTrail?:         string | null;
     dailyQuest?:           Record<string, unknown>;
     dailyQuestDate?:       string;
+
+    // ── Homebase quest (Google-auth learner surface) ─────────────────────────
+    homebaseQuest?:        Record<string, unknown>;
+    homebaseQuestDate?:    string;
+    /** ISO date (YYYY-MM-DD) when learner last set today's stone. */
+    homebaseStoneSet?:     string;
   }
 }
