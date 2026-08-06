@@ -26,8 +26,9 @@ interface DemandRequest {
   status: RequestStatus;
   risk: RiskLevel;
   program: string;
-  notes?: string;
-  sfSynced?: boolean; // true = exists in Salesforce; false/undefined = local draft only
+  description?: string; // SF required short text (255)
+  notes?: string;       // rich-text internal context
+  sfSynced?: boolean;   // true = exists in Salesforce; false/undefined = local draft only
 }
 
 // ── Seed data (prototype — owners/dates are placeholders) ─────────────────────
@@ -370,6 +371,103 @@ const EDIT_RISKS: { value: RiskLevel; label: string }[] = [
   { value: 'high',     label: 'High / At Risk' },
 ];
 
+// ── RichTextArea ──────────────────────────────────────────────────────────────
+// Lightweight markdown-style rich toolbar over a plain textarea.
+// Stores markdown strings so the value stays a plain string.
+
+type RichAction = 'bold' | 'italic' | 'ul' | 'ol';
+
+function wrapSelection(
+  ta: HTMLTextAreaElement,
+  action: RichAction,
+  setValue: (v: string) => void,
+) {
+  const { selectionStart: s, selectionEnd: e, value } = ta;
+  const sel   = value.slice(s, e);
+  const before = value.slice(0, s);
+  const after  = value.slice(e);
+
+  let inserted = '';
+  let cursorOffset = 0;
+
+  if (action === 'bold') {
+    inserted = sel ? `**${sel}**` : '**bold**';
+    cursorOffset = sel ? inserted.length : 2;
+  } else if (action === 'italic') {
+    inserted = sel ? `_${sel}_` : '_italic_';
+    cursorOffset = sel ? inserted.length : 1;
+  } else if (action === 'ul') {
+    const lines = (sel || 'item').split('\n').map(l => `- ${l}`).join('\n');
+    inserted = lines;
+    cursorOffset = inserted.length;
+  } else if (action === 'ol') {
+    const lines = (sel || 'item').split('\n').map((l, i) => `${i + 1}. ${l}`).join('\n');
+    inserted = lines;
+    cursorOffset = inserted.length;
+  }
+
+  const next = before + inserted + after;
+  setValue(next);
+  // Restore cursor after React re-render
+  requestAnimationFrame(() => {
+    ta.focus();
+    ta.setSelectionRange(s + cursorOffset, s + cursorOffset);
+  });
+}
+
+function RichTextArea({
+  value, onChange, placeholder, rows = 6, autoFocus,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  rows?: number;
+  autoFocus?: boolean;
+}) {
+  const taRef = { current: null as HTMLTextAreaElement | null };
+  const TOOLS: { action: RichAction; label: string; title: string }[] = [
+    { action: 'bold',   label: 'B',  title: 'Bold (**text**)' },
+    { action: 'italic', label: 'I',  title: 'Italic (_text_)' },
+    { action: 'ul',     label: '•—', title: 'Bullet list' },
+    { action: 'ol',     label: '1—', title: 'Numbered list' },
+  ];
+  return (
+    <div className="rounded-md border border-border overflow-hidden focus-within:ring focus-within:ring-primary/15">
+      {/* Toolbar */}
+      <div className="flex items-center gap-px px-2 py-1 border-b border-border bg-muted/20">
+        {TOOLS.map(t => (
+          <button
+            key={t.action}
+            type="button"
+            title={t.title}
+            onMouseDown={ev => {
+              ev.preventDefault(); // keep textarea focus
+              if (taRef.current) wrapSelection(taRef.current, t.action, onChange);
+            }}
+            className={`px-2 py-0.5 rounded text-[13px] font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors select-none ${
+              t.action === 'italic' ? 'italic' : ''
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+        <span className="ml-2 text-[12px] text-muted-foreground/40 font-normal">Markdown</span>
+      </div>
+      <textarea
+        ref={el => { taRef.current = el; }}
+        autoFocus={autoFocus}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        rows={rows}
+        placeholder={placeholder}
+        className="w-full text-[14px] px-3 py-2 bg-white focus:outline-none resize-none font-mono leading-relaxed"
+      />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function InlineEditForm({
   req, draft, onChange, onSave, onCancel, onSendToSF, isSending, isSent,
 }: {
@@ -434,14 +532,36 @@ function InlineEditForm({
           ))}
         </div>
 
-        {/* Notes */}
+        {/* Description (SF required, 255) */}
         <div>
-          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">Notes</label>
-          <textarea
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[14px] font-semibold text-muted-foreground/60">
+              Description <span className="text-[#A93F2F]">*</span>
+              <span className="ml-1.5 text-[12px] font-normal text-muted-foreground/40">Salesforce · 255 chars max</span>
+            </label>
+            <span className={`text-[12px] tabular-nums ${(draft.description ?? '').length > 240 ? 'text-[#A93F2F] font-semibold' : 'text-muted-foreground/40'}`}>
+              {(draft.description ?? '').length}/255
+            </span>
+          </div>
+          <input
+            value={draft.description ?? ''}
+            onChange={e => onChange('description', e.target.value.slice(0, 255))}
+            maxLength={255}
+            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white"
+            placeholder="One-sentence summary visible in Salesforce…"
+          />
+        </div>
+
+        {/* Notes (rich text) */}
+        <div>
+          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">
+            Notes
+            <span className="ml-1.5 text-[12px] font-normal text-muted-foreground/40">internal context · supports markdown</span>
+          </label>
+          <RichTextArea
             value={draft.notes ?? ''}
-            onChange={e => onChange('notes', e.target.value)}
-            rows={3}
-            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white resize-none"
+            onChange={v => onChange('notes', v)}
+            rows={6}
             placeholder="Context, dependencies, or next actions…"
           />
         </div>
@@ -539,13 +659,36 @@ function NewDemandForm({
           ))}
         </div>
 
+        {/* Description (SF required, 255) */}
         <div>
-          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">Notes</label>
-          <textarea
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[14px] font-semibold text-muted-foreground/60">
+              Description <span className="text-[#A93F2F]">*</span>
+              <span className="ml-1.5 text-[12px] font-normal text-muted-foreground/40">Salesforce · 255 chars max</span>
+            </label>
+            <span className={`text-[12px] tabular-nums ${(draft.description ?? '').length > 240 ? 'text-[#A93F2F] font-semibold' : 'text-muted-foreground/40'}`}>
+              {(draft.description ?? '').length}/255
+            </span>
+          </div>
+          <input
+            value={draft.description ?? ''}
+            onChange={e => onChange('description', e.target.value.slice(0, 255))}
+            maxLength={255}
+            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white"
+            placeholder="One-sentence summary visible in Salesforce…"
+          />
+        </div>
+
+        {/* Notes (rich text) */}
+        <div>
+          <label className="text-[14px] font-semibold text-muted-foreground/60 block mb-1">
+            Notes
+            <span className="ml-1.5 text-[12px] font-normal text-muted-foreground/40">internal context · supports markdown</span>
+          </label>
+          <RichTextArea
             value={draft.notes ?? ''}
-            onChange={e => onChange('notes', e.target.value)}
-            rows={3}
-            className="w-full text-[14px] border border-border rounded-md px-3 py-1.5 focus:outline-none focus:ring focus:ring-primary/15 bg-white resize-none"
+            onChange={v => onChange('notes', v)}
+            rows={6}
             placeholder="What needs to happen and why? Any dependencies or urgency…"
           />
         </div>
