@@ -101,11 +101,10 @@ const navGroups: NavGroup[] = [
     label: 'Administration',
     icon: Settings,
     pathPrefix: '/admin',
-    extraPrefixes: ['/digital-twin', '/uom', '/governance'],
+    extraPrefixes: ['/uom', '/governance'],
     items: [
-      { id: 'admin-integrations',  path: '/admin/integrations',      label: 'Integrations'          },
-      { id: 'admin-people-access', path: '/admin/people-access',     label: 'People & Access'        },
-      { id: 'admin-digital-twin',  path: '/digital-twin',            label: 'Digital Twin',   minTier: 'admin' },
+      { id: 'admin-integrations',  path: '/admin/integrations',  label: 'Integrations'   },
+      { id: 'admin-people-access', path: '/admin/people-access', label: 'People & Access' },
     ],
   },
 ];

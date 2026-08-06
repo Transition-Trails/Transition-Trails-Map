@@ -63,7 +63,6 @@ import CreateAudit               from "@/pages/admin/CreateAudit";
 
 import Phase1CompletionAudit    from "@/pages/admin/Phase1CompletionAudit";
 
-import DigitalTwin      from "@/pages/twin/DigitalTwin";
 import OperationsHub    from "@/pages/ops/OperationsHub";
 import ProgramHub       from "@/pages/program/ProgramHub";
 import PennyCommandCenter      from "@/pages/penny/PennyCommandCenter";
@@ -129,17 +128,20 @@ function Router() {
       {/* Navigator → workspaces */}
       <Route path="/navigator/program-map">              <Redirect to="/program" /></Route>
       <Route path="/navigator/resolve">                  <Redirect to="/operations/demand" /></Route>
-      <Route path="/navigator/roles">                    <Redirect to="/digital-twin" /></Route>
+      <Route path="/navigator/roles">                    <Redirect to="/governance/tracer" /></Route>
       <Route path="/navigator/trail-os-map">             <Redirect to="/trail-os-overview" /></Route>
-      <Route path="/navigator/knowledge-relationships">  <Redirect to="/digital-twin" /></Route>
+      <Route path="/navigator/knowledge-relationships">  <Redirect to="/governance/map" /></Route>
 
-      {/* Old Digital Twin sub-routes → Explore */}
-      <Route path="/digital-twin/org-graph">     <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/programs">      <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/knowledge">     <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/penny-network"> <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/people">        <Redirect to="/digital-twin" /></Route>
-      <Route path="/digital-twin/relationships"> <Redirect to="/digital-twin" /></Route>
+      {/* Digital Twin → Governance Object Tracer redirects */}
+      <Route path="/digital-twin/map">           <Redirect to="/governance/map" /></Route>
+      <Route path="/digital-twin/impact">        <Redirect to="/governance/impact" /></Route>
+      <Route path="/digital-twin/governance">    <Redirect to="/governance" /></Route>
+      <Route path="/digital-twin/org-graph">     <Redirect to="/governance/tracer" /></Route>
+      <Route path="/digital-twin/programs">      <Redirect to="/governance/tracer" /></Route>
+      <Route path="/digital-twin/knowledge">     <Redirect to="/governance/tracer" /></Route>
+      <Route path="/digital-twin/penny-network"> <Redirect to="/governance/tracer" /></Route>
+      <Route path="/digital-twin/people">        <Redirect to="/governance/tracer" /></Route>
+      <Route path="/digital-twin/relationships"> <Redirect to="/governance/map" /></Route>
 
       {/* Old operations sub-pages */}
       <Route path="/operations/program-health">    <Redirect to="/operations/health" /></Route>
@@ -218,8 +220,8 @@ function Router() {
       <Route path="/library/documents">         <Redirect to="/knowledge/library" /></Route>
       <Route path="/library/templates">         <Redirect to="/knowledge/library" /></Route>
       <Route path="/library/salesforce-kb">     <Redirect to="/knowledge/library" /></Route>
-      <Route path="/library/source-mapping">    <Redirect to="/digital-twin" /></Route>
-      <Route path="/knowledge/relationships">   <Redirect to="/digital-twin" /></Route>
+      <Route path="/library/source-mapping">    <Redirect to="/governance/tracer" /></Route>
+      <Route path="/knowledge/relationships">   <Redirect to="/governance/map" /></Route>
       <Route path="/library/search">            <Redirect to="/search" /></Route>
       <Route path="/knowledge/search">          <Redirect to="/search" /></Route>
       <Route path="/library/:sub">              <Redirect to="/knowledge/library" /></Route>
@@ -249,8 +251,8 @@ function Router() {
       <Route path="/uom/:tab"             component={UnifiedObjectModel} />
       <Route path="/uom"                  component={UnifiedObjectModel} />
 
-      <Route path="/digital-twin/:tab"    component={DigitalTwin} />
-      <Route path="/digital-twin"         component={DigitalTwin} />
+      <Route path="/digital-twin/:tab">    <Redirect to="/governance/tracer" /></Route>
+      <Route path="/digital-twin">         <Redirect to="/governance/tracer" /></Route>
 
       <Route path="/operations/:tab"      component={OperationsHub} />
       <Route path="/operations">          <Redirect to="/operations/health" /></Route>

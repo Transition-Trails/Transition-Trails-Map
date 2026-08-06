@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { TERMS } from '@/config/terminology';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,7 +9,12 @@ import type { ActionItem } from '@/components/workspace/ActionBar';
 import {
   Shield, GitBranch, Users, CheckSquare, RotateCcw,
   BarChart2, Activity, BookOpen, AlertTriangle, Info, ChevronRight, ArrowRight, Plus, Hash, ExternalLink,
+  Network, Zap, Compass,
 } from 'lucide-react';
+import {
+  ObjectTracerTab, RelationshipMapTab, ImpactAnalysisTab,
+  type SelectedObject,
+} from './ObjectTracerTabs';
 import { SampleDataBadge } from '@/components/ui/SampleDataBadge';
 import {
   LIFECYCLE_MODELS, OWNERSHIP_MATRIX, GOV_HEALTH_ISSUES,
@@ -802,6 +808,9 @@ function PoliciesTab() {
 // ── GovernanceHub ─────────────────────────────────────────────────────────────
 export default function GovernanceHub() {
   const { openActionPanel, openSlackPanel } = useAppContext();
+  const [, setLocation] = useLocation();
+  const [selected, setSelected] = useState<SelectedObject | null>(null);
+  const nav = (p: string) => setLocation(p);
 
   const actions: ActionItem[] = [
     { id: 'slack-context', label: 'Slack Context', icon: Hash, variant: 'secondary', onClick: () => openSlackPanel({ context: 'governance', title: 'Governance', subtitle: 'Governance review alerts and escalations in Slack.' }) },
@@ -829,14 +838,17 @@ export default function GovernanceHub() {
       badge="Phase 1"
       actions={actions}
       tabs={[
-        { id:'overview',    label:'Overview',            path:'/governance',             icon:Shield,      content:<OverviewTab />     },
-        { id:'lifecycle',   label:'Lifecycle Models',    path:'/governance/lifecycle',   icon:GitBranch,   content:<LifecycleTab />    },
-        { id:'ownership',   label:'Ownership Matrix',    path:'/governance/ownership',   icon:Users,       content:<OwnershipTab />    },
-        { id:'approvals',   label:'Approval Workflows',  path:'/governance/approvals',   icon:CheckSquare, content:<ApprovalsTab />    },
-        { id:'reviews',     label:'Review Cycles',       path:'/governance/reviews',     icon:RotateCcw,   content:<ReviewCyclesTab /> },
-        { id:'compliance',  label:'Compliance',          path:'/governance/compliance',  icon:BarChart2,   content:<ComplianceTab />   },
-        { id:'health',      label:'Governance Health',   path:'/governance/health',      icon:Activity,    content:<HealthTab />       },
-        { id:'policies',    label:'Policies',            path:'/governance/policies',    icon:BookOpen,    content:<PoliciesTab />     },
+        { id:'overview',    label:'Overview',            path:'/governance',              icon:Shield,      content:<OverviewTab />     },
+        { id:'lifecycle',   label:'Lifecycle Models',    path:'/governance/lifecycle',    icon:GitBranch,   content:<LifecycleTab />    },
+        { id:'ownership',   label:'Ownership Matrix',    path:'/governance/ownership',    icon:Users,       content:<OwnershipTab />    },
+        { id:'approvals',   label:'Approval Workflows',  path:'/governance/approvals',    icon:CheckSquare, content:<ApprovalsTab />    },
+        { id:'reviews',     label:'Review Cycles',       path:'/governance/reviews',      icon:RotateCcw,   content:<ReviewCyclesTab /> },
+        { id:'compliance',  label:'Compliance',          path:'/governance/compliance',   icon:BarChart2,   content:<ComplianceTab />   },
+        { id:'health',      label:'Governance Health',   path:'/governance/health',       icon:Activity,    content:<HealthTab />       },
+        { id:'policies',    label:'Policies',            path:'/governance/policies',     icon:BookOpen,    content:<PoliciesTab />     },
+        { id:'tracer',      label:'Object Tracer',       path:'/governance/tracer',       icon:Compass,     content:<ObjectTracerTab    selected={selected} onSelect={setSelected} onNavigate={nav} /> },
+        { id:'map',         label:'Relationship Map',    path:'/governance/map',          icon:Network,     content:<RelationshipMapTab selected={selected} onSelect={setSelected} onNavigate={nav} /> },
+        { id:'impact',      label:'Impact Analysis',     path:'/governance/impact',       icon:Zap,         content:<ImpactAnalysisTab  selected={selected} onSelect={setSelected} onNavigate={nav} /> },
       ]}
     />
   );
