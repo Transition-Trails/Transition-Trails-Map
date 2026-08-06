@@ -1114,7 +1114,13 @@ function ChecklistView({ standards }: { standards: ContentStandard[] }) {
 
 // ── Gap Report View ────────────────────────────────────────────────────────
 
-function GapReportView({ standards }: { standards: ContentStandard[] }) {
+function GapReportView({
+  standards,
+  onNavigate,
+}: {
+  standards: ContentStandard[];
+  onNavigate: (view: StudioView, stdId?: string) => void;
+}) {
   const { setSelectedItem } = useAppContext();
   const [filterType, setFilterType] = useState<GapType | 'all'>('all');
   const [filterSev, setFilterSev]   = useState<'all' | 'high' | 'medium' | 'low'>('all');
@@ -1136,6 +1142,17 @@ function GapReportView({ standards }: { standards: ContentStandard[] }) {
     const std = standards.find(s => s.id === gap.standardId);
     setFocusedId(gap.id);
     setSelectedItem({ type: 'gapReportItem', id: gap.id, data: { gap, std } });
+  }
+
+  function fixGap(gap: (typeof gapReportItems)[0]) {
+    // Route to the most actionable destination for this gap type:
+    // missing-field → Checklist (run required checks against the object)
+    // everything else → Standards browser focused on the violating standard
+    if (gap.gapType === 'missing-field') {
+      onNavigate('checklist');
+    } else {
+      onNavigate('standards', gap.standardId);
+    }
   }
 
   return (
@@ -1181,7 +1198,9 @@ function GapReportView({ standards }: { standards: ContentStandard[] }) {
               <button
                 key={gap.id}
                 onClick={() => selectGap(gap)}
-                className={`w-full text-left rounded-xl border overflow-hidden transition-all flex items-start gap-3 px-4 py-3 hover:border-foreground/20 hover:bg-muted/10 ${
+                onDoubleClick={e => { e.preventDefault(); fixGap(gap); }}
+                title="Double-click to go to the fix"
+                className={`group w-full text-left rounded-xl border overflow-hidden transition-all flex items-start gap-3 px-4 py-3 hover:border-foreground/20 hover:bg-muted/10 ${
                   isFocused ? 'border-primary/40 bg-primary/5 border-l-2 border-l-primary' : 'border-border bg-background'
                 }`}
               >
@@ -1193,6 +1212,11 @@ function GapReportView({ standards }: { standards: ContentStandard[] }) {
                       <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                         <span className="text-[14px] text-muted-foreground font-medium">{gap.objectType}</span>
                         {gap.sprint && <><span className="text-muted-foreground/40">·</span><span className="text-[14px] text-muted-foreground">{gap.sprint}</span></>}
+                        {/* Hint visible on hover */}
+                        <span className="text-muted-foreground/40">·</span>
+                        <span className="text-[11px] text-muted-foreground/40 group-hover:text-primary/60 transition-colors">
+                          double-click to fix →
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -1317,7 +1341,7 @@ export default function StandardsStudio() {
           />
         )}
         {view === 'checklist'  && <ChecklistView standards={standards} />}
-        {view === 'gap-report' && <GapReportView standards={standards} />}
+        {view === 'gap-report' && <GapReportView standards={standards} onNavigate={navigateTo} />}
       </div>
 
       {/* Edit / Create drawer */}
