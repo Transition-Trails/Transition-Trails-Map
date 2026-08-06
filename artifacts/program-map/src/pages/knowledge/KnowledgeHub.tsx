@@ -418,7 +418,7 @@ function ArticleEditor({
                 />
                 <div className="flex gap-2">
                   <button
-                    onClick={async () => { await onRequestChanges(reviewNote); setShowRejectForm(false); setReviewNote(''); }}
+                    onClick={async () => { try { await onRequestChanges(reviewNote); setShowRejectForm(false); setReviewNote(''); } catch { /* toast shown by handler */ } }}
                     disabled={saving || !reviewNote.trim()}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-700 text-[12px] font-semibold hover:bg-amber-100 disabled:opacity-50 transition-colors"
                   >
@@ -440,8 +440,12 @@ function ArticleEditor({
 
   // ── Edit / new form ──────────────────────────────────────────────────────
   async function handleSave() {
-    await onSave({ title, summary, body, category, articleType, reviewCycle, urlName: slugify(title) });
-    setDirty(false);
+    try {
+      await onSave({ title, summary, body, category, articleType, reviewCycle, urlName: slugify(title) });
+      setDirty(false);
+    } catch {
+      // onSave already showed a toast; keep dirty=true so the save button stays enabled for retry
+    }
   }
 
   return (
@@ -841,7 +845,7 @@ function ReviewQueueTab({
                   </div>
                 )}
                 <div className="flex items-center gap-2">
-                  <button onClick={() => onApprove(a.id)} disabled={saving}
+                  <button onClick={() => { void onApprove(a.id).catch(() => { /* toast shown by handler */ }); }} disabled={saving}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2F6B3F] text-white text-[12px] font-semibold hover:bg-[#245531] disabled:opacity-50 transition-colors">
                     {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                     Approve
@@ -854,7 +858,7 @@ function ReviewQueueTab({
                     placeholder="Describe what needs to change…" rows={2}
                     className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
                   <button
-                    onClick={async () => { await onRequestChanges(a.id, note); setNoteMap(p => ({ ...p, [a.id]: '' })); setExpandedId(null); }}
+                    onClick={async () => { try { await onRequestChanges(a.id, note); setNoteMap(p => ({ ...p, [a.id]: '' })); setExpandedId(null); } catch { /* toast shown by handler */ } }}
                     disabled={saving || !note.trim()}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-700 text-[12px] font-semibold hover:bg-amber-100 disabled:opacity-50 transition-colors"
                   >
@@ -1158,6 +1162,7 @@ export default function KnowledgeHub() {
       }
     } catch (e) {
       toast({ title: 'Save failed', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+      throw e;
     } finally { setSaving(false); }
   }
 
@@ -1169,6 +1174,7 @@ export default function KnowledgeHub() {
       toast({ title: 'Submitted for review', description: 'Article is now in the review queue.' });
     } catch (e) {
       toast({ title: 'Submit failed', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+      throw e;
     } finally { setSaving(false); }
   }
 
@@ -1181,6 +1187,7 @@ export default function KnowledgeHub() {
       toast({ title: 'Approved', description: 'Article is ready to publish to Salesforce.' });
     } catch (e) {
       toast({ title: 'Approve failed', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+      throw e;
     } finally { setSaving(false); }
   }
 
@@ -1191,6 +1198,7 @@ export default function KnowledgeHub() {
       toast({ title: 'Changes requested', description: 'The author has been notified.' });
     } catch (e) {
       toast({ title: 'Failed', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+      throw e;
     } finally { setSaving(false); }
   }
 
@@ -1206,7 +1214,9 @@ export default function KnowledgeHub() {
       await publishToSf(selectedId);
       toast({ title: 'Published to Salesforce', description: 'Article created in Salesforce Knowledge.' });
     } catch (e) {
-      toast({ title: 'Publish failed', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      toast({ title: 'Publish to Salesforce failed', description: msg, variant: 'destructive' });
+      throw e;
     } finally { setSaving(false); }
   }
 
@@ -1220,6 +1230,7 @@ export default function KnowledgeHub() {
       toast({ title: 'Deleted', description: 'Draft deleted.' });
     } catch (e) {
       toast({ title: 'Delete failed', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' });
+      throw e;
     } finally { setSaving(false); }
   }
 
