@@ -756,4 +756,133 @@ router.get("/homebase/volunteer/coordinator", requireHomebaseAuth, requireVolunt
   });
 });
 
+// ── GET /homebase/volunteer/profiles (staff only) ─────────────────────────────
+//
+// Lists all rows in volunteer_profiles so staff can see current field values
+// and identify which volunteers still need their profile filled in.
+// Auth: requireStaff (global staffAuthGate already covers /homebase/* — but
+// this is a staff-facing admin endpoint so we check the session explicitly).
+
+router.get("/homebase/volunteer/profiles", async (req, res) => {
+  // Must be a signed-in staff session (googleAudience is null for staff)
+  if (!req.session.googleEmail) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  if (req.session.googleAudience !== undefined && req.session.googleAudience !== null) {
+    // Homebase audience sessions (learner/volunteer/coach) must not access this
+    res.status(403).json({ error: "Staff access only" });
+    return;
+  }
+
+  try {
+    const rows = await db
+      .select()
+      .from(volunteerProfilesTable)
+      .orderBy(volunteerProfilesTable.userEmail);
+
+    res.json({ profiles: rows });
+  } catch (err) {
+    logger.error({ err }, "homebase/volunteer/profiles: DB error");
+    res.status(500).json({ error: "Failed to load volunteer profiles" });
+  }
+});
+
+// ── PATCH /homebase/volunteer/profile/:email (staff only) ─────────────────────
+//
+// Upserts a volunteer profile row with whichever fields the staff member
+// provides. All fields are optional — omit a field to leave it unchanged.
+//
+// Body fields (all optional):
+//   monthlyCommitmentHours: number | null
+//   caseLimit:              number | null
+//   specialty:              string | null
+//   coordinatorName:        string | null
+//   coordinatorSlackId:     string | null
+//   volunteerSlackChannel:  string | null
+
+router.patch("/homebase/volunteer/profile/:email", async (req, res) => {
+  if (!req.session.googleEmail) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  if (req.session.googleAudience !== undefined && req.session.googleAudience !== null) {
+    res.status(403).json({ error: "Staff access only" });
+    return;
+  }
+
+  const targetEmail = decodeURIComponent(req.params["email"] ?? "").trim().toLowerCase();
+  if (!targetEmail) {
+    res.status(400).json({ error: "email param is required" });
+    return;
+  }
+
+  const body = req.body as Record<string, unknown>;
+
+  // Build the patch — only include keys present in the request body
+  const patch: Partial<{
+    monthlyCommitmentHours: number | null;
+    caseLimit:              number | null;
+    specialty:              string | null;
+    coordinatorName:        string | null;
+    coordinatorSlackId:     string | null;
+    volunteerSlackChannel:  string | null;
+    updatedAt:              Date;
+  }> = { updatedAt: new Date() };
+
+  if ("monthlyCommitmentHours" in body) {
+    const v = body["monthlyCommitmentHours"];
+    if (v === null) {
+      patch.monthlyCommitmentHours = null;
+    } else {
+      const n = Number(v);
+      if (!Number.isFinite(n) || n < 0 || n > 744) {
+        res.status(400).json({ error: "monthlyCommitmentHours must be a number 0–744 or null" });
+        return;
+      }
+      patch.monthlyCommitmentHours = Math.round(n);
+    }
+  }
+
+  if ("caseLimit" in body) {
+    const v = body["caseLimit"];
+    if (v === null) {
+      patch.caseLimit = null;
+    } else {
+      const n = Number(v);
+      if (!Number.isFinite(n) || n < 0 || n > 100) {
+        res.status(400).json({ error: "caseLimit must be a number 0–100 or null" });
+        return;
+      }
+      patch.caseLimit = Math.round(n);
+    }
+  }
+
+  for (const key of ["specialty", "coordinatorName", "coordinatorSlackId", "volunteerSlackChannel"] as const) {
+    if (key in body) {
+      const v = body[key];
+      patch[key] = typeof v === "string" && v.trim() ? v.trim() : null;
+    }
+  }
+
+  try {
+    // Upsert: insert if absent, update on conflict
+    const [row] = await db
+      .insert(volunteerProfilesTable)
+      .values({ userEmail: targetEmail, ...patch })
+      .onConflictDoUpdate({
+        target: volunteerProfilesTable.userEmail,
+        set:    patch,
+      })
+      .returning();
+
+    logger.info({ targetEmail, patch }, "homebase/volunteer/profile: updated by staff");
+    res.json({ ok: true, profile: row });
+  } catch (err) {
+    logger.error({ err }, "homebase/volunteer/profile: DB error");
+    res.status(500).json({ error: "Failed to update volunteer profile" });
+  }
+});
+
 export default router;
+

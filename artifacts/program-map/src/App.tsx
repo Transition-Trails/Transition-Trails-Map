@@ -63,6 +63,7 @@ import IntegrationHub            from "@/pages/admin/IntegrationHub";
 import CreateAudit               from "@/pages/admin/CreateAudit";
 
 import Phase1CompletionAudit    from "@/pages/admin/Phase1CompletionAudit";
+import VolunteersAdmin          from "@/pages/admin/VolunteersAdmin";
 
 import OperationsHub    from "@/pages/ops/OperationsHub";
 import ProgramHub       from "@/pages/program/ProgramHub";
@@ -324,6 +325,7 @@ function Router() {
       <Route path="/admin/create-audit"      component={CreateAudit} />
 
       <Route path="/admin/phase1-audit"     component={Phase1CompletionAudit} />
+      <Route path="/admin/volunteers"       component={VolunteersAdmin} />
       <Route path="/admin/program-config">   <Redirect to="/program/config" /></Route>
 
       {/* Integration Hub — unified setup center */}
