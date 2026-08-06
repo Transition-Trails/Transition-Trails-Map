@@ -392,7 +392,8 @@ export default function PennyCommandCenter() {
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <ScrollArea className="h-full">
+    <div className="flex h-full overflow-hidden">
+    <ScrollArea className="flex-1">
       <div className="p-5 space-y-5">
 
         {/* ── Header ─────────────────────────────────────────────────────────── */}
@@ -424,13 +425,8 @@ export default function PennyCommandCenter() {
           </div>
         </div>
 
-        {/* ── Two-column layout ───────────────────────────────────────────────── */}
-        <div className="grid grid-cols-[1fr_300px] gap-5">
-
-          {/* ╔══════════════════════════════════╗
-              ║  LEFT COLUMN — Engagement story  ║
-              ╚══════════════════════════════════╝ */}
-          <div className="space-y-5">
+        {/* ── Engagement ──────────────────────────────────────────────────────── */}
+        <div className="space-y-5">
 
             {/* Engagement pulse — 4 stat cards */}
             {statsLoading ? (
@@ -564,156 +560,6 @@ export default function PennyCommandCenter() {
               </div>
             </div>
 
-          </div>
-
-          {/* ╔═══════════════════════════════╗
-              ║  RIGHT COLUMN — Engine health ║
-              ╚═══════════════════════════════╝ */}
-          <div className="space-y-4">
-
-            {/* Prompt engine layers */}
-            <div className="rounded-lg border border-border bg-background p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Zap className="w-3.5 h-3.5 text-muted-foreground" />
-                <p className="text-[12px] font-bold text-foreground">Prompt Engine</p>
-                <span className="ml-auto text-[11px] text-muted-foreground/50">7 layers</span>
-              </div>
-              <div className="divide-y divide-border/50">
-                {PROMPT_LAYERS.map(layer => (
-                  <LayerRow key={layer.id} layer={layer} />
-                ))}
-              </div>
-              <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border/50">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F]" />
-                  <span className="text-[11px] text-muted-foreground/60">Live</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/25" />
-                  <span className="text-[11px] text-muted-foreground/60">Placeholder</span>
-                </div>
-              </div>
-            </div>
-
-            {/* SF Write health */}
-            <div className={`rounded-lg border p-4 ${
-              writeHealth?.lastFailure
-                ? 'border-[#FFD08A] bg-[#FFF8EC]'
-                : writeHealth && writeHealth.healthyWrites > 0
-                  ? 'border-[#9FC3AE] bg-[#F2F9F4]'
-                  : 'border-border bg-background'
-            }`}>
-              <div className="flex items-center gap-2 mb-3">
-                <Database className={`w-3.5 h-3.5 ${writeHealth?.lastFailure ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`} />
-                <p className="text-[12px] font-bold text-foreground">SF Write Log</p>
-                <span className="ml-auto text-[11px] text-muted-foreground/50">live</span>
-              </div>
-              <div className="grid grid-cols-4 gap-2 text-center">
-                {[
-                  { label: 'Attempts', value: writeHealth?.totalAttempts ?? 0, cls: 'text-foreground' },
-                  { label: 'Success',  value: writeHealth?.healthyWrites  ?? 0, cls: 'text-[#2F6B3F]' },
-                  { label: 'Failed',   value: writeHealth?.failedWrites   ?? 0, cls: writeHealth?.failedWrites ? 'text-[#CC8400]' : 'text-muted-foreground/40' },
-                  { label: 'Skipped',  value: writeHealth?.staffSkips     ?? 0, cls: 'text-muted-foreground' },
-                ].map(s => (
-                  <div key={s.label}>
-                    <p className={`text-[15px] font-bold ${s.cls}`}>{s.value}</p>
-                    <p className="text-[10px] text-muted-foreground/60">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-              {writeHealth?.lastFailure && (
-                <div className="mt-3 bg-white/70 rounded-md p-2.5">
-                  <p className="text-[11px] text-[#CC8400] font-medium">{writeHealth.lastFailure.object}</p>
-                  <p className="text-[11px] text-[#CC8400]/80 break-words mt-0.5 line-clamp-2">{writeHealth.lastFailure.reason}</p>
-                  <p className="text-[10px] text-muted-foreground/50 mt-1">{relativeTime(writeHealth.lastFailure.timestamp)}</p>
-                </div>
-              )}
-              {writeHealth?.lastStaffSkip && !writeHealth.lastFailure && (writeHealth.staffSkips ?? 0) > 0 && (
-                <div className="mt-2 flex items-start gap-1.5">
-                  <span className="text-[10px] bg-muted/60 border border-border/60 rounded px-1.5 py-0.5 text-muted-foreground shrink-0">skip</span>
-                  <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
-                    Staff writes deferred — Learner__c required. {writeHealth.staffSkips} session{writeHealth.staffSkips !== 1 ? 's' : ''} skipped.
-                  </p>
-                </div>
-              )}
-              {writeHealth?.lastSuccess && !writeHealth.lastFailure && (
-                <p className="text-[11px] text-[#2F6B3F] mt-2">
-                  Last write: {relativeTime(writeHealth.lastSuccess)}
-                </p>
-              )}
-              {writeHealth?.totalAttempts === 0 && !writeHealth?.staffSkips && (
-                <p className="text-[11px] text-muted-foreground/50 mt-2">
-                  No writes yet — ask {TERMS.aiAssistant} to start.
-                </p>
-              )}
-            </div>
-
-            {/* Needs attention */}
-            {(sfAuthenticated === false || writeHealth?.lastFailure || statsError) && (
-              <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3 space-y-1.5">
-                <p className="text-[11px] font-bold text-[#CC8400] uppercase tracking-wide">Needs Attention</p>
-                {sfAuthenticated === false && (
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-                    <p className="text-[12px] text-[#7A4F00]">Salesforce authentication required</p>
-                  </div>
-                )}
-                {writeHealth?.lastFailure && (
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-                    <p className="text-[12px] text-[#7A4F00]">SF write failed — {writeHealth.lastFailure.object}</p>
-                  </div>
-                )}
-                {statsError && (
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
-                    <p className="text-[12px] text-[#7A4F00]">Could not load engagement stats</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Quick actions */}
-            <div className="rounded-lg border border-border bg-background p-4 space-y-2">
-              <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-3">Quick Actions</p>
-              <button
-                onClick={handleAskPenny}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-colors"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                Ask {TERMS.aiAssistant}
-              </button>
-              <button
-                onClick={() => navigate('/penny/prompts')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[13px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
-                Prompt Studio
-              </button>
-              <button
-                onClick={() => navigate('/penny/learners')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[13px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
-              >
-                <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                View Learners
-              </button>
-              <button
-                onClick={() => navigate('/penny/configs')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[13px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
-              >
-                <Shield className="w-3.5 h-3.5 text-muted-foreground" />
-                Trail Configs
-              </button>
-              <button
-                onClick={() => navigate('/penny/capabilities')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[13px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
-                Capabilities
-              </button>
-            </div>
-
-          </div>
         </div>
 
         {/* All-clear when everything healthy */}
@@ -726,5 +572,150 @@ export default function PennyCommandCenter() {
 
       </div>
     </ScrollArea>
+
+    {/* ── Rail: engine health ─────────────────────────────────────────────── */}
+    <div className="w-[272px] shrink-0 border-l border-border bg-muted/10 overflow-y-auto">
+      <div className="p-4 space-y-4">
+
+        {/* Prompt engine layers */}
+        <div className="rounded-lg border border-border bg-white p-3">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap className="w-3.5 h-3.5 text-muted-foreground" />
+            <p className="text-[12px] font-bold text-foreground">Prompt Engine</p>
+            <span className="ml-auto text-[11px] text-muted-foreground/50">7 layers</span>
+          </div>
+          <div className="divide-y divide-border/50">
+            {PROMPT_LAYERS.map(layer => (
+              <LayerRow key={layer.id} layer={layer} />
+            ))}
+          </div>
+          <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border/50">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F]" />
+              <span className="text-[11px] text-muted-foreground/60">Live</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/25" />
+              <span className="text-[11px] text-muted-foreground/60">Placeholder</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SF Write health */}
+        <div className={`rounded-lg border p-3 ${
+          writeHealth?.lastFailure
+            ? 'border-[#FFD08A] bg-[#FFF8EC]'
+            : writeHealth && writeHealth.healthyWrites > 0
+              ? 'border-[#9FC3AE] bg-[#F2F9F4]'
+              : 'border-border bg-white'
+        }`}>
+          <div className="flex items-center gap-2 mb-2">
+            <Database className={`w-3.5 h-3.5 ${writeHealth?.lastFailure ? 'text-[#CC8400]' : 'text-[#2F6B3F]'}`} />
+            <p className="text-[12px] font-bold text-foreground">SF Write Log</p>
+            <span className="ml-auto text-[11px] text-muted-foreground/50">live</span>
+          </div>
+          <div className="grid grid-cols-4 gap-1 text-center">
+            {[
+              { label: 'Attempts', value: writeHealth?.totalAttempts ?? 0, cls: 'text-foreground' },
+              { label: 'Success',  value: writeHealth?.healthyWrites  ?? 0, cls: 'text-[#2F6B3F]' },
+              { label: 'Failed',   value: writeHealth?.failedWrites   ?? 0, cls: writeHealth?.failedWrites ? 'text-[#CC8400]' : 'text-muted-foreground/40' },
+              { label: 'Skipped',  value: writeHealth?.staffSkips     ?? 0, cls: 'text-muted-foreground' },
+            ].map(s => (
+              <div key={s.label}>
+                <p className={`text-[14px] font-bold ${s.cls}`}>{s.value}</p>
+                <p className="text-[10px] text-muted-foreground/60">{s.label}</p>
+              </div>
+            ))}
+          </div>
+          {writeHealth?.lastFailure && (
+            <div className="mt-2 bg-white/70 rounded p-2">
+              <p className="text-[11px] text-[#CC8400] font-medium">{writeHealth.lastFailure.object}</p>
+              <p className="text-[11px] text-[#CC8400]/80 break-words mt-0.5 line-clamp-2">{writeHealth.lastFailure.reason}</p>
+            </div>
+          )}
+          {writeHealth?.lastStaffSkip && !writeHealth.lastFailure && (writeHealth.staffSkips ?? 0) > 0 && (
+            <div className="mt-2 flex items-start gap-1.5">
+              <span className="text-[10px] bg-muted/60 border border-border/60 rounded px-1.5 py-0.5 text-muted-foreground shrink-0">skip</span>
+              <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
+                Staff writes deferred — {writeHealth.staffSkips} session{writeHealth.staffSkips !== 1 ? 's' : ''} skipped.
+              </p>
+            </div>
+          )}
+          {writeHealth?.lastSuccess && !writeHealth.lastFailure && (
+            <p className="text-[10px] text-[#2F6B3F] mt-2">Last write: {relativeTime(writeHealth.lastSuccess)}</p>
+          )}
+          {writeHealth?.totalAttempts === 0 && !writeHealth?.staffSkips && (
+            <p className="text-[10px] text-muted-foreground/50 mt-2">No writes yet.</p>
+          )}
+        </div>
+
+        {/* Needs attention */}
+        {(sfAuthenticated === false || writeHealth?.lastFailure || statsError) && (
+          <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3 space-y-1.5">
+            <p className="text-[11px] font-bold text-[#CC8400] uppercase tracking-wide">Needs Attention</p>
+            {sfAuthenticated === false && (
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
+                <p className="text-[12px] text-[#7A4F00]">Salesforce authentication required</p>
+              </div>
+            )}
+            {writeHealth?.lastFailure && (
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
+                <p className="text-[12px] text-[#7A4F00]">SF write failed — {writeHealth.lastFailure.object}</p>
+              </div>
+            )}
+            {statsError && (
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#CC8400] shrink-0 mt-0.5" />
+                <p className="text-[12px] text-[#7A4F00]">Could not load engagement stats</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Quick actions */}
+        <div className="rounded-lg border border-border bg-white p-3 space-y-1.5">
+          <p className="text-[12px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-2">Quick Actions</p>
+          <button
+            onClick={handleAskPenny}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90 transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Ask {TERMS.aiAssistant}
+          </button>
+          <button
+            onClick={() => navigate('/penny/prompts')}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[12px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+          >
+            <MessageSquare className="w-3 h-3 text-muted-foreground" />
+            Prompt Studio
+          </button>
+          <button
+            onClick={() => navigate('/penny/learners')}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[12px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+          >
+            <Users className="w-3 h-3 text-muted-foreground" />
+            View Learners
+          </button>
+          <button
+            onClick={() => navigate('/penny/configs')}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[12px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+          >
+            <Shield className="w-3 h-3 text-muted-foreground" />
+            Trail Configs
+          </button>
+          <button
+            onClick={() => navigate('/penny/capabilities')}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-[12px] font-medium hover:border-primary/40 hover:bg-primary/[0.02] transition-colors"
+          >
+            <BookOpen className="w-3 h-3 text-muted-foreground" />
+            Capabilities
+          </button>
+        </div>
+
+      </div>
+    </div>
+    </div>
   );
 }

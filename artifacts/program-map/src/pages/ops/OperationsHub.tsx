@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useLocation } from 'wouter';
 import {
   Activity, GitBranch, TrendingUp, ChevronRight, ChevronDown, Sparkles, ListChecks,
 } from 'lucide-react';
@@ -31,6 +32,7 @@ const STATUS_WEIGHT: Record<HealthLevel, number> = { 'at-risk': 0, 'needs-work':
 // ── Health Indicators — overall score + top-5 impact + domain grid ────────────
 function HealthIndicators() {
   const { setSelectedItem, setAskPennyOpen, setPendingPennyQuery } = useAppContext();
+  const { isEveryday } = useTierFlags();
   const { domainHealthData: baseDomains, overallHealthScore, overallHealthLevel } = useHealthScores();
   const oc = HEALTH_LEVEL_CONFIG[overallHealthLevel];
   const { data: sfData, isLoading: sfLoading } = useOpsSummary();
@@ -88,9 +90,18 @@ function HealthIndicators() {
 
   const pennyQ = `Trail OS Overall Health Score: ${overallHealthScore}/100 (${oc.label})\n\nDomain breakdown:\n${enrichedDomains.map(d => `  • ${d.domain}: ${d.score}/100 (${HEALTH_LEVEL_CONFIG[d.level].label})`).join('\n')}\n\nTop 5 highest-impact items to address:\n${top5.map((i, n) => `  ${n + 1}. [${HEALTH_LEVEL_CONFIG[i.status].label}] ${i.label} (${i.domain}) — ${i.detail}`).join('\n')}\n\nWhat is your recommended action plan to move the Trail OS health score from ${overallHealthScore} to 75+? Prioritise the top 5 items and identify any quick wins.`;
 
+  const [, navigate] = useLocation();
+
+  const railLinks = [
+    { label: 'Intelligence & Trends', path: '/operations/intelligence' },
+    { label: 'Demand',                path: '/operations/demand' },
+    ...(!isEveryday ? [{ label: 'Action Items', path: '/operations/recommendations' }] : []),
+  ] as { label: string; path: string }[];
+
   return (
-    <ScrollArea className="h-full">
-      <div className="p-4 space-y-4 max-w-4xl">
+    <div className="flex h-full overflow-hidden">
+    <ScrollArea className="flex-1">
+      <div className="p-4 space-y-4">
 
         {/* ── Overall Score Hero ─────────────────────────────────────────── */}
         <div className="rounded-lg border border-border bg-white overflow-hidden">
@@ -300,6 +311,87 @@ function HealthIndicators() {
 
       </div>
     </ScrollArea>
+
+    {/* ── Rail: health summary ────────────────────────────────────────────── */}
+    <div className="w-[272px] shrink-0 border-l border-border bg-muted/10 overflow-y-auto">
+      <div className="p-4 space-y-4">
+
+        {/* Overall score */}
+        <div className="rounded-lg border border-border bg-white p-3">
+          <p className="text-[12px] font-bold text-muted-foreground/50 mb-2 uppercase tracking-wide">Platform Health</p>
+          <div className="flex items-end gap-2 mb-3">
+            <span className={`text-3xl font-bold leading-none ${oc.score}`}>{overallHealthScore}</span>
+            <span className="text-[12px] text-muted-foreground mb-0.5">/ 100</span>
+            <span className={`ml-auto text-[12px] font-bold border rounded-full px-1.5 py-0.5 ${oc.cls}`}>{oc.label}</span>
+          </div>
+          <div className="space-y-1.5">
+            {sortedDomains.slice(0, 5).map(d => {
+              const dc  = HEALTH_LEVEL_CONFIG[d.level];
+              const bar = d.score >= 75 ? 'bg-[#2F6B3F]' : d.score >= 65 ? 'bg-[#2F6F7E]' : d.score >= 50 ? 'bg-[#CC8400]' : 'bg-[#A93F2F]';
+              return (
+                <div key={d.id}>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[12px] text-muted-foreground truncate">{d.domain}</span>
+                    <span className={`text-[12px] font-bold ${dc.score}`}>{d.score}</span>
+                  </div>
+                  <div className="h-1 bg-muted rounded-full">
+                    <div className={`h-1 rounded-full ${bar}`} style={{ width: `${d.score}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Top items needing attention */}
+        {top5.length > 0 && (
+          <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6]/60 p-3 space-y-1.5">
+            <p className="text-[12px] font-bold text-[#A93F2F] uppercase tracking-wide">
+              {top5.filter(i => i.status === 'at-risk').length} At Risk · {top5.filter(i => i.status === 'needs-work').length} Needs Work
+            </p>
+            {top5.slice(0, 3).map(ind => (
+              <button
+                key={ind.id}
+                onClick={() => setSelectedItem({ type: 'healthIndicator', id: ind.id, data: ind })}
+                className="w-full flex items-center gap-1.5 text-left"
+              >
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${ind.status === 'at-risk' ? 'bg-[#A93F2F]' : 'bg-[#CC8400]'}`} />
+                <span className="text-[12px] text-foreground truncate flex-1 hover:text-primary transition-colors">{ind.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Ask Penny */}
+        <button
+          onClick={() => { setAskPennyOpen(true); setPendingPennyQuery(pennyQ); }}
+          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors text-left group"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+          <div>
+            <p className="text-[12px] font-semibold text-primary">Ask Penny</p>
+            <p className="text-[11px] text-primary/60">Action plan to improve score</p>
+          </div>
+        </button>
+
+        {/* Quick links */}
+        <div className="space-y-1">
+          <p className="text-[12px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-2">Quick Links</p>
+          {railLinks.map(link => (
+            <button
+              key={link.path}
+              onClick={() => navigate(link.path)}
+              className="w-full flex items-center gap-2 px-2.5 py-2 rounded-md hover:bg-muted/40 transition-colors text-left group"
+            >
+              <ChevronRight className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary shrink-0" />
+              <span className="text-[12px] text-foreground group-hover:text-primary transition-colors">{link.label}</span>
+            </button>
+          ))}
+        </div>
+
+      </div>
+    </div>
+    </div>
   );
 }
 
