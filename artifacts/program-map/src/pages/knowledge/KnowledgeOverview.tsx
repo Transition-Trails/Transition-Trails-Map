@@ -174,7 +174,7 @@ export default function KnowledgeOverview() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-4xl">
+      <div className="p-5 space-y-5">
 
         {/* ── Page header ─────────────────────────────────────────────────── */}
         <div>

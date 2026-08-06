@@ -393,7 +393,7 @@ export default function PennyCommandCenter() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 max-w-4xl space-y-5">
+      <div className="p-5 space-y-5">
 
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4">
