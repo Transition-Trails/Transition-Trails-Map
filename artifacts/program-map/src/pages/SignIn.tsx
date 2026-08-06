@@ -14,18 +14,18 @@ import { Map, AlertTriangle, ShieldOff, Users } from 'lucide-react';
 
 // ── Error message map ─────────────────────────────────────────────────────────
 
-const ERROR_MESSAGES: Record<string, (email?: string) => { title: string; body: string }> = {
+const ERROR_MESSAGES: Record<string, (email?: string, detail?: string) => { title: string; body: string }> = {
   wrong_domain: (email) => ({
-    title: 'Personal account not allowed',
+    title: 'Wrong Google account',
     body:  email
-      ? `You signed in as ${email}. Trail OS requires a @transitiontrails.org Google Workspace account — personal Gmail addresses are not accepted.`
-      : 'Trail OS requires a @transitiontrails.org Google Workspace account. Personal Gmail addresses are not accepted.',
+      ? `You signed in as ${email}. Please use your @transitiontrails.org Google Workspace account instead. If you are a learner or program participant and do not have one, contact your program coordinator.`
+      : `Please sign in with your @transitiontrails.org Google Workspace account. If you are a learner or program participant and do not have one, contact your program coordinator.`,
   }),
   no_groups: (email) => ({
-    title: 'Account not yet provisioned',
+    title: 'Access not set up yet',
     body:  email
-      ? `${email} is not a member of any Trail OS Google Group. Ask your administrator to add this address to one of the Trail OS groups in Google Workspace Admin.`
-      : 'Your account is not a member of any Trail OS Google Group. Ask your administrator to add you to a Trail OS group in Google Workspace Admin.',
+      ? `${email} is not linked to any Trail OS program or role yet. If you are a learner or participant, contact your program coordinator. If you are staff, ask your Trail OS administrator to add your account to the appropriate Google Group.`
+      : `Your account is not linked to any Trail OS program or role yet. If you are a learner or participant, contact your program coordinator. If you are staff, ask your Trail OS administrator to add your account to the appropriate Google Group.`,
   }),
   state_mismatch: () => ({
     title: 'Sign-in session expired',
@@ -33,7 +33,7 @@ const ERROR_MESSAGES: Record<string, (email?: string) => { title: string; body: 
   }),
   token_exchange: () => ({
     title: 'Sign-in could not complete',
-    body:  'There was a problem communicating with Google. Please try again, or contact your administrator if this continues.',
+    body:  'There was a problem communicating with Google. Please try again — if this keeps happening, contact your program coordinator or administrator.',
   }),
   not_configured: () => ({
     title: 'Sign-in not configured',
@@ -43,15 +43,41 @@ const ERROR_MESSAGES: Record<string, (email?: string) => { title: string; body: 
     title: 'Email not verified',
     body:  'Your Google account email is not verified. Please verify it in your Google Account settings and try again.',
   }),
+  google_error: (_email, detail?: string) => ({
+    title: 'Google sign-in returned an error',
+    body:  detail
+      ? `Google reported: "${detail}". Please try again or contact your program coordinator if this continues.`
+      : 'Google returned an error during sign-in. Please try again or contact your program coordinator.',
+  }),
+  missing_params: () => ({
+    title: 'Sign-in link was incomplete',
+    body:  'The sign-in link was missing required information. Please try signing in again from the beginning.',
+  }),
+  no_id_token: () => ({
+    title: 'Sign-in could not complete',
+    body:  'Google did not return the expected information. Please try again — if this keeps happening, contact your program coordinator or administrator.',
+  }),
+  missing_identity: () => ({
+    title: 'Sign-in could not complete',
+    body:  'We could not read your account information from Google. Please try again or use a different browser.',
+  }),
+  session_save: () => ({
+    title: 'Sign-in could not be saved',
+    body:  'Your sign-in succeeded but could not be saved due to a session error. Please try again or clear your browser cookies.',
+  }),
+  unexpected: () => ({
+    title: 'Something went wrong',
+    body:  'An unexpected error occurred during sign-in. Please try again — if this keeps happening, contact your program coordinator or administrator.',
+  }),
 };
 
-function getError(code: string | null, email: string | null) {
+function getError(code: string | null, email: string | null, detail: string | null) {
   if (!code) return null;
-  const factory = ERROR_MESSAGES[code] ?? (() => ({
+  const factory = ERROR_MESSAGES[code] ?? ((_e?: string, _d?: string) => ({
     title: 'Sign-in failed',
-    body:  `An unexpected error occurred (${code}). Please try again or contact your administrator.`,
+    body:  `An unexpected error occurred (${code}). Please try again or contact your program coordinator.`,
   }));
-  return factory(email ?? undefined);
+  return factory(email ?? undefined, detail ?? undefined);
 }
 
 // ── Error card icons ──────────────────────────────────────────────────────────
@@ -67,9 +93,10 @@ function errorIcon(code: string | null) {
 export default function SignInPage() {
   const BASE  = (import.meta.env.BASE_URL as string).replace(/\/$/, '');
   const params = new URLSearchParams(window.location.search);
-  const errorCode = params.get('sign_in_error');
+  const errorCode  = params.get('sign_in_error');
   const errorEmail = params.get('email');
-  const error = getError(errorCode, errorEmail);
+  const errorDetail = params.get('detail');
+  const error = getError(errorCode, errorEmail, errorDetail);
 
   // If rendered inside an iframe (Replit preview), open OAuth in a new tab so
   // Google's consent screen isn't blocked by the iframe sandbox.
