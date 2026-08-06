@@ -22,9 +22,27 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: "1.5",
+    date: "August 6, 2026",
+    label: "Current",
+    entries: [
+      { kind: "major", text: "Homebase system launched — audience-dispatched landing pages for learners, coaches, volunteers, and team staff, each with a dedicated shell and personalised content." },
+      { kind: "major", text: "Google SSO + Google Group routing live — sign-in derives each user's audience from DWD group membership; 5-minute cache auto-refreshes on /me." },
+      { kind: "major", text: "Learner Homebase shipped — upcoming sessions, quest progress band, Penny nudges, and a clear sign-in error page for rejected learners." },
+      { kind: "major", text: "Coach Homebase shipped — squad overview, artefact review queue, and week summary card." },
+      { kind: "major", text: "Volunteer Homebase shipped — real Salesforce unassigned case queue with specialty matching, optimistic claim UI, and two-layer concurrency protection." },
+      { kind: "major", text: "Team Homebase shipped — team@transitiontrails.org members land on a focused workspace with a Mission Control link; superadmins in the group reach it via /homebase." },
+      { kind: "minor", text: "Back to Homebase card added to Mission Control — visible for all team group members (including superadmins) via direct group membership check." },
+      { kind: "minor", text: "Staff volunteer admin page at /admin/people/volunteers — set commitment level, specialty, and coordinator without leaving Trail OS." },
+      { kind: "minor", text: "19-test Google Group audience routing suite + DWD diagnostic probe script added to the API server." },
+      { kind: "minor", text: "connect-pg-simple replaces session-file-store for durable cross-instance sessions — all 561 tests updated and passing." },
+      { kind: "fix",   text: "Learner sign-in blank page fixed — rejected learners now see a clear error message with reason and retry button instead of a silent redirect." },
+      { kind: "fix",   text: "Home icon naming collision in Mission Control fixed — was accidentally rendering the entire page component inside the card, causing a blank white screen." },
+    ],
+  },
+  {
     version: "1.4",
     date: "August 5, 2026",
-    label: "Current",
     entries: [
       { kind: "major",  text: "Salesforce interaction log now writes with correct Source__c value ('TRAIL OS') — eliminates the silent zero-record failure that was discarding all logs." },
       { kind: "major",  text: "Staff writes to Penny_Interaction_Log__c are now deliberately skipped (Learner__c is required) and surfaced as a neutral 'Skipped' column in the write-health strip instead of silently failing." },

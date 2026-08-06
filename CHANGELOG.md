@@ -7,11 +7,73 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Docs — 2026-08-04 (ada7cba)
+No unreleased changes.
 
-- Auto-logged: `ROADMAP.md` updated in commit `ada7cba`
+---
 
-Changes on `dev` branch not yet merged to `main`.
+## [1.5.0] — 2026-08-06 — Homebase: Audience-Aware Routing for Learners, Coaches, Volunteers & Team
+
+### Added
+
+**Google SSO + Google Group audience routing (`eced91a`)**
+- Full per-user Google Sign-In flow for `@transitiontrails.org` accounts — sessions persist in PostgreSQL via `connect-pg-simple`
+- Domain-Wide Delegation (DWD) service account probes four Google Groups (`GOOGLE_GROUP_LEARNERS`, `GOOGLE_GROUP_COACHES`, `GOOGLE_GROUP_VOLUNTEERS`, `GOOGLE_GROUP_TEAM`) to determine each user's homebase audience on sign-in
+- 5-minute group membership cache stored in session; auto-refreshes on `/api/auth/google/me` once expired
+- `deriveAudience()` function applies priority order: coach → volunteer → team → learner → null (staff)
+- Staff users (`isKnownStaff`) always land on Mission Control regardless of group membership; `audience = null` for all staff tiers
+
+**Homebase system — audience-dispatched landing pages (`74d8c7f`, `70ae8ce`, `ba0220b`, `3e434b5`)**
+- `HomebaseShell` — shared shell for all homebase audiences: collapsible left drawer with audience icon, display name, build link, and log-time row
+- `HomebaseLanding` — client-side dispatcher; routes each audience to its dedicated page on mount
+- `useHomebaseAuth` hook — fetches `/api/auth/homebase/status`, returns `{ audience, displayName, isLoading }` with 5-min SWR
+- `GET /api/auth/homebase/status` — reads `googleAudience` and `displayName` from session, returns 401 if unauthenticated
+
+**Learner Homebase (`74d8c7f`)**
+- Personalized daily workspace: upcoming sessions, quest progress band, Penny nudges, and case research links
+- `/learner/dashboard`, `/learner/penny`, `/learner/quest`, `/learner/progress` routes behind `LearnerRoute` guard
+- Clear sign-in error page at `/learner/login` with friendly messaging for wrong domain and access-not-granted states
+
+**Coach Homebase (`70ae8ce`)**
+- Squad overview with artefact review queue, coaching calendar, and week summary card
+- `/api/homebase/coach/*` routes for squad data and week schedule
+
+**Volunteer Homebase + Salesforce queue (`ba0220b`, `24f3ba5`)**
+- Real Salesforce unassigned case queue surfaced in `VolunteerHomebase` via `useSfVolunteerQueue` hook
+- `GET /api/homebase/volunteer/queue` — fetches open Cases with no owner, filtered by volunteer's specialty when `Case.Type` is set; two-layer concurrency protection (DB lock + in-flight guard)
+- Input validation on claim action; optimistic UI with rollback on failure
+- `PATCH /api/homebase/volunteer/profile` — updates volunteer commitment level, specialty, and coordinator assignment
+
+**Staff admin page — volunteer management (`c3eb1af`)**
+- New admin page at `/admin/people/volunteers` — staff can set a volunteer's commitment level, specialty, and coordinator without leaving Trail OS
+- Backed by `PATCH /api/admin/volunteers/:contactId` Salesforce record update
+
+**Team Homebase (`3e434b5`, `1dd3b44`, `5ee9e82`, `a299156`)**
+- `team@transitiontrails.org` group members land on `TeamHomebase` — a focused daily workspace with a prominent Mission Control card and quick links (Programs, People, Calendar, Slack)
+- `GOOGLE_GROUP_TEAM` env var; `deriveAudience()` checks team group before learner group
+- `team@transitiontrails.org` added to `TRAIL_OS_STAFF_GROUPS` in `requireAuth.ts` — team users pass `requireStaff` on all API routes
+- `TeamRoute` in `App.tsx` — path-aware shell: `/` → `TeamHomebase`, any admin path → `AppShell + Router` (Mission Control)
+- Dedicated `/homebase` route bypasses audience check and uses group membership directly — allows superadmins who are also in `team@` to reach `TeamHomebase` via the Back to Homebase card
+- **Back to Homebase card** on Mission Control home page — visible to any user in `team@transitiontrails.org` (checked via `user.groups`, not `audience`, so superadmin override works); navigates to `/homebase`
+
+**Google Group audience routing test suite + DWD probe script (`e106885`)**
+- 19-test suite in `artifacts/api-server/src/__tests__/googleGroupAudienceRouting.test.ts` covering `deriveAudience` with live group addresses, `/auth/homebase/status` per audience, full callback→status flow, `/me` stale-session refresh, no-match session destruction, and staff-priority rule
+- `artifacts/api-server/src/scripts/probe-google-group-access.ts` — runnable DWD diagnostic that checks membership for all four configured group addresses
+
+### Fixed
+
+**Learner sign-in error page (`3470f26`)**
+- Learners rejected at sign-in (wrong Google domain, access-not-granted) previously saw a blank redirect URL
+- `LearnerLogin` now renders a clear error message with the rejection reason and a retry button instead of silently failing
+
+**Home page icon naming collision (`a299156`)**
+- Importing `Home` from lucide-react conflicted with `export default function Home()` — JSX rendered the entire page component inside the Back to Homebase card, causing a blank white screen
+- Fixed by aliasing the import: `import { Home as HomeIcon } from 'lucide-react'`
+
+### Changed
+
+- `LogTimeRow` expanded with `team` activity options (Team meeting, Admin work, Programme support, Other) to satisfy the exhaustive `Record<HomebaseAudience, string[]>` type
+- `connect-pg-simple` replaces `session-file-store` for durable cross-instance sessions — all 561 tests updated and passing (`cc35734`)
+- `useGoogleAuth` audience type updated to `'learner' | 'coach' | 'volunteer' | 'team' | null` across hook, MeResponse interface, and downstream components
 
 ---
 
