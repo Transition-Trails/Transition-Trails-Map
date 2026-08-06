@@ -38,3 +38,10 @@ externalPort = 80
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+GOOGLE_GROUP_COACHES = "coaches@transitiontrails.org"
+GOOGLE_GROUP_LEARNERS = "learners@transitiontrails.org"
+GOOGLE_GROUP_VOLUNTEERS = "volunteer@transitiontrails.org"
