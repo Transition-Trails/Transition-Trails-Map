@@ -15,7 +15,7 @@ import {
   ShieldCheck, PenLine, Plus, CheckCircle2, AlertCircle,
   Clock, CloudUpload, Trash2, Send, Eye, RotateCcw, Loader2,
   Sparkles, Brain, Target, RefreshCw, X, ExternalLink, FileText,
-  AlertTriangle, ChevronRight, BarChart2, Database,
+  AlertTriangle, ChevronRight, BarChart2, Database, Download,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -984,24 +984,138 @@ function SourceHealthTab() {
 
 // ── Governance: SF Articles ────────────────────────────────────────────────────
 
+// ── SF article shape returned by /api/knowledge/sf-articles ───────────────────
+interface SfOrgArticle {
+  id: string;
+  knowledgeArticleId: string;
+  title: string;
+  summary: string | null;
+  articleType: string | null;
+  publishStatus: string;
+  versionNumber: number | null;
+  createdDate: string;
+  lastModifiedDate: string;
+  isVisibleInApp: boolean;
+  language: string;
+}
+
+function csvEscape(v: string | null | undefined): string {
+  const s = v ?? '';
+  if (s.includes('"') || s.includes(',') || s.includes('\n')) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function triggerCsvDownload(rows: SfOrgArticle[], filename: string) {
+  const headers = ['Title', 'Summary', 'Article Type', 'Publish Status', 'Version',
+                   'Language', 'Visible In App', 'Created Date', 'Last Modified Date',
+                   'Knowledge Article ID', 'Version ID'];
+  const lines = [
+    headers.join(','),
+    ...rows.map(r => [
+      csvEscape(r.title),
+      csvEscape(r.summary),
+      csvEscape(r.articleType),
+      csvEscape(r.publishStatus),
+      r.versionNumber != null ? String(r.versionNumber) : '',
+      csvEscape(r.language),
+      r.isVisibleInApp ? 'Yes' : 'No',
+      csvEscape(r.createdDate?.slice(0, 10)),
+      csvEscape(r.lastModifiedDate?.slice(0, 10)),
+      csvEscape(r.knowledgeArticleId),
+      csvEscape(r.id),
+    ].join(',')),
+  ];
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function SfArticlesTab({ articles }: { articles: KnowledgeArticle[] }) {
-  const published = articles.filter(a => a.status === 'published');
-  const { sfKnowledgeEnrichment } = useKnowledgeSources();
+  const { toast } = useToast();
+  const [sfRows,       setSfRows]       = useState<SfOrgArticle[]>([]);
+  const [loading,      setLoading]      = useState(true);
+  const [fetchError,   setFetchError]   = useState<string | null>(null);
+  const [downloading,  setDownloading]  = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'online' | 'draft'>('all');
+
+  // Fetch directly from Salesforce on mount so the list reflects the live org,
+  // not just articles that happen to be stored locally.
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setFetchError(null);
+    fetch('/api/knowledge/sf-articles?status=all')
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return;
+        setSfRows(data.articles ?? []);
+      })
+      .catch(err => {
+        if (cancelled) return;
+        setFetchError(err instanceof Error ? err.message : 'Failed to load');
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const localSynced = articles.filter(a => a.status === 'published' && !!a.sfArticleId).length;
+
+  const filtered = statusFilter === 'all'
+    ? sfRows
+    : sfRows.filter(r => r.publishStatus.toLowerCase() === statusFilter);
+
+  async function handleDownload() {
+    setDownloading(true);
+    try {
+      // Re-fetch with status=all so download always has the freshest data.
+      const res  = await fetch('/api/knowledge/sf-articles?status=all');
+      const data = await res.json() as { articles?: SfOrgArticle[] };
+      if (!res.ok) throw new Error(data as unknown as string);
+      const rows = data.articles ?? [];
+      if (rows.length === 0) {
+        toast({ title: 'No articles to download', description: 'No SF Knowledge articles were returned.' });
+        return;
+      }
+      const date = new Date().toISOString().slice(0, 10);
+      triggerCsvDownload(rows, `sf-knowledge-articles-${date}.csv`);
+      toast({ title: `Downloaded ${rows.length} articles`, description: `sf-knowledge-articles-${date}.csv` });
+    } catch (err) {
+      toast({ title: 'Download failed', description: err instanceof Error ? err.message : 'Unknown error', variant: 'destructive' });
+    } finally {
+      setDownloading(false);
+    }
+  }
+
+  const onlineCount = sfRows.filter(r => r.publishStatus.toLowerCase() === 'online').length;
+  const draftCount  = sfRows.filter(r => r.publishStatus.toLowerCase() === 'draft').length;
 
   return (
     <div className="p-5 overflow-auto h-full">
+      {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide">Salesforce Knowledge Sync</p>
-        {sfKnowledgeEnrichment?.totalArticles != null && (
-          <p className="text-[12px] text-muted-foreground">{sfKnowledgeEnrichment.totalArticles} articles in Salesforce org</p>
-        )}
+        <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide">Salesforce Knowledge Articles</p>
+        <button
+          onClick={handleDownload}
+          disabled={downloading || loading || sfRows.length === 0}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#2F6F7E] text-white hover:bg-[#26606D] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          {downloading
+            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            : <Download className="w-3.5 h-3.5" />}
+          {downloading ? 'Preparing…' : 'Download CSV'}
+        </button>
       </div>
 
+      {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         {[
-          { label: 'Published here',  value: published.length },
-          { label: 'SF-synced',       value: published.filter(a => !!a.sfArticleId).length },
-          { label: 'SF online',       value: published.filter(a => !!a.sfPublishStatus && a.sfPublishStatus !== 'Draft').length },
+          { label: 'In Salesforce org', value: loading ? '…' : sfRows.length },
+          { label: 'Online',            value: loading ? '…' : onlineCount },
+          { label: 'Synced locally',    value: localSynced },
         ].map(s => (
           <div key={s.label} className="rounded-lg border border-border bg-white p-3 text-center">
             <p className="text-xl font-bold text-foreground">{s.value}</p>
@@ -1010,43 +1124,73 @@ function SfArticlesTab({ articles }: { articles: KnowledgeArticle[] }) {
         ))}
       </div>
 
+      {/* Status filter pills */}
+      <div className="flex gap-1.5 mb-3">
+        {(['all', 'online', 'draft'] as const).map(f => (
+          <button
+            key={f}
+            onClick={() => setStatusFilter(f)}
+            className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-colors capitalize ${
+              statusFilter === f
+                ? 'bg-[#2F6F7E] text-white border-[#2F6F7E]'
+                : 'bg-white text-muted-foreground border-border hover:border-[#2F6F7E]/40'
+            }`}
+          >
+            {f === 'all' ? `All (${sfRows.length})` : f === 'online' ? `Online (${onlineCount})` : `Draft (${draftCount})`}
+          </button>
+        ))}
+      </div>
+
+      {/* Table */}
       <div className="rounded-xl border border-border bg-white overflow-hidden">
-        <table className="w-full text-[12px]">
-          <thead>
-            <tr className="border-b border-border bg-muted/20">
-              <th className="text-left px-4 py-3 text-[11px] font-bold text-muted-foreground/60">Article</th>
-              <th className="px-3 py-3 text-[11px] font-bold text-muted-foreground/60">SF Article ID</th>
-              <th className="px-3 py-3 text-[11px] font-bold text-muted-foreground/60 text-center">SF Status</th>
-              <th className="px-3 py-3 text-[11px] font-bold text-muted-foreground/60 text-center">Published</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/40">
-            {published.map(a => (
-              <tr key={a.id} className="hover:bg-muted/10 transition-colors">
-                <td className="px-4 py-3">
-                  <p className="font-semibold text-foreground text-[12px]">{a.title}</p>
-                  <p className="text-[11px] text-muted-foreground">{a.category}</p>
-                </td>
-                <td className="px-3 py-2">
-                  {a.sfArticleId
-                    ? <span className="text-[11px] font-mono text-foreground">{a.sfArticleId}</span>
-                    : <span className="text-[11px] text-muted-foreground/40">Not synced</span>}
-                </td>
-                <td className="px-3 py-2 text-center">
-                  {a.sfPublishStatus ? (
-                    <span className={`text-[11px] font-semibold border rounded-full px-1.5 py-0.5 ${
-                      a.sfPublishStatus !== 'Draft' ? 'text-[#245531] bg-[#E6F0EA] border-[#9FC3AE]' : 'text-slate-500 bg-slate-50 border-slate-200'
-                    }`}>{a.sfPublishStatus}</span>
-                  ) : <span className="text-[11px] text-muted-foreground/40">—</span>}
-                </td>
-                <td className="px-3 py-2 text-center text-[11px] text-muted-foreground">{fmt(a.publishedAt)}</td>
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 py-12 text-[13px] text-muted-foreground">
+            <Loader2 className="w-4 h-4 animate-spin" /> Loading from Salesforce…
+          </div>
+        ) : fetchError ? (
+          <div className="flex flex-col items-center gap-2 py-12 text-center">
+            <AlertCircle className="w-5 h-5 text-destructive" />
+            <p className="text-[13px] text-muted-foreground">{fetchError}</p>
+          </div>
+        ) : (
+          <table className="w-full text-[12px]">
+            <thead>
+              <tr className="border-b border-border bg-muted/20">
+                <th className="text-left px-4 py-3 text-[11px] font-bold text-muted-foreground/60">Title</th>
+                <th className="px-3 py-3 text-[11px] font-bold text-muted-foreground/60 text-center">Type</th>
+                <th className="px-3 py-3 text-[11px] font-bold text-muted-foreground/60 text-center">Status</th>
+                <th className="px-3 py-3 text-[11px] font-bold text-muted-foreground/60 text-center">Version</th>
+                <th className="px-3 py-3 text-[11px] font-bold text-muted-foreground/60 text-center">Modified</th>
               </tr>
-            ))}
-            {published.length === 0 && (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-[13px] text-muted-foreground">No published articles yet.</td></tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border/40">
+              {filtered.map(r => (
+                <tr key={r.id} className="hover:bg-muted/10 transition-colors">
+                  <td className="px-4 py-3">
+                    <p className="font-semibold text-foreground text-[12px]">{r.title}</p>
+                    {r.summary && <p className="text-[11px] text-muted-foreground line-clamp-1">{r.summary}</p>}
+                    <p className="text-[10px] font-mono text-muted-foreground/50 mt-0.5">{r.knowledgeArticleId}</p>
+                  </td>
+                  <td className="px-3 py-2 text-center text-[11px] text-muted-foreground">{r.articleType ?? '—'}</td>
+                  <td className="px-3 py-2 text-center">
+                    <span className={`text-[11px] font-semibold border rounded-full px-1.5 py-0.5 ${
+                      r.publishStatus.toLowerCase() === 'online'
+                        ? 'text-[#245531] bg-[#E6F0EA] border-[#9FC3AE]'
+                        : 'text-slate-500 bg-slate-50 border-slate-200'
+                    }`}>{r.publishStatus}</span>
+                  </td>
+                  <td className="px-3 py-2 text-center text-[11px] text-muted-foreground">v{r.versionNumber ?? '—'}</td>
+                  <td className="px-3 py-2 text-center text-[11px] text-muted-foreground">{r.lastModifiedDate?.slice(0, 10) ?? '—'}</td>
+                </tr>
+              ))}
+              {filtered.length === 0 && !loading && (
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-[13px] text-muted-foreground">
+                  {sfRows.length === 0 ? 'No articles found in the Salesforce org.' : 'No articles match this filter.'}
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
