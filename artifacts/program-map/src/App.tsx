@@ -104,6 +104,20 @@ import LearnerPenny       from "@/pages/learner/LearnerPenny";
 import LearnerQuest       from "@/pages/learner/LearnerQuest";
 import LearnerProgress    from "@/pages/learner/LearnerProgress";
 import HomebaseLanding    from "@/pages/homebase/HomebaseLanding";
+
+// ── TeamRoute — path-aware shell for team@ staff ──────────────────────────────
+// At '/' they see TeamHomebase; any admin path shows Mission Control (AppShell).
+function TeamRoute() {
+  const [location] = useLocation();
+  if (location === "/" || location === "") {
+    return <HomebaseLanding />;
+  }
+  return (
+    <AppShell>
+      <Router />
+    </AppShell>
+  );
+}
 import AccessNotGranted   from "@/pages/AccessNotGranted";
 
 // queryClient is declared at module level above (next to the fetch interceptor)
@@ -454,10 +468,10 @@ function InnerApp() {
       <Route>
         {auth.isSignedIn ? (
           auth.user?.audience ? (
-            // ── Homebase users (learner / coach / volunteer) ──────────────
-            // These users get the HomebaseShell, not the admin AppShell.
-            // Individual audience pages (#250, #251, #252) replace HomebaseLanding.
-            <HomebaseLanding />
+            // ── Homebase users (learner / coach / volunteer / team) ───────
+            // team audience gets path-aware routing: '/' → TeamHomebase,
+            // any admin path → Mission Control (AppShell).
+            auth.user.audience === "team" ? <TeamRoute /> : <HomebaseLanding />
           ) : (
             // ── Staff users (admin / power / everyday / superadmin) ───────
             <AppShell>

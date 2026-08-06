@@ -28,7 +28,7 @@ export interface GoogleUser {
    * Homebase audience when the user is in a learner/coach/volunteer group.
    * null for staff-only users.
    */
-  audience: 'learner' | 'coach' | 'volunteer' | null;
+  audience: 'learner' | 'coach' | 'volunteer' | 'team' | null;
 }
 
 interface MeResponse {
@@ -38,7 +38,7 @@ interface MeResponse {
   sub?:      string;
   groups?:   string[];
   tier?:     string;
-  audience?: 'learner' | 'coach' | 'volunteer' | null;
+  audience?: 'learner' | 'coach' | 'volunteer' | 'team' | null;
   reason?:   string;
 }
 

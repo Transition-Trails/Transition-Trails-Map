@@ -40,6 +40,14 @@ const ACTIVITIES: Record<HomebaseAudience, string[]> = {
     "Community post",
     "Other",
   ],
+  // Team staff members can log time from Mission Control; this entry satisfies
+  // the exhaustive Record<HomebaseAudience, string[]> requirement.
+  team: [
+    "Team meeting",
+    "Admin work",
+    "Programme support",
+    "Other",
+  ],
 };
 
 const BASE = (import.meta.env.BASE_URL as string).replace(/\/$/, "");

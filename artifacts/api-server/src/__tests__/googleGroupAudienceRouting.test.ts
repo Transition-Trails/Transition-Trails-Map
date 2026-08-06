@@ -171,7 +171,7 @@ afterEach(() => {
 // ── 1–7. deriveAudience unit tests with live group addresses ──────────────────
 
 describe('deriveAudience with live group email addresses', () => {
-  let deriveAudience: (groups: string[], email: string) => 'learner' | 'coach' | 'volunteer' | null;
+  let deriveAudience: (groups: string[], email: string) => 'learner' | 'coach' | 'volunteer' | 'team' | null;
 
   beforeEach(async () => {
     ({ deriveAudience } = await import('../routes/googleSignIn.js'));
