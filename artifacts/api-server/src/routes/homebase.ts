@@ -13,7 +13,7 @@
  *   GET  /homebase/log-time      — fetch the current user's time entries for this month
  */
 
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { db } from "@workspace/db";
 import { timeLogsTable } from "@workspace/db/schema";
 import { desc, eq, gte } from "drizzle-orm";
@@ -44,6 +44,7 @@ router.get("/auth/homebase/status", (req, res) => {
     audience,
     email,
     displayName: req.session.googleName ?? email,
+    coachLevel:  req.session.coachLevel ?? null,
   });
 });
 
@@ -384,6 +385,151 @@ router.get("/homebase/learner/coach", requireHomebaseAuth, requireLearnerAudienc
   }
 
   res.json({ coach: null, cohortSlackChannel: null, linked, sfUnavailable: false });
+});
+
+// ── requireCoachAudience ──────────────────────────────────────────────────────
+//
+// Guards all /homebase/coach/* routes.  Audience must be exactly 'coach';
+// learner / volunteer / staff all get 403.
+
+function requireCoachAudience(req: Request, res: Response, next: NextFunction): void {
+  if (req.session.googleAudience !== "coach") {
+    res.status(403).json({ error: "This resource is only available to coaches." });
+    return;
+  }
+  next();
+}
+
+// ── GET /homebase/coach/penny-prepared ────────────────────────────────────────
+//
+// Returns draft items that Penny has staged for coach review:
+// draft verdicts, date-change proposals, countersign requests, nudges.
+//
+// Phase 1: Penny coaching layer not yet wired (task #254 provisions SF fields).
+// Returns an empty list so the UI renders the honest empty state.
+// Each real item shape: { id, kind, title, body }
+
+router.get("/homebase/coach/penny-prepared", requireHomebaseAuth, requireCoachAudience, (_req, res) => {
+  // Phase 1 stub — replace with Penny prep query once SF coaching fields exist.
+  res.json({ items: [], hasData: false });
+});
+
+// ── GET /homebase/coach/artefacts ─────────────────────────────────────────────
+//
+// Lists learner artefacts awaiting a coach verdict.
+// Heading and CTA label vary by coach level:
+//   assistant  → "Artefacts to read" / "Draft →"
+//   others     → "Artefacts awaiting a verdict" / "Issue verdict →"
+//
+// Phase 1 stub — SF artefact objects not yet provisioned.
+
+router.get("/homebase/coach/artefacts", requireHomebaseAuth, requireCoachAudience, (_req, res) => {
+  res.json({ items: [], hasData: false });
+});
+
+// ── GET /homebase/coach/squad ─────────────────────────────────────────────────
+//
+// Returns squad learner cards for the current coach.
+// Advanced coaches see both squads.
+//
+// Each learner shape:
+//   { id, name, buddy, activity, phase, passedCount, reworkCount, isStuck }
+//
+// Phase 1 stub — coach–learner assignment not yet SF-backed.
+
+router.get("/homebase/coach/squad", requireHomebaseAuth, requireCoachAudience, (_req, res) => {
+  res.json({ squads: [], hasData: false });
+});
+
+// ── GET /homebase/coach/lead ──────────────────────────────────────────────────
+//
+// Returns the lead coach contact info for the right People panel.
+// Also returns the cohort Slack channel for the channel feed.
+//
+// Phase 1: SF coaching fields not yet provisioned.  Returns sfUnavailable when
+// SF service token is absent; null lead otherwise.
+
+router.get("/homebase/coach/lead", requireHomebaseAuth, requireCoachAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+
+  let linked: boolean;
+  try {
+    const contacts = await sfSvcQuery<{ Id: string }>(
+      `SELECT Id FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`,
+    );
+    linked = !!contacts[0]?.Id;
+  } catch (err) {
+    if (err instanceof SfNotConfiguredError) {
+      res.json({ lead: null, cohortSlackChannel: null, linked: null, sfUnavailable: true });
+      return;
+    }
+    logger.warn({ err }, "homebase/coach/lead: SF contact lookup failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  // Phase 1: lead coach info not yet in SF — return null stub.
+  res.json({ lead: null, cohortSlackChannel: null, linked, sfUnavailable: false });
+});
+
+// ── GET /homebase/coach/cases ─────────────────────────────────────────────────
+//
+// Returns open SF Cases linked to the coach's own Contact record.
+// Same three-state error contract as the learner cases endpoint:
+//   SfNotConfiguredError → { sfUnavailable:true, linked:null }
+//   HTTP error           → 503 { sfUnavailable:true }
+//   No Contact record    → { linked:false }
+//   Records found        → { linked:true, cases, totalOpen }
+
+router.get("/homebase/coach/cases", requireHomebaseAuth, requireCoachAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+
+  // ── Step 1: look up Contact by email ──────────────────────────────────────
+  let contactId: string | null;
+  try {
+    const contacts = await sfSvcQuery<{ Id: string }>(
+      `SELECT Id FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`,
+    );
+    contactId = contacts[0]?.Id ?? null;
+  } catch (err) {
+    if (err instanceof SfNotConfiguredError) {
+      res.json({ linked: null, sfUnavailable: true, cases: [], totalOpen: 0 });
+      return;
+    }
+    logger.warn({ err }, "homebase/coach/cases: SF contact lookup failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  // ── Step 2: no Contact → genuinely unlinked account ──────────────────────
+  if (!contactId) {
+    res.json({ linked: false, sfUnavailable: false, cases: [], totalOpen: 0 });
+    return;
+  }
+
+  // ── Step 3: fetch open Cases for this Contact ─────────────────────────────
+  type CaseRecord = {
+    Id:               string;
+    CaseNumber:       string | null;
+    Subject:          string | null;
+    Status:           string | null;
+    Priority:         string | null;
+    LastModifiedDate: string | null;
+    CreatedDate:      string | null;
+  };
+
+  let cases: CaseRecord[];
+  try {
+    cases = await sfSvcQuery<CaseRecord>(
+      `SELECT Id, CaseNumber, Subject, Status, Priority, LastModifiedDate, CreatedDate FROM Case WHERE ContactId = '${contactId}' AND IsClosed = false ORDER BY LastModifiedDate DESC LIMIT 20`,
+    );
+  } catch (err) {
+    logger.warn({ err }, "homebase/coach/cases: Case query failed");
+    res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
+    return;
+  }
+
+  res.json({ linked: true, sfUnavailable: false, cases, totalOpen: cases.length });
 });
 
 export default router;

@@ -36,6 +36,11 @@ declare module "express-session" {
      * Null / absent for staff-only users.
      */
     googleAudience?: 'learner' | 'coach' | 'volunteer' | null;
+    /**
+     * Sub-level for coaches.  Populated once SF coaching fields are provisioned
+     * (task #254).  Falls back to 'associate' on the frontend when absent.
+     */
+    coachLevel?: 'assistant' | 'associate' | 'advanced' | null;
 
     // ── Learner surface ───────────────────────────────────────────────────
     learnerAuthenticated?: boolean;
