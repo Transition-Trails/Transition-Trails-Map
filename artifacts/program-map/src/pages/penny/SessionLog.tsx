@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Clock, Users, CalendarDays, RefreshCw, Plus, X,
   ChevronDown, ChevronUp, CheckCircle2, AlertCircle, Loader2, Search,
+  Database,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -472,8 +473,11 @@ export default function SessionLog() {
   }
 
   return (
-    <ScrollArea className="h-full">
-      <div className="p-5 max-w-4xl space-y-4">
+    <div className="flex h-full overflow-hidden">
+
+    {/* ── Main content ──────────────────────────────────────────────────── */}
+    <ScrollArea className="flex-1">
+      <div className="p-5 space-y-4">
 
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -572,5 +576,67 @@ export default function SessionLog() {
 
       </div>
     </ScrollArea>
+
+    {/* ── Rail: session summary ──────────────────────────────────────────── */}
+    <div className="w-[272px] shrink-0 border-l border-border bg-muted/10 overflow-y-auto">
+      <div className="p-4 space-y-4">
+
+        {/* Stats card */}
+        <div className="rounded-lg border border-border bg-white p-3 space-y-3">
+          <p className="text-[12px] font-bold text-muted-foreground/50 uppercase tracking-wide">Session Summary</p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <CalendarDays className="w-3 h-3 text-muted-foreground/50" />
+                <span className="text-[12px] text-muted-foreground">Loaded</span>
+              </div>
+              <span className="text-[12px] font-bold text-foreground">{loading ? '—' : sessions.length}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Database className="w-3 h-3 text-muted-foreground/50" />
+                <span className="text-[12px] text-muted-foreground">Total in SF</span>
+              </div>
+              <span className="text-[12px] font-bold text-foreground">{loading ? '—' : total}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Users className="w-3 h-3 text-muted-foreground/50" />
+                <span className="text-[12px] text-muted-foreground">Unique learners</span>
+              </div>
+              <span className="text-[12px] font-bold text-foreground">
+                {loading ? '—' : new Set(sessions.map(s => s.learnerId).filter(Boolean)).size || '—'}
+              </span>
+            </div>
+          </div>
+          <div className="rounded border border-[#9FC3AE] bg-[#E6F0EA] px-2 py-1 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2F6B3F] shrink-0" />
+            <span className="text-[12px] font-medium text-[#245531]">Live · TT_Session_Log__c</span>
+          </div>
+        </div>
+
+        {/* Log session CTA */}
+        <button
+          onClick={() => setShowForm(v => !v)}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-[13px] font-semibold"
+        >
+          {showForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+          {showForm ? 'Cancel' : 'Log a Session'}
+        </button>
+
+        {/* Refresh */}
+        <button
+          onClick={() => void fetchSessions(true)}
+          disabled={refreshing}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-border bg-white hover:bg-muted/40 transition-colors text-[13px] text-muted-foreground disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
+          Refresh from Salesforce
+        </button>
+
+      </div>
+    </div>
+
+    </div>
   );
 }

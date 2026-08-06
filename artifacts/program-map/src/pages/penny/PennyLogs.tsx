@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TERMS } from '@/config/terminology';
-import { Sparkles, RefreshCw, ChevronDown, ChevronUp, Clock, Zap, Brain, CalendarDays } from 'lucide-react';
+import { Sparkles, RefreshCw, ChevronDown, ChevronUp, Clock, Zap, Brain, CalendarDays, Activity } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -189,9 +190,27 @@ export default function PennyLogs() {
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
+  const todayCount   = logs.length;
+  const allTimeDone  = !loading && !error;
+  const avgMs = allTimeDone && logs.filter(l => l.durationMs !== null).length > 0
+    ? Math.round(logs.filter(l => l.durationMs !== null).reduce((s, l) => s + (l.durationMs ?? 0), 0) / logs.filter(l => l.durationMs !== null).length)
+    : null;
+
+  const { setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery } = useAppContext();
+
+  function handleAskPenny() {
+    const query = `${TERMS.aiAssistant} interaction log: ${todayCount} queries today, ${total} all time.${avgMs ? ` Average response time: ${avgMs}ms.` : ''} What patterns do you notice in how learners and staff are using me? What topics are most common, and where am I being asked things I could handle better?`;
+    setCalendarPanelOpen(false);
+    setAskPennyOpen(true);
+    setPendingPennyQuery(query);
+  }
+
   return (
-    <ScrollArea className="h-full">
-      <div className="p-5 max-w-4xl space-y-4">
+    <div className="flex h-full overflow-hidden">
+
+    {/* ── Main content ──────────────────────────────────────────────────── */}
+    <ScrollArea className="flex-1">
+      <div className="p-5 space-y-4">
 
         {/* ── Header row ──────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
@@ -313,5 +332,60 @@ export default function PennyLogs() {
 
       </div>
     </ScrollArea>
+
+    {/* ── Rail: interaction stats ────────────────────────────────────────── */}
+    <div className="w-[272px] shrink-0 border-l border-border bg-muted/10 overflow-y-auto">
+      <div className="p-4 space-y-4">
+
+        {/* Stats card */}
+        <div className="rounded-lg border border-border bg-white p-3 space-y-3">
+          <p className="text-[12px] font-bold text-muted-foreground/50 uppercase tracking-wide">Activity Summary</p>
+          <div className="space-y-2.5">
+            {[
+              { icon: Clock, label: 'Today',      value: loading ? '—' : String(todayCount), color: 'text-foreground'  },
+              { icon: Zap,   label: 'Avg latency', value: avgMs ? `${avgMs}ms` : '—',         color: 'text-[#2F6F7E]'  },
+              { icon: Brain, label: 'All time',   value: loading ? '—' : String(total),       color: 'text-primary'    },
+            ].map(s => (
+              <div key={s.label} className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <s.icon className={`w-3 h-3 shrink-0 ${s.color}`} />
+                  <span className="text-[12px] text-muted-foreground">{s.label}</span>
+                </div>
+                <span className={`text-[12px] font-bold ${s.color}`}>{s.value}</span>
+              </div>
+            ))}
+          </div>
+          <div className="rounded border border-border bg-muted/30 px-2 py-1 flex items-center gap-1.5">
+            <Activity className="w-3 h-3 text-primary shrink-0" />
+            <span className="text-[12px] font-medium text-foreground">Live · DB</span>
+          </div>
+        </div>
+
+        {/* Ask Penny CTA */}
+        <button
+          onClick={handleAskPenny}
+          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors text-left"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+          <div>
+            <p className="text-[12px] font-semibold text-primary">Ask {TERMS.aiAssistant}</p>
+            <p className="text-[11px] text-primary/60">Analyse interaction patterns</p>
+          </div>
+        </button>
+
+        {/* Refresh */}
+        <button
+          onClick={() => void fetchLogs(true)}
+          disabled={refreshing}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-border bg-white hover:bg-muted/40 transition-colors text-[13px] text-muted-foreground disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3 h-3 ${refreshing ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+
+      </div>
+    </div>
+
+    </div>
   );
 }

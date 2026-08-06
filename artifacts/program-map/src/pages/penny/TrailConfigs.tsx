@@ -668,7 +668,7 @@ export default function TrailConfigs() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
+      <div className="px-6 py-6 space-y-6">
 
         {/* ── Page header ───────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-4">

@@ -242,7 +242,7 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 max-w-4xl space-y-6">
+      <div className="p-5 space-y-6">
 
         <div>
           <div className="flex items-center gap-2 mb-3">
@@ -583,7 +583,7 @@ function ConfigRow({ link, navigate }: { link: ConfigLink; navigate: (href: stri
 function ConfigTab({ navigate }: { navigate: (href: string) => void }) {
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 max-w-3xl space-y-6">
+      <div className="p-5 space-y-6">
 
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/60 mb-3">Setup & Configuration</p>

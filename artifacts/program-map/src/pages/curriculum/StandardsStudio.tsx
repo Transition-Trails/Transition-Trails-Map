@@ -831,7 +831,7 @@ function OverviewView({
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
+      <div className="p-5 space-y-5">
 
         {/* Quick-action nav cards */}
         <div className="grid grid-cols-2 gap-3">
