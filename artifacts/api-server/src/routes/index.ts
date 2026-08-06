@@ -30,6 +30,7 @@ import personaHealthRouter     from "./personaHealth";
 import sessionsRouter           from "./sessions";
 import voiceoverRouter          from "./voiceover";
 import governanceRouter         from "./governance";
+import moduleDraftsRouter       from "./moduleDrafts";
 import { requireStaff, requireAdmin } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
@@ -141,5 +142,6 @@ router.use(personaHealthRouter);
 router.use(sessionsRouter);
 router.use(voiceoverRouter);
 router.use(governanceRouter);
+router.use(moduleDraftsRouter);
 
 export default router;

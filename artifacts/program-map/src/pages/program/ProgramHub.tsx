@@ -16,6 +16,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
+import { useModuleDraft, useSaveModuleDraft } from '@/hooks/useModuleDraft';
 
 type HubMode = 'builder' | 'governance';
 type GovernanceTab = 'scorecard' | 'skills' | 'compliance' | 'standards';
@@ -417,6 +418,9 @@ function ContentStudio({
   onSave,
   onPublish,
   onRequestReview,
+  lastSaved,
+  isSaving,
+  isDirty,
 }: {
   selected: SelectedNode | null;
   sectionValues: Record<string, string>;
@@ -426,6 +430,9 @@ function ContentStudio({
   onSave: () => void;
   onPublish: () => void;
   onRequestReview: () => void;
+  lastSaved: Date | null;
+  isSaving: boolean;
+  isDirty: boolean;
 }) {
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -477,15 +484,25 @@ function ContentStudio({
             {nodeStatusBadge(nodeStatus)}
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {lastSaved && (
+              <span className="text-[11px] text-muted-foreground/50">
+                Saved {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+            {isDirty && !isSaving && (
+              <span className="text-[11px] text-amber-600 font-medium">Unsaved changes</span>
+            )}
             <span className="text-[12px] text-muted-foreground">{passCount}/{totalCount}</span>
             <div className="h-1.5 w-20 bg-muted/40 rounded-full overflow-hidden">
               <div className="h-full bg-amber-400 rounded-full transition-all" style={{ width: `${(passCount / totalCount) * 100}%` }} />
             </div>
             <button
               onClick={onSave}
-              className="flex items-center gap-1.5 text-[12px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-full px-3 py-1 hover:bg-primary/10 transition-colors"
+              disabled={isSaving}
+              className="flex items-center gap-1.5 text-[12px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-full px-3 py-1 hover:bg-primary/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Save className="w-3 h-3" />Save
+              {isSaving ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+              {isSaving ? 'Saving…' : 'Save'}
             </button>
           </div>
         </div>
@@ -530,8 +547,9 @@ function ContentStudio({
 
       {/* Action bar */}
       <div className="shrink-0 border-t border-border bg-white px-5 py-3 flex items-center gap-2">
-        <button onClick={onSave} className="flex items-center gap-1.5 text-[12px] font-semibold bg-amber-500 text-white rounded-full px-3.5 py-1.5 hover:bg-amber-600 transition-colors">
-          <Save className="w-3.5 h-3.5" />Save draft
+        <button onClick={onSave} disabled={isSaving} className="flex items-center gap-1.5 text-[12px] font-semibold bg-amber-500 text-white rounded-full px-3.5 py-1.5 hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          {isSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+          {isSaving ? 'Saving…' : 'Save draft'}
         </button>
         <button
           onClick={onPublish}
@@ -549,7 +567,11 @@ function ContentStudio({
           <Send className="w-3.5 h-3.5" />
           {nodeStatus === 'review' ? 'In review' : 'Request review'}
         </button>
-        <span className="ml-auto text-[11px] text-muted-foreground/40">Saved to this browser</span>
+        <span className="ml-auto text-[11px] text-muted-foreground/40">
+          {lastSaved
+            ? `Last saved ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            : 'Not yet saved'}
+        </span>
       </div>
     </div>
   );
@@ -1067,10 +1089,10 @@ export default function ProgramHub() {
   // Builder selection
   const [selected, setSelected] = useState<SelectedNode | null>(null);
 
-  // Section to highlight/scroll to when jumping from governance
+  // Section to highlight/scroll to when jumping from governance (Task #245)
   const [focusedSectionKey, setFocusedSectionKey] = useState<string | null>(null);
 
-  // Per-node content — persisted in localStorage, never reset on node switch
+  // Per-node content — persisted in localStorage as a fast read-layer
   const [allSectionValues, setAllSectionValues] = useState<Record<string, Record<string, string>>>(
     () => lsRead<Record<string, Record<string, string>>>(LS_CONTENT, {})
   );
@@ -1080,7 +1102,54 @@ export default function ProgramHub() {
     () => lsRead<Record<string, NodeStatus>>(LS_STATUSES, {})
   );
 
-  // Auto-select first course in builder on load
+  // Last saved timestamp and dirty-tracking for leave-guard
+  const [lastSaved, setLastSaved] = useState<Record<string, Date>>({});
+  const [isDirtyMap, setIsDirtyMap] = useState<Record<string, boolean>>({});
+
+  // ── Backend draft (server-side persistence) ────────────────────────────────
+
+  const { data: draftData } = useModuleDraft(selected?.id ?? null);
+  const { mutateAsync: saveDraft, isPending: isSaving } = useSaveModuleDraft();
+
+  // When server draft loads for a node, merge it into local state
+  // (server wins over localStorage so that content saved on another browser/device is restored)
+  useEffect(() => {
+    if (!selected || !draftData?.draft) return;
+    const draft = draftData.draft;
+    const nodeId = selected.id;
+
+    setAllSectionValues(prev => {
+      const next = { ...prev, [nodeId]: { ...(draft.sections as Record<string, string>) } };
+      lsWrite(LS_CONTENT, next);
+      return next;
+    });
+
+    setNodeStatuses(prev => {
+      const next = { ...prev, [nodeId]: draft.nodeStatus as NodeStatus };
+      lsWrite(LS_STATUSES, next);
+      return next;
+    });
+
+    setLastSaved(prev => ({ ...prev, [nodeId]: new Date(draft.savedAt) }));
+    setIsDirtyMap(prev => ({ ...prev, [nodeId]: false }));
+  }, [draftData?.draft?.nodeId, draftData?.draft?.savedAt]);
+
+  // ── Leave-guard ────────────────────────────────────────────────────────────
+
+  const hasDirtyNode = selected ? (isDirtyMap[selected.id] ?? false) : false;
+
+  useEffect(() => {
+    if (!hasDirtyNode) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'You have unsaved changes. Leave anyway?';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [hasDirtyNode]);
+
+  // ── Auto-select first course in builder on load ────────────────────────────
+
   useEffect(() => {
     if (courses.length > 0 && !selected && mode === 'builder') {
       const first = courses[0]!;
@@ -1093,7 +1162,8 @@ export default function ProgramHub() {
     if (location.startsWith('/program/governance')) setMode('governance');
   }, [location]);
 
-  // Content change handler — writes per-node to localStorage
+  // ── Content change handler ─────────────────────────────────────────────────
+
   function handleSectionChange(key: string, val: string) {
     if (!selected) return;
     const nodeId = selected.id;
@@ -1102,6 +1172,7 @@ export default function ProgramHub() {
       lsWrite(LS_CONTENT, next);
       return next;
     });
+    setIsDirtyMap(prev => ({ ...prev, [nodeId]: true }));
   }
 
   function setNodeStatus(nodeId: string, status: NodeStatus) {
@@ -1114,33 +1185,83 @@ export default function ProgramHub() {
 
   const currentSectionValues = selected ? (allSectionValues[selected.id] ?? {}) : {};
   const currentNodeStatus    = selected ? (nodeStatuses[selected.id] ?? 'draft') : 'draft';
+  const currentLastSaved     = selected ? (lastSaved[selected.id] ?? null) : null;
+  const currentIsDirty       = selected ? (isDirtyMap[selected.id] ?? false) : false;
 
-  function handleSave() {
-    // Values already written on each keystroke; this is an explicit "save" gesture
-    if (selected) lsWrite(LS_CONTENT, allSectionValues);
-    toast({ title: 'Draft saved', description: 'Content saved to this browser. Changes persist across page refreshes.' });
+  // ── Save draft to backend ──────────────────────────────────────────────────
+
+  async function handleSave() {
+    if (!selected) return;
+    const nodeId = selected.id;
+    const sections = allSectionValues[nodeId] ?? {};
+    const nodeStatus = nodeStatuses[nodeId] ?? 'draft';
+
+    try {
+      const result = await saveDraft({
+        nodeId,
+        nodeKind:   selected.kind,
+        sections,
+        nodeStatus,
+      });
+      const savedAt = new Date(result.draft.savedAt);
+      setLastSaved(prev => ({ ...prev, [nodeId]: savedAt }));
+      setIsDirtyMap(prev => ({ ...prev, [nodeId]: false }));
+      lsWrite(LS_CONTENT, allSectionValues);
+      toast({ title: 'Draft saved', description: 'Content persisted to the server.' });
+    } catch {
+      toast({ title: 'Save failed', description: 'Could not reach the server. Changes are still stored locally.', variant: 'destructive' });
+    }
   }
 
-  function handlePublish() {
+  async function handlePublish() {
     if (!selected) return;
-    setNodeStatus(selected.id, 'published');
-    toast({ title: 'Marked as published', description: 'Status updated locally. Connect a backend to sync to Salesforce.' });
+    const nodeId = selected.id;
+    setNodeStatus(nodeId, 'published');
+
+    try {
+      const result = await saveDraft({
+        nodeId,
+        nodeKind:   selected.kind,
+        sections:   allSectionValues[nodeId] ?? {},
+        nodeStatus: 'published',
+      });
+      const savedAt = new Date(result.draft.savedAt);
+      setLastSaved(prev => ({ ...prev, [nodeId]: savedAt }));
+      setIsDirtyMap(prev => ({ ...prev, [nodeId]: false }));
+      toast({ title: 'Marked as published', description: 'Status saved to the server.' });
+    } catch {
+      toast({ title: 'Publish failed', description: 'Status updated locally but could not reach the server.', variant: 'destructive' });
+    }
   }
 
-  function handleRequestReview() {
+  async function handleRequestReview() {
     if (!selected) return;
-    setNodeStatus(selected.id, 'review');
-    toast({ title: 'Review requested', description: 'Status set to "In review" and saved locally.' });
+    const nodeId = selected.id;
+    setNodeStatus(nodeId, 'review');
+
+    try {
+      const result = await saveDraft({
+        nodeId,
+        nodeKind:   selected.kind,
+        sections:   allSectionValues[nodeId] ?? {},
+        nodeStatus: 'review',
+      });
+      const savedAt = new Date(result.draft.savedAt);
+      setLastSaved(prev => ({ ...prev, [nodeId]: savedAt }));
+      setIsDirtyMap(prev => ({ ...prev, [nodeId]: false }));
+      toast({ title: 'Review requested', description: 'Status set to "In review" and saved to the server.' });
+    } catch {
+      toast({ title: 'Request failed', description: 'Status updated locally but could not reach the server.', variant: 'destructive' });
+    }
   }
 
   // View in Builder — switches to builder, selects the best-matching course, and scrolls to the relevant section
   function handleViewInBuilder(progId: string, stdId: string) {
     setMode('builder');
 
-    // Resolve which builder section corresponds to this standard
+    // Resolve which builder section corresponds to this standard (Task #245)
     const targetSection = STANDARD_TO_SECTION[stdId] ?? null;
     setFocusedSectionKey(targetSection);
-    // Clear the highlight after 3 s so it doesn't stay forever
     if (targetSection) {
       setTimeout(() => setFocusedSectionKey(null), 3000);
     }
@@ -1159,7 +1280,6 @@ export default function ProgramHub() {
       return;
     }
 
-    // Match by looking for a course whose title/name shares keywords with the program name
     const progWords = prog.name.toLowerCase().split(/\s+/).filter(w => w.length > 3);
     const exactMatch = courses.find(c => {
       const t = (c.Course_Title__c ?? c.Name).toLowerCase();
@@ -1169,7 +1289,6 @@ export default function ProgramHub() {
     if (exactMatch) {
       setSelected({ kind: 'course', id: exactMatch.Id, name: exactMatch.Name, title: exactMatch.Course_Title__c, status: exactMatch.Status__c });
     } else {
-      // Fallback: open first course and warn
       const first = courses[0]!;
       setSelected({ kind: 'course', id: first.Id, name: first.Name, title: first.Course_Title__c, status: first.Status__c });
       toast({
@@ -1203,6 +1322,9 @@ export default function ProgramHub() {
             onSave={handleSave}
             onPublish={handlePublish}
             onRequestReview={handleRequestReview}
+            lastSaved={currentLastSaved}
+            isSaving={isSaving}
+            isDirty={currentIsDirty}
           />
           <PennyRail selected={selected} sectionValues={currentSectionValues} />
         </div>
