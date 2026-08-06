@@ -9,10 +9,8 @@
  *   - Specialty-matched cases: green-left-border
  *   - Non-matching cases: below a "See the whole queue" divider
  *   - Each row: case number, subject, client, estimated size, days-waiting badge
- *   - "Assign to me" button: disabled (SF assignment is a follow-on task)
- *
- * Empty state: "No cases in the queue right now — check back soon."
- * Phase-1 stub state: same empty state (no SF queue data yet).
+ *   - "Assign to me" button: calls POST /api/homebase/volunteer/queue/assign
+ *   - "At limit" label shown when volunteer is at their case_limit
  */
 
 import { useState } from "react";
@@ -38,7 +36,16 @@ function SizeBadge({ size }: { size: QueueCase["estimatedSize"] }) {
 
 // ── Queue row ──────────────────────────────────────────────────────────────────
 
-function QueueRow({ item }: { item: QueueCase }) {
+interface QueueRowProps {
+  item:           QueueCase;
+  atLimit:        boolean;
+  isAssigning:    boolean;
+  /** True when ANY assignment is in flight — all rows must be disabled */
+  anyAssigning:   boolean;
+  onAssign:       (id: string) => void;
+}
+
+function QueueRow({ item, atLimit, isAssigning, anyAssigning, onAssign }: QueueRowProps) {
   return (
     <div
       className={[
@@ -69,14 +76,20 @@ function QueueRow({ item }: { item: QueueCase }) {
         )}
       </div>
 
-      {/* Assign to me — disabled until SF assignment is wired (follow-on task) */}
-      <button
-        disabled
-        title="Case assignment coming soon — will write to Salesforce when wired"
-        className="flex-shrink-0 text-sm font-medium text-primary opacity-40 cursor-not-allowed mt-0.5"
-      >
-        Assign to me
-      </button>
+      {atLimit ? (
+        <span className="flex-shrink-0 text-[11px] font-medium text-muted-foreground bg-muted/50 rounded px-2 py-1 mt-0.5">
+          At limit
+        </span>
+      ) : (
+        <button
+          onClick={() => onAssign(item.id)}
+          disabled={anyAssigning}
+          className="flex-shrink-0 text-sm font-medium text-primary hover:text-primary/80 disabled:opacity-40 disabled:cursor-not-allowed mt-0.5 flex items-center gap-1"
+        >
+          {isAssigning && <Loader2 className="w-3 h-3 animate-spin" />}
+          Assign to me
+        </button>
+      )}
     </div>
   );
 }
@@ -84,20 +97,44 @@ function QueueRow({ item }: { item: QueueCase }) {
 // ── WaysToHelpCard (exported) ──────────────────────────────────────────────────
 
 interface WaysToHelpCardProps {
-  isLoading:  boolean;
-  queueState: QueueState | undefined;
-  error:      Error | null;
+  isLoading:        boolean;
+  queueState:       QueueState | undefined;
+  error:            Error | null;
+  currentCaseCount: number;
+  onAssign:         (caseId: string) => Promise<void>;
 }
 
-export function WaysToHelpCard({ isLoading, queueState, error }: WaysToHelpCardProps) {
+export function WaysToHelpCard({
+  isLoading,
+  queueState,
+  error,
+  currentCaseCount,
+  onAssign,
+}: WaysToHelpCardProps) {
   const [expanded, setExpanded] = useState(true);
+  const [assigningId, setAssigningId]     = useState<string | null>(null);
+  const [assignError,  setAssignError]    = useState<string | null>(null);
 
   const items     = queueState?.items ?? [];
   const openCount = queueState?.openCount ?? 0;
   const caseLimit = queueState?.caseLimit ?? 3;
+  const atLimit   = currentCaseCount >= caseLimit;
 
   const matched   = items.filter(i => i.matchesSpecialty);
   const unmatched = items.filter(i => !i.matchesSpecialty);
+
+  async function handleAssign(caseId: string) {
+    setAssigningId(caseId);
+    setAssignError(null);
+    try {
+      await onAssign(caseId);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to assign case";
+      setAssignError(msg === "atLimit" ? "You're at your case limit." : "Couldn't assign — try again.");
+    } finally {
+      setAssigningId(null);
+    }
+  }
 
   return (
     <div className="rounded-xl border border-border bg-white overflow-hidden">
@@ -137,9 +174,15 @@ export function WaysToHelpCard({ isLoading, queueState, error }: WaysToHelpCardP
               <p className="text-[12px] text-muted-foreground">
                 <span className="font-semibold text-foreground">{openCount}</span> open in queue
                 {" · "}
-                limit of <span className="font-semibold text-foreground">{caseLimit}</span> cases
+                <span className="font-semibold text-foreground">{currentCaseCount}</span> of{" "}
+                <span className="font-semibold text-foreground">{caseLimit}</span> case slots used
               </p>
             </div>
+          )}
+
+          {/* Assign error banner */}
+          {assignError && (
+            <p className="text-[12px] text-red-600 font-medium">{assignError}</p>
           )}
 
           {isLoading ? (
@@ -157,7 +200,16 @@ export function WaysToHelpCard({ isLoading, queueState, error }: WaysToHelpCardP
           ) : (
             <div>
               {/* Specialty-matched first */}
-              {matched.map(item => <QueueRow key={item.id} item={item} />)}
+              {matched.map(item => (
+                <QueueRow
+                  key={item.id}
+                  item={item}
+                  atLimit={atLimit}
+                  isAssigning={assigningId === item.id}
+                  anyAssigning={assigningId !== null}
+                  onAssign={handleAssign}
+                />
+              ))}
 
               {/* Divider for unmatched */}
               {matched.length > 0 && unmatched.length > 0 && (
@@ -168,7 +220,16 @@ export function WaysToHelpCard({ isLoading, queueState, error }: WaysToHelpCardP
                 </div>
               )}
 
-              {unmatched.map(item => <QueueRow key={item.id} item={item} />)}
+              {unmatched.map(item => (
+                <QueueRow
+                  key={item.id}
+                  item={item}
+                  atLimit={atLimit}
+                  isAssigning={assigningId === item.id}
+                  anyAssigning={assigningId !== null}
+                  onAssign={handleAssign}
+                />
+              ))}
             </div>
           )}
         </div>

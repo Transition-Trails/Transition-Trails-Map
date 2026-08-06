@@ -5,7 +5,7 @@
  * Each sub-query is independent — a failed cases call never blanks the queue.
  */
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const BASE = (import.meta.env.BASE_URL as string).replace(/\/$/, "");
 
@@ -164,5 +164,35 @@ export function useVolunteerCoordinator() {
     queryFn:   () => fetchJson<CoordinatorState>("/api/homebase/volunteer/coordinator"),
     staleTime: 10 * 60 * 1000,
     retry:     1,
+  });
+}
+
+// ── useAssignQueueCase ─────────────────────────────────────────────────────────
+//
+// Mutation that calls POST /api/homebase/volunteer/queue/assign.
+// On success, both the queue and the volunteer's own case list are invalidated
+// so the UI refreshes automatically.
+
+export function useAssignQueueCase() {
+  const queryClient = useQueryClient();
+  return useMutation<{ ok: boolean; caseId: string }, Error, string>({
+    mutationFn: async (caseId: string) => {
+      const res = await fetch(`${BASE}/api/homebase/volunteer/queue/assign`, {
+        method:      "POST",
+        credentials: "include",
+        headers:     { "Content-Type": "application/json" },
+        body:        JSON.stringify({ caseId }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as Record<string, unknown>;
+        if (body["atLimit"]) throw new Error("atLimit");
+        throw new Error(`${res.status}`);
+      }
+      return res.json() as Promise<{ ok: boolean; caseId: string }>;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["homebase-volunteer-queue"] });
+      void queryClient.invalidateQueries({ queryKey: ["homebase-volunteer-cases"] });
+    },
   });
 }

@@ -649,38 +649,43 @@ router.get("/homebase/volunteer/month", requireHomebaseAuth, requireVolunteerAud
 
 // ── GET /homebase/volunteer/cases ─────────────────────────────────────────────
 //
-// Same three-state SF error contract as learner/coach:
+// Returns open Cases currently owned by this volunteer's SF User record.
+// OwnerId on a Case must be a User (005…) or Queue (00G…) — NOT a Contact.
+// We look up the volunteer's User by email to get a valid SF User ID.
+//
+// Three-state error contract:
 //   SfNotConfiguredError → { sfUnavailable:true, linked:null }
 //   HTTP error           → 503 { sfUnavailable:true }
-//   No Contact record    → { linked:false }
+//   No User record       → { linked:false }
 //   Records found        → { linked:true, cases, totalOpen }
 
 router.get("/homebase/volunteer/cases", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
   const email = req.session.googleEmail!;
 
-  // ── Step 1: Contact lookup ────────────────────────────────────────────────
-  let contactId: string | null;
+  // ── Step 1: User lookup ───────────────────────────────────────────────────
+  // OwnerId on a Case must be a User (Id starts with '005'), not a Contact.
+  let userId: string | null;
   try {
-    const contacts = await sfSvcQuery<{ Id: string }>(
-      `SELECT Id FROM Contact WHERE Email = '${email.replace(/'/g, "\\'")}' LIMIT 1`,
+    const users = await sfSvcQuery<{ Id: string }>(
+      `SELECT Id FROM User WHERE Email = '${email.replace(/'/g, "\\'")}' AND IsActive = true LIMIT 1`,
     );
-    contactId = contacts[0]?.Id ?? null;
+    userId = users[0]?.Id ?? null;
   } catch (err) {
     if (err instanceof SfNotConfiguredError) {
       res.json({ linked: null, sfUnavailable: true, cases: [], totalOpen: 0 });
       return;
     }
-    logger.warn({ err }, "homebase/volunteer/cases: SF contact lookup failed");
+    logger.warn({ err }, "homebase/volunteer/cases: SF user lookup failed");
     res.status(503).json({ error: "Salesforce temporarily unavailable", sfUnavailable: true });
     return;
   }
 
-  if (!contactId) {
+  if (!userId) {
     res.json({ linked: false, sfUnavailable: false, cases: [], totalOpen: 0 });
     return;
   }
 
-  // ── Step 2: Cases ─────────────────────────────────────────────────────────
+  // ── Step 2: Cases owned by this User ─────────────────────────────────────
   type CaseRecord = {
     Id: string; CaseNumber: string | null; Subject: string | null;
     Status: string | null; Priority: string | null;
@@ -690,7 +695,7 @@ router.get("/homebase/volunteer/cases", requireHomebaseAuth, requireVolunteerAud
   let cases: CaseRecord[];
   try {
     cases = await sfSvcQuery<CaseRecord>(
-      `SELECT Id, CaseNumber, Subject, Status, Priority, LastModifiedDate, CreatedDate FROM Case WHERE ContactId = '${contactId}' AND IsClosed = false ORDER BY LastModifiedDate DESC LIMIT 20`,
+      `SELECT Id, CaseNumber, Subject, Status, Priority, LastModifiedDate, CreatedDate FROM Case WHERE OwnerId = '${userId}' AND IsClosed = false ORDER BY LastModifiedDate DESC LIMIT 20`,
     );
   } catch (err) {
     logger.warn({ err }, "homebase/volunteer/cases: Cases query failed");
@@ -701,23 +706,316 @@ router.get("/homebase/volunteer/cases", requireHomebaseAuth, requireVolunteerAud
   res.json({ linked: true, sfUnavailable: false, cases, totalOpen: cases.length });
 });
 
+// ── sfSvcUpdate ───────────────────────────────────────────────────────────────
+//
+// Issues a PATCH to the SF REST API to update a single sObject record.
+// Throws SfNotConfiguredError when credentials are absent; throws Error on
+// non-2xx responses (204 No Content is the success case for SF PATCH).
+
+async function sfSvcUpdate(
+  sobject: string,
+  id:      string,
+  body:    Record<string, unknown>,
+): Promise<void> {
+  const api   = sfSvcApi();
+  const token = sfSvcToken();
+  if (!api || !token) throw new SfNotConfiguredError();
+
+  // URL-encode the id segment so any unexpected characters cannot escape the path
+  const res = await fetch(`${api}/sobjects/${sobject}/${encodeURIComponent(id)}`, {
+    method:  "PATCH",
+    headers: {
+      Authorization:  `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body:   JSON.stringify(body),
+    signal: AbortSignal.timeout(8_000),
+  });
+
+  // SF returns 204 No Content on a successful PATCH
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`SF PATCH ${sobject}/${id} failed (${res.status}): ${text.slice(0, 120)}`);
+  }
+}
+
 // ── GET /homebase/volunteer/queue ─────────────────────────────────────────────
 //
-// Phase-1 stub. Returns empty queue.
-// Will query unassigned SF Cases filtered to the volunteer's specialty once
-// the volunteer SF object and queue fields are provisioned.
+// Returns unassigned SF Cases (OwnerId LIKE '00G%' = a Queue record) that are
+// still open.  Each case is tagged matchesSpecialty:true when the Case.Type
+// matches the volunteer's specialty (from volunteer_profiles.specialty).
+//
+// No User/Contact lookup needed here — specialty+limit come from the local
+// profile; the queue itself is a pure SF query.
+//
+// Error contract:
+//   SfNotConfiguredError → { sfUnavailable:true, items:[], hasData:false }
+//   HTTP error           → { sfUnavailable:true, items:[], hasData:false }
+//   Success              → { items, openCount, caseLimit, hasData:true }
 
 router.get("/homebase/volunteer/queue", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
-  const profile = await getOrCreateVolunteerProfile(email);
+  const email     = req.session.googleEmail!;
+  const profile   = await getOrCreateVolunteerProfile(email);
   const caseLimit = profile?.caseLimit ?? 3;
+  const specialty = profile?.specialty  ?? null;
 
-  res.json({
-    items:     [],
-    openCount: 0,
-    caseLimit,
-    hasData:   false,
-  });
+  // Queue records in SF always have Ids starting with '00G'.
+  // Query oldest-first so volunteers see what's been waiting longest.
+
+  type RawCase = {
+    Id:          string;
+    CaseNumber:  string | null;
+    Subject:     string | null;
+    Priority:    string | null;
+    Type:        string | null;
+    CreatedDate: string | null;
+    Contact:     { Name: string } | null;
+  };
+
+  let rawCases: RawCase[];
+  try {
+    rawCases = await sfSvcQuery<RawCase>(
+      `SELECT Id, CaseNumber, Subject, Priority, Type, CreatedDate, Contact.Name
+       FROM Case
+       WHERE OwnerId LIKE '00G%' AND IsClosed = false
+       ORDER BY CreatedDate ASC
+       LIMIT 30`,
+    );
+  } catch (err) {
+    if (err instanceof SfNotConfiguredError) {
+      res.json({ items: [], openCount: 0, caseLimit, hasData: false, sfUnavailable: true });
+      return;
+    }
+    logger.warn({ err }, "homebase/volunteer/queue: Cases query failed");
+    res.json({ items: [], openCount: 0, caseLimit, hasData: false, sfUnavailable: true });
+    return;
+  }
+
+  function priorityToSize(p: string | null): "small" | "medium" | "large" | null {
+    if (!p) return null;
+    const lp = p.toLowerCase();
+    if (lp === "high" || lp === "critical") return "large";
+    if (lp === "medium")                    return "medium";
+    if (lp === "low")                       return "small";
+    return null;
+  }
+
+  function daysWaiting(createdDate: string | null): number | null {
+    if (!createdDate) return null;
+    return Math.floor((Date.now() - new Date(createdDate).getTime()) / 86_400_000);
+  }
+
+  const specialtyLower = specialty?.toLowerCase() ?? null;
+
+  const items = rawCases.map(c => ({
+    id:               c.Id,
+    caseNumber:       c.CaseNumber,
+    subject:          c.Subject,
+    clientName:       (c.Contact as { Name?: string } | null)?.Name ?? null,
+    estimatedSize:    priorityToSize(c.Priority),
+    daysWaiting:      daysWaiting(c.CreatedDate),
+    matchesSpecialty: specialtyLower
+      ? (c.Type ?? "").toLowerCase() === specialtyLower
+      : false,
+  }));
+
+  // Specialty-matched cases float to the top
+  items.sort((a, b) => (b.matchesSpecialty ? 1 : 0) - (a.matchesSpecialty ? 1 : 0));
+
+  res.json({ items, openCount: items.length, caseLimit, hasData: true });
+});
+
+// ── POST /homebase/volunteer/queue/assign ─────────────────────────────────────
+//
+// Assigns a queued Case to the volunteer by setting OwnerId = volunteer's SF
+// User Id (starts with '005').  Case.OwnerId must be a User or Queue — NOT a
+// Contact — so we look up the User record, not the Contact record.
+//
+// Input validation:
+//   caseId must be a valid Salesforce Case ID — exactly 15 or 18 alphanumeric
+//   characters with the Case key prefix '500'.  This prevents SOQL injection
+//   and rejects obviously invalid payloads before any SF query runs.
+//
+// Concurrency safety (two layers):
+//   Layer 1 — per-volunteer lock (assignmentInFlight keyed by email):
+//     serialises concurrent assign requests from the same volunteer so that
+//     the read-then-PATCH limit check cannot be raced by double-click.
+//   Layer 2 — per-case lock (casesInFlight keyed by caseId):
+//     serialises concurrent assign requests from DIFFERENT volunteers for the
+//     same case, preventing two volunteers from both seeing queue ownership
+//     and both PATCHing (last-write-wins race).
+//   Both locks are acquired synchronously (before any await) and released in a
+//   finally block — atomic on the single-threaded Node.js event loop.
+//
+// Steps:
+//   1. Validate caseId format (15/18-char alphanumeric with '500' prefix)
+//   2. Acquire per-volunteer lock (429 if volunteer already has one in flight)
+//   3. Look up volunteer's SF User by email (→ userId '005…')
+//   4. Count their currently-owned open cases (fail CLOSED if query fails)
+//   5. Enforce case_limit
+//   6. Acquire per-case lock (429 if case is being claimed by another volunteer)
+//   7. Verify caseId is open AND currently queue-owned (OwnerId LIKE '00G%')
+//   8. PATCH Case.OwnerId = userId
+//   9. Release both locks
+//
+// Body:  { caseId: string }
+// 200:  { ok: true, caseId }
+// 400:  caseId missing/invalid, or volunteer has no active SF User account
+// 409:  case is no longer queue-owned (already assigned or closed)
+// 422:  { atLimit: true, caseLimit, currentCases }
+// 429:  volunteer already has an assignment in flight, OR case is already being
+//       claimed by another volunteer
+// 503:  SF unavailable
+
+// Valid SF Case ID: '500' key prefix + 12 more alphanumeric chars (15-char ID)
+// or + 15 more (18-char ID with 3-char checksum suffix).
+const SF_CASE_ID_RE = /^500[A-Za-z0-9]{12}([A-Za-z0-9]{3})?$/;
+
+// In-process per-volunteer assignment lock — exported for direct test access.
+export const assignmentInFlight = new Set<string>();
+
+// In-process per-case assignment lock — prevents two different volunteers from
+// racing to claim the same queued case.  Exported for direct test access.
+export const casesInFlight = new Set<string>();
+
+router.post("/homebase/volunteer/queue/assign", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
+  const email = req.session.googleEmail!;
+
+  // ── Step 1: Parse + validate caseId ───────────────────────────────────────
+  const { caseId } = req.body as { caseId?: unknown };
+  if (typeof caseId !== "string" || !caseId.trim()) {
+    res.status(400).json({ error: "caseId is required" });
+    return;
+  }
+  const safeCaseId = caseId.trim();
+  if (!SF_CASE_ID_RE.test(safeCaseId)) {
+    res.status(400).json({
+      error: "caseId must be a valid Salesforce Case ID (15 or 18 alphanumeric characters starting with '500')",
+    });
+    return;
+  }
+
+  // ── Step 2: Acquire per-volunteer lock ────────────────────────────────────
+  if (assignmentInFlight.has(email)) {
+    res.status(429).json({ error: "An assignment is already in progress. Please wait." });
+    return;
+  }
+  assignmentInFlight.add(email);
+
+  // casesInFlight is added after the limit check (Step 6) — released in finally.
+  let caseLockedByThisRequest = false;
+
+  try {
+    // ── Profile (for case_limit) ───────────────────────────────────────────
+    const profile   = await getOrCreateVolunteerProfile(email);
+    const caseLimit = profile?.caseLimit ?? 3;
+
+    // ── Step 3: SF User lookup ────────────────────────────────────────────
+    // Case.OwnerId must be a User ID (starts with '005'), never a Contact ID.
+    let userId: string | null;
+    try {
+      const users = await sfSvcQuery<{ Id: string }>(
+        `SELECT Id FROM User WHERE Email = '${email.replace(/'/g, "\\'")}' AND IsActive = true LIMIT 1`,
+      );
+      userId = users[0]?.Id ?? null;
+    } catch (err) {
+      if (err instanceof SfNotConfiguredError) {
+        res.status(503).json({ error: "Salesforce not configured", sfUnavailable: true });
+        return;
+      }
+      logger.warn({ err }, "homebase/volunteer/queue/assign: SF user lookup failed");
+      res.status(503).json({ error: "Salesforce temporarily unavailable" });
+      return;
+    }
+
+    if (!userId) {
+      res.status(400).json({ error: "No active Salesforce user account found for this email" });
+      return;
+    }
+
+    // ── Step 4: Count currently-owned open cases (fail CLOSED on error) ───
+    let currentCases: number;
+    try {
+      const open = await sfSvcQuery<{ Id: string }>(
+        `SELECT Id FROM Case WHERE OwnerId = '${userId}' AND IsClosed = false LIMIT 100`,
+      );
+      currentCases = open.length;
+    } catch (err) {
+      // Cannot confirm limit — reject to prevent bypassing case_limit
+      logger.warn({ err }, "homebase/volunteer/queue/assign: case-count query failed, rejecting");
+      res.status(503).json({ error: "Unable to verify current case load. Please try again." });
+      return;
+    }
+
+    // ── Step 5: Enforce limit ─────────────────────────────────────────────
+    if (currentCases >= caseLimit) {
+      res.status(422).json({ atLimit: true, caseLimit, currentCases });
+      return;
+    }
+
+    // ── Step 6: Acquire per-case lock ─────────────────────────────────────
+    // Prevents two different volunteers from both passing the queue-ownership
+    // check and then racing to PATCH the same case.
+    if (casesInFlight.has(safeCaseId)) {
+      res.status(429).json({ error: "This case is currently being claimed by another volunteer. Please try a different case." });
+      return;
+    }
+    casesInFlight.add(safeCaseId);
+    caseLockedByThisRequest = true;
+
+    // ── Step 7: Verify the case is open and still queue-owned ─────────────
+    // safeCaseId is validated alphanumeric so it cannot inject SOQL.
+    let caseOwnerId: string | null;
+    let caseIsClosed: boolean;
+    try {
+      const caseRows = await sfSvcQuery<{ OwnerId: string; IsClosed: boolean }>(
+        `SELECT OwnerId, IsClosed FROM Case WHERE Id = '${safeCaseId}' LIMIT 1`,
+      );
+      if (caseRows.length === 0) {
+        res.status(409).json({ error: "Case not found" });
+        return;
+      }
+      caseOwnerId  = caseRows[0]!.OwnerId;
+      caseIsClosed = caseRows[0]!.IsClosed;
+    } catch (err) {
+      if (err instanceof SfNotConfiguredError) {
+        res.status(503).json({ error: "Salesforce not configured", sfUnavailable: true });
+        return;
+      }
+      logger.warn({ err, caseId: safeCaseId }, "homebase/volunteer/queue/assign: case-verify query failed");
+      res.status(503).json({ error: "Salesforce temporarily unavailable" });
+      return;
+    }
+
+    if (caseIsClosed || !caseOwnerId?.startsWith("00G")) {
+      res.status(409).json({
+        error: "This case is no longer in the unassigned queue",
+        caseIsClosed,
+        caseOwnerId,
+      });
+      return;
+    }
+
+    // ── Step 8: Assign ────────────────────────────────────────────────────
+    try {
+      await sfSvcUpdate("Case", safeCaseId, { OwnerId: userId });
+    } catch (err) {
+      if (err instanceof SfNotConfiguredError) {
+        res.status(503).json({ error: "Salesforce not configured", sfUnavailable: true });
+        return;
+      }
+      logger.warn({ err, caseId: safeCaseId }, "homebase/volunteer/queue/assign: Case PATCH failed");
+      res.status(503).json({ error: "Salesforce temporarily unavailable" });
+      return;
+    }
+
+    logger.info({ email, caseId: safeCaseId, userId }, "homebase/volunteer/queue: case assigned");
+    res.json({ ok: true, caseId: safeCaseId });
+  } finally {
+    // ── Step 9: Always release both locks ─────────────────────────────────
+    assignmentInFlight.delete(email);
+    if (caseLockedByThisRequest) casesInFlight.delete(safeCaseId);
+  }
 });
 
 // ── GET /homebase/volunteer/growth ────────────────────────────────────────────
@@ -885,4 +1183,3 @@ router.patch("/homebase/volunteer/profile/:email", async (req, res) => {
 });
 
 export default router;
-

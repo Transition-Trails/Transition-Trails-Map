@@ -36,6 +36,7 @@ import {
   useVolunteerGrowth,
   useVolunteerShareables,
   useVolunteerCoordinator,
+  useAssignQueueCase,
 } from "@/hooks/useHomebaseVolunteer";
 import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
 
@@ -103,9 +104,17 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
   const growthResult      = useVolunteerGrowth();
   const shareablesResult  = useVolunteerShareables();
   const coordinatorResult = useVolunteerCoordinator();
+  const assignMutation    = useAssignQueueCase();
 
   // Read specialty from month endpoint (includes profile data)
   const specialty = monthResult.data?.specialty ?? null;
+
+  // Count of cases already assigned to this volunteer (for limit enforcement)
+  const currentCaseCount = casesResult.data?.cases?.length ?? 0;
+
+  async function handleAssign(caseId: string): Promise<void> {
+    await assignMutation.mutateAsync(caseId);
+  }
 
   const peoplePanel = (
     <VolunteerPeoplePanel coordinatorState={coordinatorResult.data} />
@@ -138,6 +147,8 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
           isLoading={queueResult.isLoading}
           queueState={queueResult.data}
           error={queueResult.error}
+          currentCaseCount={currentCaseCount}
+          onAssign={handleAssign}
         />
 
         {/* 4 — Specialty card + Record a process */}
