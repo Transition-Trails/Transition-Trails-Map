@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 import { useModuleDraft, useSaveModuleDraft } from '@/hooks/useModuleDraft';
+import { useScorecardAudit, type CellAuditDetail } from '@/hooks/useScorecardAudit';
 
 type HubMode = 'builder' | 'governance';
 type GovernanceTab = 'scorecard' | 'skills' | 'compliance' | 'standards';
@@ -230,9 +231,9 @@ function complianceScore(dims: Record<string, TrafficLight>): number {
   const pass = vals.filter(v => v === 'green').length;
   return Math.round((pass / vals.length) * 100);
 }
-function programScore(programId: string): number {
-  const cells = SCORECARD_SEED[programId] ?? {};
-  const vals   = Object.values(cells);
+function programScore(programId: string, grades?: Record<string, Record<string, CellGrade>>): number {
+  const cells = (grades ?? SCORECARD_SEED)[programId] ?? {};
+  const vals   = Object.values(cells).filter((v): v is CellGrade => v !== 'na');
   const pass   = vals.filter(v => v === 'pass').length;
   const partial = vals.filter(v => v === 'partial').length;
   if (!vals.length) return 0;
@@ -690,18 +691,64 @@ function PennyRail({ selected, sectionValues }: { selected: SelectedNode | null;
 
 // ── Governance: Quality Scorecard ─────────────────────────────────────────────
 
-function QualityScorecard({ onViewInBuilder }: { onViewInBuilder: (progId: string, stdId: string) => void }) {
+function QualityScorecard({
+  grades,
+  details,
+  kbLoading,
+  hasCourses,
+  onViewInBuilder,
+  onViewModule,
+}: {
+  grades: Record<string, Record<string, CellGrade>>;
+  details: Record<string, Record<string, CellAuditDetail>>;
+  kbLoading: boolean;
+  hasCourses: boolean;
+  onViewInBuilder: (progId: string, stdId: string) => void;
+  onViewModule: (courseId: string, moduleId: string) => void;
+}) {
   const [activeCell, setActiveCell] = useState<{ progId: string; stdId: string } | null>(null);
-  const programs = curriculumPrograms.filter(p => SCORECARD_SEED[p.id]);
 
-  const activeProg  = activeCell ? curriculumPrograms.find(p => p.id === activeCell.progId) : null;
-  const activeStd   = activeCell ? contentStandards.find(s => s.id === activeCell.stdId) : null;
-  const activeGrade: CellGrade = activeCell ? (SCORECARD_SEED[activeCell.progId]?.[activeCell.stdId] ?? 'na') : 'na';
+  const programs = curriculumPrograms;
+
+  const activeProg   = activeCell ? curriculumPrograms.find(p => p.id === activeCell.progId) : null;
+  const activeStd    = activeCell ? contentStandards.find(s => s.id === activeCell.stdId) : null;
+  const activeGrade: CellGrade = activeCell
+    ? ((grades[activeCell.progId]?.[activeCell.stdId] ?? 'na') as CellGrade)
+    : 'na';
+  const activeDetail: CellAuditDetail | null = activeCell
+    ? (details[activeCell.progId]?.[activeCell.stdId] ?? null)
+    : null;
+
+  // Which module detail fields matter per standard
+  function moduleIssues(d: typeof activeDetail, stdId: string) {
+    if (!d || d.modules.length === 0) return [];
+    const label: Record<string, (m: { missingObjectives: boolean; missingAssessment: boolean; missingReflection: boolean; missingLesson: boolean }) => string | null> = {
+      'std-module':            m => m.missingObjectives && m.missingAssessment && m.missingReflection ? 'Objectives, assessment & reflection all missing' : m.missingObjectives ? 'Missing objectives' : m.missingAssessment ? 'Missing assessment' : m.missingReflection ? 'Missing reflection prompt' : null,
+      'std-lesson':            m => m.missingLesson ? 'Key concepts or activities not written' : null,
+      'std-assessment':        m => m.missingAssessment ? 'Assessment prompts not written' : null,
+      'std-reflection-prompt': m => m.missingReflection ? 'Reflection prompt not written' : null,
+    };
+    const fn = label[stdId];
+    if (!fn) return [];
+    return d.modules.map(m => ({ ...m, issue: fn(m) })).filter(m => m.issue !== null) as (typeof d.modules[0] & { issue: string })[];
+  }
 
   return (
     <div className="flex h-full overflow-hidden">
       <div className="flex-1 overflow-auto p-5">
-        <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-3">Programs × Standards Quality Matrix</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide">
+            Programs × Standards Quality Matrix
+          </p>
+          {kbLoading && (
+            <span className="flex items-center gap-1 text-[11px] text-muted-foreground/50">
+              <RefreshCw className="w-3 h-3 animate-spin" />Checking KB articles…
+            </span>
+          )}
+          {!hasCourses && (
+            <span className="text-[11px] text-[#CC8400]">No Salesforce courses loaded — connect LMS for real grades</span>
+          )}
+        </div>
 
         <div className="rounded-xl border border-border bg-white overflow-hidden">
           <table className="w-full text-[12px]">
@@ -716,17 +763,22 @@ function QualityScorecard({ onViewInBuilder }: { onViewInBuilder: (progId: strin
             </thead>
             <tbody className="divide-y divide-border/40">
               {programs.map(prog => {
-                const score = programScore(prog.id);
+                const score = programScore(prog.id, grades);
                 return (
                   <tr key={prog.id} className="hover:bg-muted/10 transition-colors">
                     <td className="px-4 py-3 font-semibold text-foreground text-[12px]">{prog.name}</td>
                     {SCORECARD_STANDARDS.map(std => {
-                      const grade    = SCORECARD_SEED[prog.id]?.[std.id] ?? 'na';
+                      const grade    = (grades[prog.id]?.[std.id] ?? 'na') as CellGrade;
                       const isActive = activeCell?.progId === prog.id && activeCell?.stdId === std.id;
+                      const det      = details[prog.id]?.[std.id];
+                      const tooltip  = det && det.totalCount > 0 && (grade === 'pass' || grade === 'partial' || grade === 'fail')
+                        ? `${det.passCount}/${det.totalCount} complete`
+                        : undefined;
                       return (
                         <td key={std.id} className="px-3 py-2 text-center">
                           <button
                             onClick={() => setActiveCell(isActive ? null : { progId: prog.id, stdId: std.id })}
+                            title={tooltip}
                             className={`w-8 h-8 rounded-lg font-bold text-[13px] mx-auto flex items-center justify-center transition-all ${cellGradeStyle(grade)} ${
                               isActive ? 'ring-2 ring-foreground/30' : 'hover:opacity-80'
                             }`}
@@ -751,9 +803,11 @@ function QualityScorecard({ onViewInBuilder }: { onViewInBuilder: (progId: strin
               <tr className="border-t border-border bg-muted/20">
                 <td className="px-4 py-2 text-[11px] font-bold text-muted-foreground/50">Column coverage</td>
                 {SCORECARD_STANDARDS.map(std => {
-                  const cells = programs.map(p => SCORECARD_SEED[p.id]?.[std.id] ?? 'na').filter(g => g !== 'na');
-                  const pass  = cells.filter(g => g === 'pass').length;
-                  const pct   = cells.length ? Math.round((pass / cells.length) * 100) : 0;
+                  const cells = programs
+                    .map(p => (grades[p.id]?.[std.id] ?? 'na') as CellGrade)
+                    .filter(g => g !== 'na');
+                  const pass = cells.filter(g => g === 'pass').length;
+                  const pct  = cells.length ? Math.round((pass / cells.length) * 100) : 0;
                   return <td key={std.id} className="px-3 py-2 text-center text-[11px] font-bold text-muted-foreground/60">{pct}%</td>;
                 })}
                 <td />
@@ -769,40 +823,95 @@ function QualityScorecard({ onViewInBuilder }: { onViewInBuilder: (progId: strin
               <span className="text-[11px] text-muted-foreground">{lbl}</span>
             </div>
           ))}
+          <span className="ml-auto text-[11px] text-muted-foreground/40 italic">Grades computed from Salesforce LMS + Builder content</span>
         </div>
       </div>
 
       {/* Detail panel */}
       {activeCell && activeProg && activeStd && (
-        <div className="w-[300px] shrink-0 border-l border-border bg-white flex flex-col">
+        <div className="w-[320px] shrink-0 border-l border-border bg-white flex flex-col">
           <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-            <p className="text-[13px] font-bold text-foreground">{activeStd.name}</p>
-            <button onClick={() => setActiveCell(null)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+            <div>
+              <p className="text-[13px] font-bold text-foreground">{activeStd.name}</p>
+              <p className="text-[11px] text-muted-foreground">{activeProg.name}</p>
+            </div>
+            <button onClick={() => setActiveCell(null)} className="text-muted-foreground hover:text-foreground shrink-0"><X className="w-4 h-4" /></button>
           </div>
           <ScrollArea className="flex-1">
             <div className="p-4 space-y-3">
-              <div>
-                <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-1">Program</p>
-                <p className="text-[13px] font-semibold text-foreground">{activeProg.name}</p>
-              </div>
-              <div>
-                <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-1">Result</p>
+
+              {/* Grade badge */}
+              <div className="flex items-center gap-2">
                 <span className={`text-[12px] font-bold border rounded-full px-2 py-0.5 ${
                   activeGrade === 'pass'    ? 'text-[#245531] bg-[#E6F0EA] border-[#9FC3AE]' :
                   activeGrade === 'partial' ? 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' :
                   activeGrade === 'fail'    ? 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' :
                   'text-slate-500 bg-slate-50 border-slate-200'
                 }`}>
-                  {activeGrade === 'pass' ? 'Passes' : activeGrade === 'partial' ? 'Partially meets' : activeGrade === 'fail' ? 'Fails' : 'N/A'}
+                  {activeGrade === 'pass' ? '✓ Passes' : activeGrade === 'partial' ? '~ Partially meets' : activeGrade === 'fail' ? '✗ Fails' : '– Not applicable'}
                 </span>
+                {activeDetail && activeDetail.totalCount > 0 && activeGrade !== 'na' && (
+                  <span className="text-[11px] text-muted-foreground">
+                    {activeDetail.passCount}/{activeDetail.totalCount} complete
+                  </span>
+                )}
               </div>
-              <div>
-                <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-1">Standard purpose</p>
-                <p className="text-[12px] text-muted-foreground leading-relaxed">{activeStd.purpose.slice(0, 200)}…</p>
-              </div>
-              {(activeGrade === 'fail' || activeGrade === 'partial') && (
+
+              {/* Org-level issues (blueprint / KB articles) */}
+              {activeDetail && activeDetail.issues.length > 0 && (
                 <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
-                  <p className="text-[11px] font-bold text-[#CC8400] mb-1">Required fields to address</p>
+                  <p className="text-[11px] font-bold text-[#CC8400] mb-1.5">Issues found</p>
+                  <ul className="space-y-1">
+                    {activeDetail.issues.map((iss, i) => (
+                      <li key={i} className="text-[11px] text-[#8A5800] flex items-start gap-1.5">
+                        <AlertCircle className="w-3 h-3 shrink-0 mt-0.5 text-[#CC8400]" />{iss}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Per-module breakdown */}
+              {(() => {
+                const failing = moduleIssues(activeDetail, activeCell.stdId);
+                if (failing.length === 0) return null;
+                return (
+                  <div>
+                    <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-1.5">
+                      Modules needing attention ({failing.length})
+                    </p>
+                    <div className="space-y-1.5">
+                      {failing.map(m => (
+                        <div key={m.id} className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-3 py-2 flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-[12px] font-semibold text-[#A93F2F] truncate">{m.name}</p>
+                            <p className="text-[11px] text-[#7A2F1F]">{m.issue}</p>
+                          </div>
+                          {activeDetail?.courseId && (
+                            <button
+                              onClick={() => { onViewModule(activeDetail.courseId!, m.id); setActiveCell(null); }}
+                              className="shrink-0 text-[11px] font-semibold text-primary underline whitespace-nowrap"
+                            >
+                              Open →
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Standard purpose */}
+              <div>
+                <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide mb-1">Standard</p>
+                <p className="text-[12px] text-muted-foreground leading-relaxed">{activeStd.purpose.slice(0, 180)}…</p>
+              </div>
+
+              {/* Required fields hint for failing cells */}
+              {(activeGrade === 'fail' || activeGrade === 'partial') && activeDetail?.modules.length === 0 && (
+                <div className="rounded-lg border border-[#FFD08A] bg-[#FFF3E0] p-3">
+                  <p className="text-[11px] font-bold text-[#CC8400] mb-1">Required fields</p>
                   <ul className="space-y-1">
                     {activeStd.requiredFields.filter(f => f.required).slice(0, 4).map(f => (
                       <li key={f.field} className="text-[11px] text-[#8A5800] flex items-start gap-1.5">
@@ -812,6 +921,7 @@ function QualityScorecard({ onViewInBuilder }: { onViewInBuilder: (progId: strin
                   </ul>
                 </div>
               )}
+
               <button
                 onClick={() => { onViewInBuilder(activeCell.progId, activeCell.stdId); setActiveCell(null); }}
                 className="w-full text-[12px] font-semibold text-primary border border-primary/20 bg-primary/5 rounded-lg py-2 hover:bg-primary/10 transition-colors"
@@ -976,20 +1086,26 @@ function BlueprintCompliance() {
 
 // ── Governance: right rail ────────────────────────────────────────────────────
 
-function GovernanceRail({ tab }: { tab: GovernanceTab }) {
+function GovernanceRail({
+  tab,
+  computedGrades,
+}: {
+  tab: GovernanceTab;
+  computedGrades: Record<string, Record<string, CellGrade>>;
+}) {
   const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const [selectedProgramId, setSelectedProgramId] = useState('prog-foundations');
 
-  const dims  = COMPLIANCE_SEED[selectedProgramId] ?? {};
+  const dims       = COMPLIANCE_SEED[selectedProgramId] ?? {};
   const compliance = complianceScore(dims);
-  const score = programScore(selectedProgramId);
+  const score      = programScore(selectedProgramId, computedGrades);
 
-  const totalCourses  = curriculumPrograms.filter(p => COMPLIANCE_SEED[p.id]).length;
-  const avgScore      = Math.round(
-    curriculumPrograms.filter(p => SCORECARD_SEED[p.id]).reduce((s, p) => s + programScore(p.id), 0) /
-    curriculumPrograms.filter(p => SCORECARD_SEED[p.id]).length
-  );
-  const skillsCovered = SKILLS.filter(sk => Object.values(SKILLS_SEED[sk] ?? {}).some(Boolean)).length;
+  const scoredPrograms = curriculumPrograms.filter(p => computedGrades[p.id]);
+  const totalCourses   = curriculumPrograms.filter(p => COMPLIANCE_SEED[p.id]).length;
+  const avgScore       = scoredPrograms.length
+    ? Math.round(scoredPrograms.reduce((s, p) => s + programScore(p.id, computedGrades), 0) / scoredPrograms.length)
+    : 0;
+  const skillsCovered  = SKILLS.filter(sk => Object.values(SKILLS_SEED[sk] ?? {}).some(Boolean)).length;
 
   function fireGapSummary() {
     setPendingPennyQuery('Summarize the biggest content gaps across all Transition Trails programs. Consider standards compliance, skills coverage, and blueprint adherence. Give me a prioritized list of the top 5 gaps and a concrete first step for each.');
@@ -1082,20 +1198,25 @@ export default function ProgramHub() {
 
   const [govTab, setGovTab] = useState<GovernanceTab>('scorecard');
 
-  // SF LMS data for builder tree
+  // SF LMS data for builder tree + governance scorecard
   const { data, isLoading, isError } = useSfLmsCourses();
   const courses = data?.courses ?? [];
+
+  // Per-node content — persisted in localStorage as a fast read-layer
+  // (declared early so useScorecardAudit can reference it below)
+  const [allSectionValues, setAllSectionValues] = useState<Record<string, Record<string, string>>>(
+    () => lsRead<Record<string, Record<string, string>>>(LS_CONTENT, {})
+  );
+
+  // Governance scorecard — real content-health grades derived from SF LMS + builder content
+  const { grades: computedGrades, details: computedDetails, kbLoading } =
+    useScorecardAudit(courses, allSectionValues);
 
   // Builder selection
   const [selected, setSelected] = useState<SelectedNode | null>(null);
 
-  // Section to highlight/scroll to when jumping from governance (Task #245)
+  // Section to highlight/scroll to when jumping from governance → builder
   const [focusedSectionKey, setFocusedSectionKey] = useState<string | null>(null);
-
-  // Per-node content — persisted in localStorage as a fast read-layer
-  const [allSectionValues, setAllSectionValues] = useState<Record<string, Record<string, string>>>(
-    () => lsRead<Record<string, Record<string, string>>>(LS_CONTENT, {})
-  );
 
   // Per-node status — persisted in localStorage
   const [nodeStatuses, setNodeStatuses] = useState<Record<string, NodeStatus>>(
@@ -1112,7 +1233,7 @@ export default function ProgramHub() {
   const { mutateAsync: saveDraft, isPending: isSaving } = useSaveModuleDraft();
 
   // When server draft loads for a node, merge it into local state
-  // (server wins over localStorage so that content saved on another browser/device is restored)
+  // (server wins over localStorage so content saved on another device is restored)
   useEffect(() => {
     if (!selected || !draftData?.draft) return;
     const draft = draftData.draft;
@@ -1197,12 +1318,7 @@ export default function ProgramHub() {
     const nodeStatus = nodeStatuses[nodeId] ?? 'draft';
 
     try {
-      const result = await saveDraft({
-        nodeId,
-        nodeKind:   selected.kind,
-        sections,
-        nodeStatus,
-      });
+      const result = await saveDraft({ nodeId, nodeKind: selected.kind, sections, nodeStatus });
       const savedAt = new Date(result.draft.savedAt);
       setLastSaved(prev => ({ ...prev, [nodeId]: savedAt }));
       setIsDirtyMap(prev => ({ ...prev, [nodeId]: false }));
@@ -1219,12 +1335,7 @@ export default function ProgramHub() {
     setNodeStatus(nodeId, 'published');
 
     try {
-      const result = await saveDraft({
-        nodeId,
-        nodeKind:   selected.kind,
-        sections:   allSectionValues[nodeId] ?? {},
-        nodeStatus: 'published',
-      });
+      const result = await saveDraft({ nodeId, nodeKind: selected.kind, sections: allSectionValues[nodeId] ?? {}, nodeStatus: 'published' });
       const savedAt = new Date(result.draft.savedAt);
       setLastSaved(prev => ({ ...prev, [nodeId]: savedAt }));
       setIsDirtyMap(prev => ({ ...prev, [nodeId]: false }));
@@ -1240,12 +1351,7 @@ export default function ProgramHub() {
     setNodeStatus(nodeId, 'review');
 
     try {
-      const result = await saveDraft({
-        nodeId,
-        nodeKind:   selected.kind,
-        sections:   allSectionValues[nodeId] ?? {},
-        nodeStatus: 'review',
-      });
+      const result = await saveDraft({ nodeId, nodeKind: selected.kind, sections: allSectionValues[nodeId] ?? {}, nodeStatus: 'review' });
       const savedAt = new Date(result.draft.savedAt);
       setLastSaved(prev => ({ ...prev, [nodeId]: savedAt }));
       setIsDirtyMap(prev => ({ ...prev, [nodeId]: false }));
@@ -1259,12 +1365,9 @@ export default function ProgramHub() {
   function handleViewInBuilder(progId: string, stdId: string) {
     setMode('builder');
 
-    // Resolve which builder section corresponds to this standard (Task #245)
     const targetSection = STANDARD_TO_SECTION[stdId] ?? null;
     setFocusedSectionKey(targetSection);
-    if (targetSection) {
-      setTimeout(() => setFocusedSectionKey(null), 3000);
-    }
+    if (targetSection) setTimeout(() => setFocusedSectionKey(null), 3000);
 
     if (courses.length === 0) return;
 
@@ -1272,11 +1375,7 @@ export default function ProgramHub() {
     if (!prog) {
       const first = courses[0]!;
       setSelected({ kind: 'course', id: first.Id, name: first.Name, title: first.Course_Title__c, status: first.Status__c });
-      toast({
-        title: 'Program not found in Salesforce',
-        description: 'Could not find a matching LMS course. Opened the first available course instead.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Program not found in Salesforce', description: 'Could not find a matching LMS course. Opened the first available course instead.', variant: 'destructive' });
       return;
     }
 
@@ -1291,11 +1390,20 @@ export default function ProgramHub() {
     } else {
       const first = courses[0]!;
       setSelected({ kind: 'course', id: first.Id, name: first.Name, title: first.Course_Title__c, status: first.Status__c });
-      toast({
-        title: 'No matching LMS course found',
-        description: `"${prog.name}" has no matching Salesforce LMS course. Opened the first available course instead.`,
-        variant: 'destructive',
-      });
+      toast({ title: 'No matching LMS course found', description: `"${prog.name}" has no matching Salesforce LMS course. Opened the first available course instead.`, variant: 'destructive' });
+    }
+  }
+
+  // View a specific module in Builder — from the scorecard detail panel "Open →" links
+  function handleViewModule(courseId: string, moduleId: string) {
+    setMode('builder');
+    const course = courses.find(c => c.Id === courseId);
+    if (!course) return;
+    const mod = course.modules.find(m => m.Id === moduleId);
+    if (mod) {
+      setSelected({ kind: 'module', id: mod.Id, name: mod.Name, courseId: course.Id, courseName: course.Course_Title__c ?? course.Name });
+    } else {
+      setSelected({ kind: 'course', id: course.Id, name: course.Name, title: course.Course_Title__c, status: course.Status__c });
     }
   }
 
@@ -1355,14 +1463,25 @@ export default function ProgramHub() {
             </div>
 
             <div className="flex-1 overflow-hidden">
-              {govTab === 'scorecard'  && <QualityScorecard onViewInBuilder={handleViewInBuilder} />}
+              {govTab === 'scorecard'  && (
+                <QualityScorecard
+                  grades={computedGrades}
+                  details={computedDetails}
+                  kbLoading={kbLoading}
+                  hasCourses={courses.length > 0}
+                  onViewInBuilder={handleViewInBuilder}
+                  onViewModule={handleViewModule}
+                />
+              )}
               {govTab === 'skills'     && <SkillsCoverage />}
               {govTab === 'compliance' && <ScrollArea className="h-full"><BlueprintCompliance /></ScrollArea>}
               {govTab === 'standards'  && <StandardsStudio />}
             </div>
           </div>
 
-          {govTab !== 'standards' && <GovernanceRail tab={govTab} />}
+          {govTab !== 'standards' && (
+            <GovernanceRail tab={govTab} computedGrades={computedGrades} />
+          )}
         </div>
       )}
     </div>
