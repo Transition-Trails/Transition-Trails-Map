@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-bg); }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); text-decoration: underline; }
+</style>
+</helmet>
+
+<div style="font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: var(--tt-bg); min-height: 100vh; padding: 56px 32px 96px;">
+<div style="max-width: 1000px; margin: 0 auto;">
+
+  <header style="border-bottom: 1px solid var(--tt-warm-gray); padding-bottom: 32px; margin-bottom: 48px;">
+    <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-deep-teal); margin: 0 0 16px;">Platform review</p>
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: 44px; line-height: 1.15; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 20px; max-width: 20ch; text-wrap: pretty;">Trail OS against the design system and its own documentation</h1>
+    <p style="font-size: 18px; line-height: 1.6; margin: 0 0 28px; max-width: 62ch; text-wrap: pretty;">Twenty-six findings across three areas. The design-system gap is the same one the public site had in July — no tokens, hand-approximated color, non-brand type — but it runs deeper here because Trail OS uses six extra hues to carry meaning. Two findings matter more than any of the visual work, and neither is a styling problem: RESOLVE is defined differently in Trail OS than in the Master Program Guide, and the coach ladder does not exist in the access model.</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; font-size: 14px;">
+      <div><p style="margin: 0 0 4px; color: var(--tt-slate); opacity: .7;">Source</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">Transition-Trails-Map @ main</p></div>
+      <div><p style="margin: 0 0 4px; color: var(--tt-slate); opacity: .7;">Reviewed</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">3 August 2026</p></div>
+      <div><p style="margin: 0 0 4px; color: var(--tt-slate); opacity: .7;">Scope</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">program-map frontend, repo docs</p></div>
+      <div><p style="margin: 0 0 4px; color: var(--tt-slate); opacity: .7;">Compared against</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">TTDS v2.0, Master Program Guide</p></div>
+    </div>
+  </header>
+
+  <section style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 56px;">
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+      <p style="font-family: 'Poppins', sans-serif; font-size: 40px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">12</p>
+      <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Blockers</p>
+      <p style="font-size: 14px; line-height: 1.5; margin: 0;">Ship as-is and Trail OS contradicts the brand or the program documentation in ways a coach or funder would notice.</p>
+    </div>
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+      <p style="font-family: 'Poppins', sans-serif; font-size: 40px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">11</p>
+      <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Rulings needed</p>
+      <p style="font-size: 14px; line-height: 1.5; margin: 0;">A decision from you unblocks the work. Most take a sentence; five are listed at the end of this document.</p>
+    </div>
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+      <p style="font-family: 'Poppins', sans-serif; font-size: 40px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">3</p>
+      <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Cleanup</p>
+      <p style="font-size: 14px; line-height: 1.5; margin: 0;">Mechanical. Safe to run any time after the token layer lands.</p>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 64px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">What the color actually is</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 62ch;">Trail OS defines its palette as HSL triplets in <code style="font-family: Menlo, monospace; font-size: 14px; background: var(--tt-sky-100); padding: 2px 6px; border-radius: 8px;">index.css</code>, hand-tuned rather than converted from the brand hexes. Converted back to hex, the drift is visible: the green is mintier, the teal is duller and darker, and the body text is a cool blue-grey where the brand is a warm grey-green.</p>
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; overflow: hidden; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.6fr; gap: 0; padding: 16px 24px; background: var(--tt-sky-100); border-bottom: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">
+        <p style="margin: 0;">Role</p><p style="margin: 0;">Trail OS today</p><p style="margin: 0;">TTDS</p><p style="margin: 0;">Reading</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.6fr; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 14px;">
+        <p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">Primary</p>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: #31724C; border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#31724C</code></div>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: var(--tt-trail-green); border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#2F6B3F</code></div>
+        <p style="margin: 0;">Lighter and mintier than Trail Green.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.6fr; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 14px;">
+        <p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">Secondary</p>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: #20646F; border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#20646F</code></div>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: var(--tt-deep-teal); border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#2F6F7E</code></div>
+        <p style="margin: 0;">Darker and duller than Deep Teal.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.6fr; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 14px;">
+        <p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">Accent</p>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: #EDA01D; border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#EDA01D</code></div>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: var(--tt-sun-amber); border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#F5A623</code></div>
+        <p style="margin: 0;">Close. The problem here is how often it is used, not the value.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.6fr; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 14px;">
+        <p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">Body text</p>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: #303541; border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#303541</code></div>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: var(--tt-slate); border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#4A4F4D</code></div>
+        <p style="margin: 0;">Cool blue-grey against a warm grey-green. This one sets the whole mood.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.6fr; align-items: center; padding: 18px 24px; font-size: 14px;">
+        <p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">Card surface</p>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: #EDE7DE; border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#EDE7DE</code></div>
+        <div style="display: flex; align-items: center; gap: 10px;"><span style="width: 28px; height: 28px; border-radius: 8px; background: var(--tt-white); border: 1px solid rgba(42,46,44,.12);"></span><code style="font-family: Menlo, monospace; font-size: 13px;">#FFFFFF</code></div>
+        <p style="margin: 0;">Beige card on a beige page. The border does all the separating.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 64px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px;">
+      <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Design system</h2>
+      <p style="font-size: 14px; margin: 0; opacity: .7;">12 findings</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 32px; max-width: 62ch;">Trail OS imports no design-system tokens. Everything below follows from that one fact.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-01</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">No design-system tokens are imported</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The app defines its own palette from scratch as HSL triplets in a local <code style="font-family: Menlo, monospace; font-size: 14px; background: var(--tt-sky-100); padding: 2px 6px; border-radius: 8px;">:root</code> block. Nothing links to the TTDS token files, so every brand decision has been re-derived by hand and can drift again.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — the same move that fixed the public site: add <code style="font-family: Menlo, monospace; font-size: 14px;">tokens.css</code> as the single source of truth and redefine the existing shadcn variables as aliases pointing at it. No component edits, no visual regression risk beyond the intended color correction.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-02</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">None of the brand typefaces are loaded</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Trail OS runs on Inter and Playfair Display. Inter is on the brand book's explicit avoid list; Playfair appears nowhere in TTDS. Poppins, Open Sans and Caveat are absent, and so is the Fraunces display ruling taken for the public site in July.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — Open Sans for body and UI, Poppins for H3–H4, buttons and labels, Fraunces for H1–H2 to match the site. Caveat has no role in an internal operations tool; leave it out rather than find a use for it.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-03</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Primary and secondary are approximations of the brand colors</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">See the comparison above. Neither the green nor the teal matches, and side by side with the public site the two products do not look like the same organization.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — resolved by TOS-DS-01. Once the variables alias the tokens, this corrects itself.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-04</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The app reads cool where the brand is warm</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Body and heading text resolve to a blue-grey. TTDS specifies Slate for body and Charcoal for headings — both warm, both with green in them. This single value does more to make Trail OS feel like a different product than any other finding here.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — resolved by TOS-DS-01. Worth looking at first after the token swap, because it changes everything at once.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-05</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Cards are beige on a beige page</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The card surface and the page background differ by about two percent in lightness, so the border carries the entire visual hierarchy. TTDS puts white cards on Trail Light, which is what gives the brand its airy feel.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — white cards, Sky tint for nested or secondary surfaces. This is a bigger perceptual change than it sounds, which is why it is a ruling rather than a fix.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-06</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Six non-brand hues carry meaning</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Emerald, sky, violet, indigo, rose, amber and slate appear in over fifteen hundred class strings in the page files alone — as status colors, as program colors, as card accents. TTDS has four colors and caps a surface at one or two backgrounds. This is the largest single visual gap, and unlike the others it cannot be fixed by a token swap.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — collapse to four semantic roles: success on Trail Green, information on Deep Teal, attention on Amber 700, neutral on Warm Grey. Where a category genuinely needs distinguishing, use one shape or icon difference rather than a new hue.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-07</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The amber rule is broken systemically</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Amber is doing four jobs in Trail OS: a warning status, a program color, the executive lens color, and sidebar chrome. The brand book allows one amber call to action per screen and forbids decorative use. Several admin screens carry a dozen amber elements and no amber button.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — the same ruling taken on the site in July: amber earns one primary action per screen. Status and warning move to Amber 700 as text on a light tint, never as fill, and never on the same screen as an amber button.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-08</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Corners are about half the brand radius</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Buttons render at six pixels and cards at twelve. TTDS specifies fourteen for buttons and inputs and twenty-two for cards, described as "soft and approachable". At current values Trail OS reads sharper and more technical than the brand intends.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — raise to the brand scale. In a dense operations tool this is a real aesthetic choice, not a compliance one, so it needs your eye on one screen before it goes everywhere.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-09</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Focus rings are one pixel</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Buttons and inputs use a one-pixel ring in the theme color. TTDS specifies a three-pixel Trail Green ring at low opacity, which is also the better accessibility answer for keyboard users on a data-dense tool.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — adopt the brand ring. Same correction already applied to the public site.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-10</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,28px">Cleanup</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Shadows and hover behavior are framework defaults</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Cards use the default shadow rather than the brand's soft low-contrast one, and nothing lifts on hover. TTDS asks for a three-pixel lift over about a sixth of a second — the gentle motion that carries the "calm confidence" the brand describes.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — token-level fix, applies everywhere at once.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-11</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Dark mode has no brand basis</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Trail OS ships a complete dark palette. TTDS v2.0 has no dark specification at all, so whatever dark mode looks like today is invention, and it is the version staff will use at night.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — either author dark tokens into TTDS v2.1 properly, or remove the theme until you want to. Leaving an unspecified dark mode in a tool you are documenting for funders is the option to avoid.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DS-12</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Type runs far below the brand's minimum sizes</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Interface text sits at eight, nine, ten and eleven pixels throughout — sidebar labels, badges, table cells, panel captions. The brand floor for labels and small text is fourteen. This is the app's largest accessibility exposure and the one a funder or a partner is most likely to raise.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — raise the floor to fourteen and let the layout absorb it. This is real work, not a find-and-replace: several dense tables and the collapsed sidebar were designed around the smaller sizes.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section style="margin-bottom: 64px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px;">
+      <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Documentation</h2>
+      <p style="font-size: 14px; margin: 0; opacity: .7;">8 findings</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 32px; max-width: 62ch;">Trail OS is better documented than most projects at this stage — a full specification, contribution guide, security policy, changelog and roadmap. The problem is not absence. It is that three documents describe three different products, and the gaps that remain are the ones a new coach or a funder would hit first.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-01</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The README and the working notes disagree about what is live</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The README lists Gemini and Agentforce as Phase 2 and Google OAuth as in progress. The working notes and the roadmap list Penny on Gemini, Agentforce, Gmail, Calendar, Drive and Google Auth as live. The README is the first thing anyone reads, and it currently understates the platform by six integrations.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — one integration table, generated from or manually mirrored to the readiness file the code already treats as authoritative. Everything else links to it.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-02</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The documented navigation is not the navigation in the app</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The working notes describe seven sidebar groups named Navigator, Operations Center, Demand Management, Penny Command Center, Knowledge Library, Collaboration and Administration. The sidebar actually renders Digital Twin, Operations, Programs, Penny, Knowledge, Collaboration and Administration. The README's table is the accurate one.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — the sidebar definition is already a single array. Document the structure once from that file and delete the second table.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-03</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The access tiers are stated more than one way</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The README describes four tiers including Super Admin. The sidebar and the access configuration gate on Everyday, Power and Admin. Whether Super Admin is a real tier or a label on the Admin tier needs confirming before it appears in a permissions matrix a funder reads.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — state the tier model once, in one file, and have the docs quote it.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-04</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The coach ladder does not exist in Trail OS</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Coach's Assistant, Associate Coach and Advanced Coach are central to the Master Program Guide and to how the verdict rework curve is meant to calibrate. Trail OS has no concept of them — access is Everyday, Power and Admin, resolved from Google Groups. This was already on your list as the coach calibration protocol; Trail OS is where it has to land.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — coach level is a separate axis from access tier. An Associate Coach and an Advanced Coach may both be Power users, but their verdicts have to be distinguishable. Model it as its own field before the dashboard is built against the specification.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-05</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">There is no data dictionary</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Thirty-three files and well over a megabyte of prototype data sit in the data folder, and nothing says which of it is real, which is illustrative, and which will be replaced by a live query. The working notes give this one line. Anyone demonstrating Trail OS is one click from a number they cannot defend.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — one table: file, what it holds, prototype or live, and what replaces it in Phase 2. This is also the fastest way to find out how much of the app is still illustrative.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-06</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">There is no design documentation</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">No token reference, no component usage guidance, no accessibility statement. There is an in-app UX standards page, which is the right instinct, but it is not reachable by anyone who has not logged in and it is not what a contractor or a new developer reads.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — a short design document in the repo that states the token source, the four semantic status roles, the amber rule, the type floor and the radius scale. Five hundred words prevents the next fifteen hundred hardcoded colors.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-07</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,28px">Cleanup</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The app still ships placeholder metadata</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The page title is "Program Map Dashboard" and the description reads "built on Replit. Update this description to reflect the app." That is the browser tab, the bookmark and the link preview any staff member sees.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — Trail OS, Transition Trails, plus a one-line internal description. Two minutes.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-DOC-08</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">No glossary reconciled to the Master Program Guide</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The terminology file governs platform labels — Trail Signals, Trail Insights, Penny, Mission Control — and does it well. But the words the programs run on appear nowhere: verdict, rework curve, squad, buddy pair, Base Camp, Decision Log. Penny coaches learners using this vocabulary.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — one glossary, owned by the Master Program Guide, referenced by Trail OS rather than restated in it.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section style="margin-bottom: 64px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px;">
+      <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Content and methodology</h2>
+      <p style="font-size: 14px; margin: 0; opacity: .7;">6 findings</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 32px; max-width: 62ch;">These matter more than the visual findings. Trail OS teaches RESOLVE through Penny, and right now it teaches a different RESOLVE.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-CON-01</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">RESOLVE is a different methodology inside Trail OS</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 16px;">Trail OS defines eight phases. The Master Program Guide defines seven. Only Recognize, Verify and Evolve appear in both.</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;">
+            <div style="background: var(--tt-sky-100); border-radius: 14px; padding: 18px;">
+              <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Trail OS today</p>
+              <p style="font-size: 15px; line-height: 1.7; margin: 0;">Recognize · Evaluate · Solve · Organize · Leverage · Verify · Execute · Evolve</p>
+            </div>
+            <div style="background: var(--tt-green-100); border-radius: 14px; padding: 18px;">
+              <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Master Program Guide</p>
+              <p style="font-size: 15px; line-height: 1.7; margin: 0;">Recognize · Explore · Select · Outline · Launch · Verify · Evolve</p>
+            </div>
+          </div>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — the Guide and the RESOLVE Handbook are the authority; Trail OS should be rewritten to the seven phases. Worth checking whether the eight-phase version predates the Handbook, because the two named phases that only exist in Trail OS suggest it was reconstructed from the acronym rather than from the source.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-CON-02</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,28px">Blocker</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">"Source mapping needed" is visible in the product</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Six of the eight phases carry that placeholder in their inputs, outputs, owner and implications fields, and the Execute phase is flagged as needing review with a note openly questioning whether it is a real phase. Those fields render in the app.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — fill them from the RESOLVE Handbook as part of the seven-phase rewrite. The confidence flag itself is a good pattern and worth keeping.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-CON-03</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Program roster needs reconciling</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The home screen colors four programs. The Master Program Guide now carries eight, including Trail of Mastery's four tracks, First Two Weeks and the three Explorer's tiers. Whether the program data behind Trail OS has kept up needs checking before anything is demonstrated from it.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — reconcile the program data against the Guide, same exercise as the public site in July.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-CON-04</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">"Trailhead" appears seventeen times</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">Most are legitimate references to Salesforce's actual platform — resource links, module maps — and those are fine. Two sit closer to the line the brand book draws: a standards field named "Trailhead Link", and coaching copy that offers learners "Trailhead mix-ins". The prohibition is on the term as Transition Trails vocabulary, not on naming an external platform.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — rename the field to "External Resource Link" and keep external references as plain references. Your call on how tightly to hold the line.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-CON-05</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">Ruling</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">"Trail Quests" is quest language</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">There is a Trail Quests surface in the Penny section and a Quest Master capability. The brand book rules out the Salesforce ecosystem's gamified vocabulary and asks for milestone and stage language instead. Quest sits in the same register as the terms it names.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — either confirm Trail Quests as deliberate house vocabulary and write it into the brand book, or rename. It is already centralised in the terminology file, so renaming is cheap now and expensive after learners see it.</p>
+        </div>
+      </article>
+
+      <article style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08); display: grid; grid-template-columns: 150px 1fr; gap: 28px;">
+        <div><p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">TOS-CON-06</p><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,28px">Cleanup</x-import></div>
+        <div>
+          <h3 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Emoji are carrying status</h3>
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px;">The README and roadmap use tick, hourglass and clipboard marks as their status system, and one screen renders a lightning bolt in front of a Penny mapping. The brand book is explicit that emoji are not part of the brand and that status is carried by an icon paired with text.</p>
+          <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-green-300);"><strong style="color: var(--tt-charcoal);">Recommendation</strong> — plain status words in the documents, the existing icon set in the interface.</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <sc-if value="{{ showSequence }}" hint-placeholder-val="{{ true }}">
+  <section style="margin-bottom: 56px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Suggested order</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 62ch;">Each step is safe to stop after, and none of them requires the next one to have happened.</p>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: grid; grid-template-columns: 44px 1fr; gap: 20px; align-items: start; background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--tt-trail-green); margin: 0;">1</p>
+        <div><p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Take the five rulings</p><p style="font-size: 16px; line-height: 1.6; margin: 0;">Fonts, dark mode, categorical color, the type floor, and who owns RESOLVE. Nothing else is safe to start until these are settled.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 44px 1fr; gap: 20px; align-items: start; background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--tt-trail-green); margin: 0;">2</p>
+        <div><p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Land the token layer</p><p style="font-size: 16px; line-height: 1.6; margin: 0;">Tokens as the source of truth, existing variables redefined as aliases, brand fonts, brand radius, brand focus ring, brand shadows. One file, no component edits. This closes seven findings at once and is the same change that worked on the public site.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 44px 1fr; gap: 20px; align-items: start; background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--tt-trail-green); margin: 0;">3</p>
+        <div><p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Fix RESOLVE</p><p style="font-size: 16px; line-height: 1.6; margin: 0;">Seven phases, filled from the Handbook, placeholders gone. Content work, entirely independent of the styling, and the finding with the most at stake because Penny teaches from it.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 44px 1fr; gap: 20px; align-items: start; background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--tt-trail-green); margin: 0;">4</p>
+        <div><p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Collapse the six hues to four roles</p><p style="font-size: 16px; line-height: 1.6; margin: 0;">One shared status map, then a sweep through the pages. Big and mechanical. This is the equivalent of the hex collapse still outstanding on the public site, and it should not start before the ruling in step one.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 44px 1fr; gap: 20px; align-items: start; background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--tt-trail-green); margin: 0;">5</p>
+        <div><p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Documentation set</p><p style="font-size: 16px; line-height: 1.6; margin: 0;">One README as truth, one integration table, a data dictionary, a design document, and the glossary pointed at the Master Program Guide. Then the type floor, which is the only remaining item that needs layout judgment rather than a decision.</p></div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ showDecisions }}" hint-placeholder-val="{{ true }}">
+  <section style="background: var(--tt-deep-teal); border-radius: 22px; padding: 40px 44px; color: var(--tt-white);">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; margin: 0 0 12px; color: var(--tt-white);">Five decisions</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 32px; max-width: 60ch; opacity: .9;">Everything else follows from these.</p>
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.2);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; margin: 0 0 6px; color: var(--tt-white);">Does an internal tool get the full brand type?</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0; opacity: .9;">Fraunces for H1 and H2 matches the public site but is unusual in an operations product. The alternative is Poppins for all headings and Fraunces reserved for outward-facing surfaces.</p>
+      </div>
+      <div style="padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.2);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; margin: 0 0 6px; color: var(--tt-white);">Keep dark mode or drop it?</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0; opacity: .9;">Keeping it means authoring dark tokens into the brand book. Dropping it is one line and removes an unspecified surface.</p>
+      </div>
+      <div style="padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.2);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; margin: 0 0 6px; color: var(--tt-white);">Do programs need their own colors?</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0; opacity: .9;">Trail OS currently gives each program a hue. Four brand colors cannot carry eight programs, so either the brand book gains a categorical ramp or programs are distinguished by label alone.</p>
+      </div>
+      <div style="padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.2);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; margin: 0 0 6px; color: var(--tt-white);">How far do you want to go on the type floor?</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0; opacity: .9;">Fourteen pixels everywhere is the brand answer and the accessible one, and it will make several dense screens taller. A staged version raises the worst cases first.</p>
+      </div>
+      <div>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; margin: 0 0 6px; color: var(--tt-white);">Confirm the Guide owns RESOLVE.</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0; opacity: .9;">If the seven phases in the Master Program Guide are authoritative, Trail OS gets rewritten. If the eight-phase version encodes something real, the Guide needs to change instead — and that affects Penny, the Decision Log and every program document.</p>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showSequence&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showDecisions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}"></script>
+</body>
+</html>

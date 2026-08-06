@@ -1,0 +1,644 @@
+TRAIL OS
+Knowledge Capability Guide
+Transition Trails — Internal Staff Reference
+Real Experience. Real Impact. On the Trail.
+Version
+1.0 — June 2026
+Classification
+Internal — Staff & Contractors Only
+Audience
+Angela, Kim, Michele, Hugh
+Capability Status
+In Build — SOP record type in production, custom fields and articles in progress
+Owner
+Angela (Executive Director)
+Parent System
+Trail OS — Salesforce Platform
+Review Cycle
+Quarterly or upon major build milestone
+About This Guide
+This guide documents the Knowledge capability within Trail OS — Transition Trails's Salesforce-based operating system. It covers the architecture, article types, data category structure, authoring and publishing workflow, tag taxonomy, object relationships, and governance standards.
+Sections marked IN BUILD document the designed architecture for components not yet deployed. These sections are accurate as designed — they will not require rewriting when the component goes live, only a status update.
+## 1. What Is the Knowledge Capability
+The Knowledge capability is the structured content library within Trail OS. It is the single authoritative source for all operational procedures, program curriculum, Navigator resources, and published content at Transition Trails.
+Knowledge is not a file storage system or a document library. It is a governed, searchable, role-aware content platform built on Salesforce Knowledge that connects directly to Penny (Agentforce), Experience Cloud, and the Demand Management pipeline.
+## 1.1 What Knowledge Is For
+Content Type
+What It Contains
+Who It Serves
+SOPs
+Step-by-step operational procedures for running Trail OS, managing programs, governing the org, and operating all connected systems
+Angela, Kim, Michele, Hugh, coaches
+Curriculum Content
+Build with Me videos, Tango walkthroughs, how-to guides, best practice guides, Trail Kit resources for active Navigators
+Navigators, Trail of Mastery students, and coaches
+Trail Kit Resources
+Templates, checklists, and reference materials for Navigators at each program phase
+Navigators in active cohorts
+Content Library
+Published Substack articles, LinkedIn articles, and social media reference copy
+Internal staff reference
+Best Practice Guides
+Salesforce and nonprofit configuration standards for client delivery
+Nonprofit clients, coaches, Navigators
+## 1.2 What Knowledge Is Not
+Not Google Drive. Active working documents, campaign files, Canva assets, and draft content stay in Google Drive. Knowledge is for finished, governed content only.
+Not a file storage system. Videos, PDFs, and large files are hosted externally (Google Drive, Loom, YouTube). Knowledge holds the structured article that references and contextualizes those files.
+Not a wiki. Every article goes through a governed authoring and publishing workflow. Nothing is ad hoc. Angela is the publisher for every article.
+Not public by default. All articles are currently internal only. Visibility expands to Navigators, clients, and public audiences on a controlled schedule as the program matures.
+## 1.3 Current Build Status
+IN PRODUCTION
+SOP record type is live in the production org. The record type, page layout, and Lightning record page have been deployed and are available. Custom fields are actively being built. Test articles have been created.
+SOP Record Type
+In production. Record type, layout, and Lightning page deployed.
+SOP Custom Fields
+In build. 16 fields designed and being deployed to production.
+Data Categories
+In production. All three category groups are configured with full subcategory trees.
+SOP Articles
+Not yet started. Build sequence: fields first, then articles.
+Curriculum Content Type
+In design. Architecture complete, not yet deployed.
+Notion → Make → SF Sync
+In design. Fields designed on the Knowledge object, Make scenario not yet built.
+Tag Taxonomy
+In design. Approved tag list defined, not yet configured in Knowledge Settings.
+Penny Integration
+In design. GetRelevantKnowledge action is designed, not yet configured.
+## 1.4 How Knowledge Fits in Trail OS
+Knowledge connects to four other Trail OS capabilities:
+Demand Management
+Every change request that results in a new or updated SOP closes with a link to the relevant Knowledge article. Bug Fix cases link to the article that documents the expected behavior. Training Issue cases route directly to Knowledge.
+Agentforce & Penny
+Penny uses the GetRelevantKnowledge action to surface articles to Navigators, coaches, and clients in real time. She routes by the Applies To field on SOPs and by Audience and Program Track tags on Curriculum Content.
+Experience Cloud
+Published articles are surfaced on the Navigator portal and (eventually) the public site. Visibility is controlled by Data Category settings per user profile.
+Integrations
+The Notion → Make → Salesforce nightly sync is the authoring pipeline. Notion is the draft environment. Make detects status changes and creates draft articles in Salesforce. Angela is the publish gate after sync.
+## 2. Article Types
+Trail OS uses two Knowledge record types. The record type determines the fields on the layout, the content structure, and how Penny routes the article. Choosing the wrong record type is the most common authoring error — it cannot be corrected without archiving and recreating the article.
+The Decision Rule
+If the article answers "how do I operate Trail OS or run this process," it is an SOP.
+If the article answers "how do I learn this or do this as a Navigator or client," it is Curriculum Content.
+When in doubt: who is the reader, and what are they trying to accomplish?
+## 2.1 Article Type: SOP
+SOP — Standard Operating Procedure   |   IN PRODUCTION
+An SOP documents how to perform a specific operational task within Trail OS. It is written for someone who needs to complete a process — not someone who needs to learn a concept.
+SOPs fall under all three Data Category groups, depending on their topic. They are authored in Notion, synced via Make, reviewed by Angela, and published to Salesforce. Every SOP has an owner department and a review frequency.
+## SOP — Field Reference
+Group A — Content Fields (Center Panel — Reading Order)
+Field Label
+API Name
+Type
+Panel
+Purpose / Help Text
+Overview
+Overview__c
+Rich Text
+Center
+What this SOP covers, why it matters, and who it is for. 2-4 sentences. The reader's orientation before they start.
+Prerequisites
+Prerequisites__c
+Rich Text
+Center
+Everything needed before starting. Access, prior SOPs, and tools. Numbered list or checkboxes.
+Procedure
+Procedure__c
+Rich Text
+Center (dominant)
+The numbered steps. Supports inline screenshots. The most detailed and prominent field on the layout.
+Notes & Exceptions
+Notes__c
+Rich Text
+Center
+Gotchas, edge cases, common mistakes. Kept separate from Procedure so the steps stay clean and readable.
+Group B — Reference & Support Fields (Right Panel)
+Field Label
+API Name
+Type
+Panel
+Purpose / Help Text
+Tango URL
+Tango_URL__c
+URL
+Right
+Direct link to the Tango interactive walkthrough. Penny can surface this independently without pulling the full procedure.
+Related Articles
+Related_Articles__c
+Rich Text
+Right
+Links to related SOPs, Trailhead badges, and external documentation. Include a short note explaining the relevance of each link.
+Applies To
+Applies_To__c
+Multi-select
+Left
+Which TT roles is this SOP for? Values: Salesforce Admin, Learner, Coach, Client. Penny uses this for routing. A SOP can apply to more than one role.
+Group C — Classification & Metadata (Left / Right / Highlights)
+Field Label
+API Name
+Type
+Panel
+Purpose / Help Text
+Owner Department
+Owner_Department__c
+Picklist
+Left
+Which TT department owns this SOP? Values: Academy, Client Services, Operations, Marketing, Finance, Technology.
+Difficulty Level
+Difficulty_Level__c
+Picklist
+Right
+Beginner / Intermediate / Advanced. Penny uses this to match SOPs to the learner stage.
+Estimated Time (Min)
+Estimated_Time_Minutes__c
+Number
+Highlights
+Realistic time to complete in minutes. Shown in the highlights panel. Example: 15 for a quick config, 60 for a full setup.
+Last Tested Version
+Last_Tested_Version__c
+Text(50)
+Right
+Salesforce released this SOP, which was last verified against. Format: Spring '26. Update after every Salesforce release.
+Review Frequency
+Review_Frequency__c
+Picklist
+Right
+Monthly / Quarterly / Annually / As Needed. Default: Quarterly. Controls the review cycle and Next Review Date calculation.
+Group D — Review & Dates (Right Panel)
+Field Label
+API Name
+Type
+Panel
+Purpose / Help Text
+Last Reviewed Date
+Last_Reviewed_Date__c
+Date
+Right
+Set to today when Angela reviews and confirms the SOP is accurate. Do not set unless actually reviewed — this date is the team's trust signal.
+Group E — Notion Sync Fields (Left Panel — Managed by Make)
+IN BUILD — Notion Sync Fields
+These fields are designed and will be deployed as part of the Notion → Make → Salesforce sync build. They are now included in the SOP layout, so no layout rebuild is needed when the sync goes live.
+Do not populate these fields manually. They are managed exclusively by the Make automation.
+Field Label
+API Name
+Type
+Panel
+Purpose / Help Text
+Notion Sync Status
+Notion_Sync_Status__c
+Picklist
+Left
+Managed by Make. Values: Draft / Synced to SF - Pending Review / Published / Sync Failed. Do not edit manually.
+Notion Source URL
+Notion_Source_URL__c
+URL
+Left
+Auto-populated by Make. Links back to the original Notion page. Click to open the source draft.
+Notion Page ID
+Notion_Page_ID__c
+Text(50)
+Left
+The dedup key for the nightly sync. Prevents duplicate articles on subsequent runs. Do not edit manually.
+Native Fields — Add to Layout, Do Not Recreate
+Field Label
+API Name
+Type
+Panel
+Purpose / Help Text
+Next Review Date
+NextReviewDate
+Date (native)
+Right
+Calculated automatically from Last Reviewed Date and Review Frequency. Do not edit manually.
+Validation Status
+ValidationStatus
+Picklist (native)
+Highlights
+Shows whether the article has been formally validated. Angela manages the publishing workflow.
+Data Category
+DataCategorySelection
+Category (native)
+Left
+This IS the Area classification. Do not create a separate Area picklist. Select from: Mission & Delivery, Operations & Business, Technology & Trail OS.
+## SOP — Lightning Page Layout
+Highlights Panel
+Title, Article Number, Publication Status, Validation Status, Owner Department, Estimated Time (Minutes), Difficulty Level
+Left Panel (25%)
+Record Type, Owner Department, Data Category (Area), Applies To, Created By, Created Date, Version Number, Notion Sync Status, Notion Source URL, Notion Page ID, First Published, Last Published
+Center Panel (50%)
+Overview → Prerequisites → Procedure (dominant) → Notes & Exceptions — stacked in reading order. The procedure takes the most vertical space.
+Right Panel (25%)
+Visibility checkboxes (Internal / Customer / Partner / Public). Review: Last Reviewed Date, Next Review Date, Review Frequency, Last Tested Version, Difficulty Level, Estimated Time. Tango URL. Related Articles. Assignment: Assigned To, Due Date, Note.
+## 2.2 Article Type: Curriculum Content
+Curriculum Content — Learning & Program Resources   |   IN BUILD
+IN BUILD
+The Curriculum Content article type is fully designed. Architecture, fields, and layout are locked. Deployment is scheduled as part of the Knowledge capability build sequence — after SOP custom fields are complete and the first SOP articles are created.
+Curriculum Content articles are what Navigators, Trail of Mastery students, and nonprofit clients consume as part of learning and program participation. They are not procedures for operating TT — they are the learning assets that the program delivers.
+Build with Me videos, Tango walkthroughs, Trail Kit resources, best practice guides for nonprofits, and the Content Library all use this article type.
+## Curriculum Content — Field Reference
+Field Label
+API Name
+Type
+Panel
+Purpose / Help Text
+Title
+(Standard)
+Standard
+Header
+Follow naming convention: [Format] — [Topic] — [Difficulty] — [Program Track]
+Summary
+(Standard)
+Text Area
+Header
+2-3 sentence preview shown in search results and Penny's responses
+Body
+(Standard)
+Rich Text
+Center
+Full content. For video articles, include context, learning objective, and key timestamps here.
+Program Track
+Program_Track__c
+Picklist
+Left
+Foundations Trail / Guided Trail / Trail of Mastery / Explorers Journey / Digital Compass / All Programs
+Content Format
+Content_Format__c
+Picklist
+Left
+Build with Me Video / Tango Walkthrough / Step-by-Step Guide / Best Practice / Quick Reference / Template / Checklist / Decision Framework
+Difficulty Level
+Difficulty_Level__c
+Picklist
+Left
+Beginner / Intermediate / Advanced
+Estimated Time (Min)
+Estimated_Time_Minutes__c
+Number
+Highlights
+Time to complete, including watch/read and any hands-on practice
+Video URL
+Video_URL__c
+URL
+Right
+Link to Google Drive, YouTube unlisted, or Loom. The video file lives externally — this article is the structured wrapper.
+Tango URL
+Tango_URL__c
+URL
+Right
+Companion Tango interactive walkthrough if available, alongside the video or guide
+Before You Start
+Before_You_Start__c
+Rich Text
+Right
+Prerequisites — what the learner needs before accessing this content. Prior articles, access, tools.
+Learning Objective
+Learning_Objective__c
+Text Area
+Right
+What the learner can do after completing this content. One clear outcome statement.
+Related Content
+Related_Content__c
+Rich Text
+Right
+Links to related curriculum items, SOPs, or external resources with context notes
+## 2.3 Article Type Decision Guide
+If you are creating...
+Article Type
+Data Category
+A procedure for operating Trail OS
+SOP
+Technology & Trail OS
+A board or governance procedure
+SOP
+Operations & Business → Board Management
+A finance or HR procedure
+SOP
+Operations & Business
+A program delivery procedure
+SOP
+Mission & Delivery
+A client service procedure
+SOP
+Mission & Delivery → Nonprofit Client Services
+A Build with Me video
+Curriculum Content
+Technology & Trail OS → Build with Me
+A Tango walkthrough (standalone)
+Curriculum Content
+Technology & Trail OS
+A Trail Kit resource for Navigators
+Curriculum Content
+Mission & Delivery → Trail Kits
+A best practice guide for nonprofits
+Curriculum Content
+Technology & Trail OS → Best Practices
+A Substack or LinkedIn article
+Curriculum Content
+Mission & Delivery → Content Library
+A client-facing how-to guide
+Curriculum Content
+Mission & Delivery → Nonprofit Client Services
+## 3. Data Categories
+Data Categories are the classification and visibility engine for all Knowledge articles. They control who can see what, organize the library into a navigable hierarchy, and enable Penny to filter content by topic area. Salesforce limits active category groups to three. Trail OS uses all three.
+Critical Rule
+The Data Category on an article is the AREA classification. Do not create a separate Area picklist field on any article type — that is a duplicate. Data Category IS the area. Select it from the category tree when creating or editing any article.
+## 3.1 The Three Category Groups
+Category Group
+Covers
+Primary Authors
+Status
+Mission & Delivery
+Programs, cohorts, clients, Trail Kits, content library
+Angela, coaches
+In Production
+Operations & Business
+Board, HR, Finance, Legal, Marketing & Brand
+Kim, Kel, Angela
+In Production
+Technology & Trail OS
+Demand Management, Salesforce config, Experience Cloud, Integrations, AI
+Angela, Kim
+In Production
+## 3.2 Mission & Delivery — Full Structure
+Mission & Delivery
+Academy Programs
+RESOLVE Methodology  ·  Foundations Trail  ·  Guided Trail  ·  Trail of Mastery  ·  Explorer's Journey  ·  Digital Compass
+Cohort Management
+Onboarding a Navigator Cohort  ·  Waitlist Management  ·  Application Process  ·  Learner Onboarding
+Nonprofit Client Services
+Hartford Promise  ·  CLYLP  ·  KC Global One
+Service Delivery Standards
+Cross-program quality and delivery standards
+Trail Kits
+Onboarding Resources  ·  Active Project Resources  ·  Portfolio Build Resources  ·  Job Search Resources
+Content Library
+Substack Articles  ·  LinkedIn Articles  ·  Social Media Posts
+## 3.3 Operations & Business — Full Structure
+Operations & Business
+Board Management
+Governance Foundation  ·  Meeting Management  ·  Officer Responsibilities  ·  Board Compliance  ·  Board Development  ·  Board Reporting
+HR & Volunteers
+Paid Volunteers (1099)  ·  Unpaid Volunteers  ·  Roles & Accountability  ·  HR Compliance  ·  Future Employment
+Legal & Compliance
+Organizational legal reference and compliance documentation
+Finance & Budgeting
+Wave Accounting  ·  Budget Management  ·  Payroll & Compensation  ·  Financial Compliance  ·  Grant Readiness
+Grant Reporting & Outcomes
+Program outcomes reporting  ·  Funder stewardship  ·  Impact documentation
+Marketing & Brand
+Brand & Identity  ·  Content Strategy  ·  Social Media  ·  Email & Campaigns  ·  Donor Communications
+## 3.4 Technology & Trail OS — Full Structure
+Technology & Trail OS
+Demand Management
+Case Intake & Triage  ·  RESOLVE Evaluation Process  ·  Bug Fix Process  ·  Automation Management  ·  Technical Change Track  ·  Client Request Management  ·  Process & Documentation Track  ·  Demand Management Reporting
+Salesforce Setup
+Core Setup & Org Management  ·  NPSP & Nonprofit Cloud  ·  Data Management  ·  Automation & Flow  ·  Agentforce & Einstein  ·  Knowledge & Content  ·  Build with Me — Salesforce
+Experience Cloud
+Site Setup & Configuration  ·  Components & Layout  ·  User Management  ·  Content Publishing  ·  Integrations  ·  Best Practices  ·  Build with Me — Experience Cloud
+Integration Tools
+JotForm  ·  Make  ·  Zapier  ·  Pabbly  ·  Membrane  ·  API & Connected Apps (Buffer, Notion, Canva, GA4 & Analytics)
+Penny & AI
+Penny Configuration  ·  ChatGPT  ·  Claude  ·  Gemini
+## 3.5 Visibility — Current and Future
+All three category groups are currently set to Internal Only. This is deliberate. The expansion path is controlled and sequenced:
+Visibility Level
+Who Sees It
+When It Activates
+What Gets Opened
+Internal Only
+Angela, Kim, Michele, Hugh
+Now — current state
+All articles across all three groups
+Navigators
+Authenticated Navigator portal users
+Cohort 1 launch
+Trail Kits, Curriculum Content for their program track
+Nonprofit Clients
+Authenticated client portal users
+Per client engagement
+Client-specific SOPs, service delivery guides
+Public
+Unauthenticated Experience Cloud visitors
+Future — Angela's decision
+Select best practice guides, program explainers
+Changing Visibility Is a Demand Management Request
+Changes to Data Category visibility affect what Penny surfaces and what Experience Cloud shows to unauthenticated visitors. Never change visibility settings directly without first logging a Demand Management case.
+Change Category: Technical  |  Change Type: Configuration Change  |  Requires RESOLVE: check if it affects client or public access
+## 4. Authoring & Publishing Workflow
+Every Knowledge article at Transition Trails follows a governed workflow from first draft to live article. Angela is the human gate at the publish step — nothing goes live without her explicit action. This is enforced by the Salesforce workflow, not just policy.
+## 4.1 Current Workflow — SOP Record Type
+Current State — Manual Authoring Directly in Salesforce
+While the Notion → Make → Salesforce sync is in build, SOPs are authored directly in Salesforce Knowledge. This is the current workflow for all four staff members.
+Go to Service Console → Knowledge → New. Select SOP as the record type.
+Set the Data Category. Select the correct category from the tree. This is the most important field — do not skip it or set it incorrectly. It cannot be changed after publication without admin access.
+Set classification fields first. Owner Department, Applies To, Difficulty Level, Estimated Time, Review Frequency. Set these before writing content.
+Write the content fields in order. Overview → Prerequisites → Procedure → Notes & Exceptions. Write Procedure as numbered steps. Embed screenshots inline using the rich text image button.
+Add reference fields. Tango URL (if walkthrough exists), Related Articles with context notes, Last Tested Version.
+Save as Draft. Status = Draft. Do not publish yet.
+Notify Angela. Let Angela know the article is ready for review. She will edit if needed and publish.
+Angela reviews and publishes. Angela opens the draft, reviews all fields, makes edits if needed, and clicks Publish. Status moves to Online. The article is live.
+## 4.2 Future Workflow — Notion → Make → Salesforce Sync
+IN BUILD — Nightly Notion → Make → Salesforce Sync
+IN BUILD
+The Notion → Make → Salesforce sync is designed and will replace the manual authoring workflow once deployed. The sync fields (Notion_Page_ID__c, Notion_Source_URL__c, Notion_Sync_Status__c) are already on the SOP layout in anticipation.
+This section documents the designed workflow. It will be activated without requiring changes to the article layout or category structure.
+Stage 1 — Draft in Notion
+The author writes SOP in Notion using the standard template. Sets SF Data Category, SF Record Type = SOP, and Owner Department in Notion template fields.
+Stage 2 — Ready for Review
+Author sets Notion Status = Ready for Review. This is the human trigger that activates the nightly Make sync.
+Stage 3 — Nightly Make Sync
+Make automation runs nightly. Detects Status = Ready for Review. Creates a draft Knowledge article in Salesforce. Maps all content fields. Sets Notion Sync Status = Synced to SF - Pending Review.
+Stage 4 — Angela Reviews
+Angela opens the draft in Salesforce Knowledge. Reviews all four content fields. Checks Data Category, classification fields, Tango URL, and Estimated Time.
+Stage 5 — Angela Edits (if needed)
+Angela edits any field directly in Salesforce. Salesforce becomes the record of truth from this point onward. Notion holds the draft history only.
+Stage 6 — Angela Publishes
+Angela clicks Publish. Status → Online. Notion Sync Status → Published (Make updates automatically). This is the final human gate.
+Stage 7 — Article Live
+Article immediately visible to all internal Salesforce users. Penny can surface it. Experience Cloud visibility follows Data Category settings.
+Stage 8 — Sync Failure Protocol
+If Notion Sync Status = Sync Failed: check Make automation run history immediately. Log a Demand Management case with Change Type = Automation Change. Do not publish manually until the root cause is identified.
+## 4.3 Review Cycle
+Every published article has a review schedule defined by the Review Frequency field. Angela is responsible for the review cycle on all articles. The Next Review Date is calculated automatically from Last Reviewed Date + Review Frequency.
+Monthly
+Any SOP touching an active automation or integration. These break silently when platform updates occur.
+Quarterly (Default)
+All Salesforce configuration SOPs. Salesforce releases three times per year — config SOPs must be verified after each release.
+Annually
+Stable reference articles, governance documents, HR policies, and legal compliance documentation.
+As Needed
+Content library articles and Trail Kit resources that do not have a technical expiry. Review triggered by program changes, not calendar.
+## 4.4 Naming Convention
+Every article must follow this naming convention. Consistent naming makes search results readable and is required for Penny to surface articles reliably.
+Naming Format
+[Format] — [Topic] — [Difficulty] — [Program Track]
+SOP — Cohort Onboarding Process — Intermediate — Guided Trail
+SOP — Configure Einstein Activity Capture — Advanced — Internal Staff
+Build with Me — Custom Objects for Demand Management — Intermediate — Trail of Mastery
+Trail Kit — Portfolio Documentation Checklist — Beginner — Guided Trail
+Best Practice — Experience Cloud Security Settings — Advanced — All Programs
+When Format is SOP
+SOPs always start with "SOP —". The format tag is always the first element. This makes it immediately clear in search results that an article is a procedure rather than a learning resource.
+## 5. Tag Taxonomy
+IN BUILD — Tags configured after SOP custom fields are complete
+Tags complement Data Categories. Categories answer where does this content live. Tags answer what else this content is about. A single article can carry tags from multiple dimensions, making it findable from multiple angles without duplicating it across categories.
+Guided Tags — Controlled Vocabulary
+Trail OS uses Guided Tags — the approved list is managed in Setup → Knowledge Settings → Article Tags. Only tags on the approved list can be applied to articles.
+Do not create new tags without logging a Demand Management case. Tag sprawl degrades Penny's routing accuracy and makes the library harder to maintain.
+Change Type for new tag requests: Process & Documentation → Process Change.
+## 5.1 The Six Tag Dimensions
+Dimension
+Purpose
+Approved Tags
+Audience
+Who is this content for
+Navigator  ·  Coach  ·  Trail-of-Mastery-Student  ·  Nonprofit-Client  ·  Internal-Staff  ·  Board-Member  ·  Donor  ·  Public
+Program Track
+Which program does this belong to
+Foundations-Trail  ·  Guided-Trail  ·  Trail-of-Mastery  ·  Explorers-Journey  ·  Digital-Compass  ·  All-Programs
+Content Format
+What kind of content is it
+Build-with-Me-Video  ·  Tango-Walkthrough  ·  Step-by-Step-Guide  ·  Best-Practice  ·  Quick-Reference  ·  Template  ·  Checklist  ·  Decision-Framework
+Difficulty
+Complexity level
+Beginner  ·  Intermediate  ·  Advanced
+Salesforce Product
+Which Salesforce product does this touch
+Core-Salesforce  ·  NPSP-Nonprofit-Cloud  ·  Experience-Cloud  ·  Agentforce  ·  Einstein-Activity-Capture  ·  Flow-Builder  ·  Knowledge  ·  DevOps-GitHub  ·  Sales-Engagement
+Delivery Purpose
+How is this content used
+Curriculum  ·  Internal-SOP  ·  Client-Deliverable  ·  Best-Practice  ·  Reference-Only  ·  Demand-Management
+## 5.2 Tagging Examples
+Article Title
+Data Category
+Tags Applied
+SOP — Configure EAC — Advanced
+Technology & Trail OS → Salesforce Setup → EAC
+Internal-Staff  ·  Advanced  ·  Einstein-Activity-Capture  ·  Step-by-Step-Guide  ·  Internal-SOP
+Build with Me — Custom Objects for Demand Management — Intermediate
+Technology & Trail OS → Demand Management
+Trail-of-Mastery-Student  ·  Intermediate  ·  Core-Salesforce  ·  Build-with-Me-Video  ·  Curriculum  ·  Demand-Management
+Trail Kit — Portfolio Documentation Checklist
+Mission & Delivery → Trail Kits → Portfolio Build Resources
+Navigator  ·  Guided-Trail  ·  Beginner  ·  Checklist  ·  Curriculum
+Best Practice — Experience Cloud for Nonprofits
+Technology & Trail OS → Experience Cloud → Best Practices
+Nonprofit-Client  ·  Navigator  ·  Intermediate  ·  Experience-Cloud  ·  Best-Practice  ·  Client-Deliverable
+SOP — Board Meeting Minutes Process
+Operations & Business → Board Management → Meeting Management
+Internal-Staff  ·  Beginner  ·  Step-by-Step-Guide  ·  Internal-SOP  ·  Reference-Only
+## 6. Object Relationships
+Knowledge articles connect to other Trail OS objects. Understanding these connections is essential for maintaining data integrity, for closing Demand Management cases correctly, and for understanding how Penny finds and surfaces content.
+## 6.1 Knowledge → Demand Management (Case)
+The most important relationship in Trail OS. Every Demand Management case that results in new or changed content closes with a link to the relevant Knowledge article.
+New SOP / Procedure case
+When the SOP is published, link it in the Related Knowledge Article field on the case before closing. Status: Closed — Complete.
+Process Change case
+When the affected article is updated and republished, link it before closing. If multiple articles were updated, link the primary one and note the others in the Resolution Description.
+Bug Report case
+Two links: (1) the article documenting expected behavior that was violated, (2) any article updated as a result of the fix. Check Knowledge Update Needed before closing.
+Training Issue case
+Penny searches Knowledge and surfaces the top matching articles. The closing article is linked before the case closes as a Training Issue. If no article exists, a new SOP request is logged.
+Client Request case
+Client-specific articles can be linked to both the case and the client's Account record for future reference.
+## 6.2 Knowledge → Account
+Client-specific SOPs and Trail Kit resources can be linked to the relevant nonprofit Account record. This enables Penny to surface client-relevant content when working on a client Case and gives the account team a complete view of the documentation for each client.
+When to Link an Article to an Account
+When a SOP is written specifically for a client's Salesforce configuration, link it to their Account.
+When a Trail Kit resource is customized for a specific client cohort, link it to the Account.
+General best-practice guides and internal SOPs do not require Account links.
+## 6.3 Knowledge → Opportunity
+Best-practice guides and client-deliverable articles can be linked to open Opportunities during the pre-sales and discovery phases. This surfaces relevant content during client conversations and builds the engagement documentation package.
+## 6.4 Knowledge → Penny (Agentforce)
+IN BUILD — Penny GetRelevantKnowledge Action
+IN BUILD
+Penny's GetRelevantKnowledge action is designed and will be configured as part of the Agentforce & Penny capability build. The Knowledge architecture — article types, Applies To field, tag taxonomy — has been built to support Penny from Day 1.
+This section documents the intended behavior so that staff understand how Knowledge articles should be structured to surface correctly in Penny.
+Penny uses the GetRelevantKnowledge Agentforce action to find and surface articles in real time. She searches the title, summary, body, and tags. She filters by specific fields depending on the context:
+For SOP articles
+Penny filters by the Applies To field. A Navigator asking a question gets articles where Applies To includes Learner. A coach gets articles where "Applies To" includes "Coach". Internal staff get all articles.
+For Curriculum Content
+Penny filters by Audience tag and Program Track tag simultaneously. A Guided Trail Navigator gets content tagged as "Navigator + Guided-Trail". A Trail of Mastery student gets Trail-of-Mastery-Student content.
+For Demand Management cases
+Penny surfaces articles relevant to the Change Type. Training Issue cases get the top 3 matching SOPs. Bug Report cases receive the SOP that documents the expected behavior for the affected component.
+For Client Request cases
+Penny pulls the Account record first, surfaces prior cases for that client, then searches for articles tagged Client-Deliverable or Nonprofit-Client that match the request topic.
+Tango URL surfacing
+Penny can surface just the Tango_URL__c field without returning the full procedure text. Used when a Navigator needs the interactive walkthrough rather than the written steps.
+What prevents Penny from finding an article
+Notion Sync Status is not published. The Applies To field is empty on an SOP. No Audience tag on a Curriculum Content article. Naming convention not followed — title search returns poor matches.
+## 6.5 Knowledge → Notion (Sync Pipeline)
+IN BUILD — Notion Source Fields
+The three Notion sync fields on the SOP article type create the connection between the Notion draft environment and Salesforce Knowledge as the published record of truth.
+Notion_Page_ID__c
+The dedup key. If this field is populated on an existing Salesforce article, the nightly Make sync updates the record instead of creating a duplicate. Set by Make at first sync. Never edit manually.
+Notion_Source_URL__c
+Links back to the original Notion draft. Allows Angela to click through to the draft history and authoring context. Populated automatically by Make.
+Notion_Sync_Status__c
+The state machine for the sync workflow. Values: Draft → Synced to SF - Pending Review → Published → Sync Failed. Managed by Make. Angela moves to Published by clicking Publish in Salesforce.
+## 7. Governance
+Trail OS Knowledge is only as useful as the discipline behind it. These are the standing rules that keep the library accurate, searchable, and trustworthy.
+## 7.1 The Non-Negotiables
+Angela is the only person who publishes Knowledge articles. No exceptions. Kim, Michele, and Hugh author and draft — Angela publishes. This is enforced by Salesforce workflow permissions.
+No article is created without a Data Category assigned. A miscategorized article is worse than no article — it either surfaces to the wrong audience or disappears from search entirely.
+No article is created without following the naming convention. Inconsistent naming breaks Penny's title search and makes the library un-navigable.
+No new tags are created without a Demand Management request. Tag sprawl degrades Penny's routing accuracy. All new tags go through the approval process.
+Notion sync fields are never edited manually. Notion_Page_ID__c, Notion_Source_URL__c, and Notion_Sync_Status__c are managed exclusively by Make automation. Manual edits break the dedup logic, creating duplicate articles.
+Wrong article type = archive and recreate. You cannot change the record type on an existing Knowledge article. If the wrong type was used, archive the article and create a new one with the correct type. Do not attempt to work around this.
+## 7.2 Quarterly Review Responsibilities
+Owner
+Task
+Trigger
+Where
+Angela
+Review all articles with Next Review Date in the quarter. Update Last Reviewed Date and Last Tested Version.
+Calendar — every quarter
+Salesforce Knowledge
+Angela
+Review the automation run history. Investigate any Sync Failed status articles.
+Calendar — every quarter
+Make dashboard
+Kim
+Review all Operations & Business articles for accuracy. Flag anything needing update to Angela.
+Calendar — every quarter
+Salesforce Knowledge
+Kim
+Review open Demand Management cases with Knowledge Update Needed checked. Confirm updates are complete.
+Calendar — every quarter
+Service Console
+Angela
+Review tag taxonomy. Remove unused tags. Add approved new tags from resolved DM cases.
+Calendar — every quarter
+Setup → Knowledge Settings
+All authors
+After every Salesforce release, review owned articles for accuracy. Update the Last Tested Version if verified.
+Salesforce release (3x/year)
+Salesforce Knowledge
+## 7.3 When Things Go Wrong
+Sync Failed status appears
+Check the Make automation run history immediately. Identify the error. Log a Demand Management case with Change Type = Automation Change. Do not publish the article manually until the root cause is resolved and the sync is confirmed to be working.
+The article content is incorrect
+Do not archive. Edit the article directly in Salesforce and republish. If the error was caused by a process failure, log the correction in Lessons Learned on the related DM case.
+Wrong Data Category assigned
+Correct it directly in the article. No DM case needed for metadata corrections. Notify Angela so she can republish.
+Wrong article type used
+Archive the incorrectly typed article. Create a new article with the correct record type. Re-enter all content. Link the new article to any related DM cases.
+Duplicate article created
+Keep the article with the lower Article Number (the one created first). Archive the duplicate. Update Notion_Page_ID__c on the surviving article if the sync created the duplicate.
+Tag not in approved list
+Use the closest matching approved tag. Log a Demand Management case to add the new tag if genuinely needed. Change Type: Process Change.
+Angela is unavailable to publish
+Articles stay in Draft until Angela is available. There is no backup publisher. Urgent operational needs are handled by direct Salesforce access — not by bypassing the publish gate.
+## 7.4 Build Sequence — What Comes Next
+The Knowledge capability build follows this sequence. Do not skip steps — each builds on the previous.
+Complete SOP custom fields. All 16 custom fields were deployed to production and tested per the build log test plan.
+Seed the first SOPs. Priority order: Technology & Trail OS → Knowledge & Content first (the meta-SOPs about using Knowledge itself). Then Operations & Business → Board Management → Meeting Management (Q3 board meeting readiness). Then Mission & Delivery → Cohort Management (Cohort 1 prep).
+Configure tag taxonomy. Setup → Knowledge Settings → Article Tags. Add all six tag dimensions as guided tags. Test by applying tags to the first published SOPs.
+Build Curriculum Content article type. Deploy record type, fields, and layout to production. Create the first Trail Kit articles for Navigator onboarding.
+Build Notion → Make → Salesforce sync. Build Make scenario. Test with one draft SOP. Verify Notion_Page_ID__c dedup logic. Verify the Sync Failed alert path.
+Configure Penny GetRelevantKnowledge action. Part of Agentforce & Penny capability build. Knowledge must have sufficient articles for meaningful routing before Penny configuration is useful.
+## 7.5 Document History
+Version 1.0 — June 2026
+Initial release. Covers Knowledge capability architecture, article types, data categories, authoring workflow, tag taxonomy, object relationships, and governance. Author: Angela.
+Next Review
+September 2026 — Q3. Update build status sections as Curriculum Content, Notion sync, tags, and Penny are deployed. Kim to review operations sections.

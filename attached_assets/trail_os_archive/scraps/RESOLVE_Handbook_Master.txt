@@ -1,0 +1,326 @@
+The Master R.E.S.O.L.V.E. Methodology Handbook
+The Unified Problem-Solving Standard for Digital Transformation & Operations
+Document Metadata
+Title: The Master R.E.S.O.L.V.E. Methodology Handbook
+Classification: Institutional Core Standard
+Target Audience: Technical Builders, Business Analysts, Technology Champions, Accidental Admins, and Clients
+Primary Case Context: Horizon Community Hub (HCH) Case Study
+Table of Contents
+The Paradigm Shift: From Reactive Chaos to Systemic Architecture
+The R.E.S.O.L.V.E. Cross-Role Alignment Matrix
+The 7 Phases of R.E.S.O.L.V.E.: Deep Dive & Functional Specs
+Phase R: Recognize
+Phase E: Explore
+Phase S: Select
+Phase O: Outline
+Phase L: Launch
+Phase V: Verify
+Phase E: Evolve
+Mathematical Verification Models & Quantifiable ROI Formulas
+The Career Readiness Protocol (L-S-R Interview Guide)
+1. The Paradigm Shift: From Reactive Chaos to Systemic Architecture
+In modern digital ecosystems, organizations are consistently trapped in Reactive Chaos. In small businesses and non-profit organizations alike (such as the Horizon Community Hub), technology is frequently treated as a reactive band-aid. When operational systems begin to fail under pressure, the natural human instinct is to frantically request immediate software updates, custom integrations, or AI deployments: "We need a Salesforce Flow right now," or "We need a Slack integration to fix communications."
+This handbook enforces a disciplined pause. It is built on the core guiding principles established in "From Tool-User to Architect: A Beginner’s Guide to the RESOLVE Mindset" and "The_RESOLVE_Field_Manual.pdf":
+"Before you automate the work, understand the work. Clarity always comes before configuration. Automation does not fix confusion; it accelerates it."
+The R.E.S.O.L.V.E. methodology acts as an operational defense against guesswork and technical debt. It guides organizations from the "Triage Trap" (where users lose hours daily re-typing data) to a scalable, Security-First Digital Fortress.
+This handbook unifies four core identities into a single collaborative lifecycle:
+The Technical Builder (Salesforce Admin/Architect): Governs platform security, builds automation rules, and monitors system performance.
+The Business Analyst (BA): Translates stakeholder pain into requirements, documents data models, and leads user validation.
+The Accidental Admin / Tech Champion: Represents the internal operations lead who bridges daily nonprofit business realities with technology platforms.
+The Client (Sponsor/Business Owner): Actively co-designs, defines business goals, owns decisions, and validates solution value instead of demanding unvetted technical tools.
+2. The R.E.S.O.L.V.E. Cross-Role Alignment Matrix
+A high-functioning implementation requires that all actors understand their responsibilities. The matrix below synthesizes how each role executes across all seven stages, drawing on the organizational roles laid out in "RESOLVE Methodology for other Roles".
+Phase
+ | Technical Builder (Salesforce Admin)
+ | Business Analyst (BA)
+ | Accidental Admin (Tech Champion)
+ | Client / Stakeholder (Business Owner)
+ | 
+[R]ecognize
+ | Audits technical environments, databases, and structural system vulnerabilities.
+ | Identifies business pain, mission impact, and costs of organizational inaction.
+ | Identifies daily operational bottlenecks and manual data-entry fatigue.
+ | Articulates raw operational frustrations and avoids specifying platform tools.
+ | 
+[E]xplore
+ | Researches out-of-the-box platform capabilities and sandbox constraints.
+ | Maps current-state workflows, interviews users, and catalogues data.
+ | Tracks legacy shadow files, local Excel sheets, and unstructured emails.
+ | Walks the team through current processes including bypasses and workarounds.
+ | 
+[S]elect
+ | Evaluates architectural patterns (OWDs, household model) and documents trade-offs.
+ | Evaluates solutions against standard business requirements and budget.
+ | Reviews options for usability, training time, and user adoption.
+ | Approves solution path, owns chosen business trade-offs, and signs charter.
+ | 
+[O]utline
+ | Designs schema models, custom objects, and automation flow entry criteria.
+ | Writes INVEST user stories paired with Gherkin-style Acceptance Criteria.
+ | Outlines plain-language process briefs and local data inputs.
+ | Validates that proposed user stories accurately represent real scenarios.
+ | 
+[L]aunch
+ | Leads migration scripts, executes smoke tests, and deploys metadata to production.
+ | Leads data validation runs and manages user-facing training guides.
+ | Conducts a manual process pilot and runs process simulation checks.
+ | Allocates team testing time, attends training, and adopts the pilot.
+ | 
+[V]erify
+ | Conducts technical unit tests, performance load tests, and system health audits.
+ | Authors functional UAT scripts and tracks validation passes and failures.
+ | Monitors pilot user feedback and tracks data entry error rates.
+ | Participates in UAT, executes test scripts, and verifies actual business value.
+ | 
+[E]evolve
+ | Implements system validation rules, processes bugs, and clears technical debt.
+ | Triages post-launch requests, writing briefs for future system phases.
+ | Logs operational deviations and logs feedback in an Evolution Log.
+ | Submits structured requests for future optimization instead of ad-hoc fixes.
+ | 
+3. The 7 Phases of R.E.S.O.L.V.E.: Deep Dive & Functional Specs
+Phase R: Recognize
+Goal: Strip away technical assumptions and diagnose the underlying root cause of operational friction.
+During the Recognize phase, teams must practice strategic restraint. Builders, BAs, Champions, and Clients must resist the immediate "urge to fix." Jumping into technical configuration before defining the problem space is the primary driver of technical debt.
+The Toolkit: The 5 Whys & Process Flow Mapping (Current vs. Future State)
+For simple, linear issues, BAs and Champions use the 5 Whys technique to peel back symptoms. For complex, systemic organizational issues, teams must map the journey of work by building Current-State and Future-State Process Flows in draw.io. This mapping categorizes and visualizes organizational issues across three dimensions:
+People: Visualizes manual handoffs, staff shortages, manual data entry habits, or lack of software training (Current) vs. role-clear, training-aligned task execution (Future).
+Process: Maps uncoordinated intake channels, missing SLAs, or undocumented workflows (Current) vs. standardized, SLA-enforced routing logic and clear boundaries (Future).
+Technology: Exposes Excel silos, unsecure inbox architectures, or lack of relational database structures (Current) vs. a unified, secure database model (Future).
+Role Actions in Phase R:
+The Technical Builder: Audits standard data storage, reviews system logs, and inspects object limits and security holes.
+The Business Analyst: Leads root-cause workshops, interviews sponsors, and defines the Business Problem Statement.
+The Accidental Admin: Tracks the hours lost to "tab-hopping" and manual transcription.
+The Client: Cooperates with the BA to run diagnostic autopsies of their daily processes.
+HCH Scenario:
+Sarah (Support Coordinator) requests: "We need a complex Salesforce Flow and a new custom object to stop my email overload."
+The BA applies the 5 Whys:
+Why is Sarah overloaded? She has to review three uncoordinated inboxes every morning.
+Why does she review them? To locate and triage incoming client crisis and eviction notices.
+Why must she triage them manually? Because incoming requests have no priority flags or structured data formats.
+Why is there no structured format? Because clients submit applications via text, PDF, paper, or email body.
+Why do they use multiple unstructured channels? Because HCH has no single, public-facing portal or form.
+Root Cause: HCH has an unstructured data and channel fragmentation issue, not an email volume issue.
+
+================================================================================
+R.E.S.O.L.V.E. DELIVERABLE: AUTOMATION OPPORTUNITY SNAPSHOT
+================================================================================
+1. CURRENT SYMPTOM (The visible friction):
+   [e.g., Sarah is losing 10 hours/week manually copying eviction data from PDFs into Excel.]
+
+2. ROOT CAUSE (The structural process bottleneck):
+   [e.g., Unstructured crisis intake lacking validation rules, field constraints, or unified entry points.]
+
+3. MISSION RISK (The cost of doing nothing):
+   [e.g., Critical eviction response SLAs are missed; families lose housing; HCH violates federal grant SLA metrics.]
+================================================================================
+
+Phase E: Explore
+Goal: Map the current-state process and brainstorm potential solutions without committing to a build.
+The Explore phase is a divergent design phase. Its core concept is quantity over quality. The team brainstorms all possible solutions—including non-technical changes like staff training, process simplification, or security policy updates—before deciding what to build.
+Role Actions in Phase E:
+The Technical Builder: Explores AppExchange tools, evaluates standard Salesforce features, and checks platform limits.
+The Business Analyst: Maps current-state workflows, visualizes current-state handoffs, and interviews stakeholders.
+The Accidental Admin: Catalogues "shadow" IT systems, local spreadsheets, and unmonitored shared mailboxes.
+The Client: Explains current operations without hiding manual workarounds or "unofficial" Excel sheets.
+HCH Scenario:
+The BA maps Sarah's legacy process, revealing that information is printed, manually entered into a spreadsheet, and then manually checked against Salesforce Contact records. The team brainstorms several options to simplify intake:
+Option A: Experience Cloud Portal (High complexity, high capability).
+Option B: Salesforce Web-to-Case Form (Medium complexity, highly secure, native).
+Option C: Standardized third-party form connected via automated API (Low user friction, licensing cost).
+Option D: Manual process reorganization and standardized email guidelines (No-code, high manual effort).
+
+================================================================================
+R.E.S.O.L.V.E. DELIVERABLE: SHADOW SYSTEM INVENTORY
+================================================================================
+* System Name/Type: [e.g., Sarah's Master Eviction Excel Sheet]
+* Current Owner: [e.g., Program Support Team]
+* Core Fields Captured: [e.g., Client Name, Monthly Rent, Landlord Phone, Eviction Date]
+* Ingestion Strategy: [e.g., Map and migrate Excel columns to Contact & Case fields in CRM.]
+================================================================================
+
+Phase S: Select
+Goal: Commit to a specific solution with a clear understanding of its business tradeoffs.
+In Select, the team moves from brainstorm to design. Every technical solution has trade-offs. The team must document why they chose a specific path to defend the system architecture against future scope creep.
+Role Actions in Phase S:
+The Technical Builder: Selects standard vs. custom architectures and models security setups (e.g., setting Organization-Wide Defaults to Private).
+The Business Analyst: Screens options against business requirements, budget limits, and timeline constraints.
+The Accidental Admin: Scores candidates for ease of use, training requirements, and volunteer adoption.
+The Client: Accepts architectural tradeoffs (such as strict login security) and signs off on the final project charter.
+HCH Scenario:
+The team must choose an intake method. They evaluate Web-to-Case against a manual process reorganization. Web-to-Case is selected because it centralizes data and captures information securely. They also decide to set the Case security model to Private to protect sensitive Veteran financial data. The trade-off is documented: while a private sharing model requires setting up sharing sets later, it protects sensitive client records from unauthorized access.
+
+================================================================================
+R.E.S.O.L.V.E. DELIVERABLE: THE CO-DESIGN ADMIN DECISION LOG
+================================================================================
+DECISION ID: ADL-2026-004
+* Decision Point: [e.g., Case Security Access Architecture]
+* Solution Selected: [e.g., Private Organization-Wide Defaults (OWD)]
+* Alternative Evaluated: [e.g., Public Read/Write Access]
+* Technical Trade-off: [e.g., Protects sensitive client files, but requires configuring Sharing Sets in future sprints.]
+* Client Sign-off: [Formally Approved by Client Executive Sponsor]
+================================================================================
+
+Phase O: Outline
+Goal: Decompose the chosen solution into technical blueprints, database models, and user stories.
+In the Outline phase, business requirements are translated into technical specifications. The team decomposes broad business goals into actionable tasks using the Agile Hierarchy:
+Epic (The Mountain): The overarching business goal (e.g., "Foundational Architecture & Grant Compliance").
+Feature (The Room): A functional component (e.g., "Automated Case Intake Engine").
+User Story (The Brick): An actionable unit of work following the INVEST framework, paired with Gherkin-style Acceptance Criteria.
+Role Actions in Phase O:
+The Technical Builder: Drafts ERDs, maps custom field API names, and designs flow process logic.
+The Business Analyst: Writes user stories and Gherkin-style Acceptance Criteria (Given-When-Then).
+The Accidental Admin: Drafts plain-language business rules and defines required form inputs.
+The Client: Reviews user stories to verify that they accurately reflect real-world processes.
+HCH Scenario:
+The BA translates Sarah's intake requirements into a structured User Story:
+Story ID: S2-04
+Role: As a Support Coordinator,
+Action: I want an incoming eviction request to automatically create an urgent Case record with a 4-hour response SLA,
+Value: So that I can respond to critical housing emergencies and maintain grant compliance.
+
+================================================================================
+R.E.S.O.L.V.E. DELIVERABLE: PLAIN-LANGUAGE IMPROVEMENT BRIEF
+================================================================================
+1. INPUT TRIGGER:
+   - When a Veteran submits an online housing inquiry.
+
+2. MANDATORY FIELDS REQUIRED:
+   - [First/Last Name] (Text)
+   - [Active Military Email] (Email Validation)
+   - [Estimated Eviction Date] (Date - must be future date)
+
+3. AUTOMATED DECISION LOGIC:
+   - IF [Estimated Eviction Date] is within 7 days:
+     * Set Case Priority to "Critical"
+     * Route Case to "Emergency Housing Queue"
+     * Post Slack Alert: "@HousingTeam - Critical housing emergency logged!"
+   - ELSE:
+     * Set Case Priority to "Standard"
+     * Route to "General Intake Queue"
+================================================================================
+
+Phase L: Launch
+Goal: Deploy technical configuration or run manual pilot workflows with clear risk-mitigation plans.
+During Launch, the solution transitions to production. To maintain trust, deployment must be managed as a process, not an event. This phase includes sandbox deployments, manual pilot runs, user training, and smoke testing.
+Role Actions in Phase L:
+The Technical Builder: Deploys metadata to Production, runs deployment scripts, and conducts system smoke tests.
+The Business Analyst: Validates production data migration and publishes user guides.
+The Accidental Admin: Leads the process pilot and collects feedback on real-world adoption.
+The Client: Allocates time for staff training and commits to using the new process.
+HCH Scenario:
+Before turning on the automated Web-to-Case integration, Sarah runs a manual pilot for one week. She uses a standardized Google Form, processes the responses manually, and routes them to the team via Slack. The pilot reveals that users often input past dates in the eviction date field. The team realizes they must build a validation rule in Salesforce to prevent past dates from being saved. Once this validation rule is configured in the sandbox and deployed, the system is turned on in production and passes the smoke test.
+
+================================================================================
+R.E.S.O.L.V.E. DELIVERABLE: REPOSITORY DEPLOYMENT PLAYBOOK
+================================================================================
+* Deploy Date/Time: [e.g., Saturday, June 6, 2026 @ 8:00 PM CST]
+* Pre-Deployment Steps: [e.g., Freeze current data updates, run backup on Contact records.]
+* Component Checklist: [e.g., Flow: Crisis_Intake_Engine, Layout: Case_Console_Layout]
+* Smoke Test Script: [e.g., Create a test record via Web-to-Case; verify Slack alert triggers.]
+* Fallback Strategy: [e.g., If smoke test fails, roll back Flow activation and restore backups.]
+================================================================================
+
+Phase V: Verify
+Goal: Confirm the solution works technically, matches requirements, and delivers business value.
+The Verify phase begins at launch. The team evaluates the system against the original problem statement, UAT scripts, and operational metrics. This ensures the implementation successfully addresses the target business problem.
+Role Actions in Phase V:
+The Technical Builder: Executes unit tests, checks system error logs, and runs performance audits.
+The Business Analyst: Runs User Acceptance Testing (UAT) scripts and tracks system bugs.
+The Accidental Admin: Monitors pilot adoption rates and reviews data input quality.
+The Client: Performs UAT, tests system behaviors, and confirms if the solution solved their operational pain.
+HCH Scenario:
+Sarah and Elena run formal UAT scripts in the Sandbox:
+Scenario: Web-to-Case Submission with Missing Email.
+Given: The user is on the crisis intake web form.
+When: The user inputs all data but leaves the Email field blank and clicks submit.
+Then: The system must block submission, flag the Email field, and display a "Required Field" message.
+UAT Result: Pass. The form prevents invalid submissions, protecting HCH's database from incomplete records.
+
+================================================================================
+R.E.S.O.L.V.E. DELIVERABLE: UAT EXCEUTION SCORECARD
+================================================================================
+* User Story ID: [e.g., S2-04: Emergency Housing Routing]
+* Tester Name: [e.g., Sarah (Support Coordinator)]
+* Test Scenario: [Given a housing emergency is logged, when eviction is under 7 days, then prioritize as Critical.]
+* Test Result: [Pass / Fail]
+* Detected System Errors: [None / Logged Bug #420 in Agile Accelerator]
+================================================================================
+
+Phase E: Evolve
+Goal: Establish process governance, triage change requests, and scale the system over time.
+Systems are dynamic. Evolve is the continuous loop where feedback is captured, prioritized, and fed back into a new Recognize phase. This prevents technical drift, manages enhancements, and ensures long-term user adoption.
+Role Actions in Phase E:
+The Technical Builder: Optimizes platform code, monitors security access rules, and updates platform versions.
+The Business Analyst: Triages new feedback, writing briefs for future development, and updates backlog items.
+The Accidental Admin: Maintains the running Evolution Log and triages user feature requests.
+The Client: Submits structured enhancement requests with clear business justifications rather than requesting ad-hoc platform modifications.
+HCH Scenario:
+After using the system for one month, Sarah reports a new challenge: "The Case Console works great, but we are manually assigning cases when staff are out of the office." The BA logs this request in the Evolution Log. Instead of building an immediate patch, the BA uses the request to start a new R.E.S.O.L.V.E. cycle to design a dynamic staff capacity manager.
+
+================================================================================
+R.E.S.O.L.V.E. DELIVERABLE: SYSTEM EVOLUTION & GOVERNANCE LOG
+================================================================================
+DATE       | RECIPIENT FEEDBACK / ISSUE      | SYSTEM ROOT CAUSE            | PROPOSED RESOLUTION
+-----------|---------------------------------|------------------------------|-----------------------------------
+2026-06-02 | Users are bypasses the form.    | Form is too long on mobile.   | Launch a new Recognize cycle to 
+           |                                 |                              | optimize the Web-to-Case UX layout.
+-----------|---------------------------------|------------------------------|-----------------------------------
+2026-06-15 | Sensitive cases visible to all. | OWD sharing rules modified.   | Restrict Case Access rules in
+           |                                 |                              | accordance with the Security Manifesto.
+================================================================================
+
+4. Mathematical Verification Models & Quantifiable ROI Formulas
+To prove the value of system improvements, BAs and Champions must verify performance using quantitative formulas.
+1. Reclaimed Capacity Formula (Capacity ROI)
+This formula calculates the time saved by automating manual processes:
+$$T_{saved} = \sum \left( (T_{manual} \times N) - (T_{automated} \times N) \right)$$
+Where:
+$T_{manual}$ = Time taken to process one record manually (hours).
+$T_{automated}$ = Time taken to process one record using automated tools (hours).
+$N$ = Monthly volume of records processed.
+For HCH:
+$T_{manual} = 0.25\text{ hours}$ (15 minutes).
+$T_{automated} = 0.05\text{ hours}$ (3 minutes).
+$N = 100\text{ monthly intakes}$.
+$$T_{saved} = (0.25 \times 100) - (0.05 \times 100) = 25 - 5 = 20\text{ hours per month reclaimed.}$$
+2. SLA Compliance Verification Rate ($SLA_{\%}$)
+This metric tracks response reliability, showing the percentage of cases resolved within targeted SLA windows:
+$$SLA_{\%} = \left( \frac{C_{met}}{C_{total}} \right) \times 100$$
+Where:
+$C_{met}$ = Total number of cases meeting response target times (e.g., within 4 hours).
+$C_{total}$ = Total number of cases logged.
+HCH's targets require $SLA_{\%} \ge 95\%$ for critical housing requests.
+3. Data Integrity and Completeness Coefficient ($D_{IC}$)
+This coefficient measures data quality by tracking the completeness of mandatory records:
+$$D_{IC} = \frac{R_{complete}}{R_{total}}$$
+Where:
+$R_{complete}$ = Records with all key data points (e.g., military branch, verified DD-214 attachment).
+$R_{total}$ = Total records submitted.
+Target is $D_{IC} = 1.0$ (representing 100% data compliance) after setting up validation rules.
+5. The Career Readiness Protocol (L-S-R Interview Guide)
+The R.E.S.O.L.V.E. methodology provides a framework for communicating your experience in professional interviews. Use the Logic-Struggle-Result (L-S-R) formula to structure interview responses clearly and concisely:
+
+┌────────────────────────────────────────────────────────────────────────┐
+│                        THE L-S-R INTERVIEW METHOD                      │
+├────────────────────────────────────────────────────────────────────────┤
+│   [L]ogic: "I decided to build standard Web-to-Case pathways..."      │
+│            (Explains the strategic business reasoning and tradeoffs)   │
+│                                                                        │
+│   [S]truggle: "We ran into issues during Sandbox UAT validation..."    │
+│               (Discusses technical challenges and debugging steps)     │
+│                                                                        │
+│   [R]esult: "We achieved 100% intake capture and saved 20 hrs/mo..."   │
+│             (Shows quantifiable business value and metrics)            │
+└────────────────────────────────────────────────────────────────────────┘
+
+Interview Narrative Examples
+Scenario 1: Data Architecture & Security (The Security-First Mindset)
+Logic: "At Horizon Community Hub, we needed to balance open collaboration with strict data privacy for sensitive Veteran records. I recommended setting the Organization-Wide Defaults for the Case object to Private, ensuring only assigned team members could view sensitive client notes."
+Struggle: "During testing, we discovered that setting OWDs to Private blocked our external coordinators from accessing records they owned. This required us to configure Sharing Sets to grant access based on user profiles without opening the entire database."
+Result: "This approach protected sensitive Veteran records, kept our system compliant with federal grant security standards, and passed our UAT security audit."
+Scenario 2: Automation & Process Optimization
+Logic: "We wanted to replace a manual, spreadsheet-based intake process with Salesforce Case Management to meet our 4-hour urgent response SLA and save time for our staff."
+Struggle: "During our manual pilot, we found that clients often entered past dates in the eviction date field, which broke our routing automation in the sandbox."
+Result: "I built a validation rule to prevent past dates from being saved. This change achieved a 100% inquiry capture rate and saved our team 20 hours of manual data entry a month."
+

@@ -1,0 +1,5 @@
+/* Transition Trails — Webfonts
+   All three families are hosted on Google Fonts. No local binaries were
+   provided with the brand assets, so we load from the Google Fonts CDN.
+   Poppins = headings · Open Sans = body/UI · Caveat = limited accent. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Caveat:wght@400;500;600&display=swap');

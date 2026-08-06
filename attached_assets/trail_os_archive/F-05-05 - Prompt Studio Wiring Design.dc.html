@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-bg); }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); text-decoration: underline; }
+  code { font-family: Menlo, Consolas, monospace; font-size: max(14px, 0.92em); }
+</style>
+</helmet>
+
+<div style="font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: var(--tt-bg); min-height: 100vh; padding: 56px 32px 96px;">
+<div style="max-width: 1000px; margin: 0 auto;">
+
+  <header style="border-bottom: 1px solid var(--tt-warm-gray); padding-bottom: 32px; margin-bottom: 44px;">
+    <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-deep-teal); margin: 0 0 16px;">F-05-05 · design</p>
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: 42px; line-height: 1.15; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 20px; max-width: 22ch; text-wrap: pretty;">Making Prompt Studio change what Penny says</h1>
+    <p style="font-size: 18px; line-height: 1.6; margin: 0 0 16px; max-width: 64ch; text-wrap: pretty;">Prompt Studio is in better shape than the backlog suggested. Ten templates already exist with a full governance lifecycle, and the studio already has a working test runner that calls the real Penny endpoint with a real learner selected.</p>
+    <p style="font-size: 18px; line-height: 1.6; margin: 0 0 28px; max-width: 64ch; text-wrap: pretty;">What is missing is not a screen. It is that the templates live in a source file, nothing reads them at request time, and — the part that needs deciding before any code is written — <strong style="color: var(--tt-charcoal);">the templates were written to replace Penny's identity rather than to sit inside it.</strong></p>
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; font-size: 14px;">
+      <div><p style="margin: 0 0 4px; opacity: .7;">Templates today</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">10, static in source</p></div>
+      <div><p style="margin: 0 0 4px; opacity: .7;">Sub-features proposed</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">5</p></div>
+      <div><p style="margin: 0 0 4px; opacity: .7;">In scope for wiring</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">9 of 10</p></div>
+    </div>
+  </header>
+
+  <section style="background: var(--tt-white); border: 1.5px solid var(--tt-warning); border-radius: 22px; padding: 28px 32px; margin-bottom: 40px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+    <p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-warning); margin: 0 0 12px;">CORRECTION · 4 AUGUST</p>
+    <p style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Templates are already database-backed. This document said they were not.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px; max-width: 74ch;">Prompt templates have persisted in the platform database since mid-July, with create, update and seed routes, a live editing panel and an auto-seed on first load. The claim below that they live in a source file is wrong.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px; max-width: 74ch;">Two consequences. Sub-feature <strong style="color: var(--tt-charcoal);">05-05c is already complete</strong>. And moving templates to Salesforce — agreed on my recommendation — is a migration away from something working, not a first build, so it is worth re-deciding rather than inheriting.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0; max-width: 74ch;">Everything else in this design stands, including the central finding: the templates still assert their own identity, and nothing yet feeds them to the layer assembler. See the change review of 4 August for the full picture.</p>
+  </section>
+
+  <section style="margin-bottom: 48px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">What is already built</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 24px; max-width: 64ch;">Worth establishing first, because it changes the size of the job considerably.</p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Ten real templates, not placeholders</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Learning coach, resume review, LinkedIn review, weekly reflection, knowledge answer, coach brief, executive brief, study plan, post-module reflection, and a coach-only alert. Each carries a full prompt body, an intent, variables and an output shape. These are authored, considered artefacts.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">The governance lifecycle already exists</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Every template has a status: draft, in review, approved, or deprecated. Nothing enforces it yet, but the model is right and the governance policy already says a Penny capability below quality threshold gets suspended. The scaffolding for safe editing is designed.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">A live test runner is already wired</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Prompt Studio can pick a real learner from the directory, call the real endpoint, and report which context layers contributed and how long it took. The feedback loop this feature needs is built — it just is not running the template being edited.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">And the pattern to copy already works</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Trail configurations are Salesforce records, edited through a Trail OS screen, and read by the layer assembler at request time. That is precisely what templates need. This feature is mostly doing for templates what already works for trails.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: var(--tt-deep-teal); border-radius: 22px; padding: 40px 44px; color: var(--tt-white); margin-bottom: 48px;">
+    <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 16px; opacity: .85;">Decide this before writing code</p>
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; margin: 0 0 18px; color: var(--tt-white); max-width: 34ch;">Every template opens by telling Penny who she is</h2>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0 0 18px; max-width: 66ch; opacity: .95;">Nine of the ten begin with a variation of "You are Penny, a supportive Salesforce learning coach for Transition Trails." They were written as complete, standalone prompts — because when they were authored, there was no layer assembler to sit inside.</p>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0 0 18px; max-width: 66ch; opacity: .95;">There is now. Layer one already establishes who Penny is for this audience. If a template body is dropped in as layer four unchanged, every request carries <strong style="color: var(--tt-white);">two identity statements</strong> — and where they differ, the model resolves the conflict however it likes. Today the built identity is an internal operations assistant, while most templates assert a learner coach. That is not a subtle tension; it is two different jobs in one prompt.</p>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0; max-width: 66ch; opacity: .95;"><strong style="color: var(--tt-white);">The resolution:</strong> layer one owns identity, layer four owns the task. Each template gets its identity preamble removed and keeps what is genuinely task-specific — the situation, the steps, the output shape, the constraints. That is an authoring pass over ten templates and it should happen before they are loaded anywhere, not after.</p>
+  </section>
+
+  <section style="margin-bottom: 48px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">What a template should contain</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 24px; max-width: 64ch;">Once identity moves out, the boundary becomes clear — and it is a useful editorial rule for whoever writes the next one.</p>
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; overflow: hidden; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; padding: 16px 24px; background: var(--tt-sky-100); border-bottom: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">
+        <p style="margin: 0;">Belongs in the template</p><p style="margin: 0;">Belongs in another layer</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; padding: 20px 24px; font-size: 15px; line-height: 1.6;">
+        <div>
+          <p style="margin: 0 0 10px;">What this particular task is, and when it applies</p>
+          <p style="margin: 0 0 10px;">The steps to work through, in order</p>
+          <p style="margin: 0 0 10px;">The shape of the output — sections, length, whether it ends in a question</p>
+          <p style="margin: 0 0 10px;">Task-specific constraints, such as never sending a coach-only alert to a learner</p>
+          <p style="margin: 0;">Which context this task needs, so a missing input is a clear failure rather than a vague answer</p>
+        </div>
+        <div>
+          <p style="margin: 0 0 10px;">Who Penny is, and her tone — layer one</p>
+          <p style="margin: 0 0 10px;">The trail's own configuration and focal points — layer two</p>
+          <p style="margin: 0 0 10px;">The learner's phase, focus and blockers — layer three</p>
+          <p style="margin: 0 0 10px;">Retrieved knowledge and its sources — the knowledge layer</p>
+          <p style="margin: 0;">Anything about a specific person, which changes per request and cannot be authored</p>
+        </div>
+      </div>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 20px 0 0; max-width: 66ch;">One consequence worth naming. Templates currently interpolate variables such as a learner's name directly. Those must resolve from the context the layers already assembled, not from a second lookup — otherwise two parts of the same prompt can disagree about who is being talked to.</p>
+  </section>
+
+  <section style="margin-bottom: 48px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Where templates should live</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px; max-width: 64ch;">The question underneath this: is editing a prompt a content change or a code change? A Penny Admin is a governing role, not a developer, so it has to be possible without a deployment. That rules out leaving them in source.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 24px; max-width: 64ch;"><strong style="color: var(--tt-charcoal);">Recommendation: a Salesforce custom object,</strong> following the trail configuration pattern exactly. Records rather than metadata, so they are authored directly and do not need promoting through environments. Permission-controlled by the same permission set that will govern the integration user. Audit trail and approval come from the platform rather than being rebuilt.</p>
+    <div style="background: var(--tt-green-100); border-radius: 22px; padding: 26px 30px; margin-bottom: 20px;">
+      <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Why not the local database</p>
+      <p style="font-size: 15px; line-height: 1.6; margin: 0;">It would work and it would be quicker. But the local database currently holds telemetry only, and that boundary is already one of the more confusing things about the platform. Putting behavior-governing content there makes it a second system of record, and the next person has to learn which of two stores holds what. The cost is small today and compounds.</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0; max-width: 66ch;">One caution from experience this week: the new object needs a status field, and if it is a restricted picklist the four lifecycle values must be created before anything writes to it. That is exactly the class of failure that stopped Penny's interaction log ever recording a single row.</p>
+  </section>
+
+  <section style="margin-bottom: 48px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">How a template gets chosen</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 24px; max-width: 64ch;">The endpoint currently takes no notion of which task is being performed, so this needs adding. Three ways in, and the design should be explicit about which is which rather than guessing.</p>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Named by the caller — the normal case</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">A scheduled Slack brief, a resume review, a study plan: the caller knows what it is asking for. The Slack integration already carries a template reference on each of its message types, which means wiring this unlocks Slack message generation at the same time rather than as separate work.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">A default per audience — the open conversation</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Someone simply asking Penny a question has not named a task. A learner should get the knowledge-answer template, an admin the operations behavior. One default per audience, configured rather than hardcoded.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Inferred from the question — deliberately not yet</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Classifying intent to pick a template is appealing and adds a layer of unpredictability to a system nobody can currently observe. Worth revisiting once template performance is measurable, and not before.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 48px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Editing safely, and knowing it worked</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px; max-width: 64ch;">The moment this ships, a text box in an admin screen changes what Penny says to a learner. Two safeguards make that acceptable rather than alarming.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 66ch;"><strong style="color: var(--tt-charcoal);">Only approved templates reach a real request.</strong> The lifecycle already exists in the data; this gives it force. A draft is visible only to the test runner, so an admin can edit and try repeatedly without touching anyone. Approval is the deliberate act that makes an edit live.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px; max-width: 66ch;"><strong style="color: var(--tt-charcoal);">Every response names the template and version that produced it.</strong> The layer report already exists and already says which layers contributed — it should say which template too. Without that, a changed answer and a changed prompt cannot be connected, and the studio becomes a place where people make changes hopefully.</p>
+    <div style="background: var(--tt-sky-100); border-radius: 22px; padding: 26px 30px;">
+      <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The test that proves this feature is done</p>
+      <p style="font-size: 15px; line-height: 1.6; margin: 0;">Edit a template, save it as a draft, run the same question against the same learner twice — once before the edit, once after — and see two different answers with the version difference named in the report. Anything less and the studio is still describing rather than driving.</p>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 48px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px;">
+      <h2 style="font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Sub-features</h2>
+      <p style="font-size: 14px; margin: 0; opacity: .7;">5</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 24px; max-width: 66ch;">In order. The first is authoring rather than engineering, and doing it first avoids seeding bad content and correcting it in place.</p>
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; overflow: hidden; box-shadow: 0 12px 28px rgba(42,46,44,.10);">
+      <div style="display: grid; grid-template-columns: 90px 1fr 96px; gap: 0 20px; padding: 16px 24px; background: var(--tt-sky-100); border-bottom: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">
+        <p style="margin: 0;">Ref</p><p style="margin: 0;">Name and acceptance</p><p style="margin: 0;">Owner</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr 96px; gap: 0 20px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-weight: 600; color: var(--tt-charcoal);">05-05a</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Rewrite the templates as tasks, not identities</p><p style="margin: 0;">Remove the identity preamble from each and keep the situation, steps, output shape and constraints. Nine are in scope; the coach-only alert is seeded but left in draft. Acceptance: no template asserts who Penny is; each still fully specifies its own output. This is an editorial pass and the judgment in it is yours, not an engineer's.</p></div>
+        <p style="margin: 0;">Angela</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr 96px; gap: 0 20px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-weight: 600; color: var(--tt-charcoal);">05-05b</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Create the template object and seed it</p><p style="margin: 0;">A Salesforce object carrying the body, intent, domain, audience, status, version and required context. Built in development and promoted. Acceptance: all ten templates exist as records with the coach-only alert in draft, the status picklist has all four values, and a write of every value succeeds before anything depends on it.</p></div>
+        <p style="margin: 0;">Salesforce</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr 96px; gap: 0 20px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-weight: 600; color: var(--tt-charcoal);">05-05c</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Prompt Studio reads and writes real records</p><p style="margin: 0;">Replace the static import with live reads and saves, following the trail configuration pattern. Acceptance: an edit made in the studio survives a reload, and the counts on the overview come from the query rather than a frozen array.</p></div>
+        <p style="margin: 0;">Trail OS</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr 96px; gap: 0 20px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-weight: 600; color: var(--tt-charcoal);">05-05d</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">The assembler reads the approved template</p><p style="margin: 0;">Layer four resolves a template by name from the caller, or by audience default, and contributes nothing when none applies. Acceptance: a question routed to a named template produces output in that template's shape; a request naming a template that is not approved falls back to the default rather than silently using a draft.</p></div>
+        <p style="margin: 0;">Trail OS</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr 96px; gap: 0 20px; padding: 20px 24px; font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-weight: 600; color: var(--tt-charcoal);">05-05e</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Draft preview, approval gate and provenance</p><p style="margin: 0;">The test runner may execute a draft; nothing else may. Moving a template to approved requires Penny Admin, enforced on the write rather than only in the interface. The response names the template and version used. Acceptance: editing a draft and running it shows the change immediately, a non-admin cannot approve by any route, a real learner request never receives a draft, and the report identifies which template produced the answer.</p></div>
+        <p style="margin: 0;">Trail OS</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 32px 36px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 18px;">Decisions — settled 4 August</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 74ch;"><strong style="color: var(--tt-charcoal);">Templates live in Salesforce.</strong> Confirmed. The trail configuration pattern is the model, so the object is records rather than metadata, authored directly, and read by the assembler at request time.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 74ch;"><strong style="color: var(--tt-charcoal);">Approval requires Penny Admin.</strong> Confirmed, and it should be enforced on the write rather than only hidden in the interface — moving a template to approved is the act that changes what a learner hears, so it belongs behind the same kind of check that guards secrets and group administration. Everyone else may edit a draft; only a Penny Admin can make it live.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 74ch;"><strong style="color: var(--tt-charcoal);">The coach-only alert stays out of the wiring.</strong> It is not live and needs further work. Seed it as a record so the content is not lost, leave it in draft, and give the object an audience field from the start — so when it is finished, the constraint that it must never reach a learner is enforced by routing rather than by a sentence inside the prompt.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0; max-width: 74ch;">That leaves nine templates in scope for the wiring, and one waiting on its own design.</p>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080}}"></script>
+</body>
+</html>

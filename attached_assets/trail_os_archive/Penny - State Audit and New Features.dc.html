@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-bg); }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); text-decoration: underline; }
+</style>
+</helmet>
+
+<div style="font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: var(--tt-bg); min-height: 100vh; padding: 56px 32px 96px;">
+<div style="max-width: 1040px; margin: 0 auto;">
+
+  <header style="border-bottom: 1px solid var(--tt-warm-gray); padding-bottom: 32px; margin-bottom: 48px;">
+    <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-deep-teal); margin: 0 0 16px;">Penny · state audit</p>
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: 44px; line-height: 1.15; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 20px; max-width: 24ch; text-wrap: pretty;">What Penny actually is today</h1>
+    <p style="font-size: 18px; line-height: 1.6; margin: 0 0 24px; max-width: 64ch; text-wrap: pretty;">Audited from the code, not the documents. Penny in Trail OS is a real Gemini integration with real retrieval — better than the roadmap claims in two places. But the pieces are not joined to each other, nothing is persisted, and the seventeen Penny screens in the interface have almost no influence on what she actually says.</p>
+    <p style="font-size: 18px; line-height: 1.6; margin: 0 0 28px; max-width: 64ch; text-wrap: pretty;">There is also one defect I would fix today, before anything else on this list.</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; font-size: 14px;">
+      <div><p style="margin: 0 0 4px; opacity: .7;">Audited</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">api-server routes · Penny hub · data layer</p></div>
+      <div><p style="margin: 0 0 4px; opacity: .7;">New features proposed</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">10</p></div>
+      <div><p style="margin: 0 0 4px; opacity: .7;">Date</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">3 August 2026</p></div>
+    </div>
+  </header>
+
+  <section style="background: var(--tt-white); border: 1.5px solid var(--tt-warning); border-radius: 22px; padding: 32px 36px; margin-bottom: 48px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+      <p style="font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-warning); margin: 0;">DEFECT</p>
+      <p style="font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">The conversation history filter lets bad data through</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 74ch;">The history validator in the Ask Penny route checks that each item has a valid role and that its text is a string. Because <code style="font-family: Menlo, monospace; font-size: 14px; background: var(--tt-sky-100); padding: 2px 6px; border-radius: 8px;">&amp;&amp;</code> binds tighter than <code style="font-family: Menlo, monospace; font-size: 14px; background: var(--tt-sky-100); padding: 2px 6px; border-radius: 8px;">||</code>, the condition actually reads "role is user, <em>or</em> role is model and text is a string" — so for any item whose role is <strong style="color: var(--tt-charcoal);">user</strong>, the text check never runs.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 74ch;">A malformed user turn — missing text, or text that is a number or an object — passes validation and gets sent to Gemini as an undefined part. That surfaces as an unexplained failure from Penny rather than a clear error, and it will be intermittent, which makes it expensive to diagnose later.</p>
+    <p style="font-size: 15px; line-height: 1.6; margin: 0; padding-left: 16px; border-left: 3px solid var(--tt-warning);"><strong style="color: var(--tt-charcoal);">Fix</strong> — parenthesise the role comparison so the text check applies to both roles. One line. Worth doing before the feature work, because multi-turn history is about to be used much harder.</p>
+  </section>
+
+  <section style="margin-bottom: 56px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Better than documented</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 64ch;">Two things the roadmap lists as future work are already built. Worth knowing before anyone scopes them again.</p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Multi-turn conversation works</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">The route accepts a history array, caps it at the last ten turns to control tokens, and maps it into the Gemini request properly. The roadmap lists conversational memory as planned future work. The transport is done.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;"><strong style="color: var(--tt-charcoal);">The gap is persistence, not capability</strong> — history is supplied by the browser, so it dies with the tab.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Retrieval is real, and better than expected</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">A genuine relevance scorer over the knowledge corpus: stop-word removal, weighted matching across name, category, snippet and full text, a boost for confirmed sources, tier filtering, normalized scores, and source links returned.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">This is not a stub. It is a working keyword retrieval engine and it only needs joining up.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 56px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px;">
+      <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">What is not connected</h2>
+      <p style="font-size: 14px; margin: 0; opacity: .7;">the real state of Penny</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 64ch;">Every piece exists. None of them know about each other.</p>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Retrieval and generation are joined by the browser</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0;">The Ask Penny route accepts already-retrieved chunks in its request body. It never calls retrieval itself. So the client has to make two calls in the right order, and any screen that forgets the first one silently gets an ungrounded answer with no indication anything is missing. Source attribution depends on the caller too.</p>
+      </div>
+
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Nothing Penny says is stored</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0;">No database write, no Salesforce record, no log of what was asked or answered. Every conversation is lost on refresh, there is no way to review a learner's history, and there is no data to measure her against — which means none of the engagement metrics in the six-pager can currently be computed.</p>
+      </div>
+
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">The prompt has three parts, not seven</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0 0 10px;">What is assembled today: a static identity block, a role paragraph, and retrieved sources. What the architecture calls for and is absent: trail configuration, learner context, active quest, career review state, and the capability prompt template.</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0;"><strong style="color: var(--tt-charcoal);">The consequence worth naming:</strong> Prompt Studio is one of the largest screens in the application and nothing authored there reaches a real response. Same for the capability registry. Those screens describe an architecture the server does not implement yet.</p>
+      </div>
+
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Tier is whatever the client says it is — even though the server knows better</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0 0 10px;">Clerk middleware is mounted across the whole API, so a verified identity is attached to every request that reaches Penny. Both routes ignore it. They read the user's tier and role from the request body instead, and neither requires a session — Clerk's middleware attaches auth state, it does not enforce it.</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0;">So tier filtering on the knowledge corpus is advisory: anything that can reach the endpoint can claim any tier and receive the full corpus. The good news is that this is a much smaller fix than it sounds — the identity is already there and already trustworthy. It just is not being read.</p>
+      </div>
+
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Penny has one identity where she needs several</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0 0 10px;">Penny serves internal Trail OS users, learners, coaches, and eventually clients — with the Product Vision adding a public-facing guide for prospects and donors. Five audiences, and they want genuinely different things from her.</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0 0 10px;">What is built is one identity: the system prompt defines her as "AI Chief of Staff", with domains covering integrations, secrets audits and readiness dashboards. That is the internal Penny, and it matches Vision E-05 precisely — so it is right, not wrong. The other four are represented only by a short role paragraph appended underneath it.</p>
+        <p style="font-size: 16px; line-height: 1.6; margin: 0;">A paragraph cannot override an identity. Asking the chief-of-staff prompt to be "clear and encouraging" for a learner produces an operations assistant using warmer words — not a Socratic coach who asks before telling. The difference between the two is behavioral, and behavior comes from the identity layer, not from a tone instruction.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="margin-bottom: 48px;">
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px;">
+      <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Proposed features</h2>
+      <p style="font-size: 14px; margin: 0; opacity: .7;">10</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 66ch;">Written in the shape your workbooks use, so they can be loaded into Salesforce rather than kept here. Mapped to the Product Vision's epics — E-05 for Penny as internal chief of staff, E-02 for Penny as learner coach. Ordered so each one is useful on its own.</p>
+
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; overflow: hidden; box-shadow: 0 12px 28px rgba(42,46,44,.10);">
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 16px 24px; background: var(--tt-sky-100); border-bottom: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">
+        <p style="margin: 0;">Feature</p><p style="margin: 0;">Epic</p><p style="margin: 0;">Name and acceptance</p><p style="margin: 0;">Priority</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-01</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Fix the conversation history validator</p>
+          <p style="margin: 0;">Parenthesise the role check so text validation applies to user turns as well as model turns. Acceptance: a history item with a missing or non-string text field returns a 400 rather than reaching Gemini.</p>
+        </div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-02</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Retrieve on the server, not in the browser</p>
+          <p style="margin: 0;">Ask Penny calls retrieval internally instead of accepting chunks from the caller. Acceptance: a single request with only a query returns a grounded answer, and the response includes the sources consulted so attribution no longer depends on the client.</p>
+        </div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-03</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Persist every exchange</p>
+          <p style="margin: 0;">Write each question and answer to a conversation record with the model used, sources consulted, latency and tier. Acceptance: refreshing the browser does not lose the thread, and a coach can open a learner's past conversations. This is the prerequisite for measuring Penny at all.</p>
+        </div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-04</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Assemble the prompt in layers</p>
+          <p style="margin: 0;">Replace the single static string with an explicit layer assembler, each layer independently testable and logged. Acceptance: a response records which layers were assembled, and adding a layer requires no change to the Gemini call.</p>
+        </div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-05</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Make Prompt Studio change what Penny says</p>
+          <p style="margin: 0;">Wire the capability prompt template into the layer assembler so an edit in Prompt Studio changes the next response. Acceptance: editing a template and asking the same question produces a demonstrably different answer. Until this ships, that screen is describing rather than doing.</p>
+        </div>
+        <p style="margin: 0;">High</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-06</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Read tier from the session Clerk already provides</p>
+          <p style="margin: 0;">Derive tier and role from the attached Clerk identity rather than the request body, and require a session on both Penny routes. Acceptance: a request claiming a tier it does not hold receives the corpus for its real tier, and an unauthenticated request is refused. Smaller than it looks — the identity is already attached to every request; the routes just do not read it.</p>
+        </div>
+        <p style="margin: 0;">High</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-07</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Show which sources Penny used</p>
+          <p style="margin: 0;">Surface the consulted sources with their relevance in the Ask Penny rail, with links through to the source. Acceptance: a grounded answer displays its sources; an ungrounded one says so plainly rather than looking identical.</p>
+        </div>
+        <p style="margin: 0;">Medium</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-08</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-05</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Durable rate limiting and a cost ceiling</p>
+          <p style="margin: 0;">Move the limiter off in-memory per-IP state, and add a daily token or spend ceiling with an alert. Acceptance: limits survive a restart, apply per user rather than per address, and a runaway loop cannot quietly spend the month's budget.</p>
+        </div>
+        <p style="margin: 0;">Medium</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-02-01</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-02</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">One identity layer per audience, selected at request time</p>
+          <p style="margin: 0 0 8px;">Penny serves five audiences and has one identity. Replace the single static prompt with a selectable identity layer: internal staff keeps the chief-of-staff framing that exists today; the learner identity is the Socratic coach who asks before telling; the coach identity drafts for approval rather than answering directly; the client identity is bounded to case status and knowledge routing with a human approval gate; and the public identity handles program fit and donation pathways without ever coaching.</p>
+          <p style="margin: 0;">Acceptance: the same question from a learner and from an admin produces recognizably different behavior, not just different vocabulary — a learner gets a question back, an admin gets an answer. Identity is chosen from the resolved session, never from a request parameter. Maps to Vision epics E-01 through E-08; build internal and learner first, coach and client when those surfaces exist.</p>
+        </div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 104px 70px 1fr 96px; padding: 20px 24px; font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-02-02</p>
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px;">E-02</p>
+        <div>
+          <p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Give Penny real learner context</p>
+          <p style="margin: 0;">Populate the trail and learner layers from Salesforce — trail, phase, week, current focus, recent win, current blocker — instead of leaving them absent. Acceptance: asking "what should I work on this week" returns an answer naming the learner's actual position, and the same question from two learners returns two different answers.</p>
+        </div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="background: var(--tt-deep-teal); border-radius: 22px; padding: 36px 40px; color: var(--tt-white);">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 600; margin: 0 0 14px; color: var(--tt-white);">The order I would take them</h2>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0 0 16px; max-width: 68ch; opacity: .95;">Fix the defect first — it is one line and it makes everything after it easier to debug. Then the layer assembler, because five of the remaining features are additions to it and building them separately means building it five times.</p>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0 0 16px; max-width: 68ch; opacity: .95;">Then persistence, then server-side retrieval. Those two together are what turn Penny from a demonstration into something measurable — and until exchanges are stored, none of the engagement targets in the six-pager can be reported to a funder.</p>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0; max-width: 68ch; opacity: .95;">The two learner features wait on one decision from you: whether the learner surface is Experience Cloud, Trail OS, or Slack. The work is the same in all three cases, but where it renders is not.</p>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100}}"></script>
+</body>
+</html>

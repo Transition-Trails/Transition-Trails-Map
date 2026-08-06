@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+</style>
+</helmet>
+
+<div style="min-height:100%;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate);padding:0 0 96px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:44px 0">
+    <div style="max-width:1080px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Guided Trail · coach rubric</div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:40px;line-height:1.12;font-weight:600;margin:0;color:var(--tt-white);text-wrap:pretty">Pass, rework, or not attempted</h1>
+      <p style="font-size:17.5px;line-height:1.55;margin:0;max-width:740px;color:rgba(255,255,255,.88)">No grades. Every judgment names the criterion it was made against and the artifact it was made from, so the record holds up to a funder reading it cold twelve months later.</p>
+    </div>
+  </div>
+
+  <div style="max-width:1080px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:52px">
+
+    <section style="margin-top:44px;display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">01 · The three states</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">What each one means, and what a coach does next</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:19px;color:var(--tt-trail-green)">✓</span><span style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-charcoal)">Pass</span></div>
+          <div style="font-size:15.5px;line-height:1.6">Every criterion for the artifact is met. Not excellent — <em>met</em>. A pass says a competent practitioner would accept this from a colleague.</div>
+          <div style="font-size:14.5px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto"><strong>Coach action:</strong> record it and move on. Praise belongs in the campfire, not the rubric.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-amber-300);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:19px">⟳</span><span style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-charcoal)">Needs rework</span></div>
+          <div style="font-size:15.5px;line-height:1.6">The work exists and one or more criteria are unmet. The coach names which, in one sentence, and the learner resubmits. Rework is the expected state for a first attempt at judgment work — it is not a soft failure.</div>
+          <div style="font-size:14.5px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto"><strong>Coach action:</strong> name the unmet criterion, set a resubmit date inside the sprint. No unlimited loops — two rework cycles, then it goes to the sprint gate as-is.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:19px">—</span><span style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-charcoal)">Not attempted</span></div>
+          <div style="font-size:15.5px;line-height:1.6">Nothing was submitted. Recorded plainly and without commentary. This is the state that matters most to a funder, because a program that never records it is not measuring anything.</div>
+          <div style="font-size:14.5px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto"><strong>Coach action:</strong> a conversation about capacity, not curriculum. Two in a sprint triggers the completion review.</div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="Why three states and no grades" dc-props="{{ wideAlert }}" hint-size="100%,100px"><div>This is criterion-referenced assessment — a learner is measured against a fixed standard, not against the rest of the cohort. That is the form funders and accreditors trust, because it cannot be inflated by an easy cohort or deflated by a strong one. A B-minus tells a funder nothing. "Met nine of eleven criteria, reworked two, both passed on resubmission" tells them exactly what happened.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">02 · What makes it defensible</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Four rules that hold the rigour up</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-family:Poppins,sans-serif;font-size:16.5px;font-weight:600;color:var(--tt-charcoal)">Every criterion is observable</div>
+            <div style="font-size:14.5px;line-height:1.6">A criterion must be something two people can look at the same artifact and agree on. "Names the option rejected and why" is observable. "Shows good judgment" is not.</div>
+          </div>
+          <div style="font-size:14.5px;line-height:1.6;border-left:1px solid var(--tt-warm-gray);padding-left:22px"><strong>Test:</strong> could a second coach, with no knowledge of the learner, reach the same verdict from the artifact alone? If not, rewrite the criterion.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-family:Poppins,sans-serif;font-size:16.5px;font-weight:600;color:var(--tt-charcoal)">Every verdict cites its evidence</div>
+            <div style="font-size:14.5px;line-height:1.6">The record stores the artifact, the criterion, the verdict, the coach, and the date. A verdict with no artifact behind it is an opinion.</div>
+          </div>
+          <div style="font-size:14.5px;line-height:1.6;border-left:1px solid var(--tt-warm-gray);padding-left:22px"><strong>In Salesforce:</strong> a record, not a spreadsheet cell — so it is reportable, and Penny can read it when drafting a session agenda. See section 04b for where each piece lives.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-family:Poppins,sans-serif;font-size:16.5px;font-weight:600;color:var(--tt-charcoal)">Rework is counted, not hidden</div>
+            <div style="font-size:14.5px;line-height:1.6">A program where nothing is ever reworked is not assessing. Report the rework rate as a feature: it is the visible evidence that the standard is real.</div>
+          </div>
+          <div style="font-size:14.5px;line-height:1.6;border-left:1px solid var(--tt-warm-gray);padding-left:22px"><strong>Expect:</strong> a healthy first cohort reworks somewhere between a quarter and a half of judgment artifacts. Near zero means the criteria are too loose.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="font-family:Poppins,sans-serif;font-size:16.5px;font-weight:600;color:var(--tt-charcoal)">The coach judges the artifact, Penny scores the knowledge</div>
+            <div style="font-size:14.5px;line-height:1.6">Domain scores come from the skill assessment. Pass and rework come from a human reading work product. Neither substitutes for the other, and the separation is what makes the improvement claim credible.</div>
+          </div>
+          <div style="font-size:14.5px;line-height:1.6;border-left:1px solid var(--tt-warm-gray);padding-left:22px"><strong>Consistent with:</strong> the Absolute Rule in your assessment framework — Penny surfaces data, the coach makes the call.</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">03 · The rubric</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">By artifact, not by week</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:820px">Twelve artifact types cover all twelve weeks. A coach learns twelve rubrics once rather than twelve week-specific ones, and the same standard applies wherever an artifact appears — which is what makes week-over-week improvement measurable.</p>
+      <sc-for list="{{ rubric }}" as="r" hint-placeholder-count="12">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--tt-warm-gray)">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:12px">
+              <span style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-charcoal)">{{ r.name }}</span>
+              <span style="font-size:13px;color:var(--tt-slate)">{{ r.when }}</span>
+            </div>
+            <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,28px">{{ r.anchor }}</x-import>
+          </div>
+          <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:26px">
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">Pass requires all of</div>
+              <sc-for list="{{ r.pass }}" as="c" hint-placeholder-count="4">
+                <div style="display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">✓</span><span>{{ c.text }}</span></div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;border-left:1px solid var(--tt-warm-gray);padding-left:26px">
+              <div style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-charcoal)">Common rework triggers</div>
+              <div style="font-size:14.5px;line-height:1.6">{{ r.rework }}</div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">04 · The sprint gate</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">How weekly verdicts roll up</h2>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:150px 1fr 1fr;gap:18px;padding:14px 24px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>Gate state</span><span>Condition at end of sprint</span><span>What happens</span>
+        </div>
+        <sc-for list="{{ gates }}" as="g" hint-placeholder-count="4">
+          <div style="{{ g.rowStyle }}">
+            <div><sc-if value="{{ g.isDs }}" hint-placeholder-val="{{ true }}"><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ g.tone }}" hint-size="auto,28px">{{ g.state }}</x-import></sc-if><sc-if value="{{ g.isCustom }}" hint-placeholder-val="{{ false }}"><span style="{{ g.chip }}">{{ g.state }}</span></sc-if></div>
+            <span style="font-size:14.5px;line-height:1.6">{{ g.condition }}</span>
+            <span style="font-size:14.5px;line-height:1.6;color:var(--tt-slate)">{{ g.action }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="success" title="A buddy’s finding is recorded, never scored" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>When a squad buddy finds a defect, the finding goes on the record and no verdict is attached to the builder for it. The builder fixes and resubmits, and the resubmission carries the Pass or Needs rework. This is deliberate: if a finding counted against the builder, learners would learn to test their partners gently — and the honest test is the entire reason for pairing them. The tester’s own Pass comes from the quality of their peer test report, not from how much they found.</div></x-import>
+
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="Assigned work is judged on contribution, not outcome" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>Learners do not hold the client relationship — the coach assigns the work and reviews before anything reaches a production org. So judge what the learner controlled: did they refine the requirement, name the risk, write a testable script, respond to the buddy’s findings, and request release cleanly. A deferred release is not a rework trigger unless the reason was something the learner should have caught.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">04b · Where the record lives</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Salesforce holds it, which is why the claim survives an audit</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:820px">All of it is tracked on existing objects — LMS, Program Management, and Case with its related records. That matters for rigour: a funder asking how a figure was produced can be shown the record, not a spreadsheet someone maintained by hand.</p>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:14px 24px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>What is recorded</span><span>Where it lives</span><span>What it has to carry</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:16px 24px;border-bottom:1px solid var(--tt-warm-gray);align-items:start">
+          <span style="font-size:14.5px;line-height:1.6;font-weight:600;color:var(--tt-charcoal)">Attendance and participation</span>
+          <span style="font-size:14.5px;line-height:1.6">Program Engagement, per session attended</span>
+          <span style="font-size:14px;line-height:1.6;color:var(--tt-slate)">Live or replay, so the two-replay limit is queryable rather than remembered</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:16px 24px;border-bottom:1px solid var(--tt-warm-gray);align-items:start">
+          <span style="font-size:14.5px;line-height:1.6;font-weight:600;color:var(--tt-charcoal)">Curriculum, weeks and deliverable definitions</span>
+          <span style="font-size:14.5px;line-height:1.6">LMS objects</span>
+          <span style="font-size:14px;line-height:1.6;color:var(--tt-slate)">The twelve artifact types and their criteria, so a change to a criterion is versioned rather than silent</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:16px 24px;border-bottom:1px solid var(--tt-warm-gray);align-items:start">
+          <span style="font-size:14.5px;line-height:1.6;font-weight:600;color:var(--tt-charcoal)">Assigned client and TT work</span>
+          <span style="font-size:14.5px;line-height:1.6">Case and related records</span>
+          <span style="font-size:14px;line-height:1.6;color:var(--tt-slate)">Who assigned it, which client brief it came from, and what the learner contributed</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:16px 24px;border-bottom:1px solid var(--tt-warm-gray);align-items:start">
+          <span style="font-size:14.5px;line-height:1.6;font-weight:600;color:var(--tt-charcoal)">Peer test findings and release requests</span>
+          <span style="font-size:14.5px;line-height:1.6">Related to the Case the work belongs to</span>
+          <span style="font-size:14px;line-height:1.6;color:var(--tt-slate)">Tester, date, what was observed, and the coach release decision with its reason</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:16px 24px;align-items:start">
+          <span style="font-size:14.5px;line-height:1.6;font-weight:600;color:var(--tt-charcoal)">The rubric verdict itself</span>
+          <span style="font-size:14.5px;line-height:1.6">A child record on the learner’s LMS enrollment, alongside Program Engagement</span>
+          <span style="font-size:14px;line-height:1.6;color:var(--tt-slate)">Artifact, criterion, verdict, coach, date, and rework sequence number — one row per criterion</span>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="One record per criterion, not one per artifact" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>This is the detail the whole funder claim rests on. If a verdict stores only "Needs rework" against an artifact, the rework rate is reportable but nothing else is. Storing a verdict per criterion means you can say which criterion learners miss most across a cohort — and that is a curriculum finding, not just a grade. It is also what lets the rework curve be honest: the same criterion, measured in Sprint 1 and Sprint 3.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">05 · Proving improvement</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Three measures, three different claims</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Knowledge — the skill assessment</div>
+          <div style="font-size:15px;line-height:1.6">Domain scores at intake and at Week 12, same instrument, same exam-domain weighting. Movement per domain, reported by domain rather than as a single number.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto"><strong>Claim it supports:</strong> "Learners improved in the domains the certification measures."</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Judgment — the rework curve</div>
+          <div style="font-size:15px;line-height:1.6">Rework rate on judgment artifacts, sprint over sprint. A cohort that reworks 40% of Sprint 1 recommendations and 10% of Sprint 3 recommendations has demonstrably learned something the exam does not test.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto"><strong>Claim it supports:</strong> "Learners reached professional standard on work product, and we can show the trajectory."</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Articulation — first and twelfth answer</div>
+          <div style="font-size:15px;line-height:1.6">The same 90-second format, twelve times. Two coaches score the first and last against the same three criteria without knowing which is which.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto"><strong>Claim it supports:</strong> "Learners can explain their work to an employer" — the outcome the program actually sells.</div>
+        </div>
+      </div>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:30px 34px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:Caveat,cursive;font-size:26px;color:var(--tt-amber-300)">what you can defend</div>
+        <div style="font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.92)">Of five cohort members, four completed all twelve weeks and one withdrew in Week 6 after being hired. Across 61 assessed artifacts, 70% passed first submission, 25% were reworked once and then passed, 3% were reworked twice, and 2% were not attempted. Rework on stakeholder recommendations fell from 47% in Sprint 1 to 13% in Sprint 3. Mean domain score rose from 68% to 84%, with every learner improving in at least six of nine domains.</div>
+        <div style="font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.72);border-top:1px solid rgba(255,255,255,.18);padding-top:12px">Illustrative numbers, real structure. Every figure in that paragraph comes from a record with an artifact behind it — which is the difference between reporting outcomes and asserting them.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180}}">
+const RUBRIC = [
+  ['Findings register','Weeks 1–11, cumulative','Inherited-org audit',
+   ['Each finding states what was observed, not what is wrong with it','Each finding has a severity and a reason for that severity','At least one entry records something examined and deliberately left alone','No finding is a matter of taste presented as a defect'],
+   'Every finding marked high severity. A list of dislikes rather than risks. Nothing in the leave-alone column — which means the learner has not distinguished a defect from a design choice.'],
+  ['Current-state process flow','Week 1','RESOLVE · Recognize',
+   ['Shows the work as it is actually done, including the workarounds','Identifies who hands off to whom, not just which system does what','Names at least one step nobody owns','A non-technical stakeholder could follow it without narration'],
+   'Diagrams the system instead of the work. Shows the official process rather than the real one. Requires the author present to be understood.'],
+  ['Config review note','Weeks 2, 5, 6','Inherited-org audit',
+   ['Names the smell in platform terms','States the business risk in one sentence a program director would understand','Says how it was raised, with whom, and what happened next','Distinguishes what must change from what could change'],
+   'Technically correct with no business risk stated. Escalates everything. Describes the fix without describing the conversation.'],
+  ['Stakeholder recommendation','Weeks 3, 7, 9','RESOLVE · Explore to Select',
+   ['Presents at least two viable options, not one option and a straw man','Attaches a cost or effort estimate to each','States a recommendation and the tradeoff accepted by taking it','Written for the stakeholder, with no unexplained platform jargon'],
+   'One option. A second option nobody would ever choose. No cost. Recommends without saying what is given up. Reads like a design doc rather than a decision.'],
+  ['Change plan','Weeks 3, 5, 8, 10','Change management',
+   ['Lists what deploys, in order, and what depends on what','Names the deploy window and who is told before it opens','Has a rollback that has been thought through, not asserted','States how success will be confirmed after deployment'],
+   'A component list with no sequence. "Roll back if needed" with no method. No stakeholder communication. No post-deploy verification.'],
+  ['UAT script','Weeks 3, 6, 10','Verify',
+   ['Your squad buddy ran it without asking you a single clarifying question','Each step has an expected result, not just an action','Covers at least one failure path, not only the happy path','States who signs off and what sign-off means'],
+   'The buddy had to ask what a step meant. Actions with no expected results. Happy path only. No named signatory.'],
+  ['Release note for Elena','Weeks 4, 7, 10','Adoption',
+   ['Says what changed from the user’s point of view','Says what to do differently on Monday, if anything','Names what did not make this release, honestly','No jargon, no version numbers, no component names'],
+   'A changelog. Written for an admin. Silent about what was deferred. Requires platform knowledge to parse.'],
+  ['Training guide','Weeks 4, 12','Adoption · handover',
+   ['Task-based, following what a user is trying to do','Includes the two or three things they must never do, and why','Tested on someone who has not seen the system','Fits the audience — a volunteer guide is not an admin guide'],
+   'Organized by menu structure rather than by task. Never tested on a real reader. One guide written for every audience at once.'],
+  ['Peer test report','Weeks 5–11, on the buddy’s work','Verify · squad',
+   ['Reports what was observed, with the steps that produced it','Distinguishes a defect from a preference, and says which it is','States whether the acceptance criteria were met, not whether the work was good','Written so the builder can act on it without a conversation'],
+   'Reads as a critique rather than a test result. No reproduction steps. Confuses "I would have done it differently" with "this does not meet the criterion." Approves work whose criteria were not actually checked.'],
+  ['Release request','Weeks 5–12, per deployment','Change management · release gate',
+   ['Names every component in the change set and what depends on what','States what the buddy tested and what the result was','Proposes a deploy window and says who is affected','Says what happens if it fails, in enough detail that the coach could execute it'],
+   'A change set with no dependency reasoning. Requests release before the buddy has tested. No rollback the coach could actually run. Silent about who is affected.'],
+  ['Decision Log entry','Every week, #13 onward','Portfolio centerpiece',
+   ['States the business context before the technical choice','Names the options considered and the one rejected','Gives the business justification, not the platform justification','Language a non-technical stakeholder could read unedited'],
+   'Documents what was built rather than why. No rejected option. Justification that only makes sense to an admin. Reads as a task log.'],
+  ['The 90-second answer','Every week, recorded','Employment readiness',
+   ['Answers within the time — the constraint is part of the skill','Leads with the business problem, not the configuration','Includes one specific decision and its reasoning','Would make a hiring manager ask a follow-up question'],
+   'Runs long. Opens with platform detail. Describes the feature rather than the judgment. Generic enough to be about any project.']
+];
+
+const GATES = [
+  ['Open','All artifacts for the sprint are Pass, or Pass on resubmission.','Learner proceeds. Recorded with the rework count intact.','green'],
+  ['Advisory','One artifact remains at Needs rework after two cycles.','Learner proceeds. The open item is named in the private coach session and carried into the next sprint.','amber'],
+  ['Blocked','Two or more artifacts remain at Needs rework, or two Not attempted in one sprint.','No advance until the coach reviews the work with the learner and either clears it or agrees a reduced scope for the next sprint.','gray'],
+  ['Completion review','Three or more Not attempted across the program, or no submission for two consecutive weeks.','A conversation about whether this is the right twelve weeks for them. Withdrawal recorded honestly — a program that never records one is not measuring anything.','charcoal']
+];
+
+const TONE = {
+  green:   { background:'var(--tt-green-100)', color:'var(--tt-green-700)' },
+  amber:   { background:'var(--tt-amber-100)', color:'var(--tt-amber-700)' },
+  gray:    { background:'var(--tt-warm-gray)', color:'var(--tt-charcoal)' },
+  charcoal:{ background:'var(--tt-charcoal)', color:'var(--tt-white)' },
+  teal:    { background:'var(--tt-sky-100)',  color:'var(--tt-deep-teal)' }
+};
+
+class Component extends DCLogic {
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+  chip(tone) {
+    return this.css({
+      display:'inline-flex', alignItems:'center', justifyContent:'center',
+      padding:'5px 12px', borderRadius:'999px', fontFamily:'Poppins, sans-serif',
+      fontWeight:600, fontSize:'12.5px', whiteSpace:'nowrap',
+      background:TONE[tone].background, color:TONE[tone].color
+    });
+  }
+  renderVals() {
+    return {
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+      rubric: RUBRIC.map(([name, when, anchor, pass, rework]) => ({
+        name, when, anchor, rework,
+        pass: pass.map(text => ({ text }))
+      })),
+      gates: GATES.map(([state, condition, action, tone], i) => ({
+        state, condition, action, tone,
+        isDs: tone !== 'charcoal',
+        isCustom: tone === 'charcoal',
+        chip: this.chip(tone),
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'150px 1fr 1fr', gap:'18px',
+          padding:'16px 24px', alignItems:'start',
+          borderBottom: i < GATES.length - 1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

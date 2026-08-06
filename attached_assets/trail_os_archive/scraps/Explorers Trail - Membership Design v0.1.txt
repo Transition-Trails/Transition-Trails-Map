@@ -1,0 +1,84 @@
+Transition Trails · Explorer’s Trail
+One membership, three audiences
+Explorer’s Trail is the only program that is both the front door and the alumni home. That is its strength and its whole design problem — the curious, the practising, and the graduated want opposite things from the same subscription.
+01 · The design problem
+Three audiences with opposite needs
+The site already names them: curious minds, active learners, working alumni. What it does not yet resolve is that each one measures value differently, and a membership that optimises for one loses the others. Naming what each is actually buying is the whole design.
+Curious
+Buying permission to start
+They are deciding whether Salesforce is for them. What they need is a low-stakes first win inside two weeks, and an honest answer about what this career actually involves. What kills them is a wall of content.
+Churn risk:
+month two, having read a lot and built nothing.
+Active
+Buying a habit and a next step
+Studying for a cert, or filling gaps their accidental-admin job created. They need something new every month at their level, and a visible route into Foundations or Guided Trail. This is the tier that converts.
+Churn risk:
+the month a mission is too easy, or too hard, twice in a row.
+Alumni
+Buying belonging and standing
+They are employed. They do not need Trail Missions. They stay for the people, for staying current, and for a way to give back that is visible on a LinkedIn profile. Content will never hold them.
+Churn risk:
+nothing to do. Which is why the coach ladder matters more than any perk.
+Coach’s Assistant, Associate Coach, Advanced TT Coach is on the page as a pathway, but it is really the answer to alumni retention — and simultaneously the supply line for the coaches Guided Trail and the apprenticeships consume. Treat it as the alumni tier’s core benefit rather than a career perk, and one asset solves retention, delivery capacity, and founder-independence at once.
+02 · Discrepancies
+Blueprint v2 and the live site disagree in six places — the site wins
+You expected some. The live site is where the thinking landed, so the blueprint is what gets rewritten — every row below resolves in the site’s favour.
+Blueprint v2
+Live site
+Recommendation
+{{ d.row }}
+{{ d.doc }}
+{{ d.site }}
+{{ d.fix }}
+$27 Community Pass, $97 monthly or $1,164 annual for Full Membership, $1,464 annual for Full + Coaching. Blueprint v2 pricing is superseded and its tier table needs rewriting to match. Three consequences to carry through: coaching becomes what the top tier sells rather than something included everywhere, so Penny coaches every tier and a human is the upgrade; the $27 pass needs a clear line on what it does
+not
+include, now that it is a third of the core price rather than close to it; and the master program document still quotes $47 and $397, so it needs the same pass.
+03 · The monthly unit
+A Trail Mission is the only thing that has to arrive on time
+Four skill levels, one new mission each per month, self-contained and with no walkthrough. Everything else in the membership is optional — this is not. A month without a mission is a month a member cannot justify the charge, and the four-level commitment means four pieces of content monthly, forever.
+Mission anatomy — already right in the blueprint
+A brief framing the business context · the skill level · the task · no steps. A Trailhead module teaches what a feature is; a Trail Mission asks you to use it. That distinction is the product, and it is the same distinction Guided Trail makes with Option Cards versus walkthroughs.
+Four levels a month is the real cost
+Twelve months at four levels is forty-eight missions a year, and Expert-level content is the hardest to write and the least consumed. Two protections: let Expert be quarterly rather than monthly and say so plainly, and let alumni contribute missions — which is both content supply and the standing they are actually buying.
+Self-selection into four levels is the mechanic most likely to fail quietly — a member who picks wrong twice leaves without telling you. Penny already recommends the next mission based on goals in the blueprint; make that the default entry rather than a feature, and give her the skill assessment result to work from. In Foundations Penny is the primary coach because the trail can be walked alone; the same is true here, more so.
+04 · Earned access
+Some memberships are earned, and that is the retention engine
+Guided Trail completion earns membership; Guided Trail plus an apprenticeship earns it for life. Two paths, both earned by finishing something — with the trial concept dropped, "earned" keeps its meaning. A graduate never leaves the ecosystem and the alumni tier fills itself. Two things to make it work.
+Activate it automatically, from the program record.
+The blueprint already says access activates on completion confirmation. That means completion has to be a queryable state — which is exactly what the rubric produces. A graduate should never have to ask.
+Decide what lifetime means when the price changes.
+Lifetime at annual level is a promise made in 2026 against a product that will not look the same in 2030. Say what it covers — community, missions, dashboard — and what it does not, which is coaching hours and anything with a marginal cost.
+04b · The Trail Dashboard
+Four things, all of them live
+Every element is either a number that moved or something to do this week. Missions completed is a vanity count and does not appear. The test for anything added later: could a member act on it today, or did it just make them feel busy?
+Skills, with movement
+From the skill assessment, by domain, showing the change since last time — not a total. The same instrument the other programs use, so a member who later enrols arrives with a baseline already recorded.
+Goals the member set
+What they are working toward, in their words, so Penny is coaching against something real rather than guessing. This is the single most important field on the dashboard — without it Penny can only recommend by level, and a level is not a goal.
+This month’s Trail Mission
+Front and centre on the first of the month, at their level, with how many others are working it. The monthly drop is the thing people should look forward to — treat it like a release, not a library addition.
+Trail Quests available now
+Short, Penny-set, and open to everyone — the same mechanic Foundations uses nightly, here as something to pick up. And if the member is a coach, their coaching queue appears alongside it rather than in a separate place.
+A member who has told the system "I want to be hired as an admin within a year" gets different advice from one who wrote "I want to stop being scared of Flow Builder." Both are real, and neither can be inferred from a skill level. Capture the goal at signup, revisit it quarterly, and let Penny reference it by name — that is the difference between a dashboard that recommends content and one that feels like someone is paying attention.
+05 · Open
+Two settled, one open
+1. Settled — the series is awareness, and a doorway.
+Explorer’s Trail teaches the vocabulary, the seven phases, and why clarity precedes configuration. It is deliberately enticing rather than complete: someone who has not taken a program should finish it wanting the practitioner module. Guided Trail owns application against real work. Rename accordingly so the two never read as the same thing —
+RESOLVE Foundations
+here,
+RESOLVE Practitioner
+there.
+2. Open — the coaching model needs rethinking, not capping.
+Penny is the primary coach here and a TT coach is
+aware
+rather than on call. That changes the shape: instead of a 48-hour SLA on every tier, Penny handles the member continuously and surfaces the ones who need a human. A coach reviews what Penny escalates. The design question is what triggers an escalation — repeated failure on the same skill, a goal with no movement for a month, or a member who asks — and how a coach is notified without being on the hook for everyone.
+3. Settled — the dashboard is metric-driven, and it should be the thing people look forward to.
+Not missions completed. Four live things:
+skills
+from the assessment, with movement;
+goals
+the member set and what they are working toward, so Penny can coach against something real;
+this month’s Trail Mission
+, front and centre, with who else is working it; and
+Trail Quests
+available now — plus the coaching queue if they are a coach. Every element is either a number that moved or something to do this week. Nothing decorative.

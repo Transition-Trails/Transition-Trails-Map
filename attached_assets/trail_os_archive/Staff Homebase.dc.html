@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #FBF7F0; }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); }
+  button { font: inherit; cursor: pointer; }
+</style>
+</helmet>
+
+<div style="height: 100vh; display: flex; flex-direction: column; font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: #FBF7F0; overflow: hidden;">
+
+  <header style="height: 58px; flex-shrink: 0; background: var(--tt-charcoal); display: flex; align-items: center; justify-content: space-between; padding: 0 24px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; color: #fff;">Transition Trails</span>
+      <span style="font-size: 14px; color: rgba(255,255,255,.6); border-left: 1px solid rgba(255,255,255,.22); padding-left: 14px;">Trail OS</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 14px; color: rgba(255,255,255,.7);">Program Team</span>
+      <span style="width: 30px; height: 30px; border-radius: 999px; background: var(--tt-sun-amber); color: var(--tt-charcoal); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px;">KO</span>
+      <span style="font-size: 14px; color: #fff;">Kim O.</span>
+    </div>
+  </header>
+
+  <div style="flex: 1; display: flex; min-height: 0;">
+
+    <sc-if value="{{ leftClosed }}" hint-placeholder-val="{{ true }}">
+      <nav style="width: 60px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; overflow-y: auto;">
+        <button onClick="{{ openLeft }}" title="Workspace" style="width: 36px; height: 36px; border-radius: 9px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;">
+          <span style="display: grid; grid-template-columns: repeat(3, 3px); gap: 2.5px;"><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span></span>
+        </button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+          <button onClick="{{ openLeft }}" title="{{ app.name }}" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+            <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          </button>
+        </sc-for>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Gemini Notebook" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); padding: 0;"></button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Salesforce" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); padding: 0;"></button>
+        <button onClick="{{ openLeft }}" title="draw.io" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); padding: 0;"></button>
+      </nav>
+    </sc-if>
+
+    <sc-if value="{{ leftOpen }}" hint-placeholder-val="{{ false }}">
+      <nav style="width: 236px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); padding: 16px 14px; overflow-y: auto;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 12px; border-bottom: 1px solid rgba(42,46,44,.10); margin-bottom: 12px;">
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Workspace</span>
+          <button onClick="{{ closeLeft }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">‹</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px;">
+          <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+            <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal);">
+              <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+              {{ app.name }}
+              <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+            </a>
+          </sc-for>
+        </div>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Research</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal); background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); margin-bottom: 16px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+          Gemini Notebook
+          <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Build</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); margin-bottom: 6px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <span style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Salesforce</span><span style="display: block; font-size: 14px; color: var(--tt-slate);">production</span></span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+          <span style="flex: 1;"><span style="display: block; font-size: 15px; color: var(--tt-charcoal);">draw.io</span><span style="display: block; font-size: 14px; color: var(--tt-slate);">process maps</span></span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-size: 14px; color: var(--tt-slate); margin: 16px 4px 0; padding-top: 12px; border-top: 1px solid rgba(42,46,44,.10);">All open in a new tab.</p>
+      </nav>
+    </sc-if>
+
+    <main style="flex: 1; min-width: 0; overflow-y: auto; padding: 22px 30px 40px;">
+
+      <div style="display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid var(--tt-green-300); border-radius: 14px; padding: 12px 18px; margin-bottom: 16px;">
+        <span style="width: 26px; height: 26px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+        <span style="flex: 1; font-size: 15px; color: var(--tt-slate); opacity: .75;">Ask Penny — a learner, a client, a case, an article, anything</span>
+        <span style="font-size: 14px; color: var(--tt-deep-teal); font-weight: 600;">⏎</span>
+      </div>
+
+      <sc-if value="{{ deskOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08); margin-bottom: 20px; overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 24px; border-bottom: 1px solid rgba(42,46,44,.10);">
+            <span style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-trail-green);">Penny has prepared</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">· {{ deskCount }} waiting on you</span>
+            <button onClick="{{ collapseDesk }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Collapse <span style="font-size: 14px;">▲</span></button>
+          </div>
+          <sc-for list="{{ drafts }}" as="d" hint-placeholder-count="3">
+            <div style="display: flex; gap: 18px; align-items: flex-start; padding: 20px 24px; border-bottom: 1px solid rgba(42,46,44,.08);">
+              <span style="width: 34px; height: 34px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+              <div style="flex: 1; min-width: 0;">
+                <p style="font-size: 14px; color: var(--tt-slate); margin: 0 0 4px;">{{ d.kind }}</p>
+                <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">{{ d.title }}</p>
+                <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 14px; max-width: 64ch;">{{ d.body }}</p>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                  <button style="background: var(--tt-trail-green); color: #fff; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 9px 18px; border-radius: 14px; border: none;">{{ d.approve }}</button>
+                  <button style="border: 1.5px solid var(--tt-warm-gray); background: #fff; color: var(--tt-charcoal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 9px 18px; border-radius: 14px;">Edit first</button>
+                  <button style="border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 9px 6px;">Discard</button>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ deskClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 13px 22px; margin-bottom: 20px;">
+          <span style="width: 22px; height: 22px; border-radius: 999px; background: var(--tt-trail-green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">✓</span>
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Nothing waiting from Penny</span>
+          <span style="font-size: 14px; color: var(--tt-slate);">Four approved this morning</span>
+          <button onClick="{{ expandDesk }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Expand <span style="font-size: 14px;">▼</span></button>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 12px 18px; margin-bottom: 20px;">
+        <span style="flex-shrink: 0; white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Log time</span>
+        <span style="flex: 1; min-width: 150px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">Content authoring ▾</span>
+        <span style="flex-shrink: 0; width: 60px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">2.0</span>
+        <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Log it</button>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; overflow: hidden; margin-bottom: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 15px 22px; border-bottom: 1px solid rgba(42,46,44,.10);">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Content in flight</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">4 pieces · 2 waiting on review</span>
+          <button onClick="{{ collapseContent }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">{{ contentToggleLabel }}</button>
+        </div>
+        <sc-if value="{{ contentOpen }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ content }}" as="k" hint-placeholder-count="4">
+            <a href="#" style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; border-bottom: 1px solid rgba(42,46,44,.10); text-decoration: none;">
+              <span style="flex: 1; min-width: 0;">
+                <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ k.title }}</span>
+                <span style="display: block; margin-top: 5px; line-height: 1.5;">
+                  <span style="font-size: 14px; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: {{ k.statusColor }}; background: {{ k.statusBg }};">{{ k.status }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">{{ k.type }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ k.meta }}</span>
+                </span>
+              </span>
+              <span style="flex-shrink: 0; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Open →</span>
+            </a>
+          </sc-for>
+        </sc-if>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 22px 24px; margin-bottom: 22px;">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Digital Compass clients</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">3 active nonprofits</span>
+          <button onClick="{{ toggleClients }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ clientsLabel }}</button>
+        </div>
+        <div style="display: {{ clientsDisplay }}; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+          <sc-for list="{{ clients }}" as="c" hint-placeholder-count="3">
+            <div style="border: 1px solid {{ c.border }}; background: {{ c.bg }}; border-radius: 22px; padding: 18px 20px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <span style="width: 32px; height: 32px; border-radius: 9px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+                <span style="flex: 1; min-width: 0; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">{{ c.name }}</span>
+                <span style="font-size: 14px; font-weight: 600; color: {{ c.flagColor }};">{{ c.flag }}</span>
+              </div>
+              <p style="font-size: 15px; line-height: 1.5; color: var(--tt-charcoal); margin: 0 0 8px;">{{ c.request }}</p>
+              <p style="font-size: 14px; color: var(--tt-slate); margin: 0;">{{ c.meta }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 22px 24px; margin-bottom: 22px;">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Ways to help</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">Unassigned queue · 9 open</span>
+          <button onClick="{{ toggleQueue }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ queueLabel }}</button>
+        </div>
+        <div style="display: {{ queueDisplay }};">
+        <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 12px; max-width: 62ch;">Nothing here is assigned to anyone. Taking one puts it in your cases above.</p>
+        <p style="font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 16px; padding: 10px 14px; background: var(--tt-sky-100); border-radius: 14px;">You have 2 of 5 open. The limit is there so a case does not sit with someone who ran out of time for it.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ queue }}" as="q" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; border: 1px solid {{ q.border }}; background: {{ q.bg }}; border-radius: 14px;">
+              <span style="flex: 1; min-width: 200px;">
+                <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ q.subject }}</span>
+                <span style="display: block; margin-top: 5px; line-height: 1.5;">
+                  <span style="font-size: 14px; color: var(--tt-slate); font-family: Menlo, monospace;">{{ q.number }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ q.client }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ q.size }}</span>
+                  <span style="font-size: 14px; font-weight: 600; color: var(--tt-amber-700); margin-left: 8px;">{{ q.tag }}</span>
+                </span>
+              </span>
+              <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Assign to me</button>
+            </div>
+          </sc-for>
+        </div>
+        <p style="font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 14px 0 0;">Six more in the queue. <a href="#">See the whole queue</a></p>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 22px 24px; margin-bottom: 22px;">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Widen what the team can take</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">From Penny</span>
+          <button onClick="{{ toggleGrowth }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ growthLabel }}</button>
+        </div>
+        <div style="display: {{ growthDisplay }};">
+        <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 16px; max-width: 64ch;">Where the queue keeps stalling for want of a skill rather than for want of time. Learning one of these is worth more than clearing three cases.</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <sc-for list="{{ growth }}" as="g" hint-placeholder-count="3">
+            <div style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; padding: 16px 18px; border: 1px solid rgba(42,46,44,.14); border-radius: 14px;">
+              <span style="flex: 1; min-width: 220px;">
+                <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ g.skill }}</span>
+                <span style="display: block; font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin-top: 4px;">{{ g.why }}</span>
+                <span style="display: block; margin-top: 8px; line-height: 1.5;">
+                  <span style="font-size: 14px; font-weight: 600; color: var(--tt-deep-teal); background: var(--tt-sky-100); padding: 3px 10px; border-radius: 999px;">{{ g.time }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">{{ g.format }}</span>
+                </span>
+              </span>
+              <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Start</button>
+            </div>
+          </sc-for>
+        </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; align-items: start;">
+        <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; overflow: hidden;">
+          <div style="padding: 15px 22px; border-bottom: 1px solid rgba(42,46,44,.10);">
+            <h2 style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Your cases</h2>
+          </div>
+          <sc-for list="{{ cases }}" as="c" hint-placeholder-count="2">
+            <a href="#" style="display: flex; align-items: center; gap: 14px; padding: 15px 22px; border-bottom: 1px solid rgba(42,46,44,.10); text-decoration: none;">
+              <span style="flex: 1; min-width: 0;">
+                <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ c.subject }}</span>
+                <span style="display: block; margin-top: 5px; line-height: 1.5;">
+                  <span style="font-size: 14px; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: {{ c.statusColor }}; background: {{ c.statusBg }};">{{ c.status }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">{{ c.assigned }}</span>
+                </span>
+              </span>
+              <span style="flex-shrink: 0; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Open →</span>
+            </a>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Record a process</h3>
+            <p style="font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 12px;">Capture the steps once. Becomes an article, and the narration for a Build with Me video.</p>
+            <button style="border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Start recording</button>
+          </div>
+          <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">People asking for you</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <sc-for list="{{ people }}" as="p" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 11px;">
+                  <span style="width: 30px; height: 30px; border-radius: 999px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+                  <span style="flex: 1; min-width: 0;">
+                    <span style="display: block; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">{{ p.name }}</span>
+                    <span style="display: block; font-size: 14px; color: var(--tt-slate); line-height: 1.5;">{{ p.what }}</span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <sc-if value="{{ rightClosed }}" hint-placeholder-val="{{ false }}">
+      <aside style="width: 60px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 12px;">
+        <button onClick="{{ openRight }}" title="Angela Landrith" style="width: 38px; height: 38px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); padding: 0;"></button>
+        <button onClick="{{ openRight }}" title="#tt-program-team" style="position: relative; width: 38px; height: 38px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          <span style="position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 999px; background: var(--tt-deep-teal); color: #fff; font-size: 14px; line-height: 18px; text-align: center; padding: 0 4px;">9</span>
+        </button>
+      </aside>
+    </sc-if>
+
+    <sc-if value="{{ rightOpen }}" hint-placeholder-val="{{ true }}">
+      <aside style="width: 288px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; min-height: 0;">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; gap: 12px; align-items: center;">
+          <span style="width: 40px; height: 40px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Angela Landrith</p>
+            <p style="font-size: 14px; color: var(--tt-slate); margin: 0;">Your lead</p>
+          </div>
+          <button onClick="{{ closeRight }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">›</button>
+        </div>
+        <div style="padding: 12px 20px 14px; border-bottom: 1px solid var(--tt-warm-gray);">
+          <a href="#" style="display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--tt-deep-teal); border-radius: 14px; padding: 9px 14px;">
+            <span style="width: 18px; height: 18px; border-radius: 5px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+            <span style="flex: 1; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Message Angela on Slack</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+          </a>
+          <p style="font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin: 8px 0 0;">Assigned on your staff record.</p>
+        </div>
+        <div style="padding: 14px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; align-items: center; justify-content: space-between;">
+          <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">#tt-program-team</p>
+          <span style="font-size: 14px; color: #fff; background: var(--tt-deep-teal); padding: 2px 9px; border-radius: 999px;">9</span>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px;">
+          <sc-for list="{{ messages }}" as="m" hint-placeholder-count="4">
+            <div>
+              <p style="font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 2px;">{{ m.who }}</p>
+              <p style="font-size: 14px; color: var(--tt-slate); margin: 0; line-height: 1.5;">{{ m.text }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding: 14px 20px; border-top: 1px solid var(--tt-warm-gray);">
+          <span style="display: block; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 9px 12px; font-size: 14px; color: var(--tt-slate);">Message #tt-program-team</span>
+        </div>
+      </aside>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  state = { left: false, right: true, desk: true, content: true, clients: true, queue: true, growth: true };
+
+  renderVals() {
+    const drafts = [
+      {
+        kind: 'Knowledge article drafted from a resolved case',
+        title: 'Preventing duplicate volunteer hours at intake',
+        body: 'Riverside case 00001047 closed on Tuesday. Penny has drafted an article from the Decision Log entries and the fix that worked, tagged to Volunteer Management. Publishing it means the next learner who hits this finds the answer instead of asking.',
+        approve: 'Approve and publish',
+      },
+      {
+        kind: 'Client summary',
+        title: 'Northside — monthly progress note',
+        body: 'Two deliverables shipped, one blocked on their side awaiting a data export. Drafted for Marcus, not yet sent.',
+        approve: 'Approve and send',
+      },
+      {
+        kind: 'Flag',
+        title: 'Three learners asked the same question this week',
+        body: 'All three were about where a referral outcome is recorded. Nothing in Knowledge covers it. Penny suggests this is a gap rather than three separate answers.',
+        approve: 'Start an article',
+      },
+    ];
+
+    return {
+      leftOpen: this.state.left, leftClosed: !this.state.left,
+      rightOpen: this.state.right, rightClosed: !this.state.right,
+      deskOpen: this.state.desk, deskClosed: !this.state.desk,
+      contentOpen: this.state.content,
+      contentToggleLabel: this.state.content ? 'Collapse ▲' : 'Expand ▼',
+
+      openLeft: () => this.setState({ left: true, right: false }),
+      closeLeft: () => this.setState({ left: false }),
+      openRight: () => this.setState({ right: true, left: false }),
+      closeRight: () => this.setState({ right: false }),
+      collapseDesk: () => this.setState({ desk: false }),
+      expandDesk: () => this.setState({ desk: true }),
+      collapseContent: () => this.setState({ content: !this.state.content }),
+
+      clientsDisplay: this.state.clients ? 'grid' : 'none',
+      clientsLabel: this.state.clients ? 'Collapse ▲' : 'Expand ▼',
+      toggleClients: () => this.setState({ clients: !this.state.clients }),
+
+      queueDisplay: this.state.queue ? 'block' : 'none',
+      queueLabel: this.state.queue ? 'Collapse ▲' : 'Expand ▼',
+      toggleQueue: () => this.setState({ queue: !this.state.queue }),
+
+      growthDisplay: this.state.growth ? 'block' : 'none',
+      growthLabel: this.state.growth ? 'Collapse ▲' : 'Expand ▼',
+      toggleGrowth: () => this.setState({ growth: !this.state.growth }),
+
+      googleApps: [
+        { name: 'Gmail' }, { name: 'Calendar' }, { name: 'Drive' },
+        { name: 'Docs' }, { name: 'Sheets' }, { name: 'Meet' }, { name: 'Keep' },
+      ],
+
+      deskCount: drafts.length,
+      drafts,
+
+      content: [
+        { title: 'Preventing duplicate volunteer hours at intake', type: 'Knowledge article', status: 'In review', statusColor: 'var(--tt-amber-700)', statusBg: 'var(--tt-amber-100)', meta: 'drafted by Penny, needs your read' },
+        { title: 'Trail Kit 03 — Flow basics for nonprofits', type: 'Trail Kit', status: 'In review', statusColor: 'var(--tt-amber-700)', statusBg: 'var(--tt-amber-100)', meta: 'with Angela since Monday' },
+        { title: 'Guided Trail module 5 — Verify and UAT', type: 'Curriculum', status: 'Drafting', statusColor: 'var(--tt-slate)', statusBg: 'var(--tt-white)', meta: 'rubric not written yet' },
+        { title: 'Where a referral outcome is recorded', type: 'Knowledge article', status: 'Not started', statusColor: 'var(--tt-slate)', statusBg: 'var(--tt-white)', meta: 'gap Penny flagged this morning' },
+        { title: 'Setting up a Base Camp org — 14 steps', type: 'Recorded process', status: 'Recorded', statusColor: 'var(--tt-deep-teal)', statusBg: 'var(--tt-sky-100)', meta: 'steps captured · narration not produced yet' },
+      ],
+
+      clients: [
+        { name: 'Riverside Food Bank', request: 'Intake redesign — learner squad in week 4', meta: 'Next milestone: process map, Friday', flag: '', flagColor: 'var(--tt-slate)', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+        { name: 'Northside Shelter', request: 'Data migration sign-off', meta: 'Blocked on their export — 6 days', flag: 'Waiting', flagColor: 'var(--tt-amber-700)', bg: '#fff', border: 'var(--tt-sun-amber)' },
+        { name: 'Harbor Youth Trust', request: 'Scoping call — reporting for the board', meta: 'Brief not yet written', flag: '', flagColor: 'var(--tt-slate)', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+      ],
+
+      cases: [
+        { subject: 'Harbor Youth Trust — scoping brief needed before Monday', status: 'New', statusColor: 'var(--tt-slate)', statusBg: 'var(--tt-white)', assigned: 'Assigned to you' },
+        { subject: 'Northside — chase the data export', status: 'In progress', statusColor: 'var(--tt-amber-700)', statusBg: 'var(--tt-amber-100)', assigned: 'Assigned to you · owned by Marcus Bell' },
+      ],
+
+      growth: [
+        { skill: 'Editing a Build with Me video', why: 'Nine processes are recorded and unproduced. This is the single narrowest point in content right now.', time: 'about an hour', format: 'Walkthrough · logs as development time' },
+        { skill: 'Writing a Penny capability prompt', why: 'Every prompt change routes through one person. Two more people knowing this removes a bottleneck rather than adding capacity.', time: 'half a day', format: 'Prompt Studio · logs as development time' },
+        { skill: 'Drafting a grant narrative section', why: 'The next submission needs three sections and only Angela has written one before.', time: 'two sessions', format: 'With Angela · logs as development time' },
+      ],
+
+      queue: [
+        { number: '00001060', subject: 'Harbor Youth Trust — first scoping call not yet booked', client: 'Harbor Youth Trust', size: 'about an hour', tag: '· 9 days waiting', bg: '#fff', border: 'var(--tt-sun-amber)' },
+        { number: '00001057', subject: 'Trail Kit 04 — pick the feature and write the Why page', client: 'Content', size: 'half a day', tag: '', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+        { number: '00001064', subject: 'Two learners need dev orgs before Monday', client: 'Guided Trail', size: 'about 30 minutes', tag: '', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+      ],
+
+      people: [
+        { name: 'Priya Raman', what: 'Coach — wants the module 5 rubric before Thursday' },
+        { name: 'Sam M.', what: "Coach's Assistant — asked how to record a split verdict" },
+        { name: 'Tasha B.', what: 'Learner — three reworks running, Priya has flagged her' },
+      ],
+
+      messages: [
+        { who: 'Angela Landrith', text: 'Trail Kit 03 read — two notes on the Why page, otherwise good to go' },
+        { who: 'Priya Raman', text: 'module 5 rubric — even a rough draft would unblock me' },
+        { who: 'Marcus Bell', text: 'Northside export is coming Thursday, they had a staffing gap' },
+        { who: 'Angela Landrith', text: 'can we get the duplicate-hours article out before the next cohort starts' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+
+
+### SHEET: README
+TRAIL OS — FEATURES, STORIES & ACCEPTANCE CRITERIA |  |
+Set 2 of 2 — E-03 · E-06 · E-09 · E-11 · E-12 · E-14 |  |
+Version 1.0  |  June 2026  |  Internal — Transition Trails |  |
+DOCUMENT STRUCTURE |  |
+Master Backlog | All Set 2 features — filterable |
+E-03 Trail of Mastery | Features + stories for ToM launch readiness |
+E-06 Client Services | Features + stories for client delivery system |
+E-09 Commerce Revenue | Features + stories for commerce & revenue |
+E-11 Analytics Impact | Features + stories for analytics & impact reporting |
+E-12 Marketing | Features + stories for audience & pipeline activation |
+E-14 Trail OS Product | Features + stories for Trail OS as licensable product |
+DEPENDENCY NOTE — Set 2 depends on Set 1 |  |
+E-03 Trail of Mastery | E-02 Program Management must have clean engagement data and stage validation before ToM cohort records are built |
+E-06 Client Services | E-07 DevOps must be operational before any new client service automation goes to Production |
+E-09 Commerce Revenue | E-10 LMS Enrollment must link learners to cohorts before enrollment revenue can be linked to delivery |
+E-11 Analytics Impact | E-10 LMS Enrollment + E-05 Coach Infrastructure must both have data before any program report is meaningful |
+E-12 Marketing | E-02 Program Management stage cleanup must be complete before acquisition funnel tracking is layered on top |
+E-14 Trail OS Product | ALL Set 1 epics must deliver at least one cohort of evidence before TT attempts to license Trail OS to anyone else |
+
+
+### SHEET: Master Backlog
+Feature ID | Epic | Capability | Feature Name | Description | Priority | Trackable Quarter | RESOLVE Gate | Personas | Status
+F-03-01 | E-03 | CAP-03 Trail of Mastery | Contact & disposition 6 ToM waitlisted learners | Contact all 6 Trail of Mastery waitlisted learners (Adam Lemus, Anita Balogh, Bronwyn Liebner, Cecilia Ehimemen, Kriti Vaish, Sally Jimenez) before building any ToM infrastructure. Validate real demand. | Critical | Q3 2026 | R-01,R-02,R-03 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-03-02 | E-03 | CAP-03 Trail of Mastery | Define Trail of Mastery curriculum scope | Define what the Trail of Mastery program teaches, the learning model, 12-week deliverables, and what a ToM graduate can do that a Foundations Trail graduate cannot. Document before building any Salesforce records. | High | Q3 2026 | R-01,R-02,R-03 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-03-03 | E-03 | CAP-03 Trail of Mastery | Define ToM entry prerequisite in Salesforce terms | Define the entry gate: FT completion (Program Engagement Stage = Completed) OR passed Skill Assessment. Build the prerequisite enforcement logic on Program Engagement for Trail of Mastery. | High | Q3 2026 | R-01,R-02,R-03 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-03-04 | E-03 | CAP-03 Trail of Mastery | Create Trail of Mastery cohort record | Create the first Trail of Mastery pmdm__ProgramCohort__c record with valid dates, RecordType = Cohort, and program linkage. Minimum 4 of 6 waitlisted learners must be committed before the cohort record is created. | High | Q4 2026 | R-01,R-02,R-03 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-06-01 | E-06 | CAP-05 Client Services | Define client health score criteria | Define what Green, Yellow, and Red client health means for TT's service model. Document signals for each status. This is RESOLVE gate R-01 — no automation until Angela and Kim agree on the definition. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-06-02 | E-06 | CAP-05 Client Services | Client_Health__c field on Account | Add Client_Health__c picklist field (Green, Yellow, Red) to Account object. Populate for all 4 active client accounts: Hartford Promise, CLYLP, Global One Urban Farming, ZipLend. Visible on Account page layout. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-06-03 | E-06 | CAP-05 Client Services | Hartford Promise case aging audit | Audit all 7 open/in-progress Hartford Promise cases. For each: confirm actual current status, assign an owner, and set a target resolution date. 'Power of Promise' case open since May 13 with no movement. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-06-04 | E-06 | CAP-05 Client Services | Case aging alert — 14-day no-update rule | Build a Salesforce report and optional automation that flags any Service Contract Case not updated in 14+ days. Alert Kim. Applies to all active client accounts. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-06-05 | E-06 | CAP-05 Client Services | Service package documentation | Document TT's current service offerings in Salesforce Knowledge: what is delivered for Hartford Promise, CLYLP, and Global One. Define post-pro bono service tiers and pricing model. | Medium | Q4 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-09-01 | E-09 | CAP-07 Commerce Revenue | Map current revenue flow end-to-end | Map the current money flow: GiveLively → Salesforce, Stripe → Salesforce, Wave sync. Document what is manual vs. automated. Identify where Program Registration Opportunity record type was intended to fit. This is RESOLVE gate R-01. | Critical | Q4 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh | Ready — RESOLVE gate pending
+F-09-02 | E-09 | CAP-07 Commerce Revenue | Define Foundations Trail program pricing model | Define and document the FT program pricing model: cost per seat, payment schedule, scholarship policy. This must be confirmed before building any enrollment-to-revenue link in Salesforce. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh | Ready — RESOLVE gate pending
+F-09-03 | E-09 | CAP-07 Commerce Revenue | Program Registration Opportunity — link to Enrollment | The Program Registration Opportunity record type exists but has zero records. Build the link between program payment (Opportunity) and learner enrollment (Program Engagement). When a learner pays, an Opportunity is created and linked to their Enrollment record. | High | Q4 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh | Ready — RESOLVE gate pending
+F-09-04 | E-09 | CAP-07 Commerce Revenue | Century Expedition Donor Campaign setup | Create Century Expedition Campaign in Salesforce with target member count (100), annual ask ($100), launch date, and give page URL. Validate the donor journey before launching any acquisition. This is RESOLVE gate R-03. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh | Ready — RESOLVE gate pending
+F-09-05 | E-09 | CAP-07 Commerce Revenue | Wave vs. Salesforce — accounting system of record decision | Architectural decision: does Wave remain the accounting system of record with Salesforce as a mirror, or does Salesforce become the primary revenue operating system? This decision drives all subsequent integration work. | Critical | Q4 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh | Ready — RESOLVE gate pending
+F-11-01 | E-11 | CAP-09 Analytics Impact | Cohort completion report — enrolled/completed/withdrawn | Build a Salesforce report showing FT Cohort 1 enrollment, completion, and withdrawal counts. Angela can pull this for funders without manual data assembly. DEPENDS ON E-10 enrollment records existing. | High | Q4 2026 | Blocked — E-10+E-05 | Angela · Hugh · Michele | Blocked — see dependency
+F-11-02 | E-11 | CAP-09 Analytics Impact | Skill assessment baseline — pre-program score | All FT Cohort 1 learners complete an Assessment__c Skill Assessment record before Week 4. Establish pre-program baseline scores. DEPENDS ON E-05 coach assignment and E-10 enrollment records. | High | Q4 2026 | Blocked — E-10+E-05 | Angela · Hugh · Michele | Blocked — see dependency
+F-11-03 | E-11 | CAP-09 Analytics Impact | Program cost per learner — first calculation | Build a mechanism (formula field or report) to calculate total cohort cost divided by enrolled learners. Requires E-09 revenue data to be linked. First cohort P&L for Angela. | Medium | Q1 2027 | Blocked — E-10+E-05 | Angela · Hugh · Michele | Blocked — see dependency
+F-11-04 | E-11 | CAP-09 Analytics Impact | Funder impact report — send from Trail OS | Angela sends at least one cohort impact report to a funder or donor that was generated from Salesforce data — no manual spreadsheet assembly. This is the milestone that proves the analytics layer works. | Medium | Q1 2027 | Blocked — E-10+E-05 | Angela · Hugh · Michele | Blocked — see dependency
+F-12-01 | E-12 | CAP-10 Marketing | Lead Source values — Angela's approved list | Define 5-8 Lead Source values that are meaningful for TT. Angela must confirm the values before the field is built. These become the foundation for all acquisition tracking. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Marketing Specialist | Ready — RESOLVE gate pending
+F-12-02 | E-12 | CAP-10 Marketing | Populate Waitlist Campaign with 10 warm 2025 applicants | The 2026 Cohort 1 Waitlist Campaign has zero members. The 10+ Applied 2025 Guided Trail applicants are the warmest pipeline TT has. Add them as Campaign Members before building any new acquisition funnel. (Also appears in E-10 as F-10-05.) | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Marketing Specialist | Ready — RESOLVE gate pending
+F-12-03 | E-12 | CAP-10 Marketing | Campaign Member tracking for new FT applicants | Every new FT Cohort 1 applicant becomes a Campaign Member linked to a relevant Campaign. Lead Source field populated on their Program Engagement record. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Marketing Specialist | Ready — RESOLVE gate pending
+F-12-04 | E-12 | CAP-10 Marketing | Century Expedition Campaign — launch-ready | The Century Expedition Campaign record is created in Salesforce (see also E-09 F-09-04). The campaign is launch-ready with give page, target count, and Angela's approved outreach sequence documented. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Marketing Specialist | Ready — RESOLVE gate pending
+F-12-05 | E-12 | CAP-10 Marketing | Acquisition funnel report — campaign to application | Build a Salesforce report showing the path from Campaign Member (or Lead Source) to Program Engagement (Applied). Angela can see which campaign, post, or channel generated each application. | Medium | Q4 2026 | R-01,R-02,R-03,R-04 | Angela · Marketing Specialist | Ready — RESOLVE gate pending
+F-14-01 | E-14 | CAP-12 Trail OS Product | Trail OS product boundary definition | Define what parts of Trail OS are TT's proprietary program IP (curriculum, coach model) vs. what is licensable platform infrastructure (program management, knowledge base, impact reporting, DevOps). Get legal review before any product conversation with external parties. | High | H2 2027 | Blocked — all Set 1 + cohort evidence | Angela | Blocked — see dependency
+F-14-02 | E-14 | CAP-12 Trail OS Product | Market demand validation — 3 nonprofit interviews | Talk to 3 nonprofits outside TT's current client base. Validate: would they pay for program management infrastructure, what would they pay, and what is their biggest program data problem today? | High | H2 2027 | Blocked — all Set 1 + cohort evidence | Angela | Blocked — see dependency
+F-14-03 | E-14 | CAP-12 Trail OS Product | Trail OS product scope document | Write the Trail OS product scope: what is included, what is not, what the implementation timeline is, and what the annual support fee is. Informed by the 3 nonprofit interviews. | Medium | H2 2027 | Blocked — all Set 1 + cohort evidence | Angela | Blocked — see dependency
+F-14-04 | E-14 | CAP-12 Trail OS Product | First Trail OS product contract | Sign the first Trail OS product contract with a net-new nonprofit client who is buying the product (not custom services). This is the milestone that proves Trail OS is a product, not just TT's internal tool. | High | H1 2028 | Blocked — all Set 1 + cohort evidence | Angela | Blocked — see dependency
+
+
+### SHEET: E-03 Trail of Mastery
+E-03 — Trail of Mastery — Launch Readiness |  |  |  |  |  |
+Capability: CAP-03 — Trail of Mastery  |  Scope: Q4 2026 — H1 2027  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-03-01 | Contact & disposition 6 ToM waitlisted learners | Critical | Q3 2026 | Contact all 6 Trail of Mastery waitlisted learners (Adam Lemus, Anita Balogh, Bronwyn Liebner, Cecilia Ehimemen, Kriti Vaish, Sally Jimenez) before building any ToM infrastructure. Validate real demand. | All 6 learners contacted. Each Program Engagement record updated with contact date, current interest level, and next stage decision. Angela documents demand signal in a TT_Build_Item__c record before any ToM object is created. Confirmed by Angela. | Ready — RESOLVE R-01
+S-03-01a |   ↳  Contact Adam Lemus, Anita Balogh, Bronwyn Liebner |  |  | Given these 3 learners have been waitlisted since April 2026 with no contact
+When Angela contacts each via email or LinkedIn
+Then each Program Engagement record has: contact date in Notes, stated interest level (High/Medium/Low/No longer interested), and availability for Q4 2026 cohort confirmed or not
+And Angela updates the Stage to Enrolled, Withdrawn, or remains Waitlisted based on the response | Angela (Program Director) | Not Started (W-000324)
+S-03-01b |   ↳  Contact Cecilia Ehimemen, Kriti Vaish, Sally Jimenez |  |  | Given these 3 learners have been waitlisted since April 2026
+When Angela contacts each
+Then each record has the same fields updated as S-03-01a
+And a TT_Build_Item__c record documents the total demand signal: how many of the 6 confirmed interest in ToM Cohort 1 | Angela (Program Director) | Not Started (W-000324)
+F-03-02 | Define Trail of Mastery curriculum scope | High | Q3 2026 | Define what the Trail of Mastery program teaches, the learning model, 12-week deliverables, and what a ToM graduate can do that a Foundations Trail graduate cannot. Document before building any Salesforce records. | ToM curriculum scope document exists in Salesforce Knowledge. Document defines: learning objectives, 12-week structure, assessment model, and difference from FT. Angela confirms the document is complete enough for a coach candidate to understand the program. Confirmed by Angela. | Ready — RESOLVE R-02
+S-03-02a |   ↳  Author ToM curriculum scope in Knowledge |  |  | Given Angela has defined the curriculum scope
+When she publishes the SOP article 'Trail of Mastery — Curriculum Scope'
+Then the article contains: week-by-week learning objectives for 12 weeks, assessment structure, and how ToM differs from FT
+And it is reviewed by at least one ToM candidate before being marked final
+And PublishStatus = Online | Angela (Program Director) | Not Started (W-000325)
+F-03-03 | Define ToM entry prerequisite in Salesforce terms | High | Q3 2026 | Define the entry gate: FT completion (Program Engagement Stage = Completed) OR passed Skill Assessment. Build the prerequisite enforcement logic on Program Engagement for Trail of Mastery. | A validation rule or flow on pmdm__ProgramEngagement__c prevents a learner from being enrolled in a ToM cohort unless they have either a linked FT Completed engagement or a passed Assessment__c record (Skill Assessment type). Michele tests the validation with an unqualified learner. Confirmed by Angela and Michele. | Ready — RESOLVE R-01,R-03
+S-03-03a |   ↳  Build ToM prerequisite enforcement rule |  |  | Given the entry prerequisite is defined
+When Hugh builds the validation rule on pmdm__ProgramEngagement__c
+Then a learner cannot be moved to Stage = Enrolled for a Trail of Mastery cohort unless they have: pmdm__Stage__c = Completed on a FT or GT engagement, OR a linked Assessment__c with record type Skill Assessment and a pass indicator
+And Michele tests the rule by attempting to enroll an unqualified learner — the save should fail with a clear error message | Hugh (Tech Lead) | Not Started (W-000326)
+F-03-04 | Create Trail of Mastery cohort record | High | Q4 2026 | Create the first Trail of Mastery pmdm__ProgramCohort__c record with valid dates, RecordType = Cohort, and program linkage. Minimum 4 of 6 waitlisted learners must be committed before the cohort record is created. | ToM Cohort 1 pmdm__ProgramCohort__c record exists with StartDate, EndDate, Status = Planned, and RecordType = Cohort. Minimum 4 learner engagements linked to the cohort with Stage = Enrolled. Confirmed by Angela. | Ready — after F-03-01,F-03-02,F-03-03
+S-03-04a |   ↳  Create ToM Cohort 1 record |  |  | Given minimum 4 learners have confirmed interest and meet the prerequisite
+When Angela creates the ToM Cohort 1 pmdm__ProgramCohort__c record
+Then the record has: RecordType = Cohort, pmdm__StartDate__c, pmdm__EndDate__c, Status = Planned, and a capacity field set to the confirmed learner count
+And at least 4 learner Program Engagement records are linked to the cohort with Stage = Enrolled | Angela (Program Director) | Not Started (W-000327)
+
+
+### SHEET: E-06 Client Services
+E-06 — Client Services Delivery System |  |  |  |  |  |
+Capability: CAP-05 — Client Services  |  Scope: Q3 2026 — Q4 2026  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-06-01 | Define client health score criteria | Critical | Q3 2026 | Define what Green, Yellow, and Red client health means for TT's service model. Document signals for each status. This is RESOLVE gate R-01 — no automation until Angela and Kim agree on the definition. | SOP article 'Client Health Score Definition' published in Salesforce Knowledge. Article defines Green/Yellow/Red criteria with specific observable signals. Angela and Kim both confirm the criteria before the field is built. Confirmed by Angela and Kim. | Ready — RESOLVE R-01
+S-06-01a |   ↳  Angela + Kim define Green/Yellow/Red health signals |  |  | Given the 4 active client accounts have different health profiles
+When Angela and Kim discuss and agree on health signal definitions
+Then the definitions include specific observable signals for each status: Green (e.g. all cases resolved within SLA, client responded to last communication), Yellow (e.g. cases older than 14 days, missed scheduled deliverable), Red (e.g. client escalated, renewal at risk, no response in 30+ days)
+And the definitions are specific enough that Kim can apply them consistently without asking Angela | Angela + Kim Barnes (COO) | Not Started (W-000285)
+S-06-01b |   ↳  Publish 'Client Health Score Definition' SOP |  |  | Given Green/Yellow/Red criteria are agreed
+When Hugh publishes the SOP article
+Then the article contains the exact criteria matrix with observable signals for each status
+And it is linked from the Account page layout as a Quick Action or related link
+And PublishStatus = Online | Hugh (Tech Lead) | In Progress
+F-06-02 | Client_Health__c field on Account | High | Q3 2026 | Add Client_Health__c picklist field (Green, Yellow, Red) to Account object. Populate for all 4 active client accounts: Hartford Promise, CLYLP, Global One Urban Farming, ZipLend. Visible on Account page layout. | Client_Health__c field exists on Account. All 4 active client accounts have the field populated. A list view 'Client Health — All Active Clients' shows all 4 accounts with their health status. Kim can update the field without admin rights. Confirmed by Kim. | Ready — after F-06-01 | https://transition-trails.lightning.force.com/lightning/r/Knowledge__kav/ka0an0000026gY5AAI/view?ws=%2Flightning%2Fr%2FKnowledge__kav%2Fka0an0000026gMnAAI%2Fview
+S-06-02a |   ↳  Create Client_Health__c field and populate for 4 clients |  |  | Given the SOP defines health criteria
+When Hugh creates the Client_Health__c picklist field on Account
+Then the field has 3 values: Green, Yellow, Red
+And Kim populates the field for Hartford Promise, CLYLP, Global One Urban Farming, and ZipLend based on the SOP criteria
+And Kim can edit the field from the Account record without needing admin access | Hugh (Tech Lead) + Kim Barnes (COO) | Completed
+F-06-03 | Hartford Promise case aging audit | Critical | Q3 2026 | Audit all 7 open/in-progress Hartford Promise cases. For each: confirm actual current status, assign an owner, and set a target resolution date. 'Power of Promise' case open since May 13 with no movement. | All 7 Hartford Promise cases have: an assigned owner, a target resolution date in a custom field, and a status that accurately reflects current work. Zero HP cases older than 14 days without a Last Modified Date update. Kim confirms the audit. Confirmed by Kim. | Ready — RESOLVE R-02
+S-06-03a |   ↳  Audit Hartford Promise cases — assign owners and dates |  |  | Given 7 Hartford Promise cases are open or in-progress including 'Power of Promise' open since May 13
+When Kim audits each case
+Then every case has: an assigned owner (not blank), a custom Target_Resolution_Date__c field populated, and a status that accurately reflects current work (not left at New if work has started)
+And Kim documents any case that is actually complete but was not closed in Salesforce | Kim Barnes (COO) | Not Started (W-000284)
+S-06-03b |   ↳  Add Target_Resolution_Date__c to Case |  |  | Given case aging is a problem
+When Hugh adds Target_Resolution_Date__c (date field) to the Service Contract Case page layout
+Then Kim can set a target date on any case
+And the field is included in the case aging report
+And Michele confirms the field appears on the HP case layout | Hugh (Tech Lead) | Won't Do | Which "case aging report" is being referenced here.
+F-06-04 | Case aging alert — 14-day no-update rule | High | Q3 2026 | Build a Salesforce report and optional automation that flags any Service Contract Case not updated in 14+ days. Alert Kim. Applies to all active client accounts. | Report 'Cases — 14-Day No Update Alert' exists showing all Service Contract Cases where LastModifiedDate is more than 14 days ago and Status != Closed. Kim can run this report from a dashboard. Optionally: a scheduled report emails Kim weekly. Confirmed by Kim. | Ready — after F-06-03
+S-06-04a |   ↳  Build '14-Day No-Update Alert' report |  |  | Given all HP cases have been audited and Target_Resolution_Date__c is deployed
+When Angela opens the 'Cases — 14-Day No Update Alert' report
+Then the report shows: Case number, subject, account name, status, LastModifiedDate, and days since last update (formula)
+And the report is filtered to Status != Closed
+And any case with 14+ days since last update is highlighted or sorted to the top | Kim Barnes (COO) | Not Started (W-000286)
+F-06-05 | Service package documentation | Medium | Q4 2026 | Document TT's current service offerings in Salesforce Knowledge: what is delivered for Hartford Promise, CLYLP, and Global One. Define post-pro bono service tiers and pricing model. | At least 2 SOP articles exist in Salesforce Knowledge describing TT service packages. Articles define: scope of service, what is and is not included, pricing (or pricing model), and delivery cadence. Angela approves the articles as accurate representations of what TT offers. Confirmed by Angela. | Ready — RESOLVE R-03,R-04
+S-06-05a |   ↳  Document Hartford Promise current service scope |  |  | Given Angela and Kim need to define service packages
+When Angela documents what TT currently delivers for Hartford Promise
+Then the SOP article contains: regular deliverables (admin support, training, cases resolved), frequency, what is in scope vs. out of scope, and the current monthly fee ($450)
+And the article serves as the input for defining the post-pro bono service tier | Angela + Kim Barnes (COO) | Not Started (W-000287)
+
+
+### SHEET: E-09 Commerce Revenue
+E-09 — Commerce Cloud Activation |  |  |  |  |  |
+Capability: CAP-07 — Commerce & Revenue  |  Scope: Q4 2026 — H1 2027  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-09-01 | Map current revenue flow end-to-end | Critical | Q4 2026 | Map the current money flow: GiveLively → Salesforce, Stripe → Salesforce, Wave sync. Document what is manual vs. automated. Identify where Program Registration Opportunity record type was intended to fit. This is RESOLVE gate R-01. | Architecture Decision record in TT_Build_Item__c documents the complete money flow with specific API endpoints, manual steps, Wave sync frequency, and a decision on whether Salesforce or Wave is the system of record for accounting. Angela and Hugh confirm the map. Confirmed by Angela. | Ready — RESOLVE R-01
+S-09-01a |   ↳  Interview Angela — document GiveLively flow |  |  | Given Angela is the primary person managing revenue flows
+When Angela documents the GiveLively → Salesforce flow step by step
+Then the documentation includes: how donations arrive in GiveLively, how they get to Salesforce (manual or automated), the field mapping, and what happens in Wave
+And Angela can identify any step that is manual and prone to error | Angela (CEO) | Not Started (W-000292)
+S-09-01b |   ↳  Document Stripe program payment flow |  |  | Given the Stripe payment flow is separate from GiveLively
+When Angela and Hugh document the Stripe → Salesforce flow
+Then the documentation includes: how a program payment triggers a Salesforce record (or does not), what Wave receives from Stripe, and whether the Program Registration Opportunity record type was ever connected to Stripe
+And the Architecture Decision record is complete with all three flows documented | Angela + Hugh | Not Started (W-000293)
+F-09-02 | Define Foundations Trail program pricing model | Critical | Q3 2026 | Define and document the FT program pricing model: cost per seat, payment schedule, scholarship policy. This must be confirmed before building any enrollment-to-revenue link in Salesforce. | SOP article 'Foundations Trail — Pricing Model' published in Salesforce Knowledge. Article defines: standard seat price, scholarship criteria and process, payment schedule, and refund policy. Angela approves. Confirmed by Angela. | Ready — RESOLVE R-02
+S-09-02a |   ↳  Define FT pricing and document in SOP |  |  | Given Angela needs to set program pricing before Cohort 1
+When Angela defines the pricing model
+Then the SOP article contains: standard seat price (dollar amount), whether there is a sliding scale or scholarship tier, payment schedule (upfront vs. installments), and the refund policy
+And the article is published before any Cohort 1 learner is asked to pay | Angela (CEO) | Not Started (W-000291)
+F-09-03 | Program Registration Opportunity — link to Enrollment | High | Q4 2026 | The Program Registration Opportunity record type exists but has zero records. Build the link between program payment (Opportunity) and learner enrollment (Program Engagement). When a learner pays, an Opportunity is created and linked to their Enrollment record. | At least 1 Program Registration Opportunity exists linked to a learner's Program Engagement record. The Opportunity Amount equals the program fee. A report 'Program Revenue by Cohort' can be run and shows revenue linked to FT Cohort 1. Confirmed by Angela. | Ready — after F-09-01,F-09-02,E-10-F-10-01
+S-09-03a |   ↳  Create first Program Registration Opportunity |  |  | Given pricing is defined and enrollment records exist
+When Angela creates the first Program Registration Opportunity for an FT Cohort 1 learner
+Then the Opportunity has: RecordType = Program Registration, Amount = program fee, Stage = Closed Won (if paid) or Prospecting (if pending), and a lookup to the learner's Program Engagement record
+And the Opportunity appears in the 'Program Revenue by Cohort' report | Angela (CEO) | Not Started (W-000289)
+S-09-03b |   ↳  Build 'Program Revenue by Cohort' report |  |  | Given at least 1 Program Registration Opportunity exists
+When Angela opens the 'Program Revenue by Cohort' report
+Then the report shows Opportunity Amount summed by cohort
+And it is filterable by RecordType = Program Registration
+And Angela confirms the total matches what she expects based on enrolled learners | Angela (CEO) | Not Started (W-000290)
+F-09-04 | Century Expedition Donor Campaign setup | High | Q3 2026 | Create Century Expedition Campaign in Salesforce with target member count (100), annual ask ($100), launch date, and give page URL. Validate the donor journey before launching any acquisition. This is RESOLVE gate R-03. | Century Expedition Campaign exists in Salesforce with: target member count, per-year ask amount, planned launch date, and give page URL in Description. Campaign status is set to Planned until Angela is ready to launch. Confirmed by Angela. | Ready — RESOLVE R-03
+S-09-04a |   ↳  Create Century Expedition Campaign record |  |  | Given Angela has defined the Century Expedition donor value proposition
+When Angela creates the Campaign record
+Then the Campaign has: Name = 'Century Expedition 2026', Status = Planned, ExpectedRevenue = $10,000 (100 donors × $100), StartDate = planned launch date, Description includes the give page URL
+And the Campaign is linked to a Subtype of Donation | Angela (CEO) | Completed
+F-09-05 | Wave vs. Salesforce — accounting system of record decision | Critical | Q4 2026 | Architectural decision: does Wave remain the accounting system of record with Salesforce as a mirror, or does Salesforce become the primary revenue operating system? This decision drives all subsequent integration work. | An Architecture Decision TT_Build_Item__c record documents the decision with rationale. Angela and Angela review and sign off. The decision is referenced in all subsequent revenue integration stories. Confirmed by Angela. | Ready — RESOLVE R-04
+S-09-05a |   ↳  Document Wave vs. Salesforce architecture decision |  |  | Given all three revenue flows are mapped
+When Angela and Hugh make the accounting system of record decision
+Then a TT_Build_Item__c Architecture Decision record documents: the chosen approach (Wave as accounting SOR vs. Salesforce as SOR), the rationale, what this means for future revenue automation, and who approved the decision
+And the decision is referenced in all subsequent commerce epic stories | Angela + Hugh | Not Started (W-000288)
+
+
+### SHEET: E-11 Analytics Impact
+E-11 — Analytics & Impact Reporting |  |  |  |  |  |
+Capability: CAP-09 — Analytics & Impact  |  Scope: Q4 2026 — H1 2027  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-11-01 | Cohort completion report — enrolled/completed/withdrawn | High | Q4 2026 | Build a Salesforce report showing FT Cohort 1 enrollment, completion, and withdrawal counts. Angela can pull this for funders without manual data assembly. DEPENDS ON E-10 enrollment records existing. | Report 'FT Cohort 1 — Completion Summary' exists showing enrolled count, completed count, withdrawn count, and completion rate. Angela confirms the numbers match actual cohort outcomes. The report can be exported to PDF without data assembly. Confirmed by Angela. | Blocked — requires E-10 enrollment data
+S-11-01a |   ↳  Build FT Cohort 1 completion summary report |  |  | Given FT Cohort 1 has enrollment records in Salesforce (E-10 delivered)
+When Angela opens the 'FT Cohort 1 — Completion Summary' report
+Then the report shows: total enrolled, total Completed, total Withdrawn, total Application Denied, and a completion rate formula
+And the report is exportable as PDF without additional formatting
+And Angela confirms the counts match what she sees in Google Classroom | Angela (Program Director) | Not Started (W-000328)
+F-11-02 | Skill assessment baseline — pre-program score | High | Q4 2026 | All FT Cohort 1 learners complete an Assessment__c Skill Assessment record before Week 4. Establish pre-program baseline scores. DEPENDS ON E-05 coach assignment and E-10 enrollment records. | All FT Cohort 1 active learners have at least 1 Assessment__c record with RecordType = Skill Assessment and a score before Week 4. A report shows pre-program score by learner. Angela confirms baseline is established. Confirmed by Angela. | Blocked — requires E-10 + E-05 data
+S-11-02a |   ↳  Create skill assessment records for Cohort 1 learners |  |  | Given FT Cohort 1 is active and coaches are assigned
+When Angela or a coach creates pre-program Skill Assessment records for each learner
+Then each active learner has an Assessment__c record with RecordType = Skill Assessment, a score (numeric), an assessment date (before Week 4), and a link to the learner's Contact record
+And a report 'FT Cohort 1 — Pre-Program Assessment Scores' exists showing all baseline scores | Angela + coaches | Not Started (W-000329)
+F-11-03 | Program cost per learner — first calculation | Medium | Q1 2027 | Build a mechanism (formula field or report) to calculate total cohort cost divided by enrolled learners. Requires E-09 revenue data to be linked. First cohort P&L for Angela. | Angela can open a Salesforce report or view a formula field that shows estimated cost per learner for FT Cohort 1. The calculation uses program revenue from Opportunity records and is visible without Wave. Confirmed by Angela. | Blocked — requires E-09 + E-10 data
+S-11-03a |   ↳  Build cost-per-learner calculation |  |  | Given program revenue Opportunities exist and enrollment records exist
+When Hugh builds a summary report combining revenue and enrollment count
+Then the report shows total program revenue for FT Cohort 1, total enrolled learners, and cost per learner (revenue / enrolled)
+And Angela confirms the calculation is correct and does not require Wave data to run | Angela + Hugh | Not Started (W-000330)
+F-11-04 | Funder impact report — send from Trail OS | Medium | Q1 2027 | Angela sends at least one cohort impact report to a funder or donor that was generated from Salesforce data — no manual spreadsheet assembly. This is the milestone that proves the analytics layer works. | Angela exports or generates an impact report from Salesforce and sends it to at least one funder. The report contains enrollment, completion rate, skill assessment delta, and program cost. Angela confirms no manual data assembly was required. Confirmed by Angela. | Blocked — requires F-11-01,F-11-02,F-11-03
+S-11-04a |   ↳  Generate and send first funder impact report |  |  | Given completion report, skill assessment scores, and cost calculation all exist
+When Angela exports the impact data from Salesforce
+Then she can send a report to at least one funder or Century Expedition donor
+And the report contains: cohort completion rate, skill assessment pre/post comparison (if post-program scores exist), and program cost per learner
+And Angela confirms she did not open a spreadsheet to assemble the data | Angela (CEO) | Not Started (W-000331)
+
+
+### SHEET: E-12 Marketing
+E-12 — Marketing — Audience & Pipeline Activation |  |  |  |  |  |
+Capability: CAP-10 — Marketing  |  Scope: Q3 2026 — Q4 2026  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-12-01 | Lead Source values — Angela's approved list | Critical | Q3 2026 | Define 5-8 Lead Source values that are meaningful for TT. Angela must confirm the values before the field is built. These become the foundation for all acquisition tracking. | SOP article 'Lead Source — Approved Values' published in Salesforce Knowledge. Values confirmed by Angela include at minimum: LinkedIn, Social Media/Buffer, Referral-Volunteer, Referral-Alumni, Partner Org, Direct Website, In-Person Event, Unknown. Angela confirms. Confirmed by Angela. | Ready — RESOLVE R-01
+S-12-01a |   ↳  Angela confirms Lead Source values |  |  | Given TT's learner acquisition channels include LinkedIn, Buffer, partner orgs, and referrals
+When Angela reviews the proposed Lead Source values
+Then she confirms or modifies the list and it contains at minimum: LinkedIn, Social Media/Buffer, Referral-Volunteer, Referral-Alumni, Partner Org, Direct Website, In-Person Event, Unknown
+And the approved values are documented before the field is created in Salesforce | Angela (CEO) | Not Started (W-000332)
+S-12-01b |   ↳  Create Lead_Source__c on Program Engagement |  |  | Given Angela has approved the Lead Source values
+When Hugh creates Lead_Source__c (picklist) on pmdm__ProgramEngagement__c
+Then the picklist contains exactly the Angela-approved values
+And the field is required for new records created after the go-live date
+And it appears on the Engagement page layout and in the pipeline report | Hugh (Tech Lead) | Not Started (W-000333)
+F-12-02 | Populate Waitlist Campaign with 10 warm 2025 applicants | Critical | Q3 2026 | The 2026 Cohort 1 Waitlist Campaign has zero members. The 10+ Applied 2025 Guided Trail applicants are the warmest pipeline TT has. Add them as Campaign Members before building any new acquisition funnel. (Also appears in E-10 as F-10-05.) | Waitlist Campaign has at least 10 Campaign Members with Status = Waitlisted. Each CampaignMember is linked to the correct Contact. Angela has a documented outreach plan for when Cohort 1 opens. Zero cold outreach begins before warm leads are worked. Confirmed by Angela. | Ready — RESOLVE R-02
+S-12-02a |   ↳  Add 2025 Applied applicants as Waitlist Campaign Members |  |  | Given the Waitlist Campaign has zero members
+When Angela adds the 10+ Applied 2025 GT applicants as Campaign Members
+Then each CampaignMember record has Status = Waitlisted and is linked to the correct Contact
+And Angela adds a Campaign Description field note: 'These are warm 2025 applicants — contact before any cold outreach for Cohort 1'
+And Angela documents the outreach plan in the Campaign record | Angela (CEO) | Not Started (W-000334)
+F-12-03 | Campaign Member tracking for new FT applicants | High | Q3 2026 | Every new FT Cohort 1 applicant becomes a Campaign Member linked to a relevant Campaign. Lead Source field populated on their Program Engagement record. | All FT Cohort 1 Program Engagement records created after go-live have Lead_Source__c populated. At least 50% have a Campaign Member record linking them to a specific campaign. Zero applications are processed without Lead Source. Confirmed by Angela after first 10 applications. | Ready — after F-12-01,F-12-02
+S-12-03a |   ↳  Process first 10 FT applications with Lead Source and Campaign link |  |  | Given Lead_Source__c exists and the Waitlist Campaign has members
+When the first 10 FT Cohort 1 Program Engagement records are created
+Then all 10 have Lead_Source__c populated
+And at least 5 have a CampaignMember record linking them to a specific Campaign
+And Angela reviews the first batch of 10 and confirms lead source accuracy | Angela (CEO) | Not Started (W-000335)
+F-12-04 | Century Expedition Campaign — launch-ready | High | Q3 2026 | The Century Expedition Campaign record is created in Salesforce (see also E-09 F-09-04). The campaign is launch-ready with give page, target count, and Angela's approved outreach sequence documented. | Campaign exists with all required fields. Angela has a documented outreach sequence (who to contact first, what to say, when). Campaign is not launched until Angela confirms the impact narrative is ready. Confirmed by Angela. | Ready — RESOLVE R-03,R-04
+S-12-04a |   ↳  Confirm Century Expedition launch readiness |  |  | Given the Century Expedition Campaign record exists in Salesforce
+When Angela reviews the campaign
+Then she confirms: give page URL is working, outreach sequence is documented (minimum: first 20 people to contact and what to say), and the impact narrative is ready to share
+And the Campaign status changes from Planned to Active only when Angela triggers it | Angela (CEO) | Not Started (W-000336)
+F-12-05 | Acquisition funnel report — campaign to application | Medium | Q4 2026 | Build a Salesforce report showing the path from Campaign Member (or Lead Source) to Program Engagement (Applied). Angela can see which campaign, post, or channel generated each application. | Report 'Acquisition Funnel — Campaign to Application' exists. The report shows: Lead Source value, Campaign name (if linked), and count of Program Engagement records at each stage. Angela can see which channel drove the most FT Cohort 1 applications. Confirmed by Angela after Cohort 1 opens. | Ready — after F-12-03
+S-12-05a |   ↳  Build acquisition funnel report |  |  | Given at least 10 FT Cohort 1 applications have Lead Source populated
+When Angela opens the 'Acquisition Funnel — Campaign to Application' report
+Then she can see which Lead Source values generated the most applications
+And she can see whether Campaign Member records exist for those applications
+And the report answers: 'which channel drove Cohort 1 demand?' without additional data work | Angela (CEO) | Not Started (W-000337)
+
+
+### SHEET: E-14 Trail OS Product
+E-14 — Trail OS as Licensable Product |  |  |  |  |  |
+Capability: CAP-12 — Trail OS as Product  |  Scope: H2 2027 — H1 2028  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-14-01 | Trail OS product boundary definition | High | H2 2027 | Define what parts of Trail OS are TT's proprietary program IP (curriculum, coach model) vs. what is licensable platform infrastructure (program management, knowledge base, impact reporting, DevOps). Get legal review before any product conversation with external parties. | A written product boundary document exists in Salesforce Knowledge or as a TT_Build_Item__c Architecture Decision. Document clearly distinguishes: TT IP (not licensable) vs. Trail OS platform (licensable). Angela confirms the document with legal review. Confirmed by Angela. | Blocked — requires all Set 1 epics to have delivered at least one cohort
+S-14-01a |   ↳  Draft product boundary document |  |  | Given Trail OS has delivered at least one full Foundations Trail cohort
+When Angela drafts the product boundary document
+Then the document clearly lists: TT IP items that cannot be licensed (curriculum content, Penny prompt architecture, coach methodology), Trail OS platform items that can be licensed (NPSP program management configuration, Knowledge SOP framework, DevOps pipeline, impact reporting layer)
+And Angela has the document reviewed by a legal contact before publishing | Angela (CEO) | Not Started (W-000338)
+F-14-02 | Market demand validation — 3 nonprofit interviews | High | H2 2027 | Talk to 3 nonprofits outside TT's current client base. Validate: would they pay for program management infrastructure, what would they pay, and what is their biggest program data problem today? | Angela has conducted 3 qualifying conversations with non-client nonprofits. Each conversation is documented as an Account + Contact + Opportunity record (Stage = Qualification) in Salesforce. A summary document in TT_Build_Item__c notes whether demand is validated or not. Confirmed by Angela. | Blocked — requires F-14-01
+S-14-02a |   ↳  Conduct 3 qualifying nonprofit conversations |  |  | Given the product boundary is defined
+When Angela speaks with 3 nonprofits outside TT's current client base
+Then each conversation is documented as: Account (org name), Contact (person spoken to), Opportunity (Stage = Qualification, RecordType = Trail OS Product prospect)
+And Angela notes for each: their current program data problem, what they use today, and their willingness to pay for a solution
+And a demand validation summary TT_Build_Item__c record documents whether the conversations confirm or refute market demand | Angela (CEO) | Not Started (W-000339)
+F-14-03 | Trail OS product scope document | Medium | H2 2027 | Write the Trail OS product scope: what is included, what is not, what the implementation timeline is, and what the annual support fee is. Informed by the 3 nonprofit interviews. | Product scope document published in Salesforce Knowledge (Type = Product). Document contains: feature list, excluded items, implementation timeline estimate, and a price range. Angela has reviewed and confirmed the scope. Confirmed by Angela. | Blocked — requires F-14-02
+S-14-03a |   ↳  Write Trail OS product scope document |  |  | Given 3 qualifying conversations are complete and demand is confirmed
+When Angela writes the product scope
+Then the document includes: features included in the base product, features excluded from base (available as add-ons), estimated implementation time for a new nonprofit, annual support fee range, and 1-2 reference customer examples (TT itself)
+And the document is reviewed by Angela and at least one of the 3 qualified prospects before publishing | Angela (CEO) | Not Started (W-000340)
+F-14-04 | First Trail OS product contract | High | H1 2028 | Sign the first Trail OS product contract with a net-new nonprofit client who is buying the product (not custom services). This is the milestone that proves Trail OS is a product, not just TT's internal tool. | An Opportunity record with RecordType = Trail OS Product (or a new record type to be created) is at Stage = Closed Won. Angela confirms the client bought Trail OS as a product and not bespoke services. A TT_Build_Item__c Build Log documents the first Trail OS sale. Confirmed by Angela. | Blocked — requires F-14-03
+S-14-04a |   ↳  Close first Trail OS product contract |  |  | Given the product scope is finalized and a prospect is ready to buy
+When Angela closes the first Trail OS product sale
+Then an Opportunity record with RecordType = Trail OS Product is at Stage = Closed Won
+And the client has signed a contract that explicitly references Trail OS as a product (not custom services)
+And a TT_Build_Item__c Build Log documents the first product sale milestone
+And Angela confirms this client will be used as a reference for future Trail OS product sales | Angela (CEO) | Not Started (W-000341)

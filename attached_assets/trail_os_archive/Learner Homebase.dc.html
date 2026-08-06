@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #FBF7F0; }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); }
+  button { font: inherit; cursor: pointer; }
+</style>
+</helmet>
+
+<div style="height: 100vh; display: flex; flex-direction: column; font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: #FBF7F0; overflow: hidden;">
+
+  <header style="height: 58px; flex-shrink: 0; background: var(--tt-charcoal); display: flex; align-items: center; justify-content: space-between; padding: 0 24px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; color: #fff;">Transition Trails</span>
+      <span style="font-size: 14px; color: rgba(255,255,255,.6); border-left: 1px solid rgba(255,255,255,.22); padding-left: 14px;">Trail OS</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="width: 30px; height: 30px; border-radius: 999px; background: var(--tt-sun-amber); color: var(--tt-charcoal); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px;">JR</span>
+      <span style="font-size: 14px; color: #fff;">Jordan R.</span>
+    </div>
+  </header>
+
+  <div style="flex: 1; display: flex; min-height: 0;">
+
+    <sc-if value="{{ leftClosed }}" hint-placeholder-val="{{ true }}">
+      <nav style="width: 60px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; overflow-y: auto;">
+        <button onClick="{{ openLeft }}" title="Workspace" style="width: 36px; height: 36px; border-radius: 9px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;">
+          <span style="display: grid; grid-template-columns: repeat(3, 3px); gap: 2.5px;"><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span></span>
+        </button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+          <button onClick="{{ openLeft }}" title="{{ app.name }}" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+            <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          </button>
+        </sc-for>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Gemini Notebook" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <span style="width: 20px; height: 20px; border-radius: 5px; background: #fff; border: 1px solid var(--tt-sky-blue);"></span>
+        </button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Dev org" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <span style="width: 20px; height: 20px; border-radius: 5px; background: #fff; border: 1px solid var(--tt-green-300);"></span>
+        </button>
+        <button onClick="{{ openLeft }}" title="draw.io" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+        </button>
+      </nav>
+    </sc-if>
+
+    <sc-if value="{{ leftOpen }}" hint-placeholder-val="{{ false }}">
+      <nav style="width: 236px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); padding: 16px 14px; overflow-y: auto;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 12px; border-bottom: 1px solid rgba(42,46,44,.10); margin-bottom: 12px;">
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Workspace</span>
+          <button onClick="{{ closeLeft }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">‹</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px;">
+          <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+            <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal); text-decoration: none;">
+              <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+              {{ app.name }}
+              <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+            </a>
+          </sc-for>
+        </div>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Research</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal); background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); margin-bottom: 8px; text-decoration: none;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+          Gemini Notebook
+          <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin: 0 0 16px; padding: 0 4px;">For working through your own sources. Anything about your trail — ask Penny.</p>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Build</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); margin-bottom: 6px; text-decoration: none;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <span style="flex: 1; min-width: 0;">
+            <span style="display: block; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Dev org</span>
+            <span style="display: block; font-size: 14px; color: var(--tt-slate);">active</span>
+          </span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px; text-decoration: none;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+          <span style="flex: 1; min-width: 0;">
+            <span style="display: block; font-size: 15px; color: var(--tt-charcoal);">draw.io</span>
+            <span style="display: block; font-size: 14px; color: var(--tt-slate);">process maps</span>
+          </span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-size: 14px; color: var(--tt-slate); margin: 16px 4px 0; padding-top: 12px; border-top: 1px solid rgba(42,46,44,.10);">All open in a new tab.</p>
+      </nav>
+    </sc-if>
+
+    <main style="flex: 1; min-width: 0; overflow-y: auto; padding: 22px 30px 40px;">
+
+      <div style="display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid var(--tt-green-300); border-radius: 14px; padding: 12px 18px; margin-bottom: 16px;">
+        <span style="width: 26px; height: 26px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+        <span style="flex: 1; font-size: 15px; color: var(--tt-slate); opacity: .75;">Ask Penny — a question, a case, an article, anything</span>
+        <span style="font-size: 14px; color: var(--tt-deep-teal); font-weight: 600;">⏎</span>
+      </div>
+
+      <sc-if value="{{ cairnOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08); margin-bottom: 20px; overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 24px; border-bottom: 1px solid rgba(42,46,44,.10);">
+            <span style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-trail-green);">Today's Trail Quest</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">· 10 min · five stones set</span>
+            <button onClick="{{ collapseCairn }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Collapse <span style="font-size: 14px;">▲</span></button>
+          </div>
+          <div style="display: flex; gap: 26px; flex-wrap: wrap; padding: 24px 28px;">
+            <div style="flex: 1; min-width: 260px;">
+              <h1 style="font-family: 'Poppins', sans-serif; font-size: 25px; line-height: 1.32; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; max-width: 22ch;">Name one field on the Case object you would remove.</h1>
+              <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 20px; max-width: 46ch;">Then say what breaks if you do. Penny will push back on the second sentence.</p>
+              <button onClick="{{ setStone }}" style="white-space: nowrap; background: var(--tt-sun-amber); color: var(--tt-charcoal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 15px; padding: 12px 24px; border-radius: 14px; border: none; box-shadow: 0 2px 8px rgba(245,166,35,.35);">Set today's stone →</button>
+            </div>
+            <div style="flex: 1; min-width: 200px; max-width: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <div style="display: flex; flex-direction: column-reverse; align-items: center; gap: 4px; margin-bottom: 12px;">
+                <span style="width: 76px; height: 15px; border-radius: 8px; background: var(--tt-charcoal);"></span>
+                <span style="width: 64px; height: 14px; border-radius: 7px; background: var(--tt-slate);"></span>
+                <span style="width: 52px; height: 13px; border-radius: 7px; background: var(--tt-trail-green);"></span>
+                <span style="width: 42px; height: 12px; border-radius: 6px; background: var(--tt-green-500);"></span>
+                <span style="width: 32px; height: 10px; border-radius: 5px; background: var(--tt-green-300);"></span>
+                <span style="width: 24px; height: 9px; border-radius: 5px; border: 1.5px dashed var(--tt-warm-gray);"></span>
+              </div>
+              <p style="font-size: 14px; color: var(--tt-slate); margin: 0; text-align: center;">Two more completes this cairn</p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; padding: 14px 24px; border-top: 1px solid rgba(42,46,44,.10); background: rgba(42,46,44,.02); flex-wrap: wrap;">
+            <span style="font-size: 14px; color: var(--tt-slate); margin-right: 2px;">Trail behind</span>
+            <span style="width: 20px; height: 20px; border-radius: 5px 5px 3px 3px; background: var(--tt-charcoal);"></span>
+            <span style="width: 20px; height: 20px; border-radius: 5px 5px 3px 3px; background: var(--tt-charcoal);"></span>
+            <span style="width: 16px; height: 12px; border-radius: 4px 4px 3px 3px; background: var(--tt-warm-gray);"></span>
+            <span style="width: 20px; height: 17px; border-radius: 5px 5px 3px 3px; background: var(--tt-trail-green);"></span>
+            <span style="width: 14px; height: 10px; border-radius: 4px; border: 1.5px dashed var(--tt-warm-gray);"></span>
+            <span style="margin-left: 14px; display: inline-flex; align-items: center; gap: 7px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); border-radius: 999px; padding: 5px 12px; font-size: 14px; color: var(--tt-charcoal);"><span style="width: 8px; height: 8px; border-radius: 2px; background: var(--tt-trail-green);"></span>First Light</span>
+            <span style="display: inline-flex; align-items: center; gap: 7px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); border-radius: 999px; padding: 5px 12px; font-size: 14px; color: var(--tt-charcoal);"><span style="width: 8px; height: 8px; border-radius: 2px; background: var(--tt-trail-green);"></span>Steady Ground</span>
+            <span style="display: inline-flex; align-items: center; gap: 7px; background: rgba(180,85,45,.08); border: 1px solid rgba(180,85,45,.35); border-radius: 999px; padding: 5px 12px; font-size: 14px; color: var(--tt-charcoal);"><span style="width: 8px; height: 8px; border-radius: 2px; background: #B4552D;"></span>Switchback</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ cairnClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 13px 22px; margin-bottom: 20px;">
+          <span style="width: 22px; height: 22px; border-radius: 999px; background: var(--tt-trail-green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">✓</span>
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Today's stone is set</span>
+          <span style="display: inline-flex; align-items: flex-end; gap: 3px; margin-left: 4px;">
+            <span style="width: 7px; height: 12px; border-radius: 2px; background: var(--tt-charcoal);"></span>
+            <span style="width: 7px; height: 12px; border-radius: 2px; background: var(--tt-charcoal);"></span>
+            <span style="width: 6px; height: 8px; border-radius: 2px; background: var(--tt-warm-gray);"></span>
+            <span style="width: 7px; height: 11px; border-radius: 2px; background: var(--tt-trail-green);"></span>
+            <span style="width: 7px; height: 13px; border-radius: 2px; background: var(--tt-trail-green);"></span>
+          </span>
+          <span style="font-size: 14px; color: var(--tt-slate);">Two more completes this cairn</span>
+          <button onClick="{{ expandCairn }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Expand <span style="font-size: 14px;">▼</span></button>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 12px 18px; margin-bottom: 20px;">
+        <span style="flex-shrink: 0; white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Log time</span>
+        <span style="flex: 1; min-width: 150px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">Riverside Food Bank ▾</span>
+        <span style="flex-shrink: 0; width: 60px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">1.5</span>
+        <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Log it</button>
+      </div>
+
+      <sc-if value="{{ casesOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; overflow: hidden; margin-bottom: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 15px 22px; border-bottom: 1px solid rgba(42,46,44,.10);">
+            <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Your cases</h2>
+            <span style="font-size: 14px; color: var(--tt-slate);">{{ caseSummary }}</span>
+            <button onClick="{{ collapseCases }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Collapse <span style="font-size: 14px;">▲</span></button>
+          </div>
+          <sc-for list="{{ cases }}" as="c" hint-placeholder-count="3">
+            <a href="#" style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; border-bottom: 1px solid rgba(42,46,44,.10); text-decoration: none;">
+              <span style="flex: 1; min-width: 0;">
+                <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ c.subject }}</span>
+                <span style="display: block; margin-top: 5px; line-height: 1.5;">
+                  <span style="font-size: 14px; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: {{ c.statusColor }}; background: {{ c.statusBg }};">{{ c.status }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px; font-family: Menlo, monospace;">{{ c.number }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ c.updated }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ c.assigned }}</span>
+                </span>
+              </span>
+              <span style="flex-shrink: 0; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Open →</span>
+            </a>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ casesClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 13px 22px; margin-bottom: 22px;">
+          <span style="width: 22px; height: 22px; border-radius: 999px; background: var(--tt-trail-green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">✓</span>
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Your cases</span>
+          <span style="font-size: 14px; color: var(--tt-slate);">{{ casesClosedSummary }}</span>
+          <button onClick="{{ expandCases }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Expand <span style="font-size: 14px;">▼</span></button>
+        </div>
+      </sc-if>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; align-items: start;">
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 12px; margin: 0 0 12px;">
+            <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Also this week</h2>
+            <button onClick="{{ toggleWeek }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ weekLabel }}</button>
+          </div>
+          <div style="display: {{ weekDisplay }}; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ weekItems }}" as="w" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: {{ w.bg }}; border: 1px solid rgba(42,46,44,.14); border-radius: 14px;">
+                <span style="width: 17px; height: 17px; border-radius: 999px; border: 2px solid {{ w.dot }}; flex-shrink: 0;"></span>
+                <span style="flex: 1; font-size: 15px; color: var(--tt-charcoal);">{{ w.label }}</span>
+                <span style="font-size: 14px; font-weight: 600; color: {{ w.metaColor }};">{{ w.meta }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Decision Log</h3>
+            <p style="font-size: 14px; color: var(--tt-slate); margin: 0 0 12px;">Last entry 2 days ago — Select phase.</p>
+            <button style="background: var(--tt-trail-green); color: #fff; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 9px 16px; border-radius: 14px; border: none;">New entry</button>
+          </div>
+          <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Record your demo</h3>
+            <p style="font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 12px;">Walk through what you built. Goes to your coach as evidence, and stays yours to show an employer.</p>
+            <button style="border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Start recording</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <sc-if value="{{ rightClosed }}" hint-placeholder-val="{{ false }}">
+      <aside style="width: 60px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 12px;">
+        <button onClick="{{ openRight }}" title="Priya Raman, your coach" style="width: 38px; height: 38px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); padding: 0;"></button>
+        <button onClick="{{ openRight }}" title="#guided-spring" style="position: relative; width: 38px; height: 38px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          <span style="position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 999px; background: var(--tt-deep-teal); color: #fff; font-size: 14px; line-height: 18px; text-align: center; padding: 0 4px;">4</span>
+        </button>
+      </aside>
+    </sc-if>
+
+    <sc-if value="{{ rightOpen }}" hint-placeholder-val="{{ true }}">
+      <aside style="width: 288px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; min-height: 0;">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; gap: 12px; align-items: center;">
+          <span style="width: 40px; height: 40px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">{{ coachName }}</p>
+            <p style="font-size: 14px; color: var(--tt-slate); margin: 0;">{{ coachMeta }}</p>
+          </div>
+          <button onClick="{{ closeRight }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">›</button>
+        </div>
+        <div style="padding: 12px 20px 14px; border-bottom: 1px solid var(--tt-warm-gray);">
+          <a href="#" style="display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--tt-deep-teal); border-radius: 14px; padding: 9px 14px; text-decoration: none;">
+            <span style="width: 18px; height: 18px; border-radius: 5px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+            <span style="flex: 1; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">{{ contactLabel }}</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+          </a>
+          <p style="font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin: 8px 0 0;">{{ contactNote }}</p>
+        </div>
+        <div style="padding: 14px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; align-items: center; justify-content: space-between;">
+          <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">#guided-spring</p>
+          <span style="font-size: 14px; color: #fff; background: var(--tt-deep-teal); padding: 2px 9px; border-radius: 999px;">4</span>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px;">
+          <sc-for list="{{ messages }}" as="m" hint-placeholder-count="4">
+            <div>
+              <p style="font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 2px;">{{ m.who }}</p>
+              <p style="font-size: 14px; color: var(--tt-slate); margin: 0; line-height: 1.5;">{{ m.text }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding: 14px 20px; border-top: 1px solid var(--tt-warm-gray);">
+          <span style="display: block; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 9px 12px; font-size: 14px; color: var(--tt-slate);">Message #guided-spring</span>
+        </div>
+      </aside>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;stoneSet&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;},&quot;casesComplete&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;},&quot;hasCoach&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;}}">
+class Component extends DCLogic {
+  state = { left: false, right: true, cairn: true, cases: true, week: true };
+
+  renderVals() {
+    const stoneSet = this.props.stoneSet ?? false;
+    const casesComplete = this.props.casesComplete ?? false;
+    const cairn = stoneSet ? false : this.state.cairn;
+    const cases = casesComplete ? false : this.state.cases;
+
+    const openCases = [
+      { number: '00001042', subject: 'Referral intake stalls between phone and case file', status: 'In progress', statusColor: 'var(--tt-amber-700)', statusBg: 'var(--tt-amber-100)', updated: '2 hours ago', assigned: 'Assigned to you' },
+      { number: '00001047', subject: 'Volunteer hours reported twice in monthly totals', status: 'Awaiting client', statusColor: 'var(--tt-deep-teal)', statusBg: 'var(--tt-sky-100)', updated: 'Yesterday', assigned: 'Assigned to you' },
+      { number: '00001051', subject: 'Board report needs outcomes by program, not by month', status: 'New', statusColor: 'var(--tt-slate)', statusBg: 'var(--tt-white)', updated: '3 days ago', assigned: 'Assigned to you · owned by Priya Raman' },
+    ];
+
+    const hasCoach = this.props.hasCoach ?? true;
+
+    return {
+      coachName: hasCoach ? 'Priya Raman' : 'Penny',
+      coachMeta: hasCoach ? 'Advanced Coach · Thu 2:00pm' : 'Your companion until a coach is assigned',
+      contactLabel: hasCoach ? 'Message Priya on Slack' : 'Ask Penny',
+      contactNote: hasCoach
+        ? 'Opens a direct message. She answers between sessions, not instantly.'
+        : 'No coach assigned yet. Penny can help now, and will pass anything she cannot answer to the program team.',
+
+      leftOpen: this.state.left,
+      leftClosed: !this.state.left,
+      rightOpen: this.state.right,
+      rightClosed: !this.state.right,
+      cairnOpen: cairn,
+      cairnClosed: !cairn,
+      casesOpen: cases,
+      casesClosed: !cases,
+
+      openLeft: () => this.setState({ left: true, right: false }),
+      closeLeft: () => this.setState({ left: false }),
+      openRight: () => this.setState({ right: true, left: false }),
+      closeRight: () => this.setState({ right: false }),
+      collapseCairn: () => this.setState({ cairn: false }),
+      expandCairn: () => this.setState({ cairn: true }),
+      collapseCases: () => this.setState({ cases: false }),
+      expandCases: () => this.setState({ cases: true }),
+      setStone: () => this.setState({ cairn: false }),
+
+      weekDisplay: this.state.week ? 'flex' : 'none',
+      weekLabel: this.state.week ? 'Collapse ▲' : 'Expand ▼',
+      toggleWeek: () => this.setState({ week: !this.state.week }),
+
+      googleApps: [
+        { name: 'Gmail' }, { name: 'Calendar' }, { name: 'Drive' },
+        { name: 'Docs' }, { name: 'Sheets' }, { name: 'Meet' }, { name: 'Keep' },
+      ],
+
+      cases: casesComplete ? [] : openCases,
+      caseSummary: '3 open · Riverside Food Bank',
+      casesClosedSummary: 'All closed — 7 delivered at Riverside Food Bank',
+
+      weekItems: [
+        { label: 'Decision Log 04 — trade-off not stated', meta: 'Rework', metaColor: 'var(--tt-deep-teal)', bg: 'var(--tt-sky-100)', dot: 'var(--tt-deep-teal)' },
+        { label: 'Weekly quest — validation rule on referral close', meta: 'Sunday', metaColor: 'var(--tt-slate)', bg: '#fff', dot: 'var(--tt-warm-gray)' },
+        { label: 'Buddy test — Amara\u2019s validation rules', meta: 'This week', metaColor: 'var(--tt-slate)', bg: '#fff', dot: 'var(--tt-warm-gray)' },
+        { label: 'Reading ch. 3 · build the intake object', meta: 'This week', metaColor: 'var(--tt-slate)', bg: '#fff', dot: 'var(--tt-warm-gray)' },
+      ],
+
+      messages: [
+        { who: 'Amara', text: 'pushed my validation rules if anyone wants to look before Thursday' },
+        { who: 'Priya Raman', text: 'Reminder — sealed brief drops Monday 9am. Read it before you touch anything.' },
+        { who: 'Devon', text: 'passed on entry 06, second time lucky' },
+        { who: 'Amara', text: '1047 is a duplicate rule thing, I hit the same last week' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

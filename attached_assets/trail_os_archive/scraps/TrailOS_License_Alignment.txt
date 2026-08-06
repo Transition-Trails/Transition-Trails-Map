@@ -1,0 +1,184 @@
+
+
+## SHEET: Epic-License Alignment
+Trail OS — Epic to License Alignment (Live from Salesforce org + Power of Us + Slack Pro + Google Workspace) |  |  |  |  |  |  |  |  |  | 
+Epic ID | Epic Name | CAP | Phase | Primary Licenses Required | Platform | Specific License / PSL | Seats Needed | Seats Available | Coverage | Notes & Constraints
+E-01 | Penny — Public Guide (Commerce) | CAP-01 | 1 | Guest User License + Commerce User PSL + Agentforce Service Agent Builder PSL | Salesforce | Guest User (25 avail, 11 used) + Commerce User (1M) + Agent Builder (10k/2 used) | ~50–200 concurrent | Effectively unlimited | ✅ Covered | Guest User license handles unauthenticated storefront. Commerce User PSL covers buyers. Agent Builder covers Penny config. Plenty of headroom.
+E-02 | Penny — Learner Coach (Portal) | CAP-01 | 1 | External Apps Login + Agentforce Service Agent User PSL + Data Cloud | Salesforce | External Apps Login (2,020 avail / 1 used) + Agent User PSL (200 avail) + Data Cloud (200k) | Up to 200 learners | 2,020 login licenses + 200 agent user PSLs | ✅ Covered | External Apps Login is the right license for Experience Cloud learner portal. 2,020 available vs 1 used — massive runway. Agent User PSL (200) covers Penny sessions. Data Cloud feeds learner profiles.
+E-03 | Penny — Slack Integration | CAP-01 | 1 | Salesforce full license + Slack Pro | Salesforce + Slack | Salesforce (10 seats, 8 used) + Slack Pro (up to 50 free nonprofit) | Coaches + Angela + Kim + learners in Slack | 10 SF seats + Slack Pro seats | ✅ Covered | Slack Pro through nonprofit grant covers the DM and channel integration. SF API calls for interaction log writes use integration user license. Human approval gate runs on Salesforce full license (Angela/Kim).
+E-04 | Penny — Coach Coordinator | CAP-01 | 1 | Salesforce full license + Agentforce Service Agent Builder PSL | Salesforce | Salesforce (2 remaining seats) + Agent Builder PSL (10k avail) | Angela + Kim + coaches (read access) | 2 SF seats remaining + unlimited Agent Builder | ✅ Covered | Coach coordinator persona runs on Agentforce. Coaches access via External Apps Login (2,020 available). Angela and Kim use full SF licenses. No seat constraint.
+E-05 | Penny — Internal Chief of Staff | CAP-01 | 1 | Salesforce full license + Agentforce (Default) PSL | Salesforce | Salesforce (2 remaining) + Agentforce Default (1 used/1 total) + Agent Builder (10k) | Angela primary, Kim secondary | 1 Agentforce Default PSL — TIGHT | ⚠️ Watch | Agentforce Default PSL is 1 total, 1 used. Angela's Chief of Staff dashboard needs this PSL or the Agent Builder PSL. Agent Builder (10k) likely covers this. Confirm with Hugh which PSL the Angela dashboard agent uses.
+E-06 | Penny — Coach Development Engine | CAP-01 | 2 | External Apps Login + Agentforce Service Agent User PSL + Trail Tracker (trailheadapp) | Salesforce | External Apps Login (2,020) + Agent User PSL (200) + trailheadapp (free/unlimited) | All active coaches | Covered by existing pools | ✅ Covered | Coach Development Engine uses same license stack as Learner Coach (E-02). Trail Tracker package (trailheadapp) is installed and free. No additional licenses required.
+E-07 | Penny — Trail of Mastery Scrum Master | CAP-01 | 2 | External Apps Login + Agentforce Service Agent Builder PSL + sf_devops | Salesforce | External Apps Login + Agent Builder (10k) + DevOps Center (free) | ToM students + coaches | Fully covered | ✅ Covered | DevOps Center (sf_devops) is installed and free. External Apps Login covers ToM learners. Agent Builder PSL covers Penny scrum master agent config. No constraints.
+E-08 | Penny — Client Services Agent | CAP-01 | 2 | Salesforce full license + External Apps Login + Agentforce Service Agent User PSL | Salesforce | SF full (2 remaining) + External Apps Login (2,020) + Agent User (200) | Active clients via Slack Connect + Angela | Sufficient | ✅ Covered | Client access via Slack Connect doesn't require a Salesforce license for the client. Angela manages via full SF license. Agent User PSL (200 available) runs the client services agent.
+E-09 | Waitlist & Enrollment Management | CAP-02 | 1 | Salesforce full license + Commerce User PSL + External Apps Login | Salesforce | SF full (2 remaining) + Commerce User (1M) + External Apps Login (2,020) | All applicants + Angela/Kim | Effectively unlimited | ✅ Covered | Waitlist form hits Commerce Cloud or Experience Cloud as Guest (free license). Enrollment payment uses Commerce User PSL. Angela/Kim manage records on full SF licenses.
+E-10 | Learner Journey Tracking | CAP-02 | 1 | Salesforce full license + Data Cloud + External Apps Login | Salesforce | SF full + Data Cloud (200k) + External Apps Login (2,020) | All enrolled learners | 200k Data Cloud + 2,020 login seats | ✅ Covered | Program Engagement records and learner lifecycle data lives natively in Salesforce. Data Cloud (200k seats, 3 used) feeds unified learner profiles. No seat constraints for this epic.
+E-11 | Trail Tracker + Trailhead Integration | CAP-02 | 1 | trailheadapp package (Trail Tracker) + Salesforce full license | Salesforce | trailheadapp (free, unlimited, installed) + SF full (2 remaining) | All TT community members | Unlimited via Trail Tracker | ✅ Covered | Trail Tracker (trailheadapp) is already installed and free with unlimited licenses. Angela manages via full SF license. This epic is fully covered by existing provisioning.
+E-12 | Portfolio & GitHub Integration | CAP-02 | 1 | External Apps Login + sf_devops (DevOps Center) + Salesforce Integration license | Salesforce | External Apps Login (2,020) + DevOps Center (free) + SF Integration (5 total/1 used) | All enrolled learners | Fully covered | ✅ Covered | Experience Cloud portfolio pages use External Apps Login (2,020 available). DevOps Center is free and installed. GitHub connection uses Salesforce Integration license (4 remaining). No constraints.
+E-13 | Role Track Infrastructure | CAP-03 | 2 | Salesforce full license + External Apps Login + Agentforce Service Agent Builder PSL | Salesforce | SF full + External Apps Login (2,020) + Agent Builder (10k) | ToM students + Angela/Hugh config | Fully covered | ✅ Covered | Penny_Trail_Config__c is a custom object — no special license beyond full SF for configuration. ToM students access via External Apps Login. Agent Builder covers Penny persona calibration per track.
+E-14 | Client Case Queue & RESOLVE Workflow | CAP-03 | 2 | External Apps Login + Salesforce full license + Agentforce Service Agent User PSL | Salesforce | External Apps Login (2,020) + SF full (2 remaining) + Agent User (200) | ToM students + Angela/Kim review | Sufficient for first cohorts | ✅ Covered | Case object is native NPSP-adjacent. ToM students access via External Apps Login. Angela/Kim manage via full SF. Agent User PSL enables Penny context surfacing. Scales with External Apps Login pool (2,020).
+E-15 | Agentforce Track — Cross-Role | CAP-03 | 2 | Agentforce Service Agent Builder PSL + External Apps Login | Salesforce | Agent Builder (10,000 available / 2 used) + External Apps Login (2,020) | All ToM students across 6 tracks | Massive headroom on both pools | ✅ Covered | 10,000 Agent Builder PSLs is extraordinary headroom for teaching Agentforce. Every ToM student who configures an Agentforce agent in their dev org uses this PSL. No concern here.
+E-16 | Coach Onboarding & Profile | CAP-04 | 1 | External Apps Login + trailheadapp + Salesforce full license | Salesforce | External Apps Login (2,020) + Trail Tracker (free) + SF full (2 remaining) | All coaches (est. 5–15 initially) | Fully covered | ✅ Covered | Coaches access coach portal via External Apps Login. Trail Tracker is free and unlimited. Angela/Kim manage coach records on full SF licenses. Zero license constraints.
+E-17 | Sprint Guide & Resource Delivery | CAP-04 | 1 | External Apps Login + Salesforce Knowledge (included in full SF) | Salesforce | External Apps Login (2,020) + Knowledge (included in full SF license) | All active coaches | Fully covered | ✅ Covered | Knowledge Articles are included in full Salesforce license. Coach portal access uses External Apps Login. No additional license needed. This is pure configuration work.
+E-18 | Stipend Management | CAP-04 | 1 | Salesforce full license | Salesforce | SF full (2 remaining — Angela + Kim) | Angela + Kim | 2 seats sufficient for admin | ✅ Covered | Stipend tracking is internal admin workflow on full SF licenses. No external user access needed. Connects to Finance records already in org.
+E-19 | AI Org Assessment | CAP-05 | 1 | Salesforce Integration license + External Connected App + Agentforce Service Agent Builder PSL | Salesforce | SF Integration (5 total / 1 used = 4 remaining) + Agent Builder (10k) + Connected App (free) | Per client org connection | 4 integration licenses + unlimited Agent Builder | ✅ Covered | External Connected App authorization uses OAuth — no license consumed on TT side per connection. SF Integration license handles the API data pull via Zapier MCP. Claude API is external (not a SF license). 4 remaining integration licenses is sufficient for current client load.
+E-20 | Change Management System | CAP-05 | 2 | Salesforce full license + sf_devops (DevOps Center) | Salesforce | SF full (2 remaining) + DevOps Center (free) | Angela + Kim + ToM students (via External Apps Login) | Covered | ✅ Covered | Change management is a native Salesforce object configuration. DevOps Center handoff is free. Angela/Kim manage on full SF. ToM students interact via External Apps Login.
+E-21 | SOP & Knowledge Library | CAP-05 | 1 | Salesforce Knowledge (included in full SF) + External Apps Login | Salesforce | Knowledge (included) + External Apps Login (2,020) | Angela/Kim (authors) + all learners/coaches/clients (readers) | Fully covered | ✅ Covered | Salesforce Knowledge is included in full SF license. Learners, coaches, and clients read articles via External Apps Login (included in Experience Cloud access). No additional licenses.
+E-22 | GitHub + DevOps Center Integration | CAP-06 | 1 | sf_devops package (DevOps Center) + Salesforce Integration license + Code Builder PSL | Salesforce | DevOps Center (free/installed) + SF Integration (4 remaining) + Code Builder (40 avail/0 used) | Hugh + learner developers | Fully covered | ✅ Covered | DevOps Center is free and installed (sf_devops). Code Builder PSL (40 available, 0 used) enables browser-based VS Code for learners — this is a MAJOR teaching asset. Salesforce Integration license handles GitHub connection. All covered.
+E-23 | Automated Testing Framework | CAP-06 | 1 | Agentforce Service Agent Builder PSL + Salesforce Integration license + sf_devops | Salesforce | Agent Builder (10k) + SF Integration (4 remaining) + DevOps Center (free) | Automated — no user seats needed | Fully covered | ✅ Covered | Penny QA Engine runs as an Agentforce agent — no additional license beyond Agent Builder PSL. Human review gate is a DevOps Center approval step (free). Integration license handles automated test triggers.
+E-24 | Commerce Cloud Storefront | CAP-07 | 1 | Commerce Admin PSL + Commerce Session PSL + Commerce User PSL + Guest User License | Salesforce | Commerce Admin (1/1 used) + Session (1/1 used) + User (1M) + Guest (25 avail) | Angela/Kim (admin) + all buyers | 1M buyer licenses — unlimited | ✅ Covered | CRITICAL: Commerce Admin PSL is 1 seat total, 1 used — no room to add another admin. Commerce Session PSL also 1/1. This is fine for TT scale now but flag for grant renewal. Guest User (11/25 used) handles unauthenticated storefront browsing.
+E-25 | TrailKit Products | CAP-07 | 1 | Commerce User PSL + Commerce Admin PSL + Product Catalog Management PSLs | Salesforce | Commerce User (1M) + Admin (1/1 used) + Product Catalog Admin (2 avail) + Viewer (4 avail) | Angela/Kim (product management) + all buyers | Covered — Admin PSL is the constraint | ✅ Covered | Product Catalog Management PSLs (2 admin, 4 viewer available) enable digital product configuration. Commerce User PSL covers all purchases. Same Admin PSL constraint as E-24 — Angela uses the 1 available seat.
+E-26 | Google Classroom Integration | CAP-08 | 1 | Google Workspace for Nonprofits (free) + Salesforce Integration license | Google + Salesforce | Google Workspace Nonprofit (free, up to 2,000 accounts) + SF Integration (4 remaining) | All enrolled learners + coaches | Effectively unlimited on Google side | ✅ Covered | Google Workspace for Nonprofits is free for up to 2,000 users — TT is nowhere near that ceiling. SF Integration license handles the Salesforce↔Google Classroom data sync. No cost or license constraint here.
+E-27 | Native Salesforce LMS | CAP-08 | 2 | External Apps Login + Salesforce full license | Salesforce | External Apps Login (2,020) + SF full (2 remaining) | All enrolled learners | 2,020 login seats — well ahead of TT scale | ✅ Covered | Custom LMS objects in Salesforce don't require special licenses — just External Apps Login for learner access (2,020 available). Angela/Kim manage curriculum on full SF licenses.
+E-28 | Tableau Impact Dashboards | CAP-09 | 2 | Data Cloud PSL + CRM Analytics / Tableau license | Salesforce | Data Cloud (200k / 3 used) + Analytics Template Admin PSL (3 avail) + CRM User PSL (10 avail) | Angela + funders (read-only) | Data Cloud is well-provisioned | ⚠️ Watch | Data Cloud (200k) is the data layer — well covered. HOWEVER: Tableau Next (100,010 seats referenced in Product Vision doc) is not visible in current license query. This may be provisioned separately via Tableau.com nonprofit grant or via a Salesforce add-on not reflected in PermissionSetLicense. Hugh needs to verify Tableau Next provisioning before E-28 can be marked fully covered.
+E-29 | Salesforce Native Reporting | CAP-09 | 1 | Salesforce full license | Salesforce | SF full (2 remaining — Angela + Kim) | Angela + Kim | 2 full seats sufficient for report authoring | ✅ Covered | Native Salesforce reports and dashboards are included in full SF license. No additional license needed. Angela and Kim author reports; learners/coaches view via External Apps Login (included).
+E-30 | Marketing Cloud Journeys | CAP-10 | 2 | Customer Data Cloud for Marketing PSL (Marketing Cloud Engagement) | Salesforce | Customer Data Cloud for Marketing (200,000 / 0 used) | All email subscribers | 200k contacts — essentially unlimited for TT | ✅ Covered | The 'Customer Data Cloud for Marketing' PSL (200,000 seats, 0 used) covers Marketing Cloud engagement for journeys. This aligns with the Power of Us grant allocation. TT hasn't activated this yet — Phase 2 work. No license constraint.
+E-31 | Google Workspace Client Onboarding | CAP-11 | 1 | Google Workspace for Nonprofits (free for clients too via TechSoup/Google.org) | Google | Google Workspace Nonprofit — free for eligible nonprofits via Google.org | Each new nonprofit client | Free for each eligible 501(c)(3) client | ✅ Covered | Google Workspace for Nonprofits is available to any eligible 501(c)(3) through Google.org/TechSoup — TT's clients can apply independently. TT facilitates the application as a service. Slack Pro nonprofit grants are also available to clients (separate application). Zero license cost to TT for this deliverable.
+E-32 | Trail OS External Product Packaging | CAP-12 | 3 | All licenses above — packaged as a consulting deliverable for external orgs | Salesforce + Google + Slack | External orgs get their own Power of Us grant + Google Nonprofit grant + Slack Nonprofit grant | Each external nonprofit client | Each org applies for their own grants | ⚠️ Watch | TT doesn't sublicense its Salesforce licenses to external orgs — each nonprofit client applies for their own Power of Us (10 free SF licenses) and Google Workspace for Nonprofits grants. TT's role is to help them apply and configure. The Penny/Agentforce layer is the complex part — external orgs need their own Einstein Agent and Agentforce PSLs. Verify with Salesforce.org what's permissible under the Power of Us grant for reselling Trail OS.
+
+
+## SHEET: Live License Inventory
+Live License Inventory — Pulled from Salesforce Org via MCP (June 2026) |  |  |  |  | 
+License Name | Status | Total | Used | Available | Notes
+USER LICENSES (Power of Us Grant — Salesforce.org) |  |  |  |  | 
+Salesforce (full platform) | Active | 10.0 | 8.0 | 2 (20% free) | Power of Us — 10 full SF licenses
+Salesforce Integration | Active | 5.0 | 1.0 | 4 (80% free) | API/automation integration users
+Einstein Agent | Active | 201.0 | 0.0 | 201 (100% free) | Agentforce agent runner licenses
+External Apps Login | Active | 2020.0 | 1.0 | 2019 (99% free) | Experience Cloud login-based external users
+Customer Community | Active | 2.0 | 2.0 | 0 (0% free) | Legacy community licenses (in use)
+Chatter Free | Active | 5000.0 | 1.0 | 4999 (99% free) | Free collaboration — no data access
+Chatter External | Active | 500.0 | 0.0 | 500 (100% free) | External collaborators
+Guest User License | Active | 25.0 | 11.0 | 14 (56% free) | Public Experience Cloud / storefront
+Identity | Active | 100.0 | 0.0 | 100 (100% free) | SSO identity only
+Cloud Integration User | Active | 1.0 | 1.0 | 0 (0% free) | System integration
+Analytics Cloud Integration User | Active | 2.0 | 2.0 | 0 (0% free) | CRM Analytics integration
+Sales Insights Integration User | Active | 1.0 | 1.0 | 0 (0% free) | System
+PERMISSION SET LICENSES — ACTIVE (Power of Us Grant) |  |  |  |  | 
+Agentforce (Default) | Active | 1.0 | 1.0 | 0 | Core Agentforce/Copilot PSL
+Agentforce Platform User | Active | 2.0 | 0.0 | 2 | Agentforce platform users
+Agentforce Service Agent Builder | Active | 10000.0 | 2.0 | 9,998 (vast) | Build Agentforce service agents
+Agentforce Service Agent User | Active | 200.0 | 0.0 | 200 | Run Agentforce service agents
+External Einstein Agent | Active | 201.0 | 0.0 | 201 | Einstein agent for external/Experience Cloud
+Einstein Agent (PSL) | Active | 10.0 | 0.0 | 10 | Einstein Agent PSL
+Data Cloud | Active | 200000.0 | 3.0 | 199,997 (vast) | Unified data platform — massive allotment
+Customer Data Cloud for Marketing | Active | 200000.0 | 0.0 | 200,000 (vast) | Marketing Cloud / CDP segments
+Remote Data Cloud | Active | 200000.0 | 0.0 | 200,000 (vast) | External data federation
+Commerce Admin PSL | Active | 1.0 | 1.0 | 0 | Commerce Cloud admin
+Commerce Session PSL | Active | 1.0 | 1.0 | 0 | Commerce session management
+Commerce User | Active | 1000000.0 | 1.0 | 999,999 (vast) | B2C buyers — unlimited effectively
+D2C Commerce Shopper | Active | 1000000.0 | 0.0 | 1,000,000 (vast) | D2C shopper license
+Code Builder | Active | 40.0 | 0.0 | 40 | VS Code in browser for SF dev
+Einstein GPT Metadata Studio | Active | 150.0 | 0.0 | 150 | Grounding / RAG for Einstein
+Einstein Search | Active | 10.0 | 2.0 | 8 | Intelligent search
+Enablement Lite | Active | 15.0 | 1.0 | 14 | In-app guidance/training
+Einstein Conversation Insights Standard | Active | 2000.0 | 1.0 | 1,999 (vast) | Call coaching/insights
+Analytics Template Administration | Active | 3.0 | 0.0 | 3 | CRM Analytics template admin
+CRM User | Active | 10.0 | 0.0 | 10 | CRM Analytics viewer
+Employee Management | Active | 10.0 | 1.0 | 9 | HR/employee features
+Employee Access | Active | 10.0 | 0.0 | 10 | Employee self-service
+Pipeline Inspection | Active | 10.0 | 1.0 | 9 | Sales pipeline views
+Context Service Admin | Active | 2.0 | 0.0 | 2 | Agentforce context grounding admin
+Context Service Runtime | Active | 4.0 | 0.0 | 4 | Agentforce context grounding runtime
+Enhanced Chat User | Active | 2.0 | 0.0 | 2 | Messaging for web
+Automated Actions | Active | 1.0 | 0.0 | 1 | Flow automation
+Product Catalog Management Administrator | Active | 2.0 | 0.0 | 2 | Commerce product catalog
+Product Catalog Management Viewer | Active | 4.0 | 0.0 | 4 | Commerce product catalog viewer
+Product Discovery User | Active | 2.0 | 0.0 | 2 | Commerce product discovery
+Article Recommendations for Cases on Data Cloud | Active | 10.0 | 0.0 | 10 | Knowledge AI on Data Cloud
+Buyer Assistant | Active | 1.0 | 1.0 | 0 | Commerce AI buyer assistant
+Macros Manager | Active | 1.0 | 0.0 | 1 | Service macros
+Messaging User | Active | 1.0 | 0.0 | 1 | Messaging channel user
+INSTALLED PACKAGES (Free / Power of Us) |  |  |  |  | 
+NPSP (npsp) | Free | — | — | Unlimited | Nonprofit Success Pack — all objects (GAU, Opportunity, Campaigns, Recurring)
+npe01/npe03/npe4/npe5/npo02 | Free | — | — | Unlimited | NPSP sub-packages — households, recurring, relationships, affiliations
+sf_devops (DevOps Center) | Free | — | — | Unlimited | Salesforce native DevOps Center — pipelines, deployments, change tracking
+trailheadapp (Trail Tracker) | Free | — | — | Unlimited | Native Trail Tracker — Trailhead badge/trail sync for community
+agf (Agentforce framework) | Free | — | — | Unlimited | Agentforce base framework package
+omnistudio | Active | — | — | Unlimited | OmniStudio package (installed, disabled PSL)
+pmdm (Product MDM) | Active | — | — | Unlimited | Product data management
+sfdobase (SFDO Base) | Active | — | — | Unlimited | Salesforce.org base package for nonprofit cloud
+jotform | Active | — | — | Unlimited | Jotform forms integration
+canva | Active | — | — | Unlimited | Canva integration
+echosign_dev1 (Adobe Sign) | Active | — | — | Unlimited | E-signature
+HelloSign / hic_signeasy | Active | — | — | Unlimited | Additional e-signature options
+GW_Volunteers | Active | — | — | Unlimited | Volunteers for Salesforce — volunteer management
+stripeGC | Active | — | — | Unlimited | Stripe payment integration (likely to be replaced by native Payments)
+SLACK PRO — NONPROFIT GRANT |  |  |  |  | 
+Slack Pro — Workspace seats | Active | Up to 250 | TT team + coaches | 250 - current | Slack for Nonprofits grant. Standard Slack Pro features: unlimited message history, unlimited apps, Slack Connect for client channels, audio/video calls. Slack Connect (client channels) is key for TT client model.
+Slack Connect | Active | Unlimited channels | Client channels | Unlimited | External orgs can join TT's Slack via Slack Connect at no cost to either party. This is how TT runs client project channels (#project-*).
+Slack API / Webhooks | Active | Unlimited | Penny integration | N/A | Penny's Slack integration runs via Slack API (webhooks + Socket Mode). No per-seat cost for the API. Free with the Pro workspace.
+GOOGLE WORKSPACE FOR NONPROFITS — FREE GRANT |  |  |  |  | 
+Google Workspace for Nonprofits (Business Starter equiv) | Active | 2,000 accounts | TT team + learners + coaches | 2,000 - current usage | Free for eligible 501(c)(3) via Google.org. Includes Gmail, Drive, Docs, Sheets, Slides, Meet, Calendar, Forms, Classroom, NotebookLM, Gemini AI features.
+Google Classroom | Active | Unlimited courses | All program tracks | Unlimited | Free with Google Workspace for Nonprofits. TT uses as primary curriculum authoring and delivery tool. Penny connects via Google Classroom API.
+Google NotebookLM | Active | Unlimited notebooks | Penny knowledge base | Unlimited | Free with Google Workspace. TT uses as Penny's knowledge base layer. Grounding for RESOLVE methodology, SOPs, and program content.
+Google Gemini (AI features) | Active | Included | Penny intelligence engine | Included in workspace | Gemini 2.5 Flash is TT's AI engine for Penny. Included in Google Workspace for Nonprofits. API access for higher volume may require separate Google.org AI grant or API billing.
+Google Drive | Active | Pooled storage | All team + program assets | Up to 1TB pooled | Document storage, curriculum assets, org assessment outputs, build logs.
+Google Meet | Active | Included | Coaching sessions + team meetings | Included | Video calls up to 100 participants. Used for cohort sessions, coach sessions, client meetings.
+
+
+## SHEET: Constraints + Watch List
+License Constraints, Watch Items & Gaps — Trail OS |  |  |  | 
+Severity | Item | Current State | Risk / What Happens | Recommended Action
+🔴 Critical | Full Salesforce licenses (10 seats, 8 used, 2 remaining) | Angela and Kim are using 8 of 10 full SF licenses. Only 2 remaining. | TT cannot add a third full-access team member without exhausting the grant allocation. Hugh may need a full license for some admin work — check if he's on one of the 8. | Audit who holds the 8 active full SF licenses. Confirm Hugh's license type. Plan for next grant renewal cycle to request additional seats if program scales.
+🔴 Critical | Commerce Admin PSL (1 seat total, 1 used) | Commerce Admin PSL: 1 total, 1 used. No room to add a second Commerce admin. | If Angela or Kim needs a backup Commerce admin (e.g., Hugh supporting Commerce config), there is no available seat. Any Commerce Cloud changes require the 1 person who holds this PSL. | Confirm which user holds the Commerce Admin PSL. Evaluate whether the Commerce Session PSL (also 1/1) creates a single point of failure. Request additional Commerce Admin seats in next Power of Us renewal.
+⚠️ Watch | Agentforce Default PSL (1 seat total, 1 used) | Agentforce (Default) PSL: 1 total, 1 used. This is distinct from Agent Builder (10,000). | The Default PSL enables Copilot/Einstein sidebar in the SF UI. If Angela's Chief of Staff dashboard (E-05) requires this specific PSL rather than Agent Builder, there is no room to give it to a second user. | Confirm with Hugh: does Angela's dashboard agent use Agentforce Default PSL or Agent Builder PSL? If Default, this is a hard constraint. Agent Builder (10,000 available) is likely sufficient.
+⚠️ Watch | Tableau Next (100,010 seats) — not visible in license query | Product Vision references 100,010 Tableau Next seats. This does not appear in the Salesforce PermissionSetLicense query. | Either Tableau Next is provisioned through a separate Tableau.com nonprofit grant (not reflected in SF org licenses) or it hasn't been activated yet. E-28 (Tableau Impact Dashboards) cannot be built without confirming this. | Hugh: verify where the Tableau Next license lives. If it's a Tableau.com grant, confirm org connection to Salesforce. If not yet applied for, apply through Tableau Foundation nonprofit program before E-28 sprint begins.
+⚠️ Watch | Salesforce Integration licenses (5 total, 1 used, 4 remaining) | 4 integration licenses remaining for API-based connections (GitHub, Zapier, Claude API, Google Classroom). | TT has multiple planned API integrations: GitHub, Zapier MCP, Google Classroom sync, Connected App for client orgs. Each may require an integration license. 4 remaining provides some runway but could get tight in Phase 2. | Map each planned API integration to an integration license. Some may share one license user. Audit whether current 1 used is GitHub or another integration. Flag for renewal if 3+ simultaneous API integrations are required.
+⚠️ Watch | Google Gemini API for Penny — high-volume usage | Google Workspace for Nonprofits includes Gemini features. High-volume API usage for Penny (all learners, coaches, clients) may exceed what's included. | Penny's 7-layer prompt architecture on 100+ learners doing daily sessions will generate significant Gemini API volume. Workspace inclusion may have rate limits that don't support production-scale coaching. | Test Gemini API rate limits with a pilot cohort before full program launch. Apply for Google.org AI for Social Good grant for expanded API access if needed. Have a fallback plan (Claude API direct) if Gemini rate limits become a constraint.
+ℹ️ Note | External Apps Login (2,020 seats, only 1 used currently) | TT has 2,020 External Apps Login seats for Experience Cloud. Only 1 is currently used. | This is the license that covers every learner, coach, and client accessing Experience Cloud portal features. 2,020 seats means TT can run approximately 2,000 simultaneous portal users before hitting any ceiling. | No action required. This is a significant grant allocation. Note for future planning: if TT scales beyond 2,000 active portal users, additional External Apps Login seats will need to be requested.
+ℹ️ Note | Code Builder PSL (40 seats, 0 used) | 40 Code Builder PSLs available, none activated. | Code Builder enables browser-based VS Code for Salesforce development. This is a major teaching asset for Trail of Mastery — learners can develop in a browser without a local VS Code setup. | Activate Code Builder for Hugh immediately to test. Plan to enable for ToM learners in Phase 2. 40 seats is enough for multiple cohorts. This is a free teaching tool TT is not using yet.
+ℹ️ Note | Slack Pro nonprofit grant — verify seat count and renewal | Slack for Nonprofits grant provides Pro workspace. Seat limit and renewal terms vary. | If TT's Slack Pro grant has a seat cap (some nonprofit grants cap at 250 seats), adding large cohorts of learners to Slack could approach the limit. | Verify current Slack for Nonprofits grant: seat limit, renewal date, and whether Slack Connect client channels count against seat limits. Plan accordingly for cohort size.
+
+
+## SHEET: Feature License Map
+Feature-Level License Map — Which License Enables Which Feature |  |  |  |  | 
+Feature ID | Feature Name | Primary License | License Platform | Coverage | Key Constraint
+F-001 | Program fit quiz | Guest User + Commerce User PSL | Salesforce | ✅ Covered | Guest (11/25 used) + Commerce User (1M)
+F-002 | Nonprofit scoping conversation | Guest User + Commerce User PSL | Salesforce | ✅ Covered | Same as F-001
+F-003 | Donor merch/donation guidance | Guest User + Commerce User PSL | Salesforce | ✅ Covered | Same as F-001
+F-004 | 7-layer prompt architecture | Agentforce Service Agent Builder PSL | Salesforce | ✅ Covered | 10,000 seats / 2 used
+F-005 | Trail Quest delivery | External Apps Login + Agent Builder PSL | Salesforce | ✅ Covered | 2,020 login / 10k agent builder
+F-006 | Career Profile Review | External Apps Login + Agent Builder PSL | Salesforce | ✅ Covered | Same as F-005
+F-007 | Penny_Interaction_Log__c | Salesforce full license (object creation) | Salesforce | ✅ Covered | Custom object — included in full SF
+F-008 | Gamification badges/points | External Apps Login + SF full | Salesforce | ✅ Covered | Custom objects included in full SF
+F-009 | Penny Slack DM — full coaching | Slack Pro + SF Integration license | Slack + Salesforce | ✅ Covered | Slack Pro nonprofit grant
+F-010 | Penny channel @mention | Slack Pro | Slack | ✅ Covered | Included in Slack Pro
+F-011 | Client channel liaison mode | Slack Pro (Slack Connect) + SF full | Slack + Salesforce | ✅ Covered | Slack Connect free with Pro
+F-012 | Weekly cohort intelligence report | Slack Pro + SF Integration | Slack + Salesforce | ✅ Covered | Scheduled Slack post via API
+F-013 | Pre-session learner context assembly | Agent Builder PSL + SF full | Salesforce | ✅ Covered | 10,000 Agent Builder PSLs
+F-014 | Red flag detection | Agent Builder PSL + SF Integration | Salesforce | ✅ Covered | Automated — no user seat
+F-015 | Post-session note structuring | Agent Builder PSL + SF full | Salesforce | ✅ Covered | Writes to Contact record
+F-016 | Angela Dashboard — cohort health | Salesforce full license | Salesforce | ✅ Covered | Angela's 1 of 10 full seats
+F-017 | Angela Dashboard — learner detail | Salesforce full license | Salesforce | ✅ Covered | Same as F-016
+F-018 | Natural language queries via Claude MCP | Salesforce full + SF Integration | Salesforce | ✅ Covered | Claude API is external, not a SF license
+F-019 | Trail Tracker — Trailhead badge sync | trailheadapp package (free) | Salesforce | ✅ Covered | Free installed package
+F-020 | TT-assigned Trailmixes | trailheadapp package (free) | Salesforce | ✅ Covered | Same as F-019
+F-021 | Salesforce Connected App — client auth | SF Integration license + Connected App (free) | Salesforce | ✅ Covered | 4 integration licenses remaining
+F-022 | Zapier MCP → Claude API org pull | SF Integration license | Salesforce | ✅ Covered | Claude API external, not a license
+F-023 | Structured assessment to Google Doc | Google Workspace for Nonprofits (Drive/Docs) | Google | ✅ Covered | Free nonprofit grant
+F-024 | Penny delivers assessment to Slack | Slack Pro + SF Integration | Slack + Salesforce | ✅ Covered | Human approval gate uses SF full license
+F-025 | Knowledge Article library — RESOLVE | Salesforce Knowledge (included in full SF) | Salesforce | ✅ Covered | Knowledge included in full SF
+F-026 | Penny Knowledge Article routing | Agent Builder PSL | Salesforce | ✅ Covered | 10,000 Agent Builder PSLs
+F-027 | GitHub branch protection + CI | sf_devops package (free) + SF Integration | Salesforce | ✅ Covered | DevOps Center is free
+F-028 | DevOps Center + GitHub connection | sf_devops package (free) + SF Integration | Salesforce | ✅ Covered | 1 integration license for GitHub connection
+F-029 | Build log tracking | Google Sheets (Google Workspace) + SF full | Google + Salesforce | ✅ Covered | Google Workspace nonprofit grant
+F-030 | Penny QA Engine | Agent Builder PSL + SF Integration | Salesforce | ✅ Covered | Automated agent — no user seat
+F-031 | Human review gate | sf_devops (free) + SF full | Salesforce | ✅ Covered | DevOps Center approval step
+F-032 | Commerce Cloud program enrollment | Commerce Admin PSL + Commerce User PSL | Salesforce | ⚠️ Watch | Commerce Admin PSL: 1/1 used — no backup
+F-033 | Commerce coaching session booking | Commerce Admin PSL + Commerce User PSL | Salesforce | ⚠️ Watch | Same Commerce Admin constraint as F-032
+F-034 | Native Salesforce Payments | Commerce Admin PSL + Salesforce Payments | Salesforce | ⚠️ Watch | Commerce Admin PSL single point of failure
+F-035 | Penny Google Classroom monitoring | Google Workspace + SF Integration | Google + Salesforce | ✅ Covered | Google Classroom API free
+F-036 | Penny_Classroom_Nudge__c dedup | SF full (object creation) + SF Integration | Salesforce | ✅ Covered | Custom object in full SF
+F-037 | Six role track configs (Penny_Trail_Config__c) | SF full (object) + Agent Builder PSL | Salesforce | ✅ Covered | Custom object + 10k Agent Builder
+F-038 | Agentforce cross-track quest content | Agent Builder PSL | Salesforce | ✅ Covered | 10,000 PSLs — major teaching asset
+F-039 | ToM Case queue | SF full + External Apps Login | Salesforce | ✅ Covered | Case object native
+F-040 | RESOLVE evaluation workflow (Flow) | SF full (Flow builder) | Salesforce | ✅ Covered | Flow included in full SF
+F-041 | Change management system | SF full + sf_devops | Salesforce | ✅ Covered | Custom objects + DevOps handoff
+F-042 | Tableau impact dashboards | Data Cloud PSL + Tableau Next (unverified) | Salesforce + Tableau | ⚠️ Watch | Tableau Next license not confirmed in SF org
+F-043 | Live grant impact reporting | Data Cloud PSL + Tableau Next (unverified) | Salesforce + Tableau | ⚠️ Watch | Same as F-042 — verify Tableau provisioning
+F-044 | Marketing Cloud learner nurture | Customer Data Cloud for Marketing PSL (200k) | Salesforce | ✅ Covered | 200k seats, 0 used — wide open
+F-045 | Marketing Cloud donor/alumni journeys | Customer Data Cloud for Marketing PSL | Salesforce | ✅ Covered | Same as F-044
+F-046 | Google Workspace client onboarding playbook | Google Workspace for Nonprofits (client-side) | Google | ✅ Covered | Free for each eligible client
+F-047 | Google Workspace + Salesforce integration | Google Workspace + SF Integration license | Google + Salesforce | ✅ Covered | 1 integration license per client
+F-048 | Trail OS external product packaging | Client's own Power of Us grant | Salesforce (client) | ⚠️ Watch | Each external org needs their own grant
+F-049 | Penny external offering | Client's own Einstein Agent + Agentforce PSLs | Salesforce (client) | ⚠️ Watch | Verify Power of Us grant transferability rules

@@ -1,0 +1,700 @@
+TRANSITION TRAILS
+Foundations Trail
+FT
+Program Blueprint & Learner Guide
+Program
+ | Foundations Trail (FT)
+ | 
+Prerequisites
+ | Salesforce Platform Foundations Certification — or currently enrolled and preparing for it
+ | 
+Target Goal
+ | Pass the Salesforce Administrator certification exam + build a portfolio of real project experience
+ | 
+Duration
+ | 12 Weeks (3 Sprints × 4 weeks)
+ | 
+Format
+ | Self-Guided + Build With Me Videos + Penny AI + Weekly Office Hours + 2 Private Coach Sessions
+ | 
+Capstone Project
+ | Horizon Community Hub (HCH) — Administrator Edition (build from scratch)
+ | 
+Program Cost
+ | Standard: $997 (one-time)  ·  Payment Plan: 3x $367/mo ($1,101 total)  ·  Scholarship: $497 (application required)
+ | 
+Version
+ | 1.0  —  2026
+ | 
+
+&quot;The certification is the door. The Foundations Trail is how you prove you can walk through it.&quot;
+1. Program Overview
+1.1 What Is the Foundations Trail?
+The Foundations Trail (FT) is a 12-week, self-guided program designed for learners who are working toward the Salesforce Administrator certification and want to build real project experience at the same time. It is the second step on the Transition Trails learning path — after the Explorer's Trail and before the Guided Trail.
+
+The Foundations Trail does not just prepare you for the exam. It builds the portfolio that proves you can do the work. By the end of 12 weeks, you will have passed — or be ready to pass — the Salesforce Admin exam, and you will have a complete, published Salesforce build that employers can review.
+
+This is not a study guide. It is a practicum with exam prep embedded inside it.
+
+The Foundations Trail Difference: Build While You Study
+Trailhead prepares you for the exam — but it doesn’t give you a project to show.
+Bootcamps build things — but they often skip the exam or charge $5,000+ to do both.
+The Foundations Trail does both at once, at a fraction of the cost.
+Every Sprint builds a new layer of the HCH capstone AND maps directly to the Admin exam domains. By the time you sit the exam, you’ve already built the thing they’re testing you on.
+ | 
+
+1.2 Who This Program Is For
+The Foundations Trail is designed for learners who are ready to commit to earning their Salesforce Administrator certification — and who want to come out the other side with more than a test result.
+
+ | The Career Pivoter
+ | The Accidental Admin
+ | 
+Your Profile
+ | Making a deliberate career change into Salesforce. Has done the research. Ready to commit.
+ | Already using Salesforce at work but never formally trained. Wants the credential to match the reality.
+ | 
+What You Bring
+ | Motivation, transferable business skills, and willingness to put in the work.
+ | Real org experience. You’ve seen how it works in practice. Now you need the theory to match it.
+ | 
+What You Need
+ | A structured program that builds exam readiness AND portfolio proof simultaneously.
+ | A way to formalize what you already know and fill in the gaps you’ve been working around.
+ | 
+
+Who Is NOT Ready for the Foundations Trail
+•  You have not yet earned the Platform Foundations certification. (Explorer’s Trail Beginner/Intermediate level is your next step.)
+•  You have already passed the Admin exam. (Guided Trail or Explorer’s Trail Advanced is the right place.)
+•  You are looking for a passive study experience. This program requires weekly builds, not just reading.
+ | 
+
+1.3 How the Foundations Trail Differs from Other TT Programs
+Feature
+ | Foundations Trail (FT)
+ | Explorer's Trail (ET)
+ | Guided Trail (GT)
+ | Trail of Mastery (ToM)
+ | 
+Primary Goal
+ | Pass Admin exam + build first project experience
+ | Ongoing skill-building at any level
+ | Close experience gap and get hired
+ | Advance to practitioner-level consulting
+ | 
+Prerequisites
+ | Platform Foundations cert
+ | None
+ | Admin cert; not yet employed
+ | Employed Salesforce Admin
+ | 
+Format
+ | Self-guided + Build With Me videos
+ | Self-guided membership
+ | Cohort-based practicum
+ | Cohort-based + client work
+ | 
+Duration
+ | 12 weeks (3 Sprints)
+ | Monthly/annual (ongoing)
+ | 12 weeks (3 Sprints)
+ | Ongoing cohort-based
+ | 
+Live Sessions
+ | Weekly Office Hours
+ | Webinars (optional)
+ | Weekly Campfires + Stand-Ups
+ | Weekly Campfires + client sessions
+ | 
+Coaching
+ | 2 private sessions
+ | Async 1:1 coaching
+ | 3 private sessions
+ | Included in program
+ | 
+Capstone
+ | HCH — full org build from scratch
+ | None (Trail Missions)
+ | HCH — inherited org as admin
+ | Real nonprofit client projects
+ | 
+Entry Cost
+ | $997 / 3x$367 / $497 scholarship
+ | $47/mo · $397/yr
+ | $1,497 / 3x$549 / $747 scholarship
+ | $1,997 / 4x$549 / employer tier
+ | 
+
+1.4 The Penny AI Assistant
+Penny is your on-demand AI learning partner throughout the Foundations Trail. She is available 24/7 inside the Academy platform and is specifically tuned to support the dual goal of this program: pass the exam AND build something real.
+
+In the Foundations Trail, Penny shifts between two modes depending on what you need:
+
+Exam Mode: Concept explanation, scenario quiz, mock exam questions, and 'explain it back to me' prompts that mirror the way the Admin exam actually tests knowledge.
+Build Mode: Build reviewer that connects your HCH configuration work to the exam domain it belongs to, decision log partner that pushes back on weak reasoning, and stakeholder language coach that helps you explain technical decisions in plain English.
+
+What Penny Is Not
+Penny does not take the exam for you or walk you through build tasks step by step.
+Penny does not replace your coach. She prepares you for more productive coaching conversations.
+Penny is not a study guide that summarizes what to memorize. She is a thinking partner that helps you understand why — which is what the Admin exam actually tests.
+ | 
+2. Program Structure
+2.1 The 12-Week Journey
+The Foundations Trail is organized into three 4-week Sprints. Each Sprint builds a new layer of the HCH capstone and covers a distinct cluster of Admin exam domains. The Sprint structure ensures that every build task is anchored to testable knowledge — and every exam concept has a corresponding configuration you can point to in your portfolio.
+
+Sprint
+ | Name
+ | Exam Domains Covered
+ | HCH Build Output
+ | 
+Sprint 1Weeks 1–4
+ | The Foundation
+ | Data Model & Management · Security & Access · Platform Basics
+ | Complete HCH data model (NPSP), role hierarchy, profiles & permission sets, OWD settings, field-level security
+ | 
+Sprint 2Weeks 5–8
+ | The Engine
+ | Automation · Service Cloud · Process Automation · Data Management
+ | Email-to-Case, Web-to-Case, record-triggered Flows, assignment rules, data import/export, duplicate management
+ | 
+Sprint 3Weeks 9–12
+ | The Proof
+ | Reports & Dashboards · Activity Management · Collaboration · Adoption & Analytics
+ | Entitlements & SLAs, custom reports & dashboards, org documentation, portfolio completion, exam readiness review
+ | 
+
+2.2 Your Weekly Rhythm
+The Foundations Trail is self-paced — there are no required live sessions outside of Office Hours. But the best learners are not passive. The weekly rhythm below is the structure that produces results.
+
+Activity
+ | What It Looks Like
+ | 
+Complete the Weekly Build Task
+ | Work through the HCH build task for the week. Build in your Developer Edition org. No walkthroughs — just the stakeholder brief, the documentation, and Penny.
+ | 
+Update Your Admin Decision Log
+ | After your build, document your decision: what you built, the options you considered, what you chose, and why. Minimum one entry per week.
+ | 
+Penny Exam Check-In
+ | Penny connects your build to the exam domain it covers. She asks scenario questions, quizzes the concept, and makes sure you can explain it without looking at your notes.
+ | 
+Attend Office Hours (Optional)
+ | Weekly live session — 45 to 60 minutes, recorded. Bring questions. Bring your build. Get real answers from a Transition Trails coach.
+ | 
+Engage the Community
+ | Slack community. #foundations-trail channel. Share a win, ask a question, answer someone else’s. Self-guided learning compounds when it’s connected.
+ | 
+
+2.3 Private Coach Sessions
+You have two private 45-minute sessions with a Transition Trails coach during your 12 weeks. These sessions are not technical help desks. They are career and exam readiness conversations grounded in your actual build work.
+
+Session
+ | Timing
+ | Focus
+ | 
+Session 1
+ | End of Sprint 1 (Week 4)
+ | Build check-in: are you building the right things and documenting decisions clearly? Career clarity: is the Admin exam and Salesforce career the right direction for you? Penny usage: are you using the exam modes effectively?
+ | 
+Session 2
+ | Week 10 (Sprint 3 mid-point)
+ | Exam readiness check: are you ready to sit the exam? Portfolio review: does your published work tell the story of an exam-ready, job-ready candidate? Next steps: Guided Trail, job market, or more time in the Explorer’s Trail?
+ | 
+3. The HCH Capstone — Foundations Trail Edition
+3.1 Project Overview
+Your capstone project is the Horizon Community Hub (HCH) — a realistic nonprofit that serves vulnerable communities in the Dallas-Fort Worth area. HCH provides utility assistance, housing stabilization support, and veteran services to families in crisis.
+
+In the Foundations Trail, you are building HCH's Salesforce environment from scratch. You start with an empty Developer Edition org. Over 12 weeks, you build the complete system — data model, security architecture, automation, case management, dashboards, and documentation — using Build With Me videos that walk you through each step while Penny connects every configuration choice to the Admin exam domain it covers.
+
+HCH at a Glance
+Organization: Horizon Community Hub (HCH) — nonprofit, Dallas-Fort Worth
+Mission: Stabilize families in crisis through utility assistance, housing support, and veteran services
+Staff: Executive Director, Program Director (Elena), 4 Support Staff, 3 Volunteers
+Your Role: Salesforce Administrator building the system from the ground up
+Stakeholder: Elena (Program Director) — your primary point of contact throughout the build
+Org Type: Nonprofit (NPSP) — Household Account model, Donation tracking, case management
+ | 
+
+3.2 What Makes This a Foundations Trail Build
+The Foundations Trail capstone is guided. You receive Build With Me videos that walk you through the configuration — and Penny explains why every decision maps to the Admin exam. This is different from the Guided Trail, where no walkthrough exists and you have to figure out the solution yourself.
+
+The goal in the Foundations Trail is not yet independent decision-making. The goal is to build something real while learning the concepts deeply enough to pass the exam and explain your work to an employer.
+
+ | Foundations Trail (You Are Here)
+ | Guided Trail (What Comes Next)
+ | 
+Build prompt
+ | Build With Me video showing the steps
+ | Stakeholder brief describing the business problem — no video
+ | 
+Configuration decisions
+ | Guided
+ | Yours to justify
+ | 
+Penny’s role
+ | Exam connector + concept explainer
+ | Interview prep + decision challenger
+ | 
+Portfolio artifact format
+ | Prescribed format, guided content
+ | Prescribed format, your authentic decisions
+ | 
+Primary goal
+ | Build it and understand it
+ | Build it, decide it, and prove you can explain it
+ | 
+4. Sprint 1: The Foundation (Weeks 1–4)
+Sprint Goal
+Build HCH’s complete data architecture from scratch. Establish the security model that governs who sees what. Create the documentation foundation that every future admin will rely on.
+Technical Focus: Data Model · NPSP · Security & Access · Role Hierarchy · Profiles & Permission Sets · Field-Level Security
+Capstone Output: Complete HCH org — NPSP configured, custom objects, role hierarchy, profiles, OWD settings, and Sprint 1 portfolio section published
+ | 
+
+Week 1: Org Setup & NPSP Configuration
+Stakeholder Brief: Elena has asked you to get HCH set up in Salesforce. The organization has never had a CRM before. She needs to know that the system is ready for the team to start entering client data — and she needs to be able to trust that the data is organized the way HCH actually works.
+
+Build Task: Install NPSP in your Developer Edition org. Configure the Household Account model. Set up the HCH account and contact data structure. Document your configuration decisions in your Admin Decision Log.
+
+Portfolio Artifact: Publish a screenshot gallery and a 150-word written summary of your configuration decisions for this week. Your summary should explain what you built and why — in language Elena could understand.
+
+Penny Exam Check-In: #FT-01: Why did you choose the Household Account model over Person Accounts? What would change about HCH’s reporting capability if you had chosen differently?
+
+Admin Decision Log Entry: #FT-01: Why did you choose the Household Account model over Person Accounts? What would change about HCH’s reporting capability if you had chosen differently?
+ | 
+
+Week 2: Custom Objects & Data Model
+Stakeholder Brief: HCH tracks three service types — utility assistance, housing stabilization, and veteran services — but there is no object for client cases or service records in the default NPSP setup. Elena needs these tracked separately from donations.
+
+Build Task: Build HCH’s custom data model: create the Service Record custom object, establish relationships to the Household Account and Contact, and map the field structure for each service type. Create a validation rule that prevents a Service Record from being saved without a linked Case.
+
+Portfolio Artifact: Publish a screenshot gallery and a 150-word written summary of your configuration decisions for this week. Your summary should explain what you built and why — in language Elena could understand.
+
+Penny Exam Check-In: #FT-02: What relationship type did you use between Service Record and Account? What were the alternatives, and why did this relationship best serve HCH’s reporting needs?
+
+Admin Decision Log Entry: #FT-02: What relationship type did you use between Service Record and Account? What were the alternatives, and why did this relationship best serve HCH’s reporting needs?
+ | 
+
+Week 3: Security Architecture — Roles, Profiles & OWDs
+Stakeholder Brief: HCH has five staff members and three volunteers. Staff need full access to client records. Volunteers should only see the cases they are assigned to. The Executive Director needs to see everything, including financial donation records. Volunteers must never see donor financial data.
+
+Build Task: Configure HCH’s security model: build the role hierarchy, assign profiles, set OWD defaults, and create sharing rules that give volunteers case access without exposing financial records. Test your security model by logging in as a volunteer user.
+
+Portfolio Artifact: Publish a screenshot gallery and a 150-word written summary of your configuration decisions for this week. Your summary should explain what you built and why — in language Elena could understand.
+
+Penny Exam Check-In: #FT-03: Explain the principle of least privilege as you applied it to the volunteer profile. What is the business risk you were protecting against, and how does your configuration address it?
+
+Admin Decision Log Entry: #FT-03: Explain the principle of least privilege as you applied it to the volunteer profile. What is the business risk you were protecting against, and how does your configuration address it?
+ | 
+
+Week 4: Field-Level Security & Record Visibility
+Stakeholder Brief: A board member has raised a concern: staff members can currently see donation amounts on all donor records, including major donors whose gift amounts are considered confidential. Only the Executive Director and Development Officer should see major donor gift amounts.
+
+Build Task: Configure field-level security to restrict the Donation Amount field based on role. Create a custom field to flag records as major donor records. Test that the restriction applies correctly across profiles.
+
+Portfolio Artifact: Publish a screenshot gallery and a 150-word written summary of your configuration decisions for this week. Your summary should explain what you built and why — in language Elena could understand.
+
+Penny Exam Check-In: #FT-04: When would you use field-level security instead of record-level sharing? What is the difference, and when does each approach apply?
+
+Admin Decision Log Entry: #FT-04: When would you use field-level security instead of record-level sharing? What is the difference, and when does each approach apply?
+ | 
+
+PRIVATE COACH SESSION 1 — End of Sprint 1 (Week 4)
+This session reviews your Sprint 1 build and opens a career clarity conversation.
+Your coach will ask you to walk them through one artifact from your Sprint 1 portfolio as if they were reviewing it as an employer.
+Come prepared: know your Decision Log entries. Be ready to explain what you built and why.
+Career question your coach will ask: ‘Is the Salesforce Admin certification and career path still the right direction for you based on what you’ve experienced in this first sprint?’
+ | 
+
+5. Sprint 2: The Engine (Weeks 5–8)
+Sprint Goal
+Automate HCH’s intake and case management processes. Build the flows, routing rules, and email/web channels that turn manual work into automated structure.
+Technical Focus: Automation · Flow Builder · Email-to-Case · Web-to-Case · Assignment Rules · Data Management
+Capstone Output: Tri-channel automated intake system (email + web + phone), assignment rules, loop-protected Flows, and Sprint 2 portfolio section published
+ | 
+
+Week 5: Email-to-Case
+Stakeholder Brief: HCH receives client requests through three email addresses: intake@hch.org, urgent@hch.org, and info@hch.org. Staff are manually creating cases from email. Cases are being missed. Elena needs every inbound email to automatically create a case in Salesforce.
+
+Build Task: Configure Email-to-Case for all three HCH inboxes. Set routing addresses, configure auto-response templates for each inbox, and assign record types per channel. Test end-to-end.
+
+Portfolio Artifact: Screenshot gallery of your configuration + a 100-word written explanation of the business problem this build solves. Write it as if explaining to Elena.
+
+Penny Exam Check-In: Ask Penny to give you three exam-style scenario questions based on what you built this week. Answer them, then ask Penny to evaluate your answers.
+
+Admin Decision Log Entry: #FT-05: Why did you configure separate routing addresses rather than a single inbox? How does this configuration map to the Service Cloud domain on the Admin exam?
+ | 
+
+Week 6: Web-to-Case & Intake Forms
+Stakeholder Brief: HCH is partnering with a local school district to receive family referrals. School counselors need a web form they can fill out on behalf of families. Elena wants these referrals to arrive in Salesforce as pre-categorized cases with a specific record type.
+
+Build Task: Build a Web-to-Case form for the school district referral channel. Configure the form fields, set up a dedicated record type and queue for school district referrals. Test end-to-end.
+
+Portfolio Artifact: Screenshot gallery of your configuration + a 100-word written explanation of the business problem this build solves. Write it as if explaining to Elena.
+
+Penny Exam Check-In: Ask Penny to give you three exam-style scenario questions based on what you built this week. Answer them, then ask Penny to evaluate your answers.
+
+Admin Decision Log Entry: #FT-06: What are the differences between Web-to-Case and a Salesforce Experience Cloud form? When would you use each?
+ | 
+
+Week 7: Flow Builder & Record-Triggered Automation
+Stakeholder Brief: When a new case is created in HCH’s Salesforce org, staff have to manually update the case status and send a notification to the assigned caseworker. Elena wants this to happen automatically the moment a case is created.
+
+Build Task: Build a record-triggered Flow that fires on Case creation: update the initial status field, send an email notification to the assigned queue, and log a task for the caseworker. Add entry criteria to prevent the Flow from running on updates.
+
+Portfolio Artifact: Screenshot gallery of your configuration + a 100-word written explanation of the business problem this build solves. Write it as if explaining to Elena.
+
+Penny Exam Check-In: Ask Penny to give you three exam-style scenario questions based on what you built this week. Answer them, then ask Penny to evaluate your answers.
+
+Admin Decision Log Entry: #FT-07: What entry criteria did you set, and why? What would happen if you did not add entry criteria — and how does this connect to loop protection on the Admin exam?
+ | 
+
+Week 8: Data Management — Import, Export & Deduplication
+Stakeholder Brief: HCH is migrating client records from a spreadsheet maintained by a former staff member. The spreadsheet has 150 records, some of which are duplicates. Elena needs the data in Salesforce by the end of the week, clean and without breaking existing records.
+
+Build Task: Use Data Import Wizard to import a sample dataset of 30 records. Configure duplicate management rules to catch records with matching email or phone. Run a test import, identify errors, resolve them, and document your approach.
+
+Portfolio Artifact: Screenshot gallery of your configuration + a 100-word written explanation of the business problem this build solves. Write it as if explaining to Elena.
+
+Penny Exam Check-In: Ask Penny to give you three exam-style scenario questions based on what you built this week. Answer them, then ask Penny to evaluate your answers.
+
+Admin Decision Log Entry: #FT-08: What deduplication strategy did you use, and why? What would you recommend HCH do going forward to prevent data quality problems from accumulating?
+ | 
+
+6. Sprint 3: The Proof (Weeks 9–12)
+Sprint Goal
+Complete the HCH implementation: add SLA accountability, build reporting that tells HCH’s story to funders, document the org, and finish your portfolio. Then sit the exam.
+Technical Focus: Entitlements & SLAs · Reports & Dashboards · Org Documentation · Exam Readiness
+Capstone Output: Published portfolio with all required artifacts, complete Admin Decision Log (12+ entries), exam readiness confirmed with Penny, exam scheduled
+ | 
+
+Week 9: Entitlements & SLA Management
+Stakeholder Brief: A board member has raised concerns that HCH has no way to track whether urgent cases are being responded to within a reasonable timeframe. Elena wants a system that shows SLA compliance on every urgent case — not a report she has to run, but a live countdown.
+
+Build Task: Configure HCH’s Entitlement process. Create an Entitlement Process with a 4-hour First Response Milestone for Urgent cases and a 48-hour Resolution Milestone. Associate the Entitlement with the Case record type. Test with a live urgent case.
+
+Portfolio Artifact: See Section 7.3 required artifact checklist for this week’s deliverables.
+
+Penny Exam Check-In: Ask Penny to run a 10-question mock exam covering this week’s domain. Review your missed questions before moving on.
+
+Admin Decision Log Entry: #FT-09: When would you use Entitlements instead of a time-based Flow for SLA tracking? What are the exam-level differences between these approaches?
+ | 
+
+Week 10: Reports & Dashboards
+Stakeholder Brief: HCH’s annual donor report is due in six weeks. Elena needs a dashboard she can screen-share with the board: SLA achievement rate, case volume by service type, case volume by month, and veteran client service volume.
+
+Build Task: Build the HCH Donor Impact Dashboard. Create: a Summary Report on SLA achievement rate, a Matrix Report on case volume by type and month, a Tabular Report on veteran case volume, and a 4-component Dashboard. Configure dashboard sharing for Elena’s user.
+
+Portfolio Artifact: See Section 7.3 required artifact checklist for this week’s deliverables.
+
+Penny Exam Check-In: Ask Penny to run a 10-question mock exam covering this week’s domain. Review your missed questions before moving on.
+
+Admin Decision Log Entry: #FT-10: What report type did you use for each component, and why? How does this connect to the Reports & Dashboards domain on the Admin exam?
+ | 
+
+Week 11: Org Documentation & Handover
+Stakeholder Brief: Elena has been asked by the Executive Director to document HCH’s Salesforce setup so that any future admin can understand the system without having to start from scratch. She needs a plain-language overview of what was built and why.
+
+Build Task: Produce HCH’s complete org documentation: a 1-page Volunteer Cheat Sheet, a full Admin Handover Guide (org overview, data model, security summary, automation inventory, known issues), and a final smoke test checklist covering all major Sprint builds.
+
+Portfolio Artifact: See Section 7.3 required artifact checklist for this week’s deliverables.
+
+Penny Exam Check-In: Ask Penny to run a 10-question mock exam covering this week’s domain. Review your missed questions before moving on.
+
+Admin Decision Log Entry: #FT-11: What would you tell an incoming admin that the documentation alone cannot convey? What institutional knowledge did you build over 11 weeks that lives in your head, not in the docs?
+ | 
+
+Week 12: Portfolio Completion & Exam Readiness
+Stakeholder Brief: You have built a complete Salesforce implementation for HCH over 12 weeks. Now it is time to prove that you can explain it — to an employer, to a hiring manager, and to the Salesforce certification exam.
+
+Build Task: Finalize your Experience Cloud portfolio with all required artifacts published. Record a 5-to-7-minute Loom capstone walkthrough presenting the full HCH build end-to-end. Confirm your exam is scheduled. Complete your final Penny mock exam session — minimum 40 scenario questions across all domains.
+
+Portfolio Artifact: See Section 7.3 required artifact checklist for this week’s deliverables.
+
+Penny Exam Check-In: Ask Penny to run a 10-question mock exam covering this week’s domain. Review your missed questions before moving on.
+
+Admin Decision Log Entry: #FT-12: What was the most important decision you made in this build, and what would you do differently if you were starting over? How will you answer this question in a job interview?
+ | 
+
+PRIVATE COACH SESSION 2 — Week 10 (Sprint 3 Mid-Point)
+This session is your exam readiness check and portfolio review.
+Your coach will review your portfolio as an employer would. Come with your portfolio URL, your Admin Decision Log, and your target exam date.
+The session covers: Is your portfolio telling a coherent story? Are you ready to sit the exam? What does your next step look like — Guided Trail, job market entry, or more time in Explorer’s Trail?
+ | 
+7. The Foundations Trail Portfolio Framework
+7.1 Portfolio Architecture
+Your portfolio is built on Salesforce Experience Cloud. This is intentional. An employer reviewing your portfolio is not just seeing what you built in HCH — they are seeing that you can build, manage, and publish a Salesforce Experience Cloud site. That is itself a demonstration of skill.
+
+Portfolio Section
+ | Content
+ | Built When
+ | 
+Homepage
+ | Professional headshot, headline, mission statement — clean and employer-facing
+ | Week 1
+ | 
+About Me
+ | Professional bio, why Salesforce, why nonprofits, LinkedIn + Trailhead links
+ | Week 2
+ | 
+HCH Admin Build
+ | Sprint-organized screenshots, Decision Log entries, Loom videos — one section per Sprint
+ | Weeks 1–12 (continuous)
+ | 
+Admin Decision Log
+ | All 12 FT Decision Log entries published as a formatted page — minimum 12 entries
+ | Updated each sprint
+ | 
+Certifications & Learning
+ | Admin certification badge (once earned), Trailhead progress embed
+ | Week 2 (initial), updated
+ | 
+Contact
+ | LinkedIn, email, availability statement: ‘Available for Salesforce Admin roles’
+ | Week 2
+ | 
+
+7.2 The Admin Decision Log
+The Admin Decision Log is the single most differentiating artifact in your Foundations Trail portfolio. It is not documentation for documentation’s sake. It is the artifact that turns a screenshot gallery into a story of how you think.
+
+A complete Foundations Trail Decision Log contains:
+Minimum 12 documented decisions, one per week (FT-01 through FT-12)
+For each entry: the business context, the options you considered, the option you chose, and the business justification
+At least 2 entries that document a mistake or unexpected outcome — with what you learned
+Language that Elena (a non-technical stakeholder) could read and understand
+
+7.3 Portfolio Required Artifacts Checklist
+Artifact
+ | Requirements
+ | 
+NPSP configuration screenshots + data model documentation (Week 1)
+ | Published to HCH Admin Build section
+ | 
+Custom object ERD and field map (Week 2)
+ | Published with relationship rationale
+ | 
+Security model documentation: role hierarchy, OWDs, profiles (Week 3)
+ | Includes written business justification
+ | 
+Field-level security configuration screenshots (Week 4)
+ | Documents what was restricted and why
+ | 
+Email-to-Case configuration screenshots + auto-response templates (Week 5)
+ | All three routing addresses documented
+ | 
+Web-to-Case form configuration + test submission screenshot (Week 6)
+ | Includes record type setup
+ | 
+Record-triggered Flow screenshots + logic explanation (Week 7)
+ | Entry criteria documented
+ | 
+Data import documentation + deduplication rule setup (Week 8)
+ | Includes error log and resolution
+ | 
+Entitlement Process + Milestone countdown screenshot (Week 9)
+ | Active timer on test urgent case
+ | 
+Donor Impact Dashboard screenshot + written board narrative (Week 10)
+ | 200-word narrative included
+ | 
+Admin Handover Guide + Volunteer Cheat Sheet (Week 11)
+ | Both published; Handover Guide minimum 2 pages
+ | 
+Final capstone Loom walkthrough (Week 12)
+ | 5–7 minutes, full HCH build end-to-end
+ | 
+Admin Decision Log — all FT entries (Weeks 1–12)
+ | Minimum 12 entries; published as formatted page
+ | 
+Exam confirmation screenshot
+ | Proof that exam is scheduled or completed
+ | 
+8. Salesforce Admin Exam Strategy
+8.1 The Foundations Trail Approach to Exam Prep
+Most exam prep programs treat the Admin exam as a memorization challenge. Transition Trails treats it as a comprehension challenge — because that is how the exam is actually designed. The Salesforce Admin exam is scenario-based. It does not ask you to define what a Profile is. It asks you to decide which Profile configuration solves a specific business problem.
+
+The Foundations Trail prepares you for scenario-based thinking by building scenarios — real ones, in a real org, with real stakeholder context. By the time you sit the exam, you will have configured every major domain at least once inside HCH.
+
+Exam Domain
+ | Approx. Weight
+ | Where You Build It in HCH
+ | 
+Data Modeling & Management
+ | ~14%
+ | Weeks 1–2: NPSP, custom objects, relationships, validation rules
+ | 
+Security & Access
+ | ~13%
+ | Weeks 3–4: Role hierarchy, OWDs, profiles, FLS
+ | 
+Automation & Process Builder / Flow
+ | ~18%
+ | Weeks 7–8: Record-triggered Flows, entry criteria, loop protection
+ | 
+Service Cloud & Case Management
+ | ~11%
+ | Weeks 5–6: Email-to-Case, Web-to-Case, queues, assignment rules
+ | 
+Reports, Dashboards & Analytics
+ | ~11%
+ | Week 10: Summary, matrix, tabular reports; dashboard components
+ | 
+Salesforce Platform Basics
+ | ~11%
+ | Week 1: Org setup, app configuration, NPSP install
+ | 
+Sales Cloud & Standard Objects
+ | ~10%
+ | Integrated throughout; Penny covers remaining gaps
+ | 
+Activity Management & Collaboration
+ | ~6%
+ | Week 7: Task creation, Chatter, notification configuration
+ | 
+AppExchange & Integration
+ | ~6%
+ | Penny exam sessions in Weeks 11–12
+ | 
+
+8.2 Penny Mock Exam Protocol
+Penny runs structured mock exam sessions throughout the Foundations Trail. The protocol escalates by Sprint:
+
+Sprint 1 (Weeks 1–4): 5-question mini-quiz after each build task, focused on the domain covered that week.
+Sprint 2 (Weeks 5–8): 10-question domain quizzes after each build. Penny begins asking cross-domain scenario questions.
+Sprint 3 (Weeks 9–12): Full 40-question mock exam in Week 11. Review all missed questions with Penny before sitting the real exam.
+
+The goal is not to simulate the exam interface. It is to build the scenario-reasoning muscle that the exam rewards. Every Penny session in this program is designed to make the exam feel like a familiar problem format — not a surprise.
+9. Program Strategy
+9.1 Strategic Positioning
+The Foundations Trail occupies the entry-to-intermediate tier of the Transition Trails program ecosystem. It is the on-ramp for learners who are serious enough to commit to 12 weeks and a certification exam — but who are not yet certified and not yet ready for the client-facing, employment-focused experience of the Guided Trail.
+
+Program
+ | Target Learner
+ | Primary Outcome
+ | FT Role
+ | 
+Explorer’s Trail (ET)
+ | Any learner at any level
+ | Skill-building habit + community
+ | ET Beginner/Intermediate members ready to commit to the exam
+ | 
+Foundations Trail (FT)
+ | Pre-certification learner
+ | Pass Admin exam + build first project
+ | The structured exam-to-portfolio pipeline
+ | 
+Guided Trail (GT)
+ | Certified, pre-hire admin
+ | Close experience gap and get hired
+ | FT graduates who are certified and ready to go deeper
+ | 
+Trail of Mastery (ToM)
+ | Employed admin
+ | Advance to practitioner-level skills
+ | FT graduates who are employed and advancing
+ | 
+
+9.2 Grant & Funding Positioning
+The Foundations Trail is the pipeline and preparation tier for Transition Trails’ workforce development grant strategy. Its grant narrative is built on two angles:
+
+Exam outcome: % of graduates passing the Salesforce Admin exam within 90 days of program completion.
+Pipeline metric: % of graduates proceeding into the Guided Trail (the direct employment outcome tier) within one cycle.
+
+Employment outcomes for grant purposes are claimed at Guided Trail exit, not Foundations Trail exit. The Foundations Trail is framed to funders as the preparation investment that makes the Guided Trail outcome possible.
+
+Scholarship pricing ($497) is set at a level that qualifies for WIOA Individual Training Accounts and community foundation scholarship pools. Full program cost ($997) is set to be grant-fundable at 1–2 scholarship seats per funder cycle.
+
+9.3 Success Metrics
+Metric
+ | Definition
+ | Target
+ | 
+Admin Exam Pass Rate
+ | % of FT graduates who pass the Salesforce Admin exam within 90 days of program completion
+ | 75%+
+ | 
+Portfolio Completion Rate
+ | % of learners who publish a complete portfolio (all required artifacts) by Week 12
+ | 80%+
+ | 
+Guided Trail Pipeline Rate
+ | % of FT graduates who enroll in Guided Trail within one program cycle
+ | 40%+
+ | 
+Decision Log Completion
+ | % of learners with 12+ complete Decision Log entries at program end
+ | 80%+
+ | 
+Office Hours Engagement
+ | % of learners attending at least one Office Hours session per Sprint
+ | 60%+
+ | 
+Learner NPS
+ | Net Promoter Score collected at Week 12
+ | 50+
+ | 
+Scholarship Utilization
+ | % of scholarship seats filled per cohort cycle
+ | 100% target
+ | 
+10. Completion & What Comes Next
+10.1 What Completing the Foundations Trail Means
+Foundations Trail completion is defined by deliverables, not attendance. A learner who completes all required portfolio artifacts, publishes their portfolio, completes both private coaching sessions, and has their exam scheduled or passed has earned the Foundations Trail completion designation.
+
+Completion Requirement
+ | Status
+ | 
+All 12 weekly build tasks completed in HCH org
+ | Required
+ | 
+Portfolio published with all required artifacts (see Section 7.3 checklist)
+ | Required
+ | 
+Admin Decision Log — minimum 12 FT entries
+ | Required
+ | 
+Both private coaching sessions attended
+ | Required
+ | 
+Salesforce Admin exam scheduled or passed
+ | Required
+ | 
+Final capstone Loom walkthrough published
+ | Required
+ | 
+
+Foundations Trail Completion Badge
+Learners who meet all completion requirements receive the Transition Trails Foundations Trail Completion Badge.
+This badge is verifiable and can be displayed on LinkedIn alongside your Salesforce Admin certification.
+It certifies that you completed a 12-week structured Salesforce build program AND are positioned for the Admin exam.
+Employers who want to verify completion can contact Transition Trails directly.
+ | 
+
+10.2 After the Foundations Trail — Your Next Trail Options
+Path
+ | Description
+ | 
+Enroll in the Guided Trail (Primary Path)
+ | Once you hold the Admin certification, the Guided Trail is your next step. You’ll inherit the HCH org you built here and work as its ongoing administrator — making real decisions without a walkthrough, building the portfolio employers trust.
+ | 
+Enter the Job Market Directly
+ | Some Foundations Trail graduates enter the job market directly after passing the Admin exam. Your portfolio and Completion Badge are your primary assets. Transition Trails provides a post-program portfolio review for all FT graduates.
+ | 
+Continue in the Explorer’s Trail
+ | If you want more time to build foundational skills before sitting the exam, the Explorer’s Trail is always available. FT graduates receive Annual-level Explorer’s Trail access as part of their completion.
+ | 
+Volunteer as an FT Mentor
+ | FT graduates who want to give back can apply to assist in Office Hours or serve as peer mentors for future cohorts. Portfolio-worthy contribution.
+ | 
+
+A Final Note on Why the Foundations Trail Exists
+The Salesforce Admin certification has one of the highest ROIs of any technology credential you can earn.
+And yet, thousands of people who want it never get there — because they study in isolation, fail the exam once, and give up.
+The Foundations Trail exists to close that gap.
+Not by making the exam easier. By making sure that by the time you sit it, you’ve already built everything it tests.
+You built a real nonprofit Salesforce org. You documented 12 configuration decisions. You explained your work to a stakeholder and a coach.
+The exam is not the hardest thing you’ll do in the next 12 weeks. It’s the paperwork at the end.
+— Transition Trails
+ | 
+
+Build it. Pass it. Prove it.
+Transition Trails Academy  |  Foundations Trail Program Blueprint  |  Version 1.0 — 2026
+transitiontrails.org

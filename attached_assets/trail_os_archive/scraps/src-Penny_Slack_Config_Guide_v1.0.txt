@@ -1,0 +1,477 @@
+Penny AI Trail Companion
+Slack App Configuration Guide
+Best practices for connecting an external AI to your Slack workspace
+Field
+Value
+Document
+Penny Slack App Configuration Guide v1.0
+Version
+1.0 — May 2026
+Audience
+Angela Landrith · Workspace Administrator
+Stack
+Bolt.js (Socket Mode) · Slack API · Node.js · Replit
+Related docs
+Penny POC PRD v2.1 · Solution Design v2.1 · Prompt Scenarios v1.0
+Transition Trails Academy
+## 1.  Overview
+Penny operates in Slack across three surfaces: direct messages, channel mentions, and the native Slack AI assistant panel. This guide covers the complete configuration of the Penny Slack app — from creating the app in the Slack API portal through OAuth scopes, Socket Mode, event subscriptions, slash commands, the AI assistant panel, and privacy best practices for running an AI assistant inside a Slack workspace.
+## 1.1  Three Penny surfaces in Slack
+Surface
+How it activates
+Full coaching?
+Learner context?
+Slack DM
+Learner sends direct message to @Penny bot
+Yes
+Yes — full
+Slack channel
+@Penny mention or /penny slash command
+Partial
+Yes — abbreviated
+Slack AI assistant panel
+Click the Penny panel (top-right)
+Awareness only
+No
+## 2.  Prerequisites
+## 2.1  What you need before starting
+Item
+Where to get it
+Status
+Slack workspace Admin role
+You must be a Workspace Owner or Admin to install apps
+Required
+Replit backend running
+api-server must be deployed and accessible. Socket Mode does not need a public URL.
+Required
+GEMINI_APP_KEY or GEMINI_API_KEY
+Google AI Studio → Get API key
+Required
+DATABASE_URL
+Supabase → Settings → Database → Connection string
+Required
+Google account (for Slack login)
+Standard Gmail / Google Workspace account
+Required
+Penny bot icon image
+512×512 PNG — see Bot Identity section
+Recommended
+## 2.2  Slack API portal access
+All Slack app configuration happens at api.slack.com/apps. You will need to log in with the Google account that owns the Transition Trails Slack workspace.
+## 3.  Create the Slack App
+## 3.1  Create from app manifest (recommended)
+The fastest and most reliable way to create the Penny Slack app is from a manifest — a YAML configuration file that sets all permissions, events, and features in one step.
+1.  Go to api.slack.com/apps → click Create New App
+2.  Choose From an app manifest
+3.  Select the Transition Trails workspace
+4.  Paste the manifest below (YAML tab) → click Next → Create
+## Complete Penny app manifest
+display_information:  name: Penny  description: Your AI Trail Assistant — coaching, quests, and career guidance  background_color: "#0F6E56"  long_description: >    Penny is your AI coaching companion on the Transition Trails.    She helps you work through Salesforce concepts, assigns daily quests,    coaches your career, and guides your team project. Message her directly    for the full experience, or mention @Penny in a channel for quick help.features:  app_home:    home_tab_enabled: true    messages_tab_enabled: true    messages_tab_read_only_enabled: false  bot_user:    display_name: Penny    always_online: true  slash_commands:    - command: /penny      description: Talk to Penny — your AI Trail Assistant      usage_hint: "[your message or question]"      should_escape: falseoauth_config:  scopes:    bot:      - app_mentions:read      - channels:history      - channels:join      - channels:read      - chat:write      - chat:write.customize      - commands      - files:read      - groups:history      - groups:read      - groups:write      - im:history      - im:read      - im:write      - mpim:history      - mpim:read      - mpim:write      - users:read      - users:read.email      - users.profile:readsettings:  event_subscriptions:    bot_events:      - app_home_opened      - app_mention      - message.channels      - message.groups      - message.im      - message.mpim  interactivity:    is_enabled: true  org_deploy_enabled: false  socket_mode_enabled: true  token_rotation_enabled: false
+Why these scopes?
+• app_mentions:read — Penny hears @Penny mentions in channels
+• channels:history / groups:history / im:history — Penny can read context when mentioned in a thread
+• chat:write — Penny can send messages
+• chat:write.customize — Penny can send messages with a custom username and icon (used for formatted career review output)
+• files:read — learners can upload PDF resumes for career review
+• im:read + im:write + im:history — DM access (the primary coaching surface)
+• users:read / users.profile:read — Penny can look up a Slack user's name and email for auto-registration
+## 4.  Enable Socket Mode
+Socket Mode allows Penny to receive real-time events from Slack without exposing a public webhook URL. This is the correct architecture for Replit-hosted apps and for workspaces that do not want to manage inbound firewall rules.
+## 4.1  Generate the App-Level Token
+Socket Mode requires a special App-Level Token (different from the Bot Token). This token starts with xapp- and is set as SLACK_APP_TOKEN in your environment variables.
+1.  In your Penny app configuration → Settings → Basic Information
+2.  Scroll to App-Level Tokens → Generate Token and Scopes
+3.  Token name: Penny Socket Mode
+4.  Add scope: connections:write
+5.  Click Generate → copy the xapp-... token immediately (it is only shown once)
+6.  Add to Replit Secrets as SLACK_APP_TOKEN
+Token visibility warning
+• The App-Level Token is only displayed once at generation time.
+• If you miss copying it, you must regenerate it — the old token is invalidated.
+• Never commit this token to git or share it outside Replit Secrets.
+## 4.2  Verify Socket Mode is enabled
+1.  Settings → Socket Mode → toggle Enable Socket Mode to On
+2.  Confirm "Socket Mode is enabled" message appears in green
+## 4.3  Three required environment variables for Slack
+Variable
+Where to find it
+Format
+SLACK_BOT_TOKEN
+OAuth & Permissions → OAuth Tokens → Bot User OAuth Token
+xoxb-...
+SLACK_APP_TOKEN
+Basic Information → App-Level Tokens → the xapp- token you just generated
+xapp-...
+SLACK_SIGNING_SECRET
+Basic Information → App Credentials → Signing Secret
+32-char hex string
+## 5.  Bot Identity & Display
+How Penny appears to learners in Slack matters. A consistent identity builds trust and helps learners understand they are talking to an AI companion, not a generic bot.
+## 5.1  Bot name and display settings
+1.  Features → App Home → scroll to Bot User
+2.  Display name: Penny
+3.  Default username: penny
+4.  Always show my bot as online: ✓ Enabled
+Why "always online" matters
+• "Always online" means Penny shows a green dot in Slack at all times.
+• This signals to learners that Penny is available and reduces hesitation to message.
+• The actual response time depends on Gemini — typically under 3 seconds.
+## 5.2  Bot icon
+1.  Basic Information → Display Information → App Icon & Preview
+2.  Upload the Penny bot icon — 512×512 PNG, transparent or teal background
+3.  Background color: #0F6E56 (Transition Trails brand teal)
+The icon visible in screenshots is the blue/yellow notepad — this should be replaced with the official Penny icon to match the Transition Trails brand. The icon appears in: DM headers, @mentions, the AI assistant panel, App Home, and Slack notifications.
+## 5.3  Short and long descriptions
+Field
+Recommended text
+Short description (up to 150 chars)
+Your AI coaching companion on the Transition Trails — Salesforce coaching, daily quests, and career guidance.
+Long description
+Penny is your AI Trail Assistant at Transition Trails Academy. She helps you work through Salesforce concepts with Socratic coaching, assigns daily practice quests, reviews your career profile, and guides your team project. Message Penny directly for the full coaching experience, or @mention her in a channel for quick help.
+## 6.  Event Subscriptions
+Events tell Slack which activities Penny should be notified about. Socket Mode delivers these events over a persistent WebSocket connection — no webhook URL is needed.
+## 6.1  Required bot events
+Event
+Why Penny needs it
+Surface triggered
+message.im
+Fires when a learner sends Penny a direct message — the primary coaching surface
+Slack DM
+message.channels
+Fires when a message is posted in a channel Penny is a member of — needed for @mentions
+Slack channel
+message.groups
+Fires for messages in private channels — needed if cohort uses private channels
+Private channels
+message.mpim
+Fires for group DMs — needed if coaches use group DMs with learners
+Group DM
+app_mention
+Fires specifically when @Penny is mentioned — used as a secondary trigger alongside message.channels
+All channels
+app_home_opened
+Fires when a learner opens the Penny App Home tab — used to display a personalised home screen
+App Home
+Channel membership required
+• Penny only receives message.channels events in channels she has joined.
+• She does NOT automatically join all channels — you must /invite @Penny to each cohort channel.
+• See Section 10 (Onboarding Cohort 1) for the complete channel setup procedure.
+## 7.  Interactivity & Slash Commands
+## 7.1  Interactivity
+Interactivity must be enabled for Penny to handle file uploads (PDF career review) and any future interactive components such as buttons or select menus in Block Kit messages.
+1.  Features → Interactivity & Shortcuts → toggle Interactivity to On
+2.  Request URL: leave blank (Socket Mode handles interactivity without a URL)
+3.  Save changes
+## 7.2  Slash command: /penny
+The /penny slash command gives learners a fast entry point to Penny from any channel or DM without needing to @mention her.
+1.  Features → Slash Commands → Create New Command
+2.  Command: /penny
+3.  Request URL: leave blank (Socket Mode handles slash commands)
+4.  Short description: Talk to Penny — your AI Trail Assistant
+5.  Usage hint: [your message or question]
+6.  Escape channels, users, and links: leave unchecked
+7.  Save
+What /penny does
+• /penny [message] in a channel — Penny responds in a thread. Keeps the channel clean.
+• /penny with no message — Penny responds with a short welcome and asks what's on the learner's mind.
+• /penny in a DM — same as sending a message directly to Penny.
+## 8.  Slack AI Assistant Panel
+The AI assistant panel is the Penny icon that appears in the top-right corner of Slack when users are in your workspace. It is a Slack-native feature that surfaces AI apps alongside the message window. Penny is already appearing there — this section covers how to customise it.
+## 8.1  What the panel is and is not
+It IS
+It IS NOT
+A discovery surface for learners who haven't messaged Penny yet
+A full coaching surface — Penny has no learner context in the panel
+A shortcut to show "How to use Penny?" onboarding content
+A replacement for DM coaching or Penny Mobile
+Channel-scoped — it shows in the context of whatever channel is open
+Personalised — no individual learner profile is injected
+A great place for quick FAQ answers (how does questing work?)
+Suitable for career review, quest submission, or coordinator tasks
+## 8.2  Customise "How to use Penny?"
+Currently the panel shows the default Slack onboarding text. Replace it with Penny-specific content so learners know exactly what she can do.
+1.  In api.slack.com/apps → select Penny → Features → App Home
+2.  Scroll to Show Tabs → enable the Home Tab
+3.  The AI assistant "How to use Penny?" prompt is controlled by your App Home home_tab_enabled configuration
+4.  In your Bolt.js app, register an app_home_opened handler (see code below)
+## Recommended App Home content (Bolt.js handler)
+app.event('app_home_opened', async ({ event, client }) => {  await client.views.publish({    user_id: event.user,    view: {      type: 'home',      blocks: [        {          type: 'header',          text: { type: 'plain_text', text: 'Welcome to Penny 👋', emoji: true },        },        {          type: 'section',          text: {            type: 'mrkdwn',            text: '*A penny for your thoughts — and your career.*\n\nI\'m Penny, your AI coaching companion on the Transition Trails. Here\'s what I can do for you:',          },        },        {          type: 'section',          text: {            type: 'mrkdwn',            text: ':brain: Coaching — :dart: Quests — :briefcase: Career Review — :busts_in_silhouette: Mobile App',          },        },        {          type: 'section',          text: {            type: 'mrkdwn',            text: ':speech_balloon: *Ready? Send me a direct message to get started.*',          },        },      ],    },  });});
+AI assistant panel best practices
+• Keep the panel content short — 4-5 bullet points maximum. Learners scan, they don't read.
+• Always end with a clear CTA: "Send me a direct message to get started."
+• Do not try to do coaching inside the panel. Its job is to route learners to the right surface.
+• Update the panel content whenever Penny's capabilities change.
+## 9.  Install the App & Retrieve Tokens
+## 9.1  Install to workspace
+1.  Settings → Install App → Install to Workspace
+2.  Review the permissions screen → click Allow
+3.  Copy the Bot User OAuth Token (xoxb-...) → add to Replit as SLACK_BOT_TOKEN
+## 9.2  Complete environment variable checklist
+Variable
+Source
+Required?
+Added to Replit?
+SLACK_BOT_TOKEN
+OAuth & Permissions → Bot User OAuth Token
+Yes
+SLACK_APP_TOKEN
+Basic Information → App-Level Tokens (xapp-...)
+Yes
+SLACK_SIGNING_SECRET
+Basic Information → App Credentials
+Yes
+PENNY_ADMIN_SLACK_CHANNEL
+The channel ID for #leadership or #tt-leaders-and-admin — used for weekly reports and alerts
+Recommended
+DATABASE_URL
+Supabase → Settings → Database → Connection string
+Yes
+GEMINI_APP_KEY
+Google AI Studio → Get API key
+Yes
+NOTION_API_KEY
+Notion → Settings → Connections → Develop integrations
+For projects
+NOTION_DATABASE_ID
+Notion project database URL
+For projects
+GITHUB_WEBHOOK_SECRET
+GitHub → repo → Settings → Webhooks
+For gamification
+GITHUB_TOKEN
+GitHub → Settings → Developer settings → Personal access tokens
+For coach PR queue
+## 9.3  Find the admin channel ID
+The PENNY_ADMIN_SLACK_CHANNEL variable needs a Slack channel ID (not the channel name). Channel IDs start with C and look like C07XXXXXXXXX.
+1.  Right-click any Slack channel → View channel details
+2.  Scroll to the bottom of the About tab
+3.  Copy the Channel ID (e.g. C07XXXXXXXXX)
+4.  Add to Replit Secrets as PENNY_ADMIN_SLACK_CHANNEL
+## 10.  Onboarding Cohort 1
+Once the app is installed and tokens are in place, follow this procedure to bring Cohort 1 learners into the Penny experience.
+## 10.1  Invite Penny to cohort channels
+Penny only receives events from channels she has explicitly joined. She must be invited to every channel where learners might @mention her.
+Channel
+Purpose
+Command to run
+#super-duper-secret-penny
+Current test channel — already joined
+Already joined ✓
+#guided-trail-cohort-1
+Primary cohort channel
+/invite @Penny
+#project-dfw-rescue
+Client project channel
+/invite @Penny
+#trail-wins
+Celebrations channel
+/invite @Penny
+Any other cohort channel
+As needed
+/invite @Penny
+## 10.2  Remove the Linear integration
+The Slack channel #super-duper-secret-penny currently has a Linear integration added on May 19. This should be removed since Notion has replaced Linear as the project management tool.
+1.  Open #super-duper-secret-penny → click the channel name at the top
+2.  Go to Integrations tab → find the Linear integration
+3.  Click Remove → confirm
+4.  Repeat for any other channels that have the Linear integration
+## 10.3  Announce Penny to the cohort
+Send a welcome message to the cohort channel introducing Penny before learners interact with her. This sets expectations and reduces first-message hesitation.
+Hey everyone 👋I want to introduce Penny — your AI coaching companion for the Guided Trail.Here's how to use her:• 💬 Send her a *direct message* for coaching, career feedback, and daily quests• 📣 @Penny in this channel for quick questions• ⚡ Type /penny anywhere for a fast replyPenny is here to coach you — not to give you answers.She'll ask you questions, push you to think, and celebrate every win.Say hi and ask her for a quest 🎯
+## 10.4  Learner first-contact flow
+When a learner sends their first DM to Penny, this is what happens automatically:
+1.  Penny receives the message.im event via Socket Mode
+2.  She checks the interaction_logs table for this Slack user ID
+3.  If the user is unknown: auto-registration fires — a new learner_profiles row is created with trail: guided_trail
+4.  Penny greets them as a new learner and asks for their name and goal
+5.  The learner is now registered and will receive personalised coaching on all subsequent messages
+Auto-registration is intentional
+• Any unknown Slack user who messages Penny is automatically registered as a guided_trail learner.
+• Angela can reassign them to a different trail in the Admin Dashboard → Learners.
+• The learner does not need to complete any form or registration step.
+## 11.  Privacy & AI Best Practices
+Running an AI assistant inside a Slack workspace requires careful attention to privacy, transparency, and data handling. This section covers the best practices for Transition Trails.
+## 11.1  What Penny stores
+Data type
+Where stored
+Who can see it
+Retention
+All messages sent to Penny
+interaction_logs table (Supabase)
+Angela via Admin Dashboard → Logs
+Indefinite unless cleared
+Learner name, goal, coaching tone
+learner_profiles table
+Angela via Admin Dashboard → Learners
+Indefinite
+Quest responses (submissions)
+quest_submissions table
+Angela via Quest Activity feed
+Indefinite
+Career review text
+career_review_sessions table
+Angela via Learner Detail → Career Status
+Indefinite
+PDF resume content
+Held in memory during review only
+Not persisted after review completes
+Session only
+Weekly report data
+weekly_reports table
+Angela via Weekly Reports page
+Indefinite
+## 11.2  What Penny does NOT store
+Message content from Slack channels where Penny is not @mentioned — she only sees messages directed at her
+Slack channel message history beyond what's needed for community sync (Community tab in mobile)
+PDF resume text after the career review session completes — it is held in memory only
+Any message from a user who has not directly interacted with Penny (no passive monitoring)
+## 11.3  Transparency with learners
+Learners should know they are interacting with an AI assistant and that their conversations are stored. Include this in the cohort welcome message and in the Penny App Home description.
+Recommended transparency statement
+• Penny is an AI coaching assistant. Your conversations with her are stored to help Angela support you.
+• Angela can see your messages, quest responses, and career review summaries in the coaching dashboard.
+• Your data is never shared outside of Transition Trails. You can ask Angela to delete your Penny history at any time.
+## 11.4  Minimum required scopes — principle of least privilege
+The manifest in Section 3 requests only the scopes Penny needs. Do not add scopes beyond what is listed. Specifically:
+Scopes to avoid
+• channels:manage / groups:manage — Penny should not be able to create, archive, or modify channels
+• users:write — Penny should not be able to update user profiles
+• files:write — Penny should not be able to upload files (only read PDFs that learners send her)
+• admin:* scopes — never required and should never be granted
+• Any user token scopes — Penny uses a bot token only. User tokens act as Angela and are a significant security risk.
+## 11.5  Signing secret validation
+The SLACK_SIGNING_SECRET is used to verify that incoming events actually come from Slack and have not been tampered with. Bolt.js handles this automatically when the signing secret is present in the environment.
+Security checklist
+• SLACK_SIGNING_SECRET is set in Replit Secrets — not hardcoded in source
+• SLACK_BOT_TOKEN is set in Replit Secrets — never in a .env file committed to git
+• SLACK_APP_TOKEN is set in Replit Secrets — only shown once at generation
+• Socket Mode is enabled — no public webhook URL is exposed to the internet
+• Token rotation is disabled by default — enable it if you suspect a token has been compromised
+## 12.  Testing the Connection End-to-End
+Run through this checklist after initial setup and after any environment or configuration change.
+## 12.1  Connection verification checklist
+Test
+How to run it
+Expected result
+Bolt.js connects to Slack
+Start the api-server. Check Replit logs.
+Log shows: "Bolt app is running (Socket Mode)"
+Bot appears online in Slack
+Open Slack → find Penny in DMs section
+Green dot. Status shows "Penny - Your AI Trail Assistant"
+DM coaching works
+Send Penny a DM: "Hello"
+Penny responds with a warm greeting within 3 seconds
+Quest request works
+Send: "Give me a quest"
+Quest assigned. Full brief returned. No fallback error.
+P0 quest routing
+Send: "Can you assign me a new quest?"
+Quest assigned — NOT a fallback error (this was the TTP-24 bug)
+@Penny channel mention
+Type @Penny hello in a channel she's in
+Penny replies in thread within 3 seconds
+/penny slash command
+Type /penny hello in any channel
+Penny replies in thread
+Auto-registration
+Have a new Slack user send Penny a DM
+New row in learner_profiles. Penny greets as new learner.
+Career review redirect
+Send "Review my resume" in a channel
+Penny redirects: "This works best in a DM — message me directly"
+Admin Slack channel
+Manually trigger a weekly report in admin UI
+Report posts to PENNY_ADMIN_SLACK_CHANNEL
+## 12.2  Interpreting the Bolt.js startup log
+When the api-server starts successfully, you should see these log lines in the Replit console:
+{"level":"info","msg":"Bolt app is running (Socket Mode)"}{"level":"info","msg":"API server listening on port 8080"}{"level":"info","msg":"Database migrations complete"}{"level":"info","msg":"Weekly report cron scheduled: Friday 16:00 UTC"}
+Common startup errors
+• "Error: An API error occurred: invalid_auth" — SLACK_BOT_TOKEN is wrong or missing. Re-copy from OAuth & Permissions.
+• "Error: An API error occurred: not_allowed_token_type" — SLACK_APP_TOKEN is missing or using the bot token instead of the xapp- app token.
+• "SocketModeClient: Unable to connect" — Socket Mode is not enabled in the app configuration.
+• "Gemini quota exhausted" — GEMINI_APP_KEY is at the 20 req/day free tier limit. Response resumes tomorrow.
+## 13.  Ongoing Maintenance
+## 13.1  Token rotation
+Slack bot tokens do not expire by default. However, if you suspect a token has been compromised:
+1.  api.slack.com/apps → Penny → OAuth & Permissions → Revoke All OAuth Tokens
+2.  Reinstall the app to the workspace to generate a new token
+3.  Update SLACK_BOT_TOKEN in Replit Secrets
+4.  Restart the api-server
+## 13.2  Adding Penny to new channels
+As new cohort channels are created, invite Penny to each one:
+In the new channel: type /invite @Penny
+Verify Penny posts the join confirmation message
+No code changes needed — Bolt.js listens for events from all channels where Penny is a member
+## 13.3  Integration staleness alerts
+Penny includes a built-in hourly poller that checks whether integrations (Slack, Notion, GitHub) have sent a recent event. If an integration goes silent for more than 24 hours, Penny posts an alert to PENNY_ADMIN_SLACK_CHANNEL. This is your early warning system for broken webhooks or expired credentials.
+## 13.4  Weekly report delivery
+Every Friday at 4 PM UTC (default), Penny posts a cohort health report to PENNY_ADMIN_SLACK_CHANNEL. To change the schedule:
+Variable
+Default
+Example change
+PENNY_REPORT_DAY
+5 (Friday)
+1 = Monday, 3 = Wednesday, 5 = Friday
+PENNY_REPORT_HOUR
+16 (4 PM UTC)
+11 = 11 AM UTC = 6 AM CDT in summer
+CDT time offset
+• Central Daylight Time (CDT) is UTC-5.
+• 16:00 UTC = 11:00 AM CDT — the report arrives at 11 AM Dallas time on Fridays.
+• Set PENNY_REPORT_HOUR=16 to keep this schedule.
+## 13.5  Clearing a learner's Penny memory
+If a learner's context becomes stale or incorrect, Angela can clear their memory from the admin dashboard. This deletes all interaction_logs rows for that learner. Penny will start the next conversation fresh.
+1.  Admin Dashboard → Learners → select the learner
+2.  Scroll to Conversation History → click Clear Memory
+3.  Confirm the dialog
+4.  The learner's next message to Penny will be treated as a clean-slate conversation
+Clear Memory is permanent
+• Clearing memory deletes all interaction_logs rows for that learner.
+• This cannot be undone from the admin UI.
+• Quest history, career review sessions, and gamification records are NOT deleted — only the conversation memory window is cleared.
+## 14.  Quick Reference
+## 14.1  Slack API portal cheat sheet
+What you need to do
+Where in the portal
+Create or edit the app
+api.slack.com/apps → select Penny
+Enable Socket Mode
+Settings → Socket Mode
+Generate App-Level Token (xapp-)
+Settings → Basic Information → App-Level Tokens
+Get the Bot Token (xoxb-)
+Features → OAuth & Permissions → Bot User OAuth Token
+Get the Signing Secret
+Settings → Basic Information → App Credentials
+Edit the app manifest
+Settings → App Manifest
+Add/remove OAuth scopes
+Features → OAuth & Permissions → Scopes
+Edit the /penny slash command
+Features → Slash Commands
+Configure App Home
+Features → App Home
+Update app icon + description
+Settings → Basic Information → Display Information
+View event subscriptions
+Features → Event Subscriptions
+Reinstall after scope changes
+Features → OAuth & Permissions → Reinstall to Workspace
+## 14.2  Penny channel behavior quick reference
+Scenario
+What Penny does
+"@Penny give me a quest" in channel
+Assigns quest. Brief summary in thread. Redirects to DM for full experience.
+"@Penny review my resume" in channel
+Redirects: "This works best in a DM — message me directly."
+"@Penny I got the job!" in channel
+Loudest celebration Penny gives. Public, warm, specific. Does NOT redirect.
+/penny help in channel
+Short overview of capabilities + CTA to send a DM.
+DM: any message
+Full 7-layer prompt. Socratic coaching with full learner context.
+DM: first message from unknown user
+Auto-registration. Penny greets as new learner.
+DM: "Can you assign me a new quest?"
+Quest assigned. NOT a fallback error. (P0 test — verify every deploy.)

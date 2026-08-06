@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+</style>
+</helmet>
+
+<div style="min-height:100%;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate);padding:0 0 96px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:52px 0">
+    <div style="max-width:1120px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+        <a href="Program%20Journeys%20-%20Index.dc.html" style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;color:var(--tt-amber-300);text-decoration:none">← All journeys</a>
+        <span style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Transition Trails · the pathway, end to end</span>
+      </div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:44px;line-height:1.1;font-weight:600;margin:0;color:var(--tt-white);max-width:900px;text-wrap:pretty">One learner, three years, and she never leaves</h1>
+      <p style="font-size:18px;line-height:1.6;margin:0;max-width:780px;color:rgba(255,255,255,.88)">Marisol arrives with an entry-level certification she earned on her own and no experience anyone will hire. Three years later she holds two certifications, coaches the cohort behind her, has commissioned her own apprenticeship in a capability her employer could not teach — and is hired as a consultant by the company whose revenue helps fund the mission.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Foundations Trail</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Guided Trail</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Explorer's Trail</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Trail of Mastery</x-import>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1120px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:56px">
+
+    <div style="margin-top:40px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:22px 26px">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:280px">
+        <span style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ lensTitle }}</span>
+        <span style="font-size:15px;line-height:1.55">{{ lensNote }}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div onClick="{{ setTeam }}" style="{{ teamTab }}">Team view</div>
+        <div onClick="{{ setFunder }}" style="{{ funderTab }}">Funder view</div>
+      </div>
+    </div>
+
+    <section style="display:flex;flex-direction:column;gap:0">
+      <sc-for list="{{ stations }}" as="s" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:1fr 88px 1fr;gap:0;align-items:stretch">
+
+          <div style="{{ s.leftStyle }}">
+            <sc-if value="{{ s.onLeft }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ s.cardStyle }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                  <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">{{ s.kicker }}</span>
+                  <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ s.badgeTone }}" hint-size="auto,26px">{{ s.badge }}</x-import>
+                </div>
+                <div style="font-family:Poppins,sans-serif;font-size:24px;line-height:1.2;font-weight:600;color:var(--tt-charcoal)">{{ s.title }}</div>
+                <div style="font-size:15.5px;line-height:1.6">{{ s.blurb }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--tt-warm-gray);padding-top:14px">
+                  <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-slate)">{{ s.listLabel }}</span>
+                  <sc-for list="{{ s.items }}" as="i" hint-placeholder-count="4">
+                    <div style="display:flex;gap:9px;align-items:flex-start;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ i.text }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+            <div style="{{ s.lineStyle }}"></div>
+            <div style="{{ s.dotStyle }}">{{ s.dot }}</div>
+          </div>
+
+          <div style="{{ s.rightStyle }}">
+            <sc-if value="{{ s.onRight }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ s.cardStyle }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                  <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">{{ s.kicker }}</span>
+                  <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ s.badgeTone }}" hint-size="auto,26px">{{ s.badge }}</x-import>
+                </div>
+                <div style="font-family:Poppins,sans-serif;font-size:24px;line-height:1.2;font-weight:600;color:var(--tt-charcoal)">{{ s.title }}</div>
+                <div style="font-size:15.5px;line-height:1.6">{{ s.blurb }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--tt-warm-gray);padding-top:14px">
+                  <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-slate)">{{ s.listLabel }}</span>
+                  <sc-for list="{{ s.items }}" as="i" hint-placeholder-count="4">
+                    <div style="display:flex;gap:9px;align-items:flex-start;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ i.text }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">What carries across</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Eleven stations, one continuous record</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:840px;text-wrap:pretty">Nothing restarts at a program boundary. That is the whole design — a learner is not enrolling over and over, they are walking one trail, and the evidence accumulates the entire way.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The Decision Log</div>
+          <div style="font-size:15px;line-height:1.6">Entry #1 is written in Week 1 of Foundations. It is at #37 by the end of the apprenticeship, numbered continuously and never restarted. Context, options, the choice, the business reason.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The vocabulary</div>
+          <div style="font-size:15px;line-height:1.6">Sprint, Definition of Done, Pass, Needs rework, acceptance criteria. Taught once in the first two weeks and identical in every program, so no transition costs a week of relearning.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">RESOLVE</div>
+          <div style="font-size:15px;line-height:1.6">Recognize · Explore · Select · Outline · Launch · Verify · Evolve. Introduced in the Practitioner Series, taught as a module in Guided Trail, and the method the apprenticeship runs on end to end.</div>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The public portfolio</div>
+          <div style="font-size:15px;line-height:1.6">One shareable page she owns for as long as she stays involved — hosted by Transition Trails, not trapped in a sandbox that expires. Decisions she defended, systems she inherited and improved, her 90-second answers. Recruiters, partners, anyone she chooses.</div>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Explorer's Trail</div>
+          <div style="font-size:15px;line-height:1.6">Not a stage between programs — the connective tissue underneath all of them. Earned at Guided Trail completion and never given up, it is where she waits for a role, brings real questions once she has one, and stays involved between engagements.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The coach ladder</div>
+          <div style="font-size:15px;line-height:1.6">Coach's Assistant, then Associate Coach, then Advanced Coach — open to anyone in Explorer's Trail. Judging the cohort behind her is how her own standard sharpens, and it is how coaching capacity grows without being recruited from outside.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Expedition Weekend</div>
+          <div style="font-size:15px;line-height:1.6">Twice a year, every program, one sealed brief opened together on a clock — one virtual, one in person in Dallas. A learner in month two and a coach in year three build side by side, and recruiters watch the work happen instead of reading about it.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Penny</div>
+          <div style="font-size:15px;line-height:1.6">Primary coach in Foundations, the interviewer in Guided Trail, the goal-setter in Explorer's Trail. One AI coach who has read everything the learner has ever submitted.</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">The capability</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">We can build a track for a skill that does not have one yet</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px;text-wrap:pretty">Marisol's Agentforce apprenticeship is not a special case — it is the model working as designed. When the ecosystem moves faster than curricula can, we assemble a custom coaching program around the capability someone actually needs: a real nonprofit client engagement for the judgment, and skill development modules underneath it so the fundamentals are never assumed. The programs evolve because the community tells us what to build next.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">A real client engagement</div>
+          <div style="font-size:15px;line-height:1.6">A nonprofit that needs the same capability, supervised by a coach. Judgment only forms where there are consequences — a lab exercise cannot produce a stakeholder who changes their mind in week six.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Modules underneath it</div>
+          <div style="font-size:15px;line-height:1.6">Skill development modules run alongside the engagement so fundamentals are covered rather than assumed. The client sets the work; the modules make sure nothing load-bearing gets skipped because the client never happened to need it.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Coverage decides the rest</div>
+          <div style="font-size:15px;line-height:1.6">A minimum skill set is named up front, and the coverage ledger tracks what has actually been exercised. Prepared use cases fill anything the client never produced — so a custom track is still a track, not an improvisation.</div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="This is the part of the value proposition that has no competitor" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>Certification bodies teach what is already stable. Bootcamps teach what was in demand when the curriculum was written. A supervised client engagement wrapped in fundamentals can be assembled for a capability that is six months old — and the learner who commissions it often ends up helping write the track they are taking.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">{{ closeKicker }}</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">{{ closeTitle }}</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ closePoints }}" as="c" hint-placeholder-count="4">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:180px 1fr;gap:22px;align-items:start">
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-trail-green)">{{ c.label }}</span>
+            <span style="font-size:15.5px;line-height:1.65">{{ c.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:32px 36px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:Caveat,cursive;font-size:27px;color:var(--tt-amber-300)">the trail keeps going</div>
+        <div style="font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.92);max-width:840px">{{ closeBanner }}</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200},&quot;audience&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;team&quot;,&quot;funder&quot;],&quot;default&quot;:&quot;team&quot;,&quot;tsType&quot;:&quot;'team' | 'funder'&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+const STATIONS = [
+  { kind:'gate', dot:'✓', badge:'Entry requirement', badgeTone:'amber',
+    kicker:'Before month 1 · certification',
+    title:'Salesforce Certified Platform Foundations',
+    blurb:'Marisol earns the entry-level certification on her own before she applies. It is a modest exam and that is the point — it proves she wants to build a career on this platform and that she can carry herself through a certification process without being managed.',
+    team:['Required to enrol — the first filter, and a self-selecting one','She has already sat an exam and passed, so the Admin exam is not her first','Costs us nothing to verify and tells us a great deal'],
+    funder:['Externally verified credential before any Transition Trails investment','A demonstrated-persistence signal at intake, not a self-reported one','Explains a completion rate: the people who arrive have already finished something'] },
+
+  { kind:'program', dot:'1', badge:'12 weeks', badgeTone:'green',
+    kicker:'Months 1–3 · Foundations Trail',
+    title:'Learning to build',
+    blurb:'Marisol has no certification and no Salesforce experience. She works largely on her own with Penny as her primary coach, building a complete case-management system for a fictional nonprofit — Horizon Community Hub — from an empty org.',
+    team:['Three sprints: the foundation, the engine, the proof','Email-to-Case, queues, assignment rules, record-triggered flows, reports','A nightly Trail Quest from Penny, chosen from her weakest domain','A Decision Log entry every week, starting at #1'],
+    funder:['12 Decision Log entries, each with a business justification','36 weekly build verifications against published acceptance criteria','Domain scores at intake and exit on the same instrument','Rework rate per sprint — the curve, not the total'] },
+
+  { kind:'gate', dot:'✓', badge:'The gate', badgeTone:'amber',
+    kicker:'Month 4 · certification',
+    title:'Salesforce Administrator certified',
+    blurb:'The exam is the entry requirement for the next trail, not the finish line. It proves she knows the platform. It does not prove she can be trusted with someone else\u2019s org, which is exactly what the next twelve weeks are for.',
+    team:['Required before Guided Trail — no exceptions','A learner who is not ready waits in Explorer\u2019s Trail rather than being pushed'],
+    funder:['Industry-recognised credential, externally verified','The one measure in the pathway Transition Trails does not grade itself'] },
+
+  { kind:'program', dot:'2', badge:'12 weeks', badgeTone:'green',
+    kicker:'Months 4–7 · Guided Trail',
+    title:'Certified, and still unhireable',
+    blurb:'A cohort of three to five, an Associate Coach, and an org she did not build — seeded with the kind of debt real nonprofits have. Alongside it, real client work the coach assigns. She never speaks to the client; the coach holds that relationship and reviews everything before it reaches production.',
+    team:['Inherits an org with overlapping assignment rules and profile-granted permissions','Squad buddy testing — she runs a peer\u2019s UAT script and they run hers','Deploys by change set, by hand, so she learns what depends on what','One 90-second interview answer recorded every single week'],
+    funder:['Findings register: what she inherited, flagged, and deliberately left alone','Peer test reports — evidence she can be tested and can test','Release requests reviewed by a coach before any production deploy','Twelve 90-second answers; the change from first to last is itself the measure','Demo Day recording, usable as an employer work sample'] },
+
+  { kind:'program', dot:'3', badge:'Ongoing', badgeTone:'teal',
+    kicker:'Month 7 onward · Explorer\u2019s Trail',
+    title:'Membership earned, and a room full of people',
+    blurb:'Finishing Guided Trail earns her membership, so this starts the week that ends. It is where she waits for a role, then where she stays once she has one. Twice a year the whole Academy gathers for an Expedition Weekend — one virtual, one in person in Dallas — a build weekend with a sealed brief, and the reason she meets the person who hires her.',
+    team:['Two Expedition Weekends a year: one virtual, one in person in Dallas','Her public portfolio stays live and hosted here, not in an expiring sandbox','Penny skill assessments against the job she wants, then the job she has','A monthly Trail Mission the whole membership participates in','Coach\u2019s Assistant: first-read verdicts, confirmed by an Associate Coach'],
+    funder:['Assessment movement tracked through unemployment and into employment','A public portfolio she can hand to any recruiter, hosted and durable','Expedition Weekend is a measurable network event, not a social one','Calibration record: her first-read verdicts against the Associate Coach\u2019s','Volunteer coaching hours contributed back into delivery'] },
+
+  { kind:'gate', dot:'★', badge:'The outcome', badgeTone:'amber',
+    kicker:'Month 9 · hired',
+    title:'First Salesforce role',
+    blurb:'She met the recruiter virtually at an Expedition Weekend — someone actively looking for a Salesforce admin who watched her work a real brief under a deadline. The portfolio then did what an interview cannot: three defended decisions, a system she inherited and improved, and a recording of her explaining it to a non-technical audience.',
+    team:['The connection came from an Expedition Weekend, not a job board','Recruiters see the work happen rather than hearing about it afterwards','The portfolio she sent them is hosted by us and still live today','She keeps her membership either way — it was earned, not conditional'],
+    funder:['Placement, with the artifact chain that produced it still on the record','Attributable to a specific program event, so the channel is known','Cost per placement is computable across the whole pathway, not per program'] },
+
+  { kind:'program', dot:'4', badge:'3 sprints', badgeTone:'green',
+    kicker:'Months 20–23 · Trail of Mastery',
+    title:'Salesforce Administrator apprenticeship',
+    blurb:'A year in the role she found at Expedition Weekend, and the ceiling is visible — she wants Administrator II skills that hold up in practice, not just on an exam. Now she is the employed admin on a real client engagement, paired with a Product Owner, working in a real DevOps pipeline with source control. She is in the room with the nonprofit; the coach is present, not in between.',
+    team:['Sprint 1 Recognize, Sprint 2 Outline and Launch, Sprint 3 Verify and Evolve','No capstone — the client is the capstone','Coverage ledger drives what she is assigned, not what is next in the queue','Prepared use cases fill any skill the client never produced'],
+    funder:['Coverage ledger: every required skill exercised, with the artifact proving it','Three decisions defended to a panel','Something she shipped, measured a month later against the problem it named','Nonprofit capacity delivered — the second half of the mission'] },
+
+  { kind:'gate', dot:'✓', badge:'Second certification', badgeTone:'amber',
+    kicker:'Month 24 · certification',
+    title:'Salesforce Certified Platform Administrator II',
+    blurb:'The apprenticeship gave her the scale problems the exam asks about — what breaks at volume, what the next change costs, why a configuration that works is still wrong. She sits Administrator II with a real engagement behind her rather than a study guide.',
+    team:['The apprenticeship is the preparation; the exam is the confirmation','Second credential earned inside the ecosystem, two years after the first'],
+    funder:['Career progression evidence, externally verified, at the 24-month mark','A second credential per learner is a materially different outcome claim than one'] },
+
+  { kind:'program', dot:'5', badge:'Coach ladder', badgeTone:'teal',
+    kicker:'Month 24 onward · giving back',
+    title:'She applies to coach',
+    blurb:'Two years in, doing well, and she wants to give back. She has already been a Coach\u2019s Assistant reading first-pass artifacts, so the step to Associate Coach is a promotion inside a ladder rather than a leap. Her calibration record is the application.',
+    team:['Coach\u2019s Assistant to Associate Coach — the ladder she was already on','Her own artifacts are what she now judges other people against','Four to six hours a week alongside a full-time job'],
+    funder:['A delivery coach produced by the pathway rather than recruited into it','Calibration record already exists: two years of verdicts against a senior coach','This is Founder-Independent Delivery, staffed and measurable'] },
+
+  { kind:'program', dot:'6', badge:'Custom track', badgeTone:'green',
+    kicker:'Month 26 · Trail of Mastery',
+    title:'Agentforce, because a promotion requires it',
+    blurb:'The promotion she wants needs hands-on Agentforce work her employer cannot give her yet. So she commissions a custom apprenticeship: a real Agentforce implementation for a nonprofit client, with Penny adapting to a domain that barely has documentation. She is not a student here — she is a practitioner buying access to a problem.',
+    team:['Custom track built around a capability, not a job title','Real implementation, real client, coached delivery','Penny adapts to an emerging domain rather than a settled exam','She may end up co-writing the track she is taking'],
+    funder:['Demand-led curriculum: the market names the capability and we build the track','A returning learner paying for a third engagement is the retention proof','Nonprofits get AI capability they could not otherwise fund','Evidence the model extends beyond certification-shaped learning'] },
+
+  { kind:'horizon', dot:'→', badge:'Aspirational · TT Consulting', badgeTone:'teal',
+    kicker:'Year 3 · a separate company',
+    title:'Associate Consultant, TT Consulting, LLC',
+    blurb:'She is hired by TT Consulting, LLC — a separate entity with its own staff, serving small and mid-size businesses, which supports Transition Trails through services and a share of its revenue. The associate post is a one-to-two year role sharpening consulting skills on paid engagements alongside senior consultants. Nobody interviewed her cold. She was known through her coaching record and an Agentforce implementation that let a short-staffed nonprofit handle its own support caseload.',
+    team:['A separate company and a separate payroll — this is employment, not a program stage','A destination role, not a stepping stone out — one to two years by design','Paid engagements with senior consultants, not shadowing','The apprenticeship she commissioned is what made her known'],
+    funder:['An independent company choosing to hire someone the nonprofit developed — an arm\u2019s-length signal, not an internal placement','TT Consulting supports Transition Trails through services and a percentage of revenue','From unhireable to billable in three years, verified by a third party\u2019s payroll','A career ceiling raised twice, both times because of work on the record'] }
+];
+
+const CLOSE = {
+  team: { kicker:'For the team', title:'What this page is for',
+    banner:'Three years, eleven stations, one record. The next design job is the piece that makes this real rather than aspirational: the coverage ledger and the minimum skill set per role, so an apprenticeship assigns work by what a learner has not yet touched.',
+    points:[
+      ['Nobody starts over','Every transition inherits vocabulary, a Decision Log number, and a coverage record. If a program boundary makes a learner relearn something, that is a defect in our design, not in the learner.'],
+      ['The gates are real','Certification gates Guided Trail. Guided Trail completion earns membership. Neither is negotiable, and both are the reason the credential means anything.'],
+      ['Alumni are staff, eventually','Marisol judging artifacts in month 12 is not a perk we gave her. It is how coaching scales past the founder, and it needs a calibration step to stay safe.'],
+      ['The fiction is shared','Horizon Community Hub and Elena appear in Foundations and again in Guided Trail. One narrative across the pathway means less to explain every time.'],
+      ['A returning learner is the goal','Marisol comes back three times — Guided Trail, an apprenticeship, then a custom track she commissions. The pathway is not a funnel with an exit; the last station is the one that proves the model.']] },
+  funder:{ kicker:'For funders', title:'Why this holds up to scrutiny',
+    banner:'Every figure on this page comes from a record in Salesforce, produced by the work itself rather than assembled for a report. Ask how any number was computed and the answer is a query, not a spreadsheet someone maintained by hand. The final station is aspirational and marked as such — the ten before it are designed.',
+    points:[
+      ['One definition, four programs','Completion means every required artifact assessed. Pass means every criterion met. Needs rework means the work exists and a named criterion is unmet. Identical in every program, so a rate is comparable across cohorts.'],
+      ['Judged, not graded','Pass, Needs rework, or Not attempted — no letter grades and no curve. Two coaches reading the same artifact against the same criteria should reach the same verdict, and the rubric is written to make that testable.'],
+      ['The rework curve is the evidence','A falling rework rate across three sprints is the clearest signal of learning available. A flat line means the criteria are not discriminating, and we would rather find that ourselves than have it found for us.'],
+      ['What does not compare, stated','Foundations is measured toward an exam; the apprenticeship toward client delivery. Those pass rates are never added together. Naming the limit is what makes the rest of the numbers credible.'],
+      ['Two outcomes per learner','A placement, and supervised capacity delivered to a nonprofit that could not otherwise afford it. The same two years produce both.'],
+      ['Lifetime value, not cohort throughput','Two certifications, one placement, one promotion track, volunteer coaching hours returned, three paid engagements, and eventually a billable consultant. A cost-per-participant figure taken at month three misses almost all of it.'],
+      ['The loop closes on sustainability','TT Consulting, LLC is a separate entity with its own staff that supports Transition Trails through services and a share of revenue. It hiring a Transition Trails alum is an independent company validating the pathway on its own payroll — which is stronger evidence than an internal placement, and it is what Financial Sustainability looks like as structure rather than intention.']] }
+};
+
+class Component extends DCLogic {
+  state = { lens:null };
+  get lens() { return this.state.lens || this.props.audience || 'team'; }
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+
+  tab(active) {
+    return this.css({
+      padding:'9px 20px', borderRadius:'999px', cursor:'pointer',
+      fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'14px',
+      background: active ? 'var(--tt-trail-green)' : 'var(--tt-white)',
+      color: active ? 'var(--tt-white)' : 'var(--tt-slate)',
+      border: active ? '1.5px solid var(--tt-trail-green)' : '1.5px solid var(--tt-warm-gray)'
+    });
+  }
+
+  renderVals() {
+    const lens = this.lens, isTeam = lens === 'team', c = CLOSE[lens];
+    const last = STATIONS.length - 1;
+
+    return {
+      lensTitle: isTeam ? 'Team view — how the pathway fits together' : 'Funder view — the evidence each stage produces',
+      lensNote: isTeam
+        ? 'Each stage shows what a learner actually does. Switch to the funder view to see the record it leaves behind.'
+        : 'Each stage shows the artifacts and measures on the record. Switch to the team view to see the work that produced them.',
+      lightChip: { style:{ background:'rgba(255,255,255,.14)', color:'var(--tt-white)' } },
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+      teamTab: this.tab(isTeam),
+      funderTab: this.tab(!isTeam),
+      setTeam: () => this.setState({ lens:'team' }),
+      setFunder: () => this.setState({ lens:'funder' }),
+
+      stations: STATIONS.map((s, i) => {
+        const onLeft = i % 2 === 0, isGate = s.kind === 'gate', isHorizon = s.kind === 'horizon';
+        const card = this.css({
+          display:'flex', flexDirection:'column', gap:'12px',
+          background: isHorizon ? 'var(--tt-sky-100)' : 'var(--tt-white)',
+          border: isGate ? '2px solid var(--tt-sun-amber)'
+            : isHorizon ? '2px dashed var(--tt-deep-teal)' : '1px solid var(--tt-warm-gray)',
+          borderRadius:'22px', padding: isGate ? '24px 28px' : '28px 30px',
+          margin: onLeft ? '0 8px 34px 0' : '0 0 34px 8px',
+          boxShadow: isGate || isHorizon ? '0 6px 16px rgba(42,46,44,.08)' : '0 12px 28px rgba(42,46,44,.10)'
+        });
+        return {
+          kicker:s.kicker, title:s.title, blurb:s.blurb, badge:s.badge, dot:s.dot,
+          onLeft, onRight: !onLeft,
+          cardStyle: card,
+          badgeTone: s.badgeTone,
+          leftStyle: this.css({ display:'flex', justifyContent:'flex-end', minWidth:0 }),
+          rightStyle: this.css({ display:'flex', justifyContent:'flex-start', minWidth:0 }),
+          lineStyle: this.css({
+            position:'absolute', top:'0', bottom: i === last ? '40px' : '0',
+            left:'50%', width:'2px', marginLeft:'-1px',
+            background: i === 0 ? 'var(--tt-warm-gray)' : 'var(--tt-warm-gray)'
+          }),
+          dotStyle: this.css({
+            position:'relative', marginTop:'26px', width:'44px', height:'44px',
+            borderRadius:'999px', display:'flex', alignItems:'center', justifyContent:'center',
+            fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'16px',
+            background: isGate ? 'var(--tt-sun-amber)' : isHorizon ? 'var(--tt-deep-teal)' : 'var(--tt-trail-green)',
+            color: isGate ? 'var(--tt-charcoal)' : 'var(--tt-white)',
+            border:'4px solid var(--tt-trail-light)', flexShrink:0
+          }),
+          listLabel: isTeam ? 'What she does' : 'What it produces',
+          items: (isTeam ? s.team : s.funder).map(text => ({ text }))
+        };
+      }),
+
+      closeKicker: c.kicker,
+      closeTitle: c.title,
+      closeBanner: c.banner,
+      closePoints: c.points.map(([label, text]) => ({ label, text }))
+    };
+  }
+}
+</script>
+</body>
+</html>

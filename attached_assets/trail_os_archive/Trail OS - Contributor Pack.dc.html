@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="./doc-page.js"></script>
+<style>
+  doc-page:not(:defined) { visibility: hidden; }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); text-decoration: underline; }
+  .cal { break-inside: avoid; orphans: 3; widows: 3; }
+  table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  code { font-family: Menlo, Consolas, monospace; font-size: max(14px, 0.92em); }
+</style>
+</helmet>
+
+<doc-page margin="0.8in">
+
+<h1 style="font-family: 'Poppins', sans-serif; font-size: 34px; line-height: 1.2; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Trail OS — Contributor Pack</h1>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 8px;">Everything you need to work on Trail OS without breaking it. Written for a developer or contractor joining the build, not for someone using the product.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 14px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 28px; opacity: .8;">Current as of 4 August 2026. Where this document and the code disagree, the code is right — please correct the document.</p>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">1 · What Trail OS is</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Transition Trails trains Salesforce professionals through real client work paired with structured skill development. Trail OS is the <strong style="color: var(--tt-charcoal);">internal staff platform</strong> that runs it — a control room over Salesforce, Slack, Google Workspace and Gemini, with an AI assistant called Penny woven through it.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Two things it is not. It is not the system of record — Salesforce is, and Trail OS reads from it. And it is not yet a learner-facing product; coach and learner views are planned inside Trail OS but not built.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 22px;">The single most useful thing to understand early: <strong style="color: var(--tt-charcoal);">the product evolved while the approach was being worked out.</strong> Documents that predate a decision still describe the old one. GitHub is current state; if a document disagrees with the code, the document is stale.</p>
+
+<h3 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The three products</h3>
+
+<table style="width: 100%; border-collapse: collapse; font-family: 'Open Sans', sans-serif; font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 22px;">
+  <thead>
+    <tr style="background: var(--tt-sky-100);">
+      <th style="text-align: left; padding: 10px 12px; border: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--tt-charcoal);">Repository</th>
+      <th style="text-align: left; padding: 10px 12px; border: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--tt-charcoal);">What it is</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);"><code>Transition-Trails-Map</code></td>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">Trail OS. This is the one you will work in. Fifty-plus routes, six navigation groups, live integrations.</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);"><code>Penny-POC</code></td>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">The original proof of concept — a mobile app with learner and coach screens, its own database and a Slack bot. Not a throwaway: it is where the learner experience was first built, and it is scheduled for retirement. Do not build on it, but read it when you need to know what a learner journey looked like.</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);"><code>TT-Public-Website</code></td>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">The marketing site. Launched and fully on brand — useful as the reference for what correct brand implementation looks like.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">2 · How the code is arranged</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Four workspaces. Two matter for most work:</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">api-server</strong> — the Express API. Every integration lives here: Salesforce, Slack, Gemini, Google Workspace, and authentication. Around 115 route handlers across 28 files.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">program-map</strong> — the React front end. Pages are grouped by navigation section; the sidebar definition is a single array and is the authoritative description of the app's structure. If you want to know what Trail OS contains, read that file rather than any document.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 18px;"><strong style="color: var(--tt-charcoal);">mockup-sandbox</strong> and <strong style="color: var(--tt-charcoal);">scripts</strong> — supporting. The sandbox carries two pre-existing type errors that are not yours to fix and do not affect anything.</p>
+
+<div class="cal" style="background: var(--tt-sky-100); border-radius: 14px; padding: 18px 22px; margin: 0 0 22px;">
+  <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Six navigation groups</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0;">Operations · Programs · Penny · Knowledge · Collaboration · Administration. Digital Twin is an item inside Administration, not a group of its own — several older documents get this wrong.</p>
+</div>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">3 · Where the data comes from</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">This is the section to read most carefully, because a screen showing a number tells you nothing about where that number came from. There are three sources, and roughly two thirds of the data files are still illustrative.</p>
+
+<table style="width: 100%; border-collapse: collapse; font-family: 'Open Sans', sans-serif; font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 18px;">
+  <thead>
+    <tr style="background: var(--tt-sky-100);">
+      <th style="text-align: left; padding: 10px 12px; border: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--tt-charcoal);">Source</th>
+      <th style="text-align: left; padding: 10px 12px; border: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--tt-charcoal);">What it holds</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">Salesforce, live</td>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">The system of record. Contacts, programs, cases, curriculum, Penny's trail configurations. Read through the Replit connector proxy.</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">Local database</td>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">Telemetry only — Penny's model, latency and resolved tier per exchange. Not a second system of record, and not a cache of Salesforce.</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">Illustrative fixtures</td>
+      <td style="padding: 10px 12px; border: 1px solid var(--tt-warm-gray);">Around twenty files of invented data written to make screens demonstrable. Every figure in them is made up. They carry a marker; respect it.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 22px;">If you are replacing a fixture with a live query, the honest test is whether a change made in Salesforce appears in Trail OS without a code change. Anything short of that is still a fixture wearing a live query's clothes.</p>
+
+<h3 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">The Salesforce model, in brief</h3>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Eighteen custom objects in three families — eight for Penny, six for curriculum and progress, four for build governance. Seventeen are deployed and readable. Four hold data today: course, module and activity records, plus the four Penny trail configurations. The rest are empty, which is expected.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Two reuse decisions matter more than anything else here. <strong style="color: var(--tt-charcoal);">There is no learner object</strong> — a learner is a Contact, with program membership expressed through Program Engagement and around twenty-eight organization-specific custom fields on Contact itself. And <strong style="color: var(--tt-charcoal);">curriculum reuses the course objects</strong> rather than creating parallel ones.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 22px;">This is where stale documents will mislead you most. Older specifications name objects like a standalone learner object or separate conversation objects. Those were superseded by the data model and never created. Always check the org before creating anything.</p>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">4 · Identity and access</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">One identity, three grants. Understanding this distinction will save you a day.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">Google is the identity provider.</strong> Sign-in is Google OAuth restricted to the organization's domain — and it validates the domain claim in the returned token, not just the request hint. There is no other login. A separate administrator wizard also exists for granting the application service access to Drive, Calendar and Gmail; it looks like a login flow and is not one. Do not confuse them.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">Google Groups determine access.</strong> At sign-in, the person's group memberships are resolved through the Directory API and held on the session <em>as a set</em>. Never collapse that set to a single level when making a decision — somebody can hold both Penny governance and platform governance, and those are different domains rather than rungs on a ladder. A display tier is derived from the set for the interface; it is a label, not the authority.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">Salesforce and Slack are separate grants.</strong> A Google token proves who someone is; it does not authorize Trail OS to read Salesforce or post to Slack. Each issues its own tokens. Because Salesforce signs in through Google as its SAML provider, that grant costs the user one consent click and no password.</p>
+
+<div class="cal" style="background: var(--tt-green-100); border-radius: 14px; padding: 18px 22px; margin: 0 0 22px;">
+  <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Authorization is default-deny. Keep it that way.</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 8px;">A single gate runs before every router mount: every route requires staff authentication unless it is explicitly listed as public, and that list is deliberately tiny — the two OAuth round-trips, the wizard callbacks, a signature-verified webhook, and a health check. Secrets, group administration and role owners carry a second administrator check.</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0;">If you add a route, it is protected automatically. Adding something to the public list is a decision, not a convenience — and it should be justified in the pull request.</p>
+</div>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">5 · How Penny works</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Penny runs on Gemini. She serves five audiences — internal staff, learners, coaches, clients and eventually the public — though only the internal identity is built today. The others are currently a tone instruction on top of it, which changes vocabulary rather than behavior.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Her system prompt is assembled from seven independent layers, each a separate function. Every layer is optional and contributes nothing when it has no data — <strong style="color: var(--tt-charcoal);">an empty layer is normal, not a failure.</strong> The response reports which layers actually contributed, which is how you debug prompt quality.</p>
+
+<table style="width: 100%; border-collapse: collapse; font-family: 'Open Sans', sans-serif; font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 18px;">
+  <thead>
+    <tr style="background: var(--tt-sky-100);">
+      <th style="text-align: left; padding: 10px 12px; border: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--tt-charcoal);">Layer</th>
+      <th style="text-align: left; padding: 10px 12px; border: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--tt-charcoal);">State</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Identity — who Penny is for this audience</td><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Internal only</td></tr>
+    <tr><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Trail context — the program configuration</td><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Live from Salesforce</td></tr>
+    <tr><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Learner context — phase, focus, blockers</td><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Live from Contact</td></tr>
+    <tr><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Knowledge — retrieved sources</td><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Working</td></tr>
+    <tr><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Active quest</td><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Empty — object has no records</td></tr>
+    <tr><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Career review</td><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Empty — object has no records</td></tr>
+    <tr><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Memory window — recent exchanges</td><td style="padding: 9px 12px; border: 1px solid var(--tt-warm-gray);">Depends on persistence</td></tr>
+  </tbody>
+</table>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Two things about the architecture that are easy to get wrong. <strong style="color: var(--tt-charcoal);">Retrieval is currently orchestrated by the browser</strong> — the endpoint accepts already-retrieved sources from the caller, so a screen that forgets to fetch them gets an ungrounded answer that looks identical to a grounded one. Moving that server-side is open work. And <strong style="color: var(--tt-charcoal);">the prompt studio does not yet drive real responses</strong>; templates authored there have no effect until that is wired.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 22px;">The write of each exchange to Salesforce is deliberately fire-and-forget: a failed write must never cost the user their answer. That is correct, and it has a cost you need to know about — see the lessons below.</p>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">6 · Conventions to follow</h2>
+
+<h3 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Design</h3>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;">The design system is the source of truth and it is implemented as a token layer. Do not introduce a color, a typeface, a radius or a shadow that is not in it. Specifically:</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 8px;">Four brand colors and five semantic status roles. There is no red in the palette; the attention color is amber, used as text on a light tint rather than as a fill. <strong style="color: var(--tt-charcoal);">One amber call to action per screen</strong>, never decorative — amber on a badge that appears on every screen breaks this without looking like it does.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 8px;">Poppins for headings, Open Sans for body and interface. <strong style="color: var(--tt-charcoal);">Fourteen pixels is the floor</strong> for any text, including table cells, badges and sidebar labels. This was raised from as low as eight and is easy to reintroduce.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 18px;">Status is never carried by color alone — pair it with an icon and text. No emoji, in the product or in repository documents.</p>
+
+<h3 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Language</h3>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">RESOLVE has seven phases:</strong> Recognize, Explore, Select, Outline, Launch, Verify, Evolve. It is the delivery methodology every program teaches, and an earlier eight-phase version in the code was wrong and has been corrected. If you find eight anywhere, it is stale.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">Work is judged by verdict, not by grade:</strong> pass, needs rework, or not attempted. Never a percentage. The measure of a learner is their rework curve over time.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 18px;">The brand avoids the Salesforce ecosystem's own vocabulary — a few such terms survive in field names and are being relabeled rather than migrated. "Trail Quests" is deliberate house vocabulary and is not one of them.</p>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">7 · Lessons paid for already</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 16px;">Five failures found in this codebase, each of which cost real time. They are not hypothetical and they will recur if you do not know them.</p>
+
+<div class="cal" style="border-left: 3px solid var(--tt-green-300); padding: 0 0 0 18px; margin: 0 0 16px;">
+  <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">A failure and a zero must never look the same</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0;">Operations queries once swallowed every error and returned nothing, so a permissions problem and a genuinely empty result were indistinguishable. A dashboard reporting no active programs when the real answer is a misspelled picklist value is worse than an error, because it looks like information.</p>
+</div>
+
+<div class="cal" style="border-left: 3px solid var(--tt-green-300); padding: 0 0 0 18px; margin: 0 0 16px;">
+  <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">A throttled response is not an absence</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0;">The connector proxy rate-limits at twenty requests per ten seconds. Probing eighteen objects in parallel exceeded it, and the page reported nine of them as inaccessible when they were fine. Worse, a throttled field describe returned nothing and was reported as fields being missing — which would have sent someone to create fields that already existed. Anything you cannot determine needs a third state, and it must not read as absent.</p>
+</div>
+
+<div class="cal" style="border-left: 3px solid var(--tt-green-300); padding: 0 0 0 18px; margin: 0 0 16px;">
+  <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Validate written values against the real schema</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0;">Penny's interaction log never wrote a single record. The code sent a source value that was not among the picklist's permitted options, so Salesforce rejected every insert. It went unnoticed for as long as it did because the tests mock the Salesforce client — they assert that a write is attempted with certain values, never that those values are legal. Mocked tests prove intent, not conformance.</p>
+</div>
+
+<div class="cal" style="border-left: 3px solid var(--tt-green-300); padding: 0 0 0 18px; margin: 0 0 16px;">
+  <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Fire-and-forget needs somewhere to shout</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0;">Swallowing a write failure so the user keeps their answer is the right design. But it made a total, permanent failure look exactly like success from every angle anyone checked. If you write something asynchronously, make its last failure visible somewhere a person will actually look.</p>
+</div>
+
+<div class="cal" style="border-left: 3px solid var(--tt-green-300); padding: 0 0 0 18px; margin: 0 0 20px;">
+  <p style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">One caught exception can disable far more than you think</p>
+  <p style="font-family: 'Open Sans', sans-serif; font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0;">A throw on a missing contact was caught two lines later and nulled the Salesforce client for the <em>entire request</em> — so staff users silently had no trail configuration, no learner context and no history, not merely no log entry. When something is missing for one purpose, scope the failure to that purpose.</p>
+</div>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">8 · Working here</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">Run a type check and the test suite before you finish.</strong> The suite is around two hundred tests and passing; the two type errors in the sandbox workspace are pre-existing.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">There are three Salesforce orgs — development, staging and production.</strong> Metadata changes are made in development and promoted through staging to production using DevOps Center, with GitHub as source control for the Salesforce metadata. So schema work follows a real pipeline: make the change in development, promote it, and do not hand-edit production.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">Trail OS itself points at production.</strong> That is the asymmetry to hold in your head: the schema has a promotion path, but the application reads and writes the live org directly. There is no staging deployment of Trail OS pointed at the staging org today, so treat every write from the application as real. The connector also authenticates as a named personal account for now — moving it to a dedicated integration user is open work, and it will change the permissions your code runs under.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;">A practical consequence: when you add a field or object, it exists in development before it exists in production, so application code that depends on it will fail against production until the change is promoted. If something the schema says should be there is missing, check which org you are looking at before assuming it was never built.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 10px;"><strong style="color: var(--tt-charcoal);">Never add a Salesforce field or object without checking the org first</strong> — and be explicit about which org you checked. The documented model and the deployed model have diverged before, in both directions, and a field present in development and absent from production looks identical to a field that was never created.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 18px;"><strong style="color: var(--tt-charcoal);">Verify integration work against the org, not a mock.</strong> The most expensive bug in this codebase would have been caught by one real query.</p>
+
+<h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tt-warm-gray);">9 · Where the documentation lives</h2>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Being reorganized, so this matters. <strong style="color: var(--tt-charcoal);">Epics, features and cases are moving into Salesforce</strong>, with knowledge articles supporting Trail OS. The older strategy and requirements documents are being archived rather than maintained.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">What that means for you in practice: <strong style="color: var(--tt-charcoal);">do not treat an archived document as a specification.</strong> Several describe objects that were never created, integrations listed as planned that have shipped, and a version of the methodology that was wrong. They are useful for understanding intent and unsafe as instructions.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0 0 14px;">Four things are authoritative, in this order. <strong style="color: var(--tt-charcoal);">The Salesforce org</strong> for anything about data. <strong style="color: var(--tt-charcoal);">The code</strong> for anything about structure or behavior. <strong style="color: var(--tt-charcoal);">Salesforce epics and features</strong> for what is planned. <strong style="color: var(--tt-charcoal);">The design system</strong> for anything visual.</p>
+
+<p style="font-family: 'Open Sans', sans-serif; font-size: 16px; line-height: 1.65; color: var(--tt-slate); margin: 0;">If you find this document wrong, it is wrong — fix it. A contributor pack that nobody trusts is worse than none, because it costs a day before it is discovered.</p>
+
+</doc-page>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,832 @@
+TRANSITION TRAILS
+Trail OS
+Product Vision Document
+Document Type
+Product Vision — SAFe Format
+Version
+1.0 — Session 2, June 2026
+Status
+Draft — Internal Product Team
+Product Owner
+Angela R. Landrith, CEO & Co-Founder
+CTO / Lead Builder
+Hugh Richardson, CTO & Co-Founder
+Platform
+Salesforce (native) + Google (AI/Workspace)
+Audience
+Internal Product Team — Angela, Hugh, Kim
+transitiontrails.org  |  angela@transitiontrails.org  |  EIN: 88-2746412
+## 1. Vision Statement
+Trail OS is Transition Trails' proprietary operating platform — built natively on Salesforce and powered by Google Gemini — that enables a small founding team to deliver world-class workforce development programs, serve nonprofit clients at scale, and develop the next generation of Salesforce practitioners across six role tracks. It is simultaneously an internal operating system, a teaching laboratory, a client services platform, and an AI-powered coaching infrastructure. TT doesn't just build Trail OS for others. TT runs on Trail OS. The founders are learners too.
+## The Problem Trail OS Solves
+Transition Trails cannot scale through headcount. There are not enough certified Salesforce experts who can dedicate time to coaching, client services, and program delivery at the volume TT needs to serve its mission. The only path to scale is AI-augmented infrastructure that multiplies the impact of every human on the team — coaches, Trail of Mastery students, founders, and clients alike.
+Trail OS is that infrastructure. Penny — TT's AI companion powered by Google Gemini and Salesforce Agentforce — serves every person in TT's ecosystem: learners, coaches, clients, job seekers, accidental admins, donors, and the founders themselves. The platform and the program are inseparable. Every tool TT uses is a tool TT teaches.
+## The Long-Term Vision
+Trail OS is designed to be offered beyond Transition Trails — to other nonprofits that use Salesforce or want to start. Organizations that are under-resourced, under-supported, and operating on technology that isn't serving their mission. TT is the first client. It will not be the last.
+## 2. Strategic Themes
+All Trail OS capabilities, epics, and features map to at least one Strategic Theme. Strategic Themes are the business objectives that drive prioritization across every Program Increment.
+ID
+Theme
+Description
+Key Capabilities
+ST-1
+AI-Augmented Scale
+Enable TT to serve 10x the learners and clients with the same founding team by making Penny the intelligence layer across every program, client engagement, and operational workflow.
+Penny development, Agentforce integration, Google Gemini API capacity, Einstein Agent capacity
+ST-2
+Real-World Learning Infrastructure
+Deliver the only workforce development program in the Salesforce ecosystem grounded in live client work, real stakeholders, and a proprietary methodology — not simulations.
+RESOLVE methodology, Trail OS LMS, DevOps pipeline, learner portal, coach infrastructure
+ST-3
+Nonprofit Client Excellence
+Serve nonprofit clients with a delivery model that is simultaneously a consulting engagement and a learning program — starting with AI-powered org assessment and ending with a client who owns their Salesforce org.
+AI org assessment, client portal, change management system, Knowledge Library, RESOLVE client track
+ST-4
+Platform Self-Sufficiency
+Build toward earned revenue that sustains TT operations without grant dependency by activating Commerce Cloud, TrailKits, program enrollment, and coaching session commerce.
+Commerce Cloud storefront, Marketing Cloud, Tableau impact reporting, revenue diversification
+ST-5
+Google + Salesforce License Maximization
+Maximize every nonprofit grant license across both the Salesforce Power of Us program and Google Workspace for Nonprofits — building capabilities that would cost a for-profit company $500,000+ per year.
+Experience Cloud, Data Cloud, Tableau, Marketing Cloud, Slack Pro, Google Workspace, Google Classroom, NotebookLM
+ST-6
+Trail OS as a Product
+Build Trail OS as a product that can be offered to other nonprofits — the change management system, Knowledge Library, Penny AI layer, and Google Workspace onramp — starting with TT as the first client.
+Client deliverable packaging, Google Workspace onboarding track, nonprofit product roadmap
+## 3. Solution Intent
+## Fixed Decisions — Not Up for Debate
+These architectural and philosophical decisions are made. Features, sprints, and Program Increments must respect them.
+Decision
+What It Means
+Salesforce-Native Platform
+Trail OS is built natively on Salesforce. No exceptions. Every feature is a Salesforce object, Flow, or Agentforce agent — not a third-party integration that creates data silos.
+Google Gemini as AI Engine
+Penny's intelligence runs on Google Gemini (currently 2.5 Flash). The knowledge base is Google NotebookLM + Google Drive. Google Classroom is the LMS integration.
+Human in the Loop — Always
+No deployment, no client-facing message, no change request advances without a human review. This is a trust architecture, not a limitation.
+RESOLVE as the Methodology
+Every client engagement, every learner build, every change request runs through the RESOLVE framework. It is non-negotiable and proprietary.
+Admin Cert as Baseline
+Every Trail of Mastery participant holds the Salesforce Certified Platform Administrator credential. This is the entry requirement, not a preference.
+Google Workspace Foundation
+Every client engagement starts with Google Workspace for Nonprofits as the foundation layer — before Salesforce, before automation, before Trail OS capabilities.
+## Evolving Decisions — Under Active Design
+These decisions are in flight. They have a direction but not a final answer. They will be resolved during Program Increment planning.
+Decision Area
+Current Status
+Penny Persona Sequencing
+Which of Penny's six personas ships first. Current plan: Public Guide and Learner Coach in Phase 1, remaining personas in subsequent phases.
+Trail OS LMS vs Google Classroom
+Google Classroom is the current authoring/delivery tool. Trail OS mirrors curriculum into a native Salesforce LMS. Migration timeline is Phase 2.
+Client Deliverable Packaging
+Which Trail OS components are offered to external nonprofits and in what format. Currently internal only — external product packaging is Phase 3.
+Commerce Cloud Activation
+TrailKit products, cohort enrollment, and coaching sessions via Commerce Cloud. Architecture is complete. Full activation is Phase 1 / Phase 2.
+Trail of Mastery Launch Sequencing
+Six role tracks defined. Launch sequence (which tracks in which cohort) to be determined by market demand and coach availability.
+Mobile App
+Phase 1 = mobile browser (LWR responsive). Phase 2 = Mobile Publisher. Phase 3 = app store.
+## 4. Personas — Everyone Trail OS Serves
+Trail OS serves a broader audience than any single program. Every persona below has a defined pathway through the platform.
+ID
+Persona
+Who They Are
+How Trail OS Serves Them
+Theme
+P-01
+Career Starter
+No tech background, exploring Salesforce as a first career step
+Foundations Trail → Guided Trail → job placement
+ST-2
+P-02
+Career Changer
+Non-technical professional making a deliberate pivot into Salesforce
+Guided Trail → Penny coaching → portfolio → hire
+ST-2
+P-03
+Accidental Admin
+Nonprofit staff who became the Salesforce person without a plan
+Foundations Trail, Penny as guide, Google Workspace onramp
+ST-2, ST-3
+P-04
+Employed Admin (Ceiling)
+Certified, working, stuck — wants to advance to BA/PM/SA/Architect
+Trail of Mastery — role track + live client work
+ST-2
+P-05
+Salesforce Marketer
+Marketing professional needing to add Salesforce tech fluency
+Trail of Mastery — Marketer track
+ST-2
+P-06
+Reporting & Analytics Pro
+Data-oriented professional building Salesforce/Tableau expertise
+Trail of Mastery — Reporting track
+ST-2
+P-07
+Coach — PM Track
+Certified practitioner giving back, developing PM leadership skills
+Cohort coaching + Penny development track + stipend
+ST-2
+P-08
+Coach — SA Track
+Certified architect giving back, developing SA leadership skills
+Cohort coaching + Penny development track + stipend
+ST-2
+P-09
+Nonprofit Client
+Under-resourced nonprofit that needs Salesforce help it can't afford
+AI org assessment → RESOLVE engagement → Trail OS access
+ST-3
+P-10
+Prospective Client
+Nonprofit evaluating whether TT is the right fit
+Penny on Commerce Cloud → scoping → engagement
+ST-3, ST-4
+P-11
+Job Seeker
+Salesforce professional in career transition, not in a program
+Penny commerce layer, TrailKits, coaching sessions
+ST-4
+P-12
+Donor / Supporter
+Individual who wants to support TT's mission financially
+Commerce Cloud — merch, donations, scholarship funding
+ST-4
+P-13
+TT Founders
+Angela, Kim, Hugh, Kel — building a nonprofit from scratch
+Penny as Chief of Staff, Angela's dashboard, Trail OS operations
+ST-1, ST-5
+P-14
+Other Nonprofit (Future)
+External nonprofit that wants Trail OS + Penny for their own org
+Trail OS product offering — Phase 3
+ST-6
+## 5. Capabilities
+Capabilities are the major feature areas of Trail OS. Each maps to Strategic Themes and contains multiple Epics. Capabilities are the highest level of the product backlog — they describe WHAT the system does, not HOW it does it.
+ID
+Capability
+Theme
+Phase
+Description
+CAP-01
+Penny — AI Intelligence Layer
+ST-1
+Phase 1-3
+Penny powered by Google Gemini + Salesforce Agentforce, serving all 14 personas across five surfaces: Commerce Cloud, Learner Portal, Slack, Google Classroom/LMS, and Angela's Dashboard.
+CAP-02
+Program Management
+ST-2
+Phase 1
+Full learner lifecycle management — waitlist, enrollment, cohort delivery, portfolio tracking, job placement — across Foundations Trail, Guided Trail, and Trail of Mastery.
+CAP-03
+Trail of Mastery Platform
+ST-2
+Phase 2
+Six role tracks, client case queue, RESOLVE engagement workflow, DevOps pipeline, coach development infrastructure, and Penny Scrum Master integration for advanced practitioners.
+CAP-04
+Coach Infrastructure
+ST-2
+Phase 1
+Coach onboarding, stipend management, structured resource delivery (sprint guides, answer keys, facilitation frameworks), Penny session prep, and coach development quest tracks.
+CAP-05
+Client Services Platform
+ST-3
+Phase 1-2
+AI-powered org assessment via Connected App + Zapier MCP + Claude, client case management, RESOLVE engagement workflow, change management system, Knowledge Library, client portal via Slack Connect.
+CAP-06
+DevOps & Build Infrastructure
+ST-2, ST-3
+Phase 1
+GitHub org, Salesforce DevOps Center, branch protection, CI/CD pipeline, build log, automated testing with human review gates. Both TT's operational infrastructure and its teaching laboratory.
+CAP-07
+Commerce & Revenue
+ST-4
+Phase 1-2
+Salesforce Commerce Cloud storefront — TrailKits, program enrollment, coaching sessions, client service packages, donations, and physical merch via Fourthwall. Native Salesforce Payments.
+CAP-08
+Learning Management System
+ST-2
+Phase 1-2
+Google Classroom as authoring/delivery layer, mirrored into Salesforce-native LMS. Trail Tracker for Trailhead integration. Penny connects the two surfaces.
+CAP-09
+Analytics & Impact Reporting
+ST-4
+Phase 1-2
+Tableau Next (100,010 seats) fed by Data Cloud. Learner placement rates, program health, client satisfaction, revenue by source, grant impact reporting — live and auditable.
+CAP-10
+Marketing Cloud — Outreach Engine
+ST-4
+Phase 2
+Automated learner nurture journeys, donor campaigns, alumni engagement, and program marketing. Connected to CRM — every campaign closes the loop back to a Contact record.
+CAP-11
+Google Workspace Onboarding
+ST-3, ST-6
+Phase 1
+First-deliverable capability for nonprofit clients operating on personal email or chaos. Google Workspace for Nonprofits setup, training, and integration with Salesforce as the foundation layer before any build work begins.
+CAP-12
+Trail OS as Product (External)
+ST-6
+Phase 3
+Packaging Trail OS capabilities — change management system, Knowledge Library, Penny, Google Workspace onramp — for other nonprofits. TT is the first client. This is the expansion product.
+## 6. Epic Breakdown
+Epics are the primary units of the Trail OS product backlog. Each Epic maps to a Capability and one or more Strategic Themes. This table is the exportable backlog for sprint planning and Program Increment tracking.
+Epic ID
+Cap
+Epic Name
+Theme
+Phase
+Status
+Description
+E-01
+CAP-01
+Penny — Public Guide (Commerce)
+ST-1, ST-4
+Phase 1
+In Progress
+Penny on the Commerce Cloud storefront serving prospective learners, nonprofit clients, and donors/supporters. Program fit guidance, scoping conversations, donation pathways.
+E-02
+CAP-01
+Penny — Learner Coach (Portal)
+ST-1, ST-2
+Phase 1
+In Progress
+Penny inside the Experience Cloud learner portal. 7-layer prompt architecture, Socratic coaching, quest delivery, career review, sprint orientation.
+E-03
+CAP-01
+Penny — Slack Integration
+ST-1, ST-2, ST-3
+Phase 1
+In Sprint
+Penny in Slack DMs and client channels. Coach mode, coordinator mode, client liaison safety rules, human approval gate for client-facing messages.
+E-04
+CAP-01
+Penny — Coach Coordinator
+ST-1, ST-2
+Phase 1
+Planned
+Penny as Scrum Master for coaches. Session prep assembly, red flag surfacing, weekly intelligence reports, post-session note structuring.
+E-05
+CAP-01
+Penny — Internal Chief of Staff
+ST-1
+Phase 1
+Planned
+Angela's Dashboard. Cohort health, sprint status, learner flags, automation health, revenue by source, deployment logs. Natural language queries via Claude MCP.
+E-06
+CAP-01
+Penny — Coach Development Engine
+ST-1, ST-2
+Phase 2
+Planned
+Penny-powered professional development for coaches. Resume upload, Trail Tracker integration, LinkedIn conversational input, PM/SA quest tracks, leadership development.
+E-07
+CAP-01
+Penny — Trail of Mastery Scrum Master
+ST-1, ST-2
+Phase 2
+Planned
+Penny as Agentforce Scrum Master for Trail of Mastery cohorts. Case queue management, change request evaluation support, DevOps pipeline integration.
+E-08
+CAP-01
+Penny — Client Services Agent
+ST-1, ST-3
+Phase 2
+Planned
+Penny for active nonprofit clients. Case status updates, Knowledge Article routing, change management support, org assessment orchestration.
+E-09
+CAP-02
+Waitlist & Enrollment Management
+ST-2
+Phase 1
+Planned
+Salesforce-native waitlist, application, enrollment, and cohort assignment workflow. Connected to Commerce Cloud for payment and to Data Cloud for learner profiles.
+E-10
+CAP-02
+Learner Journey Tracking
+ST-2
+Phase 1
+Planned
+Full learner lifecycle from first contact through placement. Program Engagement records, sprint progress, portfolio milestones, badge awards, placement tracking.
+E-11
+CAP-02
+Trail Tracker + Trailhead Integration
+ST-2
+Phase 1
+In Sprint
+Native Trail Tracker monitoring Trailhead badge/trail completion across TT community. TT-assigned Trailmixes per program track. Penny reads data directly from Salesforce.
+E-12
+CAP-02
+Portfolio & GitHub Integration
+ST-2
+Phase 1
+Planned
+Learner portfolio built on Experience Cloud. GitHub repo verification. Admin Decision Log and Build Log as portfolio artifacts. DevOps Center connected.
+E-13
+CAP-03
+Role Track Infrastructure
+ST-2
+Phase 2
+Planned
+Six role track configurations: Admin/Builder, BA, PM, SA, Marketer, Reporting/Analytics. Track-specific quest libraries, Penny persona calibration, cert pathway alignment.
+E-14
+CAP-03
+Client Case Queue & RESOLVE Workflow
+ST-2, ST-3
+Phase 2
+Planned
+Salesforce Case queue for ToM students. RESOLVE evaluation workflow. Penny context surfacing. Knowledge Article routing vs. build decision gate.
+E-15
+CAP-03
+Agentforce Track — Cross-Role
+ST-1, ST-2
+Phase 2
+Planned
+Agentforce/AI agent design, configuration, and governance skills woven into all six role tracks. Every ToM graduate has documented Agentforce experience.
+E-16
+CAP-04
+Coach Onboarding & Profile
+ST-2
+Phase 1
+Planned
+Coach Contact record, resume upload, LinkedIn URL, Trail Tracker connection, role track assignment, cohort assignment, stipend agreement workflow.
+E-17
+CAP-04
+Sprint Guide & Resource Delivery
+ST-2
+Phase 1
+Planned
+Structured coach resources (sprint guides, answer keys, facilitation frameworks, red flag protocols) delivered through the coach-facing Salesforce portal.
+E-18
+CAP-04
+Stipend Management
+ST-2
+Phase 1
+Planned
+3-month coaching engagement stipend tracking, approval, and payment workflow. Connected to Finance and to coach Contact record.
+E-19
+CAP-05
+AI Org Assessment
+ST-1, ST-3
+Phase 1
+Built — POC
+Salesforce External Connected App + Zapier MCP + Claude API. Live org data pull, structured assessment against NPSP/NPC/security/data quality framework, Google Doc output, Penny Slack delivery.
+E-20
+CAP-05
+Change Management System
+ST-2, ST-3
+Phase 2
+Planned
+Salesforce-native change management. Client roadmap, feature requests, change evaluation, Penny recommendations, human approval gate, DevOps pipeline handoff.
+E-21
+CAP-05
+SOP & Knowledge Library
+ST-2, ST-3
+Phase 1
+In Progress
+Salesforce Knowledge Articles covering all operational areas. RESOLVE methodology documentation. Client-facing and internal articles. Penny surfaces relevant articles in context.
+E-22
+CAP-06
+GitHub + DevOps Center Integration
+ST-2
+Phase 1
+Built
+GitHub org active. DevOps Center installed. Branch protection live. CI jobs configured. Build log (Google Sheet) tracking all components and deployments.
+E-23
+CAP-06
+Automated Testing Framework
+ST-2
+Phase 1
+In Sprint
+Penny QA Engine checking learner builds against acceptance criteria. Automated test suite for TT org. Human review gate — no deployment without sign-off.
+E-24
+CAP-07
+Commerce Cloud Storefront
+ST-4
+Phase 1
+Built — Config Needed
+Two B2C stores already built (PayNow, Digital Compass). TrailKits, program enrollment, coaching sessions, client packages, donations. Native Salesforce Payments.
+E-25
+CAP-07
+TrailKit Products
+ST-4
+Phase 1
+Planned
+Digital product library — learning resources, RESOLVE methodology guides, org assessment templates. Purchasable via Commerce Cloud. Physical merch via Fourthwall.
+E-26
+CAP-08
+Google Classroom Integration
+ST-2
+Phase 1
+In Sprint
+Penny connected to Google Classroom. Assignment monitoring, nudge system (Penny_Classroom_Nudge__c), curriculum mirroring into Salesforce LMS objects.
+E-27
+CAP-08
+Native Salesforce LMS
+ST-2
+Phase 2
+Planned
+Trail OS native learning system mirroring Google Classroom content. Learner accesses curriculum inside Experience Cloud portal without platform switching.
+E-28
+CAP-09
+Tableau Impact Dashboards
+ST-4
+Phase 2
+Planned
+Tableau Next (100,010 seats) fed by Data Cloud. Learner placement, program health, client satisfaction, revenue, cohort metrics. Live grant impact reporting.
+E-29
+CAP-09
+Salesforce Native Reporting
+ST-2, ST-4
+Phase 1
+Planned
+Native Salesforce reports and dashboards for operational visibility. Penny surfaces key metrics in Angela's Dashboard. Foundation for Tableau layer.
+E-30
+CAP-10
+Marketing Cloud Journeys
+ST-4
+Phase 2
+Planned
+Automated email journeys: learner nurture, donor cultivation, alumni engagement. Connected to CRM — every campaign action closes back to a Contact.
+E-31
+CAP-11
+Google Workspace Client Onboarding
+ST-3, ST-6
+Phase 1
+Planned
+First-deliverable playbook for nonprofit clients on personal email. Google Workspace for Nonprofits setup, staff training, Salesforce integration foundation.
+E-32
+CAP-12
+Trail OS External Product Packaging
+ST-6
+Phase 3
+Future
+Package Trail OS capabilities for external nonprofits. Change management system, Knowledge Library, Penny layer, Google Workspace onramp. TT as first client.
+## 7. Feature List — Product Backlog
+Features are the working units of the backlog. Each maps to an Epic and has a priority, the personas it serves, its phase, and a name. This table is designed for export to Excel for sprint planning.
+Feature
+Epic
+Feature Name
+Personas
+Phase
+Priority
+F-001
+E-01
+Program fit quiz for prospective learners
+P-01, P-02, P-03
+High
+F-002
+E-01
+Nonprofit scoping conversation for prospective clients
+P-09, P-10
+High
+F-003
+E-01
+Donor and supporter merch/donation guidance
+P-12
+Medium
+F-004
+E-02
+7-layer prompt architecture (brand, trail, learner, mode, quest, career, memory)
+P-01, P-02
+Critical
+F-005
+E-02
+Trail Quest daily scenario-based challenges
+P-01, P-02, P-04
+High
+F-006
+E-02
+Career Profile Review (resume + LinkedIn + Trailhead)
+P-01, P-02, P-04
+High
+F-007
+E-02
+Penny interaction log (Penny_Interaction_Log__c)
+P-01, P-02
+Critical
+F-008
+E-02
+Gamification: badges, points, sprint velocity (Penny_Badge__c, Penny_Gamification__c)
+P-01, P-02
+Medium
+F-009
+E-03
+Penny Slack DM — full 7-layer coaching
+P-01, P-02, P-07, P-08
+Critical
+F-010
+E-03
+Penny channel @mention — abbreviated, DM redirect
+P-01, P-02
+High
+F-011
+E-03
+Client channel liaison mode with human approval gate
+P-09
+Critical
+F-012
+E-03
+Weekly cohort intelligence report to Angela (#penny-admin-slack-channel)
+P-13
+High
+F-013
+E-04
+Pre-session learner context assembly (interaction log, sprint status, flags)
+P-07, P-08
+High
+F-014
+E-04
+Red flag detection and surfacing (quiet learner, suspicious import results)
+P-07, P-08
+High
+F-015
+E-04
+Post-session note structuring against Session Notes template
+P-07, P-08
+Medium
+F-016
+E-05
+Angela's Dashboard — cohort health view
+P-13
+High
+F-017
+E-05
+Angela's Dashboard — learner detail view (last 20 turns, quest history, career scores)
+P-13
+High
+F-018
+E-05
+Natural language queries to Salesforce via Claude MCP
+P-13
+Medium
+F-019
+E-11
+Trail Tracker — Trailhead badge/trail sync
+P-01, P-02, P-04
+High
+F-020
+E-11
+TT-assigned Trailmixes per program track
+P-01, P-02
+Medium
+F-021
+E-19
+Salesforce Connected App — client org authorization
+P-09, P-10
+Critical
+F-022
+E-19
+Zapier MCP → Claude API org data pull and analysis
+P-09, P-10
+Critical
+F-023
+E-19
+Structured assessment output to Google Doc
+P-09, P-10
+Critical
+F-024
+E-19
+Penny delivers assessment link to client Slack channel
+P-09, P-10
+High
+F-025
+E-21
+Salesforce Knowledge Article library — RESOLVE methodology
+P-01, P-02, P-04, P-09
+High
+F-026
+E-21
+Penny Knowledge Article routing (training vs. build decision)
+P-09
+High
+F-027
+E-22
+GitHub branch protection + CI job requirements
+P-04, P-13
+Critical
+F-028
+E-22
+DevOps Center + GitHub connection active
+P-04, P-13
+Critical
+F-029
+E-22
+Build log tracking (component, builder, sandbox, prod)
+P-04, P-13
+High
+F-030
+E-23
+Penny QA Engine — acceptance criteria check against learner dev org
+P-01, P-02
+High
+F-031
+E-23
+Human review gate — no deployment without sign-off
+P-04, P-13
+Critical
+F-032
+E-24
+Commerce Cloud storefront — program enrollment
+P-01, P-02
+High
+F-033
+E-24
+Commerce Cloud — coaching session booking
+P-11
+Medium
+F-034
+E-24
+Native Salesforce Payments (replaces Stripe/PayPal)
+P-12
+High
+F-035
+E-26
+Penny — Google Classroom assignment monitoring
+P-01, P-02
+High
+F-036
+E-26
+Penny_Classroom_Nudge__c — dedup nudge system
+P-01, P-02
+Medium
+F-037
+E-13
+Six role track configurations in Penny_Trail_Config__c
+P-04, P-05, P-06
+High
+F-038
+E-13
+Agentforce capability thread — cross-track quest content
+P-04, P-05, P-06
+High
+F-039
+E-14
+Salesforce Case queue for ToM client requests
+P-04
+High
+F-040
+E-14
+RESOLVE evaluation workflow in Salesforce
+P-04
+High
+F-041
+E-20
+Change management system — client roadmap and change request tracking
+P-09
+High
+F-042
+E-28
+Tableau impact dashboards — learner placement and program health
+P-13
+High
+F-043
+E-28
+Live grant impact reporting via Data Cloud + Tableau
+P-13
+High
+F-044
+E-30
+Marketing Cloud learner nurture journey
+P-01, P-02
+Medium
+F-045
+E-30
+Marketing Cloud donor cultivation and alumni engagement
+P-12
+Medium
+F-046
+E-31
+Google Workspace for Nonprofits setup playbook
+P-09
+High
+F-047
+E-31
+Google Workspace + Salesforce integration foundation
+P-09
+High
+F-048
+E-32
+Trail OS external product packaging — change management + Knowledge Library
+P-14
+Medium
+F-049
+E-32
+Penny external offering for nonprofit clients
+P-14
+Medium
+## 8. Program Increment Roadmap
+Phases are not calendar dates. They represent logical sequencing and dependency order. Phase 1 must be substantially complete before Phase 2 begins. The scaling constraint at Phase 3 is AI API capacity — expanded Einstein Agent and Google Gemini capacity is the unlock.
+## Phase 1 — Foundation (Run the Program)
+Phase 1 makes Trail OS operational for one cohort of learners, one active client, and the TT founding team. Penny's core personas are live. The DevOps pipeline is teaching-ready. Commerce is activated. The AI org assessment is in production.
+CAP-01
+Penny — Public Guide, Learner Coach, Slack, Coach Coordinator, Angela Dashboard
+CAP-02
+Program Management — waitlist, enrollment, learner journey, Trail Tracker, portfolio
+CAP-04
+Coach Infrastructure — onboarding, resources, stipend management
+CAP-05
+AI Org Assessment (POC is built — production deployment)
+CAP-06
+DevOps Pipeline — GitHub + DevOps Center (already built, formalize teaching layer)
+CAP-07
+Commerce Cloud — storefront activation, program enrollment, donations
+CAP-08
+Google Classroom integration — Penny nudge system, LMS mirror foundation
+CAP-09
+Salesforce native reporting foundation
+CAP-11
+Google Workspace client onboarding playbook
+## Phase 2 — Scale (Run Multiple Cohorts + Trail of Mastery)
+Phase 2 activates Trail of Mastery across all six role tracks, opens the full Penny coaching infrastructure, launches Tableau impact reporting, and activates Marketing Cloud. The platform can now run multiple simultaneous cohorts and multiple active client engagements without proportional founder involvement.
+CAP-01
+Penny — Coach Development Engine, Trail of Mastery Scrum Master, Client Services Agent
+CAP-03
+Trail of Mastery Platform — six role tracks, case queue, RESOLVE workflow, Agentforce thread
+CAP-05
+Change Management System — client roadmap, change request workflow, DevOps handoff
+CAP-08
+Native Salesforce LMS — full curriculum mirror from Google Classroom
+CAP-09
+Tableau impact dashboards — Data Cloud integration, live grant reporting
+CAP-10
+Marketing Cloud — learner nurture, donor cultivation, alumni engagement
+CAP-07
+TrailKit digital product library — Commerce Cloud + Fourthwall
+## Phase 3 — Product (Trail OS Beyond TT)
+Phase 3 is the self-sufficiency and product expansion phase. Earned revenue is the majority of operating budget. Trail OS capabilities are packaged for other nonprofits. Penny operates at full scale across all 14 personas. This phase is gated on expanded AI API capacity from Salesforce and Google.org.
+CAP-01
+Penny — full persona deployment at scale (requires expanded Agentforce + Gemini API capacity)
+CAP-03
+Trail of Mastery — mature cohorts across all six role tracks
+CAP-12
+Trail OS External Product — packaging for other nonprofits
+CAP-09
+Advanced analytics — Data Cloud segmentation, predictive placement models
+CAP-10
+Full Marketing Cloud maturation — advanced journeys, personalization at scale
+ALL
+Self-sufficiency inflection point — earned revenue majority, grant dependency minimal
+## 9. Non-Negotiables
+These principles are architectural and philosophical guardrails. They are not features to be prioritized — they are constraints that every feature must respect. When a product decision conflicts with a non-negotiable, the non-negotiable wins.
+Principle
+What It Means for Product Decisions
+Human in the Loop
+No deployment, no client-facing Penny message, no change request, and no major decision advances without a human review. This is the trust architecture. It is not negotiable and does not erode as the platform matures.
+RESOLVE Methodology
+Every client engagement and every learner build runs through RESOLVE. It is TT's proprietary framework. Trail OS features must support it, not replace it.
+Salesforce-Native First
+If a capability can be built natively in Salesforce, it is built natively. Third-party integrations are used only when no native option exists. This keeps the platform teachable.
+Google Gemini as AI Engine
+Penny's intelligence runs on Google Gemini. Architecture must support this — not default to generic Salesforce Einstein responses when Gemini is the designed engine.
+Admin Cert Baseline
+Trail of Mastery entry requires the Salesforce Certified Platform Administrator credential. No exceptions. The cert is the floor, not the ceiling.
+Real Client Work Only
+TT programs use real nonprofit clients, real data, and real stakeholders. Simulations, sandboxes, and case studies are not the product. If a feature supports simulation instead of real work, it is deprioritized.
+Google Workspace First for Clients
+Every nonprofit client engagement starts with Google Workspace foundation. Before Salesforce. Before automation. Before Trail OS. This is the technology onramp.
+TT Is the First Client
+Every Trail OS capability is built for TT's own use first. If TT doesn't run on it, TT doesn't offer it to clients. Dogfooding is the quality standard.
+"Automation does not fix confusion. It accelerates whatever process already exists." This is the governing principle behind RESOLVE and behind every Trail OS build decision. Clarity before configuration. Every time.
+## 10. Glossary
+Term
+Definition
+Agentforce
+Salesforce's AI agent platform. Powers Penny's Salesforce-native operations.
+Capability
+A major feature area of Trail OS. Contains multiple Epics. Maps to Strategic Themes.
+Data Cloud
+Salesforce Data Cloud — 200,000 seats. Unified learner profiles. Feeds Penny personalization and Tableau.
+DevOps Center
+Salesforce native DevOps tool installed in TT org. Connected to GitHub.
+Epic
+A body of work that can be broken into Features. The primary unit of the product backlog.
+Feature
+A specific product capability within an Epic. The working unit for sprint planning.
+GAU
+General Accounting Unit — NPSP fund management object. Required for grant-designated gift reporting.
+Gemini
+Google Gemini — TT's AI engine for Penny. Currently Gemini 2.5 Flash.
+Human in the Loop
+TT's trust architecture — no deployment, no client message, no change advances without human review.
+NPSP
+Nonprofit Success Pack — Salesforce's legacy nonprofit package. Installed and active in TT org.
+NPC
+Nonprofit Cloud — Salesforce's newer nonprofit product. TT has access to NPC features.
+Penny
+TT's AI companion. Powered by Google Gemini + Salesforce Agentforce. Serves all 14 personas.
+Program Increment (PI)
+A SAFe planning unit. Trail OS uses Phases (1/2/3) rather than calendar-based PIs.
+RESOLVE
+TT's proprietary 7-phase problem-solving methodology: Recognize, Explore, Select, Outline, Launch, Verify, Evolve.
+SAFe
+Scaled Agile Framework — the product development methodology Trail OS uses.
+Strategic Theme
+A business objective that drives Trail OS prioritization. All Capabilities and Epics map to at least one.
+Trail of Mastery
+TT's advanced program for employed Salesforce professionals. Six role tracks. Live client work.
+Trail Tracker
+TT's native Salesforce tool monitoring Trailhead badge/trail completion across the TT community.
+TrailKit
+TT's digital product offerings — learning resources, methodology guides, templates — sold via Commerce Cloud.

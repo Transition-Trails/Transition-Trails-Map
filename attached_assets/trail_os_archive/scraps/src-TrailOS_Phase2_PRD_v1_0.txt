@@ -1,0 +1,631 @@
+TRANSITION TRAILS ACADEMY
+Trail OS Phase 2
+Product Requirements Document
+Penny POC Retirement  •  Live AI Integration  •  Platform Completion
+Document Type
+Product Requirements Document
+Version
+v1.0
+Date
+June 12, 2026
+Status
+Draft — Pending Review
+Product Owner
+Angela Landrith
+CEO / Executive Director
+Tech Lead
+Hugh Richardson
+Phase 2 Implementation
+Tester
+Michele Ward
+QA & Acceptance Testing
+PURPOSE  This PRD defines all product requirements for Trail OS Phase 2. It covers four sprint themes: Live Penny AI (Gemini wire-up + RAG), Live Data (Salesforce queries replacing prototype data), Trail Quests and Career Review delivery, and Penny POC retirement. This document is the contract between Angela (product owner) and Hugh (implementation). Every feature, user story, acceptance criterion, and non-functional requirement is defined here.
+SECTION 1   —   Product Overview
+## 1.1  Product Vision
+Trail OS is the unified internal operating system for Transition Trails Academy. Phase 2 completes the platform by replacing every prototype data fixture with live connections, wiring Penny to a live AI engine, and retiring the standalone Penny POC Replit app. When Phase 2 is done, the organization operates entirely through Trail OS — no separate tools, no disconnected dashboards, no prototype scaffolding.
+## 1.2  Problem Statement
+Phase 1 delivered a navigable, role-aware platform with live Salesforce and Slack integrations. However, three critical gaps prevent Trail OS from becoming the operational center of gravity:
+Penny responds with pattern-matched text — not live AI. Coaches and learners cannot trust her output for real coaching.
+All learner, program, and signal data is hardcoded prototype fixtures. No operational decision can be made from current screens.
+The Penny POC Replit app continues to serve as the real Penny — meaning the organization runs on two disconnected systems.
+## 1.3  Goals and Non-Goals
+## Goals
+Wire Ask Penny and Test Penny to live Gemini 2.5 Flash with contextual prompt architecture.
+Replace all 11 hardcoded Phase 2 data items with live Salesforce queries.
+Deliver Trail Quests and Career Profile Review through Trail OS.
+Implement Penny RAG over approved Knowledge Sources.
+Generate and deliver Weekly Intelligence Reports from Trail OS.
+Retire the Penny POC Replit app per the checklist in the Master Plan.
+Achieve 50+ Vitest automated tests covering critical paths.
+## Non-Goals — explicitly out of scope for Phase 2
+Live user authentication / SSO (Phase 3)
+Mobile optimization (Phase 3)
+Agentforce coexistence handoff protocol (defined but not built — Phase 2 backlog card p2-agentforce)
+Public-facing learner portal (separate product)
+Custom report builder
+Email / Gmail action panel (Phase 2 backlog card p2-gmail-panel, deferred)
+## 1.4  Users
+Tier
+Who
+Phase 1 Access
+Phase 2 New Access
+Everyday
+Learners, participants
+My Programs, basic Penny
+New Trail Quest delivery, Ask Penny coaching responses
+Power
+Coaches, facilitators
+All operational hubs, full Penny
+Live learner data, Intelligence reports, Prompt Studio
+Admin
+Program directors
+All + Administration, integrations
+Agentforce config, SF live queries, Secrets management
+Super Admin
+Angela, Hugh
+Everything + audit tooling
+Phase 2 backlog execution, Vitest suite, POC retirement
+## 1.5  Success Metrics
+Metric
+Acceptance Criterion
+Ask Penny returns live Gemini response
+< 3 seconds P95 latency; response varies by query context
+Learner data is live from Salesforce
+SOQL query to Contact object confirmed in Network tab
+Trail Quest delivered and logged
+Quest record created in Penny_Trail_Quest_Activity__c
+Career Review saves to Salesforce
+Penny_Career_Profile__c record created/updated
+Weekly Intelligence Report delivered
+Slack message in configured channel; record in Penny_Weekly_Report__c
+0 prototype data fixtures in production
+/admin/phase1-audit hardcoded inventory: all 11 Phase 2 items resolved
+Penny POC retired
+All 15 Definition of Done checks pass (see Master Plan §6)
+Vitest suite ≥ 50 tests
+pnpm test passes with ≥ 50 specs; 0 failing
+SECTION 2   —   Technical Architecture
+## 2.1  Dual Engine Architecture
+Trail OS Phase 2 operates on the Dual Engine model: Salesforce is The Brain (data, records, truth) and Gemini is The Voice (reasoning, generation, coaching). These two engines are complementary and non-overlapping.
+Layer
+Responsibility
+Salesforce (The Brain)
+Learner profiles, quest records, career profiles, conversation logs, program data, knowledge governance, custom objects (W-000222)
+Gemini 2.5 Flash (The Voice)
+Ask Penny responses, Test Penny, Trail Quest generation, Career Review scoring, Weekly Intelligence synthesis, Penny Recommendations
+Trail OS API Server
+Express 5 broker between Salesforce, Gemini, Slack, and the React frontend. All integration routes live in /artifacts/api-server/src/routes/
+Agentforce (Future — p2-agentforce)
+Coexistence model with Penny defined but not implemented in Phase 2. Handoff protocol deferred.
+## 2.2  Salesforce Custom Objects (W-000222)
+All 8 custom objects were built in TTDev sandbox and are ready for promotion to staging. One additional object must be created before Sprint 3.
+Object
+Purpose
+Penny_Conversation__c
+Learner conversation sessions — links to Contact
+Penny_Conversation_Message__c
+Individual messages within a conversation
+Penny_Trail_Quest_Template__c
+Quest template definitions — 12 to be seeded from POC
+Penny_Trail_Quest_Activity__c
+Quest assignments and submissions per learner
+Penny_Career_Profile__c
+Career review results — 5-dimension scoring
+Penny_Classroom_Nudge__c
+Automated coaching nudges (dedup at Node.js layer)
+Penny_Trail_Config__c
+Per-trail Penny configuration and persona settings
+Learner__c
+TT-specific learner record linked to Salesforce Contact
+Penny_Weekly_Report__c
+NEW — Weekly Intelligence Report records (Sprint 3 prerequisite)
+OPEN ITEM  Penny_Weekly_Report__c schema must be finalized between Angela and Hugh before Sprint 3 begins. Minimum fields: Report_Date__c, Trail__c, Summary__c (Long Text Area), Gemini_Model__c, Delivery_Status__c, Slack_Message_TS__c.
+## 2.3  API Route Architecture
+All Phase 2 features route through the Express 5 API server. The following routes must be built or extended:
+Route
+Purpose
+POST /api/gemini/ask
+Live Penny Ask — accepts learner context, selected capability prompts, and returns Gemini response
+POST /api/gemini/quest
+Trail Quest generation — generates quest content using template + learner context
+POST /api/gemini/career-review
+Career Profile Review — scores 5 dimensions from raw resume bullets
+POST /api/gemini/weekly-report
+Weekly Intelligence synthesis — aggregates cohort data and returns Gemini narrative
+GET /api/salesforce/learners
+Returns Contact records for active learners with Penny-relevant fields
+GET /api/salesforce/learner/:id
+Single learner profile with conversations, quests, career profile
+GET /api/salesforce/conversations/:learnerId
+Conversation history from Penny_Conversation__c
+GET /api/salesforce/quests/:learnerId
+Quest activity from Penny_Trail_Quest_Activity__c
+POST /api/salesforce/quest/assign
+Assigns a quest to a learner — creates Penny_Trail_Quest_Activity__c record
+POST /api/salesforce/career-profile/save
+Saves Career Review result to Penny_Career_Profile__c
+POST /api/slack/deliver/report
+Posts Weekly Intelligence Report to configured Slack channel
+## 2.4  Prompt Architecture
+Penny uses a 5-layer prompt architecture. Each layer must be assembled before the Gemini API call is made. This architecture is already documented in the Penny Six-Pager; Phase 2 implements it in code.
+Layer
+Name
+Content
+Source
+L1
+System Identity
+Who Penny is, her voice, and her guardrails
+Static — from Penny_Trail_Config__c per trail
+L2
+Trail Context
+Which trail, phase, and program the learner is in
+Dynamic — from Salesforce Contact + program data
+L3
+Learner Context
+Current focus, recent win, current blocker, week number
+Dynamic — from Learner__c + most recent Penny_Conversation__c
+L4
+Knowledge Context
+Relevant knowledge sources (RAG)
+Dynamic — retrieved from Authoritative + Trusted sources only
+L5
+Capability Template
+The specific prompt template for the requested capability
+Dynamic — from Prompt Studio (Prompt Library in Trail OS)
+SECTION 3   —   Feature Requirements — Sprint 0
+SPRINT 0 SCOPE  Sprint 0 is UX and design lock — no new functionality. All Replit changes are limited to UX corrections from §3.2 of the Master Plan. Figma frames are the acceptance criteria for every correction.
+## F-000  Figma Design Lock
+## User Stories
+As Hugh, I need a Figma file with exact layer specs so I know precisely what to build in Replit — not a prose description I have to interpret.
+As Angela, I need the design patterns locked in Figma before implementation begins so that each sprint ships against a visual contract, not a moving target.
+## Acceptance Criteria
+Figma file "Trail OS — Phase 2 Design Lock File" exists in TT Consulting Figma workspace. ✅ Complete.
+File contains 6 pages: Design Tokens, P1 Object Workspace, P2 Hub Overview, P3 Integration Center, P4 Studio/Editor, P5 Phase 2 Placeholder. ✅ Complete.
+Design Tokens page contains: 20 color swatches, 7-step typography scale, 8-step spacing scale, all status chip variants, and Figma variable collections (TT / Colors, TT / Spacing). ✅ Complete.
+Each pattern page contains: annotated frame at 1440×960, all layer names matching spec, and annotation strip with canonical name. ✅ Complete.
+## F-001  UX Corrections (Applied to Replit)
+## User Stories
+As a Power user, I should not see admin-only "New Capability" or "New Prompt Template" buttons as primary CTAs on the Capabilities page.
+As a user on Knowledge Sources, the breadcrumb should read "Knowledge / Sources" — not "Knowledge / Dashboard".
+As an admin, the Intelligence tab should show an intentional Phase 2 placeholder — not a blank white page with "being built" text.
+## Acceptance Criteria
+Penny / Capabilities: action bar shows "Review Readiness", "View Relationships", "Ask Penny" as primary. "New Capability" and "New Prompt Template" moved to overflow/admin-only role gate.
+Knowledge / Sources: breadcrumb reads "Knowledge / Sources" on all sub-tabs.
+Penny / Intelligence: page shows P5 Phase 2 Placeholder pattern — 3 preview cards (Learner Trend Analysis, Cohort Health Signals, Weekly Report Archive) with data source attribution and backlog link.
+Context Engine: workspace coverage grid shows object counts per workspace, not blank gray tiles.
+Programs / Standards: action bar on Standards tab shows "Review Standards" and "Gap Report" — not "Create Program".
+SECTION 3 CONT.   —   Feature Requirements — Sprint 1: Live Penny LLM
+## F-100  Ask Penny — Live Gemini Response (Right Rail)
+The Ask Penny tab in the right rail currently returns hardcoded pattern-matched responses. Phase 2 wires it to a live Gemini endpoint with the 5-layer prompt architecture.
+## User Stories
+As a coach, when I open any page and type a question in Ask Penny, I receive a live AI response grounded in the current page context and selected learner.
+As a Power user, Ask Penny responses about capabilities should reflect the capability I have selected in the workspace — not generic platform guidance.
+As an admin, I need to see the Gemini model and prompt layer used in each Ask Penny response for quality auditing.
+## Functional Requirements
+Ask Penny input field and send button wired to POST /api/gemini/ask.
+Request payload includes: learner context (if context is set), current page/section, selected object (if in workspace), prompt template ID (L5).
+Response streamed to the Ask Penny panel in the right rail with typing indicator during generation.
+Session Info panel (visible to Admin+) shows: model used, prompt layers assembled, token count, latency.
+Responses saved to Penny_Conversation__c with learner_id, session_id, message_role, content, and timestamp.
+## Acceptance Criteria
+User types "What should I work on this week?" — Penny returns a live Gemini response referencing the learner's current context within 3 seconds.
+Two different questions to the same Penny session return related but distinct responses (not identical pattern text).
+Admin Session Info panel shows model: "gemini-2.5-flash", layers: 5, latency in ms.
+Penny_Conversation__c record is created in Salesforce after each exchange.
+## F-101  Test Penny Tab — Live Gemini
+Test Penny currently shows "Prototype — pattern matched" in Session Info. Phase 2 replaces the pattern-matching engine with a live Gemini call using the same 5-layer architecture as Ask Penny.
+## User Stories
+As Angela, I need to simulate a conversation as any learner in the system and receive live Gemini responses — to validate prompt quality before a cohort begins.
+As Hugh, Test Penny is my primary smoke test for the Gemini integration. It must show model, layers, and latency in real time.
+## Functional Requirements
+Learner selector dropdown populated from live Salesforce Contact query (/api/salesforce/learners).
+Conversation history maintained within the session (in-memory, not persisted).
+Session Info panel shows: Mode (Live — Gemini 2.5 Flash), Model, Messages count, Context summary.
+"Try Asking" suggestion chips are dynamic — generated from the selected learner's current context.
+## Acceptance Criteria
+Select Alex Johnson → type "What quest should I work on?" → receive live Gemini response referencing Alex's trail and program phase.
+Session Info shows Mode: "Live — Gemini 2.5 Flash" (not "Prototype — pattern matched").
+Suggestions chips update when learner selection changes.
+## F-102  Live Learner Data from Salesforce
+The Penny / Learners page currently displays hardcoded prototype data (Jordan M., Taylor R., Avery K., etc.). Phase 2 replaces this with a live Salesforce query against Contact + Learner__c.
+## User Stories
+As a coach, when I open Penny / Learners, I see the actual enrolled learners in our Salesforce org — not demo data.
+As an admin, I need learner data to come from Salesforce so that enrollment changes are reflected in Trail OS within one sync cycle.
+## Functional Requirements
+GET /api/salesforce/learners returns Contact records with: Name, Program (from Learner__c.Trail__c), Status, Progress, Current Quest, Last Active.
+Learner table sorted by Last Active descending.
+Learner count pills (Total, Active, Avg Progress, Completed) computed from live records.
+Search/filter operates against live data — not a client-side array filter.
+"Prototype Data" badge removed from page when live data is confirmed.
+## Acceptance Criteria
+Network tab in browser shows GET /api/salesforce/learners returning JSON — not a static import.
+Adding a new Contact in Salesforce and refreshing Trail OS shows the new learner within 60 seconds.
+"Prototype Data" chip no longer appears on Penny / Learners.
+SECTION 3 CONT.   —   Feature Requirements — Sprint 2: Trail Quests + Career Review
+## F-200  Trail Quest Delivery
+Trail Quests are daily scenario-based Salesforce Admin challenges. The Penny POC has 12 seeded templates and a full quest assignment/submission workflow. Phase 2 delivers this through Trail OS.
+## User Stories
+As a learner, I receive a daily Salesforce Admin challenge through Penny that is relevant to my current trail phase.
+As a coach, I can see which quest each learner is currently working on and their submission status from Penny / Learners.
+As an admin, I can create, edit, and delete quest templates from Prompt Studio without writing code.
+## Functional Requirements
+Quest Templates tab in Prompt Studio shows 12 seeded templates from POC migration, organized by trail and category.
+Each template has: Title, Trail (Guided/Explorer/Mastery/Community), Category (Technical/Scenario/Research/Reflection/Tooling), Difficulty, Prompt Body, Expected Output, Hints array.
+Quest assignment: Admin can assign a quest to a learner from Penny / Learners detail view → creates Penny_Trail_Quest_Activity__c record.
+Quest generation: POST /api/gemini/quest generates the quest content using the template + learner context (L1–L5 architecture).
+Quest delivery: Generated quest delivered to learner via Slack DM from @coachconnectbot.
+Submission: Learner submits answer via Slack thread → saved to Penny_Trail_Quest_Activity__c.Submission__c.
+Quest History tab on Learner Detail shows all assigned quests with status (Assigned, In Progress, Submitted, Reviewed).
+## Acceptance Criteria
+Quest template CRUD works in Prompt Studio: create, edit, delete templates without page refresh errors.
+Assign quest to Alex Johnson → Penny_Trail_Quest_Activity__c record created in Salesforce with Status = Assigned.
+Generated quest content references Alex's trail and current sprint context.
+Quest delivered as Slack message to Alex's DM from @coachconnectbot.
+Quest History tab on Alex's detail view shows the assigned quest.
+## F-201  Career Profile Review
+Career Profile Review is one of Penny's four core POC capabilities. It provides 5-dimension scoring of resume bullets and LinkedIn content without fabricating credentials.
+## User Stories
+As a learner, I can paste my raw resume bullets into Penny and receive structured feedback across 5 dimensions without Penny inventing experience I don't have.
+As a coach, I can see a learner's Career Profile Review scores and Penny's recommendations in the Learner Detail view.
+## 5-Dimension Scoring Model
+Dimension
+What It Measures
+Output
+D1
+Impact Framing
+Does the bullet show measurable outcomes vs. just tasks?
+Score 1–5 + specific fix if <4
+D2
+Salesforce Relevance
+Does the bullet connect to Salesforce Admin skills employers look for?
+Score 1–5 + suggested SF terminology if <4
+D3
+Specificity
+Are details (names, numbers, systems) present and verifiable?
+Score 1–5 + specificity prompt if <4
+D4
+Transferability
+Would a hiring manager outside Salesforce understand the value?
+Score 1–5 + plain-language reframe if <4
+D5
+Authenticity
+Is the language genuine to the learner? No fabricated credentials?
+Pass/Fail + guardrail note if fabrication detected
+## Functional Requirements
+Career Review input: text area accepting raw resume bullets or LinkedIn About section text.
+POST /api/gemini/career-review sends text + learner context to Gemini with D1–D5 scoring prompt.
+Response parsed into structured scores and saved to Penny_Career_Profile__c.
+Career Profile tab on Learner Detail displays: dimension scores, Penny's specific rewrites, and overall readiness indicator.
+Penny never fabricates: if no quantifiable data exists in the input, D3 score reflects that — Penny does not invent numbers.
+## Acceptance Criteria
+Paste raw bullet "Helped with Salesforce" → all 5 dimensions scored with specific improvement suggestions returned.
+D5 Authenticity returns Pass for real bullet, Fail + guardrail message if Penny detects invented credentials.
+Penny_Career_Profile__c record created in Salesforce with all 5 dimension scores.
+Career Profile tab on learner detail shows the review with edit history.
+## F-202  Learner Detail — Conversations + Quest History Tabs
+The Learner Detail view in Penny / Learners currently has no conversation or quest history. These tabs must be built to replace the equivalent POC admin dashboard pages.
+## Functional Requirements
+Conversations tab: lists all Penny_Conversation__c records for the selected learner, sorted by date descending.
+Each conversation row: date, duration, message count, summary (if available), expand to see full message thread.
+Quest History tab: lists all Penny_Trail_Quest_Activity__c records, sorted by date descending.
+Each quest row: template name, trail, status chip, assigned date, submitted date, score (if reviewed).
+Career Profile tab: shows all Penny_Career_Profile__c records with dimension scores and Penny recommendations.
+## Acceptance Criteria
+Select Alex Johnson → Conversations tab shows minimum 1 conversation record from migrated Supabase data.
+Quest History tab shows minimum 1 quest record.
+Tabs load without full page refresh when switching between Profile, Conversations, Quests, and Career.
+SECTION 3 CONT.   —   Feature Requirements — Sprint 3: Intelligence + RAG
+## F-300  Weekly Intelligence Reports
+Weekly Intelligence Reports are Gemini-synthesized cohort summaries that give coaches and admins a narrative view of learner progress, signals, and recommended actions. The POC generates these on demand; Trail OS must do the same with a Salesforce data foundation.
+## User Stories
+As Angela, I can generate a Weekly Intelligence Report from Penny / Intelligence and have it delivered to a Slack channel with one click.
+As a coach, I can review past Weekly Reports in the Collaboration / Weekly Briefs tab without having to search Slack.
+## Functional Requirements
+Penny / Intelligence page built with P2 Hub Overview pattern — shows Learner Trend Analysis, Cohort Health Signals, and Weekly Report Archive (replaces P5 placeholder).
+"Generate Report" action triggers POST /api/gemini/weekly-report.
+Report generation pulls: active learner count, avg progress, quest completion rates, signals from Penny conversations, and any flagged items from Salesforce.
+Gemini synthesizes narrative report with sections: Cohort Pulse, Signals This Week, Attention Required, Recommended Actions.
+Report saved to Penny_Weekly_Report__c with full text, generation timestamp, and delivery status.
+POST /api/slack/deliver/report posts formatted Slack message to configured channel.
+Collaboration / Weekly Briefs tab shows all generated reports, sorted by date, with Slack delivery status.
+## Acceptance Criteria
+Click "Generate Report" → report appears in Penny / Intelligence within 10 seconds.
+Report contains at minimum: cohort count, avg progress, 3 Penny recommendations.
+Penny_Weekly_Report__c record created in Salesforce with Delivery_Status__c = Pending.
+Slack message posted to configured channel with formatted report content.
+Delivery_Status__c updated to Delivered after successful Slack post.
+Report appears in Collaboration / Weekly Briefs tab.
+## F-301  Penny RAG — Knowledge Source Retrieval
+RAG (Retrieval-Augmented Generation) gives Penny the ability to retrieve from the Knowledge Library when answering learner questions. Only sources approved for Penny (Penny_Approved__c = true, Trust Level = Authoritative or Trusted) are eligible.
+## User Stories
+As a learner, when I ask Penny about the RESOLVE framework, she retrieves from the actual RESOLVE Handbook rather than generating from training data alone.
+As an admin, I control which knowledge sources Penny can retrieve from through the Knowledge Sources governance workflow.
+## Functional Requirements
+Knowledge source retrieval integrated into L4 of the prompt architecture.
+Only sources where Trust Level IN (Authoritative, Trusted) AND Penny_Approved__c = true are eligible for retrieval.
+Retrieval triggered when: Ask Penny query contains keywords matching a source topic, or capability template specifies required sources.
+Retrieved content injected into L4 prompt layer with source attribution.
+Penny response includes "Sources consulted:" footer when RAG is triggered (visible to Power+ users).
+Knowledge Sources governance UI updated: "Approve for Penny" toggle on Sources workspace activates retrieval.
+## Acceptance Criteria
+Ask Penny "What is the Recognize phase of RESOLVE?" → response references content from RESOLVE Handbook source (confirmed by Sources Consulted footer).
+Sources with Trust Level = Unverified do NOT appear in Penny responses even if query matches.
+Toggling Penny_Approved__c off for a source removes it from retrieval within 60 seconds.
+SECTION 3 CONT.   —   Feature Requirements — Sprint 4: Live Data + POC Retirement
+## F-400  Live Salesforce Data — Operations Dashboard
+The Operations hub (Executive Overview, Health Indicators, Scorecards, Trends & Insights) currently runs on operationalIntelligenceData.ts — hardcoded prototype data. Phase 2 replaces this with live Salesforce queries.
+## Functional Requirements
+Domain Health scores computed from live Salesforce data: Programs (count, status), Knowledge (source health), Penny AI (capability readiness), Integrations (readiness state).
+Critical & High Priority Actions pulled from live demand queue (TT_Work_Item__c).
+Scorecards computed from live data — not static arrays.
+Trends & Insights section populated from aggregated Salesforce query results.
+All "Prototype Data" and "Phase 1" badges removed from Operations hub when live data confirmed.
+## Acceptance Criteria
+Executive Overview domain health scores change when underlying Salesforce data changes.
+Creating a new TT_Work_Item__c with Priority = Critical appears in Critical & High Priority Actions on next page load.
+No "Prototype Data" indicators visible in Operations hub.
+## F-401  Trail Signals Live Aggregation Engine
+Trail Signals are currently hardcoded counts from signalCounts.ts mapped by route. Phase 2 builds a live aggregation engine that computes signals from Salesforce events, Slack activity, and Penny interactions.
+## Functional Requirements
+GET /api/signals/count?context= returns live signal count for the given context (page/section).
+Signal sources: open TT_Work_Item__c (demand), Salesforce health indicators, pending Penny capability reviews, Slack OAuth warnings.
+Topbar signal count badge shows live count — not hardcoded number.
+Trail Signals rail content reflects actual signals for the current page context.
+## Acceptance Criteria
+Resolve all open demand items in Salesforce → Trail Signals count decreases on next page load.
+Signal count varies between pages (Operations shows different count than Programs).
+## F-402  Google OAuth — Token Completion
+Google OAuth is currently in progress: the 5-step wizard is built and the redirect URI is set, but tokens have not been generated. Phase 2 completes this so Drive and Calendar data can be live.
+## Acceptance Criteria
+Run Google OAuth wizard at /admin/google-oauth → access token and refresh token stored in Replit Secrets.
+Google Drive integration status changes from "partial" to "live" in readinessState.ts.
+Collaboration / Google Drive tab loads real Drive folder structure (not static placeholder data).
+## F-403  Automated Test Suite (Vitest)
+Phase 1 has zero automated tests. Phase 2 introduces a Vitest suite covering critical paths. This is the p2-vitest-automation backlog card.
+## Functional Requirements
+pnpm workspace configured with Vitest targeting both @workspace/program-map and @workspace/api-server.
+Unit tests: data transformation utilities in src/data/, API route handler logic.
+Integration tests: Salesforce API routes (mock responses), Gemini API routes (mock responses), Slack post route.
+Component tests: HubShell, ObjectWorkspace, ContextBar rendering.
+Minimum 50 passing specs before POC retirement gate is opened.
+## Acceptance Criteria
+pnpm run test runs without errors and outputs pass/fail summary.
+≥ 50 test specs, 0 failing.
+CI: tests run on every PR to main branch via GitHub Actions.
+## F-404  Penny POC Retirement
+See Master Plan Section 2.4 and Section 6 for the full checklist. All 15 Definition of Done checks must pass in a synchronous session between Angela and Hugh.
+## Acceptance Criteria — abbreviated (full checklist in Master Plan)
+All Supabase records migrated to Salesforce. SOQL counts match.
+Penny POC Replit app set to private. URL returns error.
+Gemini API key rotated. Old key invalid. New key in Trail OS Replit Secrets only.
+Supabase project paused. Not deleted.
+Penny-POC GitHub README updated with archive notice and Trail OS link.
+POC Slack bot removed. @coachconnectbot is the only active bot.
+SECTION 4   —   Non-Functional Requirements
+## 4.1  Performance
+Requirement
+Target
+Ask Penny response latency (P95)
+< 3,000ms from send to first token streamed
+Page load (all routes)
+< 1,500ms Time to Interactive on Replit deployment
+Salesforce API response (read queries)
+< 800ms P95
+Trail Quest generation
+< 5,000ms for full quest generation (non-streamed)
+Weekly Report generation
+< 10,000ms (acceptable — admin-triggered batch)
+Vitest test suite run time
+< 60 seconds for full suite
+## 4.2  Security
+Requirement
+Rule
+Gemini API key
+Stored in Replit Secrets only. Never committed to GitHub. Rotated after POC retirement.
+Salesforce credentials
+client_id, client_secret, access tokens in Replit Secrets. Never in .env files committed to repo.
+Slack bot token
+In Replit Secrets. Not logged. Not returned to frontend.
+Google OAuth refresh token
+In Replit Secrets. Wizard generates — not hardcoded.
+.gitignore enforcement
+.env, .env.*, *.pem, *.key must remain in .gitignore. PR check must fail if secrets detected in diff.
+API authorization
+All /api/* routes require valid session or API key. No unauthenticated access to Salesforce data.
+## 4.3  Data Integrity
+Requirement
+Rule
+Penny_Classroom_Nudge dedup
+Three-field dedup (Learner + Course_Work_ID + Nudge_Date) enforced at Node.js application layer. Salesforce Matching Rules cannot enforce Date fields.
+Career Review — no fabrication
+Penny guardrail must detect and flag fabricated credentials in D5 Authenticity check. Gemini prompt must include explicit instruction not to invent data.
+Supabase migration fidelity
+SOQL counts for migrated objects must match Supabase row counts before POC retirement gate opens.
+Prototype data removal
+All 11 Phase 2 data items in /admin/phase1-audit hardcoded inventory resolved before sprint 4 closes.
+## 4.4  UX Standards (Carried from Phase 1)
+All Phase 2 pages must comply with the Phase 1 UX standards at /admin/ux-standards. The following are the most commonly violated rules and are repeated here for emphasis:
+Rule
+Specification
+No font-serif anywhere
+Use font-semibold or font-bold for emphasis. font-serif is prohibited.
+Stat values: text-xl semibold only
+Never text-2xl or text-3xl on stat values. text-xl font-semibold maximum.
+Eyebrow labels: 10px bold uppercase
+text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50
+No inline empty states
+No "this section is being built" text. Use P5 Placeholder pattern.
+No modal overlays
+Use inline panels or tabs. No slide-overs or modal dialogs.
+No empty default detail panes
+Object workspaces must show meaningful content at first render — not a blank right panel.
+Breadcrumbs must match routes
+Breadcrumb text must match the actual page path. No "Dashboard" when route is /sources.
+SECTION 5   —   Sprint Plan and Sequencing
+## 5.1  Sprint Overview
+Sprint
+Name
+Duration
+Features
+S0
+Figma + UX Lock
+~1 week
+F-000, F-001 · Design tokens, Figma 5 patterns, 5 Replit UX corrections
+S1
+Live Penny LLM
+~2 weeks
+F-100, F-101, F-102 · Ask Penny live, Test Penny live, learner data from Salesforce
+S2
+Quests + Career Review
+~2 weeks
+F-200, F-201, F-202 · Quest delivery, Career Review 5-dim, Learner Detail tabs
+S3
+Intelligence + RAG
+~2 weeks
+F-300, F-301 · Weekly Intelligence Reports, Penny RAG over Knowledge Sources
+S4
+Live Data + Retirement
+~2 weeks
+F-400, F-401, F-402, F-403, F-404 · Operations live data, Trail Signals, Google OAuth, Vitest, POC retirement
+## 5.2  Feature Dependencies
+Feature
+Depends On
+Blocks
+F-100 (Ask Penny Live)
+Gemini API key in Replit Secrets (already present and validated)
+F-102 (live learner context requires live learner data)
+F-200 (Trail Quests)
+F-100 (Quest generation uses same Gemini route)
+W-000222 objects promoted to production (Penny_Trail_Quest_Template__c, Penny_Trail_Quest_Activity__c)
+F-201 (Career Review)
+F-100 (same Gemini integration pattern)
+W-000222 Penny_Career_Profile__c promoted to production
+F-300 (Weekly Reports)
+F-102 (live learner data), F-200 (quest activity data)
+Penny_Weekly_Report__c created before Sprint 3 starts
+F-301 (RAG)
+F-100 (RAG is L4 of Ask Penny prompt)
+Knowledge Sources governance approval workflow complete
+F-400 (Operations live)
+F-102 (SF query pattern established)
+operationalIntelligenceData.ts replaceable once SF routes are tested
+F-403 (Vitest)
+F-100, F-200 (routes must exist to integration test)
+Must complete before F-404 (POC retirement gate)
+F-404 (POC Retirement)
+All of F-100 through F-403 passing
+Angela + Hugh synchronous retirement session required
+## 5.3  Prerequisite Checklist (Before Sprint 1)
+The following must be complete before any Sprint 1 work begins:
+W-000222 DevOps Center promotion: Resolve XML errors (allowReports vs. enableReports; missing deleteConstraint on 4 lookup fields) with Hugh. Promote 8 objects from TTDev to Staging to Production.
+Penny_Weekly_Report__c schema: Define fields with Hugh. Create object in Salesforce before Sprint 3.
+Gemini API key: Verify key is current and valid. The Phase 1 Audit flagged that the key needs refresh before live LLM calls ship.
+Agentforce coexistence decision: Confirm which query types route to Agentforce vs. Gemini. Document the boundary in TRAIL_OS_SPEC.md before Sprint 1.
+Figma file reviewed by Hugh: Confirm Hugh has Figma viewer access and has reviewed all 5 pattern pages.
+SECTION 6   —   Open Decisions and Risk Register
+## 6.1  Open Decisions
+Decision
+Options / Context
+Owner · Deadline
+OD-01
+Gemini model version
+Stay on Gemini 2.5 Flash or upgrade for production? Flash is faster and cheaper. Pro has higher quality ceiling.
+Angela · Before Sprint 1
+OD-02
+Agentforce boundary
+Which query types go to Agentforce vs. live Gemini? Coaching → Gemini. SF data retrieval → Agentforce? Needs explicit boundary definition.
+Angela + Hugh · Before Sprint 1
+OD-03
+Penny_Weekly_Report__c schema
+Fields: Report_Date, Trail, Summary, Gemini_Model, Delivery_Status, Slack_Message_TS. Any additional fields?
+Angela + Hugh · Before Sprint 3
+OD-04
+Supabase migration timing
+Migrate POC data before Sprint 1 (so live learner data starts with history) or at Sprint 4 retirement? Earlier migration reduces data loss risk.
+Angela · Before Sprint 1
+OD-05
+Trail OS Replit deployment
+Same Replit account as POC or new? New account ensures secrets isolation and billing separation.
+Angela · Sprint 0
+OD-06
+Google OAuth testing mode
+Google Cloud Console app is in Testing mode. Must add all user emails as test users before OAuth wizard can complete.
+Angela · Sprint 4
+## 6.2  Risk Register
+Level
+Risk
+Mitigation
+R-01
+HIGH
+W-000222 XML errors block Salesforce promotion
+Resolve with Hugh before Sprint 1. Known errors documented in Master Plan §2.3.
+R-02
+HIGH
+Gemini API key expires or rate-limits during live LLM work
+Verify key validity before Sprint 1. Set up billing alerts. Keep old POC key separate.
+R-03
+MED
+Supabase data migration fails or loses records
+Run dry-run SOQL count comparison before retiring POC. Keep Supabase paused (not deleted) for 90 days post-retirement.
+R-04
+MED
+Google OAuth testing mode blocks Drive/Calendar integration in Sprint 4
+Add all required test user emails to Google Cloud Console before Sprint 4. Known blocker — plan ahead.
+R-05
+MED
+Trail OS Replit deployment instability under concurrent Gemini calls
+Test concurrency in Test Penny before Sprint 1 ships. Add retry logic to /api/gemini/* routes.
+R-06
+LOW
+Penny RAG retrieval returns irrelevant content and degrades response quality
+Implement source relevance scoring. Add "Sources Consulted" footer so coaches can flag bad retrievals.
+R-07
+LOW
+Vitest suite test coverage too low for meaningful quality gate
+Start with API route integration tests (most value). Hugh to spike one test file in Sprint 1 to confirm setup works.
+SECTION 7   —   Appendix — Reference Documents
+## 7.1  Related Documents
+Document
+Location / Notes
+TRAIL_OS_SPEC.md
+Full technical specification — 18 sections · github.com/Transition-Trails/Transition-Trails-Map
+Trail OS Phase 2 Master Plan v1.0
+POC retirement checklist, UX correction brief, Figma spec, sprint plan · this document's companion
+Trail OS — Phase 2 Design Lock File
+Figma · figma.com/design/gckyWIAAAAH0xnV2Lf98nh · 6 pages, 5 patterns
+Penny_SF_Build_Log_W000222.xlsx
+Salesforce object build status · Google Drive ID: 1oXjuc-KZPcbMTo15HvvPWIHR_K8w7GSG
+Penny_Prompt_Scenarios_v1_3.xlsx
+Prompt scenarios workbook — source for Prompt Studio seeding
+TT_Brand_Kit_2_0.docx
+Brand colors, fonts, and visual identity
+TrailOS_License_Alignment.xlsx
+PSL inventory: 10,000 Agent Builder PSLs, 200,000 Data Cloud seats, 201 External Agent PSLs
+Penny POC GitHub
+github.com/Transition-Trails/Penny-POC · POC source — reference for capability migration
+## 7.2  Glossary
+Term
+Definition
+Trail OS
+The unified internal operating platform for Transition Trails. The Replit app at github.com/Transition-Trails/Transition-Trails-Map.
+Penny
+Transition Trails' AI coaching companion. Dual Engine: Salesforce = The Brain, Gemini = The Voice.
+Penny POC
+The standalone Replit app at github.com/Transition-Trails/Penny-POC. To be retired after Phase 2.
+W-000222
+The Salesforce build work item for the 8 Penny custom objects. Built in TTDev sandbox.
+RESOLVE Methodology
+7-phase framework: Recognize, Explore, Select, Outline, Launch, Verify, Evolve.
+Four Trails
+Guided Trail (12-week cohort), Explorer Journey (ongoing), Trail of Mastery (real client work), Community & Alumni.
+Dual Engine
+Architecture pattern: Salesforce = data/records/truth. Gemini = reasoning/generation/coaching.
+RAG
+Retrieval-Augmented Generation — Penny retrieves from approved Knowledge Sources before generating responses.
+Trail Signals
+Aggregated signals from Salesforce, Slack, and Penny interactions. Surfaced in topbar badge and right rail.
+DevOps Center
+Salesforce DevOps tool used for sandbox → staging → production promotion pipeline.
+PSL
+Penny Seat License (Agentforce term). TT has 10,000 Agent Builder PSLs and 201 External Agent PSLs.
+End of Document

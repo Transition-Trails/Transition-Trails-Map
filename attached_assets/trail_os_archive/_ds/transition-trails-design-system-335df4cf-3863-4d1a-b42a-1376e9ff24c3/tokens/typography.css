@@ -1,0 +1,28 @@
+/* Transition Trails — Typography tokens
+   Poppins (headings) · Open Sans / Roboto fallback (body/UI) · Caveat (accent, limited). */
+:root {
+  --tt-font-heading: 'Poppins', system-ui, sans-serif;
+  --tt-font-body:    'Open Sans', 'Roboto', system-ui, sans-serif;
+  --tt-font-accent:  'Caveat', cursive;
+
+  /* Type scale (mid-point of documented ranges) */
+  --tt-h1: 44px;   /* 36–48 · Poppins 600–700 */
+  --tt-h2: 32px;   /* 28–36 · Poppins 600 */
+  --tt-h3: 25px;   /* 22–28 · Poppins 500–600 */
+  --tt-h4: 20px;   /* 18–22 · Poppins 500 */
+  --tt-body: 17px;    /* 16–18 · Open Sans 400 */
+  --tt-body-sm: 14px; /* 14–16 · Open Sans 400–500 */
+  --tt-label: 14px;   /* Open Sans 500 */
+  --tt-accent: 30px;  /* 22–32 · Caveat 400–600 */
+
+  /* Weights */
+  --tt-weight-regular: 400;
+  --tt-weight-medium:  500;
+  --tt-weight-semibold: 600;
+  --tt-weight-bold:    700;
+
+  /* Line heights */
+  --tt-leading-tight: 1.2;
+  --tt-leading-snug:  1.4;
+  --tt-leading-body:  1.6;
+}

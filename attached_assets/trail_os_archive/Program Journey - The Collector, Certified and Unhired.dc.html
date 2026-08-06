@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+</style>
+</helmet>
+
+<div style="min-height:100%;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate);padding:0 0 96px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:52px 0">
+    <div style="max-width:1120px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+        <a href="Program%20Journeys%20-%20Index.dc.html" style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;color:var(--tt-amber-300);text-decoration:none">← All journeys</a>
+        <span style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Transition Trails · the certification trap</span>
+      </div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:44px;line-height:1.1;font-weight:600;margin:0;color:var(--tt-white);max-width:920px;text-wrap:pretty">Four certifications, ninety applications, two first-round interviews</h1>
+      <p style="font-size:18px;line-height:1.6;margin:0;max-width:800px;color:rgba(255,255,255,.88)">Marcus finished a two-year business degree at community college with no idea what came next. Entry-level postings wanted three years of experience or had quietly been automated away. So he did what everyone told him to do: he collected certifications. Each one felt like progress. None of them changed the outcome.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Trail Talk</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Explorer's Trail</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Guided Trail</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Hired</x-import>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1120px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:56px">
+
+    <div style="margin-top:40px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:22px 26px">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:280px">
+        <span style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ lensTitle }}</span>
+        <span style="font-size:15px;line-height:1.55">{{ lensNote }}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div onClick="{{ setTeam }}" style="{{ teamTab }}">Team view</div>
+        <div onClick="{{ setFunder }}" style="{{ funderTab }}">Funder view</div>
+      </div>
+    </div>
+
+    <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="He is not underqualified. He is unproven." dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>Marcus can pass any multiple-choice exam you put in front of him. What he cannot do is show anyone a decision he made, defend a tradeoff, or say what happened when something he built met a real person. Employers are not screening him out for lack of knowledge — they are screening him out because there is no evidence he can be trusted with work. Another certification cannot fix that, which is why he kept buying them and nothing changed.</div></x-import>
+
+    <section style="display:flex;flex-direction:column;gap:0">
+      <sc-for list="{{ stations }}" as="s" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:1fr 88px 1fr;gap:0;align-items:stretch">
+
+          <div style="{{ s.leftStyle }}">
+            <sc-if value="{{ s.onLeft }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ s.cardStyle }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                  <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">{{ s.kicker }}</span>
+                  <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ s.badgeTone }}" hint-size="auto,26px">{{ s.badge }}</x-import>
+                </div>
+                <div style="font-family:Poppins,sans-serif;font-size:24px;line-height:1.2;font-weight:600;color:var(--tt-charcoal)">{{ s.title }}</div>
+                <div style="font-size:15.5px;line-height:1.6">{{ s.blurb }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--tt-warm-gray);padding-top:14px">
+                  <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-slate)">{{ s.listLabel }}</span>
+                  <sc-for list="{{ s.items }}" as="i" hint-placeholder-count="4">
+                    <div style="display:flex;gap:9px;align-items:flex-start;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ i.text }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+            <div style="{{ s.lineStyle }}"></div>
+            <div style="{{ s.dotStyle }}">{{ s.dot }}</div>
+          </div>
+
+          <div style="{{ s.rightStyle }}">
+            <sc-if value="{{ s.onRight }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ s.cardStyle }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                  <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">{{ s.kicker }}</span>
+                  <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ s.badgeTone }}" hint-size="auto,26px">{{ s.badge }}</x-import>
+                </div>
+                <div style="font-family:Poppins,sans-serif;font-size:24px;line-height:1.2;font-weight:600;color:var(--tt-charcoal)">{{ s.title }}</div>
+                <div style="font-size:15.5px;line-height:1.6">{{ s.blurb }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--tt-warm-gray);padding-top:14px">
+                  <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-slate)">{{ s.listLabel }}</span>
+                  <sc-for list="{{ s.items }}" as="i" hint-placeholder-count="4">
+                    <div style="display:flex;gap:9px;align-items:flex-start;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ i.text }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">The turn</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">What actually changed, and it was not knowledge</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px;text-wrap:pretty">Marcus arrived knowing more about the platform than some working admins. Twelve weeks later he was hired. Nothing was added to what he knew — four things were added to what he could show.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Someone else's mess</div>
+          <div style="font-size:15px;line-height:1.6">Every certification exam gives him a clean scenario. Guided Trail gave him an org nobody documented, with overlapping rules and permissions granted in the wrong place. Reading a system you did not build is most of the actual job and no exam tests it.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">A reason for every choice</div>
+          <div style="font-size:15px;line-height:1.6">Twelve Decision Log entries: what he chose, what he rejected, and the business reason. An interviewer can pick any one of them and probe it. That is the difference between claiming judgment and evidencing it.</div>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Ninety seconds, twelve times</div>
+          <div style="font-size:15px;line-height:1.6">His first recorded answer was thirty seconds of nothing. By week twelve he could explain a technical decision to a non-technical person on demand. The improvement curve is itself the artifact — and it is the skill that gets him past a screening call.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">People who vouch for him</div>
+          <div style="font-size:15px;line-height:1.6">A coach who watched him work for twelve weeks, three squad members who tested his builds, and a nonprofit that uses what he delivered. He applied for job ninety-one with references, which he had never had before.</div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="Why he needed the community before he needed the program" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>Marcus did not find a program on LinkedIn — he found a monthly Trail Talk, sat in the back of it for free, and heard people describe the exact wall he was hitting. That is the honest entry point for someone who has already been sold three things that did not work. Trail Talk costs him nothing and asks nothing, which is precisely why he showed up. Then Explorer's Trail gave him somewhere to be while he got ready: daily quests, a monthly mission, group coaching, and prior capstones to build against — practice with company, instead of another exam alone at a kitchen table.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">{{ closeKicker }}</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">{{ closeTitle }}</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ closePoints }}" as="c" hint-placeholder-count="5">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:200px 1fr;gap:22px;align-items:start">
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-trail-green)">{{ c.label }}</span>
+            <span style="font-size:15.5px;line-height:1.65">{{ c.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:32px 36px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:Caveat,cursive;font-size:27px;color:var(--tt-amber-300)">the certificate was never the problem</div>
+        <div style="font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.92);max-width:860px">{{ closeBanner }}</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200},&quot;audience&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;team&quot;,&quot;funder&quot;],&quot;default&quot;:&quot;team&quot;,&quot;tsType&quot;:&quot;'team' | 'funder'&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+const STATIONS = [
+  { kind:'gate', dot:'✕', badge:'Where he starts', badgeTone:'gray',
+    kicker:'Two years before month 1 · stuck',
+    title:'Certified, credentialed, and invisible',
+    blurb:'An associate degree in business, four Salesforce certifications including Administrator, and ninety applications. Two interviews in two years, neither past the first round. The entry-level postings that used to exist either want three years of experience or have quietly been handed to automation. He does not know what he is doing wrong, because on paper he is doing everything right.',
+    team:['He is not lacking knowledge — every exam says so','Nothing on his résumé shows a decision he made or defended','He has been sold certifications as the answer, three times over'],
+    funder:['The population this pathway exists for, described precisely','Credentialed and unemployed is a measurable cohort, not an anecdote','Certification alone has a documented ceiling — this is what it looks like'] },
+
+  { kind:'program', dot:'1', badge:'Free · monthly', badgeTone:'teal',
+    kicker:'Month 1 · Trail Talk',
+    title:'He finds a room where people describe his wall',
+    blurb:'A LinkedIn post about a monthly virtual Trail Talk for people trying to break into a Salesforce career. He joins with his camera off, expecting another pitch. Instead somebody names the thing precisely: certifications prove you studied, and employers are buying evidence you can be trusted with work. It is the first useful sentence he has heard in two years.',
+    team:['Free, monthly, virtual — no commitment and no pitch','The honest entry point for someone already sold three things that failed','Where he learns the difference between knowing and being trusted'],
+    funder:['Top-of-funnel with zero cost to the participant','Attributable acquisition channel — we know how he arrived','Reach measurable independently of enrolment'] },
+
+  { kind:'program', dot:'2', badge:'Ongoing', badgeTone:'teal',
+    kicker:'Months 1–3 · Explorer\u2019s Trail',
+    title:'He joins the community while he gets ready',
+    blurb:'He already holds the Administrator certification, so he does not need Foundations — but he is not ready for a client-facing squad either. Explorer\u2019s Trail is where he waits productively rather than idly. There is something to do every day, something to build every month, and people to do it around.',
+    team:['Daily Trail Quests from Penny, aimed at his weakest domain','A monthly Trail Mission the whole membership works together','Group coaching sessions — his questions, answered in front of others with the same ones','Scenarios and prior capstones to build against, so he practises on real problems','Penny skill assessments find the gaps the exam never tested','Expedition Weekend: a sealed brief, a clock, and a team'],
+    funder:['Daily and monthly participation recorded, so readiness is assessed not guessed','Assessment baseline established before any program investment','Prior capstones are a reusable asset — built once, practised against for years','Group coaching serves many learners per coach hour','Membership retains people between stages instead of losing them'] },
+
+  { kind:'gate', dot:'✓', badge:'Already held', badgeTone:'amber',
+    kicker:'Entry requirement · already met',
+    title:'Salesforce Administrator certification',
+    blurb:'For once, his collecting works in his favour. Guided Trail requires the Administrator certification and he has had it for eighteen months. He enters the program on day one at full speed, which is the only part of the last two years that pays off.',
+    team:['He skips Foundations entirely — the certification is the gate','Two years of self-study becomes twelve weeks of runway'],
+    funder:['Prerequisite externally verified before enrolment','A shorter, cheaper path to placement for an already-certified learner'] },
+
+  { kind:'program', dot:'3', badge:'12 weeks', badgeTone:'green',
+    kicker:'Months 4–6 · Guided Trail',
+    title:'The twelve weeks that changed the outcome',
+    blurb:'A squad of four, an Associate Coach, and an org he did not build — seeded with the debt real nonprofits carry. Alongside it, coach-assigned client work he never has to sell himself for. In week two he cannot explain why a flow is wrong even though he can see that it is. By week nine he catches a permission granted on a profile instead of a permission set and writes up how he raised it.',
+    team:['Inherits an undocumented org and writes a findings register','Squad buddy testing — he runs a peer\u2019s UAT script and they run his','Change sets by hand, so he learns what depends on what','A 90-second interview answer recorded every single week','Config review: naming a bad implementation before it ships'],
+    funder:['Findings register: what he inherited, flagged, and left alone deliberately','Peer test reports — evidence he can test and be tested','Release requests reviewed by a coach before any production deploy','Twelve 90-second answers; the curve from first to last is the measure','Demo Day recording, usable as an employer work sample'] },
+
+  { kind:'gate', dot:'★', badge:'The outcome', badgeTone:'amber',
+    kicker:'Month 7 · hired',
+    title:'Junior Salesforce Administrator',
+    blurb:'Application ninety-one, and this time the conversation is different — not because his certifications changed, but because he can talk for ten minutes about a decision he made on a system he did not build. They ask him about a tradeoff. He has one ready, written down, with what he rejected and why.',
+    team:['Same certifications. Different evidence. Different result.','The interview is about his work rather than about his potential','He has three references who watched him do it'],
+    funder:['Placement, with the artifact chain that produced it on the record','Time from enrolment to placement: seven months including community time','A previously unplaceable candidate, placed — the hardest case to move'] },
+
+  { kind:'program', dot:'4', badge:'Ongoing', badgeTone:'teal',
+    kicker:'Month 7 onward · Explorer\u2019s Trail',
+    title:'He stays, and his portfolio stays live',
+    blurb:'Membership was earned by completing Guided Trail, and his public portfolio is hosted here rather than in a sandbox that expires. He keeps it current. Six months in he is at Expedition Weekend again — this time helping someone who joined a Trail Talk with their camera off.',
+    team:['His public portfolio stays live and shareable for as long as he is here','Two Expedition Weekends a year: one virtual, one in person in Dallas','Coach\u2019s Assistant when he is ready — first-read artifact verdicts'],
+    funder:['Post-placement retention, which most programs cannot report at all','Portfolio remains a durable public record, not tied to an expiring org','Volunteer coaching capacity generated from a placed learner'] },
+
+  { kind:'horizon', dot:'→', badge:'Aspirational', badgeTone:'teal',
+    kicker:'Year 2 onward · what comes next',
+    title:'An apprenticeship when the ceiling appears',
+    blurb:'A year in the role and he will hit the same wall from a higher place — the work that requires judgement he has not been given yet. Trail of Mastery is there when he does, and by then he knows how this works: real client, coached delivery, and a record of what he decided.',
+    team:['The pathway does not end at placement — that is the point','He is already in the community when he needs the next step'],
+    funder:['Lifetime value rather than cohort throughput','A returning learner is the retention proof the sector rarely has'] }
+];
+
+const CLOSE = {
+  team: { kicker:'For the team', title:'Why this is the story to lead with',
+    banner:'Marcus is the clearest case we have. He arrived with more platform knowledge than some working admins and could not get a first-round interview. Twelve weeks later, with nothing added to what he knew, he was hired. That isolates the variable perfectly: it was never knowledge. It was evidence.',
+    points:[
+      ['He is the market we exist for','Certified, motivated, credentialed, and unhireable. If certifications were sufficient he would already have a job, and the fact that he does not is the whole thesis of the organisation in one person.'],
+      ['Trail Talk is doing more than we credit it for','He found us through a free monthly session, not a program page. For someone already sold three things that failed, a room that asks nothing is the only credible front door. Worth resourcing as acquisition rather than treating as outreach.'],
+      ['He skips Foundations, and that is correct','He already holds the Administrator certification. Making him repeat it would cost him three months and teach him nothing. Explorer\u2019s Trail is where a ready-but-unproven learner waits, and Penny assessing his real gaps is what makes that judgement defensible.'],
+      ['The 90-second answer is the underrated artifact','His first recording was thirty seconds of nothing. Twelve weeks of forced practice is what got him through a screening call — arguably more decisive than any build he completed.']] },
+  funder:{ kicker:'For funders', title:'Why this holds up to scrutiny',
+    banner:'Every figure on this page comes from a record in Salesforce, produced by the work itself rather than assembled for a report. Marcus is also the cleanest evidence available that the intervention is the variable: same person, same certifications, different outcome after twelve weeks of supervised delivery. The final station is aspirational and marked as such.',
+    points:[
+      ['The counterfactual is his own history','Two years, four certifications, ninety applications, two first-round interviews. Then twelve weeks, and a placement. He is his own control group, which is rare and worth saying plainly.'],
+      ['One definition, every program','Completion means every required artifact assessed. Pass means every criterion met. Needs rework means the work exists and a named criterion is unmet. Identical everywhere, so rates compare across cohorts.'],
+      ['Judged, not graded','Pass, Needs rework, or Not attempted — no letter grades and no curve. Two coaches reading the same artifact against the same criteria should reach the same verdict, and the rubric is built to make that testable.'],
+      ['Seven months, not four years','Enrolment to placement including his community time. For an already-certified learner the pathway is short, which makes cost per placement genuinely competitive with any workforce intervention.'],
+      ['Two outcomes per learner','A placement for him, and supervised capacity delivered to a nonprofit that could not otherwise afford an administrator at all.']] }
+};
+
+class Component extends DCLogic {
+  state = { lens:null };
+  get lens() { return this.state.lens || this.props.audience || 'team'; }
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+
+  tab(active) {
+    return this.css({
+      padding:'9px 20px', borderRadius:'999px', cursor:'pointer',
+      fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'14px',
+      background: active ? 'var(--tt-trail-green)' : 'var(--tt-white)',
+      color: active ? 'var(--tt-white)' : 'var(--tt-slate)',
+      border: active ? '1.5px solid var(--tt-trail-green)' : '1.5px solid var(--tt-warm-gray)'
+    });
+  }
+
+  renderVals() {
+    const lens = this.lens, isTeam = lens === 'team', c = CLOSE[lens];
+    const last = STATIONS.length - 1;
+
+    return {
+      lightChip: { style:{ background:'rgba(255,255,255,.14)', color:'var(--tt-white)' } },
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+
+      lensTitle: isTeam ? 'Team view — what turned it around' : 'Funder view — the evidence each stage produces',
+      lensNote: isTeam
+        ? 'Each stage shows what Marcus does. Switch to the funder view to see the record it leaves behind.'
+        : 'Each stage shows the artifacts and measures on the record. Switch to the team view to see the work that produced them.',
+      teamTab: this.tab(isTeam),
+      funderTab: this.tab(!isTeam),
+      setTeam: () => this.setState({ lens:'team' }),
+      setFunder: () => this.setState({ lens:'funder' }),
+
+      stations: STATIONS.map((s, i) => {
+        const onLeft = i % 2 === 0, isGate = s.kind === 'gate', isHorizon = s.kind === 'horizon';
+        const isStuck = s.badgeTone === 'gray';
+        return {
+          kicker:s.kicker, title:s.title, blurb:s.blurb, badge:s.badge, dot:s.dot,
+          badgeTone:s.badgeTone,
+          onLeft, onRight: !onLeft,
+          cardStyle: this.css({
+            display:'flex', flexDirection:'column', gap:'12px',
+            background: isHorizon ? 'var(--tt-sky-100)' : 'var(--tt-white)',
+            border: isStuck ? '2px solid var(--tt-warm-gray)'
+              : isGate ? '2px solid var(--tt-sun-amber)'
+              : isHorizon ? '2px dashed var(--tt-deep-teal)' : '1px solid var(--tt-warm-gray)',
+            borderRadius:'22px', padding: isGate ? '24px 28px' : '28px 30px',
+            margin: onLeft ? '0 8px 34px 0' : '0 0 34px 8px',
+            boxShadow: isGate || isHorizon ? '0 6px 16px rgba(42,46,44,.08)' : '0 12px 28px rgba(42,46,44,.10)'
+          }),
+          leftStyle: this.css({ display:'flex', justifyContent:'flex-end', minWidth:0 }),
+          rightStyle: this.css({ display:'flex', justifyContent:'flex-start', minWidth:0 }),
+          lineStyle: this.css({
+            position:'absolute', top:'0', bottom: i === last ? '40px' : '0',
+            left:'50%', width:'2px', marginLeft:'-1px', background:'var(--tt-warm-gray)'
+          }),
+          dotStyle: this.css({
+            position:'relative', marginTop:'26px', width:'44px', height:'44px',
+            borderRadius:'999px', display:'flex', alignItems:'center', justifyContent:'center',
+            fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'16px',
+            background: isStuck ? 'var(--tt-warm-gray)'
+              : isGate ? 'var(--tt-sun-amber)'
+              : isHorizon ? 'var(--tt-deep-teal)' : 'var(--tt-trail-green)',
+            color: isStuck || isGate ? 'var(--tt-charcoal)' : 'var(--tt-white)',
+            border:'4px solid var(--tt-trail-light)', flexShrink:0
+          }),
+          listLabel: isTeam ? 'What he does' : 'What it produces',
+          items: (isTeam ? s.team : s.funder).map(text => ({ text }))
+        };
+      }),
+
+      closeKicker: c.kicker,
+      closeTitle: c.title,
+      closeBanner: c.banner,
+      closePoints: c.points.map(([label, text]) => ({ label, text }))
+    };
+  }
+}
+</script>
+</body>
+</html>

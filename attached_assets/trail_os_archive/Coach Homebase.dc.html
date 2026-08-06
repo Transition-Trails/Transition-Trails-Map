@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #FBF7F0; }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); }
+  button { font: inherit; cursor: pointer; }
+</style>
+</helmet>
+
+<div style="height: 100vh; display: flex; flex-direction: column; font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: #FBF7F0; overflow: hidden;">
+
+  <header style="height: 58px; flex-shrink: 0; background: var(--tt-charcoal); display: flex; align-items: center; justify-content: space-between; padding: 0 24px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; color: #fff;">Transition Trails</span>
+      <span style="font-size: 14px; color: rgba(255,255,255,.6); border-left: 1px solid rgba(255,255,255,.22); padding-left: 14px;">Trail OS</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 14px; color: rgba(255,255,255,.7);">{{ levelLabel }}</span>
+      <span style="width: 30px; height: 30px; border-radius: 999px; background: var(--tt-sun-amber); color: var(--tt-charcoal); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px;">SM</span>
+      <span style="font-size: 14px; color: #fff;">Sam M.</span>
+    </div>
+  </header>
+
+  <div style="flex: 1; display: flex; min-height: 0;">
+
+    <sc-if value="{{ leftClosed }}" hint-placeholder-val="{{ true }}">
+      <nav style="width: 60px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; overflow-y: auto;">
+        <button onClick="{{ openLeft }}" title="Workspace" style="width: 36px; height: 36px; border-radius: 9px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;">
+          <span style="display: grid; grid-template-columns: repeat(3, 3px); gap: 2.5px;"><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span></span>
+        </button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+          <button onClick="{{ openLeft }}" title="{{ app.name }}" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+            <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          </button>
+        </sc-for>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Gemini Notebook" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); padding: 0;"></button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Dev org" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); padding: 0;"></button>
+        <button onClick="{{ openLeft }}" title="draw.io" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); padding: 0;"></button>
+      </nav>
+    </sc-if>
+
+    <sc-if value="{{ leftOpen }}" hint-placeholder-val="{{ false }}">
+      <nav style="width: 236px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); padding: 16px 14px; overflow-y: auto;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 12px; border-bottom: 1px solid rgba(42,46,44,.10); margin-bottom: 12px;">
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Workspace</span>
+          <button onClick="{{ closeLeft }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">‹</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px;">
+          <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+            <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal);">
+              <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+              {{ app.name }}
+              <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+            </a>
+          </sc-for>
+        </div>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Research</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal); background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); margin-bottom: 16px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+          Gemini Notebook
+          <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Build</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); margin-bottom: 6px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <span style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Dev org</span><span style="display: block; font-size: 14px; color: var(--tt-slate);">active</span></span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+          <span style="flex: 1;"><span style="display: block; font-size: 15px; color: var(--tt-charcoal);">draw.io</span><span style="display: block; font-size: 14px; color: var(--tt-slate);">process maps</span></span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-size: 14px; color: var(--tt-slate); margin: 16px 4px 0; padding-top: 12px; border-top: 1px solid rgba(42,46,44,.10);">All open in a new tab.</p>
+      </nav>
+    </sc-if>
+
+    <main style="flex: 1; min-width: 0; overflow-y: auto; padding: 22px 30px 40px;">
+
+      <div style="display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid var(--tt-green-300); border-radius: 14px; padding: 12px 18px; margin-bottom: 16px;">
+        <span style="width: 26px; height: 26px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+        <span style="flex: 1; font-size: 15px; color: var(--tt-slate); opacity: .75;">Ask Penny — a learner, a case, an article, anything</span>
+        <span style="font-size: 14px; color: var(--tt-deep-teal); font-weight: 600;">⏎</span>
+      </div>
+
+      <sc-if value="{{ deskOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08); margin-bottom: 20px; overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 24px; border-bottom: 1px solid rgba(42,46,44,.10);">
+            <span style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-trail-green);">Penny has prepared</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">· {{ deskCount }} waiting on you</span>
+            <button onClick="{{ collapseDesk }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Collapse <span style="font-size: 14px;">▲</span></button>
+          </div>
+          <sc-for list="{{ drafts }}" as="d" hint-placeholder-count="3">
+            <div style="display: flex; gap: 18px; align-items: flex-start; padding: 20px 24px; border-bottom: 1px solid rgba(42,46,44,.08);">
+              <span style="width: 34px; height: 34px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+              <div style="flex: 1; min-width: 0;">
+                <p style="font-size: 14px; color: var(--tt-slate); margin: 0 0 4px;">{{ d.kind }}</p>
+                <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">{{ d.title }}</p>
+                <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 14px; max-width: 62ch;">{{ d.body }}</p>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <button style="background: var(--tt-trail-green); color: #fff; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 9px 18px; border-radius: 14px; border: none;">{{ d.approve }}</button>
+                  <button style="border: 1.5px solid var(--tt-warm-gray); background: #fff; color: var(--tt-charcoal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 9px 18px; border-radius: 14px;">Edit first</button>
+                  <button style="border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 9px 6px;">Discard</button>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ deskClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 13px 22px; margin-bottom: 20px;">
+          <span style="width: 22px; height: 22px; border-radius: 999px; background: var(--tt-trail-green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">✓</span>
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Nothing waiting from Penny</span>
+          <span style="font-size: 14px; color: var(--tt-slate);">Three approved this morning</span>
+          <button onClick="{{ expandDesk }}" style="margin-left: auto; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Expand <span style="font-size: 14px;">▼</span></button>
+        </div>
+      </sc-if>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; overflow: hidden; margin-bottom: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 15px 22px; border-bottom: 1px solid rgba(42,46,44,.10);">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">{{ verdictHeading }}</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">{{ verdictNote }}</span>
+          <button onClick="{{ toggleVerdicts }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ verdictsLabel }}</button>
+        </div>
+        <div style="display: {{ verdictsDisplay }};">
+        <sc-for list="{{ artefacts }}" as="a" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; border-bottom: 1px solid rgba(42,46,44,.08);">
+            <span style="width: 30px; height: 30px; border-radius: 999px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+            <span style="flex: 1; min-width: 0;">
+              <span style="display: block; font-size: 15px; line-height: 1.45; color: var(--tt-charcoal);"><span style="font-weight: 600;">{{ a.learner }}</span> — {{ a.artefact }}</span>
+              <span style="display: block; font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin-top: 2px;">{{ a.meta }} · {{ a.pennyNote }}</span>
+            </span>
+            <span style="flex-shrink: 0; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">{{ verdictAction }} →</span>
+          </div>
+        </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 12px 18px; margin-bottom: 20px;">
+        <span style="flex-shrink: 0; white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Log time</span>
+        <span style="flex: 1; min-width: 150px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">Squad coaching ▾</span>
+        <span style="flex-shrink: 0; width: 60px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">0.5</span>
+        <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Log it</button>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; overflow: hidden; margin-bottom: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 15px 22px; border-bottom: 1px solid rgba(42,46,44,.10);">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Your cases</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">2 open</span>
+          <button onClick="{{ toggleCases }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ casesLabel }}</button>
+        </div>
+        <div style="display: {{ casesDisplay }};">
+        <sc-for list="{{ coachCases }}" as="c" hint-placeholder-count="2">
+          <a href="#" style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; border-bottom: 1px solid rgba(42,46,44,.10); text-decoration: none;">
+            <span style="flex: 1; min-width: 0;">
+              <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ c.subject }}</span>
+              <span style="display: block; margin-top: 5px; line-height: 1.5;">
+                <span style="font-size: 14px; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: {{ c.statusColor }}; background: {{ c.statusBg }};">{{ c.status }}</span>
+                <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px; font-family: Menlo, monospace;">{{ c.number }}</span>
+                <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ c.updated }}</span>
+                <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ c.assigned }}</span>
+              </span>
+            </span>
+            <span style="flex-shrink: 0; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Open →</span>
+          </a>
+        </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 22px 24px; margin-bottom: 22px;">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">{{ squadHeading }}</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">{{ squadNote }}</span>
+          <button onClick="{{ toggleSquad }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ squadLabel }}</button>
+        </div>
+        <div style="display: {{ squadDisplay }}; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+          <sc-for list="{{ squad }}" as="s" hint-placeholder-count="4">
+            <div style="border: 1px solid {{ s.border }}; background: {{ s.bg }}; border-radius: 22px; padding: 18px 20px;">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <span style="width: 32px; height: 32px; border-radius: 999px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+                <span style="flex: 1; min-width: 0;">
+                  <span style="display: block; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">{{ s.name }}</span>
+                  <span style="display: block; font-size: 14px; color: var(--tt-slate);">{{ s.buddy }}</span>
+                </span>
+                <span style="font-size: 14px; font-weight: 600; color: {{ s.flagColor }};">{{ s.flag }}</span>
+              </div>
+              <p style="font-size: 14px; color: var(--tt-charcoal); margin: 0 0 10px;">{{ s.working }}</p>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <span style="font-size: 14px; color: #fff; background: var(--tt-trail-green); padding: 3px 10px; border-radius: 999px;">{{ s.passed }}</span>
+                <span style="font-size: 14px; color: var(--tt-deep-teal); border: 1px solid var(--tt-deep-teal); padding: 3px 10px; border-radius: 999px;">{{ s.rework }}</span>
+                <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">{{ s.curve }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; align-items: start;">
+        <div>
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">This week</h2>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ weekItems }}" as="w" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: {{ w.bg }}; border: 1px solid rgba(42,46,44,.14); border-radius: 14px;">
+                <span style="width: 17px; height: 17px; border-radius: 999px; border: 2px solid {{ w.dot }}; flex-shrink: 0;"></span>
+                <span style="flex: 1; font-size: 15px; color: var(--tt-charcoal);">{{ w.label }}</span>
+                <span style="font-size: 14px; font-weight: 600; color: {{ w.metaColor }};">{{ w.meta }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: var(--tt-sky-100); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Squad session</h3>
+            <p style="font-size: 15px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 12px;">Thursday 2:00pm. Penny has drafted an agenda from this week's verdicts.</p>
+            <button style="border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Review agenda</button>
+          </div>
+          <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Record a walkthrough</h3>
+            <p style="font-size: 15px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 12px;">Capture the steps once for a learner who is stuck. Becomes a teaching article the whole squad can find.</p>
+            <button style="border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Start recording</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <sc-if value="{{ rightClosed }}" hint-placeholder-val="{{ false }}">
+      <aside style="width: 60px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 12px;">
+        <button onClick="{{ openRight }}" title="{{ leadName }}" style="width: 38px; height: 38px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); padding: 0;"></button>
+        <button onClick="{{ openRight }}" title="#guided-spring" style="position: relative; width: 38px; height: 38px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          <span style="position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 999px; background: var(--tt-deep-teal); color: #fff; font-size: 14px; line-height: 18px; text-align: center; padding: 0 4px;">6</span>
+        </button>
+      </aside>
+    </sc-if>
+
+    <sc-if value="{{ rightOpen }}" hint-placeholder-val="{{ true }}">
+      <aside style="width: 288px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; min-height: 0;">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; gap: 12px; align-items: center;">
+          <span style="width: 40px; height: 40px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">{{ leadName }}</p>
+            <p style="font-size: 14px; color: var(--tt-slate); margin: 0;">Lead Coach</p>
+          </div>
+          <button onClick="{{ closeRight }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">›</button>
+        </div>
+        <div style="padding: 12px 20px 14px; border-bottom: 1px solid var(--tt-warm-gray);">
+          <a href="#" style="display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--tt-deep-teal); border-radius: 14px; padding: 9px 14px;">
+            <span style="width: 18px; height: 18px; border-radius: 5px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+            <span style="flex: 1; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Message {{ leadFirst }} on Slack</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+          </a>
+          <p style="font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin: 8px 0 0;">{{ leadNote }}</p>
+        </div>
+        <div style="padding: 14px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; align-items: center; justify-content: space-between;">
+          <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">#guided-spring</p>
+          <span style="font-size: 14px; color: #fff; background: var(--tt-deep-teal); padding: 2px 9px; border-radius: 999px;">6</span>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px;">
+          <sc-for list="{{ messages }}" as="m" hint-placeholder-count="4">
+            <div>
+              <p style="font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 2px;">{{ m.who }}</p>
+              <p style="font-size: 14px; color: var(--tt-slate); margin: 0; line-height: 1.5;">{{ m.text }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding: 14px 20px; border-top: 1px solid var(--tt-warm-gray);">
+          <span style="display: block; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 9px 12px; font-size: 14px; color: var(--tt-slate);">Message #guided-spring</span>
+        </div>
+      </aside>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;coachLevel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;assistant&quot;,&quot;associate&quot;,&quot;advanced&quot;],&quot;default&quot;:&quot;advanced&quot;,&quot;tsType&quot;:&quot;'assistant' | 'associate' | 'advanced'&quot;,&quot;section&quot;:&quot;Coach level&quot;}}">
+class Component extends DCLogic {
+  state = { left: false, right: true, desk: true, cases: true, verdicts: true, squad: true };
+
+  renderVals() {
+    const level = this.props.coachLevel ?? 'advanced';
+    const isAssistant = level === 'assistant';
+    const isAdvanced = level === 'advanced';
+
+    const levelLabel = isAssistant ? "Coach's Assistant" : (isAdvanced ? 'Advanced Coach' : 'Associate Coach');
+
+    const drafts = isAssistant
+      ? [
+          { kind: 'Draft verdict · needs countersign', title: "Amara — buddy test report", body: 'Penny suggests pass on all four criteria. Your reading agreed on three; you flagged the evidence criterion as thin. Submit with your note and Priya countersigns.', approve: 'Submit to Priya' },
+          { kind: 'Nudge', title: 'Tasha has not set a stone in four days', body: 'She is mid-Select on the intake map and her last two entries were reworked. Penny suggests a short message rather than raising it in the session.', approve: 'Send it' },
+        ]
+      : [
+          { kind: 'Draft verdict', title: 'Jordan — Decision Log entry 04', body: 'Penny suggests needs rework: the rejected alternative is named but the trade-off is not stated. Wording is drafted against the rubric criterion, not invented.', approve: 'Approve and issue' },
+          { kind: 'Date change', title: 'Tasha has been away nine days', body: 'Penny has moved her intake map to Friday 15th and drafted a note to Riverside. Nothing else of hers is late.', approve: 'Approve and notify' },
+          { kind: 'Countersign', title: "Sam's verdict on Amara's buddy test", body: isAdvanced ? 'Your Assistant read the evidence criterion as thin where Penny read it as met. Worth a look — this is the third time this pattern has come up.' : 'Awaiting an Advanced Coach.', approve: 'Countersign' },
+        ];
+
+    const squad = [
+      { name: 'Jordan R.', buddy: 'buddy: Amara', working: 'Intake process map · Outline', passed: '4 passed', rework: '1 rework', curve: 'improving', flag: '', flagColor: 'var(--tt-slate)', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+      { name: 'Amara O.', buddy: 'buddy: Jordan', working: 'Validation rules · awaiting verdict', passed: '5 passed', rework: '0 rework', curve: 'steady', flag: '', flagColor: 'var(--tt-slate)', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+      { name: 'Devon M.', buddy: 'buddy: Tasha', working: 'Reporting brief · Verify', passed: '6 passed', rework: '2 rework', curve: 'improving', flag: '', flagColor: 'var(--tt-slate)', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+      { name: 'Tasha B.', buddy: 'buddy: Devon', working: 'Intake process map · Select', passed: '3 passed', rework: '3 rework', curve: 'not improving', flag: 'Stuck', flagColor: 'var(--tt-amber-700)', bg: 'var(--tt-amber-100)', border: 'var(--tt-sun-amber)' },
+    ];
+
+    return {
+      levelLabel,
+      leftOpen: this.state.left, leftClosed: !this.state.left,
+      rightOpen: this.state.right, rightClosed: !this.state.right,
+      deskOpen: this.state.desk, deskClosed: !this.state.desk,
+
+      openLeft: () => this.setState({ left: true, right: false }),
+      closeLeft: () => this.setState({ left: false }),
+      openRight: () => this.setState({ right: true, left: false }),
+      closeRight: () => this.setState({ right: false }),
+      collapseDesk: () => this.setState({ desk: false }),
+      expandDesk: () => this.setState({ desk: true }),
+
+      casesDisplay: this.state.cases ? 'block' : 'none',
+      casesLabel: this.state.cases ? 'Collapse ▲' : 'Expand ▼',
+      toggleCases: () => this.setState({ cases: !this.state.cases }),
+
+      verdictsDisplay: this.state.verdicts ? 'block' : 'none',
+      verdictsLabel: this.state.verdicts ? 'Collapse ▲' : 'Expand ▼',
+      toggleVerdicts: () => this.setState({ verdicts: !this.state.verdicts }),
+
+      squadDisplay: this.state.squad ? 'grid' : 'none',
+      squadLabel: this.state.squad ? 'Collapse ▲' : 'Expand ▼',
+      toggleSquad: () => this.setState({ squad: !this.state.squad }),
+
+      googleApps: [
+        { name: 'Gmail' }, { name: 'Calendar' }, { name: 'Drive' },
+        { name: 'Docs' }, { name: 'Sheets' }, { name: 'Meet' }, { name: 'Keep' },
+      ],
+
+      deskCount: drafts.length,
+      drafts,
+
+      verdictHeading: isAssistant ? 'Artefacts to read' : 'Artefacts awaiting a verdict',
+      verdictNote: isAssistant
+        ? 'You draft; Priya issues. Your reading is recorded either way.'
+        : (isAdvanced ? 'Your squad, plus anything countersigned across both squads' : 'Your squad'),
+      verdictAction: isAssistant ? 'Draft' : 'Issue verdict',
+
+      artefacts: [
+        { learner: 'Amara O.', artefact: 'Buddy test report — validation rules', meta: 'Submitted 2 hours ago · 4 criteria', pennyNote: 'Penny: pass on all four' },
+        { learner: 'Devon M.', artefact: 'Reporting brief — board outcomes', meta: 'Submitted yesterday · 5 criteria', pennyNote: 'Penny: rework on scope' },
+        { learner: 'Jordan R.', artefact: 'Decision Log 04 — intake routing', meta: 'Resubmitted · second attempt', pennyNote: 'Penny: trade-off now stated' },
+      ],
+
+      squadHeading: isAdvanced ? 'Both squads' : 'Your squad',
+      squadNote: isAdvanced ? 'Riverside and Northside · 9 learners' : 'Riverside · week 4',
+      squad,
+
+      weekItems: [
+        { label: 'Tasha — three reworks running, curve is flat', meta: 'Needs you', metaColor: 'var(--tt-amber-700)', bg: 'var(--tt-amber-100)', dot: 'var(--tt-sun-amber)' },
+        { label: 'Sealed brief drops Monday 9am — read before the squad does', meta: 'Monday', metaColor: 'var(--tt-slate)', bg: '#fff', dot: 'var(--tt-warm-gray)' },
+        { label: 'Riverside check-in — Marcus on the duplicate hours case', meta: 'Wednesday', metaColor: 'var(--tt-slate)', bg: '#fff', dot: 'var(--tt-warm-gray)' },
+      ],
+
+      coachCases: [
+        { subject: 'Riverside — scope change on the board report', status: 'In progress', statusColor: 'var(--tt-amber-700)', statusBg: 'var(--tt-amber-100)', number: '00001058', updated: 'Today', assigned: 'Assigned to you' },
+        { subject: 'Northside — data migration sign-off', status: 'Awaiting client', statusColor: 'var(--tt-deep-teal)', statusBg: 'var(--tt-sky-100)', number: '00001033', updated: '2 days ago', assigned: 'Assigned to you · owned by Marcus Bell' },
+      ],
+
+      leadName: 'Priya Raman',
+      leadFirst: 'Priya',
+      leadNote: isAssistant
+        ? 'She countersigns your verdicts. Ask before submitting if a criterion is genuinely unclear.'
+        : 'Assigned on your coach record. She answers between sessions, not instantly.',
+
+      messages: [
+        { who: 'Amara', text: 'pushed my validation rules if anyone wants to look before Thursday' },
+        { who: 'Priya Raman', text: 'Sealed brief drops Monday 9am. Read it before you touch anything.' },
+        { who: 'Tasha', text: 'still stuck on where the referral actually stalls, going in circles' },
+        { who: 'Devon', text: 'passed on entry 06, second time lucky' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

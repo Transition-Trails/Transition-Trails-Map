@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+  html { scroll-behavior: smooth; }
+</style>
+</helmet>
+
+<div style="min-height:100%;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate);padding:0 0 96px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:56px 0">
+    <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:18px">
+      <div style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Transition Trails Academy · program design v0.1</div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:44px;line-height:1.1;font-weight:600;margin:0;color:var(--tt-white);max-width:900px;text-wrap:pretty">Digital Compass — the program that produces the clients</h1>
+      <p style="font-size:18px;line-height:1.6;margin:0;max-width:840px;color:rgba(255,255,255,.88)">The fifth program, and the only one whose members are organizations rather than people. Every other program needs somewhere for a learner to do real work. This is where that work comes from — which makes Digital Compass a supply constraint on the entire Academy, not a side business.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Serving clients since 2022</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">3 active clients, zero churn</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Kim Barnes, COO</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">3 tiers · $149–$749/mo</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Pricing confirmed</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Penny a future phase</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Trail OS live Q1 2027</x-import>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--tt-white);border-bottom:1px solid var(--tt-warm-gray);padding:16px 0;position:sticky;top:0;z-index:10">
+    <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-wrap:wrap;gap:22px;font-family:Poppins,sans-serif;font-size:13.5px;font-weight:600">
+      <a href="#why" style="text-decoration:none">01 Why it exists</a>
+      <a href="#frontdoor" style="text-decoration:none">02 The front door</a>
+      <a href="#members" style="text-decoration:none">03 Who joins</a>
+      <a href="#tiers" style="text-decoration:none">04 Tiers</a>
+      <a href="#pipeline" style="text-decoration:none">05 The pipeline</a>
+      <a href="#projects" style="text-decoration:none">06 Project work</a>
+      <a href="#capstone" style="text-decoration:none">07 Capstone</a>
+      <a href="#measures" style="text-decoration:none">08 Measures</a>
+      <a href="#open" style="text-decoration:none">09 Open</a>
+    </div>
+  </div>
+
+  <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:56px">
+
+    <section id="why" style="margin-top:44px;display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">01 · Why it exists</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">A membership, not a course — and the supply side of the model</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px;text-wrap:pretty">Digital Compass serves nonprofit organizations directly. It is a recurring relationship rather than a program with a graduation date: weekly office hours, a library of resources built from real client work, and the ability to submit real Salesforce projects that coached learners complete. Transition Trails has been supporting nonprofits this way since 2022 — CLYLP first, then Hartford Promise, and Global One Urban Farming most recently — and all three are still clients. The membership structure names and prices what was already happening.</p>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="Why this belongs in the program guide and not in a sales folder" dc-props="{{ wideAlert }}" hint-size="100%,130px"><div>Trail of Mastery runs on live nonprofit engagements, and that work does not appear on its own — it arrives through Digital Compass intake. <strong>The number of Mid and Full tier members is a direct ceiling on how many apprenticeships can run.</strong> Guided Trail is deliberately insulated from that: it works Transition Trails\u2019 own backlog and takes nonprofit overflow only when it exists, so its cohorts are not gated on the membership count. Growing Digital Compass is what unlocks Trail of Mastery — and every Mid or Full member added is another apprenticeship that can be staffed.</div></x-import>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">
+        <sc-for list="{{ why }}" as="w" hint-placeholder-count="3">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ w.name }}</div>
+            <div style="font-size:15px;line-height:1.65">{{ w.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section id="frontdoor" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">02 · The front door</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Base Camp — we set up your Power of Us org, free</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px;text-wrap:pretty">Salesforce donates ten licenses to eligible nonprofits through the Power of Us program. It is an extraordinary grant and most recipients never really claim it — the licenses are approved, nobody knows what to do next, and the org sits empty or half-configured for a year. Transition Trails does that setup pro bono: Nonprofit Cloud with Agentforce, whichever NPSP feature sets the organization actually needs, and a check on the Slack, Google and Canva grants while we are there. It is a small piece of work for us and the difference between a dormant grant and a working system for them.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px">
+        <sc-for list="{{ frontDoor }}" as="f" hint-placeholder-count="3">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ f.name }}</div>
+            <div style="font-size:15px;line-height:1.65">{{ f.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;padding:15px 26px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>What Base Camp includes</span><span>Why it is in scope</span>
+        </div>
+        <sc-for list="{{ baseCamp }}" as="b" hint-placeholder-count="6">
+          <div style="{{ b.rowStyle }}">
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-charcoal)">{{ b.item }}</span>
+            <span style="font-size:14px;line-height:1.6">{{ b.why }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <h3 style="font-family:Poppins,sans-serif;font-size:22px;line-height:1.25;font-weight:600;margin:0;color:var(--tt-charcoal)">While we are in there — the rest of the grant stack</h3>
+        <p style="font-size:16px;line-height:1.7;margin:0;max-width:880px">Power of Us is the one worth the setup effort, but it is not the only program a nonprofit qualifies for and never claims. An organization eligible for one is almost always eligible for the others, and checking costs us a conversation. It widens Base Camp from a Salesforce favor into something closer to a technology grant audit — which is a better reason to say yes and a better story for a funder.</p>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px 30px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">Start with what Power of Us already reaches</div>
+          <div style="font-size:15.5px;line-height:1.7">Ten donated seats is the part everyone knows. The entitlement runs wider than that — Data Cloud, Commerce Cloud, Marketing Cloud, Tableau, Experience Cloud, Slack and more sit behind it at donated or heavily discounted nonprofit rates, and the terms move often enough that even engaged organizations lose track. Almost nobody reads the whole thing. A license review is an hour of reading against a current entitlement and it routinely finds capability an organization has been quoting external vendors for.</div>
+          <div style="font-size:14.5px;line-height:1.65;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:14px">Two things follow from it. It is the most credible possible opening — we tell a nonprofit something true and valuable about their own account before asking for anything. And it generates qualified project work: an organization that discovers it already has Experience Cloud has a reason to talk about a portal, and that conversation belongs in the project catalogue rather than with a consultancy.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:1fr 1.7fr 1fr;gap:16px;padding:15px 26px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+            <span>Program</span><span>What it gives them</span><span>Our role</span>
+          </div>
+          <sc-for list="{{ grants }}" as="g" hint-placeholder-count="4">
+            <div style="{{ g.rowStyle }}">
+              <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-charcoal)">{{ g.name }}</span>
+              <span style="font-size:14px;line-height:1.6">{{ g.text }}</span>
+              <span style="font-size:13.5px;line-height:1.55;color:var(--tt-green-700);font-weight:600">{{ g.role }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:var(--tt-green-100);border-radius:14px;padding:18px 22px;font-size:14.5px;line-height:1.7">The catalogue already covers most of this. Google Workspace, Google Sites, Gmail and Calendar setup are four existing project types; Slack setup is a fifth. Grant activation is not new work to design — it is existing project types pointed at a new trigger, which is why the audit can be free and the follow-through can be a paid project.</div>
+      </div>
+
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="This also answers the production-org question" dc-props="{{ wideAlert }}" hint-size="100%,140px"><div>The Master Program Guide has an open item about what a nonprofit is told when learners work in their production org. Base Camp sidesteps it entirely: <strong>a freshly granted Power of Us org has no data, no users, no configuration debt and nothing to break.</strong> It is the lowest-risk real work in the entire Academy, and it is real — a live org for a live organization, not a scenario. That makes it the natural first client engagement for a Guided Trail squad, months before anyone goes near a system somebody depends on.</div></x-import>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:30px 34px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-white)">Why give it away</div>
+        <div style="font-size:16px;line-height:1.7;color:rgba(255,255,255,.9);max-width:880px">Because the hard part of selling a nonprofit membership is the first conversation, and this replaces it with a delivered result. An organization whose org we have just stood up has already been helped once, at no risk and no cost, and the obvious next question is who keeps it running. Base Camp is not marketing spend dressed as generosity — it is the cheapest client acquisition available to us, and it produces a working Salesforce org for a nonprofit either way.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:8px">
+          <sc-for list="{{ funnel }}" as="s" hint-placeholder-count="4">
+            <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px 20px;flex:1;min-width:180px;display:flex;flex-direction:column;gap:5px">
+              <span style="font-family:Poppins,sans-serif;font-size:14px;font-weight:600;color:var(--tt-amber-300)">{{ s.step }}</span>
+              <span style="font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.8)">{{ s.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:var(--tt-green-100);border-radius:22px;padding:24px 28px;font-size:15px;line-height:1.7"><span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-green-700);display:block;margin-bottom:6px">Naming, and one caution</span>Base Camp is a suggestion — it sits in the trail lexicon, it is not a Salesforce trademark, and it says "this is where you start" without implying a course. Whatever it is called, the caution is the same: publish a defined scope and hold it. A free setup with fuzzy edges becomes an unpaid implementation, and the thing that makes this sustainable is that it is genuinely small.</div>
+    </section>
+
+    <section id="members" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">03 · Who joins</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Three people, one organization</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px">No certification required, no prior Salesforce experience required. The member is an organization; the person who shows up is usually someone who did not apply for this part of their job.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px">
+        <sc-for list="{{ personas }}" as="p" hint-placeholder-count="3">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-charcoal)">{{ p.name }}</div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <div style="display:flex;flex-direction:column;gap:3px">
+                <span style="font-family:Poppins,sans-serif;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--tt-trail-green)">Their profile</span>
+                <span style="font-size:14.5px;line-height:1.6">{{ p.profile }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:3px">
+                <span style="font-family:Poppins,sans-serif;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--tt-trail-green)">What they bring</span>
+                <span style="font-size:14.5px;line-height:1.6">{{ p.brings }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:3px">
+                <span style="font-family:Poppins,sans-serif;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--tt-trail-green)">What they need</span>
+                <span style="font-size:14.5px;line-height:1.6">{{ p.needs }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-sky-100);border-radius:22px;padding:26px 30px;font-size:15.5px;line-height:1.7">
+        <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-deep-teal);display:block;margin-bottom:6px">The positioning, in one line</span>The Accidental Admin did not apply to be a technology lead. They applied to run programs, manage donors, or support their community — and then Salesforce got installed. Digital Compass is a standing door for that person, with people on the other side who have been there.
+      </div>
+    </section>
+
+    <section id="tiers" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">04 · Tiers</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">What separates the tiers is project access, then the roadmap</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px">Every tier gets the office hours and the library. Mid buys the two annual reviews and the ability to submit project work — which is also where a member starts generating learner placements. Full is where those reviews become a written personalised roadmap, alongside priority queue placement and a named point of contact. Annual is ten times monthly, two months free, and is the form grant-funded purchases should take.</p>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:1.9fr .7fr .7fr .7fr;gap:16px;padding:16px 26px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>Benefit</span><span>Entry · $149/mo</span><span>Mid · $349/mo</span><span>Full · $749/mo</span>
+        </div>
+        <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="12">
+          <div style="{{ b.rowStyle }}">
+            <span style="{{ b.labelStyle }}">{{ b.label }}</span>
+            <span style="{{ b.aStyle }}">{{ b.a }}</span>
+            <span style="{{ b.bStyle }}">{{ b.b }}</span>
+            <span style="{{ b.cStyle }}">{{ b.c }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Annual Strategy Review — with Angela</div>
+          <div style="font-size:15px;line-height:1.65">Where the organization is going, and what its technology has to do to support that. Output is a strategic technology brief that frames the priorities for the architecture review.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Annual Architecture Review — with Hugh and Kim</div>
+          <div style="font-size:15px;line-height:1.65">A technical deep-dive into the org and stack, with findings and recommendations. At Full tier those findings are written up as a personalised roadmap — prioritized by impact and complexity — which is what tells a member which projects to submit next.</div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="Two rows in this table are dated, not delivered" dc-props="{{ wideAlert }}" hint-size="100%,140px"><div><strong>Penny</strong> is in development for the learner programs, and Digital Compass is a later phase — she has no date here. The blueprint lists her as core access at every tier and builds the whole TrailKit video library around her narration, which is further ahead of reality than any other row in this table. <strong>Trail OS</strong> is in development now, tests in Q4 2026, and goes live with a cohort in Q1 2027 — so the installation step that gates project work does not exist yet either.<br><br>Neither should be a discovery. A member paying $149 in September needs to know which parts are here now; a row marked "future" costs less trust than one that quietly is not true. The capstone, by contrast, is finished and can be sold as such.</div></x-import>
+    </section>
+
+    <section id="pipeline" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">05 · The pipeline</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Where a nonprofit problem becomes a learner's evidence</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px">This is the exchange the whole Academy runs on. It is also the place where the programs have to agree with each other about who is allowed to talk to whom — and right now they do not quite.</p>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <sc-for list="{{ ecosystem }}" as="e" hint-placeholder-count="4">
+          <div style="{{ e.rowStyle }}">
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-charcoal)">{{ e.prog }}</span>
+            <span style="font-size:14.5px;line-height:1.6">{{ e.link }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="The distinction that has to be written down once" dc-props="{{ wideAlert }}" hint-size="100%,130px"><div>The Digital Compass blueprint says Guided Trail learners complete supervised project work for member nonprofits and calls it the primary learner-client pipeline. The Master Program Guide says there is no direct client contact until Trail of Mastery. <strong>Both are true, and the reconciliation is the word contact.</strong> Guided Trail learners do real work for real member organizations — in a sandbox, never in production, and never in a room with the member. The coach relays every requirement and carries every result back. At Trail of Mastery the learner is in front of the client and the coach is present rather than in between.<br><br>The reason is coaching, not liability. A coach has to be able to stop a learner mid-decision and correct them, and there is no way to do that while a client watches without undermining both of them. Every document, and the public site, should say it in exactly those terms.</div></x-import>
+      <div style="background:var(--tt-charcoal);border-radius:22px;padding:28px 32px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-white)">Registration, before any project work begins</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+          <sc-for list="{{ registration }}" as="r" hint-placeholder-count="7">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <span style="font-family:Poppins,sans-serif;font-size:14px;font-weight:600;color:var(--tt-amber-300)">{{ r.n }} · {{ r.name }}</span>
+              <span style="font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.82)">{{ r.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);border-top:1px solid rgba(255,255,255,.16);padding-top:14px">Step seven is the one to watch. Digital Compass is designed to require the Trail OS managed package in the member's own Salesforce org — that is how an org gets assessed, how the right learner gets assigned, and how work is documented. <strong style="color:var(--tt-amber-300)">Trail OS is in development, tests in Q4 2026, and goes live with a cohort in Q1 2027.</strong> Until then, registration ends at step six and project work is coordinated manually. Two consequences: the onboarding sequence needs a documented interim path, and installing a managed package in a production org is the largest objection a cautious executive director will raise — so it belongs in the sales conversation from the start, not in an onboarding email fifteen months from now.</div>
+      </div>
+    </section>
+
+    <section id="projects" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">06 · Project work</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Eighteen project types, each with a timeframe and a value</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px">A member picks a category, then a type; the timeframe is calculated and a project manager is assigned. Because every type carries an estimated market value, completed project work converts directly into the impact figure a funder asks for — and into the "for every $1 granted" leverage line the grant framing already uses.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ catTabs }}" as="t" hint-placeholder-count="5">
+          <div onClick="{{ t.pick }}" style="{{ t.style }}">{{ t.name }}</div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:1.7fr .9fr .9fr;gap:16px;padding:15px 26px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>Project type</span><span>Timeframe</span><span>Estimated value</span>
+        </div>
+        <sc-for list="{{ projects }}" as="p" hint-placeholder-count="8">
+          <div style="{{ p.rowStyle }}">
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-charcoal)">{{ p.name }}</span>
+            <span style="font-size:14px">{{ p.time }}</span>
+            <span style="font-size:14px;color:var(--tt-green-700);font-weight:600">{{ p.value }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-green-100);border-radius:22px;padding:24px 28px;font-size:15px;line-height:1.7">Ten of the eighteen types are recorded as "market rate value" rather than a figure. Those are the ones that cannot be counted toward delivered value in a grant report. Pricing them — even as a range, the way the Digital Experience Site and Process Automation types already are — is a short piece of work with a direct effect on what the impact number is allowed to say.</div>
+    </section>
+
+    <section id="capstone" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">07 · Capstone</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Practise in Horizon. Do it for real in yours.</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px">Horizon Community Hub is the fictional Dallas–Fort Worth nonprofit used across the learner programs. In Foundations a learner builds its system. In the Digital Compass capstone the member is the person who has to <em>use</em> it — the program director or executive director who needs to know what to ask and how to tell whether the answer is right. It is the one place in the Academy where the learner-side and client-side curricula share a scenario, which makes it unusually cheap to maintain.</p>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="success" title="The capstone is built" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>All four modules are complete for both roles and can be sold as an included benefit rather than a coming feature. What is not settled is the stakeholder material — the personas a member interacts with inside the scenario — which needs to be run with real members before it is fixed. That is a testing question, not a build one, and it does not hold the capstone back.</div></x-import>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px">
+          <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="green" hint-size="auto,26px">Role · The Accidental Admin</x-import>
+          <div style="font-size:15px;line-height:1.65">You inherited HCH's Salesforce. You did not build it and you do not fully understand it, but it is yours and people are asking questions. Builds navigation and configuration confidence.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px">
+          <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,26px">Role · The Nonprofit Leader</x-import>
+          <div style="font-size:15px;line-height:1.65">You are HCH's program director. You need Salesforce to tell you whether your programs are working, and you are not sure what to ask or whether the data is accurate. Builds critical reading and scoping.</div>
+        </div>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:44px 1fr 1.2fr 1.2fr;gap:16px;padding:15px 26px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>#</span><span>Focus</span><span>In Horizon — practice</span><span style="color:var(--tt-trail-green)">In your org — for real</span>
+        </div>
+        <sc-for list="{{ modules }}" as="m" hint-placeholder-count="4">
+          <div style="{{ m.rowStyle }}">
+            <span style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-trail-green)">{{ m.n }}</span>
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-charcoal)">{{ m.focus }}</span>
+            <span style="font-size:14px;line-height:1.6">{{ m.output }}</span>
+            <span style="font-size:14px;line-height:1.6;color:var(--tt-green-700)">{{ m.mirror }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px">
+        <sc-for list="{{ sticky }}" as="s" hint-placeholder-count="4">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ s.name }}</div>
+            <div style="font-size:15px;line-height:1.65">{{ s.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:var(--tt-charcoal);border-radius:22px;padding:30px 34px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-white)">The rule that makes own-org work safe</div>
+        <div style="font-size:16px;line-height:1.7;color:rgba(255,255,255,.88);max-width:880px">Every own-org task in the capstone is <strong style="color:var(--tt-amber-300)">read, document, or recommend</strong> — never change. A member investigates their duplicates and writes the cleanup plan; they do not run the merge. They scope the new module; they do not build it. That is not a limitation dressed up as pedagogy: the recommendation <em>is</em> the skill this program teaches, and the build is what a project submission is for. It also means a member can do all four modules in production without a sandbox, on their own time, with nothing at risk.</div>
+        <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.68);border-top:1px solid rgba(255,255,255,.16);padding-top:14px">Office hours becomes the review venue. A member brings their own-org output and gets it read by someone who has seen a hundred of them — which gives the weekly session a spine without turning it into a class, and gives the member a reason to attend that is specifically theirs.</div>
+      </div>
+
+      <div style="background:var(--tt-sky-100);border-radius:22px;padding:24px 28px;font-size:15px;line-height:1.7"><span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-deep-teal);display:block;margin-bottom:6px">Where module four lands</span>The last own-org output is a technology decision memo about a change the organization is actually considering — which is, structurally, a scoped project request. A member finishes the capstone holding the exact document the project submission form asks for. That is the cleanest path from Entry tier to Mid that exists in this program, and it arrives because the member did the thinking, not because anyone sold them anything.</div>
+    </section>
+
+    <section id="measures" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">08 · Measures</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Ten figures, and none of them belong in the learner dashboard</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:880px">Digital Compass measures organizations; the learner programs measure people. The Master Program Guide's rule about never summing incomparable figures applies here more than anywhere — a Digital Compass completion rate and a Guided Trail pass rate have nothing to do with each other and must sit in separate panels.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ measures }}" as="m" hint-placeholder-count="9">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:18px 24px;display:grid;grid-template-columns:230px 1fr 150px;gap:20px;align-items:start">
+            <span style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">{{ m.name }}</span>
+            <span style="font-size:14.5px;line-height:1.6">{{ m.def }}</span>
+            <span style="font-size:13.5px;line-height:1.5;color:var(--tt-green-700);font-weight:600"><span style="font-family:Poppins,sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-trail-green);display:block;margin-bottom:3px;font-weight:400">Target</span>{{ m.target }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px 30px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">The one figure that ties the two halves together</div>
+        <div style="font-size:15.5px;line-height:1.7">Learner Pipeline — the share of Digital Compass project slots filled by Guided Trail or Trail of Mastery learners rather than by staff. It is the only measure in either half of the Academy that fails if the other half is not working, which makes it the honest health check on the whole model. It should appear on the learner dashboard <em>and</em> the client one.</div>
+      </div>
+    </section>
+
+    <section id="open" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">09 · Open</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Decided, and still open</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">Settled</div>
+          <sc-for list="{{ settled }}" as="s" hint-placeholder-count="7">
+            <div style="display:flex;gap:9px;font-size:14.5px;line-height:1.6"><span style="color:var(--tt-trail-green);font-weight:700">✓</span><span>{{ s.text }}</span></div>
+          </sc-for>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-sun-amber);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">Still open</div>
+          <sc-for list="{{ openItems }}" as="o" hint-placeholder-count="8">
+            <div style="display:flex;gap:9px;font-size:14.5px;line-height:1.6"><span style="color:var(--tt-amber-700);font-weight:700">·</span><span>{{ o.text }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:32px 36px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:Caveat,cursive;font-size:27px;color:var(--tt-amber-300)">the next step on the trail</div>
+        <div style="font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.92);max-width:880px">Digital Compass is the only program already earning revenue and already serving clients, and it is the one with the least written down. The two decisions that unblock the rest are pricing formalisation and the Penny question — both of which are on the pending list with a Q3 date against them, and both of which the public site is already implying answers to.</div>
+      </div>
+      <div style="font-size:15px;line-height:1.7">Sources: <span style="font-family:Poppins,sans-serif;font-weight:600">Digital Compass Program Blueprint &amp; Member Guide v1.0 (2026)</span> and <span style="font-family:Poppins,sans-serif;font-weight:600">TT Master Program Comparison 2026 v2.0 (June 2026)</span>. Reconciled against <a href="Master%20Program%20Guide.dc.html">Master Program Guide</a> and the live site — see <a href="Site%20Review%20-%20Master%20Guide%20Reconciliation.dc.html">Site Review</a> for the conflicts this raised.</div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200},&quot;openCategory&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;salesforce&quot;,&quot;google&quot;,&quot;tools&quot;,&quot;analysis&quot;,&quot;web&quot;],&quot;default&quot;:&quot;salesforce&quot;,&quot;tsType&quot;:&quot;'salesforce' | 'google' | 'tools' | 'analysis' | 'web'&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+const WHY = [
+  ['Not a course','There is no graduation date and no credential. It is a recurring relationship — weekly office hours, a resource library, and project delivery — and its success measure is a nonprofit that fights its tools less each quarter.'],
+  ['Four years of it already','Supporting clients this way since 2022 — CLYLP first, then Hartford Promise, and Global One Urban Farming most recently. All three are still clients. Everything else in the Academy is being designed; this is being formalised after the fact.'],
+  ['The client engine','Guided Trail and Trail of Mastery both consume live nonprofit work. Mid and Full tier members are the only source of it. Grow the membership or the learner programs stall.'],
+  ['Retention is the proof','CLYLP came in first and is still here four years later, and neither of the two that followed has left. For a program whose whole claim is that nonprofits stop fighting their tools, an unbroken retention record is stronger evidence than any completion rate — and it is the number a funder will find most persuasive.']
+];
+
+const FRONT_DOOR = [
+  ['The grant nobody activates','Power of Us donates ten licenses to an eligible nonprofit. Approval is the easy part. What follows is an empty org, a login, and no idea what to do with either — so a genuinely valuable grant sits unused and quietly reinforces the belief that Salesforce is not for organizations this size.'],
+  ['Small work, large effect','Standing up a new org is a few hours of straightforward configuration for someone who has done it before. There is no legacy data, no integration, no existing automation to respect. The gap between what it costs us and what it is worth to them is the widest in anything we do.'],
+  ['It is how clients arrive','Every one of the three organizations we support came through a relationship, not a funnel. Base Camp turns that into something repeatable: a defined free service that starts the relationship with delivered work instead of a pitch.']
+];
+
+const BASE_CAMP = [
+  ['License provisioning and org activation','The step most recipients stall on. Nothing else is possible until it is done.'],
+  ['Nonprofit Cloud with Agentforce, installed and configured','The donated licenses are worth little without the nonprofit data model on top of them — and Agentforce is the part no comparable free offer includes.'],
+  ['The NPSP feature sets they actually need','Program Management, Volunteer Management, or neither. Installed on the basis of how the organization works, not as a default bundle.'],
+  ['Users, profiles and basic sharing','Enough security to be safe from day one, and no more — this is a foundation, not an architecture.'],
+  ['A working data model for how they actually operate','Constituents, programs, gifts. Named for their work rather than the default labels.'],
+  ['One report and one dashboard that answer a real question','The moment the org stops being abstract. Pick the question their board asks most.'],
+  ['A Power of Us entitlement review','The ten seats are the headline, not the whole grant. We read the entitlement and tell them what else it reaches — Data Cloud, Commerce Cloud, Marketing Cloud, Tableau, Experience Cloud, Slack — at donated or discounted rates.'],
+  ['A grant audit across Slack, Google and Canva','Three more nonprofit programs most recipients qualify for and have not claimed. We check eligibility and tell them what is on the table.'],
+  ['A thirty-minute recorded handover walkthrough','It becomes their onboarding material for the next person who inherits this.'],
+  ['A written scope boundary','What Base Camp does not include, given in writing at the start. This is what keeps it free.']
+];
+
+const GRANTS = [
+  ['Salesforce Power of Us','Ten donated licenses, Nonprofit Cloud and Agentforce. The anchor — and the one with the steepest setup.','We install and configure'],
+  ['Slack for Nonprofits','Discounted or donated paid plans. Solves the internal communication problem almost every small nonprofit has and few name.','Setup and training already priced'],
+  ['Google for Nonprofits','Workspace, plus the Ad Grant — up to $10,000 a month of search advertising that most recipients never spend.','Four project types in the catalogue'],
+  ['Canva for Nonprofits','Free Canva Pro. Unglamorous and immediately useful to a one-person communications team.','Pointed to, not managed by us']
+];
+
+const FUNNEL = [
+  ['1 · Base Camp','Pro bono setup of a newly granted Power of Us org. No cost, defined scope.'],
+  ['2 · Office hours','They arrive with the first real question. The door is already open.'],
+  ['3 · Entry membership','$149/mo for continuity — support, the library, recordings.'],
+  ['4 · Mid or Full','Project submission unlocks, and the organization becomes a learner placement.']
+];
+
+const PERSONAS = [
+  ['The Accidental Admin',
+   'A staff member who inherited Salesforce without training — program manager, development officer, ED assistant, and now also the tech lead.',
+   'Deep knowledge of the mission and the data. Just not the platform it lives in.',
+   'Practical help with real problems in their actual org. Not theory, not a certification.'],
+  ['The Nonprofit Leader',
+   'An executive director or COO who knows the organization should use technology better but does not know where to start or who to trust.',
+   'Strategic vision and the authority to act. They know what success looks like.',
+   'An honest technology roadmap, and people who can execute against it.'],
+  ['The Emerging Organization',
+   'An early-stage nonprofit building its Salesforce instance from the ground up, with limited resources and no technical background.',
+   'Motivation and willingness to learn. They are building something real.',
+   'Support building the foundation correctly the first time, so they do not pay to fix it later.']
+];
+
+const BENEFITS = [
+  ['CORE ACCESS', null, null, null],
+  ['Weekly Office Hours, live','✓','✓','✓'],
+  ['Transition Trails Slack community','✓','✓','✓'],
+  ['TrailKit library — Fix It With Me and Build With Me','✓','✓','✓'],
+  ['Trail OS installed in your Salesforce org','Q1 2027','Q1 2027','Q1 2027'],
+  ['Penny — learning and guidance support','future','future','future'],
+  ['Recorded Office Hours sessions','✓','✓','✓'],
+  ['STRATEGY AND ARCHITECTURE', null, null, null],
+  ['Annual Strategy Review with Angela','—','✓','✓'],
+  ['Annual Architecture Review with Hugh and Kim','—','✓','✓'],
+  ['Personalised technology roadmap','—','—','✓'],
+  ['PROJECT SUPPORT', null, null, null],
+  ['Project submission — learners complete your work','—','✓','✓'],
+  ['Fixed-fee optimisation packages','—','✓','✓'],
+  ['Recurring guided implementation and ongoing support','—','—','✓'],
+  ['Priority project queue placement','—','—','✓'],
+  ['A dedicated Transition Trails point of contact','—','—','✓'],
+  ['CAPSTONE', null, null, null],
+  ['HCH Capstone — Accidental Admin and Leader editions','✓','✓','✓'],
+  ['Paired work in your own Salesforce org','✓','✓','✓']
+];
+
+const ECOSYSTEM = [
+  ["Explorer's Trail",'Members may become volunteer contributors to Digital Compass content. Client scenarios feed the monthly Trail Missions.'],
+  ['Foundations Trail','Shares the Horizon Community Hub scenario. A Foundations learner builds the org a Digital Compass member practices inside.'],
+  ['Guided Trail','Member work in a sandbox, brand-new Base Camp setups, and Transition Trails\u2019 own org. Real requirements, never client production, and never in front of the member — the coach relays.'],
+  ['Trail of Mastery','First call on member projects. Participants lead them with direct client contact and a coach present. Office hours act as project intake.']
+];
+
+const REGISTRATION = [
+  ['1','Submit registration','From the nonprofit card on the site, or Project Support under Services.'],
+  ['2','Complete the form','Name, organization, EIN, website, email, LinkedIn.'],
+  ['3','Confirmation','A thank-you email with next steps.'],
+  ['4','Review','Approved moves the record to Open. Declined is notified with a reason.'],
+  ['5','Records created','Individual, Contact and Account in the TT org; portal access granted.'],
+  ['6','Welcome','How project submission works and how to reach the portal.'],
+  ['7','Trail OS installed','From Q1 2027. Coordinated by the TT technology team before project work begins.']
+];
+
+const PROJECTS = {
+  salesforce: [
+    ['Salesforce Org Assessment','1 week','$3,000'],
+    ['Salesforce Org Setup','2–4 weeks','$2,250'],
+    ['Reports and Dashboards Setup','1–2 weeks','$1,200'],
+    ['Program Management Module','1–2 weeks','$2,400'],
+    ['Volunteer Management Module','2–4 weeks','$1,500'],
+    ['Event Management Module','1–2 weeks','$1,500'],
+    ['Digital Experience Site','4–8 weeks','$3,000–$6,000'],
+    ['Process Automation — Flow Builder','2–6 weeks','$1,500–$3,000']
+  ],
+  google: [
+    ['Google Workspace Setup and Training','1 week','Not priced'],
+    ['Google Sites Setup','1 week','Not priced'],
+    ['Gmail Setup and Training','2–4 weeks','Not priced'],
+    ['Google Calendar Setup and Training','1 week','Not priced']
+  ],
+  tools: [
+    ['Jotform Setup and Training','1 day','Not priced'],
+    ['Slack Setup and Training','2–4 weeks','Not priced']
+  ],
+  analysis: [
+    ['Process Assessment','1–2 weeks','10–15 hrs saved'],
+    ['General AI Training for Staff','2–4 weeks','15–25 hrs saved']
+  ],
+  web: [
+    ['General Website Audit','2–4 weeks','Not priced'],
+    ['Accessibility Audit','2–4 weeks','Not priced']
+  ]
+};
+
+const CAT_ORDER = [['salesforce','Salesforce'],['google','Google Workspace'],['tools','Comms and productivity'],['analysis','Analysis and AI'],['web','Websites']];
+
+const MODULES = [
+  ['1','Understanding your org',
+   'Navigate Horizon\u2019s data model and write a plain-English overview for a new volunteer.',
+   'The same overview for your org. Hand it to your board, or the next person who inherits this.'],
+  ['2','Working with data',
+   'Find Horizon\u2019s duplicate client records, assess the impact, document a cleanup approach.',
+   'Run the same assessment on your own data. You finish holding a real, prioritized cleanup backlog.'],
+  ['3','Reports and dashboards',
+   'Build a verified report, then review Horizon\u2019s dashboards for what they do and do not say.',
+   'Build the one report your ED keeps asking for, and audit the dashboards you already rely on.'],
+  ['4','Making a technology decision',
+   'Recommend for or against adding Volunteer Management: what it does, what it costs, whether to.',
+   'The same memo for the change you are actually weighing up — which is a scoped project request.']
+];
+
+const STICKY = [
+  ['Why not just Horizon','A scenario teaches the move. It does not leave anything behind. A member who only ever works in Horizon finishes with a certificate and an unchanged organization, and cancels in month four because nothing in their own week got easier.'],
+  ['Why not just their own org','Because the first mistake is expensive and the fear of making it is why the org is untouched in the first place. Horizon is where you get it wrong for free — same data model, same questions, no consequences.'],
+  ['Practise, then apply','Each module runs twice: once in Horizon to learn the move, once in their org to get the result. The second run is the one that changes their Monday, and it is only safe because the first one happened.'],
+  ['Stickiness is a by-product','Four modules in produces four artifacts about their own organization that did not exist before. Cancelling does not just stop a subscription — it abandons something real that they built. That is retention earned rather than engineered.']
+];
+
+const MEASURES = [
+  ['Active members','Registered members with at least one login or office hours attendance in the period.','Growing MoM'],
+  ['Office hours attendance','Share of members attending at least one session per month.','50%+'],
+  ['Project completion rate','Share of submitted projects completed within the defined timeframe.','90%+'],
+  ['Project value delivered','Cumulative estimated market value of completed project work.','Reported quarterly'],
+  ['Member process improvement','Share of project-submitting members reporting improved adoption or productivity.','80%+'],
+  ['Member confidence','Share reporting improved confidence in at least three pillars within twelve months.','80%+'],
+  ['Resource efficiency','Average hours saved per month reported by active members using TrailKits.','10+ hrs/mo'],
+  ['Learner pipeline','Share of project slots filled by Guided Trail or Trail of Mastery learners rather than staff.','Rising quarterly'],
+  ['Net promoter score','Member satisfaction and likelihood to recommend.','50+'],
+  ['Base Camp conversion','Share of pro bono Power of Us setups that become paying members within six months.','To be set']
+];
+
+const SETTLED = [
+  'Digital Compass is a membership, not a program with a completion date.',
+  'Pricing is confirmed: $149, $349 and $749 a month. The live site is correct.',
+  'Three tiers. Office hours and the TrailKit library at every one.',
+  'Project submission unlocks at Mid — that is the tier boundary that matters.',
+  'Annual billing is ten times monthly, and is the right form for grant-funded purchases.',
+  'Trail OS installation will be a precondition of project work — from Q1 2027.',
+  'Kim Barnes owns the program; Angela and Hugh own the annual reviews.',
+  'Horizon Community Hub is shared with the learner programs rather than duplicated.',
+  'The HCH capstone is complete — four modules, both roles, sellable as included.',
+  'Every module runs twice: once in Horizon to practice, once in the member\u2019s own org for real.',
+  'Own-org tasks are read, document or recommend — never change. No sandbox required.',
+  'Digital Compass measures are reported separately and never summed with learner figures.',
+  'Pro bono Power of Us setup is the acquisition channel, not a charitable extra.',
+  'Base Camp installs Nonprofit Cloud with Agentforce, plus only the NPSP features needed.',
+  'The grant audit covers Slack, Google and Canva as well as Salesforce.',
+  'Base Camp includes a Power of Us entitlement review — what the grant reaches beyond ten seats.',
+  'A newly granted org is the safest real client work in the Academy — nothing to break.',
+  'Trail OS: in development now, testing Q4 2026, live with a cohort Q1 2027.',
+  'Penny is in development for learners. Digital Compass is a future phase, undated.'
+];
+
+const OPEN = [
+  'Custom pricing for nonprofit teams is undefined.',
+  'Penny is built for learners first; Digital Compass is a later phase with no date.',
+  'The blueprint lists Penny as core access at every tier and narrating every TrailKit video.',
+  'Trail OS gates project work but is not live until Q1 2027 — the interim path is undocumented.',
+  'How members onboarded before Q1 2027 get Trail OS installed once it ships.',
+  'Capstone stakeholder personas are unrefined and need testing with real members.',
+  'Whether own-org outputs are reviewed at office hours by appointment or first come, first served.',
+  'Whether the four own-org artifacts carry a verdict, or are simply read and returned.',
+  'Ten of eighteen project types have no dollar value, so cannot count toward delivered value.',
+  'Trail OS installation is a real commitment and appears nowhere in public-facing material.',
+  'Whether capstone module outputs carry a verdict the way learner artifacts do.',
+  'What a member is told about learners working in their production org — still open in the Master Guide too.',
+  'The Nine Pillars framework exists in the blueprint and nowhere else — site, guide, or portal.',
+  'What Base Camp is called, and whether its scope is published or quoted case by case.',
+  'Who delivers Base Camp — staff now, a Guided Trail squad once cohorts are running.',
+  'Whether Base Camp requires anything of the recipient: an eligibility check, or nothing at all.',
+  'Whether we file the Slack, Google and Canva applications or just tell them what they qualify for.',
+  'The Google Ad Grant is $10k/month and needs ongoing management — a service line, or out of scope?',
+  'Who keeps the Power of Us entitlement list current as Salesforce changes the terms.',
+  'Conversion rate from Base Camp to paid membership — currently unmeasured, and the number that decides whether this scales.'
+];
+
+class Component extends DCLogic {
+  state = { cat: null };
+  get cat() { return this.state.cat || this.props.openCategory || 'salesforce'; }
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+
+  cell(v) {
+    const base = { fontSize:'14px', lineHeight:1.5 };
+    if (v === '✓') return this.css({ ...base, color:'var(--tt-trail-green)', fontWeight:700 });
+    if (v === '—') return this.css({ ...base, color:'var(--tt-warm-gray)', fontWeight:700 });
+    return this.css({ ...base, color:'var(--tt-amber-700)', fontWeight:600, fontSize:'12.5px' });
+  }
+
+  renderVals() {
+    const cat = this.cat;
+    const rows = PROJECTS[cat] || PROJECTS.salesforce;
+
+    return {
+      lightChip: { style:{ background:'rgba(255,255,255,.14)', color:'var(--tt-white)' } },
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+
+      why: WHY.map(([name,text]) => ({ name, text })),
+      frontDoor: FRONT_DOOR.map(([name,text]) => ({ name, text })),
+      grants: GRANTS.map(([name,text,role], i) => ({
+        name, text, role,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'1fr 1.7fr 1fr', gap:'16px',
+          padding:'15px 26px', alignItems:'start',
+          borderBottom: i < GRANTS.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+      funnel: FUNNEL.map(([step,text]) => ({ step, text })),
+      baseCamp: BASE_CAMP.map(([item,why], i) => ({
+        item, why,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'1.5fr 1fr', gap:'16px',
+          padding:'15px 26px', alignItems:'start',
+          borderBottom: i < BASE_CAMP.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+      personas: PERSONAS.map(([name,profile,brings,needs]) => ({ name, profile, brings, needs })),
+
+      benefits: BENEFITS.map(([label,a,b,c], i) => {
+        const header = a === null;
+        return {
+          label, a, b, c,
+          rowStyle: this.css({
+            display:'grid', gridTemplateColumns:'1.9fr .7fr .7fr .7fr', gap:'16px',
+            padding: header ? '16px 26px 8px' : '13px 26px', alignItems:'center',
+            background: header ? 'var(--tt-trail-light)' : 'transparent',
+            borderBottom: i < BENEFITS.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+          }),
+          labelStyle: this.css(header
+            ? { fontFamily:'Poppins, sans-serif', fontSize:'11px', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:'var(--tt-deep-teal)' }
+            : { fontSize:'14.5px', lineHeight:1.5 }),
+          aStyle: header ? 'display:none' : this.cell(a),
+          bStyle: header ? 'display:none' : this.cell(b),
+          cStyle: header ? 'display:none' : this.cell(c)
+        };
+      }),
+
+      ecosystem: ECOSYSTEM.map(([prog,link], i) => ({
+        prog, link,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'220px 1fr', gap:'20px',
+          padding:'16px 26px', alignItems:'start',
+          borderBottom: i < ECOSYSTEM.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+
+      registration: REGISTRATION.map(([n,name,text]) => ({ n, name, text })),
+
+      catTabs: CAT_ORDER.map(([k,name]) => ({
+        name,
+        pick: () => this.setState({ cat:k }),
+        style: this.css({
+          padding:'9px 18px', borderRadius:'999px', cursor:'pointer',
+          fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'13.5px',
+          background: k === cat ? 'var(--tt-trail-green)' : 'var(--tt-white)',
+          color: k === cat ? 'var(--tt-white)' : 'var(--tt-slate)',
+          border: k === cat ? '1.5px solid var(--tt-trail-green)' : '1.5px solid var(--tt-warm-gray)'
+        })
+      })),
+
+      projects: rows.map(([name,time,value], i) => ({
+        name, time, value,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'1.7fr .9fr .9fr', gap:'16px',
+          padding:'14px 26px', alignItems:'center',
+          borderBottom: i < rows.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+
+      modules: MODULES.map(([n,focus,output,mirror], i) => ({
+        n, focus, output, mirror,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'44px 1fr 1.2fr 1.2fr', gap:'16px',
+          padding:'16px 26px', alignItems:'start',
+          borderBottom: i < MODULES.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+      sticky: STICKY.map(([name,text]) => ({ name, text })),
+
+      measures: MEASURES.map(([name,def,target]) => ({ name, def, target })),
+      settled: SETTLED.map(text => ({ text })),
+      openItems: OPEN.map(text => ({ text }))
+    };
+  }
+}
+</script>
+</body>
+</html>

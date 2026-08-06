@@ -1,0 +1,739 @@
+## Trail OS — Penny Salesforce Build Requirements
+Transition Trails  |  Internal — Engineering Reference
+Version: 1.0  |  July 14, 2026
+Owner: Angela Landrith (Executive Director)
+Prepared for: Hugh Richardson (Tech Lead)
+Purpose: Salesforce objects and data cleanup required to support the next phase of Penny configuration in Trail OS.
+Build environment: TTDev first → Staging → Production via DevOps Center pipeline.
+## Document Structure
+This document covers four categories of work:
+1.  New custom objects to build (Priority 1–3)
+2.  Data cleanup required in Production (Priority 4–5)
+3.  Schema change decision (Priority 6)
+4.  Seed data to create after objects are built
+Each section includes the object and field specification, acceptance criteria, and the Trail OS page or capability it unblocks.
+## Priority 1 — Penny_Capability__c
+CRITICAL — blocks Capabilities page wiring in Trail OS
+Object Label: Penny Capability
+Object API Name: Penny_Capability__c
+Purpose: Stores the definition of each thing Penny can do — what it is, who it serves, what it needs, and how mature it is. Powers the Penny Capabilities configuration page in Trail OS, replacing the current hardcoded TypeScript data file.
+Unblocks: Penny Capabilities page Save / Edit / Add functionality (Batch 2 and 3 of current UI rebuild)
+## Fields
+Field Label
+API Name
+Type
+Required
+Default
+Notes
+Capability Name
+Name
+Text(80)
+Yes
+Standard Name field
+Domain
+Domain__c
+Picklist
+Yes
+Coaching, Career, Learning, Knowledge, Communications, Questing, Operations
+Short Description
+Short_Description__c
+Text Area(255)
+Yes
+One sentence. Shown in Trail OS list view.
+Purpose
+Purpose__c
+Long Text Area(32768)
+No
+Why this capability matters and what problem it solves
+Maturity
+Maturity__c
+Picklist
+Yes
+Prototype
+Prototype, Defined, Planned, In Development, Integrated, Operational
+Status
+Status__c
+Picklist
+Yes
+Partial
+Live, Partial, Planned
+Active
+Active__c
+Checkbox
+Yes
+True
+Whether Penny currently uses this capability
+Audience
+Audience__c
+Multi-select Picklist
+No
+Learners, Coaches, Program Managers, Leadership
+Trail Scope
+Trail_Scope__c
+Multi-select Picklist
+No
+Foundations Trail, Guided Trail, Explorer's Trail, Trail of Mastery, Community & Alumni, All Trails
+Inputs
+Inputs__c
+Long Text Area(32768)
+No
+What Penny needs to execute this capability
+Outputs
+Outputs__c
+Long Text Area(32768)
+No
+What Penny produces (messages, flags, logs, reports)
+Related SF Objects
+Related_SF_Objects__c
+Long Text Area(32768)
+No
+Comma-separated API names of SF objects this capability reads or writes
+Next Steps
+Next_Steps__c
+Long Text Area(32768)
+No
+Ordered build steps to activate. One per line.
+Prompt Template
+Prompt_Template__c
+Lookup(Penny_Prompt__c)
+No
+ADD AFTER Penny_Prompt__c is built. Links to the prompt that powers this capability.
+## Page Layout
+Include all fields. Place Active__c and Status__c prominently at the top — these are the two fields Angela will change most often. Group the remaining fields into three sections:
+Overview: Domain, Short Description, Purpose, Maturity
+Delivery: Audience, Trail Scope, Inputs, Outputs
+Technical: Related SF Objects, Prompt Template, Next Steps
+## List View — "All Active Capabilities"
+Fields: Name, Domain__c, Status__c, Maturity__c, Active__c
+Filter: Active__c = True
+Share with all internal users
+## Acceptance Criteria
+Object exists in TTDev with all fields deployed via DevOps Center
+Page layout configured per groupings above
+Angela can create, edit, and delete a Capability record without Hugh's help
+Active__c checkbox is visible and editable on the list view
+Record promoted to Staging and Production via DevOps Center
+## Priority 2 — Penny_Prompt__c
+HIGH — blocks Prompt Studio wiring in Trail OS
+Object Label: Penny Prompt
+Object API Name: Penny_Prompt__c
+Purpose: Stores the actual prompt templates that power Penny's behavior for each capability. Backs the Prompt Studio page in Trail OS, replacing the current hardcoded pennyPromptStudioData.ts file.
+Unblocks: Penny Prompt Studio page Save / Edit / Add functionality in Trail OS
+Dependency: Build Penny_Capability__c first. Then add the Prompt_Template__c lookup on Penny_Capability__c to complete the bi-directional relationship.
+## Fields
+Field Label
+API Name
+Type
+Required
+Default
+Notes
+Prompt Name
+Name
+Text(80)
+Yes
+Descriptive, e.g. "Learner Coaching Message v1.3"
+Domain
+Domain__c
+Picklist
+Yes
+Same values as Penny_Capability__c.Domain__c
+Capability
+Capability__c
+Lookup(Penny_Capability__c)
+No
+Which capability this prompt powers. Filter to same domain.
+Status
+Status__c
+Picklist
+Yes
+Draft
+Draft, In Review, Approved, Active, Deprecated
+Version
+Version__c
+Text(10)
+No
+Semantic version e.g. v1.3. Required if Status = Active.
+Risk Level
+Risk_Level__c
+Picklist
+Yes
+Low
+Low, Medium, High. Governs review requirements before activation.
+Quality Score
+Quality_Score__c
+Number(3,0)
+No
+0–100. Populated during quality review. Read-only after approval.
+Template Text
+Template_Text__c
+Long Text Area(131072)
+Yes
+The actual prompt template. Variable tokens in {curly braces}.
+Variables
+Variables__c
+Long Text Area(32768)
+No
+Comma-separated variable tokens used in Template Text
+Source Rules
+Source_Rules__c
+Long Text Area(32768)
+No
+Which knowledge sources Penny should draw from
+Output Format
+Output_Format__c
+Long Text Area(32768)
+No
+How Penny should structure her response
+Guardrails
+Guardrails__c
+Long Text Area(32768)
+No
+What Penny must never do or say when this prompt is active
+Trail Scope
+Trail_Scope__c
+Multi-select Picklist
+No
+Same values as Penny_Capability__c.Trail_Scope__c
+Last Reviewed Date
+Last_Reviewed_Date__c
+Date
+No
+When quality review last occurred
+Reviewed By
+Reviewed_By__c
+Lookup(User)
+No
+Who approved the current version
+## Acceptance Criteria
+Object exists in TTDev with all fields deployed via DevOps Center
+Capability__c lookup correctly filters to Penny_Capability__c records
+Angela can create a prompt, link it to a capability, and mark it Approved
+Record promoted to Staging and Production via DevOps Center
+## Priority 3 — TT_Session_Log__c
+HIGH — unblocks Session Log page in Trail OS
+Object Label: Session Log
+Object API Name: TT_Session_Log__c
+Purpose: Tracks each coaching session — office hours, campfire sessions, and private coaching. Coaches log sessions here after they occur. Powers the Session Log page in Trail OS which is currently a stub waiting for this object.
+Unblocks: Session Log page in Trail OS Penny section
+## Fields
+Field Label
+API Name
+Type
+Required
+Default
+Notes
+Session Log Name
+Name
+Auto Number
+Yes
+Format: SL-{0000}
+Session Type
+Session_Type__c
+Picklist
+Yes
+Office Hours, Campfire Session, Private Coaching
+Session Date
+Session_Date__c
+Date
+Yes
+Date the session occurred
+Session Coach
+Session_Coach__c
+Lookup(Contact)
+Yes
+Filter to Contact records with RecordType = Coach
+Session Cohort
+Session_Cohort__c
+Lookup(pmdm__ProgramCohort__c)
+No
+Which cohort this session served. Optional for private sessions.
+Attendee Count
+Attendee_Count__c
+Number(3,0)
+No
+How many learners attended. Not required for private sessions.
+Duration Minutes
+Duration_Minutes__c
+Number(3,0)
+No
+Session length in minutes
+Session Notes
+Session_Notes__c
+Long Text Area(32768)
+No
+Qualitative notes from the coach about what was covered
+At Risk Flags
+At_Risk_Flags__c
+Long Text Area(32768)
+No
+Learners flagged as at-risk during this session. Penny reads this field.
+Penny Context
+Penny_Context__c
+Long Text Area(2000)
+No
+Context Penny uses when referencing this session in coaching conversations
+## Related Lists
+Add TT_Session_Log__c related list to: Contact (Coach record type page layout)
+Add TT_Session_Log__c related list to: pmdm__ProgramCohort__c page layout
+## List View — "My Sessions"
+Fields: Name, Session_Type__c, Session_Date__c, Session_Cohort__c, Attendee_Count__c
+Filter: Session_Coach__c = current user's linked Contact record
+Share with Coach profile
+## Acceptance Criteria
+Object exists in TTDev with all fields deployed via DevOps Center
+Session_Coach__c lookup correctly filters to Contact records with RecordType = Coach
+Related lists appear on Coach Contact and Cohort records
+Angela can log a test session and it appears on the related cohort record
+Michele confirms related lists are visible from both Contact and Cohort
+Record promoted to Staging and Production via DevOps Center
+## Priority 4 — Data Cleanup: Course__c Program Field Population
+MEDIUM — Angela action, no build required
+Object: Course__c
+Field: Program__c (Picklist — currently null on all 24 records)
+Issue: Every Course__c record has Program__c = null. Trail OS uses this field to link a course to its program. Without it, the app must fuzzy-match by course name convention, which is fragile.
+Owner: Angela — data entry in Production, no Salesforce build required
+## Program Mapping
+Course Name
+Course Title
+Program Assignment
+FoundationsTrail
+The Foundations Trail
+The Foundations Trail
+GuidedTrail
+The Guided Trail
+The Guided Trail
+VisitorsTrail
+Visitors Trail
+The Visitor's Trail
+ET Flows101
+Process Automation with Flows
+The Explorer's Trail
+RESOLVE101
+RESOLVE Course
+Standalone — assign to all programs or leave null
+SLACK101
+SLACK Basics
+Standalone — assign to all programs or leave null
+Agile101
+Agile Basics for Professionals
+Assign to relevant program or leave null
+All others (15 records)
+Various
+Assign to program or leave null if truly standalone
+CONFIRM: Verify that the picklist values on Course__c.Program__c include "The Foundations Trail", "The Guided Trail", "The Visitor's Trail", and "The Explorer's Trail" as exact matches to the pmdm__Program__c Name field values in Production.
+## Priority 5 — Data Cleanup: TEST PROGRAM Record
+LOW — quick fix, Angela action
+Object: pmdm__Program__c
+Record: TEST PROGRAM
+Record ID: a2yan0000009F7tAAE
+Issue: This record has pmdm__Status__c = Active, which means it appears in all program queries as if it were a live program. Trail OS currently filters it out by name but this is fragile.
+## Action Required
+Change pmdm__Status__c on the TEST PROGRAM record from "Active" to "Canceled". Trail OS already filters Canceled records from the Programs page, so this will permanently remove it from operational views without deleting the record.
+Alternative: Delete the record entirely if it is no longer needed for any testing purpose.
+## Priority 6 — Schema Decision: Course__c.Program__c Field Type
+ARCHITECTURAL — Hugh decision required before build
+Current state: Program__c on Course__c is a Picklist field. Program names are duplicated as hardcoded picklist values rather than linked to live pmdm__Program__c records.
+Problem: Changes to program names in Salesforce do not automatically update the course assignment. Trail OS cannot query by record ID — it must match by string.
+Recommended change: Convert Program__c from a Picklist to a Lookup(pmdm__Program__c). This makes the relationship a proper record ID join.
+## Impact
+Changing a Picklist to a Lookup is a destructive schema change — existing picklist values on current records will be lost
+The field must be deleted and rebuilt as a Lookup field
+Only 24 Course records exist — re-assignment after conversion is minimal work
+Trail OS server routes must be updated to query by Id rather than by name string
+## Recommendation
+Do this now while the data volume is small. The right time to fix a schema mistake is before records accumulate. If deferred, fuzzy name-matching remains as a workaround in Trail OS.
+Decision required from Hugh: Confirm approach (convert now vs. accept fuzzy match temporarily) before either option is executed.
+## Seed Data — Penny_Capability__c Records
+Create the following 13 Capability records in TTDev after the object is built. These represent the current live and partial capabilities from the Penny POC. All records: Active__c = True.
+## Record 1 — Learner Coaching
+Field
+Value
+Name
+Learner Coaching
+Domain__c
+Coaching
+Status__c
+Partial
+Maturity__c
+Prototype
+Active__c
+True
+Short_Description__c
+Real-time personalized coaching conversations throughout the learner journey.
+Audience__c
+Learners; Coaches
+Trail_Scope__c
+Foundations Trail; Guided Trail
+Inputs__c
+Learner context, current module, assessment scores, prior conversations
+Outputs__c
+Coaching message, follow-up questions, coach escalation flag, log entry
+Related_SF_Objects__c
+Contact, Penny_Interaction_Log__c, pmdm__ProgramEngagement__c
+Next_Steps__c
+1. Define conversation state model2. Wire coach notes into secondary context layer3. Implement escalation trigger detection
+## Record 2 — Reflection Prompts
+Field
+Value
+Name
+Reflection Prompts
+Domain__c
+Coaching
+Status__c
+Partial
+Maturity__c
+Defined
+Active__c
+True
+Short_Description__c
+Structured post-module reflection delivered by Penny to deepen learning.
+Audience__c
+Learners
+Trail_Scope__c
+Foundations Trail; Guided Trail
+Inputs__c
+Module completion event, learner context, reflection prompt content
+Outputs__c
+Reflection message, follow-up question, response log entry
+Related_SF_Objects__c
+Contact, Penny_Interaction_Log__c, Course_Module__c
+Next_Steps__c
+1. Connect module completion trigger to Penny delivery2. Build follow-up logic3. Store learner responses in engagement log
+## Record 3 — Resume Review
+Field
+Value
+Name
+Resume Review
+Domain__c
+Career
+Status__c
+Partial
+Maturity__c
+Prototype
+Active__c
+True
+Short_Description__c
+Penny reviews learner resume for Salesforce role readiness and provides structured feedback.
+Audience__c
+Learners
+Trail_Scope__c
+Guided Trail; Trail of Mastery
+Inputs__c
+Learner resume, target role, certifications, program completion status
+Outputs__c
+Structured feedback report, priority improvements list, rewritten examples
+Related_SF_Objects__c
+Contact, Penny_Career_Review__c
+Next_Steps__c
+1. Define structured feedback schema2. Wire certification data from SF into review context3. Test with real learner resumes
+## Record 4 — Interview Preparation
+Field
+Value
+Name
+Interview Preparation
+Domain__c
+Career
+Status__c
+Partial
+Maturity__c
+Planned
+Active__c
+True
+Short_Description__c
+Mock interview practice and preparation guidance for Salesforce roles.
+Audience__c
+Learners
+Trail_Scope__c
+Guided Trail; Trail of Mastery
+Inputs__c
+Target role, interview type, certifications, program completion status
+Outputs__c
+Mock interview questions, STAR-method guidance, feedback on practice answers
+Related_SF_Objects__c
+Next_Steps__c
+1. Build question library by role type2. Define answer evaluation rubric3. Wire program progress context into question selection
+## Record 5 — Study Coach
+Field
+Value
+Name
+Study Coach
+Domain__c
+Learning
+Status__c
+Partial
+Maturity__c
+Defined
+Active__c
+True
+Short_Description__c
+Proactive study guidance, pacing recommendations, and content suggestions.
+Audience__c
+Learners
+Trail_Scope__c
+Foundations Trail
+Inputs__c
+Current module, sprint deadline, assessment history, confidence level
+Outputs__c
+Study plan message, content recommendations, pacing alert, prep checklist
+Related_SF_Objects__c
+Contact, Course_Module__c, Penny_Interaction_Log__c
+Next_Steps__c
+1. Build sprint pacing model2. Design pre-assessment prep prompt sequence3. Test with Foundations Trail Sprint 1
+## Record 6 — Progress Insights
+Field
+Value
+Name
+Progress Insights
+Domain__c
+Learning
+Status__c
+Partial
+Maturity__c
+Defined
+Active__c
+True
+Short_Description__c
+Individual learner progress analysis and self-service insights.
+Audience__c
+Learners
+Trail_Scope__c
+Foundations Trail; Guided Trail
+Inputs__c
+Module completion, assessment scores, sprint timeline, cohort benchmarks
+Outputs__c
+Progress summary, cohort comparison (anonymized), next recommended action
+Related_SF_Objects__c
+Contact, Course_Module__c, pmdm__ProgramEngagement__c
+Next_Steps__c
+1. Wire LMS completion data into Penny context2. Build cohort anonymized benchmarking3. Add certification readiness estimation
+## Record 7 — Knowledge Retrieval
+Field
+Value
+Name
+Knowledge Retrieval
+Domain__c
+Knowledge
+Status__c
+Live
+Maturity__c
+Prototype
+Active__c
+True
+Short_Description__c
+Answers learner and coach questions using the Knowledge Library.
+Audience__c
+Learners; Coaches
+Trail_Scope__c
+All Trails
+Inputs__c
+Learner question (natural language), current module context, Knowledge Library index
+Outputs__c
+Conversational answer with citation, related article links, confidence indicator
+Related_SF_Objects__c
+Knowledge__kav, Penny_Interaction_Log__c
+Next_Steps__c
+1. Define knowledge index structure and update cadence2. Build source citation format3. Add confidence scoring4. Implement I-don't-know handling
+## Record 8 — Source Recommendations
+Field
+Value
+Name
+Source Recommendations
+Domain__c
+Knowledge
+Status__c
+Partial
+Maturity__c
+Defined
+Active__c
+True
+Short_Description__c
+Suggests relevant Trailhead, documentation, and internal content based on learner context.
+Audience__c
+Learners
+Trail_Scope__c
+Foundations Trail; Guided Trail
+Inputs__c
+Current module, confusion signal, content library index, Trailhead module map
+Outputs__c
+Ranked resource list, relevance explanations, direct links
+Related_SF_Objects__c
+Next_Steps__c
+1. Build content relevance ranking by module and topic2. Map internal docs to Trailhead equivalents3. Test with Foundations Trail Module 1-4
+## Record 9 — Slack Messaging
+Field
+Value
+Name
+Slack Messaging
+Domain__c
+Communications
+Status__c
+Live
+Maturity__c
+Prototype
+Active__c
+True
+Short_Description__c
+Penny delivers messages, prompts, and activities in Slack channels and DMs.
+Audience__c
+Learners; Coaches; Program Managers
+Trail_Scope__c
+All Trails
+Inputs__c
+Message content, target channel or DM, learner Slack user ID, trigger event
+Outputs__c
+Slack message, thread continuation, reaction tracking, delivery confirmation
+Related_SF_Objects__c
+Contact, Penny_Interaction_Log__c, Penny_Classroom_Nudge__c
+Next_Steps__c
+1. Implement thread management for coaching conversations2. Add reaction and response tracking3. Wire to Penny message queue from other capabilities
+## Record 10 — Google Chat Messaging
+Field
+Value
+Name
+Google Chat Messaging
+Domain__c
+Communications
+Status__c
+Partial
+Maturity__c
+Defined
+Active__c
+True
+Short_Description__c
+Penny delivers messages and activities in Google Chat spaces and DMs.
+Audience__c
+Learners; Coaches
+Trail_Scope__c
+Explorer's Trail
+Inputs__c
+Message content, target Chat space or DM, learner email, trigger event
+Outputs__c
+Google Chat message (DM or space), threaded reply, delivery confirmation
+Related_SF_Objects__c
+Next_Steps__c
+1. Implement Google Chat API with service account2. Build space management for multi-cohort support3. Test with Explorer's Trail pilot cohort
+## Record 11 — Calendar-Aware Reminders
+Field
+Value
+Name
+Calendar-Aware Reminders
+Domain__c
+Communications
+Status__c
+Partial
+Maturity__c
+Defined
+Active__c
+True
+Short_Description__c
+Penny sends contextually aware reminders tied to calendar events and sprint schedules.
+Audience__c
+Learners; Coaches
+Trail_Scope__c
+Foundations Trail; Guided Trail
+Inputs__c
+Calendar event data, learner progress context, outstanding module list
+Outputs__c
+Personalized reminder message, preparation checklist, attendance confirmation request
+Related_SF_Objects__c
+Next_Steps__c
+1. Connect Google Calendar API for event data2. Build personalization logic3. Test reminder timing and response rates
+## Record 12 — Trail Quests
+Field
+Value
+Name
+Trail Quests
+Domain__c
+Questing
+Status__c
+Partial
+Maturity__c
+Prototype
+Active__c
+True
+Short_Description__c
+Challenge-based learning quests that Penny delivers and tracks throughout the program.
+Audience__c
+Learners
+Trail_Scope__c
+Foundations Trail; Guided Trail
+Inputs__c
+Quest definitions, learner program stage, completion status
+Outputs__c
+Quest assignment message, hints on request, completion acknowledgment, quest log
+Related_SF_Objects__c
+Penny_Quest_Submission__c, Penny_Gamification__c
+Next_Steps__c
+1. Define quest data model2. Build quest assignment trigger logic3. Implement completion tracking4. Design hint-delivery conversation flow
+## Record 13 — Weekly Reviews
+Field
+Value
+Name
+Weekly Reviews
+Domain__c
+Questing
+Status__c
+Partial
+Maturity__c
+Defined
+Active__c
+True
+Short_Description__c
+End-of-week reflection and planning sessions guided by Penny.
+Audience__c
+Learners
+Trail_Scope__c
+Foundations Trail; Guided Trail
+Inputs__c
+Week completion data, prior commitments, upcoming sprint schedule
+Outputs__c
+Weekly review conversation, commitment capture, progress summary, coach flag
+Related_SF_Objects__c
+Course_Module__c, Penny_Interaction_Log__c
+Next_Steps__c
+1. Design weekly review conversation flow2. Build commitment capture and reminder logic3. Wire progress data into personalized review context
+## Build Sequence Summary
+Step
+Work Item
+Owner
+Unblocks
+Build Penny_Capability__c with all fields
+Hugh
+Capabilities page wiring (Batch 3)
+Seed 13 Capability records in TTDev
+Angela
+Testing and validation
+Build Penny_Prompt__c with all fields
+Hugh
+Prompt Studio wiring
+Add Prompt_Template__c lookup on Penny_Capability__c
+Hugh
+Capability-to-prompt link in Trail OS
+Seed Prompt Studio records in TTDev
+Angela
+Prompt Studio testing
+Build TT_Session_Log__c
+Hugh
+Session Log page activation
+Decide on Course__c.Program__c schema change
+Hugh
+Clean curriculum queries in Trail OS
+Populate Course__c.Program__c on all 24 records
+Angela
+Programs Curriculum tab accuracy
+Change TEST PROGRAM status to Canceled
+Angela
+Program list data quality
+10
+Promote all objects Staging → Production via DevOps Center
+Hugh
+Live data in Trail OS
+## Document Version History
+Version
+Date
+Author
+Change
+1.0
+July 14, 2026
+Angela Landrith
+Initial release — derived from Trail OS UX review session and Production SF audit

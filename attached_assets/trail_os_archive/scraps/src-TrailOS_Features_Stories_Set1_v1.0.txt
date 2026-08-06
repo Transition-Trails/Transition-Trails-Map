@@ -1,0 +1,398 @@
+
+
+### SHEET: README
+TRAIL OS — FEATURES, STORIES & ACCEPTANCE CRITERIA |  |
+Set 1 of 2 — Priority Capabilities: E-07 · E-02 · E-13 · E-05 · E-10 |  |
+Version 1.0  |  June 2026  |  Transition Trails  |  Internal — RESOLVE-gated, not for external distribution |  |
+DOCUMENT STRUCTURE |  |
+README | This page — document guide and RESOLVE gate status |
+Master Backlog | All features across Set 1 — filterable, priority-sorted |
+E-07 DevOps | Features + stories for CAP-06 DevOps & Build System |
+E-02 Program Mgmt | Features + stories for CAP-02 Program Management |
+E-13 GWS Onboarding | Features + stories for CAP-11 Google Workspace Onboarding |
+E-05 Coach Infra | Features + stories for CAP-04 Coach Infrastructure |
+E-10 LMS Enrollment | Features + stories for CAP-08 LMS Integration & Delivery |
+RESOLVE GATE STATUS — No stories execute until gates are confirmed |  |
+Epic | Gate description | Gate ID | Status
+E-07 | Re-register Dev + Staging in DevOps Center | R-01 | Completed
+E-07 | Connect DevOps Center to GitHub org | R-02 | Completed
+E-07 | Configure sandbox test data for W-000222 | R-03 | Not Started
+E-07 | Configure Agile Accelerator role surfaces | R-04 | Not Started
+E-02 | Audit all 36 Program Engagement records | R-01 | Not Started
+E-02 | Define official stage progression | R-02 | Not Started
+E-02 | Decide disposition for 10 Applied + 10 Denied 2025 records | R-03 | Not Started
+E-02 | Audit 11 Experience Cloud sites | R-04 | Not Started
+E-13 | Document current onboarding steps in exact order | R-01 | Not Started
+E-13 | Decide who can provision GWS besides Kim | R-02 | Not Started
+E-13 | Audit 4 stale in-progress onboarding calls | R-03 | Not Started
+E-05 | Define certified coach criteria for Foundations Trail | R-01 | Not Started
+E-05 | Interview 3-5 Volunteer candidates for coaching | R-02 | Not Started
+E-05 | Define weekly coaching rhythm in SF terms | R-03 | Not Started
+E-05 | Validate coach-to-learner ratio model | R-04 | Not Started
+E-10 | Define program data model (Cohort, Enrollment, Progress) | R-01 | Not Started
+E-10 | Validate Google Classroom API data availability | R-02 | Not Started
+E-10 | Deduplicate 16 Guided Trail learner records | R-03 | Not Started
+E-10 | Confirm program completion criteria per track | R-04 | Not Started
+E-10 | Validate Waitlist Campaign structure | R-05 | Not Started
+
+
+### SHEET: Master Backlog
+Feature ID | Epic | Capability | Feature Name | Description | Priority | Trackable Quarter | RESOLVE Gate | Personas | Status
+F-07-01 | E-07 | CAP-06 DevOps & Build | Re-register Dev & Staging in DevOps Center | Re-register Dev and Staging sandbox environments in DevOps Center after sandbox refresh. Validate pipeline connectivity before any sprint opens. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-07-02 | E-07 | CAP-06 DevOps & Build | Connect GitHub org to DevOps Center | Connect the Transition-Trails GitHub org to DevOps Center. Validate branch naming standard (sprint/YYYY.MMx) works end-to-end for one test branch. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-07-03 | E-07 | CAP-06 DevOps & Build | Configure Agile Accelerator role-based surfaces | Configure Agile Accelerator working surfaces per role: PM view at Portfolio level (Angela), BA/PO view at Epic/Feature (Angela+Hugh), Dev view at Sprint Board (Hugh). Document as first published SOP article. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-07-04 | E-07 | CAP-06 DevOps & Build | Execute W-000222 test plan (28 test cases) | Configure sandbox test data and execute all 28 test cases in test plan W-000222 across all 8 custom objects. Record results in TT_Test_Result__c object. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-07-05 | E-07 | CAP-06 DevOps & Build | Publish first 3 SOP Knowledge articles | Author and publish at least 3 SOP articles in Salesforce Knowledge: (1) Agile Accelerator role surfaces, (2) DevOps Center branch naming standard, (3) Build Standards governance summary. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-07-06 | E-07 | CAP-06 DevOps & Build | Enforce Production deployment governance | Validate that zero Production deployments occur without a corresponding DevOps Center pipeline record. Document in Build Standards SOP. Audit Q3 sprint for violations. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-02-01 | E-02 | CAP-02 Program Mgmt | Audit & clean 36 Program Engagement records | Audit all 36 existing pmdm__ProgramEngagement__c records. Link unlinked records to correct cohort. Validate stage values. Remove or archive TEST cohort records. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-02-02 | E-02 | CAP-02 Program Mgmt | Define & enforce program stage progression | Define the official stage progression for TT programs: Applied → Screened → Enrolled → Active → Completed / Withdrawn / Denied. Build picklist validation and document in SOP. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-02-03 | E-02 | CAP-02 Program Mgmt | Convert WAITLISTED cohort to structured pipeline | Replace the undated WAITLISTED pmdm__ProgramCohort__c record with structured waitlist management. Populate StartDate, status logic, and capacity field. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-02-04 | E-02 | CAP-02 Program Mgmt | Program pipeline report — Applied → Active → Completed | Build a Salesforce report Angela can open to see Applied, Enrolled, Active, and Completed counts per program track. No spreadsheet assembly required. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-02-05 | E-02 | CAP-02 Program Mgmt | Lead Source field on Program Engagement | Add Lead_Source__c picklist field to pmdm__ProgramEngagement__c. Populate for all new records created after go-live. Backfill best-guess values for existing 36 records. | Medium | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-13-01 | E-13 | CAP-11 GWS Onboarding | Document current volunteer onboarding steps | Document the exact manual steps Kim currently performs to onboard a new Volunteer: Google Workspace provisioning, group membership, onboarding call scheduling. Publish as SOP. This is RESOLVE gate R-01 — no automation until the manual process is documented. | Critical | Q3 2026 | R-01,R-02,R-03 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-13-02 | E-13 | CAP-11 GWS Onboarding | Google Workspace status field on Contact | Add Google_Workspace_Status__c picklist field to Contact. Values: Provisioned, Pending, Not Required. Backfill for all 34 existing Volunteer contacts. | High | Q3 2026 | R-01,R-02,R-03 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-13-03 | E-13 | CAP-11 GWS Onboarding | Onboarding call completion tracking field | Add Onboarding_Call_Completed__c checkbox and Onboarding_Call_Date__c date field to Contact. Resolve 4 stale 'In Progress' onboarding calls: Sujatha Ramadoss, Chikomborero Dingolo, Sneh Srivastav, Cam Anderson. | High | Q3 2026 | R-01,R-02,R-03 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-13-04 | E-13 | CAP-11 GWS Onboarding | Onboarding checklist — triggered on Volunteer record creation | Build a Salesforce checklist (Action Plan or custom object) that triggers when a new Volunteer Contact record is created. Steps: Add to Google Workspace, Add to TT Volunteer group, Schedule onboarding call, Complete onboarding call. Assign to Kim by default. | High | Q3 2026 | R-01,R-02,R-03 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-13-05 | E-13 | CAP-11 GWS Onboarding | Onboarding completion time report | Build a Salesforce report measuring time from Contact: Created Date to Onboarding_Call_Completed__c = true. Establish baseline from current 34 Volunteers. Target: under 10 business days. | Medium | Q4 2026 | R-01,R-02,R-03 | Angela · Kim · Hugh | Ready — RESOLVE gate pending
+F-05-01 | E-05 | CAP-04 Coach Infra | Coach record type on Contact | Create a Coach record type on Contact. Differentiate coaches from general Volunteers in Salesforce data. Add Coach-specific fields: Certification_Status__c, Coach_Since__c, Max_Learners__c, Assigned_Cohort__c. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-05-02 | E-05 | CAP-04 Coach Infra | Coach certification criteria & checklist | Define and document the certification criteria for Foundations Trail coaches. Build a certification checklist in Salesforce. Values for Certification_Status__c: Candidate, In Training, Certified, Inactive. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-05-03 | E-05 | CAP-04 Coach Infra | Interview & qualify Volunteer candidates | Interview 3-5 Volunteer contacts from the existing 34 as Foundations Trail coach candidates. Validate Salesforce depth, availability, and commitment. Create a structured evaluation form in Salesforce. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-05-04 | E-05 | CAP-04 Coach Infra | Session Log object — office hours, campfire, private | Build TT_Session_Log__c custom object. Fields: Session_Type__c (Office Hours / Campfire / Private), Session_Date__c, Coach__c (lookup Contact), Cohort__c (lookup pmdm__ProgramCohort__c), Attendee_Count__c, Notes__c, Duration_Minutes__c, At_Risk_Flags__c. | Critical | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-05-05 | E-05 | CAP-04 Coach Infra | Coach-to-learner cohort assignment | Add Coach_Assignment__c lookup field (Contact, Coach RT) to pmdm__ProgramEngagement__c. Every active learner must have a coach assignment. Build a report showing unassigned learners. | High | Q3 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-05-06 | E-05 | CAP-04 Coach Infra | Coach session coverage report | Build a report comparing scheduled sessions per week to TT_Session_Log__c records per week per cohort. Surface coverage gaps — weeks where sessions were scheduled but no log was created. | High | Q4 2026 | R-01,R-02,R-03,R-04 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-10-01 | E-10 | CAP-08 LMS Enrollment | Enrollment record model — Cohort, Enrollment, Progress | Define and build the program enrollment data model in Salesforce. Validate the object design against the Foundations Trail traceability matrix. TT_Enrollment__c (or use/extend pmdm__ProgramEngagement__c) and TT_Progress_Record__c for week-by-week tracking. | Critical | Q3 2026 | R-01,R-02,R-03,R-04,R-05 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-10-02 | E-10 | CAP-08 LMS Enrollment | Deduplicate 16 Guided Trail learner contacts | Clean duplicate Contact records for Guided Trail learners before building the program data model on top of dirty data. Duplicates confirmed: Nahkia Henry, Pauline Chavez, Joe Zwiebel, Ibukunoluwa Olaniyan, Sara Shariq, Stephanie Oppliger, Henry Mbare, Ella Fedotova. | Critical | Q3 2026 | R-01,R-02,R-03,R-04,R-05 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-10-03 | E-10 | CAP-08 LMS Enrollment | Google Classroom API capability validation | Validate what data Google Classroom Course ID 863797587247 (FT 2026 Beta 01) exposes via API: enrollment list, assignment completion, grades, submission status. Document in Architecture Decision before designing the sync automation. | Critical | Q3 2026 | R-01,R-02,R-03,R-04,R-05 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-10-04 | E-10 | CAP-08 LMS Enrollment | Define program completion criteria per track | Document in Salesforce Knowledge: what constitutes completion for Foundations Trail, Guided Trail, and Trail of Mastery. Define the Salesforce field values that reflect completion. This drives automation and reporting. | High | Q3 2026 | R-01,R-02,R-03,R-04,R-05 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-10-05 | E-10 | CAP-08 LMS Enrollment | Populate Waitlist Campaign with qualified 2025 applicants | The 2026 Cohort 1 Waitlist Campaign has zero members. The 10 Applied 2025 Guided Trail applicants (Anastasia Deryabina, Adam Lemus, Anita Balogh, Bronwyn Liebner, Cecilia Ehimemen, Ebenezer Amoako, Kriti Vaish, Oscar Aluso, Sally Jimenez, Stephanie Oppliger, Tola Ajao) are the warmest pipeline TT has. Add them as Campaign Members. | High | Q3 2026 | R-01,R-02,R-03,R-04,R-05 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-10-06 | E-10 | CAP-08 LMS Enrollment | Google Classroom → Salesforce enrollment sync (first pass) | Build the first version of the Classroom → Salesforce sync: sync enrollment list from Google Classroom FT Beta 01 into Salesforce Enrollment records. Marissa Pavlak and Michele Ward must appear as enrolled learners in Salesforce with their Classroom enrollment date. | High | Q4 2026 | R-01,R-02,R-03,R-04,R-05 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+F-10-07 | E-10 | CAP-08 LMS Enrollment | Cohort enrollment report — Angela's Monday morning view | Build a Salesforce report Angela can open every Monday to see: who is enrolled in each active cohort, what week they are on, and whether they have a progress record for the current week. | High | Q4 2026 | R-01,R-02,R-03,R-04,R-05 | Angela · Hugh · Michele | Ready — RESOLVE gate pending
+
+
+### SHEET: E-07 DevOps
+E-07 — DevOps & Build System Completion |  |  |  |  |  |
+Capability: CAP-06 — DevOps & Build  |  Scope: Q3 2026  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-07-01 | Re-register Dev & Staging in DevOps Center | Critical | Q3 2026 | Re-register Dev and Staging sandbox environments in DevOps Center after sandbox refresh. Validate pipeline connectivity before any sprint opens. | DevOps Center shows both environments as registered and active. A test change flows from Dev → Staging without error. Confirmed by Hugh before sprint Q3 opens. | Ready — RESOLVE R-01
+S-07-01a |   ↳  Re-register Dev sandbox |  |  | Given DevOps Center is open
+When Hugh navigates to environment registration
+Then the Dev sandbox appears as a registered, active environment with a green status indicator
+And the environment was refreshed after the last sandbox refresh date
+And Hugh confirms in Slack with Angela | Hugh (Tech Lead) | Completed
+S-07-01b |   ↳  Re-register Staging sandbox |  |  | Given Dev sandbox is registered
+When Hugh registers Staging
+Then Staging appears as a registered, active environment
+And a test change can be promoted from Dev → Staging without error
+And promotion takes under 5 minutes for a trivial metadata change | Hugh (Tech Lead) | Completed
+F-07-02 | Connect GitHub org to DevOps Center | Critical | Q3 2026 | Connect the Transition-Trails GitHub org to DevOps Center. Validate branch naming standard (sprint/YYYY.MMx) works end-to-end for one test branch. | GitHub org connected. One test branch created using sprint naming standard. DevOps Center reflects the branch. Confirmed by Hugh. | Ready — RESOLVE R-02
+S-07-02a |   ↳  Connect GitHub Transition-Trails org |  |  | Given DevOps Center environments are registered
+When Hugh connects the Transition-Trails GitHub org
+Then DevOps Center shows the GitHub connection as active
+And at least one repository is visible in the DevOps Center interface | Hugh (Tech Lead) | Completed
+S-07-02b |   ↳  Validate branch naming standard |  |  | Given GitHub is connected
+When Hugh creates a test branch using the name sprint/2026.07a
+Then DevOps Center reflects the branch within 2 minutes
+And the branch naming follows the sprint/YYYY.MMx standard documented in Build Standards
+And Angela confirms the branch is visible from the DevOps Center PM view | Angela + Hugh | Completed
+F-07-03 | Configure Agile Accelerator role-based surfaces | High | Q3 2026 | Configure Agile Accelerator working surfaces per role: PM view at Portfolio level (Angela), BA/PO view at Epic/Feature (Angela+Hugh), Dev view at Sprint Board (Hugh). Document as first published SOP article. | Three distinct views configured and in use by Angela and Hugh within one sprint. SOP article published in Salesforce Knowledge (PublishStatus = Online). Confirmed by Angela. | Ready — RESOLVE R-04
+S-07-03a |   ↳  Configure Angela PM portfolio view |  |  | Given Agile Accelerator is installed
+When Angela opens her Agile Accelerator home page
+Then she sees a Portfolio view showing all active epics and features for Trail OS
+And she can filter by Epic without needing to navigate to the Sprint Board
+And she cannot accidentally modify sprint assignments from this view | Angela (CEO/PO) | Not Started (W-000294)
+S-07-03b |   ↳  Configure Hugh Dev sprint board view |  |  | Given Agile Accelerator is configured
+When Hugh opens his Sprint Board view
+Then he sees only stories assigned to the current sprint
+And each story shows its Acceptance Criteria field
+And he can move a story to In Progress or Done without leaving the board | Hugh (Tech Lead) | Not Started (W-000295)
+S-07-03c |   ↳  Publish Agile Accelerator SOP article |  |  | Given role-based views are configured and working
+When Angela authors the SOP article 'Agile Accelerator role surfaces'
+Then the article is published in Salesforce Knowledge with RecordType = SOP
+And it contains: Angela's view description, Hugh's view description, and a screenshot or step list
+And PublishStatus = Online | Angela (CEO/PO) | Not Started (W-000296)
+F-07-04 | Execute W-000222 test plan (28 test cases) | Critical | Q3 2026 | Configure sandbox test data and execute all 28 test cases in test plan W-000222 across all 8 custom objects. Record results in TT_Test_Result__c object. | 28 TT_Test_Result__c records created. All test cases have pass/fail status and are linked to W-000222. Zero test cases skipped. Results reviewed by Michele and Hugh. | Ready — RESOLVE R-03
+S-07-04a |   ↳  Configure W-000222 test data in sandbox |  |  | Given the sandbox is registered in DevOps Center
+When Hugh and Michele configure test data
+Then each of the 8 custom objects has at least 2 seed records in sandbox
+And the test data does not include any real production learner or client data
+And a data setup checklist is documented | Hugh + Michele Ward (Tester) | Completed
+S-07-04b |   ↳  Execute W-000222 test cases 1-14 |  |  | Given test data is configured
+When Michele executes test cases 1-14
+Then each test case has a TT_Test_Result__c record with fields: Test_Case_ID__c, Pass_Fail__c, Tested_By__c, Tested_Date__c, Notes__c
+And all 14 records are linked to work item W-000222
+And any failing test case has a Notes__c value describing the failure | Michele Ward (Tester) | Completed
+S-07-04c |   ↳  Execute W-000222 test cases 15-28 |  |  | Given test cases 1-14 are complete
+When Michele executes test cases 15-28
+Then each test case has a TT_Test_Result__c record
+And all 28 total records exist with Pass_Fail__c populated
+And Angela reviews the test summary before sprint closes | Michele Ward + Angela | Completed
+F-07-05 | Publish first 3 SOP Knowledge articles | High | Q3 2026 | Author and publish at least 3 SOP articles in Salesforce Knowledge: (1) Agile Accelerator role surfaces, (2) DevOps Center branch naming standard, (3) Build Standards governance summary. | 3 Knowledge__kav records with RecordType = SOP and PublishStatus = Online. Each article has Description, Help Text, and Last_Reviewed_Date populated. Confirmed by Angela. | Ready — RESOLVE R-04
+S-07-05a |   ↳  Publish DevOps Center branch naming SOP |  |  | Given GitHub is connected and branch naming is validated
+When Hugh authors the SOP article 'DevOps Center branch naming standard'
+Then the article contains: branch naming pattern (sprint/YYYY.MMx), who creates branches, what happens on merge, and what happens if a branch is wrong
+And PublishStatus = Online, RecordType = SOP | Kim or Hugh (Tech Lead) | Not Started (W-000297)
+S-07-05b |   ↳  Publish Build Standards governance SOP |  |  | Given DevOps Center is fully connected
+When Angela authors the SOP article 'Build Standards governance'
+Then the article contains: RESOLVE gate definition, DevOps-only Production rule, field standards summary, and approved language standards
+And it links to the TrailOS_Build_Standards_v1.0 document
+And PublishStatus = Online | Angela (CEO/PO) | Not Started (W-000298)
+F-07-06 | Enforce Production deployment governance | Critical | Q3 2026 | Validate that zero Production deployments occur without a corresponding DevOps Center pipeline record. Document in Build Standards SOP. Audit Q3 sprint for violations. | Q3 sprint closes with zero manual Production deployments. DevOps Center deployment log matches all changes in Production. Angela confirms no governance exceptions were made. | Ready — RESOLVE R-01,R-02
+S-07-06a |   ↳  Q3 sprint deployment audit |  |  | Given DevOps Center is connected and all environments are registered
+When Q3 sprint closes
+Then Angela runs a deployment audit comparing Production org metadata against DevOps Center pipeline log
+And zero changes exist in Production that do not have a corresponding DevOps Center record
+And the audit result is documented in a TT_Build_Item__c record of type Build Log | Angela (CEO/PO) | Not Started (W-000299)
+
+
+### SHEET: E-02 Program Mgmt
+E-02 — Program Management Infrastructure |  |  |  |  |  |
+Capability: CAP-02 — Program Management  |  Scope: Q3 2026 — Q1 2027  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-02-01 | Audit & clean 36 Program Engagement records | Critical | Q3 2026 | Audit all 36 existing pmdm__ProgramEngagement__c records. Link unlinked records to correct cohort. Validate stage values. Remove or archive TEST cohort records. | Zero Program Engagement records with null pmdm__ProgramCohort__c. All 36 records have a valid, non-test stage value. 4 TEST cohorts archived or deleted. Confirmed by Angela. | Ready — RESOLVE R-01,R-03
+S-02-01a |   ↳  Link 10 Applied records to correct program |  |  | Given the 10 Applied Guided Trail engagement records have null cohort links
+When Angela audits and assigns each to the correct program
+Then all 10 records have pmdm__ProgramCohort__c populated
+And the correct program (Guided Trail vs. Foundations Trail vs. Trail of Mastery) is reflected
+And Angela documents the disposition decision for each in the record Notes field | Kim | Completed | Moved any program engagement record for GT with a missing Cohort to the WAITLISTED cohort.
+S-02-01b |   ↳  Archive or delete 4 TEST cohort records |  |  | Given 4 pmdm__ProgramCohort__c records have no RecordTypeId (TEST cohorts)
+When Angela reviews and dispositions each TEST record
+Then all 4 TEST records are either archived (Status = Completed with a note) or deleted
+And no Program Engagement records are orphaned by the deletion
+And a TT_Build_Item__c record documents the cleanup action | Kim | Completed | Deleted all program cohort records with TEST as part of the name.  None of them had any related program engagement records
+S-02-01c |   ↳  Resolve duplicate learner contact records |  |  | Given duplicate Contact records exist for Nahkia Henry, Pauline Chavez, Joe Zwiebel, Ibukunoluwa Olaniyan, Sara Shariq, Stephanie Oppliger, Henry Mbare, and Ella Fedotova
+When Angela runs the Salesforce duplicate management report
+Then each duplicate pair is reviewed and merged or one record is marked as Not a Duplicate
+And all Program Engagement records point to the surviving Contact record
+And zero learner contacts have more than one active Contact record after cleanup | Kim | Not Started (W-000300)
+F-02-02 | Define & enforce program stage progression | High | Q3 2026 | Define the official stage progression for TT programs: Applied → Screened → Enrolled → Active → Completed / Withdrawn / Denied. Build picklist validation and document in SOP. | pmdm__Stage__c picklist contains only approved stage values. A validation rule prevents invalid stage transitions. Stage progression documented in Salesforce Knowledge SOP. Confirmed by Angela. | Ready — RESOLVE R-02
+S-02-02a |   ↳  Build stage picklist with approved values |  |  | Given Angela has confirmed the official stage progression
+When Hugh updates the pmdm__Stage__c picklist
+Then the picklist contains exactly these values: Applied, Screened, Enrolled, Active, Completed, Withdrawn, Application Denied, Waitlisted
+And no other values are active in the picklist
+And existing records with valid stages are not affected | Hugh (Tech Lead) | Not Started (W-000301)
+S-02-02b |   ↳  Validation rule — prevent invalid stage reversal |  |  | Given the stage picklist is updated
+When a user attempts to change a Completed or Withdrawn engagement back to Applied
+Then Salesforce displays a validation error: 'Stage cannot be reversed once Completed or Withdrawn'
+And the record is not saved with the invalid stage
+And Michele tests this validation with at least 2 invalid transitions | Michele Ward (Tester) | Not Started (W-000301)
+F-02-03 | Convert WAITLISTED cohort to structured pipeline | High | Q3 2026 | Replace the undated WAITLISTED pmdm__ProgramCohort__c record with structured waitlist management. Populate StartDate, status logic, and capacity field. | WAITLISTED cohort record has: StartDate populated (or explicitly marked TBD with a reason), capacity field set, all 6 ToM waitlisted learner engagements reviewed and dispositioned. Confirmed by Angela. | Ready — RESOLVE R-01,R-03
+S-02-03a |   ↳  Contact 6 ToM waitlisted learners |  |  | Given 6 Trail of Mastery waitlisted engagements exist (Adam Lemus, Anita Balogh, Bronwyn Liebner, Cecilia Ehimemen, Kriti Vaish, Sally Jimenez, Stephanie Oppliger)
+When Angela contacts each learner
+Then each engagement record is updated with: the contact date in Notes, the learner's current interest level, and the next stage decision (remain waitlisted, move to Applied for FT, or close as withdrawn)
+And all 6 records have a stage other than Waitlisted with no action taken | Angela (Program Director) | Not Started (W-000302)
+S-02-03b |   ↳  Update WAITLISTED cohort with capacity and dates |  |  | Given Angela has dispositioned the 6 waitlisted learners
+When Hugh updates the WAITLISTED pmdm__ProgramCohort__c record
+Then the record has: pmdm__StartDate__c populated or a Custom_Notes__c field explaining the delay, a capacity field reflecting the planned cohort size, and Status = Planned
+And the record is no longer a catch-all parking lot | Hugh (Tech Lead) | Not Started (W-000302)
+F-02-04 | Program pipeline report — Applied → Active → Completed | High | Q3 2026 | Build a Salesforce report Angela can open to see Applied, Enrolled, Active, and Completed counts per program track. No spreadsheet assembly required. | A Salesforce report exists grouped by pmdm__Stage__c and Program track. Angela can answer 'how many people are actively enrolled right now' in under 30 seconds from Trail OS. Confirmed by Angela. | Ready — RESOLVE R-02
+S-02-04a |   ↳  Build program pipeline Salesforce report |  |  | Given stage values are validated and records are clean
+When Angela opens the 'Program Pipeline — Enrollment by Stage' Salesforce report
+Then the report shows: row count grouped by pmdm__Stage__c, filtered to active program records only (no TEST cohorts)
+And Angela can see Applied, Active, Completed, and Withdrawn counts in a single view
+And the report loads in under 5 seconds | Angela (Program Director) | Not Started (W-000303)
+S-02-04b |   ↳  Build cohort health list view |  |  | Given the pipeline report exists
+When Angela opens the 'Active Cohorts — Health View' list view on pmdm__ProgramCohort__c
+Then she sees all Active cohorts with: name, start date, end date, count of Active engagements, count of Completed engagements
+And she can sort by start date
+And the list view is saved as a shared view accessible to Kim | Angela + Kim Barnes (COO) | Not Started (W-000304)
+F-02-05 | Lead Source field on Program Engagement | Medium | Q3 2026 | Add Lead_Source__c picklist field to pmdm__ProgramEngagement__c. Populate for all new records created after go-live. Backfill best-guess values for existing 36 records. | Lead_Source__c field exists on Program Engagement. All records created after go-live date have Lead_Source__c populated. Zero blank lead source on new engagements. Confirmed by Angela. | Ready — RESOLVE R-01
+S-02-05a |   ↳  Create Lead_Source__c field on Program Engagement |  |  | Given the program data model is validated
+When Hugh creates the Lead_Source__c custom picklist field on pmdm__ProgramEngagement__c
+Then the field contains these values: LinkedIn, Social Media / Buffer, Referral — Volunteer, Referral — Alumni, Partner Org, Direct Website, In-Person Event, Unknown
+And the field is visible on the Engagement page layout
+And it is included in the program pipeline report | Hugh (Tech Lead) | Not Started (W-000305)
+
+
+### SHEET: E-13 GWS Onboarding
+E-13 — Google Workspace Volunteer & Coach Onboarding |  |  |  |  |  |
+Capability: CAP-11 — Google Workspace Onboarding  |  Scope: Q3 2026  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-13-01 | Document current volunteer onboarding steps | Critical | Q3 2026 | Document the exact manual steps Kim currently performs to onboard a new Volunteer: Google Workspace provisioning, group membership, onboarding call scheduling. Publish as SOP. This is RESOLVE gate R-01 — no automation until the manual process is documented. | SOP article 'Volunteer Onboarding Process' published in Salesforce Knowledge. Article contains: step-by-step provisioning instructions, Google Workspace group names, access levels by role (Volunteer vs. Coach vs. Staff), and time estimates per step. Confirmed by Kim. | Ready — RESOLVE R-01
+S-13-01a |   ↳  Interview Kim — document each manual step |  |  | Given Kim is the only person who knows the current onboarding process
+When Angela interviews Kim and documents each step
+Then the documentation includes: exact path in Google Admin to provision a new account, the Google Group name(s) to add Volunteers to, the access level granted to Volunteers vs. Coaches vs. Staff, and the estimated time per step
+And Kim reviews and approves the documentation before it becomes a SOP article | Angela + Kim Barnes (COO) | Not Started (W-000306)
+S-13-01b |   ↳  Publish 'Volunteer Onboarding Process' SOP article |  |  | Given onboarding steps are documented and Kim-approved
+When Hugh publishes the SOP article in Salesforce Knowledge
+Then the article has: RecordType = SOP, PublishStatus = Online, title = 'Volunteer Onboarding Process'
+And it is accessible from the Salesforce home page without admin access
+And Kim can find and open it in under 30 seconds | Hugh (Tech Lead) | Not Started (W-000306)
+F-13-02 | Google Workspace status field on Contact | High | Q3 2026 | Add Google_Workspace_Status__c picklist field to Contact. Values: Provisioned, Pending, Not Required. Backfill for all 34 existing Volunteer contacts. | Google_Workspace_Status__c field exists on Contact. All 34 Volunteer contacts have the field populated. Field is visible on Volunteer page layout. Zero Volunteer contacts with null status. Confirmed by Kim. | Ready — RESOLVE R-01
+S-13-02a |   ↳  Create Google_Workspace_Status__c field |  |  | Given the onboarding SOP is published
+When Hugh creates the Google_Workspace_Status__c picklist field on Contact
+Then the picklist contains exactly: Provisioned, Pending, Not Required
+And the field appears on the Volunteer page layout
+And a field-level security rule ensures all internal users can view and edit it | Hugh (Tech Lead) | Not Started (W-000307)
+S-13-02b |   ↳  Backfill Google Workspace status for 34 Volunteers |  |  | Given the field exists
+When Kim reviews and updates each of the 34 Volunteer contacts
+Then all 34 records have Google_Workspace_Status__c populated
+And zero Volunteer contacts have a null value
+And Kim documents any records marked 'Not Required' with a reason in the Notes field | Kim Barnes (COO) | Not Started (W-000307)
+F-13-03 | Onboarding call completion tracking field | High | Q3 2026 | Add Onboarding_Call_Completed__c checkbox and Onboarding_Call_Date__c date field to Contact. Resolve 4 stale 'In Progress' onboarding calls: Sujatha Ramadoss, Chikomborero Dingolo, Sneh Srivastav, Cam Anderson. | Both fields exist on Contact. The 4 stale onboarding tasks are resolved — each has a scheduled date or is documented as no longer active. All Volunteer contacts with Google_Workspace_Status = Provisioned have Onboarding_Call_Completed__c = true or have a scheduled date. Confirmed by Kim. | Ready — RESOLVE R-03
+S-13-03a |   ↳  Create Onboarding_Call_Completed__c and date field |  |  | Given Google_Workspace_Status__c is deployed
+When Hugh creates Onboarding_Call_Completed__c (checkbox) and Onboarding_Call_Date__c (date) on Contact
+Then both fields appear on the Volunteer page layout
+And Onboarding_Call_Completed__c defaults to false on new records | Hugh (Tech Lead) | Not Started (W-000308)
+S-13-03b |   ↳  Resolve 4 stale In Progress onboarding calls |  |  | Given 4 onboarding calls have been 'In Progress' with no date: Sujatha Ramadoss, Chikomborero Dingolo, Sneh Srivastav, Cam Anderson
+When Kim contacts each of these 4 Volunteers
+Then each Contact record is updated with either: Onboarding_Call_Date__c = a future scheduled date, or a Note documenting that the Volunteer is no longer active
+And zero of these 4 records remain as open Tasks with status 'In Progress' and no date | Kim Barnes (COO) | Not Started (W-000308)
+F-13-04 | Onboarding checklist — triggered on Volunteer record creation | High | Q3 2026 | Build a Salesforce checklist (Action Plan or custom object) that triggers when a new Volunteer Contact record is created. Steps: Add to Google Workspace, Add to TT Volunteer group, Schedule onboarding call, Complete onboarding call. Assign to Kim by default. | When a new Contact with RecordType = Volunteer is created, a checklist record is automatically created and assigned to Kim. The checklist has 4 steps in sequence. Kim can see all open checklists from a single list view. Zero new Volunteers fall through without a checklist. Confirmed by Kim after first live Volunteer onboarded. | Ready — RESOLVE R-01,R-02
+S-13-04a |   ↳  Build onboarding checklist trigger flow |  |  | Given the SOP is published and fields are deployed
+When a new Contact record is created with RecordType = Volunteer
+Then a checklist record (Action Plan or TT_Onboarding_Checklist__c) is automatically created within 1 minute
+And the checklist has 4 tasks in sequence: Add to Google Workspace, Add to TT Volunteer Group, Schedule Onboarding Call, Complete Onboarding Call
+And the checklist is assigned to Kim Barnes by default
+And the checklist is linked to the new Volunteer Contact record | Kim Barnes (COO) | Not Started (W-000309)
+S-13-04b |   ↳  Test onboarding checklist with a real new Volunteer |  |  | Given the checklist trigger is deployed
+When Kim onboards the next new Volunteer using the checklist
+Then all 4 checklist steps are completed in order
+And each step's completion date is recorded
+And Kim confirms the total onboarding time was under 10 business days
+And the Volunteer's Contact record shows: Google_Workspace_Status = Provisioned, Onboarding_Call_Completed = true | Kim Barnes (COO) | Not Started (W-000309)
+F-13-05 | Onboarding completion time report | Medium | Q4 2026 | Build a Salesforce report measuring time from Contact: Created Date to Onboarding_Call_Completed__c = true. Establish baseline from current 34 Volunteers. Target: under 10 business days. | Report exists showing average onboarding completion time per new Volunteer. Baseline established from the first 3 Volunteers onboarded through the new checklist system. Kim can open the report without assistance. Confirmed by Angela. | Ready — after F-13-03,F-13-04
+S-13-05a |   ↳  Build onboarding completion time report |  |  | Given at least 3 Volunteers have been onboarded through the new checklist
+When Angela opens the 'Volunteer Onboarding — Completion Time' Salesforce report
+Then the report shows: Volunteer name, Created Date, Onboarding_Call_Date__c, calculated days between them
+And the report includes an average at the bottom
+And baseline is established from the first 3 complete onboardings | Angela (CEO) | Not Started (W-000310)
+
+
+### SHEET: E-05 Coach Infra
+E-05 — Coach Onboarding & Delivery |  |  |  |  |  |
+Capability: CAP-04 — Coach Infrastructure  |  Scope: Q3 2026 — Q1 2027  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-05-01 | Coach record type on Contact | Critical | Q3 2026 | Create a Coach record type on Contact. Differentiate coaches from general Volunteers in Salesforce data. Add Coach-specific fields: Certification_Status__c, Coach_Since__c, Max_Learners__c, Assigned_Cohort__c. | Coach RecordType exists on Contact. Coach page layout shows coach-specific fields. At least 2 existing Volunteer contacts are designated as Coach candidates. Field-level security allows coaches to view their own assigned learners. Confirmed by Angela. | Ready — RESOLVE R-01,R-02
+S-05-01a |   ↳  Create Coach record type on Contact |  |  | Given the Volunteer record type exists on Contact
+When Hugh creates the Coach record type on Contact
+Then the RecordType is visible in the object manager with a distinct name
+And a Coach page layout exists with coach-specific fields
+And existing Volunteer records are not affected by the new record type creation | Hugh (Tech Lead) | Not Started (W-000311)
+S-05-01b |   ↳  Add coach-specific fields to Contact |  |  | Given the Coach record type exists
+When Hugh adds Certification_Status__c (picklist), Coach_Since__c (date), Max_Learners__c (number), and Assigned_Cohort__c (lookup: pmdm__ProgramCohort__c) to Contact
+Then all 4 fields are visible on the Coach page layout
+And all 4 fields are hidden from the Volunteer and General page layouts
+And Michele tests that a General contact cannot see Certification_Status__c | Hugh (Tech Lead) | Not Started (W-000311)
+F-05-02 | Coach certification criteria & checklist | Critical | Q3 2026 | Define and document the certification criteria for Foundations Trail coaches. Build a certification checklist in Salesforce. Values for Certification_Status__c: Candidate, In Training, Certified, Inactive. | Certification criteria are documented in a Salesforce Knowledge SOP article. Certification checklist object or Action Plan exists in Salesforce. Certification_Status__c picklist is live with correct values. Angela confirms the criteria are sufficient to certify a coach who has never met her. Confirmed by Angela. | Ready — RESOLVE R-01
+S-05-02a |   ↳  Define and document certification criteria |  |  | Given the Foundations Trail coach guides exist for Sprints 1-3
+When Angela documents the certification criteria
+Then the criteria specify: what knowledge a coach must demonstrate (Salesforce admin fundamentals, FT curriculum depth, facilitation approach), how certification is assessed (written test, observed practice session, or both), and who approves certification
+And the criteria are sufficient for a coach who has never spoken with Angela to know what to study
+And Angela confirms the criteria in a Salesforce Knowledge SOP article | Angela (Program Director) | Not Started (W-000312)
+S-05-02b |   ↳  Build certification checklist in Salesforce |  |  | Given certification criteria are documented
+When Hugh builds the certification checklist
+Then when Angela designates a Contact as RecordType = Coach and Certification_Status = Candidate, a certification checklist is created automatically
+And the checklist contains the certification milestones from the SOP article
+And each checklist item can be marked Complete with a date and completed-by user | Hugh (Tech Lead) | Not Started (W-000312)
+F-05-03 | Interview & qualify Volunteer candidates | High | Q3 2026 | Interview 3-5 Volunteer contacts from the existing 34 as Foundations Trail coach candidates. Validate Salesforce depth, availability, and commitment. Create a structured evaluation form in Salesforce. | At least 3 Volunteer contacts have been interviewed. Each has an Assessment__c record (Contact Assessment type) with evaluation score and recommendation. At least 2 are designated as Coach candidates with Certification_Status__c = Candidate. Confirmed by Angela. | Ready — RESOLVE R-02
+S-05-03a |   ↳  Build coach candidate evaluation form |  |  | Given the certification criteria are defined
+When Hugh creates an Assessment__c record layout for Contact Assessment type to be used for coach evaluation
+Then the layout includes: evaluator name, evaluation date, technical SF score (1-5), facilitation score (1-5), availability confirmation, and a recommendation field (Recommend / Do Not Recommend / Needs Development)
+And the form is usable by Angela without needing Hugh to create individual records | Hugh (Tech Lead) | Not Started (W-000313)
+S-05-03b |   ↳  Conduct 3-5 coach candidate interviews |  |  | Given the evaluation form exists
+When Angela interviews Volunteer candidates (starting with Sujatha Ramadoss, Idhant Jena, Nicolette Minneo, Ezgi Ozerinc, Mahua Ghosh as priority candidates given their Instructional Designer and SF Dev titles)
+Then each interviewed candidate has an Assessment__c record with all evaluation fields completed
+And at least 2 candidates are designated Certification_Status = Candidate
+And at least 2 candidates are committed to being available for FT Cohort 1 | Angela (Program Director) | Not Started (W-000313)
+F-05-04 | Session Log object — office hours, campfire, private | Critical | Q3 2026 | Build TT_Session_Log__c custom object. Fields: Session_Type__c (Office Hours / Campfire / Private), Session_Date__c, Coach__c (lookup Contact), Cohort__c (lookup pmdm__ProgramCohort__c), Attendee_Count__c, Notes__c, Duration_Minutes__c, At_Risk_Flags__c. | TT_Session_Log__c object exists with all required fields. Page layout configured. Coach can create a session log from the Coach Contact record or Cohort record. Test: Angela logs a mock office hours session and it appears on the related cohort record. Confirmed by Angela and Michele. | Ready — RESOLVE R-03
+S-05-04a |   ↳  Create TT_Session_Log__c custom object |  |  | Given coach certification criteria are defined
+When Hugh creates TT_Session_Log__c
+Then the object has these fields: Session_Type__c (picklist: Office Hours, Campfire Session, Private Coaching), Session_Date__c (date), Session_Coach__c (lookup: Contact, Coach RT), Session_Cohort__c (lookup: pmdm__ProgramCohort__c), Attendee_Count__c (number), Duration_Minutes__c (number), Session_Notes__c (long text), At_Risk_Flags__c (long text)
+And the object has a standard auto-number field for record ID
+And field-level security allows Coach contacts to create records | Hugh (Tech Lead) | Not Started (W-000314)
+S-05-04b |   ↳  Test: log a mock office hours session |  |  | Given TT_Session_Log__c is deployed
+When Angela logs a mock office hours session for FT Beta 01
+Then the session log record is created with all required fields
+And the record appears in the Related list on the FT 2026 Beta 01 cohort record
+And it appears in the Related list on the coach's Contact record
+And Michele confirms the record is visible from both related lists | Angela + Michele Ward (Tester) | Not Started (W-000314)
+F-05-05 | Coach-to-learner cohort assignment | High | Q3 2026 | Add Coach_Assignment__c lookup field (Contact, Coach RT) to pmdm__ProgramEngagement__c. Every active learner must have a coach assignment. Build a report showing unassigned learners. | Coach_Assignment__c field exists on Program Engagement. Report 'Unassigned Active Learners' shows zero results after Cohort 1 launch. All FT Beta 01 learners (Marissa Pavlak, Michele Ward) have a coach assigned. Confirmed by Angela. | Ready — RESOLVE R-01,R-04
+S-05-05a |   ↳  Add Coach_Assignment__c to Program Engagement |  |  | Given Coach record type exists on Contact
+When Hugh adds Coach_Assignment__c (lookup: Contact, filter RecordType = Coach) to pmdm__ProgramEngagement__c
+Then the field is visible on the Engagement page layout
+And Angela can assign a coach to a learner by editing the Engagement record
+And the lookup filter restricts the field to Contact records with RecordType = Coach only | Hugh (Tech Lead) | Not Started (W-000315)
+S-05-05b |   ↳  Assign coaches to FT Beta 01 learners |  |  | Given Coach_Assignment__c exists and at least one coach candidate is designated
+When Angela assigns coaches to Marissa Pavlak and Michele Ward (FT Beta 01 active learners)
+Then both Program Engagement records have Coach_Assignment__c populated
+And the 'Unassigned Active Learners' report shows zero results
+And Angela confirms she can see the coach assignment from the cohort health list view | Angela (Program Director) | Not Started (W-000315)
+F-05-06 | Coach session coverage report | High | Q4 2026 | Build a report comparing scheduled sessions per week to TT_Session_Log__c records per week per cohort. Surface coverage gaps — weeks where sessions were scheduled but no log was created. | Report 'Coach Session Coverage' exists and is viewable by Angela. The report can identify any week in a cohort where a scheduled session type has no corresponding log record. Baseline established from FT Beta 01 sessions. Confirmed by Angela. | Ready — after F-05-04
+S-05-06a |   ↳  Build coach session coverage report |  |  | Given TT_Session_Log__c has records from FT Beta 01
+When Angela opens the 'Coach Session Coverage' report
+Then the report shows each week in the active cohort, the expected session types, and whether a log record exists for each type
+And any week missing a session log is highlighted
+And the report filters to the current active cohort by default | Angela (Program Director) | Not Started (W-000316)
+
+
+### SHEET: E-10 LMS Enrollment
+E-10 — LMS Integration & Delivery |  |  |  |  |  |
+Capability: CAP-08 — Learning Management System  |  Scope: Q3 2026 — Q2 2027  |  RESOLVE gates must pass before any story executes |  |  |  |  |  |
+ID | Name / Title | Priority | Trackable | Description / Acceptance Criteria | Definition of Done / Persona | Status
+F-10-01 | Enrollment record model — Cohort, Enrollment, Progress | Critical | Q3 2026 | Define and build the program enrollment data model in Salesforce. Validate the object design against the Foundations Trail traceability matrix. TT_Enrollment__c (or use/extend pmdm__ProgramEngagement__c) and TT_Progress_Record__c for week-by-week tracking. | Object design is documented in a TT_Build_Item__c Architecture Decision record before any object is created in Salesforce. Angela signs off on the design. Hugh builds the objects after sign-off. Michele tests that a learner enrollment can be created, linked to a cohort, and updated with a progress record. Confirmed by all three. | Ready — RESOLVE R-01
+S-10-01a |   ↳  Author Enrollment Architecture Decision record |  |  | Given the Foundations Trail traceability matrix and NPSP Program Management objects exist
+When Angela and Hugh design the enrollment data model
+Then a TT_Build_Item__c record with RecordType = Architecture Decision is created documenting: choice to extend pmdm__ProgramEngagement__c vs. create TT_Enrollment__c, rationale, fields required, and relationship to TT_Progress_Record__c
+And Angela signs off on the decision before Hugh builds anything
+And the decision record is linked to Epic E-10 | Angela + Hugh | Not Started (W-000317)
+S-10-01b |   ↳  Build enrollment and progress objects |  |  | Given the Architecture Decision is signed off
+When Hugh builds the objects per the approved design
+Then either pmdm__ProgramEngagement__c has enrollment-specific fields OR a new TT_Enrollment__c object exists
+And TT_Progress_Record__c exists with fields: Learner__c, Cohort__c, Week_Number__c, Completion_Status__c, Last_Activity_Date__c, At_Risk__c (checkbox)
+And Michele tests creating an enrollment record and linking a progress record to it | Hugh (Tech Lead) | Not Started (W-000317)
+F-10-02 | Deduplicate 16 Guided Trail learner contacts | Critical | Q3 2026 | Clean duplicate Contact records for Guided Trail learners before building the program data model on top of dirty data. Duplicates confirmed: Nahkia Henry, Pauline Chavez, Joe Zwiebel, Ibukunoluwa Olaniyan, Sara Shariq, Stephanie Oppliger, Henry Mbare, Ella Fedotova. | Zero duplicate Contact records exist for any Guided Trail learner. All Program Engagement records point to the surviving (correct) Contact. A TT_Build_Item__c Build Log record documents each merge decision. Confirmed by Angela before enrollment model is built. | Ready — RESOLVE R-03
+S-10-02a |   ↳  Run duplicate report on Guided Trail learner contacts |  |  | Given the Salesforce duplicate rules are configured
+When Angela runs the standard duplicate management report filtered to Guided Trail learner names
+Then the report identifies all duplicate pairs: Nahkia Henry, Pauline Chavez, Joe Zwiebel, Ibukunoluwa Olaniyan, Sara Shariq, Stephanie Oppliger, Henry Mbare, Ella Fedotova
+And each pair shows which record is the older (original) and which is newer | Angela (Program Director) | Not Started (W-000318)
+S-10-02b |   ↳  Merge or resolve each duplicate pair |  |  | Given the duplicate report identifies all pairs
+When Angela resolves each duplicate
+Then each pair is either merged (one record survives with all Program Engagement records transferred) or marked Not a Duplicate with a documented reason
+And all Program Engagement records for GT 2025 point to the surviving Contact record
+And a TT_Build_Item__c Build Log record documents each merge decision
+And zero learner contacts have more than one active record after cleanup | Angela (Program Director) | Not Started (W-000318)
+F-10-03 | Google Classroom API capability validation | Critical | Q3 2026 | Validate what data Google Classroom Course ID 863797587247 (FT 2026 Beta 01) exposes via API: enrollment list, assignment completion, grades, submission status. Document in Architecture Decision before designing the sync automation. | Architecture Decision record in TT_Build_Item__c documents: confirmed API endpoints, data fields available, rate limits, and authentication method. Angela and Hugh both confirm they understand what can and cannot be synced before any automation is designed. Confirmed by Angela. | Ready — RESOLVE R-02
+S-10-03a |   ↳  Test Google Classroom API — enrollment data |  |  | Given Google Classroom Course ID 863797587247 is accessible
+When Hugh tests the API for Course ID 863797587247
+Then Hugh documents which of these fields are available: student enrollment list, enrollment date, assignment list, assignment submission status, assignment grade
+And the API response is confirmed to include Marissa Pavlak and Michele Ward as enrolled students
+And the documentation is stored in a TT_Build_Item__c Architecture Decision record | Hugh (Tech Lead) | Not Started (W-000319)
+S-10-03b |   ↳  Document Classroom sync design constraints |  |  | Given API capability is validated
+When Hugh documents the sync design constraints
+Then the Architecture Decision record includes: confirmed available fields, confirmed unavailable fields (e.g. video watch time if not available), rate limits, authentication method, and proposed sync frequency
+And Angela reviews and approves the constraints before any sync code is written | Angela + Hugh | Not Started (W-000319)
+F-10-04 | Define program completion criteria per track | High | Q3 2026 | Document in Salesforce Knowledge: what constitutes completion for Foundations Trail, Guided Trail, and Trail of Mastery. Define the Salesforce field values that reflect completion. This drives automation and reporting. | SOP article 'Program Completion Criteria' published in Salesforce Knowledge. Article defines completion for each active track with specific Salesforce field values. Angela confirms the criteria could be evaluated without asking her. Confirmed by Angela. | Ready — RESOLVE R-04
+S-10-04a |   ↳  Define FT completion criteria |  |  | Given the Foundations Trail curriculum has 3 sprints and a final exam
+When Angela defines completion criteria for Foundations Trail
+Then the criteria specify: minimum Sprint exam scores, attendance requirements (if any), capstone submission requirement, and the Salesforce field value that marks a learner as Completed
+And the criteria are written such that a coach could evaluate a learner's completion without asking Angela | Angela (Program Director) | Not Started (W-000320)
+S-10-04b |   ↳  Publish 'Program Completion Criteria' SOP |  |  | Given FT completion criteria are defined
+When Hugh publishes the SOP article
+Then the article covers Foundations Trail, Guided Trail (retroactive), and notes that Trail of Mastery criteria are TBD
+And the article is linked from the Cohort record page layout as a related Quick Link
+And PublishStatus = Online | Hugh (Tech Lead) | Not Started (W-000320)
+F-10-05 | Populate Waitlist Campaign with qualified 2025 applicants | High | Q3 2026 | The 2026 Cohort 1 Waitlist Campaign has zero members. The 10 Applied 2025 Guided Trail applicants (Anastasia Deryabina, Adam Lemus, Anita Balogh, Bronwyn Liebner, Cecilia Ehimemen, Ebenezer Amoako, Kriti Vaish, Oscar Aluso, Sally Jimenez, Stephanie Oppliger, Tola Ajao) are the warmest pipeline TT has. Add them as Campaign Members. | 2026 Cohort 1 Waitlist Campaign has at least 10 Campaign Members with Status populated. Each Campaign Member has a contact reason documented. Angela has a process for moving members from Waitlist to Applied when Cohort 1 opens. Confirmed by Angela. | Ready — RESOLVE R-05
+S-10-05a |   ↳  Add 10+ Applied 2025 applicants as Campaign Members |  |  | Given 2026 Cohort 1 Waitlist Campaign exists with zero members
+When Angela adds the 10 Applied 2025 Guided Trail applicants as Campaign Members
+Then the Campaign has at least 10 CampaignMember records with Status = 'Waitlisted'
+And each CampaignMember is linked to the correct Contact record
+And Angela has a written note in the Campaign record describing the outreach plan for when Cohort 1 opens | Angela (Program Director) | Not Started (W-000321)
+F-10-06 | Google Classroom → Salesforce enrollment sync (first pass) | High | Q4 2026 | Build the first version of the Classroom → Salesforce sync: sync enrollment list from Google Classroom FT Beta 01 into Salesforce Enrollment records. Marissa Pavlak and Michele Ward must appear as enrolled learners in Salesforce with their Classroom enrollment date. | Marissa Pavlak and Michele Ward each have an Enrollment record in Salesforce linked to FT 2026 Beta 01 cohort. The enrollment date matches their Google Classroom enrollment date. Sync runs at least once per 24 hours. At-risk flag can be manually set on the enrollment record. Confirmed by Angela and Hugh. | Ready — after F-10-01,F-10-02,F-10-03
+S-10-06a |   ↳  Build Classroom → SF enrollment sync for FT Beta 01 |  |  | Given enrollment objects are built and API constraints are documented
+When Hugh builds the first enrollment sync for Google Classroom Course 863797587247
+Then Marissa Pavlak has an Enrollment record in Salesforce with enrollment date matching Google Classroom
+And Michele Ward has an Enrollment record in Salesforce with enrollment date matching Google Classroom
+And the sync runs at least once every 24 hours without manual intervention
+And a sync error log is visible to Angela if the sync fails | Hugh (Tech Lead) | Not Started (W-000322)
+S-10-06b |   ↳  Validate sync — Michele checks her own record |  |  | Given the sync is running
+When Michele logs in to Salesforce and opens her own Contact record
+Then she sees her Enrollment record linked to FT 2026 Beta 01
+And the enrollment date matches her actual Google Classroom enrollment date
+And her At_Risk__c field is set to false by default
+And Michele confirms the data is accurate | Michele Ward (Tester) | Not Started (W-000322)
+F-10-07 | Cohort enrollment report — Angela's Monday morning view | High | Q4 2026 | Build a Salesforce report Angela can open every Monday to see: who is enrolled in each active cohort, what week they are on, and whether they have a progress record for the current week. | Report 'Cohort Enrollment — Weekly Health' exists. Angela can open it in under 30 seconds and see enrolled learner count, current week, and last activity date per learner for all active cohorts. Confirmed by Angela within 1 week of first Cohort 1 learner being enrolled. | Ready — after F-10-06
+S-10-07a |   ↳  Build 'Cohort Enrollment — Weekly Health' report |  |  | Given enrollment records exist for at least 2 active learners
+When Angela opens the 'Cohort Enrollment — Weekly Health' Salesforce report
+Then the report shows for each active cohort: learner name, enrollment date, current week number, last activity date from Google Classroom sync, and At_Risk__c flag
+And Angela can open and interpret the report in under 30 seconds on a Monday morning
+And the report is saved as a shared report accessible to Kim | Angela (Program Director) | Not Started (W-000323)

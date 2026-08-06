@@ -1,0 +1,763 @@
+TRANSITION TRAILS  |  Explorer's Trail  |  Program Blueprint & Member Guide
+
+TRANSITION TRAILS
+Explorer's Trail
+ET
+Program Blueprint & Member Guide
+
+Program
+ | Explorer's Trail (ET)
+ | 
+Prerequisites
+ | None — open to all learners at any stage
+ | 
+Target Goal
+ | Structured, self-guided Salesforce skill-building through monthly Trail Missions and community
+ | 
+Duration
+ | Monthly (renewable) or Annual membership — no fixed end date
+ | 
+Format
+ | Self-Guided + Monthly Trail Missions + Penny AI + Slack Community + 1:1 Coaching Access
+ | 
+Skill Tracks
+ | Beginner · Intermediate · Advanced · Expert
+ | 
+Version
+ | 1.0  —  2026
+ | 
+
+"You don't need permission to start. You just need a trail."
+
+1. Program Overview
+
+1.1 What Is the Explorer's Trail?
+
+The Explorer's Trail (ET) is a subscription-based, self-guided learning membership within Transition Trails Academy. It is the entry point and evergreen learning layer of the Transition Trails ecosystem — designed for anyone who wants structured, affordable, community-supported access to Salesforce curriculum without the commitment of a cohort-based program.
+
+The Explorer's Trail is not a course with a start and end date. It is a membership — a place you return to every month to learn something new, practice at your own pace, and stay connected to a community of people on the same journey.
+
+Every month, new Trail Missions are released at four skill levels — Beginner, Intermediate, Advanced, and Expert. Members choose the level that meets them where they are, complete what they can, and come back next month for more. There is no cohort. There are no deadlines. There is just the work, the community, and the next trail marker in front of you.
+
+The Explorer's Trail Difference: Structure Without Pressure
+
+Trailhead is free — but it doesn't tell you what to do next. Bootcamps are structured — but they cost thousands of dollars and demand your full attention for weeks. The Explorer's Trail is the middle path.
+
+Monthly Trail Missions give you a clear task. Four skill levels mean you're never lost or bored. The Slack community means you're never alone. And the price point means cost is never the reason you stop learning.
+ | 
+
+1.2 Who This Program Is For
+
+The Explorer's Trail is designed for a wide range of learners. You do not need a certification to join. You do not need any prior Salesforce experience. You just need to be curious and willing to show up.
+
+The Explorer's Trail serves three core member profiles:
+
+ | The Undecided
+ | The Accidental Admin
+ | The Career Pivoter
+ | 
+Your Profile
+ | Exploring whether Salesforce is the right career path. Curious, but not yet committed.
+ | Already using Salesforce at work but never formally trained. Filling in the gaps.
+ | Ready to change careers and building the skills to make it happen — on their own timeline.
+ | 
+What You Bring
+ | Openness. Willingness to try without knowing the destination.
+ | Real-world context. You've seen Salesforce in action — you just don't know why it works.
+ | Drive and discipline. You know this is the direction — you need the structure.
+ | 
+What You Need From This Program
+ | Low-stakes exposure to real Salesforce concepts without a multi-week commitment.
+ | Structured curriculum that fills the knowledge gaps your job created.
+ | A consistent, affordable learning habit that compounds over time into real career momentum.
+ | 
+
+1.3 How the Explorer's Trail Differs from Other TT Programs
+
+Feature
+ | Explorer's Trail (ET)
+ | Foundations Trail (FT)
+ | Guided Trail (GT)
+ | Trail of Mastery (ToM)
+ | 
+Primary Goal
+ | Ongoing skill-building at any level
+ | Pass the Admin exam + build experience
+ | Close the experience gap and get hired
+ | Advance to practitioner-level consulting
+ | 
+Prerequisites
+ | None
+ | Platform Foundations cert
+ | Admin certification; not yet employed
+ | Employed as a Salesforce Admin
+ | 
+Format
+ | Self-guided membership
+ | Self-guided + Build With Me videos
+ | Cohort-based practicum
+ | Cohort-based + client work
+ | 
+Duration
+ | Monthly or annual (ongoing)
+ | 12 weeks (3 Sprints)
+ | 12 weeks (3 Sprints)
+ | Ongoing cohort-based
+ | 
+Live Sessions
+ | Webinars (optional); recorded Campfires for annual members
+ | Weekly Office Hours
+ | Weekly Campfires + Stand-Ups
+ | Weekly Campfires + client sessions
+ | 
+Coaching Access
+ | Async 1:1 coaching included
+ | 2 private sessions
+ | 3 private sessions
+ | Included in program
+ | 
+Capstone Project
+ | None — Trail Missions are self-contained
+ | HCH — Administrator Edition (build from scratch)
+ | HCH — as ongoing admin (inherited org)
+ | Real nonprofit client projects
+ | 
+Entry Cost
+ | $47/mo · $397/yr · $597/yr (Annual + Coaching)
+ | Program tuition
+ | Program tuition
+ | Program tuition
+ | 
+
+1.4 The Penny AI Assistant
+
+Penny is your on-demand AI learning partner throughout the Explorer's Trail. She is available 24/7 inside the Academy platform and is tuned to support self-guided Salesforce learners at all skill levels.
+
+In the Explorer's Trail, Penny's role is to deepen your understanding — not to walk you through a task step by step. When you get stuck, Penny explains the concept. When you finish a Trail Mission, Penny asks you to explain it back. When you're ready for a challenge, Penny gives you harder questions.
+
+Penny can help you:
+
+Understand the 'why' behind a Salesforce concept — not just how to click through it
+Ask scenario-based questions to test what you really understood from a Trail Mission
+Suggest which skill level or Trail Mission to tackle next based on your goals
+Point you toward relevant Trailhead badges or official documentation for deeper learning
+Help you begin to articulate your skills in plain language — useful whether you're job searching or just want to sound credible at work
+
+What Penny Is Not
+
+Penny does not complete Trail Missions for you. She helps you understand them so you can complete them yourself.
+Penny does not replace the coaching team. She gets you ready to use your coaching time more effectively.
+Penny is not a study guide. She is a thinking partner. The more you engage with her, the more you get out of her.
+ | 
+
+2. Membership Structure
+
+2.1 Membership Tiers
+
+The Explorer's Trail offers three membership tiers — Monthly, Annual, and Annual + Coaching — plus two earned access paths for Transition Trails program graduates. Each tier is intentionally distinct. Monthly ($47/mo) gives you access to what's current. Annual ($397/yr, ~$33/mo) gives you the full picture, the full archive, and the full career-building toolkit. Annual + Coaching ($597/yr) adds two scheduled private coaching sessions for learners who want structured accountability — the power tier for serious career movers.
+
+Benefit
+ | Monthly
+ | Annual
+ | GT / GT+ToM Graduate
+ | 
+LEARNING ACCESS
+ | 
+ | 
+ | 
+ | 
+Monthly Capstone Project (new self-contained project each month)
+ | ✓
+ | ✓
+ | ✓
+ | 
+Daily, Weekly & Monthly Challenges
+ | ✓
+ | ✓
+ | ✓
+ | 
+New deliverables as developed
+ | ✓
+ | ✓
+ | ✓
+ | 
+Cumulative HCH-style build (compounds over time)
+ | —
+ | ✓
+ | ✓
+ | 
+Archive access (all past content, capstones & deliverables)
+ | —
+ | ✓
+ | ✓
+ | 
+PENNY AI
+ | 
+ | 
+ | 
+ | 
+Penny AI — learning support (concept help, mission guidance)
+ | ✓
+ | ✓
+ | ✓
+ | 
+Penny LinkedIn profile review
+ | ✓
+ | ✓
+ | ✓
+ | 
+Penny Advanced Career Skills Assessment
+ | —
+ | ✓
+ | ✓
+ | 
+Penny Career Builder (LinkedIn + Resume + Trailhead)
+ | —
+ | ✓
+ | ✓
+ | 
+COMMUNITY
+ | 
+ | 
+ | 
+ | 
+Transition Trails Slack community access
+ | ✓
+ | ✓
+ | ✓
+ | 
+Recorded Campfire Sessions (GT & ToM cohorts)
+ | —
+ | ✓
+ | ✓
+ | 
+Full Campfire archive (all past sessions)
+ | —
+ | ✓
+ | ✓
+ | 
+CAREER & COACHING
+ | 
+ | 
+ | 
+ | 
+Async 1:1 coaching access
+ | ✓
+ | ✓
+ | ✓
+ | 
+Live & recorded webinars
+ | ✓
+ | ✓
+ | ✓
+ | 
+50% off Nonprofit Consulting Program
+ | —
+ | ✓
+ | ✓
+ | 
+Discounted Workshops & Bootcamp rates
+ | ✓
+ | ✓
+ | ✓
+ | 
+GRADUATE ACCESS
+ | 
+ | 
+ | 
+ | 
+Membership type
+ | $47/month — cancel anytime
+ | $397/year (~$33/mo) — saves $167 vs monthly
+ | GT = Annual-level (earned)GT + ToM = Lifetime
+ | 
+
+What Monthly Members Do NOT Have Access To
+
+Monthly membership is intentionally lean. It gives you enough to know if the Explorer's Trail is worth a deeper commitment — and to build a real learning habit while you decide.
+
+Monthly members do NOT have access to:
+  •  Archive (past capstone projects, past deliverables, past Trail Missions)
+  •  Cumulative HCH-style build
+  •  Penny Advanced Career Skills Assessment
+  •  Penny Career Builder (LinkedIn, Resume, Trailhead)
+  •  Recorded Campfire Sessions
+  •  50% off Nonprofit Consulting Program
+
+If you are serious about using the Explorer's Trail as a career-building tool, Annual is where that happens.
+ | 
+
+How Graduates Earn Access
+
+Complete the Guided Trail → You earn Annual-level Explorer's Trail access and community membership. You did the work. The membership is your reward.
+
+Complete the Guided Trail AND the Trail of Mastery → You earn Lifetime membership at Annual level. You are Transition Trails. The trail never closes for you.
+
+Graduate access is verified through Transition Trails program records. It activates automatically upon completion confirmation.
+ | 
+
+2.2 Your Monthly Rhythm
+
+The Explorer's Trail is asynchronous — there are no required live sessions. But the best members are not passive. They show up, they do the work, and they engage with the community. Here is what a productive month looks like:
+
+Activity
+ | What It Looks Like
+ | 
+Complete the Monthly Capstone Project
+ | A new self-contained project drops on the first of each month. This is the core deliverable. No prior month required — just show up and build.
+ | 
+Work the Challenges
+ | Daily, weekly, and monthly challenges are available throughout the month. Pick what fits your schedule and your level.
+ | 
+Engage with Penny
+ | Use Penny to go deeper on what you built, prep for a career conversation, or get your LinkedIn profile reviewed.
+ | 
+Show Up in Slack
+ | The community is where the learning multiplies. Share a win. Ask a question. Answer someone else's.
+ | 
+Access Coaching (Optional)
+ | Submit an async coaching request if you hit a wall or want a real human in your corner. 48-hour business hour response.
+ | 
+Attend a Webinar (Optional)
+ | Live webinars scheduled throughout the month. All sessions recorded and available to all members.
+ | 
+
+2.3 The Four Skill Tracks
+
+Every Trail Mission and Monthly Capstone Project is available at four skill levels. Members are not locked into a single track — you can move between levels as your skills grow, tackle a challenge at a higher level, or revisit a lower level to solidify something you know you rushed through.
+
+Skill Track
+ | Who It's For
+ | What You'll Be Doing
+ | Next Step When Ready
+ | 
+Beginner
+ | Brand new to Salesforce. Never logged into an org. Just getting oriented.
+ | Navigating the platform, understanding standard objects, exploring basic configuration.
+ | Foundations Trail (FT) to build toward the Admin certification.
+ | 
+Intermediate
+ | Has some Salesforce exposure. May have started Trailhead or worked in an org. Ready for real configuration.
+ | Configuring objects, building flows, working with security settings and data management.
+ | Foundations Trail or Guided Trail depending on certification status.
+ | 
+Advanced
+ | Holds the Admin cert or works in Salesforce regularly. Looking to go deeper on declarative development.
+ | Declarative automation, integrations, analytics, Experience Cloud, advanced reporting.
+ | Guided Trail (if pre-hire) or Trail of Mastery (if employed).
+ | 
+Expert
+ | Experienced admin or developer seeking architecture-level thinking and emerging platform capabilities.
+ | Solution design, architecture patterns, advanced development concepts, org strategy.
+ | Trail of Mastery — or consider contributing to Transition Trails as a coach or content contributor.
+ | 
+
+3. Trail Missions — The Core Learning Unit
+
+3.1 What Is a Trail Mission?
+
+A Trail Mission is the core learning unit of the Explorer's Trail. Each month, a new set of Trail Missions is released — one at each of the four skill levels (Beginner, Intermediate, Advanced, Expert), plus optional Extra Credit Missions.
+
+Each Trail Mission is self-contained. It introduces a Salesforce concept, provides context for why it matters in the real world, and gives the member a clear task to complete. There are no walkthrough videos in the Trail Mission itself — members are expected to work through the build with the documentation, Penny, and the community as their resources.
+
+Trail Mission vs. Trailhead Module
+
+Trailhead modules teach you what a feature is. Trail Missions ask you to use it.
+
+A Trailhead module on Flow Builder walks you through a specific flow, step by step, in a guided environment. A Trail Mission on Flow Builder gives you a business scenario and asks you to decide what kind of flow to build, how to configure it, and why.
+
+That gap — between knowing and doing — is exactly what the Explorer's Trail is designed to close.
+ | 
+
+3.2 Trail Mission Anatomy
+
+Every Trail Mission follows the same structure so members always know what to expect:
+
+Component
+ | What It Contains
+ | 
+Mission Brief
+ | A short scenario framing the business context. Why does this skill matter? What real-world problem does it solve?
+ | 
+Skill Level
+ | Clear designation: Beginner / Intermediate / Advanced / Expert. Members self-select their level.
+ | 
+Learning Objective
+ | One or two sentences: what you'll understand or be able to do after completing this mission.
+ | 
+The Task
+ | The actual work. What to build, configure, or explore in Salesforce — described in enough detail to get started, not enough to remove the thinking.
+ | 
+Completion Criteria
+ | How you'll know you're done. What does success look like for this mission?
+ | 
+Penny Prompt
+ | Two or three questions from Penny to test your understanding after you complete the task. Optional but encouraged.
+ | 
+Community Prompt
+ | A question or share prompt for the Slack community. Optional — but this is how members learn from each other.
+ | 
+Next Steps
+ | What to explore next if this mission sparked curiosity. May point to a Trailhead badge, a related Trail Mission, or a TT program.
+ | 
+
+3.3 Sample Trail Mission — Month 1 Preview
+
+The following samples illustrate how Trail Missions scale across skill levels for the same monthly theme. Month 1 theme: Getting Oriented — Understanding How Salesforce Thinks.
+
+Beginner Mission — Month 1: The Lay of the Land
+ 
+Scenario Context: You've just been told you're going to start using Salesforce at your new job. You've never logged in before. Your manager sends you a login and says: 'Explore it. We'll talk next week.' Where do you start?
+ 
+Trail Missions Unlocked: Navigate the App Launcher and identify three standard apps. Find the Setup menu and locate five different settings areas. Identify one standard object (Contacts, Accounts, Opportunities) and describe what kind of data it stores. Explore one record and explain what you see.
+ 
+Member Note: This mission doesn't ask you to build anything. It asks you to look around. The goal is to stop being intimidated by the interface and start seeing the logic behind it.
+ 
+Penny Prompt: Ask Penny: 'I just logged into Salesforce for the first time. What is the most important thing I should understand about how it organizes data?' Then explain her answer back to her in your own words.
+ 
+Community Prompt: Drop into #explorers-trail on Slack: What's one thing about Salesforce that surprised you on your first real look at it?
+ | 
+
+Intermediate Mission — Month 1: Objects, Fields & the Data Model
+ 
+Scenario Context: A coworker comes to you and says: 'I don't understand why there's both an Account and a Contact in Salesforce. Can't we just use one?' You realize you need to explain the Salesforce data model in plain English — without getting technical.
+ 
+Trail Missions Unlocked: Create a one-paragraph explanation of the Account-Contact relationship that a non-Salesforce person could understand. In a Developer Edition org, create a custom field on the Contact object and explain your field type choice. Explore the relationship between Accounts, Contacts, and Opportunities and draw or describe the data model in your own words.
+ 
+Member Note: The goal here is not to memorize object definitions. It is to understand why the data model is structured this way — and be able to explain it to someone who has never heard of Salesforce.
+ 
+Penny Prompt: Ask Penny: 'Why does Salesforce separate Accounts and Contacts instead of combining them into one record? What would break if you tried to use just one object for everything?' See if her answer matches yours.
+ 
+Community Prompt: Drop into #explorers-trail: How did you explain the Account-Contact relationship in plain English? Share your one-paragraph explanation.
+ | 
+
+Advanced Mission — Month 1: Schema Strategy & Object Architecture
+ 
+Scenario Context: You've been asked to advise a small nonprofit that is about to go live on Salesforce for the first time. They're not sure whether to use Person Accounts or Household Accounts — or whether they even need a custom object. They're coming to you for a recommendation.
+ 
+Trail Missions Unlocked: Research the difference between Person Accounts, Household Accounts (NPSP), and a custom object approach for a nonprofit client services use case. Write a one-page recommendation memo: which model you'd recommend, why, and what the long-term implications are for reporting and data migration. Be prepared to defend your recommendation.
+ 
+Member Note: This mission is about architecture thinking, not configuration. The work product is a written recommendation, not a screenshot. The skill being tested is your ability to think through trade-offs and communicate a recommendation clearly.
+ 
+Penny Prompt: Ask Penny: 'If I recommend NPSP Household Accounts and the client later needs to track individual donor histories separately from household giving histories, what are my options?' Walk through the implications with her.
+ 
+Community Prompt: Drop into #explorers-trail: What data model did you recommend and why? What was the hardest trade-off to explain to a non-technical stakeholder?
+ | 
+
+Expert Mission — Month 1: Org Strategy & Architecture Governance
+ 
+Scenario Context: A Salesforce partner has handed you a newly acquired client org with 8 years of data, 40+ custom objects, and no documentation. The client wants to modernize. Your job: assess the org, identify the three biggest architectural risks, and propose a governance framework that prevents the same problems from recurring.
+ 
+Trail Missions Unlocked: Conduct an architecture review of a sandbox or Developer Edition org (or document a hypothetical org review process in detail). Produce: a risk assessment identifying at least three architectural concerns, a recommended governance framework with at least five concrete policies, and a one-page executive summary written for a non-technical client stakeholder.
+ 
+Member Note: There is no tutorial for this mission. This is the kind of work that separates architects from admins. The deliverable is professional-grade documentation — the kind you would actually hand to a client.
+ 
+Penny Prompt: Ask Penny: 'What are the five most common architectural debt problems in long-running Salesforce orgs — and what governance practices prevent each one?' Compare her answer to your own assessment.
+ 
+Community Prompt: Drop into #explorers-trail: What's the single biggest governance failure you've seen (or can imagine) in a Salesforce org — and what one policy would have prevented it?
+ | 
+
+4. Community & Coaching
+
+4.1 The Slack Community
+
+The Transition Trails Slack community is not an add-on. It is a core feature of the Explorer's Trail — and one of the primary things that differentiates this program from simply buying access to a course library.
+
+Self-guided learning fails when it becomes isolating. The Slack community is the antidote. Explorer's Trail members have access to dedicated channels for their program, plus the broader Transition Trails community of learners, coaches, and alumni across all programs.
+
+Channel
+ | Purpose
+ | 
+#explorers-trail
+ | The primary home for ET members. Trail Mission discussion, questions, and wins. Community prompts posted monthly to spark engagement.
+ | 
+#help-desk
+ | Ask any Salesforce question. Get answers from coaches, community managers, and fellow members. No question is too basic.
+ | 
+#job-talk
+ | Career conversations — job postings, interview prep, resume questions, application advice. Open to all TT community members.
+ | 
+#wins
+ | Celebrate every milestone. Passed a module? Got a job? Landed your first real project? This is where you post it.
+ | 
+#announcements
+ | Official Transition Trails updates — new Trail Missions, program launches, webinar schedules, community events.
+ | 
+
+4.2 Async 1:1 Coaching Access
+
+All Explorer's Trail members — monthly and annual — have access to asynchronous 1:1 coaching. This is not a real-time session. It is a written exchange: you submit a question or request, a Transition Trails coach reviews it and responds with substantive feedback, direction, or guidance within 48 business hours.
+
+Coaching is not limited to technical questions. You can bring:
+
+A Salesforce concept you're not fully grasping
+A career question about how to position your skills or what to do next
+Feedback on something you've built or written
+A decision you're wrestling with — which program to enroll in, which certification to pursue, whether this career path is right for you
+
+How to Get the Most from Async Coaching
+
+The members who get the most from coaching are the ones who arrive with a specific question — not 'I don't understand Flow Builder' but 'I configured a Record-Triggered Flow but it's firing more than once on the same record and I can't figure out why.'
+
+Specificity gets better answers. Show your work. Share what you've already tried. Tell the coach what you think might be going wrong. That context turns a 48-hour exchange into a genuinely useful conversation.
+ | 
+
+4.3 Webinars & Recorded Campfires
+
+Explorer's Trail members have access to live and recorded webinars throughout their membership. Webinars cover a range of topics — platform updates, career transition stories, industry trends, and deep dives on specific Salesforce features.
+
+Annual members additionally receive access to recorded Campfire Sessions from active Guided Trail and Trail of Mastery cohorts. Campfires are the group learning sessions where cohort members present their work and receive peer and coach feedback. Watching a Campfire is one of the fastest ways to understand what employer-ready Salesforce work looks and sounds like — before you're in the room yourself.
+
+5. The Explorer's Trail Pathway — Where This Goes
+
+5.1 The Explorer's Trail in the TT Learning Ecosystem
+
+The Explorer's Trail is not a standalone destination. It is the entry point and evergreen layer of the Transition Trails learning ecosystem. For most members, it is the beginning — not the end.
+
+The Transition Trails Learning Pathway
+
+Explorer's Trail → Foundations Trail (FT) → Guided Trail (GT) → Trail of Mastery (ToM)
+
+Explorer's Trail: Build the habit. Find your level. Explore at your own pace.
+Foundations Trail: Get exam-ready with structure and a real capstone project.
+Guided Trail: Prove your job-readiness. Build the portfolio. Get hired.
+Trail of Mastery: Advance to practitioner-level consulting with real client work.
+ | 
+
+5.2 When You're Ready for the Next Trail
+
+The Explorer's Trail is designed to feed directly into Transition Trails' premium programs. Here is how to know when you're ready to move:
+
+Your Situation
+ | Signs You're Ready to Move
+ | Your Next Trail
+ | 
+No certification yet; Beginner or Intermediate level
+ | You've completed 2–3 months of Trail Missions and want more structure. You're ready to commit to exam prep.
+ | Foundations Trail (FT)
+ | 
+Have the Admin cert; not yet employed in Salesforce
+ | You're consistently at Advanced level. You want real portfolio artifacts that prove you can do the job.
+ | Guided Trail (GT)
+ | 
+Currently employed in Salesforce; want to advance
+ | You're at Expert level. You want practitioner-level skills and real client project experience.
+ | Trail of Mastery (ToM)
+ | 
+Happy to keep learning here
+ | You're using the Explorer's Trail to stay sharp, explore new features, or fill in gaps while doing something else. This is a perfectly valid long-term use of the membership.
+ | Stay. Keep exploring.
+ | 
+
+5.3 Explorer's Trail Discounts for Premium Programs
+
+Active Explorer's Trail members receive discounted enrollment rates for Transition Trails' cohort programs — the Foundations Trail, Guided Trail, and Trail of Mastery. This is not a promotional offer. It is a recognition that Explorer's Trail members have already invested in the TT ecosystem and demonstrated the commitment to show up for their learning.
+
+Active ET members receive discounted enrollment on all TT cohort programs. Annual and Annual + Coaching members receive the highest discount tier — typically 10–15% off standard tuition, confirmed at enrollment. Monthly members receive a standard member discount. These discounts are not promotional — they recognize that ET members have already invested in the TT ecosystem.
+
+6. Content Library & Member Resources
+
+6.1 What's in the Library
+
+Beyond the monthly Trail Missions, Explorer's Trail members have access to an expanding content library hosted within Transition Trails Academy. This library is a living resource — it grows with every cohort that completes a program.
+
+Resource
+ | What It Is
+ | 
+GT & ToM Cohort Materials
+ | Curriculum documents, frameworks, and resources from past Guided Trail and Trail of Mastery cohorts. See how the full programs work before you commit to one.
+ | 
+Completed Capstone Projects
+ | Reference portfolio artifacts from GT and FT graduates. The best way to understand what employer-ready Salesforce work looks like is to see it.
+ | 
+Webinar Archive
+ | Recordings of all past webinars. Searchable by topic and date.
+ | 
+Recorded Campfire Sessions (Annual Members Only)
+ | Group learning session recordings from active cohorts. See how coaches facilitate real problem-solving conversations.
+ | 
+Extra Credit Missions
+ | Optional stretch assignments at every skill level. Not tied to the monthly theme — for members who finish early, want more challenge, or are working on a specific skill gap.
+ | 
+
+6.2 Monthly Content Cadence
+
+New content is released on the first of each month. Members receive an email notification when new Trail Missions and resources go live. Previous months' Trail Missions remain accessible throughout an active membership — so there is no penalty for falling behind, and there is always a backlog to dig into if you want to work ahead.
+
+Content Type
+ | Release Cadence
+ | 
+Trail Missions (4 skill levels)
+ | New set released monthly (1st of each month)
+ | 
+Extra Credit Missions
+ | Released monthly alongside Trail Missions
+ | 
+Webinars
+ | 2–4 per month; scheduled and announced in advance
+ | 
+Campfire Recordings (Annual)
+ | Released as they occur within active cohorts
+ | 
+Content Library (GT/ToM materials)
+ | Updated after each cohort cycle completes
+ | 
+
+7. Program Strategy
+
+7.1 Strategic Positioning
+
+The Explorer's Trail occupies a specific and intentional position in the Transition Trails program ecosystem. It is the widest part of the funnel — the program with no prerequisites, the lowest barrier to entry, and the broadest possible audience.
+
+This positioning is strategic. Every premium TT program — Foundations Trail, Guided Trail, Trail of Mastery — benefits from a healthy Explorer's Trail membership base. Members who start here and build the habit of learning are the ones most likely to enroll in a full program when they're ready. The Explorer's Trail is not just a revenue stream. It is a pipeline.
+
+Program
+ | Target Learner
+ | Primary Outcome
+ | Barrier to Entry
+ | ET Role
+ | 
+Explorer's Trail (ET)
+ | Any learner at any level
+ | Skill-building habit + community belonging
+ | None
+ | Entry point and feeder
+ | 
+Foundations Trail (FT)
+ | Pre-certification learner
+ | Pass the Admin exam + build experience
+ | Platform Foundations cert
+ | ET graduates who are ready to commit
+ | 
+Guided Trail (GT)
+ | Certified, pre-hire admin
+ | Close the experience gap and get hired
+ | Admin certification
+ | ET Advanced/Expert members who are cert-ready but haven't enrolled
+ | 
+Trail of Mastery (ToM)
+ | Employed admin
+ | Advance to practitioner-level skills
+ | Employed as Salesforce Admin
+ | ET Expert members ready to go deeper
+ | 
+
+7.2 Instructional Design Principles
+
+The Explorer's Trail is built on four instructional principles that distinguish it from a content subscription or a course library:
+
+Principle
+ | Why It Matters
+ | 
+Scenario-First Learning
+ | Every Trail Mission begins with a real-world business context — not a definition. Members learn Salesforce by using it to solve a problem, not by reading about it.
+ | 
+Self-Selection by Skill
+ | Four skill levels prevent the two most common failure modes in self-guided learning: boredom (content too easy) and overwhelm (content too hard). Members choose their level and adjust as they grow.
+ | 
+Community as Accountability
+ | Accountability in a self-guided program cannot come from deadlines. It has to come from relationships. The Slack community — when it is active and engaging — creates the social accountability that keeps members coming back.
+ | 
+Pathway Transparency
+ | Members always know where they stand in the TT ecosystem and what comes next. Pathway confusion is a silent killer of momentum. The Explorer's Trail removes that confusion by being explicit about next steps at every level.
+ | 
+
+7.3 Success Metrics
+
+Transition Trails tracks the following metrics for the Explorer's Trail on a monthly and quarterly basis:
+
+Metric
+ | Definition
+ | Target
+ | 
+Active Monthly Members
+ | Total enrolled members with at least one login in the billing period
+ | Growing month-over-month
+ | 
+Mission Completion Rate
+ | % of members completing at least 1 Trail Mission per billing period
+ | 70%+
+ | 
+Monthly Renewal Rate
+ | % of monthly members who renew after first billing cycle
+ | 60%+
+ | 
+Annual Conversion Rate
+ | % of monthly members upgrading to annual membership
+ | Increasing quarterly
+ | 
+GT/FT Pipeline Conversion
+ | % of ET members enrolling in a premium TT program within 12 months
+ | 15–20%
+ | 
+Career Milestone Rate
+ | % of members reporting a Salesforce career advancement at 6-month follow-up
+ | 25%+
+ | 
+Community Engagement
+ | % of members active in Slack at least 2x/month
+ | 50%+
+ | 
+Net Promoter Score (NPS)
+ | Member satisfaction and likelihood to recommend
+ | 50+
+ | 
+
+8. Completion & What Comes Next
+
+8.1 What 'Completing' the Explorer's Trail Means
+
+The Explorer's Trail does not have a completion date. It is a membership, not a program with a finish line. But that does not mean there is nothing to show for your time here.
+
+Members who engage consistently — completing Trail Missions, contributing to the community, using their coaching access — build something real over time: a body of Salesforce knowledge, a network of peers, and the habit of learning that every technology career requires.
+
+When you are ready to move into a full TT program, your time in the Explorer's Trail is not starting over. It is the foundation you are building from.
+
+8.2 Recognizing Your Progress
+
+The Explorer's Trail does not issue completion certificates — Trail Missions are self-contained, not cumulative in the way a 12-week program is. What members can document and share:
+
+The Trail Missions completed (visible in your Academy profile)
+Skill levels achieved and any Extra Credit Missions completed
+Community contributions — Slack engagement, answers given, connections made
+Transition into a premium TT program, which carries its own verifiable completion badge
+
+Transition Trails is developing a Member Activity Record — a lightweight document members can generate from their Academy profile that summarizes their Explorer's Trail engagement. This is not a certification. It is a record of showing up. (Coming in a future release.)
+
+8.3 After the Explorer's Trail — Your Next Trail Options
+
+Path
+ | Description
+ | 
+Enroll in the Foundations Trail
+ | If you don't yet have the Admin certification and want a structured 12-week program that maps directly to the exam while building a real capstone project. This is the most common next step for ET Beginner and Intermediate members.
+ | 
+Enroll in the Guided Trail
+ | If you already hold the Admin certification and are ready to close the experience gap with a 12-week cohort-based practicum and a professional portfolio. The most common next step for ET Advanced members.
+ | 
+Enroll in the Trail of Mastery
+ | If you are already employed in Salesforce and want to advance toward practitioner-level consulting and real client project experience. The most common next step for ET Expert members.
+ | 
+Keep Exploring
+ | There is no rule that says you have to move on. The Explorer's Trail is a legitimate long-term learning environment for members who are using it to stay sharp, build incrementally, or supplement other learning they are doing.
+ | 
+Volunteer as a Community Contributor
+ | ET members who want to give back can apply to serve as Slack community moderators, answer questions in #help-desk, or contribute to Trail Mission development. This is a portfolio-worthy contribution and a way to deepen your own learning.
+ | 
+
+A Final Note on Why the Explorer's Trail Exists
+
+The Salesforce ecosystem is one of the fastest-growing technology platforms in the world. But most of the people who could thrive in it never get a real shot — because the cost of entry is too high, the learning curve feels too steep, or there's simply nowhere that meets them where they are.
+
+The Explorer's Trail exists for those people.
+
+It is not the most intensive program in the Transition Trails ecosystem. It is the most accessible one. And accessibility — real, affordable, community-supported access to structured learning — is how you build a pipeline of Salesforce professionals that looks like the world they're going to serve.
+
+Come as you are. Start where you are. The trail is right in front of you.
+
+— Transition Trails
+ | 
+
+The Explorer's Trail  |  Transition Trails Academy
+Building accessible pathways to Salesforce careers — one Trail Mission at a time.
+transitiontrails.org

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+</style>
+</helmet>
+
+<div style="min-height:100%;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate);padding:0 0 96px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:44px 0">
+    <div style="max-width:1080px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Transition Trails · Guided Trail</div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:40px;line-height:1.12;font-weight:600;margin:0;color:var(--tt-white);text-wrap:pretty">Certified. Now prove it.</h1>
+      <p style="font-size:17.5px;line-height:1.55;margin:0;max-width:720px;color:rgba(255,255,255,.88)">Program design for a 12-week cohort of 3 to 5 certified, unhired admins who inherit a working org and take coach-assigned client work alongside it. No direct client contact — that is Trail of Mastery. Nothing here rebuilds what the Foundations Trail built.</p>
+    </div>
+  </div>
+
+  <div style="max-width:1080px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:52px">
+
+    <section style="margin-top:44px;display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">01 · The bar</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">A working org, real consequences, and no script</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Entry is the certification</div>
+          <div style="font-size:15px;line-height:1.6">Admin certification passed, not in progress. A Foundations graduate who has not sat the exam waits. This keeps the cohort at one level and lets every week assume the exam concepts are already there.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Real work, shielded interface</div>
+          <div style="font-size:15px;line-height:1.6">The inherited capstone teaches the craft on a safe org. Coach-assigned client and TT work provides the consequences. The coach holds the client relationship and relays the requirement; the learner never speaks to the nonprofit. Direct client contact is Trail of Mastery.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Penny changes role</div>
+          <div style="font-size:15px;line-height:1.6">In Foundations, Penny is the primary coach — the trail can be walked alone toward an exam. In Guided Trail the coach leads and Penny becomes the interviewer: challenging decisions, rehearsing answers, never supplying them.</div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="Load is the risk, not rigour" dc-props="{{ wideAlert }}" hint-size="100%,100px"><div>Two one-hour sessions, a weekly capstone increment, assigned client work, and testing a buddy’s build is a lot for someone job-hunting. The capstone should be the lighter workstream — roughly a third of the week. If a week has to give, it is the capstone that gives, because the assigned work has a real deadline and the capstone does not. Splitting the sessions across the week helps: the stand-up sets the work, the campfire closes it.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">02 · The inherited org</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Three ways to hand someone a real mess</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:820px">Every GT learner needs an org that already works and already has problems. Where that org comes from changes what the program can promise.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <div><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,26px">Option A</x-import></div>
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">A peer's org, as they left it</div>
+          <div style="font-size:15px;line-height:1.6">Each learner inherits a Foundations graduate's actual org. Maximum realism — the mess is authentic, the documentation gaps are real, and nobody planted anything.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);margin-top:auto;padding-top:12px;border-top:1px solid var(--tt-warm-gray)"><strong>Cost:</strong> ungradeable. Two learners get wildly different difficulty, and a tidy predecessor leaves nothing to find. Also needs a supply of finished FT orgs you do not yet have.</div>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+          <div><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="green" hint-size="auto,26px">Option B · recommended</x-import></div>
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">A seeded org TT controls</div>
+          <div style="font-size:15px;line-height:1.6">One master HCH org, built to the Foundations end state, with seven known defects planted and a sealed findings list held by the coach. Every learner gets the same starting difficulty.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);margin-top:auto;padding-top:12px;border-top:1px solid var(--tt-warm-gray)"><strong>Why:</strong> gradeable, repeatable, and available before any FT cohort finishes. It is also the starter org section 3.3 of the current blueprint already promises but does not exist.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:12px">
+          <div><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,26px">Option C</x-import></div>
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">A peer's org, then seeded</div>
+          <div style="font-size:15px;line-height:1.6">Take a real FT graduate org and plant the same seven defects into it. Authentic texture, controlled difficulty.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);margin-top:auto;padding-top:12px;border-top:1px solid var(--tt-warm-gray)"><strong>Cost:</strong> per-learner setup work every cohort, forever. Right answer eventually; wrong answer for Cohort 1.</div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" dc-props="{{ wideAlert }}" hint-size="100%,90px"><div><strong>Start at B, plan for C.</strong> Cohort 1 needs a controlled org you can grade against and hand to someone next week. Once Foundations has produced a few finished orgs, seeding real ones gives you the texture without giving up the grading. Option A never becomes safe on its own.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">03 · The seeded findings</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Seven defects, each teaching something different</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:820px">Planted in the master org, sealed in a coach findings list. A learner is not told how many there are — part of the assessment is whether they find them, and whether they can tell a defect from a design choice they merely dislike.</p>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:52px 1.4fr 1fr 96px;gap:16px;padding:14px 22px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>ID</span><span>The defect</span><span>What it teaches</span><span>Surfaces</span>
+        </div>
+        <sc-for list="{{ debt }}" as="d" hint-placeholder-count="7">
+          <div style="{{ d.rowStyle }}">
+            <span style="font-family:Poppins,sans-serif;font-size:13.5px;font-weight:600;color:var(--tt-trail-green)">{{ d.id }}</span>
+            <span style="font-size:14.5px;line-height:1.55">{{ d.defect }}</span>
+            <span style="font-size:14px;line-height:1.55;color:var(--tt-slate)">{{ d.teaches }}</span>
+            <span style="font-size:13px;color:var(--tt-slate)">{{ d.week }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" dc-props="{{ wideAlert }}" hint-size="100%,100px">
+        <div>Two of the seven are deliberately ambiguous. The unused field that three reports depend on is not clearly wrong — deleting it breaks reporting, keeping it clutters the model. The duplicated validation logic may have been a reasonable choice under time pressure. A learner who flags everything as a defect has not learned judgment; they have learned suspicion.</div>
+      </x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">04 · The twelve weeks</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Take ownership, pay down the debt, prove it</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:820px">Sprint 1 keeps the audit structure from the current blueprint — it already differentiates. Sprints 2 and 3 are new work: remediation and consequence, not a second pass at Foundations.</p>
+      <sc-for list="{{ sprints }}" as="s" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;border-bottom:1px solid var(--tt-warm-gray);padding-bottom:12px">
+            <span style="font-family:Poppins,sans-serif;font-size:22px;font-weight:600;color:var(--tt-charcoal)">{{ s.name }}</span>
+            <span style="font-size:14px;color:var(--tt-slate)">{{ s.meta }}</span>
+          </div>
+          <sc-for list="{{ s.weeks }}" as="w" hint-placeholder-count="4">
+            <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:74px 1fr;gap:20px;align-items:start">
+              <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-trail-green)">{{ w.n }}</span>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <span style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ w.title }}</span>
+                <span style="font-size:15.5px;line-height:1.6">{{ w.body }}</span>
+                <span style="font-size:14px;line-height:1.55;color:var(--tt-slate)"><strong>Ships:</strong> {{ w.ships }}</span>
+              </div>
+            </div>
+          </sc-for>
+          <div style="background:var(--tt-green-100);border-radius:14px;padding:16px 22px;font-size:15px;line-height:1.6;color:var(--tt-charcoal)">{{ s.session }}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">04b · The squad</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Coach assigns, buddy tests, coach releases</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:820px">Alongside the capstone, each learner takes real work the coach assigns from client and TT backlogs. The learner does not hold the client relationship. Three roles, and nothing reaches a production org without the third.</p>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:18px 22px;font-size:15.5px;line-height:1.6"><strong>Cadence:</strong> two one-hour sessions a week on separate days — stand-up early in the week to set the work, campfire late to close it. Days are set per cohort once the roster is known. Replays count, to a maximum of two.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The coach assigns</div>
+          <div style="font-size:15px;line-height:1.6">Work arrives as a requirement, not a ticket — the coach relays what the nonprofit needs and holds back the solution. The learner still has to refine it, ask what is missing, and say what it will cost.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto">The coach is the stakeholder proxy. Deliberately imperfect at explaining what they want — because real ones are.</div>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The buddy tests</div>
+          <div style="font-size:15px;line-height:1.6">Learners pair and test each other’s work. This is the best structural decision in the program: it makes the UAT script criterion literal. "Runnable by someone who did not build it" stops being hypothetical when a peer is about to run it and will say so if it is not.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto">Being tested teaches as much as testing. Both sides produce a record.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The coach releases</div>
+          <div style="font-size:15px;line-height:1.6">Nothing enters a client production org without coach review. The learner assembles the change set and requests release; the coach approves, defers, or sends it back with a reason.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto">A deferred release is a teaching moment, not a failure — and it is the closest thing to a real change advisory board a learner will meet before they are hired.</div>
+        </div>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px 30px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--tt-warm-gray)">
+          <span style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-charcoal)">The client brief</span>
+          <span style="font-size:13.5px;color:var(--tt-slate)">One per client · generated from the Digital Compass assessment, coach-edited · issued at assignment</span>
+        </div>
+        <div style="font-size:15.5px;line-height:1.65">This is the standard for how much context a learner gets, so it stops being a per-coach habit. NDAs are signed at onboarding, so the brief can be specific. Generated from the Digital Compass assessment output, then edited by the coach. Five parts:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">1 · What they do</div>
+              <div style="font-size:14.5px;line-height:1.6">Mission, who they serve, staff size, funding model. Enough that a learner can reason about why a requirement matters — a grant deadline explains more than a priority field ever will.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">2 · What we know about their org</div>
+              <div style="font-size:14.5px;line-height:1.6">Edition, installed packages, integrations, who administers it, and the debt already found. Facts only.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">3 · What we do not know</div>
+              <div style="font-size:14.5px;line-height:1.6">Stated explicitly. This is the most useful section — it marks the discovery the learner is expected to do rather than leaving them to guess where the map ends.</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;border-left:1px solid var(--tt-warm-gray);padding-left:22px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">4 · How this client is handled</div>
+              <div style="font-size:14.5px;line-height:1.6">Who at TT owns the relationship, what the release cadence is, and what the client has been told about who does the work.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">5 · What is publishable</div>
+              <div style="font-size:14.5px;line-height:1.6">Anonymised by default — "a 40-user nonprofit org with a grant deadline" — and named only with written client consent. Stated per client at assignment, so a learner never discovers the limit in Week 11.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="Anonymised by default, named only with consent" dc-props="{{ wideAlert }}" hint-size="100%,120px"><div>Anonymised by default, named only with written client consent. The reasoning is what an employer is buying, and it survives anonymisation almost intact — "a nonprofit with a 40-user org and a grant deadline" carries nearly all the interview value of naming them. Two consequences worth building in: consent has to be requested at engagement start rather than at Week 12 when the learner needs it, and the capstone portfolio has to be strong enough to stand alone in case consent never comes.</div></x-import>
+
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="Pair the buddies across different work" dc-props="{{ wideAlert }}" hint-size="100%,90px"><div>If two learners are assigned the same requirement they will converge on the same solution and test their own assumptions back at each other. Assign different work and cross-test — the value is in reading a system you did not build, which is the same muscle the inherited capstone trains.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">05 · Deliverables</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Two every week, six rotating</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:20px">
+        <div style="flex:1;min-width:300px;background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:24px 26px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Every week, without exception</div>
+          <div style="font-size:15.5px;line-height:1.65"><strong>Decision Log entry</strong> — continuing from #13, since Foundations produces exactly twelve.</div>
+          <div style="font-size:15.5px;line-height:1.65"><strong>The 90-second answer</strong> — this week's work as an interview response. Recorded, not written. Twelve of these by Week 12, and the improvement from the first to the last is itself evidence.</div>
+        </div>
+        <div style="flex:1;min-width:300px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px 26px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Rotating, where the work calls for it</div>
+          <div style="font-size:15px;line-height:1.7">Current-state process flow · config review note · stakeholder recommendation with options and cost · change plan with a rollback · UAT script someone else can run · release note written for Elena · training guide</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto">Each appears two or three times across twelve weeks. Producing all eight every week would make them homework rather than artifacts.</div>
+        </div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">06 · Support, and the evidence</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Replacing the walkthroughs, and proving readiness</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Option Cards — during the week</div>
+          <div style="font-size:15px;line-height:1.6">Two or three viable approaches to the week's problem with tradeoffs named, and no steps. One page. Teaches Select from the RESOLVE handbook, which is exactly the muscle an unhired admin has never had to use.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Decision Debriefs — after DoD passes</div>
+          <div style="font-size:15px;line-height:1.6">A short recording of a practitioner reasoning through the same problem: what they considered, rejected, and got wrong. Released only once the learner’s own work is done, so it is a mirror rather than a script — and it doubles as interview modeling.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">The RESOLVE module — add-on, taught here</div>
+          <div style="font-size:15px;line-height:1.6">Guided Trail is where RESOLVE gets taught, as an add-on module alongside the twelve weeks. That is the right place for it: the method lands when there is real work to apply it to, and every artifact in the rubric maps to a phase of it.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto">Trail of Mastery offers the same module as catch-up, since an experienced admin can enter there directly from Explorer’s Trail without having taken it.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Concept explainers — before the week</div>
+          <div style="font-size:15px;line-height:1.6">Short generated videos on how a platform feature works — <em>How Email-to-Case automates support</em> — paired with something to read. Concept, never configuration. Visuals and reading alongside the doing, not instead of it.</div>
+          <div style="font-size:14px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:12px;margin-top:auto">These do not break the no-script rule, and the distinction is worth being strict about: an explainer says what the feature is for and where it breaks. A walkthrough says which buttons to press. The first is knowledge a certified admin should already have and often does not; the second is the thing Guided Trail removes.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">What a coach never does</div>
+          <div style="font-size:15px;line-height:1.6">Confirm a configuration is correct before the learner has committed to it. Sprint 1 of the current blueprint already says this well — the coach reviews how you present the work, not whether it compiles.</div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="Change sets here, pipelines in Trail of Mastery" dc-props="{{ wideAlert }}" hint-size="100%,100px"><div>Guided Trail deploys with change sets. That is the right call and not just a simpler one — change sets teach a learner what metadata actually depends on what, because the set fails until they work it out by hand. Source control and CI/CD belong in Trail of Mastery, where the work is client-facing and a bad deploy has a real cost. A learner who has hand-assembled change sets understands what a pipeline is doing for them later.</div></x-import>
+
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px 30px;display:flex;flex-direction:column;gap:16px">
+        <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">Evidence for employers — your three, plus four I would add</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">Confirmed</div>
+            <div style="font-size:15px;line-height:1.65">A portfolio an employer can review without you present · a Demo Day recording usable as a work sample · three defended decisions, with what you rejected</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;border-left:1px solid var(--tt-warm-gray);padding-left:24px">
+            <div style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">Suggested additions</div>
+            <div style="font-size:15px;line-height:1.65"><strong>The findings register.</strong> What you inherited, what you flagged, what you left alone and why. Almost no candidate can show this, and it is the single most senior-looking artifact in the set.</div>
+            <div style="font-size:15px;line-height:1.65"><strong>A before-and-after measure.</strong> One number that moved — queue misroutes, SLA rate, records failing validation. Employers trust a number with a method behind it.</div>
+            <div style="font-size:15px;line-height:1.65"><strong>Peer testimony.</strong> You worked a real client engagement with two to four others. Their account of how you worked is more credible than a coach's, and free.</div>
+            <div style="font-size:15px;line-height:1.65"><strong>The first and twelfth 90-second answer, side by side.</strong> Growth is more persuasive than polish, and it is the one thing a bootcamp graduate cannot fake.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">07 · Open</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Two decided, one still open</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:18px 22px;font-size:16px;line-height:1.6"><strong>1. Someone hired mid-program — decided.</strong> A learner who paid may withdraw at any point, though the encouragement is to finish. A scholarship learner completes the program. That asymmetry is defensible and worth stating plainly in enrollment: the scholarship is funded on the expectation of a completed record, and the completed record is what the funder is buying. One practical consequence — a scholarship learner who starts a job in Week 7 will need the load reduced, not the requirement waived, so the capstone increment should be the part that flexes.</div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:18px 22px;font-size:16px;line-height:1.6"><strong>2. The client brief — open, own design session.</strong> Briefs generate from the Digital Compass assessment output with the coach editing. The one thing to carry into that session: the assessment was built to scope a nonprofit’s needs, not to brief a learner, so it almost certainly does not record <em>what we do not know</em> — the section that makes a brief teach anything rather than just inform.</div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:18px 22px;font-size:16px;line-height:1.6"><strong>3. Attendance — decided, and deliberately outside the rubric.</strong> Participation is a coach and learner conversation, captured separately from the artifact record. That is the right split: the rubric judges what a learner produced, and mixing in whether they attended live would make the artifact verdicts harder to defend to a funder. Program Engagement still records the sessions, so the data exists without becoming a grade.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180}}">
+const DEBT = [
+  ['D-1','Assignment rule with overlapping entries — cases land in the wrong queue intermittently','Reading first-match-wins order; reproducing an intermittent fault before fixing it','Week 5'],
+  ['D-2','Record-triggered Flow with no entry criteria — fires on every update','Recursion and cost of change; the difference between working and safe','Week 6'],
+  ['D-3','Hardcoded record type ID inside that Flow','Why the org breaks on deployment to another environment','Week 6'],
+  ['D-4','Permissions granted on the profile instead of a permission set','Maintainability as a product property; who can be onboarded next quarter','Week 2'],
+  ['D-5','Sharing rule that quietly over-grants access to case notes','Security findings nobody reports because nothing looks broken','Week 2'],
+  ['D-6','Validation logic duplicated across a validation rule, a Flow, and a required field','Where a rule should live, and the cost of three sources of truth','Week 7'],
+  ['D-7','A field nobody populates that three reports depend on','Impact analysis before deletion; deprecation instead of removal','Week 8']
+];
+
+const SPRINTS = [
+  { name:'Sprint 1 · Take Ownership', meta:'Weeks 1–4 · audit the inherited org · structure retained from the current blueprint',
+    session:'Private Coach Session 1 (Week 4) — walk one Sprint 1 artifact as if the coach were a hiring manager. The subject is how you present it, not whether the config is right.',
+    weeks:[
+      ['Week 1','Mapping the chaos','You inherit HCH with no documentation and a volunteer coordinator getting conflicting answers from staff. Audit the data model: objects, relationships, dependencies. Open the findings register — and note what you cannot yet explain.','Current-state process flow · findings register v1 · Decision Log #13'],
+      ['Week 2','Secure foundations','Two new part-time staff joined. Confirm each sees only what they need. This is where D-4 and D-5 surface — one of them looks like nothing is wrong, which is the point.','Config review note · remediation plan with priority order · Decision Log #14'],
+      ['Week 3','The legacy data question','A food bank partner has client records in Google Sheets. Elena wants to know what migrating them would take. Answer with options and a number, not a yes.','Stakeholder recommendation with options and cost · UAT script · change plan · Decision Log #15'],
+      ['Week 4','Unified visibility','Caseworkers navigate too many records to see one client. Build a Case record page that serves them — and a different view for volunteers. Then teach someone to use it.','Training guide · release note for Elena · Decision Log #16']
+    ]},
+  { name:'Sprint 2 · Pay Down the Debt', meta:'Weeks 5–8 · new work · the seeded defects become the backlog',
+    session:'Private Coach Session 2 (Week 8) — portfolio mid-point and job search strategy. Bring the portfolio URL, the resume, and the LinkedIn profile.',
+    weeks:[
+      ['Week 5','The intermittent bug','Elena says cases "sometimes" go to the wrong queue. Nobody can reproduce it. Find D-1, prove it before you touch it, and sequence the fix against live intake.','Root cause write-up · change plan with rollback · Decision Log #17'],
+      ['Week 6','Automation that runs too often','A Flow fires on every update and carries a hardcoded ID (D-2, D-3). Fix the behavior, then explain to Elena why the second problem mattered even though nothing looked broken.','Config review note · UAT script · Decision Log #18'],
+      ['Week 7','Three sources of truth','The same rule is enforced in a validation rule, a Flow, and a required field (D-6). Decide where it belongs. Defend the choice — including the option of leaving it alone.','Stakeholder recommendation · release note · Decision Log #19'],
+      ['Week 8','The field nobody uses','A field is empty on every record and three reports depend on it (D-7). Deleting it breaks reporting. Keeping it clutters the model. Produce a deprecation plan, not a delete.','Impact analysis · change plan · Decision Log #20']
+    ]},
+  { name:'Sprint 3 · Prove It', meta:'Weeks 9–12 · consequence, handover and hiring',
+    session:'Private Coach Session 3 (Week 11) — employer simulation. The coach interviews you about the build as a hiring manager would.',
+    weeks:[
+      ['Week 9','A request with no obvious answer','Elena needs cases escalated to a partner organization that does not use Salesforce. Entitlements, a Flow, a scheduled job, or a manual process — all defensible. Choose, cost it, and say what you gave up.','Stakeholder recommendation with options and cost · Decision Log #21'],
+      ['Week 10','Shipping it properly','Deploy the sprint with change sets: build the outbound set, work out what it silently leaves behind, sequence the deploy window, smoke test, and decide what Elena hears if it fails at 8pm on a Saturday.','Change plan · UAT script someone else runs · release note · Decision Log #22'],
+      ['Week 11','The numbers are wrong','The donor dashboard the previous admin built reports an SLA rate leadership does not believe. Reconcile it. Decide whether the report or the process is broken.','Before-and-after measure · findings register close-out · Decision Log #23'],
+      ['Week 12','Handover and Demo Day','Hand the org to whoever comes next, then defend three decisions to a panel — one you changed, one you left alone, and one you got wrong.','Training guide · handover pack · Demo Day recording · Decision Log #24']
+    ]}
+];
+
+class Component extends DCLogic {
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+  renderVals() {
+    return {
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+      debt: DEBT.map(([id,defect,teaches,week],i) => ({
+        id, defect, teaches, week,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'52px 1.4fr 1fr 96px', gap:'16px',
+          padding:'16px 22px', alignItems:'start',
+          borderBottom: i < DEBT.length - 1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+      sprints: SPRINTS.map(s => ({
+        name:s.name, meta:s.meta, session:s.session,
+        weeks: s.weeks.map(([n,title,body,ships]) => ({ n, title, body, ships }))
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+</style>
+</helmet>
+
+<div style="min-height:100%;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate);padding:0 0 96px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:52px 0">
+    <div style="max-width:1120px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px">
+        <a href="Program%20Journeys%20-%20Index.dc.html" style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;color:var(--tt-amber-300);text-decoration:none">← All journeys</a>
+        <span style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Transition Trails · the specialist volunteer</span>
+      </div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:44px;line-height:1.1;font-weight:600;margin:0;color:var(--tt-white);max-width:920px;text-wrap:pretty">She trades what she knows for what she needs</h1>
+      <p style="font-size:18px;line-height:1.6;margin:0;max-width:800px;color:rgba(255,255,255,.88)">Simone is a marketing manager — eight years of campaign strategy, segmentation, and demand generation. The promotion she wants requires something her day job will not give her: building the campaigns herself in Salesforce, and pulling numbers out of Salesforce, Google Analytics, and three other systems without asking anyone. We need marketing help. She needs hands on the platform. So we trade.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Skill-for-access</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Explorer's Trail</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Coach ladder</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">ToM · Integrations</x-import>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1120px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:56px">
+
+    <div style="margin-top:40px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:22px 26px">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:280px">
+        <span style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ lensTitle }}</span>
+        <span style="font-size:15px;line-height:1.55">{{ lensNote }}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div onClick="{{ setTeam }}" style="{{ teamTab }}">Team view</div>
+        <div onClick="{{ setFunder }}" style="{{ funderTab }}">Funder view</div>
+      </div>
+    </div>
+
+    <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="This is the only journey where the exchange runs both ways" dc-props="{{ wideAlert }}" hint-size="100%,120px"><div>Every other pathway starts with someone who needs something from us. Simone starts by offering. She is employed and good at her job — what she lacks is the technical half of it, and her employer has no reason to let her learn on their campaigns. We have real campaigns that need running and nobody to run them. Neither side is doing the other a favor, which is exactly why the arrangement holds: she is not donating spare expertise, she is buying hands-on experience with the only currency she has.</div></x-import>
+
+    <section style="display:flex;flex-direction:column;gap:0">
+      <sc-for list="{{ stations }}" as="s" hint-placeholder-count="7">
+        <div style="display:grid;grid-template-columns:1fr 88px 1fr;gap:0;align-items:stretch">
+
+          <div style="{{ s.leftStyle }}">
+            <sc-if value="{{ s.onLeft }}" hint-placeholder-val="{{ true }}">
+              <div style="{{ s.cardStyle }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                  <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">{{ s.kicker }}</span>
+                  <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ s.badgeTone }}" hint-size="auto,26px">{{ s.badge }}</x-import>
+                </div>
+                <div style="font-family:Poppins,sans-serif;font-size:24px;line-height:1.2;font-weight:600;color:var(--tt-charcoal)">{{ s.title }}</div>
+                <div style="font-size:15.5px;line-height:1.6">{{ s.blurb }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--tt-warm-gray);padding-top:14px">
+                  <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-slate)">{{ s.listLabel }}</span>
+                  <sc-for list="{{ s.items }}" as="i" hint-placeholder-count="4">
+                    <div style="display:flex;gap:9px;align-items:flex-start;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ i.text }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="position:relative;display:flex;flex-direction:column;align-items:center">
+            <div style="{{ s.lineStyle }}"></div>
+            <div style="{{ s.dotStyle }}">{{ s.dot }}</div>
+          </div>
+
+          <div style="{{ s.rightStyle }}">
+            <sc-if value="{{ s.onRight }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ s.cardStyle }}">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+                  <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">{{ s.kicker }}</span>
+                  <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ s.badgeTone }}" hint-size="auto,26px">{{ s.badge }}</x-import>
+                </div>
+                <div style="font-family:Poppins,sans-serif;font-size:24px;line-height:1.2;font-weight:600;color:var(--tt-charcoal)">{{ s.title }}</div>
+                <div style="font-size:15.5px;line-height:1.6">{{ s.blurb }}</div>
+                <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--tt-warm-gray);padding-top:14px">
+                  <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-slate)">{{ s.listLabel }}</span>
+                  <sc-for list="{{ s.items }}" as="i" hint-placeholder-count="4">
+                    <div style="display:flex;gap:9px;align-items:flex-start;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ i.text }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">The exchange</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">What each side actually gets</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px;text-wrap:pretty">Written plainly, because a vague volunteer arrangement is the kind that quietly ends. Both columns have to be worth it after month three, not just at signup.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">She gives</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>Eight hours a month — about two a week, with room to miss one</span></div>
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>Marketing automation capability we have no budget to buy</span></div>
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>Delivery on real nonprofit and internal work, coach-reviewed like anyone else's</span></div>
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>Eventually, the design of a track only a practitioner could write</span></div>
+          </div>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-trail-green);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:12px;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">She gets</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>Explorer's Trail membership for as long as the commitment holds</span></div>
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>Self-guided learning, daily quests, group coaching, prior capstones</span></div>
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>Nonprofit work on her public portfolio — the part her day job cannot give her</span></div>
+            <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>A route past her ceiling: coaching, then an apprenticeship in a new domain</span></div>
+          </div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="Two settled, one still open" dc-props="{{ wideAlert }}" hint-size="100%,140px"><div><strong>The number is eight hours a month.</strong> Roughly two a week, expressed monthly on purpose so a bad week or a holiday does not put her in breach of an agreement she is honouring in spirit. It is small enough to survive a busy quarter and large enough to be real. <strong>Skill is not coaching.</strong> Eight years of campaign work does not make her calibrated to your rubric — she goes up the same ladder as everyone else: Coach's Assistant first, verdicts confirmed, then Associate Coach. <strong>Still open: what happens when the hours lapse.</strong> Decide whether membership pauses, converts to paid, or continues on goodwill, and say it at signup rather than improvising in month five.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:22px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">{{ closeKicker }}</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">{{ closeTitle }}</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ closePoints }}" as="c" hint-placeholder-count="5">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:200px 1fr;gap:22px;align-items:start">
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-trail-green)">{{ c.label }}</span>
+            <span style="font-size:15.5px;line-height:1.65">{{ c.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:32px 36px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:Caveat,cursive;font-size:27px;color:var(--tt-amber-300)">the community grows the curriculum</div>
+        <div style="font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.92);max-width:860px">{{ closeBanner }}</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200},&quot;audience&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;team&quot;,&quot;funder&quot;],&quot;default&quot;:&quot;team&quot;,&quot;tsType&quot;:&quot;'team' | 'funder'&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+const STATIONS = [
+  { kind:'program', dot:'1', badge:'A targeted ask', badgeTone:'green',
+    kicker:'Month 1 · the posting',
+    title:'We advertise for a skill, and name what we trade for it',
+    blurb:'A nonprofit client needs campaigns that actually reach people, and Transition Trails needs the same. So the ask is specific: campaign strategy, segmentation, audience work, eight hours a month — and in return, hands-on time in a real org plus full Explorer\u2019s Trail access. Simone applies because it is the first posting she has seen that offers the technical experience she cannot get at work.',
+    team:['Eight hours a month, about two a week — stated in the posting itself','Postings written per capability gap, with the trade stated plainly','The offer names what she gets: hands on the platform, not just gratitude','It reaches people who would never answer a generic volunteer call'],
+    funder:['Marketing capability acquired without payroll or contractor spend','Volunteer recruitment tied to a named client need, so the value is traceable','The exchange is documented, not informal goodwill'] },
+
+  { kind:'gate', dot:'✓', badge:'Onboarding', badgeTone:'amber',
+    kicker:'Month 1 · agreement',
+    title:'Same day zero as everyone else',
+    blurb:'Google account and groups, Slack, a sandbox, and an NDA — because she is touching a real client. Her volunteer agreement names eight hours a month and the access those hours earn. She is not a guest; she is a member of a delivery squad with a specialism.',
+    team:['Identical access and agreement path as a learner — no volunteer shortcut','NDA before any client work, same as everyone','Eight hours a month and the access it earns, both in writing'],
+    funder:['Volunteers under the same governance as learners and staff','Hours recorded against Program Engagement, so contribution is reportable','No informal access to client data — auditable by design'] },
+
+  { kind:'program', dot:'2', badge:'Ongoing', badgeTone:'teal',
+    kicker:'Month 1 onward · Explorer\u2019s Trail',
+    title:'The room turns out to be the point',
+    blurb:'She expected to trade hours for a login. What she did not expect was being a beginner again in public. She works prior capstones on objects, reports and automation she has only ever requested from someone else — and in the same session she is the one explaining why a segment is wrong, because nobody else in the room has run a campaign to fifty thousand people.',
+    team:['Self-guided learning on the technical half she has always delegated','Group coaching, where she is the expert one week and the student the next','Daily quests and the monthly Trail Mission alongside the learners','Expedition Weekend twice a year: one virtual, one in Dallas'],
+    funder:['An experienced professional engaged in the learner community, unpaid','Her presence raises the ceiling of every session she attends','Skills gained are recorded on the same instrument as any learner\u2019s'] },
+
+  { kind:'program', dot:'3', badge:'Real delivery', badgeTone:'green',
+    kicker:'Months 2–6 · client and TT work',
+    title:'She runs the campaigns, and this time she builds them',
+    blurb:'A nonprofit that had been sending appeals by hand, and then Transition Trails itself. She writes the strategy — that part she could do in her sleep — and then configures the campaigns, the campaign members, the reports. An admin learner pairs with her: she brings the marketing judgment, he brings the object model, and each of them is the other\u2019s teacher.',
+    team:['She configures what she used to request — the whole reason she is here','Paired with an admin learner: her strategy, his platform, both learning','Delivery reviewed by a coach before production, no exceptions for experience','Her nonprofit work is publishable on her portfolio, anonymised by default'],
+    funder:['Nonprofit marketing capacity delivered at no cash cost','Internal capability built for Transition Trails by the same hours','A learner gains marketing exposure no curriculum currently covers'] },
+
+  { kind:'program', dot:'4', badge:'Coach ladder', badgeTone:'teal',
+    kicker:'Month 8 onward · coaching',
+    title:'She wants to teach it, so she starts at the bottom',
+    blurb:'Skill is not calibration. She joins as a Coach\u2019s Assistant, giving first-read verdicts that an Associate Coach confirms or overrides, until her judgments and the rubric agree. Then she coaches — and she is unusually good with the learners who feel like the only person in their company who does their job.',
+    team:['Coach\u2019s Assistant first, however senior the volunteer','Calibration against a senior coach before any binding verdict','Her specialism becomes coachable rather than personal'],
+    funder:['Coaching capacity added at no salary cost, with calibration evidence','Inter-rater agreement recorded from her first read onward','Founder-Independent Delivery, staffed from the community'] },
+
+  { kind:'program', dot:'5', badge:'Co-design', badgeTone:'green',
+    kicker:'Year 2 · Trail of Mastery',
+    title:'She joins a track she is helping write',
+    blurb:'Her own ceiling is integration work — MCP connectors, External Services, Zapier, everything that happens when Salesforce stops being the only system. No track exists for it, so she does both jobs at once: apprentice on a real integration engagement, and co-author of the Integrations track with a coach. She is learning it and specifying it in the same twelve weeks.',
+    team:['Apprentice and co-designer simultaneously — the demand-led model working','MCP connectors, External Apps, middleware and Zapier as the domain','A practitioner writes the minimum skill set, because only they can','Penny adapts to a domain with almost no settled documentation'],
+    funder:['New curriculum authored by the person who needed it, at cost of coaching','A track that will serve every future learner, written once','Evidence the model builds capability the market has not standardised yet'] },
+
+  { kind:'horizon', dot:'→', badge:'Aspirational', badgeTone:'teal',
+    kicker:'Year 3 · what it becomes',
+    title:'The Integrations track runs without her',
+    blurb:'The track she co-wrote enrols its second cohort, coached by someone she trained. She is an Advanced Coach with a specialism the organization now owns rather than borrows — and the nonprofit clients get integration work that was simply unavailable three years earlier.',
+    team:['A borrowed capability becomes an owned one','She is now the person a new specialist volunteer meets first'],
+    funder:['Curriculum and coaching capacity both generated from volunteer time','The clearest test of whether the model compounds — it does, or it does not','A specialism retained after the individual steps back'] }
+];
+
+const CLOSE = {
+  team: { kicker:'For the team', title:'What this journey proves that the others cannot',
+    banner:'Simone arrives giving rather than needing, and leaves having built a track that outlasts her involvement. If skill-for-access works, the curriculum grows from the community instead of from a curriculum team — which is the only version of this that scales without hiring.',
+    points:[
+      ['The posting has to be specific','A generic volunteer call reaches people who want to help. A posting that names Account Engagement, journeys and lead scoring reaches the person who can actually close the gap. Write them per capability, per client need.'],
+      ['Eight hours a month, counted monthly','Two hours a week in practice, but expressed as a monthly total so a holiday or a bad week does not put a willing volunteer in breach. What remains open is the lapse rule — whether membership pauses, converts, or continues when life intervenes. Say it at signup, not in month five.'],
+      ['Seniority does not skip the ladder','She starts as a Coach\u2019s Assistant like everyone else. It is not about respect; it is that the rubric only means something if verdicts are calibrated, and hers are not until they have been checked against a senior coach\u2019s.'],
+      ['Co-design is the real prize','A practitioner who needs a track is the best possible author of it. The Agentforce apprenticeship in the Trail of Mastery journey hinted at this; here it is the whole point. Budget coaching time for track authorship, because that is what it costs.']] },
+  funder:{ kicker:'For funders', title:'Why this holds up to scrutiny',
+    banner:'Specialty capability acquired without payroll, nonprofit delivery in a domain we could not otherwise offer, coaching capacity added with calibration evidence, and a new track authored by the practitioner who needed it. The final station is aspirational and marked as such — everything before it is designed.',
+    points:[
+      ['Volunteers under the same governance','Same day-zero access path, same NDA, same coach review before production. A volunteer\u2019s work is recorded and reviewed exactly like a learner\u2019s, so quality claims hold across both.'],
+      ['Contribution is measured, not estimated','Hours recorded against Program Engagement, delivery recorded against client Cases. Volunteer value can be reported without anyone reconstructing it from memory.'],
+      ['In-kind capability has a market rate','Marketing automation and integration expertise at commercial rates, contributed. That is a reportable in-kind figure with a defensible basis, distinct from generic volunteer hours.'],
+      ['Capability outlives the individual','The track she co-wrote enrols cohorts after she steps back. That is the difference between borrowing a skill and owning one, and it is what makes the investment compound.'],
+      ['Two outcomes, again','A senior practitioner grows past her own ceiling, and nonprofits receive specialist delivery they could never fund. Neither is a by-product of the other.']] }
+};
+
+class Component extends DCLogic {
+  state = { lens:null };
+  get lens() { return this.state.lens || this.props.audience || 'team'; }
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+
+  tab(active) {
+    return this.css({
+      padding:'9px 20px', borderRadius:'999px', cursor:'pointer',
+      fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'14px',
+      background: active ? 'var(--tt-trail-green)' : 'var(--tt-white)',
+      color: active ? 'var(--tt-white)' : 'var(--tt-slate)',
+      border: active ? '1.5px solid var(--tt-trail-green)' : '1.5px solid var(--tt-warm-gray)'
+    });
+  }
+
+  renderVals() {
+    const lens = this.lens, isTeam = lens === 'team', c = CLOSE[lens];
+    const last = STATIONS.length - 1;
+
+    return {
+      lightChip: { style:{ background:'rgba(255,255,255,.14)', color:'var(--tt-white)' } },
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+
+      lensTitle: isTeam ? 'Team view — how the exchange works' : 'Funder view — the evidence each stage produces',
+      lensNote: isTeam
+        ? 'Each stage shows what Simone does. Switch to the funder view to see the record it leaves behind.'
+        : 'Each stage shows the artifacts and measures on the record. Switch to the team view to see the work that produced them.',
+      teamTab: this.tab(isTeam),
+      funderTab: this.tab(!isTeam),
+      setTeam: () => this.setState({ lens:'team' }),
+      setFunder: () => this.setState({ lens:'funder' }),
+
+      stations: STATIONS.map((s, i) => {
+        const onLeft = i % 2 === 0, isGate = s.kind === 'gate', isHorizon = s.kind === 'horizon';
+        return {
+          kicker:s.kicker, title:s.title, blurb:s.blurb, badge:s.badge, dot:s.dot,
+          badgeTone:s.badgeTone,
+          onLeft, onRight: !onLeft,
+          cardStyle: this.css({
+            display:'flex', flexDirection:'column', gap:'12px',
+            background: isHorizon ? 'var(--tt-sky-100)' : 'var(--tt-white)',
+            border: isGate ? '2px solid var(--tt-sun-amber)'
+              : isHorizon ? '2px dashed var(--tt-deep-teal)' : '1px solid var(--tt-warm-gray)',
+            borderRadius:'22px', padding: isGate ? '24px 28px' : '28px 30px',
+            margin: onLeft ? '0 8px 34px 0' : '0 0 34px 8px',
+            boxShadow: isGate || isHorizon ? '0 6px 16px rgba(42,46,44,.08)' : '0 12px 28px rgba(42,46,44,.10)'
+          }),
+          leftStyle: this.css({ display:'flex', justifyContent:'flex-end', minWidth:0 }),
+          rightStyle: this.css({ display:'flex', justifyContent:'flex-start', minWidth:0 }),
+          lineStyle: this.css({
+            position:'absolute', top:'0', bottom: i === last ? '40px' : '0',
+            left:'50%', width:'2px', marginLeft:'-1px', background:'var(--tt-warm-gray)'
+          }),
+          dotStyle: this.css({
+            position:'relative', marginTop:'26px', width:'44px', height:'44px',
+            borderRadius:'999px', display:'flex', alignItems:'center', justifyContent:'center',
+            fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'16px',
+            background: isGate ? 'var(--tt-sun-amber)' : isHorizon ? 'var(--tt-deep-teal)' : 'var(--tt-trail-green)',
+            color: isGate ? 'var(--tt-charcoal)' : 'var(--tt-white)',
+            border:'4px solid var(--tt-trail-light)', flexShrink:0
+          }),
+          listLabel: isTeam ? 'What she does' : 'What it produces',
+          items: (isTeam ? s.team : s.funder).map(text => ({ text }))
+        };
+      }),
+
+      closeKicker: c.kicker,
+      closeTitle: c.title,
+      closeBanner: c.banner,
+      closePoints: c.points.map(([label, text]) => ({ label, text }))
+    };
+  }
+}
+</script>
+</body>
+</html>

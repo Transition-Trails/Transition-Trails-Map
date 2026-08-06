@@ -1,0 +1,320 @@
+TRANSITION TRAILS
+Program Overview & Launch Guide
+Five Programs. One Ecosystem. Built to Launch.
+
+For internal use by the Transition Trails founding team.
+Prepared: June 2026
+
+Contents
+ TOC \h \u \z \t &quot;Heading 1,1,Heading 2,2,&quot;
+
+Our Programs at a Glance
+Transition Trails runs two parallel program tracks: a learner pathway for individuals building or advancing Salesforce careers, and a client program for nonprofit organizations that need technology support. These programs are designed to feed each other — learners gain real-world experience by doing client work, and nonprofit clients benefit from coached, supervised support at a fraction of consulting rates.
+This document is the single source of truth for all five programs as we move into launch. Use it to align on who we serve, what we offer, what it costs, and how the programs connect.
+The Learner Pathway
+Learners move through the pathway based on where they are in their Salesforce journey:
+Explorer's Trail (ET) — Ongoing subscription for anyone exploring or practicing Salesforce. No prerequisites. The entry point and evergreen layer.
+Foundations Trail (FT) — 12-week self-guided program for learners working toward the Salesforce Administrator certification. Build real projects while you study.
+Guided Trail (GT) — 12-week cohort program for certified admins who aren't yet hired. Turn your cert into proof of readiness through real client-style work.
+Trail of Mastery (ToM) — Advanced cohort for employed admins who want to move into consulting-level work. Real nonprofit client projects, coached delivery.
+The Client Program
+Digital Compass (DC) serves nonprofit organizations directly — not individual learners. Nonprofit clients become members, get structured Salesforce and technology support, and their projects are completed by coached GT and ToM learners. This creates a virtuous cycle: learners get real-world experience, nonprofits get high-quality support.
+The Shared Capstone: Horizon Community Hub (HCH)
+FT and GT learners build and administer a shared fictional nonprofit called Horizon Community Hub (HCH) — a Dallas-Fort Worth organization providing utility assistance, housing stabilization, and veteran services. This shared environment creates continuity: FT learners build the org from scratch; GT learners inherit it and work as ongoing admins under real stakeholder pressure from a character named Elena (Program Director).
+Penny AI
+Penny is Transition Trails' on-demand AI learning partner, embedded across all programs. Penny's role shifts by program: self-selection guide in ET, dual exam/build coach in FT, employment and career translator in GT, and guidance support in DC. All learners have access to Penny 24/7 inside the Academy platform.
+
+Program Comparison
+At a glance, here is how all five programs compare:
+
+ | Explorer's Trail
+ | Foundations Trail
+ | Guided Trail
+ | Trail of Mastery
+ | Digital Compass
+ | 
+Type
+ | Subscription
+ | Self-guided (12 wk)
+ | Cohort (12 wk)
+ | Cohort / client work
+ | Membership
+ | 
+Who
+ | Anyone exploring Salesforce
+ | Cert seekers
+ | Cert holders (unhired)
+ | Employed admins
+ | Nonprofit orgs
+ | 
+Prerequisites
+ | None
+ | Platform Foundations cert
+ | Admin certification
+ | Employed as Admin
+ | Salesforce org or tech need
+ | 
+Price (Starting)
+ | $47/mo or $397/yr
+ | $997 (or $497 scholarship)
+ | $1,497 (or $747 scholarship)
+ | $1,997 per learner
+ | $149/mo – $749/mo
+ | 
+Live Sessions
+ | Webinars + office hours
+ | Weekly office hours
+ | Weekly Campfires
+ | Campfires + client sessions
+ | Weekly office hours
+ | 
+Coaching
+ | Async + optional 1:1
+ | 2 private sessions
+ | 3 private sessions
+ | Included
+ | Tier-based
+ | 
+Capstone
+ | Monthly projects
+ | HCH build from scratch
+ | HCH as administrator
+ | Real nonprofit projects
+ | Technology support
+ | 
+Penny AI
+ | Yes
+ | Yes (exam + build modes)
+ | Yes (career focus)
+ | Yes
+ | Yes
+ | 
+
+How to Use This Table
+When someone reaches out, ask two questions: (1) Do they have a Salesforce certification? (2) Are they currently employed in a Salesforce role? Those two answers determine the right program. If they represent a nonprofit organization looking for technology help, that's Digital Compass — a completely separate track.
+Decision Flow
+No cert, exploring → Explorer's Trail
+Working toward cert → Foundations Trail
+Has cert, not yet hired → Guided Trail
+Employed admin, wants to advance → Trail of Mastery
+Nonprofit org needs tech support → Digital Compass
+
+ET — Explorer's Trail
+&quot;You don't need permission to start. You just need a trail.&quot;
+
+What It Is
+The Explorer's Trail is a subscription-based, self-guided learning membership — the entry point and evergreen learning layer of the Transition Trails ecosystem. It is designed for anyone who wants structured, affordable, community-supported access to Salesforce curriculum without the commitment of a cohort-based program. There is no fixed end date and no prerequisites.
+Who It Serves
+The Undecided: Exploring whether Salesforce is the right career path. Needs low-stakes exposure to real concepts without a multi-week commitment.
+The Accidental Admin: Already using Salesforce at work, never formally trained. Needs structured curriculum that fills the gaps their job created.
+The Career Pivoter: Ready to change careers and building skills on their own timeline. Needs an affordable learning habit that compounds over time.
+Program Structure
+Monthly Trail Missions are the core learning unit. Each month, new missions are released across four skill levels — Beginner, Intermediate, Advanced, and Expert — so learners always have something at the right level. Missions are self-contained and work with documentation, Penny, and the community. No walkthrough videos: learners figure it out.
+Monthly rhythm: complete a Trail Mission (or more), work through daily/weekly Challenges, engage with Penny, participate in the Slack community, and optionally attend live webinars.
+Membership Tiers & Pricing
+Monthly: $47/mo — full access, cancel anytime
+Annual: $397/yr (~$33/mo) — saves $167 vs. monthly, plus archive access and advanced Penny features
+Annual + Coaching: $597/yr — adds two scheduled private 1:1 coaching sessions
+GT Graduate: Annual-level access, earned upon completing Guided Trail (no charge)
+GT + ToM Graduate: Lifetime Annual-level access, earned upon completing both programs (no charge)
+Key Features
+Monthly Trail Missions across 4 skill levels (new set released 1st of each month)
+Monthly Capstone Project
+Daily, Weekly & Monthly Challenges
+Penny AI — concept help, self-selection guidance, LinkedIn review (all tiers); advanced Career Builder at Annual
+Slack Community — dedicated channels: #explorers-trail, #help-desk, #job-talk, #wins
+Async 1:1 Coaching — submit a question, coach responds within 48 business hours
+Live and recorded webinars (2-4/month)
+Archive access and cumulative HCH-style build (Annual tiers only)
+50% off Digital Compass / Nonprofit Consulting Program (Annual tiers)
+Discounts on GT, FT, workshops, and bootcamps
+Success Targets
+Mission Completion Rate: 70%+ completing at least 1 Trail Mission per billing period
+Monthly Renewal Rate: 60%+ after first billing cycle
+GT/FT Pipeline Conversion: 15-20% enrolling in a premium program within 12 months
+Career Milestone Rate: 25%+ reporting Salesforce career advancement at 6-month follow-up
+Community Engagement: 50%+ active in Slack at least 2x/month
+NPS: 50+
+What Comes Next
+Enroll in Foundations Trail (no cert yet, Beginner/Intermediate level)
+Enroll in Guided Trail (has Admin cert, not yet hired)
+Enroll in Trail of Mastery (employed and want to advance)
+Volunteer as a Community Contributor
+
+FT — Foundations Trail
+&quot;The certification is the door. The Foundations Trail is how you prove you can walk through it.&quot;
+
+What It Is
+The Foundations Trail is a 12-week, self-guided program for learners working toward the Salesforce Administrator certification. It is a practicum with exam prep embedded inside it — learners build a real Salesforce environment (Horizon Community Hub) from scratch while studying for the exam. By the time they sit the exam, they've already built everything it tests.
+Who It Serves
+The Career Pivoter: Making a deliberate career change into Salesforce. Brings motivation and transferable business skills. Needs structured program that builds exam readiness AND portfolio proof simultaneously.
+The Accidental Admin: Already using Salesforce at work but never formally trained. Wants the credential to match their reality. Needs to formalize what they know and fill the gaps.
+
+Not ready for FT: learners without the Platform Foundations certification (start with ET Beginner/Intermediate), learners who have already passed the Admin exam (go to GT), or anyone looking for a passive study experience — FT requires weekly builds.
+Prerequisites
+Salesforce Platform Foundations Certification — or currently enrolled and preparing for it
+Commitment to weekly builds (this is a practicum, not a study course)
+Program Structure
+Three Sprints, each four weeks long. Each sprint produces a concrete deliverable.
+Sprint 1 (Weeks 1–4): The Foundation — Data Model & Management, Security & Access, Platform Basics. Output: Complete HCH data model, role hierarchy, profiles, permission sets, OWD settings.
+Sprint 2 (Weeks 5–8): The Engine — Automation, Service Cloud, Data Management. Output: Email-to-Case, Web-to-Case, record-triggered Flows, assignment rules, data import/export, duplicate management.
+Sprint 3 (Weeks 9–12): The Proof — Reports & Dashboards, Portfolio Completion, Exam Readiness. Output: Published portfolio, complete Admin Decision Log (12+ entries), exam scheduled or passed.
+Admin Decision Log
+Every learner documents a minimum of 12 configuration decisions throughout the program (FT-01 through FT-12). Each entry includes: the business context, options considered, option chosen, and business justification. At least 2 entries must document mistakes or unexpected outcomes. All entries should be written in language a non-technical stakeholder could understand.
+Coaching
+2 private coaching sessions (45 minutes each)
+Session 1 (Week 4): Build check-in, career clarity, Penny usage review
+Session 2 (Week 10): Exam readiness check, portfolio review, next steps
+Weekly Office Hours: 45-60 min live, optional, recorded
+Penny AI — Dual Mode
+Exam Mode: concept explanation, scenario quizzes, mock exam questions (escalating: mini-quizzes Sprint 1, domain quizzes Sprint 2, full 40-question mock in Week 11)
+Build Mode: build reviewer, decision log partner, stakeholder language coach
+Pricing
+Standard: $997 one-time payment
+Payment Plan: 3x $367/month ($1,101 total)
+Scholarship: $497 — application required; qualifies for WIOA Individual Training Accounts and community foundation pools
+Completion & Outcomes
+Completion is defined by deliverables, not attendance. Learners must complete all 12 weekly build tasks, publish a complete portfolio, complete the Admin Decision Log (12+ entries), attend both coaching sessions, schedule or pass the exam, and publish a final Loom walkthrough.
+Completion Badge: verifiable, LinkedIn-displayable — employers can contact TT to verify
+Admin Exam Pass Rate target: 75%+ within 90 days of completion
+Portfolio Completion Rate target: 80%+ by Week 12
+GT Pipeline Rate target: 40%+ enrolling in Guided Trail within one program cycle
+Learner NPS target: 50+
+
+GT — Guided Trail
+&quot;You earned the certification. Now earn the job.&quot;
+
+What It Is
+The Guided Trail is a 12-week, cohort-based practicum for learners who have passed the Salesforce Administrator certification but have not yet been hired into their first Salesforce admin role. The gap isn't knowledge — it's proof. Employers don't hire certifications; they hire people who can demonstrate judgment under real conditions. The Guided Trail builds that proof.
+Who It Serves
+The Career Starter: New to the workforce, ready to begin a digital career. Brings coachability and curiosity. Needs hands-on project experience and confidence in their own judgment.
+The Career Shifter: Transitioning from operations, support, or management in another industry. Brings transferable business skills. Needs a bridge to translate past experience into Salesforce interview language.
+Prerequisites
+Must hold the Salesforce Administrator Certification
+Must not yet be employed as a Salesforce Admin
+Must commit to 12-week cohort experience with live weekly participation (recordings are backup, not replacement)
+Program Structure
+Three Sprints, each four weeks long. Cohort size: 8–12 learners (minimum 6 to run, maximum 12). One coach per cohort.
+Sprint 1 (Weeks 1–4): The Identity Phase — Org Audit, Data Architecture, Security Review, Stakeholder Alignment. Learner inherits the HCH org and works as its ongoing administrator.
+Sprint 2 (Weeks 5–8): The Efficiency Engine — Automated Intake, Flow Automation, Case Management, Service Cloud. Output: Email-to-Case, Web-to-Case, Flows, Assignment Rules, full case management workflow.
+Sprint 3 (Weeks 9–12): The Accountability Phase — SLA Management, Reporting & Dashboards, Proactive Escalation, Org Handover Documentation. Culminates in Capstone Demo Day.
+What Makes GT Different: Problem-First Learning
+Learners receive a Stakeholder Brief from Elena (fictional Program Director) describing a business problem. They must design the solution before building it. There are no walkthrough videos. Campfire Sessions require learners to present their build and explain their decisions to peers and the coach. This is deliberate: employers want admins who can think, not just follow instructions.
+Admin Decision Log
+Minimum 12 documented decisions (GT-01 through GT-12). At least 3 entries must document mistakes and what the learner would do differently. At least 2 entries must explicitly reference stakeholder preferences or constraints. All entries in language Elena could read and understand.
+Coaching
+3 private coaching sessions (45 minutes each)
+Session 1 (Week 4): How you are presenting your work — employer simulation with one artifact
+Session 2 (Week 8): Portfolio mid-point review, interview readiness, resume and LinkedIn audit
+Session 3 (Week 11): Final career clarity, employer simulation mock interview
+Weekly Stand-Ups: 20-minute group check-in each week
+Weekly Campfire Sessions: 60-minute live group discussion with coach
+Capstone Demo Day (Week 12)
+Each learner presents their HCH build in an 8-minute presentation followed by a 4-minute Q&A. Guests from the Salesforce professional community are invited. This is the culminating public demonstration of readiness.
+Pricing
+Standard: $1,497 one-time payment
+Payment Plan: 3x $549/month
+Scholarship: $747 — application required
+At $1,497 vs. a $73K average entry-level Salesforce Admin salary, payback is under one week of the learner's first paycheck.
+Completion & Outcomes
+Completion is defined by deliverables, not attendance. Required: all 12 weekly build tasks, published portfolio with all required artifacts, Admin Decision Log (12+ GT entries), all 3 coaching sessions, Demo Day presentation, and Career Story section (3-5 curated highlights with problem/solution/business outcome language).
+Post-completion: TT provides a portfolio review and job search guidance session for all GT graduates
+Employment Conversion Rate target: % hired as Salesforce Admins within 6 months of completion
+Cohort Retention Rate target: 85%+
+Learner NPS target: 50+
+
+ToM — Trail of Mastery
+&quot;From credentialed to capable. From capable to indispensable.&quot;
+
+What It Is
+The Trail of Mastery is the advanced cohort for employed Salesforce Admins who want to move into consulting-level, practitioner work. Instead of a fictional capstone environment, ToM participants work on real nonprofit client projects sourced through the Digital Compass program. Projects are delivered under direct expert coach guidance.
+This is the program that closes the gap between holding a certification and being trusted with real, complex, client-facing work — and it creates a direct pipeline between learners and Digital Compass nonprofit clients.
+Who It Serves
+Certified Admins needing client experience: Have the credential, want to prove they can deliver at a higher level in real-world conditions.
+Certified Business Analysts: Need real-world client-facing experience in that role.
+Technical professionals seeking advancement: Aiming for Admin → Product Owner or Advanced Administrator transitions.
+Prerequisites
+Currently employed as a Salesforce Admin
+Skills assessment may be required to confirm readiness for program rigor
+Natural pathway from Guided Trail, though not a hard requirement
+Program Structure
+Cohort-based, ongoing. Participants work in teams on real nonprofit client projects submitted through the Digital Compass portal. Weekly Campfire Sessions plus weekly client sessions. Expert coach guidance included throughout.
+Real client projects: sourced from DC nonprofit member organizations
+Weekly Campfire Sessions + weekly client sessions
+Expert coaching included
+Participants earn a completed project portfolio and documented case studies
+ToM participants take on DC client projects with greater complexity and autonomy than GT learners
+Pricing
+Standard: $1,997 per learner
+Employer-Sponsored Groups (3+ seats): $1,597/seat — opens B2B channel from L&D budgets
+Payment Plan: 4x $549/month
+Scholarship: Availability TBD — funded via grant revenue, not program margin
+Revenue model: At $1,997 x 8 learners = $15,976 gross per cohort.
+Launch Plan — 2026 Pilot
+Marketing campaign to recruit first cohort of talent
+Acquire nonprofit clients through Digital Compass outreach
+Define and create project request portal (DC nonprofit registration)
+Founding member pricing at Angela's discretion for first 5 seats — offset by grant or donor funding
+Completion & Outcomes
+Successfully deliver at least one real-world client project
+Earn completed project portfolio and documented case studies
+LinkedIn and profile updates reflecting new capabilities
+% transitioning into target role (Admin → Product Owner) within 90 days
+Upon completion: Lifetime Annual-level Explorer's Trail access earned
+
+DC — Digital Compass
+&quot;Real Help for the Person Who Didn't Ask for This Job&quot;
+
+What It Is
+Digital Compass is Transition Trails' nonprofit client technology program. It serves nonprofit organizations directly — not individual learners. It provides structured Salesforce guidance, technology training, and consulting project support for nonprofit professionals who need to use their tools more effectively but don't have dedicated technology staff.
+Digital Compass is a membership — a recurring relationship between Transition Trails and the nonprofit organizations they serve. Projects submitted through DC are completed by coached GT and ToM learners, creating a direct connection between the learner pathway and the client program.
+Who It Serves
+The Accidental Admin: Staff member who inherited Salesforce without formal training — program manager, development officer, ED assistant — now also tech lead. Deep knowledge of mission and data, just not the platform it lives in.
+The Nonprofit Leader: Executive Director or COO who knows their org needs to use technology better but doesn't know where to start or who to trust. Has strategic vision and organizational authority.
+The Emerging Organization: Early-stage nonprofit building their Salesforce instance from the ground up with limited resources and no tech background.
+Prerequisites
+None — open to any nonprofit organization with a Salesforce org or technology need. Nonprofit registration is required before project submission (verifies nonprofit status and establishes the technical Trail OS relationship).
+Membership Tiers
+Entry Tier: $149/mo or $1,490/yr — Weekly Office Hours, TrailKit library, Trail OS installation, Penny AI, Slack community
+Mid Tier: $349/mo or $3,490/yr — All Entry features plus Annual Strategy Review (Angela), Annual Architecture Review (Hugh & Kim), personalized technology roadmap, project submission access
+Full Tier: $749/mo or $7,490/yr — All Mid features plus recurring guided implementation and ongoing support, priority project queue placement, dedicated TT point of contact
+Annual pricing = 10x monthly (2 months free). All tiers available on annual invoicing — recommended for grant-funded purchases.
+Core Services
+Weekly Office Hours: live, open-door sessions for real Salesforce and tech questions
+TrailKits: self-serve digital resource packages (guides, templates, AI prompt packs for Claude/Gemini/GPT, curated nonprofit discounts). Available: Nonprofit Salesforce Starter Kit, AI Central Command for Nonprofits, Enabling AI in Salesforce, Data Hygiene Playbook, DKIM Email Deliverability Guide
+Fix It With Me Videos: screen-recorded walkthroughs of common Salesforce problems
+Build With Me Videos: step-by-step configuration walkthroughs
+Trail OS: proprietary app installed in member's Salesforce org for TT access and project visibility
+Project Support (Mid/Full): projects submitted through portal, completed by coached GT/ToM learners
+Project Categories & Examples (Mid/Full Tiers)
+Salesforce, Google Workspace, Communications & Productivity, Business Analysis, AI, Websites
+Org Assessment: 1 week, ~$3K value
+Org Setup: 2-4 weeks, ~$2,250 value
+Reports & Dashboards: 1-2 weeks, ~$1,200 value
+Program Management Module: 1-2 weeks, ~$2,400 value
+Volunteer Management: 2-4 weeks, ~$1,500 value
+Digital Experience Site: 4-8 weeks, ~$3K-$6K value
+Process Automation: 2-6 weeks, ~$1.5K-$3K value
+The Nine Pillars Framework
+Digital Compass is organized around nine pillars of nonprofit operations: Strategic Planning, Board Governance, Human Resources, Volunteer Management, Collaboration & Partnerships, Fundraising, Legal & Financial Management, Technology, and Marketing. The goal is for members to report improved confidence in at least 3 pillars within 12 months.
+Success Targets
+Office Hours Attendance Rate: 50%+ per month
+Project Completion Rate: 90%+ within defined timeframe
+Member Process Improvement: 80%+ reporting improved adoption and productivity
+Member Confidence Rate: 80%+ reporting improved confidence in at least 3 pillars within 12 months
+Resource Efficiency: 10+ hours/month saved via TrailKits
+NPS: 50+
+
+Next Steps for the Founding Team
+These programs are designed and ready. The following is what each founder needs to own as we move into launch:
+
+Finalize pricing pages and program descriptions for the website
+Set cohort dates for the first GT and ToM runs (2026)
+Complete the TrailKit library and ET Mission content for Month 1
+Build the Digital Compass registration and project submission portal
+Open ET and DC memberships — these can run immediately, no cohort required
+Identify founding member pipeline: personal networks, LinkedIn, community partners
+Finalize grant targets for FT and ToM scholarship funding
+Recruit first GT cohort — target 6-8 learners minimum
+
+This document should be reviewed and updated after each program launch. If anything in the program changes, this is the document that gets updated first.

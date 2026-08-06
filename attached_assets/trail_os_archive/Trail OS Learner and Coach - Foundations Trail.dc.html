@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+  textarea { font-family: 'Open Sans', Roboto, sans-serif; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate)">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:0 32px;position:sticky;top:0;z-index:20;box-shadow:0 6px 16px rgba(42,46,44,.08)">
+    <div style="max-width:1280px;margin:0 auto;height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <span style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em">Transition Trails</span>
+        <span style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6)">Trail OS</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;background:rgba(255,255,255,.12);border-radius:999px;padding:3px;gap:2px">
+          <div onClick="{{ setLearner }}" style="{{ tabLearner }}">Learner</div>
+          <div onClick="{{ setCoach }}" style="{{ tabCoach }}">Coach</div>
+        </div>
+        <div onClick="{{ togglePenny }}" style="display:flex;align-items:center;gap:8px;background:var(--tt-sun-amber);color:var(--tt-charcoal);font-family:Poppins,sans-serif;font-weight:600;font-size:13.5px;padding:9px 16px;border-radius:999px;cursor:pointer">Ask Penny</div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ isLearner }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1280px;margin:0 auto;padding:32px;display:grid;grid-template-columns:{{ learnerCols }};gap:28px;align-items:start">
+
+    <div style="display:flex;flex-direction:column;gap:24px;min-width:0">
+
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <h1 style="font-family:Poppins,sans-serif;font-size:30px;font-weight:600;margin:0;color:var(--tt-charcoal)">Good evening, Dana</h1>
+          <div style="font-size:15.5px">Foundations Trail · Cohort 0 · Week 7 of 12</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" hint-size="auto,26px">Sprint 2 · The Engine</x-import>
+          <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="green" hint-size="auto,26px">6 weeks complete</x-import>
+        </div>
+      </div>
+
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px 30px">
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Stepper" current="{{ one }}" steps="{{ sprintSteps }}" hint-size="100%,70px"></x-import>
+      </div>
+
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="One domain needs attention" dc-props="{{ wideAlert }}" hint-size="100%,90px"><div>Data Management is at <strong>64%</strong> — advisory, so you can keep moving. Sprint 1 covered it, and Week 12's final audit depends on a clean import. Your coach can see this too. Two Penny scenario rounds would clear it.</div></x-import>
+
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+        <div style="background:var(--tt-green-100);padding:18px 30px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--tt-warm-gray)">
+          <div style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--tt-green-700)">This week · Week 7</div>
+          <div style="font-size:13.5px;color:var(--tt-green-700)">Sales &amp; Marketing Applications · ~12% of the exam · Definition of Done by Sunday</div>
+        </div>
+        <div style="padding:30px;display:flex;flex-direction:column;gap:26px">
+
+          <h2 style="font-family:Poppins,sans-serif;font-size:27px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Intelligent routing: assignment rules &amp; auto-response</h2>
+
+          <div style="background:var(--tt-sky-100);border-radius:14px;padding:22px 24px;display:flex;gap:18px">
+            <div style="width:44px;height:44px;border-radius:999px;background:var(--tt-deep-teal);color:var(--tt-white);display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;font-weight:600;font-size:16px;flex-shrink:0">E</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-family:Poppins,sans-serif;font-size:14px;font-weight:600;color:var(--tt-charcoal)">Elena Vasquez · Program Director, Horizon Community Hub</div>
+              <div style="font-size:16px;line-height:1.65;text-wrap:pretty">"Two utility cases sat in the general queue for a day because nobody moved them. And a family called to ask whether we had even received their form. I need cases to land in the right place, and people to know we have them."</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--tt-trail-green)">Stories you are building this week</div>
+            <div style="display:flex;flex-wrap:wrap;gap:14px">
+            <div style="flex:1;min-width:250px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-family:Poppins,sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--tt-trail-green)">S2-02</span><span style="font-size:12.5px;color:var(--tt-slate)">Support Representative</span></div>
+              <div style="font-size:15.5px;line-height:1.6"><strong>I want</strong> incoming cases automatically routed to the correct specialist queue based on service type <strong>so that</strong> no case sits in the wrong queue.</div>
+            </div>
+            <div style="flex:1;min-width:250px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-family:Poppins,sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--tt-trail-green)">S2-04</span><span style="font-size:12.5px;color:var(--tt-slate)">Support Representative</span></div>
+              <div style="font-size:15.5px;line-height:1.6"><strong>I want</strong> clients to automatically receive a confirmation email when their case is created <strong>so that</strong> they know their request was received.</div>
+            </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
+              <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--tt-trail-green)">Acceptance criteria — this is the Definition of Done</div>
+              <span style="font-size:13px;color:var(--tt-slate)">2 of 5 passing</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">✓</span><span>A Housing Support case is assigned to the Housing Support Queue with no manual assignment</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">✓</span><span>A case matching no entry criteria lands in the General Support Queue</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.55"><span style="color:#9AA09D;font-weight:700">○</span><span>Activating a second Assignment Rule deactivates the first — only one can be active per object</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.55"><span style="color:#9AA09D;font-weight:700">○</span><span>A web submission returns "We received your request — Case #" within minutes</span></div>
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.55"><span style="color:#9AA09D;font-weight:700">○</span><span>A case a caseworker creates by phone triggers no auto-response</span></div>
+            </div>
+          </div>
+
+          <sc-if value="{{ pennyInline }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1.5px solid var(--tt-sky-blue);background:var(--tt-white);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:26px;height:26px;border-radius:999px;background:var(--tt-deep-teal);color:var(--tt-white);display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;font-size:12px;font-weight:600">P</span><span style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">Penny · on this task</span></div>
+              <div style="font-size:15.5px;line-height:1.6">You scoped the auto-response to Web and Email origin. Tell me what breaks for Elena if you had left it firing on every origin — not the exam answer, what she would actually see.</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap"><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Button" variant="secondary" size="sm" hint-size="auto,36px">Answer Penny</x-import><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Button" variant="ghost" size="sm" hint-size="auto,36px">Ask something else</x-import></div>
+            </div>
+          </sc-if>
+
+          <div style="border-top:1px solid var(--tt-warm-gray);padding-top:24px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
+              <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Decision Log · FT-07</div>
+              <div style="font-size:13.5px;color:var(--tt-slate)">7th of 12 required entries</div>
+            </div>
+            <div style="font-size:15.5px;line-height:1.6;font-style:italic">You built one Assignment Rule with three ordered entries instead of three separate rules. Why? What happens if someone activates a second rule next year — and how would Elena find out?</div>
+            <textarea value="{{ logText }}" onChange="{{ onLog }}" placeholder="Write it the way you would explain it to Elena. Plain language beats precision here." style="width:100%;box-sizing:border-box;min-height:120px;border:1.5px solid var(--tt-warm-gray);border-radius:14px;padding:16px;font-size:15.5px;line-height:1.6;color:var(--tt-slate);resize:vertical"></textarea>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+              <div onClick="{{ saveLog }}" style="display:inline-flex"><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Button" variant="primary" size="md" hint-size="auto,44px">Save entry</x-import></div>
+              <span style="font-size:14px;color:var(--tt-slate)">{{ logStatus }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="background:var(--tt-charcoal);border-radius:22px;padding:24px 28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px">
+        <div style="display:flex;flex-direction:column;gap:6px;min-width:260px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--tt-amber-300)">Tonight's Trail Quest</span>
+            <span style="font-size:12.5px;color:rgba(255,255,255,.6)">Due 11:59 PM · 12 min</span>
+          </div>
+          <div style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-white)">Import Wizard, or Data Loader?</div>
+          <div style="font-size:15px;line-height:1.55;color:rgba(255,255,255,.78)">{{ questBlurb }}</div>
+        </div>
+        <div onClick="{{ doQuest }}" style="display:inline-flex"><x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Button" variant="amber" size="md" hint-size="auto,44px">{{ questLabel }}</x-import></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">Everything else</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:8px;cursor:pointer" style-hover="border-color:var(--tt-trail-green)">
+            <div style="font-family:Poppins,sans-serif;font-size:16px;font-weight:600;color:var(--tt-charcoal)">Course modules</div>
+            <div style="font-size:14.5px;line-height:1.5">Module 2.3 — Assignment &amp; Auto-Response Rules. Two assignments open in Salesforce.</div>
+            <div style="font-size:13.5px;color:var(--tt-trail-green);font-family:Poppins,sans-serif;font-weight:600;margin-top:auto;padding-top:8px">Open in Salesforce →</div>
+          </div>
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:8px;cursor:pointer" style-hover="border-color:var(--tt-trail-green)">
+            <div style="font-family:Poppins,sans-serif;font-size:16px;font-weight:600;color:var(--tt-charcoal)">Your cases</div>
+            <div style="font-size:14.5px;line-height:1.5">Two HCH build cases assigned to you. One is waiting on your reply since Monday.</div>
+            <div style="font-size:13.5px;color:var(--tt-trail-green);font-family:Poppins,sans-serif;font-weight:600;margin-top:auto;padding-top:8px">View queue →</div>
+          </div>
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:8px;cursor:pointer" style-hover="border-color:var(--tt-trail-green)">
+            <div style="font-family:Poppins,sans-serif;font-size:16px;font-weight:600;color:var(--tt-charcoal)">Skill assessment</div>
+            <div style="font-size:14.5px;line-height:1.5">Sprint 2 domain review is required before Week 9. Or take one now on any domain.</div>
+            <div style="font-size:13.5px;color:var(--tt-trail-green);font-family:Poppins,sans-serif;font-weight:600;margin-top:auto;padding-top:8px">Start with Penny →</div>
+          </div>
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:8px;cursor:pointer" style-hover="border-color:var(--tt-trail-green)">
+            <div style="font-family:Poppins,sans-serif;font-size:16px;font-weight:600;color:var(--tt-charcoal)">Office hours</div>
+            <div style="font-size:14.5px;line-height:1.5">Thursday, 7:00 PM CT with Coach Kim. Assignment Rules are on the agenda.</div>
+            <div style="font-size:13.5px;color:var(--tt-trail-green);font-family:Poppins,sans-serif;font-weight:600;margin-top:auto;padding-top:8px">Add to calendar →</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <sc-if value="{{ pennyColumn }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:16px;position:sticky;top:96px">
+        <div style="display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--tt-warm-gray)">
+          <span style="width:30px;height:30px;border-radius:999px;background:var(--tt-deep-teal);color:var(--tt-white);display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;font-size:13px;font-weight:600">P</span>
+          <div style="display:flex;flex-direction:column"><span style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">Penny</span><span style="font-size:12.5px;color:var(--tt-slate)">Exam mode · Sprint 2</span></div>
+        </div>
+        <div style="background:var(--tt-sky-100);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.6">Your entries evaluate in order: Utility, Housing, Veteran Services. What happens to a case that matches two of them?</div>
+        <div style="align-self:flex-end;max-width:88%;background:var(--tt-green-100);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.6;color:var(--tt-charcoal)">First match wins — so only the Utility entry fires.</div>
+        <div style="background:var(--tt-sky-100);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.6">Right. Now tell me what Elena would notice if you had ordered Veteran Services first.</div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;padding-top:12px">
+          <div style="border:1.5px solid var(--tt-warm-gray);border-radius:14px;padding:12px 14px;font-size:14.5px;color:#9AA09D">Ask Penny anything…</div>
+          <div style="font-size:12.5px;color:var(--tt-slate);line-height:1.5">Penny can see your build task and your domain scores. She cannot see your org.</div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isCoach }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1280px;margin:0 auto;padding:28px 32px;display:flex;flex-direction:column;gap:22px">
+
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h1 style="font-family:Poppins,sans-serif;font-size:26px;font-weight:600;margin:0;color:var(--tt-charcoal)">Foundations Trail · Cohort 0</h1>
+        <div style="font-size:14px">8 learners · Week 7 · Coach Kim</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,26px">2 advisory</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,26px">1 blocked</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,26px">1 critical</x-import>
+      </div>
+    </div>
+
+    <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+      <div style="padding:18px 24px;border-bottom:1px solid var(--tt-warm-gray);display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px">
+        <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">Friday synthesis — do these Monday</div>
+        <div style="font-size:13px;color:var(--tt-slate)">Generated 6:00 AM · 4 actions</div>
+      </div>
+      <div style="display:flex;flex-direction:column">
+        <div style="padding:16px 24px;border-bottom:1px solid var(--tt-warm-gray);display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:start">
+          <span style="font-family:Poppins,sans-serif;font-weight:600;color:var(--tt-trail-green);font-size:15px">1</span>
+          <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600;color:var(--tt-charcoal)">Open Thursday office hours with the Assignment Rule question</span><span style="font-size:13.5px;line-height:1.5">Dana, Nia and Devin all believe two Assignment Rules can be active on Case at once. Work it as a group instead of three DMs.</span></div>
+          <span style="font-size:12.5px;color:var(--tt-slate);white-space:nowrap">Cohort pattern</span>
+        </div>
+        <div style="padding:16px 24px;border-bottom:1px solid var(--tt-warm-gray);display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:start">
+          <span style="font-family:Poppins,sans-serif;font-weight:600;color:var(--tt-trail-green);font-size:15px">2</span>
+          <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600;color:var(--tt-charcoal)">Sam Ortega needs a 1:1 this week — critical gate</span><span style="font-size:13.5px;line-height:1.5">Object Manager at 47% on a 20% domain, and no Penny activity in six days. Agenda is drafted from his question-level failures.</span></div>
+          <span style="font-size:12.5px;color:var(--tt-slate);white-space:nowrap">Critical</span>
+        </div>
+        <div style="padding:16px 24px;border-bottom:1px solid var(--tt-warm-gray);display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:start">
+          <span style="font-family:Poppins,sans-serif;font-weight:600;color:var(--tt-trail-green);font-size:15px">3</span>
+          <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600;color:var(--tt-charcoal)">Review Rosalind's Elena Test flag before she publishes</span><span style="font-size:13.5px;line-height:1.5">Her Week 8 scenario answer is technically right and has no business reason in it. Second flag in three weeks — it's a pattern, not a slip.</span></div>
+          <span style="font-size:12.5px;color:var(--tt-slate);white-space:nowrap">Judgment</span>
+        </div>
+        <div style="padding:16px 24px;display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:start">
+          <span style="font-family:Poppins,sans-serif;font-weight:600;color:var(--tt-trail-green);font-size:15px">4</span>
+          <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600;color:var(--tt-charcoal)">Clear or remediate Curtis's blocked gate</span><span style="font-size:13.5px;line-height:1.5">Data Management at 58% blocks his Sprint 3 advance. His build artifacts are complete — this may be a question-reading problem, not a knowledge gap.</span></div>
+          <span style="font-size:12.5px;color:var(--tt-slate);white-space:nowrap">Blocked</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.05fr 1fr;gap:22px;align-items:start">
+
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="padding:16px 22px;border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:16px;font-weight:600;color:var(--tt-charcoal)">Cohort roster</div>
+        <div style="display:grid;grid-template-columns:1fr 52px 96px 78px;gap:10px;padding:10px 22px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span>Learner</span><span>Week</span><span>Gate</span><span>Penny</span>
+        </div>
+        <sc-for list="{{ roster }}" as="r" hint-placeholder-count="8">
+          <div onClick="{{ pick }}" data-id="{{ r.id }}" style="{{ r.rowStyle }}">
+            <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+              <span style="font-size:14.5px;font-weight:600;color:var(--tt-charcoal)">{{ r.name }}</span>
+              <span style="font-size:12.5px;color:var(--tt-slate)">{{ r.note }}</span>
+            </div>
+            <span style="font-size:14px;color:var(--tt-slate)">{{ r.week }}</span>
+            <span style="{{ r.gateStyle }}">{{ r.gate }}</span>
+            <span style="{{ r.pennyStyle }}">{{ r.penny }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px 26px;display:flex;flex-direction:column;gap:20px;position:sticky;top:92px">
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--tt-warm-gray)">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-charcoal)">{{ selName }}</span>
+            <span style="font-size:13.5px;color:var(--tt-slate)">{{ selSub }}</span>
+          </div>
+          <span style="{{ selGateStyle }}">{{ selGate }}</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">Domain scores</div>
+          <sc-for list="{{ selDomains }}" as="d" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1fr 46px 120px;gap:12px;align-items:center">
+              <span style="font-size:13.5px">{{ d.name }}</span>
+              <span style="font-size:13.5px;font-weight:600;color:var(--tt-charcoal);text-align:right">{{ d.score }}</span>
+              <span style="height:6px;border-radius:999px;background:var(--tt-warm-gray);position:relative;overflow:hidden"><span style="{{ d.barStyle }}"></span></span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">Build verification</div>
+          <div style="font-size:14px;line-height:1.6">{{ selVerif }}</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">Reasoning quality</div>
+          <div style="font-size:14px;line-height:1.6">{{ selScenario }}</div>
+        </div>
+
+        <sc-if value="{{ selHasFlag }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--tt-amber-100);border:1px solid var(--tt-amber-300);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px"><span style="font-size:15px">⚠</span><span style="font-family:Poppins,sans-serif;font-size:14px;font-weight:600;color:var(--tt-charcoal)">Elena Test flag — coach only</span></div>
+            <div style="font-size:13.5px;line-height:1.6;font-style:italic;color:var(--tt-slate)">{{ selFlagQuote }}</div>
+            <div style="font-size:13.5px;line-height:1.6">{{ selFlagNote }}</div>
+          </div>
+        </sc-if>
+
+        <div style="border-top:1px solid var(--tt-warm-gray);padding-top:18px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">Penny-drafted session agenda</div>
+          <sc-for list="{{ selAgenda }}" as="a" hint-placeholder-count="3">
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ a.text }}</span></div>
+          </sc-for>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+            <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Button" variant="primary" size="sm" hint-size="auto,36px">Schedule session</x-import>
+            <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Button" variant="secondary" size="sm" hint-size="auto,36px">Clear gate</x-import>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ pennyRailOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:30;display:flex;justify-content:flex-end">
+      <div onClick="{{ closePenny }}" style="flex:1;background:rgba(42,46,44,.28)"></div>
+      <div style="width:420px;max-width:92vw;background:var(--tt-white);height:100%;box-shadow:-12px 0 28px rgba(42,46,44,.14);display:flex;flex-direction:column">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--tt-warm-gray);display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:30px;height:30px;border-radius:999px;background:var(--tt-deep-teal);color:var(--tt-white);display:flex;align-items:center;justify-content:center;font-family:Poppins,sans-serif;font-size:13px;font-weight:600">P</span>
+            <div style="display:flex;flex-direction:column"><span style="font-family:Poppins,sans-serif;font-size:16px;font-weight:600;color:var(--tt-charcoal)">Penny</span><span style="font-size:12.5px;color:var(--tt-slate)">{{ pennyContext }}</span></div>
+          </div>
+          <div onClick="{{ closePenny }}" style="font-size:20px;color:var(--tt-slate);cursor:pointer;line-height:1;padding:4px 8px">×</div>
+        </div>
+        <div style="flex:1;padding:22px 24px;display:flex;flex-direction:column;gap:14px;overflow:auto">
+          <div style="background:var(--tt-sky-100);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.6">Your entries evaluate in order: Utility, Housing, Veteran Services. What happens to a case that matches two of them?</div>
+          <div style="align-self:flex-end;max-width:88%;background:var(--tt-green-100);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.6;color:var(--tt-charcoal)">First match wins — so only the Utility entry fires.</div>
+          <div style="background:var(--tt-sky-100);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.6">Right. Now tell me what Elena would notice if you had ordered Veteran Services first — in her words, not the platform's.</div>
+        </div>
+        <div style="padding:18px 24px;border-top:1px solid var(--tt-warm-gray);display:flex;flex-direction:column;gap:10px">
+          <div style="border:1.5px solid var(--tt-warm-gray);border-radius:14px;padding:13px 15px;font-size:14.5px;color:#9AA09D">Ask Penny anything…</div>
+          <div style="font-size:12.5px;color:var(--tt-slate);line-height:1.5">Grounded in your build task, your domain scores, and the Admin exam guide. Penny cannot see your org.</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:1000},&quot;startView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;learner&quot;,&quot;coach&quot;],&quot;default&quot;:&quot;learner&quot;,&quot;tsType&quot;:&quot;'learner' | 'coach'&quot;,&quot;section&quot;:&quot;Prototype&quot;},&quot;pennyPlacement&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;rail&quot;,&quot;column&quot;,&quot;inline&quot;],&quot;default&quot;:&quot;rail&quot;,&quot;tsType&quot;:&quot;'rail' | 'column' | 'inline'&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
+const ROSTER = [
+  { id:'dana', name:'Dana Whitfield', note:'Routing rules · on pace', week:'7', gate:'Advisory', penny:'Today', fresh:true,
+    sub:'Foundations Trail · Week 7 · Sprint 2',
+    domains:[['Configuration & Setup',84],['Object Manager',81],['Security & Access',91],['Data Management',64],['Service & Support',76],['Sales & Marketing',72]],
+    verif:'6 of 7 weekly verifications passed. Week 7 auto-response check is still open.',
+    scenario:'Strong. Connects configuration choices to what Elena would notice, without prompting.',
+    agenda:['Walk her Week 3 security artifact as an employer would read it.','Data Management is her only soft domain — Week 12 audit needs a clean import.','Career check: is the Admin path still the right direction after six weeks?'] },
+  { id:'theo', name:'Theo Nakamura', note:'On pace', week:'7', gate:'Open', penny:'1d', fresh:true,
+    sub:'Foundations Trail · Week 7 · Sprint 2',
+    domains:[['Configuration & Setup',88],['Object Manager',85],['Security & Access',79],['Data Management',77],['Service & Support',83],['Sales & Marketing',80]],
+    verif:'7 of 7 verifications passed.',
+    scenario:'Consistent. Occasionally over-explains the platform and under-explains the business.',
+    agenda:['No gate to clear — use the time on exam pacing.','Ask him to sit a timed 60-question mock before Week 9.'] },
+  { id:'priya', name:'Priya Raman', note:'A week ahead', week:'8', gate:'Open', penny:'Today', fresh:true,
+    sub:'Foundations Trail · Week 8 · Sprint 2',
+    domains:[['Configuration & Setup',92],['Object Manager',90],['Security & Access',88],['Data Management',84],['Service & Support',89],['Sales & Marketing',86]],
+    verif:'8 of 8 verifications passed. Running a week ahead of the cohort.',
+    scenario:'Excellent. Writes decision entries a hiring manager could read unedited.',
+    agenda:['Talk about the Guided Trail application now, not at Week 12.','Ask whether she wants to sit the exam early.'] },
+  { id:'curtis', name:'Curtis Ellery', note:'Blocked · Data Management', week:'6', gate:'Blocked', penny:'5d', fresh:false,
+    sub:'Foundations Trail · Week 6 · Sprint 2',
+    domains:[['Configuration & Setup',76],['Object Manager',71],['Security & Access',74],['Data Management',58],['Service & Support',72]],
+    verif:'5 of 6 passed. Builds are complete and correct — the gap is on the questions, not the org.',
+    scenario:'Adequate on reasoning. Misreads multi-part question stems under time pressure.',
+    agenda:['His builds are right and his scores are not — read three missed questions with him aloud.','Decide: clear the gate or assign one remediation task. Do not leave it open.','No Penny activity in five days. Ask what changed.'] },
+  { id:'nia', name:'Nia Bankole', note:'Routing rules · on pace', week:'7', gate:'Open', penny:'2d', fresh:true,
+    sub:'Foundations Trail · Week 7 · Sprint 2',
+    domains:[['Configuration & Setup',82],['Object Manager',80],['Security & Access',85],['Data Management',79],['Service & Support',78],['Sales & Marketing',70]],
+    verif:'6 of 7 passed.',
+    scenario:'Good. Missed the same Assignment Rule question as Dana and Devin.',
+    agenda:['Cohort pattern on one-active-rule-per-object — office hours, not 1:1.'] },
+  { id:'sam', name:'Sam Ortega', note:'Critical · 1:1 required', week:'5', gate:'Critical', penny:'6d', fresh:false,
+    sub:'Foundations Trail · Week 5 · Sprint 2',
+    domains:[['Configuration & Setup',69],['Object Manager',47],['Security & Access',66],['Data Management',61],['Service & Support',58]],
+    verif:'3 of 5 passed. Week 5 Email-to-Case verification failed twice.',
+    scenario:'Thin. Answers describe clicks rather than outcomes.',
+    agenda:['47% on Object Manager — 20% of the exam. This is the whole session.','Six days without Penny and two failed verifications — ask about capacity before curriculum.','Be honest about the exam date. Moving it is a legitimate outcome.'] },
+  { id:'rosalind', name:'Rosalind Pike', note:'Elena Test flag ×2', week:'8', gate:'Advisory', penny:'Today', fresh:true,
+    sub:'Foundations Trail · Week 8 · Sprint 2',
+    domains:[['Configuration & Setup',90],['Object Manager',87],['Security & Access',89],['Data Management',83],['Service & Support',91],['Process Automation',88]],
+    verif:'8 of 8 passed. Technically the strongest builder in the cohort.',
+    scenario:'Technically correct, business-blind. Second Elena Test flag in three weeks.',
+    flagQuote:'"I created a record-triggered flow, set the object to Case, chose after-save, added a decision element, then added an update records element and set the status to Closed."',
+    flagNote:'Complete and accurate. Nothing about why the Out of Office filter matters or what it changes for Elena\u2019s queues. She can build anything and explain none of it — that shows up in interviews, not on the exam.',
+    agenda:['Do not lead with the flag. Ask her to explain Week 8 to you as if you were Elena.','Name the pattern out loud: this is the second time.','Her portfolio needs rewriting for a non-technical reader before Week 12.'] },
+  { id:'devin', name:'Devin Frost', note:'Routing rules · on pace', week:'7', gate:'Open', penny:'1d', fresh:true,
+    sub:'Foundations Trail · Week 7 · Sprint 2',
+    domains:[['Configuration & Setup',79],['Object Manager',76],['Security & Access',81],['Data Management',75],['Service & Support',77],['Sales & Marketing',67]],
+    verif:'6 of 7 passed.',
+    scenario:'Improving. Missed the Assignment Rule question with Dana and Nia.',
+    agenda:['Assignment Rules belong in office hours with the other two.','Ask him to redo the Week 4 decision entry — it is the weakest in his log.'] }
+];
+
+const GATE_TONE = {
+  Open:    { background:'var(--tt-green-100)', color:'var(--tt-green-700)' },
+  Advisory:{ background:'var(--tt-amber-100)', color:'var(--tt-amber-700)' },
+  Blocked: { background:'var(--tt-warm-gray)', color:'var(--tt-charcoal)' },
+  Critical:{ background:'var(--tt-charcoal)', color:'var(--tt-white)' }
+};
+
+class Component extends DCLogic {
+  state = { view:null, penny:null, pennyOpen:false, sel:'rosalind', logText:'', logSaved:false, questDone:false };
+
+  get view() { return this.state.view || this.props.startView || 'learner'; }
+  get penny() { return this.state.penny || this.props.pennyPlacement || 'rail'; }
+
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+
+  tab(active) {
+    return this.css({
+      padding:'7px 18px', borderRadius:'999px', cursor:'pointer',
+      fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'13.5px',
+      background: active ? 'var(--tt-white)' : 'transparent',
+      color: active ? 'var(--tt-deep-teal)' : 'rgba(255,255,255,.82)'
+    });
+  }
+
+  gateChip(gate) {
+    const t = GATE_TONE[gate] || GATE_TONE.Open;
+    return this.css({
+      display:'inline-flex', alignItems:'center', justifyContent:'center',
+      padding:'4px 10px', borderRadius:'999px', fontFamily:'Poppins, sans-serif',
+      fontWeight:600, fontSize:'11.5px', whiteSpace:'nowrap',
+      background:t.background, color:t.color
+    });
+  }
+
+  renderVals() {
+    const view = this.view, penny = this.penny;
+    const sel = ROSTER.find(r => r.id === this.state.sel) || ROSTER[0];
+    const quest = this.state.questDone;
+
+    return {
+      one: 1,
+      isLearner: view === 'learner',
+      isCoach: view === 'coach',
+      tabLearner: this.tab(view === 'learner'),
+      tabCoach: this.tab(view === 'coach'),
+      setLearner: () => this.setState({ view:'learner' }),
+      setCoach: () => this.setState({ view:'coach' }),
+
+      sprintSteps: ['Sprint 1 · The Foundation', 'Sprint 2 · The Engine', 'Sprint 3 · The Proof'],
+      learnerCols: penny === 'column' ? 'minmax(0,1fr) 340px' : 'minmax(0,1fr)',
+      pennyColumn: penny === 'column',
+      pennyInline: penny === 'inline',
+      pennyRailOpen: this.state.pennyOpen,
+      pennyContext: view === 'coach' ? 'Coach mode · Cohort 0' : 'Exam mode · Week 7 build task',
+      togglePenny: () => this.setState(s => ({ pennyOpen: !s.pennyOpen })),
+      closePenny: () => this.setState({ pennyOpen:false }),
+
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.6, padding:'20px 24px', borderRadius:'22px', gap:'14px' } },
+
+      logText: this.state.logText,
+      onLog: e => this.setState({ logText:e.target.value, logSaved:false }),
+      saveLog: () => this.setState(s => ({ logSaved: s.logText.trim().length > 0 })),
+      logStatus: this.state.logSaved
+        ? '✓ Saved to your Decision Log — Penny will read it before your next check-in'
+        : 'Autosaves as you type. Published to your portfolio at the end of the sprint.',
+
+      questDone: quest,
+      questLabel: quest ? '✓ Quest complete' : 'Start quest',
+      questBlurb: quest
+        ? 'Logged at 9:14 PM. Penny picked tomorrow\u2019s quest from the domain you scored lowest.'
+        : 'Penny picked this from your Data Management score. Complete or not, it closes at midnight.',
+      doQuest: () => this.setState({ questDone:true }),
+
+      roster: ROSTER.map(r => ({
+        id:r.id, name:r.name, note:r.note, week:r.week, gate:r.gate, penny:r.penny,
+        gateStyle: this.gateChip(r.gate),
+        pennyStyle: this.css({ fontSize:'13px', color: r.fresh ? 'var(--tt-slate)' : 'var(--tt-amber-700)', fontWeight: r.fresh ? 400 : 600 }),
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'1fr 52px 96px 78px', gap:'10px',
+          padding:'14px 22px', alignItems:'center', cursor:'pointer',
+          borderBottom:'1px solid var(--tt-warm-gray)',
+          borderLeft: this.state.sel === r.id ? '3px solid var(--tt-trail-green)' : '3px solid transparent',
+          background: this.state.sel === r.id ? 'var(--tt-green-100)' : 'var(--tt-white)'
+        })
+      })),
+      pick: e => this.setState({ sel: e.currentTarget.dataset.id }),
+
+      selName: sel.name,
+      selSub: sel.sub,
+      selGate: sel.gate,
+      selGateStyle: this.gateChip(sel.gate),
+      selVerif: sel.verif,
+      selScenario: sel.scenario,
+      selHasFlag: !!sel.flagQuote,
+      selFlagQuote: sel.flagQuote || '',
+      selFlagNote: sel.flagNote || '',
+      selAgenda: (sel.agenda || []).map(text => ({ text })),
+      selDomains: sel.domains.map(([name, score]) => ({
+        name, score: score + '%',
+        barStyle: this.css({
+          position:'absolute', inset:'0 auto 0 0', width: score + '%', borderRadius:'999px',
+          background: score < 60 ? 'var(--tt-charcoal)' : score < 70 ? 'var(--tt-sun-amber)' : 'var(--tt-trail-green)'
+        })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

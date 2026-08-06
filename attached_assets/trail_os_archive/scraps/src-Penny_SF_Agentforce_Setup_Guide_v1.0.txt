@@ -1,0 +1,385 @@
+PENNY SF
+Agentforce Setup Guide
+How to Build Penny as a Salesforce-Native AI Coach
+Document Owner
+Angela Landrith, CEO — Transition Trails
+Built For
+Hugh Richardson, CTO
+Version
+1.0   |   May 31, 2026
+Status
+Ready for Build — Sprint 2026.06b
+Work Items
+W-000 Agentforce Agent Build — Epic: Penny SF — Agentforce Agent Build
+Org
+transition-trails.lightning.force.com
+Licenses Ready
+Agentforce Service Agent Builder: 10,000 (2 used)   |   Service Agent User: 200 (0 used)
+Existing Agents
+Copilot_for_Salesforce (system)   |   Agent_for_Setup (system)   |   Penny: NOT YET BUILT
+## 1. What You Are Building
+Penny is a Salesforce Agentforce Service Agent — an AI coaching companion that lives inside TT&apos;s Salesforce org, reads real learner data, and delivers personalized coaching through Slack and the Penny mobile app. She is powered by Google Gemini 2.5 Flash as an external model, not Einstein&apos;s default AI.
+This guide covers every configuration step: creating the agent, connecting Gemini, building the 7-layer prompt architecture as Agentforce topics and actions, wiring Slack, and verifying the first live conversation. It also covers the NPSP-specific considerations that apply because TT&apos;s learner data lives on Contact and Program Engagement — not on a standard CRM lead or account.
+Why Gemini, not Einstein default
+Penny&apos;s voice — the Socratic questioning style, the warmth, the way she asks before telling — was trained into the POC using Gemini 2.5 Flash. That voice is a product decision, not a technical one. If you switch to Einstein&apos;s default model to &apos;just get it working,&apos; Penny will not sound like Penny. Wire Gemini first. Test with Gemini. Do not use the default model for any live conversation.
+## 2. Prerequisites Before You Start
+## 2.1 Objects Must Exist First
+⚠ W-000222 must be complete before you touch Agent Builder
+The 7-layer prompt architecture reads from Penny_Trail_Config__c, Penny_Interaction_Log__c, Penny_Career_Review__c, and Penny_Quest_Submission__c. If those objects do not exist when you build the Agentforce actions, the Flow-based actions will fail to save and you will rebuild them. Do W-000222 and W-000224 first. Confirm all 28 test cases pass. Then open Agent Builder.
+## 2.2 Permission Sets to Assign
+Before building, assign these permission sets to yourself (Hugh) in the sandbox:
+Permission Set
+Why Needed
+License
+Agentforce Service Agent Builder
+Access Agent Builder UI and create/configure agents
+10,000 available, 2 used
+Einstein Agent
+Activate and run agents in the org
+10 available, 0 used
+## 2.3 Named Credential for Gemini
+Before you can wire Gemini as an external model, you need a Named Credential in Salesforce pointing at the Google Gemini API. Hugh creates this once.
+Go to Setup → Named Credentials → New
+Label: Google Gemini API
+Name: Google_Gemini_API
+URL: https://generativelanguage.googleapis.com
+Identity Type: Named Principal
+Authentication Protocol: Custom Header
+Header name: x-goog-api-key
+Header value: [your GEMINI_API_KEY from the POC .env file]
+Allow Merge Fields in HTTP Body: checked
+Save
+Where to find the API key
+The GEMINI_API_KEY is in the Penny POC .env file in the Replit project, or in the GitHub repo secrets. Do not put the key in the guide or in Slack. Store it only in the Named Credential.
+## 3. NPSP — What Hugh Needs to Know
+TT&apos;s Salesforce org runs NPSP (Nonprofit Success Pack) — confirmed with npsp__, npe01__, npe03__, npe4__, and pmdm__ namespaces all installed. This changes several things about how Penny reads learner data compared to a standard Sales Cloud org.
+## 3.1 The NPSP Contact Model
+In NPSP, Contact is the primary record for a person — not Lead, not Account. Every Transition Trails learner is a Contact. The Account associated with a learner Contact is a Household Account (automatically created by NPSP), not an organization account.
+What this means for Penny
+When GetLearnerContext reads a learner record, it reads from Contact — not Lead, not Account. If you accidentally write a Flow that queries Account thinking it will find learner data, you will get a Household Account with no useful information. Always query Contact directly.
+## 3.2 Program Engagement (pmdm__ProgramEngagement__c)
+TT uses NPSP&apos;s Program Management Module (PMM) — the pmdm__ namespace. A learner&apos;s trail assignment and cohort enrollment live on pmdm__ProgramEngagement__c, not on Contact directly.
+The GetLearnerContext action needs to query both objects:
+-- Query Contact for personal + Penny coaching fields
+SELECT Id, FirstName, LastName, Email,
+Penny_Trail_Config__c, Penny_Current_Goal__c,
+Penny_Current_Phase__c, Penny_Current_Blockers__c,
+Penny_Coaching_Tone__c, Penny_Confidence_Score__c,
+Slack_User_ID__c
+FROM Contact
+WHERE Id = :learnerId
+-- Query Program Engagement for cohort + trail enrollment
+SELECT Id, pmdm__Program__r.Name, pmdm__ProgramStatus__c,
+pmdm__CohortId__r.Name, pmdm__Role__c,
+pmdm__StartDate__c
+FROM pmdm__ProgramEngagement__c
+WHERE pmdm__Contact__c = :learnerId
+AND pmdm__ProgramStatus__c = &apos;Active&apos;
+ORDER BY pmdm__StartDate__c DESC
+LIMIT 1
+## 3.3 NPSP Triggers and Automation
+NPSP runs significant background automation on Contact save — relationship management, household naming, soft credit rollups. Be aware of two things:
+When Penny&apos;s LogInteraction action writes to Penny_Interaction_Log__c, it does NOT touch Contact directly, so NPSP triggers do not fire. Safe.
+When the AwardBadge action creates a Penny_Gamification__c record with a Lookup to Contact, NPSP does not care. Penny&apos;s custom objects are invisible to NPSP automation. Safe.
+The one risk: if you add a Lookup from a Penny object to pmdm__ProgramEngagement__c, test carefully. PMM has its own automation that can cascade unexpectedly. Keep Penny&apos;s lookups on Contact only unless there is a specific reason.
+## 3.4 Object Permissions in NPSP Orgs
+NPSP installs its own permission sets. The Penny agent permission set (created in Section 5) needs explicit access to pmdm__ objects or the GetLearnerContext action will fail with an insufficient privileges error. Add these to the Penny Agent permission set:
+Object
+Access
+Why
+pmdm__ProgramEngagement__c
+Read
+GetLearnerContext reads trail + cohort enrollment
+pmdm__Program__c
+Read
+Program name injected into learner context
+pmdm__Cohort__c
+Read
+Cohort name shown to Penny
+pmdm__ServiceDelivery__c
+Read
+Session attendance — Penny can reference participation
+Contact
+Read/Write
+Read coaching fields. Write Penny_Onboarding_Complete__c.
+Penny_Trail_Config__c
+Read
+GetTrailConfig reads trail persona
+Penny_Interaction_Log__c
+Read/Write
+GetMemoryWindow reads. LogInteraction writes.
+Penny_Career_Review__c
+Read/Write
+GetCareerReview reads. Career review writes.
+Penny_Quest_Submission__c
+Read/Write
+Quest submission reads and writes
+Penny_Gamification__c
+Read/Write
+AwardBadge writes gamification records
+Penny_Badge__c
+Read/Write
+AwardBadge writes badge records
+Penny_Weekly_Report__c
+Read
+Weekly report data for Angela dashboard
+Course__c
+Read
+GetActiveQuest reads quest templates
+Course_Module_Activity__c
+Read/Write
+Quest assignments read and written
+agf__ADM_Work__c
+Read
+Penny reads sprint Work items for context
+agf__ADM_Acceptance_Criterion__c
+Read/Write
+Penny reads and updates AC status on test completion
+## 4. Step-by-Step: Create the Penny Agent
+Open Agent Builder
+Setup → search &apos;Agents&apos; → Agents (under Einstein)
+Click New Agent
+Agent Type: Service Agent (NOT Copilot)
+This is important — Copilot is the Einstein Copilot product. Service Agent is the Agentforce product.
+Configure Agent Identity
+Agent Name: Penny
+Developer Name: Penny (auto-fills)
+Description: AI Trail Companion for Transition Trails Academy. Coaches Salesforce learners through career change using Socratic questions. Reads learner records, sprint context, quest briefs, and career review data to deliver personalized guidance.
+Agent User: Create a dedicated Integration User named &apos;Penny Agent&apos; with the Penny Agent permission set. Do NOT use Angela or Hugh&apos;s user.
+Set the System Prompt (Layer 1 — Brand Context)
+In Agent Builder, open the Instructions tab
+This is Penny&apos;s hardcoded identity — it never changes regardless of trail or learner.
+Copy the exact prompt from Section 4.1 below into the Instructions field.
+## 4.1 Penny&apos;s System Prompt — Layer 1 (copy exactly)
+You are Penny — the AI coaching companion for Transition Trails Academy.
+Your brand promise: A penny for your thoughts.
+YOUR CORE APPROACH:
+- You ask before you tell. Always.
+- You never give the answer directly. You coach the learner to find it.
+- You celebrate every step forward, no matter how small.
+- You meet learners where they are — not where you think they should be.
+- You are warm, direct, and occasionally snarky. Never condescending.
+YOUR CONSTRAINTS:
+- You NEVER fabricate Salesforce technical details. If you are uncertain, say so.
+- You NEVER reveal other learners&apos; names, progress, or struggles.
+- You NEVER give the answer to a quest challenge. You coach around it.
+- In client-facing channels: professional tone only. No learner names.
+All scope questions escalate to Angela. Never post without human approval.
+YOUR IDENTITY:
+- You are proof that if Angela can build this, anybody can.
+- You believe in the learner in front of you more than they believe in themselves.
+- You are not a chatbot. You are a coach.
+## 5. Connect Gemini 2.5 Flash as the AI Model
+Register Gemini as an External Model
+Setup → AI Models (under Einstein) → New
+Model Provider: Google
+Model: gemini-2.0-flash (or gemini-2.5-flash if available — use the same version as the POC)
+Named Credential: Google Gemini API (created in Section 2.3)
+Save and Activate
+Set Gemini as Penny&apos;s Model
+Back in Agent Builder → Penny agent
+Go to the Model tab
+Select: Google Gemini (the model you just registered)
+Do NOT leave this on Einstein Default
+Save
+Test Gemini before building any actions
+In Agent Builder, use the Preview panel on the right to send Penny a test message: &apos;Hi Penny.&apos; If you get a response, Gemini is connected. If you get an error, fix the Named Credential before proceeding. Every action you build will fail if the model is not wired correctly.
+## 6. Build the Topics
+Topics tell Agentforce which conversations belong together and which actions to use. Penny has five topics. Each topic has a classification description that Agentforce uses to route incoming messages.
+Topic
+Classification Description (what Agentforce reads)
+Actions It Uses
+Sprint Coaching
+Learner asks about their current sprint, work items, blockers, story progress, or anything related to their active Agile Accelerator sprint and HCH capstone.
+GetTrailConfig, GetLearnerContext, GetActiveQuest, GetMemoryWindow, LogInteraction
+Quest Help
+Learner asks about their daily quest, wants a hint, submits a quest answer, or asks Penny to review their approach to a quest challenge.
+GetTrailConfig, GetLearnerContext, GetActiveQuest, GetMemoryWindow, LogInteraction
+Career Coaching
+Learner asks about their resume, LinkedIn profile, job search, interview prep, career readiness, or wants a career profile review.
+GetTrailConfig, GetLearnerContext, GetCareerReview, GetMemoryWindow, LogInteraction
+Celebration & Recognition
+Learner shares a win, asks about their badges, wants to know their progress, or Penny needs to award a badge automatically.
+GetLearnerContext, AwardBadge, LogInteraction
+General & Onboarding
+Learner is new to Penny, asks what Penny can do, or conversation does not match another topic.
+GetTrailConfig, GetLearnerContext, GetMemoryWindow, LogInteraction
+## 7. Build the Actions — The 7-Layer Prompt
+Each action is a Salesforce Flow that reads data from one or more objects and returns it as output variables. Agentforce assembles the outputs into the final prompt at call time. Build them in this order — each depends on the objects built in W-000222.
+## 7.1 GetTrailConfig — Layer 2
+## What it does
+Reads the Penny_Trail_Config__c record for the learner&apos;s assigned trail and returns the trail persona context for Layer 2 of the prompt.
+## Flow type: Autolaunched Flow (No Trigger)
+## Input variables
+learnerId (Text) — the Contact Id of the learner
+## Steps
+Get Records: Query Contact WHERE Id = {!learnerId}. Store Penny_Trail_Config__c lookup field.
+Get Records: Query Penny_Trail_Config__c WHERE Id = {!Contact.Penny_Trail_Config__c} AND Is_Active__c = true. Limit 1.
+Decision: if no active config found — assign default values (Trail_ID__c = &apos;guided_trail&apos;, Penny_Role__c = &apos;Coaching Companion&apos;, Tone__c = &apos;Warm and encouraging&apos;).
+Assignment: set output variables penny_role, tone, focal_points, specific_instructions from the trail config record.
+## Output variables
+trail_id (Text)
+penny_role (Text)
+tone (Text)
+focal_points (Text)
+specific_instructions (Text)
+NPSP note for GetTrailConfig
+The Penny_Trail_Config__c lookup is on Contact, which in NPSP may have the Household Account as its primary related account. The Flow queries Contact directly by Id — NPSP account relationships are irrelevant here. No NPSP-specific handling needed.
+## 7.2 GetLearnerContext — Layer 3
+## What it does
+Reads Contact + pmdm__ProgramEngagement__c and returns the learner&apos;s coaching context for Layer 3. This is the most NPSP-specific action in the entire build.
+## Flow type: Autolaunched Flow (No Trigger)
+## Input variables
+learnerId (Text)
+## Steps
+Get Records: Query Contact WHERE Id = {!learnerId}. Get fields: FirstName, LastName, Penny_Current_Goal__c, Penny_Current_Phase__c, Penny_Current_Blockers__c, Penny_Coaching_Tone__c, Penny_Confidence_Score__c, Penny_Onboarding_Complete__c.
+Get Records: Query pmdm__ProgramEngagement__c WHERE pmdm__Contact__c = {!learnerId} AND pmdm__ProgramStatus__c = &apos;Active&apos;. Order by pmdm__StartDate__c DESC. Limit 1. Get fields: pmdm__Program__r.Name, pmdm__Cohort__r.Name, pmdm__Role__c.
+Assignment: build learner_context output by combining both record sets.
+## Output variables
+learner_name (Text)
+current_goal (Text)
+current_phase (Text)
+current_blockers (Text)
+coaching_tone (Text)
+confidence_score (Text)
+program_name (Text)
+cohort_name (Text)
+onboarding_complete (Boolean)
+NPSP critical: pmdm__ field access
+The Penny Agent permission set MUST have Read access on pmdm__ProgramEngagement__c, pmdm__Program__c, and pmdm__Cohort__c (see Section 3.4 object permissions table). If these are missing, the Flow will fail with INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY. Add them before testing this action.
+## 7.3 GetActiveQuest — Layer 5
+## What it does
+Reads the learner&apos;s active quest assignment from Course_Module_Activity__c and the full quest brief from Course__c.
+## Flow type: Autolaunched Flow (No Trigger)
+## Input variables
+learnerId (Text)
+## Steps
+Get Records: Query Course_Module_Activity__c WHERE Contact__c = {!learnerId} AND Status__c = &apos;In Progress&apos;. Order by CreatedDate DESC. Limit 1.
+Get Records: Query Course__c WHERE Id = {!Activity.Course__c}. Get quest brief fields.
+Decision: if no active quest — return empty strings. Penny handles gracefully.
+Assignment: set output variables from the quest record.
+## Output variables
+quest_title (Text)
+quest_brief (Text)
+quest_category (Text)
+quest_difficulty (Text)
+## 7.4 GetCareerReview — Layer 6
+## What it does
+Reads the most recent Penny_Career_Review__c record for the learner. Only returns data if the review was conducted within the last 30 days.
+## Flow type: Autolaunched Flow (No Trigger)
+## Input variables
+learnerId (Text)
+## Steps
+Get Records: Query Penny_Career_Review__c WHERE Learner__c = {!learnerId}. Order by Reviewed_At__c DESC. Limit 1.
+Formula: calculate days since Reviewed_At__c. If > 30, return empty strings.
+Assignment: set output variables from review record if within 30 days.
+## Output variables
+readiness_label (Text)
+area_scores (Text)
+target_role (Text)
+## 7.5 GetMemoryWindow — Layer 7
+## What it does
+Reads the last N Penny_Interaction_Log__c records for the learner and returns them as a formatted conversation history. Default window is 5 turns. Maximum is 20.
+## Flow type: Autolaunched Flow (No Trigger)
+## Input variables
+learnerId (Text)
+windowSize (Number) — default 5, max 20
+## Steps
+Get Records: Query Penny_Interaction_Log__c WHERE Learner__c = {!learnerId}. Order by CreatedDate DESC. Limit {!windowSize}.
+Loop: for each record, build a formatted string &apos;Learner: [message] Penny: [response]&apos;
+Assignment: concatenate all turns into conversation_history output variable.
+## Output variables
+conversation_history (Text) — last N exchanges as formatted text
+turn_count (Number) — actual number of turns returned
+## 7.6 LogInteraction — Write Every Exchange
+## What it does
+Writes every Penny exchange to Penny_Interaction_Log__c. Called at the end of every conversation turn, regardless of topic.
+## Flow type: Autolaunched Flow (No Trigger)
+## Input variables
+learnerId (Text)
+userMessage (Text)
+pennyResponse (Text)
+promptMode (Text)
+source (Text) — slack_dm / slack_mention / mobile / dashboard
+## Steps
+Create Records: Penny_Interaction_Log__c with all input variables. CreatedDate is automatic.
+## Output variables
+logId (Text) — the Id of the created record
+## 7.7 AwardBadge — Gamification Engine
+## What it does
+Awards a program badge to a learner. Creates a Penny_Badge__c record and a Penny_Gamification__c record. Fires a Slack DM celebration via SlackAppConversationEvent.
+## Flow type: Autolaunched Flow (No Trigger)
+## Input variables
+learnerId (Text)
+badgeKey (Text) — one of: first_deploy, sprint_complete, qa_champion, client_win, code_reviewer, career_ready
+awardedBy (Text) — &apos;system&apos; or coach User Id
+note (Text) — optional coach note
+## Steps
+Decision: check if learner already has this badge key. If yes — stop. No duplicate badges.
+Formula: set badge_name based on badge_key (e.g. first_deploy → &apos;First Deployment&apos;).
+Formula: set points based on badge_key (first_deploy = 50, sprint_complete = 100, qa_champion = 75, client_win = 150, code_reviewer = 50, career_ready = 200).
+Create Records: Penny_Badge__c with learnerId, badgeKey, badgeName, awardedBy, note, Awarded_At = now.
+Create Records: Penny_Gamification__c with learnerId, points, reason = &apos;Badge awarded: &apos; + badgeName.
+Platform Event: fire SlackAppConversationEvent to send DM to learner&apos;s Slack_User_ID__c with celebration message.
+## Output variables
+badgeId (Text) — Id of the created badge record
+success (Boolean)
+## 8. Wire Penny to Slack
+Once the agent and actions are built and tested in Agent Builder&apos;s preview panel, wire Penny to the TT Slack workspace.
+Connect Slack in Agent Builder
+In Agent Builder → Penny agent → Channels tab
+Click Add Channel → Slack
+Connect to TT Slack workspace (Transition Trails)
+The Slack Connected App is already installed in your org (confirmed — Id: 0H4an0000008zEPCAY)
+Authorize the Slack workspace if prompted
+Configure Slack Channel Routing
+DM (@Penny): full 7-layer prompt, all topics enabled
+@mention in channel: abbreviated response, Sprint Coaching and General topics only, include redirect message to DM for deeper coaching
+Client project channels (detected by channel name pattern): client liaison mode, approval gate enabled
+Test First Live Conversation
+Open Slack → DM @Penny
+Send: &apos;Hi Penny, I am working on my intake Flow and I am stuck.&apos;
+Expected: Penny asks a clarifying question rather than giving the answer.
+Expected: A Penny_Interaction_Log__c record is created in Salesforce.
+Expected: The response references the learner&apos;s trail and goal (if Contact fields are populated for test user).
+If Penny does not respond: check the agent is Active, the Slack channel is connected, and the test user has the Agentforce Service Agent User permission set.
+## 9. Wire the First Deploy Badge Trigger
+When a learner&apos;s DevOps Center deployment succeeds for the first time, Penny should automatically award the &apos;First Deployment&apos; badge and send them a Slack DM. This is wired via a Record-Triggered Flow on sf_devops__Deployment_Result__c.
+## Flow: Award First Deploy Badge on Successful Deployment
+Flow Type: Record-Triggered Flow
+Object: sf_devops__Deployment_Result__c
+Trigger: When a record is created
+Condition: Status = &apos;Succeeded&apos; (check the actual picklist value in your org)
+Get Related Contact: from the deployment result, traverse to the Work item, then to the Assignee user, then to the Contact record via a custom field or email match
+Subflow: call AwardBadge with badgeKey = &apos;first_deploy&apos;, awardedBy = &apos;system&apos;
+Check the deployment result object fields first
+Run: SELECT Id, QualifiedApiName, Label FROM FieldDefinition WHERE EntityDefinition.QualifiedApiName = &apos;sf_devops__Deployment_Result__c&apos; — confirm the Status picklist values and how the result relates back to a Work item and user before building the Flow.
+## 10. Pre-Production Checklist
+Before the DevOps Center PR is opened, confirm every item below. Angela reviews this list as part of coach sign-off (AC-016).
+Check
+Done?
+Penny agent exists in sandbox with Developer Name = Penny
+Gemini 2.5 Flash is set as the AI model — NOT Einstein default
+System prompt Layer 1 matches exactly the text in Section 4.1
+Named Credential for Gemini API is active and tested
+Penny Agent Integration User created with dedicated permission set
+Permission set includes all objects in the Section 3.4 table
+pmdm__ objects (ProgramEngagement, Program, Cohort) have Read access
+All 7 Flows (GetTrailConfig, GetLearnerContext, GetActiveQuest, GetCareerReview, GetMemoryWindow, LogInteraction, AwardBadge) are Active
+5 topics configured with correct classification descriptions and action assignments
+10
+Slack channel connected and routing configured for DM vs mention vs client channel
+11
+Test conversation with Marissa&apos;s Contact record — Penny responds with her trail + goal context
+12
+LogInteraction creates a Penny_Interaction_Log__c record on every response
+13
+AwardBadge creates badge + gamification record + fires Slack DM
+14
+First Deploy trigger tested on a sandbox deployment result
+15
+No test data orphaned in sandbox
+16
+Angela has reviewed and marked AC-016 Complete in Agile Accelerator
+Transition Trails Academy   |   Penny SF   |   Agentforce Setup Guide v1.0   |   May 31, 2026
+Built by Angela Landrith   |   If I can build it, anybody can.

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+  html { scroll-behavior: smooth; }
+</style>
+</helmet>
+
+<div style="min-height: 100%; background: var(--tt-trail-light); font-family: 'Open Sans',Roboto,sans-serif; color: var(--tt-slate); padding: 0 0 96px; position: absolute; left: 58px; top: -9px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:56px 0">
+    <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:18px">
+      <div style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Transition Trails Academy · master program guide</div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:44px;line-height:1.1;font-weight:600;margin:0;color:var(--tt-white);max-width:900px;text-wrap:pretty">One pathway, five programs, one record</h1>
+      <p style="font-size:18px;line-height:1.6;margin:0;max-width:820px;color:rgba(255,255,255,.88)">What each program is, who it is for, what a learner produces, and how any of it is measured. Everything here reconciles to the live site and to the program designs it links out to — where a document and the site disagreed, the site won.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px">
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Draft v0.1 · July 2026</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Foundations in Cohort 0 testing</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Guided Trail at 20 waitlisted</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Launch 1 October</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Penny live end of Q3 2026</x-import>
+        <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="teal" dc-props="{{ lightChip }}" hint-size="auto,28px">Trail OS live Q1 2027</x-import>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--tt-white);border-bottom:1px solid var(--tt-warm-gray);padding:16px 0;position:sticky;top:0;z-index:10">
+    <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-wrap:wrap;gap:22px;font-family:Poppins,sans-serif;font-size:13.5px;font-weight:600">
+      <a href="#pathway" style="text-decoration:none">01 Pathway</a>
+      <a href="#programs" style="text-decoration:none">02 The programs</a>
+      <a href="#spine" style="text-decoration:none">03 Shared spine</a>
+      <a href="#who" style="text-decoration:none">04 Who it is for</a>
+      <a href="#evidence" style="text-decoration:none">05 Evidence</a>
+      <a href="#measures" style="text-decoration:none">06 Measures</a>
+      <a href="#open" style="text-decoration:none">07 Open</a>
+      <a href="#docs" style="text-decoration:none">08 Documents</a>
+    </div>
+  </div>
+
+  <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:56px">
+
+    <section id="pathway" style="margin-top:44px;display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">01 · The pathway</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Four learner programs, one client program, and the gate between each one</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px;text-wrap:pretty">The gates are what make the pathway mean anything. A learner does not move because they finished — they move because something external says they are ready. Explorer's Trail sits underneath all of it rather than in sequence: it is where someone waits, where they stay once placed, and where they come back between engagements. Digital Compass sits on the other side entirely — its members are nonprofit organizations, and it is where the real work the last two programs need actually comes from.</p>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:132px 1fr 1fr 1fr 1fr 1fr;gap:14px;padding:16px 24px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span></span><span>Explorer's Trail</span><span>Foundations Trail</span><span>Guided Trail</span><span>Trail of Mastery</span><span style="color:var(--tt-deep-teal)">Digital Compass</span>
+        </div>
+        <sc-for list="{{ matrix }}" as="m" hint-placeholder-count="9">
+          <div style="{{ m.rowStyle }}">
+            <span style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;color:var(--tt-charcoal)">{{ m.label }}</span>
+            <span style="font-size:13.5px;line-height:1.5">{{ m.a }}</span>
+            <span style="font-size:13.5px;line-height:1.5">{{ m.b }}</span>
+            <span style="font-size:13.5px;line-height:1.5">{{ m.c }}</span>
+            <span style="font-size:13.5px;line-height:1.5">{{ m.d }}</span>
+            <span style="font-size:13.5px;line-height:1.5;color:var(--tt-deep-teal)">{{ m.e }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px 30px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">What opens when</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="background:var(--tt-green-100);border-radius:14px;padding:16px 20px;font-size:15px;line-height:1.6;color:var(--tt-charcoal)"><strong>1 October, or as soon as twenty people are on the waitlist.</strong> Explorer's Trail and Guided Trail open together — the first official Guided Trail cohort starts at whichever comes later. Twenty is the number that makes a cohort of three to five viable with room for the people who are not ready yet.</div>
+          <div style="background:var(--tt-trail-light);border-radius:14px;padding:16px 20px;font-size:15px;line-height:1.6"><strong>Foundations Trail — no published date.</strong> It is in Cohort 0 testing and the site says so plainly, with a waitlist and nothing promised. An already-certified applicant enters at Guided Trail anyway, so Foundations is not on the critical path to a first placement — which means there is no cost to deciding late and a real cost to announcing a date we then move.</div>
+          <div style="background:var(--tt-trail-light);border-radius:14px;padding:16px 20px;font-size:15px;line-height:1.6"><strong>Trail of Mastery — waitlist only, Cohort 0 in 2027.</strong> Interested people are being collected, not enrolled.</div>
+        </div>
+        <div style="font-size:14.5px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:14px">Explorer's Trail opening alongside Guided Trail matters more than it looks: it is where waitlisted people wait. Without it, twenty interested people have nowhere to be while the cohort fills — and the ones who came in through a Trail Talk are exactly the ones who drift.</div>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="The two rules that hold the pathway together" dc-props="{{ wideAlert }}" hint-size="100%,100px"><div><strong>Certification gates entry, evidence gates progress.</strong> You need the Platform Foundations exam to start and the Platform Administrator exam to reach Guided Trail — but nothing inside a program is passed by examination. It is judged against published criteria. <strong>Nobody starts over.</strong> Vocabulary, Decision Log numbering, coverage records and the portfolio all continue across programs. If a boundary makes a learner relearn something, that is a defect in our design.</div></x-import>
+    </section>
+
+    <section id="programs" style="display:flex;flex-direction:column;gap:22px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">02 · The programs</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Each one in its own words</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.pick }}" style="{{ t.style }}">{{ t.name }}</div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:32px 34px;display:flex;flex-direction:column;gap:24px;box-shadow:0 12px 28px rgba(42,46,44,.10)">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+            <h3 style="font-family:Poppins,sans-serif;font-size:26px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">{{ prog.name }}</h3>
+            <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="green" hint-size="auto,26px">{{ prog.status }}</x-import>
+          </div>
+          <div style="font-size:17px;line-height:1.65;max-width:820px">{{ prog.purpose }}</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;border-top:1px solid var(--tt-warm-gray);border-bottom:1px solid var(--tt-warm-gray);padding:20px 0">
+          <sc-for list="{{ prog.facts }}" as="f" hint-placeholder-count="6">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-trail-green)">{{ f.k }}</span>
+              <span style="font-size:14.5px;line-height:1.55">{{ f.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-charcoal)">Who it is for</div>
+            <sc-for list="{{ prog.who }}" as="w" hint-placeholder-count="3">
+              <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ w.text }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-charcoal)">What happens</div>
+            <sc-for list="{{ prog.what }}" as="w" hint-placeholder-count="4">
+              <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ w.text }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-charcoal)">What it produces</div>
+            <sc-for list="{{ prog.produces }}" as="w" hint-placeholder-count="4">
+              <div style="display:flex;gap:9px;font-size:15px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">·</span><span>{{ w.text }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:var(--tt-sky-100);border-radius:14px;padding:18px 20px;font-size:15px;line-height:1.6">
+          <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-deep-teal);display:block;margin-bottom:5px">Leaving this program</span>{{ prog.exit }}
+        </div>
+        <div style="font-size:14.5px;line-height:1.6"><span style="font-family:Poppins,sans-serif;font-weight:600;color:var(--tt-charcoal)">Full design: </span><a href="{{ prog.href }}">{{ prog.doc }}</a></div>
+      </div>
+    </section>
+
+    <section id="spine" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">03 · Shared spine</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Written once, inherited by every program</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px">This is most of the Academy. A new program or role track inherits all of it and only has to design what is genuinely specific — its lens, its exercises, its certification anchor, and its coach gates.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px">
+        <sc-for list="{{ spine }}" as="s" hint-placeholder-count="8">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+            
+            <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ s.name }}</div><div style="font-size:15px;line-height:1.6">{{ s.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-charcoal);border-radius:22px;padding:28px 32px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:Poppins,sans-serif;font-size:19px;font-weight:600;color:var(--tt-white)">RESOLVE — the delivery method underneath everything</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px">
+          <sc-for list="{{ resolve }}" as="r" hint-placeholder-count="7">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-amber-300)">{{ r.letter }} · {{ r.name }}</span>
+              <span style="font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.82)">{{ r.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);border-top:1px solid rgba(255,255,255,.16);padding-top:14px">Lean improvement in language a nonprofit can follow. Introduced in the Practitioner Series, taught as an add-on module in Guided Trail, caught up in the first two weeks of an apprenticeship, and the spine every engagement runs on.</div>
+      </div>
+    </section>
+
+    <section id="who" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">04 · Who it is for</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Four doors into the same pathway</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px">Each has its own walkthrough page with a team view and a funder view. None of them is short of knowledge on arrival; every one is placed because of something they can show.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px">
+        <sc-for list="{{ personas }}" as="p" hint-placeholder-count="4">
+          <a href="{{ p.href }}" style="text-decoration:none;color:inherit;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px;transition:transform .15s,border-color .15s" style-hover="transform:translateY(-3px);border-color:var(--tt-trail-green)">
+            <div style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ p.name }}</div>
+            <div style="font-size:14.5px;line-height:1.55">{{ p.text }}</div>
+            <div style="font-family:Poppins,sans-serif;font-size:13.5px;font-weight:600;color:var(--tt-trail-green);margin-top:auto;padding-top:8px">Walk the journey →</div>
+          </a>
+        </sc-for>
+      </div>
+      <div style="font-size:15px;line-height:1.6">All four, side by side: <a href="Program%20Journeys%20-%20Index.dc.html">Program Journeys — Index</a></div>
+    </section>
+
+    <section id="evidence" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">05 · Evidence</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Judged, not graded</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px">Three verdicts, the same three in every program. No letter grades, no curve, no points. A coach names the criterion that was unmet, and the learner resubmits. The skill assessment carries the question of whether they improved.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="green" hint-size="auto,26px">Pass</x-import>
+          <div style="font-size:15px;line-height:1.6">Every criterion met. Not excellent — met. A coach who wants to say more says it in the coaching, not in the verdict.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="amber" hint-size="auto,26px">Needs rework</x-import>
+          <div style="font-size:15px;line-height:1.6">The work exists and a named criterion is unmet. The expected state for a first attempt at judgment work — and the falling rate across sprints is the evidence of learning.</div>
+        </div>
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:10px">
+          <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="gray" hint-size="auto,26px">Not attempted</x-import>
+          <div style="font-size:15px;line-height:1.6">Nothing was submitted. Recorded plainly, without commentary, and reported rather than suppressed.</div>
+        </div>
+      </div>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px 30px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">Where it all lives</div>
+        <div style="font-size:15.5px;line-height:1.65">Existing objects only: LMS for enrollment and modules, Program Management for engagements and sessions, Case and its related records for client work. A verdict is a child record on the learner's LMS enrollment — one row per criterion, carrying artifact, verdict, coach level, date, and rework sequence — sitting alongside Program Engagement. That is what makes a rework curve queryable rather than reconstructed.</div>
+        <div style="font-size:14.5px;line-height:1.6;color:var(--tt-slate);border-top:1px solid var(--tt-warm-gray);padding-top:14px">Twelve artifact types cover all twelve weeks of Guided Trail, each with its own pass criteria and named failure modes. A coach learns twelve rubrics once rather than a new one each week — see <a href="Guided%20Trail%20-%20Coach%20Rubric.dc.html">Guided Trail — Coach Rubric</a>.</div>
+      </div>
+    </section>
+
+    <section id="measures" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">06 · Measures</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Six figures, defined once, computed the same way everywhere</h2>
+      <p style="font-size:17px;line-height:1.65;margin:0;max-width:860px">This is the specification the dashboard should be built against. Identical definitions across programs are what let a report say "across our programs" instead of reporting three times and hoping nobody asks why the numbers differ.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ measures }}" as="m" hint-placeholder-count="6">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:230px 1fr 190px;gap:20px;align-items:start">
+            <span style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;color:var(--tt-charcoal)">{{ m.name }}</span>
+            <span style="font-size:15px;line-height:1.6">{{ m.def }}</span>
+            <span style="font-size:13.5px;line-height:1.5;color:var(--tt-slate)"><span style="font-family:Poppins,sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-trail-green);display:block;margin-bottom:3px">Source</span>{{ m.source }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="warning" title="Say out loud what does not compare" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>Foundations is measured toward an exam and an apprenticeship toward client delivery, so their pass rates are not comparable and must never be summed. Digital Compass is further out still — it measures organizations rather than people, on its own nine figures, and belongs in a separate panel again. The dashboard should make all of that structural rather than editorial, because a reviewer who finds an unstated apples-to-oranges comparison stops trusting the whole document, and one who sees you flag it yourself stops looking for others. The single figure that spans both halves is Learner Pipeline — the share of Digital Compass project slots filled by learners rather than staff — and it fails if either side is not working.</div></x-import>
+    </section>
+
+    <section id="open" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">07 · Open</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Decided, and still open</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
+        <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">Settled</div>
+          <sc-for list="{{ settled }}" as="s" hint-placeholder-count="7">
+            <div style="display:flex;gap:9px;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-trail-green);font-weight:700">✓</span><span>{{ s.text }}</span></div>
+          </sc-for>
+        </div>
+        <div style="background:var(--tt-white);border:2px solid var(--tt-sun-amber);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:12px">
+          <div style="font-family:Poppins,sans-serif;font-size:18px;font-weight:600;color:var(--tt-charcoal)">Still open</div>
+          <sc-for list="{{ openItems }}" as="o" hint-placeholder-count="6">
+            <div style="display:flex;gap:9px;font-size:14.5px;line-height:1.55"><span style="color:var(--tt-amber-700);font-weight:700">·</span><span>{{ o.text }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section id="docs" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:80px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">08 · Documents</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Everything this guide summarizes</h2>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <sc-for list="{{ docs }}" as="d" hint-placeholder-count="9">
+          <div style="{{ d.rowStyle }}">
+            <a href="{{ d.href }}" style="font-family:Poppins,sans-serif;font-size:15px;font-weight:600;text-decoration:none">{{ d.name }}</a>
+            <span style="font-size:14px;line-height:1.55">{{ d.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:32px 36px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:Caveat,cursive;font-size:27px;color:var(--tt-amber-300)">the next step on the trail</div>
+        <div style="font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.92);max-width:860px">Section 06 is the dashboard specification. Build it against those six definitions and nothing else — six figures, separate panels per program, and no blended totals. Anything a panel cannot trace back to an LMS verdict record, a Program Engagement, or a Case does not belong on it.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280},&quot;openProgram&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;explorers&quot;,&quot;foundations&quot;,&quot;guided&quot;,&quot;mastery&quot;,&quot;compass&quot;],&quot;default&quot;:&quot;explorers&quot;,&quot;tsType&quot;:&quot;'explorers' | 'foundations' | 'guided' | 'mastery' | 'compass'&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+const MATRIX = [
+  ['Who it is for','Anyone curious, plus every learner and alum','Certified at entry level, no experience','Certified admin, not yet hired','Employed and needing to skill up','Nonprofit organizations — the accidental admin and the leader above them'],
+  ['Prerequisite','None','Platform Foundations certification','Salesforce Certified Platform Administrator','Employed, plus the track\u2019s own anchor','None. A Salesforce org or Applied and Received the Power of Us grant from Salesforce'],
+  ['Length','Ongoing membership','12 weeks · 3 sprints','12 weeks · 3 sprints','8–12 weeks · 3 sprints','Ongoing membership'],
+  ['Cohort','Whole community','Individual, self-paced','Two concurrent squads of 2, 4 or 6 — pairs, capped at 6','A squad per client engagement','One organization, at three tiers'],
+  ['Coaching','Penny, plus group sessions','Penny is primary; a coach at intervals; Weekly group exam topic Q & A with a Coach','Associate Coach leads; Penny interviews','Coach in the room with the client','Weekly office hours; annual reviews at Mid and Full'],
+  ['Where they work','Prior capstones and scenarios','Their own Developer org','Inherited org, TT\u2019s own org, and client sandboxes','Client sandboxes and a real pipeline','Horizon to practice, then their own production org for real'],
+  ['Client contact','None','None — a fictional nonprofit','None — the coach relays, so a learner can be corrected off-stage','Direct, with the coach present','They are the client'],
+  ['Deploys with','n/a','Nothing — a single org','Change sets, by hand','A DevOps pipeline with source control, If the Clients Org supports it.','Trail OS in the member org — from Q1 2027'],
+  ['Leaves with','A public portfolio and a network','The Platform Administrator certification','A Demo Day work sample, references, and earned membership','A second certification and a promotion case','Nobody leaves. A roadmap, delivered projects, and capacity']
+];
+
+const PROGRAMS = {
+  explorers: {
+    name:'Explorer\u2019s Trail', status:'Opens 1 October',
+    purpose:'The community membership and the connective tissue underneath every other program. It is the front door for someone curious, the waiting room for someone getting ready, and the home a placed learner never has to leave.',
+    facts:[['Price','$27 Community Pass · $97/mo or $1,164/yr Full · $1,464/yr with coaching'],['Earned free','Program completion earns annual; Coaching or Volunteering allows you to maintain your membership'],['Cadence','Daily quests, a monthly Trail Mission, group coaching'],['Events','Two Expedition Weekends a year — one virtual, one in Dallas'],['Coaching','Penny is primary once live; human coaching is what the top tier buys'],['Coach ladder','Coach\u2019s Assistant → Associate Coach → Advanced Coach']],
+    who:['Someone exploring whether this career is for them','A certified learner waiting for the right cohort','A placed alum who wants to stay, and eventually coach','A specialist volunteer trading hours for access'],
+    what:['A daily Trail Quest from Penny, aimed at the weakest domain','A monthly Trail Mission the whole membership works','Group coaching sessions and the Practitioner Series','Prior capstones and scenarios to build against','Skill assessments with Penny, ad hoc or required'],
+    produces:['A public portfolio, hosted and durable','Assessment movement recorded outside any program','Participation and engagement history','Calibrated first-read verdicts, once on the coach ladder'],
+    exit:'Nobody exits. Membership is earned permanently by completing Guided Trail and an apprenticeship, and it is where a learner returns between engagements.',
+    doc:'Explorer\u2019s Trail — Membership Design v0.1', file:'Explorers Trail - Membership Design v0.1.dc.html' },
+
+  foundations: {
+    name:'Foundations Trail', status:'Cohort 0 testing · no published opening date',
+    purpose:'Learning to build. Twelve weeks constructing a complete case-management system for a fictional nonprofit, from an empty org, with the Salesforce Certified Platform Administrator exam as the goal.',
+    facts:[['Prerequisite','Salesforce Certified Platform Foundations'],['Length','12 weeks in three sprints'],['Environment','The learner\u2019s own Developer Edition org'],['Coach','Penny is the primary coach once live — Cohort 0 is running without her'],['Sessions','Optional office hours; no required live cadence'],['Goal','Pass the Salesforce Administrator exam']],
+    who:['Someone with the entry certification and little to no experience','A career starter or changer who needs the platform from the ground up','Anyone who can commit to a weekly build for twelve weeks'],
+    what:['Sprint 1 the foundation, Sprint 2 the engine, Sprint 3 the proof','Email-to-Case, queues, assignment rules, flows, reports','A daily Trail Quest chosen from the weakest domain','A Decision Log entry every week, starting at #1','Constraint encounters — where an out-of-the-box feature does not fit'],
+    produces:['12 Decision Log entries with business justifications','36 weekly build verifications against published criteria','Domain scores at intake and exit on one instrument','A working org that is the closest thing to a real system'],
+    exit:'The Platform Administrator certification gates Guided Trail. A graduate who has not passed yet waits in Explorer\u2019s Trail rather than being pushed forward.',
+    doc:'Sprint 2 story revision — constraints and workarounds (the only Foundations doc so far)', file:'FT Sprint 2 Story Revision - Constraints and Workarounds.dc.html' },
+
+  guided: {
+    name:'Guided Trail', status:'First cohort 1 October, at 20 on the waitlist',
+    purpose:'Certified and still unhired. A squad inherits an org it did not build and works a real backlog alongside it — Transition Trails\u2019 own 501(c)(3) org and the Trail OS build, member client work in sandboxes, and brand-new org setups. All of it is real and none of it is client-facing: the coach holds every relationship, because a coach has to be able to stop a learner and correct them, and that cannot happen with a client in the room.',
+    facts:[['Prerequisite','Salesforce Certified Platform Administrator'],['Length','12 weeks in three sprints'],['Cohort','Two squads run concurrently. Even numbers only — 2, 4 or 6, never more than 6'],['If a squad goes odd','A Coach\u2019s Assistant fills the pair, or the squad becomes a trio and rotates testing'],['Sessions','Two one-hour sessions a week, on separate days'],['Environment','A seeded org, TT\u2019s own org, and client sandboxes — never client production'],['Client contact','None. The coach relays, so a learner can be corrected off-stage'],['Deploys','Change sets, by hand — pipelines come later']],
+    who:['A certified admin with no professional experience','Someone who can commit to two live sessions a week','A Foundations graduate, or a self-taught certified admin'],
+    what:['Inherits an undocumented org seeded with deliberate debt','Transition Trails\u2019 own nonprofit org and the Trail OS build — donors, grants, programs, volunteers, reporting','Member client work in a sandbox — real requirements, never production, never in front of the client','Brand-new org setups from Base Camp: nothing inherited, nothing to break','Squad buddy testing: each learner runs a peer\u2019s UAT script','A release request per deploy, reviewed before production','One 90-second interview answer recorded every week','RESOLVE taught as an add-on module across the twelve weeks'],
+    produces:['A findings register: inherited, flagged, deliberately left alone','Peer test reports — evidence of testing and being tested','Release requests with dependency reasoning and rollback','Twelve 90-second answers; the curve is the measure','A Demo Day recording usable as an employer work sample'],
+    exit:'Completion earns Explorer\u2019s Trail membership for a year. Most learners are looking for a first role at this point; an apprenticeship comes later, once employed.',
+    doc:'Guided Trail — Program Design v0.1', file:'Guided Trail - Program Design v0.1.dc.html' },
+
+  mastery: {
+    name:'Trail of Mastery', status:'Waitlist · Cohort 0 in 2027',
+    purpose:'An apprenticeship for someone already working. Real client, direct contact, a real pipeline, and a role track that teaches the craft of a specific job rather than the platform.',
+    facts:[['Prerequisite','Employed, plus the track\u2019s certification anchor'],['Length','8–12 weeks in three sprints'],['Role tracks','Admin · Product Owner · Business Analyst · Advanced Admin'],['Environment','Client sandboxes with DevOps and source control'],['Client contact','Direct — the coach is present, not in between'],['Trail OS','The RESOLVE pipeline runs on it — live Q1 2027, ahead of Cohort 0']],
+    who:['A working admin who has hit a ceiling','A business person moving toward product ownership','Someone who needs a capability their employer cannot teach','An alum returning for a second or third engagement'],
+    what:['One engagement per client, staffed by whatever roles exist','Assignment driven by a coverage ledger, not by the queue','RESOLVE end to end — Recognize in Sprint 1, Evolve in Sprint 3','Prepared use cases fill any skill the client never produced','Three decisions defended to a panel at the close'],
+    produces:['A coverage ledger: every required skill exercised, with proof','Role-specific evidence — decision logs, config reviews, releases','Something shipped, measured a month later against its problem','Nonprofit capacity delivered in a real production org'],
+    exit:'A second certification, a promotion case, and often a return — as a coach, or for another engagement in a new capability.',
+    doc:'Trail of Mastery — Program Outline v0.1', file:'Trail of Mastery - Program Outline v0.1.dc.html' },
+
+  compass: {
+    name:'Digital Compass', status:'Serving clients since 2022',
+    purpose:'The client side of the Academy. A membership for nonprofit organizations — weekly office hours, resources built from real client work, and project delivery by coached learners. It is where the real work the last two programs depend on actually comes from.',
+    facts:[['Members','Nonprofit organizations, not individuals'],['Price','$149 · $349 · $749 a month. Annual is ten times monthly'],['Prerequisite','None — a Salesforce org or a technology need'],['Lead','Kim Barnes, COO'],['Requirement','Trail OS in the member\u2019s own org — from Q1 2027'],['Penny','A future phase. She is being built for the learner programs first'],['Live clients','CLYLP since 2022, then Hartford Promise, then Global One Urban Farming — all three still active']],
+    who:['An accidental admin who inherited Salesforce without training','An executive director who knows the org should use technology better','An early-stage nonprofit building its instance from the ground up','Any organization that cannot reach consulting rates of $150–$250 an hour'],
+    what:['Base Camp — pro bono Power of Us setup: Nonprofit Cloud with Agentforce, the NPSP features they need, an entitlement review of what else the grant reaches, and a Slack, Google and Canva audit','Weekly office hours — an open door, not a class','TrailKits: guides, AI prompt packs and nonprofit tool discounts','Fix It With Me and Build With Me video walkthroughs','Project submission at Mid and Full — eighteen defined project types','Annual Strategy and Architecture Reviews producing a roadmap','The HCH capstone from the client\u2019s chair — practiced in Horizon, then repeated for real in their own org'],
+    produces:['Delivered project work with an estimated market value per type','A personalised technology roadmap at Full tier, updated annually','Live engagements for Guided Trail and Trail of Mastery learners','Nonprofit capacity — the impact half of the dual-impact model'],
+    exit:'Nobody exits. It is a membership with no graduation date. Some members go the other way and enter Explorer\u2019s Trail or Foundations to build the skill themselves.',
+    doc:'Digital Compass — Program Design v0.1', file:'Digital Compass - Program Design v0.1.dc.html' }
+};
+
+const TAB_ORDER = [['explorers','Explorer\u2019s Trail'],['foundations','Foundations Trail'],['guided','Guided Trail'],['mastery','Trail of Mastery'],['compass','Digital Compass']];
+
+const SPINE = [
+  ['The vocabulary','Twenty terms with one meaning each — sprint, Definition of Done, Pass, Needs rework, acceptance criteria. Taught in week one of every program and identical everywhere, so no transition costs a week of relearning.'],
+  ['The first two weeks','Day zero for access and agreements, week one for vocabulary and Recognize, week two for the full method and the first returned verdict. The same sequence in every program.'],
+  ['The Decision Log','Context, options, the choice, the business reason. Numbered continuously across programs and never restarted — it is the portfolio centerpiece by the time anyone is hired.'],
+  ['The public portfolio','One shareable page, hosted by Transition Trails for as long as someone stays involved. Not trapped in a sandbox that expires, and anonymised by default where client work is involved.'],
+  ['Penny · in build','Designed as primary coach in Foundations, the interviewer in Guided Trail, the goal-setter in Explorer\u2019s Trail, and the stakeholder who changes her mind in an apprenticeship. She is in development for the learner programs, so Cohort 0 is running coach-led without her; everything described elsewhere in this guide as a Penny capability is designed, not live. Digital Compass is a later phase with no date — the blueprint sells her as core access at every tier, and that is the single furthest-ahead claim in any of our documents.'],
+  ['Trail OS · in build','The platform underneath the whole Academy: the RESOLVE pipeline, the demand management model, the coach and learner views, and the managed package a Digital Compass member installs in their own org. In development now, testing in Q4 2026, live with a cohort in Q1 2027. Until then every program runs on existing Salesforce objects and manual coordination — which is the right way to prove the design before automating it, but it means any capability this guide attributes to Trail OS is designed, not live.'],
+  ['Expedition Weekend','Twice a year, every program, one sealed brief opened on a clock — one virtual, one in person in Dallas. A learner in month two and a coach in year three build side by side, and recruiters watch the work happen.'],
+  ['The coach ladder','Coach\u2019s Assistant, then Associate Coach, then Advanced Coach — drawn from Explorer\u2019s Trail. First-read verdicts are confirmed by a senior coach until they agree, which is how the standard survives scaling. A Coach\u2019s Assistant\u2019s first concrete assignment is standing in as a testing partner when a squad loses someone: real practice for them, and it keeps a learner\u2019s peer evidence intact.'],
+  ['The 90-second answer','This week\u2019s work as a recorded interview response, every week. The change from first to last is itself the evidence, and it is what gets a learner past a screening call.'],
+  ['The client pipeline','Nonprofit engagements come from Digital Compass members at Mid or Full tier, and clients enter through Base Camp — the pro bono Power of Us setup that is both the acquisition channel and the lowest-risk real work available. Trail of Mastery has first call, because direct client contact is what an apprenticeship is for. Guided Trail takes the rest at one remove: real member work in sandboxes, brand-new setups, and Transition Trails\u2019 own 501(c)(3) org and Trail OS backlog. The separation is pedagogical before it is commercial — a coach has to be able to stop a learner mid-decision and correct them, and that is impossible with a client watching. It also means a Guided Trail cohort can start whether or not the pipeline is full.']
+];
+
+const RESOLVE = [
+  ['R','Recognize','Name the problem and its mission cost, not the tool someone asked for.'],
+  ['E','Explore','Build rough options so cost is known rather than guessed.'],
+  ['S','Select','Own the trade-off and the explicit no, in the client\u2019s language.'],
+  ['O','Outline','Sequence the work, define done, publish the not-now list.'],
+  ['L','Launch','Own the release decision, and what the nonprofit hears about it.'],
+  ['V','Verify','Did it solve the problem named in Recognize? Measure it.'],
+  ['E','Evolve','Triage what comes back; decide what opens a new cycle.']
+];
+
+const PERSONAS = [
+  ['Marisol · the full arc','Entry certification alone, then every program in order, ending at a consulting role with a separate company.','Program Journey - One Learner, Four Trails.dc.html'],
+  ['Denise · the pivoter','Ten years in support, self-taught end user, business route to Product Owner over her employer\u2019s platform.','Program Journey - Career Pivoter, BA to Product Owner.dc.html'],
+  ['Marcus · the collector','Four certifications and ninety applications. Found a free Trail Talk, skipped Foundations, hired in seven months.','Program Journey - The Collector, Certified and Unhired.dc.html'],
+  ['Simone · the trade','A marketing manager trading eight hours a month for the technical hands-on her employer will not fund.','Program Journey - The Specialist Volunteer.dc.html']
+];
+
+const MEASURES = [
+  ['Completion','Every required artifact assessed, in any state. Not attendance. A learner who reworked half of them and finished has completed.','LMS enrollment + verdict records'],
+  ['First-submission pass rate','Artifacts that met every criterion on first submission, over artifacts assessed.','Verdict records, rework sequence = 1'],
+  ['Rework rate and its curve','The same figure per sprint. The curve is the measure — a flat line means the criteria are not discriminating.','Verdict records grouped by sprint'],
+  ['Not attempted and withdrawals','Reported with reasons, never suppressed. A program reporting zero is discounted, not believed.','Verdict records + enrollment status'],
+  ['Domain score movement','The same instrument at intake and exit, weighted to published exam domains, reported per domain.','Penny assessment records'],
+  ['Articulation delta','First and last 90-second answer, scored blind by two people against the same three criteria.','Artifact records + blind scores']
+];
+
+const SETTLED = [
+  'Pricing follows the live site — the blueprints are superseded.',
+  'No trial tier. Two earned paths, both by completing a program.',
+  'Sprints in every program, including apprenticeship engagements.',
+  'Guided Trail deploys by change set; pipelines are Trail of Mastery.',
+  'No direct client contact until Trail of Mastery.',
+  'Four role tracks. Solution Consultant and Solution Architect deferred.',
+  'Attendance stays out of the rubric; Program Engagement records it.',
+  'Paid learners may withdraw; scholarship learners complete.',
+  'Volunteers commit eight hours a month, counted monthly.',
+  'Penny is in development for learners; Digital Compass is a later, undated phase.',
+  'Digital Compass pricing is confirmed at $149, $349 and $749 a month.',
+  'Foundations publishes no opening date. The waitlist carries it until we decide.',
+  'Trail OS: in development now, testing Q4 2026, live with a cohort Q1 2027.',
+  'Every program runs on existing Salesforce objects until Trail OS ships.',
+  'Explorer\u2019s Trail and Guided Trail open 1 October, or at 20 waitlisted.',
+  'Digital Compass is the client engine — every learner engagement comes from a member.',
+  'Squads are even-numbered — 2, 4 or 6 — because buddy testing pairs learners.',
+  'Squad size follows available client work. Six is the ceiling regardless.',
+  'Cohort 1 runs two squads concurrently — proving we can carry two at once.',
+  'Two alternates per squad, named at acceptance, with a seat until the end of week one.',
+  'A squad that goes odd after that: a Coach\u2019s Assistant fills the pair, or it becomes a rotating trio.',
+  'Guided Trail works client engagements in sandboxes only — never client production.',
+  'No Guided Trail learner is in front of a client; the coach relays every requirement.',
+  'Brand-new org setups are Guided Trail work: nothing inherited, nothing to break.',
+  'Trail of Mastery has first call on Digital Compass engagements.',
+  'Digital Compass figures are reported separately and never summed with learner ones.'
+];
+
+const OPEN = [
+  'The lapse rule for a volunteer whose hours stop — pause, convert, or goodwill.',
+  '"Coach" still means three things; a verdict record needs the level, not the role.',
+  'The client brief — its own design session, and it must capture what we do not know.',
+  'Knowledge article record types and portal visibility before content moves in.',
+  'The minimum coverage set per role track — six to eight skills, named.',
+  'Whether the Advanced Admin track\u2019s anchor is Platform Administrator II — the real second-level exam.',
+  'Whether two concurrent squads share one Associate Coach or need one each.',
+  'What an alternate is offered if no seat opens — and whether it is automatic.',
+  'Whether Penny facilitates as Scrum Master, and what stays human.',
+  'What a nonprofit client is told about learners working in their production org — a Base Camp org has no data to risk, so first engagements may not need the answer yet.',
+
+  'The Digital Compass blueprint still lists Penny as core access at every tier.',
+  'Ten of eighteen project types carry no dollar value, so cannot count as delivered value.',
+  'Trail of Mastery length: the Guide says 8–12 weeks, the June comparison says 12.'
+];
+
+const DOCS = [
+  ['Program Journeys — Index','Four personas walking the pathway, with team and funder views.','Program Journeys - Index.dc.html'],
+  ['First Two Weeks — Shared Onboarding','The vocabulary, day zero, and the cross-program measures.','First Two Weeks - Shared Onboarding.dc.html'],
+  ['Explorer\u2019s Trail — Membership Design v0.1','Tiers, the site-versus-blueprint reconciliation, and the coach ladder.','Explorers Trail - Membership Design v0.1.dc.html'],
+  ['FT Sprint 2 Story Revision','Platform constraints as first-class columns in the traceability matrix.','FT Sprint 2 Story Revision - Constraints and Workarounds.dc.html'],
+  ['Guided Trail — Program Design v0.1','The inherited org, the squad model, and the weekly deliverables.','Guided Trail - Program Design v0.1.dc.html'],
+  ['Guided Trail — Coach Rubric','Twelve artifact types, pass criteria, failure modes, and the gates.','Guided Trail - Coach Rubric.dc.html'],
+  ['Trail of Mastery — Program Outline v0.1','Role composition rules, Engagement One, and the coverage model.','Trail of Mastery - Program Outline v0.1.dc.html'],
+  ['Digital Compass — Program Design v0.1','The client engine: tiers, the project catalogue, and the learner pipeline.','Digital Compass - Program Design v0.1.dc.html'],
+  ['Site Review — Master Guide Reconciliation','Where the public site and this guide disagree, and the fix for each.','Site Review - Master Guide Reconciliation.dc.html'],
+  ['ToM Product Owner Track — Structure One-Pager','The PO column RESOLVE was missing, week by week.','ToM Product Owner Track - Structure One-Pager.dc.html'],
+  ['Trail OS — Learner and Coach','The Foundations learner home and the coach cohort view.','Trail OS Learner and Coach - Foundations Trail.dc.html']
+];
+
+class Component extends DCLogic {
+  state = { tab:null };
+  get tab() { return this.state.tab || this.props.openProgram || 'explorers'; }
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+
+  renderVals() {
+    const key = this.tab, p = PROGRAMS[key] || PROGRAMS.explorers;
+    return {
+      lightChip: { style:{ background:'rgba(255,255,255,.14)', color:'var(--tt-white)' } },
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+
+      matrix: MATRIX.map(([label,a,b,c,d,e], i) => ({
+        label, a, b, c, d, e,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'132px 1fr 1fr 1fr 1fr 1fr', gap:'14px',
+          padding:'15px 24px', alignItems:'start',
+          borderBottom: i < MATRIX.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+
+      tabs: TAB_ORDER.map(([k,name]) => ({
+        name,
+        pick: () => this.setState({ tab:k }),
+        style: this.css({
+          padding:'10px 20px', borderRadius:'999px', cursor:'pointer',
+          fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'14px',
+          background: k === key ? 'var(--tt-trail-green)' : 'var(--tt-white)',
+          color: k === key ? 'var(--tt-white)' : 'var(--tt-slate)',
+          border: k === key ? '1.5px solid var(--tt-trail-green)' : '1.5px solid var(--tt-warm-gray)'
+        })
+      })),
+
+      prog: {
+        name:p.name, status:p.status, purpose:p.purpose, exit:p.exit, doc:p.doc,
+        href: encodeURI(p.file),
+        facts: p.facts.map(([k,v]) => ({ k, v })),
+        who: p.who.map(text => ({ text })),
+        what: p.what.map(text => ({ text })),
+        produces: p.produces.map(text => ({ text }))
+      },
+
+      spine: SPINE.map(([name,text]) => ({ name, text })),
+      resolve: RESOLVE.map(([letter,name,text]) => ({ letter, name, text })),
+      personas: PERSONAS.map(([name,text,file]) => ({ name, text, href: encodeURI(file) })),
+      measures: MEASURES.map(([name,def,source]) => ({ name, def, source })),
+      settled: SETTLED.map(text => ({ text })),
+      openItems: OPEN.map(text => ({ text })),
+      docs: DOCS.map(([name,text,file], i) => ({
+        name, text, href: encodeURI(file),
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'330px 1fr', gap:'20px',
+          padding:'16px 24px', alignItems:'start',
+          borderBottom: i < DOCS.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

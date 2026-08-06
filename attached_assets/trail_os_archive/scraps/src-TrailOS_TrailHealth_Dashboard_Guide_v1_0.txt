@@ -1,0 +1,385 @@
+TrailHealth Dashboard
+Reference Guide & Health Definition Framework
+Transition Trails Academy  |  TrailOS Operating System  |  Version 1.0  |  June 2026
+Version
+1.0 — June 2026
+Classification
+Internal — Staff & Contractors Only
+Audience
+Angela (CEO), Kim (COO), Hugh (Tech Lead), Michele (Tester)
+Owner
+Angela Landrith — Executive Director
+Data Sources
+Salesforce MCP (live), Google Analytics 4 via Zapier (weekly), Project knowledge docs
+Refresh Cadence
+Weekly — Mondays 8:00 AM CDT
+Dashboard File
+tt_trail_health_dashboard_v6.html  |  Hosted on GitHub Pages
+Review Cycle
+Quarterly or upon a major build milestone
+About this document: This guide explains what the TrailHealth Dashboard is, where every number comes from, and how the health of each dimension is defined. It is the reference document for Angela, Kim, Hugh, and Michele — so that any team member can understand what they are looking at, verify the source of any data point, and update the dashboard correctly when the org or the programs change.
+## 1. What the TrailHealth Dashboard Is
+The TrailHealth Dashboard is Transition Trails' weekly operating pulse — a single HTML file that surfaces live data from the Salesforce org and Google Analytics into a structured five-tab view for Angela, Kim, Hugh, and Michele. It replaces the need to open Salesforce reports, check Zapier logs, or manually compile a status update before the team's weekly touchpoint.
+The dashboard serves two purposes simultaneously. It is an operational health monitor — a real-time view of the org, the programs, and the digital presence as they exist today. And it is a build governance tool — it tracks which Trail OS capabilities have been designed and which have been deployed, surfacing the gap between architecture and production so the team never loses track of where the system actually is.
+Core principle: the dashboard surfaces what is true, not what is planned. Every metric is sourced from a live system or a dated document. Where data is estimated or sourced from a document rather than a live pull, the source is labelled explicitly.
+## 1.1 The Five Tabs
+Tab
+What it shows
+Primary data source
+Refresh
+Website & GA4
+Sessions, bounce rate, goal completions, traffic sources, top pages
+Google Analytics 4 via Zapier
+Weekly — Mondays
+Salesforce Org
+Org health scorecard, pipeline, cases, user login recency, priority actions
+Salesforce MCP — live pull
+On demand + weekly
+Automation Health
+Custom flow inventory, legacy Workflow Rule migration status, integration health
+Salesforce MCP — live pull
+On demand + weekly
+Program Health
+Program portfolio, active cohorts with progress bars, learner rosters, funnel chart
+Salesforce MCP — live pull
+On demand + weekly
+Penny & Agentforce
+License inventory, Penny personas, build phases, Data Cloud segments, health flags
+SF MCP live + Capability Guide v1.0
+On demand + weekly
+Trail OS
+Capability build status, Demand Management sequence, epic roadmap, and architecture flags
+SF MCP live + project knowledge docs
+On demand + weekly
+## 1.2 How to Use the Dashboard
+Open the HTML file in any browser — it requires no server or login. Click Refresh data to trigger a manual pull. The Salesforce MCP connection runs live queries against the production org each time the dashboard is opened or refreshed. GA4 data updates on Mondays via Zapier.
+Each tab is independent. Navigate by clicking the tab bar. Flags and attention items appear inline within each tab — there is no separate notifications pane. The footer of each tab shows the data source and the last updated timestamp for that section.
+## 2. Data Sources
+Every number in the dashboard has a source. This section documents what pulls from where, how frequently, and what the fallback is when a live connection is unavailable.
+## 2.1 Salesforce MCP (Primary — Live)
+The Salesforce MCP server (TT-Claude MCP External App, registered May 25, 2026) provides direct SOQL query access to the production Salesforce org. This is the primary data source for the Salesforce Org, Automation Health, Program Health, Penny & Agentforce, and Trail OS tabs.
+The MCP connection runs unauthenticated relative to the dashboard user — it uses the pre-authorised credentials established when the External Client Application was registered. No Salesforce login is required to view the dashboard.
+Object / Query
+Tab
+What it returns
+FlowDefinitionView WHERE IsActive = true AND LastModifiedDate > [date]
+Automation Health
+All active custom flows with API name, type, description, and last modified date
+BotVersion + BotDefinition
+Penny & Agentforce
+Agent definitions, version status, and last modified date
+ExternalClientApplication
+Penny & Agentforce
+Connected app inventory — Penny Platform, Claude MCP, Linear, Slack, etc.
+ConnectedApplication
+Penny & Agentforce + Trail OS
+Fully connected application registry — 19 apps
+pmdm__Program__c
+Program Health
+All programs with status, start/end dates, and descriptions
+pmdm__ProgramCohort__c
+Program Health
+All cohorts with status, start/end dates, and program linkage
+pmdm__ProgramEngagement__c
+Program Health
+All 36 engagements — stage, cohort, contact, program
+Case GROUP BY Status
+Salesforce Org
+Live case count by status
+Opportunity WHERE IsClosed = false GROUP BY StageName
+Salesforce Org
+Open pipeline by stage
+User WHERE IsActive = true
+Salesforce Org
+Active users with last login date and profile
+EntityDefinition WHERE IsCustomizable = true
+Trail OS
+All custom objects by namespace — confirms what is deployed vs. planned
+## 2.2 Google Analytics 4 via Zapier (Weekly)
+Website and GA4 metrics are pulled weekly on Mondays via a Zapier automation that queries the GA4 Reporting API and writes the results to a data layer that the dashboard reads. The current refresh schedule is Monday, 8:00 AM CDT.
+The GA4 metrics cover the trailing 7-day window ending Sunday night. Week-over-week change is calculated by the Zapier automation before it reaches the dashboard. If the Zapier automation has not run since the last Monday, the dashboard displays the previous week's data with a stale indicator in the update banner.
+Metric
+GA4 dimension / metric
+How WoW change is calculated
+Sessions
+ga: sessions
+Current week vs. prior 7-day period — Zapier computes
+Unique Users
+ga:activeUsers
+Same
+Avg. Session Duration
+ga:averageSessionDuration
+Same — formatted as M:SS
+Bounce Rate
+ga:bounceRate
+Delta in percentage points — not percentage change
+Goal Completions
+ga:goalCompletionsAll
+Count delta + percentage change
+New Applicants
+Custom event: application_submit
+Count delta only
+Traffic Sources
+ga:sessionDefaultChannelGroup
+Percentage share of sessions this week
+Top Pages
+ga:pagePath + ga:pageviews
+Top 5 by pageviews — WoW view count change
+## 2.3 Project Knowledge Documents (Dated — Not Live)
+Important: data sourced from project documents is not live. It reflects the state of the document at its version date. Where document data is used, the dashboard labels the source and version explicitly.
+Document
+Version / Date
+What it contributes to the dashboard
+TrailOS Agentforce & Data Cloud Capability Guide
+v1.0 — June 2026
+Penny personas, prompt architecture, Data Cloud segments, build phases, PSL inventory
+TrailOS Demand Management Capability Guide
+v1.0 — June 2026
+Object model, build sequence, RESOLVE gate, Case architecture
+TrailOS Employee Management Capability Guide
+v1.0 — June 2026
+Employee object design, core team records to seed, build dependencies
+TrailOS Knowledge Capability Guide
+v1.0 — June 2026
+Knowledge object design, tag taxonomy, Data Categories, Penny integration
+TrailOS Product Vision Epics Set 1 & 2
+v1.0 — June 2026
+Epic roadmap (E-01 through E-14+), dependencies, RESOLVE gates
+Penny POC Handoff Summary
+May 19, 2026
+Penny POC build status — note: test count (~297) is superseded by ~1,200 as of June 2026
+## 3. How Health Is Defined
+The term 'health' in the TrailHealth Dashboard is deliberate and specific. It does not mean everything is working. It means the team has clear visibility into what is working, what is not, and what the next action is. A system where every flag is green is healthy. A system where every flag is red but all flags are surfaced, and owners are assigned, is also healthy. A system where problems exist but are not visible is not healthy.
+Health definition: an org, program, or capability is healthy when its current state is accurately known, the gap between current state and target state is explicitly documented, and every gap has an owner and a next action. Visibility is health. Surprise is the failure mode.
+## 3.1 Org Health Scorecard — Six Dimensions
+The Salesforce Org tab shows a six-dimensional health scorecard. Each dimension is scored 0–100% and displayed as a progress bar with a status label. The scores are not automatically calculated from a query — they are Angela's assessment based on the org assessment completed May 21, 2026 and updated as build work completes.
+Dimension
+What it measures
+Current score
+How it improves
+Security
+Password policies, login attempt limits, session timeout, MFA, profile permissions, user account hygiene
+40%
+Fix password policies (Setup → Security), deactivate 3 test accounts, review profile permissions
+User Management
+Active users have appropriate roles and profiles, no ghost accounts, license utilisation is clean
+70%
+Deactivate Test Coach, Test Richardson, Test Designer — immediate license recovery
+Automation
+Flows are documented, named correctly, no legacy Workflow Rules, no TEST flows in Production, DevOps Center connected
+72%
+Deactivate TEST flow, migrate 4 Workflow Rules (copies already exist), reconnect DevOps Center
+Feature Adoption
+Licensed features are configured and in use — Sales Engagement, Pipeline Inspection, Einstein Activity Capture, In-App Guidance
+45%
+Complete Einstein Activity Capture setup, assign Pipeline Inspection to users, configure In-App Guidance
+Reporting & Dashboards
+Angela can answer program health, pipeline, and operational questions from Trail OS without manual compilation
+75%
+Seed Knowledge content, build program-level reports once E-02 data is cleaned
+Data Quality
+Case origin field populated, no orphaned program engagement records, no TEST cohorts, consistent record types
+65%
+Make Case Origin required, clean 4 TEST cohorts, link 10 unassigned Applied learners to GT 2026 03
+## 3.2 Automation Health — What Makes a Flow Healthy
+A flow is considered healthy when it meets all four criteria below. The Automation Health tab inventories all active custom flows against these criteria and flags any violations.
+Criterion
+Healthy
+Flagged
+Current org status
+Description populated
+Flow has a clear description explaining its purpose and trigger
+No description — intent unknown without reading the flow
+3 of 17 missing: Contact - Edit trigger, TEST, Clockify Integration Center
+Naming convention
+Object_Trigger_Purpose format, e.g. Case_New_Record
+Arbitrary naming makes inventory impossible
+Most flows follow convention — TEST and Sme_ flows do not
+Not a legacy Workflow Rule
+Flow is an AutoLaunchedFlow, Screen Flow, or Scheduled Flow
+ProcessType = Workflow — deprecated Dec 2025
+4 Workflow Rules remain — migration copies exist for 3 of 4
+Not a test artifact in Production
+Flow name is not TEST, DEMO, or sandbox-pattern
+TEST flows consume org capacity and create confusion
+1 flagged: TEST flow (Feb 22, 2026) — deactivate immediately
+## 3.3 Program Health — How Cohort Progress Is Measured
+The Program Health tab calculates each cohort's progress toward its end date as a simple linear percentage: (days elapsed since start date) ÷ (total duration in days) × 100. This is displayed as a coloured progress bar alongside the cohort name and date range.
+This is a time-based measure, not a completion-based measure. It shows how far through the scheduled window a cohort is — not whether learners are on track within that window. Learner-level completion tracking requires the Assessment and Program Engagement stage data to be cleaned (E-02) before it can be computed accurately.
+Cohort
+Start
+End
+Progress calc
+Bar colour
+GT 2026 01
+Apr 19, 2026
+Jul 19, 2026
+(Jun 5 − Apr 19) ÷ (Jul 19 − Apr 19) = 64%
+Trail Green
+GT 2026 02
+May 3, 2026
+Jul 26, 2026
+(Jun 5 − May 3) ÷ (Jul 26 − May 3) = 47%
+Trail Green
+FT 2026 Beta 01
+May 11, 2026
+Aug 3, 2026
+(Jun 5 − May 11) ÷ (Aug 3 − May 11) = 37%
+Deep Teal
+GT 2026 03
+Aug 2, 2026
+Oct 25, 2026
+Not started — 0%
+Grey (planned)
+## 3.4 Learner Pipeline — How the Funnel Is Counted
+The Program Health tab shows an engagement funnel for the Guided Trail. Each bar in the chart represents the count of Program Engagement records in a given Stage value, pulled live from pmdm__ProgramEngagement__c. The funnel categories and their current live counts are:
+Stage value
+What it means
+Live count (Jun 5, 2026)
+Applied
+Submitted application — awaiting cohort assignment
+13
+Waitlisted (ToM)
+Waitlisted for Trail of Mastery specifically
+Active (live cohorts)
+Currently enrolled and active in a GT cohort
+Cohort-level — query by cohort
+Completed
+Completed the program (GT 2025 cohort)
+Application Denied
+Application reviewed and not accepted
+11
+Withdrawn
+Enrolled but withdrew before completion
+## 3.5 Penny & Agentforce — How Readiness Is Measured
+The Penny & Agentforce tab does not use a percentage score. Readiness is assessed against the five-phase build sequence defined in the Agentforce & Data Cloud Capability Guide v1.0. Each phase has a gate — a specific condition that must be met before the next phase can begin. The dashboard shows which phase each component is in and whether its gate is met.
+The primary readiness blocker at the time of this document is not technical — it is data quality. The Agent Builder cannot produce reliable results until the data foundation (Phase 1) is complete: Program Engagement records are cleaned, 10+ Knowledge articles are published, Employee records are seeded, and Contact learner fields are built. License headroom is not a constraint — 10,000 Agent Builder PSLs and 200,000 Data Cloud seats are provisioned.
+## 3.6 Trail OS Capability — How Build Status Is Assessed
+Each Trail OS capability is classified into one of four states. These are not automatically computed — they are assessed by Angela based on the object inventory query (EntityDefinition) against the designed architecture in the capability guides.
+Status
+Definition
+How it appears in the dashboard
+In Production
+Objects deployed, fields configured, record types active, flows running in the production org
+Green left border · pstat-green chip
+Partially Built
+Some components in Production, some still In Design — common during phased builds
+Green left border · mix of status chips
+In Design
+Capability guide complete, architecture documented, objects specified — no Production deployment yet
+Amber left border · purple 'In Design' chip
+Not Started
+No design documentation exists beyond the epic frame in the Product Vision document
+Blue left border · grey chip
+## 4. How Attention Flags Work
+Every tab in the dashboard has an Attention Flags section at the bottom. Flags are not automated alerts — they are authored observations that reflect what matters most this week based on the live data. They are updated each time the dashboard is regenerated.
+Flags follow a three-tier urgency system. The icon and background colour indicate urgency at a glance.
+Icon
+Colour
+Urgency
+Criteria for use
+🔴 Red circle
+Red light background
+Immediate — this week
+Security risk, P0 bug, governance violation, data corruption, or a blocker preventing other work from proceeding
+⚠ Warning
+Amber light background
+Soon — this sprint
+Important but not emergency — missing fields, inactive test accounts, configuration gaps, approaching deadlines
+↗ Upward arrow
+Teal light background
+Opportunity / good news
+A positive trend, an easy win available, a capability ready to activate, or a demand signal worth acting on
+✓ Green check
+Green light background
+Confirmed healthy
+Something that was previously flagged and is now resolved, or a baseline confirmation that a key system is working
+## 4.1 What Gets Flagged vs. What Does Not
+Not every data point that is below target appears as a flag. Flags are reserved for items that require a decision or action this week. Known roadmap gaps that are sequenced and documented (e.g., 'LMS not yet built — Epic E-10 target Q1 2027') appear in the capability status sections, not as flags.
+A flag appears when: (1) a live data pull reveals something different from what was expected, (2) a governance rule is being violated in the current state, (3) a P0 or P1 issue is open and unresolved, or (4) a time-sensitive opportunity exists — for example, a batch of learners who applied 11 months ago when a new cohort is 8 weeks from opening.
+## 5. The Weekly Refresh Process
+The dashboard is designed to be refreshed weekly. The Refresh button in the header triggers a new Salesforce MCP pull and updates the data freshness banner. GA4 data does not refresh on demand — it updates on the Monday Zapier schedule.
+## 5.1 Refresh Steps
+Step
+Who
+Action
+When
+Automated (Zapier)
+GA4 weekly report runs — pulls trailing 7-day metrics
+Monday 8:00 AM CDT
+Angela or Hugh
+Open the dashboard HTML file in the browser
+Monday — weekly touch point
+Auto (SF MCP)
+Dashboard queries Salesforce org on load — live data
+On every open
+Angela
+Review flags on each tab — action or dismiss
+Monday review
+Angela
+Update org health scorecard scores if the build work is completed
+As needed
+Angela or Hugh
+Regenerate dashboard HTML if new capabilities or tabs are needed
+When architecture changes
+## 5.2 When to Regenerate the Dashboard
+The dashboard HTML file is static between refreshes — it does not auto-update. Regeneration (producing a new version of the HTML file) is needed when:
+New capability tab needed — a new Trail OS capability has been documented and built and deserves its own tab.
+Scorecard dimensions change — new health dimensions are identified or existing ones are retired.
+Major build milestone — a capability moves from In Design to In Production and all its in-design flags become in-production confirmations.
+Data source changes — a new MCP connection is added, a Zapier zap is rebuilt, or GitHub is connected for live test counts.
+Minor updates — correcting a flag, adjusting a score, adding a note — can be made by editing the HTML directly.
+## 5.3 Known Gaps and Future Live Data
+Current limitation
+What it affects
+How to fix
+Penny POC test count is estimated (~1,200)
+Penny & Agentforce tab KPI
+Connect GitHub MCP — live query to Actions API for latest test run count
+GA4 data is weekly, not live
+Website & GA4 tab
+Zapier schedule is set — acceptable for weekly operating rhythm
+Org health scores are manual assessments
+Salesforce Org tab scorecard
+Scores update when Angela assesses after build milestones — not auto-computed
+Agentforce topic/action details unavailable
+Penny & Agentforce tab — actions section
+Tooling API access or Agent Builder API needed — not available via current MCP
+Knowledge article content not queryable
+Trail OS tab — content gap flag
+KAV SOQL returns metadata — article body not surfaced in dashboard
+## 6. Displaying the Dashboard in Salesforce
+The TrailHealth Dashboard is an HTML file. It can be displayed inside Salesforce as a tab in the TrailOS Lightning App using an iframe component. This makes it accessible to the team without leaving the org.
+## 6.1 Recommended Approach — Lightning App Page + iframe
+This is the recommended deployment method. It takes approximately one to two hours and requires no code.
+Step
+Action
+Where in Salesforce
+Host the HTML file on GitHub Pages (free — Transition-Trails org already exists)
+github.com/Transition-Trails
+Add GitHub Pages domain to CSP Trusted Sites
+Setup → Security → CSP Trusted Sites → New
+Add domain to Remote Site Settings
+Setup → Security → Remote Site Settings → New
+Create a new Lightning App Page
+Setup → Lightning App Builder → New → App Page
+Add a Custom URL component or Flow component with iframe to the page
+Lightning App Builder canvas
+Set the URL to the GitHub Pages URL for the dashboard HTML file
+Component properties
+Activate the page and add it as a nav item in the TrailOS app
+App Builder → Activation → Add to nav
+The GA4 tab data requires a Zapier webhook connection to populate with live data. The Salesforce tabs populate automatically from the MCP connection each time the dashboard is opened. Hosting on GitHub Pages makes the static file accessible from within Salesforce without needing an external server.
+## 6.2 Future State — Experience Cloud Admin Page
+The long-term home for the TrailHealth Dashboard is a dedicated Admin Health page within the Transition Trails internal Experience Cloud site. This would give the team a permission-aware, mobile-friendly dashboard that updates in real time and integrates with the org's authentication model. This is a sprint-level item and is sequenced after the Salesforce MCP connection and Zapier integrations are fully wired.
+## 7. Document History
+Version
+Date
+Notes
+1.0
+June 2026
+Initial release. Documents all five dashboard tabs, data sources, health definitions for org scorecard, automation, cohort progress, learner funnel, Penny readiness, and Trail OS build status. Authored: Angela. Design session: Angela + Claude (June 2026).
+Next review
+September 2026
+Update when: (1) Data Cloud Phase 1 is complete. (2) Org health scorecard scores change after Demand Management build. (3) GitHub MCP is connected for live Penny test counts. (4) GA4 Zapier zap is rebuilt with live webhook.
+TrailHealth Dashboard Reference Guide  |  v1.0  |  June 2026  |  Internal — Transition Trails

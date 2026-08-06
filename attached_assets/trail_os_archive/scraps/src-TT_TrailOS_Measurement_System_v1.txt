@@ -1,0 +1,348 @@
+TRANSITION TRAILS  ·  INTERNAL TEAM REFERENCE
+Trail OS
+Measurement System & Survey Model
+Why Trail OS is our measurement infrastructure —
+and how JotForm, Penny, and Salesforce work together to prove our outcomes.
+Version 1.0  ·  June 2026  ·  CONFIDENTIAL — Internal Staff Only
+Angela — Strategy & Funding
+Kim — Program Operations
+Kel — Finance & Compliance
+Hugh — Architecture & Build
+THE ARGUMENT IN ONE PAGE
+Without Trail OS, Transition Trails has anecdotes. With Trail OS, Transition Trails has evidence.
+Hugh Richardson's story is compelling. It is the proof of concept that everything else is built on. But one story is not a program. Forty Hugh Richardson stories — with documented wage gains, linked to specific program versions, specific capstone builds, specific cohorts — is fundable at a completely different level.
+Trail OS is the system that turns one story into forty, and forty into a defensible, reportable, grant-ready outcome dataset. Every measurement point in the system — Penny's domain quiz scores, Trail OS pipeline completion, JotForm survey responses, employment outcomes — is tagged to:
+The specific program (GT, ToM, FT)
+The specific version of that program (v1.0, v2.0)
+The specific capstone the participant worked (HCH v1.0, Hartford Promise v1.0)
+The specific track (Solo Admin or Team)
+The specific cohort (Cohort 1, Cohort 2)
+That tagging is what makes the data reusable across grant applications, program iterations, and partnership conversations. When we tell Salesforce, JPMorgan Chase, or the Texas Workforce Commission that 78% of GT Cohort 3 Solo Admin participants reported increased Security & Access confidence within 90 days of completing HCH v2.0 — that is not a claim. That is a query.
+The Bottom Line for Every Team Member
+Angela: Trail OS is the grant narrative engine. Every funder metric we promise is a Trail OS report.
+Kim: Trail OS tells you which program elements are working and which need redesign — before the next cohort starts.
+Kel: Trail OS produces the cost-per-outcome calculations and wage gain documentation ETPL and TWC SDF require.
+Hugh: Trail OS is what you're building. This document is the specification for the measurement layer.
+SECTION 1 — WHY TRAIL OS IS THE MEASUREMENT INFRASTRUCTURE
+## The Problem Trail OS Solves
+Most workforce development programs cannot answer the question funders actually ask: 'How do you know it worked?' They have completion rates. They have satisfaction scores. They occasionally have employment rates — if they tracked them manually.
+What they cannot do is connect an employment outcome back to a specific program element and say: participants who completed this capstone build at this quality level in this track were 40% more likely to be employed within 90 days than participants who didn't. That level of specificity requires a data model that was designed for measurement from the start — not retrofitted onto a spreadsheet after the fact.
+Trail OS was designed for measurement from the start. Every object, every relationship, every field is intentional. The Demand Management pipeline creates an audit trail for every build. The Skills Assessment Framework creates a competency record for every learner. The Survey Model creates an outcomes record at four points in every participant's journey. Combined, these three data sources answer every question a funder, employer, or program designer needs to ask.
+## Three Data Sources, One Coherent Picture
+Source
+What It Measures
+Who Owns It
+Penny + Quest Engine
+Internal skill developmentDomain quiz scores by weekScenario reasoning qualityBuild verification completionCoach gate flags
+Hugh (infrastructure)Angela (content + coach gate)
+Trail OS Pipeline
+Process discipline + real-world deliveryRESOLVE gate completionWork Item build qualityDevOps deployment recordsClient project delivery
+Hugh (build)Kim (program ops)
+JotForm Survey Responses
+External outcomes + perceptionSelf-reported confidence gainsEmployment and wage outcomesClient satisfactionProgram experience quality
+Kim (design + deployment)Kel (reporting)
+The Key Insight
+None of these three sources is sufficient alone. Penny data tells you how someone performed in the program. Trail OS pipeline data tells you how they executed a real project. Survey data tells you what changed in their life and career. The measurement system is the combination of all three, linked to the same participant record, the same program version, and the same capstone.
+SECTION 2 — THE TRAIL OS MEASUREMENT DATA MODEL
+## The Objects That Make Measurement Possible
+These are the Salesforce objects — existing and planned — that form the measurement data model. Every survey response, every assessment score, and every program outcome links back through this structure.
+FOR: Hugh — these are build priorities, sequenced below
+Object
+Purpose
+Status
+TT_Program__c
+Defines each program (GT, ToM, FT, ET, DC). Master record that all versions link to.
+Build — new
+TT_Program_Version__c
+Tracks each version of a program (GT v1.0, GT v2.0). Links to TT_Program__c. Every enrollment links to a specific version. This is the key to measuring program iteration.
+Build — new
+TT_Capstone__c
+Defines each capstone (HCH, Hartford Promise, DC Client). Versioned separately from the program — HCH v1.0 and HCH v2.0 can run in the same program version.
+Build — new
+TT_Capstone_Version__c
+Tracks specific capstone versions with the traceability matrix version, acceptance criteria standard, and exam domain coverage. Links to TT_Capstone__c.
+Build — new
+TT_Cohort__c
+Tracks each cohort: start date, end date, program version, capstone version, track (Solo Admin or Team), cohort size. The container for participant enrollment.
+Build — new
+TT_Enrollment__c
+Links a Contact (participant) to a Cohort. Carries: track assignment, application interview notes, Penny trail config reference, current phase, status. One enrollment per participant per cohort.
+Build — new
+TT_Assessment_Result__c
+Stores Penny domain quiz scores, scenario quality flags, and build verification results. Links to Enrollment. Tagged by domain, week, sprint, and assessment mode (MC/Scenario/Build Verification).
+Build — new (Penny integration)
+TT_Survey_Response__c
+Stores JotForm survey responses mapped from the JotForm integration. Links to Enrollment, Survey Instrument version, and Survey Moment (Pre/Mid/Completion/90-Day).
+Build — new (JotForm integration)
+TT_Survey_Instrument__c
+Defines each survey instrument and its version. Ensures that when a survey is updated, historical responses are still linked to the version that generated them.
+Build — new
+TT_Client_Project__c
+Tracks DC client project assignments for Team track participants. Links to Enrollment, DC client Contact/Account, and Trail OS Case (via Demand Management pipeline).
+Build — extends existing
+Contact
+The participant's master record. All enrollment, assessment, survey, and outcome data links here. Employment outcome fields added: employed date, role, employer, salary before, salary after.
+Extend existing
+## How the Objects Relate
+Reading this chain from left to right is how you answer any measurement question:
+Contact → TT_Enrollment__c → TT_Cohort__c → TT_Program_Version__c → TT_Program__c
+Contact → TT_Enrollment__c → TT_Assessment_Result__c (domain scores, Penny flags)
+Contact → TT_Enrollment__c → TT_Survey_Response__c → TT_Survey_Instrument__c (JotForm)
+Contact → TT_Enrollment__c → TT_Client_Project__c → Case (Trail OS Demand Management)
+TT_Cohort__c → TT_Capstone_Version__c → TT_Capstone__c
+Why Program Version Tagging Is Non-Negotiable
+When GT v2.0 produces better outcomes than GT v1.0, we need to know which specific changes drove the improvement. Was it the two-track model? The RESOLVE pipeline introduction? The org assessment in Week 1? Without version tagging on every enrollment and every survey response, we cannot answer that question. With version tagging, we can run a report and know within one cohort cycle.
+SECTION 3 — THE SURVEY MODEL
+## Three Survey Subjects
+TT has three types of people whose experience needs to be measured. Each requires a different instrument — but all responses flow into the same Trail OS data model.
+Subject
+Who They Are
+What We're Measuring
+Navigator
+GT, ToM, or FT participant going through a program. Their learning experience, skill growth, confidence, and employment outcome.
+Skill confidence by domain · Program quality · Career outcome · Wage change · What worked and what didn't
+DC Client
+Nonprofit organization that received project work from a GT or ToM learner. The client's point of contact (typically an ED or program director).
+Project delivery quality · Learner professionalism · Value delivered to mission · Likelihood to recommend · Net Promoter Score
+Navigator who is also a DC Client
+A volunteer admin or nonprofit staff member who is both learning through DC membership AND receiving project work. Needs one instrument that captures both experiences without duplication.
+Combined: learning experience + project delivery quality · Confidence growth in their own role · Value of the dual relationship
+## Four Survey Moments
+Every Navigator completes surveys at four points in their journey. DC Clients complete two. The Navigator/DC Client hybrid completes a tailored version at each point.
+Moment
+Timing
+Navigator
+DC Client
+Pre-Program
+Week 1 — before any build begins
+Baseline: skill confidence by domain (1–5), current salary, career goal, primary concern, track assigned
+Baseline: current Salesforce confidence, what they hope the project delivers, primary pain point
+Mid-Program
+Sprint transition (Week 4 for GT/ToM)
+Progress check: confidence movement, what's working, what's blocking, Penny usage, office hours value
+Mid-project check: communication quality, are they seeing progress, any concerns
+Program Completion
+Week 12 — Demo Day week
+Outcome: skill confidence by domain (same scale as Pre), program quality rating, what changed, career status, immediate next steps
+Project close: delivery quality, artifacts received, would they work with TT again, NPS
+90-Day Follow-Up
+90 days post-completion
+Employment outcome: hired yes/no, role, employer, salary, what in the program directly contributed to getting hired
+Long-term value: is the Salesforce build still running, did it deliver what was promised, any ongoing support needs
+## Navigator Survey — Key Questions by Moment
+FOR: Kim — own the survey design and deployment schedule
+Every skill confidence question uses the same 1–5 scale at Pre and Completion to enable before/after measurement. The domains map directly to the Salesforce Admin exam domains in the Skills Assessment Framework.
+Moment
+Key Questions
+Pre-Program
+On a scale of 1–5, how confident are you in each of these areas today? [9 Admin exam domains listed] · What is your current annual salary or hourly rate? · What is your primary goal for completing this program? · What is your biggest concern about completing the program? · Have you previously attempted the Salesforce Admin exam? · What is your current employment status?
+Mid-Program (Week 4)
+On a scale of 1–5, how supported do you feel by Penny between office hours sessions? · On a scale of 1–5, how clear is the RESOLVE process feeling? · What is the single most valuable thing you've experienced so far? · What is the single biggest obstacle you're facing right now? · How many hours per week are you spending on program work? · Are you on the Solo Admin or Team track — is that assignment feeling right for your situation?
+Program Completion
+On a scale of 1–5, how confident are you in each of these areas now? [same 9 domains] · On a scale of 1–5, overall program quality rating · What one thing would you change about the program? · What one thing should never change? · What is your current employment status? · Did you receive any job interviews or offers during or after the program? · How would you describe the program to someone considering enrolling?
+90-Day Follow-Up
+Are you currently employed in a Salesforce role? · If yes: What is your role title? Who is your employer? What is your annual salary? · How long after program completion did you receive your first Salesforce job offer? · Which specific program element do you feel most directly contributed to getting hired? [Portfolio, RESOLVE experience, Decision Log, Client project, Penny, Other] · Are you still using Trail OS or the skills from the program in your current role? · Would you refer a colleague to Transition Trails?
+## DC Client Survey — Key Questions by Moment
+FOR: Kim — DC Client surveys deploy from Trail OS via Penny Client Liaison mode
+Moment
+Key Questions
+Pre-Project
+On a scale of 1–5, how confident is your team in using Salesforce today? · What is the most important thing this project needs to deliver for your organization? · What is your biggest concern about working with a learner team? · Have you worked with Salesforce consultants or volunteers before?
+Mid-Project
+On a scale of 1–5, how would you rate communication with the learner team so far? · Are you seeing the progress you expected at this point? · Is there anything the team should adjust about how they're working with you? · How responsive has the Transition Trails coach been when you've had questions?
+Project Close
+On a scale of 1–5, overall rating of the project delivery · Did the project deliver what was scoped? · Did the learner team behave professionally in all interactions? · What artifacts did you receive? [Org Assessment, Automation Inventory, Handover Guide, User Cheat Sheet, Release Note] · On a scale of 0–10, how likely are you to recommend Transition Trails to another nonprofit? [NPS] · Would you like to continue as a Digital Compass member?
+90-Day Follow-Up
+Is the Salesforce build the learner team delivered still running and being used? · Has it delivered the value to your mission that you expected? · Have you needed to make changes since the learner team left — and were you able to? · What was the most valuable thing about working with Transition Trails?
+## Navigator + DC Client Hybrid Survey
+For a volunteer admin or nonprofit staff member who is both a DC membership participant and a Navigator in a TT program — the survey combines both instruments with shared questions consolidated. Penny identifies this dual status from the Trail OS enrollment record and triggers the hybrid instrument automatically. No duplicate surveys.
+How Penny Handles the Hybrid
+When a JotForm survey trigger fires, Penny checks the participant's Trail OS record for both TT_Enrollment__c (Navigator status) and TT_Client_Project__c (DC Client status). If both exist, the hybrid survey link is sent instead of the standard Navigator survey. The hybrid survey captures both dimensions in a single 10–12 minute instrument. Responses are stored as two linked TT_Survey_Response__c records — one tagged Navigator, one tagged DC Client — so reporting works correctly for both lenses.
+SECTION 4 — JOTFORM ARCHITECTURE & SALESFORCE INTEGRATION
+## Why JotForm, Not Salesforce Survey
+FOR: Hugh — licensing check required before build
+Factor
+The Reality
+What TT has in Salesforce Survey
+Enterprise Edition includes the basic Survey Response Pack: 1,000 responses, standard question types, simple branching. No merge fields. No record updates. No embedded surveys. Survey data sits in survey objects and does not automatically update any other record.
+What unlocking it costs
+Feedback Management Starter (next tier) is approximately $46,000/month. That tier adds merge fields, basic embedding, and sentiment analysis. Not a realistic option for TT's current stage.
+The structural problem
+Even at higher tiers, Salesforce Survey does not write responses back to custom objects like TT_Survey_Response__c without significant custom development. It was designed for satisfaction surveys, not program measurement systems.
+What JotForm does instead
+JotForm's native Salesforce integration maps form fields directly to any Salesforce object — including custom objects. A completed Navigator survey creates a TT_Survey_Response__c record automatically, linked to the correct Enrollment, tagged with the Survey Moment, with zero manual data entry.
+The TT org assessment connection
+We already use JotForm. The MCP connector is live in Claude. Hugh knows the integration. This is not a new vendor — it is extending an existing tool we already trust.
+Hugh's action item
+Check TT's current JotForm plan for: response limits, Salesforce integration tier availability, and field mapping capabilities for custom objects. If the current plan doesn't support Salesforce custom object mapping, upgrade before the survey build begins.
+## How JotForm Connects to Trail OS
+The integration flow for every survey response:
+Step 1 — TRIGGER: Trail OS fires a survey trigger at the correct moment (Pre-Program = Week 1 enrollment, Mid = Week 4, Completion = Week 12, 90-Day = 90 days after TT_Enrollment__c.Status = Completed). Trigger can be a Flow on TT_Enrollment__c or a Penny proactive Slack message.
+Step 2 — PERSONALIZATION: The survey link includes a hidden prefill parameter containing the participant's Enrollment ID (TT_Enrollment__c.Id). JotForm receives this parameter and stores it as a hidden field in the response.
+Step 3 — RESPONSE: Participant completes the JotForm survey. On submission, JotForm's Salesforce integration fires.
+Step 4 — MAPPING: JotForm creates a new TT_Survey_Response__c record in Salesforce. The Enrollment ID from the hidden field populates the TT_Enrollment__c lookup. The Survey Instrument and Survey Moment fields are populated from the form's configuration. Every survey question maps to a specific field on TT_Survey_Response__c.
+Step 5 — ROLLUP: Formula and roll-up fields on TT_Enrollment__c and TT_Cohort__c aggregate the response data for reporting. Angela's dashboard updates automatically.
+## Survey Trigger Schedule
+Survey
+Trigger Object
+Trigger Condition
+Delivery Method
+Navigator Pre-Program
+TT_Enrollment__c
+Status changes to Active AND Phase = Week 1
+Penny Slack DM + Trail OS email
+Navigator Mid-Program
+TT_Enrollment__c
+Sprint 1 complete flag set OR Week 4 date reached
+Penny Slack DM
+Navigator Completion
+TT_Enrollment__c
+Status changes to Completed
+Penny Slack DM + Trail OS email
+Navigator 90-Day
+TT_Enrollment__c
+Completed date + 90 days (Scheduled Flow)
+Trail OS email + Penny Slack nudge if no response in 7 days
+DC Client Pre-Project
+TT_Client_Project__c
+Status = Active AND project kick-off complete
+Penny Client Liaison mode (Angela approval required)
+DC Client Mid-Project
+TT_Client_Project__c
+Sprint 1 complete flag set on project
+Penny Client Liaison mode (Angela approval required)
+DC Client Project Close
+TT_Client_Project__c
+Status changes to Completed
+Penny Client Liaison mode (Angela approval required)
+DC Client 90-Day
+TT_Client_Project__c
+Completed date + 90 days (Scheduled Flow)
+Trail OS email
+Hybrid (Navigator + Client)
+Both records above
+Both conditions met — Penny detects dual status
+Penny Slack DM — single hybrid link
+SECTION 5 — THE METRICS DASHBOARD
+## What Gets Measured and Who Sees It
+Trail OS produces four dashboard views. Each is designed for a specific audience and a specific decision. None requires manual data assembly.
+FOR: Angela — Program Performance + Grant Metrics
+Metric
+Definition & Source
+Employment Rate (90-Day)
+% of Navigator completions who report employment in a Salesforce role within 90 days. Source: TT_Survey_Response__c (90-Day Moment). Filterable by program version, track, cohort, capstone version.
+Wage Gain (Average)
+Average salary increase from Pre-Program baseline to 90-Day follow-up. Source: TT_Survey_Response__c (Pre vs. 90-Day). Reportable by program version and cohort.
+Domain Confidence Gain
+Average improvement in skill confidence rating (1–5 scale) across 9 Admin exam domains. Source: TT_Survey_Response__c (Pre vs. Completion). The before/after story for grant applications.
+RESOLVE Pipeline Completion Rate
+% of enrollments where at least one full RESOLVE cycle (Case through Production deployment) was completed. Source: Trail OS Case + Work Item + TT_Enrollment__c link.
+Portfolio Completion Rate
+% of enrollments where portfolio was published by Week 12. Source: TT_Enrollment__c (portfolio_published__c flag set by coach).
+Program Version Comparison
+Side-by-side metric comparison between GT v1.0 and GT v2.0 (or any two versions). Answers: did the program changes improve outcomes? Requires version tagging on all records.
+FOR: Kim — Program Operations + Client Health
+Metric
+Definition & Source
+Cohort Health (Weekly)
+Friday Gemini synthesis from Penny: momentum flags, clarity issues, confidence gaps by learner. Source: Penny interaction logs + TT_Assessment_Result__c. Kim sees the cohort-level pattern, not individual PII.
+Coach Gate Status
+How many learners are currently in advisory, blocking, or critical gate status across all active cohorts. Source: TT_Assessment_Result__c domain scores. Kim escalates to coaches.
+DC Client NPS
+Net Promoter Score across all active and completed DC client relationships. Source: TT_Survey_Response__c (Project Close Moment). Filterable by program version and client type.
+Client Project Delivery Rate
+% of DC client projects that delivered all scoped Work Items to production. Source: Trail OS Work Items with Date_Pushed_to_Prod__c set vs. total scoped.
+Mid-Program Risk Flags
+Learners who have not responded to the Mid-Program survey within 7 days of trigger. Source: TT_Survey_Response__c absence check. Kim follows up personally or via Penny.
+Track Assignment Accuracy
+At 90-Day follow-up, did participants report that their Solo Admin or Team track assignment felt right for their situation? Source: TT_Survey_Response__c (Completion Moment, track fit question).
+FOR: Kel — Finance, Compliance & Grant Reporting
+Metric
+Definition & Source
+Cost Per Employed Graduate
+Total program cost ÷ number of graduates employed within 90 days. Requires: TT_Enrollment__c (cost field) + TT_Survey_Response__c (90-Day employment status). Reportable by program version.
+ETPL Outcome Report
+% employed + average starting salary + average wage gain, filterable by program and cohort. Formatted for Texas Workforce Commission ETPL reporting requirements.
+TWC SDF Documentation
+Wage increase documentation: Pre-Program salary vs. post-program salary, linked to specific participant records. Exportable as a compliance report.
+Scholarship Utilization
+# and % of scholarship seats used per cohort, by scholarship type. Source: TT_Enrollment__c (scholarship_type__c field).
+Grant Metric Export
+One-click export of all grant-required metrics for a specified cohort range and program version. Formatted for common funder report templates. Source: aggregated Trail OS + Survey data.
+90-Day Response Rate
+% of Navigators who complete the 90-Day follow-up survey. Low response rate = unreliable outcome data = weaker grant narrative. Kel monitors this and escalates to Kim if rate drops below 70%.
+FOR: Hugh — System Health & Build Priorities
+Metric
+Definition & Source
+JotForm Integration Health
+# of survey submissions in last 7 days vs. expected based on active enrollments. Any gap = integration issue. Source: TT_Survey_Response__c CreatedDate vs. expected trigger dates.
+Trail OS Pipeline Completeness
+% of Work Items with all required fields populated: Case link, Sprint link, Date_Pushed_to_Prod__c, Acceptance Criteria Pass/Fail. Incomplete records = reporting gaps.
+Object Build Status
+Dashboard showing which measurement objects are In Production vs. In Design. Hugh updates this as each object is deployed. Angela and Kim can see build progress without asking.
+Penny Assessment Coverage
+% of active enrollments with at least one TT_Assessment_Result__c record in the current sprint. Low coverage = Penny integration issue or learner disengagement.
+Survey Response Mapping Errors
+JotForm submissions that created a TT_Survey_Response__c record but failed to populate the TT_Enrollment__c lookup (hidden field missing or invalid). These are orphaned responses that need manual correction.
+SECTION 6 — BUILD SEQUENCE & PRIORITIES
+## What Hugh Builds First
+The measurement system build is sequenced so that each phase is usable as soon as it's complete — not blocked on the entire system being live.
+FOR: Hugh — sequenced build priorities
+Priority
+Object / Capability
+Why First
+TT_Program__c + TT_Program_Version__c
+Everything links to these. Build first so version tagging works from day one of Cohort 1.
+TT_Capstone__c + TT_Capstone_Version__c
+Capstone version tagging is required before HCH v2.0 launches. Build alongside Program Version.
+TT_Cohort__c
+Required before any enrollment can be created. Carries track, program version, capstone version, and cohort size.
+TT_Enrollment__c
+The central linking object. Required for survey triggers, assessment results, and client project links.
+JotForm — Pre-Program + Completion surveys
+These two surveys produce the before/after confidence data. Build and test before Cohort 1 starts. Mid and 90-Day can follow.
+TT_Survey_Response__c + JotForm integration
+Build the Salesforce object and map JotForm fields. Test with a sample submission before deploying triggers.
+Survey trigger Flows (enrollment-based)
+Pre-Program trigger fires on enrollment activation. Completion trigger fires on status change. Build and test in sandbox.
+TT_Assessment_Result__c
+Penny integration object. Requires Penny PWA API connection. Hugh coordinates with Penny build timeline.
+Mid-Program + 90-Day surveys
+Build after Pre and Completion are stable. Add the 90-Day Scheduled Flow trigger last.
+10
+Angela + Kim + Kel dashboards
+Build once data is flowing from at least one cohort. Use real data, not sample data, for dashboard design.
+## Contact Fields to Add for Outcome Measurement
+These fields need to be added to the Contact object before the 90-Day survey triggers. They store the employment outcome data that funds our grant narratives.
+Field Label
+API Name
+Type
+Pre-Program Salary
+Pre_Program_Salary__c
+Currency
+Post-Program Salary
+Post_Program_Salary__c
+Currency
+Employment Outcome Date
+Employment_Outcome_Date__c
+Date
+Employer (Post-Program)
+Post_Program_Employer__c
+Text(255)
+Role (Post-Program)
+Post_Program_Role__c
+Text(255)
+Days to Employment
+Days_to_Employment__c
+Formula (Number) — Employment_Outcome_Date__c minus TT_Enrollment__c Completion Date
+Wage Gain
+Wage_Gain__c
+Formula (Currency) — Post_Program_Salary__c minus Pre_Program_Salary__c
+Employment Outcome Source
+Employment_Outcome_Source__c
+Picklist — Navigator Survey / Coach Reported / LinkedIn Verified / Unknown
+The Standard We're Building Toward
+Every funder, employer, and partner we approach should be able to ask us: 'How do you know your program works?' And we should be able to say: 'Because we have the data. Here is the employment rate for GT v2.0, Solo Admin track, HCH capstone, broken down by domain confidence gain and RESOLVE pipeline completion. Here are the client satisfaction scores for the nonprofit projects those participants delivered. Here is the wage gain data, verified against pre-program baselines.' That is not a talking point. That is a query. Trail OS is how we get there.
+"One story is proof of concept. Forty stories is a program."
+"Forty stories with version-tagged data is a fundable, scalable, replicable model."
+Trail OS Measurement System v1.0  ·  Transition Trails  ·  June 2026  ·  Internal Only

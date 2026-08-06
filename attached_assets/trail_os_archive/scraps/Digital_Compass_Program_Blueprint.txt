@@ -1,0 +1,796 @@
+TRANSITION TRAILS  |  Digital Compass  |  Program Blueprint & Member Guide
+
+TRANSITION TRAILS
+Digital Compass
+DC
+Program Blueprint & Member Guide
+
+Program
+ | Digital Compass (DC)
+ | 
+Program Lead
+ | Kim Barnes, COO — Transition Trails
+ | 
+Prerequisites
+ | None — open to any nonprofit organization with a Salesforce org or technology need
+ | 
+Target Member
+ | Accidental Admins, Nonprofit Leaders, and Executive Directors navigating technology without dedicated tech staff
+ | 
+Format
+ | Membership + Weekly Office Hours + TrailKits + Project Support + Trail OS installation
+ | 
+Membership Tiers
+ | Entry $149/mo · Mid $349/mo · Full $749/mo (Annual = 10x monthly, 2 months free)
+ | 
+Connected Programs
+ | Guided Trail (GT) · Trail of Mastery (ToM) — learners deliver member project work
+ | 
+Version
+ | 1.0  —  2026
+ | 
+
+"You didn't choose to be the tech person. But you're here. Let's make it work."
+
+1. Program Overview
+
+1.1 What Is the Digital Compass?
+
+The Digital Compass is Transition Trails' nonprofit client technology program — the program arm that serves nonprofit organizations directly rather than individual learners. It provides structured Salesforce guidance, technology training, and consulting project support for nonprofit professionals who need to use their tools more effectively but don't have a dedicated technology staff member to rely on.
+
+The Digital Compass is not a course. It is a membership — a recurring relationship between Transition Trails and the nonprofit organizations we serve. Members get weekly access to live expert support, a growing library of self-serve resources, and the ability to submit real Salesforce and technology projects to be completed by coached learners from the Guided Trail and Trail of Mastery programs.
+
+The program is already running. Digital Compass Office Hours have been active since early 2026, serving Hartford Promise, Global One Urban Farming, and other nonprofit clients. This blueprint formalizes what is working and defines the structure for scale.
+
+The Digital Compass Difference: Real Help for the Person Who Didn't Ask for This Job
+
+The Accidental Admin didn't apply to be a technology lead. They applied to run programs, manage donors, or support their community. Then Salesforce got installed — and suddenly it was their job.
+
+The Digital Compass exists for that person. Not a certification program. Not a bootcamp. A standing door that is always open, with real people on the other side who have been where you are and know how to help.
+
+Weekly Office Hours. TrailKits built from real client work. Projects completed by coached learners. And a capstone experience that lets you practice in a safe environment before you make changes in your live org.
+
+You are not behind. You are exactly where we expected you to be. Let's go.
+ | 
+
+1.2 Who This Program Is For
+
+The Digital Compass serves nonprofit organizations and the professionals inside them who are responsible for technology — whether they chose that responsibility or not. There is no certification required. There is no prior Salesforce experience required. There is only a genuine need to use technology better in service of a mission.
+
+ | The Accidental Admin
+ | The Nonprofit Leader
+ | The Emerging Organization
+ | 
+Your Profile
+ | Staff member who inherited Salesforce without formal training. Program manager, development officer, ED assistant — now also tech lead.
+ | Executive Director or COO who knows their org needs to use technology better but doesn't know where to start or who to trust.
+ | Early-stage nonprofit building their Salesforce instance from the ground up with limited resources and no tech background.
+ | 
+What You Bring
+ | Deep knowledge of your mission and your data — just not the platform it lives in.
+ | Strategic vision and organizational authority. You know what success looks like. You just need someone to help you build it.
+ | Motivation and willingness to learn. You're building something real. You just need support doing it right.
+ | 
+What You Need
+ | Practical help with real problems in your actual org. Not theory. Not a certification. Help.
+ | A trusted partner who can give you an honest technology roadmap — and the people to execute on it.
+ | Hands-on support building the foundation correctly the first time so you don't pay to fix it later.
+ | 
+
+1.3 How the Digital Compass Connects to the TT Ecosystem
+
+The Digital Compass is not a standalone program. It is the client-facing arm of the Transition Trails ecosystem — and the mechanism that makes the entire model work. Nonprofit organizations bring real problems. TT learners bring coached, supervised skill. The Digital Compass is where those two things meet.
+
+The Ecosystem Exchange
+
+Nonprofits get: structured technology support, live coaching access, and project work completed by skilled learners — at a fraction of consulting market rates.
+
+Guided Trail learners get: real client experience for their portfolio, supervised by TT coaches, that employers can verify.
+
+Trail of Mastery participants get: practitioner-level consulting experience on real organizational challenges.
+
+Every Digital Compass member makes the learner programs more valuable. Every learner makes the Digital Compass more capable. This is the model.
+ | 
+
+Program
+ | Role in the Ecosystem
+ | Connection to Digital Compass
+ | 
+Explorer's Trail (ET)
+ | Individual learners building foundational Salesforce skills via self-guided membership.
+ | ET members may become volunteer contributors to DC content. DC scenarios inform ET Trail Missions.
+ | 
+Foundations Trail (FT)
+ | Individual learners building toward the Admin certification through structured 12-week program.
+ | FT capstone uses the same HCH nonprofit scenario that DC capstone members practice in.
+ | 
+Guided Trail (GT)
+ | Certified, pre-hire admins building portfolio-ready experience.
+ | GT learners complete supervised project work for DC nonprofit members. This is the primary learner-client pipeline.
+ | 
+Trail of Mastery (ToM)
+ | Employed admins advancing to practitioner-level consulting skills.
+ | ToM participants lead DC client projects with greater complexity and autonomy. DC office hours serve as their project intake pipeline.
+ | 
+Digital Compass (DC)
+ | Nonprofit organizations and their technology staff getting structured support.
+ | The client side of the entire ecosystem. Real problems. Real projects. Real outcomes.
+ | 
+
+1.4 Trail OS — The Technology Foundation
+
+The Digital Compass requires the installation of Trail OS — Transition Trails' proprietary app — in the member organization's Salesforce org. Trail OS is what makes the Digital Compass relationship work technically. It provides Transition Trails with the access, visibility, and tooling needed to support, assess, and complete project work inside a member's org safely and effectively.
+
+Trail OS installation is completed by the Transition Trails technology team as part of member onboarding. Members do not need to configure or manage Trail OS themselves. The installation process is documented, supported, and completed before any project work begins.
+
+Why Trail OS Matters
+
+Without Trail OS, every project starts from scratch. With Trail OS, Transition Trails has the foundation needed to assess your org, assign the right learner to your project, and deliver consistent, documented work.
+
+Think of it as the connection that makes the partnership real. You open the door. We make sure we can actually help once we're inside.
+ | 
+
+2. Membership Structure
+
+2.1 Membership Tiers
+
+The Digital Compass offers three membership tiers. All tiers include access to Weekly Office Hours and the Transition Trails community. Higher tiers unlock dedicated strategy and architecture support from TT leadership, project submission access, and deeper implementation engagement.
+
+Pricing is confirmed as of June 2026. Entry: $149/mo ($1,490/yr). Mid: $349/mo ($3,490/yr). Full: $749/mo ($7,490/yr). Annual pricing = 10x monthly (2 months free). All tiers available on annual invoicing — recommended for grant-funded purchases.
+
+Benefit
+ | Entry
+ | Mid
+ | Full
+ | 
+Pricing
+ | See pricing above
+ | See pricing above
+ | See pricing above
+ | 
+CORE ACCESS
+ | 
+ | 
+ | 
+ | 
+Weekly Office Hours (all members, live)
+ | ✓
+ | ✓
+ | ✓
+ | 
+Access to Transition Trails Slack community
+ | ✓
+ | ✓
+ | ✓
+ | 
+TrailKit library (Fix It With Me + Build With Me resources)
+ | ✓
+ | ✓
+ | ✓
+ | 
+Trail OS installation in your Salesforce org
+ | ✓
+ | ✓
+ | ✓
+ | 
+Penny AI — learning and guidance support
+ | ✓
+ | ✓
+ | ✓
+ | 
+Access to recorded Office Hours sessions
+ | ✓
+ | ✓
+ | ✓
+ | 
+STRATEGY & ARCHITECTURE
+ | 
+ | 
+ | 
+ | 
+Annual Strategy Review with Angela (CEO)
+ | —
+ | ✓
+ | ✓
+ | 
+Annual Architecture Review with Hugh & Kim (CTO/COO)
+ | —
+ | ✓
+ | ✓
+ | 
+Personalized technology roadmap for your org
+ | —
+ | ✓
+ | ✓
+ | 
+PROJECT SUPPORT
+ | 
+ | 
+ | 
+ | 
+Project submission access (GT/ToM learners complete your work)
+ | —
+ | ✓
+ | ✓
+ | 
+Fixed-fee optimization packages available
+ | —
+ | ✓
+ | ✓
+ | 
+Recurring guided implementation + ongoing support
+ | —
+ | —
+ | ✓
+ | 
+Priority project queue placement
+ | —
+ | —
+ | ✓
+ | 
+Dedicated Transition Trails point of contact
+ | —
+ | —
+ | ✓
+ | 
+CAPSTONE EXPERIENCE
+ | 
+ | 
+ | 
+ | 
+HCH Capstone — Accidental Admin & Nonprofit Leader Edition (DRAFT)
+ | ✓
+ | ✓
+ | ✓
+ | 
+
+2.2 The Annual Strategy & Architecture Reviews (Mid and Full Members)
+
+Mid and Full tier members receive two dedicated annual reviews from Transition Trails leadership. These are not check-ins. They are structured working sessions designed to produce a technology roadmap your organization can actually execute.
+
+Review
+ | What Happens
+ | 
+Annual Strategy ReviewWith Angela (CEO)
+ | A focused conversation about where your organization is going and how your technology needs to support that direction. Angela helps you think through your mission, your growth plans, and the strategic questions your technology should be answering. Output: a strategic technology brief that frames the priorities for your architecture review.
+ | 
+Annual Architecture ReviewWith Hugh (CTO) & Kim (COO)
+ | A technical deep-dive into your Salesforce org and technology stack. Hugh and Kim review your Trail OS data, assess your current configuration, and map your strategic priorities to a practical technology roadmap. Output: a prioritized roadmap of recommended projects, configurations, and improvements — sequenced by impact and complexity.
+ | 
+
+2.3 Weekly Office Hours
+
+All Digital Compass members — at every tier — have access to Weekly Office Hours. This is the heartbeat of the program. It is a live, open session where nonprofit professionals can bring real questions, walk through real problems in their real org, and get real answers from the Transition Trails team.
+
+Office Hours are not a class. They are not a webinar. They are what the name says — an open door. Show up with a question. Leave with an answer.
+
+What Gets Covered in Office Hours
+
+From active Digital Compass sessions, here is what members have brought:
+  •  Salesforce basics for non-technical staff — reports, views, tasks, opportunities
+  •  Tech stack guidance: which tools to use together (Salesforce + QuickBooks + Google Workspace + Slack)
+  •  HR system scoping: ATS selection, payroll integration, recruiting workflows
+  •  Training on specific modules: Volunteer Management, Event Management, NPSP
+  •  Grant deadline tracking in Salesforce
+  •  Roadmap planning for nonprofit tech expansion
+  •  Any question you've been embarrassed to ask anyone else
+
+No question is too basic. That is not a platitude. It is the policy.
+ | 
+
+3. The HCH Capstone — Accidental Admin & Nonprofit Leader Edition
+
+⚠ DRAFT — In Development
+ 
+This section describes a capstone experience that is currently in development. The structure, scenarios, and format below are a working draft. Content is directionally accurate but not yet finalized. This section will be updated before program launch.
+ | 
+
+3.1 What Is the HCH Capstone?
+
+The Horizon Community Hub (HCH) Capstone is a safe-practice Salesforce environment that Digital Compass members can use to build confidence, develop skills, and try things without fear of breaking their live org.
+
+HCH is the same fictional nonprofit used across Transition Trails' learner programs — a Dallas-Fort Worth organization providing utility assistance, housing stabilization, and veteran services to families in crisis. In the learner programs, participants play the role of an incoming Salesforce admin. In the Digital Compass capstone, the perspective shifts. You are not the admin building the system. You are the nonprofit professional who has to use it, manage it, and make decisions about it.
+
+The Capstone Perspective Shift
+
+In the Guided Trail: You are the Salesforce Administrator building HCH's system from scratch or inheriting it as an admin.
+
+In the Digital Compass Capstone: You are the Program Director, Development Officer, or Executive Director who has to use that system — understand what it's doing, ask the right questions, and make decisions about what needs to change.
+
+Same org. Different chair. Different skills. Both matter.
+ | 
+
+3.2 The Two Capstone Roles
+
+Digital Compass members choose one of two roles based on their actual position and goals. Both roles work in the same HCH org. Both develop skills that transfer directly to your real organization.
+
+The Accidental Admin
+ | The Nonprofit Leader
+ | 
+You are HCH's staff member who has inherited Salesforce. You did not build it. You do not fully understand it. But it is yours now — and people are asking you questions you don't know how to answer.
+ | You are HCH's Program Director or Executive Director. You need Salesforce to tell you whether your programs are working — but you're not sure what questions to ask or whether the data you're looking at is accurate.
+ | 
+Best for: Staff who directly manage or touch Salesforce and need hands-on navigation and configuration confidence.
+ | Best for: Leaders who need to understand what Salesforce can and should tell them about their organization's performance.
+ | 
+Skills developed: Navigating the org, running reports, understanding security, asking better questions of your admin or consultant.
+ | Skills developed: Reading dashboards critically, identifying data quality issues, scoping technology needs, directing an admin or consultant effectively.
+ | 
+
+3.3 Capstone Structure (DRAFT)
+
+⚠ DRAFT — In Development
+ 
+The capstone scenario structure below is a working draft. Module count, scenario titles, and specific tasks are subject to change during development. The format and learning objectives are directionally confirmed.
+ | 
+
+The HCH capstone is organized into four modules, each focused on a different area of nonprofit Salesforce use. Members work through scenarios in the HCH Developer Edition org at their own pace, with Penny available for guidance throughout.
+
+Module
+ | Focus Area
+ | Accidental Admin Scenario
+ | Nonprofit Leader Scenario
+ | 
+1
+ | Understanding Your Org
+ | You've been asked to explain to a new volunteer what Salesforce is tracking and why. Navigate HCH's data model and produce a one-page plain-English overview.
+ | A board member asks you why HCH uses Salesforce for case management instead of spreadsheets. Build your answer by exploring what the org actually does.
+ | 
+2
+ | Working with Data
+ | HCH has duplicate client records and no one knows how they got there. Identify the duplicates, assess the impact, and document your recommended cleanup approach.
+ | HCH's monthly report to funders looks different from last month but no one changed anything. Investigate the data to find out what happened and how to prevent it.
+ | 
+3
+ | Running Reports & Dashboards
+ | Elena needs a report on how many clients received veteran services last quarter. Build it, verify the data is correct, and explain how you know it is.
+ | Prepare for a board meeting by reviewing HCH's existing dashboards. Identify what the dashboards tell you, what they don't tell you, and what you'd add if you could.
+ | 
+4
+ | Making a Technology Decision
+ | HCH is considering adding a Volunteer Management module. Document a recommendation: what it would do, what it would cost (in time and complexity), and whether you'd recommend it.
+ | A funder has asked HCH to track program outcomes in a new way. Scope what that would require in Salesforce and draft a plan to bring to your admin or consultant.
+ | 
+
+3.4 What Completing the Capstone Gets You (DRAFT)
+
+⚠ DRAFT — In Development
+ 
+Completion recognition format is under development. The framework below is the intended direction.
+ | 
+
+Completing all four HCH capstone modules produces something concrete you can use in your real organization. This is not a certificate for a shelf. It is practical output for your work.
+
+What You Produce
+ | How You Use It
+ | 
+A plain-English data model overview for your org
+ | Share with board members, new staff, and volunteers who need to understand what Salesforce is doing without a technical explanation.
+ | 
+A data quality assessment framework
+ | Apply the same approach you used in HCH to your real org. Know what to look for, how to document it, and how to prioritize a cleanup.
+ | 
+A dashboard review template
+ | Use the questions you practiced in HCH to evaluate your real dashboards. Know what a good dashboard tells you — and how to identify when yours isn't.
+ | 
+A technology decision memo
+ | Template for scoping any technology change in your org. Useful for conversations with admins, consultants, or funders who want to understand your technology decisions.
+ | 
+Digital Compass Capstone Completion recognition
+ | Verifiable record of completing the HCH capstone program. Documents your engagement with Transition Trails and your commitment to building technology literacy.
+ | 
+
+4. TrailKits — Self-Serve Learning Resources
+
+4.1 What Are TrailKits?
+
+TrailKits are Transition Trails' self-serve digital resources — built from real client work with Hartford Promise, Global One Urban Farming, CLYLP, and other nonprofit partners. Every TrailKit is a complete package: a guide or template, a set of AI prompt packs tuned to the specific use case (Claude, Gemini, and GPT versions), and curated nonprofit discounts for the tools the kit requires.
+
+TrailKits are not courses. They are not tutorials. They are what you hand to someone who needs to get something done today — built by practitioners who did the same work themselves in real orgs.
+
+All Digital Compass members have access to the TrailKit library as part of their membership. New kits are added as they are completed.
+
+4.2 Fix It With Me & Build With Me Videos
+
+In addition to written TrailKits, Digital Compass members have access to two types of video resources, both narrated by Penny, Transition Trails' AI coaching persona:
+
+Video Type
+ | What It Is
+ | 
+Fix It With Me
+ | Screen-recorded walkthroughs of common Salesforce problems — the ones nonprofit admins encounter most often and don't know how to diagnose. Hugh records the screen. Penny narrates. You watch, follow along, and fix the same issue in your own org.
+ | 
+Build With Me
+ | Step-by-step configuration walkthroughs for setting up specific Salesforce features, modules, or workflows from scratch. Designed for the nonprofit staff member who has been asked to set something up and needs to see exactly how it's done before touching their live org.
+ | 
+
+The Penny Layer
+
+All video content in TrailKits is narrated by Penny — Transition Trails' AI coaching persona. Hugh records the screen. Penny narrates. Angela reviews and approves.
+
+This is intentional. When Salesforce updates its UI, only the screen recording needs to change — the audio swaps in minutes. Penny on video, Penny in Slack, and Penny as an AI prompt persona creates a coherent, multi-modal coaching experience across every Digital Compass touchpoint.
+ | 
+
+4.3 Current TrailKit Library
+
+The following TrailKits are in active development or available to Digital Compass members. Additional kits are added on an ongoing basis as new client work produces reusable content.
+
+TrailKit
+ | What It Covers
+ | Status
+ | 
+Nonprofit Salesforce Starter Kit
+ | Foundational Salesforce setup, data hygiene, NPSP quick-start, board reporting template, grant pipeline template, AI prompt pack
+ | In development
+ | 
+AI Central Command for Nonprofits
+ | Setting up a functioning AI system for your organization — not just disconnected chats. Includes AI Identity Kit, Central Command setup guide, Quick Start Prompt Library
+ | In development
+ | 
+Enabling AI in Salesforce (Accidental Admin Series)
+ | How to use the AI features already in your Salesforce org: Einstein Activity Capture, Opportunity Scoring, Agentforce, Email Insights, and more
+ | Module 1 complete; 6 modules planned
+ | 
+Data Hygiene Playbook
+ | Finding, documenting, and fixing the most common data quality problems in a nonprofit Salesforce org
+ | Draft complete
+ | 
+DKIM Email Deliverability Guide
+ | Configuring email deliverability in Salesforce so your communications actually reach donors and clients
+ | Near complete
+ | 
+
+5. Project Support — How Nonprofit Projects Get Done
+
+5.1 The Project Model
+
+Mid and Full tier Digital Compass members can submit project requests to be completed by Transition Trails learners from the Guided Trail and Trail of Mastery programs. This is the core value exchange of the Digital Compass ecosystem — real nonprofit technology problems, solved by coached and supervised learners, at a fraction of the market cost.
+
+Projects are scoped, assigned, and delivered through a structured process managed by the Transition Trails operations team. Every project has defined deliverables, a timeframe, and a project plan. Members know what they will receive and when.
+
+5.2 Nonprofit Registration Process
+
+Before submitting projects, nonprofit organizations complete a one-time registration. Registration verifies the organization's nonprofit status and establishes the technical relationship needed for project work to begin, including Trail OS installation.
+
+Step
+ | Action
+ | Detail
+ | 
+1
+ | Submit Registration
+ | Go to TransitionTrails.org → click Register with Us on the Nonprofit card, or select Project Support under Services in the menu.
+ | 
+2
+ | Complete Registration Form
+ | Full name, organization name, org EIN, website, email address, and LinkedIn profile.
+ | 
+3
+ | Receive Confirmation
+ | Applicant receives a Thank You email with next steps and additional information.
+ | 
+4
+ | Registration Review
+ | Transition Trails reviews the submission. If approved, status moves to Open and the full onboarding process begins. If not approved, applicant is notified with the reason.
+ | 
+5
+ | Records Created
+ | An Individual, Contact, and Account record are created in TT's Salesforce org. Primary contact is granted access to the Nonprofit Support Portal.
+ | 
+6
+ | Welcome & Next Steps
+ | Contact receives an email explaining the project submission process and how to access the portal.
+ | 
+7
+ | Trail OS Installation
+ | TT technology team coordinates Trail OS installation in the organization's Salesforce org before any project work begins.
+ | 
+
+5.3 Project Submission Process
+
+Once registered and approved, members submit project requests through the Digital Compass portal. The submission process is structured so that every project arrives with the information needed to assign the right learner and set clear expectations.
+
+Step
+ | Action
+ | Detail
+ | 
+1
+ | Log into Portal
+ | Access the Nonprofit Digital Compass site using your registered credentials.
+ | 
+2
+ | Select Submit a Project
+ | Navigate to the Submit a Project menu item.
+ | 
+3
+ | Choose a Project Category
+ | Select from the available project categories (Salesforce, Google, Jotform, Slack, Business Analysis, AI, Websites).
+ | 
+4
+ | Select a Project Type
+ | Choose the specific project type within the selected category.
+ | 
+5
+ | Review Timeline
+ | An estimated completion date is automatically calculated based on the project type selected.
+ | 
+6
+ | Project Manager Assigned
+ | A project manager is assigned based on project type. Notification is sent to the project manager and to the member.
+ | 
+7
+ | Confirmation Sent
+ | Member receives confirmation with project details and what to expect next.
+ | 
+
+5.4 Available Project Types
+
+The following project categories and types are available for member submission. Each project type has defined deliverables, timeframes, and estimated value. All projects are completed by coached TT learners under TT team supervision.
+
+SALESFORCE
+ 
+Salesforce Org Assessment
+Timeframe: 1 Week  ·  Est. Value: $3,000 value
+ 
+Salesforce Org Setup
+Timeframe: 2–4 Weeks  ·  Est. Value: $2,250 value
+ 
+Reports & Dashboards Setup
+Timeframe: 1–2 Weeks  ·  Est. Value: $1,200 value
+ 
+Program Management Module Setup
+Timeframe: 1–2 Weeks  ·  Est. Value: $2,400 value
+ 
+Volunteer Management Module Setup
+Timeframe: 2–4 Weeks  ·  Est. Value: $1,500 value
+ 
+Event Management Module Setup
+Timeframe: 1–2 Weeks  ·  Est. Value: $1,500 value
+ 
+Digital Experience Site Creation
+Timeframe: 4–8 Weeks  ·  Est. Value: $3,000–$6,000 value
+ 
+Process Automation (Flow Builder)
+Timeframe: 2–6 Weeks  ·  Est. Value: $1,500–$3,000 value
+ 
+ | 
+
+GOOGLE WORKSPACE
+ 
+Google Workspace Setup & Training
+Timeframe: 1 Week  ·  Est. Value: Market rate value
+ 
+Google Sites Setup
+Timeframe: 1 Week  ·  Est. Value: Market rate value
+ 
+Gmail Setup & Training
+Timeframe: 2–4 Weeks  ·  Est. Value: Market rate value
+ 
+Google Calendar Setup & Training
+Timeframe: 1 Week  ·  Est. Value: Market rate value
+ 
+ | 
+
+COMMUNICATIONS & PRODUCTIVITY TOOLS
+ 
+Jotform Setup & Training
+Timeframe: 1 Day  ·  Est. Value: Market rate value
+ 
+Slack Setup & Training
+Timeframe: 2–4 Weeks  ·  Est. Value: Market rate value
+ 
+ | 
+
+BUSINESS ANALYSIS
+ 
+Process Assessment
+Timeframe: 1–2 Weeks  ·  Est. Value: Market rate value — 10–15 hrs saved
+ 
+ | 
+
+AI
+ 
+General AI Training for Nonprofit Staff
+Timeframe: 2–4 Weeks  ·  Est. Value: Market rate value — 15–25 hrs
+ 
+ | 
+
+WEBSITES
+ 
+General Website Audit
+Timeframe: 2–4 Weeks  ·  Est. Value: Market rate value
+ 
+Accessibility Audit
+Timeframe: 2–4 Weeks  ·  Est. Value: Market rate value
+ 
+ | 
+
+6. Program Strategy
+
+6.1 Strategic Positioning
+
+The Digital Compass occupies a unique position in both the Transition Trails ecosystem and the broader nonprofit technology support landscape. It is not a consulting firm. It is not a training program. It is a membership community that delivers real technology support through a model that benefits everyone involved.
+
+The closest comparisons in the market — TechSoup, Idealware, NTEN — provide resources and community but not hands-on project delivery. Traditional Salesforce consulting firms deliver project work but at costs that exclude the majority of small to mid-sized nonprofits the Digital Compass is designed to serve. The Digital Compass sits in the gap between those two worlds.
+
+ | Digital Compass
+ | Nonprofit Tech Communities (NTEN, TechSoup)
+ | Salesforce Consulting Firms
+ | 
+Live expert access
+ | ✓ Weekly
+ | Limited
+ | Billable only
+ | 
+Hands-on project delivery
+ | ✓ Included in Mid/Full
+ | ✗
+ | ✓ At market rates ($150–250/hr)
+ | 
+Self-serve resources
+ | ✓ TrailKits
+ | ✓ General
+ | ✗
+ | 
+Technology roadmap
+ | ✓ Annual review
+ | ✗
+ | Billable
+ | 
+Practitioner-built content
+ | ✓ From real client work
+ | Varies
+ | N/A
+ | 
+Cost to access
+ | $149–$749/mo (Entry–Full)
+ | Free–low cost
+ | $3,000–$25,000+ per project
+ | 
+Who delivers the work
+ | Coached TT learners + TT team
+ | N/A
+ | Senior consultants
+ | 
+
+6.2 The Nine Pillars Framework
+
+The Digital Compass is organized around nine foundational areas of nonprofit organizational health. These pillars serve as the content framework for Office Hours topics, TrailKit development priorities, and the assessment conversation that informs each member's technology roadmap.
+
+The nine pillars are not a rigid curriculum. They are a map of the territory. Office Hours follow the member's needs, not a fixed syllabus. The pillars ensure that no important area is systematically overlooked.
+
+Pillar
+ | Focus Area
+ | Key Resources & Activities
+ | 
+Strategic Planning
+ | Mission alignment, theory of change, long-term roadmaps
+ | Strategic plan templates, quarterly goal-setting frameworks
+ | 
+Board Governance
+ | Fiduciary duties, board recruitment, board/staff relations
+ | Board handbook templates, governance health checks
+ | 
+Human Resources
+ | Talent acquisition, retention, DEI initiatives
+ | Sample HR policies, compensation benchmarks, burnout prevention guides
+ | 
+Volunteer Management
+ | Recruitment, training, and retention strategies
+ | Volunteer onboarding workflows, Salesforce Volunteer Management module support
+ | 
+Collaboration & Partnerships
+ | Collective impact and strategic alliances
+ | Partner mapping tools, MOU templates, networking support
+ | 
+Fundraising
+ | Grant writing, individual giving, donor stewardship
+ | Grant calendars, donor database training in Salesforce, appeal frameworks
+ | 
+Legal & Financial Management
+ | Compliance, budgeting, risk management
+ | Internal control checklists, 990 guidance, financial dashboard templates
+ | 
+Technology
+ | Digital transformation, cybersecurity, CRM systems
+ | Tech audits (Trail OS), TrailKits, AI implementation guides, Salesforce project support
+ | 
+Marketing
+ | Brand storytelling, social media, public relations
+ | Editorial calendars, Canva guidance, SEO resources for nonprofits
+ | 
+
+6.3 Success Metrics
+
+Transition Trails tracks the following metrics for the Digital Compass on a monthly and quarterly basis:
+
+Metric
+ | Definition
+ | Target
+ | 
+Active Members
+ | Registered members with at least one login or Office Hours attendance in the period
+ | Growing month-over-month
+ | 
+Office Hours Attendance Rate
+ | % of members attending at least one session per month
+ | 50%+
+ | 
+Project Completion Rate
+ | % of submitted projects completed within defined timeframe
+ | 90%+
+ | 
+Project Value Delivered
+ | Cumulative estimated dollar value of completed project work for members
+ | Tracked and reported quarterly
+ | 
+Member Process Improvement
+ | % of members who submitted projects reporting improved adoption/productivity
+ | 80%+
+ | 
+Member Confidence Rate
+ | % of members reporting improved confidence in at least 3 pillars within 12 months
+ | 80%+
+ | 
+Resource Efficiency
+ | Average hours saved per month reported by active members using TrailKits
+ | 10+ hours/month
+ | 
+Learner Pipeline
+ | % of DC project slots filled by GT or ToM learners (vs. TT staff direct)
+ | Increasing quarterly
+ | 
+Net Promoter Score (NPS)
+ | Member satisfaction and likelihood to recommend
+ | 50+
+ | 
+
+7. Completion & What Comes Next
+
+7.1 What Membership Delivers Over Time
+
+The Digital Compass does not have a graduation date. It is a membership — a sustained relationship between Transition Trails and the nonprofit organizations we serve. What members gain compounds over time: each Office Hours session builds on the last, each project completed leaves the org in a better state than it was, and each TrailKit applied reduces the time it takes to solve the next problem.
+
+The measure of success is not a credential. It is a nonprofit organization that uses its technology more confidently, serves its mission more effectively, and spends less time fighting its tools.
+
+7.2 The Member Technology Roadmap
+
+Mid and Full tier members receive a technology roadmap as part of their annual Architecture Review. This roadmap is a living document — updated annually, informed by Trail OS data, and prioritized by impact and capacity. It is the primary tool members use to decide which projects to submit, what to tackle in Office Hours, and where to invest their technology budget.
+
+The roadmap is produced by Hugh and Kim following the Architecture Review and delivered in a format the member can share with their board, their funders, and any Salesforce partner they work with.
+
+7.3 Connecting the Dots — From Digital Compass to the Full Ecosystem
+
+Digital Compass membership is sometimes the beginning of a deeper Transition Trails relationship. Nonprofit staff who begin attending Office Hours sometimes discover they want to go further — not just use Salesforce, but build a career in it. When that happens, the pathway is clear.
+
+Path
+ | Description
+ | 
+Continue as a Digital Compass member
+ | Stay in the membership. Keep attending Office Hours. Submit more projects. Build your org's technology capacity incrementally with ongoing TT support.
+ | 
+Transition into the Explorer's Trail
+ | If a DC member wants to build their own Salesforce skills more systematically, the Explorer's Trail is the entry point — accessible, self-paced, no prerequisites.
+ | 
+Transition into the Foundations Trail or Guided Trail
+ | If a DC member decides to pursue a Salesforce career, the Foundations Trail (pre-certification) or Guided Trail (post-certification) is the structured pathway to get there.
+ | 
+Become a TrailKit contributor
+ | Nonprofit professionals with deep domain knowledge in one of the nine pillars can contribute to TrailKit development — translating their expertise into resources that serve the broader DC community.
+ | 
+
+A Final Note on Why the Digital Compass Exists
+
+Nonprofit organizations are doing the most important work in our communities. And too many of them are doing it with technology that doesn't work the way it should — because they can't afford the consultant, can't find the training, and can't carve out the time to figure it out alone.
+
+The Digital Compass exists to close that gap.
+
+Not with a course. Not with a certification. With a standing door that is always open — weekly office hours, real project support, resources built from actual client work, and a team that has been where you are.
+
+You don't have to know what you're doing yet. You just have to show up.
+
+— Kim Barnes, COO, Transition Trails
+ | 
+
+Digital Compass  |  Transition Trails
+Empowering nonprofits to use technology in service of their mission.
+transitiontrails.org

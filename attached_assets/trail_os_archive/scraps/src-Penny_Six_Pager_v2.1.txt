@@ -1,0 +1,204 @@
+TRANSITION TRAILS ACADEMY
+Penny, Your AI Trail Companion
+Six-Pager Strategic Narrative — v2.0
+Version
+2.1 — May 2026
+Status
+Updated — Notion · GitHub · Slack · Salesforce stack
+Author
+Angela Landrith, Founder, Transition Trails Academy
+Audience
+Leadership, Google.org, Strategic Partners
+Platform
+Replit POC · GitHub: Transition-Trails/Penny-POC
+## 1.  The Brand Promise
+"A penny for your thoughts."
+Penny is Transition Trails Academy&apos;s adaptive AI coaching companion — the voice that helps career changers, military veterans, and underrepresented professionals think through the hard moments on their path to becoming Salesforce Administrators. She doesn&apos;t give answers. She helps learners find them.
+Penny operates across three surfaces: a mobile progressive web app, a Slack bot, and an admin intelligence dashboard. Every surface reflects the same core belief: the best coaching asks better questions.
+## 2.  The Problem We Are Solving
+Transition Trails equips career changers with Salesforce skills through structured cohort programs. But the hardest moments — the late-night blocker, the interview anxiety, the "does my resume even make sense?" spiral — happen outside of scheduled coaching sessions.
+Without on-demand support, three things break:
+Learners stall and lose momentum when they can&apos;t get unstuck on their own timeline
+Coaches are overwhelmed with repetitive unblocking work instead of high-value mentorship
+Program administrators have no real-time visibility into cohort health, engagement, or risk
+Hugh Richardson is the proof of concept. A Cohort 0 graduate who went from certified-and-stuck to employed — Penny was the bridge he needed between "I passed the exam" and "I got the job."
+## 3.  Penny&apos;s Solution
+Penny v2 is a production-quality POC with a complete mobile PWA, a live Slack bot, a 12-template quest system, a career review engine, and a full admin intelligence dashboard. The system is built, tested, and running.
+## Four Core Capabilities
+Capability
+What It Does
+Who It Serves
+Adaptive Socratic Coaching
+Trail-aware, learner-context-aware AI that asks before telling. Injects current phase, goal, blockers, and memory window into every exchange.
+Learners — Slack DM + Mobile app
+Trail Quests
+Daily scenario-based Salesforce Admin challenges drawn from a 12-template library. Penny coaches without solving.
+Learners — Mobile app + Slack
+Career Profile Review
+5-dimension AI review of resumes and LinkedIn profiles. Scores Experience Relevance, Credentials, Professional Presence, Communication Clarity, and Career Trajectory. No fabrication.
+Learners — Slack + Admin test UI
+Weekly Intelligence Reports
+Gemini-synthesised cohort insights with support flags (Momentum, Clarity, Confidence), suggested actions, and trail breakdown — delivered to admins every Friday.
+Angela + Trail Guides
+## Four Trail Personas
+Trail
+Penny&apos;s Role
+Audience
+Guided Trail
+Coaching Companion — structured support for new-to-Salesforce learners
+Career changers, veterans in structured cohort
+Explorer Journey
+Learning Navigator — self-directed exploration with targeted nudges
+Independent learners building at their own pace
+Trail of Mastery
+Leadership Advisor — deepening expertise and facilitation skills
+Advanced practitioners expanding their toolkit
+Community / Alumni
+Career Companion — portfolio storytelling and job-search coaching
+Graduates giving back and seeking employment
+## 4.  What Has Been Built (POC v2)
+Build Status: Production-Quality POC
+The Penny POC v2 is substantially ahead of spec. The backend is feature-complete with 1,100+ automated tests across 38 test files. The mobile PWA is built and deployed on Replit. This is not a prototype — it is a working system.
+## System Architecture
+Backend Runtime
+Node.js ESM · Express 5 · TypeScript strict mode throughout
+Database
+PostgreSQL via Drizzle ORM (Supabase) · 12 tables · auto-migrations at startup
+AI Engine
+Google Gemini 2.5 Flash (gemini-2.5-flash-preview-05-20) with 7-layer system prompt construction
+Mobile PWA
+React 18 + Vite · Shadcn UI · TanStack Query · Wouter routing · SSE streaming chat
+Slack Bot
+Bolt.js Socket Mode — no public webhook required
+Notion
+Project management · sprint tasks · training documentation · sprint briefs (Notion API)
+API Contract
+OpenAPI 3.0 spec → Orval codegen → type-safe React Query hooks
+Logging
+Pino structured JSON throughout; no bare console.log
+Testing
+Vitest · 1,100+ tests · Gemini mocked · runs in ~74s · CI via GitHub Actions
+## Mobile PWA — Screens Built
+Screen / Route
+Description
+/login
+Slack user ID authentication → JWT session
+/onboarding
+3-step first-run: name, goal, coaching tone selection
+/ (Home)
+Dashboard: streak, sprint points, today&apos;s focus, next meeting
+/penny
+Streaming AI chat: Coach mode + Coordinator mode toggle
+/quest
+Daily quest view with Penny deep-link shortcut and submission flow
+/projects
+Browse active/available/completed nonprofit client projects
+/projects/:id
+Project detail: Penny Coordinator Card, Linear issues, team, deliverables
+/community
+Slack channel and DM sync with unread indicators
+/classroom
+Google Classroom assignments and materials (demo fallback built-in)
+/profile
+Learner stats, Penny context fields, career profile, settings
+/badges
+Full badge library and earned badge history with BadgeEarnedModal
+/coach
+Coach dashboard: PR queue, flagged learners, cohort stats
+/coach/learners
+Searchable, filterable cohort list with inline activity indicators
+/coach/learners/:id
+Learner detail + Award Points modal + Award Badge modal
+/coach/penny
+Coach-mode Penny with admin-level context injection
+## Admin Dashboard — 12 Pages
+Page
+Key Features
+Dashboard
+Prompt mode breakdown chart, trail stats, quest and learner counts
+Learners
+Searchable directory; Create/Edit learner profiles
+Learner Detail
+Profile · Conversations · Quest History · Career Profile · Clear Memory
+Trails
+View and edit trail configurations (persona, tone, focal points)
+Test Penny
+Simulate conversations as any learner; tabbed prompt picker; PDF upload
+Quest Templates
+Full CRUD; 12 seeded templates; soft-deactivate
+Quest Activity
+Real-time feed of all assignments and submissions
+Weekly Reports
+Gemini synthesis; generate on demand; paginated history
+Logs
+Interaction logs with learner/mode filters + CSV export
+App Settings
+Runtime AI parameter tuning (memory window, blocked phrases)
+Integrations
+Live status: Slack, Linear, Salesforce, GitHub, Google Classroom
+Webhook Health
+Webhook registration status and last-received timestamps
+## 5.  Impact and Success Metrics
+## POC v2 Metrics (Live)
+Learner Profiles
+5 active profiles across 4 trails
+Total Interactions
+38 logged exchanges (POC demo environment)
+Quest Templates
+12 seeded across 4 trails and 5 categories
+Test Coverage
+1,100+ automated tests · 38 test files · ~74s suite runtime
+Admin Dashboard Pages
+12 fully built pages
+Mobile App Screens
+15 routes / screens (learner + coach)
+## Target Outcomes — MVP (Q1 2027)
+Metric
+Target
+How We Measure
+Learner Engagement
+≥70% of active learners interact with Penny at least 3x per week
+interaction_logs count by week
+Quest Completion Rate
+≥60% of assigned daily quests submitted within 24 hours
+quest_assignments status tracking
+Career Review Utilisation
+≥80% of job-seeking learners complete at least one career review
+career_review_sessions count
+Coach Time Savings
+Coaches report ≥30% reduction in routine unblocking conversations
+Coach survey pre/post
+Employment Rate
+≥65% of Cohort 1 graduates employed in Salesforce roles within 90 days of graduation
+Alumni tracking
+Weekly Report Utility
+Angela rates ≥4/5 on actionability of weekly intelligence reports
+Weekly feedback form
+## 6.  Roadmap and the Ask
+## Post-POC Roadmap
+Phase
+Timeline
+Focus
+MVP
+Q1 2027
+Salesforce Experience Cloud integration, full CRM context, production deployment
+Q2
+H1 2027
+Coach scheduling integration, persistent draft messages, Slack thread-aware responses
+Q3
+2028
+Skills assessment engine, Weekly Reflections, coach-facing analytics dashboards
+Q4
+2028
+Trail of Mastery automation, Notion + GitHub deep integrations, proactive mission assignments
+## The Ask
+What We Need to Scale Penny Beyond the POC
+Engineering capacity to extend the Replit POC into a production-grade deployment with Salesforce Experience Cloud integration
+Design capacity to expand the Figma design system into a full component library and refine the mobile PWA UX
+Partnership support to pilot Penny with 2-3 additional nonprofit cohorts alongside Transition Trails Cohort 1
+AI infrastructure budget for Gemini API costs at scale (estimated $200-400/month for 50 active learners)
+Strategic advisors with experience in workforce development technology and nonprofit technology grants
+Why Now
+The Penny POC v2 proves the concept at a level of technical maturity that most early-stage nonprofit tools never reach. 1,100+ tests, a live mobile app, a running Slack bot, and a complete admin dashboard are not demo artifacts — they are a foundation. The question is no longer "can this be built?" The question is "how fast can we get this to every cohort that needs it?"
+Transition Trails Academy  ·  Dallas, Texas  ·  501(c)(3)  ·  transitiontrails.org
+Angela Landrith, Founder & CEO  ·  github.com/Transition-Trails/Penny-POC

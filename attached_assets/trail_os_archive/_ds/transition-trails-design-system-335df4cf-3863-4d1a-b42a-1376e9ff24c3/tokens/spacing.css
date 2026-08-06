@@ -1,0 +1,18 @@
+/* Transition Trails — Spacing & radius tokens
+   8px-based scale. Generous radii give a soft, approachable feel. */
+:root {
+  /* Spacing (8px base) */
+  --tt-space-xs:  4px;
+  --tt-space-sm:  8px;
+  --tt-space-md:  16px;
+  --tt-space-lg:  24px;
+  --tt-space-xl:  32px;
+  --tt-space-2xl: 48px;
+  --tt-space-3xl: 64px;
+
+  /* Radius */
+  --tt-radius-sm:   8px;
+  --tt-radius-md:   14px;
+  --tt-radius-lg:   22px;
+  --tt-radius-pill: 999px;
+}

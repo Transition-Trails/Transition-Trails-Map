@@ -1,0 +1,1308 @@
+I want you to review the RESOLVE methodology that we have brought on for Transition Trails on how you solve problems when you're building Salesforce technology. Look for it within the resources of the Transition Trails Academy shared drive. What I want to do is take that same RESOLVE methodology and apply it to business thinking instead of thinking about how do you solve it to build a technical project, but rather, how do you solve and figure out this with the same acronym, RESOLVE, but you're doing it to set yourself up to be able to automate a process, not necessarily build the automation. Let's talk, let's figure that out.
+I’ll ground this in the Academy materials first, then we can translate R.E.S.O.L.V.E. from “prepare to build Salesforce tech” into “prepare the business to automate wisely.” I’ll treat this as a framework design conversation, not a final polished course document yet.
+Looked for available tools
+Called tool
+I found the Academy-facing course canvas plus a newer beginner guide and handbook materials. The strongest thread is already “clarity before configuration,” which fits your automation-readiness angle very cleanly.
+Called tool
+Absolutely. I think this is a strong evolution of R.E.S.O.L.V.E., and it actually makes the methodology more valuable because it separates business readiness from technical execution.
+The current Academy framing already supports this shift. The materials describe R.E.S.O.L.V.E. as a way to move learners “from uncertain admin tasks to confident analysis and solution design,” with emphasis on analyzing problems, mapping solutions, and practicing continuous improvement. Another newer resource frames it as a “disciplined pause” that helps people avoid guesswork and technical debt by making sure they are solving the right problem for the right reason.
+That is exactly the bridge we need.
+The key pivot
+Right now, R.E.S.O.L.V.E. is often framed as:
+“How do we analyze a problem so we can design and build the right Salesforce solution?”
+For business automation thinking, we shift it to:
+“How do we understand, simplify, and prepare a process so automation becomes possible, useful, and responsible?”
+That means the output is not necessarily a Flow, app, dashboard, or Salesforce build.
+The output could be:
+a clarified business process
+a decision tree
+an automation readiness checklist
+a cleaned-up handoff process
+a list of required data fields
+a process map
+a risk and exception log
+a “do not automate yet” recommendation
+a future automation brief for a Salesforce admin, consultant, or AI tool
+Tiny but important distinction: this version helps people become automation thinkers before automation builders.
+Suggested name
+I would consider calling this:
+R.E.S.O.L.V.E. for Automation Readiness
+Tagline:
+Think before you automate. Clarify before you configure.
+Or slightly warmer:
+Turn messy work into automation-ready process clarity.
+The reframed acronym
+Here is the first-pass adaptation.
+Letter
+ | Current technical/project meaning
+ | Business automation readiness meaning
+ | 
+R: Recognize
+ | Identify the root problem before building
+ | Recognize the workflow pain, manual burden, delay, rework, or decision bottleneck
+ | 
+E: Explore
+ | Explore solution options and process models
+ | Explore how the work actually happens today, including people, tools, handoffs, exceptions, and shadow systems
+ | 
+S: Select
+ | Select the best solution or MVP
+ | Select the process segment that is most worth preparing for automation
+ | 
+O: Outline
+ | Outline the build and implementation plan
+ | Outline the future-state process, required data, rules, owners, triggers, and outcomes
+ | 
+L: Launch
+ | Launch the technical solution
+ | Launch a business-ready automation brief, pilot workflow, or manual prototype before full automation
+ | 
+V: Verify
+ | Verify results against KPIs and user feedback
+ | Verify that the clarified process produces better consistency, less rework, and measurable readiness
+ | 
+E: Evolve
+ | Improve after launch
+ | Evolve the process, automation requirements, and governance as the business changes
+ | 
+The big philosophical shift
+The existing R.E.S.O.L.V.E. materials already say that clarity comes before configuration and that digital noise is often a structural failure rather than just a software limitation.
+For automation readiness, I would make that the headline principle:
+Automation does not fix confusion. It accelerates whatever process already exists.
+So before someone automates, they need to ask:
+Is the process consistent enough to automate?
+Are the decision rules clear?
+Is the data reliable?
+Do people agree on what “done” means?
+Are exceptions documented?
+Is this a high-value use of automation, or are we automating clutter with a tiny robot broom?
+That last one is a very real business risk. Tiny robot broom syndrome is rampant.
+How each phase could work
+R: Recognize the Automation Opportunity
+This phase is about spotting where automation might help, without assuming automation is the answer.
+The learner identifies:
+where work is repetitive
+where delays happen
+where people duplicate effort
+where handoffs break down
+where data is copied between systems
+where staff rely on memory, sticky notes, spreadsheets, or Slack archaeology
+where clients, donors, staff, or partners experience friction
+The key question:
+What business pain keeps repeating, and what does it cost us in time, quality, money, trust, or momentum?
+Deliverable:
+Automation Opportunity Statement
+Example:
+Intake requests are coming in through email, forms, and Slack. Staff manually review, categorize, assign, and follow up. This causes missed requests, inconsistent response times, and limited visibility into workload.
+
+E: Explore the Current-State Process
+This phase slows everything down, in a good way.
+The learner maps the real process, not the imaginary “official” process that lives in a dusty SOP goblin cave.
+They document:
+who starts the process
+what triggers it
+what information is collected
+where the information goes
+who touches it
+what decisions are made
+what tools are used
+what exceptions occur
+where people wait
+where errors happen
+what workarounds people use
+The key question:
+How does this work actually happen today, from first trigger to final outcome?
+Deliverable:
+Current-State Workflow Map
+This phase should include interviews, observation, sample records, screenshots, and “walk me through the last real example” conversations.
+
+S: Select the Best Automation Candidate
+Not every process is ready for automation.
+This phase helps learners choose the part of the workflow that is most valuable and realistic to prepare.
+They evaluate:
+frequency: does this happen often?
+consistency: does it follow a repeatable pattern?
+impact: would improvement matter?
+risk: what happens if it goes wrong?
+data readiness: is the required information available?
+ownership: does someone own the process?
+exception volume: are there too many edge cases?
+user readiness: will people actually use the improved process?
+The key question:
+Which part of this process is stable, valuable, and clear enough to prepare for automation?
+Deliverable:
+Automation Candidate Scorecard
+This is where people learn that the best first automation is often not the flashiest one. It is the one with enough structure to survive contact with Monday morning.
+
+O: Outline the Automation-Ready Process
+This is the heart of the new version.
+The learner outlines what needs to be true before anything gets built.
+They define:
+trigger: what starts the process?
+input: what data is required?
+rules: what decisions must be made?
+routing: who or what receives the work?
+actions: what should happen automatically?
+exceptions: when should a human intervene?
+notifications: who needs to know what?
+data updates: what records should change?
+success outcome: what does “complete” mean?
+audit trail: what needs to be tracked?
+The key question:
+What would a clean, automation-ready version of this process look like?
+Deliverable:
+Automation Readiness Brief
+This could become a handoff artifact for Salesforce, Zapier, Make, Slack, Jira, Monday.com, or even an AI-supported workflow.
+The point is not tool selection yet. The point is business clarity.
+
+L: Launch the Manual Prototype or Automation Brief
+For the business-thinking version, Launch does not have to mean “deploy the automation.”
+It could mean:
+test the future-state process manually
+launch a standardized intake form
+pilot a new checklist
+test routing rules with a small group
+validate the automation brief with stakeholders
+confirm that the proposed rules work in real life
+hand off the brief to a builder
+The key question:
+Can this improved process work manually before we ask technology to repeat it at scale?
+Deliverable:
+Pilot Workflow or Builder-Ready Handoff
+This is where I would teach the principle:
+If the process cannot work manually, automation will not magically bless it with order.
+Automation is not a wizard. It is a very literal intern with lightning speed.
+
+V: Verify Business Readiness and Value
+Here, learners measure whether the process is truly clearer and more automation-ready.
+They look at:
+time saved
+fewer missed steps
+fewer duplicate entries
+clearer ownership
+cleaner data
+better response times
+fewer questions from users
+easier reporting
+reduced manual follow-up
+user confidence
+The key question:
+Did this process become clearer, more consistent, and more measurable?
+Deliverable:
+Readiness and Value Review
+This is also where learners decide whether the next step should be:
+automate now
+refine the process first
+collect better data
+train users
+reduce exceptions
+redesign the workflow
+abandon automation because the value is not there
+That last one matters. A mature automation thinker can say, “Not yet.”
+
+E: Evolve the Process and Automation Plan
+The current methodology already treats Evolve as a loop back into Recognize, where feedback reveals the next problem or opportunity.
+In this business automation version, Evolve becomes a governance habit.
+The learner asks:
+What changed in the business?
+What new exceptions appeared?
+What data quality issues surfaced?
+Are users bypassing the process?
+Has volume increased?
+Are the rules still accurate?
+Should this now become a technical automation?
+Should the automation be expanded, simplified, or retired?
+The key question:
+What did we learn, and what needs to change before we scale?
+Deliverable:
+Process Evolution Log
+This makes automation feel less like a one-time build and more like a living business capability.
+The course or module angle
+This could become a distinct Academy module or mini-course:
+Automation Readiness with R.E.S.O.L.V.E.
+Possible audience:
+Explorer’s Journey members
+Trail of Mastery Associates
+nonprofit staff
+small business clients
+new admins who need to think before building
+operations people who want to use AI, Salesforce, Zapier, Make, Slack, or spreadsheets more strategically
+Learning promise:
+By the end of this course, learners will be able to evaluate a business process, determine whether it is ready for automation, and create a clear automation brief that a builder or tool can act on.
+Suggested artifact set
+This should produce very practical templates:
+Automation Opportunity Statement
+Current-State Workflow Map
+Pain Point and Rework Log
+Automation Candidate Scorecard
+Decision Rules Worksheet
+Data Readiness Checklist
+Exception Handling Matrix
+Future-State Workflow Outline
+Automation Readiness Brief
+Pilot Review and Value Tracker
+Process Evolution Log
+This fits beautifully into Transition Trails because it teaches people to think like consultants before they touch Salesforce.
+My recommended framing
+I would not position this as replacing the technical R.E.S.O.L.V.E. methodology.
+I would position it as a companion track:
+R.E.S.O.L.V.E. for Solution Design
+Used when preparing to design and build Salesforce technology.
+R.E.S.O.L.V.E. for Automation Readiness
+Used when preparing the business process so automation makes sense.
+One prepares the builder.
+The other prepares the business.
+Together, they create the kind of person Transition Trails is trying to develop: someone who can see the whole system, not just the shiny button.
+I’ll turn our working strategy into a structured document you can keep refining: first the overall R.E.S.O.L.V.E. adaptation, then the BA Product Lab model, then the Guided Trail versus Trail of Mastery split.
+Resolve Ba Product Lab Approach
+R.E.S.O.L.V.E. and the Business Analyst Product Lab Approach
+Quick Navigation
+Purpose of This Approach
+Strategic Framing
+The Updated R.E.S.O.L.V.E. Model
+The HCH Capstone as a Shared Project Ecosystem
+Two BA Learning Layers
+Guided Trail BA Lens
+Trail of Mastery BA Product Lab
+Certification Alignment
+Learner Role and Project Simulation
+Product Lab Structure
+Core Deliverables
+Portfolio Outcomes
+Program Design Recommendations
+Reference Notes
+
+1. Purpose of This Approach
+Transition Trails is adapting the R.E.S.O.L.V.E. methodology into a Business Analyst learning model that helps learners think through business problems before building or automating technology solutions.
+The first major use case will be a Salesforce Business Analyst learning experience built around the Horizon Community Hub, or HCH, capstone project. This approach will support two learning pathways:
+Guided Trail BA LensA lighter version embedded into the Guided Trail experience so learners begin practicing BA thinking while working through the HCH capstone.
+Trail of Mastery BA Product LabA deeper, role-based project lab where learners step into the Business Analyst role and use the HCH capstone to prepare for Salesforce Business Analyst certification and BA-style project work.
+The goal is not to turn every learner into a technical builder. The goal is to teach learners how to analyze business needs, clarify requirements, prepare automation-ready process thinking, support validation, and connect Salesforce work to measurable business value.
+
+2. Strategic Framing
+Core Idea
+R.E.S.O.L.V.E. becomes a structured thinking model for Salesforce Business Analysts.
+Instead of asking only:
+How do we build the right Salesforce solution?
+The BA version asks:
+How do we understand the business problem, clarify the process, define the requirements, validate the solution, and prepare the organization for successful automation or improvement?
+This framing is especially valuable because many organizations, especially nonprofits, often start with a tool request before the process is clear.
+Examples:
+“We need Salesforce to automate intake.”
+“We need Zapier to connect everything.”
+“We need AI to summarize donor notes.”
+“We need a dashboard.”
+The BA learner is trained to pause and ask:
+What problem are we actually solving?
+Who is affected?
+What happens today?
+What needs to change?
+What should be automated, simplified, clarified, or left manual?
+How will we know the solution worked?
+Guiding Principle
+Before you automate the work, understand the work.
+Supporting Principle
+Automation does not fix confusion. It accelerates whatever process already exists.
+The BA Product Lab gives learners a safe but realistic environment to practice this kind of thinking.
+
+3. The Updated R.E.S.O.L.V.E. Model
+The adapted R.E.S.O.L.V.E. framework supports business analysis, process clarity, automation readiness, and Salesforce solution alignment.
+Phase
+ | BA Meaning
+ | Core Question
+ | Primary Output
+ | 
+R: Recognize
+ | Identify the real business problem, mission impact, and risk of inaction.
+ | What problem keeps repeating, and why does it matter?
+ | Business Problem Brief
+ | 
+E: Explore
+ | Understand stakeholders, current-state process, pain points, systems, data, handoffs, and exceptions.
+ | How does the work actually happen today?
+ | Current-State Process Map + Stakeholder Notes
+ | 
+S: Select
+ | Prioritize the best focus area, user story, process segment, or automation candidate.
+ | What should we focus on first, and why?
+ | Prioritization Matrix + Automation Readiness Scorecard
+ | 
+O: Outline
+ | Translate business needs into clear requirements, user stories, rules, data needs, and acceptance criteria.
+ | What does the solution need to do to meet the business need?
+ | Requirements Addendum + User Stories + Acceptance Criteria
+ | 
+L: Launch
+ | Prepare the project for validation, UAT, stakeholder review, training, or builder handoff.
+ | Are we ready for users, builders, or stakeholders to validate this?
+ | UAT Support Packet + Traceability Matrix
+ | 
+V: Verify
+ | Confirm whether the solution meets business needs, acceptance criteria, and value expectations.
+ | Did the work solve the right problem?
+ | Acceptance & Value Review
+ | 
+E: Evolve
+ | Capture feedback, triage change requests, identify future enhancements, and improve the process.
+ | What should change next based on what we learned?
+ | Change Request Analysis + Enhancement Backlog
+ | 
+
+4. The HCH Capstone as a Shared Project Ecosystem
+The Horizon Community Hub capstone is already used across Transition Trails program design as a realistic nonprofit Salesforce project scenario.
+The capstone centers on a nonprofit organization moving away from manual spreadsheets, fragmented data, and inconsistent intake processes toward a Salesforce-supported system for client management, urgent service response, case routing, reporting, and mission-critical visibility.
+This makes HCH a strong shared project universe because different learners can approach the same project from different professional perspectives.
+One Capstone, Multiple Professional Perspectives
+Program
+ | Role Lens
+ | Core Question
+ | 
+Foundations Trail
+ | Emerging Admin / Certification Learner
+ | Can I understand and practice core Salesforce concepts?
+ | 
+Guided Trail
+ | Salesforce Admin / Project Contributor
+ | Can I build, test, document, and explain a realistic Salesforce solution?
+ | 
+Trail of Mastery BA Product Lab
+ | Business Analyst
+ | Can I clarify the business problem, document requirements, support validation, and connect the solution to business value?
+ | 
+This approach prevents duplicate learning while making the capstone more valuable. The same HCH project becomes a layered professional simulation.
+
+5. Two BA Learning Layers
+Transition Trails will use two versions of the BA experience:
+Layer 1: Guided Trail BA Lens
+A lighter, embedded version that introduces BA thinking while learners are still primarily building and documenting Salesforce work.
+Layer 2: Trail of Mastery BA Product Lab
+A deeper role-based simulation where learners act as the Business Analyst assigned to the HCH project.
+Element
+ | Guided Trail BA Lens
+ | Trail of Mastery BA Product Lab
+ | 
+Depth
+ | Introductory
+ | Applied and advanced
+ | 
+Learner Identity
+ | Admin/project contributor learning BA habits
+ | Business Analyst assigned to the project
+ | 
+Main Activity
+ | Build with BA reflection
+ | Analyze, clarify, document, validate, and recommend
+ | 
+Certification Connection
+ | Awareness and vocabulary
+ | Direct certification readiness and portfolio alignment
+ | 
+HCH Use
+ | Build-focused capstone with BA prompts
+ | BA-focused project simulation
+ | 
+Final Output
+ | Business impact reflection
+ | Full BA portfolio packet
+ | 
+
+6. Guided Trail BA Lens
+Purpose
+The Guided Trail BA Lens introduces learners to Business Analyst thinking without turning the Guided Trail into a full BA certification course.
+The learner is still primarily participating as a Salesforce admin/project contributor, but they are prompted to think about the business purpose behind their work.
+Learner Role
+You are a Salesforce project contributor learning to think like a Business Analyst while you build.
+Learning Outcomes
+By the end of the Guided Trail BA Lens, learners should be able to:
+Explain the business problem behind the HCH project.
+Identify stakeholders and their needs.
+Connect user stories to Salesforce configuration.
+Write basic acceptance criteria.
+Document the business rationale behind admin decisions.
+Participate thoughtfully in testing and validation.
+Explain how their configuration supports mission impact.
+How It Fits Existing Guided Trail Work
+The BA Lens can be embedded through prompts, workbook pages, sprint reflections, and Admin Decision Log enhancements.
+Existing Guided Trail Activity
+ | BA Lens Add-On
+ | 
+Build Salesforce fields
+ | What business question does this field answer?
+ | 
+Configure intake
+ | What stakeholder need does this support?
+ | 
+Create routing or escalation logic
+ | What business rule does this represent?
+ | 
+Complete Admin Decision Log
+ | What requirement or business need drove this decision?
+ | 
+Test a user story
+ | What acceptance criteria are being validated?
+ | 
+Build dashboard/report
+ | What decision will leadership make from this data?
+ | 
+Prepare portfolio story
+ | What business problem did this solve?
+ | 
+Guided Trail BA Lens Artifacts
+Keep these lightweight:
+Stakeholder Snapshot
+Problem Statement
+Simple Requirement Notes
+User Story Reflection
+Acceptance Criteria Practice
+Admin Decision Log with BA Rationale
+UAT Reflection
+Business Impact Portfolio Summary
+Sample Guided Trail BA Prompt
+Before you build this Salesforce component, write one sentence explaining the business problem it supports, one stakeholder who benefits, and one acceptance criterion that would prove it works.
+This prompt helps learners connect configuration work to project meaning.
+
+7. Trail of Mastery BA Product Lab
+Purpose
+The Trail of Mastery BA Product Lab is a deeper, role-based project simulation using the HCH capstone. Learners step into the Business Analyst role and use R.E.S.O.L.V.E. to move from business problem analysis through requirements, UAT support, value verification, and change request triage.
+Proposed Name
+Trail of Mastery: Business Analyst Product Lab
+HCH Capstone + Salesforce BA Certification Readiness
+Alternative names:
+Business Analyst Project Lab
+HCH Business Analyst Lab
+R.E.S.O.L.V.E. for Business Analysts
+Automation Readiness with R.E.S.O.L.V.E.
+“Product Lab” is useful if the program wants learners to think of the Salesforce solution as a product that serves users, stakeholders, and measurable business outcomes.
+Learner Role
+You are the Business Analyst assigned to the Horizon Community Hub Salesforce transformation project.
+The learner does not own every configuration decision or build every Salesforce feature. Their responsibility is to connect stakeholder needs to project execution.
+They clarify:
+What problem is being solved.
+Who needs the solution.
+What requirements must be met.
+What business rules apply.
+What data is needed.
+What acceptance criteria prove the solution works.
+What users need to validate.
+What feedback should become a defect, change request, training issue, or future enhancement.
+BA Product Lab Learning Promise
+By the end of the lab, learners will be able to use the HCH capstone to practice the business analysis skills needed for Salesforce project work and Salesforce Business Analyst certification readiness.
+They will produce a portfolio-ready BA packet showing how they used R.E.S.O.L.V.E. to analyze business needs, document requirements, support UAT, verify business value, and recommend future improvements.
+
+8. Certification Alignment
+The Salesforce Certified Business Analyst credential focuses on the ability to understand business needs, capture requirements, collaborate with stakeholders, and support Salesforce solutions that drive business improvement.
+The BA Product Lab should not only “teach to the test.” Instead, it should use the certification as a map and the HCH capstone as the practice field.
+Certification Readiness Through HCH Practice
+Certification Skill Area
+ | HCH Product Lab Practice
+ | 
+Understand business needs
+ | Analyze HCH’s manual spreadsheet problem, intake delays, and 4-hour response goal.
+ | 
+Collaborate with stakeholders
+ | Build stakeholder maps, discovery questions, UAT scripts, and feedback summaries.
+ | 
+Capture requirements
+ | Translate PRD, backlog, and project context into requirements, user stories, business rules, and acceptance criteria.
+ | 
+Support Salesforce solutions
+ | Clarify what the Salesforce build must accomplish, without requiring the BA learner to be the sole builder.
+ | 
+Validate business improvements
+ | Compare delivered work to business goals, response time needs, data quality, reporting value, and user adoption.
+ | 
+Certification Reflection Component
+Each module should include a short reflection:
+Which BA skill did I practice?
+Which certification concept does this connect to?
+What would I say in an interview about this work?
+What do I still need to study?
+
+9. Learner Role and Project Simulation
+Role Statement
+In the Trail of Mastery BA Product Lab, the learner joins the HCH Salesforce transformation as the Business Analyst. They are responsible for connecting stakeholder needs to project execution. They do not own every configuration decision or build every Salesforce feature. Instead, they clarify the business problem, document workflows, refine user stories, define acceptance criteria, support UAT, and help the project team verify whether the solution meets mission-critical goals.
+Project Team Context
+The learner works as part of a simulated project team:
+Role
+ | Responsibility
+ | 
+Product Owner
+ | Owns project priorities and business outcomes.
+ | 
+Salesforce Admin / Builder
+ | Configures Salesforce features.
+ | 
+Solution Architect / Lead
+ | Designs the technical approach.
+ | 
+QA / Test Coordinator
+ | Manages testing and defect validation.
+ | 
+Trainer / Enablement Lead
+ | Prepares end users.
+ | 
+Stakeholders
+ | Represent support staff, program managers, leadership, clients, or donors.
+ | 
+BA Learner
+ | Clarifies needs, documents requirements, supports validation, and connects work to mission impact.
+ | 
+BA Mindset
+The learner repeatedly asks:
+What do I need to understand?
+What do I need to clarify?
+What do I need to document?
+What do I need to validate?
+What do I need to escalate?
+What business value are we trying to protect?
+
+10. Product Lab Structure
+The Product Lab can be structured as an 8 or 9 module experience.
+Module 1: Enter the Project as the BA
+R.E.S.O.L.V.E. Connection
+Orientation before Recognize.
+Purpose
+Learners understand the HCH project context, their BA role, and the difference between building the solution and analyzing the solution need.
+Learner Activities
+Review HCH project summary.
+Identify the BA’s responsibilities.
+Clarify what the BA does and does not own.
+Review available project artifacts.
+Draft initial discovery questions.
+Deliverables
+BA Role Charter
+Stakeholder Map
+Initial Discovery Question List
+
+Module 2: Recognize the Business Problem
+R.E.S.O.L.V.E. Phase
+R: Recognize
+Purpose
+Learners translate the HCH scenario from “they need Salesforce” into a clear business problem with mission impact.
+Learner Activities
+Identify the current pain points.
+Describe the operational risk.
+Connect the problem to staff, clients, Veterans, donors, and leadership.
+Identify the cost of inaction.
+Separate symptoms from root causes.
+Key Questions
+What problem keeps repeating?
+Who is affected?
+What mission outcome is at risk?
+What happens if nothing changes?
+Which pain points are business problems versus technology symptoms?
+Deliverables
+Business Problem Brief
+Mission Impact Statement
+Risk of Inaction Summary
+
+Module 3: Explore the Current State
+R.E.S.O.L.V.E. Phase
+E: Explore
+Purpose
+Learners map how HCH’s process works today before Salesforce or automation improves it.
+Learner Activities
+Map intake channels.
+Identify stakeholders and handoffs.
+Document manual steps.
+Capture data sources and duplicate entry points.
+Identify exception paths.
+Identify reporting gaps.
+Key Questions
+How does the work actually happen today?
+Where does the process rely on memory, manual effort, or one person knowing what to do next?
+Where does data enter the process?
+Where does data become unreliable?
+Where do staff wait, rework, or guess?
+Deliverables
+Current-State Process Map
+Pain Point Log
+Stakeholder Interview Notes
+Data Source Inventory
+Risk / Assumption / Question Log
+
+Module 4: Select the BA Focus Area
+R.E.S.O.L.V.E. Phase
+S: Select
+Purpose
+Learners choose a focused slice of the HCH project to analyze deeply.
+Recommended Focus Area for Version 1
+Urgent Intake and 4-Hour Response Readiness
+This is the strongest first BA focus because it connects:
+Intake
+Automation readiness
+Service urgency
+Mission impact
+Data quality
+Case assignment
+SLA logic
+Reporting
+UAT
+Stakeholder communication
+Optional Focus Areas for Future Versions
+Focus Area
+ | BA Practice Value
+ | 
+Veteran Data & Privacy Readiness
+ | Sensitive data, access control, source of truth, data stewardship.
+ | 
+Donor Impact Reporting
+ | Dashboard requirements, leadership questions, outcome metrics.
+ | 
+Case Assignment & Triage
+ | Routing, ownership, staff capacity, escalation paths.
+ | 
+Intake Data Quality
+ | Required fields, validation, duplicate prevention, user experience.
+ | 
+Learner Activities
+Review backlog items or user stories.
+Score potential focus areas.
+Identify dependencies.
+Select a project slice.
+Justify the recommendation.
+Key Questions
+Which process area has the highest business value?
+Which area is ready enough to analyze?
+Which area has clear stakeholder impact?
+Which area has enough structure to support automation or validation?
+What should not be automated yet?
+Deliverables
+Focus Area Recommendation
+Story Prioritization Matrix
+Automation Readiness Scorecard
+Assumptions and Dependencies List
+
+Module 5: Outline Requirements and Acceptance Criteria
+R.E.S.O.L.V.E. Phase
+O: Outline
+Purpose
+Learners turn business needs into clear requirements, user stories, business rules, data needs, and acceptance criteria.
+Learner Activities
+Extract requirements from HCH materials.
+Identify missing requirements or open questions.
+Refine user stories.
+Write acceptance criteria.
+Define business rules.
+Identify data needs and validation rules.
+Identify exception handling needs.
+Key Questions
+What does the solution need to do?
+What business rule drives this behavior?
+What data is required?
+What happens when information is missing?
+Who needs to be notified?
+What should be automated?
+Where is human review required?
+How will we prove this works?
+Deliverables
+Requirements Addendum
+User Stories
+Acceptance Criteria
+Business Rules Worksheet
+Data Needs Checklist
+Exception Handling Matrix
+Open Questions Log
+Example Requirement Expansion
+High-Level Need
+HCH must respond to urgent service requests within a 4-hour window.
+Business Requirement
+HCH needs a repeatable process to identify urgent intake requests, assign ownership, and monitor response deadlines.
+Functional Requirements
+The system must capture service request type.
+The system must identify urgent request categories.
+The system must create a case connected to the client record.
+The system must assign urgent cases to the correct queue or staff member.
+The system must track the response deadline.
+The system must notify staff when urgent action is required.
+The system must support reporting on urgent response performance.
+Business Rules
+If request type equals urgent housing or utility shut-off, response target is 4 hours.
+If required intake fields are missing, the case should be flagged for review.
+If no owner accepts the case within a defined period, escalation should occur.
+Acceptance Criteria
+Given a new urgent request is submitted, when required fields are complete, then a case is created with urgent priority.
+Given an urgent case is assigned, when the case is created, then the response deadline is calculated.
+Given an urgent case approaches the deadline, when no action has been logged, then the assigned staff member receives an escalation alert.
+Given a manager views urgent cases, when they open the dashboard, then they can see open cases by deadline status.
+
+Module 6: Launch UAT Readiness
+R.E.S.O.L.V.E. Phase
+L: Launch
+Purpose
+Learners prepare the project for validation. In this BA version, Launch does not mean the learner deploys the Salesforce solution. It means the learner helps launch understanding, testing, stakeholder review, and readiness.
+Learner Activities
+Review test cases.
+Connect test cases to requirements.
+Draft UAT scenarios.
+Identify expected results.
+Prepare stakeholder testing questions.
+Define what counts as defect versus enhancement.
+Review training implications.
+Key Questions
+What should users validate?
+Which requirement does this test prove?
+What is the expected business result?
+What would count as a blocker?
+What would count as a change request?
+What training gaps might appear?
+Deliverables
+UAT Support Packet
+Requirement Traceability Matrix
+UAT Scenario Draft
+Expected Results Guide
+Stakeholder Feedback Form
+Defect vs. Enhancement Decision Guide
+
+Module 7: Verify Business Value
+R.E.S.O.L.V.E. Phase
+V: Verify
+Purpose
+Learners compare the solution, tests, release goals, and stakeholder feedback against the original business need.
+Learner Activities
+Review whether acceptance criteria were met.
+Analyze testing feedback.
+Identify unresolved business risks.
+Connect solution output to mission outcomes.
+Define post-launch metrics.
+Evaluate dashboard and reporting usefulness.
+Key Questions
+Did the solution solve the right problem?
+Did it meet the acceptance criteria?
+Can users perform the workflow?
+Can managers see what they need to see?
+Is the process more reliable than before?
+What value should be measured after launch?
+Deliverables
+Acceptance & Value Review
+Success Metrics Tracker
+Dashboard Question Checklist
+Stakeholder Readiness Notes
+Training Gap Summary
+
+Module 8: Evolve Through Change Requests
+R.E.S.O.L.V.E. Phase
+E: Evolve
+Purpose
+Learners practice post-launch BA thinking by reviewing feedback, triaging change requests, and recommending future enhancements.
+Learner Activities
+Review feedback and change requests.
+Classify issues as defect, enhancement, training gap, process issue, or future phase.
+Write business justification for changes.
+Recommend backlog updates.
+Reflect on lessons learned.
+Identify future automation or reporting opportunities.
+Key Questions
+What did we learn?
+What needs to change next?
+Is this request a defect, enhancement, training issue, or process issue?
+What is the business justification?
+What should be prioritized?
+What should be deferred?
+Deliverables
+Change Request Analysis
+Enhancement Backlog Recommendations
+Lessons Learned Summary
+BA Retrospective
+Future-State Improvement Log
+
+Optional Module 9: Connect to Certification and Career Story
+Purpose
+Learners connect their HCH BA work to Salesforce Business Analyst certification readiness and interview storytelling.
+Learner Activities
+Map Product Lab artifacts to BA certification concepts.
+Identify study gaps.
+Draft resume bullets.
+Draft interview stories.
+Prepare a portfolio narrative.
+Deliverables
+Certification Study Map
+BA Skills Reflection
+Portfolio Narrative
+Resume Bullet Drafts
+Interview STAR Stories
+Example Portfolio Narrative
+I acted as the Business Analyst on a Salesforce nonprofit transformation scenario for Horizon Community Hub. Using the R.E.S.O.L.V.E. method, I analyzed the business problem, mapped current-state intake workflows, prioritized an urgent response process, documented requirements and acceptance criteria, supported UAT planning, verified business value, and recommended future enhancements.
+
+11. Core Deliverables
+The Trail of Mastery BA Product Lab should produce a complete portfolio-ready packet.
+HCH Business Analyst Portfolio Packet
+BA Role Charter
+Stakeholder Map
+Initial Discovery Questions
+Business Problem Brief
+Mission Impact Statement
+Current-State Process Map
+Pain Point Log
+Data Source Inventory
+Focus Area Recommendation
+Story Prioritization Matrix
+Automation Readiness Scorecard
+Requirements Addendum
+User Stories
+Acceptance Criteria
+Business Rules Worksheet
+Data Needs Checklist
+Exception Handling Matrix
+Requirement Traceability Matrix
+UAT Scenario Draft
+Expected Results Guide
+Stakeholder Feedback Summary
+Acceptance & Value Review
+Success Metrics Tracker
+Change Request Analysis
+Enhancement Backlog Recommendations
+BA Retrospective
+Certification Study Reflection
+Portfolio Narrative
+
+12. Portfolio Outcomes
+The BA Product Lab should help learners leave with practical proof of skill.
+Learner Can Say
+I used the R.E.S.O.L.V.E. method to act as the Business Analyst on a Salesforce nonprofit transformation project. I analyzed business needs, mapped workflows, refined requirements, supported UAT, and connected solution decisions to mission impact.
+Resume Bullet Examples
+Applied Business Analyst practices to a Salesforce nonprofit capstone project focused on intake, case management, urgent response, and reporting.
+Created stakeholder maps, process documentation, user stories, acceptance criteria, and UAT support materials for a Salesforce transformation scenario.
+Used R.E.S.O.L.V.E. methodology to analyze current-state pain points, prioritize automation-ready requirements, and recommend future enhancements.
+Connected Salesforce configuration needs to business outcomes, including faster intake triage, improved case visibility, and stronger leadership reporting.
+Interview Story Themes
+Turning a vague technology need into a clear business problem.
+Identifying stakeholders and documenting their needs.
+Translating business rules into acceptance criteria.
+Supporting UAT by connecting tests to requirements.
+Handling change requests after stakeholder feedback.
+Explaining how Salesforce work supports mission outcomes.
+
+13. Program Design Recommendations
+Recommendation 1: Build the Trail of Mastery BA Product Lab First
+The full Product Lab should be designed first because it creates the complete framework, artifact set, and certification alignment.
+Once complete, lighter pieces can be pulled into Guided Trail as BA Lens prompts.
+Recommendation 2: Keep Guided Trail Lightweight
+The Guided Trail version should not become a second full BA course. It should introduce BA thinking through practical prompts, reflections, and Admin Decision Log enhancements.
+Recommendation 3: Use HCH as a Shared Capstone Universe
+Do not create a separate case study for BA learners yet. Use HCH as the shared project ecosystem so learners can experience the same scenario from different professional roles.
+Recommendation 4: Make the BA Role Explicit
+Every module should remind learners:
+You are the Business Analyst. What do you need to understand, document, clarify, validate, or escalate?
+Recommendation 5: Separate BA Work from Builder Work
+The BA learner may understand Salesforce concepts, but the Product Lab should not require them to personally configure every component.
+Use BA verbs:
+Analyze
+Clarify
+Document
+Validate
+Trace
+Recommend
+Facilitate
+Prepare
+Review
+Triage
+Connect to business value
+Avoid making the BA lab primarily about:
+Configure
+Build
+Deploy
+Debug
+Administer
+Recommendation 6: Tie Every Artifact to Certification and Career Readiness
+Each artifact should answer:
+What BA skill does this demonstrate?
+How does this support Salesforce Business Analyst certification readiness?
+How could the learner discuss this in an interview?
+
+14. Reference Notes
+Internal Transition Trails Context
+This approach builds on the existing Transition Trails use of:
+R.E.S.O.L.V.E. methodology
+Guided Trail
+Trail of Mastery
+Foundations Trail
+HCH capstone project
+Admin Decision Log
+Sprint-based project learning
+Salesforce project simulation
+Portfolio-based career readiness
+R.E.S.O.L.V.E. Origin Within Transition Trails
+R.E.S.O.L.V.E. is used as a structured problem-solving and mentoring methodology:
+R — Recognize Problem
+E — Explore Solutions
+S — Select Best Option
+O — Outline Build
+L — Launch Solution
+V — Verify Results
+E — Evolve Solution
+The BA Product Lab adapts this from a builder-centered approach to an analysis-centered approach:
+Recognize business need.
+Explore current-state process.
+Select the best focus area.
+Outline requirements.
+Launch validation readiness.
+Verify value.
+Evolve through feedback and change requests.
+Working Taglines
+Before you automate the work, understand the work.
+Think before you automate. Clarify before you configure.
+From process pain to automation-ready requirements.
+Learn to think like the BA before the build begins.
+
+Summary
+The R.E.S.O.L.V.E. BA Product Lab gives Transition Trails a clear, career-aligned way to teach Salesforce Business Analyst thinking using the existing HCH capstone.
+The Guided Trail version introduces BA habits while learners build. The Trail of Mastery version turns the same capstone into a full BA project simulation aligned to Salesforce Business Analyst certification readiness.
+This creates a clean learning progression:
+I first learned to think like a BA while building. Then I practiced acting as the BA on the project.
+That progression supports certification readiness, portfolio development, interview confidence, and stronger real-world project thinking.
+Thought for 1m 0s
+Created the detailed approach document in canvas: Resolve BA Product Lab Approach.
+Now let's create the same approach to help someone that is a nonprofit business user to use resolve to figure out how to solve the problem, the POV is an "Accidental Admin" Who is a volunteer at the non profit or they use salesforce in their business as an ed user and they want to get more experience so they volunteer with a non profit and they are learning as they go. They are a person that works for the HCH Non profit and they will be the person in charge of salesforce at their cp,[any
+I think this may actually be the most important audience of the three.
+If the Business Analyst Product Lab teaches someone how to be a BA on a Salesforce project, this version teaches someone how to become a trusted nonprofit technology champion.
+This person is not trying to become a consultant.
+They're not trying to pass the Salesforce Business Analyst certification.
+They're the person who suddenly discovers:
+"I seem to be the Salesforce person now."
+Which happens in nonprofits approximately every 17 minutes. 😄
+
+R.E.S.O.L.V.E. for the Accidental Admin
+Nonprofit Technology Readiness Lab
+Audience
+This path is designed for:
+Volunteer Salesforce admins
+Accidental admins
+Program managers
+Operations coordinators
+Volunteer coordinators
+Case managers
+Development staff
+Executive assistants
+Office managers
+Small nonprofit leaders
+End users who inherited Salesforce
+Employees who use Salesforce at work and volunteer with a nonprofit
+Typical Learner
+Meet Sarah.
+Sarah is a Program Coordinator at Horizon Community Hub.
+She isn't technical.
+She wasn't hired to manage Salesforce.
+But the previous volunteer left.
+Now she's responsible for:
+Intake forms
+Volunteer tracking
+Client records
+Reports
+User questions
+Duplicate records
+Strange automation behavior
+Board requests
+Grant reporting
+She doesn't need to become an architect.
+She needs to become a confident problem solver.
+
+Core Promise
+Learn how to think through nonprofit operational problems, understand your processes, identify opportunities for improvement, and work effectively with Salesforce, AI tools, volunteers, consultants, and automation platforms.
+By the end of this experience, learners will be able to:
+Identify business problems
+Document workflows
+Ask better questions
+Work effectively with consultants
+Use AI to analyze processes
+Improve data quality
+Prioritize automation opportunities
+Create meaningful requirements
+Lead small technology improvements
+Become the trusted technology champion inside their organization
+
+Positioning
+The BA Product Lab asks:
+How do I act as the Business Analyst on this project?
+The Accidental Admin Lab asks:
+How do I help my nonprofit solve problems with technology?
+This is a very different mindset.
+
+The New Role
+Nonprofit Technology Champion
+Not:
+Salesforce Architect
+Developer
+Consultant
+Instead:
+A mission-focused problem solver who understands enough about process, data, technology, and people to improve how the organization works.
+
+R.E.S.O.L.V.E. for Accidental Admins
+R — Recognize
+Purpose
+Identify the real nonprofit problem.
+Common Starting Point
+Most accidental admins start here:
+"We need Salesforce to do X."
+R.E.S.O.L.V.E. teaches them to ask:
+Why?
+Example
+Bad:
+We need a dashboard.
+Better:
+Leadership spends four hours every month creating board reports manually.
+The dashboard is not the problem.
+The reporting burden is.
+Learner Activities
+Identify recurring frustrations
+Identify manual work
+Identify delays
+Identify duplicate effort
+Identify mission impact
+Questions
+What keeps happening over and over?
+What wastes time?
+What frustrates staff?
+What hurts clients, donors, volunteers, or programs?
+What happens if we do nothing?
+Deliverable
+Problem Snapshot
+
+E — Explore
+Purpose
+Understand how the work happens today.
+This is where accidental admins become detectives.
+They follow the process.
+They talk to people.
+They observe.
+Learner Activities
+Interview staff
+Observe workflows
+Review forms
+Review spreadsheets
+Review Salesforce usage
+Identify handoffs
+Questions
+Who starts the process?
+Who touches it?
+What tools are involved?
+Where does data come from?
+Where do people get stuck?
+What workarounds exist?
+Deliverable
+Current State Workflow Map
+
+S — Select
+Purpose
+Choose the best improvement opportunity.
+Nonprofits often try to fix everything.
+This phase teaches focus.
+Questions
+Which problem hurts the most?
+Which improvement would save the most time?
+Which process is simple enough to improve?
+Which change would benefit the most people?
+Example
+Instead of:
+Fix volunteer management.
+Choose:
+Improve volunteer application intake.
+Deliverable
+Improvement Prioritization Matrix
+
+O — Outline
+Purpose
+Describe the future process in plain language.
+No technical jargon required.
+Learner Activities
+Document:
+What should happen
+Who should be involved
+What information is needed
+What notifications should occur
+What should be tracked
+What should stay manual
+Questions
+What would a better version look like?
+What information is required?
+What decisions need to be made?
+What should happen automatically?
+What should still involve a person?
+Deliverable
+Nonprofit Improvement Brief
+This becomes the handoff to:
+Salesforce Admin
+Consultant
+Volunteer
+Claude
+ChatGPT
+Zapier
+Make
+Notion
+
+L — Launch
+Purpose
+Test the improved process.
+Not necessarily the technology.
+The process.
+Example
+Before building an automation:
+Test the process manually.
+Can people follow it?
+Does it make sense?
+Do the rules work?
+Deliverable
+Pilot Plan
+
+V — Verify
+Purpose
+Determine if things improved.
+Questions
+Did we save time?
+Did we reduce confusion?
+Did we improve data quality?
+Did we improve client experience?
+Did staff adopt it?
+Deliverable
+Impact Review
+
+E — Evolve
+Purpose
+Keep improving.
+Questions
+What did we learn?
+What should change next?
+What new opportunities appeared?
+What should be automated later?
+Deliverable
+Improvement Roadmap
+
+The HCH Version
+Unlike the BA Product Lab, the learner is not an outside analyst.
+They are inside Horizon Community Hub.
+They own the problem.
+Learner Role
+You are the Operations Coordinator who inherited Salesforce and now helps HCH improve how it serves clients.
+This is a very different perspective.
+The learner experiences HCH from the inside.
+
+HCH Technology Champion Lab
+Module 1
+Why Are We Struggling?
+Review:
+Intake process
+Client management
+Reporting challenges
+Volunteer tracking
+Response time issues
+Deliverable:
+Problem Snapshot
+
+Module 2
+Understanding the Work
+Map:
+Intake
+Case management
+Volunteer onboarding
+Donor reporting
+Deliverable:
+Workflow Map
+
+Module 3
+Finding the Best Opportunity
+Choose one:
+Intake
+Volunteer process
+Donor reporting
+Program reporting
+Case management
+Deliverable:
+Improvement Prioritization Matrix
+
+Module 4
+Designing a Better Process
+Create:
+Future workflow
+Business rules
+Data needs
+Notifications
+Success measures
+Deliverable:
+Nonprofit Improvement Brief
+
+Module 5
+Using AI as a Thought Partner
+This is where this program becomes unique.
+Learners use:
+ChatGPT
+Claude
+to help:
+Analyze workflows
+Create process maps
+Draft requirements
+Generate SOPs
+Identify risks
+Brainstorm solutions
+Example Prompt
+Here is our volunteer onboarding process. Help me identify bottlenecks, unnecessary steps, missing data, and automation opportunities.
+Deliverable:
+AI-Assisted Process Analysis
+
+Module 6
+Choosing the Right Tool
+Instead of teaching a specific platform, learners evaluate:
+Salesforce
+Notion
+Zapier
+Make
+Forms
+Slack
+Teams
+Google Workspace
+Question:
+Which tool is the best fit for this problem?
+Deliverable:
+Technology Recommendation Worksheet
+
+Module 7
+Pilot and Measure
+Deliverable:
+Impact Review
+
+Module 8
+Become the Technology Champion
+Final deliverable:
+HCH Technology Improvement Portfolio
+Contents:
+Problem Snapshot
+Workflow Map
+Stakeholder Notes
+Prioritization Matrix
+Improvement Brief
+AI-Assisted Analysis
+Technology Recommendation
+Pilot Plan
+Impact Review
+Improvement Roadmap
+
+Relationship to Other Transition Trails Paths
+Path
+ | Learner Identity
+ | 
+Foundations Trail
+ | Emerging Salesforce professional
+ | 
+Guided Trail
+ | Salesforce Admin / Project Contributor
+ | 
+Trail of Mastery BA Product Lab
+ | Business Analyst
+ | 
+Technology Champion Lab
+ | Accidental Admin / Nonprofit Operations Leader
+ | 
+
+The Long-Term Vision
+Together these become a family of R.E.S.O.L.V.E. learning experiences:
+R.E.S.O.L.V.E. Builder Path
+"I build solutions."
+R.E.S.O.L.V.E. Business Analyst Path
+"I define solutions."
+R.E.S.O.L.V.E. Technology Champion Path
+"I improve how my organization works."
+Of the three, the Technology Champion Path may have the broadest nonprofit impact because it helps everyday nonprofit staff move from:
+"I don't know how technology can help us."
+to
+"I know how to identify problems, evaluate options, work with AI and Salesforce, and lead meaningful improvements for our mission."
+That's a very powerful transformation, and it aligns beautifully with Transition Trails' goal of creating people who can bridge mission, process, and technology.
+

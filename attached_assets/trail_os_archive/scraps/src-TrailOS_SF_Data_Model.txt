@@ -1,0 +1,366 @@
+
+
+### SHEET: Mapping
+TrailOS DATA MODEL  |  |  |  |  |  |  |
+Supabase Table | Row Count (POC) | Salesforce Object | Object Type | Reuse or New | Approved | SF Object ID | Notes
+learner_profiles | Active learners | Contact | Standard | Reuse |  |  | Name, email, phone already on Contact. Penny fields added as custom fields (see Fields tab)
+learner_profiles | Active learners | pmdm__ProgramEngagement__c | NPSP/PMM | Reuse |  |  | Trail assignment + cohort enrollment lives here
+trail_configs | 4 records | Penny_Trail_Config__c | Custom Object | New |  |  | 4 trail personas: Guided Trail · Explorer Journey · Trail of Mastery · Community/Alumni
+interaction_logs | Growing | Penny_Interaction_Log__c | Custom Object | New |  |  | Every Penny exchange — message + response + mode + source + timestamp
+quest_templates | 12 templates | Course__c | Custom Object | Reuse (extend) |  |  | Existing TT LMS object. Quest templates map to Course records by category + difficulty
+quest_assignments | Per learner | Course_Module_Activity__c | Custom Object | Reuse (extend) |  |  | Existing activity object. Extend with quest-specific fields
+quest_submissions | Per assignment | Penny_Quest_Submission__c | Custom Object | New |  |  | Learner quest answer text + submission timestamp. Unique on assignment ID
+career_profiles | Per learner | Contact | Standard | Reuse (extend) |  |  | Career fields added to Contact (target role + readiness score)
+career_review_sessions | Per learner | Penny_Career_Review__c | Custom Object | New |  |  | Full AI career review — readiness label + 5 dimension scores + feedback JSON
+weekly_reports | Weekly per cohort | Penny_Weekly_Report__c | Custom Object | New |  |  | Cohort intelligence snapshot — themes + flags + suggested actions. Delivered Fridays
+gamification | Per learner | Penny_Gamification__c | Custom Object | New |  |  | Points + sprint points + sprint number + reason + awarded by
+badges | Per learner | Penny_Badge__c | Custom Object | New |  |  | Program badge awards. 6 badge keys: first_deploy · sprint_complete · qa_champion · client_win · code_reviewer · career_ready
+classroom_nudge_log | Per assignment/day | Penny_Classroom_Nudge__c | Custom Object | New |  |  | Google Classroom nudge dedup. UNIQUE on learner + course_work_id + nudge_date
+
+
+### SHEET: TT SOP Automation
+TT SOP Automation (TT_SOP_Automation__c) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | Compact Layout | TT SOP Automation Compact Layout
+Automation | Automation__c | Lookup(TT Automation) | Reports Enabled
+Knowledge ARticle | Knowledge_Article__c | Lookup(Knowledge) | Lightning Record Page
+Notes | Notes__c | Text(255) | Search Layout
+Relationship Type | Relationship_Type__c | Picklist
+TT SOP Automation Name | Name | Text(80)
+
+
+### SHEET: TT Build Item
+TT Build Item (TT_Build_Item__c) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | Lightning Record Pages | TT Build Item Page Architecture, TT Build Item Page Automation, TT Build Item Page Build Log
+Admin Owner | Admin_Owner__c | Lookup(User) | Compact layout | created and assigned
+Alternatives Considered | Alternatives_Considered__c | Long Text Area(32768) | Search Layout | updated for all profiles
+Associated Object | Associated__c | Text(80) | Reports Enabled
+Blocking Work Items | Blocking_Work_Items__c | Long Text Area(32768) | Activity Enabled
+Business Reason | Business_Reason__c | Long Text Area(32768) | Track Field History Enabled
+Change Summary | Change_Summary__c | Long Text Area(32768)
+Component API Name | Component_API_Name__c | Text(100)
+Component Label | Component__c | Text(100)
+Component Type | Component_Type__c | Picklist
+Date Pushed to Prod | Date_Pushed_to_Prod__c | Date
+Decided By | Decided_By__c | Lookup(User)
+Decision Date | Decision_Date__c | Date
+Default Value | Default_Value__c | Text(100)
+Dependencies | Dependencies__c | Long Text Area(32768)
+Deployment Method | Deployment_Method__c | Picklist
+Documentation URL | Documentation_URL__c | URL(255)
+Environment | Environment__c | Picklist
+Follow Up Needed | Follow_Up_Needed__c | Checkbox
+Help Text | Help_Text__c | Long Text Area(32768)
+New Or Update | New_Or_Update__c | Picklist
+Notes | Notes__c | Long Text Area(32768)
+Prerequisite Rows | Prerequisite_Rows__c | Text(255)
+Priority | Priority__c | Picklist
+Related Work Item | Related_Work_Item__c | Lookup(Work)
+Requested By | Requested_By__c | Text(100)
+Risk Level | Risk_Level__c | Picklist
+
+
+### SHEET: TT Automation
+TT Automation (TT_Automation__c) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | Reporting Enabled
+Source System | Source_System__c | Picklist | Track Field History enabled
+Sprint Build | Sprint__Built__c | Lookup(Sprint) | Activities Enabled
+Status | Status__c | Picklist | Lightning Record Page | 1 page created
+Target System | Target_System__c | Picklist | Compact Layout | 1 layout created and assigned
+Total Failures | Total_Failures__c | Roll-Up Summary (COUNT TT Build Item) | Search Layout | Updated for all profiles (default)
+Total Runs | Total_Runs__c | Roll-Up Summary (COUNT TT Build Item) | Record Types | None setup
+TT Automation Id | Name | Auto Number
+TT Automation Name | TT_Automation_Name__c | Text(255)
+Type | Type__c | Picklist
+Work Item | Work_Item__c | Lookup(Work)
+Description | Description__c | Long Text Area (32768)
+External ID | External__ID__c | Text(100) (External ID)
+External URL | External_URL__c | URL(255)
+Last Run Date | Last_Run_Date__c | Date
+Last Run Status | Last_Run_Status__c | Picklist
+Platform | Platform__c | Picklist
+Schedule | Schedule__c | Text(100)
+
+
+### SHEET: TT SOP Account
+TT SOP Account (TT_SOP_Account__c) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | Reports Enabled
+Account | Account__c | Lookup(Account) | Compact Layout | created and assigned
+Knowledge Article | Knowledge_Article__c | Lookup(Knowledge) | Lightning Record Page | one page created
+Notes | Notes__c | Text(255) | Search Layout | updated for default
+Relationship Type | Relationship_Type__c | Picklist
+TT SOP Account Name | Name | Text(80)
+
+
+### SHEET: Knowledge
+Knowledge (Knowledge_kav) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | Reports | Not Enabled
+Activities | Not Enabled
+Track Field History | Not Enabled
+Lightning Record Paged | One for each record type (2)
+Compact Layout | Knowledge Compact Layout created and assigned
+Search Layouts | Updated for Default
+
+
+### SHEET: Program
+Program (pmdm__Program__c) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | No changes in DEV
+Budget & Resources | Budget_Resources__c | Rich Text Area(100000)
+Canva Folder | Canva_Folder__c | URL(255)
+Description | pmdm_Description__c | Long Text Area(32768)
+End Date | pmd_EndDate__c | Date
+Funding Strategy | Funding_Strategy__c | Rich Text Area(32768)
+Google Drive Folder | Google_Drive_Folder__c | URL(255)
+Implementation Plan | Implementation_Plan__c | Rich Text Area(100000)
+Partnership Opportunities | Partnership_Opportunities__c | Rich Text Area(32768)
+Problem Statement | Problem_Statement__c | Rich Text Area(100000)
+Product | Product__c | Lookup(Product)
+Program Expected Outcomes | Program_Expected_Outcomes__c | Rich Text Area(100000)
+Program Goals | Program_Goals__c | Rich Text Area(32768)
+Program Issue Area | pmdm_ProgramIssueArea__c | Picklist
+Program Manager | Program_Manager__c | Lookup(User)
+Program Name | Name | Text(80)
+Program Structure | Program_Structure_c | Rich Text Area(32768)
+Program Target Audience | Program_Target_Audience__c | Rich Text Area(100000)
+Reference Link | Program_Reference_Link__c | URL(255)
+Requires Payment | Requires_Payment__c | Checkbox
+Risks & Assumptions | Risks_Assumptions__c | Rich Text Area(32768)
+Short Summary | pmdm_ShortSummary__c | Text(255)
+Start Date | pmdm_StartDate__c | Date
+Status | pmdm_Status__c | Picklist
+Success Metrics & Evaluation Plan | Success_Metrics_Evaluation_Plan__c | Rich Text Area(32768)
+Target Population | pmdm_TargetPopulation__c | Long Text Area(32768)
+
+
+### SHEET: Program Engagement
+Program Engagement (pmdm__ProgramEngagement__c) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | Lightning Page Layout | Program Engagement Record Page updated
+Penny Trail | Penny_Trail | Picklist | No | No | active trail picklist
+Penny Sprint Week | Penny_Sprint_Week | Number | No | No
+LMS Learner ID | LMS_Learner_Id | Text | No | No | Google Classroom user dedup key
+Penny Trail Config | Penny_Trail_Config__c | Lookup(Penny_Trail_Config__c) | No | No
+Penny Coaching Tone | Penny_Coaching_Tone__c | Picklist | No | No | Warm, Professional, Challenging
+Penny Current Goal | Penny_Current_Goal | Text(255) | No | No | Learner stated job goal + timeline e.g. SF Admin at nonprofit in Dallas within 90 days
+Penny Current Phase | Penny_Current_Phase | Text(255) | No | No | Where they are in the program. e.g. Sprint 8 — Demo prep. Not required.
+Penny Current Blockers | Penny_Current_Blockers | Long Text Area | No | No | What is blocking them right now. Injected into Layer 3, not required
+Penny Confidence Score | Penny_Confidence_Score | Number(3,1) | No | No | 1-5 Score.  Updated by Penny or authorized users. not required
+Penny Onboarding Complete | Penny_Onboarding_Complete | Checkbox | No | No | True after first Penny conversation + goal-setting; default is false
+Slack User Id | Slack_User_Id | Text(50) | No | No | Learner Slack user ID (xUxxxxxx format). UNIQUE. Used to send DMs via Penny. Not required.
+TT Academy Connector Token | TT_Academy_Connector_Token | Encrypted Text | No | No | Encrypted Text. OAuth token for learner dev org read access. Set on Day 1 auth. Not required.
+
+
+### SHEET: Course
+Course (Course__c) |  |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | New or Update | Lightning Record Page | Updated this layout
+Penny Enabled | Penny_Enabled__c | Checkbox | No | No | Indicates this is enabled for TrailOs AI Agent | New
+LMS Provider | LMS_Provider | Picklist | No | No | Name of the platform where course originates | New
+External Course ID | External_Course_ID | No | No | Unique identifier for the course from LMS Provider (aka GC) | New
+Program Cohort | Program_Cohort__c | Formula | No | No | Pulls the cohort from the Program Engagement record | New
+Difficulty | Difficulty | Picklist | (Yes) | No | Indicates how hard the material covered in the course is; beginner, intermediate, advanced | New
+Category |  |  |  |  | Quest templates map to course records by category & difficulty; not sure what goes in category | New
+
+
+### SHEET: Course Module
+Course Module (Course_Module__c) |  |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | New / Update | Lightning Record Page | Modified
+Course Module Name | Name | Text(80) | Yes |  | Existing
+Course | Course__c | Master/detail | Yes | No |  | Existing
+% Completed | PercentCompleted__c | Formula | No | No | Indicates level of completion based on related course activities | Existing
+External Module Id | External_Module_Id__c | Text(80) | No | No | Google Classroom topic Id | New
+Google Folder Link | Google_Folder_Link__c | URL | No | No | Link to folder in google drive where module backups are saved | Existing
+Penny Context | Penny_Context__c | Long Text (2000) | No | No | Admin-written plain-text coaching guidance for Penny. Written TO Penny, not to learners. Distinct from Mission_Brief__c which is written for learners. | New
+
+
+### SHEET: Course Module Activity
+Course Module Activity (Course_Module_Activity__c) |  |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | New or Existing | Lightning Record Page | Modified
+External Id | External_Id__c | Text (external) | No | No | Unique identifier from an external LMS source; GC Course Work Id | New
+
+
+### SHEET: Learner Course
+Learner Course (Learner_Course__c) |  |  |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | New/Existing |  | Lightning Record Page |
+Learner Course ID | Name | Autonum | Yes | Yes | Unique identifier for the Learner Course record | New   |  | Compact Layout |
+Learner | Learner | Lookup (Program Engagement) | Yes | No | Identification of the learner enrolled in the program to which this course belongs | New   |  | Search Layout |
+Course | Course | Lookup (Course) | Yes | No | Identification of the course  | New |  |  |
+Course Title | Course_Title | Text(255) | Yes | No | Copied from the course record when this record is created.  Not a lookup because name of course may change over time and we want to know the exact name of the course at the time the learner enrolled | New |  |  |
+Total Modules | Total_Modules | Rollup Summary (Learner Course Modules) | No | No | Total number of related modules | New |  |  |
+Total Completed Modules | Total_Completed_Modules | Rollup Summary (Learner Course Modules) | No | No | Total number of related modules that have been completed | New |  |  |
+Penny Enabled | Penny_Enabled__c | Checkbox | No | No | Indicates this is enabled for TrailOs AI Agent | New |  |  |
+LMS Provider | LMS_Provider | Picklist | No | No | Name of the platform where course originates | New |  |  |
+External Enrollment ID | External_Enrollment_ID | Text | No | No | Unique identifier for the course from LMS Provider (aka GC) | New |  |  |
+Program Cohort | Program_Cohort__c | Formula | No | No | Pulls the cohort from the Program Engagement record | New |  |  |
+Last Activity Date | Last_Activity_Date__c | Date | No | No |  | New |  |  |
+Progress Percent | Progress_Pct__c | Number | No | No | omputed after each completion sync | New |  |  |
+Penny Flag | Penny_Flag__c | Text | No | No |  | New |  |  |
+Learner Name | Learner_Name__c | Formula | Pull information via Program Engagement; We could replace formula with a text datatype and "stamp" it when record is created
+Total Activities | Total_Activities__c | Rollup Summary (Learner Course Modules) | Sum Total Activities on Learner Course Modules
+Total Completed Activities | Total_Completed_Activities__c | Rollup Summary (Learner Course Modules) | Sum Total Completed Activities on Learner Course Modules
+Penny Current Focus | Penny_Current_Focus__c | Text(255) | coach editable, feeds L3 prompt
+Penny Recent Win | Penny_Recent_Win__c | Text(255) | coach editable, feeds L3 prompt
+Penny Current Blocker | Penny_Current_Blocker__c | Text(255) | coach editable, feeds L3 prompt
+Coach Notes | Coach_Notes__c | Long Text Area(32768) | not shown to learner, visible to Penny
+Program_Engagement__c - Master-Detail(pmdm__ProgramEngagement__c) - required |  |  | This should be a lookup and not a master detail
+2. Course__c - Lookup(Course__c), Delete Constraint = Don't Restrict - required |  |  | Propose that when a learner course enrollment it captured, key pieces of information from course are also captured so that we know exactly what the info was at the time of enrollment
+3. Contact__c - Lookup(Contact), Delete Constraint = Don't Restrict - denormalized for direct querying |  |  | Do not make lookup to contact but pull information via program engagement
+6. Current_Module__c - Lookup(Course_Module__c), Delete Constraint = Don't Restrict |  |  | This information is in learner
+7. Current_Activity__c - Lookup(Course_Module_Activity__c), Delete Constraint = Don't Restrict |  |  |
+
+
+### SHEET: Learner Course Modules
+Learner Course Module (Learner_Course_Module__c) |  |  |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | New or Existing |  |  |
+Learner Course Modules id | Name | Autonum | New   |  |  |
+Learner   | Learner__c | Formula | Pull Learner Id from Program Engagement | New |  |  |
+Learner Name | Learner_Name__c | Formula | Pull Learner Name from Program Engagement.Contact.FullName | New |  |  |
+External Module Id | External_Module_Id__c | Text(80) | Google Classroom topic Id | New  |  |  |
+Mission Brief | Mission_Brief__c | Rich Text | Copy from related Course Module | New |  |  |
+Course Module | master-detail(Course Module) | Text  | New |  |  |
+Total Activities | Total_Activities__c | Rollup(Learner Course Module Activities) | Count all records | New |  |  |
+Total Completed Activities | Total_Completed_Activities__c | Rollup(Learner Course Module Activities) | Count where status is completed | New |  |  |
+
+
+### SHEET: Learner Course Module Activity
+Learner Course Module Activity (Learner_Course_Module_Activity__c) |  |  |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes | New or Existing |  |  |
+Learner Module Activity Id | Name | Autonumber (LMA-{000}) | Yes | Yes |  | New    |  |  |
+Learner Module Title | Learner_Module_Activity_Title__c | Text(80) |  | New |  |  |
+Activity Type | Activity_Type__c | Text(255) | Copied from Course Module Activity.Activity_Type__c | New |  |  |
+CM Activity Name | CM_Activity_Name__c | Text | Copied from Course Module Activity.Name | New |  |  |
+Learner Course Module | Learner_Course_Module__c | Master Detail (Learner Course Module) |  | New |  |  |
+Description | Description__c | Rich Text  | Copied from Course Module Activity.Description__c | New |  |  |
+Learner | Learner__c | Lookup(Program Engagement) | Original request is to lookup to contact | New |  |  |
+Order | Order__c | Number | Copied from Course Module Activity.Order__c | New |  |  |
+Status | Status__c | Picklist | Not Started, In Progress, Submitted, Graded, Complete, Excused | New |  |  |
+Score | Score__c | Number(5,1) | raw score from LMS | New |  |  |
+Points Earned | Points_Earned__c | Number(5,0) |  out of Activity__r.Points_Possible__c | New |  |  |
+Grade Percent | Grate_Pct__c | Formula (percent) | Formula: Points_Earned__c / Activity__r.Points_Possible__c * 100. Returns null if Points_Possible__c = 0. | New |  |  |
+Submitted At | Submitted_At__c | DateTime | GC updateTime when state = Turned In | New |  |  |
+Graded At | Graded_At__c | DateTime | GC updateTime when state = RETURNED | New |  |  |
+External Submission ID | External_Submission_ID__c | Text(255) | indexed - GC submissionId dedup key. Re-running sync must never create duplicate records. | New |  |  |
+Penny Flag | Penny_Flag__c | Picklist | None, Low Confidence, Needs Coaching, Celebrate.  Set by post-sync logic | New |  |  |
+Penny Flag Reason | Penny_Flag_Reason__c | Text(255) | why the flag was set, visible to coach and Penny | New |  |  |
+13. Course_Module__c - Lookup(Course_Module__c) - denormalized from Activity for rollup and reporting | When a learner enrolls in a course, the learner course, learner course module and learner course module activity information is copied from the course/course module/course module activity so that we have a record of the course, modules and activities that existed at the time of enrollment.
+2. Activity__c - Lookup(Course_Module_Activity__c), Delete Constraint = Don't Restrict - required | Ditto
+
+
+### SHEET: Contact
+Contact (Contact) |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Google Classroom Learner ID | GC_Learner_Id
+
+
+### SHEET: Penny Classroom Nudge
+Penny_Classroom_Nudge__c |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Learner | Learner__c | Lookup(Contact) | Yes | No |
+Course Work ID | Course_Work_ID__c | Text(255) | Yes | No | Google Classroom assignment ID
+Nudge Date | Nudge_Date__c | Date | Yes | No |
+Sent At | Sent_At__c | DateTime | Yes | No |
+Since nudge is for a learner of a specific program at a specific time, should use Program Engagement instead of contact
+
+
+### SHEET: Penny Badge
+Penny_Badge__c |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Learner | Learner__c | Lookup(Contact) | Yes | No |
+Badge Key | Badge_Key__c | Text(50) | Yes | No | Values: first_deploy · sprint_complete · qa_champion · client_win · code_reviewer · career_ready
+Badge Name | Badge_Name__c | Text(255) | Yes | No | Display name e.g. First Deployment
+Awarded By | Awarded_By__c | Picklist | No | No | Values: system / coach
+Note | Note__c | Text Area(255) | No | No | Optional note from coach when manually awarding
+Awarded At | Awarded_At__c | DateTime | Yes | No |
+Description | Description__c | Text(255) | Yes | No
+Should lookup to Program Engagement
+Penny Gamification is where badge awards are captured.
+
+
+### SHEET: Penny Gamification
+Penny_Gamification__c |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Learner | Learner__c | Lookup(Contact) | Yes | No |  | Should lookup to Program Engagement
+Points | Points__c | Number(6,0) | Yes | No | Points earned in this transaction
+Sprint Points | Sprint_Points__c | Number(6,0) | No | No | Points earned this sprint
+Sprint Number | Sprint_Number__c | Number(4,0) | No | No |
+Reason | Reason__c | Text(255) | No | No | e.g. Story completed · Badge awarded · Quest submitted
+Awarded By | Awarded_By__c | Lookup(User) | No | No | Null if awarded by system (Penny)
+
+
+### SHEET: Penny Weekly Report
+Penny_Weekly_Report__c |  |  |  |  |
+Field Label | API Name | Data Type | Required | Unique | Notes
+Week Start | Week_Start__c | Date | Yes | No |
+Week End | Week_End__c | Date | Yes | No |
+Top Themes | Top_Themes__c | Long Text Area | No | No | Gemini-synthesized themes from interaction logs this week
+Support Flags | Support_Flags__c | Long Text Area | No | No | Learners flagged: Momentum / Clarity / Confidence
+Suggested Actions | Suggested_Actions__c | Long Text Area | No | No | Angela's recommended actions for the week
+Trail Breakdown | Trail_Breakdown__c | Long Text Area | No | No | Per-trail summary
+Generated At | Generated_At__c | DateTime | Yes | No |
+
+
+### SHEET: Penny Career Review
+Penny_Career_Review__c |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Learner | Learner__c | Lookup(Contact) | Yes | No |
+Review Mode | Review_Mode__c | Text(50) | No | No | Values: resume / linkedin / both
+Readiness Label | Readiness_Label__c | Text(50) | No | No | e.g. Strong Candidate / Developing / Needs Work
+Area Scores | Area_Scores__c | Long Text Area | No | No | JSON: 5 dimensions (Experience Relevance · Credentials · Professional Presence · Communication Clarity · Career Trajectory)
+Feedback JSON | Feedback_JSON__c | Long Text Area | No | No | Structured AI feedback per dimension
+Target Role | Target_Role__c | Text(255) | No | No |
+Reviewed At | Reviewed_At__c | DateTime | Yes | No | GetCareerReview action checks if within 30 days
+Should lookup to Program Engagement
+
+
+### SHEET: Penny Trail Config
+Penny_Trail_Config__c |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Trail ID | Trail_ID__c | Text(50) | Yes | Yes | Values: guided_trail · explorer_journey · trail_of_mastery · community_alumni
+Penny Role | Penny_Role__c | Text(255) | Yes | No | e.g. Coaching Companion — warm structured foundational
+Tone | Tone__c | Text Area(255) | No | No | Tone guidance injected into Layer 2 of Penny prompt
+Focal Points | Focal_Points__c | Long Text Area | No | No | Key focus areas Penny should emphasize for this trail
+Specific Instructions | Specific_Instructions__c | Long Text Area | No | No | Hardcoded behavioral rules for this trail persona
+Is Active | Is_Active__c | Checkbox | Yes | No | Only active trail configs returned by GetTrailConfig action
+Penny Trail Config Id | Penny_Trail_Config_Id | Autonum | Yes | Yes | Auto generated id
+
+
+### SHEET: Penny Interaction Log
+Penny_Interaction_Log__c |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Learner | Learner__c | Lookup(Contact) | Yes | No |  | Should reference Program Engagement object
+User Message | User_Message__c | Long Text Area | Yes | No | What the learner said to Penny
+Penny Response | Penny_Response__c | Long Text Area | Yes | No | What Penny said back
+Prompt Mode | Prompt_Mode__c | Text(50) | No | No | Values: coach / coordinator / career_review / quest
+Source | Source__c | Picklist | No | No | Values: slack_dm / slack_mention / mobile / dashboard
+
+
+### SHEET: Penny Quest Submission
+Penny_Quest_Submission__c |  |  |  |  |  | Additional Components | Notes
+Field Label | API Name | Data Type | Required | Unique | Notes
+Assignment | Assignment__c | Lookup(Course_Module_Activity__c) | Yes | Yes | Unique — one submission per assignment
+Submission Text | Submission_Text__c | Long Text Area | Yes | No |
+Submitted At | Submitted_At__c | DateTime | Yes | No |
+Use the Student Course Activity object for this information
+
+
+### SHEET: Decisions Log
+DECISIONS LOG — SF DATA MODEL |  |  |  |
+Date | Decision | Made By | Rationale | Status
+May 31 2026 | Reuse Contact for learner profiles — do not create Learner__c custom object | Angela | NPSP Contact is already the learner record. Adding custom fields is cleaner than duplicating. | Approved
+May 31 2026 | Reuse Course__c for quest templates | Angela | TT already has Course__c LMS object. Quest templates are courses by another name. | Approved
+May 31 2026 | Reuse Course_Module_Activity__c for quest assignments | Angela | Existing activity object tracks learner-course relationships. Extend, dont duplicate. | Approved
+May 31 2026 | Supabase retired after migration validated — no parallel run | Angela | Single source of truth is Salesforce. Replit POC becomes archived reference only. | Approved
+May 31 2026 | career_review_flow_states merged into Penny_Career_Review__c | Angela | Flow state is a field on the review record, not a separate object. Simplifies schema. | Approved
+May 31 2026 | classroom_nudge_log gets UNIQUE constraint on learner + courseWorkId + date | Angela | Prevents duplicate nudges. Critical for Google Classroom integration integrity. | Approved
+
+
+### SHEET: New Fields
+NEW FIELDS  |  |  |  |  |  |
+Contact (NOTE: may be better on Program Engagement record) |  |  |  |  |  |
+Field Label | API Name | Data Type | Required | Approved | SF Field ID | Notes
+Penny Trail Config | Penny_Trail_Config__c | Lookup(Penny_Trail_Config__c) | No |  |  | Links learner Contact to their assigned trail persona record
+Penny Coaching Tone | Penny_Coaching_Tone__c | Picklist | No |  |  | Values: Warm / Professional / Challenging. Injected into Layer 3 of Penny prompt
+Penny Current Goal | Penny_Current_Goal__c | Text(255) | No |  |  | Learner stated job goal + timeline. e.g. SF Admin at nonprofit in Dallas within 90 days
+Penny Current Phase | Penny_Current_Phase__c | Text(255) | No |  |  | Where they are in program. e.g. Sprint 8 — Demo prep and client presentation
+Penny Current Blockers | Penny_Current_Blockers__c | Long Text Area | No |  |  | What is blocking them right now. Injected into Layer 3 of Penny prompt
+Penny Confidence Score | Penny_Confidence_Score__c | Number(3,1) | No |  |  | 1-5 score. Updated by Angela or Penny. Tracked over time in Angela dashboard
+Penny Onboarding Complete | Penny_Onboarding_Complete__c | Checkbox | No |  |  | True after learner completes first Penny conversation and goal-setting
+Slack User ID | Slack_User_ID__c | Text(50) | No |  |  | Learner Slack user ID (xUxxxxxx format). Used to send DMs via Penny. Must be unique.
+TT Academy Connector Token | TT_Academy_Connector_Token__c | Encrypted Text | No |  |  | Encrypted OAuth token for learner dev org read access via TT Academy Connector. Set Day 1.

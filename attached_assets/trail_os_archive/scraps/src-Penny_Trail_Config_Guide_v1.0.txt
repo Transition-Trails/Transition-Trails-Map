@@ -1,0 +1,227 @@
+Penny AI Trail Companion
+Trail Configuration Guide
+How to view, edit, and extend Penny&apos;s trail personas
+Field
+Value
+Document
+Penny Trail Configuration Guide v1.0
+Version
+1.0 — May 2026
+Audience
+Angela Landrith · Trail Guides
+Related docs
+Penny POC PRD v2.1 · Solution Design v2.1 · Admin Training Guide v2.1
+Transition Trails Academy
+## 1.  What a Trail Config Is
+A trail configuration is the set of instructions that shapes how Penny behaves with a specific group of learners. Every learner is assigned to one of four trails. When Penny responds, she injects the trail&apos;s configuration directly into her system prompt — it is layer 2 of the 7-layer prompt architecture.
+Trail config = Penny&apos;s persona per audience
+• Guided Trail learners get a warm, structured coaching companion.
+• Explorer Journey learners get a curious, self-directed learning navigator.
+• Trail of Mastery learners get a peer-level leadership advisor who skips the hand-holding.
+• Community/Alumni learners get a career-focused companion who celebrates legacy and mentoring.
+## 1.1  How trail config maps to the system prompt
+System prompt layer
+What it contains
+Editable?
+Layer 1
+Universal brand context — "A penny for your thoughts" promise
+No — hardcoded in code
+Layer 2
+Trail config → penny_role + tone + focal_points + specific_instructions
+Yes — via Admin Dashboard → Trails
+Layer 3
+Learner context — name, phase, goal, blockers, coaching_tone
+Per-learner, set on learner profile
+Layer 4
+Mode context — Coach vs Coordinator (mobile only)
+Automatic — set by mode toggle
+Layer 5
+Active quest context (if quest is assigned)
+Automatic — from quest assignment
+Layer 6
+Career review context (if review < 30 days old)
+Automatic — from career_review_sessions
+Layer 7
+Memory window — last N conversation turns
+Set via PENNY_MEMORY_WINDOW env var
+Changes to trail config take immediate effect
+• Editing a trail config in the admin dashboard changes Penny&apos;s behaviour on the NEXT conversation for ALL learners on that trail.
+• There is no staging or preview — changes are live immediately.
+• Test changes in the Test Penny screen before editing a live trail.
+## 2.  The Four Configured Trails
+## 2.1  Guided Trail
+Field
+Current value
+Trail ID
+guided_trail
+Audience
+New-to-Salesforce career changers needing structured support
+Penny&apos;s role
+Coaching Companion — warm, structured, foundational
+Tone
+Warm and encouraging. Meets the learner where they are. Celebrates every step forward.
+Focal points
+troubleshooting · salesforce_technical · consulting · agile
+Specific instructions
+Ask before telling. Always break down complex concepts into steps. Reference the CLYLP project context when relevant. Check understanding before moving on. Flag confidence drops to the coach.
+Primary learner
+Alex Johnson — Sprint 8, 90-day goal to land a nonprofit Salesforce Admin role
+## 2.2  Explorer Journey
+Field
+Current value
+Trail ID
+explorer_journey
+Audience
+Self-directed learners exploring the Salesforce ecosystem independently
+Penny&apos;s role
+Learning Navigator — curious, open-ended, self-directed
+Tone
+Curious and collaborative. Asks discovery questions. Celebrates unexpected connections.
+Focal points
+salesforce_technical · troubleshooting · professional_presence
+Specific instructions
+Follow the learner&apos;s energy. Ask "what surprised you?" before suggesting next steps. Offer breadth before depth — help them map the territory before drilling down.
+## 2.3  Trail of Mastery
+Field
+Current value
+Trail ID
+trail_of_mastery
+Audience
+Advanced practitioners deepening Salesforce expertise
+Penny&apos;s role
+Leadership Advisor — peer-level, direct, assumes competence
+Tone
+Peer-level and precise. Skips foundational explanations. Challenges assumptions. Expects nuanced answers.
+Focal points
+salesforce_technical · consulting
+Specific instructions
+Engage as a technical peer. Ask about edge cases. Push for the second-order consequence. Do not over-explain. If they know the basics, move to the non-obvious.
+## 2.4  Community / Alumni
+Field
+Current value
+Trail ID
+community_alumni
+Audience
+Graduates giving back to the community and mentoring newer learners
+Penny&apos;s role
+Career Companion — legacy-focused, celebratory, forward-looking
+Tone
+Celebratory and purposeful. Helps articulate the arc of the journey. Focuses on storytelling, portfolio, and what comes next.
+Focal points
+professional_presence · agile · consulting
+Specific instructions
+Help the learner articulate what they built and why it mattered. Support portfolio storytelling. Connect their experience to how they can now help others on the trail.
+## 3.  How to Edit a Trail Config
+Trail configurations are managed in the admin dashboard. You do not edit code — everything is done through the UI.
+## 3.1  Navigate to Trails
+1.  Open the Admin Dashboard → left navigation → Trails
+2.  The Trails page shows all four configured trails in a read-only list
+3.  Click on a trail name to open the detail view
+4.  Click Edit to enter edit mode
+## 3.2  Trail config fields — what each one does
+Field
+DB column
+What Penny does with it
+How to write it well
+Penny&apos;s role
+penny_role
+First thing injected into system prompt — sets who Penny is for this trail
+Start with a job title-style label: "Coaching Companion", "Leadership Advisor". Keep it to one sentence.
+Tone
+tone
+Describes how Penny speaks and the emotional register she uses
+Describe the feeling you want a learner to have after talking to Penny. "Warm and encouraging" vs "peer-level and precise."
+Focal points
+focal_points
+Comma-separated topic categories — Penny weights quest templates and coaching toward these
+Use the seeded category values: troubleshooting · salesforce_technical · consulting · agile · professional_presence
+Specific instructions
+specific_instructions
+Rules and guidance that override general coaching — the most powerful field
+Write in the second person addressed to Penny: "Ask before telling." "Do not explain basics." "Reference the CLYLP project." Be specific — vague instructions do nothing.
+Most impactful field: specific_instructions
+• specific_instructions overrides the general coaching persona. Use it to encode your coaching philosophy for each trail.
+• Examples of effective instructions:
+•   "Always ask what the learner has already tried before offering guidance."
+•   "Reference the learner&apos;s current project context before offering abstract advice."
+•   "If the learner expresses frustration, acknowledge it before coaching."
+## 3.3  Save and test
+1.  Click Save — the config is live immediately
+2.  Navigate to Admin Dashboard → Test Penny
+3.  Select a learner on the trail you just edited
+4.  Send a coaching message — verify Penny&apos;s tone and focus match your edits
+5.  If the response is off, return to Trails → Edit → adjust specific_instructions
+## 4.  Assigning Learners to Trails
+Every learner has a trail field on their profile. It defaults to guided_trail for all auto-registered learners. You can reassign it at any time.
+## 4.1  Reassign from admin dashboard
+1.  Admin Dashboard → Learners → select the learner
+2.  Click Edit on the learner profile
+3.  Change the Trail field to the target trail ID
+4.  Click Save — takes effect on the learner&apos;s next message to Penny
+## 4.2  Reassign from mobile coach view
+1.  Penny Mobile → /coach/learners → select the learner
+2.  Tap the trail badge on their profile card
+3.  Select the new trail from the dropdown
+4.  Confirm — takes effect immediately
+When to reassign a trail
+Recommended new trail
+Learner completes Guided Trail sprint sequence and is ready for independent exploration
+explorer_journey
+Explorer reaches advanced proficiency and needs peer-level challenge
+trail_of_mastery
+Learner lands a job and wants to focus on portfolio + mentoring
+community_alumni
+New learner joins mid-cohort with no prior Salesforce experience
+guided_trail (default)
+Experienced Salesforce professional joins to upskill (not a career changer)
+trail_of_mastery or explorer_journey
+Trail assignment is Angela&apos;s judgment call
+• There is no automatic trail progression — Angela decides when a learner is ready to advance.
+• Penny will alert Angela when a learner&apos;s confidence, quest performance, or coaching signals suggest they may be ready for a different trail.
+• The Weekly Report will surface trail reassignment candidates.
+## 5.  Adding a Fifth Trail
+The system supports unlimited trails. Adding a fifth trail requires two steps: creating the trail config in the database, and optionally adding quest templates for it.
+## 5.1  Create the trail config
+1.  Admin Dashboard → Trails → New Trail
+2.  Enter: Trail ID (lowercase, underscores, e.g. specialist_track)
+3.  Fill in: penny_role, tone, focal_points, specific_instructions
+4.  Save
+Trail ID naming rules
+• Use lowercase letters and underscores only — no spaces or special characters.
+• The Trail ID is used as a prefix in all prompt_mode logs, e.g. specialist_track_coaching.
+• Choose a name that will be readable in the admin dashboard charts.
+## 5.2  Seed quest templates for the new trail
+New trails have no quest templates by default. You must create at least 3-5 templates before assigning learners.
+1.  Admin Dashboard → Quest Templates → New Template
+2.  Set Trail Affinity to your new trail ID
+3.  Create at least one template per difficulty level (guided, intermediate, advanced)
+4.  Set is_active = true on each template
+5.  Assign a learner to the trail and test: say "Give me a quest" — Penny should return a trail-matched template
+## 5.3  Assign the first learner
+Once you have templates seeded: Admin Dashboard → Learners → select the learner → Edit → Trail → set to new trail ID → Save.
+## 6.  Testing Trail Changes
+Always test trail config changes before relying on them in production. The Test Penny screen is the fastest way.
+## 6.1  Test Penny procedure for trail changes
+1.  Admin Dashboard → Test Penny
+2.  Select a learner assigned to the trail you edited
+3.  Click the Coaching tab in the tabbed prompt picker
+4.  Select "I&apos;m stuck on something" — this triggers default coaching mode
+5.  Verify: Penny&apos;s response reflects the tone, role, and focal points you set
+6.  Select "I don&apos;t know where to start" — this tests the warm/structured differentiation
+7.  For Trail of Mastery: select a technical question — verify Penny skips foundational explanation
+## 6.2  Common trail config problems
+Symptom
+Likely cause
+Fix
+Penny sounds the same on all trails
+specific_instructions is blank or too generic
+Add trail-specific rules that override default coaching: "Do not break down basics", "Engage as a peer"
+Penny ignores the coaching tone preference
+tone field is overriding coaching_tone preference unintentionally
+The learner&apos;s coaching_tone preference is a Layer 3 field — it overrides the trail tone. If you want trail tone to always win, set specific_instructions: "Always use the tone defined in this trail config."
+Quest assignments don&apos;t match the trail
+Quest templates for this trail are missing or is_active=false
+Go to Quest Templates → filter by trail affinity → verify templates exist and are active
+New trail shows no quests
+Templates not seeded yet
+Create at least 3 templates with trail_affinity matching the new trail ID

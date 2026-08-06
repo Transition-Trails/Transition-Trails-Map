@@ -1,0 +1,625 @@
+TRANSITION TRAILS ACADEMY
+Penny Customer Journey
+Learner & Coach Experience — v1.1
+Version
+1.0 — May 2026
+Status
+Updated — Notion · GitHub · Slack · Salesforce stack
+Personas Covered
+Learner (Guided Trail · Alex Johnson) · Coach / Trail Guide (Angela Landrith)
+Companion Docs
+Penny Six-Pager v2.1 · Penny POC PRD v2.1 · Penny POC Solution Design v2.1
+Platform
+Penny Mobile PWA · Slack Bot · Notion · GitHub · Salesforce · Admin Dashboard
+## About This Document
+This document maps the end-to-end experience of two people: the learner working to transform their career, and the coach guiding them through it. It traces every significant moment — the ones that create confidence, the ones that create anxiety, and the ones where Penny makes the difference between stuck and moving.
+It is written as a design and product reference. Every phase, touchpoint, emotion, and Penny interaction documented here should be treated as a specification for what the experience must feel like — not just what it must do.
+Document Sections
+What It Contains
+Part 1 — Personas
+Detailed profiles of the Learner and Coach personas with real context
+Part 2 — Learner Journey
+7 phases from discovery to employed, with touchpoints and Penny's role at each
+Part 3 — Coach Journey
+6 phases of the coach's daily and program-level experience
+Part 4 — Shared Moments
+Where the two journeys intersect and how Penny enables those connections
+Part 5 — Pain & Opportunity
+The problems Penny solves, mapped to journey phases
+Part 6 — Experience Principles
+The 5 design principles that must hold true across every interaction
+## Part 1 — Personas
+## 1.1  The Learner — Alex Johnson
+Alex represents the core Transition Trails learner: a career changer who has made the commitment to enter the Salesforce ecosystem but faces a gap between "I passed the exam" and "I got the job." Alex is motivated, time-constrained, and needs a system that meets them where they are.
+Background
+Former operations manager at a logistics company. Laid off 8 months ago. Decided to pivot to Salesforce after discovering the ecosystem at a free Trailhead event.
+Current Position
+Guided Trail · Sprint 8 · Actively job searching while completing the program
+Goal
+Salesforce Admin role at a nonprofit or social impact organization within 90 days
+Key Win
+CLYLP org build is live in production — first real-world Salesforce deployment
+Key Blocker
+Cannot translate program experience into resume language that resonates with hiring managers
+Confidence Level
+3/5 — knows the technical material but doubts the narrative around their transition
+Coaching Tone
+Warm — needs encouragement alongside challenge; not ready for "brutal honesty" mode yet
+Devices
+iPhone 14 Pro (primary) · MacBook Air for admin dashboard, Notion, and GitHub
+Slack Activity
+Checks Slack 3-4x per day; DMs coaches when stuck; posts wins in #trail-wins
+"I know I can do this work. I just don't know how to prove it to someone who hasn't seen me do it yet."
+— Alex Johnson, Cohort 1 Learner
+Alex's Emotional Landscape
+Situation
+Alex Feels
+Risk If Unaddressed
+Sunday evening before a new sprint
+Anxious about the scope; not sure where to start
+Delays first action; falls behind in sprint week 1
+After a successful deliverable submission
+Proud but briefly — imposter syndrome kicks in fast
+Doesn't build self-belief; doesn't share the win
+When a team member is at risk
+Responsible but unsure how to help without overstepping
+Avoids the conversation; project suffers
+During job applications
+Frustrated that experience feels invisible on paper
+Abandons applications; considers giving up the transition
+After a coaching session with Angela
+Energized and clear; remembers why they started
+Energy dissipates without reinforcement between sessions
+When Penny asks a Socratic question
+Slightly challenged but engaged; feels seen as capable
+None — this is the optimal state
+## 1.2  The Coach — Angela Landrith (Trail Guide)
+Angela is the founder and CEO of Transition Trails Academy — and the primary Trail Guide for Cohort 1. She is simultaneously running the organization, coaching learners, managing client relationships, and building the systems that will allow other coaches to step in. She is the most resource-constrained person in the system.
+Role
+Founder, CEO, and Trail Guide — Transition Trails Academy
+Cohort
+Cohort 1 · 5 active learners · 4 trails · Sprint 8
+Coaching Style
+Challenge with care — pushes learners to articulate their own insights; celebrates wins loudly
+Primary Constraint
+Time — managing program operations, client relationships, and coaching simultaneously
+Primary Goal
+≥65% of Cohort 1 graduates employed in Salesforce roles within 90 days of graduation
+Biggest Fear
+A learner slips through — loses momentum, goes quiet, and disengages without Angela noticing
+Devices
+MacBook Air (admin dashboard, Notion, GitHub, Slack) · iPhone for mobile app and Slack on the go
+Admin Dashboard Use
+Daily: Logs, Weekly Reports · Weekly: Learner Detail, Quest Activity · As needed: Test Penny, Trails
+"I know every learner's story. What I don't have is enough hours to be present in every one of their moments. That's what Penny is for."
+— Angela Landrith, Founder & Trail Guide
+Angela's Daily Reality
+On any given Tuesday, Angela might:
+Review open GitHub PRs from learners before 9 AM; approve directly in GitHub
+Take a call with a nonprofit client about sprint progress
+Notice a learner hasn't interacted with Penny in 4 days and reach out proactively
+Update a trail config to reflect the new sprint's focus area
+Generate a weekly report and share it with a strategic partner
+Answer 8-12 Slack messages from learners ranging from "I'm stuck" to "I GOT AN INTERVIEW"
+Think about the next cohort and what needs to be systematized before it begins
+Penny is not a nice-to-have for Angela. Penny is how the program runs at all.
+The Success Story That Drives Everything
+Hugh Richardson — Cohort 0 Graduate
+Hugh completed Cohort 0 as a certified-and-stuck learner. Despite having his Salesforce Admin certification, he could not land interviews. The program gave him structured project experience and coaching support.
+"Hugh's story is why Penny exists. He had the skills. He needed a system that helped him articulate them, build on them under real conditions, and stay moving even when he hit walls."
+Cohort 0 → Certified → Stuck (no traction on applications)
+Joined Transition Trails for structured project experience + coaching
+Gained real nonprofit Salesforce project credit to put on resume
+Received coached career review — translated experience into compelling narrative
+Outcome: Employed in a Salesforce Administrator role
+Every design decision in Penny is accountable to this arc.
+## Part 2 — The Learner Journey
+Seven phases from the moment Alex hears about Transition Trails to the day they accept a job offer. Each phase has a distinct emotional character, a set of key touchpoints, and specific places where Penny makes the difference.
+Phase 1
+Discovery & Enrolment
+Alex finds the program and decides this is the path.
+Alex has been exploring Salesforce for months — Trailhead badges, YouTube tutorials, a certification course. But the exam alone hasn't opened doors. A post in a Slack community mentions Transition Trails: "real project experience, coached by people who actually understand the ecosystem." Alex clicks the link.
+Key Touchpoints
+Touchpoint
+Alex's Experience
+Penny's Role
+Website / social media discovery
+Reads about the program; looks for proof that it works; finds Hugh's story
+Not yet present — but Hugh's story sets the expectation
+Application / intake conversation
+Talks to Angela; feels assessed but also heard; nervously hopeful
+Not yet present
+Enrolment confirmation
+Relief + excitement + "what did I get myself into"
+Not yet present
+First login to mobile app
+Opens the app; sees the onboarding flow; first encounter with Penny
+Penny introduces herself; asks for name, goal, coaching tone
+Onboarding Step 3 — Coaching Tone
+Chooses "Warm" — relieved there's an option; feels personalization
+Stores tone preference; every subsequent response honours it
+First Penny Interaction
+Penny's Role
+Alex opens the app for the first time
+Completes 3-step onboarding (name, goal, tone)
+Sees the Home screen with their name in the header
+Types their first message to Penny: "I'm not sure where to start"
+Responds warmly, acknowledges the goal they stated
+Does not overwhelm with information
+Asks one clarifying question: "What feels most uncertain right now — the Salesforce skills, the project work, or the job search?"
+Sets the tone for a coaching relationship, not a chatbot
+Emotional Signature — Phase 1
+Dominant feeling: Cautious optimism. Alex has been disappointed before by resources that didn't translate to opportunity.
+Risk: If the first Penny interaction feels generic, robotic, or unhelpfully vague, Alex will dismiss the tool before it has a chance to help.
+Design imperative: The onboarding coaching tone selection must feel meaningful — and the first Penny response must prove it was.
+Phase 2
+Orientation & First Sprint
+Alex learns the rhythm of the trail.
+The first sprint is disorienting in the best way. There's structure Alex didn't have as a solo learner — sprint goals, deliverables, a Notion project board, a cohort Slack channel, and daily quests. The volume of new context is high. Penny's job in this phase is to help Alex find their footing without overwhelming them.
+Key Touchpoints
+Touchpoint
+Alex's Experience
+Penny's Role
+Sprint kickoff (Classroom tab)
+Reads assignments; watches kickoff recording; starts to understand what's expected
+Penny's home screen surfaces "SPRINT 1 ASSIGNMENTS" with status indicators
+First daily quest
+Sees a Salesforce scenario in the Quest tab; initially intimidated
+Penny presents the quest without solving it; offers hints when asked; coaches through reasoning
+First Slack cohort message
+Posts cautiously in #guided-trail-cohort-1; relieved when others respond
+Community tab surfaces unread badges; Penny doesn't interfere in peer channels
+First Notion task assigned
+Opens Notion; sees their first sprint task assigned to them; feels like real work
+Penny coordinator mode can surface Notion task status on the project card
+First deliverable submitted
+Submits to Classroom; waits anxiously for feedback
+Penny home screen updates the deliverable status row from Pending to Submitted
+First Quest — Stuck Moment
+Penny's Role
+Alex reads the quest scenario and freezes
+"I don't understand what they're asking for"
+Types into Penny: "I'm confused about this quest"
+Considers skipping it
+Enters Quest Guide mode — will not solve the quest
+"What part of the scenario feels unclear — the Salesforce context, or what you're supposed to produce?"
+Breaks the scenario into smaller questions
+Keeps Alex in the quest; doesn't let them off the hook
+Quest Submission — Celebration
+Penny's Role
+Alex submits their first quest answer
+Feels proud but immediately second-guesses it
+"That probably wasn't good enough"
+Confirms submission; gives specific feedback on what was strong
+Names a specific thing Alex got right
+Connects it to a real interview scenario
+Points system awards XP; progress bar moves
+Emotional Signature — Phase 2
+Dominant feeling: Overwhelmed-but-engaged. Too much new information, but finally feels like real work.
+Risk: Alex compares themselves to other learners in the cohort and feels behind. Imposter syndrome spikes.
+Design imperative: Penny must name specific wins, not generic encouragement. "You identified the correct object relationship" lands better than "Great job!"
+Phase 3
+Project Entry & Real-World Work
+Alex joins the DFW Animal Rescue project. The stakes get real.
+Joining a client project is the moment the program transforms from training into professional experience. Alex is now working on a real nonprofit's Salesforce instance, with a real client relationship on the line. The team of five — Alex, Taylor, Maya, Jordan, Sam — need to deliver. This is where Penny's Coordinator mode becomes essential.
+Key Touchpoints
+Touchpoint
+Alex's Experience
+Penny's Role
+Project browse (/projects)
+Sees the DFW Animal Rescue card; reads the skill tags; decides this is the right fit
+Projects screen shows trail badge (Guided Trail), team slots, skill tags from Notion/Salesforce data
+Join project
+Taps "Join project"; sees their avatar fill a slot
+POST /api/projects/:id/join; avatar appears in team row
+Project Detail — first view
+Sees client name, sprint count, Notion task list, team; feels the weight of it
+Penny Coordinator Card shows 0 flags (healthy); Sarah Martinez contact info from Salesforce
+First client check-in mentioned
+Reads "Next meeting Thu May 22 · 2:00 PM" on the project card
+Penny flags the meeting in advance if agenda isn't drafted
+Notion task assigned
+Gets their first sprint task in Notion; works through it in the Salesforce dev org and pushes code to GitHub
+GitHub PR merge triggers gamification point award; First Merge badge queued
+Sprint 2 demo prep
+Sprint 8 Demo Prep appears as Pending on Classroom tab
+"Ask Penny to help prep" button deep-links to pre-filled coaching conversation
+Coordinator Mode — First Use
+Penny's Role
+Alex opens Project Detail; sees Penny Coordinator Card with 2 flags
+"Penny flagged 2 items" — red indicator on the project card
+Flag 1: Jordan hasn't submitted Sprint 2B; client is waiting
+Flag 2: Client check-in Thursday; agenda not drafted
+Alex doesn't know what to do with either flag
+Coordinator mode: action-oriented, not Socratic
+"Draft agenda" quick prompt chip ready
+"Ping Jordan" quick prompt chip ready
+Alex taps "Ping Jordan" — Penny drafts a Slack message to Jordan for review
+Alex taps "Draft agenda" — Penny drafts the client meeting agenda based on sprint status
+Both drafts go to #project-dfw-rescue for team review before sending
+Emotional Signature — Phase 3
+Dominant feeling: Pressure and pride mixed. "This is real" is exciting and terrifying simultaneously.
+Risk: A team breakdown (Jordan missing Sprint 2B) derails Alex's confidence in the team and the program.
+Design imperative: Penny Coordinator mode must make Alex feel like a capable project lead, not just a bystander watching flags accumulate. She provides the tools to act, not just the awareness of the problem.
+Phase 4
+Deepening & Sprint Momentum
+Alex finds their groove. Confidence starts to compound.
+By Sprint 4-6, Alex has a rhythm. Morning check on the Home screen. Quest in the afternoon. Project work in the evenings. Penny has learned Alex's patterns — she references previous conversations, remembers the CLYLP win, and nudges without pushing. This is when the relationship between learner and AI coach starts to feel genuinely useful rather than novel.
+Key Touchpoints
+Touchpoint
+Alex's Experience
+Penny's Role
+Daily Home screen check
+Scans TODAY section; feels oriented; knows exactly what needs to happen
+Dynamic items surface most urgent item first; at-risk items in red
+Ongoing quest streak
+Quest completion becomes a daily habit; badge progress is visible
+Penny tracks quest history; references past submissions in coaching responses
+Coaching conversation depth
+"Penny remembers what I told her last week — that feels different from a chatbot"
+7-layer system prompt includes last 5 turns + career review context
+Profile — Penny Context editing
+Updates "Recent Win" after CLYLP goes live; updates "Current Blocker"
+Next conversation from Penny immediately acknowledges the new win
+Badge earned — Applied Thinker
+Badge earned modal fires after 5th quest completion
+Full-screen celebration; badge visible on /badges and /profile
+Sprint leaderboard moment
+Sees their sprint points on the Home screen; compares to last sprint
+Sprint points displayed; GitHub PR merges and Notion task completions contribute to points; progress toward On-Time Closer badge shown
+The Confidence Inflection Moment
+Penny's Role
+Alex references the CLYLP build in a coaching session
+"I keep thinking — does this actually count as experience?"
+Pushes Penny on whether the project work is "real enough" for employers
+Coaching mode: Socratic but direct
+"You configured an automation that runs in a live Salesforce org for a real nonprofit. What would you call that if someone else had done it?"
+Follows up: "Now say that sentence as if you're in an interview."
+Stores the exchange — references it in the next career review session
+Emotional Signature — Phase 4
+Dominant feeling: Building confidence — but still fragile. One bad day or missed deliverable can set it back.
+Risk: Isolation. If Alex's cohort peers go quiet in Slack, the sense of community disappears.
+Design imperative: Penny must actively reinforce wins at this stage. The memory window and career review context must create a sense of continuity — Penny knows where Alex has been.
+Phase 5
+Active Job Search
+The hardest phase. Skills are there. Narrative isn't yet.
+Alex starts applying. The response rate is lower than expected. Resume reviewers don't understand what "implemented NPSP volunteer management for a Dallas nonprofit" means. LinkedIn hasn't been updated since the old career. This is the phase where the gap between "I have the skills" and "employers see me as qualified" feels widest — and where Penny's career review capability is most critical.
+Key Touchpoints
+Touchpoint
+Alex's Experience
+Penny's Role
+Career review — raw bullets
+Pastes old resume text into Penny; receives 5-dimension scorecard
+Career review: readiness label "Building Evidence" · scores surface specific weak dimensions
+Career review — coached iteration
+Works with Penny to rewrite each bullet against the scorecard
+Penny coaches: "What was the measurable outcome of the CLYLP automation?" — never writes bullets for Alex
+Interview prep
+Asks Penny to run a practice technical question
+Penny conducts mock interview in coaching mode; references specific project work as evidence
+Rejection dejection
+"I just got turned down for the third role in a row"
+Penny acknowledges the feeling first; then asks one forward-looking question
+Interview scheduled
+Sends Penny the job description; asks for help prepping
+Penny breaks down the JD, maps Alex's project experience to each requirement
+Post-interview debrief
+"I think it went OK but I froze on one question"
+Penny helps Alex analyze what happened and what to do differently
+Career Review — The A/B Moment
+Penny's Role
+Alex pastes raw resume bullets into Penny
+Receives score: Experience Relevance 2/5, Communication Clarity 2/5
+"Managed Salesforce for nonprofit" → Penny flags this as vague
+Alex resists at first: "But that's what I did"
+"What did 'managing Salesforce' enable the nonprofit to do that they couldn't before?"
+Alex thinks: "They could track volunteers better"
+Penny: "How many volunteers? Was there a before/after you can quantify?"
+Result: "Configured NPSP volunteer tracking for 340 active volunteers, reducing coordinator time by 6 hours/week"
+New score: Experience Relevance 4/5
+Emotional Signature — Phase 5
+Dominant feeling: Vulnerable. Alex knows the skills are there but can't make employers see it. Imposter syndrome is loudest here.
+Risk: Alex gives up on the transition entirely. The gap between effort and outcome feels unfair.
+Design imperative: Penny must never fabricate experience — but she must relentlessly help Alex excavate the real evidence that's already there. The coaching is about articulation, not invention.
+Phase 6
+Offer & Transition
+The moment everything was for.
+Alex gets the offer. The first person they tell outside of family might be Penny — or Angela. This phase is brief but emotionally enormous. The program's promise has been kept. The focus now shifts to a clean transition: accepting the offer, closing out the program gracefully, and beginning the next trail.
+Touchpoint
+Alex's Experience
+Penny's Role
+Offer received
+Euphoria + disbelief + "is this actually happening"
+Penny celebrates specifically — references the work, the blockers overcome, the CLYLP build
+Sharing in #trail-wins
+Posts to the channel; cohort responds with genuine celebration
+Community tab surfaces the message; Angela's response is the most meaningful
+Offer evaluation
+"Should I negotiate? Is this a good salary for this role?"
+Penny helps Alex research comp data and think through the decision — does not advise on specifics
+Program closeout
+Final sprint submission; client project handoff
+Coordinator mode manages the handoff checklist; nothing falls through
+Trail graduation
+Moves to Community / Alumni trail
+Penny persona shifts to Career Companion mode; alumni focus on giving back and portfolio storytelling
+"I typed it into Penny before I even called my mom. 'I got it.' She said: 'Of course you did. Now tell me what you're going to do on day one.'"
+— Alex Johnson — imagined, but what this experience should feel like
+Phase 7
+Alumni & Community Contribution
+Alex becomes the next Hugh Richardson.
+The program doesn't end with employment — it evolves. Alumni move to the Community / Alumni trail where Penny becomes a Career Companion: helping with portfolio storytelling, supporting the next cohort, and staying connected to the ecosystem. Alex's success story becomes a proof point for the next person sitting where Alex sat in Phase 1.
+Touchpoint
+Alex's Experience
+Penny's Role
+#trail-wins participation
+Posts wins from the first 90 days in the new role
+Penny tracks and celebrates milestones with the community
+Mentoring newer learners
+Answers questions in #ask-a-coach style; shares project war stories
+Community tab keeps alumni connected to cohort channels
+Portfolio and LinkedIn refresh
+Updates profile with new role; refines the narrative with Penny
+Career Companion mode: portfolio storytelling, ongoing career review
+Referral to the program
+Tells a colleague about Transition Trails
+Alex's story becomes part of the program's social proof — Hugh 2.0
+## Part 3 — The Coach Journey
+Angela's journey is not a linear progression like Alex's — it's a cyclical, daily practice of oversight, intervention, celebration, and design. Each sprint is a new cycle. Penny's role is to reduce Angela's cognitive load so she can focus on the coaching moments only she can provide.
+Coach Phase 1
+Daily Oversight
+Angela starts every day with the dashboard and her learners.
+The Morning Routine
+Time
+Angela Does
+Penny Supports
+7:00 AM
+Opens mobile app Coach Home; scans cohort stats (active, due this sprint, flags)
+Coach Home stat cards surface at-a-glance health immediately
+7:05 AM
+Checks "Needs Attention" section; identifies Jordan's Sprint 2B flag
+Red-tinted flag cards show learner name and specific reason; View Learner button
+7:10 AM
+Reviews PR Review Queue; clicks Review PR to open Alex's flow build PR directly in GitHub
+PR cards show learner name, branch name, GitHub PR link; Review PR ↗ opens GitHub; approval happens in GitHub
+7:15 AM
+Opens Alex's learner detail; checks Penny activity (12 messages this week)
+Penny activity section: message count, mode breakdown, last active timestamp
+7:20 AM
+Awards Alex 10 points for exceptional sprint delivery; adds a personal note
+Award Points modal requires justification note; points update immediately
+7:30 AM
+Sends a personal Slack message to Jordan — not via Penny; this one is direct
+Penny surfaced the flag; Angela makes the human call
+"The dashboard used to be a spreadsheet and a prayer. Now I open the app and Penny tells me exactly who needs me today."
+— Angela Landrith, Trail Guide
+Coach Phase 2
+Weekly Intelligence
+Every Friday — the Weekly Report changes how Angela plans the next week.
+The Weekly Intelligence Report is Angela's most powerful tool. It synthesizes a week of 38+ interactions across all learners and trails into a 5-minute read with specific actions. Without it, Angela would need hours to generate the same picture manually.
+Report Section
+What Angela Reads
+How She Uses It
+Top Themes
+"Resume translation anxiety" appeared in 4/5 learner conversations this week
+Plans a cohort-wide workshop on resume storytelling for next Monday
+Support Flags
+Confidence flag: 3 learners showed low confidence signals
+Prioritizes 1:1 check-ins with the flagged learners before sprint week 2
+Suggested Actions
+"Consider adding a group mock interview session in Sprint 8"
+Adds to the sprint planning calendar
+Trail Breakdown
+Guided Trail: 28 messages · Explorer Journey: 4 messages (low)
+Checks in with the Explorer Journey learner who's gone quiet
+Quest Completions
+9/12 quests completed this week (75%)
+Celebrates in #trail-wins; investigates the 3 non-completions
+Angela's Friday Routine with the Weekly Report
+1. Opens Weekly Reports on admin dashboard at 4 PM (same time the Slack delivery fires)
+2. Reads Top Themes and Support Flags — 3 minutes
+3. Reviews Suggested Actions — decides which to act on this week vs. next sprint
+4. Posts a "week in review" message to #general based on the report narrative
+5. Adjusts one trail config to better address the dominant theme she just read
+6. Plans Monday's agenda based on confidence flags and pending check-ins
+Coach Phase 3
+Sprint Planning & Kickoff
+Setting every learner up for a strong sprint start.
+Action
+Angela Does
+Penny Supports
+Trail config refresh
+Updates focal points for the new sprint; adjusts tone if needed
+Trails page: edit persona, focal points, specific instructions inline
+Quest template prep
+Checks that quest templates match the sprint's Salesforce topics
+Quest Templates CRUD: filter by trail and category; create sprint-specific templates
+Learner context review
+Reviews each learner's current goal and blocker fields
+Admin Learner Detail: Penny Context section with all 5 fields visible and editable
+Sprint task setup
+Creates sprint tasks in Notion project database; assigns to learners
+Notion tasks sync to /projects/:id/tasks in Penny mobile — learners see assigned tasks immediately
+Cohort kick-off message
+Posts to #guided-trail-cohort-1 to start the sprint
+Angela writes this personally; Penny provides cohort context if needed via /coach/penny
+Coach Phase 4
+Intervention & Rescue
+A learner goes quiet. Penny notices first.
+The most dangerous moment in a cohort is not when a learner is stuck and asking for help — it's when they're stuck and silent. A learner who disengages without signaling creates a crisis that Angela often can't detect until a deliverable is missed. Penny's flagging system is designed to catch these before they become program exits.
+Jordan Goes Quiet
+Penny's Role
+Jordan hasn't interacted with Penny in 4 days
+Sprint 2B Notion task due today; not submitted
+Angela hasn't noticed yet — she has 4 other learners
+Client is waiting for the flow build
+Flags Jordan on Coach Home "Needs Attention" section
+Red card: "Sprint 2B overdue — client waiting"
+Home screen shows the flag on Alex's active project card
+Angela sees it on first morning check; reaches out to Jordan directly
+Penny has already drafted a Slack check-in for review in coordinator mode
+Flag Type
+Trigger
+Angela's Action
+No Penny activity
+Learner hasn't interacted in ≥4 days
+Personal Slack DM — not via Penny
+Deliverable at risk
+Notion task past due or team member not submitted
+Review Notion project board; contact the specific learner; use Penny coordinator for team messaging
+Low confidence signal
+Weekly Report flags 3+ low-confidence signals
+Schedule 1:1 session; update learner context fields after the call
+Quest abandonment pattern
+3 consecutive quests forfeited
+Review quest difficulty; check trail config; may assign simpler Notion sprint tasks alongside quests
+Career review stalled
+Learner hasn't run a career review in the job-search phase
+Prompt via Slack; offer to run a session together via Test Penny
+Coach Phase 5
+Celebration & Recognition
+Angela turns wins into culture.
+One of Angela's most powerful coaching tools is public recognition. When Alex's CLYLP build goes live, posting to #trail-wins creates a cultural artifact that motivates every other learner in the cohort. Penny makes it easy to find the wins and frame them — but Angela delivers them.
+Win Type
+Angela Does
+Penny Supports
+Major milestone (project live)
+Posts to #trail-wins with context and congratulation
+Admin Dashboard surfaces the event; Notion task marked Done; GitHub PR merged — both contribute to gamification
+Badge earned
+Adds a personal note when awarding manual badges
+Award Badge modal in Coach Learner Detail; BadgeEarnedModal fires on learner's device
+Strong quest submission
+Adds a comment when reviewing quest activity
+Quest Activity feed shows all submissions; expandable detail view
+Interview scheduled
+Celebrates the milestone personally
+Penny has context from the career review history to frame the significance
+Offer accepted
+Posts to #trail-wins; shares with Angela's newsletter/social proof
+Learner's alumni trail transition creates a record in the system
+Coach Phase 6
+Program Design & Iteration
+Angela builds the system that will work without her.
+Angela is simultaneously running Cohort 1 and designing the infrastructure for Cohort 2. Every Weekly Report, every trail config edit, every new quest template is part of the system she's building. Penny is the intelligence layer that tells her what's working.
+Activity
+Angela Does
+Penny Supports
+Trail config evolution
+Adjusts focal points based on what's resonating in coaching sessions
+Trails editor; changes take effect immediately for all learners on that trail
+Quest library growth
+Creates new templates that match emerging client project scenarios
+Quest Templates CRUD; 12 templates seeded; Angela adds as needed
+Onboarding refinement
+Observes where new learners get confused in the first sprint
+Interaction logs and prompt mode breakdown show where coaching shifts happen
+Coach replication
+Documents the coaching patterns that work so other coaches can use them
+Penny's trail configs are the institutional knowledge container
+Report-driven decisions
+Uses Weekly Reports to identify what to systematize vs. what to keep human
+Weekly Reports with support flags and suggested actions drive program iteration
+## Part 4 — Where the Journeys Intersect
+The most powerful moments in the program happen at the intersection of the learner's journey and the coach's journey. These are the touchpoints where Penny's role is to enable the connection — not to replace it.
+Shared Moment
+Alex's Experience
+Angela's Experience
+Penny's Role
+Sprint kickoff
+"I know what I'm building this sprint — my Notion tasks are assigned and I can see the brief"
+"Everyone's context is current; Notion tasks assigned; Classroom synced"
+Surfaces Notion sprint tasks, Classroom assignments, and quest themes on Home screen
+Mid-sprint flag
+"Penny flagged a task on my project card — the Notion task is overdue"
+"Penny caught Jordan's overdue task before I noticed it — I can now reach out directly"
+Flags Notion task overdue for learner (project card) and coach (Coach Home Needs Attention)
+Badge award moment
+"Angela gave me the Client Ready badge and wrote me a note — she saw what I did"
+"I can recognise exactly what happened with a personal message, not a generic system award"
+BadgeEarnedModal delivers Angela's message; logs the recognition permanently
+Career review session
+"Penny helped me see what I actually did — Angela helped me see why it matters to employers"
+"Alex came into our coaching call with a 4/5 experience relevance score — we could start at a different level"
+Career review surfaces the evidence; Angela elevates the narrative
+Offer accepted
+"Angela was the first person I told after my family"
+"This is why I built the program — another Hugh moment"
+Penny surfaces the win in the system; both learner and coach have a record of the arc
+## Part 5 — Pain Points & How Penny Addresses Them
+## 5.1  Learner Pain Points
+⚠  Gets stuck and has no one to ask at 11 PM
+✓  Penny is always available; Quest Guide mode coaches through blockers without solving
+⚠  Can't translate project experience into resume language
+✓  Career review 5-dimension scoring with Socratic bullet coaching — Alex does the work, Penny asks the questions
+⚠  Loses momentum between coaching sessions
+✓  Daily quest habit + gamification + home screen daily focus keeps Alex engaged between human touchpoints
+⚠  Doesn't know how to handle team breakdowns on client projects or overdue Notion tasks
+✓  Coordinator mode surfaces overdue Notion tasks and provides Slack message templates; Penny drafts the team check-in Alex doesn't know how to write
+⚠  Imposter syndrome tells them their wins don't count
+✓  Penny names specific wins; badge system creates permanent visible record; Angela's personal notes on manual badges are the highest-value reinforcement
+⚠  Doesn't know what to focus on each day
+✓  Home screen TODAY section surfaces the 3 most important items in priority order every morning
+## 5.2  Coach Pain Points
+⚠  Learner goes silent and Angela doesn't notice until a deliverable is missed
+✓  Penny activity flags surface on Coach Home; "Needs Attention" section catches disengagement before it becomes dropout
+⚠  Spends hours generating a cohort health picture that should take minutes
+✓  Weekly Intelligence Report synthesizes all learner activity into a 5-minute read every Friday
+⚠  Each coaching session starts from scratch — no continuity from last week's conversation
+✓  Career review session history + learner Penny context fields give Angela a current picture before every 1:1
+⚠  Recognising learner wins requires manually tracking them across Slack, Notion, and GitHub
+✓  Quest Activity feed + gamification history (GitHub PR merges + Notion task completions) surfaces every win; Award Points and Badge modals provide the delivery mechanism
+⚠  Sprint task structure and trail configuration live in Angela's head — not scalable to other coaches
+✓  Trail configs in the admin dashboard AND Notion sprint templates are the institutional knowledge container; Notion holds the task structure and docs; trail configs hold the Penny persona
+⚠  Cannot tell which parts of the program are working and which need design iteration
+✓  Prompt mode breakdown chart + Weekly Report themes + quest completion rates provide product-level intelligence for program design
+## Part 6 — Experience Principles
+Five principles that must hold true in every Penny interaction, every screen, and every system design decision. These are not aspirations — they are constraints.
+## 1.  Ask Before Telling
+Penny's brand promise — "a penny for your thoughts" — is a coaching philosophy, not a chatbot UX pattern. Penny asks one good question instead of giving ten pieces of advice. The learner does the thinking. Penny holds the space.
+In Practice
+Alex says: "I don't know how to explain my CLYLP project"
+Penny says: "What did the nonprofit do with the org that they couldn't do before?"
+(NOT: "Here are 5 ways to describe your Salesforce experience")
+Alex says: "I failed an interview question about data models"
+Penny says: "What did you say, and what did you wish you'd said?"
+(NOT: "Here is a complete guide to Salesforce data models")
+## 2.  Earn the Right to the Next Moment
+Every phase of the journey must earn the learner's trust before asking them to go deeper. The first quest must feel achievable. The first coordinator action must feel natural. The first career review must surface something true. If any of these moments fails, the learner's relationship with Penny does not recover to the same level.
+In Practice
+Onboarding tone selection must be immediately honoured in Penny's first response
+The first quest must not be too hard — trail affinity and difficulty matching exists for this reason
+The career review must not feel like a grade — it must feel like a mirror that shows something useful
+## 3.  Augment the Coach, Never Replace
+Angela is the coach. Penny is the system that makes Angela's coaching more scalable and more informed. Any feature that substitutes for Angela's relationship — unsolicited personal messages, fabricated praise, generic encouragement — undermines the program's core value.
+In Practice
+When Jordan goes quiet, Penny flags it. Angela calls.
+When Alex gets a badge, Angela writes the personal note. Penny delivers it.
+When the cohort has a confidence problem, Penny's report names it. Angela designs the response.
+Penny never sends unsolicited messages to learners. She surfaces information; humans act on it.
+## 4.  Real Experience, Real Recognition
+The program's competitive advantage is real project experience. Penny must never fabricate evidence, invent accomplishments, or give empty praise. Everything Penny celebrates must be traceable to something Alex actually did. The career review is built on this principle — Penny coaches Alex to excavate real evidence, not to invent a better story.
+In Practice
+Career review: Penny asks for the evidence; never writes a resume bullet from scratch
+Quest feedback: Penny references the specific reasoning in Alex's submission — not generic "great work"
+Badge award notes: Angela's personal note describes the specific act that earned the badge
+Weekly Report: Themes and flags are derived from real interaction data — Gemini synthesises, never invents
+## 5.  Every Learner Has a Trail. Every Trail Has a Penny.
+A Guided Trail learner and a Trail of Mastery learner are in fundamentally different places. Penny's persona must reflect this — the tone, focus, and question style that works for a new-to-Salesforce career changer will frustrate an experienced practitioner. Trail configuration is not a nice-to-have — it is the mechanism by which Penny remains relevant across the full learner lifecycle.
+Trail
+Penny's Posture
+Example Response Style
+Guided Trail
+Warm, structured, foundational — celebrates first steps as genuinely significant
+"What part of the object relationship are you trying to model? Let's start there."
+Explorer Journey
+Curious, self-directed — asks what the learner has already tried
+"You've been exploring independently — what have you tested so far, and what surprised you?"
+Trail of Mastery
+Peer-level, challenging — assumes competence and pushes for nuance
+"What's the edge case in your solution that you haven't accounted for yet?"
+Community / Alumni
+Celebratory, legacy-focused — helps articulate the full arc
+"Looking back at where you started — what would you tell a learner entering Sprint 1 right now?"
+Penny Customer Journey v1.1  ·  Transition Trails Academy  ·  May 2026
+"A penny for your thoughts."  ·  One step at a time.

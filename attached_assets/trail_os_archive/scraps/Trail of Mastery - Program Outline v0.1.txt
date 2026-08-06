@@ -1,0 +1,97 @@
+Transition Trails · Trail of Mastery
+Real clients, real roles, whoever shows up
+Four role tracks that have to work when you have two people and when you have four. Start with a Product Owner and an Admin — the design question is not what a full squad looks like, it is what the smallest honest one does.
+01 · The unit
+The engagement is the program, not the cohort
+Foundations and Guided Trail run as cohorts on a fixed capstone. Trail of Mastery cannot, because the work arrives from clients and the roles available depend on who enrolled. So the unit is one engagement: a client, a coach, and whatever roles you have — and the curriculum is a role lens applied to whatever that client needs this week.
+Direct client contact
+This is the line between Guided Trail and here. In GT the coach relays the requirement. In Trail of Mastery the learner is in the room, and the coach is present rather than in between.
+Pipelines, not change sets
+Guided Trail deploys by hand so a learner understands what depends on what. Here they work in a real DevOps pipeline with source control, because the client environment has consequences and a reviewer.
+No capstone
+The client is the capstone. Role-specific exercises exist to guarantee coverage the client may not produce — they are the floor, not the spine.
+With four tracks and a first cohort in H1 2027, most engagements will be two or three people for a long time. A program that only works with a full squad will not run. Every role track needs a defined answer to "what happens when the role next to you is empty" — and for the first engagements that answer is usually the coach, wearing the missing hat and saying so out loud.
+02 · The four roles
+Define each by the decision it owns
+Job titles overlap; decision rights do not. Naming what each role decides is what makes squad composition a rule rather than a judgement call, and it is how you avoid two learners quietly competing for the same call.
+Role
+Owns the decision about
+Certification anchor
+{{ r.name }}
+{{ r.status }}
+{{ r.owns }}
+{{ r.anchor }}
+03 · Composition
+One rule: never two owners of the same decision
+Two roles owning the same decision on one client means one of them is shadowing. That reasoning is what removed both hybrid roles from the set — a Solution Consultant collided with the Product Owner on one side and the Admin on the other, and a Solution Architect collided with the Advanced Admin. What remains is four roles with four genuinely distinct decisions.
+Combination
+Verdict
+Why
+{{ c.pair }}
+{{ c.verdict }}
+{{ c.why }}
+A BA pairs with a Product Owner, never sits alone, and never pairs with an Admin as the only other role — the BA would end up making sequencing calls nobody assigned them. The BA finds out what is true; someone else has to decide what happens because of it. If that someone is missing, the coach owns it explicitly rather than letting it drift to the BA.
+04 · Shared and specific
+Build the shared spine once
+Same for every track
+RESOLVE as the delivery method — as a catch-up module for anyone who did not take it in Guided Trail · the client brief · the engagement kickoff and close · DevOps pipeline and source control · the release review · weekly stand-up and campfire with the squad · monthly private coaching · Decision Log · the 90-second answer · Demo Day
+Write these once and every future track inherits them. This is most of the program.
+Different per track
+The weekly lens · the role exercises that guarantee coverage · the certification anchor and its domain weights · the role-specific evidence artifacts · the coach gate criteria · Penny’s persona for that role
+Roughly a quarter of the design work per track, once the spine exists. This is why the spine goes first.
+Two ways in, and only one of them arrives with the method
+Trail of Mastery is an apprenticeship, not a next step in a sequence. A six-year admin can come straight from Explorer’s Trail because they need to skill up, not because they finished something. That means the entry check is not which program you completed — it is whether you already have the method.
+From Guided Trail
+RESOLVE was an add-on module there, so they arrive with it. They also arrive with a findings register, a Decision Log from #13, and twelve recorded 90-second answers — start the engagement at Week 1 and keep the numbering running.
+From Explorer’s Trail or outside
+An experienced admin with no TT program behind them. They take the RESOLVE module before or during the first two weeks of the engagement, and they start their Decision Log at #1. Their platform skill is not in question; the method and the documentation habit are.
+Worth deciding as a rule: does the RESOLVE module run before the engagement starts, or inside its first two weeks? Before is cleaner. Inside is more likely to actually happen, since an apprentice with a day job will not do a module while waiting for a cohort to form.
+Why the length varies from 8 to 12 weeks
+The site advertises 8 to 16 weeks, track-dependent — wider than the four live tracks need, and it stays honest for whenever the deferred roles return. The reason is worth naming: an Admin track can prove competence inside one delivery cycle, because the evidence is a working configuration. A Product Owner needs a full cycle plus its consequences — a decision defended, shipped, and then lived with. Twelve weeks is the floor for anything whose evidence is judgement rather than output.
+8–10 weeks
+Admin, Advanced Admin — evidence is the build
+12 weeks
+Business Analyst, Product Owner — evidence is judgement
+Deferred
+Solution Consultant and Solution Architect — dropped from the set for now
+05 · Start here
+Engagement One: a Product Owner and an Admin
+One client, two learners, one coach, twelve weeks in three sprints — the same cadence as every other program. Enough to prove the model, small enough to fix while it runs. The two tracks you can staff now are also the two whose decisions least overlap, which is convenient rather than accidental.
+Sprint 1 · Weeks 1–2
+Recognize — together
+Both learners meet the client and read the org. The PO produces the problem statement with a mission cost; the Admin produces the technical assessment. They compare, and where the two disagree is the first real conversation of the engagement.
+Sprint 1 · Weeks 3–4
+Explore and Select — the estimate conversation
+The Admin scopes options in a sandbox. The PO builds a rough version of one of them themselves, then hears the Admin’s estimate. This is the single most valuable exercise in the PO track and it only works with a real Admin on the other side of it.
+Sprint 2 · Weeks 5–8
+Outline and Launch — deliver something real
+The PO sequences and writes acceptance criteria; the Admin builds through the pipeline. At least one thing reaches the client’s production org, reviewed by the coach. The PO writes the release note and runs the demo.
+Sprint 3 · Weeks 9–12
+Verify and Evolve — live with it
+The thing they shipped has been in use for a month. Measure whether it solved the problem named in Week 1. Triage what the client now wants changed, and decide what opens a new cycle versus what waits. Then defend three decisions to a panel.
+The engagement runs on RESOLVE end to end, so the methodology is learned by doing the thing rather than by studying the acronym. It also means Weeks 9 to 12 are the part most programs skip — living with a decision after it ships. That is where the judgement actually forms, and it is the reason a judgement-based track cannot be compressed below twelve weeks.
+05b · Supply and demand
+The client backlog is the supply. Skill coverage is the demand.
+Curating a healthy roadmap per client solves the availability problem — clients want outcomes and cannot name the work, so somebody has to translate. But a full backlog does not guarantee a learner touches what they need. Two things have to meet in the middle, and the meeting point is the assignment decision.
+Tag the backlog when you build it
+As each roadmap item is written, note which role skills it would exercise — a data migration touches discovery, sequencing and acceptance; a permission cleanup touches security and maintainability. Tagging at authoring time costs a minute. Reconstructing it at assignment time costs an hour and gets guessed.
+Keep a coverage ledger per learner
+One row per role skill, marked as exercised or not, with the artifact that proves it. The coach assigns from the client backlog by what a learner has not yet touched — not by what happens to be next in the queue. That single change turns opportunistic assignment into a curriculum.
+Use cases fill what no client produced
+Prepared exercises against the seeded Guided Trail org, one per role skill, held in reserve. They close coverage gaps at the end of an engagement — and they are the same bank that covers a client going quiet, so one asset solves two problems.
+Before Cohort 0, write the short list of skills a learner cannot complete a track without having exercised — six or eight per role, not thirty. That list is what the coverage ledger measures against, it is what a use case gets written for, and it is the sentence you give an employer: "every Product Owner who completes this has sequenced under uncertainty, refused something real, and reconciled a report they did not build." Without it, coverage is a feeling.
+"I plan to work with each client to build a healthy roadmap and backlog" is the right answer for the first engagements and the wrong one by the fifth. Founder-Independent Delivery is one of your five pillars, and backlog curation is exactly the kind of judgement work that quietly stays with the founder because it is faster to do than to teach. Two protections worth building in now: make the roadmap-building itself a Product Owner deliverable on a second engagement, and write down how you decide what belongs on a client roadmap — even roughly — so the next person has something to work from rather than watching you do it.
+06 · Open
+Five things to settle before Cohort 0
+1. What the client is told.
+These are learners doing real work in a production org. The nonprofit needs to know that, and how it is supervised. An engagement agreement that says it plainly protects everyone — and is easier to write now than after an incident.
+2. Whether Penny is the Scrum Master.
+Your epic list already names a Trail of Mastery Scrum Master persona. If Penny facilitates, the roles above need to say what she owns and what stays human — facilitation and accountability are not the same thing, and only one of them can be automated.
+3. Who writes the use case bank, and when.
+The prepared exercises in 05b cover both a stalled client and an unmet coverage gap, so they are load-bearing rather than nice to have. They need to exist before Cohort 0, and they need one per skill in the minimum coverage set — which is another reason to write that list first.
+4. Pricing against employer sponsorship.
+The site lists no price and says Coming 2027. These learners are employed, which makes an employer tier plausible in a way it is not for the other trails — worth deciding before the page goes live rather than after.
+5. When the two dropped roles come back, and as what.
+Solution Consultant and Solution Architect are out. Worth revisiting once someone has completed two engagements, because that is what those roles actually describe — a Product Owner or Admin with a second engagement behind them, not a separate curriculum.
+the next step on your trail
+Confirm the Engagement One shape, and the next piece is the shared spine — RESOLVE kickoff to close, written once so all four tracks inherit it. The Product Owner one-pager already covers that track’s lens and evidence; the Admin track can borrow the Foundations domain work almost intact.

@@ -1,0 +1,185 @@
+/* ============================================================
+   Transition Trails Design System — v2.1 proposed additions
+   ------------------------------------------------------------
+   Three rulings from the site review, plus the six gaps.
+   Written to drop into tokens/ as an addendum, or to merge
+   into the existing token files. Nothing here changes how the
+   live site looks — these are the values the site already uses,
+   given names so they stop being reinvented.
+   ============================================================ */
+
+/* ---------- 1. TYPOGRAPHY — Fraunces joins the system ----------
+   RULING: Fraunces is adopted as the display face. It is already
+   on nearly every H1 and H2 sitewide and it makes those headings
+   stand out in a way Poppins does not at display sizes.
+   The system is now three faces, not two:
+     Fraunces  — H1, H2 only (display)
+     Poppins   — H3, H4, buttons, labels, eyebrows
+     Open Sans — body and UI
+     Caveat    — accent, one per page maximum
+   Load: https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900
+*/
+:root {
+  --tt-font-display: 'Fraunces', Georgia, serif;   /* NEW — H1 and H2 */
+  --tt-font-heading: 'Poppins', system-ui, sans-serif;  /* now H3–H4, buttons, labels */
+
+  /* Display sizes carry tighter tracking than Poppins did */
+  --tt-h1-tracking: -1.5px;
+  --tt-h2-tracking: -0.5px;
+  --tt-display-weight: 700;
+}
+
+/* ---------- 2. COLOUR — corrections to existing tokens ----------
+   Where the site and the system disagreed, the site's value was
+   usually the better one. These three replace their originals.
+*/
+:root {
+  --tt-green-700: #1E4A2A;   /* was #245531 — site's is richer, and is used sitewide */
+  --tt-amber-700: #D4890A;   /* was #CC8400 — site's hover state, used sitewide */
+  --tt-amber-100: #FEF3DB;   /* was #FFF3E0 — site's badge tint */
+}
+
+/* ---------- 3. COLOUR — new tokens ----------
+   Deep Teal had no ramp at all, which is why gradient stops and
+   teal tints were being invented per page.
+*/
+:root {
+  --tt-teal-100: #E0F0F3;
+  --tt-teal-300: #7FAFC6;    /* = Sky Blue; the ramp resolves to it */
+  --tt-teal-500: #2F6F7E;
+  --tt-teal-700: #1E4F5C;    /* NEW — used in every gradient hero */
+
+  /* Warm muted text. Replaces the Tailwind greys (#6B7280, #F3F4F6)
+     that leaked in — those are cool and clash with the warm neutrals. */
+  --tt-muted:     #8C8882;   /* captions, attributions, secondary body */
+  --tt-muted-100: #F3F2EF;   /* warm equivalent of a grey-100 fill */
+
+  /* Danger — the system had none, so #DC2626 (stock Tailwind red)
+     got invented on the board page. This is a warm brick that sits
+     with the palette instead of shouting over it. */
+  --tt-danger:     #A83A2C;
+  --tt-danger-100: #FBEAE7;
+
+  /* Success — was borrowing Trail Green with no alias. */
+  --tt-success:     var(--tt-trail-green);
+  --tt-success-100: var(--tt-green-100);
+}
+
+/* ---------- 4. THE DARK SECTION ----------
+   Full-bleed charcoal sections are one of the site's most
+   recognisable moves — About, Board, Coaches, Consulting,
+   Guided Trail, blog. Never described, so the rules got
+   re-derived each time. Green-500 fails contrast on charcoal,
+   which is where #6BBF85 came from; it is a real need.
+*/
+:root {
+  --tt-surface-dark:        #2A2E2C;
+  --tt-on-dark:             rgba(255, 255, 255, .92);
+  --tt-on-dark-muted:       rgba(255, 255, 255, .68);
+  --tt-on-dark-faint:       rgba(255, 255, 255, .45);
+  --tt-on-dark-rule:        rgba(255, 255, 255, .16);
+  --tt-on-dark-fill:        rgba(255, 255, 255, .08);
+  --tt-green-on-dark:       #6BBF85;  /* green-500 fails on charcoal; use this */
+  --tt-amber-on-dark:       #FFD08A;  /* = amber-300, passes on charcoal */
+}
+
+/* ---------- 5. GRADIENTS — approved, with fixed recipes ----------
+   RULING: gradients are in. The ramps exist, so they are
+   on-palette by construction. Use these three and no others;
+   the drift came from hand-mixing stops per page.
+   Always 135deg. Never behind body copy at low contrast.
+*/
+:root {
+  --tt-gradient-hero-green: linear-gradient(135deg, #1E4A2A 0%, #2F6B3F 100%);
+  --tt-gradient-hero-teal:  linear-gradient(135deg, #1E4F5C 0%, #2F6F7E 55%, #1E4A2A 100%);
+  --tt-gradient-hero-deep:  linear-gradient(135deg, #1E4A2A 0%, #2F6B3F 55%, #2F6F7E 100%);
+
+  /* Card media placeholder where photography is missing */
+  --tt-gradient-media: linear-gradient(135deg, var(--tt-green-100) 0%, var(--tt-green-300) 100%);
+}
+
+/* ---------- 6. FOCUS — the site was right ----------
+   The system's 3px glow at 15% opacity is pretty and hard to see.
+   The site's solid outline is the accessible choice. Token follows site.
+*/
+:root {
+  --tt-focus-ring:   0 0 0 3px rgba(47, 107, 63, .15);  /* keep for soft fields */
+  --tt-focus-outline: 2px solid #2F6B3F;                /* NEW — default for keyboard focus */
+  --tt-focus-offset:  2px;
+}
+
+/* ---------- 7. THE AMBER RULE, ENCODED ----------
+   RULING: the nav button gives up amber; the in-page CTA keeps it.
+
+   Amber's job is "the Next Step". The nav button is identical on
+   every page, so it cannot be the next step anywhere — it is a
+   fallback. The real next step differs per page (Find your Trail /
+   Join the Cohort 1 waitlist / Book a free assessment) and that is
+   what amber should track. An accent that is always on screen also
+   stops reading as an accent; it becomes chrome.
+
+   THREE PARTS:
+   1. One amber BUTTON per screen — the next step on that page.
+   2. Amber TEXT on dark surfaces only, using amber-300 (passes on
+      charcoal). Keeps the eyebrows on dark heroes, where they do
+      real hierarchy work; keeps amber text off light backgrounds
+      where it fails contrast anyway.
+   3. Amber TINT FILLS (badges, callouts) allowed, but never
+      adjacent to the amber button — they compete with it.
+      "MOST POPULAR" on a program card is fine. The same badge
+      beside the page's amber CTA is not.
+*/
+:root {
+  /* The one amber CTA — the next step on this page */
+  --tt-cta-next-bg:     var(--tt-sun-amber);
+  --tt-cta-next-fg:     var(--tt-charcoal);
+  --tt-cta-next-hover:  var(--tt-amber-700);
+  --tt-cta-next-shadow: var(--tt-shadow-amber);
+
+  /* Primary action, and everything else that used to be amber */
+  --tt-cta-primary-bg:    var(--tt-trail-green);
+  --tt-cta-primary-fg:    var(--tt-white);
+  --tt-cta-primary-hover: var(--tt-green-700);
+
+  /* Persistent nav CTA — white on the teal bar, green if the bar
+     ever goes light on scroll. Never amber. */
+  --tt-cta-nav-bg:        var(--tt-white);
+  --tt-cta-nav-fg:        var(--tt-deep-teal);
+  --tt-cta-nav-hover:     var(--tt-sky-100);
+  --tt-cta-nav-bg-light:  var(--tt-trail-green);
+  --tt-cta-nav-fg-light:  var(--tt-white);
+
+  /* Amber text, dark surfaces only */
+  --tt-amber-text-on-dark: var(--tt-amber-300);
+}
+
+/* SITE FIX that follows from this ruling:
+   The full-bleed amber band at the foot of the Guided Trail page
+   is an amber section containing an amber button. Make the band
+   deep green or charcoal and let the button carry the amber. */
+
+/* ============================================================
+   COLLAPSE LIST — near-duplicates to retire from the site.
+   No new tokens needed; these all resolve to something above.
+
+     #E6F3EA  →  var(--tt-green-100)   /* pale green, callout panels */
+     #EBF3EE  →  var(--tt-green-100)   /* pale green, icon chips     */
+     #FEF3DC  →  var(--tt-amber-100)   /* differs by one hex digit   */
+     #E0F0F7  →  var(--tt-sky-100)     /* sky tint                   */
+     #6B7280  →  var(--tt-muted)       /* Tailwind grey-500          */
+     #F3F4F6  →  var(--tt-muted-100)   /* Tailwind grey-100          */
+     #DC2626  →  var(--tt-danger)      /* Tailwind red-600           */
+     #FEE2E2  →  var(--tt-danger-100)  /* Tailwind red-100           */
+
+   STILL TO FIX ON THE SITE (system is right, site is wrong):
+     Card radius   12–16px  →  var(--tt-radius-lg)   22px
+     Button radius 8px      →  var(--tt-radius-md)   14px
+     Card shadow   rgba(0,0,0,.06) → var(--tt-shadow-card)
+     Amber CTA glow — currently absent → var(--tt-shadow-amber)
+
+   STILL MISSING AS COMPONENTS (see review section 06):
+     Stat        — value + label + accent. Six pages, six builds.
+     TierCard    — badge, name, price, note, features, CTA.
+                   Would have caught the Explorer's card losing a
+                   tier and Digital Compass mixing monthly/annual.
+   ============================================================ */

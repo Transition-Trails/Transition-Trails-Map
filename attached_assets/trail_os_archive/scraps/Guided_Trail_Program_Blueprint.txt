@@ -1,0 +1,726 @@
+TRANSITION TRAILS
+Guided Trail
+GT
+Program Blueprint & Capstone Guide
+Program
+ | Guided Trail (GT)
+ | 
+Prerequisites
+ | Salesforce Administrator Certification — not yet employed as a Salesforce Admin
+ | 
+Target Goal
+ | First Salesforce Admin Job — Build Portfolio Proof + Interview Readiness
+ | 
+Duration
+ | 12 Weeks (3 Sprints)
+ | 
+Format
+ | Cohort-Based + Weekly Campfire Sessions + Penny AI + Weekly Stand-Ups + 3 Private Coach Sessions
+ | 
+Capstone Project
+ | Horizon Community Hub (HCH) — Administrator Edition
+ | 
+Version
+ | 1.0  —  2026
+ | 
+
+"You earned the certification. Now earn the job."
+
+ROI Note: At $1,497 vs. a $73K average entry-level Salesforce Admin salary, payback is under one week of your first paycheck. Hugh's story is the proof of concept. The Guided Trail exists to make his story repeatable.
+
+1. Program Overview
+
+1.1 What Is the Guided Trail?
+The Guided Trail (GT) is a 12-week, cohort-based practicum designed for learners who have already passed the Salesforce Administrator certification exam but have not yet been hired into their first Salesforce admin role. It is the next step on the Transition Trails learning path after the Admin Certification Trail (ACT).
+
+The Guided Trail is not a course. It is not a review program. It is a professional proving ground.
+
+In the Guided Trail, learners stop following instructions and start making decisions. Every week, you receive a stakeholder brief from Elena, HCH’s Program Director, and your job is to figure out how to build the solution yourself. No walkthrough videos. No step-by-step scripts. Just a business problem, a Salesforce org, and a cohort of peers working through the same challenge alongside you.
+
+The artifacts you produce become your proof — a documented portfolio of real administrative judgment that employers can review, evaluate, and trust.
+
+The Guided Trail Difference: Problem-Solving Over Procedure
+ACT taught you what to build and showed you how. The Guided Trail gives you a problem and asks you to decide.
+Employers don’t need admins who follow tutorials. They need admins who troubleshoot, prioritize, and document their reasoning.
+The Guided Trail is where you develop — and prove — that kind of judgment.
+ | 
+
+1.2 Who This Program Is For
+The Guided Trail is exclusively for learners who meet all three of the following criteria:
+
+You hold the Salesforce Administrator certification
+You have not yet been hired for your first Salesforce Admin role
+You are committed to a 12-week cohort-based experience with live participation
+
+This program is designed for the learner who has done everything “right” — passed the exam, built Trailhead badges, applied for jobs — and still cannot get past the experience requirement. The Guided Trail exists to close that gap with verified, portfolio-ready proof.
+
+Who Is Not Ready for the Guided Trail
+You have not yet passed the Salesforce Administrator exam. (ACT is your next step.)
+You are already employed as a Salesforce Admin. (Trail of Mastery is your next step.)
+You cannot commit to live weekly sessions. Session replays are a backup for life events, not a replacement for participation.
+ | 
+
+1.3 The Three Personas of the Guided Trail
+Guided Trail cohorts typically include three types of learners. Your coach is trained to meet each where they are.
+
+ | The Career Starter
+ | The Career Shifter
+ | 
+Your Profile
+ | New to the workforce, ready to begin a digital career.
+ | Transitioning from operations, support, or management in another industry.
+ | 
+What You Bring
+ | Coachability, curiosity, and learning discipline.
+ | Transferable business skills (stakeholder management, problem-solving).
+ | 
+What You Need From This Program
+ | Hands-on project experience and confidence in your own judgment.
+ | A bridge to translate past experience into Salesforce interview language.
+ | 
+
+Note: The Experienced Pro (someone with deep domain expertise modernizing their skills) is also welcome. All three personas build the same capstone and publish the same portfolio framework.
+
+1.4 How the Guided Trail Differs from ACT
+Feature
+ | Guided Trail (GT)
+ | 
+Primary Goal
+ | Get hired as a Salesforce Admin. Build the portfolio that proves you can do the job.
+ | 
+Prerequisites
+ | Salesforce Administrator certification. Not yet employed as an admin.
+ | 
+Learner Autonomy
+ | Problem-solve the build yourself. You receive a stakeholder brief, not a walkthrough video.
+ | 
+Certification Focus
+ | Certification already earned. This program focuses on translating that knowledge into job-ready experience.
+ | 
+AI Support
+ | Penny AI (general Salesforce guidance + career coaching + interview prep)
+ | 
+Coach Access
+ | Weekly Campfire Sessions (group) + Weekly Stand-Up (group) + 3 Private Coach Sessions
+ | 
+Career Focus
+ | Explicit. Every sprint includes structured interview prep tied to what you built that week.
+ | 
+Portfolio
+ | Experience Cloud digital portfolio — same framework as ACT, but now complete and employer-ready
+ | 
+
+1.5 The Penny AI Assistant
+Penny is your on-demand AI learning partner throughout the Guided Trail. She is available 24/7 inside the program platform and is specifically tuned to support career transition into Salesforce Admin roles.
+
+In the Guided Trail, Penny shifts her focus from exam prep to employability. She can help you:
+
+Challenge your configuration decisions: “Why did you choose that approach? What alternatives did you consider?”
+Simulate a hiring manager asking about your portfolio artifacts
+Help you translate what you built this week into compelling interview language
+Provide Salesforce documentation references when you hit a blocker — without giving you the answer
+Review your Admin Decision Log entries for completeness and clarity
+
+What Penny Is Not
+Penny does not tell you how to complete the build task. She helps you think through the problem.
+Penny does not replace your coach. She prepares you for more productive coaching conversations.
+Penny does not guarantee interview success. Career readiness is built through practice, reflection, and honest coaching — not AI prompts.
+ | 
+
+2. Program Structure
+
+2.1 The 12-Week Journey
+The Guided Trail is organized into three 4-week Sprints. Each Sprint builds a new layer of the HCH capstone and introduces a new dimension of career readiness. The technical complexity increases each sprint — and so does your ability to explain what you built and why.
+
+Sprint
+ | Name
+ | Technical Focus
+ | HCH Build Output
+ | 
+Sprint 1Weeks 1–4
+ | The Identity Phase
+ | Data Architecture, Security & Access, Stakeholder Alignment
+ | HCH org with complete data model, security framework, and data migration plan
+ | 
+Sprint 2Weeks 5–8
+ | The Efficiency Engine
+ | Automated Intake, Flow Automation, Case Management, Service Cloud
+ | Email-to-Case, Web-to-Case, Flows, Assignment Rules, and full case management workflow
+ | 
+Sprint 3Weeks 9–12
+ | The Accountability Phase
+ | SLA Management, Reporting & Dashboards, Org Handover & Documentation
+ | Entitlement SLAs, Donor Impact Dashboard, Escalation Flow, and published portfolio with org handover docs
+ | 
+
+2.2 Your Weekly Rhythm
+Every week in the Guided Trail follows the same predictable structure. Consistency is intentional — it mirrors how real admin work runs and reduces the cognitive load of figuring out what to do next.
+
+Element
+ | What Happens
+ | 
+Weekly Stand-Up (Group)
+ | A 20-minute live group check-in at the start of the week. You share what you completed last week, what you’re building this week, and any blockers. This is not a class. It is a professional accountability ritual.
+ | 
+Stakeholder Brief
+ | Elena sends you a short scenario brief — a realistic business problem at HCH. This is your build prompt. No walkthrough. No tutorial. You read the brief, consult Penny if you need a nudge, and figure out the solution.
+ | 
+Your Build Task
+ | You complete the build in your HCH Developer Edition org. This is the core weekly deliverable. Your cohort peers are building the same thing — but the decisions you make are yours.
+ | 
+Admin Decision Log Entry
+ | After your build, you document your decision in the Admin Decision Log: what you built, the options you considered, what you chose, and your business justification. Minimum one entry per week.
+ | 
+Penny Check-In
+ | Penny prompts you with a challenge: “How would you explain this to a hiring manager in 60 seconds?” or “What would break this configuration, and how would you prevent it?” These are interview rehearsals, not tests.
+ | 
+Weekly Campfire Session (Group)
+ | A live 60-minute discussion facilitated by your coach. You present what you built, explain your decisions, and receive peer and coach feedback. This is where the real learning happens.
+ | 
+
+2.3 Private Coach Sessions
+You have three private 45-minute sessions with a Transition Trails coach during your 12 weeks. These sessions are not technical help desks. They are career conversations grounded in your actual work.
+
+Session
+ | Timing
+ | Focus
+ | 
+Session 1
+ | End of Sprint 1 (Week 4)
+ | How are you making decisions, not just completing tasks? Are you explaining your build in a way an employer would find compelling? Where are your confidence gaps?
+ | 
+Session 2
+ | Week 8 (End of Sprint 2)
+ | Portfolio mid-point review. Interview readiness check. Resume and LinkedIn audit. What does your job search strategy look like, and is this portfolio telling the right story?
+ | 
+Session 3
+ | Week 11 (Sprint 3 mid-point)
+ | Final career clarity conversation. Employer simulation: your coach interviews you about your HCH build. What roles are the right fit? What is your 30-second answer to ‘Tell me about a project you’ve built in Salesforce’?
+ | 
+
+A Note on What These Sessions Are For
+Private Coach Sessions in the Guided Trail are specifically focused on employment readiness. Your coach is not reviewing your configuration for accuracy — Penny and your campfire cohort handle that.
+Your coach is asking: Can you talk about this work like a professional? Can you tell the story of this build in a way that makes a hiring manager want to call you back?
+If the answer is not yet there, your coach will help you get there before Week 12.
+ | 
+
+3. The HCH Capstone Project — Guided Trail Edition
+
+3.1 Project Overview
+Your capstone project is the Horizon Community Hub (HCH) — a realistic nonprofit that serves vulnerable communities in the Dallas-Fort Worth area. HCH provides utility assistance, housing stabilization support, and veteran services to families in crisis.
+
+In ACT, you built the HCH Salesforce environment from scratch by following Build With Me videos. In the Guided Trail, that environment already exists — and you are taking over as its administrator. You have inherited a partially-built system, a backlog of stakeholder requests, and a Program Director (Elena) who needs things done now.
+
+HCH at a Glance
+Organization: Horizon Community Hub (HCH) — nonprofit, Dallas-Fort Worth
+Mission: Stabilize families in crisis through utility assistance, housing support, and veteran services
+Staff: Executive Director, Program Director (Elena), 4 Support Staff, 3 Volunteers
+Current State: A working Salesforce org built by their previous admin (you, in ACT). You are now the ongoing admin.
+Your Role: Salesforce Administrator — sole system owner, stakeholder liaison, and solution architect
+Stakeholder: Elena (Program Director) — your primary point of contact. She communicates through weekly briefs, not technical specs.
+ | 
+
+3.2 The Shift from ACT to Guided Trail
+The most important difference between ACT and the Guided Trail is not technical complexity. It is the removal of the script.
+
+In ACT...
+ | In the Guided Trail...
+ | 
+You received a Build With Me video showing every step
+ | You receive a stakeholder brief describing the business problem
+ | 
+You replicated a demonstrated solution
+ | You design the solution before you build it
+ | 
+Configuration decisions were guided
+ | Configuration decisions are yours to justify
+ | 
+You documented what you did
+ | You document why you made the choices you made, including what you rejected
+ | 
+Portfolio artifacts were prescribed
+ | Portfolio artifacts are still prescribed in format, but the content is your authentic work
+ | 
+
+3.3 Org Setup for the Guided Trail
+If you completed ACT, you already have a Salesforce Developer Edition org with the HCH build. The Guided Trail continues that same org. Do not start a new org. Your Sprint 1 work in the Guided Trail builds on top of what ACT produced.
+
+If you are entering the Guided Trail without having completed ACT, your coach will provide access to a pre-built HCH starter org that replicates the ACT output.
+
+Your org name should remain: Horizon Community Hub — [Your Name]
+Keep your Admin Decision Log from ACT. Guided Trail entries begin at #13 (or #1 if you are new to the program)
+Your Experience Cloud portfolio site continues from ACT. You will build new sections for Guided Trail Sprint artifacts
+
+4. Sprint 1: The Identity Phase (Weeks 1–4)
+
+Sprint Goal
+Become the authoritative expert on HCH’s data architecture. Audit the inherited org, resolve configuration debt, and establish the documentation practices that will govern your entire time as HCH’s admin.
+Technical Focus   Data Model & Architecture  •  Security Audit  •  Stakeholder Communication  •  Documentation Standards
+Capstone Output   HCH Org Audit Report, revised data model documentation, updated Role Hierarchy rationale, and Sprint 1 portfolio section published
+ | 
+
+4.1 Weekly Trail Map — Sprint 1
+
+Week 1: Mapping the Chaos — Org Audit & Data Architecture Review
+Stakeholder Brief: Elena has pulled in a new volunteer coordinator who is trying to understand how client data is organized in Salesforce. She’s receiving conflicting answers from staff. Elena needs you to produce a clear, one-page overview of HCH’s data architecture that anyone on the team can understand.
+Build Task: Conduct a full org audit. Review the HCH data model: all custom objects, relationships, key fields, and field dependencies. Identify any configuration gaps, duplicate fields, or naming inconsistencies left over from the initial build. Produce an Entity Relationship Diagram (ERD) for the current HCH data model.
+Portfolio Artifact: Publish your ERD to your portfolio with a 150-word written explanation of why HCH uses the Household Account model and how it serves their family-based mission.
+Penny Check-In: Ask Penny: ‘If a hiring manager asked me to walk them through a Salesforce data model I’d built, what should I be ready to explain? Give me five questions they might ask.’ Practice your answers.
+Decision Log Entry: #GT-01: What did your audit reveal? What is working well, and what would you change if given the authority to do so? Why?
+ | 
+
+Week 2: Secure Foundations — Security Audit & Access Review
+Stakeholder Brief: Elena has been informed that HCH recently onboarded two new part-time staff members. She wants to confirm that each staff member can see only what they need to see — and that no volunteer has access to confidential client financial data.
+Build Task: Perform a complete security audit of the HCH org. Review profiles, permission sets, OWD settings, role hierarchy, and sharing rules. Identify any over-permissioned users, gaps in field-level security, or sharing rules that expose data inappropriately. Remediate any issues you find.
+Portfolio Artifact: Document your security audit findings: what you found, what you changed, and your business justification for each change. Minimum 3 documented remediation actions.
+Penny Check-In: Ask Penny: ‘Walk me through the principle of least privilege in Salesforce. How would I explain my approach to security architecture to a non-technical stakeholder like Elena?’
+Decision Log Entry: #GT-02: What security gaps did you discover? What was your remediation priority order, and why? What would you do differently at initial setup to prevent these gaps?
+ | 
+
+Week 3: Data Migration & Narrative Bridge — Legacy Data Strategy
+Stakeholder Brief: HCH has recently partnered with a local food bank whose staff previously managed client records in Google Sheets. Elena wants to understand what it would take to migrate that data into Salesforce without disrupting existing records.
+Build Task: Design a data migration strategy for the food bank partner data. Map the source fields to HCH Salesforce fields. Identify deduplication risks. Build a test import using Data Loader or Data Import Wizard with a sample dataset of 20 records. Document any data quality issues you encounter and how you resolved them.
+Portfolio Artifact: Publish your data migration plan as a portfolio artifact: source-to-target field map, deduplication strategy, test import screenshot, and error resolution log.
+Penny Check-In: Ask Penny: ‘If a hiring manager asked me about my experience with Salesforce data migrations, what should I say? Help me build a 90-second response based on what I actually did this week.’
+Decision Log Entry: #GT-03: What data quality challenges did you encounter? How did you resolve them? What would you tell a future admin to watch out for in similar migrations?
+ | 
+
+Week 4: Unified Visibility — Custom Record Pages & Stakeholder Views
+Stakeholder Brief: Elena’s staff are spending too much time navigating between related records on the case view. She wants a single record page where caseworkers can see the client’s household, active cases, recent donations, and upcoming service appointments without leaving the page.
+Build Task: Design and build a custom Lightning Record Page for the Case object. Use the App Builder to arrange components that surface related household data, recent activity, and service history in a single, intuitive view. Create a second simplified view for volunteers that removes confidential financial fields.
+Portfolio Artifact: Publish a Loom walkthrough (3–5 minutes) of your record page design. Narrate your decisions: what you included, what you excluded, and why the layout serves caseworkers’ workflow.
+Penny Check-In: Ask Penny: ‘Give me a mock interview question about Lightning App Builder that would distinguish a junior admin from a competent one. I’ll answer and you critique me.’
+Decision Log Entry: #GT-04: What layout decisions did you make for the caseworker view vs. the volunteer view? What drove those distinctions?
+ | 
+
+PRIVATE COACH SESSION 1 — End of Sprint 1 (Week 4)
+This session is focused on how you are presenting your work, not whether the configuration is correct.
+Your coach will ask you to walk them through one artifact from your Sprint 1 portfolio as if they were a hiring manager.
+Come prepared: know your Decision Log entries. Be ready to explain what you built, why you made the choices you did, and what you would do differently.
+ | 
+
+5. Sprint 2: The Efficiency Engine (Weeks 5–8)
+
+Sprint Goal
+Transform HCH’s reactive chaos into a structured, automated intake and case management system. Design solutions that reduce manual effort, eliminate dropped cases, and give Elena real-time visibility into caseload.
+Technical Focus   Automated Intake  •  Flow Builder  •  Case Management  •  Email-to-Case  •  Assignment Rules
+Capstone Output   Fully automated tri-channel intake (email + web + phone), intelligent routing, loop-protection Flows, and Sprint 2 portfolio section published
+ | 
+
+5.1 Weekly Trail Map — Sprint 2
+
+Week 5: Silencing the Noise — Email-to-Case & Inbox Management
+Stakeholder Brief: HCH staff are managing three different email inboxes for client requests: intake@hch.org, urgent@hch.org, and info@hch.org. Cases are being missed, duplicated, and assigned to the wrong person. Elena wants every inbound email to automatically become a case in Salesforce.
+Build Task: Configure Email-to-Case for all three HCH inboxes. Set up routing addresses, configure auto-response templates for each inbox, and establish record type assignments for each channel. Test end-to-end: send test emails and confirm correct case creation, record type assignment, and auto-response delivery.
+Portfolio Artifact: Screenshot gallery: routing configuration, auto-response templates, and a test case created from each inbox. Written summary: how does this configuration eliminate the three specific problems Elena described?
+Penny Check-In: Ask Penny: ‘If I’m asked in an interview to describe a Service Cloud implementation I’ve done, how do I talk about Email-to-Case in a way that demonstrates I understand the business problem it solves, not just the configuration steps?’
+Decision Log Entry: #GT-05: Why did you use separate routing addresses rather than a single catch-all inbox? What was the business driver for that decision?
+ | 
+
+Week 6: Structured Intake — Web-to-Case & Online Intake Forms
+Stakeholder Brief: HCH is launching a community partnership with a local school district that will refer families for housing stabilization services. The school district counselors need a simple web form they can complete on behalf of families. Elena wants these referrals to arrive in Salesforce as pre-categorized cases.
+Build Task: Build a Web-to-Case form for the school district referral channel. Configure the form fields to capture required intake data. Set up a dedicated record type and queue for school district referrals. Test end-to-end: submit a test form and verify correct case creation, record type, queue assignment, and auto-response.
+Portfolio Artifact: Publish the Web-to-Case form configuration documentation and a test submission screenshot. Write a 100-word explanation of how this form reduces data entry burden for both the school district and HCH staff.
+Penny Check-In: Ask Penny: ‘I built a Web-to-Case form this week. How would I explain the difference between Web-to-Case and a Salesforce Experience Cloud form to a stakeholder who doesn’t know either one?’
+Decision Log Entry: #GT-06: Why Web-to-Case instead of an Experience Cloud form for this use case? What trade-offs did you consider?
+ | 
+
+Week 7: Intelligent Routing — Assignment Rules & Queue Management
+Stakeholder Brief: Elena has identified that urgent veteran services cases are sometimes sitting in the general queue for hours before being picked up. She wants urgent veteran cases to be automatically routed to the two caseworkers who specialize in veteran services, and she wants those workers notified immediately.
+Build Task: Build Case Assignment Rules to automatically route cases based on priority and service category. Create a dedicated Veteran Services Queue. Configure assignment rule criteria that catch Urgent cases with the Veteran Services record type and assign them to the correct queue. Set up email notification for queue members. Test with a sample urgent veteran case.
+Portfolio Artifact: Document your assignment rule logic in a decision tree diagram. Publish to portfolio with a 100-word explanation of how this routing strategy reduces response time for the most vulnerable clients.
+Penny Check-In: Ask Penny: ‘A hiring manager asks me: “Have you built any automation in Salesforce?” Walk me through how I should answer this question based on what I’ve built in Sprints 1 and 2.’
+Decision Log Entry: #GT-07: What criteria did you use in your assignment rules? What edge cases did you identify, and how did you handle them?
+ | 
+
+Week 8: Loop Protection — Flow Safeguards & Automation Governance
+Stakeholder Brief: A staff member accidentally triggered a Flow loop last week by updating a Case field that the Flow also updates. The org slowed down and several records were overwritten with incorrect data. Elena needs to understand how this happened and wants to make sure it cannot happen again.
+Build Task: Audit the existing Flows in the HCH org. Identify any Flows that do not have loop protection. Add Entry Criteria or Decision elements to prevent recursive triggering. Create a simple Automation Governance Checklist document that HCH staff must review before any future Flow is activated in the org.
+Portfolio Artifact: Publish your Automation Governance Checklist to your portfolio. Include a 150-word post-mortem written as if you are reporting to Elena: what went wrong, what you fixed, and what governance practice now prevents recurrence.
+Penny Check-In: Ask Penny: ‘If I’m asked in an interview to describe a time I had to troubleshoot a Salesforce problem, how do I turn this loop protection scenario into a compelling answer?’
+Decision Log Entry: #GT-08: What loop protection approach did you implement? What other safeguards would you recommend for an org with multiple admins building Flows independently?
+ | 
+
+PRIVATE COACH SESSION 2 — End of Sprint 2 (Week 8)
+This session is your portfolio mid-point review and job search strategy check-in.
+Your coach will review your portfolio as an employer would. Come with your portfolio URL, your updated resume, and your LinkedIn profile URL.
+The session will cover: Is your portfolio telling a coherent story? Is your resume language consistent with your portfolio? Do you have a clear answer to ‘Tell me about a Salesforce project you’ve built’?
+ | 
+
+6. Sprint 3: The Accountability Phase (Weeks 9–12)
+
+Sprint Goal
+Complete the HCH implementation lifecycle: add SLA accountability infrastructure, build data storytelling dashboards, and hand over a fully documented org. Then publish your portfolio and deliver your final capstone demo.
+Technical Focus   Entitlements & SLAs  •  Reports & Dashboards  •  Proactive Escalation  •  Org Handover Documentation
+Capstone Output   Published portfolio with all required artifacts, final Loom capstone demo, complete Admin Decision Log, org handover documentation, and Capstone Demo Day presentation
+ | 
+
+6.1 Weekly Trail Map — Sprint 3
+
+Week 9: The 4-Hour Promise — Entitlements & SLA Milestones
+Stakeholder Brief: A board member reviewed HCH’s case resolution data and raised concerns that there is no formal accountability mechanism for response times on urgent cases. Elena needs a system that makes SLA compliance visible to her at all times — not a report she has to run, but a live countdown on every urgent case.
+Build Task: Configure the HCH Entitlement process. Create an Entitlement Process with a 4-hour First Response Milestone for Urgent cases and a 48-hour Resolution Milestone. Associate the Entitlement with the correct Case record type. Test with a live urgent case to verify the countdown timer appears and activates correctly.
+Portfolio Artifact: Screenshot of an active Milestone countdown timer on a test urgent case. Admin Decision Log Entry #GT-09: Why use Entitlements rather than a time-based Workflow Rule for SLA tracking? What are the business advantages?
+Penny Check-In: Ask Penny: ‘My Milestone timer is not showing on my Case. Walk me through the five most likely causes and how I would troubleshoot each one.’
+Decision Log Entry: #GT-09: Entitlements vs. time-based automation for SLA management. What drove your configuration choices?
+ | 
+
+Week 10: Proactive Accountability — Escalation Flow & Red Alert Engine
+Stakeholder Brief: Elena has asked for a private notification when an Urgent case has been sitting in a queue for more than two hours without being assigned to a caseworker. She specifically does not want a public Chatter post — she needs a private alert that allows her to intervene without embarrassing staff.
+Build Task: Build a Scheduled-Triggered Flow that checks every 30 minutes for Urgent cases that have been in queue status for more than 2 hours with no assigned owner. When the condition is met, send Elena a Private Bell Notification with the case number, subject, and current queue. Ensure no public Chatter post is created under any conditions.
+Portfolio Artifact: Record a 3-minute Loom narrating your escalation Flow logic. Explain: the trigger, the criteria, the notification choice, and the specific stakeholder consideration that drove the private notification decision.
+Penny Check-In: Ask Penny: ‘How would I explain this Flow to Elena in a way she can understand and trust? Write me a plain-language stakeholder update about what this Flow does and why.’
+Decision Log Entry: #GT-10: Why a private Bell Notification instead of Chatter or email? What organizational dynamics drove that decision?
+ | 
+
+Week 11: Measuring the Impact — Reports, Dashboards & Data Storytelling
+Stakeholder Brief: HCH’s annual donor report is due in six weeks. Elena needs a dashboard she can screen-share with the board that shows: SLA achievement rate, case volume by service type, case volume by month, and veteran client service volume. She also needs this data in a format she can narrate to donors who know nothing about Salesforce.
+Build Task: Build the HCH Donor Impact Dashboard. Create: a Summary Report on SLA achievement rate, a Matrix Report on case volume by type and month, a Tabular Report on veteran case volume, and a 4-component Dashboard assembling these reports for Elena. Ensure dashboard-level sharing is configured for Elena’s user.
+Portfolio Artifact: Publish your completed Donor Impact Dashboard screenshot. Include a 200-word written narrative: ‘If I were presenting this dashboard to HCH’s board, here is what I would say about each metric and why it matters.’
+Penny Check-In: Ask Penny: ‘A hiring manager asks me: “Describe a reporting solution you’ve built in Salesforce and what business problem it solved.” Give me a strong 90-second answer based on what I built this week.’
+Decision Log Entry: #GT-11: What report types and formats did you choose for each metric? Why?
+ | 
+
+Week 12: The Summit — Org Handover, Portfolio Completion & Demo Day
+Stakeholder Brief: Elena has informed you that HCH is hiring an office manager who will eventually take over basic Salesforce admin tasks. She needs: a 1-page Volunteer Cheat Sheet that explains how to log into Salesforce safely and do routine tasks, a final smoke test confirming all configurations are working, and a complete handover document for the incoming staff member.
+Build Task: Complete all handover documentation: the Volunteer Cheat Sheet (1 page), the Admin Handover Guide (org overview, key configurations, known issues, and governance guidelines), and a final smoke test checklist covering all major Sprint builds. Conduct the smoke test and document results. Ensure your portfolio is published with all required artifacts.
+Portfolio Artifact: Publish your Volunteer Cheat Sheet and Admin Handover Guide. Complete your final Loom capstone walkthrough (5–7 minutes): present the full HCH build end-to-end as if presenting to HCH’s Executive Director. Ensure Admin Decision Log has all GT entries (minimum 12).
+Penny Check-In: Ask Penny: ‘Give me a 5-question mock technical interview. Ask me what a hiring manager would ask a candidate who lists nonprofit Salesforce admin experience. After I answer each one, critique my response.’
+Decision Log Entry: #GT-12: What does a responsible org handover look like? What would you tell the incoming admin that the documentation alone cannot convey?
+ | 
+
+PRIVATE COACH SESSION 3 — Week 11 (Sprint 3 Mid-Point)
+This is your employer simulation session. Your coach will interview you about your HCH build as a hiring manager would.
+Come with: your portfolio URL, your Admin Decision Log, your updated resume, and your answer to ‘Tell me about a Salesforce project you’ve built and a decision you made that you’re proud of.’
+After the mock interview, your coach will give you specific, actionable feedback on how to strengthen your answers before Demo Day.
+ | 
+
+CAPSTONE DEMO DAY — Week 12
+Demo Day is the final session of the Guided Trail cohort. Every learner presents their HCH build and portfolio to the group.
+Format: 8-minute presentation per learner, followed by 4 minutes of Q&A from peers and coach.
+Purpose: Practice presenting your work in a high-stakes setting. Many employers ask candidates to walk through a project during interviews. Demo Day is your rehearsal.
+Invited guests: Where possible, Transition Trails will invite Salesforce professionals from the community to attend as observers and provide employer-perspective feedback.
+ | 
+
+7. The Guided Trail Portfolio Framework
+
+7.1 Portfolio Architecture
+Your portfolio is built on Salesforce Experience Cloud — the same platform as ACT. This is intentional. An employer reviewing your portfolio is not just seeing what you built in HCH — they are seeing that you can build, manage, and publish a Salesforce Experience Cloud site. That is itself a demonstration of skill.
+
+Portfolio Section
+ | Content
+ | GT-Specific Guidance
+ | Built When
+ | 
+Homepage
+ | Professional headshot, headline, mission statement
+ | Keep it clean and employer-facing. No clutter.
+ | Week 1
+ | 
+About Me
+ | Professional bio, why Salesforce, why nonprofits, LinkedIn + Trailhead links
+ | Connect your background to the work you’ve done in this program.
+ | Week 2
+ | 
+HCH Admin Build
+ | Sprint-organized screenshots, Decision Log entries, Loom videos
+ | This is what employers review. Keep it organized by Sprint.
+ | Weeks 1–12 (continuous)
+ | 
+Admin Decision Log
+ | All GT Decision Log entries published as a formatted page
+ | Minimum 12 entries. This is your proof of judgment.
+ | Final Week 4, updated each sprint
+ | 
+Certifications & Learning
+ | Administrator certification badge, any Superbadges, Trailhead embed
+ | Add your certification badge as soon as it’s official.
+ | Week 2 (initial), updated
+ | 
+Career Story
+ | 3–5 curated portfolio highlights with the problem, your solution, and the business outcome
+ | New section in Guided Trail. Tell the story of your best 3–5 decisions in this program.
+ | Sprint 2–3
+ | 
+Contact
+ | LinkedIn, email, availability statement: ‘Available for Salesforce Admin roles’
+ | Simple. Professional. Make it easy for employers to reach you.
+ | Week 2
+ | 
+
+7.2 The Admin Decision Log as a Portfolio Centerpiece
+The Admin Decision Log is the single most differentiating artifact in your Guided Trail portfolio. Employers who have reviewed Transition Trails portfolios consistently return to the Decision Log — because it proves something a certification cannot: that you think like an admin, not just a test-taker.
+
+A complete Guided Trail Decision Log contains:
+
+Minimum 12 documented decisions, one per week (GT-01 through GT-12)
+For each entry: the business context, the options you considered, the option you chose, and the business justification
+At least 3 entries that document a mistake or unexpected outcome — with what you learned and what you would do differently
+Language that Elena (a non-technical stakeholder) could read and understand
+At least 2 entries that explicitly reference a stakeholder preference or constraint that shaped your decision
+
+The Decision Log in a Job Interview
+When a hiring manager asks ‘Have you ever made a configuration decision you later had to revisit?’, your Decision Log has the answer.
+When they ask ‘How do you document your work?’, your Decision Log is the answer.
+When they ask ‘Can you walk me through a real business problem you solved in Salesforce?’, your Decision Log is the foundation of your answer.
+The Decision Log is not documentation for documentation’s sake. It is the artifact that makes your portfolio tell a story.
+ | 
+
+7.3 Portfolio Required Artifacts Checklist
+Artifact
+ | Requirements
+ | 
+ERD and data architecture overview (Week 1)
+ | Published to HCH Admin Build section
+ | 
+Security audit findings and remediation log (Week 2)
+ | Published with business justification for each change
+ | 
+Data migration plan and test import documentation (Week 3)
+ | Includes source-to-target map and error resolution log
+ | 
+Custom record page Loom walkthrough (Week 4)
+ | 3–5 minutes, narrated decision rationale
+ | 
+Email-to-Case configuration documentation (Week 5)
+ | Routing screenshots + auto-response templates
+ | 
+Web-to-Case form documentation (Week 6)
+ | Form config + test submission screenshot
+ | 
+Assignment rule decision tree (Week 7)
+ | Diagram + 100-word business justification
+ | 
+Automation Governance Checklist (Week 8)
+ | Published as standalone portfolio document
+ | 
+Entitlement Milestone countdown screenshot (Week 9)
+ | Active timer on test urgent case
+ | 
+Escalation Flow Loom walkthrough (Week 10)
+ | 3 minutes, narrated logic and stakeholder reasoning
+ | 
+Donor Impact Dashboard screenshot + board narrative (Week 11)
+ | 200-word written narrative included
+ | 
+Volunteer Cheat Sheet + Admin Handover Guide (Week 12)
+ | Both published; Handover Guide minimum 2 pages
+ | 
+Final capstone Loom walkthrough (Week 12)
+ | 5–7 minutes, full HCH build end-to-end
+ | 
+Admin Decision Log — all GT entries (Weeks 1–12)
+ | Minimum 12 entries; published as formatted page
+ | 
+
+8. Career Readiness Framework
+
+8.1 The Guided Trail Employment Strategy
+The Guided Trail is not a job placement program. It is a proof-building program. The distinction matters: Transition Trails does not promise to find you a job. It gives you the evidence, the language, and the confidence to find it yourself.
+
+The Guided Trail employment strategy is built on three pillars:
+
+Pillar
+ | What It Means
+ | How You Build It in GT
+ | 
+Proof
+ | A published portfolio with 12 documented artifacts and a complete Admin Decision Log that any employer can review before an interview.
+ | By Week 12, your portfolio exists and is publicly accessible. This is your primary job search asset.
+ | 
+Language
+ | The ability to articulate what you built, why you made the decisions you made, and what business problem you solved — in clear, confident, non-technical language.
+ | Private Coach Sessions 2 and 3 are specifically focused on this. Demo Day is the rehearsal.
+ | 
+Network
+ | Connections to the Transition Trails community of practitioners, coaches, and alumni who can refer, recommend, and advocate.
+ | The Campfire Sessions and Demo Day are your networking opportunities. Show up. Be present. Make the connections.
+ | 
+
+8.2 Sprint-by-Sprint Interview Prep
+Every sprint in the Guided Trail is paired with specific interview preparation work. This is not a separate module — it is embedded into your weekly Penny prompts, Campfire Session discussions, and coaching conversations.
+
+Sprint
+ | Interview Focus
+ | Key Practice Artifacts
+ | 
+Sprint 1Weeks 1–4
+ | Talking about your technical background and how you approach Salesforce architecture decisions
+ | ERD walkthrough, security audit narrative, ‘Tell me about your Salesforce experience’ answer
+ | 
+Sprint 2Weeks 5–8
+ | Describing automation work and business problem-solving; STAR-format storytelling
+ | Email-to-Case scenario, Flow loop post-mortem, ‘Describe a time you solved a problem’ answer
+ | 
+Sprint 3Weeks 9–12
+ | Presenting your portfolio end-to-end; answering technical challenge questions; mock interviews
+ | Full portfolio walk, Decision Log deep-dive, 5-question mock interview via Penny and coach
+ | 
+
+8.3 Resume & LinkedIn Guidance
+Your Guided Trail experience should appear on your resume and LinkedIn profile as professional experience, not as a training program. Here is the recommended framing:
+
+Recommended Resume Language
+Salesforce Administrator  |  Horizon Community Hub (Nonprofit Practicum)  |  2026
+Served as sole Salesforce Administrator for a Dallas-Fort Worth nonprofit serving 500+ clients annually. Designed and implemented automated tri-channel intake system using Email-to-Case, Web-to-Case, and intelligent assignment rules. Built SLA management infrastructure using Entitlements and Milestones. Produced donor impact dashboards used in board reporting. Maintained complete Admin Decision Log documenting 12+ configuration decisions with business justification.
+
+Note: Replace with your own language based on the specific work you completed. Do not copy this template verbatim.
+ | 
+
+Your LinkedIn profile should reference the Guided Trail under Experience (not Education) and link directly to your published portfolio. Your coach will review your LinkedIn language in Coach Session 2.
+
+9. Program Strategy
+
+9.1 Strategic Positioning
+The Guided Trail occupies a specific and intentional position in the Transition Trails program ecosystem. Understanding that position clarifies its design decisions.
+
+Program
+ | Target Learner
+ | Primary Outcome
+ | 
+ACT(Admin Certification Trail)
+ | Pre-certification learners
+ | Pass the exam AND build first experience
+ | 
+Guided Trail (GT)
+ | Certified, pre-hire admins
+ | Close the experience gap and get hired
+ | 
+Trail of Mastery
+ | Employed admins
+ | Advance to practitioner-level consulting skills
+ | 
+
+The Guided Trail is the most focused program in the Transition Trails portfolio. Every design decision — the removal of walkthroughs, the emphasis on Decision Log documentation, the embedded interview prep, the employer simulation in Demo Day — exists to answer one question: Why can’t a certified Salesforce Admin get hired?
+
+The answer Transition Trails has identified: They lack proof of judgment, not proof of configuration ability.
+
+The Guided Trail is the proof engine.
+
+9.2 Instructional Design Principles
+The Guided Trail is designed on four core instructional principles that differentiate it from traditional Salesforce training:
+
+Principle
+ | Why It Matters
+ | 
+Problem-First Learning
+ | Every build task begins with a stakeholder brief describing a business problem. The learner must figure out the solution. This mirrors how real admin work arrives — as a problem, not as a tutorial.
+ | 
+Decision Documentation as a Learning Artifact
+ | The Admin Decision Log is not an administrative requirement. It is a learning artifact. The act of documenting decisions — including options rejected and mistakes made — builds metacognitive awareness that certification exams do not test.
+ | 
+Peer Learning Through Campfire Sessions
+ | The Campfire Session is the pedagogical core of the program. Learners who built the same task present different solutions. Hearing other approaches, defending your own, and receiving critique from peers is how practitioners develop professional judgment.
+ | 
+Career Translation as a Required Skill
+ | Knowing how to build something in Salesforce and knowing how to talk about having built it are two different skills. The Guided Trail treats career translation — the ability to explain technical work in business language — as a required curriculum outcome, not an optional soft skill.
+ | 
+
+9.3 Cohort Design
+Guided Trail cohorts are intentionally kept small. Cohorts of 8–12 learners allow every participant to present work at Campfire Sessions, receive coach attention in Stand-Ups, and build meaningful peer relationships over 12 weeks.
+
+Cohort Size
+ | 8–12 learners (minimum 6 to run, maximum 12 for quality)
+ | 
+Cohort Composition
+ | Mixed experience backgrounds encouraged. Career starters, career shifters, and experienced pros in the same cohort produces richer Campfire discussions.
+ | 
+Coach Ratio
+ | 1 coach per cohort for Campfire Sessions and Stand-Ups. Private coaching sessions may be delivered by a different coach with appropriate handoff documentation.
+ | 
+Session Recordings
+ | All group sessions are recorded. Recordings are made available within 24 hours. Attendance policy: recordings are a backup, not a replacement.
+ | 
+Cohort Communication
+ | Primary channel: Slack (dedicated cohort channel). Secondary: program platform. Coach responds to Slack messages within 48 hours on weekdays.
+ | 
+
+9.4 Success Metrics
+Transition Trails tracks the following metrics for each Guided Trail cohort:
+
+Metric
+ | Definition
+ | 
+Portfolio Completion Rate
+ | % of learners who publish a complete portfolio (all required artifacts) by Week 12
+ | 
+Admin Decision Log Completion Rate
+ | % of learners with 12+ complete Decision Log entries at program end
+ | 
+Demo Day Participation Rate
+ | % of learners who present at Week 12 Demo Day
+ | 
+Employment Conversion Rate
+ | % of Guided Trail graduates hired as Salesforce Admins within 6 months of program completion
+ | 
+Coach Session Completion Rate
+ | % of learners who complete all 3 private coach sessions
+ | 
+Cohort Retention Rate
+ | % of learners who complete all 12 weeks (target: 85%+)
+ | 
+Learner NPS
+ | Net Promoter Score collected at Week 12 (target: 50+)
+ | 
+
+10. Completion & What Comes Next
+
+10.1 What Completing the Guided Trail Means
+Guided Trail completion is defined by deliverables, not attendance. A learner who completes all required artifacts, publishes their portfolio, completes all three private coaching sessions, and presents at Demo Day has earned the Guided Trail completion designation.
+
+Completion Requirement
+ | Status
+ | 
+All 12 weekly build tasks completed in HCH org
+ | Required
+ | 
+Portfolio published with all required artifacts (see Section 7.3 checklist)
+ | Required
+ | 
+Admin Decision Log — minimum 12 GT entries
+ | Required
+ | 
+All 3 private coaching sessions attended
+ | Required
+ | 
+Demo Day presentation delivered
+ | Required
+ | 
+Career Story section of portfolio completed (3–5 curated highlights)
+ | Required
+ | 
+
+Guided Trail Completion Badge
+Learners who meet all completion requirements receive the Transition Trails Guided Trail Completion Badge.
+This badge is verifiable and can be displayed on LinkedIn. Employers who want to verify a candidate’s Guided Trail completion can contact Transition Trails directly.
+The badge does not guarantee employment. It certifies that you built a 12-week documented body of Salesforce admin work and completed a structured employment readiness program.
+ | 
+
+10.2 After the Guided Trail — Your Next Trail Options
+Path
+ | Description
+ | 
+Enter the Job Market (Primary Path)
+ | Your portfolio, certification, and Guided Trail completion are your job search assets. Transition Trails provides a post-program portfolio review and job search guidance session for all GT graduates.
+ | 
+Trail of Mastery — Advanced Admin Path
+ | If you are hired as a Salesforce Admin after the Guided Trail and want to advance toward senior admin or consulting roles, the Trail of Mastery provides practitioner-level coaching and real nonprofit client projects.
+ | 
+Volunteer as a GT Mentor or Campfire Facilitator
+ | GT graduates who want to give back can apply to become Campfire facilitators or peer mentors for future cohorts. This is also a portfolio-worthy leadership artifact.
+ | 
+Adjacent Career Paths
+ | If the Guided Trail surfaced interest in adjacent roles (Business Analysis, Salesforce Development, Project Management), your coach can connect you with resources and next steps for those paths.
+ | 
+
+A Final Note on Why the Guided Trail Exists
+The Salesforce Administrator certification is one of the most recognized credentials in the CRM industry. And yet, thousands of people who hold that certification cannot get their first job.
+The gap is not knowledge. It is proof.
+Employers do not hire certifications. They hire people who can demonstrate judgment under real conditions — people who can walk into a room, describe a problem they solved, show their reasoning, and tell a stakeholder what it means for their organization.
+The Guided Trail exists to build that proof. Twelve weeks of real decisions, documented reasoning, and professional presentation practice.
+You came in certified. You leave ready.
+— Transition Trails
+ | 
+
+Real experience. Real decisions. Real proof.
+transitiontrails.org

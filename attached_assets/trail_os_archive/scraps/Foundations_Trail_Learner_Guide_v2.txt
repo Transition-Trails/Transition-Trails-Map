@@ -1,0 +1,1241 @@
+TRANSITION TRAILS
+Foundations Trail
+Learner Guide
+"You don't just study for the exam. You build your proof."
+
+ |  
+ | 
+Program
+ | Foundations Trail
+ | 
+Prerequisite
+ | Salesforce Platform Foundations certification (required before Week 1)
+ | 
+Duration
+ | 12 weeks — 3 Sprints of 4 weeks each
+ | 
+Goal
+ | Pass the Salesforce Administrator exam and build a portfolio employers can evaluate
+ | 
+Capstone
+ | Horizon Community Hub (HCH) — a nonprofit in Dallas-Fort Worth
+ | 
+Format
+ | Self-guided + Build With Me videos + Penny AI + Weekly Office Hours + 2 Private Coach Sessions
+ | 
+Version
+ | 1.0 — 2026
+ | 
+
+1. Program Overview
+The Foundations Trail is a 12-week practitioner program for people who have earned their Salesforce Platform Foundations certification and are ready to take the next step: passing the Salesforce Administrator exam and building the experience that gets them hired.
+
+This is not a study course. Every week you build something real for a nonprofit — Horizon Community Hub (HCH) in the Dallas-Fort Worth area. Every artifact you build goes into a professional portfolio on Salesforce Experience Cloud. By Week 12, you have a working org, a published portfolio, and 12 weeks of documented decisions that prove you think like an admin.
+
+The Prerequisite Is Not Negotiable
+Platform Foundations Certification — Required Before Week 1
+ | 
+You must hold the Salesforce Platform Foundations certification before you begin. This is not a gatekeeping formality. The Foundations Trail builds directly on that knowledge. Learners without the cert fall behind by Week 2 and cannot recover pace. If you do not yet have Platform Foundations, earn it first — then enroll.
+ | 
+
+The Transition Trails Pathway
+Program
+ | Prerequisite
+ | Goal
+ | 
+Foundations Trail (you are here)
+ | Platform Foundations certification
+ | Pass the Salesforce Administrator exam + build the HCH capstone + publish portfolio
+ | 
+Guided Trail
+ | Salesforce Administrator certification, not yet hired
+ | First Salesforce Admin job — portfolio proof + interview readiness
+ | 
+Trail of Mastery
+ | Employed as a Salesforce Admin
+ | Advanced skills, specialization, career acceleration
+ | 
+
+What You Are Building
+Your capstone is Horizon Community Hub (HCH) — a fictional but realistic nonprofit that serves vulnerable families in the Dallas-Fort Worth area. HCH provides utility assistance, housing stabilization support, and veteran services. They have just adopted Salesforce. You are their first administrator.
+
+HCH Detail
+ | Why It Matters to Your Build
+ | 
+Mission
+ | Stabilize families in crisis: utility shutoffs, housing instability, veteran services. Every security and privacy decision you make has a business reason rooted in this mission.
+ | 
+Staff
+ | Executive Director, Program Director (Elena), 4 Support Staff, 3 Volunteers. You build the role hierarchy and security model around this org chart.
+ | 
+Your Stakeholder
+ | Elena Vasquez, Program Director. Every configuration decision should be explainable to Elena in plain English. If you cannot explain it without jargon, you do not yet understand it.
+ | 
+Legacy Data
+ | 40+ client records in an Excel spreadsheet. Maintained by non-technical staff for years. The data quality problems you will encounter are real — not invented.
+ | 
+Current State
+ | No Salesforce org. No automation. No intake system. No SLA tracking. You build all of it.
+ | 
+
+2. How This Program Works
+Your Weekly Rhythm
+Every week follows the same structure. Predictability is intentional — it reduces decision fatigue so you can focus on the build.
+
+Element
+ | What It Is
+ | 
+Concept Primer
+ | A short written overview (5–10 min read) of the exam concept for the week. Read it before you start the build — it orients the work.
+ | 
+Build With Me Video
+ | A screen-recorded walkthrough of the week's build in a demo org. Watch it, then replicate it in your own HCH org. Do not just watch — follow along step by step.
+ | 
+Your Build Task
+ | Complete the same build in your HCH Developer Edition org using the nonprofit context. This is your capstone contribution for the week.
+ | 
+Watch Out
+ | The specific mistakes most learners make at this exact step — translated from real coach observations. Read this before you start, not after something breaks.
+ | 
+Penny Check-In
+ | A starter prompt to use with Penny after your build. This is not a test. It is a rehearsal for how this concept will appear on the exam.
+ | 
+Exam Connection
+ | How this week's build connects to a specific Administrator exam domain and weight.
+ | 
+Portfolio Artifact
+ | What to capture and publish to your Experience Cloud portfolio site this week. Every week adds one artifact.
+ | 
+Definition of Done
+ | Specific checkable criteria that confirm this week is complete. Do not move forward until every item is checked.
+ | 
+
+Private Coach Sessions
+You have two private 45-minute sessions with a Foundations Trail coach during the 12 weeks. These are not technical tutoring sessions. They are conversations about your thinking, your growth, and your direction.
+
+Session
+ | Timing
+ | Focus
+ | 
+Session 1
+ | End of Sprint 1 (Week 4)
+ | Are you understanding the concepts or just completing tasks? Is this career direction still feeling right? What are you genuinely curious about?
+ | 
+Session 2
+ | Week 10 (Sprint 3 mid-point)
+ | Exam readiness check. Portfolio review. Career clarity: What does your next step look like after this program? Where are your confidence gaps?
+ | 
+
+The Admin Decision Log
+The Admin Decision Log is a running document of every significant configuration decision you make — and why you made it. You start it in Week 2 and add at least one entry every week. By Week 12 you have a minimum of 12 documented decisions.
+
+Format for every entry: What did I decide? What were the alternatives? Why did I choose this option? What would have broken if I had chosen differently?
+
+Why the Decision Log matters
+ | 
+The exam does not test whether you can click through a setup menu. It tests whether you understand why you make certain configuration choices. The Decision Log builds that habit. In an interview, "Here is my Decision Log" is worth more than any certification badge.
+ | 
+
+SPRINT 1
+ | The Foundation Layer
+ | 
+WEEKS 1 – 4
+ | Exam Focus: Configuration & Setup (20%), Object Manager (20%), Security & Access (13%), Data Management (10%)
+Capstone Output: A fully secured HCH org with custom data model, role hierarchy, and 36 imported client records
+ | 
+
+WK
+1
+ | Org Setup & Data Discovery
+Sprint 1 — Configuration & Setup
+ | Exam Weight
+~20%
+of Admin Exam
+ | 
+
+What You Are Building
+Sign up for a new Salesforce Developer Edition org at developer.salesforce.com/signup
+Name it exactly: Horizon Community Hub — [Your First Name Last Name]
+Configure Company Information: timezone = US/Central, currency = USD, fiscal year starts January
+Install NPSP (Nonprofit Success Pack) from the AppExchange
+Verify the NPSP Household Account Model is active in NPSP Settings
+Set up your Experience Cloud portfolio site: select a template, set a professional URL slug
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Do not use a Trailhead Playground. A Playground resets and is shared infrastructure. Your org is a professional artifact you will build for 12 weeks and show to employers. Developer Edition only.
+ | 
+Installing NPSP is not the same as configuring it. After install, go to NPSP Settings and confirm the Household Account Model is active. If you skip this, your data model in Week 2 and your import in Week 4 will both produce wrong results.
+ | 
+Read the install log. The AppExchange wizard shows warnings during NPSP install that are not blocking errors. Look for the word "Succeeded" — not just "Completed."
+ | 
+Name your org exactly as specified. The org name appears in your portfolio and in screenshots you show to employers. Professional presentation of even a dev org matters.
+ | 
+
+NPSP — What It Changes and Why HCH Needs It
+In standard Salesforce, a Contact links to a business Account. In NPSP, a Contact links to a Household Account — an Account type that represents a family unit. When you create a Contact named "Carlos Martinez," NPSP automatically creates a "Martinez Household" Account and links Carlos to it.
+
+HCH serves families, not individuals. The Martinez family — Carlos, Maria, and their daughter Sofia — must all be linked under one Household so Elena can see the complete family service history in one place. Without NPSP, that family relationship does not exist in the standard data model.
+
+🎯  Exam Connection
+ | 
+Configuration & Setup is 20% of the Administrator exam — the highest single domain weight. The exam does not test whether you can click through setup menus. It tests whether you understand WHAT each setting controls and WHAT HAPPENS if it is wrong. Key concept this week: the difference between org-level settings (affect all users) and object-level settings (field and record level). That distinction is the conceptual backbone of Sprint 1.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "I just installed NPSP. Explain the Household Account Model to me as if I have never used Salesforce. Then tell me: what would break at HCH if I skipped this and used the standard Contact-Account relationship instead?"
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot your NPSP Settings page showing the Household Account Model active. Add it to your portfolio under "HCH Admin Build > Sprint 1." Caption: "Week 1: NPSP installed and Household Account Model configured for Horizon Community Hub." This is your first portfolio artifact.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+Developer Edition org is live with the exact name: Horizon Community Hub — [Your Name]
+ | 
+Company Information set: timezone = US/Central, currency = USD, fiscal year starts January
+ | 
+NPSP installed and install log shows "Succeeded"
+ | 
+NPSP Settings confirms Household Account Model is active
+ | 
+Experience Cloud portfolio site is live with a shareable URL
+ | 
+You can answer in one sentence: "What does NPSP change about the Contact-Account relationship?"
+ | 
+
+WK
+2
+ | Custom Objects, Fields & Relationships
+Sprint 1 — Object Manager & Lightning App Builder
+ | Exam Weight
+~20%
+of Admin Exam
+ | 
+
+What You Are Building
+Create 4 custom fields on the Contact object (details below)
+Build a Validation Rule on Lease Expiration Date that blocks past dates
+Build a Formula field for basic grant eligibility (your decision — document it)
+Create a Page Layout section called "Utility Information" containing all 4 fields
+Build your initial ERD and publish it to your portfolio
+Add 3 Admin Decision Log entries: Account model choice, field type choices, validation rule logic
+
+The Four Custom Fields — With Reasoning
+Field
+ | Type
+ | Why This Type
+ | Why NOT the Alternative
+ | 
+Utility Account Number
+ | Text, length 18
+ | Utility account numbers like "UTL-88421" contain letters and leading zeros. Text preserves them exactly.
+ | Number strips the "UTL-" prefix and leading zeros. "088421" becomes "88421" — permanently wrong and unrecoverable.
+ | 
+Lease Expiration Date
+ | Date
+ | A calendar date. No time component needed.
+ | Date/Time adds unnecessary timestamps. Text loses date filtering and formula compatibility.
+ | 
+Veteran Status
+ | Picklist: Yes / No / Unknown
+ | Controlled values enable reliable filtering. The grant eligibility report filters by Veteran = "Yes" — that only works with exact values.
+ | Text: users type "yes," "YES," "Veteran," "y." The report count breaks. Checkbox: cannot store "Unknown" — only Yes/No.
+ | 
+Income Bracket
+ | Picklist: 5 tiers
+ | Controlled categories for grant eligibility reporting. Brackets, not exact amounts.
+ | Number or Currency: exact amounts are not how grant eligibility works. Text: same reliability problem as Veteran Status.
+ | 
+
+The Validation Rule
+Formula: AND(NOT(ISBLANK(Lease_Expiration_Date__c)), Lease_Expiration_Date__c < TODAY())
+Error message: "Lease Expiration Date must be today or a future date."
+Error location: Field (not top of page — appears next to the problem field).
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Set Required = FALSE on all four fields at the field level. Some clients will not have a utility account number or a lease date yet. If you make any field required at the API level, your data import in Week 4 will fail for every record missing that value — 11 of the 36 clean records have no utility account number.
+ | 
+The ISBLANK() guard in the validation rule is not optional. Without it, the formula fires on every new Contact with a blank Lease Expiration Date — because blank evaluates to null, which is less than TODAY(). Result: you cannot create any new Contact records at all. Always wrap: AND(NOT(ISBLANK(...)), your_condition).
+ | 
+Veteran Status must be a Picklist, not a Text field. The grant eligibility report in Week 4 filters by Veteran Status = "Yes." A Text field returns unreliable counts because users type it differently every time.
+ | 
+"Required on the page layout" and "Required at the field level" are two different things. Page layout required = the user sees an asterisk and cannot save via the UI. Field-level required = the import API cannot create the record. Know which one you are setting and why.
+ | 
+
+🎯  Exam Connection
+ | 
+Object Manager & Lightning App Builder is 20% of the exam — tied for highest. This week covers the most tested sub-topics: field type selection, validation rule logic, and page layout design. The exam gives scenarios: "A nonprofit needs to track veteran status for grant reporting — which field type?" The answer is Picklist, and the reason is what the exam actually tests: controlled values make reporting reliable.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "I created a Picklist field for Veteran Status with values Yes, No, and Unknown. Why did I choose Picklist instead of a Checkbox? What would have broken if I had used a Text field instead? Give me the business consequence, not just the technical difference."
+ | 
+
+📸  Portfolio Artifact
+ | 
+Export your ERD showing the Contact object with all 4 custom fields and their field types. Publish to your portfolio with your first 3 Admin Decision Log entries: (1) why you chose Household Account model, (2) why you chose Picklist for Veteran Status, (3) what your Validation Rule does and what would happen without the ISBLANK() check.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+All 4 custom fields exist on Contact with the correct field types
+ | 
+Veteran Status picklist has exactly 3 values: Yes, No, Unknown
+ | 
+Income Bracket has exactly 5 values in order
+ | 
+Required = FALSE on all 4 fields at the field level
+ | 
+Validation Rule active with ISBLANK() guard — test it: past date fails, blank date succeeds
+ | 
+"Utility Information" section on Contact page layout contains all 4 fields
+ | 
+Admin Decision Log has 3 entries with business reasoning (not just what you did)
+ | 
+
+WK
+3
+ | Security Architecture: Roles, Profiles & OWDs
+Sprint 1 — Security & Access
+ | Exam Weight
+~13%
+of Admin Exam
+ | 
+
+The Four Security Layers — In Order
+Layer
+ | Controls
+ | HCH Configuration
+ | Exam Concept
+ | 
+Profiles / Permission Sets
+ | What objects and fields a user can access — regardless of which records they own
+ | Volunteer Profile: no Case access, Veteran Status and Income Bracket hidden. Support Staff: full Case access, all fields visible.
+ | Profiles set the floor. Permission Sets add to it. One profile per user; multiple permission sets possible.
+ | 
+Organization-Wide Defaults (OWD)
+ | The baseline record visibility for the entire org
+ | Case OWD = Private. Only the record owner and users above them in the hierarchy can see a Case.
+ | OWD is the most tested security concept. Private = restrictive default. Everything else opens access from there.
+ | 
+Role Hierarchy
+ | Opens visibility upward above the OWD baseline
+ | Executive Director > Program Director > Support Staff > Volunteer. Elena can see all Support Staff cases.
+ | Hierarchy grants upward visibility. Tom Reid's manager Elena sees Tom's cases. Tom cannot see Elena's.
+ | 
+Sharing Rules
+ | Extends access sideways to users at the same level
+ | Not configured this week — covered in the Guided Trail.
+ | Sharing Rules exist to handle horizontal access that hierarchy does not cover.
+ | 
+
+What You Are Building
+Build the HCH Role Hierarchy: Executive Director > Program Director > Support Staff > Volunteer
+Clone Standard User profile to create the HCH Volunteer Profile with reduced permissions
+Set Case OWD to Private
+Apply FLS: Veteran Status and Income Bracket hidden from Volunteer profile, visible to Support Staff
+Create 5 test users from the Data Guide
+Run the acceptance tests: log in as each test user, verify access exactly matches expectations
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Never test security as System Admin. System Admin bypasses all security — there is nothing to verify. "It looks like it's working" tested as yourself means nothing. Log in as each test user individually. That is the only valid test.
+ | 
+Create all 5 test users before running any security tests. You cannot log in as a user that does not exist.
+ | 
+Volunteer must be a child (below) of Support Staff in the role hierarchy — not at the same level. If they are at the same level, Volunteers gain peer visibility into Support Staff records, which breaks the privacy model.
+ | 
+FLS is set on the Profile, not the Role. A common mistake is setting FLS on the Role (which does not exist — roles do not control field visibility). Go to the Volunteer Profile > Field-Level Security > hide the fields there.
+ | 
+
+The 5 Security Tests — What You Are Verifying
+Log In As
+ | Test
+ | Expected Result
+ | Proves
+ | 
+Sarah Kim (Support Staff)
+ | Can you see Tom Reid's cases?
+ | NO — Cases tab is empty or shows only Sarah's own cases
+ | OWD Private working
+ | 
+Elena Vasquez (Program Director)
+ | Can you see Tom Reid's cases?
+ | YES — Tom's cases are visible
+ | Role Hierarchy working
+ | 
+Alex Rivera (Volunteer)
+ | Cases tab visible? Veteran Status visible on a Contact?
+ | Zero cases visible; Veteran Status and Income Bracket fields hidden
+ | OWD + Profile + FLS all working
+ | 
+Edward Nguyen (Executive Director)
+ | Can you see all staff cases?
+ | YES — cases from all 4 Support Staff visible
+ | Full hierarchy working
+ | 
+Tom Reid (Support Staff)
+ | Can you see Sarah Kim's cases?
+ | NO — peer cases not visible
+ | OWD Private working across peers
+ | 
+
+🎯  Exam Connection
+ | 
+Security & Access is 13% of the exam. The critical mental model: Salesforce security is additive at the object/field level (profiles and permission sets grant access) but restrictive at the record level (OWD locks down by default; Role Hierarchy and Sharing Rules open it back up). The most tested question type: "A caseworker should see their own cases but not their colleague's. Which feature controls this?" Answer: OWD set to Private — not Profiles, not the Role Hierarchy.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "Case OWD is set to Private. Tom Reid creates a Case. List every user who can see that case and tell me which specific Salesforce feature gives each person access. Then tell me: what would change if OWD were set to Public Read Only instead?"
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot 3 security tests: (1) Alex Rivera seeing zero Cases, (2) Elena Vasquez seeing Tom's cases, (3) Alex Rivera with Veteran Status hidden on a Contact record. Add to your portfolio with a one-paragraph narrative explaining what the screenshots prove and why HCH needed this security model for client privacy and grant compliance.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+Role Hierarchy built with Volunteer as a child of Support Staff (bottom of hierarchy)
+ | 
+HCH Volunteer Profile exists (cloned from Standard User) with Case permissions removed
+ | 
+Case OWD set to Private
+ | 
+Veteran Status and Income Bracket hidden on Volunteer Profile via FLS
+ | 
+All 5 test users created from the Data Guide
+ | 
+All 5 security tests passed — results documented
+ | 
+You can explain the four security layers in plain English without notes
+ | 
+
+WK
+4
+ | Data Management & Sprint 1 Demo
+Sprint 1 — Data Management
+ | Exam Weight
+~10%
+of Admin Exam
+ | 
+
+What You Are Building
+Clean the HCH_Legacy_Client_Data_DIRTY.csv following the Data Guide issue log
+Map CSV columns to NPSP Contact and Account fields using the Field Mapping Guide
+Run the import via the Data Import Wizard
+Configure a Duplicate Rule for Contacts
+Review import results — document failures in your Admin Decision Log
+Record a 2-minute Loom walkthrough of your Sprint 1 build
+Attend Sprint 1 Demo Office Hours
+
+The Data Files
+File
+ | What It Is
+ | Your Role
+ | 
+HCH_Legacy_Client_Data_DIRTY.csv
+ | The raw export from HCH's Excel spreadsheet. 41 rows, 12 categories of data quality issues.
+ | Clean it before import. Every issue is intentional and documented.
+ | 
+HCH_Sprint1_Data_Guide.xlsx
+ | 5-sheet reference: Dirty Data Issue Log, Field Mapping Guide, Import Checklist, Test Users.
+ | Read the Issue Log before touching the CSV. Use the Field Mapping Guide during the import.
+ | 
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Read the Data Guide Issue Log before opening the CSV. Every data problem is documented with the correct resolution. Skipping the guide means you will encounter errors you do not understand and spend hours diagnosing problems that are already solved.
+ | 
+Picklist values must match exactly. Your Veteran Status picklist says "Yes." Importing "YES," "Veteran," or "Y" will fail. Check every Veteran Status and Income Bracket value in the CSV against the exact picklist values you created in Week 2.
+ | 
+The two past-lease-date records failing on import is your Validation Rule working — not a bug. Records HCH-006 (Patricia Williams) and HCH-019 (Charles Lee) have expired lease dates. Your rule blocks them correctly. Do not disable the rule. Flag those records for manual follow-up and document the decision.
+ | 
+The duplicate row for Mildred Collins (HCH-038) must be removed from the CSV before import. Delete the second row, not the first. Configure your Duplicate Rule to Alert (not Block) for the initial import so you can see if any other duplicates slip through.
+ | 
+Do not map Account Name to an existing Account field — select "Insert Account Name" to let NPSP auto-create Household Accounts. Getting this mapping wrong splits families or creates orphaned Contacts.
+ | 
+
+🎯  Exam Connection
+ | 
+Data Management is ~10% of the exam. Key concepts tested this week: Data Import Wizard vs. Data Loader (Wizard: up to 50K records, no coding, built-in UI; Loader: any volume, requires installation and API access), Duplicate Rules (Alert vs. Block behavior, when each is appropriate), and Validation Rule behavior during import — a record that violates a Validation Rule fails import cleanly; this is correct, not an error condition.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "My import completed and 3 records failed. Two failed because of my Lease Expiration Validation Rule. One failed because of a picklist value mismatch on Veteran Status. For each failure: why did it happen, what should I do about it, and does the failure mean my configuration is broken or working correctly?"
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot your import results page showing success count and failure count. Record a 2-minute Loom walking through your Sprint 1 build: org setup → custom fields → security model → data import. Narrate your decisions — this is your first video artifact. Publish both to your portfolio.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+HCH_Sprint1_Data_Guide.xlsx read in full before starting the import
+ | 
+All picklist values normalized to exact Salesforce values before import
+ | 
+Duplicate row removed from CSV
+ | 
+Import completed — results reviewed, failures documented in Admin Decision Log
+ | 
+You can explain: why past-lease-date failures are correct behavior, not errors
+ | 
+Duplicate Rule configured on Contacts
+ | 
+Sprint 1 Demo Loom recorded (2 minutes, narrated)
+ | 
+Sprint 1 Demo attended
+ | 
+
+🗓️  Private Coach Session 1 — End of Week 4
+ | 
+This is a 45-minute 1:1 conversation — not a technical help session. Come prepared to discuss your build, your reasoning, and your direction.
+ | 
+Come prepared to walk your coach through one decision from your Admin Decision Log — not the what, the why.
+ | 
+Your coach will ask: "Are you understanding the concepts or completing tasks? What is still confusing you?"
+ | 
+This session includes a career clarity conversation. Is this the right direction for you? What are you curious about?
+ | 
+Do not prepare a presentation. Come ready to have a real conversation.
+ | 
+
+SPRINT 2
+ | The Automation Layer
+ | 
+WEEKS 5 – 8
+ | Exam Focus: Service & Support (11%), Sales & Marketing (12%), Process Automation, Flow Builder
+Capstone Output: Fully automated tri-channel intake, intelligent routing, loop-protection Flow
+ | 
+
+WK
+5
+ | Case Management & Multi-Channel Intake
+Sprint 2 — Service & Support Applications
+ | Exam Weight
+~11%
+of Admin Exam
+ | 
+
+What You Are Building
+Create 3 Case Record Types: Utility Assistance, Housing Support, Veteran Services
+Create 4 Case Queues: General Support (default), Utility Assistance, Housing Support, Veteran Services
+Enable Email-to-Case for info@hch.org — the first of three inboxes
+Add all Support Staff test users as members of all queues
+Build an intake flow diagram for your portfolio
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Create all 4 queues now — not just one. The Assignment Rules you build in Week 7 reference specific queue names that must exist before the rules are configured. Missing a queue means broken routing that is hard to diagnose later.
+ | 
+Add your Support Staff test users to every queue before testing anything. A queue with no members routes cases there correctly — but no one can see them from their personal view. The queue exists but is functionally invisible.
+ | 
+Queue ownership overrides Private OWD for visibility — intentionally. A Case owned by a queue is visible to ALL queue members, even with Case OWD set to Private. This is a deliberate exception to standard OWD behavior. The exam tests this. Know why it exists: queues would be useless for team intake if this exception did not exist.
+ | 
+
+🎯  Exam Connection
+ | 
+Service & Support Applications is 11% of the exam. Key concepts this week: Queue ownership as an OWD exception (cases owned by a queue are visible to all queue members regardless of Private OWD), Email-to-Case setup (routing addresses, threading tokens, default case owner), and Record Types as a case classification tool. The exam asks scenario-based questions about when to use queues vs. direct assignment.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "A client emails info@hch.org asking for help with a utility shutoff. Walk me through exactly what happens in Salesforce from the moment that email arrives to the moment a caseworker sees it in their queue. Name every component involved."
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot your Case queue configuration showing all 4 queues and their members. Draw an intake flow diagram (Lucidchart, draw.io, or even a clean hand sketch scanned) showing the path from client contact → Case creation → queue assignment. Publish to portfolio.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+3 Case Record Types created: Utility Assistance, Housing Support, Veteran Services
+ | 
+4 Case Queues created with correct names (exact spelling — Assignment Rules will reference these)
+ | 
+All Support Staff test users are members of all 4 queues
+ | 
+Email-to-Case enabled for info@hch.org — routing address created
+ | 
+Test email sent to info@hch.org and confirmed Case created in General Support Queue
+ | 
+
+WK
+6
+ | Web-to-Case & Validation Logic
+Sprint 2 — Service & Support Applications
+ | Exam Weight
+~11%
+of Admin Exam
+ | 
+
+What You Are Building
+Generate Web-to-Case HTML for a Utility Assistance intake form
+Embed a hidden Record Type field so all submissions create Utility Assistance Cases
+Test end-to-end: submit the form, verify Case created in correct queue
+Add Decision Log Entry 6: Why Web-to-Case over a custom object for intake?
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+HTML "required" is browser-level validation only — it can be bypassed. A client submitting via browser console or developer tools can bypass all HTML required fields. If HCH needs server-side enforcement (they do), add a Validation Rule on the Case object as well. Your Decision Log should explain this distinction.
+ | 
+The Record Type must be set as a hidden input — not a visible dropdown. Find the Record Type ID in Object Manager: open the Utility Assistance Record Type and copy the ID from the URL. This is intentionally not in an obvious location — it tests whether you know where to look.
+ | 
+Auto-response emails will not fire until you build Assignment Rules and Auto-Response Rules in Week 7. If you submit a test form and no confirmation email arrives, that is expected. The Cases should still be created correctly.
+ | 
+
+🎯  Exam Connection
+ | 
+Web-to-Case is a Service & Support exam topic tested in scenario format. Key facts: Web-to-Case generates HTML that lives on HCH's own web page — Salesforce just receives the form submission. It is NOT a Salesforce Experience Cloud page. The daily limit is 5,000 case submissions — exceeding it silently drops cases. The exam tests administrator awareness of this limit.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "A tech-savvy client submitted the Web-to-Case form using browser developer tools, bypassing the HTML required field validation. The Case was created with no phone number. What happened technically, and what two things should I do to prevent this in the future?"
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot of your live Web-to-Case form in a browser, plus the resulting Case record showing correct Record Type and queue assignment. Add Decision Log Entry 6: why Web-to-Case over a custom object, and what the trade-offs are.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+Web-to-Case form generates and renders correctly in a browser
+ | 
+Record Type hidden input set to Utility Assistance Record Type ID
+ | 
+Test submission creates a Case with: Record Type = Utility Assistance, Queue = Utility Assistance
+ | 
+Contact matching works: test submission with a known email matches an imported Contact
+ | 
+Decision Log Entry 6 written with business reasoning
+ | 
+
+WK
+7
+ | Intelligent Routing: Assignment Rules & Auto-Response
+Sprint 2 — Sales & Marketing Applications
+ | Exam Weight
+~12%
+of Admin Exam
+ | 
+
+What You Are Building
+Build ONE Case Assignment Rule with multiple entries routing by Record Type to correct queues
+Add Email-to-Case routing addresses for help@hch.org (Housing) and grants@hch.org (Veteran Services)
+Create Auto-Response Rules with queue-specific email templates for each Record Type
+Test the full chain: submit via each channel, verify correct queue landing and auto-response delivery
+Add Decision Log Entry 7: Why Record Type routing over Subject keyword routing?
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Only ONE Assignment Rule can be active per object. Activating a second rule immediately deactivates the first. All your routing logic must live inside a single rule as multiple entries. If you create separate rules thinking they compound, your routing will silently break.
+ | 
+Rule entries evaluate top-down — first match wins. Entry 1: Utility Assistance → Utility Queue. Entry 2: Housing Support → Housing Queue. Entry 3: Veteran Services → Veteran Queue. If a case matches Entry 1 criteria, it never reaches Entry 2 even if Entry 2 also matches.
+ | 
+Auto-Response Rules should fire on Origin = Web OR Email only — not on internally created cases. If you do not include an Origin filter, every case created manually by a caseworker will also trigger an auto-response email to the client. This is confusing and unprofessional.
+ | 
+
+🎯  Exam Connection
+ | 
+Sales & Marketing Applications is 12% of the exam and includes Assignment Rules heavily. Critical exam facts: one active rule per object, entries evaluate top-down first match wins, the rule has a default owner for no-match cases. The exam trap: "A case matches entries 2 and 4 of the Assignment Rule — where does it go?" Answer: Entry 2 — first match wins, Entry 4 never evaluates.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "HCH is adding a fourth service line next year: Mental Health Support. Walk me through every place in the HCH Salesforce org you would need to update to accommodate it — starting from the Case object and going through every piece of automation we built in Sprint 2."
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot the full routing test: submit via each of the three channels and show the resulting Case record with correct Record Type, queue, and auto-response email received. Publish all three tests. Add Decision Log Entry 7.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+ONE Case Assignment Rule active with three routing entries in correct order
+ | 
+All three Email-to-Case routing addresses exist (info@, help@, grants@) with correct Record Type defaults
+ | 
+Auto-Response Rules scoped to Origin = Web OR Email only (not all cases)
+ | 
+Full chain test passed for all three channels: form/email → correct queue → auto-response fires
+ | 
+Grant Eligibility Report returns exactly 9 Veterans (if not, check Veteran Status import from Week 4)
+ | 
+
+WK
+8
+ | Flow Builder: The Loop Protection Engine
+Sprint 2 — Process Automation & Flow Builder
+ | Exam Weight
+~16%
+of Admin Exam
+ | 
+
+What You Are Building
+Build a Record-Triggered Flow on Case that fires on Case Created (After-Save)
+Decision element: Subject CONTAINS "Out of Office," "Automatic reply," or "Undeliverable" (ANY match)
+Update Records element: sets Status = "Closed" for matched cases
+Test with a loop-trigger case AND a legitimate case — verify only the right one closes
+Record a 3-minute Loom walkthrough of the Flow logic
+Add Decision Log Entry 8: After-Save vs. Before-Save — why did you choose what you chose?
+
+Why This Flow Exists
+When a client's email address has an out-of-office auto-reply active, every case-creation notification HCH sends generates another auto-reply from the client, which Email-to-Case converts into another new case, which sends another notification, which generates another reply. Without loop protection, one client interaction creates dozens of phantom cases and floods HCH's queue.
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Test 1 must trigger a close. Test 2 must NOT. Subject = "Automatic reply: Re: your utility request" should auto-close. Subject = "Help, my lights are out" must remain open. If both close, your Decision element conditions are wrong — likely the condition value field was left blank, which evaluates all cases as a match.
+ | 
+CONTAINS is case-insensitive in Flow — "out of office" and "OUT OF OFFICE" both match. You do not need separate conditions for different capitalizations.
+ | 
+The Decision element must evaluate ANY match (not ALL). If you configure it as ALL conditions must be true, a subject of "Automatic reply: Out of Office" would need to contain all three phrases simultaneously — which it never will.
+ | 
+
+🎯  Exam Connection
+ | 
+Flow Builder is the most important automation topic on the current Administrator exam. The exam has shifted heavily toward Flow since the retirement of Workflow Rules and Process Builder. Key concepts: Record-Triggered Flow types (Before Save vs. After Save — Before Save is faster, no extra DML, cannot access related records; After Save can update related records and send notifications), and the trigger types (Created, Updated, Created or Updated, Deleted).
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "Explain this Loop Protection Flow to Elena — HCH's Program Director — as if she has no idea what a Flow is. Why did we build it, what problem does it solve for her staff, and how does she know it is working?"
+ | 
+
+📸  Portfolio Artifact
+ | 
+Record a 3-minute Loom showing: (1) the Flow configuration, (2) Test 1 — a loop-trigger case auto-closing, (3) Test 2 — a legitimate case staying open. Narrate your decision-making throughout. This is one of the strongest technical portfolio artifacts in the program.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+Record-Triggered Flow on Case, trigger = Created, After-Save
+ | 
+Decision element uses ANY (OR) logic with 3 CONTAINS conditions
+ | 
+Test 1 passed: "Automatic reply" subject → Case Status = Closed
+ | 
+Test 2 passed: "Help, my lights are out" → Case stays open
+ | 
+Loom walkthrough recorded (3 minutes, narrated)
+ | 
+Decision Log Entry 8 written: After-Save vs. Before-Save reasoning
+ | 
+
+SPRINT 3
+ | The Analytics & Accountability Layer
+ | 
+WEEKS 9 – 12
+ | Exam Focus: Service & Support / Entitlements (11%), Analytics & Reporting (9%), Change Management
+Capstone Output: Entitlement SLAs, Red Alert escalation Flow, Donor Impact Dashboard, final org handover
+ | 
+
+WK
+9
+ | Entitlements & SLA Milestones
+Sprint 3 — Service & Support Applications
+ | Exam Weight
+~11%
+of Admin Exam
+ | 
+
+What You Are Building
+Enable Entitlements, Milestones, and Entitlement History in Salesforce Setup
+Create an Entitlement Process: "HCH Standard Support"
+Add Milestone 1 — First Response: 4 hours, Urgent cases, completion = status not New
+Add Milestone 2 — Resolution: 48 hours, all cases, completion = status = Closed
+Associate the Entitlement Process with Utility Assistance and Veteran Services Record Types
+Create a test Urgent Case and verify the Milestone countdown timer appears
+Add Decision Log Entry 9: Why Entitlements instead of a time-based Workflow Rule for SLA tracking?
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+The Milestone timer appearing is not the same as it counting down. If the timer shows 4:00:00 but is static (not moving), the Entitlement Process is active but not running on this specific Case. The most common cause: you forgot to associate the Record Type with the Entitlement Process scope. Check that Utility Assistance is in the process scope.
+ | 
+Do not set First Response completion criteria to "Status = Closed." That means the 4-hour clock runs until the case is fully resolved — not until first contact. The business need is first contact within 4 hours. Completion should trigger when Status changes away from "New" (or when an outgoing email is logged).
+ | 
+Add the Entitlements related list to the Case page layout. Without it, the Milestone Tracker component has nothing to render — the timer will not appear even if the process is configured correctly.
+ | 
+Create the Case AFTER activating the Entitlement Process. Cases created before activation do not inherit the process automatically.
+ | 
+
+The 5-Step Diagnostic — If the Timer Does Not Appear
+Is the Entitlements related list on the Case page layout?
+Is the Entitlement Process associated with the correct Record Types?
+Was the test Case created after the Entitlement Process was activated?
+Is the test Case within configured business hours?
+Is the Milestone Tracker component on the Case Lightning Record Page (not the Contact page)?
+
+🎯  Exam Connection
+ | 
+Entitlements and Milestones are within Service & Support (11%) and are consistently tested because most learners have never configured them before. Key distinction: an Entitlement is the agreement (HCH clients are entitled to a 4-hour response). An Entitlement Process defines the Milestones and timing rules that enforce it. Both must exist. The exam tests which configuration element controls the timing vs. the business rule.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "Elena calls you. A volunteer told her they can see a countdown timer saying 47 minutes on a Contact record. What happened, and is this a problem? Walk me through your diagnosis."
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot of an active Milestone countdown timer on a test Urgent Case showing the timer actively running. Add Decision Log Entry 9 explaining why Entitlements (not time-based Workflow or a report) is the right tool for SLA visibility at HCH.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+Entitlements, Milestones, and Entitlement History enabled in Setup
+ | 
+"HCH Standard Support" Entitlement Process active
+ | 
+First Response Milestone: 4 hours, Urgent cases, correct completion criteria
+ | 
+Resolution Milestone: 48 hours, all cases, Status = Closed completion
+ | 
+Entitlement Process associated with Utility Assistance and Veteran Services Record Types
+ | 
+Entitlements related list added to Case page layout
+ | 
+Test Urgent Case shows active countdown timer at 4:00:00
+ | 
+Decision Log Entry 9 written
+ | 
+
+WK
+10
+ | The Red Alert Escalation Flow
+Sprint 3 — Process Automation & Flow Builder
+ | Exam Weight
+~16%
+of Admin Exam
+ | 
+
+What You Are Building
+Build a Scheduled-Triggered Flow that checks every 30 minutes for unassigned Urgent Cases
+Filter criteria: Priority = Urgent, Status = New, CreatedDate > 2 hours ago, OwnerId starts with "00G" (still in a queue)
+Send a private Custom Bell Notification to Elena with case details
+Record a 3-minute Loom walkthrough of the escalation Flow logic
+Add Decision Log Entry 10: Why a private notification instead of a Chatter post?
+
+The Key Technical Details
+Element
+ | What It Does
+ | Why It Matters
+ | 
+OwnerId STARTS WITH "00G"
+ | Filters to Cases still owned by a queue (Queue IDs start with 00G; User IDs start with 005)
+ | This is the only reliable way to detect "no caseworker has claimed this yet" — because once a caseworker takes the case, the OwnerId becomes their User ID starting with 005.
+ | 
+CreatedDate <= NOW - (1/12)
+ | 1/12 of a day = 2 hours. Filters to Cases at least 2 hours old.
+ | Testing: change to (1/288) for 5-minute threshold. Restore to (1/12) before going live.
+ | 
+Private Bell Notification
+ | A private in-app notification — no Chatter post, no email blast
+ | Elena specifically requested no public post. A Chatter post would appear on the Case record visible to all queue members, potentially embarrassing staff.
+ | 
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+Elena is receiving alerts for Cases her team already responded to. Most likely cause: a caseworker responded but did not change the Status away from "New." The Flow checks Status = New — if Status is not updated, the alert fires even after a response. This is a process gap, not a configuration error. Document it in the Decision Log.
+ | 
+Reduce the time threshold to 5 minutes for testing (change 1/12 to 1/288). Verify Elena's notification fires. Then restore to 2 hours before leaving the Flow active. Running a 30-minute scheduled Flow at 5-minute threshold in a real org generates excessive execution logs.
+ | 
+You must create the Custom Notification Type in Setup before using it in the Flow. Go to Setup > Notification Builder > Custom Notifications. Without this, the Send Notification action in Flow has nothing to reference.
+ | 
+
+🎯  Exam Connection
+ | 
+Scheduled-Triggered Flows are a distinct Flow type that the exam tests separately from Record-Triggered Flows. Key difference: Scheduled Flows run on a schedule and evaluate a batch of records matching filter criteria — they do not fire when a record is saved. Exam scenario: "A Flow needs to send a reminder email for all open Cases created more than 3 days ago — which Flow type?" Answer: Scheduled-Triggered, not Record-Triggered.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "Write me a plain-language explanation of what this Red Alert Flow does — written as if you are sending Elena a one-paragraph update about a new feature you just deployed. She does not know what a Flow is. She cares about the business outcome."
+ | 
+
+📸  Portfolio Artifact
+ | 
+Record a 3-minute Loom narrating the Red Alert Flow: the trigger, the filter logic (including why OwnerId STARTS WITH "00G"), the notification design, and the stakeholder decision that drove the private notification choice. This demonstrates both technical depth and stakeholder communication — two things employers look for.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+Scheduled-Triggered Flow on Case, runs every 30 minutes
+ | 
+Filter: Priority = Urgent, Status = New, OwnerId starts with "00G", CreatedDate >= 2 hours ago
+ | 
+Custom Notification Type "HCH Red Alert" created in Setup
+ | 
+Send Notification action targets Elena's User ID
+ | 
+Tested at 5-minute threshold — notification fired correctly
+ | 
+Restored to 2-hour threshold
+ | 
+Loom walkthrough recorded
+ | 
+Decision Log Entry 10 written: private notification rationale
+ | 
+
+🗓️  Private Coach Session 2 — Week 10
+ | 
+This is a 45-minute 1:1 conversation — not a technical help session. Come prepared to discuss your build, your reasoning, and your direction.
+ | 
+Exam readiness check: which domains feel confident, which need more work?
+ | 
+Portfolio review: your coach will look at it as an employer would.
+ | 
+Career clarity: what does your next step look like after Week 12? What roles are you targeting?
+ | 
+Come with your portfolio URL, your Admin Decision Log open, and an honest answer to "What is still confusing you?"
+ | 
+
+WK
+11
+ | Reports, Dashboards & Data Storytelling
+Sprint 3 — Analytics & Reporting
+ | Exam Weight
+~9%
+of Admin Exam
+ | 
+
+What You Are Building
+Summary Report: SLA Achievement Rate — Milestones met vs. violated by Record Type
+Matrix Report: Case Volume by Type and Month
+Joined Report: Veteran Status and Income Bracket analysis combining Contact and Case data
+4-component Donor Impact Dashboard assembling all three reports
+Publish dashboard to a "Leadership" folder visible to Elena's role
+Add Decision Log Entry 11: dashboard component type choices and reasoning
+
+The Four Dashboard Components
+Component
+ | Report Source
+ | Type
+ | Why This Format
+ | 
+SLA Achievement %
+ | SLA Summary Report
+ | Gauge or Metric
+ | Elena needs to see at a glance whether HCH is meeting its commitment. A percentage with a target line communicates compliance instantly.
+ | 
+Case Volume by Type & Month
+ | Matrix Report
+ | Bar or Column chart
+ | Shows trends over time by service category — essential for staff planning and donor reporting.
+ | 
+Veteran Client Analysis
+ | Joined Report
+ | Table
+ | Veteran count and income bracket breakdown — the specific data required by HCH's federal grant reporting.
+ | 
+Open Cases (Total)
+ | Cases Report
+ | Metric
+ | A single number showing current caseload. Elena checks this daily.
+ | 
+
+Expected Values from the Sprint 3 Test Cases
+Your dashboard results should align with the 30 Sprint 3 test cases in the Data Guide. Expected values: SLA achievement rate ≈ 78%, veteran count = 10, open cases = 10. If your numbers differ significantly, check your Veteran Status import data from Week 4.
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+A dashboard is not a collection of screenshots. A common mistake is presenting four separate report screenshots in a Loom and calling it a dashboard. A Dashboard is a Salesforce object with Report components assembled into a single view, accessible to Elena directly in Salesforce. Build it in Salesforce.
+ | 
+Save your reports to a shared folder. Reports saved to "My Personal Custom Reports" are invisible to everyone except you — including Elena and your coach reviewing your portfolio.
+ | 
+"I used a bar chart because it looks nice" is not a Decision Log entry. The business reason matters: a bar chart shows comparative volume across categories, which is what Elena needs for donor reporting. Explain the communication purpose, not the aesthetic preference.
+ | 
+The Joined Report requires a custom Report Type. You need to join Cases with Contacts — that Report Type may not exist out-of-the-box. You may need to create it in Report Types before you can build the Joined Report.
+ | 
+
+🎯  Exam Connection
+ | 
+Analytics & Reporting is 9% of the exam. Key concepts: report types (Tabular = flat list, no grouping, cannot source a chart; Summary = grouped rows, subtotals, sourceable; Matrix = rows AND columns grouped, crosstab; Joined = multiple blocks, shared grouping field), dashboard components (metric, gauge, chart, table), dynamic dashboards (running user = logged-in user), and report folder sharing for access control.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "Elena wants each caseworker to see only their own Case performance on the dashboard — not the whole team's combined data. What do I change in the dashboard configuration, and what Salesforce feature makes that possible?"
+ | 
+
+📸  Portfolio Artifact
+ | 
+Screenshot of your completed Donor Impact Dashboard with all 4 components visible. Add a 200-word written narrative alongside it: "If I were presenting this dashboard to HCH's board of directors, here is what I would say about each metric and why it matters to the mission." This narrative matters as much as the screenshot.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+3 reports built: Summary (SLA), Matrix (Volume), Joined (Veteran/Income)
+ | 
+All reports saved to a shared folder accessible to Elena's role
+ | 
+4-component Donor Impact Dashboard assembled in Salesforce (not screenshots)
+ | 
+Dashboard visible to Elena via "Leadership" folder sharing
+ | 
+SLA % ≈ 78%, veteran count = 10, open cases = 10 (approximate — depends on import accuracy)
+ | 
+Decision Log Entry 11 written: component type reasoning
+ | 
+200-word board presentation narrative written
+ | 
+
+WK
+12
+ | Org Handover, Final Audit & Capstone Demo Day
+Sprint 3 — Change Management & Org Maintenance
+ | Exam Weight
+~7%
+of Admin Exam
+ | 
+
+What You Are Building
+Write the Volunteer Cheat Sheet: 1-page Quick Reference Guide for HCH's Volunteer users
+Run a final security audit against Sprint 1 configuration
+Complete the full smoke test checklist — verify all four automation chains work end-to-end
+Complete all 12 Admin Decision Log entries and publish your final portfolio
+Record the 5–7 minute final Capstone Loom — full HCH build end-to-end
+Attend Capstone Demo Day Office Hours
+
+The Volunteer Cheat Sheet Must Include
+How to find and view a Contact record in Salesforce
+How to log a volunteer interaction as a Task on a Contact
+Three things Volunteers must NEVER do: never edit Case records, never modify Contact owner, never create or delete any record without explicit instruction
+
+The Four Automation Chain Smoke Tests
+Chain
+ | Test Action
+ | Expected Result
+ | 
+Web Intake
+ | Submit the Web-to-Case form with a test email
+ | Case created in Utility Assistance Queue, auto-response email received by test address
+ | 
+Email Intake
+ | Send email to info@hch.org from a test address
+ | Case created in General Support Queue, auto-response fires
+ | 
+SLA Entitlement
+ | Create a new Urgent Case with Utility Assistance Record Type
+ | 4-hour Milestone countdown timer appears and is counting down
+ | 
+Loop Protection
+ | Create a Case with Subject = "Automatic reply: test message"
+ | Case Status = Closed within seconds of creation
+ | 
+
+The Capstone Loom Structure (5–7 minutes)
+HCH mission and the problem Salesforce solves (30 seconds)
+Data model and security architecture — show the org and explain the decisions (90 seconds)
+Intake automation chain — submit the web form live, watch it route (90 seconds)
+Donor Impact Dashboard — narrate each metric to a board member (60 seconds)
+Decision Log highlight — read your best entry and explain the reasoning (60 seconds)
+What you would build next if HCH gave you Sprint 4 (30 seconds)
+
+⚠️  Watch Out — Avoid These Mistakes
+ | 
+The final security audit is not optional. Log back in as Alex Rivera (Volunteer) and verify the security model is still intact. Sprint 2 and Sprint 3 builds sometimes inadvertently change profile permissions or queue assignments. Verify nothing drifted.
+ | 
+Your Decision Log must have entries that explain WHY, not just WHAT. An entry that says "I created a Validation Rule on Lease Expiration Date" is not a Decision Log entry — it is a task log. The entry must include: why this rule, what would happen without it, and what business problem it solves.
+ | 
+The Capstone Loom is a presentation, not a screen recording of you clicking around. Have a clear narrative arc. Practice it once before recording. Employers watch these — it is your most visible portfolio artifact.
+ | 
+
+🎯  Exam Connection
+ | 
+Change Management and Org Maintenance appears as meta-level questions throughout the exam. Key concepts: sandbox types (Developer = metadata only; Developer Pro = slightly more storage; Partial = metadata + sample data; Full = complete copy), change sets for metadata deployment, and release management best practices. The exam asks which sandbox type is appropriate for a given scenario.
+ | 
+
+🤖  Penny Check-In
+ | 
+Ask Penny: "Give me a 5-question mock technical interview. Ask me questions a hiring manager would ask a candidate who lists '12 weeks of nonprofit Salesforce Admin experience' on their resume. After I answer each one, critique my response and tell me what a stronger answer would include."
+ | 
+
+📸  Portfolio Artifact
+ | 
+Publish your complete portfolio with all required artifacts (list below). Record your 5–7 minute Capstone Loom. This is your program deliverable — the thing you take into job applications and interviews.
+ | 
+
+✅  Definition of Done — Before You Move On
+ | 
+Volunteer Cheat Sheet written (1 page, publishable)
+ | 
+Final security audit passed: Alex Rivera sees zero Cases, Veteran Status hidden, all test users intact
+ | 
+All 4 smoke tests passed
+ | 
+All 12 Admin Decision Log entries complete — each has a WHY, not just a WHAT
+ | 
+Complete portfolio published with all sprint artifacts
+ | 
+Capstone Loom recorded (5–7 minutes, narrated, not just screen capture)
+ | 
+Capstone Demo Day attended
+ | 
+
+5. Portfolio Requirements
+Your portfolio lives on Salesforce Experience Cloud — the same platform you configured for HCH. An employer reviewing your portfolio is not just reading what you built. They are seeing that you can build, manage, and publish an Experience Cloud site. That is itself a demonstration of skill.
+
+Week
+ | Required Artifact
+ | What It Proves
+ | 
+Week 1
+ | NPSP Settings screenshot confirming Household Account Model active
+ | You installed correctly and verified configuration — not just clicked through
+ | 
+Week 2
+ | ERD + first 3 Admin Decision Log entries
+ | You understand the data model and can document your reasoning
+ | 
+Week 3
+ | 3 security test screenshots + narrative
+ | You built and verified a multi-layer security model
+ | 
+Week 4
+ | Import results screenshot + 2-minute Loom build walkthrough
+ | You can narrate technical work in plain language
+ | 
+Week 5
+ | Queue configuration screenshot + intake flow diagram
+ | You understand case management architecture
+ | 
+Week 6
+ | Web-to-Case form screenshot + test Case record
+ | You built end-to-end intake and tested it
+ | 
+Week 7
+ | Full routing test (3 channels) + Decision Log Entry 7
+ | You understand routing logic and can explain trade-offs
+ | 
+Week 8
+ | 3-minute Loop Protection Flow Loom
+ | You can narrate complex automation clearly
+ | 
+Week 9
+ | Active Milestone countdown screenshot + Decision Log Entry 9
+ | You configured SLA infrastructure and understand why
+ | 
+Week 10
+ | 3-minute Red Alert Flow Loom
+ | You built escalation automation with stakeholder reasoning
+ | 
+Week 11
+ | Donor Impact Dashboard screenshot + 200-word board narrative
+ | You can translate Salesforce data into business language
+ | 
+Week 12
+ | Volunteer Cheat Sheet + 5–7 minute Capstone Loom
+ | You can document for non-technical users and present your full build
+ | 
+All Weeks
+ | Admin Decision Log — 12 entries minimum, published as a page
+ | You think like an admin, not just a test-taker
+ | 
+
+6. Exam Domain Reference
+The Salesforce Administrator exam covers 7 domains. Every week of the Foundations Trail builds directly toward at least one of them. This table shows where your capstone work connects to the exam.
+
+Domain
+ | Exam Weight
+ | Foundations Trail Weeks
+ | What You Built That Connects
+ | 
+Configuration & Setup
+ | ~20%
+ | Week 1
+ | Org setup, NPSP install, company information, the distinction between org-level and object-level settings
+ | 
+Object Manager & Lightning App Builder
+ | ~20%
+ | Week 2
+ | 4 custom fields with field type decisions, Validation Rule, Formula field, Page Layout design
+ | 
+Security & Access
+ | ~13%
+ | Week 3
+ | Role Hierarchy, OWD, Profiles, FLS, Permission Sets — the full security stack, built and verified
+ | 
+Data Management
+ | ~10%
+ | Week 4
+ | Data Import Wizard, Duplicate Rules, Validation Rule interaction with import, data quality triage
+ | 
+Service & Support Applications
+ | ~11%
+ | Weeks 5, 6, 7, 9
+ | Case Record Types, Queues, Email-to-Case, Web-to-Case, Assignment Rules, Auto-Response, Entitlements, Milestones
+ | 
+Process Automation
+ | ~16%
+ | Weeks 8, 10
+ | Record-Triggered Flow (Loop Protection), Scheduled-Triggered Flow (Red Alert), Before vs. After Save decisions
+ | 
+Analytics, Reports & Dashboards
+ | ~9%
+ | Week 11
+ | Summary, Matrix, and Joined Reports; 4-component Dashboard; dynamic running user; folder sharing
+ | 
+Sales & Marketing Applications
+ | ~12%
+ | Week 7
+ | Assignment Rules (one active rule, first-match-wins logic), Auto-Response Rules
+ | 
+Change Management & Maintenance
+ | ~7%
+ | Week 12
+ | Org handover, smoke test, sandbox concepts, change management practices
+ | 
+
+Exam Scheduling Guidance
+ | 
+Schedule your Salesforce Administrator exam when you are scoring consistently above 75% on full practice tests — not before. Take at least two full practice tests before scheduling. The exam costs $200 and a failed attempt delays your timeline. Two more weeks of Trailhead review is always the better investment.
+ | 
+
+7. Getting Help
+When You Are...
+ | Do This First
+ | Then, If Still Stuck
+ | 
+Stuck on a concept
+ | Ask Penny using a prompt from the Penny Prompt Bank. Customize it to your specific situation. "I tried X and Y happened — why?"
+ | Bring the question to Office Hours with context: what you tried, what happened, what you expected.
+ | 
+Getting an error in your org
+ | Read the full error message. Salesforce errors usually say exactly what is wrong. Paste it to Penny: "I got this error: [message]. What does it mean and how do I fix it?"
+ | Post in the program Slack with your error message and a screenshot of the configuration that caused it.
+ | 
+Unsure if your build is correct
+ | Work through the Definition of Done for the week. If every item is checked, your build is correct.
+ | Ask Penny: "I built [describe it]. What are the most common mistakes at this step I should verify I avoided?"
+ | 
+Behind on a week
+ | Look at the Definition of Done items you have not checked. Address the first unchecked item only.
+ | Contact your coach. Being behind is not a problem. Not telling anyone is.
+ | 
+Questioning whether this path is right
+ | Reflect on what is driving the question. Write it in your Decision Log.
+ | Bring it to your private coach session. That is exactly what those sessions are for.
+ | 
+
+The Penny Prompt Bank
+The Foundations Trail Penny Prompt Bank (PB-F1) contains 13 starter prompts organized by concept area: Objects & Data Model, Field Types, Security, Exam Prep, Documentation, Decision Log, Portfolio. Use them when you do not know how to phrase your question. Customize the bracketed parts before sending.
+
+A final note
+ | 
+The Foundations Trail is 12 weeks of real admin work. The HCH org you build is not a practice exercise — it is the foundation of something a hiring manager can evaluate. Every decision you make, you will make again in a real organization. Make them deliberately. Document them honestly. That habit is worth more than any certification.
+ | 
+

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-trail-light); }
+  a { color: var(--tt-trail-green); }
+  a:hover { color: var(--tt-green-700); }
+</style>
+</helmet>
+
+<div style="min-height:100%;background:var(--tt-trail-light);font-family:'Open Sans',Roboto,sans-serif;color:var(--tt-slate);padding:0 0 96px">
+
+  <div style="background:var(--tt-deep-teal);color:var(--tt-white);padding:56px 0">
+    <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:18px">
+      <div style="font-family:Poppins,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7)">Transition Trails · program journeys</div>
+      <h1 style="font-family:Poppins,sans-serif;font-size:44px;line-height:1.1;font-weight:600;margin:0;color:var(--tt-white);max-width:900px;text-wrap:pretty">Four people, one pathway</h1>
+      <p style="font-size:18px;line-height:1.6;margin:0;max-width:800px;color:rgba(255,255,255,.88)">The same programs, entered from four different places. Each journey is a page you can walk someone through in ten minutes, with a team view of the work and a funder view of the evidence it leaves behind.</p>
+    </div>
+  </div>
+
+  <div style="max-width:1140px;margin:0 auto;padding:0 32px;display:flex;flex-direction:column;gap:52px">
+
+    <div style="margin-top:40px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:22px 26px">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:280px">
+        <span style="font-family:Poppins,sans-serif;font-size:17px;font-weight:600;color:var(--tt-charcoal)">{{ lensTitle }}</span>
+        <span style="font-size:15px;line-height:1.55">{{ lensNote }}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div onClick="{{ setTeam }}" style="{{ teamTab }}">Team view</div>
+        <div onClick="{{ setFunder }}" style="{{ funderTab }}">Funder view</div>
+      </div>
+    </div>
+
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:22px">
+      <sc-for list="{{ journeys }}" as="j" hint-placeholder-count="4">
+        <a href="{{ j.href }}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:16px;background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;padding:30px;box-shadow:0 12px 28px rgba(42,46,44,.10);transition:transform .15s,border-color .15s" style-hover="transform:translateY(-3px);border-color:var(--tt-trail-green)">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+            <span style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tt-trail-green)">{{ j.eyebrow }}</span>
+            <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Pill" tone="{{ j.tone }}" hint-size="auto,26px">{{ j.badge }}</x-import>
+          </div>
+          <div style="font-family:Poppins,sans-serif;font-size:26px;line-height:1.18;font-weight:600;color:var(--tt-charcoal)">{{ j.title }}</div>
+          <div style="font-size:15.5px;line-height:1.6">{{ j.blurb }}</div>
+          <div style="display:grid;grid-template-columns:96px 1fr;gap:10px 16px;border-top:1px solid var(--tt-warm-gray);padding-top:16px;font-size:14.5px;line-height:1.5">
+            <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate);padding-top:2px">Starts</span>
+            <span>{{ j.starts }}</span>
+            <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate);padding-top:2px">Ends</span>
+            <span>{{ j.ends }}</span>
+          </div>
+          <div style="background:var(--tt-green-100);border-radius:14px;padding:16px 18px;font-size:14.5px;line-height:1.6;color:var(--tt-charcoal)">
+            <span style="font-family:Poppins,sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-green-700);display:block;margin-bottom:5px">{{ whyLabel }}</span>{{ j.why }}
+          </div>
+          <div style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-trail-green);margin-top:auto">Open this journey →</div>
+        </a>
+      </sc-for>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">Side by side</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Where each one enters, and what it costs them</h2>
+      <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:22px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:150px 1fr 1fr 1fr 1fr;gap:16px;padding:16px 24px;background:var(--tt-trail-light);border-bottom:1px solid var(--tt-warm-gray);font-family:Poppins,sans-serif;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tt-slate)">
+          <span></span><span>Marisol</span><span>Denise</span><span>Marcus</span><span>Simone</span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="7">
+          <div style="{{ r.rowStyle }}">
+            <span style="font-family:Poppins,sans-serif;font-size:13px;font-weight:600;color:var(--tt-charcoal)">{{ r.label }}</span>
+            <span style="font-size:14px;line-height:1.5">{{ r.a }}</span>
+            <span style="font-size:14px;line-height:1.5">{{ r.b }}</span>
+            <span style="font-size:14px;line-height:1.5">{{ r.c }}</span>
+            <span style="font-size:14px;line-height:1.5">{{ r.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <x-import component-from-global-scope="TransitionTrailsDesignSystem_335df4.Alert" tone="info" title="What the four have in common is the argument" dc-props="{{ wideAlert }}" hint-size="100%,110px"><div>None of them is short of knowledge when they arrive, and none of them is placed because of what they learned. Every one is placed — or promoted, or trusted with a client — because of something they can show: a decision they defended, a system they inherited, a release they owned, a campaign they built. The pathway is not a curriculum with a certificate at the end. It is a machine for producing evidence.</div></x-import>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:Poppins,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--tt-trail-green)">How to use these</div>
+      <h2 style="font-family:Poppins,sans-serif;font-size:30px;line-height:1.2;font-weight:600;margin:0;color:var(--tt-charcoal)">Which one to open, and when</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ guidance }}" as="g" hint-placeholder-count="5">
+          <div style="background:var(--tt-white);border:1px solid var(--tt-warm-gray);border-radius:14px;padding:20px 24px;display:grid;grid-template-columns:220px 1fr;gap:22px;align-items:start">
+            <span style="font-family:Poppins,sans-serif;font-size:14.5px;font-weight:600;color:var(--tt-trail-green)">{{ g.label }}</span>
+            <span style="font-size:15.5px;line-height:1.65">{{ g.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:var(--tt-deep-teal);color:var(--tt-white);border-radius:22px;padding:32px 36px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-family:Caveat,cursive;font-size:27px;color:var(--tt-amber-300)">one pathway, many doors</div>
+        <div style="font-size:16.5px;line-height:1.65;color:rgba(255,255,255,.92);max-width:860px">Four journeys, four entry points, and the same programs underneath every one. If a fifth person shows up who does not fit any of these pages, that is worth knowing — it usually means a door exists that we have not built yet.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200},&quot;audience&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;team&quot;,&quot;funder&quot;],&quot;default&quot;:&quot;team&quot;,&quot;tsType&quot;:&quot;'team' | 'funder'&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+const JOURNEYS = [
+  { file:'Program Journey - One Learner, Four Trails.dc.html',
+    eyebrow:'Marisol · the full arc', badge:'11 stations · 3 years', tone:'green',
+    title:'One learner, three years, and she never leaves',
+    blurb:'Entry certification earned alone, then Foundations, Guided Trail, a first role found at Expedition Weekend, an apprenticeship, a second certification, coaching, and a custom Agentforce track she commissions herself.',
+    starts:'Platform Foundations certification, no experience',
+    ends:'Hired by TT Consulting, LLC — a separate company',
+    whyTeam:'The reference journey. Every program appears in order, so it doubles as the map for how the pathway is meant to fit together.',
+    whyFunder:'Lifetime value rather than cohort throughput: two certifications, a placement, a promotion track, volunteer coaching hours returned, and three paid engagements from one person.' },
+
+  { file:'Program Journey - Career Pivoter, BA to Product Owner.dc.html',
+    eyebrow:'Denise · the pivoter', badge:'Business route · 4 years', tone:'teal',
+    title:'Ten years on the phones, then the platform',
+    blurb:'A decade in customer support, self-taught on Salesforce as an end user. Foundations, Guided Trail, hired as a business analyst, then two apprenticeships — Business Analyst, then Product Owner.',
+    starts:'Ten years of frontline support, no tech role',
+    ends:'Product Owner for her employer\u2019s Salesforce platform',
+    whyTeam:'The hardest case to coach well. Her decade is an asset to convert, not a gap to retrain past — and the expert-analyst trap is a real risk worth naming to coaches.',
+    whyFunder:'A mid-career pivot into a decision-making role in four years, without a degree or a bootcamp loan, with wage progression measurable from intake.' },
+
+  { file:'Program Journey - The Collector, Certified and Unhired.dc.html',
+    eyebrow:'Marcus · the collector', badge:'Fast route · 7 months', tone:'amber',
+    title:'Four certifications, ninety applications, two first-round interviews',
+    blurb:'Community college business degree, four certifications, two years of nothing. Finds a free Trail Talk on LinkedIn, waits in Explorer\u2019s Trail, skips Foundations, and is hired twelve weeks after Guided Trail starts.',
+    starts:'Certified, credentialed, and unplaceable',
+    ends:'Junior Salesforce Administrator, month 7',
+    whyTeam:'The clearest proof that the missing thing was never knowledge. Also the case for Trail Talk as acquisition rather than outreach — a room that asks nothing is the only credible front door for someone already sold three things that failed.',
+    whyFunder:'He is his own control group. Two years and ninety applications, then twelve weeks of supervised delivery and a placement. Seven months enrollment to hire.' },
+
+  { file:'Program Journey - The Specialist Volunteer.dc.html',
+    eyebrow:'Simone · the trade', badge:'Skill-for-access · 3 years', tone:'teal',
+    title:'She trades what she knows for what she needs',
+    blurb:'A marketing manager who needs technical hands-on for a promotion her employer will not fund. Eight hours a month of campaign expertise buys her Explorer\u2019s Trail, real delivery, coaching, and an Integrations track she co-writes.',
+    starts:'Employed, skilled, and blocked at her ceiling',
+    ends:'Advanced Coach; the track she authored runs without her',
+    whyTeam:'The only journey where someone arrives giving. It is also where curriculum comes from — a practitioner who needs a track is the best possible author of it.',
+    whyFunder:'Specialty capability acquired without payroll, in-kind at a defensible market rate, plus a new track and coaching capacity generated from volunteer hours.' }
+];
+
+const ROWS = [
+  ['Arrives with', 'An entry certification and nothing else', 'Ten years of support domain knowledge', 'Four certifications and no evidence', 'Eight years of campaign expertise'],
+  ['What they lack', 'Any experience at all', 'Anyone who counts her decade', 'Proof he can be trusted with work', 'The technical half of her own job'],
+  ['Enters at', 'Foundations Trail', 'Foundations Trail', 'Explorer\u2019s Trail, then Guided Trail', 'Explorer\u2019s Trail, as a volunteer'],
+  ['Found us via', 'Applied directly', 'Applied directly', 'A free monthly Trail Talk on LinkedIn', 'A posting for a specific skill'],
+  ['Pays with', 'Tuition or scholarship', 'Tuition or scholarship', 'Tuition or scholarship', 'Eight hours a month'],
+  ['First outcome', 'Admin certification, then a first role', 'Business Analyst role at month 9', 'Junior admin at month 7', 'Nonprofit delivery she configured herself'],
+  ['Gives back as', 'Coach, then a returning learner', 'Associate Coach on BA cohorts', 'Coach\u2019s Assistant when ready', 'Coach, and author of a new track']
+];
+
+const GUIDANCE = [
+  ['Opening with a funder', 'Marcus. He isolates the variable better than any cohort statistic — same person, same certifications, two years of nothing, then twelve weeks and a placement. Lead there, then use Marisol for lifetime value.'],
+  ['Explaining the pathway internally', 'Marisol. Every program appears in sequence, so the page doubles as the map. Use it to onboard a new coach or volunteer before anything else.'],
+  ['Talking to a nonprofit client', 'Simone. It shows what a squad can deliver and how supervision works, without asking the client to care about curriculum design.'],
+  ['Recruiting a career changer', 'Denise. It is the only page that tells someone their existing career counts for something — which is the objection every pivoter arrives with.'],
+  ['Coaching the coaches', 'All four, for the risks. The expert-analyst trap, the readiness judgment for someone who skips Foundations, and why a senior volunteer still starts as a Coach\u2019s Assistant.']
+];
+
+class Component extends DCLogic {
+  state = { lens:null };
+  get lens() { return this.state.lens || this.props.audience || 'team'; }
+  css(o) { return Object.entries(o).map(([k,v]) => k.replace(/[A-Z]/g,m=>'-'+m.toLowerCase())+':'+v).join(';'); }
+
+  tab(active) {
+    return this.css({
+      padding:'9px 20px', borderRadius:'999px', cursor:'pointer',
+      fontFamily:'Poppins, sans-serif', fontWeight:600, fontSize:'14px',
+      background: active ? 'var(--tt-trail-green)' : 'var(--tt-white)',
+      color: active ? 'var(--tt-white)' : 'var(--tt-slate)',
+      border: active ? '1.5px solid var(--tt-trail-green)' : '1.5px solid var(--tt-warm-gray)'
+    });
+  }
+
+  renderVals() {
+    const isTeam = this.lens === 'team';
+    return {
+      wideAlert: { style:{ maxWidth:'none', fontSize:'15.5px', lineHeight:1.65, padding:'22px 26px', borderRadius:'22px', gap:'14px' } },
+      lensTitle: isTeam ? 'Team view — what each journey is for' : 'Funder view — what each journey evidences',
+      lensNote: isTeam
+        ? 'Cards show why each story matters to us. Every journey page has the same toggle inside it.'
+        : 'Cards show the claim each story supports. Every journey page has the same toggle inside it.',
+      teamTab: this.tab(isTeam),
+      funderTab: this.tab(!isTeam),
+      setTeam: () => this.setState({ lens:'team' }),
+      setFunder: () => this.setState({ lens:'funder' }),
+      whyLabel: isTeam ? 'Why this one' : 'What it evidences',
+
+      journeys: JOURNEYS.map(j => ({
+        href: encodeURI(j.file),
+        eyebrow:j.eyebrow, badge:j.badge, tone:j.tone,
+        title:j.title, blurb:j.blurb, starts:j.starts, ends:j.ends,
+        why: isTeam ? j.whyTeam : j.whyFunder
+      })),
+
+      rows: ROWS.map(([label,a,b,c,d], i) => ({
+        label, a, b, c, d,
+        rowStyle: this.css({
+          display:'grid', gridTemplateColumns:'150px 1fr 1fr 1fr 1fr', gap:'16px',
+          padding:'15px 24px', alignItems:'start',
+          borderBottom: i < ROWS.length-1 ? '1px solid var(--tt-warm-gray)' : 'none'
+        })
+      })),
+
+      guidance: GUIDANCE.map(([label,text]) => ({ label, text }))
+    };
+  }
+}
+</script>
+</body>
+</html>

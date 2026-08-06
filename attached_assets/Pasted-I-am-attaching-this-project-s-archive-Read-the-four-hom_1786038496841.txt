@@ -1,0 +1,31 @@
+I am attaching this project's archive. Read the four homebase files before you write anything — they are working prototypes with real interaction, not static mockups, and they will answer far more than this brief does:
+
+Learner Homebase.dc.html
+Coach Homebase.dc.html
+Staff Homebase.dc.html
+Volunteer Homebase.dc.html
+Open each one and click it. The drawers open and close, the sections collapse, and the tweak panels switch between states — stone set, cases complete, no coach, coach level, behind on hours. Those states are decisions, not decoration.
+
+How to read them. Each file is one template plus one logic class. The template is the markup; the logic class returns the values it renders. Ignore the framework — what matters is the structure, the copy, and the interaction. Do not port the framework; rebuild in our stack. The copy is deliberate throughout and should carry across close to verbatim, because the wording is where most of the design decisions live.
+
+Also read, for the reasoning behind them:
+
+Learner Homebase - Directions.dc.html — the exploration and the decisions taken, newest at the top
+Trail OS - Feature Tracking.dc.html — what is open, what is settled, and the architectural rules
+Trail OS - Contributor Pack.dc.html — conventions, and five failures already paid for in this codebase
+What to notice in the four files, because it is easy to miss.
+
+The shell is identical in all four and that is the point — a Workspace drawer on the left, Penny as the only input, a log-time row directly beneath her, work in the middle, people on the right. Only one drawer opens at a time. Build the shell once; the four are fillings.
+
+The collapse state is per section, not per page, and each toggle reads its own state — a collapsed section says "Expand", never "Collapse". The learner's Cairn band and the volunteer's month band follow the same rule as everything else.
+
+There is no search field anywhere. Penny recognizes a lookup, hands to Agentforce, and the record returns inline marked as retrieved rather than generated. This applies to every record type. It is what keeps cost tied to coaching rather than usage.
+
+Where the design outruns the data. Several things these pages show do not exist in the org yet. Build the page correctly and leave the binding obvious:
+
+The volunteer's monthly commitment is per person from their onboarding agreement. There is no field for it yet. Do not hard-code eight.
+Coach level is not on the record yet either. It changes verdict authority, not screen access.
+Most of the Penny objects are empty in production, so these pages will render with nothing in them for a while. That is expected — make the empty states right rather than filling them with invented figures.
+Use our design system tokens for everything. 14px minimum on all text, badges and table cells included. At most one amber call to action per screen.
+
+Please tell me what you had to guess at, anything that conflicts with the existing routing or access model, and anything in the prototypes you think is wrong.

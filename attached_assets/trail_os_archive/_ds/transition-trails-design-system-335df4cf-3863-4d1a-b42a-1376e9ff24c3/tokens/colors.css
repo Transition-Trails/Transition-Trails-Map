@@ -1,0 +1,32 @@
+/* Transition Trails — Color tokens
+   Nature-inspired palette reinforcing the metaphor of trails and guided progress.
+   Base values + ramps. Semantic aliases live in semantic.css. */
+:root {
+  /* ---- Core brand palette ---- */
+  --tt-trail-green: #2F6B3F;   /* primary — actions, headings, growth */
+  --tt-deep-teal:   #2F6F7E;   /* secondary — containers, footer, depth */
+  --tt-sky-blue:    #7FAFC6;   /* surface — backgrounds, cards */
+  --tt-sun-amber:   #F5A623;   /* accent — ONE "Next Step" CTA per screen */
+
+  /* ---- Neutrals ---- */
+  --tt-trail-light: #FAFAF7;   /* main background */
+  --tt-warm-gray:   #E2E4E1;   /* dividers, borders */
+  --tt-slate:       #4A4F4D;   /* body text */
+  --tt-charcoal:    #2A2E2C;   /* headings, icons */
+  --tt-white:       #FFFFFF;
+
+  /* ---- Trail Green ramp ---- */
+  --tt-green-100: #E6F0EA;
+  --tt-green-300: #9FC3AE;
+  --tt-green-500: #2F6B3F;
+  --tt-green-700: #245531;
+
+  /* ---- Sun Amber ramp ---- */
+  --tt-amber-100: #FFF3E0;
+  --tt-amber-300: #FFD08A;
+  --tt-amber-500: #F5A623;
+  --tt-amber-700: #CC8400;
+
+  /* ---- Sky Blue tint ---- */
+  --tt-sky-100: #EDF5F8;
+}

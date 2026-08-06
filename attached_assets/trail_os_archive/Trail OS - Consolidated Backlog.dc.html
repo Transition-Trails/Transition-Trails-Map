@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--tt-bg); }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); text-decoration: underline; }
+</style>
+</helmet>
+
+<div style="font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: var(--tt-bg); min-height: 100vh; padding: 56px 32px 96px;">
+<div style="max-width: 1060px; margin: 0 auto;">
+
+  <header style="border-bottom: 1px solid var(--tt-warm-gray); padding-bottom: 32px; margin-bottom: 48px;">
+    <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-deep-teal); margin: 0 0 16px;">Consolidated backlog</p>
+    <h1 style="font-family: 'Poppins', sans-serif; font-size: 44px; line-height: 1.15; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 20px; max-width: 22ch; text-wrap: pretty;">Everything identified, in the order it should happen</h1>
+    <p style="font-size: 18px; line-height: 1.6; margin: 0 0 28px; max-width: 64ch; text-wrap: pretty;">Work is currently spread across five review documents. This is the single list — what is applied, what is next, and what is waiting on a decision from you. Written to be loaded into Salesforce as Features rather than kept here.</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; font-size: 14px;">
+      <div><p style="margin: 0 0 4px; opacity: .7;">Applied</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">21 changes</p></div>
+      <div><p style="margin: 0 0 4px; opacity: .7;">Open features</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">9</p></div>
+      <div><p style="margin: 0 0 4px; opacity: .7;">Decisions needed</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">0 · 1 action</p></div>
+      <div><p style="margin: 0 0 4px; opacity: .7;">Tests</p><p style="margin: 0; font-weight: 600; color: var(--tt-charcoal);">218 · gate was 50</p></div>
+    </div>
+  </header>
+
+  <section style="background: var(--tt-green-100); border-radius: 22px; padding: 32px 36px; margin-bottom: 24px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 16px;">Closed since this list was written</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 16px; max-width: 74ch;">Three features and one defect, all verified against the live org.</p>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="background: var(--tt-white); border-radius: 14px; padding: 20px 24px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">F-05-15 · Google SSO login — working end to end</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Verified in the server logs: sign-in, session, and Salesforce calls all completing. Groups held as a set — your account resolves with two group memberships. Domain restriction validates the <code style="font-family: Menlo, monospace; font-size: 14px;">hd</code> claim in the returned token rather than trusting the request hint. Personal Gmail rejection is covered by test but not yet clicked through manually.</p>
+      </div>
+      <div style="background: var(--tt-white); border-radius: 14px; padding: 20px 24px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">F-05-17 · Route enforcement — and the exposure was total</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">Clerk was never wired to the session middleware at all, so it was client-side decoration. <strong style="color: var(--tt-charcoal);">115 route handlers across 28 files were reachable by anyone who could reach the server</strong> — including the full credential audit, Penny's endpoint (Gemini spend and Salesforce writes), live Drive, Calendar and Gmail data, an endpoint enumerating every Workspace group, and one that could post to your admin Slack channel.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Now default-deny: staff auth required unless explicitly public, and the public list is five items — the two OAuth round-trips, the wizard callbacks, the signature-verified Slack webhook, and the health check. Secrets, group admin and role owners carry a second admin check. The prototype Super Admin default is gone and nothing depended on it.</p>
+      </div>
+      <div style="background: var(--tt-white); border-radius: 14px; padding: 20px 24px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Defect · the validation page was reporting false failures</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">It claimed 9 of 18 objects accessible. The real figure is 17 of 18 — nine failures were the connector proxy throttling at twenty requests per ten seconds, not inaccessibility. Worse, the Contact panel reported zero custom fields and listed fifteen as missing, when all of them exist; a throttled describe had been read as absence.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Probes are now batched with a retry that honours the server's back-off. A throttled probe that still fails reports as <em>undetermined</em> in amber, never as missing — and the server now guarantees a missing-fields list cannot be produced when the describe itself failed. The page takes four seconds instead of being instant and wrong.</p>
+      </div>
+      <div style="background: var(--tt-white); border-radius: 14px; padding: 20px 24px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Tests · 169 → 218</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Including one protecting the behavior that misled us: a throttled probe must classify as undetermined rather than inaccessible.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: var(--tt-sky-100); border-radius: 22px; padding: 28px 32px; margin-bottom: 48px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Next up — the Penny Admin's tool still does nothing</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px; max-width: 74ch;">The Platform Admin's tool is now reliable. The Penny Admin's is not: Prompt Studio is one of the largest screens in the application and nothing authored there reaches a real response, and the same is true of the capability registry.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px; max-width: 74ch;">F-05-05 fixes that, and the layer assembler makes it a wiring job rather than a rebuild. Worth pairing with F-05-02, since grounding is part of what a Penny Admin governs — and it removes the browser's ability to silently skip retrieval and return an ungrounded answer that looks identical to a grounded one.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0; max-width: 74ch;">This is the same shape of problem as the validation page: a tool that describes an architecture it does not yet drive.</p>
+  </section>
+
+  <section style="margin-bottom: 56px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Backlogged — identity and access</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px; max-width: 66ch;">Login is complete: Google SSO, per-user sessions, groups held as a set, and every route enforcing. What remains in this block is not login — it is whose credentials the platform acts under, and whose permissions govern what data appears.</p>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 66ch; padding: 14px 18px; background: var(--tt-sky-100); border-radius: 14px;"><strong style="color: var(--tt-charcoal);">Parked to finish later this week</strong>, starting with creating the Salesforce integration user. None of it blocks Penny Admin or Platform Admin work while the same person holds both roles — it blocks adding anyone else.</p>
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; overflow: hidden; box-shadow: 0 12px 28px rgba(42,46,44,.10);">
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 16px 24px; background: var(--tt-sky-100); border-bottom: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">
+        <p style="margin: 0;">Feature</p><p style="margin: 0;">What and why</p><p style="margin: 0;">Priority</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-14</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Dedicated Salesforce integration user</p><p style="margin: 0 0 8px;">The connector authenticates to production as a personal account. Reauthorizing it as a dedicated integration user is a configuration change in Replit rather than a build — no code involved.</p><p style="margin: 0 0 8px;">The work that is not a switch is the permission set behind it. Read on the eighteen custom objects, plus create on Penny's interaction log, plus the standard and managed objects the connector uses. Without that in place first, the switch trades a working over-permissioned account for a broken under-permissioned one.</p><p style="margin: 0;">Penny's write path now logs Salesforce permission failures at error level, so a missing grant surfaces immediately rather than silently dropping records — which makes the switch safe to verify by doing it.</p></div>
+        <p style="margin: 0;">Backlog</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-18</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Per-user Salesforce authorization</p><p style="margin: 0;">Chain a Salesforce grant after login — one consent click, since Salesforce uses Google as its SAML provider. Screen data then reads as the person, so their sharing rules apply and there is no authorization logic to write.</p></div>
+        <p style="margin: 0;">High</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-19</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Slack authorization at first use</p><p style="margin: 0;">Requested when someone first acts in Slack from Trail OS, not at login — most people never need it.</p></div>
+        <p style="margin: 0;">Medium</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 56px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Then — Penny</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 66ch;">The assembler, persistence and memory are done. What remains is grounding, governance and the audiences she does not yet have.</p>
+    <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; overflow: hidden; box-shadow: 0 12px 28px rgba(42,46,44,.10);">
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 16px 24px; background: var(--tt-sky-100); border-bottom: 1px solid var(--tt-warm-gray); font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">
+        <p style="margin: 0;">Feature</p><p style="margin: 0;">What and why</p><p style="margin: 0;">Priority</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-02</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Retrieve on the server, not in the browser</p><p style="margin: 0;">Ask Penny accepts pre-retrieved chunks from the caller, so any screen that forgets to fetch them silently gets an ungrounded answer that looks identical to a grounded one. Moving retrieval server-side removes the possibility.</p></div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-02-01</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">One identity layer per audience</p><p style="margin: 0;">Penny serves internal staff, learners, coaches, clients and eventually the public. Only the internal identity exists; the rest are a tone paragraph on top of it. Build learner next — internal answers, learner asks back. Coach and client when those surfaces exist.</p></div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-05</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Make Prompt Studio change what Penny says</p><p style="margin: 0;">One of the largest screens in the application currently has no effect on a real response. The assembler makes this a wiring job rather than a rebuild.</p></div>
+        <p style="margin: 0;">High</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-07</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Show which sources Penny used</p><p style="margin: 0;">Sources with relevance in the Ask Penny rail, and an ungrounded answer that says so plainly instead of looking the same as a grounded one.</p></div>
+        <p style="margin: 0;">Medium</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; border-bottom: 1px solid var(--tt-warm-gray); font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-05-08</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Durable rate limiting and a cost ceiling</p><p style="margin: 0;">Limits currently live in memory per instance and key on IP address. Move to per-user, surviving restart, with a daily spend ceiling and an alert.</p></div>
+        <p style="margin: 0;">Medium</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 100px 1fr 100px; padding: 20px 24px; font-size: 15px; line-height: 1.55;">
+        <p style="margin: 0; font-family: Menlo, monospace; font-size: 14px; font-weight: 600; color: var(--tt-charcoal);">F-10-01a</p>
+        <div><p style="margin: 0 0 6px; font-weight: 600; color: var(--tt-charcoal);">Live learner read model</p><p style="margin: 0 0 8px;">A learner endpoint joining Contact, Program Engagement and the Penny fields into the shape the interface needs, so the Penny learner screens come off prototype fixtures and the learner-context layer has real data to carry.</p><p style="margin: 0;">Blocked on two things below: how a learner is identified now that Contact is reused rather than a standalone object — <code style="font-family: Menlo, monospace; font-size: 14px;">LMS_Learner_ID__c</code> and <code style="font-family: Menlo, monospace; font-size: 14px;">Penny_Trail__c</code> are likely part of the answer — and the missing <code style="font-family: Menlo, monospace; font-size: 14px;">Learner_Course__c</code> parent, which is where progress would come from.</p></div>
+        <p style="margin: 0;">Critical</p>
+      </div>
+    </div>
+    <p style="font-size: 15px; line-height: 1.6; margin: 20px 0 0; max-width: 70ch; padding: 14px 18px; background: var(--tt-sky-100); border-radius: 14px;"><strong style="color: var(--tt-charcoal);">Two now folded into other work.</strong> F-05-06, reading tier from the session, is absorbed by F-05-17. F-05-09, Salesforce write capability, is deferred by your ruling that we are read-only for now — though Penny's interaction log is already writing, so that boundary is worth restating deliberately rather than leaving implicit.</p>
+  </section>
+
+  <section style="margin-bottom: 56px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Data and schema</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 66ch;">Found by the object probe. None of these are code problems.</p>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;"><code style="font-family: Menlo, monospace; font-size: 16px;">Learner_Course__c</code> does not exist</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Both its children exist and are empty. The parent of the learner progress chain is missing, so nothing can hang from them. Either it was never deployed or the model changed — worth confirming which before the learner read model is built on top.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Thirteen objects are deployed and empty <span style="font-family: 'Open Sans', sans-serif; font-size: 14px; font-weight: 400; color: var(--tt-slate); opacity: .8;">— now twelve, since Penny's log is filling</span></p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Expected at this stage, but it means most screens read nothing until data exists. Worth deciding which get seeded first, because that determines which screens can come off illustrative data. Course, Course Module and Course Module Activity are already populated, so curriculum screens are the closest to real.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Penny's interaction log has five fields</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Model, latency, prompt layers, audience and tier have nowhere to go in Salesforce and are written to the local database only. You cancelled adding them, which is reasonable — but the measurement specification should say plainly that Salesforce holds the exchange and the local database holds the telemetry, or someone will later count one and report the other.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="margin-bottom: 56px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Decisions — all settled</h2>
+    <p style="font-size: 16px; line-height: 1.6; margin: 0 0 28px; max-width: 66ch;">All six are now resolved or deliberately parked. One action remains rather than a decision: the migration into Salesforce tomorrow, which fixes the identifier question by doing it.</p>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="background: var(--tt-green-100); border: 1px solid var(--tt-green-300); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Resolved — the learner surface is Trail OS, with Slack as the communication layer</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">Settled 4 August. Trail OS is where the work and the coaching happen; Slack carries conversation, nudges and quest delivery, likely open in a side panel alongside it. Not Experience Cloud, not a separate product, not Slack alone.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;"><strong style="color: var(--tt-charcoal);">One design consequence to settle before either surface is built.</strong> Because the two are open at the same time rather than used in turn, Penny in Trail OS and Penny in Slack are one conversation with two windows. Her memory has to be keyed on the person rather than the surface — otherwise a learner asks something in Slack, switches to Trail OS, and finds she has forgotten it.</p>
+      </div>
+      <div style="background: var(--tt-green-100); border: 1px solid var(--tt-green-300); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Resolved — Foundations gets a fifth trail configuration</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">Settled 4 August, to be created through the Penny Configuration interface so that interface is exercised at the same time. The configuration object is all free text with no restricted picklists, so nothing will silently reject. Trail ID and Penny Role are the two required fields, and the existing four use hyphenated identifiers — <code style="font-family: Menlo, monospace; font-size: 14px;">guided-trail</code>, <code style="font-family: Menlo, monospace; font-size: 14px;">explorer-journey</code>, <code style="font-family: Menlo, monospace; font-size: 14px;">trail-of-mastery</code>, <code style="font-family: Menlo, monospace; font-size: 14px;">community-alumni</code>.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;"><strong style="color: var(--tt-charcoal);">One thing to check first.</strong> The trail field on Contact is a picklist. If it has no Foundations value, the configuration can be created but no learner can be assigned to it — the same failure that hid the interaction log problem.</p>
+      </div>
+      <div style="background: var(--tt-green-100); border: 1px solid var(--tt-green-300); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Resolved — "Trail Quests" stays</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Confirmed 4 August as deliberate house vocabulary rather than borrowed ecosystem language. Worth writing into the brand book as an intentional exception so it is not raised again. Separately, one genuinely prohibited term does sit in a live field name on Contact — worth folding into the next brand-book pass, where the label can be changed without a schema migration.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Dark mode <span style="font-family: 'Open Sans', sans-serif; font-size: 14px; font-weight: 400; opacity: .8;">— backlog, not a priority</span></p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">Trail OS ships a full dark palette; the brand has no dark specification. Either author dark tokens or remove the theme.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Parked deliberately, 4 August. Worth revisiting only when the brand book is next opened — it is a staff-facing surface, so nobody outside the team will see it in the meantime.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+
+      <div style="background: var(--tt-green-100); border: 1px solid var(--tt-green-300); border-radius: 22px; padding: 24px 28px;">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Resolved — Digital Twin is an Administration item</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Settled 4 August. The documentation sync had it right, so the correction to six navigation groups across the README, the working notes, the roadmap and the specification stands. Nothing to undo.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 24px 28px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Action for tomorrow — which identifier scheme becomes real in Salesforce</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">The Product Vision and the Features workbooks both number epics from E-01 and mean different work by the same identifier. In the Vision, E-02 is Penny as learner coach; in the workbooks it is Program Management. Nothing in either document says which scheme it is using.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">Epics and Features move into Salesforce tomorrow, which settles it in practice — whichever numbering you create there becomes the real one.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;"><strong style="color: var(--tt-charcoal);">Two things to carry into that session.</strong> Every feature written in this document uses the Vision's numbering — the Penny work under E-05 and E-02, the learner read model under E-10 — so if the workbooks' scheme is chosen instead, all fifteen need remapping. And the workbooks' 56 existing features should be remapped once during the migration rather than left to coexist with whatever is created.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom: 56px;">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 12px;">Design work, not yet started</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Empty, loading, stale and failed states</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">The prototype has never needed them — stubbed data is always present, correctly sized and fresh. Twelve objects are deployed and empty, so live data will be none of those things.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Four shared states designed once against the brand, rather than invented per screen as each one breaks.</p>
+      </div>
+      <div style="background: var(--tt-white); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 26px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <p style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">Coach and learner views</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0 0 10px;">Deferred until platform work is finished. Decided already: inside Trail OS with Slack alongside as the communication layer, group-gated, desktop first, coach sees everything, and Penny drafts while the coach approves.</p>
+        <p style="font-size: 15px; line-height: 1.6; margin: 0;">Still open: how the three coach levels differ, where a verdict is issued, and whether learners see each other's verdicts. Brief is written and waiting.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: var(--tt-deep-teal); border-radius: 22px; padding: 36px 40px; color: var(--tt-white);">
+    <h2 style="font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 600; margin: 0 0 16px; color: var(--tt-white);">What changed today</h2>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0 0 16px; max-width: 68ch; opacity: .95;">Seventeen changes applied. The design system is genuinely in sync — tokens, type, color, shape, standards and configuration. RESOLVE matches the Handbook. The data is classified and the invented figures are labeled. The documents tell one story. The program roster matches the Master Guide.</p>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0 0 16px; max-width: 68ch; opacity: .95;">On the platform: Trail OS reads its own Salesforce objects for the first time, Penny remembers across sessions, every exchange is recorded, there is a real per-user login, and every route now refuses requests it should refuse. The test suite went from a documented zero to 218.</p>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0 0 16px; max-width: 68ch; opacity: .95;">The security story has changed most. This morning 115 route handlers were open to anyone who could reach the server, including the credential audit and an endpoint that could post to Slack. That is closed.</p>
+    <p style="font-size: 17px; line-height: 1.65; margin: 0; max-width: 68ch; opacity: .95;">The remaining risk is narrower and worth stating plainly: <strong style="color: var(--tt-white);">the platform still acts in production under a personal account.</strong> Switching it is configuration rather than code, and it is parked deliberately — but the permission set it needs should exist before anyone outside the team signs in.</p>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1120}}"></script>
+</body>
+</html>

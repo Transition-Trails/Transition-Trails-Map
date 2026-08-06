@@ -1,0 +1,8 @@
+/* Transition Trails — Elevation & focus tokens
+   Soft, low-contrast shadows. Cards lift gently on hover. */
+:root {
+  --tt-shadow-card:  0 12px 28px rgba(42, 46, 44, .10);
+  --tt-shadow-soft:  0 6px 16px rgba(42, 46, 44, .08);
+  --tt-shadow-amber: 0 2px 8px rgba(245, 166, 35, .35);
+  --tt-focus-ring:   0 0 0 3px rgba(47, 107, 63, .15);
+}

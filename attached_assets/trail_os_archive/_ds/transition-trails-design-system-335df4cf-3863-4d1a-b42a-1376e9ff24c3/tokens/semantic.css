@@ -1,0 +1,23 @@
+/* Transition Trails — Semantic role aliases
+   Reference these in components so intent stays readable. */
+:root {
+  --tt-bg:         var(--tt-trail-light);
+  --tt-surface:    var(--tt-white);
+  --tt-surface-alt: var(--tt-sky-100);
+  --tt-border:     var(--tt-warm-gray);
+  --tt-text:       var(--tt-slate);
+  --tt-heading:    var(--tt-charcoal);
+  --tt-link:       var(--tt-trail-green);
+  --tt-link-hover: var(--tt-green-700);
+
+  /* Action roles */
+  --tt-action-primary:       var(--tt-trail-green);
+  --tt-action-primary-hover: var(--tt-green-700);
+  --tt-action-accent:        var(--tt-sun-amber);
+  --tt-action-accent-hover:  var(--tt-amber-700);
+
+  /* Status */
+  --tt-success:  var(--tt-green-500);
+  --tt-info:     var(--tt-deep-teal);
+  --tt-warning:  var(--tt-amber-700);
+}

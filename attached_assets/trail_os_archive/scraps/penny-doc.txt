@@ -1,0 +1,122 @@
+Transition Trails Academy
+Penny — AI Coach’s Assistant Powered by Google Gemini
+Six-Pager (Amazon Narrative Format)
+1. Introduction
+Transition Trails Academy provides structured programs like Guided Trail and Trail of Mastery to help learners transition into Salesforce careers. As enrollment and demand grow, learners face cognitive context gaps between curriculum content, real-world expectations, and coach interaction time. Coaches are highly valued but cannot scale one-to-one support for foundational questions and personalized guidance without burnout.
+Penny is designed as an AI coach’s assistant embedded in the Academy’s mobile and web experience, powered by Google Gemini and grounded in Salesforce as the source of truth. Penny’s mission is to:
+keep learners on track with weekly program commitments
+reinforce key Salesforce Admin concepts
+support career readiness (resume, LinkedIn, interview practice)
+increase learner confidence and engagement
+augment coaches, not replace them
+Penny will be released iteratively, starting with a clearly scoped MVP and expanding to include deeper personalization, proactive guidance, coach workflows, and advanced ecosystems (Slack, Linear, GitHub integrations).
+2. Goals (Outcomes and Success Metrics)
+Primary Goals
+Program adherence: Students reliably complete weekly assignments and understand what’s next.
+Learning confidence: Students articulate admin concepts clearly and connect curriculum to real-world scenarios.
+Career readiness: Students improve resumes and LinkedIn presence with targeted coaching support.
+Coach efficiency: Coaches spend less time on repeated questions and more time on high-impact conversations.
+Early Metrics (MVP)
+% of learners using Penny weekly
+% of learners who complete weekly assignments on time
+Resume and LinkedIn improvements (self-reported confidence scores)
+Coach satisfaction ratings with Penny-assisted learners
+Future Metrics
+Expert-rated improvement in structured skills assessments
+Increase in job interview success rates
+Learner NPS for Penny support
+Coach time saved per learner
+Pricing Consideration Placeholder: Determine annual/licensed pricing tiers for Guided Trail and Trail of Mastery that factor in Penny’s value contribution. Open question we will finalize in future iteration.
+3. Tenets (Guiding Principles)
+Coaching augmentation, not replacement. Penny supports coaches and learners; it never replaces human judgment.
+Data grounding. Penny’s recommendations are grounded in Salesforce program data and curriculum sources only.
+Intentional engagement. Learners control Penny’s interaction; proactive nudges are introduced later after MVP validation.
+Clarity over verbosity. Penny provides concise, actionable guidance, not generic or overwhelming responses.
+Skill reinforcement. Scenario-based practice is aligned with sprint outcomes and capstone focus.
+Ethical AI use. Penny’s outputs avoid fabricating credentials or inventing experiences; career coaching is explicit about learner input.
+4. State of the Business (Current Situation)
+Transition Trails currently offers two primary programs:
+Guided Trail
+Focused on career acceleration into Salesforce Admin roles
+Structured weekly sprints and assignments
+Hands-on subprojects and interview preparation
+Trail of Mastery
+Advanced cohort focused on real client delivery readiness
+Deep technical and business problem exploration
+Integration with delivery tools (planned: Slack, Linear, GitHub)
+Challenges without Penny:
+Learners hesitate or delay assignments due to uncertainty
+Coaches are consulted frequently on routine concepts
+Resume and LinkedIn readiness support varies by coach capacity
+Skills assessments are manual and not scalable
+Penny is positioned to reduce friction and increase consistency across learner outcomes.
+5. Lessons Learned (Insights and Risks)
+Insights
+Learners benefit from on-demand guidance when momentum stalls.
+Coaches achieve more impact when freed from repeating foundational explanations.
+Career transition success is tied not only to technical skills but also to confidence and articulation (resumes, interviews).
+Grounded knowledge (Salesforce documentation, curriculum) improves trust and reduces hallucination risks.
+Risks
+AI hallucination risk: Penny must be tightly constrained to curated sources to ensure accuracy.
+Overdependence risk: Learners may default to Penny for answers they should reason through; guardrails are required.
+Coach alignment risk: Penny must be integrated into coaching workflows without displacing human relationships or judgment.
+6. Strategic Priorities (Plan and Execution)
+MVP (Quarter 1) — Focus: Foundational Value
+Scope
+Experience Cloud UI with Penny chat
+Salesforce-grounded program navigation
+Salesforce Admin concept coaching
+Career coaching (resume + LinkedIn + interview stories)
+Optional on-demand extra credit scenarios (alignment to sprint)
+Program context awareness (what’s due, what’s next)
+Guardrails
+Penny on-demand only (no proactive prompts)
+No persistence of drafts
+No task creation
+No coach dashboards
+Deliverables
+MVP six-pager validated
+Penny backend service calling Gemini
+UI prototype in Experience Cloud
+Quarter 2 — Focus: Engagement and Reality
+Scope
+Coach scheduling support (surface Google booking links)
+Slack integration (reactive Penny interaction)
+Save career coaching drafts
+Tag extra credit scenarios by skill area
+Enable one active extra credit mission at a time
+Deliverables
+Improved UX for career feedback
+Slack Penny Slackbot surface
+Early engagement metrics
+Quarter 3 — Focus: Skill Measurement and Insight
+Scope
+Skills assessment flow (structured) with recordable outcomes
+Penny-suggested learning focus areas
+Salesforce task creation (optional)
+Aggregate insight summaries for coaches
+Deliverables
+Skill diagnostics
+Activity and usage dashboards
+Coach view of patterns of confusion
+Quarter 4 — Focus: Mastery and Ecosystem Expansion
+Scope
+Role-aware Penny behavior (Trail of Mastery)
+Linear and GitHub integration
+CI/CD coaching guidance
+Proactive daily prompts (special trail missions)
+Coach dashboards and insights
+Deliverables
+Personalized mastery coaching
+Delivery tool integrations
+Earned engagement mechanisms (daily challenges)
+7. Appendices &amp; Supporting Materials (Optional)
+Architecture diagram (Salesforce + Penny Service + Gemini + Slack)
+Sample Penny prompts and behavior rules (MVP)
+Data model assumptions (Salesforce schema)
+Learner journey diagrams
+Open Questions for Future Refinement
+Pricing and value articulation: How should Guided Trail and Trail of Mastery be priced when Penny is included?
+Options might include tiered subscription, per-cohort licensing, or usage-based pricing.
+Proactive prompting thresholds: When and how should Penny surface reminders or nudges proactively?
+Learner progression criteria: What criteria determine readiness to automate tasks or enable advanced features?

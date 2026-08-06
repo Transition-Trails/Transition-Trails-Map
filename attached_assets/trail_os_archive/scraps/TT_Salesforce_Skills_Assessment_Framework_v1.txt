@@ -1,0 +1,444 @@
+
+TRANSITION TRAILS
+Salesforce Skills Assessment Framework
+How Penny + Trail OS Assess, Surface, and Escalate Learner Skill Gaps
+Version 1.0  ·  June 2026  ·  Transition Trails Academy  ·  CONFIDENTIAL
+ | 
+
+Purpose of This Document
+This framework defines how Penny and Trail OS assess learner Salesforce skills across all program tracks. Every assessment is grounded in Salesforce's published certification exam domains. Every gap surfaces to the right person at the right time. No coach has to guess who is struggling — the system tells them. This document is the specification for that system.
+ | 
+
+SECTION 1 — THE CORE PRINCIPLE
+ | 
+
+Every Track Starts with Salesforce's Published Exam Domains
+The foundation of every skills assessment at Transition Trails is Salesforce's official certification exam guide, published at help.salesforce.com. TT does not invent competency frameworks. We use Salesforce's own domain structure — with Salesforce's own weights — as the anchor for everything Penny asks, measures, and flags.
+
+This makes every assessment defensible. When a participant, an employer, or a funder asks how we determined a learner's skill level, the answer is grounded in the same framework Salesforce uses to certify professionals worldwide.
+
+The Non-Negotiable
+All multiple choice questions, scenario prompts, and coach assessment criteria must be traceable to a specific Salesforce certification exam domain and a specific concept documented on help.salesforce.com or in Salesforce's official study guide. Penny does not quiz on TT-invented knowledge.
+ | 
+
+The Track Template — Applies to Every Future Track
+Salesforce Admin is the first track. Advanced Admin, Product Owner, Agentforce, and Slack tracks follow the identical model. Each new track begins with:
+
+Step 1 — Pull the official Salesforce certification exam guide for that credential
+Step 2 — Map every exam domain to a weighted capstone build task in the HCH or DC client org
+Step 3 — Write Penny assessment content (multiple choice + scenarios) for each domain
+Step 4 — Define the coach gate criteria for that track's sprint transitions
+
+Track
+ | Certification Anchor
+ | Status
+ | 
+Salesforce Admin
+ | Salesforce Administrator Exam (CRT-101)
+ | Active — Foundations Trail live
+ | 
+Salesforce Advanced Admin
+ | Advanced Administrator Exam
+ | Planned — Phase 2
+ | 
+Agentforce Specialist
+ | Agentforce Specialist Exam
+ | Planned — High demand
+ | 
+Slack Admin
+ | Slack Admin Certification
+ | Planned — Phase 3
+ | 
+Product Owner
+ | PSPO / Salesforce PO alignment
+ | Planned — Phase 3
+ | 
+
+SECTION 2 — THE FOUR-LAYER ASSESSMENT MODEL
+ | 
+
+Every skills assessment at Transition Trails operates across four layers. Each layer builds on the one below it. No layer can function without its foundation.
+
+Layer 1 — The Anchor: Salesforce Certification Exam Domains
+The exam domain structure is the single source of truth for what gets assessed. For the Salesforce Admin track, the nine domains and their weights are:
+
+Exam Domain
+ | Approx. Weight
+ | Primary Sprint
+ | 
+Configuration & Setup
+ | ~20%
+ | Sprint 1
+ | 
+Object Manager & Lightning App Builder
+ | ~20%
+ | Sprint 1
+ | 
+Security & Access
+ | ~13%
+ | Sprint 1
+ | 
+Data Management
+ | ~10%
+ | Sprint 1
+ | 
+Service & Support Applications
+ | ~11%
+ | Sprint 2 + 3
+ | 
+Process Automation & Flow Builder
+ | ~16%
+ | Sprint 2 + 3
+ | 
+Sales & Marketing Applications
+ | ~12%
+ | Sprint 2
+ | 
+Analytics, Reports & Dashboards
+ | ~9%
+ | Sprint 3
+ | 
+Change Management & Maintenance
+ | ~7%
+ | Sprint 3
+ | 
+
+Why Weights Matter for Assessment
+A learner who fails Process Automation questions (16% of the exam) is at greater risk of exam failure than one who misses a Change Management question (7%). Penny prioritizes gap intervention by domain weight — not just by wrong answer count.
+ | 
+
+Layer 2 — The Capstone Map: Domain → Build → Acceptance Criteria
+The Foundations Trail Traceability Matrix translates exam domains into specific capstone build tasks with documented acceptance criteria. This is the bridge between abstract knowledge and demonstrated skill.
+
+Every build task in the HCH capstone is mapped to:
+The specific exam domain it covers
+The user story that defines the business requirement
+The acceptance criteria that define pass/fail
+The Definition of Done that confirms completion
+
+Penny's scenario-based assessment questions are written directly from these acceptance criteria. When Penny asks a scenario question, it is not a generic Salesforce question — it is grounded in something the participant actually built.
+
+Example — Process Automation Domain
+User Story S2-05: Loop Protection Flow. Acceptance Criteria AC-1: An email with subject 'Automatic reply' must result in the Case being immediately set to Closed. Penny scenario prompt: 'Your Email-to-Case inbox is filling up with auto-generated replies from a client's out-of-office system. Cases are being created for each one. What Flow type, trigger, and action would you use to prevent this — and why would you choose After-Save instead of Before-Save?' This question cannot be answered correctly by guessing. It requires understanding the build they completed.
+ | 
+
+Layer 3 — Penny's Three Assessment Modes
+Penny operates in three assessment modes. Each serves a different purpose and runs at different points in the program.
+
+Mode 1 — Multiple Choice (Knowledge Check)
+Domain-aligned questions written to Salesforce's official exam guide. These test whether the participant knows the concept — not whether they can apply it.
+
+Attribute
+ | Detail
+ | When It Runs
+ | Who Sees Results
+ | 
+Source
+ | Salesforce help.salesforce.com + official study guide only
+ | On demand anytime + scheduled at sprint end
+ | Learner + Penny + Coach dashboard
+ | 
+Format
+ | 4-option multiple choice, single correct answer
+ | Recommended: 10 questions per domain per sprint
+ | Score by domain, not just total
+ | 
+Scoring
+ | Tracked by exam domain with running average
+ | Auto-triggered at Definition of Done completion
+ | Penny flags domains below 70%
+ | 
+Penny role
+ | Administers, scores, stores results in learner CRM profile
+ | Learner can retake anytime — no penalty
+ | Coach sees trend, not just snapshot
+ | 
+
+Sample Multiple Choice — Security & Access Domain
+Q: An HCH volunteer should be able to view Contact records but never see the Veteran Status or Income Bracket fields. Which Salesforce feature controls field-level visibility at the profile level?A) Sharing Rules  B) Field-Level Security  C) Role Hierarchy  D) Record TypesCorrect: B. If the learner selects A, Penny flags a Security & Access gap and surfaces a targeted follow-up prompt.
+ | 
+
+Mode 2 — Scenario Based (Applied Knowledge)
+Scenario questions require the participant to apply what they built to a new situation. These are the highest-value assessment format — they distinguish participants who understand concepts from those who followed steps.
+
+Attribute
+ | Detail
+ | When It Runs
+ | Coach Involvement
+ | 
+Source
+ | Written from Traceability Matrix acceptance criteria
+ | After each major build task completion
+ | Reviews Penny's assessment of reasoning quality
+ | 
+Format
+ | Narrative scenario + open or multiple choice response
+ | Integrated into Penny Check-In at end of each week
+ | Can override Penny's assessment score
+ | 
+Scoring
+ | Penny evaluates reasoning, not just the answer
+ | Can be triggered by coach at any time
+ | Required for any scenario scored below 60%
+ | 
+Penny role
+ | Socratic follow-up if answer is incomplete or correct but unexplained
+ | Mandatory before each sprint transition
+ | Reviews flagged responses before gate opens
+ | 
+
+Sample Scenario — Flow Builder Domain (Week 8)
+Scenario: 'Elena calls you on a Monday morning. HCH received 47 new Cases overnight — all from an automated email system at a partner organization. Every Case is legitimate except 43 of them, which are Out of Office replies. Your queue is flooded. Walk me through exactly what you built last week that should have prevented this, and why it may not have fired.'Penny evaluates: Did they correctly name the Record-Triggered Flow? Did they identify the After-Save trigger? Did they articulate the CONTAINS operator logic? A technically correct answer with no business reasoning scores lower than a slightly imprecise answer with strong stakeholder framing.
+ | 
+
+Mode 3 — Build Verification (Output Check)
+Build verification confirms that the participant's org actually does what the Definition of Done requires. Penny cannot directly query the learner's Salesforce org — the participant reports the output, and Penny asks follow-up questions to verify understanding.
+
+Step
+ | What Happens
+ | 
+1 — Penny prompts
+ | At end of each week, Penny asks the participant to run a specific test against their HCH org
+ | 
+2 — Participant reports
+ | Participant reports the result: what the system did, what it returned, or what error appeared
+ | 
+3 — Penny probes
+ | If the result is correct, Penny asks one follow-up: 'Why did it do that?' If incorrect, Socratic diagnosis begins
+ | 
+4 — Trail OS logs
+ | Build verification result is logged to the learner's Trail OS record with timestamp and domain tag
+ | 
+5 — Coach visibility
+ | Incomplete or failed verifications appear on the coach dashboard under the learner's sprint progress
+ | 
+
+Sample Build Verification — Security Domain (Week 3)
+Penny prompt: 'Log into your HCH org as Alex Rivera (Volunteer profile). Navigate to the Cases tab. Tell me exactly what you see.'Expected: 'Zero case records.' If the participant reports seeing cases, Penny asks: 'What does that tell you about your OWD configuration?' This surfaces whether the security architecture is actually working — not just configured.
+ | 
+
+SECTION 3 — THE COACH GATE
+ | 
+
+When Human Judgment Is Required
+The coach gate is the point where Penny stops and a human takes over. There are three situations where the gate activates — and one situation where it is absolute.
+
+Gate Trigger 1 — Domain Score Below Threshold
+If a learner's cumulative domain score in any exam domain falls below 70% after the sprint that covers that domain, the gate activates.
+
+Gate State
+ | What It Means
+ | 
+ADVISORY (60–69%)
+ | Penny flags the domain gap on the coach dashboard. Coach reviews and decides whether to intervene. Learner may proceed to next sprint while working on the gap.
+ | 
+BLOCKING (below 60%)
+ | Learner cannot advance to the next sprint until the coach reviews their build artifacts and either clears the gate or assigns a remediation task. Penny notifies both learner and coach.
+ | 
+CRITICAL (below 50% on domains weighted 15%+)
+ | Immediate 1:1 coach session required. Penny drafts the session agenda based on specific question-level failure data. Coach owns the outcome.
+ | 
+
+Gate Trigger 2 — Technically Correct, No Business Reasoning
+This is the most important gate — and the hardest one for automated systems to catch alone.
+
+A participant can answer every multiple choice question correctly and still not be ready. The red flag is a learner who can configure a solution but cannot explain it to Elena in plain English. Penny listens for this in scenario responses and flags it explicitly.
+
+The Elena Test
+The coach guide for every sprint uses the same standard: 'Can this learner explain their configuration decision to Elena — HCH's Program Director — without using jargon?' If the answer is no, the learner is following steps, not building understanding. Penny flags this pattern. The coach decides what to do about it.
+ | 
+
+Penny flags the Elena Test failure when a scenario response:
+Contains the correct technical answer but no business justification
+References Salesforce UI steps without explaining what the configuration achieves
+Cannot connect the configuration choice to an HCH business outcome
+
+These flags appear on the coach dashboard with the specific response text. The coach decides: advisory note, targeted follow-up prompt, or scheduled 1:1.
+
+Gate Trigger 3 — Sprint 3 Exam Readiness
+By Week 10, the Private Coach Session 2 framework includes a formal exam readiness check. This is never Penny's decision alone. The coach reviews:
+
+Cumulative domain scores across all 9 domains
+Scenario response quality from Sprints 1–3
+Build verification completion rate
+Admin Decision Log quality — are entries explaining the WHY, or just documenting the HOW
+The learner's own confidence level in each domain
+
+The coach's Session 2 recommendation is one of three outcomes: Ready to sit the exam, Needs 2–4 more weeks of focused prep in specific domains, or Needs a fundamental concept review before attempting the exam.
+
+The Absolute Rule
+Exam candidacy — the decision that a learner is ready to sit the Salesforce Administrator exam — is never Penny's decision. Penny surfaces the data. The coach makes the call. This is not a system limitation. It is a design principle.
+ | 
+
+Coach Gate — Decision Matrix
+
+Situation
+ | Penny's Action
+ | Coach's Action
+ | Gate State
+ | 
+Domain score 70%+
+ | Records score, no flag
+ | Reviews in weekly dashboard
+ | Open — learner proceeds
+ | 
+Domain score 60–69%
+ | Advisory flag on dashboard, sends targeted practice prompts
+ | Reviews build artifacts, decides whether to intervene
+ | Advisory — learner may proceed
+ | 
+Domain score below 60%
+ | Blocking flag, notifies learner and coach, pauses sprint advance
+ | Reviews artifacts, assigns remediation or clears gate
+ | Blocked — cannot advance
+ | 
+Domain score below 50% on high-weight domain
+ | Critical flag, drafts 1:1 agenda with question-level failure data
+ | Schedules 1:1, owns the outcome
+ | Blocked — 1:1 required
+ | 
+Elena Test failure flagged
+ | Flags specific response, notes pattern
+ | Reviews response, decides follow-up type
+ | Advisory — coach judgment
+ | 
+Sprint 3 Week 10 Session 2
+ | Prepares full domain score report + scenario quality summary
+ | Runs exam readiness conversation, makes candidacy recommendation
+ | Coach gate — human decision only
+ | 
+ToM track — client-facing work
+ | Flags when scenario answers show no stakeholder awareness
+ | Reviews before learner communicates with DC client
+ | Blocking — client work requires coach clearance first cohort
+ | 
+
+SECTION 4 — ASSESSMENT SCHEDULE & RHYTHM
+ | 
+
+When Assessment Happens
+Assessment is not a separate event from learning. It is woven into the weekly rhythm so that Penny knows where every learner stands at all times — without adding workload.
+
+Timing
+ | Assessment Type
+ | What It Produces
+ | 
+End of each week (Definition of Done)
+ | Build Verification — Penny prompts specific output checks
+ | Build verification log entry in Trail OS, domain flag if failed
+ | 
+After each Penny Check-In (weekly)
+ | Scenario-based prompt tied to that week's build
+ | Reasoning quality score, Elena Test flag if triggered
+ | 
+On demand (learner-initiated)
+ | Multiple choice quiz — any domain, any time
+ | Domain score update in learner profile, Penny tracks trends
+ | 
+End of Sprint 1 (Week 4 — Demo)
+ | Sprint 1 domain coverage review — all Sprint 1 domains
+ | Full Sprint 1 scorecard, coach dashboard summary
+ | 
+End of Sprint 2 (Week 8 — Demo)
+ | Sprint 2 domain coverage review
+ | Full Sprint 2 scorecard, gate check before Sprint 3
+ | 
+Week 10 — Private Session 2
+ | Formal exam readiness check with coach
+ | Candidacy recommendation — coach decision
+ | 
+End of Sprint 3 (Week 12 — Demo Day)
+ | Final domain scorecard + portfolio review
+ | Program completion record in Trail OS
+ | 
+ToM — Weekly office hours
+ | Stand-up includes Penny quest completion review
+ | Coach sees who completed quests, who needs follow-up
+ | 
+
+The Friday Synthesis — Coach Intelligence Report
+Every Friday, Gemini synthesizes the week's assessment data across the entire cohort into a coach intelligence report. This report tells the coach:
+
+Which domains showed the most incorrect answers this week across the cohort
+Which learners triggered advisory or blocking gates
+Which learners haven't engaged with Penny in 4+ days
+Elena Test failure patterns — are multiple learners struggling to explain the same concept
+Suggested actions for Monday — specific, named, not generic
+
+What the Coach Does With the Friday Report
+The report is a to-do list, not a status update. If 3 of 8 learners failed the same Flow Builder scenario question, the coach doesn't intervene with 3 separate DMs — they open Monday's office hours with that scenario and let the group work through it together. The report turns individual gaps into cohort-level curriculum decisions.
+ | 
+
+SECTION 5 — APPLYING THE MODEL TO NEW TRACKS
+ | 
+
+The Template for Every New Track
+When TT adds a new certification track — Agentforce, Slack, Advanced Admin, Product Owner — the same four-layer model applies. The only thing that changes is the content.
+
+Step
+ | What to Do
+ | 
+1 — Get the exam guide
+ | Pull the official Salesforce certification exam outline from help.salesforce.com. Document every domain and its weight.
+ | 
+2 — Build the traceability matrix
+ | Map every exam domain to a capstone build task. Use HCH or a DC client org scenario. Write acceptance criteria for each build in Given/When/Then format.
+ | 
+3 — Write the Penny content
+ | For each domain: 10 multiple choice questions (MC), 3 scenario prompts tied to build tasks, 2 build verification checks. All grounded in help.salesforce.com.
+ | 
+4 — Set the gate thresholds
+ | Confirm domain weight thresholds for advisory/blocking/critical gates. High-weight domains (15%+) have lower tolerance for gaps.
+ | 
+5 — Define the coach gate criteria
+ | What scenarios require human review for this track? Document them explicitly. Client-facing tracks have stricter gates than exam-prep tracks.
+ | 
+6 — Load into Trail OS
+ | Hugh loads the domain structure, question bank, and gate configurations into Trail OS. Penny inherits the track configuration automatically.
+ | 
+
+Agentforce & Slack — What Makes These Tracks Different
+Agentforce and Slack certifications represent a significant growth opportunity for TT. Many participants will arrive already employed, wanting to add these skills. The assessment model is identical — but two things are different:
+
+The capstone work is DC client work, not just HCH. Agentforce and Slack work happens inside real nonprofit orgs. This raises the coach gate standard — the client environment is not a practice org.
+The skill gap profile is different. Participants arriving for Agentforce work often have strong admin fundamentals but no AI/automation exposure. The assessment needs to surface that gap early in Week 1, not Week 8.
+
+The Agentforce Opportunity
+Nonprofits are being asked about AI constantly and have almost no one to help them implement it responsibly. A ToM participant who completes the Agentforce track has something almost no one in the nonprofit Salesforce ecosystem has: supervised, documented, real-client Agentforce implementation experience. That is worth building for.
+ | 
+
+SECTION 6 — DATA PRIVACY & ASSESSMENT INTEGRITY
+ | 
+
+What Penny Stores and What Coaches See
+
+Data Point
+ | Who Can See It
+ | 
+Individual question responses
+ | Learner + Coach only. Never shared with other learners or clients.
+ | 
+Domain scores and trends
+ | Learner + Coach + Admin dashboard. Aggregated cohort data (no PII) in Friday report.
+ | 
+Build verification logs
+ | Learner + Coach. Stored in Trail OS linked to learner profile.
+ | 
+Elena Test flags
+ | Coach only. Specific response text visible to coach — not surfaced to learner as a score.
+ | 
+Friday cohort synthesis
+ | Coaches only. PII scrubbed. Gemini synthesizes patterns, not individual identities.
+ | 
+Exam candidacy recommendation
+ | Coach + Learner. Stored as a program record in Trail OS.
+ | 
+
+The Zero Fabrication Rule
+Penny never invents a score, fabricates progress, or tells a learner they are ready when the data says otherwise. Every score is traceable to a specific question response or build verification result. Every flag has evidence behind it. This is not just an ethical standard — it is the foundation of the program's credibility with employers and funders.
+ | 
+
+"You didn't just study for the exam. You built your proof."
+Salesforce Skills Assessment Framework v1.0  ·  Transition Trails Academy  ·  June 2026
+ | 
+

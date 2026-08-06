@@ -1,0 +1,58 @@
+All Academy programs · shared onboarding
+The first two weeks are the same everywhere
+One vocabulary, one onboarding sequence, one place the RESOLVE module lives. A learner moving from Foundations to Guided Trail to an apprenticeship should never have to relearn what a word means — and a coach should never have to relearn the process.
+01 · Why parity
+Same words, same shape, different content
+Three programs, four role tracks, and a volunteer coach ladder. Without shared language every one of those becomes its own dialect, and the cost lands in three places: a learner who has to relearn vocabulary at every transition, a coach who cannot move between programs, and a funder who cannot compare one cohort to another. The content differs by program. The words and the sequence should not.
+For the learner
+A Definition of Done means the same thing in Week 2 of Foundations and Week 9 of an apprenticeship. Continuity is the product — the Decision Log that starts at #1 keeps counting for years.
+For the coach
+A volunteer at four to six hours a week cannot learn a new process per program. One onboarding sequence means a Coach’s Assistant can step into any cohort and know what week one looks like.
+For the record
+If "Needs rework" means the same thing in every program, a rework rate is comparable across cohorts. If it does not, the number is decoration.
+02 · The shared vocabulary
+Every term used the same way, everywhere
+Taught in Week 1 of every program, and the reference a coach checks when they are unsure. If a term is not on this list, it is program-specific and should be introduced as such.
+Term
+What it means — the only meaning
+Where it appears
+{{ t.term }}
+{{ t.means }}
+{{ t.where }}
+Coach
+currently covers a volunteer Associate Coach, a Coach’s Assistant, and you. The rubric needs to know which one issued a verdict — a verdict from an Assistant on a first read and a verdict from you are not the same evidence — so the record should name the level, not the role.
+03 · The sequence
+Day zero, week one, week two
+{{ p.name }}
+{{ p.meta }}
+Happens
+{{ i.text }}
+Done when
+{{ p.done }}
+Not before, and not as a prerequisite to finish while waiting for a cohort. An apprentice with a day job will not complete a module in a gap — they will complete it when it is week one and someone is expecting it. Splitting it across the two weeks also means Recognize is taught in the week they are actually recognising something, which is the only way the method sticks.
+04 · What differs, and what compares
+Same shape, three contents
+Foundations
+Guided Trail
+Apprenticeship
+{{ d.row }}
+{{ d.ft }}
+{{ d.gt }}
+{{ d.tom }}
+The measures that aggregate across all three
+Identical definitions are what let a grant report say "across our programs" instead of reporting three times and hoping nobody asks why the numbers were computed differently. These six are defined once and recorded the same way everywhere.
+Completion.
+Every required artifact assessed, in any state. Not attendance, and not a feeling. A learner who reworked half of them and finished has completed.
+First-submission pass rate.
+Artifacts that met every criterion on first submission, over artifacts assessed.
+Rework rate, and its curve.
+The same figure per sprint. The curve is the measure — a flat line means the criteria are not discriminating, and a falling one is the clearest evidence of learning you will ever produce.
+Not attempted, and withdrawals with reason.
+Reported, never suppressed. A program that reports zero is not being believed, it is being discounted.
+Domain score movement.
+Same instrument at intake and exit, weighted to the same published exam domains, reported per domain rather than as one number.
+Articulation delta.
+First and last 90-second answer, scored blind by two people against the same three criteria.
+Foundations is measured toward an exam and an apprenticeship is measured toward client delivery, so pass rates are not comparable between them and should never be added together. Naming that limit in the report is what makes the rest of the numbers credible — a funder who finds an unstated apples-to-oranges comparison stops trusting the whole document, and a funder who sees you flag it yourself stops looking for others.
+one more thing worth doing
+Publish the vocabulary as Knowledge articles in Salesforce rather than as a document. Learners and coaches read them via External Apps Login, Penny can ground on them, and a change to a definition is versioned instead of silently diverging across three program guides. It is the cheapest parity mechanism available and it uses a license you already have.

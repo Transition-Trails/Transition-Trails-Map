@@ -1,0 +1,818 @@
+TRANSITION TRAILS
+Foundations Trail
+Sprint 1 Coach Guide
+The Foundation Layer  |  Weeks 1–4
+For
+ | Foundations Trail Coaches & Office Hours Facilitators
+ | 
+Sprint
+ | Sprint 1: The Foundation Layer  (Weeks 1–4)
+ | 
+Program
+ | Foundations Trail (FT)
+ | 
+Exam Domains
+ | Configuration & Setup (20%)  •  Object Manager (20%)  •  Security & Access (13%)  •  Data Management (10%)
+ | 
+Companion Files
+ | HCH_Legacy_Client_Data_DIRTY.csv  •  HCH_Legacy_Client_Data_CLEAN.csv  •  HCH_Sprint1_Data_Guide.xlsx
+ | 
+Classification
+ | CONFIDENTIAL — Coach Use Only. Do not share with learners.
+ | 
+
+📖  How to Use This Guide
+ | 
+This document is your complete operating guide for Sprint 1. It is organized by week and includes:
+ | 
+• The correct build (answer key) for every task a learner is asked to complete
+ | 
+• The purpose and expected outcomes of each data file — what each record tests, what errors will fire, and why
+ | 
+• Office Hours facilitation notes: what learners typically bring, how to lead the discussion, what questions to ask
+ | 
+• Private Session 1 framework: specific conversation prompts, what to listen for, when to be concerned
+ | 
+• Exam concept depth for each domain: what you need to know cold to answer questions confidently
+ | 
+• Red flags: behavioral patterns that signal a learner is completing tasks without understanding them
+ | 
+This guide does not replace your own Salesforce expertise. It gives you the HCH-specific context so you can coach the program, not just answer generic Salesforce questions.
+ | 
+
+1. Sprint 1 at a Glance — Coach Orientation
+1.1 What Learners Are Doing This Sprint
+Learners are building the HCH Salesforce org from scratch. By the end of Week 4, they will have: installed NPSP, created a custom data model with 4 fields and 1 validation rule, configured a role hierarchy and security model, and imported legacy client data. Every build step maps to the exam domains that carry the most weight on the Administrator exam.
+
+This is also the sprint where most learners discover whether they are following steps or actually understanding concepts. Your job is to surface that distinction — gently but clearly — before it calculates into a failed exam.
+
+1.2 What Coaches Are Responsible For This Sprint
+Responsibility
+ | Details
+ | 
+Weekly Office Hours (4 sessions)
+ | 45–60 min live Q&A. Weeks 1–3 are open technical Q&A. Week 4 is the Sprint 1 Demo session. See per-week facilitation notes in Section 2.
+ | 
+Private Coach Session 1 (Week 4)
+ | 45 min 1:1 per learner. NOT a technical tutoring session. See Section 3 for the full conversation framework.
+ | 
+Data File Expertise
+ | You must know the DIRTY CSV cold before Week 4 Office Hours. Section 4 gives you a complete breakdown of every record and issue.
+ | 
+Exam Concept Depth
+ | Learners will ask 'will this be on the exam?' You need to know domain weights and how HCH builds connect to exam questions. Section 5 has the depth content.
+ | 
+
+1.3 The HCH Context Coaches Must Know
+HCH is a fictional nonprofit in Dallas-Fort Worth. Learners are its sole Salesforce Administrator. Every configuration decision they make should be answerable with a business reason tied to HCH's mission. If a learner cannot explain why they made a choice in terms of HCH's actual needs, they are not ready for the exam or for employment.
+
+HCH Detail
+ | Why Coaches Need to Know It
+ | 
+HCH serves families in crisis: utility shutoffs, housing instability, veteran services
+ | Drives the Case privacy requirement (S1-03). Sensitive financial data cannot be visible to all staff. If a learner asks 'why can't we just use Public Read Only?' — this is your answer.
+ | 
+Primary stakeholder: Elena, Program Director
+ | All requirements flow through Elena. Learners reference her throughout the program. In coaching conversations, use her name — 'What would you tell Elena about why you made that choice?'
+ | 
+4 Support Staff, 3 Volunteers, 1 Program Director, 1 Executive Director
+ | This maps to the role hierarchy learners build. Know who can see what and why. The test users in the Data Guide match this org chart exactly.
+ | 
+HCH tracks Veteran Status and Income Bracket for federal 'Community First' grant compliance
+ | This is the business reason for S1-04 and FLS on sensitive fields. If a learner makes these fields visible to Volunteers, their grant reporting is compromised. The business consequence matters.
+ | 
+Legacy data is 40+ records in a manually managed Excel spreadsheet
+ | This is the source of the DIRTY CSV. HCH staff are not Salesforce-trained — the data quality issues reflect real non-technical data entry. Learners are not cleaning 'bad data' — they are doing real admin work.
+ | 
+
+2. Week-by-Week Facilitation Guide
+WEEK 1  Org Setup & Data Discovery
+ | 
+
+2.1 What Learners Are Doing
+Installing NPSP in a Developer Edition org named 'Horizon Community Hub — [Name]'
+Configuring company information and user interface settings
+Setting up the Digital Experiences site for their portfolio (Homepage + initial setup)
+Exploring what NPSP adds to the standard Salesforce data model
+
+🎯  Exam Concept Depth — What Coaches Need to Know Cold
+ | 
+Configuration & Setup is 20% of the exam — the highest single weight. The exam does NOT test whether you can click through a setup menu. It tests whether you understand WHAT each setting controls and the CONSEQUENCE of getting it wrong.
+ | 
+What coaches must know cold:
+ | 
+• NPSP installs the Household Account model and changes how Contacts relate to Accounts. Without NPSP, a Contact-to-Account relationship is a standard lookup. With NPSP, it uses a custom relationship that enforces the Household structure. The exam won't test NPSP specifically, but the underlying relationship model absolutely appears.
+ | 
+• Company Information fields (fiscal year, currency, address) affect how reports aggregate data and how formulas reference date fields. A wrong fiscal year start month breaks quarter-based reports.
+ | 
+• The difference between 'org settings' (global, affect all users) and 'object settings' (field-level, record-level) is the conceptual backbone of this entire sprint. Keep returning to it.
+ | 
+Common exam question pattern: 'An administrator changes the default currency. Which users are affected?' Answer: all users — but users with personal currency settings override the org default. This tests whether the learner understands the hierarchy of settings.
+ | 
+
+2.2 Office Hours — Week 1 Facilitation Notes
+📋  Coach Note
+ | 
+Week 1 Office Hours are the first touchpoint. Many learners have never installed NPSP before and are still figuring out what a Developer Edition org is. Set the tone: this is not a class. They bring questions. You help them think, not just answer.
+ | 
+Typical Week 1 questions you should be ready for:
+ | 
+• 'My NPSP install shows errors — is that okay?' → Common. The AppExchange install wizard sometimes surfaces warnings that are not blocking. Walk them through reading the install log vs. guessing.
+ | 
+• 'Do I have to name my org exactly as specified?' → The naming matters for portfolio professionalism but not Salesforce function. Explain why professional presentation of even a dev org matters to an employer reviewing their portfolio.
+ | 
+• 'Why can't I just use my existing Trailhead playground?' → A playground is shared/reset infrastructure. Their org is a professional artifact they are building for 12 weeks. A clean dedicated org is non-negotiable.
+ | 
+
+Discussion Prompt for Week 1 Office Hours
+Ask this question to the group and let it drive 10–15 minutes of discussion:
+
+💬  Discussion Prompt
+ | 
+'If you had to explain to Elena — HCH's Program Director — why you chose NPSP over standard Salesforce, what would you say? She is not a Salesforce user. Use no jargon.'
+ | 
+What you're listening for: Can they explain that NPSP automatically creates Household Accounts that group families together, which is essential for HCH's family-based service model? If they can only say 'NPSP is for nonprofits,' they have read the label but not understood the mechanism.
+ | 
+Follow-up: 'What specifically does NPSP change about the Contact-to-Account relationship?' This is the conceptual test. Most Week 1 learners won't know yet — and that's fine. Tell them: this is what Week 2 will clarify.
+ | 
+
+🚩  Red Flags — Learner Is Following Steps, Not Understanding
+ | 
+Learner installs NPSP and moves on without verifying the Household Account model is active in NPSP settings. The install alone is not enough — the model must be configured. If this is missed, their Week 2 data model build and Week 4 import will both produce wrong results.
+ | 
+Ask: 'After you installed NPSP, what did you check in NPSP Settings to confirm it was configured correctly for HCH?' A learner who can't answer this has not read the Build With Me video carefully enough.
+ | 
+
+WEEK 2  Custom Objects, Fields & Relationships
+ | 
+
+2.3 What Learners Are Doing
+Creating 4 custom fields on Contact: Utility Account Number (Text), Lease Expiration Date (Date), Veteran Status (Picklist), Income Bracket (Picklist)
+Creating a Validation Rule on Lease Expiration Date that rejects past dates
+Building a Formula field for basic grant eligibility (this is a Decision Log entry — no prescribed formula, learner decides)
+Placing all fields on a custom Page Layout section called 'Utility Information'
+Creating the initial ERD and publishing it to their portfolio
+Making 3 Admin Decision Log entries: Account model, field type choices, validation rule logic
+
+✅  Answer Key
+ | 
+Utility Account Number: Field Type = Text (not Number — utility account numbers often have leading zeros and alpha prefixes like UTL-88421. A Number field would strip the 'UTL-' prefix and leading zeros). Length = 18 chars minimum to accommodate format. Required = FALSE at the field level (import safety — some records don't have it yet).
+ | 
+Lease Expiration Date: Field Type = Date. Required = FALSE at the field level (same reason — some household members don't have leases). Validation Rule formula:
+ | 
+     AND(NOT(ISBLANK(Lease_Expiration_Date__c)), Lease_Expiration_Date__c < TODAY())
+ | 
+     Error message: 'Lease Expiration Date must be today or a future date.'
+ | 
+     Error location: Field (not top of page) so it appears next to the field.
+ | 
+Veteran Status: Field Type = Picklist. Values: Yes / No / Unknown (in that order). Default = none. Required = FALSE.
+ | 
+Income Bracket: Field Type = Picklist. Values (in order): Under $15,000 / $15,000 - $24,999 / $25,000 - $34,999 / $35,000 - $49,999 / $50,000 and above. Default = none. Required = FALSE.
+ | 
+Page Layout: Create a new Section called 'Utility Information'. Place all 4 custom fields inside it. Place the section below 'Contact Information' and above 'Address Information'.
+ | 
+
+🎯  Exam Concept Depth — What Coaches Need to Know Cold
+ | 
+Object Manager & Lightning App Builder is 20% of the exam — tied for highest. This week's build touches the most commonly tested sub-topics.
+ | 
+Field types: The exam gives scenario-based questions where the wrong field type causes a specific business problem. Key ones coaches must know:
+ | 
+• Text vs. Number: Text preserves leading zeros and allows alpha-numeric. Number enforces numeric input only.
+ | 
+• Date vs. Date/Time: Date is calendar-date only. Date/Time includes a time stamp. TODAY() works with Date fields; NOW() is for Date/Time. Common exam trap: using a Date field and then trying to use NOW() in a formula — it fails.
+ | 
+• Picklist vs. Text: Picklist enforces controlled values (better for reporting and filtering). Text is freeform (flexible but creates inconsistency). The exam tests when you'd choose each.
+ | 
+Validation Rules: The formula runs BEFORE the record saves. If the formula returns TRUE, the record is BLOCKED. This is counterintuitive — learners often write their formula backwards. Common error: AND(Lease_Expiration_Date__c < TODAY()) with no ISBLANK() check — this fires on every blank date, blocking new records that don't yet have a lease date.
+ | 
+The correct formula uses AND(NOT(ISBLANK(...)), ...) to only fire when the field is populated AND the date is in the past.
+ | 
+
+2.4 Office Hours — Week 2 Facilitation Notes
+📋  Coach Note
+ | 
+Week 2 generates the most Office Hours traffic of Sprint 1. Learners are confronting field type decisions for the first time and many will get the Utility Account Number field type wrong (using Number instead of Text).
+ | 
+If a learner says their Utility Account Number field won't accept the 'UTL-' prefix: they used a Number field. Walk them through deleting and recreating it as Text. This is also a Decision Log teachable moment — 'Add an entry explaining why you changed it.'
+ | 
+The most common validation rule mistake: formula fires on blank dates. If a learner reports that they can't create new Contacts at all, their validation rule is running on blank Lease Expiration values. Ask them to show you their formula — almost certainly missing the ISBLANK() check.
+ | 
+
+Discussion Prompt for Week 2 Office Hours
+💬  Discussion Prompt
+ | 
+'You built a Validation Rule that blocks records with past Lease Expiration dates. Patricia Williams (HCH-006) has a lease that expired in November 2023. What do you do? Can you import her record? What should HCH do before that record enters Salesforce?'
+ | 
+What you're listening for: Does the learner understand that the rule will block the import — and that this is CORRECT behavior, not a bug? The validation rule is working exactly as designed. The fix is not to turn off the rule — it is to get the updated lease date from HCH staff before importing. This is real admin work.
+ | 
+Follow-up: 'What process would you recommend Elena put in place so records never enter Salesforce with expired lease dates in the future?' Looking for: required fields on web forms, regular data audits, or a Flow that auto-flags approaching expirations.
+ | 
+
+🚩  Red Flags — Learner Is Following Steps, Not Understanding
+ | 
+Learner makes Utility Account Number a Required field on the Page Layout. This will block the import because 11 of the 36 clean records don't have a utility account number yet. The distinction between 'required on the layout' (user-facing enforcement) and 'required at the API level' (import-blocking enforcement) is a critical admin concept.
+ | 
+Learner creates Veteran Status as a Text field instead of a Picklist. The grant eligibility report (S1-04) requires filtering by Veteran = 'Yes'. A Text field cannot be reliably filtered — users can type 'yes', 'YES', 'Veteran', etc. If the report is the goal, the field type must enforce the value.
+ | 
+Ask: 'If you made Veteran Status a text field instead of a picklist, what would happen to the grant report when staff members type the value differently?' This surfaces the consequence without lecturing.
+ | 
+
+WEEK 3  Security Architecture: Roles, Profiles & OWDs
+ | 
+
+2.5 What Learners Are Doing
+Building the HCH Role Hierarchy: Executive Director > Program Director > Support Staff > Volunteer
+Creating the HCH Volunteer Profile (cloned from Standard User with reduced permissions)
+Setting Case OWD to Private
+Applying Field-Level Security to Veteran Status and Income Bracket: visible to Support Staff, hidden from Volunteers
+Creating 5 test users (from the Data Guide) to verify security scenarios
+Running the S1-03 acceptance criteria tests (login as each user, verify access)
+
+✅  Answer Key
+ | 
+Role Hierarchy (top to bottom): CEO/Executive Director → Program Director → Support Staff → Volunteer. Note: The role hierarchy should have Support Staff as a PARENT of Volunteers — this ensures Volunteers are at the bottom of the hierarchy and have no upward visibility into sensitive records.
+ | 
+HCH Volunteer Profile: Clone from 'Standard User'. Remove: Edit, Delete, Create on Cases. Remove: View on Cases if possible given OWD. Verify that object-level permissions do not conflict with OWD — OWD restricts record access; profiles restrict object access. Both layers must be correct.
+ | 
+Case OWD: Private. This means a Case is only visible to the record owner and users above the owner in the Role Hierarchy. Sharing Rules can be added to open access back up — but the default is locked.
+ | 
+FLS for Veteran Status and Income Bracket: In Profile settings (or Permission Sets — either is acceptable), set these fields to Hidden for the Volunteer profile. Confirm they are still Read/Edit for Support Staff.
+ | 
+Expected test results using the 5 test users from the Data Guide:
+ | 
+  • Sarah Kim (Support Staff) CANNOT see Tom Reid's cases → OWD Private working
+ | 
+  • Elena Vasquez (Program Director) CAN see Tom Reid's cases → Role Hierarchy working
+ | 
+  • Alex Rivera (Volunteer) sees ZERO Cases on Cases tab → OWD + Profile working
+ | 
+  • Alex Rivera CANNOT see Veteran Status or Income Bracket on a Contact → FLS working
+ | 
+  • Edward Nguyen (Executive Director) sees ALL Cases from all staff → Hierarchy top working
+ | 
+
+🎯  Exam Concept Depth — What Coaches Need to Know Cold
+ | 
+Security & Access is 13% of the exam and conceptually the hardest domain for most learners. The key mental model: Salesforce security is ADDITIVE at the object level but RESTRICTIVE at the record level.
+ | 
+The order of evaluation coaches must be able to explain in plain English:
+ | 
+  1. Profiles / Permission Sets → Control WHAT objects and fields a user can access (object-level, field-level)
+ | 
+  2. OWDs → Set the BASELINE record access for the ENTIRE org. Private means no sharing by default.
+ | 
+  3. Role Hierarchy → OPENS UP access above the OWD baseline. Users higher in the hierarchy can see records owned by users below them.
+ | 
+  4. Sharing Rules → EXTEND access horizontally (to users at the same level) based on criteria or ownership.
+ | 
+Common misconception: 'Setting OWD to Private hides all records from everyone.' Wrong — it hides records from peers and below. The owner always sees their own records. Managers above always see their subordinates' records.
+ | 
+Another common misconception: 'I set the Volunteer profile to not see Cases. Why can the Volunteer still see some cases?' Answer: Profile removes Object-level access. But if OWD is Public Read Only (not Private), the user still has record-level access. OWD and Profile are independent layers — both must be correct.
+ | 
+FLS vs. OWD: FLS controls whether a field is visible at all (regardless of record access). OWD controls whether the record is visible. A user can have OWD access to a record but still have certain fields hidden via FLS. The grant data (Veteran Status, Income Bracket) is the perfect real-world example: even if a Volunteer could see the Contact record, they should NOT see the sensitive demographic fields.
+ | 
+
+2.6 Office Hours — Week 3 Facilitation Notes
+📋  Coach Note
+ | 
+Week 3 is where conceptual gaps become visible. Learners who were successfully 'following steps' in Weeks 1-2 will get confused because security architecture requires building a mental model, not just completing a checklist.
+ | 
+The most common confusion: learners set the Case OWD to Private and then expect that no one can see any Cases — including Elena. They're surprised when Elena (Program Director) can still see Tom's cases. They've missed the Role Hierarchy piece.
+ | 
+Coaching move: 'Walk me through the three layers of Salesforce security in order. Start with profiles.' If they can't articulate all three layers in sequence, slow down and work through it conceptually before touching the org.
+ | 
+Second common issue: Learners create the Role Hierarchy correctly but don't create the test users — so they can't verify their work. Without logging in as a Volunteer, they have no evidence their FLS configuration is correct. Push hard on this.
+ | 
+This is also Private Coach Session 1 week. Use Office Hours to address technical questions. Save the career conversation and big-picture reflection for the 1:1.
+ | 
+
+💬  Discussion Prompt
+ | 
+'A volunteer at HCH accidentally sees income bracket data for a client and asks a caseworker about it. Elena calls you. What happened, and what are the three things you check first?'
+ | 
+What you're listening for: Did the learner apply FLS to the Volunteer PROFILE — not just the Volunteer ROLE? FLS must be set at the profile level. Roles do not control field visibility. If they set OWD to Private but forgot FLS, the record is hidden but the field is exposed on any record the volunteer CAN see.
+ | 
+Second: Was the Volunteer test user actually using the Volunteer profile, or was it created as a Standard User? A wrong profile assignment means their tests proved nothing.
+ | 
+This scenario is a real thing that happens. Let learners sit with the discomfort of it for a moment before explaining the fix.
+ | 
+
+🚩  Red Flags — Learner Is Following Steps, Not Understanding
+ | 
+Learner creates the Role Hierarchy but does not create test users, using their own System Admin login to 'test' instead. System Admin bypasses all security — there is nothing to test. If they say 'it looks like it's working,' ask: 'How do you know? Which user did you log in as to verify?'
+ | 
+Learner sets OWD to Private for Cases but forgets to verify that the existing Cases created in Weeks 1-2 (if any) are owned by the correct users. OWD applies to all records — if early test Cases are owned by the Admin, the security model appears to work even when it isn't.
+ | 
+Learner conflates Permission Sets and Profiles. Profiles set a user's base access. Permission Sets ADD access on top. A Permission Set cannot REMOVE access that a Profile grants — only Profiles can restrict. If a learner tries to use a Permission Set to block Volunteer access, it won't work.
+ | 
+
+WEEK 4  Data Management & the Sprint 1 Demo
+ | 
+
+2.7 What Learners Are Doing
+Cleaning the HCH_Legacy_Client_Data_DIRTY.csv following the Data Guide issue log
+Mapping CSV columns to NPSP Contact and Account fields
+Running the import via the Data Import Wizard
+Configuring a Duplicate Rule for Contacts
+Reviewing import results and documenting failures in the Admin Decision Log
+Recording a 2-minute Loom video walkthrough of their Sprint 1 build
+Attending the Sprint 1 Demo Office Hours session
+
+3. The Data Files — Complete Coach Reference
+3.1 Overview of the Three Data Files
+There are three companion files for Sprint 1. Every coach must read this section before Week 4 Office Hours.
+
+File
+ | Purpose
+ | Who Sees It
+ | 
+HCH_Legacy_Client_Data_DIRTY.csv
+ | The raw 'Excel export' with 41 rows (including 1 duplicate) and 12 categories of intentional data quality issues. This is the learner's starting point — they clean and import this file.
+ | Learners and coaches
+ | 
+HCH_Legacy_Client_Data_CLEAN.csv
+ | The corrected, import-ready version with 36 records, NPSP API field names as headers, all values normalized. This is the answer key — what a correctly prepared import should look like.
+ | COACHES ONLYDo not share with learners until after their import attempt.
+ | 
+HCH_Sprint1_Data_Guide.xlsx
+ | 5-sheet formatted workbook: Overview, Dirty Data Issue Log, Field Mapping Guide, Import Checklist, Test Users & Roles. Learner reference throughout Sprint 1.
+ | Learners and coaches
+ | 
+
+3.2 The Dirty CSV — What's in It and Why
+The dirty CSV was built to give learners a realistic data cleaning experience and to test the configuration they built in Weeks 1–3. Every issue was intentional. Here is what coaches need to know about each category:
+
+Record(s)
+ | Client
+ | Issue Category & What's Wrong
+ | Correct Resolution
+ | Story
+ | 
+HCH-006
+ | Patricia Williams
+ | FAIL — Past Lease Date (2023-11-15). Validation Rule WILL block this record on import.
+ | Do NOT import. Flag for manual follow-up. Staff must get updated lease date. This proves the Validation Rule is working — coach this as success, not a bug.
+ | S1-01
+ | 
+HCH-019
+ | Charles Lee
+ | FAIL — Past Lease Date (01/31/2024). Same issue as HCH-006 but in a different date format.
+ | Exclude from import. Note: the date format is also wrong (MM/DD/YYYY vs. YYYY-MM-DD expected). Two issues on one record — good for teaching prioritization.
+ | S1-01
+ | 
+HCH-038 (×2)
+ | Mildred Collins
+ | FAIL — Exact duplicate row. Same Client ID, same all data. Duplicate Rule should catch this during import.
+ | Delete second row before import. After import, review Duplicate Alert log to confirm rule fired. Decision: set Duplicate Rule to Alert, not Block, for initial import.
+ | Data Mgmt
+ | 
+HCH-005
+ | Diane Johnson
+ | DECIDE — Shares email with HCH-004 (Marcus Johnson). Duplicate Rule may flag the household.
+ | Remove email from HCH-005 before import. Add Description: 'Household shares one email account.' This is a judgment call, not a technical error.
+ | Data Mgmt
+ | 
+HCH-007
+ | James Thompson
+ | Format — Phone: '2145550234' (no formatting).
+ | Reformat to (214) 555-0234. Apply TRIM and formatting to all phone numbers before export.
+ | S1-01
+ | 
+HCH-008
+ | Rosa Garcia
+ | Picklist — Veteran Status: 'YES' (all caps). Picklist value is 'Yes'.
+ | Change 'YES' → 'Yes'. Audit all Veteran Status values. Normalize to exactly: Yes / No / Unknown.
+ | S1-04
+ | 
+HCH-009
+ | Miguel Garcia
+ | Picklist — Veteran Status: 'N'. Not a defined picklist value.
+ | Change 'N' → 'No'. Same audit as HCH-008.
+ | S1-04
+ | 
+HCH-010
+ | David Brown
+ | Picklist — Income Bracket: '$25k-$35k'. Informal format, no picklist match.
+ | Map to '$25,000 - $34,999'. Document this mapping decision in Decision Log.
+ | S1-04
+ | 
+HCH-011
+ | Linda Davis
+ | Missing Required (soft) — No email. Not a system-required field but affects Sprint 2 auto-response.
+ | Import without email. Add Description: 'No email — contact by phone only.' Flag for follow-up.
+ | S1-01
+ | 
+HCH-012
+ | Kevin Wilson
+ | Missing — No Utility Account Number. Field is not system-required but affects eligibility.
+ | Import without Utility Acct #. Add Description note. Will not appear in grant eligibility report until updated.
+ | S1-01
+ | 
+HCH-013
+ | Susan Anderson
+ | Date Format — Lease date: 'Aug 15 2026'. Text format, not YYYY-MM-DD.
+ | Convert to 2026-08-15. Standardize ALL dates to YYYY-MM-DD before import.
+ | S1-01
+ | 
+HCH-014
+ | Robert Taylor
+ | Picklist — Veteran Status: 'Veteran'. Descriptive word, not a picklist value.
+ | Change 'Veteran' → 'Yes'. Army service detail belongs in Description, not the picklist field.
+ | S1-04
+ | 
+HCH-015
+ | Jennifer Moore
+ | Name Format — Full name 'Jennifer L. Moore' entered in First Name field. Last Name blank.
+ | Split: First = Jennifer, Last = Moore. Discard middle initial (no SF field) or add to Description.
+ | S1-01
+ | 
+HCH-016
+ | Anthony Robinson
+ | Name Format — Leading space in First Name (' Anthony').
+ | Trim space. In Excel: apply TRIM() to all Name columns before exporting.
+ | Data Mgmt
+ | 
+HCH-020
+ | Dorothy Walker
+ | Format — State: 'Texas' (full name, not 2-letter abbreviation).
+ | Change 'Texas' → 'TX'. Audit all State values for full-word entries.
+ | Data Mgmt
+ | 
+HCH-021
+ | George Hall
+ | Format — ZIP: '7610' (4 digits). Fort Worth ZIPs are 5 digits.
+ | Flag for manual review — DO NOT guess the missing digit. Import with 4-digit ZIP temporarily. Add Description note.
+ | Data Mgmt
+ | 
+HCH-022
+ | Nancy Young
+ | Picklist — Income Bracket: 'about 30k'. Informal, no match.
+ | Map to '$25,000 - $34,999' (best fit). Document mapping judgment in Decision Log.
+ | S1-04
+ | 
+HCH-024
+ | Shirley Wright
+ | Format — Phone has extension: '(214) 555-0621 x204'.
+ | Strip extension from Phone field. Move 'Ext. 204' to Description.
+ | Data Mgmt
+ | 
+HCH-026
+ | Barbara Green
+ | Missing — Veteran Status blank. Status unknown.
+ | Import with Veteran Status = 'Unknown'. Blank fields are excluded from report filters; Unknown is a valid data point.
+ | S1-04
+ | 
+HCH-028
+ | Gloria Nelson
+ | Data Type — Income Bracket: '27500' (actual dollar, not bracket).
+ | Map to '$25,000 - $34,999'. Document in Decision Log: why picklist over a currency field?
+ | S1-04
+ | 
+HCH-030
+ | Joyce Mitchell
+ | Format — Utility Account: 'Utility#44821' (inconsistent prefix).
+ | Normalize to 'UTL-44821'. Document standardization. Consider adding a Validation Rule for format.
+ | S1-01
+ | 
+HCH-033
+ | Jerome Turner
+ | Name Format — ALL CAPS in both First and Last Name.
+ | Apply PROPER() in Excel before export → 'Jerome Turner'. Also fix Veteran Status: 'YES' → 'Yes'.
+ | Data Mgmt
+ | 
+HCH-035
+ | Lawrence Campbell
+ | Picklist — Income Bracket: '35k/50k'. Slash-separated, no match.
+ | Map to '$35,000 - $49,999'. Document mapping.
+ | S1-04
+ | 
+HCH-037
+ | Joshua Edwards
+ | Invalid Email — 'jedwards@email..com' (double period).
+ | Remove email before import. Cannot guess correct address. Add Description note.
+ | Data Mgmt
+ | 
+HCH-040
+ | Irene Sanchez
+ | Import Decision — Active? = 'N'. No Salesforce equivalent for this field.
+ | Discuss with stakeholder. Best practice: create 'Active Client' checkbox field, import all records including inactive ones. Preserves history.
+ | S1 Decision
+ | 
+HCH-003
+ | Sofia Martinez
+ | Import Decision — Minor (14 years old). Depends on HCH policy.
+ | Coach learner to ask: does HCH track minors as Contacts? If so, import. If not, skip. This is a policy question, not a technical one. Document the decision.
+ | S1 Decision
+ | 
+
+3.3 Expected Import Results — The Answer Key
+A learner who correctly cleaned the CSV and ran the import should see approximately these results. Use these numbers to evaluate their work in Office Hours and Private Session 1.
+
+Metric
+ | Expected Value
+ | What It Means if Wrong
+ | 
+Total records in CLEAN CSV
+ | 36
+ | If lower: they may have over-excluded records. If higher: they may have not removed duplicates or past-date records.
+ | 
+Records successfully imported
+ | ~34–36
+ | 1–2 failures are acceptable (import process learning). More than 5 failures suggests the CSV was not properly cleaned.
+ | 
+Household Accounts created by NPSP
+ | 32 (28 single + 4 multi-member)
+ | 4 households have 2 members each (Martinez, Johnson, Garcia, Harris). If learner sees 36 Household Accounts, NPSP is not grouping by household — the Account Name column wasn't mapped correctly.
+ | 
+Veteran Status = 'Yes' contacts
+ | 9
+ | If the Grant Eligibility Report returns a different number, picklist values were not normalized correctly before import — some 'Yes' values may still be 'YES', 'Veteran', or 'Y'.
+ | 
+Veteran Status = 'Unknown'
+ | 1 (Barbara Green)
+ | If 0, learner imported blank as blank instead of mapping to 'Unknown'. Blank fields are excluded from report filters — this is a data quality issue.
+ | 
+Duplicate Alert fired
+ | At minimum: Johnson household (shared email). Mildred Collins if duplicate row wasn't removed.
+ | If Duplicate Rule never fired, it was either not active or set to Allow instead of Alert. Ask learner to show you the Duplicate Management settings.
+ | 
+Records excluded (NOT imported)
+ | HCH-006, HCH-019 at minimum
+ | Validation Rule should block past-date records. If learner reports 0 failures, either: (a) the validation rule is not active, (b) those records were pre-excluded from the CSV (acceptable), or (c) the dates weren't past after the learner 'fixed' them (wrong).
+ | 
+
+3.4 Office Hours — Week 4 Sprint 1 Demo Facilitation
+📋  Coach Note
+ | 
+Week 4 Office Hours is the Sprint 1 Demo session. This is not a lecture or a grading event — it is a peer showcase and a Q&A on what learners built. Your role is facilitator, not evaluator.
+ | 
+Format that works well (45 minutes):
+ | 
+  • 10 min: 2-3 volunteers demo their org — specifically the security setup (login as Volunteer, show zero Cases) and the import results. This normalizes sharing imperfect work.
+ | 
+  • 15 min: Open Q&A on anything from Sprint 1. Most common: 'My import had X failures — what did I do wrong?'
+ | 
+  • 10 min: Coach walks through the most common mistakes from this sprint (draw from the Red Flags sections above)
+ | 
+  • 10 min: Preview of Sprint 2 — what changes, what carries forward
+ | 
+Do NOT share the CLEAN CSV during this session. Let learners compare their import results to their own cleaned CSV. Publish the CLEAN CSV to coaches-only resources after all learners have submitted Sprint 1.
+ | 
+
+💬  Discussion Prompt for Sprint 1 Demo
+ | 
+'Show me your Grant Eligibility Report. How many Veterans did it return? How do you know that number is correct?'
+ | 
+What you're listening for: A learner who says '9 Veterans' AND can explain how they got there — 'I normalized all Veteran Status values to exactly Yes/No/Unknown and mapped informal values like YES and Veteran to Yes' — is thinking like an admin.
+ | 
+A learner who says '9 Veterans' but can't explain how they cleaned the Veteran Status field is guessing. Follow up: 'What values did the original CSV use for Veteran Status? How many different variations were there?'
+ | 
+Knowing the answer isn't proof of understanding. Being able to trace back to the data preparation is.
+ | 
+
+3. Private Coach Session 1 — Conversation Framework
+Private Coach Session 1 is scheduled at the end of Sprint 1 (Week 4). It is 45 minutes. It is NOT a technical tutoring session. It is a conversation about the learner as a person, a thinker, and someone making a career decision.
+
+📌  Core Purpose of This Session
+ | 
+There are three things you are trying to learn from this conversation:
+ | 
+1. Is this learner understanding the concepts, or just completing tasks?
+ | 
+2. Is the learner starting to feel like a Salesforce Admin — does this feel like a natural fit for them?
+ | 
+3. What does this learner need most from coaching for the next 8 weeks?
+ | 
+You are not grading their Sprint 1 build. You are not fixing their technical mistakes. You are having a genuine human conversation with someone who has invested real time and money in a career change, and you are their guide.
+ | 
+
+3.1 Session Structure (45 Minutes)
+Time
+ | What Happens
+ | 
+0–5 min
+ | Open with warmth, not agenda. 'How are you doing? Not with Salesforce — how are YOU doing?' Let them land before diving in.
+ | 
+5–20 min
+ | Sprint 1 Reflection. Use the questions in Section 3.2. The goal is to surface whether they're understanding or just executing. Ask open questions. Don't lecture. Don't explain — listen.
+ | 
+20–35 min
+ | Career Clarity Conversation. Use the questions in Section 3.3. This is the most important part. Many learners have never been asked directly whether this career change is actually right for them.
+ | 
+35–45 min
+ | Forward Look. What's one thing they want to do differently in Sprint 2? What's one thing they're genuinely excited to learn? Close with a specific encouragement grounded in something they said — not generic praise.
+ | 
+
+3.2 Sprint 1 Reflection Questions
+Use these questions to move from 'did you complete the tasks' to 'do you understand what you built and why.' Ask one at a time. Let the silence sit before jumping in.
+
+On the Build
+'Walk me through the security decision you're most confident in. Why does Private OWD for Cases protect HCH?'
+'Which decision log entry was hardest to write? What made it hard?'
+'If Elena called you tomorrow and said a volunteer just saw a client's income bracket data — what would you check first?'
+
+On Understanding vs. Executing
+'At what point this sprint did you feel like you understood what you were doing vs. following instructions?'
+'What would you tell a new admin about why Salesforce security works the way it does? Use an analogy if it helps.'
+'When your import had failures — what was your first instinct? Did you troubleshoot or did you look for the answer first?'
+
+📋  Coach Note
+ | 
+What you're listening for in the technical reflection:
+ | 
+• Can they explain the purpose of a decision, not just what they did? ('I set Case OWD to Private because HCH's case data includes income and housing information that should only be visible to the assigned caseworker' = good. 'I set it to Private because that's what the user story said' = needs work.)
+ | 
+• Are they curious about edge cases? ('I set the Volunteer FLS but I wasn't sure if there were other fields I should restrict' = thinking like an admin. 'I followed the checklist' = completing tasks.)
+ | 
+• Do they know what they don't know? Learners who can articulate their specific gaps are ready to learn. Learners who say 'I think I've got it' without being able to demonstrate it are the ones to watch.
+ | 
+
+3.3 Career Clarity Questions
+These questions are about the whole person, not the program. Foundations Trail is explicit about creating space for learners to evaluate whether this career change is right for them. Your job is to create that space, not to advocate for any particular answer.
+
+Opening the Conversation
+'How has this first month compared to what you expected when you signed up?'
+'What surprised you about what an admin actually does day-to-day?'
+
+Testing the Fit
+'You spent the last four weeks thinking about data structure, access control, and data quality. How did that feel? Tedious? Satisfying? Both?'
+'When something broke and you had to troubleshoot it — what was your emotional response? Did you want to figure it out, or did you just want it to be fixed?'
+'What do you picture yourself doing as a Salesforce Admin six months from now? What does a typical Tuesday look like?'
+
+The Hard Question (ask when the conversation has enough trust)
+'Is this still feeling like the right move? There's no wrong answer — and you don't have to decide today. But I want to ask directly because this is the moment to say it if something feels off.'
+
+📋  Coach Note
+ | 
+What to do if a learner expresses doubt:
+ | 
+Do not reassure them that they're doing great and push them forward. That's not coaching — that's avoiding the conversation.
+ | 
+Do ask: 'Tell me more about what's creating doubt.' Then listen. The doubt might be about Salesforce specifically, or it might be about the pace of change, imposter syndrome, or something outside the program entirely.
+ | 
+You can normalize doubt without dismissing it: 'A lot of people hit a moment in this sprint where they wonder if this is for them. The question is whether the doubt is coming from the work feeling wrong, or from the work feeling hard. Those are different things.'
+ | 
+If the learner expresses genuine misalignment (e.g., 'I realized I don't actually like this kind of detail-oriented thinking'), take that seriously. Connect them with Angela or the program director before Session 2. This is why we built career clarity into the program — catching it at Week 4 is better than Week 12.
+ | 
+
+3.4 Session 1 Notes Template
+Use this structure to document your notes after each Session 1 conversation. Keep notes in the coach-only channel, not shared with learners.
+
+Field
+ | Your Notes
+ | 
+Learner Name
+ | 
+ | 
+Session Date
+ | 
+ | 
+Technical Understanding (1–5)1 = following steps only, 5 = explaining WHY confidently
+ | 
+ | 
+Specific evidence of understanding or gap
+ | 
+ | 
+Career Clarity SignalEnthusiastic / Uncertain / Concerning
+ | 
+ | 
+Key things they said about career fit
+ | 
+ | 
+What they need most from coaching in Sprint 2
+ | 
+ | 
+Any flags to escalate to program lead
+ | 
+ | 
+
+4. Exam Concept Depth — What Coaches Must Know
+This section gives you the conceptual depth you need to answer learner exam questions confidently. These are not general Salesforce facts — they are the specific concepts the Administrator exam tests in the domains Sprint 1 covers, grounded in the HCH build.
+
+4.1 Configuration & Setup (20% of Exam)
+Exam Topic
+ | What the Exam Actually Tests
+ | 
+Company Information
+ | Fiscal year start month affects period-based reports. Currency affects all financial fields globally. These are org-wide settings — changing them affects every user.
+ | 
+User Interface Settings
+ | Enabling features like Chatter, Activities, and Einstein affects what all users see. Some cannot be disabled once enabled. The exam tests consequences of enabling vs. not enabling.
+ | 
+Installed Packages (NPSP)
+ | Managed packages (like NPSP) cannot be edited — only configured through their own settings. An admin cannot modify package code. This is tested via 'An admin wants to change a field in an installed package. What can they do?' Answer: configure within the package's settings, not modify the field directly.
+ | 
+HCH Connection
+ | The decision to install NPSP is a Configuration & Setup decision. The learner's Decision Log entry on this choice is an exam-ready artifact: 'We installed NPSP because HCH's Household Account model requires family grouping that standard Salesforce Contact-to-Account relationships don't provide out of the box.'
+ | 
+
+4.2 Object Manager & Lightning App Builder (20% of Exam)
+Exam Topic
+ | What the Exam Actually Tests
+ | 
+Field Types — Key Distinctions
+ | Text vs. Number (leading zeros, alpha-numeric), Date vs. Date/Time (TODAY() vs. NOW()), Picklist vs. Text (controlled values vs. freeform, impact on reporting), Formula (read-only, calculated) vs. Rollup Summary (aggregate from child records). The exam gives scenarios where the wrong field type causes a specific problem.
+ | 
+Validation Rules — Logic Direction
+ | The rule fires when the formula = TRUE. Most learners write the formula they want to ALLOW rather than what they want to BLOCK. When the formula returns TRUE, the record is rejected. Always test with the ISBLANK() pattern: AND(NOT(ISBLANK(field)), field < TODAY())
+ | 
+Page Layouts vs. Lightning Record Pages
+ | Page Layout controls fields, related lists, and sections available on the record. Lightning Record Page (App Builder) controls the overall page structure: components, tabs, visibility rules. They are separate layers — both must be configured correctly.
+ | 
+Record Types
+ | Record Types allow different picklist values and page layouts for different groups of records of the same object. Sprint 2 introduces Case record types (Utility Assistance, Housing Support, Veteran Services). Worth mentioning in Week 2 as a preview.
+ | 
+HCH Connection
+ | Every field the learner created this sprint (Utility Account Number, Lease Expiration, Veteran Status, Income Bracket) is a direct exam question waiting to happen. 'Why Text for Utility Account Number?' 'Why a Date field instead of Date/Time for Lease Expiration?' 'Why Picklist instead of Text for Veteran Status?' These are the Decision Log entries that make the portfolio real.
+ | 
+
+4.3 Security & Access (13% of Exam)
+Exam Topic
+ | What the Exam Actually Tests
+ | 
+The Four-Layer Mental Model
+ | Layer 1: Profiles/Permission Sets (object & field access). Layer 2: OWDs (default record access). Layer 3: Role Hierarchy (opens access upward). Layer 4: Sharing Rules (opens access horizontally). The exam tests 'what happens if you only configure some layers correctly?'
+ | 
+OWD Options and Their Consequences
+ | Private: only owner + hierarchy above. Public Read Only: everyone can read, only owner can edit/delete. Public Read/Write: everyone can read and edit. Controlled by Parent: access is determined by the parent record's OWD. Cases must be Private for HCH's scenario.
+ | 
+The 'You Can't Restrict Past the OWD' Rule
+ | Sharing Rules and Role Hierarchy can only OPEN access above what OWD grants. They cannot RESTRICT below OWD. This is the most counterintuitive rule. If OWD is Public Read Only, you cannot use a Sharing Rule to hide records from specific users.
+ | 
+FLS vs. OWD — Independent Layers
+ | FLS controls field visibility regardless of record access. OWD controls record visibility regardless of field visibility. A user can have record access (OWD allows it) but still have a specific field hidden (FLS blocks it). The Veteran Status and Income Bracket fields on HCH Contact records are the perfect example.
+ | 
+HCH Connection
+ | The S1-03 test protocol (log in as each of the 5 test users) is the best exam prep available for this domain. If a learner can walk through each test scenario and explain WHY the result is what it is — they understand the security model, not just the configuration.
+ | 
+
+4.4 Data Management (10% of Exam)
+Exam Topic
+ | What the Exam Actually Tests
+ | 
+Data Import Wizard vs. Data Loader
+ | Import Wizard: 50,000 record limit, web browser, supports Contacts/Leads/Accounts/custom objects, no scheduling, basic mapping. Data Loader: 5 million+ records, desktop app, supports all objects, can schedule, command line available, harder to use. The exam gives scenarios: 'which tool?' Always ask: how many records? Does it need scheduling? Is it a custom object?
+ | 
+Duplicate Rules — Alert vs. Block
+ | Alert: creates the record, flags the potential duplicate for review. Block: prevents creation if a match is found. For an initial import, Alert is safer — Block could prevent legitimate new records if the matching criteria are too broad.
+ | 
+Import Failures — Common Causes
+ | Validation Rule violation (past lease dates), required field missing (if set to required at API level), picklist value not in picklist definition, relationship field can't find a matching record. Each failure in the import results log tells you which field caused the error. Reading the log is a skill.
+ | 
+External IDs and Upserts
+ | An External ID field allows you to match incoming records to existing records during import (upsert = update if exists, insert if not). HCH's Client ID column in the dirty CSV is a candidate for an External ID — though the learner is taught to ignore it in the initial import. Worth mentioning as an advanced concept.
+ | 
+HCH Connection
+ | The dirty CSV is the exam come to life. Every issue in the Dirty Data Issue Log maps to a data management concept. When a learner says 'I just deleted those rows and moved on' — that's a missed learning opportunity. Ask: 'Why did that record fail? What specifically in Salesforce blocked it?'
+ | 
+
+5. Red Flags & Coaching Interventions
+These are the behavioral patterns coaches should watch for across Sprint 1. Each one has a specific coaching response. None of them warrant alarm — they are learning opportunities. They do require active intervention before Sprint 2.
+
+Red Flag
+ | What It Usually Means
+ | Coaching Response
+ | 
+Learner completes all tasks but can't explain any decision
+ | Following the Build With Me videos without engaging with the 'why' behind each step
+ | Ask a specific Decision Log question: 'Why did you choose a Picklist for Veteran Status instead of a Text field?' If they can't answer, assign: add a Decision Log entry explaining it before Office Hours next week.
+ | 
+Learner tested security as System Admin
+ | Didn't create test users or didn't realize System Admin bypasses all security checks
+ | 'What did you log in as when you verified that volunteers can't see Cases?' If the answer is their own admin account, the test is invalid. Have them create the test users from the Data Guide and run the protocol before Session 1.
+ | 
+Import had 0 failures with the dirty CSV
+ | Either: they imported the CLEAN CSV (should be coach-only), they modified records to avoid validation rule rejection, or the validation rule is not active
+ | 'Show me your import results. Which records from the original CSV had past lease dates, and what happened to them?' The two records with past dates (HCH-006, HCH-019) should have been excluded or failed. If they didn't, something is wrong with the validation rule setup.
+ | 
+Learner merged all household members into one Contact record
+ | Misunderstood NPSP Household model — thought one record per household, not one per person
+ | 'HCH needs to track Carlos and Maria Martinez separately — different service history, different eligibility dates. How does NPSP allow you to do that while still treating them as one family?' Return to the Household Account structure.
+ | 
+Decision Log entries describe WHAT, not WHY
+ | Entries read like a configuration log: 'I set OWD to Private' instead of explaining the business reason
+ | 'Rewrite Decision 4. Pretend Elena just asked you why Cases are locked down. What would you tell her? Write that.' The Decision Log must be readable by a non-technical stakeholder — that's the standard.
+ | 
+Learner expresses that Sprint 1 felt purely mechanical and unsatisfying
+ | May be a fit signal — or may be that the learner has stronger strengths in areas Sprint 1 didn't touch yet (automation, analytics)
+ | Explore in Session 1. Ask about what they expected vs. what they found. Also: 'Sprint 2 is mostly automation — building Flows that make Salesforce do the thinking for you. Does that sound more interesting?' Honest preview.
+ | 
+Learner is significantly behind (incomplete Sprint 1 by Week 4)
+ | Life interference, underestimated time commitment, or early discouragement
+ | Address in Session 1 directly and with care: 'You're partway through Sprint 1. I want to understand what's in the way. Is it time, or is it something about the content?' Then problem-solve together — don't let them quietly fall further behind.
+ | 
+
+📌  A Final Note for Sprint 1 Coaches
+ | 
+Sprint 1 is where learners form their identity as Salesforce admins — or don't. The technical content is important. But what you're really watching for is whether they're starting to think like someone who owns a system.
+ | 
+An admin who owns a system asks: 'What breaks if I get this wrong?' not 'Did I follow the steps correctly?'
+ | 
+Your job is to ask that question on their behalf — every week — until they start asking it themselves.
+ | 
+That's what this program is for.
+ | 
+
+Real experience. Real impact. On the trail.

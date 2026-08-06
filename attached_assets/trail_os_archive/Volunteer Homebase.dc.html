@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/colors.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/typography.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/elevation.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/styles.css">
+<script src="_ds/transition-trails-design-system-335df4cf-3863-4d1a-b42a-1376e9ff24c3/_ds_bundle.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #FBF7F0; }
+  a { color: var(--tt-link); text-decoration: none; }
+  a:hover { color: var(--tt-link-hover); }
+  button { font: inherit; cursor: pointer; }
+</style>
+</helmet>
+
+<div style="height: 100vh; display: flex; flex-direction: column; font-family: 'Open Sans', system-ui, sans-serif; color: var(--tt-slate); background: #FBF7F0; overflow: hidden;">
+
+  <header style="height: 58px; flex-shrink: 0; background: var(--tt-charcoal); display: flex; align-items: center; justify-content: space-between; padding: 0 24px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; color: #fff;">Transition Trails</span>
+      <span style="font-size: 14px; color: rgba(255,255,255,.6); border-left: 1px solid rgba(255,255,255,.22); padding-left: 14px;">Trail OS</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 14px; color: rgba(255,255,255,.7);">Volunteer</span>
+      <span style="width: 30px; height: 30px; border-radius: 999px; background: var(--tt-sun-amber); color: var(--tt-charcoal); display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px;">SN</span>
+      <span style="font-size: 14px; color: #fff;">Simone N.</span>
+    </div>
+  </header>
+
+  <div style="flex: 1; display: flex; min-height: 0;">
+
+    <sc-if value="{{ leftClosed }}" hint-placeholder-val="{{ true }}">
+      <nav style="width: 60px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; overflow-y: auto;">
+        <button onClick="{{ openLeft }}" title="Workspace" style="width: 36px; height: 36px; border-radius: 9px; border: none; background: transparent; display: flex; align-items: center; justify-content: center;">
+          <span style="display: grid; grid-template-columns: repeat(3, 3px); gap: 2.5px;"><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span><span style="width: 3px; height: 3px; background: var(--tt-slate);"></span></span>
+        </button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+          <button onClick="{{ openLeft }}" title="{{ app.name }}" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+            <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          </button>
+        </sc-for>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Gemini Notebook" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); padding: 0;"></button>
+        <span style="width: 26px; height: 1px; background: rgba(42,46,44,.14); margin: 4px 0;"></span>
+        <button onClick="{{ openLeft }}" title="Salesforce" style="width: 36px; height: 36px; border-radius: 9px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); padding: 0;"></button>
+        <button onClick="{{ openLeft }}" title="draw.io" style="width: 36px; height: 36px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); padding: 0;"></button>
+      </nav>
+    </sc-if>
+
+    <sc-if value="{{ leftOpen }}" hint-placeholder-val="{{ false }}">
+      <nav style="width: 236px; flex-shrink: 0; background: #fff; border-right: 1px solid rgba(42,46,44,.14); padding: 16px 14px; overflow-y: auto;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 12px; border-bottom: 1px solid rgba(42,46,44,.10); margin-bottom: 12px;">
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Workspace</span>
+          <button onClick="{{ closeLeft }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">‹</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px;">
+          <sc-for list="{{ googleApps }}" as="app" hint-placeholder-count="7">
+            <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal);">
+              <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+              {{ app.name }}
+              <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+            </a>
+          </sc-for>
+        </div>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Research</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 8px; border-radius: 10px; font-size: 15px; color: var(--tt-charcoal); background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); margin-bottom: 16px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+          Gemini Notebook
+          <span style="margin-left: auto; font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tt-slate); margin: 0 0 6px; padding: 0 4px;">Build</p>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); margin-bottom: 6px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <span style="flex: 1;"><span style="display: block; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Salesforce</span><span style="display: block; font-size: 14px; color: var(--tt-slate);">production</span></span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <a href="#" style="display: flex; align-items: center; gap: 11px; padding: 9px 8px; border-radius: 10px;">
+          <span style="width: 22px; height: 22px; border-radius: 6px; background: var(--tt-warm-gray); flex-shrink: 0;"></span>
+          <span style="flex: 1;"><span style="display: block; font-size: 15px; color: var(--tt-charcoal);">draw.io</span><span style="display: block; font-size: 14px; color: var(--tt-slate);">process maps</span></span>
+          <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+        </a>
+        <p style="font-size: 14px; color: var(--tt-slate); margin: 16px 4px 0; padding-top: 12px; border-top: 1px solid rgba(42,46,44,.10);">All open in a new tab.</p>
+      </nav>
+    </sc-if>
+
+    <main style="flex: 1; min-width: 0; overflow-y: auto; padding: 22px 30px 40px;">
+
+      <div style="display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid var(--tt-green-300); border-radius: 14px; padding: 12px 18px; margin-bottom: 16px;">
+        <span style="width: 26px; height: 26px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+        <span style="flex: 1; font-size: 15px; color: var(--tt-slate); opacity: .75;">Ask Penny — a case, an article, anything</span>
+        <span style="font-size: 14px; color: var(--tt-deep-teal); font-weight: 600;">⏎</span>
+      </div>
+
+      <sc-if value="{{ monthOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08); margin-bottom: 20px; overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 24px; border-bottom: 1px solid rgba(42,46,44,.10);">
+            <span style="font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--tt-trail-green);">This month</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">{{ monthSummary }}</span>
+            <button onClick="{{ collapseMonth }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Collapse ▲</button>
+          </div>
+          <div style="display: flex; gap: 26px; padding: 24px 28px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 220px;">
+              <p style="font-family: 'Poppins', sans-serif; font-size: 21px; line-height: 1.3; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 10px;">{{ hoursHeadline }}</p>
+              <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 16px; max-width: 48ch;">{{ hoursNote }}</p>
+              <div style="display: flex; gap: 4px; align-items: flex-end; height: 34px;">
+                <sc-for list="{{ hourBars }}" as="b" hint-placeholder-count="8">
+                  <span style="width: 26px; height: {{ b.h }}; border-radius: 4px 4px 2px 2px; background: {{ b.fill }}; border: {{ b.border }};"></span>
+                </sc-for>
+              </div>
+              <p style="font-size: 14px; color: var(--tt-slate); margin: 8px 0 0;">{{ commitmentNote }}</p>
+            </div>
+            <div style="width: 232px; flex-shrink: 0; border-left: 1px solid rgba(42,46,44,.10); padding-left: 26px;">
+              <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 8px;">Toward Trail Merch</p>
+              <p style="font-size: 15px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 12px;">340 points. The field notebook unlocks at 500.</p>
+              <div style="height: 8px; background: var(--tt-warm-gray); border-radius: 999px; overflow: hidden; margin-bottom: 12px;"><span style="display: block; width: 68%; height: 100%; background: var(--tt-trail-green);"></span></div>
+              <p style="font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin: 0;">Earned by closing cases you were assigned — never bought, and only made for people who do the work.</p>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ monthClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 13px 22px; margin-bottom: 20px;">
+          <span style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">This month</span>
+          <span style="font-size: 14px; color: var(--tt-slate);">{{ monthSummary }} · 340 points toward merch</span>
+          <button onClick="{{ expandMonth }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); display: inline-flex; align-items: center; gap: 7px; padding: 4px 8px;">Expand ▼</button>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 14px; padding: 12px 18px; margin-bottom: 20px;">
+        <span style="flex-shrink: 0; white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal);">Log time</span>
+        <span style="flex: 1; min-width: 150px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">Harbor Youth Trust ▾</span>
+        <span style="flex-shrink: 0; width: 60px; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 8px 12px; font-size: 14px; color: var(--tt-slate);">1.0</span>
+        <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Log it</button>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; overflow: hidden; margin-bottom: 22px; box-shadow: 0 6px 16px rgba(42,46,44,.08);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 15px 22px; border-bottom: 1px solid rgba(42,46,44,.10);">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Your cases</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">2 open</span>
+          <button onClick="{{ toggleCases }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ casesLabel }}</button>
+        </div>
+        <div style="display: {{ casesDisplay }};">
+        <sc-for list="{{ cases }}" as="c" hint-placeholder-count="2">
+          <a href="#" style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; border-bottom: 1px solid rgba(42,46,44,.10); text-decoration: none;">
+            <span style="flex: 1; min-width: 0;">
+              <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ c.subject }}</span>
+              <span style="display: block; margin-top: 5px; line-height: 1.5;">
+                <span style="font-size: 14px; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: {{ c.statusColor }}; background: {{ c.statusBg }};">{{ c.status }}</span>
+                <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">{{ c.assigned }}</span>
+              </span>
+            </span>
+            <span style="flex-shrink: 0; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Open →</span>
+          </a>
+        </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 22px 24px; margin-bottom: 22px;">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Ways to help</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">Unassigned queue · 6 open</span>
+          <span style="font-size: 14px; color: var(--tt-slate);">Matching your specialty first</span>
+          <button onClick="{{ toggleQueue }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ queueLabel }}</button>
+        </div>
+        <div style="display: {{ queueDisplay }};">
+        <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 12px; max-width: 62ch;">Nothing here is assigned to anyone. Take what you have time for — taking one puts it in your cases above, and closing it earns points toward merch.</p>
+        <p style="font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 16px; padding: 10px 14px; background: var(--tt-sky-100); border-radius: 14px;">You have 2 of 3 open. One more and the queue will ask you to close something first — that limit exists so a case does not sit with someone who ran out of time for it.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ queue }}" as="q" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; border: 1px solid {{ q.border }}; background: {{ q.bg }}; border-radius: 14px;">
+              <span style="flex: 1; min-width: 200px;">
+                <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ q.subject }}</span>
+                <span style="display: block; margin-top: 5px; line-height: 1.5;">
+                  <span style="font-size: 14px; color: var(--tt-slate); font-family: Menlo, monospace;">{{ q.number }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ q.client }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">· {{ q.size }}</span>
+                  <span style="font-size: 14px; font-weight: 600; color: var(--tt-deep-teal); margin-left: 8px;">{{ q.tag }}</span>
+                </span>
+              </span>
+              <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Assign to me</button>
+            </div>
+          </sc-for>
+        </div>
+        <p style="font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 14px 0 0;">Six more in the queue that do not match your specialty. <a href="#">See the whole queue</a></p>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 22px 24px; margin-bottom: 22px;">
+        <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 19px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Widen what you can take</h2>
+          <span style="font-size: 14px; color: var(--tt-slate);">From Penny</span>
+          <button onClick="{{ toggleGrowth }}" style="margin-left: auto; flex-shrink: 0; white-space: nowrap; border: none; background: transparent; font-size: 14px; color: var(--tt-slate); padding: 4px 8px;">{{ growthLabel }}</button>
+        </div>
+        <div style="display: {{ growthDisplay }};">
+        <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 16px; max-width: 64ch;">Drawn from the cases nobody could take this month, not from a course list. Learn one of these and the work is already waiting — and the time you spend learning counts toward your hours, because widening what you can take is a contribution.</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <sc-for list="{{ growth }}" as="g" hint-placeholder-count="3">
+            <div style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; padding: 16px 18px; border: 1px solid rgba(42,46,44,.14); border-radius: 14px;">
+              <span style="flex: 1; min-width: 220px;">
+                <span style="display: block; font-size: 15px; line-height: 1.45; font-weight: 600; color: var(--tt-charcoal);">{{ g.skill }}</span>
+                <span style="display: block; font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin-top: 4px;">{{ g.why }}</span>
+                <span style="display: block; margin-top: 8px; line-height: 1.5;">
+                  <span style="font-size: 14px; font-weight: 600; color: var(--tt-deep-teal); background: var(--tt-sky-100); padding: 3px 10px; border-radius: 999px;">{{ g.time }}</span>
+                  <span style="font-size: 14px; color: var(--tt-slate); margin-left: 8px;">{{ g.format }}</span>
+                </span>
+              </span>
+              <button style="flex-shrink: 0; white-space: nowrap; border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Start</button>
+            </div>
+          </sc-for>
+        </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; align-items: start;">
+        <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 22px 24px;">
+          <h2 style="font-family: 'Poppins', sans-serif; font-size: 17px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Worth sharing</h2>
+          <p style="font-size: 15px; line-height: 1.6; color: var(--tt-slate); margin: 0 0 16px;">Posting about what you have actually done here counts for more than a share — and it is the part that helps your own network see the work.</p>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ shareables }}" as="s" hint-placeholder-count="2">
+              <div style="padding: 14px 16px; border: 1px solid rgba(42,46,44,.14); border-radius: 14px;">
+                <p style="font-size: 15px; line-height: 1.5; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 4px;">{{ s.title }}</p>
+                <p style="font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin: 0 0 10px;">{{ s.meta }}</p>
+                <button style="border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 7px 14px; border-radius: 14px;">{{ s.action }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #fff; border: 1px solid rgba(42,46,44,.14); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Record a process</h3>
+            <p style="font-size: 14px; line-height: 1.55; color: var(--tt-slate); margin: 0 0 12px;">Capture the steps once. Becomes an article, and the narration for a Build with Me video.</p>
+            <button style="border: 1.5px solid var(--tt-deep-teal); background: #fff; color: var(--tt-deep-teal); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 14px; padding: 8px 16px; border-radius: 14px;">Start recording</button>
+          </div>
+          <div style="background: var(--tt-sky-100); border: 1px solid var(--tt-warm-gray); border-radius: 22px; padding: 20px 22px;">
+            <h3 style="font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 6px;">Your specialty</h3>
+            <p style="font-size: 15px; line-height: 1.55; color: var(--tt-slate); margin: 0;">Reporting and dashboards. The team routes asks to you on that first — tell Kim if that has changed.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <sc-if value="{{ rightClosed }}" hint-placeholder-val="{{ false }}">
+      <aside style="width: 60px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 12px;">
+        <button onClick="{{ openRight }}" title="Kim O." style="width: 38px; height: 38px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); padding: 0;"></button>
+        <button onClick="{{ openRight }}" title="#tt-volunteers" style="position: relative; width: 38px; height: 38px; border-radius: 9px; background: #fff; border: 1px solid rgba(42,46,44,.14); display: flex; align-items: center; justify-content: center; padding: 0;">
+          <span style="width: 20px; height: 20px; border-radius: 5px; background: var(--tt-warm-gray);"></span>
+          <span style="position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 999px; background: var(--tt-deep-teal); color: #fff; font-size: 14px; line-height: 18px; text-align: center; padding: 0 4px;">3</span>
+        </button>
+      </aside>
+    </sc-if>
+
+    <sc-if value="{{ rightOpen }}" hint-placeholder-val="{{ true }}">
+      <aside style="width: 288px; flex-shrink: 0; background: #fff; border-left: 1px solid rgba(42,46,44,.14); display: flex; flex-direction: column; min-height: 0;">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; gap: 12px; align-items: center;">
+          <span style="width: 40px; height: 40px; border-radius: 999px; background: var(--tt-green-100); border: 1px solid var(--tt-green-300); flex-shrink: 0;"></span>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">Kim O.</p>
+            <p style="font-size: 14px; color: var(--tt-slate); margin: 0;">Volunteer Coordinator</p>
+          </div>
+          <button onClick="{{ closeRight }}" style="border: none; background: transparent; font-size: 16px; color: var(--tt-slate); padding: 2px 6px;">›</button>
+        </div>
+        <div style="padding: 12px 20px 14px; border-bottom: 1px solid var(--tt-warm-gray);">
+          <a href="#" style="display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--tt-deep-teal); border-radius: 14px; padding: 9px 14px;">
+            <span style="width: 18px; height: 18px; border-radius: 5px; background: var(--tt-sky-100); border: 1px solid var(--tt-sky-blue); flex-shrink: 0;"></span>
+            <span style="flex: 1; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--tt-deep-teal);">Message Kim on Slack</span>
+            <span style="font-size: 14px; color: var(--tt-slate);">↗</span>
+          </a>
+          <p style="font-size: 14px; line-height: 1.5; color: var(--tt-slate); margin: 8px 0 0;">Assigned on your volunteer record.</p>
+        </div>
+        <div style="padding: 14px 20px; border-bottom: 1px solid var(--tt-warm-gray); display: flex; align-items: center; justify-content: space-between;">
+          <p style="font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: var(--tt-charcoal); margin: 0;">#tt-volunteers</p>
+          <span style="font-size: 14px; color: #fff; background: var(--tt-deep-teal); padding: 2px 9px; border-radius: 999px;">3</span>
+        </div>
+        <div style="flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px;">
+          <sc-for list="{{ messages }}" as="m" hint-placeholder-count="3">
+            <div>
+              <p style="font-size: 14px; font-weight: 600; color: var(--tt-charcoal); margin: 0 0 2px;">{{ m.who }}</p>
+              <p style="font-size: 14px; color: var(--tt-slate); margin: 0; line-height: 1.5;">{{ m.text }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding: 14px 20px; border-top: 1px solid var(--tt-warm-gray);">
+          <span style="display: block; border: 1.5px solid var(--tt-warm-gray); border-radius: 14px; padding: 9px 12px; font-size: 14px; color: var(--tt-slate);">Message #tt-volunteers</span>
+        </div>
+      </aside>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;monthlyHours&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:8,&quot;min&quot;:1,&quot;max&quot;:20,&quot;unit&quot;:&quot;hrs&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Agreement&quot;},&quot;behindOnHours&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;States&quot;},&quot;$preview&quot;:{&quot;width&quot;:1280}}">
+class Component extends DCLogic {
+  state = { left: false, right: true, month: true, cases: true, queue: true, growth: true };
+
+  renderVals() {
+    const behind = this.props.behindOnHours ?? false;
+    const commitment = this.props.monthlyHours ?? 8;
+    const logged = behind ? Math.max(1, Math.round(commitment * 0.25)) : Math.max(1, commitment - 2);
+    const remaining = Math.max(0, commitment - logged);
+
+    const hourBars = [];
+    for (let i = 0; i < commitment; i++) {
+      const done = i < logged;
+      hourBars.push({
+        h: done ? (22 + (i % 3) * 4) + 'px' : '14px',
+        fill: done ? 'var(--tt-trail-green)' : 'transparent',
+        border: done ? 'none' : '1.5px dashed var(--tt-warm-gray)',
+      });
+    }
+
+    return {
+      leftOpen: this.state.left, leftClosed: !this.state.left,
+      rightOpen: this.state.right, rightClosed: !this.state.right,
+      monthOpen: this.state.month, monthClosed: !this.state.month,
+
+      openLeft: () => this.setState({ left: true, right: false }),
+      closeLeft: () => this.setState({ left: false }),
+      openRight: () => this.setState({ right: true, left: false }),
+      closeRight: () => this.setState({ right: false }),
+      collapseMonth: () => this.setState({ month: false }),
+      expandMonth: () => this.setState({ month: true }),
+
+      casesDisplay: this.state.cases ? 'block' : 'none',
+      casesLabel: this.state.cases ? 'Collapse ▲' : 'Expand ▼',
+      toggleCases: () => this.setState({ cases: !this.state.cases }),
+
+      queueDisplay: this.state.queue ? 'block' : 'none',
+      queueLabel: this.state.queue ? 'Collapse ▲' : 'Expand ▼',
+      toggleQueue: () => this.setState({ queue: !this.state.queue }),
+
+      growthDisplay: this.state.growth ? 'block' : 'none',
+      growthLabel: this.state.growth ? 'Collapse ▲' : 'Expand ▼',
+      toggleGrowth: () => this.setState({ growth: !this.state.growth }),
+
+      googleApps: [
+        { name: 'Gmail' }, { name: 'Calendar' }, { name: 'Drive' },
+        { name: 'Docs' }, { name: 'Sheets' }, { name: 'Meet' }, { name: 'Keep' },
+      ],
+
+      monthSummary: logged + ' of ' + commitment + ' hours logged',
+      hoursHeadline: behind
+        ? logged + ' hours in, with two weeks left.'
+        : logged + ' hours in, ' + remaining + ' to go.',
+      hoursNote: behind
+        ? 'No rush and no penalty — a quiet month happens. If it is going to stay quiet, tell Kim rather than the system, and she will hold your place.'
+        : 'Comfortably on track. Anything beyond your ' + commitment + ' is genuinely extra, not expected.',
+      commitmentNote: 'Each block is an hour · ' + commitment + ' is what you agreed to when you joined',
+      hourBars,
+
+      growth: [
+        { skill: 'Drafting marketing copy for a nonprofit', why: 'Four cases asked for this in the last month and none of them found anyone. It is the biggest gap in the queue.', time: '40 minutes', format: 'Trail Kit · counts toward your hours' },
+        { skill: 'Editing a Build with Me video', why: 'Every process someone records needs one. Nine recordings are captured and unproduced right now.', time: 'about an hour', format: 'Walkthrough · counts toward your hours' },
+        { skill: 'Flow basics', why: 'Turns up in more unmatched cases than anything else, and it builds on the reporting you already do.', time: 'two sessions', format: 'Trail Kit 03 · counts toward your hours' },
+      ],
+
+      cases: [
+        { subject: 'Harbor Youth Trust — board reporting scope', status: 'In progress', statusColor: 'var(--tt-amber-700)', statusBg: 'var(--tt-amber-100)', assigned: 'Assigned to you' },
+        { subject: 'Riverside — dashboard refresh after the intake change', status: 'New', statusColor: 'var(--tt-slate)', statusBg: 'var(--tt-white)', assigned: 'Assigned to you · owned by Kim O.' },
+      ],
+
+      queue: [
+        { number: '00001063', subject: 'Review a learner demo — reporting build', client: 'Guided Trail', size: 'about 30 minutes', tag: '· reporting', bg: 'var(--tt-green-100)', border: 'var(--tt-green-300)' },
+        { number: '00001059', subject: 'Second pair of eyes on the Northside dashboard spec', client: 'Northside Shelter', size: 'about an hour', tag: '· reporting', bg: 'var(--tt-green-100)', border: 'var(--tt-green-300)' },
+        { number: '00001061', subject: 'Mock interview — Denise, week 10', client: 'Program team', size: '45 minutes, scheduled', tag: '', bg: '#fff', border: 'rgba(42,46,44,.14)' },
+      ],
+
+      shareables: [
+        { title: 'Marisol placed as a Salesforce Administrator', meta: 'Posted by Transition Trails yesterday · 14 shares', action: 'Open on LinkedIn' },
+        { title: 'The dashboard you built for Harbor Youth Trust', meta: 'Your work · nothing published about it yet', action: 'Draft a post' },
+      ],
+
+      messages: [
+        { who: 'Kim O.', text: 'Simone — the Harbor scope is ready whenever you are, no deadline on it' },
+        { who: 'Priya Raman', text: 'anyone free to watch a 10-minute learner demo this week?' },
+        { who: 'Kim O.', text: 'field notebooks arrived, they look good' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
