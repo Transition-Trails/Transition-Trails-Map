@@ -173,21 +173,9 @@ function AdminContextBar() {
     setShowSwitcher(false);
   }
 
+  // No context — render a silent spacer so layout doesn't shift when context is set
   if (!activeContext) {
-    return (
-      <div className="h-[32px] flex items-center gap-2 px-4 bg-muted/20 border-b border-border/40 text-[14px] shrink-0">
-        <Target className="w-3 h-3 text-muted-foreground/40 shrink-0" />
-        <span className="text-muted-foreground/50">No workspace context</span>
-        <div className="flex-1" />
-        <button
-          onClick={() => setLocation('/context')}
-          className="inline-flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/80 transition-colors"
-        >
-          <Plus className="w-3 h-3" />
-          Set Context
-        </button>
-      </div>
-    );
+    return <div className="h-[32px] border-b border-border/30 shrink-0" />;
   }
 
   return (
