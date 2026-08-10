@@ -34,7 +34,7 @@ import moduleDraftsRouter       from "./moduleDrafts";
 import homebaseRouter           from "./homebase";
 import adminUsersRouter         from "./adminUsers";
 import impersonateRouter        from "./impersonate";
-import { requireStaff, requireAdmin, requireSuperAdmin, isSuperAdmin } from "../middlewares/requireAuth";
+import { requireStaff, requireAdmin, requireSuperAdmin, isSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
 import { db } from "@workspace/db";
 import { trailOsAuditLogTable } from "@workspace/db/schema";
 import { logger } from "../lib/logger";
@@ -104,6 +104,16 @@ const staffAuthGate: RequestHandler = (req, res, next) => {
 };
 
 router.use(staffAuthGate);
+
+// ── Effective identity middleware ─────────────────────────────────────────────
+//
+// Populates res.locals.effectiveEmail and res.locals.effectiveAudience for every
+// request.  When a superadmin is impersonating, these reflect the target user so
+// homebase data routes and audience guards operate on the correct identity.
+// Access-control middleware (requireStaff/requireAdmin/requireSuperAdmin) always
+// reads the REAL session and is unaffected.
+
+router.use(effectiveIdentityMiddleware as RequestHandler);
 
 // ── Admin-only path guards ────────────────────────────────────────────────────
 //

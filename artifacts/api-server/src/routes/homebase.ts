@@ -125,8 +125,8 @@ router.get("/auth/homebase/status", async (req, res) => {
 // ── POST /homebase/log-time ───────────────────────────────────────────────────
 
 router.post("/homebase/log-time", requireHomebaseAuth, async (req, res) => {
-  const email    = req.session.googleEmail!;
-  const audience = req.session.googleAudience!;
+  const email    = (res.locals["effectiveEmail"] as string);
+  const audience = (res.locals["effectiveAudience"] as string);
 
   const { activityLabel, hours } = req.body as {
     activityLabel?: unknown;
@@ -166,7 +166,7 @@ router.post("/homebase/log-time", requireHomebaseAuth, async (req, res) => {
 // ── GET /homebase/log-time ────────────────────────────────────────────────────
 
 router.get("/homebase/log-time", requireHomebaseAuth, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   // Start of current calendar month
   const now       = new Date();
@@ -247,7 +247,7 @@ function requireLearnerAudience(
   res:  import("express").Response,
   next: import("express").NextFunction,
 ): void {
-  if (req.session.googleAudience !== "learner") {
+  if (res.locals["effectiveAudience"] !== "learner") {
     res.status(403).json({ error: "This resource is only available to learners." });
     return;
   }
@@ -275,7 +275,7 @@ router.get("/homebase/learner/quest", requireHomebaseAuth, requireLearnerAudienc
     return;
   }
 
-  const email  = req.session.googleEmail!;
+  const email  = (res.locals["effectiveEmail"] as string);
   const apiKey = process.env["GEMINI_API_KEY"];
 
   if (!apiKey) {
@@ -370,7 +370,7 @@ router.post("/homebase/learner/quest/set-stone", requireHomebaseAuth, requireLea
 // than an empty list, which would be misleading.
 
 router.get("/homebase/learner/cases", requireHomebaseAuth, requireLearnerAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   // ── Step 1: look up Contact by email ──────────────────────────────────────
   let contactId: string | null;
@@ -440,7 +440,7 @@ router.get("/homebase/learner/week", requireHomebaseAuth, requireLearnerAudience
 // Returns coach: null so the UI renders the Penny fallback.
 
 router.get("/homebase/learner/coach", requireHomebaseAuth, requireLearnerAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   let linked: boolean;
   try {
@@ -467,7 +467,7 @@ router.get("/homebase/learner/coach", requireHomebaseAuth, requireLearnerAudienc
 // learner / volunteer / staff all get 403.
 
 function requireCoachAudience(req: Request, res: Response, next: NextFunction): void {
-  if (req.session.googleAudience !== "coach") {
+  if (res.locals["effectiveAudience"] !== "coach") {
     res.status(403).json({ error: "This resource is only available to coaches." });
     return;
   }
@@ -524,7 +524,7 @@ router.get("/homebase/coach/squad", requireHomebaseAuth, requireCoachAudience, (
 // SF service token is absent; null lead otherwise.
 
 router.get("/homebase/coach/lead", requireHomebaseAuth, requireCoachAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   let linked: boolean;
   try {
@@ -556,7 +556,7 @@ router.get("/homebase/coach/lead", requireHomebaseAuth, requireCoachAudience, as
 //   Records found        → { linked:true, cases, totalOpen }
 
 router.get("/homebase/coach/cases", requireHomebaseAuth, requireCoachAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   // ── Step 1: look up Contact by email ──────────────────────────────────────
   let contactId: string | null;
@@ -609,7 +609,7 @@ router.get("/homebase/coach/cases", requireHomebaseAuth, requireCoachAudience, a
 // ── Volunteer audience guard ───────────────────────────────────────────────────
 
 function requireVolunteerAudience(req: Request, res: Response, next: NextFunction): void {
-  if (req.session.googleAudience !== "volunteer") {
+  if (res.locals["effectiveAudience"] !== "volunteer") {
     res.status(403).json({ error: "Volunteer access only" });
     return;
   }
@@ -675,7 +675,7 @@ function nextMerchTier(points: number) {
 //     nextMerchTier, nextMerchPoints, pointsToNext, specialty, caseLimit }
 
 router.get("/homebase/volunteer/month", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   // ── Time log sum for current month ─────────────────────────────────────────
   const now        = new Date();
@@ -734,7 +734,7 @@ router.get("/homebase/volunteer/month", requireHomebaseAuth, requireVolunteerAud
 //   Records found        → { linked:true, cases, totalOpen }
 
 router.get("/homebase/volunteer/cases", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   // ── Step 1: User lookup ───────────────────────────────────────────────────
   // OwnerId on a Case must be a User (Id starts with '005'), not a Contact.
@@ -828,7 +828,7 @@ async function sfSvcUpdate(
 //   Success              → { items, openCount, caseLimit, hasData:true }
 
 router.get("/homebase/volunteer/queue", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
-  const email     = req.session.googleEmail!;
+  const email     = (res.locals["effectiveEmail"] as string);
   const profile   = await getOrCreateVolunteerProfile(email);
   const caseLimit = profile?.caseLimit ?? 3;
   const specialty = profile?.specialty  ?? null;
@@ -953,7 +953,7 @@ export const assignmentInFlight = new Set<string>();
 export const casesInFlight = new Set<string>();
 
 router.post("/homebase/volunteer/queue/assign", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
-  const email = req.session.googleEmail!;
+  const email = (res.locals["effectiveEmail"] as string);
 
   // ── Step 1: Parse + validate caseId ───────────────────────────────────────
   const { caseId } = req.body as { caseId?: unknown };
@@ -1117,7 +1117,7 @@ router.get("/homebase/volunteer/shareables", requireHomebaseAuth, requireVolunte
 // coordinator data is wired into SF records.
 
 router.get("/homebase/volunteer/coordinator", requireHomebaseAuth, requireVolunteerAudience, async (req, res) => {
-  const email   = req.session.googleEmail!;
+  const email   = (res.locals["effectiveEmail"] as string);
   const profile = await getOrCreateVolunteerProfile(email);
 
   res.json({

@@ -217,19 +217,45 @@ function getHomebaseAudience(
 }
 
 /**
+ * effectiveIdentityMiddleware
+ *
+ * Populates `res.locals.effectiveEmail` and `res.locals.effectiveAudience`
+ * for every authenticated request.
+ *
+ * When a superadmin is impersonating, the effective identity is the impersonated
+ * user — homebase data routes and audience guards use these values so the
+ * superadmin sees exactly what the target user sees.
+ *
+ * Access-control checks (requireStaff / requireAdmin / requireSuperAdmin) always
+ * read the REAL session (googleEmail, googleGroups) and are unaffected.
+ *
+ * Must be mounted BEFORE any router that uses the effective identity.
+ */
+export const effectiveIdentityMiddleware: RequestHandler = (req, res, next) => {
+  if (req.session.impersonatedEmail) {
+    res.locals['effectiveEmail']    = req.session.impersonatedEmail;
+    res.locals['effectiveAudience'] = req.session.impersonatedAudience ?? null;
+  } else {
+    res.locals['effectiveEmail']    = req.session.googleEmail   ?? null;
+    res.locals['effectiveAudience'] = req.session.googleAudience ?? null;
+  }
+  next();
+};
+
+/**
  * requireHomebaseAuth
  *
- * Returns 401 if no Google session.
- * Returns 403 if the signed-in user does not have a homebase audience in session.
+ * Returns 401 if no Google session (real session check).
+ * Returns 403 if the effective audience is not a homebase audience.
+ *
+ * Uses res.locals.effectiveAudience (set by effectiveIdentityMiddleware) so
+ * a superadmin impersonating a learner/coach/volunteer passes this gate.
  *
  * Applied to homebase data routes (log-time, quest, squad, etc.).
- * The homebase auth flow uses the same Google Sign-In as staff, so the
- * session is the single source of truth.
  */
 export const requireHomebaseAuth: RequestHandler = (req, res, next) => {
-  const email = req.session.googleEmail;
-
-  if (!email) {
+  // Authentication: use real session (superadmin is genuinely signed in)
+  if (!req.session.googleEmail) {
     res.status(401).json({
       error:   'not_authenticated',
       message: 'Sign in required.',
@@ -237,9 +263,11 @@ export const requireHomebaseAuth: RequestHandler = (req, res, next) => {
     return;
   }
 
-  const audience = getHomebaseAudience(req.session);
+  // Authorization: use effective audience so impersonation works
+  const audience = res.locals['effectiveAudience'] as string | null | undefined;
+  const HOMEBASE_AUDIENCES = ['learner', 'coach', 'volunteer'] as const;
 
-  if (!audience) {
+  if (!audience || !HOMEBASE_AUDIENCES.includes(audience as typeof HOMEBASE_AUDIENCES[number])) {
     res.status(403).json({
       error:   'not_authorized',
       message: 'This resource is only available to Homebase users (learner, coach, or volunteer).',
