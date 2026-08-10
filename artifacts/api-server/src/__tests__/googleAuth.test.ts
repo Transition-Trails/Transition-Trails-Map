@@ -117,10 +117,12 @@ describe('getGroupsForUser', () => {
   it('does NOT cache when the access token is unavailable — retries on next call', async () => {
     mockGetToken.mockResolvedValue(null); // no token
 
-    await getGroupsForUser('retry@transitiontrails.org');
-    await getGroupsForUser('retry@transitiontrails.org');
+    // Without a stale cache entry, each no-token call throws so the caller
+    // (e.g. /me) can fall back to session data instead of silently receiving [].
+    await expect(getGroupsForUser('retry@transitiontrails.org')).rejects.toThrow();
+    await expect(getGroupsForUser('retry@transitiontrails.org')).rejects.toThrow();
 
-    // Should have tried to get the token twice since failure is never cached
+    // Should have tried to get the token twice — failure is never cached so it retries
     expect(mockGetToken).toHaveBeenCalledTimes(2);
   });
 
@@ -140,19 +142,38 @@ describe('getGroupsForUser', () => {
     expect(mockGetToken).toHaveBeenCalledTimes(2);
   });
 
-  it('uses stale cached data when a live fetch throws — does not crash', async () => {
+  it('propagates throw when fetch fails and no stale cache is available', async () => {
+    // With no stale cache entry, a network failure propagates so the caller
+    // (e.g. /me) can fall back to session data rather than receiving [] and
+    // incorrectly treating the user as having no group membership.
     mockGetToken.mockResolvedValue('tok');
-    // First call succeeds
-    global.fetch = makeFetchMock([GROUPS.everyday]);
-    await getGroupsForUser('stale@transitiontrails.org');
-
-    // Clear cache but keep mock returning a token — then make fetch throw
     clearGroupsCache();
     global.fetch = vi.fn().mockRejectedValue(new Error('network down'));
 
-    const groups = await getGroupsForUser('stale@transitiontrails.org');
-    // Returns empty (no stale data this time) rather than throwing
-    expect(Array.isArray(groups)).toBe(true);
+    await expect(getGroupsForUser('stale@transitiontrails.org')).rejects.toThrow('network down');
+  });
+
+  it('returns stale cached data when a live fetch throws and stale entry exists', async () => {
+    mockGetToken.mockResolvedValue('tok');
+    // First call succeeds — populates cache
+    global.fetch = makeFetchMock([GROUPS.everyday]);
+    const fresh = await getGroupsForUser('stale@transitiontrails.org');
+    expect(fresh).toContain(GROUPS.everyday);
+
+    // Expire the cache entry so the next call attempts a refresh
+    const key = 'stale@transitiontrails.org';
+    const entry = (getGroupsForUser as unknown as { _cache?: Map<string, { groups: string[]; expires: number }> })._cache;
+    // Force expiry via clearGroupsCache + manual re-insert with expired TTL
+    // (using the exported cache via a second import is cleanest)
+    vi.useFakeTimers();
+    vi.advanceTimersByTime(10 * 60 * 1000); // advance past 5-min TTL
+    global.fetch = vi.fn().mockRejectedValue(new Error('network down'));
+
+    const stale = await getGroupsForUser(key);
+    // Stale data served — caller is not disrupted
+    expect(Array.isArray(stale)).toBe(true);
+    expect(stale).toContain(GROUPS.everyday);
+    vi.useRealTimers();
   });
 });
 

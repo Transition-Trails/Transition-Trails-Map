@@ -179,7 +179,7 @@ function decodeIdToken(token: string): {
 
 // 1. Start sign-in — redirect user to Google's consent screen
 router.get('/auth/google/login', (req, res) => {
-  const clientId = process.env['GOOGLE_CLIENT_ID'];
+  const clientId     = process.env['GOOGLE_CLIENT_ID'];
   if (!clientId) {
     res.status(500).send(
       'Google Sign-In is not configured (GOOGLE_CLIENT_ID missing). ' +
@@ -297,11 +297,11 @@ router.get('/auth/google/callback', async (req, res) => {
     // Group membership check — accept staff groups OR homebase groups.
     // Staff takes priority: if the user is in any staff group, they go to the
     // admin screens regardless of homebase group membership.
-    const groups    = await getGroupsForUser(email.toLowerCase());
-    const hasStaff  = isKnownStaff(groups, email);
-    const tier      = deriveGroupTier(groups, email);
+      const groups   = await getGroupsForUser(email);
+      const hasStaff = isKnownStaff(groups, email);
+      const tier = deriveGroupTier(groups, email);
     // Only derive homebase audience for non-staff users
-    const audience  = hasStaff ? null : deriveAudience(groups, email);
+      const audience = hasStaff ? null : deriveAudience(groups, email);
     const hasHomebase = audience !== null;
 
     if (!hasStaff && !hasHomebase) {
@@ -349,27 +349,40 @@ router.get('/auth/google/me', async (req, res) => {
 
   // Groups are refreshed after the cache TTL expires
   if (!req.session.googleGroupsExpiry || req.session.googleGroupsExpiry <= now) {
-    const groups   = await getGroupsForUser(email);
-    const hasStaff = isKnownStaff(groups, email);
-    // Staff takes priority: if the user is in any staff group, audience is
-    // always null — matching callback semantics exactly.
-    const audience = hasStaff ? null : deriveAudience(groups, email);
+    try {
+      const groups   = await getGroupsForUser(email);
+      const hasStaff = isKnownStaff(groups, email);
+      // Staff takes priority: if the user is in any staff group, audience is
+      // always null — matching callback semantics exactly.
+      const audience = hasStaff ? null : deriveAudience(groups, email);
 
-    if (!hasStaff && !audience) {
-      // User has been removed from all known groups — sign them out immediately
-      logger.warn({ email }, 'googleSignIn /me: user is no longer in any known group — ending session');
-      req.session.destroy(() => {});
-      res.json({ authenticated: false, reason: 'no_groups' });
-      return;
+      if (!hasStaff && !audience) {
+        // User has been removed from all known groups — sign them out immediately
+        logger.warn({ email }, 'googleSignIn /me: user is no longer in any known group — ending session');
+        req.session.destroy(() => {});
+        res.json({ authenticated: false, reason: 'no_groups' });
+        return;
+      }
+
+      const tier = deriveGroupTier(groups, email);
+      req.session.googleGroups       = groups;
+      req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
+      req.session.googleTier         = tier;
+      req.session.googleAudience     = audience ?? undefined;
+      // Fire-and-forget save — we'll already return the fresh data below
+      req.session.save(() => {});
+    } catch (groupsErr) {
+      // Transient Google Groups API failure (network error, quota exceeded, outage).
+      // Serve the stale session rather than returning a 500 — the user is still
+      // authenticated and should not be locked out due to a temporary API hiccup.
+      // Extend the expiry by 60 s so we retry soon without hammering the API.
+      logger.warn(
+        { err: groupsErr, email },
+        'googleSignIn /me: groups re-fetch failed — serving stale session data',
+      );
+      req.session.googleGroupsExpiry = now + 60 * 1000;
+      req.session.save(() => {});
     }
-
-    const tier = deriveGroupTier(groups, email);
-    req.session.googleGroups       = groups;
-    req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
-    req.session.googleTier         = tier;
-    req.session.googleAudience     = audience ?? undefined;
-    // Fire-and-forget save — we'll already return the fresh data below
-    req.session.save(() => {});
   }
 
   res.json({

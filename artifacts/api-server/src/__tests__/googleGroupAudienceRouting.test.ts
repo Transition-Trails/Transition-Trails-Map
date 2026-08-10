@@ -574,6 +574,75 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
   });
 });
 
+// ── 26–28. GET /api/auth/google/me — transient Google Groups API failure ─────────
+//
+// If getGroupsForUser throws (network error, quota exceeded, Google outage) during
+// a session refresh, /me must NOT return a 500.  The stale session data is still
+// valid proof of authentication, so the endpoint should serve it and let the user
+// continue working.  The expiry is extended slightly so a retry happens soon
+// without hammering the unavailable API.
+
+describe('GET /api/auth/google/me — transient Google Groups API failure', () => {
+  it('26. network error during refresh → 200 with stale coach audience (no 500)', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'coach@transitiontrails.org',
+      googleName:         'A Coach',
+      googleSub:          'uid-c-err',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0, // force a refresh attempt
+      googleTier:         'everyday',
+      googleAudience:     'coach',
+    });
+    // Simulate a transient network failure
+    mockGetGroups.mockRejectedValue(new Error('Network error: ECONNREFUSED'));
+
+    const res = await request(app).get('/api/auth/google/me');
+    expect(res.status).toBe(200);
+    expect(res.body.authenticated).toBe(true);
+    // Stale audience is served — user is not locked out
+    expect(res.body.audience).toBe('coach');
+    expect(res.body.email).toBe('coach@transitiontrails.org');
+    // Re-fetch was attempted
+    expect(mockGetGroups).toHaveBeenCalledWith('coach@transitiontrails.org');
+  });
+
+  it('27. quota-exceeded error during refresh → 200 with stale learner audience (no 500)', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'learner@transitiontrails.org',
+      googleName:         'A Learner',
+      googleSub:          'uid-l-err',
+      googleGroups:       [LEARNERS_GROUP],
+      googleGroupsExpiry: 0,
+      googleTier:         'everyday',
+      googleAudience:     'learner',
+    });
+    mockGetGroups.mockRejectedValue(new Error('Quota exceeded: rateLimitExceeded'));
+
+    const res = await request(app).get('/api/auth/google/me');
+    expect(res.status).toBe(200);
+    expect(res.body.authenticated).toBe(true);
+    expect(res.body.audience).toBe('learner');
+  });
+
+  it('28. API failure during refresh → response is never a 500', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'vol@transitiontrails.org',
+      googleName:         'A Volunteer',
+      googleSub:          'uid-v-err',
+      googleGroups:       [VOLUNTEERS_GROUP],
+      googleGroupsExpiry: 0,
+      googleTier:         'everyday',
+      googleAudience:     'volunteer',
+    });
+    mockGetGroups.mockRejectedValue(new Error('Google API unavailable'));
+
+    const res = await request(app).get('/api/auth/google/me');
+    expect(res.status).not.toBe(500);
+    expect(res.body.authenticated).toBe(true);
+    expect(res.body.audience).toBe('volunteer');
+  });
+});
+
 // ── 24–25. Hard-refresh / cold-start: /homebase route guard after session expiry ──
 //
 // When a user hard-refreshes the browser (or starts a cold session), the frontend

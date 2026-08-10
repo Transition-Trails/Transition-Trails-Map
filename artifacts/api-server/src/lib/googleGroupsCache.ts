@@ -76,20 +76,27 @@ export function clearGroupsCache(): void {
 
 /**
  * Check whether a specific email is a direct member of a group.
- * Returns true on HTTP 200, false on 404 or any error.
+ *
+ * Returns:
+ *   true  — HTTP 200 (definitive member)
+ *   false — HTTP 404 (definitive non-member)
+ *   throws — any other status (429, 500, 503…) or network error (transient failure)
+ *
+ * Callers must NOT equate a thrown error with non-membership.  A transient
+ * failure means "we don't know", not "they left the group".
  */
 async function isMemberOf(
   groupEmail: string,
   userEmail:  string,
   accessToken: string,
 ): Promise<boolean> {
-  try {
-    const url = `https://admin.googleapis.com/admin/directory/v1/groups/${encodeURIComponent(groupEmail)}/members/${encodeURIComponent(userEmail)}`;
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-    return res.status === 200;
-  } catch {
-    return false;
-  }
+  const url = `https://admin.googleapis.com/admin/directory/v1/groups/${encodeURIComponent(groupEmail)}/members/${encodeURIComponent(userEmail)}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 200) return true;
+  if (res.status === 404) return false;
+  // Transient failure (rate-limited, server error, etc.) — throw so the caller
+  // can serve stale data instead of incorrectly treating the user as non-member.
+  throw new Error(`Directory API transient error: HTTP ${res.status} for group ${groupEmail}`);
 }
 
 /**
@@ -112,8 +119,15 @@ export async function getGroupsForUser(email: string): Promise<string[]> {
   const accessToken = await getAdminAccessToken();
   if (!accessToken) {
     logger.warn({ email }, 'googleGroupsCache: no admin access token — lookup skipped, result not cached');
-    // Return stale data if we have it, otherwise empty (caller decides what to do)
-    return hit?.groups ?? [];
+    if (hit) {
+      // Serve the stale cached result so a temporary token-acquisition hiccup
+      // doesn't incorrectly revoke the user's group membership.
+      logger.warn({ email }, 'googleGroupsCache: serving stale groups (no access token)');
+      return hit.groups;
+    }
+    // No stale data and no token — propagate so callers like /me can fall back
+    // to session data rather than signing the user out.
+    throw new Error('googleGroupsCache: no admin access token and no stale cache for ' + email);
   }
 
   try {
@@ -134,6 +148,14 @@ export async function getGroupsForUser(email: string): Promise<string[]> {
     return groups;
   } catch (err) {
     logger.error({ email, err }, 'googleGroupsCache: lookup threw — result not cached');
-    return hit?.groups ?? [];
+    if (hit) {
+      // Serve the stale cached result so a temporary API hiccup doesn't
+      // incorrectly revoke the user's group membership.
+      logger.warn({ email }, 'googleGroupsCache: serving stale groups after transient failure');
+      return hit.groups;
+    }
+    // No stale data available — propagate so the caller can decide how to
+    // handle the failure (e.g. /me serves from session rather than signing out).
+    throw err;
   }
 }
