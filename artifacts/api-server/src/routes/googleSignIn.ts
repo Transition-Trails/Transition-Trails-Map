@@ -44,6 +44,32 @@ const SCOPES           = 'openid email profile';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /**
+ * Race a groups-lookup promise against a configurable wall-clock timeout.
+ *
+ * If `getGroupsForUser` is slow (e.g. Directory API is under load) the
+ * promise may never settle, holding up the /me response for the full HTTP
+ * round-trip duration.  Wrapping it here lets the existing catch block in
+ * /me serve stale session data for slow responses, exactly as it does for
+ * hard failures (network error, quota exceeded, etc.).
+ *
+ * Timeout is read fresh on every call so tests can override via
+ * `process.env.GROUPS_REFRESH_TIMEOUT_MS` without reloading the module.
+ * Default: 3 000 ms.
+ */
+function withGroupsTimeout(promise: Promise<import('../lib/googleGroupsCache.js').GroupLookupResult>): Promise<import('../lib/googleGroupsCache.js').GroupLookupResult> {
+  const ms = Number(process.env['GROUPS_REFRESH_TIMEOUT_MS'] ?? 3000);
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error(`getGroupsForUser timed out after ${ms} ms`)),
+        ms,
+      ),
+    ),
+  ]);
+}
+
+/**
  * Build the OAuth callback URL.
  * Priority: GOOGLE_USER_SIGNIN_CALLBACK_URL env var → derived from request headers.
  * The env var is the one to set in Google Cloud Console's authorised redirect URIs.
@@ -352,34 +378,47 @@ router.get('/auth/google/me', async (req, res) => {
 
   // Groups are refreshed after the cache TTL expires
   if (!req.session.googleGroupsExpiry || req.session.googleGroupsExpiry <= now) {
-    const { groups, isReliable } = await getGroupsForUser(email);
+    try {
+      const { groups, isReliable } = await withGroupsTimeout(getGroupsForUser(email));
 
-    if (!isReliable) {
-      // The Directory API was unavailable (no token or network error).
-      // Do NOT sign the user out — an empty groups list here means "couldn't
-      // check", not "confirmed non-member". Leave the TTL expired so the
-      // next request retries.
-      logger.warn({ email }, 'googleSignIn /me: group refresh unreliable — serving cached session');
-    } else {
-      const hasStaff = isKnownStaff(groups, email);
-      // Staff takes priority: if the user is in any staff group, audience is
-      // always null — matching callback semantics exactly.
-      const audience = hasStaff ? null : deriveAudience(groups, email);
+      if (!isReliable) {
+        // The Directory API was unavailable (no token or network error).
+        // Do NOT sign the user out — an empty groups list here means "couldn't
+        // check", not "confirmed non-member". Leave the TTL expired so the
+        // next request retries.
+        logger.warn({ email }, 'googleSignIn /me: group refresh unreliable — serving cached session');
+      } else {
+        const hasStaff = isKnownStaff(groups, email);
+        // Staff takes priority: if the user is in any staff group, audience is
+        // always null — matching callback semantics exactly.
+        const audience = hasStaff ? null : deriveAudience(groups, email);
 
-      if (!hasStaff && !audience) {
-        // API responded and confirmed the user is in no known group — end session.
-        logger.warn({ email }, 'googleSignIn /me: user is no longer in any known group — ending session');
-        req.session.destroy(() => {});
-        res.json({ authenticated: false, reason: 'no_groups' });
-        return;
+        if (!hasStaff && !audience) {
+          // API responded and confirmed the user is in no known group — end session.
+          logger.warn({ email }, 'googleSignIn /me: user is no longer in any known group — ending session');
+          req.session.destroy(() => {});
+          res.json({ authenticated: false, reason: 'no_groups' });
+          return;
+        }
+
+        const tier = deriveGroupTier(groups, email);
+        req.session.googleGroups       = groups;
+        req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
+        req.session.googleTier         = tier;
+        req.session.googleAudience     = audience ?? undefined;
+        // Fire-and-forget save — we'll already return the fresh data below
+        req.session.save(() => {});
       }
-
-      const tier = deriveGroupTier(groups, email);
-      req.session.googleGroups       = groups;
-      req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
-      req.session.googleTier         = tier;
-      req.session.googleAudience     = audience ?? undefined;
-      // Fire-and-forget save — we'll already return the fresh data below
+    } catch (groupsErr) {
+      // The groups lookup timed out (slow Directory API response).
+      // Serve the stale session rather than blocking the response — the user is
+      // still authenticated and should not be locked out.
+      // Extend the expiry by 60 s so we retry soon without hammering the API.
+      logger.warn(
+        { err: groupsErr, email },
+        'googleSignIn /me: groups re-fetch timed out — serving stale session data',
+      );
+      req.session.googleGroupsExpiry = now + 60 * 1000;
       req.session.save(() => {});
     }
   }

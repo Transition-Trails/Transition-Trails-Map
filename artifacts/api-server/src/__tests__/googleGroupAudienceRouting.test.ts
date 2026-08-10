@@ -581,6 +581,46 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
   });
 });
 
+// ── 26a. Slow (never-resolving) getGroupsForUser → timely 200 with stale data ─
+//
+// A very slow Groups API response is as dangerous as a hard failure: it can hold
+// the /me endpoint open indefinitely, blocking the frontend from rendering.
+// withGroupsTimeout() races the real call against a configurable deadline so that
+// a hung lookup gets the same stale-session fallback as an outright rejection.
+
+describe('GET /api/auth/google/me — slow Groups API (timeout protection)', () => {
+  it('26a. never-resolving getGroupsForUser → 200 with stale session data within timeout', async () => {
+    // Use a short timeout so the test finishes quickly without actually waiting 3 s
+    process.env['GROUPS_REFRESH_TIMEOUT_MS'] = '100';
+
+    Object.assign(mockSession, {
+      googleEmail:        'coach@transitiontrails.org',
+      googleName:         'A Coach',
+      googleSub:          'uid-c-slow',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0, // force a refresh attempt
+      googleTier:         'everyday',
+      googleAudience:     'coach',
+    });
+
+    // Simulate a Groups API call that never resolves (hung connection)
+    mockGetGroups.mockImplementation(() => new Promise(() => { /* never settles */ }));
+
+    const start = Date.now();
+    const res = await request(app).get('/api/auth/google/me');
+    const elapsed = Date.now() - start;
+
+    // Must return a 200 with stale data — not hang or 500
+    expect(res.status).toBe(200);
+    expect(res.body.authenticated).toBe(true);
+    expect(res.body.audience).toBe('coach');
+    expect(res.body.email).toBe('coach@transitiontrails.org');
+
+    // Must settle within a reasonable margin of the configured 100 ms timeout
+    expect(elapsed).toBeLessThan(1000);
+  }, 5000 /* generous jest/vitest timeout — actual wall time should be ~100 ms */);
+});
+
 // ── 26–28. GET /api/auth/google/me — Groups API unavailable during refresh ────
 //
 // When getGroupsForUser returns { isReliable: false } (no admin token, network
