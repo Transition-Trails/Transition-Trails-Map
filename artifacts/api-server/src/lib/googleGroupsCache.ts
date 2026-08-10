@@ -14,23 +14,36 @@
 import { getAdminAccessToken } from './googleAdmin';
 import { logger } from './logger';
 
-// ── Trail OS group emails — single source of truth for the server ─────────────
-export const TRAIL_OS_GROUPS = [
-  'trailosadmin@transitiontrails.org',
-  'trailospennyadmin@transitiontrails.org',
-  'trailosusers@transitiontrails.org',
-] as const satisfies readonly string[];
+/**
+ * Returns the three configured Trail OS staff group emails at call time.
+ *
+ * Reads from ENV vars so a group-address change takes effect without a code
+ * deploy.  Defaults match the historic hard-coded values so existing
+ * installations continue to work without the vars set.
+ *
+ *   GOOGLE_GROUP_ADMIN    — trailosadmin@transitiontrails.org
+ *   GOOGLE_GROUP_POWER    — trailospennyadmin@transitiontrails.org
+ *   GOOGLE_GROUP_EVERYDAY — trailosusers@transitiontrails.org
+ */
+function getStaffGroups(): string[] {
+  return [
+    (process.env['GOOGLE_GROUP_ADMIN']    ?? 'trailosadmin@transitiontrails.org').toLowerCase().trim(),
+    (process.env['GOOGLE_GROUP_POWER']    ?? 'trailospennyadmin@transitiontrails.org').toLowerCase().trim(),
+    (process.env['GOOGLE_GROUP_EVERYDAY'] ?? 'trailosusers@transitiontrails.org').toLowerCase().trim(),
+  ].filter(Boolean);
+}
 
 /**
  * Returns the dynamic list of all groups to probe for a given user.
  *
- * Includes the three hard-coded Trail OS staff groups PLUS any configured
- * Homebase groups (GOOGLE_GROUP_COACHES, GOOGLE_GROUP_VOLUNTEERS,
- * GOOGLE_GROUP_LEARNERS). Missing/empty ENV values are silently skipped —
- * if a homebase group isn't configured, its users simply don't gain an
- * audience and are rejected as having no groups during sign-in.
+ * Includes the three configurable Trail OS staff groups (read from ENV vars)
+ * PLUS any configured Homebase groups (GOOGLE_GROUP_COACHES, etc.).
+ * Missing/empty ENV values are silently skipped — if a homebase group isn't
+ * configured, its users simply don't gain an audience and are rejected as
+ * having no groups during sign-in.
  */
 function getGroupsToProbe(): string[] {
+  const staffGroups = getStaffGroups();
   const homebaseGroups = [
     process.env['GOOGLE_GROUP_COACHES'],
     process.env['GOOGLE_GROUP_VOLUNTEERS'],
@@ -39,11 +52,12 @@ function getGroupsToProbe(): string[] {
   ].filter((g): g is string => Boolean(g));
 
   // Deduplicate in case an ENV var was accidentally set to a staff group email
-  const all = [...TRAIL_OS_GROUPS, ...homebaseGroups];
+  const all = [...staffGroups, ...homebaseGroups];
   return [...new Set(all)];
 }
 
-export type TrailOsGroup = (typeof TRAIL_OS_GROUPS)[number];
+/** @deprecated Use string — staff groups are now configurable via ENV vars. */
+export type TrailOsGroup = string;
 
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 

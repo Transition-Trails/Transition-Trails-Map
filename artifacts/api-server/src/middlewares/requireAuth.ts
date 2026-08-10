@@ -20,16 +20,40 @@
 
 import type { RequestHandler } from 'express';
 
-// ── Group constants ───────────────────────────────────────────────────────────
+// ── Group getters (read from ENV vars at call time) ───────────────────────────
 
-/** Every Trail OS group that constitutes "staff" access (fixed addresses). */
-export const TRAIL_OS_STAFF_GROUPS: readonly string[] = [
-  'trailosusers@transitiontrails.org',
-  'trailospennyadmin@transitiontrails.org',
-  'trailosadmin@transitiontrails.org',
-  // team@ is added dynamically via getTeamGroup() so it tracks GOOGLE_GROUP_TEAM
-  // without a code change — see isStaff() below.
-];
+/**
+ * Returns the resolved staff group emails at call time, reading from ENV vars
+ * so a group-address change takes effect without a code deploy.
+ *
+ * Defaults match the historic hard-coded values so existing installations
+ * continue to work even without the ENV vars set.
+ *
+ *   GOOGLE_GROUP_EVERYDAY — trailosusers@transitiontrails.org
+ *   GOOGLE_GROUP_POWER    — trailospennyadmin@transitiontrails.org
+ *   GOOGLE_GROUP_ADMIN    — trailosadmin@transitiontrails.org
+ *
+ * NOTE: team@ is intentionally excluded here; it is added by isStaff() via
+ * getTeamGroup() so it continues to track GOOGLE_GROUP_TEAM dynamically.
+ */
+export function getStaffGroups(): string[] {
+  return [
+    (process.env['GOOGLE_GROUP_EVERYDAY'] ?? 'trailosusers@transitiontrails.org').toLowerCase().trim(),
+    (process.env['GOOGLE_GROUP_POWER']    ?? 'trailospennyadmin@transitiontrails.org').toLowerCase().trim(),
+    (process.env['GOOGLE_GROUP_ADMIN']    ?? 'trailosadmin@transitiontrails.org').toLowerCase().trim(),
+  ].filter(Boolean);
+}
+
+/**
+ * Returns the resolved admin group emails at call time, reading from ENV vars.
+ *
+ *   GOOGLE_GROUP_ADMIN — trailosadmin@transitiontrails.org
+ */
+export function getAdminGroups(): string[] {
+  return [
+    (process.env['GOOGLE_GROUP_ADMIN'] ?? 'trailosadmin@transitiontrails.org').toLowerCase().trim(),
+  ].filter(Boolean);
+}
 
 /**
  * Returns the configured team group email (from GOOGLE_GROUP_TEAM env var),
@@ -40,11 +64,6 @@ export function getTeamGroup(): string | null {
   const v = (process.env['GOOGLE_GROUP_TEAM'] ?? '').toLowerCase().trim();
   return v || null;
 }
-
-/** Groups required for admin-only routes. */
-export const TRAIL_OS_ADMIN_GROUPS: readonly string[] = [
-  'trailosadmin@transitiontrails.org',
-];
 
 // ── Grant helpers (check the set, not the derived tier) ───────────────────────
 
@@ -66,7 +85,7 @@ export function isSuperAdmin(email: string): boolean {
 export function isStaff(groups: string[], email: string): boolean {
   if (isSuperAdmin(email)) return true;
   const lowerGroups = groups.map(g => g.toLowerCase());
-  if (TRAIL_OS_STAFF_GROUPS.some(g => lowerGroups.includes(g))) return true;
+  if (getStaffGroups().some(g => lowerGroups.includes(g))) return true;
   const teamGroup = getTeamGroup();
   return teamGroup !== null && lowerGroups.includes(teamGroup);
 }
@@ -77,7 +96,8 @@ export function isStaff(groups: string[], email: string): boolean {
  */
 export function isAdmin(groups: string[], email: string): boolean {
   if (isSuperAdmin(email)) return true;
-  return TRAIL_OS_ADMIN_GROUPS.some(g => groups.includes(g));
+  const lowerGroups = groups.map(g => g.toLowerCase());
+  return getAdminGroups().some(g => lowerGroups.includes(g));
 }
 
 // ── Middleware ─────────────────────────────────────────────────────────────────

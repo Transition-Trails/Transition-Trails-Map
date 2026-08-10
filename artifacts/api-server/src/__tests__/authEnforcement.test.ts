@@ -16,7 +16,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import app from '../app.js';
-import { requireStaff, requireAdmin, isStaff, isAdmin, isSuperAdmin, TRAIL_OS_STAFF_GROUPS, TRAIL_OS_ADMIN_GROUPS } from '../middlewares/requireAuth.js';
+import { requireStaff, requireAdmin, isStaff, isAdmin, isSuperAdmin, getStaffGroups, getAdminGroups } from '../middlewares/requireAuth.js';
 import type { Request, Response, NextFunction } from 'express';
 import * as googleGroupsCache from '../lib/googleGroupsCache.js';
 
@@ -192,7 +192,7 @@ describe('grant helpers', () => {
   });
 
   it('isStaff returns true for any of the three staff groups', () => {
-    for (const g of TRAIL_OS_STAFF_GROUPS) {
+    for (const g of getStaffGroups()) {
       expect(isStaff([g], 'x@transitiontrails.org')).toBe(true);
     }
   });
@@ -217,12 +217,41 @@ describe('grant helpers', () => {
     expect(isSuperAdmin('d@t.org')).toBe(false);
   });
 
-  it('exported group constants contain the expected addresses', () => {
-    expect(TRAIL_OS_STAFF_GROUPS).toContain('trailosusers@transitiontrails.org');
-    expect(TRAIL_OS_STAFF_GROUPS).toContain('trailospennyadmin@transitiontrails.org');
-    expect(TRAIL_OS_STAFF_GROUPS).toContain('trailosadmin@transitiontrails.org');
-    expect(TRAIL_OS_ADMIN_GROUPS).toContain('trailosadmin@transitiontrails.org');
-    expect(TRAIL_OS_ADMIN_GROUPS).not.toContain('trailosusers@transitiontrails.org');
+  it('getStaffGroups / getAdminGroups return the expected default addresses', () => {
+    expect(getStaffGroups()).toContain('trailosusers@transitiontrails.org');
+    expect(getStaffGroups()).toContain('trailospennyadmin@transitiontrails.org');
+    expect(getStaffGroups()).toContain('trailosadmin@transitiontrails.org');
+    expect(getAdminGroups()).toContain('trailosadmin@transitiontrails.org');
+    expect(getAdminGroups()).not.toContain('trailosusers@transitiontrails.org');
+  });
+
+  it('getStaffGroups honours GOOGLE_GROUP_ADMIN / GOOGLE_GROUP_POWER / GOOGLE_GROUP_EVERYDAY env vars', () => {
+    process.env['GOOGLE_GROUP_ADMIN']    = 'newadmin@example.org';
+    process.env['GOOGLE_GROUP_POWER']    = 'newpower@example.org';
+    process.env['GOOGLE_GROUP_EVERYDAY'] = 'newusers@example.org';
+    const staffGroups = getStaffGroups();
+    expect(staffGroups).toContain('newadmin@example.org');
+    expect(staffGroups).toContain('newpower@example.org');
+    expect(staffGroups).toContain('newusers@example.org');
+    expect(staffGroups).not.toContain('trailosadmin@transitiontrails.org');
+  });
+
+  it('getAdminGroups honours GOOGLE_GROUP_ADMIN env var', () => {
+    process.env['GOOGLE_GROUP_ADMIN'] = 'newadmin@example.org';
+    expect(getAdminGroups()).toContain('newadmin@example.org');
+    expect(getAdminGroups()).not.toContain('trailosadmin@transitiontrails.org');
+  });
+
+  it('isStaff accepts a custom GOOGLE_GROUP_ADMIN address', () => {
+    process.env['GOOGLE_GROUP_ADMIN'] = 'customadmin@example.org';
+    expect(isStaff(['customadmin@example.org'], 'user@transitiontrails.org')).toBe(true);
+    expect(isStaff(['trailosadmin@transitiontrails.org'], 'user@transitiontrails.org')).toBe(false);
+  });
+
+  it('isAdmin accepts a custom GOOGLE_GROUP_ADMIN address', () => {
+    process.env['GOOGLE_GROUP_ADMIN'] = 'customadmin@example.org';
+    expect(isAdmin(['customadmin@example.org'], 'user@transitiontrails.org')).toBe(true);
+    expect(isAdmin(['trailosadmin@transitiontrails.org'], 'user@transitiontrails.org')).toBe(false);
   });
 
   // ── Dynamic team group (GOOGLE_GROUP_TEAM) ────────────────────────────────

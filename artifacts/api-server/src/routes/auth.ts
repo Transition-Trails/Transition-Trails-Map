@@ -3,11 +3,14 @@ import { getAdminAccessToken, getAdminDirectoryStatus } from "../lib/googleAdmin
 
 const router = Router();
 
-const TRAIL_OS_GROUPS = {
-  admin:    'trailosadmin@transitiontrails.org',
-  power:    'trailospennyadmin@transitiontrails.org',
-  everyday: 'trailosusers@transitiontrails.org',
-} as const;
+/** Read staff group addresses from ENV vars at call time (with safe defaults). */
+function getTrailOsGroups() {
+  return {
+    admin:    (process.env['GOOGLE_GROUP_ADMIN']    ?? 'trailosadmin@transitiontrails.org').toLowerCase().trim(),
+    power:    (process.env['GOOGLE_GROUP_POWER']    ?? 'trailospennyadmin@transitiontrails.org').toLowerCase().trim(),
+    everyday: (process.env['GOOGLE_GROUP_EVERYDAY'] ?? 'trailosusers@transitiontrails.org').toLowerCase().trim(),
+  };
+}
 
 const DOMAIN = 'transitiontrails.org';
 
@@ -47,10 +50,11 @@ router.get('/auth/tier', async (req, res) => {
   const accessToken = await getAdminAccessToken();
 
   if (accessToken) {
+    const groups = getTrailOsGroups();
     const [adminMembers, powerMembers, everydayMembers] = await Promise.all([
-      getGroupMemberEmails(TRAIL_OS_GROUPS.admin,    accessToken),
-      getGroupMemberEmails(TRAIL_OS_GROUPS.power,    accessToken),
-      getGroupMemberEmails(TRAIL_OS_GROUPS.everyday, accessToken),
+      getGroupMemberEmails(groups.admin,    accessToken),
+      getGroupMemberEmails(groups.power,    accessToken),
+      getGroupMemberEmails(groups.everyday, accessToken),
     ]);
 
     if (adminMembers.includes(email)) {
@@ -97,7 +101,7 @@ router.get('/auth/groups-status', (_req, res) => {
     directoryConfigured: status.configured,
     directoryMethod:     status.method,
     serviceAccountEmail: status.serviceAccountEmail,
-    groups: Object.entries(TRAIL_OS_GROUPS).map(([tier, email]) => ({ tier, email })),
+    groups: Object.entries(getTrailOsGroups()).map(([tier, email]) => ({ tier, email })),
     domain: DOMAIN,
     superadminCount: getSuperadminEmails().length,
   });

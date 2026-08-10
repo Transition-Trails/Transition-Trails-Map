@@ -75,10 +75,16 @@ export function deriveGroupTier(
     .map(e => e.trim().toLowerCase())
     .filter(Boolean);
 
+  const adminGroup    = (process.env['GOOGLE_GROUP_ADMIN']    ?? 'trailosadmin@transitiontrails.org').toLowerCase().trim();
+  const powerGroup    = (process.env['GOOGLE_GROUP_POWER']    ?? 'trailospennyadmin@transitiontrails.org').toLowerCase().trim();
+  const everydayGroup = (process.env['GOOGLE_GROUP_EVERYDAY'] ?? 'trailosusers@transitiontrails.org').toLowerCase().trim();
+
+  const lowerGroups = groups.map(g => g.toLowerCase());
+
   if (superadmins.includes(email.toLowerCase())) return 'superadmin';
-  if (groups.includes('trailosadmin@transitiontrails.org'))       return 'admin';
-  if (groups.includes('trailospennyadmin@transitiontrails.org')) return 'power';
-  if (groups.includes('trailosusers@transitiontrails.org'))       return 'everyday';
+  if (adminGroup    && lowerGroups.includes(adminGroup))    return 'admin';
+  if (powerGroup    && lowerGroups.includes(powerGroup))    return 'power';
+  if (everydayGroup && lowerGroups.includes(everydayGroup)) return 'everyday';
   return 'everyday'; // org-domain user not yet in any group — caller guards on groups.length
 }
 
@@ -144,10 +150,10 @@ function isKnownStaff(groups: string[], email: string): boolean {
   if (superadmins.includes(email.toLowerCase())) return true;
   const lowerGroups = groups.map(g => g.toLowerCase());
   const staffGroups = [
-    'trailosadmin@transitiontrails.org',
-    'trailospennyadmin@transitiontrails.org',
-    'trailosusers@transitiontrails.org',
-  ];
+    (process.env['GOOGLE_GROUP_ADMIN']    ?? 'trailosadmin@transitiontrails.org').toLowerCase().trim(),
+    (process.env['GOOGLE_GROUP_POWER']    ?? 'trailospennyadmin@transitiontrails.org').toLowerCase().trim(),
+    (process.env['GOOGLE_GROUP_EVERYDAY'] ?? 'trailosusers@transitiontrails.org').toLowerCase().trim(),
+  ].filter(Boolean);
   return staffGroups.some(g => lowerGroups.includes(g));
 }
 

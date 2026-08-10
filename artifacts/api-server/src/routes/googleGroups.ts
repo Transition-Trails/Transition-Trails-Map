@@ -3,11 +3,26 @@ import { getAdminAccessToken, getAdminUserAccessToken, getAdminDirectoryStatus }
 
 const router = Router();
 
-const TRAIL_OS_GROUPS = [
-  { tier: 'admin',    email: 'trailosadmin@transitiontrails.org',      label: 'Trail OS Admin' },
-  { tier: 'power',    email: 'trailospennyadmin@transitiontrails.org',  label: 'Trail OS Penny Admin' },
-  { tier: 'everyday', email: 'trailosusers@transitiontrails.org',        label: 'Trail OS Users' },
-] as const;
+/** Returns the configured staff group descriptors at call time (reads ENV vars). */
+function getTrailOsGroups() {
+  return [
+    {
+      tier:  'admin',
+      email: (process.env['GOOGLE_GROUP_ADMIN']    ?? 'trailosadmin@transitiontrails.org').toLowerCase().trim(),
+      label: 'Trail OS Admin',
+    },
+    {
+      tier:  'power',
+      email: (process.env['GOOGLE_GROUP_POWER']    ?? 'trailospennyadmin@transitiontrails.org').toLowerCase().trim(),
+      label: 'Trail OS Penny Admin',
+    },
+    {
+      tier:  'everyday',
+      email: (process.env['GOOGLE_GROUP_EVERYDAY'] ?? 'trailosusers@transitiontrails.org').toLowerCase().trim(),
+      label: 'Trail OS Users',
+    },
+  ];
+}
 
 async function getGroupMembers(groupEmail: string, accessToken: string) {
   try {
@@ -57,7 +72,7 @@ router.get('/admin/google-groups', async (_req, res) => {
   }
 
   const results = await Promise.all(
-    TRAIL_OS_GROUPS.map(async g => {
+    getTrailOsGroups().map(async g => {
       const members = await getGroupMembers(g.email, accessToken);
       return {
         tier:    g.tier,
@@ -119,7 +134,7 @@ router.get('/admin/staff-users', async (_req, res) => {
     const groupToken = await getAdminAccessToken();
     if (groupToken) {
       const allMembers = await Promise.all(
-        TRAIL_OS_GROUPS.map(g => getGroupMembers(g.email, groupToken)),
+        getTrailOsGroups().map(g => getGroupMembers(g.email, groupToken)),
       );
       const seen = new Set<string>();
       const users: { name: string; email: string }[] = [];
