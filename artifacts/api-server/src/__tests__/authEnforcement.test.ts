@@ -224,6 +224,31 @@ describe('grant helpers', () => {
     expect(TRAIL_OS_ADMIN_GROUPS).toContain('trailosadmin@transitiontrails.org');
     expect(TRAIL_OS_ADMIN_GROUPS).not.toContain('trailosusers@transitiontrails.org');
   });
+
+  // ── Dynamic team group (GOOGLE_GROUP_TEAM) ────────────────────────────────
+
+  it('isStaff returns true for a user in the configured GOOGLE_GROUP_TEAM group', () => {
+    process.env['GOOGLE_GROUP_TEAM'] = 'team@example.org';
+    expect(isStaff(['team@example.org'], 'user@transitiontrails.org')).toBe(true);
+  });
+
+  it('isStaff is case-insensitive for the team group check', () => {
+    process.env['GOOGLE_GROUP_TEAM'] = 'Team@Example.org';
+    expect(isStaff(['team@example.org'], 'user@transitiontrails.org')).toBe(true);
+  });
+
+  it('isStaff returns false for the old address when GOOGLE_GROUP_TEAM is reconfigured', () => {
+    // Simulates the scenario where the group email was changed in env — the old
+    // address must no longer grant staff access.
+    process.env['GOOGLE_GROUP_TEAM'] = 'newteam@transitiontrails.org';
+    expect(isStaff(['team@transitiontrails.org'], 'user@transitiontrails.org')).toBe(false);
+  });
+
+  it('isStaff returns false for a team group address when GOOGLE_GROUP_TEAM is unset', () => {
+    delete process.env['GOOGLE_GROUP_TEAM'];
+    // Without the env var, no address is treated as the team group
+    expect(isStaff(['team@transitiontrails.org'], 'user@transitiontrails.org')).toBe(false);
+  });
 });
 
 // ── 4. HTTP integration — unauthenticated request ─────────────────────────────

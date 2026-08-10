@@ -258,6 +258,92 @@ describe('GET /api/auth/google/me', () => {
   });
 });
 
+// ── Configured team group (GOOGLE_GROUP_TEAM) ─────────────────────────────────
+//
+// A team-group-only member should:
+//  - receive audience='team' (not null/staff) so they land on TeamHomebase
+//  - see teamGroup in /me matching the normalised env var value
+//  - NOT be classified as staff during audience derivation (isKnownStaff)
+
+describe('GET /api/auth/google/me — GOOGLE_GROUP_TEAM propagation', () => {
+  const TEAM_GROUP = 'staff@example.org';
+
+  it('team-group-only member gets audience=team and teamGroup in /me response', async () => {
+    process.env['GOOGLE_GROUP_TEAM'] = TEAM_GROUP;
+
+    global.fetch = mockTokenExchange({
+      sub:            'uid-team-1',
+      email:          'member@transitiontrails.org',
+      name:           'Team Member',
+      hd:             'transitiontrails.org',
+      email_verified: true,
+    });
+    // User is ONLY in the team group (not any staff group)
+    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+
+    const agent = request.agent(app);
+    const loginRes = await agent.get('/api/auth/google/login');
+    const state = new URL(loginRes.headers['location'] as string).searchParams.get('state') ?? '';
+    const callbackRes = await agent.get(`/api/auth/google/callback?code=abc&state=${state}`);
+
+    // Successful sign-in (team group counts as a known group)
+    expect(callbackRes.headers['location']).not.toContain('sign_in_error');
+
+    const meRes = await agent.get('/api/auth/google/me');
+    expect(meRes.body.authenticated).toBe(true);
+    expect(meRes.body.audience).toBe('team');
+    // teamGroup exposes the configured address (lowercase)
+    expect(meRes.body.teamGroup).toBe(TEAM_GROUP.toLowerCase());
+    // groups contains the normalised team group address
+    expect(meRes.body.groups).toContain(TEAM_GROUP.toLowerCase());
+  });
+
+  it('/me exposes teamGroup=null when GOOGLE_GROUP_TEAM is not configured', async () => {
+    delete process.env['GOOGLE_GROUP_TEAM'];
+
+    global.fetch = mockTokenExchange({
+      sub:            'uid-noteam-1',
+      email:          'admin@transitiontrails.org',
+      name:           'Admin',
+      hd:             'transitiontrails.org',
+      email_verified: true,
+    });
+    mockGetGroups.mockResolvedValue(['trailosadmin@transitiontrails.org']);
+
+    const agent = request.agent(app);
+    const loginRes = await agent.get('/api/auth/google/login');
+    const state = new URL(loginRes.headers['location'] as string).searchParams.get('state') ?? '';
+    await agent.get(`/api/auth/google/callback?code=abc&state=${state}`);
+
+    const meRes = await agent.get('/api/auth/google/me');
+    expect(meRes.body.authenticated).toBe(true);
+    expect(meRes.body.teamGroup).toBeNull();
+  });
+
+  it('teamGroup in /me is lower-cased even when GOOGLE_GROUP_TEAM has uppercase characters', async () => {
+    process.env['GOOGLE_GROUP_TEAM'] = 'Team@Example.Org';
+
+    global.fetch = mockTokenExchange({
+      sub:            'uid-case-1',
+      email:          'member@transitiontrails.org',
+      name:           'Member',
+      hd:             'transitiontrails.org',
+      email_verified: true,
+    });
+    mockGetGroups.mockResolvedValue(['team@example.org']); // normalised by cache
+
+    const agent = request.agent(app);
+    const loginRes = await agent.get('/api/auth/google/login');
+    const state = new URL(loginRes.headers['location'] as string).searchParams.get('state') ?? '';
+    await agent.get(`/api/auth/google/callback?code=abc&state=${state}`);
+
+    const meRes = await agent.get('/api/auth/google/me');
+    expect(meRes.body.teamGroup).toBe('team@example.org');
+    // groups and teamGroup share the same normalised casing so frontend includes() works
+    expect(meRes.body.groups).toContain(meRes.body.teamGroup);
+  });
+});
+
 // ── POST /api/auth/google/sign-out ────────────────────────────────────────────
 
 describe('POST /api/auth/google/sign-out', () => {

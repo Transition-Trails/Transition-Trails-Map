@@ -29,17 +29,25 @@ export interface GoogleUser {
    * null for staff-only users.
    */
   audience: 'learner' | 'coach' | 'volunteer' | 'team' | null;
+  /**
+   * The configured team group email address (from GOOGLE_GROUP_TEAM env var).
+   * Exposed so the frontend never hardcodes a specific address — changing the
+   * env var requires no frontend code change.
+   * null when the env var is not set.
+   */
+  teamGroup: string | null;
 }
 
 interface MeResponse {
   authenticated: boolean;
-  email?:    string;
-  name?:     string;
-  sub?:      string;
-  groups?:   string[];
-  tier?:     string;
-  audience?: 'learner' | 'coach' | 'volunteer' | 'team' | null;
-  reason?:   string;
+  email?:     string;
+  name?:      string;
+  sub?:       string;
+  groups?:    string[];
+  tier?:      string;
+  audience?:  'learner' | 'coach' | 'volunteer' | 'team' | null;
+  teamGroup?: string | null;
+  reason?:    string;
 }
 
 const VALID_TIERS: AccessTier[] = ['everyday', 'power', 'admin', 'superadmin'];
@@ -73,7 +81,7 @@ export function useGoogleAuth(): {
     ? data.tier
     : 'everyday') as AccessTier;
 
-  const VALID_AUDIENCES = ['learner', 'coach', 'volunteer'] as const;
+  const VALID_AUDIENCES = ['learner', 'coach', 'volunteer', 'team'] as const;
   type ValidAudience = typeof VALID_AUDIENCES[number];
   const audience = (VALID_AUDIENCES as readonly string[]).includes(data.audience ?? '')
     ? (data.audience as ValidAudience)
@@ -83,12 +91,13 @@ export function useGoogleAuth(): {
     isLoading: false,
     isSignedIn: true,
     user: {
-      email:    data.email,
-      name:     data.name   ?? data.email,
-      sub:      data.sub    ?? '',
-      groups:   data.groups ?? [],
+      email:     data.email,
+      name:      data.name   ?? data.email,
+      sub:       data.sub    ?? '',
+      groups:    data.groups ?? [],
       tier,
       audience,
+      teamGroup: data.teamGroup ?? null,
     },
   };
 }

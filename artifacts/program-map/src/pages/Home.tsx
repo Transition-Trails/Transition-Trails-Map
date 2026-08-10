@@ -87,8 +87,10 @@ export default function Home() {
   const { user } = useGoogleAuth();
   // Superadmins always get audience=null (isKnownStaff short-circuits before
   // deriveAudience runs), so check group membership directly instead.
+  // teamGroup comes from the server (GOOGLE_GROUP_TEAM env var) so this check
+  // stays correct if the group address is ever reconfigured.
   const isTeam = user?.audience === 'team'
-    || user?.groups?.includes('team@transitiontrails.org');
+    || (!!user?.teamGroup && !!user?.groups?.includes(user.teamGroup));
   const { visibleRecs } = useActionItems();
   const { domainHealthData, overallHealthScore, overallHealthLevel } = useHealthScores();
 

@@ -472,7 +472,7 @@ function InnerApp() {
       <Route path="/homebase">
         {auth.isSignedIn ? (
           auth.user?.audience === 'team'
-          || auth.user?.groups?.includes('team@transitiontrails.org') ? (
+          || (!!auth.user?.teamGroup && !!auth.user?.groups?.includes(auth.user.teamGroup)) ? (
             <TeamHomebase displayName={auth.user?.name ?? ''} />
           ) : (
             <Redirect to="/" />

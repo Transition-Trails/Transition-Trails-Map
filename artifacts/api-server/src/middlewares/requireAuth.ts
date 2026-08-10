@@ -22,15 +22,24 @@ import type { RequestHandler } from 'express';
 
 // ── Group constants ───────────────────────────────────────────────────────────
 
-/** Every Trail OS group that constitutes "staff" access. */
+/** Every Trail OS group that constitutes "staff" access (fixed addresses). */
 export const TRAIL_OS_STAFF_GROUPS: readonly string[] = [
   'trailosusers@transitiontrails.org',
   'trailospennyadmin@transitiontrails.org',
   'trailosadmin@transitiontrails.org',
-  // team@ is a homebase-first staff group — they land on TeamHomebase but
-  // are permitted to use Mission Control (the admin app) via the drawer link.
-  'team@transitiontrails.org',
+  // team@ is added dynamically via getTeamGroup() so it tracks GOOGLE_GROUP_TEAM
+  // without a code change — see isStaff() below.
 ];
+
+/**
+ * Returns the configured team group email (from GOOGLE_GROUP_TEAM env var),
+ * normalised to lower-case, or null when the env var is not set.
+ * Called at request time so a live env-var update takes effect immediately.
+ */
+export function getTeamGroup(): string | null {
+  const v = (process.env['GOOGLE_GROUP_TEAM'] ?? '').toLowerCase().trim();
+  return v || null;
+}
 
 /** Groups required for admin-only routes. */
 export const TRAIL_OS_ADMIN_GROUPS: readonly string[] = [
@@ -51,10 +60,15 @@ export function isSuperAdmin(email: string): boolean {
 /**
  * Returns true if the user qualifies as staff.
  * Checks the GROUPS SET so a user in two groups retains both grants.
+ * The team group is read from GOOGLE_GROUP_TEAM at call time so changing
+ * the env var takes effect without a code change.
  */
 export function isStaff(groups: string[], email: string): boolean {
   if (isSuperAdmin(email)) return true;
-  return TRAIL_OS_STAFF_GROUPS.some(g => groups.includes(g));
+  const lowerGroups = groups.map(g => g.toLowerCase());
+  if (TRAIL_OS_STAFF_GROUPS.some(g => lowerGroups.includes(g))) return true;
+  const teamGroup = getTeamGroup();
+  return teamGroup !== null && lowerGroups.includes(teamGroup);
 }
 
 /**

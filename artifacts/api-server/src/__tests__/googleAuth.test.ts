@@ -53,12 +53,13 @@ describe('getGroupsForUser', () => {
     delete process.env['GOOGLE_GROUP_COACHES'];
     delete process.env['GOOGLE_GROUP_VOLUNTEERS'];
     delete process.env['GOOGLE_GROUP_LEARNERS'];
+    delete process.env['GOOGLE_GROUP_TEAM'];
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    // Restore any homebase env vars that were set before this suite ran
-    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS']) {
+    // Restore any homebase/team env vars that were set before this suite ran
+    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS', 'GOOGLE_GROUP_TEAM']) {
       if (ORIG_ENV[k] !== undefined) process.env[k] = ORIG_ENV[k];
       else delete process.env[k];
     }
@@ -169,11 +170,14 @@ describe('getGroupsForUser — homebase group probing', () => {
     process.env['GOOGLE_GROUP_COACHES']    = 'coaches@transitiontrails.org';
     process.env['GOOGLE_GROUP_VOLUNTEERS'] = 'volunteers@transitiontrails.org';
     process.env['GOOGLE_GROUP_LEARNERS']   = 'learners@transitiontrails.org';
+    // Explicitly delete TEAM so tests that don't set it get a deterministic probe count
+    // regardless of what the real process environment contains.
+    delete process.env['GOOGLE_GROUP_TEAM'];
   });
 
   afterEach(() => {
     // Restore env so homebase ENV vars don't bleed into other test cases
-    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS']) {
+    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS', 'GOOGLE_GROUP_TEAM']) {
       if (ORIG_ENV[k] !== undefined) process.env[k] = ORIG_ENV[k];
       else delete process.env[k];
     }

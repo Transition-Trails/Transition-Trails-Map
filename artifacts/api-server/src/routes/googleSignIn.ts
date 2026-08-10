@@ -128,8 +128,13 @@ export function deriveAudience(
 }
 
 /**
- * Returns true if the user is a recognised staff member (any staff group or superadmin).
- * Used to distinguish "staff with no homebase group" from "homebase-only user".
+ * Returns true if the user is a recognised STAFF member for audience-derivation purposes.
+ * Only checks the three fixed Trail OS staff groups and superadmins — NOT the team group.
+ *
+ * The team group (GOOGLE_GROUP_TEAM) is intentionally excluded here: team-only members
+ * should receive audience='team' and land on TeamHomebase, not the staff Mission Control.
+ * requireAuth.isStaff (used for API route authorization) separately includes the team
+ * group so they can access Mission Control routes once they navigate there via the drawer.
  */
 function isKnownStaff(groups: string[], email: string): boolean {
   const superadmins = (process.env['TRAIL_OS_SUPERADMIN_EMAILS'] ?? '')
@@ -137,12 +142,13 @@ function isKnownStaff(groups: string[], email: string): boolean {
     .map(e => e.trim().toLowerCase())
     .filter(Boolean);
   if (superadmins.includes(email.toLowerCase())) return true;
+  const lowerGroups = groups.map(g => g.toLowerCase());
   const staffGroups = [
     'trailosadmin@transitiontrails.org',
     'trailospennyadmin@transitiontrails.org',
     'trailosusers@transitiontrails.org',
   ];
-  return staffGroups.some(g => groups.map(x => x.toLowerCase()).includes(g));
+  return staffGroups.some(g => lowerGroups.includes(g));
 }
 
 /**
@@ -368,6 +374,9 @@ router.get('/auth/google/me', async (req, res) => {
     groups:   req.session.googleGroups ?? [],
     tier:     req.session.googleTier  ?? deriveGroupTier(req.session.googleGroups ?? [], email),
     audience: req.session.googleAudience ?? null,
+    // Non-secret config — lets the frontend adapt without a code change when
+    // GOOGLE_GROUP_TEAM is updated in the environment.
+    teamGroup: (process.env['GOOGLE_GROUP_TEAM'] ?? '').toLowerCase().trim() || null,
   });
 });
 

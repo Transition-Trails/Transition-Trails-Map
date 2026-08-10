@@ -107,7 +107,10 @@ export async function getGroupsForUser(email: string): Promise<string[]> {
     const checks = await Promise.all(
       groupsToProbe.map(async (g) => {
         const isMember = await isMemberOf(g, key, accessToken);
-        return isMember ? g : null;
+        // Normalize to lower-case so all callers (frontend includes() and
+        // server-side comparisons) work consistently regardless of how the
+        // env var was cased.
+        return isMember ? g.toLowerCase() : null;
       }),
     );
     const groups: string[] = checks.filter((g) => g !== null) as string[];
