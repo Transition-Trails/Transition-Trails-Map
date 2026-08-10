@@ -94,18 +94,24 @@ function WorkspaceDrawer({
 
   return (
     <motion.div
-      className="relative flex-shrink-0 flex flex-col border-r border-border bg-white overflow-hidden"
+      className="relative flex-shrink-0 flex flex-col border-r border-border bg-white"
       animate={{ width: open ? 240 : 60 }}
       transition={{ type: "spring", damping: 28, stiffness: 300 }}
     >
-      {/* Toggle button */}
+      {/* Toggle button — sits at the drawer edge, half-overlapping the centre column.
+          overflow-hidden has been moved to the inner content div so this button
+          is never clipped and remains fully clickable. */}
       <button
         onClick={onToggle}
-        className="absolute top-3 right-0 translate-x-1/2 z-10 w-5 h-5 rounded-full border border-border bg-white shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        className="absolute top-3 right-0 translate-x-1/2 z-20 w-5 h-5 rounded-full border border-border bg-white shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         aria-label={open ? "Collapse workspace drawer" : "Expand workspace drawer"}
       >
         {open ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
       </button>
+
+      {/* Inner content wrapper — overflow-hidden here clips text labels when
+          the drawer is collapsed without affecting the toggle button above. */}
+      <div className="flex flex-col flex-1 overflow-hidden">
 
       {/* Header — audience identity */}
       <div className="flex items-center gap-2.5 px-3 py-4 border-b border-border min-h-[56px]">
@@ -216,6 +222,8 @@ function WorkspaceDrawer({
           </AnimatePresence>
         </a>
       </div>
+
+      </div>{/* end inner overflow-hidden content wrapper */}
     </motion.div>
   );
 }
