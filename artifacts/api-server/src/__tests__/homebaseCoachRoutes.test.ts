@@ -74,6 +74,7 @@ vi.mock("@workspace/db", () => ({
 
 vi.mock("@workspace/db/schema", () => ({
   timeLogsTable: { id: "id", userEmail: "user_email", audience: "audience", activityLabel: "activity_label", hours: "hours", loggedAt: "logged_at" },
+  coachProfilesTable: { userEmail: "user_email", coachLevel: "coach_level", updatedAt: "updated_at" },
 }));
 
 vi.mock("drizzle-orm", () => ({

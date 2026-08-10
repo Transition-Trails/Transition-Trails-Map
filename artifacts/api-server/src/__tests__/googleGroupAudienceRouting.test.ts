@@ -109,6 +109,9 @@ vi.mock('@workspace/db/schema', () => ({
     coordinatorSlackId: 'coordinator_slack_id', coordinatorName: 'coordinator_name',
     volunteerSlackChannel: 'volunteer_slack_channel', updatedAt: 'updated_at',
   },
+  coachProfilesTable: {
+    userEmail: 'user_email', coachLevel: 'coach_level', updatedAt: 'updated_at',
+  },
 }));
 
 vi.mock('drizzle-orm', () => ({
@@ -128,6 +131,8 @@ vi.mock('../lib/googleGroupsCache.js', async (importOriginal) => {
 });
 
 const mockGetGroups = vi.mocked(googleGroupsCache.getGroupsForUser);
+
+import { db } from '@workspace/db';
 
 import app from '../app.js';
 
@@ -878,5 +883,134 @@ describe('Hard-refresh / cold-start — /homebase route guard after session expi
     expect(res.body.teamGroup).toBe(TEAM_GROUP);
 
     expect(mockGetGroups).toHaveBeenCalledWith(NON_TEAM_SUPERADMIN);
+  });
+});
+
+// ── 34–37. GET /api/auth/homebase/status — coachLevel refresh on group TTL expiry ─
+//
+// When the group cache expires (TTL), homebase/status re-derives the audience.
+// If the new audience is 'coach', it also re-fetches coachLevel from the DB so
+// a profile change (e.g. a promotion from 'associate' to 'advanced') is
+// reflected without requiring a sign-out.
+//
+// 34. Stale coach session → group refresh → DB has an updated coachLevel →
+//     session.coachLevel and response.coachLevel both reflect the new value
+// 35. Stale coach session → group refresh → DB has no coach_profiles row →
+//     coachLevel is set to null (not the old stale value)
+// 36. Stale learner session → group refresh → coachLevel DB query is NOT
+//     executed (only coaches trigger the DB look-up)
+// 37. Stale coach session → group refresh → DB query throws → status still
+//     returns 200 with the cached coachLevel (degraded gracefully, no 500)
+
+describe('GET /api/auth/homebase/status — coachLevel refresh on group TTL expiry', () => {
+  it('34. stale coach session → group refresh → DB returns updated coachLevel → response reflects new value', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'coach@transitiontrails.org',
+      googleName:         'Kim Coach',
+      googleSub:          'uid-coach-cl',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0,          // expired — trigger refresh
+      googleAudience:     'coach',
+      coachLevel:         'associate', // stale value in session
+    });
+    mockGetGroups.mockResolvedValue({ groups: [COACHES_GROUP], isReliable: true });
+
+    // DB returns the updated coach level ('advanced')
+    vi.mocked(db).select.mockImplementationOnce(() => ({
+      from: () => ({
+        where: () => ({
+          limit: () => Promise.resolve([{ userEmail: 'coach@transitiontrails.org', coachLevel: 'advanced', updatedAt: new Date() }]),
+        }),
+      }),
+    }) as unknown as ReturnType<typeof db.select>);
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(true);
+    expect(res.body.audience).toBe('coach');
+    // The promoted coachLevel must be returned — not the stale 'associate'
+    expect(res.body.coachLevel).toBe('advanced');
+    expect(mockGetGroups).toHaveBeenCalledWith('coach@transitiontrails.org');
+  });
+
+  it('35. stale coach session → group refresh → no DB profile row → coachLevel is null', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'newcoach@transitiontrails.org',
+      googleName:         'New Coach',
+      googleSub:          'uid-new-coach',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0,
+      googleAudience:     'coach',
+      coachLevel:         'associate', // stale
+    });
+    mockGetGroups.mockResolvedValue({ groups: [COACHES_GROUP], isReliable: true });
+
+    // DB has no record for this coach
+    vi.mocked(db).select.mockImplementationOnce(() => ({
+      from: () => ({
+        where: () => ({
+          limit: () => Promise.resolve([]),
+        }),
+      }),
+    }) as unknown as ReturnType<typeof db.select>);
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(true);
+    expect(res.body.audience).toBe('coach');
+    // No DB row → coachLevel must be null (not the stale 'associate')
+    expect(res.body.coachLevel).toBeNull();
+  });
+
+  it('36. stale learner session → group refresh → coachLevel DB query is NOT executed', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'learner@transitiontrails.org',
+      googleName:         'A Learner',
+      googleSub:          'uid-lrn-cl',
+      googleGroups:       [LEARNERS_GROUP],
+      googleGroupsExpiry: 0,
+      googleAudience:     'learner',
+    });
+    mockGetGroups.mockResolvedValue({ groups: [LEARNERS_GROUP], isReliable: true });
+
+    const selectSpy = vi.mocked(db).select;
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(true);
+    expect(res.body.audience).toBe('learner');
+    // coachLevel DB query must NOT run for non-coach audiences
+    expect(selectSpy).not.toHaveBeenCalled();
+  });
+
+  it('37. stale coach session → DB throws during coachLevel re-fetch → status still returns 200 (degraded gracefully)', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'coach@transitiontrails.org',
+      googleName:         'Kim Coach',
+      googleSub:          'uid-coach-dberr',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0,
+      googleAudience:     'coach',
+      coachLevel:         'associate', // cached value in session
+    });
+    mockGetGroups.mockResolvedValue({ groups: [COACHES_GROUP], isReliable: true });
+
+    // DB query throws (e.g. transient connection error)
+    vi.mocked(db).select.mockImplementationOnce(() => ({
+      from: () => ({
+        where: () => ({
+          limit: () => Promise.reject(new Error('DB connection lost')),
+        }),
+      }),
+    }) as unknown as ReturnType<typeof db.select>);
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    // Must NOT return 500 — DB errors during the coach-level re-fetch are
+    // non-fatal; the response must always be a 200 with the cached value.
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(true);
+    expect(res.body.audience).toBe('coach');
+    // Cached coachLevel is served because the DB query failed
+    expect(res.body.coachLevel).toBe('associate');
   });
 });

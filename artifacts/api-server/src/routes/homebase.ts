@@ -15,7 +15,7 @@
 
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { db } from "@workspace/db";
-import { timeLogsTable, volunteerProfilesTable } from "@workspace/db/schema";
+import { timeLogsTable, volunteerProfilesTable, coachProfilesTable } from "@workspace/db/schema";
 import { desc, eq, gte, and } from "drizzle-orm";
 import { requireHomebaseAuth } from "../middlewares/requireAuth";
 import { logger } from "../lib/logger";
@@ -68,6 +68,28 @@ router.get("/auth/homebase/status", async (req, res) => {
       req.session.googleGroups       = groups;
       req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
       req.session.googleAudience     = audience ?? undefined;
+
+      // If the refreshed audience is 'coach', re-fetch the coach level from the
+      // DB so a profile change (e.g. promotion to 'advanced') is reflected
+      // without requiring a sign-out.  A missing row or a DB error leaves the
+      // session value untouched (null by default) and never blocks the response.
+      if (audience === "coach") {
+        try {
+          const rows = await db
+            .select()
+            .from(coachProfilesTable)
+            .where(eq(coachProfilesTable.userEmail, email))
+            .limit(1);
+          req.session.coachLevel =
+            (rows[0]?.coachLevel as typeof req.session.coachLevel) ?? null;
+        } catch (err) {
+          logger.warn(
+            { err },
+            "homebase/status: DB coachLevel re-fetch failed — serving cached value",
+          );
+        }
+      }
+
       // Fire-and-forget save — we return the fresh data immediately below
       req.session.save(() => {});
     }
