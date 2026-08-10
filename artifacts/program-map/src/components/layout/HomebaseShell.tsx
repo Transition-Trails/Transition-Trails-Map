@@ -34,6 +34,7 @@ import {
   FileText,
   Sheet,
   Video,
+  StickyNote,
   Sparkles,
   ExternalLink,
   Users,
@@ -48,12 +49,13 @@ import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
 // ── Google Workspace app links ─────────────────────────────────────────────────
 
 const GOOGLE_APPS = [
-  { label: "Gmail",     Icon: Mail,       href: "https://mail.google.com"              },
-  { label: "Calendar",  Icon: Calendar,   href: "https://calendar.google.com"          },
-  { label: "Drive",     Icon: HardDrive,  href: "https://drive.google.com"             },
-  { label: "Docs",      Icon: FileText,   href: "https://docs.google.com"              },
-  { label: "Sheets",    Icon: Sheet,      href: "https://sheets.google.com"            },
-  { label: "Meet",      Icon: Video,      href: "https://meet.google.com"              },
+  { label: "Gmail",     Icon: Mail,        href: "https://mail.google.com"              },
+  { label: "Calendar",  Icon: Calendar,    href: "https://calendar.google.com"          },
+  { label: "Drive",     Icon: HardDrive,   href: "https://drive.google.com"             },
+  { label: "Docs",      Icon: FileText,    href: "https://docs.google.com"              },
+  { label: "Sheets",    Icon: Sheet,       href: "https://sheets.google.com"            },
+  { label: "Meet",      Icon: Video,       href: "https://meet.google.com"              },
+  { label: "Keep",      Icon: StickyNote,  href: "https://keep.google.com"              },
 ];
 
 const BUILD_LINKS: Record<HomebaseAudience, { label: string; href: string; external?: boolean }> = {
