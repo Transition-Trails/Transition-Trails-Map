@@ -573,3 +573,88 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
     expect(mockGetGroups).toHaveBeenCalledWith(SUPERADMIN_EMAIL);
   });
 });
+
+// ── 24–25. Hard-refresh / cold-start: /homebase route guard after session expiry ──
+//
+// When a user hard-refreshes the browser (or starts a cold session), the frontend
+// re-fetches /me before rendering. The /homebase route guard in App.tsx checks:
+//   user?.audience === 'team'
+//   || (!!user?.teamGroup && !!user?.groups?.includes(user.teamGroup))
+//
+// These tests confirm that /me returns the correct shape on a session-expiry
+// refresh so the guard evaluates correctly without requiring a new sign-in.
+
+describe('Hard-refresh / cold-start — /homebase route guard after session expiry', () => {
+  const TEAM_MEMBER_EMAIL = 'member@transitiontrails.org';
+
+  beforeEach(() => {
+    process.env['GOOGLE_GROUP_TEAM'] = TEAM_GROUP;
+  });
+
+  it('24. regular team-member with stale session → groups refreshed → /me returns audience:"team" enabling /homebase access', async () => {
+    // Simulate a stale (expired) session for a non-superadmin team-group member.
+    // This mirrors a hard-refresh: the session cookie exists but the groups
+    // TTL has lapsed, so /me must re-fetch and re-derive the audience.
+    Object.assign(mockSession, {
+      googleEmail:        TEAM_MEMBER_EMAIL,
+      googleName:         'Team Member',
+      googleSub:          'uid-team-stale',
+      googleGroups:       [TEAM_GROUP],
+      googleGroupsExpiry: 0, // force refresh
+      googleTier:         'everyday',
+      googleAudience:     'team',
+    });
+    // Groups re-fetch confirms the user is still in the team group
+    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+
+    const res = await request(app).get('/api/auth/google/me');
+    expect(res.status).toBe(200);
+    expect(res.body.authenticated).toBe(true);
+
+    // audience:'team' satisfies the first branch of the /homebase route guard
+    expect(res.body.audience).toBe('team');
+
+    // groups[] and teamGroup are both returned so the second branch
+    // (groups.includes(teamGroup)) also passes for superadmins
+    expect(res.body.groups).toContain(TEAM_GROUP);
+    expect(res.body.teamGroup).toBe(TEAM_GROUP);
+
+    // Confirms the re-fetch actually happened (not served from stale session)
+    expect(mockGetGroups).toHaveBeenCalledWith(TEAM_MEMBER_EMAIL);
+  });
+
+  it('25. superadmin WITHOUT team group + stale session → /me refresh → audience:null, groups excludes team@ (frontend redirects to /)', async () => {
+    const NON_TEAM_SUPERADMIN = 'notteam@transitiontrails.org';
+    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = NON_TEAM_SUPERADMIN;
+
+    // Stale session for a superadmin who is NOT in the team group
+    Object.assign(mockSession, {
+      googleEmail:        NON_TEAM_SUPERADMIN,
+      googleName:         'Non-Team Admin',
+      googleSub:          'uid-nteam-super',
+      googleGroups:       ['trailosadmin@transitiontrails.org'],
+      googleGroupsExpiry: 0, // force refresh
+      googleTier:         'superadmin',
+      // audience intentionally absent — staff user
+    });
+    // Groups re-fetch confirms no team group membership
+    mockGetGroups.mockResolvedValue(['trailosadmin@transitiontrails.org']);
+
+    const res = await request(app).get('/api/auth/google/me');
+    expect(res.status).toBe(200);
+    expect(res.body.authenticated).toBe(true);
+
+    // audience:null — staff priority wins; no homebase audience
+    expect(res.body.audience).toBeNull();
+
+    // groups[] does NOT include the team group → both branches of the
+    // /homebase guard evaluate to false → frontend Redirect to="/" fires
+    expect(res.body.groups).not.toContain(TEAM_GROUP);
+
+    // teamGroup is still returned (non-null) so the guard can check it,
+    // but the groups array doesn't contain it — the redirect is unambiguous
+    expect(res.body.teamGroup).toBe(TEAM_GROUP);
+
+    expect(mockGetGroups).toHaveBeenCalledWith(NON_TEAM_SUPERADMIN);
+  });
+});
