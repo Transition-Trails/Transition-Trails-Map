@@ -38,6 +38,7 @@ import {
   PenLine,
   Dices,
   BookOpen,
+  Share2,
   Sparkles,
   ExternalLink,
   Users,
@@ -65,6 +66,7 @@ const COLLAB_APPS = [
   { label: "Mural",           Icon: PenLine,   href: "https://app.mural.co/t/starthere9675/home" },
   { label: "Planning Poker",  Icon: Dices,     href: "https://planningpoker.live"                },
   { label: "Trailhead",       Icon: BookOpen,  href: "https://www.trailhead.com"                 },
+  { label: "Draw.io",         Icon: Share2,    href: "https://app.diagrams.net"                  },
 ];
 
 const BUILD_LINKS: Record<HomebaseAudience, { label: string; href: string; external?: boolean }> = {
