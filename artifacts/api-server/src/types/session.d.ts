@@ -56,5 +56,18 @@ declare module "express-session" {
     homebaseQuestDate?:    string;
     /** ISO date (YYYY-MM-DD) when learner last set today's stone. */
     homebaseStoneSet?:     string;
+
+    // ── Superadmin impersonation ──────────────────────────────────────────────
+    /**
+     * Set when a superadmin is viewing the platform as another user.
+     * The UI and /me / /auth/homebase/status responses reflect this user.
+     * Cleared on exit. The REAL superadmin session (googleEmail etc.) is
+     * preserved throughout — it is used for all access-control checks.
+     */
+    impersonatedEmail?:        string;
+    impersonatedAudience?:     'learner' | 'coach' | 'volunteer' | 'team' | null;
+    impersonatedDisplayName?:  string;
+    /** The superadmin's real email — stored so the exit route can log it. */
+    originalSuperadminEmail?:  string;
   }
 }

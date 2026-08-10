@@ -42,6 +42,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
   return res;
 };
 
+import { ImpersonationBanner } from "@/components/layout/ImpersonationBanner";
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
 import ReleaseNotes        from "@/pages/ReleaseNotes";
@@ -421,6 +422,8 @@ function InnerApp() {
   const { setUserTier } = useAppContext();
   const { toast } = useToast();
 
+  const { isImpersonating, impersonatedUser, realEmail, realName } = auth;
+
   // Apply tier from session on sign-in (server computed it from the group set)
   useEffect(() => {
     if (!auth.isLoading && auth.isSignedIn && auth.user) {
@@ -448,6 +451,17 @@ function InnerApp() {
   }
 
   return (
+    <>
+      {/* Impersonation banner — fixed amber strip, z-[200], above everything */}
+      {isImpersonating && impersonatedUser && realEmail && (
+        <ImpersonationBanner
+          impersonatedEmail={impersonatedUser.email}
+          impersonatedName={impersonatedUser.name}
+          realEmail={realEmail}
+        />
+      )}
+      {/* Offset the page content down when the banner is visible (≈36px) */}
+      <div style={isImpersonating ? { paddingTop: '36px' } : undefined}>
     <Switch>
       {/* Auth page — accessible whether signed in or not */}
       <Route path="/sign-in/*?" component={SignInPage} />
@@ -508,6 +522,8 @@ function InnerApp() {
         )}
       </Route>
     </Switch>
+      </div>
+    </>
   );
 }
 

@@ -33,7 +33,11 @@ import governanceRouter         from "./governance";
 import moduleDraftsRouter       from "./moduleDrafts";
 import homebaseRouter           from "./homebase";
 import adminUsersRouter         from "./adminUsers";
-import { requireStaff, requireAdmin } from "../middlewares/requireAuth";
+import impersonateRouter        from "./impersonate";
+import { requireStaff, requireAdmin, requireSuperAdmin, isSuperAdmin } from "../middlewares/requireAuth";
+import { db } from "@workspace/db";
+import { trailOsAuditLogTable } from "@workspace/db/schema";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
@@ -119,6 +123,53 @@ const ADMIN_PREFIXES: string[] = [
 
 router.use(ADMIN_PREFIXES as unknown as string, requireAdmin as RequestHandler);
 
+// ── Superadmin-only path guards ───────────────────────────────────────────────
+// These paths additionally require TRAIL_OS_SUPERADMIN_EMAILS membership.
+// requireAdmin already ran for paths that overlap; this is the extra gate.
+
+const SUPERADMIN_PREFIXES: string[] = [
+  '/admin/impersonate',
+];
+
+router.use(SUPERADMIN_PREFIXES as unknown as string, requireSuperAdmin as RequestHandler);
+
+// ── Impersonation action audit middleware ─────────────────────────────────────
+//
+// When a superadmin is impersonating, every non-GET, non-HEAD write action is
+// recorded in the audit log as `impersonation_action`.  This runs after the auth
+// gate so req.session is guaranteed to have googleEmail when it fires.
+// The audit write is fire-and-forget — it never blocks the request.
+
+router.use((req, _res, next) => {
+  const impersonatedEmail = req.session.impersonatedEmail;
+  if (
+    impersonatedEmail &&
+    req.method !== 'GET' &&
+    req.method !== 'HEAD' &&
+    req.method !== 'OPTIONS'
+  ) {
+    const superadminEmail = req.session.originalSuperadminEmail ?? req.session.googleEmail ?? 'unknown';
+    const ip =
+      (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim()
+      ?? req.socket?.remoteAddress
+      ?? null;
+
+    // Shallow body summary — never log full body (may contain PII)
+    const body = req.body as Record<string, unknown> | undefined;
+    const bodySummary = body ? Object.keys(body).join(', ') : '';
+
+    db.insert(trailOsAuditLogTable).values({
+      eventType:   'impersonation_action',
+      actorEmail:  superadminEmail,
+      targetEmail: impersonatedEmail,
+      audience:    req.session.impersonatedAudience ?? null,
+      ipAddress:   ip,
+      metadata:    { method: req.method, path: req.path, bodyFields: bodySummary },
+    }).catch(err => logger.error({ err }, 'impersonationActionMiddleware: audit log write failed'));
+  }
+  next();
+});
+
 // ── Router mounts ─────────────────────────────────────────────────────────────
 
 router.use("/auth/salesforce", salesforceAuthRouter);
@@ -155,5 +206,6 @@ router.use(governanceRouter);
 router.use(moduleDraftsRouter);
 router.use(homebaseRouter);
 router.use(adminUsersRouter);
+router.use(impersonateRouter);
 
 export default router;

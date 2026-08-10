@@ -172,6 +172,39 @@ export const requireAdmin: RequestHandler = (req, res, next) => {
   next();
 };
 
+/**
+ * requireSuperAdmin
+ *
+ * Returns 401 if no Google session.
+ * Returns 403 if the signed-in user is not in TRAIL_OS_SUPERADMIN_EMAILS.
+ *
+ * Applied to the impersonation routes — only superadmins can trigger
+ * impersonation. Admin group members (who pass requireAdmin) are explicitly
+ * refused.
+ */
+export const requireSuperAdmin: RequestHandler = (req, res, next) => {
+  const email = req.session.googleEmail;
+
+  if (!email) {
+    res.status(401).json({
+      error:   'not_authenticated',
+      message: 'Sign in required.',
+    });
+    return;
+  }
+
+  if (!isSuperAdmin(email)) {
+    res.status(403).json({
+      error:   'not_authorized',
+      message: 'This action requires superadmin access.',
+      hint:    'Contact your Trail OS administrator. Only accounts listed in TRAIL_OS_SUPERADMIN_EMAILS can perform impersonation.',
+    });
+    return;
+  }
+
+  next();
+};
+
 // ── Homebase audience groups ──────────────────────────────────────────────────
 
 /** Returns the stored homebase audience from session, or null. */

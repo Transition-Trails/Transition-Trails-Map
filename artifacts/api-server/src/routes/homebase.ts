@@ -39,6 +39,21 @@ router.get("/auth/homebase/status", async (req, res) => {
     return;
   }
 
+  // ── Impersonation overlay ─────────────────────────────────────────────────
+  // When a superadmin is impersonating, bypass group re-fetch and return the
+  // impersonated user's audience directly.
+  if (req.session.impersonatedEmail) {
+    res.json({
+      isSignedIn:      true,
+      audience:        req.session.impersonatedAudience ?? null,
+      email:           req.session.impersonatedEmail,
+      displayName:     req.session.impersonatedDisplayName ?? req.session.impersonatedEmail,
+      coachLevel:      null,
+      isImpersonating: true,
+    });
+    return;
+  }
+
   const now = Date.now();
 
   // If the group cache has expired, re-fetch groups and re-derive the audience

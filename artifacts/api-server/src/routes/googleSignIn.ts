@@ -388,6 +388,27 @@ router.get('/auth/google/me', async (req, res) => {
     return;
   }
 
+  // ── Impersonation overlay ─────────────────────────────────────────────────
+  // When a superadmin is impersonating, return the impersonated user's data so
+  // the frontend renders the correct homebase / shell.  The real tier (superadmin)
+  // is still returned so the frontend can enforce UI-level permission guards.
+  if (req.session.impersonatedEmail) {
+    res.json({
+      authenticated:   true,
+      email:           req.session.impersonatedEmail,
+      name:            req.session.impersonatedDisplayName ?? req.session.impersonatedEmail,
+      sub:             '',
+      groups:          [],
+      tier:            req.session.googleTier ?? 'superadmin',
+      audience:        req.session.impersonatedAudience ?? null,
+      teamGroup:       (process.env['GOOGLE_GROUP_TEAM'] ?? '').toLowerCase().trim() || null,
+      isImpersonating: true,
+      realEmail:       req.session.originalSuperadminEmail ?? req.session.googleEmail,
+      realName:        req.session.googleName ?? req.session.googleEmail,
+    });
+    return;
+  }
+
   const email = req.session.googleEmail;
   const now   = Date.now();
 

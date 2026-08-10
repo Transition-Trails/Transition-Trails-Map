@@ -1,10 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import {
   Users as UsersIcon, Search, X, ChevronRight,
-  Clock, Shield, Star,
+  Clock, Shield, Star, Eye,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
+import { useQueryClient } from '@tanstack/react-query';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -231,6 +234,50 @@ export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [selected,   setSelected]   = useState<UserEntry | null>(null);
+  const [impersonating, setImpersonating] = useState<string | null>(null);
+
+  const { user: currentUser }  = useGoogleAuth();
+  const isSuperAdminUser       = currentUser?.tier === 'superadmin';
+  const queryClient            = useQueryClient();
+  const [, navigate]           = useLocation();
+
+  const BASE = (import.meta.env.BASE_URL as string).replace(/\/$/, '');
+
+  async function handleImpersonate(target: UserEntry, e: React.MouseEvent) {
+    e.stopPropagation(); // don't open detail panel
+    if (impersonating) return;
+    setImpersonating(target.email);
+    try {
+      const roleToAudience: Record<string, string | null> = {
+        Learner:   'learner',
+        Coach:     'coach',
+        Volunteer: 'volunteer',
+        Staff:     null,
+      };
+      const resp = await fetch(`${BASE}/api/admin/impersonate`, {
+        method:      'POST',
+        credentials: 'include',
+        headers:     { 'Content-Type': 'application/json' },
+        body:        JSON.stringify({
+          targetEmail:    target.email,
+          targetName:     target.name,
+          targetAudience: roleToAudience[target.role] ?? null,
+        }),
+      });
+      if (!resp.ok) {
+        const body = await resp.json() as { message?: string };
+        alert(body.message ?? `Failed to impersonate (${resp.status})`);
+        return;
+      }
+      // Re-fetch /me so the auth hook reflects the impersonated session
+      await queryClient.invalidateQueries({ queryKey: ['google-auth-me'] });
+      navigate('/');
+    } catch {
+      alert('Impersonation request failed — check console.');
+    } finally {
+      setImpersonating(null);
+    }
+  }
 
   function loadUsers() {
     setLoading(true);
@@ -439,6 +486,7 @@ export default function UsersPage() {
                   <th className="text-left px-4 py-3 text-[13px] font-bold text-muted-foreground/70 w-24">Status</th>
                   <th className="text-left px-4 py-3 text-[13px] font-bold text-muted-foreground/70 w-36">Permissions</th>
                   <th className="text-left px-4 py-3 text-[13px] font-bold text-muted-foreground/70">Last Login</th>
+                  {isSuperAdminUser && <th className="w-28 px-2" />}
                   <th className="w-8" />
                 </tr>
               </thead>
@@ -537,6 +585,29 @@ export default function UsersPage() {
                           <span className={`text-[13px] ${isActive ? 'text-background/50' : 'text-muted-foreground/40'}`}>—</span>
                         )}
                       </td>
+
+                      {/* View as (superadmin only) */}
+                      {isSuperAdminUser && (
+                        <td className="px-2 py-2.5" onClick={e => e.stopPropagation()}>
+                          {user.tier === 'superadmin' ? (
+                            <span className="text-[11px] text-muted-foreground/30 px-2">—</span>
+                          ) : (
+                            <button
+                              onClick={e => handleImpersonate(user, e)}
+                              disabled={impersonating === user.email}
+                              title={`View Trail OS as ${user.name}`}
+                              className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-semibold transition-colors whitespace-nowrap ${
+                                isActive
+                                  ? 'bg-background/20 border border-background/30 text-background hover:bg-background/30'
+                                  : 'bg-muted border border-border text-muted-foreground hover:text-foreground hover:border-ring/50'
+                              } disabled:opacity-50`}
+                            >
+                              <Eye className="w-3 h-3 flex-shrink-0" />
+                              {impersonating === user.email ? 'Loading…' : 'View as'}
+                            </button>
+                          )}
+                        </td>
+                      )}
 
                       {/* Chevron */}
                       <td className="px-2 py-2.5">

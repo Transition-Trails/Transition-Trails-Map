@@ -39,24 +39,35 @@ export interface GoogleUser {
 }
 
 interface MeResponse {
-  authenticated: boolean;
-  email?:     string;
-  name?:      string;
-  sub?:       string;
-  groups?:    string[];
-  tier?:      string;
-  audience?:  'learner' | 'coach' | 'volunteer' | 'team' | null;
-  teamGroup?: string | null;
-  reason?:    string;
+  authenticated:   boolean;
+  email?:          string;
+  name?:           string;
+  sub?:            string;
+  groups?:         string[];
+  tier?:           string;
+  audience?:       'learner' | 'coach' | 'volunteer' | 'team' | null;
+  teamGroup?:      string | null;
+  reason?:         string;
+  /** Set when a superadmin is viewing the platform as another user. */
+  isImpersonating?: boolean;
+  realEmail?:      string;
+  realName?:       string;
 }
 
 const VALID_TIERS: AccessTier[] = ['everyday', 'power', 'admin', 'superadmin'];
 const QUERY_KEY = ['google-auth-me'] as const;
 
 export function useGoogleAuth(): {
-  isLoading:  boolean;
-  isSignedIn: boolean;
-  user:       GoogleUser | null;
+  isLoading:        boolean;
+  isSignedIn:       boolean;
+  user:             GoogleUser | null;
+  /** True when a superadmin is currently viewing the platform as another user. */
+  isImpersonating:  boolean;
+  /** The user being impersonated. Null when not impersonating. */
+  impersonatedUser: { email: string; name: string; audience: string | null } | null;
+  /** The superadmin's real email. Non-null only during impersonation. */
+  realEmail:        string | null;
+  realName:         string | null;
 } {
   const BASE = (import.meta.env.BASE_URL as string).replace(/\/$/, '');
 
@@ -70,11 +81,17 @@ export function useGoogleAuth(): {
   });
 
   if (isLoading || isPending || !data) {
-    return { isLoading: true, isSignedIn: false, user: null };
+    return {
+      isLoading: true, isSignedIn: false, user: null,
+      isImpersonating: false, impersonatedUser: null, realEmail: null, realName: null,
+    };
   }
 
   if (!data.authenticated || !data.email) {
-    return { isLoading: false, isSignedIn: false, user: null };
+    return {
+      isLoading: false, isSignedIn: false, user: null,
+      isImpersonating: false, impersonatedUser: null, realEmail: null, realName: null,
+    };
   }
 
   const tier = (VALID_TIERS.includes(data.tier as AccessTier)
@@ -86,6 +103,8 @@ export function useGoogleAuth(): {
   const audience = (VALID_AUDIENCES as readonly string[]).includes(data.audience ?? '')
     ? (data.audience as ValidAudience)
     : null;
+
+  const isImpersonating = data.isImpersonating === true;
 
   return {
     isLoading: false,
@@ -99,6 +118,12 @@ export function useGoogleAuth(): {
       audience,
       teamGroup: data.teamGroup ?? null,
     },
+    isImpersonating,
+    impersonatedUser: isImpersonating
+      ? { email: data.email, name: data.name ?? data.email, audience: audience }
+      : null,
+    realEmail: isImpersonating ? (data.realEmail ?? null) : null,
+    realName:  isImpersonating ? (data.realName  ?? null) : null,
   };
 }
 
