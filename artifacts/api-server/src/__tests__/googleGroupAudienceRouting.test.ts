@@ -393,6 +393,10 @@ describe('GET /api/auth/google/me — group refresh with live group addresses', 
   });
 });
 
+// ── Real team group address ───────────────────────────────────────────────────
+
+const TEAM_GROUP = 'team@transitiontrails.org';
+
 // ── 19. Staff-priority rule ───────────────────────────────────────────────────
 
 describe('Staff-priority rule — staff group wins over homebase group', () => {
@@ -421,5 +425,96 @@ describe('Staff-priority rule — staff group wins over homebase group', () => {
     const meRes = await agent.get('/api/auth/google/me');
     expect(meRes.body.authenticated).toBe(true);
     expect(meRes.body.audience).toBeNull();
+  });
+});
+
+// ── 20–23. Superadmin who is also in team@ group — Team Homebase access ───────
+//
+// A superadmin has audience:null (isKnownStaff short-circuits deriveAudience),
+// but the `groups` array is always stored in the session and returned by /me.
+// The frontend /homebase route guard and the "Back to Homebase" card both check
+//   user?.audience === 'team' || user?.groups?.includes('team@transitiontrails.org')
+// so the session must preserve the team group membership even for superadmins.
+
+describe('Superadmin in team@ group — /homebase access without signing out', () => {
+  const SUPERADMIN_EMAIL = 'super@transitiontrails.org';
+
+  beforeEach(() => {
+    process.env['GOOGLE_GROUP_TEAM']            = TEAM_GROUP;
+    process.env['TRAIL_OS_SUPERADMIN_EMAILS']   = SUPERADMIN_EMAIL;
+  });
+
+  it('20. deriveAudience returns "team" for a team@ group member', async () => {
+    const { deriveAudience } = await import('../routes/googleSignIn.js');
+    expect(deriveAudience([TEAM_GROUP], 'user@transitiontrails.org')).toBe('team');
+  });
+
+  it('21. full sign-in: superadmin in team group → /me returns audience:null and groups includes team@', async () => {
+    stubTokenExchange({
+      sub: 'uid-super-team', email: SUPERADMIN_EMAIL,
+      name: 'Super Admin', hd: 'transitiontrails.org', email_verified: true,
+    });
+    // Superadmin is also a member of the team group
+    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+
+    const agent = request.agent(app);
+    const loginRes = await agent.get('/api/auth/google/login');
+    const state = new URL(loginRes.headers['location'] as string).searchParams.get('state') ?? '';
+    const callbackRes = await agent.get(`/api/auth/google/callback?code=abc&state=${state}`);
+    // Staff users are redirected to / (not /homebase) — superadmin must navigate there manually
+    expect(callbackRes.headers['location']).toBe('/');
+
+    const meRes = await agent.get('/api/auth/google/me');
+    expect(meRes.status).toBe(200);
+    expect(meRes.body.authenticated).toBe(true);
+    // Staff priority wins — audience must be null
+    expect(meRes.body.audience).toBeNull();
+    // But the group membership is preserved so the frontend can detect team membership
+    expect(meRes.body.groups).toContain(TEAM_GROUP);
+  });
+
+  it('22. full sign-in: superadmin in team group → /homebase status session has no homebase audience', async () => {
+    stubTokenExchange({
+      sub: 'uid-super-team-2', email: SUPERADMIN_EMAIL,
+      name: 'Super Admin', hd: 'transitiontrails.org', email_verified: true,
+    });
+    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+
+    const agent = request.agent(app);
+    const loginRes = await agent.get('/api/auth/google/login');
+    const state = new URL(loginRes.headers['location'] as string).searchParams.get('state') ?? '';
+    await agent.get(`/api/auth/google/callback?code=abc&state=${state}`);
+
+    // homebase/status reflects audience:null (staff wins), confirming the user
+    // must rely on groups[] to access /homebase, not the audience field
+    const statusRes = await agent.get('/api/auth/homebase/status');
+    expect(statusRes.status).toBe(200);
+    expect(statusRes.body.isSignedIn).toBe(true);
+    expect(statusRes.body.audience).toBeNull();
+  });
+
+  it('23. stale superadmin+team session → groups refreshed → /me still returns audience:null with team@ in groups', async () => {
+    // Pre-populate a stale session for the superadmin who is in the team group
+    Object.assign(mockSession, {
+      googleEmail:        SUPERADMIN_EMAIL,
+      googleName:         'Super Admin',
+      googleSub:          'uid-super-stale',
+      googleGroups:       [TEAM_GROUP],
+      googleGroupsExpiry: 0, // force a refresh
+      googleTier:         'superadmin',
+      // audience is absent (staff user — stored as undefined)
+    });
+    // Groups re-fetch still returns the team group
+    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+
+    const res = await request(app).get('/api/auth/google/me');
+    expect(res.status).toBe(200);
+    expect(res.body.authenticated).toBe(true);
+    // Audience remains null after refresh — superadmin identity is preserved
+    expect(res.body.audience).toBeNull();
+    // groups[] still carries team@ so the frontend /homebase guard and
+    // "Back to Homebase" card (isTeam check) both evaluate to true
+    expect(res.body.groups).toContain(TEAM_GROUP);
+    expect(mockGetGroups).toHaveBeenCalledWith(SUPERADMIN_EMAIL);
   });
 });
