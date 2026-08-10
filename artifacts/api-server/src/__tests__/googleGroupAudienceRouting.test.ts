@@ -63,7 +63,12 @@ vi.mock('express-session', () => ({
     req['session'] = new Proxy(mockSession, {
       get(target, prop) {
         if (prop === 'save')    return (cb?: () => void) => cb?.();
-        if (prop === 'destroy') return (cb?: () => void) => cb?.();
+        if (prop === 'destroy') return (cb?: () => void) => {
+            // Mirror real session.destroy: wipe all session data so the next
+            // request sees an empty session (unauthenticated).
+            for (const k of Object.keys(mockSession)) delete mockSession[k];
+            cb?.();
+          };
         return target[prop as string];
       },
       set(target, prop, value) { target[prop as string] = value; return true; },
@@ -491,6 +496,56 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
     expect(statusRes.status).toBe(200);
     expect(statusRes.body.isSignedIn).toBe(true);
     expect(statusRes.body.audience).toBeNull();
+  });
+
+  // ── 24–25. Sign-out path for a superadmin who visited /homebase ──────────────
+  //
+  // A superadmin with audience:null + team group membership can sign out from
+  // TeamHomebase via POST /auth/google/sign-out.  After that:
+  //   24. The sign-out call must succeed (200, ok:true).
+  //       A subsequent /auth/homebase/status must return isSignedIn:false so the
+  //       frontend knows the session is gone and shows the sign-in page — not a
+  //       staff-only shell that would strand the user.
+  //   25. A cold unauthenticated GET /auth/homebase/status (no session at all)
+  //       must return 200 isSignedIn:false, never 500 or a blank response.
+
+  it('24. superadmin with team group signs out → sign-out returns ok:true, status returns isSignedIn:false', async () => {
+    // Establish a signed-in superadmin session (audience:null, team group present)
+    stubTokenExchange({
+      sub: 'uid-super-signout', email: SUPERADMIN_EMAIL,
+      name: 'Super Admin', hd: 'transitiontrails.org', email_verified: true,
+    });
+    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+
+    const agent = request.agent(app);
+    const loginRes = await agent.get('/api/auth/google/login');
+    const state = new URL(loginRes.headers['location'] as string).searchParams.get('state') ?? '';
+    await agent.get(`/api/auth/google/callback?code=abc&state=${state}`);
+
+    // Confirm they are signed in as staff (audience:null) with team group
+    const meBefore = await agent.get('/api/auth/google/me');
+    expect(meBefore.body.authenticated).toBe(true);
+    expect(meBefore.body.audience).toBeNull();
+    expect(meBefore.body.groups).toContain(TEAM_GROUP);
+
+    // Sign out
+    const signOutRes = await agent.post('/api/auth/google/sign-out');
+    expect(signOutRes.status).toBe(200);
+    expect(signOutRes.body.ok).toBe(true);
+
+    // Homebase status must reflect the cleared session — isSignedIn:false
+    const statusAfter = await agent.get('/api/auth/homebase/status');
+    expect(statusAfter.status).toBe(200);
+    expect(statusAfter.body.isSignedIn).toBe(false);
+  });
+
+  it('25. unauthenticated GET /auth/homebase/status (no session) returns 200 isSignedIn:false', async () => {
+    // No session established — cold request
+    clearSession();
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(false);
+    expect(res.body.audience).toBeNull();
   });
 
   it('23. stale superadmin+team session → groups refreshed → /me still returns audience:null with team@ in groups', async () => {
