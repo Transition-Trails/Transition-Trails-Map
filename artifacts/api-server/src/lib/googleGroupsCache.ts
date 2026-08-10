@@ -59,6 +59,20 @@ function getGroupsToProbe(): string[] {
 /** @deprecated Use string — staff groups are now configurable via ENV vars. */
 export type TrailOsGroup = string;
 
+/**
+ * The result of a group-membership lookup.
+ *
+ * `isReliable: true`  — the Directory API responded; `groups` is the
+ *                        authoritative set (empty means confirmed non-member).
+ * `isReliable: false` — the lookup could not be completed (no admin token or
+ *                        a network error); `groups` is stale-cache fallback or
+ *                        an empty array.  Callers MUST NOT treat an empty
+ *                        `groups` as confirmed removal when isReliable is false.
+ */
+export type GroupLookupResult = {
+  groups:     string[];
+  isReliable: boolean;
+};
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 interface CacheEntry {
@@ -103,31 +117,26 @@ async function isMemberOf(
  * Return the set of Trail OS groups the given email belongs to.
  *
  * Cache policy
- *  - Hit (in cache, not expired)   → return cached value immediately
- *  - Miss / expired                → fetch from Directory API, cache result
- *  - Failure (no token or throw)   → return stale value if available; do NOT update cache
+ *  - Hit (in cache, not expired)   → return cached value, isReliable: true
+ *  - Miss / expired                → fetch from Directory API, cache result, isReliable: true
+ *  - Failure (no token or throw)   → return stale value if available, isReliable: false
+ *                                    (do NOT update cache; do NOT treat as confirmed removal)
  */
-export async function getGroupsForUser(email: string): Promise<string[]> {
+export async function getGroupsForUser(email: string): Promise<GroupLookupResult> {
   const key = email.toLowerCase();
   const now = Date.now();
 
   const hit = _cache.get(key);
   if (hit && hit.expires > now) {
-    return hit.groups;
+    return { groups: hit.groups, isReliable: true };
   }
 
   const accessToken = await getAdminAccessToken();
   if (!accessToken) {
     logger.warn({ email }, 'googleGroupsCache: no admin access token — lookup skipped, result not cached');
-    if (hit) {
-      // Serve the stale cached result so a temporary token-acquisition hiccup
-      // doesn't incorrectly revoke the user's group membership.
-      logger.warn({ email }, 'googleGroupsCache: serving stale groups (no access token)');
-      return hit.groups;
-    }
-    // No stale data and no token — propagate so callers like /me can fall back
-    // to session data rather than signing the user out.
-    throw new Error('googleGroupsCache: no admin access token and no stale cache for ' + email);
+    // Return stale data if we have it; mark as unreliable so callers don't
+    // sign out a user whose membership simply could not be verified.
+    return { groups: hit?.groups ?? [], isReliable: false };
   }
 
   try {
@@ -145,17 +154,9 @@ export async function getGroupsForUser(email: string): Promise<string[]> {
 
     // Cache both member results AND empty results — non-membership should be cached too
     _cache.set(key, { groups, expires: now + TTL_MS });
-    return groups;
+    return { groups, isReliable: true };
   } catch (err) {
     logger.error({ email, err }, 'googleGroupsCache: lookup threw — result not cached');
-    if (hit) {
-      // Serve the stale cached result so a temporary API hiccup doesn't
-      // incorrectly revoke the user's group membership.
-      logger.warn({ email }, 'googleGroupsCache: serving stale groups after transient failure');
-      return hit.groups;
-    }
-    // No stale data available — propagate so the caller can decide how to
-    // handle the failure (e.g. /me serves from session rather than signing out).
-    throw err;
+    return { groups: hit?.groups ?? [], isReliable: false };
   }
 }

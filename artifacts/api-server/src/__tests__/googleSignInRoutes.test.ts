@@ -182,7 +182,7 @@ describe('GET /api/auth/google/callback', () => {
       hd:             'transitiontrails.org',
       email_verified: true,
     });
-    mockGetGroups.mockResolvedValue([]); // no groups
+    mockGetGroups.mockResolvedValue({ groups: [], isReliable: true }); // no groups
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -203,7 +203,7 @@ describe('GET /api/auth/google/callback', () => {
       hd:             'transitiontrails.org',
       email_verified: true,
     });
-    mockGetGroups.mockResolvedValue(['trailosadmin@transitiontrails.org']);
+    mockGetGroups.mockResolvedValue({ groups: ['trailosadmin@transitiontrails.org'], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -243,7 +243,7 @@ describe('GET /api/auth/google/me', () => {
       hd:             'transitiontrails.org',
       email_verified: true,
     });
-    mockGetGroups.mockResolvedValue(['trailospennyadmin@transitiontrails.org']);
+    mockGetGroups.mockResolvedValue({ groups: ['trailospennyadmin@transitiontrails.org'], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -279,7 +279,7 @@ describe('GET /api/auth/google/me — GOOGLE_GROUP_TEAM propagation', () => {
       email_verified: true,
     });
     // User is ONLY in the team group (not any staff group)
-    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [TEAM_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -308,7 +308,7 @@ describe('GET /api/auth/google/me — GOOGLE_GROUP_TEAM propagation', () => {
       hd:             'transitiontrails.org',
       email_verified: true,
     });
-    mockGetGroups.mockResolvedValue(['trailosadmin@transitiontrails.org']);
+    mockGetGroups.mockResolvedValue({ groups: ['trailosadmin@transitiontrails.org'], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -330,7 +330,7 @@ describe('GET /api/auth/google/me — GOOGLE_GROUP_TEAM propagation', () => {
       hd:             'transitiontrails.org',
       email_verified: true,
     });
-    mockGetGroups.mockResolvedValue(['team@example.org']); // normalised by cache
+    mockGetGroups.mockResolvedValue({ groups: ['team@example.org'], isReliable: true }); // normalised by cache
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -362,7 +362,7 @@ describe('POST /api/auth/google/sign-out', () => {
       hd:             'transitiontrails.org',
       email_verified: true,
     });
-    mockGetGroups.mockResolvedValue(['trailosusers@transitiontrails.org']);
+    mockGetGroups.mockResolvedValue({ groups: ['trailosusers@transitiontrails.org'], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');

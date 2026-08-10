@@ -220,51 +220,61 @@ describe('deriveAudience with live group email addresses', () => {
 });
 
 // ── 8–11. GET /api/auth/homebase/status (reads googleAudience from session) ───
+//
+// Tests 26–30 (below) cover the stale-session refresh path added to homebase/status.
 
 describe('GET /api/auth/homebase/status with live group sessions', () => {
-  it('8. returns audience:"coach" when session contains coaches group audience', async () => {
+  it('8. returns audience:"coach" when session contains coaches group audience (TTL fresh — cached path)', async () => {
     Object.assign(mockSession, {
-      googleEmail:    'user@transitiontrails.org',
-      googleGroups:   [COACHES_GROUP],
-      googleAudience: 'coach',
+      googleEmail:        'user@transitiontrails.org',
+      googleGroups:       [COACHES_GROUP],
+      googleAudience:     'coach',
+      googleGroupsExpiry: Date.now() + 60_000, // TTL valid — no re-fetch
     });
     const res = await request(app).get('/api/auth/homebase/status');
     expect(res.status).toBe(200);
     expect(res.body.isSignedIn).toBe(true);
     expect(res.body.audience).toBe('coach');
+    expect(mockGetGroups).not.toHaveBeenCalled();
   });
 
-  it('9. returns audience:"volunteer" when session contains volunteer group audience', async () => {
+  it('9. returns audience:"volunteer" when session contains volunteer group audience (TTL fresh — cached path)', async () => {
     Object.assign(mockSession, {
-      googleEmail:    'user@transitiontrails.org',
-      googleGroups:   [VOLUNTEERS_GROUP],
-      googleAudience: 'volunteer',
+      googleEmail:        'user@transitiontrails.org',
+      googleGroups:       [VOLUNTEERS_GROUP],
+      googleAudience:     'volunteer',
+      googleGroupsExpiry: Date.now() + 60_000,
     });
     const res = await request(app).get('/api/auth/homebase/status');
     expect(res.status).toBe(200);
     expect(res.body.audience).toBe('volunteer');
+    expect(mockGetGroups).not.toHaveBeenCalled();
   });
 
-  it('10. returns audience:"learner" when session contains learners group audience', async () => {
+  it('10. returns audience:"learner" when session contains learners group audience (TTL fresh — cached path)', async () => {
     Object.assign(mockSession, {
-      googleEmail:    'user@transitiontrails.org',
-      googleGroups:   [LEARNERS_GROUP],
-      googleAudience: 'learner',
+      googleEmail:        'user@transitiontrails.org',
+      googleGroups:       [LEARNERS_GROUP],
+      googleAudience:     'learner',
+      googleGroupsExpiry: Date.now() + 60_000,
     });
     const res = await request(app).get('/api/auth/homebase/status');
     expect(res.status).toBe(200);
     expect(res.body.audience).toBe('learner');
+    expect(mockGetGroups).not.toHaveBeenCalled();
   });
 
-  it('11. returns audience:null for a staff-only session (no homebase audience)', async () => {
+  it('11. returns audience:null for a staff-only session (no homebase audience, TTL fresh — cached path)', async () => {
     Object.assign(mockSession, {
-      googleEmail:  'staff@transitiontrails.org',
-      googleGroups: ['trailosadmin@transitiontrails.org'],
+      googleEmail:        'staff@transitiontrails.org',
+      googleGroups:       ['trailosadmin@transitiontrails.org'],
+      googleGroupsExpiry: Date.now() + 60_000,
       // googleAudience intentionally absent — staff users have no homebase audience
     });
     const res = await request(app).get('/api/auth/homebase/status');
     expect(res.status).toBe(200);
     expect(res.body.audience).toBeNull();
+    expect(mockGetGroups).not.toHaveBeenCalled();
   });
 });
 
@@ -276,7 +286,7 @@ describe('Full sign-in → /auth/homebase/status with live group addresses', () 
       sub: 'uid-coach-1', email: 'coach@transitiontrails.org',
       name: 'A Coach', hd: 'transitiontrails.org', email_verified: true,
     });
-    mockGetGroups.mockResolvedValue([COACHES_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [COACHES_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -294,7 +304,7 @@ describe('Full sign-in → /auth/homebase/status with live group addresses', () 
       sub: 'uid-vol-1', email: 'vol@transitiontrails.org',
       name: 'A Volunteer', hd: 'transitiontrails.org', email_verified: true,
     });
-    mockGetGroups.mockResolvedValue([VOLUNTEERS_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [VOLUNTEERS_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -310,7 +320,7 @@ describe('Full sign-in → /auth/homebase/status with live group addresses', () 
       sub: 'uid-lrn-1', email: 'learner@transitiontrails.org',
       name: 'A Learner', hd: 'transitiontrails.org', email_verified: true,
     });
-    mockGetGroups.mockResolvedValue([LEARNERS_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [LEARNERS_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -338,7 +348,7 @@ describe('GET /api/auth/google/me — group refresh with live group addresses', 
       googleTier:         'everyday',
       googleAudience:     'coach',
     });
-    mockGetGroups.mockResolvedValue([COACHES_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [COACHES_GROUP], isReliable: true });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).toBe(200);
@@ -356,7 +366,7 @@ describe('GET /api/auth/google/me — group refresh with live group addresses', 
       googleGroupsExpiry: 0,
       googleAudience:     'volunteer',
     });
-    mockGetGroups.mockResolvedValue([VOLUNTEERS_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [VOLUNTEERS_GROUP], isReliable: true });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.body.authenticated).toBe(true);
@@ -372,7 +382,7 @@ describe('GET /api/auth/google/me — group refresh with live group addresses', 
       googleGroupsExpiry: 0,
       googleAudience:     'learner',
     });
-    mockGetGroups.mockResolvedValue([LEARNERS_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [LEARNERS_GROUP], isReliable: true });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.body.authenticated).toBe(true);
@@ -389,7 +399,7 @@ describe('GET /api/auth/google/me — group refresh with live group addresses', 
       googleAudience:     'coach',
     });
     // Groups re-fetch returns empty — user has been removed
-    mockGetGroups.mockResolvedValue([]);
+    mockGetGroups.mockResolvedValue({ groups: [], isReliable: true });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).toBe(200);
@@ -411,10 +421,7 @@ describe('Staff-priority rule — staff group wins over homebase group', () => {
       name: 'Staff Admin', hd: 'transitiontrails.org', email_verified: true,
     });
     // Simulate a user who belongs to both staff and homebase groups
-    mockGetGroups.mockResolvedValue([
-      'trailosadmin@transitiontrails.org',
-      COACHES_GROUP,
-    ]);
+    mockGetGroups.mockResolvedValue({ groups: ['trailosadmin@transitiontrails.org', COACHES_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -460,7 +467,7 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
       name: 'Super Admin', hd: 'transitiontrails.org', email_verified: true,
     });
     // Superadmin is also a member of the team group
-    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [TEAM_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -483,7 +490,7 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
       sub: 'uid-super-team-2', email: SUPERADMIN_EMAIL,
       name: 'Super Admin', hd: 'transitiontrails.org', email_verified: true,
     });
-    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [TEAM_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -515,7 +522,7 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
       sub: 'uid-super-signout', email: SUPERADMIN_EMAIL,
       name: 'Super Admin', hd: 'transitiontrails.org', email_verified: true,
     });
-    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [TEAM_GROUP], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -560,7 +567,7 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
       // audience is absent (staff user — stored as undefined)
     });
     // Groups re-fetch still returns the team group
-    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [TEAM_GROUP], isReliable: true });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).toBe(200);
@@ -574,13 +581,12 @@ describe('Superadmin in team@ group — /homebase access without signing out', (
   });
 });
 
-// ── 26–28. GET /api/auth/google/me — transient Google Groups API failure ─────────
+// ── 26–28. GET /api/auth/google/me — Groups API unavailable during refresh ────
 //
-// If getGroupsForUser throws (network error, quota exceeded, Google outage) during
-// a session refresh, /me must NOT return a 500.  The stale session data is still
-// valid proof of authentication, so the endpoint should serve it and let the user
-// continue working.  The expiry is extended slightly so a retry happens soon
-// without hammering the unavailable API.
+// When getGroupsForUser returns { isReliable: false } (no admin token, network
+// error, quota exceeded), /me must NOT sign the user out or return a 500.
+// The stale session data is still valid proof of authentication; the endpoint
+// serves it and leaves the TTL expired so the next request retries.
 
 describe('GET /api/auth/google/me — transient Google Groups API failure', () => {
   it('26. network error during refresh → 200 with stale coach audience (no 500)', async () => {
@@ -593,8 +599,8 @@ describe('GET /api/auth/google/me — transient Google Groups API failure', () =
       googleTier:         'everyday',
       googleAudience:     'coach',
     });
-    // Simulate a transient network failure
-    mockGetGroups.mockRejectedValue(new Error('Network error: ECONNREFUSED'));
+    // Simulate a transient network failure — isReliable:false, not a throw
+    mockGetGroups.mockResolvedValue({ groups: [], isReliable: false });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).toBe(200);
@@ -616,7 +622,7 @@ describe('GET /api/auth/google/me — transient Google Groups API failure', () =
       googleTier:         'everyday',
       googleAudience:     'learner',
     });
-    mockGetGroups.mockRejectedValue(new Error('Quota exceeded: rateLimitExceeded'));
+    mockGetGroups.mockResolvedValue({ groups: [], isReliable: false });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).toBe(200);
@@ -624,7 +630,7 @@ describe('GET /api/auth/google/me — transient Google Groups API failure', () =
     expect(res.body.audience).toBe('learner');
   });
 
-  it('28. API failure during refresh → response is never a 500', async () => {
+  it('28. API unavailable during refresh → response is never a 500', async () => {
     Object.assign(mockSession, {
       googleEmail:        'vol@transitiontrails.org',
       googleName:         'A Volunteer',
@@ -634,7 +640,7 @@ describe('GET /api/auth/google/me — transient Google Groups API failure', () =
       googleTier:         'everyday',
       googleAudience:     'volunteer',
     });
-    mockGetGroups.mockRejectedValue(new Error('Google API unavailable'));
+    mockGetGroups.mockResolvedValue({ groups: [], isReliable: false });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).not.toBe(500);
@@ -643,6 +649,113 @@ describe('GET /api/auth/google/me — transient Google Groups API failure', () =
   });
 });
 
+// ── 29–33. GET /api/auth/homebase/status — stale-session refresh path ─────────
+//
+// homebase/status re-fetches groups when googleGroupsExpiry <= now, exactly
+// as /me does.  A group change (e.g. a user removed from the coaches group)
+// therefore takes effect at the next homebase/status poll, without requiring
+// a sign-out or a separate /me call.
+
+describe('GET /api/auth/homebase/status — stale session refresh', () => {
+  it('29. stale coach session → groups refreshed → audience:"coach" still returned when group is unchanged', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'coach@transitiontrails.org',
+      googleName:         'A Coach',
+      googleSub:          'uid-c-stale',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0, // force refresh
+      googleAudience:     'coach',
+    });
+    mockGetGroups.mockResolvedValue({ groups: [COACHES_GROUP], isReliable: true });
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(true);
+    expect(res.body.audience).toBe('coach');
+    expect(mockGetGroups).toHaveBeenCalledWith('coach@transitiontrails.org');
+  });
+
+  it('30. stale session where user was moved from coaches to learners group → audience:"learner"', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'moved@transitiontrails.org',
+      googleName:         'Moved User',
+      googleSub:          'uid-moved',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0, // force refresh
+      googleAudience:     'coach', // stale — user has since moved to learners
+    });
+    // Groups re-fetch reflects the change
+    mockGetGroups.mockResolvedValue({ groups: [LEARNERS_GROUP], isReliable: true });
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(true);
+    // Stale 'coach' audience must NOT be returned — fresh derivation gives 'learner'
+    expect(res.body.audience).toBe('learner');
+    expect(mockGetGroups).toHaveBeenCalledWith('moved@transitiontrails.org');
+  });
+
+  it('31. stale session where user has been removed from all homebase groups → session destroyed, isSignedIn:false', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'removed@transitiontrails.org',
+      googleName:         'Removed User',
+      googleSub:          'uid-removed',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: 0, // force refresh
+      googleAudience:     'coach',
+    });
+    // Groups re-fetch returns empty with isReliable:true — confirmed removal
+    mockGetGroups.mockResolvedValue({ groups: [], isReliable: true });
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(false);
+    expect(res.body.reason).toBe('no_groups');
+  });
+
+  it('32. stale session with still-fresh TTL → groups are NOT re-fetched (cache is served)', async () => {
+    Object.assign(mockSession, {
+      googleEmail:        'cached@transitiontrails.org',
+      googleName:         'Cached User',
+      googleSub:          'uid-cached',
+      googleGroups:       [COACHES_GROUP],
+      googleGroupsExpiry: Date.now() + 60_000, // TTL still valid
+      googleAudience:     'coach',
+    });
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    expect(res.body.isSignedIn).toBe(true);
+    expect(res.body.audience).toBe('coach');
+    // No re-fetch — cache is still valid
+    expect(mockGetGroups).not.toHaveBeenCalled();
+  });
+
+  it('33. stale session where Groups API is unavailable (no token / network down) → stale audience served, user NOT signed out', async () => {
+    // This test exercises the production outage path: a server restart empties
+    // the in-memory groups cache, then the admin token is missing (or the
+    // Directory API is unreachable).  getGroupsForUser returns
+    // { groups: [], isReliable: false } — an empty groups list that does NOT
+    // mean the user has been removed.  homebase/status must preserve the session.
+    Object.assign(mockSession, {
+      googleEmail:        'apierr@transitiontrails.org',
+      googleName:         'API Error User',
+      googleSub:          'uid-apierr',
+      googleGroups:       [VOLUNTEERS_GROUP],
+      googleGroupsExpiry: 0, // force refresh
+      googleAudience:     'volunteer',
+    });
+    // Simulate no-token / API-down: reliable=false, groups=[] (no stale cache)
+    mockGetGroups.mockResolvedValue({ groups: [], isReliable: false });
+
+    const res = await request(app).get('/api/auth/homebase/status');
+    expect(res.status).toBe(200);
+    // User must NOT be signed out — isReliable:false means "couldn't check",
+    // not "confirmed non-member".  Stale session audience is served as fallback.
+    expect(res.body.isSignedIn).toBe(true);
+    expect(res.body.audience).toBe('volunteer');
+  });
+});
 // ── 24–25. Hard-refresh / cold-start: /homebase route guard after session expiry ──
 //
 // When a user hard-refreshes the browser (or starts a cold session), the frontend
@@ -674,7 +787,7 @@ describe('Hard-refresh / cold-start — /homebase route guard after session expi
       googleAudience:     'team',
     });
     // Groups re-fetch confirms the user is still in the team group
-    mockGetGroups.mockResolvedValue([TEAM_GROUP]);
+    mockGetGroups.mockResolvedValue({ groups: [TEAM_GROUP], isReliable: true });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).toBe(200);
@@ -707,7 +820,7 @@ describe('Hard-refresh / cold-start — /homebase route guard after session expi
       // audience intentionally absent — staff user
     });
     // Groups re-fetch confirms no team group membership
-    mockGetGroups.mockResolvedValue(['trailosadmin@transitiontrails.org']);
+    mockGetGroups.mockResolvedValue({ groups: ['trailosadmin@transitiontrails.org'], isReliable: true });
 
     const res = await request(app).get('/api/auth/google/me');
     expect(res.status).toBe(200);

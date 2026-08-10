@@ -141,8 +141,11 @@ export function deriveAudience(
  * should receive audience='team' and land on TeamHomebase, not the staff Mission Control.
  * requireAuth.isStaff (used for API route authorization) separately includes the team
  * group so they can access Mission Control routes once they navigate there via the drawer.
+ *
+ * Exported so homebase.ts can apply the same staff-priority rule when re-deriving audience
+ * on a stale session (expired googleGroupsExpiry TTL).
  */
-function isKnownStaff(groups: string[], email: string): boolean {
+export function isKnownStaff(groups: string[], email: string): boolean {
   const superadmins = (process.env['TRAIL_OS_SUPERADMIN_EMAILS'] ?? '')
     .split(',')
     .map(e => e.trim().toLowerCase())
@@ -297,11 +300,11 @@ router.get('/auth/google/callback', async (req, res) => {
     // Group membership check — accept staff groups OR homebase groups.
     // Staff takes priority: if the user is in any staff group, they go to the
     // admin screens regardless of homebase group membership.
-      const groups   = await getGroupsForUser(email);
-      const hasStaff = isKnownStaff(groups, email);
-      const tier = deriveGroupTier(groups, email);
+    const { groups } = await getGroupsForUser(email.toLowerCase());
+    const hasStaff    = isKnownStaff(groups, email);
+    const tier        = deriveGroupTier(groups, email);
     // Only derive homebase audience for non-staff users
-      const audience = hasStaff ? null : deriveAudience(groups, email);
+    const audience    = hasStaff ? null : deriveAudience(groups, email);
     const hasHomebase = audience !== null;
 
     if (!hasStaff && !hasHomebase) {
@@ -349,15 +352,22 @@ router.get('/auth/google/me', async (req, res) => {
 
   // Groups are refreshed after the cache TTL expires
   if (!req.session.googleGroupsExpiry || req.session.googleGroupsExpiry <= now) {
-    try {
-      const groups   = await getGroupsForUser(email);
+    const { groups, isReliable } = await getGroupsForUser(email);
+
+    if (!isReliable) {
+      // The Directory API was unavailable (no token or network error).
+      // Do NOT sign the user out — an empty groups list here means "couldn't
+      // check", not "confirmed non-member". Leave the TTL expired so the
+      // next request retries.
+      logger.warn({ email }, 'googleSignIn /me: group refresh unreliable — serving cached session');
+    } else {
       const hasStaff = isKnownStaff(groups, email);
       // Staff takes priority: if the user is in any staff group, audience is
       // always null — matching callback semantics exactly.
       const audience = hasStaff ? null : deriveAudience(groups, email);
 
       if (!hasStaff && !audience) {
-        // User has been removed from all known groups — sign them out immediately
+        // API responded and confirmed the user is in no known group — end session.
         logger.warn({ email }, 'googleSignIn /me: user is no longer in any known group — ending session');
         req.session.destroy(() => {});
         res.json({ authenticated: false, reason: 'no_groups' });
@@ -370,17 +380,6 @@ router.get('/auth/google/me', async (req, res) => {
       req.session.googleTier         = tier;
       req.session.googleAudience     = audience ?? undefined;
       // Fire-and-forget save — we'll already return the fresh data below
-      req.session.save(() => {});
-    } catch (groupsErr) {
-      // Transient Google Groups API failure (network error, quota exceeded, outage).
-      // Serve the stale session rather than returning a 500 — the user is still
-      // authenticated and should not be locked out due to a temporary API hiccup.
-      // Extend the expiry by 60 s so we retry soon without hammering the API.
-      logger.warn(
-        { err: groupsErr, email },
-        'googleSignIn /me: groups re-fetch failed — serving stale session data',
-      );
-      req.session.googleGroupsExpiry = now + 60 * 1000;
       req.session.save(() => {});
     }
   }

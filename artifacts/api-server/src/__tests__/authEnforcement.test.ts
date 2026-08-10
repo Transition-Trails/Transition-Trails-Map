@@ -346,7 +346,7 @@ describe('HTTP enforcement — authenticated staff on admin-only route returns 4
         }),
       }),
     });
-    mockGetGroups.mockResolvedValue([GROUPS.everyday]);
+    mockGetGroups.mockResolvedValue({ groups: [GROUPS.everyday], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -375,7 +375,7 @@ describe('HTTP enforcement — authenticated staff on admin-only route returns 4
         }),
       }),
     });
-    mockGetGroups.mockResolvedValue([GROUPS.power]);
+    mockGetGroups.mockResolvedValue({ groups: [GROUPS.power], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');
@@ -412,7 +412,7 @@ describe('HTTP enforcement — two-group case', () => {
         }),
       }),
     });
-    mockGetGroups.mockResolvedValue([GROUPS.admin, GROUPS.power]);
+    mockGetGroups.mockResolvedValue({ groups: [GROUPS.admin, GROUPS.power], isReliable: true });
 
     const agent = request.agent(app);
     const loginRes = await agent.get('/api/auth/google/login');

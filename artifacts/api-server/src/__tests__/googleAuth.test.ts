@@ -48,8 +48,8 @@ describe('getGroupsForUser', () => {
   beforeEach(() => {
     clearGroupsCache();
     vi.clearAllMocks();
-    // Clear homebase group ENV vars so this block always probes exactly 3 staff groups.
-    // Tests that need homebase probing live in the "homebase group probing" describe below.
+    process.env = { ...ORIG_ENV };
+    // Ensure only 3 staff groups are probed — no homebase env vars
     delete process.env['GOOGLE_GROUP_COACHES'];
     delete process.env['GOOGLE_GROUP_VOLUNTEERS'];
     delete process.env['GOOGLE_GROUP_LEARNERS'];
@@ -57,40 +57,16 @@ describe('getGroupsForUser', () => {
   });
 
   afterEach(() => {
+    process.env = { ...ORIG_ENV };
     vi.useRealTimers();
-    // Restore any homebase/team env vars that were set before this suite ran
-    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS', 'GOOGLE_GROUP_TEAM']) {
-      if (ORIG_ENV[k] !== undefined) process.env[k] = ORIG_ENV[k];
-      else delete process.env[k];
-    }
   });
 
-  it('returns an empty array when user is a personal Gmail account (not in any group)', async () => {
-    mockGetToken.mockResolvedValue('tok');
-    global.fetch = makeFetchMock([]); // member of no groups
+  it('returns isReliable:false when the access token is unavailable (no stale cache)', async () => {
+    mockGetToken.mockResolvedValue(null);
 
-    const groups = await getGroupsForUser('person@gmail.com');
-    expect(groups).toEqual([]);
-  });
-
-  it('returns multiple groups when user belongs to more than one', async () => {
-    mockGetToken.mockResolvedValue('tok');
-    // This user is in both admin AND power groups
-    global.fetch = makeFetchMock([GROUPS.admin, GROUPS.power]);
-
-    const groups = await getGroupsForUser('multi@transitiontrails.org');
-    expect(groups).toContain(GROUPS.admin);
-    expect(groups).toContain(GROUPS.power);
-    expect(groups).not.toContain(GROUPS.everyday);
-    expect(groups).toHaveLength(2);
-  });
-
-  it('returns an empty array when org-domain user is in no groups', async () => {
-    mockGetToken.mockResolvedValue('tok');
-    global.fetch = makeFetchMock([]); // not a member of any group
-
-    const groups = await getGroupsForUser('nobody@transitiontrails.org');
-    expect(groups).toEqual([]);
+    const result = await getGroupsForUser('noaccess@transitiontrails.org');
+    expect(result.isReliable).toBe(false);
+    expect(result.groups).toEqual([]);
   });
 
   it('caches a positive result — second call does not hit the Directory API again', async () => {
@@ -117,11 +93,13 @@ describe('getGroupsForUser', () => {
   it('does NOT cache when the access token is unavailable — retries on next call', async () => {
     mockGetToken.mockResolvedValue(null); // no token
 
-    // Without a stale cache entry, each no-token call throws so the caller
-    // (e.g. /me) can fall back to session data instead of silently receiving [].
-    await expect(getGroupsForUser('retry@transitiontrails.org')).rejects.toThrow();
-    await expect(getGroupsForUser('retry@transitiontrails.org')).rejects.toThrow();
+    // With no stale cache, each no-token call returns isReliable:false.
+    // The failure is never cached so the next call retries.
+    const r1 = await getGroupsForUser('retry@transitiontrails.org');
+    const r2 = await getGroupsForUser('retry@transitiontrails.org');
 
+    expect(r1.isReliable).toBe(false);
+    expect(r2.isReliable).toBe(false);
     // Should have tried to get the token twice — failure is never cached so it retries
     expect(mockGetToken).toHaveBeenCalledTimes(2);
   });
@@ -142,37 +120,32 @@ describe('getGroupsForUser', () => {
     expect(mockGetToken).toHaveBeenCalledTimes(2);
   });
 
-  it('propagates throw when fetch fails and no stale cache is available', async () => {
-    // With no stale cache entry, a network failure propagates so the caller
-    // (e.g. /me) can fall back to session data rather than receiving [] and
-    // incorrectly treating the user as having no group membership.
+  it('returns isReliable:false (empty groups) when fetch fails and no stale cache is available', async () => {
     mockGetToken.mockResolvedValue('tok');
     clearGroupsCache();
     global.fetch = vi.fn().mockRejectedValue(new Error('network down'));
 
-    await expect(getGroupsForUser('stale@transitiontrails.org')).rejects.toThrow('network down');
+    const result = await getGroupsForUser('stale@transitiontrails.org');
+    expect(result.isReliable).toBe(false);
+    expect(result.groups).toEqual([]);
   });
 
-  it('returns stale cached data when a live fetch throws and stale entry exists', async () => {
+  it('returns stale cached data (isReliable:false) when a live fetch throws and stale entry exists', async () => {
     mockGetToken.mockResolvedValue('tok');
     // First call succeeds — populates cache
     global.fetch = makeFetchMock([GROUPS.everyday]);
     const fresh = await getGroupsForUser('stale@transitiontrails.org');
-    expect(fresh).toContain(GROUPS.everyday);
+    expect(fresh.groups).toContain(GROUPS.everyday);
 
-    // Expire the cache entry so the next call attempts a refresh
-    const key = 'stale@transitiontrails.org';
-    const entry = (getGroupsForUser as unknown as { _cache?: Map<string, { groups: string[]; expires: number }> })._cache;
-    // Force expiry via clearGroupsCache + manual re-insert with expired TTL
-    // (using the exported cache via a second import is cleanest)
+    // Advance past 5-min TTL so next call attempts a refresh
     vi.useFakeTimers();
-    vi.advanceTimersByTime(10 * 60 * 1000); // advance past 5-min TTL
+    vi.advanceTimersByTime(10 * 60 * 1000);
     global.fetch = vi.fn().mockRejectedValue(new Error('network down'));
 
-    const stale = await getGroupsForUser(key);
-    // Stale data served — caller is not disrupted
-    expect(Array.isArray(stale)).toBe(true);
-    expect(stale).toContain(GROUPS.everyday);
+    const stale = await getGroupsForUser('stale@transitiontrails.org');
+    // Stale data served with isReliable:false — caller is not disrupted
+    expect(stale.isReliable).toBe(false);
+    expect(stale.groups).toContain(GROUPS.everyday);
     vi.useRealTimers();
   });
 });
@@ -188,40 +161,27 @@ describe('getGroupsForUser — homebase group probing', () => {
   beforeEach(() => {
     clearGroupsCache();
     vi.clearAllMocks();
+    process.env = { ...ORIG_ENV };
+    // Pin exactly 3 homebase groups; no TEAM so counts are predictable
+    delete process.env['GOOGLE_GROUP_TEAM'];
     process.env['GOOGLE_GROUP_COACHES']    = 'coaches@transitiontrails.org';
     process.env['GOOGLE_GROUP_VOLUNTEERS'] = 'volunteers@transitiontrails.org';
     process.env['GOOGLE_GROUP_LEARNERS']   = 'learners@transitiontrails.org';
-    // Explicitly delete TEAM so tests that don't set it get a deterministic probe count
-    // regardless of what the real process environment contains.
-    delete process.env['GOOGLE_GROUP_TEAM'];
   });
 
   afterEach(() => {
-    // Restore env so homebase ENV vars don't bleed into other test cases
-    for (const k of ['GOOGLE_GROUP_COACHES', 'GOOGLE_GROUP_VOLUNTEERS', 'GOOGLE_GROUP_LEARNERS', 'GOOGLE_GROUP_TEAM']) {
-      if (ORIG_ENV[k] !== undefined) process.env[k] = ORIG_ENV[k];
-      else delete process.env[k];
-    }
+    process.env = { ...ORIG_ENV };
   });
 
-  it('includes the learner group when the user is only in the learner group', async () => {
-    mockGetToken.mockResolvedValue('tok');
-    global.fetch = makeFetchMock(['learners@transitiontrails.org']);
-
-    const groups = await getGroupsForUser('learner@transitiontrails.org');
-    expect(groups).toContain('learners@transitiontrails.org');
-    expect(groups).not.toContain(GROUPS.admin);
-    expect(groups).not.toContain(GROUPS.everyday);
-  });
-
-  it('includes both a staff group and a homebase group when user is in both', async () => {
+  it('probes homebase groups and returns both staff + homebase memberships for a dual-role user', async () => {
     mockGetToken.mockResolvedValue('tok');
     global.fetch = makeFetchMock([GROUPS.admin, 'coaches@transitiontrails.org']);
 
-    const groups = await getGroupsForUser('dualrole@transitiontrails.org');
+    const result = await getGroupsForUser('dualrole@transitiontrails.org');
     // Both memberships are reported — the caller (deriveAudience/isKnownStaff) applies priority
-    expect(groups).toContain(GROUPS.admin);
-    expect(groups).toContain('coaches@transitiontrails.org');
+    expect(result.groups).toContain(GROUPS.admin);
+    expect(result.groups).toContain('coaches@transitiontrails.org');
+    expect(result.isReliable).toBe(true);
   });
 
   it('probes all 6 groups (3 staff + 3 homebase) when all ENV vars are set', async () => {

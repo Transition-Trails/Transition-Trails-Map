@@ -19,6 +19,8 @@ import { timeLogsTable, volunteerProfilesTable } from "@workspace/db/schema";
 import { desc, eq, gte, and } from "drizzle-orm";
 import { requireHomebaseAuth } from "../middlewares/requireAuth";
 import { logger } from "../lib/logger";
+import { getGroupsForUser } from "../lib/googleGroupsCache";
+import { deriveAudience, isKnownStaff } from "./googleSignIn";
 
 const router = Router();
 
@@ -28,15 +30,50 @@ const router = Router();
 // (returns { isSignedIn: false }) — used by the HomebaseRoute guard on the
 // frontend to decide which shell to render.
 
-router.get("/auth/homebase/status", (req, res) => {
-  const email    = req.session.googleEmail;
-  const audience = req.session.googleAudience ?? null;
+router.get("/auth/homebase/status", async (req, res) => {
+  const email = req.session.googleEmail;
 
   if (!email) {
     // No session — unauthenticated
     res.json({ isSignedIn: false, audience: null });
     return;
   }
+
+  const now = Date.now();
+
+  // If the group cache has expired, re-fetch groups and re-derive the audience
+  // so a group change (e.g. a user removed from the coaches group) is reflected
+  // without requiring a sign-out.  This mirrors the refresh logic in /me.
+  if (!req.session.googleGroupsExpiry || req.session.googleGroupsExpiry <= now) {
+    const { groups, isReliable } = await getGroupsForUser(email);
+
+    if (!isReliable) {
+      // The Directory API was unavailable (no token or network error).
+      // Do NOT sign the user out — an empty groups list here means "couldn't
+      // check", not "confirmed non-member". Leave the TTL expired so the
+      // next request retries.
+      logger.warn({ email }, "homebase/status: group refresh unreliable — serving cached audience");
+    } else {
+      const hasStaff = isKnownStaff(groups, email);
+      const audience = hasStaff ? null : deriveAudience(groups, email);
+
+      if (!hasStaff && !audience) {
+        // API responded and confirmed the user is in no known group — end session.
+        logger.warn({ email }, "homebase/status: user is no longer in any known group — ending session");
+        req.session.destroy(() => {});
+        res.json({ isSignedIn: false, audience: null, reason: "no_groups" });
+        return;
+      }
+
+      req.session.googleGroups       = groups;
+      req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
+      req.session.googleAudience     = audience ?? undefined;
+      // Fire-and-forget save — we return the fresh data immediately below
+      req.session.save(() => {});
+    }
+  }
+
+  const audience = req.session.googleAudience ?? null;
 
   // Authenticated — could be staff (audience:null) or homebase (audience set)
   res.json({
